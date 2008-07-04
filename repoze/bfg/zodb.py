@@ -28,6 +28,8 @@ class ZODBGetitemPolicy:
             element = path.pop(0)
             try:
                 ob = ob[element]
+            except AttributeError, what:
+                raise AttributeError(str(what[0]) + ' (element: '+element+')')
             except KeyError:
                 if path:
                     name = path.pop(0)
