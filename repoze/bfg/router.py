@@ -2,12 +2,14 @@ from zope.component import getAdapter
 from repoze.bfg.interfaces import IWSGIApplication
 
 class Router:
-    def __init__(self, app, policy):
+    def __init__(self, app, root_finder, policy):
         self.app = app
+        self.root_finder = root_finder
         self.policy = policy
 
     def __call__(self, environ, start_response):
-        context, name, subpath = self.policy(environ)
+        root = self.root_finder(environ)
+        context, name, subpath = self.policy(root, environ)
         app = getAdapter(context, IWSGIApplication, name)
         environ['repoze.bfg.context'] = context
         environ['repoze.bfg.subpath'] = subpath

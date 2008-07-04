@@ -5,6 +5,6 @@ class IWSGIApplication(Interface):
         """ Represent a WSGI (PEP 333) application """
 
 class IPolicy(Interface):
-    def __call__(environ):
+    def __call__(root, environ):
         """ Return a tuple in the form (context, name, subpath) """
         
