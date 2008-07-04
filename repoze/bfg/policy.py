@@ -2,7 +2,8 @@ import urllib
 
 from zope.interface import implements
 
-from repoze.bfg.interfaces import IPolicy
+from repoze.bfg.interfaces import ITraversalPolicy
+from repoze.bfg.interfaces import ITraverser
 
 def split_path(path):
     if path.startswith('/'):
@@ -20,26 +21,27 @@ def split_path(path):
             clean.append(item)
     return clean
 
-class NaivePolicy:
-
-    implements(IPolicy)
+class NaiveTraversalPolicy:
+    implements(ITraversalPolicy)
 
     def __call__(self, environ, root):
         path = split_path(environ['PATH_INFO'])
         
         ob = root
         name = ''
+
         while path:
             element = pop(path)
-            try:
-                ob = ob[element]
-            except KeyError:
+            traverser = ITraverser(ob)
+            next = traverser(environ, element)
+            if next is None:
                 if path:
                     name = pop(path)
                 break
-            
+            ob = next
+
         return ob, name, path
-            
+
 def pop(path):
     return path.pop(0)
 

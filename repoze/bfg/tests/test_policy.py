@@ -1,5 +1,7 @@
 import unittest
 
+from zope.component.testing import PlacelessSetup
+
 class SplitPathTests(unittest.TestCase):
     def _getFUT(self):
         from repoze.bfg.policy import split_path
@@ -25,25 +27,35 @@ class SplitPathTests(unittest.TestCase):
         f = self._getFUT()
         self.assertEqual(f('/foo/space%20thing/bar'), ['foo', 'space thing',
                                                        'bar'])
-   
-class NaivePolicyTests(unittest.TestCase):
+
+class NaivePolicyTests(unittest.TestCase, PlacelessSetup):
+    def setUp(self):
+        PlacelessSetup.setUp(self)
+
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
+        
     def _getTargetClass(self):
-        from repoze.bfg.policy import NaivePolicy
-        return NaivePolicy
+        from repoze.bfg.policy import NaiveTraversalPolicy
+        return NaiveTraversalPolicy
 
     def _makeOne(self, *arg, **kw):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ITraverser
+        gsm.registerAdapter(DummyTraverser, (None,), ITraverser, '')
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
     def test_class_conforms_to_IPolicy(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IPolicy
-        verifyClass(IPolicy, self._getTargetClass())
+        from repoze.bfg.interfaces import ITraversalPolicy
+        verifyClass(ITraversalPolicy, self._getTargetClass())
 
     def test_instance_conforms_to_IPolicy(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IPolicy
-        verifyObject(IPolicy, self._makeOne())
+        from repoze.bfg.interfaces import ITraversalPolicy
+        verifyObject(ITraversalPolicy, self._makeOne())
 
     def test_call_nonkeyerror_raises(self):
         policy = self._makeOne()
@@ -92,3 +104,12 @@ class DummyContext:
             raise KeyError, name
         return self.next
     
+class DummyTraverser:
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self, environ, name):
+        try:
+            return self.context[name]
+        except KeyError:
+            return None
