@@ -38,13 +38,15 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         headerii = []
         def rootpolicy(environ):
             return None
-        def traversalpolicy(root, environ):
+        def traversalpolicy(environ, root):
             return DummyContext(), 'foo', []
+        def securitypolicy(environ, context, name):
+            return None
         def start_response(status, headers):
             statii[:] = [status]
             headerii[:] = [headers]
         environ = self._makeEnviron()
-        router = self._makeOne(rootpolicy, traversalpolicy)
+        router = self._makeOne(rootpolicy, traversalpolicy, securitypolicy)
         result = router(environ, start_response)
         headers = headerii[0]
         self.assertEqual(len(headers), 2)
@@ -52,17 +54,40 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(status, '404 Not Found')
         self.failUnless('http://localhost:8080' in result[0], result)
 
+    def test_call_securitypolicy_denies(self):
+        statii = []
+        headerii = []
+        def rootpolicy(environ):
+            return None
+        def traversalpolicy(environ, root):
+            return DummyContext(), 'foo', []
+        def securitypolicy(environ, context, name):
+            from webob.exc import HTTPUnauthorized
+            return HTTPUnauthorized()
+        def start_response(status, headers):
+            statii[:] = [status]
+            headerii[:] = [headers]
+        environ = self._makeEnviron()
+        router = self._makeOne(rootpolicy, traversalpolicy, securitypolicy)
+        result = router(environ, start_response)
+        headers = headerii[0]
+        self.assertEqual(len(headers), 2)
+        status = statii[0]
+        self.assertEqual(status, '401 Unauthorized')
+
     def test_call_app_registered_nonspecific_default_path(self):
         def rootpolicy(environ):
             return None
         context = DummyContext()
-        def traversalpolicy(root, environ):
+        def traversalpolicy(environ, root):
             return context, '', []
         def start_response(status, headers):
             pass
+        def securitypolicy(environ, context, name):
+            return None
         environ = self._makeEnviron()
         self._registerFactory(DummyWSGIApplicationFactory, '', None, None)
-        router = self._makeOne(rootpolicy, traversalpolicy)
+        router = self._makeOne(rootpolicy, traversalpolicy, securitypolicy)
         result = router(environ, start_response)
         self.failUnless(result[0] is context)
         import webob
@@ -73,13 +98,15 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         def rootpolicy(environ):
             return None
         context = DummyContext()
-        def traversalpolicy(root, environ):
+        def traversalpolicy(environ, root):
             return context, 'foo', ['bar', 'baz']
         def start_response(status, headers):
             pass
+        def securitypolicy(environ, context, name):
+            return None
         environ = self._makeEnviron()
         self._registerFactory(DummyWSGIApplicationFactory, 'foo', None, None)
-        router = self._makeOne(rootpolicy, traversalpolicy)
+        router = self._makeOne(rootpolicy, traversalpolicy, securitypolicy)
         result = router(environ, start_response)
         self.failUnless(result[0] is context)
         import webob
@@ -95,15 +122,17 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         class IContext(Interface):
             pass
         directlyProvides(context, IContext)
-        def traversalpolicy(root, environ):
+        def traversalpolicy(environ, root):
             return context, 'foo', ['bar', 'baz']
         def start_response(status, headers):
             pass
+        def securitypolicy(environ, context, name):
+            return None
         environ = self._makeEnviron()
         from repoze.bfg.interfaces import IWebObRequest
         self._registerFactory(DummyWSGIApplicationFactory, 'foo', IContext,
                               IWebObRequest)
-        router = self._makeOne(rootpolicy, traversalpolicy)
+        router = self._makeOne(rootpolicy, traversalpolicy, securitypolicy)
         result = router(environ, start_response)
         self.failUnless(result[0] is context)
         import webob
@@ -123,16 +152,18 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         headerii = []
         def rootpolicy(environ):
             return None
-        def traversalpolicy(root, environ):
+        def traversalpolicy(environ, root):
             return context, 'foo', []
         def start_response(status, headers):
             statii[:] = [status]
             headerii[:] = [headers]
+        def securitypolicy(environ, context, name):
+            return None
         environ = self._makeEnviron()
         from repoze.bfg.interfaces import IWebObRequest
         self._registerFactory(DummyWSGIApplicationFactory, 'foo', IContext,
                               IWebObRequest)
-        router = self._makeOne(rootpolicy, traversalpolicy)
+        router = self._makeOne(rootpolicy, traversalpolicy, securitypolicy)
         result = router(environ, start_response)
         headers = headerii[0]
         self.assertEqual(len(headers), 2)

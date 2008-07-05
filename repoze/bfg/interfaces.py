@@ -11,6 +11,11 @@ class IRootPolicy(Interface):
 class ITraversalPolicy(Interface):
     def __call__(environ, root):
         """ Return a tuple in the form (context, name, subpath) """
+
+class ISecurityPolicy(Interface):
+    def __call__(environ, context, name):
+        """ Return a WSGI app on unauthorized or None to signify that
+        the request is allowed to continue """
         
 class ITraverser(Interface):
     def __init__(context):
