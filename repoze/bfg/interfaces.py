@@ -1,8 +1,12 @@
 from zope.interface import Interface
 
-class IWSGIApplication(Interface):
-    def __call__(environ, start_response):
-        """ Represent a WSGI (PEP 333) application """
+class IWSGIApplicationFactory(Interface):
+    def __call__(context):
+        """ Return a WSGI (PEP333) application """
+
+class IRootPolicy(Interface):
+    def __call__(environ):
+        """ Return a root object """
 
 class ITraversalPolicy(Interface):
     def __call__(environ, root):
