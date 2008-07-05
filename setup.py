@@ -50,11 +50,15 @@ setup(name='repoze.bfg',
       install_requires=[
             'zope.interface',
             'zope.component',
-            'zope.testing'],
+            'zope.testing',
+            'WebOb'
+            ],
       tests_require=[
             'zope.interface',
             'zope.component',
-            'zope.testing'],
+            'zope.testing',
+            'WebOb',
+            ],
       test_suite="repoze.bfg.tests",
       entry_points = """\
       """

@@ -19,3 +19,6 @@ class ITraverser(Interface):
     def __call__(environ, name):
         """ Return a subcontext or based on name """
         
+class IWebObRequest(Interface):
+    """ Marker interface for a webob.Request object """
+    
