@@ -4,7 +4,7 @@ from zope.component.testing import PlacelessSetup
 
 class SplitPathTests(unittest.TestCase):
     def _getFUT(self):
-        from repoze.bfg.policy import split_path
+        from repoze.bfg.traversal import split_path
         return split_path
         
     def test_cleanPath_path_startswith_endswith(self):
@@ -36,7 +36,7 @@ class NaivePolicyTests(unittest.TestCase, PlacelessSetup):
         PlacelessSetup.tearDown(self)
         
     def _getTargetClass(self):
-        from repoze.bfg.policy import NaiveTraversalPolicy
+        from repoze.bfg.traversal import NaiveTraversalPolicy
         return NaiveTraversalPolicy
 
     def _makeOne(self, *arg, **kw):
@@ -47,12 +47,12 @@ class NaivePolicyTests(unittest.TestCase, PlacelessSetup):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
-    def test_class_conforms_to_IPolicy(self):
+    def test_class_conforms_to_ITraversalPolicy(self):
         from zope.interface.verify import verifyClass
         from repoze.bfg.interfaces import ITraversalPolicy
         verifyClass(ITraversalPolicy, self._getTargetClass())
 
-    def test_instance_conforms_to_IPolicy(self):
+    def test_instance_conforms_to_ITraversalPolicy(self):
         from zope.interface.verify import verifyObject
         from repoze.bfg.interfaces import ITraversalPolicy
         verifyObject(ITraversalPolicy, self._makeOne())

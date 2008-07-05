@@ -11,14 +11,14 @@ def split_path(path):
     if path.endswith('/'):
         path = path[:-1]
     clean=[]
-    for item in path.split('/'):
-        item = urllib.unquote(item) # deal with spaces in path segment
-        if not item or item=='.':
+    for segment in path.split('/'):
+        segment = urllib.unquote(segment) # deal with spaces in path segment
+        if not segment or segment=='.':
             continue
-        elif item == '..':
+        elif segment == '..':
             del clean[-1]
         else:
-            clean.append(item)
+            clean.append(segment)
     return clean
 
 class NaiveTraversalPolicy:
@@ -31,9 +31,9 @@ class NaiveTraversalPolicy:
         name = ''
 
         while path:
-            element = pop(path)
+            segment = pop(path)
             traverser = ITraverser(ob)
-            next = traverser(environ, element)
+            next = traverser(environ, segment)
             if next is None:
                 if path:
                     name = pop(path)

@@ -48,8 +48,14 @@ setup(name='repoze.bfg',
       include_package_data=True,
       namespace_packages=['repoze', 'repoze.bfg'],
       zip_safe=False,
-      tests_require = ['zope.interface', 'zope.component', 'zope.testing'],
-      install_requires=['zope.interface', 'zope.component', 'zope.testing'],
+      install_requires=[
+            'zope.interface',
+            'zope.component',
+            'zope.testing'],
+      tests_require=[
+            'zope.interface',
+            'zope.component',
+            'zope.testing'],
       test_suite="repoze.bfg.tests",
       entry_points = """\
       """
