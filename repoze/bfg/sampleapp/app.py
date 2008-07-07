@@ -46,8 +46,9 @@ if __name__ == '__main__':
                         name='woohoo.html')
     gsm.registerAdapter(DefaultView, (None, IRequest), IViewFactory, '')
     from repoze.bfg.router import make_app
+    root = {'blog':BlogModel('myblog')}
     def get_root(environ):
-        return {'blog':BlogModel('myblog')}
+        return root
     app = make_app(get_root)
     from paste import httpserver
     httpserver.serve(app, host='0.0.0.0', port='5432')
