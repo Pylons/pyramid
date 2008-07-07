@@ -1,4 +1,3 @@
-from zope.component import getGlobalSiteManager
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.interface import directlyProvides
@@ -34,12 +33,22 @@ class Router:
             app = getMultiAdapter((app, request), IWSGIApplicationFactory)
         return app(environ, start_response)
 
-def make_app(**config):
-    from repoze.bfg.traversal import NaivePublishTraverser
-    from repoze.bfg.wsgiadapter import NaiveWSGIViewAdapter
+def make_app(root_policy,
+             default_publish_traverser_factory=None,
+             default_wsgi_application_factory=None
+             ):
+    if default_publish_traverser_factory is None:
+        from repoze.bfg.traversal import NaivePublishTraverser
+        default_publish_traverser_factory = NaivePublishTraverser
+    if default_wsgi_application_factory is None:
+        from repoze.bfg.wsgiadapter import NaiveWSGIViewAdapter
+        default_wsgi_application_factory = NaiveWSGIViewAdapter
+    from zope.component import getGlobalSiteManager
     gsm = getGlobalSiteManager()
-    gsm.registerAdapter(NaivePublishTraverser, (None, None),
+    gsm.registerAdapter(default_publish_traverser_factory, (None, None),
                         IPublishTraverserFactory)
-    gsm.registerAdapter(NaiveWSGIViewAdapter, (None, None),
+    gsm.registerAdapter(default_wsgi_application_factory, (None, None),
                         IWSGIApplicationFactory)
+    return Router(root_policy)
+
     
