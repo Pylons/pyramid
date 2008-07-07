@@ -1,6 +1,9 @@
 from zope.interface import Interface
 from zope.interface import Attribute
 
+class IRequest(Interface):
+    """ Marker interface for a request object """
+    
 class IResponse(Interface):
     status = Attribute('WSGI status code of response')
     headerlist = Attribute('List of response headers')
@@ -36,9 +39,6 @@ class IWSGIApplicationFactory(Interface):
     def __call__(view, request):
         """ Return an object that implements IWSGIApplication """
 
-class IRequest(Interface):
-    """ Marker interface for a request object """
-    
 class ILocation(Interface):
     """Objects that have a structural location"""
     __parent__ = Attribute("The parent in the location hierarchy")

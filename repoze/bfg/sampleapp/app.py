@@ -1,3 +1,5 @@
+import UserDict
+
 from zope.interface import classProvides
 from zope.interface import implements
 from zope.interface import Interface
@@ -11,7 +13,7 @@ from webob import Response
 class IBlogModel(Interface):
     id = Attribute('id')
 
-class BlogModel:
+class BlogModel(UserDict):
     implements(IBlogModel)
     def __init__(self, id):
         self.id = id
