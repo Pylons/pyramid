@@ -36,62 +36,61 @@ class NaivePolicyTests(unittest.TestCase, PlacelessSetup):
         PlacelessSetup.tearDown(self)
         
     def _getTargetClass(self):
-        from repoze.bfg.traversal import NaiveTraversalPolicy
-        return NaiveTraversalPolicy
+        from repoze.bfg.traversal import NaivePublishTraverser
+        return NaivePublishTraverser
 
     def _makeOne(self, *arg, **kw):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import ITraverser
-        gsm.registerAdapter(DummyTraverser, (None,), ITraverser, '')
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
-    def test_class_conforms_to_ITraversalPolicy(self):
+    def test_class_conforms_to_IPublishTraverser(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ITraversalPolicy
-        verifyClass(ITraversalPolicy, self._getTargetClass())
+        from repoze.bfg.interfaces import IPublishTraverser
+        verifyClass(IPublishTraverser, self._getTargetClass())
 
-    def test_instance_conforms_to_ITraversalPolicy(self):
+    def test_instance_conforms_to_IPublishTraverser(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ITraversalPolicy
-        verifyObject(ITraversalPolicy, self._makeOne())
+        from repoze.bfg.interfaces import IPublishTraverser
+        context = DummyContext()
+        request = DummyRequest()
+        verifyObject(IPublishTraverser, self._makeOne(context, request))
 
-    def test_call_nonkeyerror_raises(self):
-        policy = self._makeOne()
-        environ = {'PATH_INFO':'/foo'}
-        root = None
-        self.assertRaises(TypeError, policy, environ, root)
+    def test_call_pathel_with_no_getitem(self):
+        request = DummyRequest()
+        policy = self._makeOne(None, request)
+        ctx, name, subpath = policy('/foo/bar')
+        self.assertEqual(ctx, None)
+        self.assertEqual(name, 'foo')
+        self.assertEqual(subpath, ['bar'])
 
     def test_call_withconn_getitem_emptypath_nosubpath(self):
-        policy = self._makeOne()
-        context = DummyContext()
-        environ = {'PATH_INFO':''}
-        root = context
-        ctx, name, subpath = policy(environ, root)
-        self.assertEqual(context, ctx)
+        root = DummyContext()
+        request = DummyRequest()
+        policy = self._makeOne(root, request)
+        ctx, name, subpath = policy('')
+        self.assertEqual(ctx, root)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])
 
     def test_call_withconn_getitem_withpath_nosubpath(self):
-        policy = self._makeOne()
-        context = DummyContext()
-        context2 = DummyContext(context)
-        environ = {'PATH_INFO':'/foo/bar'}
-        root = context
-        ctx, name, subpath = policy(environ, root)
-        self.assertEqual(context, ctx)
+        foo = DummyContext()
+        root = DummyContext(foo)
+        request = DummyRequest()
+        policy = self._makeOne(root, request)
+        ctx, name, subpath = policy('/foo/bar')
+        self.assertEqual(ctx, foo)
         self.assertEqual(name, 'bar')
         self.assertEqual(subpath, [])
 
     def test_call_withconn_getitem_withpath_withsubpath(self):
-        policy = self._makeOne()
-        context = DummyContext()
-        context2 = DummyContext(context)
-        environ = {'PATH_INFO':'/foo/bar/baz/buz'}
-        root = context
-        ctx, name, subpath = policy(environ, root)
-        self.assertEqual(context, ctx)
+        foo = DummyContext()
+        request = DummyRequest()
+        root = DummyContext(foo)
+        policy = self._makeOne(root, request)
+        ctx, name, subpath = policy('/foo/bar/baz/buz')
+        self.assertEqual(ctx, foo)
         self.assertEqual(name, 'bar')
         self.assertEqual(subpath, ['baz', 'buz'])
 
@@ -103,6 +102,9 @@ class DummyContext:
         if self.next is None:
             raise KeyError, name
         return self.next
+
+class DummyRequest:
+    pass
     
 class DummyTraverser:
     def __init__(self, context):

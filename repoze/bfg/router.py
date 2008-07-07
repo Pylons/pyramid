@@ -1,28 +1,45 @@
+from zope.component import getGlobalSiteManager
+from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.interface import directlyProvides
 
 from webob import Request
 from webob.exc import HTTPNotFound
 
+from repoze.bfg.interfaces import IPublishTraverserFactory
+from repoze.bfg.interfaces import IViewFactory
 from repoze.bfg.interfaces import IWSGIApplicationFactory
-from repoze.bfg.interfaces import IWebObRequest
+
+from repoze.bfg.interfaces import IRequest
+
+_marker = ()
 
 class Router:
-    def __init__(self, root_policy, traversal_policy, security_policy):
+    def __init__(self, root_policy):
         self.root_policy = root_policy
-        self.traversal_policy = traversal_policy
-        self.security_policy = security_policy
 
     def __call__(self, environ, start_response):
+        request = Request(environ)
+        directlyProvides(request, IRequest)
         root = self.root_policy(environ)
-        context, name, subpath = self.traversal_policy(environ, root)
-        app = self.security_policy(environ, context, name)
-        if app is None:
-            environ['repoze.bfg.subpath'] = subpath
-            request = Request(environ)
-            directlyProvides(request, IWebObRequest)
-            app = queryMultiAdapter((context, request),
-                                    IWSGIApplicationFactory, name=name)
-            if app is None:
-                app = HTTPNotFound(request.url)
+        path = environ.get('PATH_INFO', '/')
+        traverser = getMultiAdapter((root, request), IPublishTraverserFactory)
+        context, name, subpath = traverser(path)
+        request.subpath = subpath
+        app = queryMultiAdapter((context, request), IViewFactory, name=name,
+                                default=_marker)
+        if app is _marker:
+            app = HTTPNotFound(request.url)
+        else:
+            app = getMultiAdapter((app, request), IWSGIApplicationFactory)
         return app(environ, start_response)
+
+def make_app(**config):
+    from repoze.bfg.traversal import NaivePublishTraverser
+    from repoze.bfg.wsgiadapter import NaiveWSGIViewAdapter
+    gsm = getGlobalSiteManager()
+    gsm.registerAdapter(NaivePublishTraverser, (None, None),
+                        IPublishTraverserFactory)
+    gsm.registerAdapter(NaiveWSGIViewAdapter, (None, None),
+                        IWSGIApplicationFactory)
+    

@@ -1,9 +1,10 @@
 import urllib
 
+from zope.interface import classProvides
 from zope.interface import implements
 
-from repoze.bfg.interfaces import ITraversalPolicy
-from repoze.bfg.interfaces import ITraverser
+from repoze.bfg.interfaces import IPublishTraverser
+from repoze.bfg.interfaces import IPublishTraverserFactory
 
 def split_path(path):
     if path.startswith('/'):
@@ -21,27 +22,37 @@ def split_path(path):
             clean.append(segment)
     return clean
 
-class NaiveTraversalPolicy:
-    implements(ITraversalPolicy)
+def step(ob, name, default):
+    if not hasattr(ob, '__getitem__'):
+        return default
+    try:
+        return ob[name]
+    except KeyError:
+        return default
 
-    def __call__(self, environ, root):
-        path = split_path(environ['PATH_INFO'])
-        
-        ob = root
+_marker = ()
+
+class NaivePublishTraverser:
+    classProvides(IPublishTraverserFactory)
+    implements(IPublishTraverser)
+    def __init__(self, root, request):
+        self.root = root
+        self.request = request
+
+    def __call__(self, path):
+        path = split_path(path)
+
+        ob = self.root
         name = ''
 
         while path:
-            segment = pop(path)
-            traverser = ITraverser(ob)
-            next = traverser(environ, segment)
-            if next is None:
-                if path:
-                    name = pop(path)
+            segment = path.pop(0)
+            next = step(ob, segment, _marker)
+            if next is _marker:
+                name = segment
                 break
             ob = next
 
         return ob, name, path
 
-def pop(path):
-    return path.pop(0)
 
