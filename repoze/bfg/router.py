@@ -33,22 +33,9 @@ class Router:
             app = getMultiAdapter((app, request), IWSGIApplicationFactory)
         return app(environ, start_response)
 
-def make_app(root_policy,
-             default_publish_traverser_factory=None,
-             default_wsgi_application_factory=None
-             ):
-    if default_publish_traverser_factory is None:
-        from repoze.bfg.traversal import NaivePublishTraverser
-        default_publish_traverser_factory = NaivePublishTraverser
-    if default_wsgi_application_factory is None:
-        from repoze.bfg.wsgiadapter import NaiveWSGIViewAdapter
-        default_wsgi_application_factory = NaiveWSGIViewAdapter
-    from zope.component import getGlobalSiteManager
-    gsm = getGlobalSiteManager()
-    gsm.registerAdapter(default_publish_traverser_factory, (None, None),
-                        IPublishTraverserFactory)
-    gsm.registerAdapter(default_wsgi_application_factory, (None, None),
-                        IWSGIApplicationFactory)
+def make_app(root_policy, package=None, filename='configure.zcml'):
+    import zope.configuration.xmlconfig
+    zope.configuration.xmlconfig.file(filename, package=package)
     return Router(root_policy)
 
     

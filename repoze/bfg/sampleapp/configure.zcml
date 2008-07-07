@@ -1,0 +1,25 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+	           i18n_domain="repoze.bfg">
+
+  <include package="repoze.bfg" />
+
+  <adapter
+        factory=".app.BlogDefaultView"
+        provides="repoze.bfg.interfaces.IViewFactory"
+        for=".models.IBlogModel repoze.bfg.interfaces.IRequest"
+   />
+
+  <adapter
+        factory=".app.BlogWooHooView"
+        provides="repoze.bfg.interfaces.IViewFactory"
+        for=".models.IBlogModel repoze.bfg.interfaces.IRequest"
+        name="woohoo.html"
+   />
+
+  <adapter
+        factory=".app.DefaultView"
+        provides="repoze.bfg.interfaces.IViewFactory"
+        for="* repoze.bfg.interfaces.IRequest"
+   />
+
+</configure>

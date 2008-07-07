@@ -1,0 +1,18 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+	           i18n_domain="repoze.bfg">
+
+  <include package="z3c.pt" />
+
+  <adapter
+      factory=".traversal.NaivePublishTraverser"
+      provides=".interfaces.IPublishTraverserFactory"
+      for="* *"
+  />
+
+  <adapter
+      factory=".wsgiadapter.NaiveWSGIViewAdapter"
+      provides=".interfaces.IWSGIApplicationFactory"
+      for="* *"
+   />
+
+</configure>
