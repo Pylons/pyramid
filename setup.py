@@ -51,13 +51,15 @@ setup(name='repoze.bfg',
             'zope.interface',
             'zope.component',
             'zope.testing',
-            'WebOb'
+            'WebOb',
+            'Paste',
             ],
       tests_require=[
             'zope.interface',
             'zope.component',
             'zope.testing',
             'WebOb',
+            'Paste',
             ],
       test_suite="repoze.bfg.tests",
       entry_points = """\
