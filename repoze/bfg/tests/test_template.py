@@ -77,7 +77,7 @@ class ViewPageTemplateFileTests(unittest.TestCase, Base):
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 
-class BrowserViewTests(unittest.TestCase, Base):
+class TemplateViewTests(unittest.TestCase, Base):
     def setUp(self):
         Base.setUp(self)
 
@@ -85,8 +85,8 @@ class BrowserViewTests(unittest.TestCase, Base):
         Base.tearDown(self)
 
     def _getTargetClass(self):
-        from repoze.bfg.template import BrowserView
-        return BrowserView
+        from repoze.bfg.template import TemplateView
+        return TemplateView
 
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()

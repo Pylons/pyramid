@@ -26,7 +26,7 @@ class ViewPageTemplateFile(property):
                                         options=kwargs)
         return template        
     
-class BrowserView(object):
+class TemplateView(object):
     classProvides(IViewFactory)
     implements(IView)
 
