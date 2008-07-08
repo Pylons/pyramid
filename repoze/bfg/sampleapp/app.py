@@ -1,18 +1,18 @@
-from repoze.bfg.template import View
+from repoze.bfg.template import BrowserView
 
 from webob import Response
 
-class BlogDefaultView(View):
+class BlogDefaultView(BrowserView):
     def getInfo(self):
         return {'greeting':'Hello, I\'m the default view',
                 'id':self.context.id}
 
-class BlogWooHooView(View):
+class BlogWooHooView(BrowserView):
     def getInfo(self):
         return {'greeting':'Woo hoo, I\'m another view' ,
                 'id':self.context.id}
 
-class DefaultView(View):
+class DefaultView(BrowserView):
     def __call__(self):
         return Response('Default page, context is %s' % self.context)
 
