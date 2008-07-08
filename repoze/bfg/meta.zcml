@@ -1,0 +1,15 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:meta="http://namespaces.zope.org/meta">
+
+  <meta:directives namespace="http://namespaces.repoze.org/browser">
+
+    <meta:directive
+        name="page"
+        schema=".metaconfigure.IPageDirective"
+        handler=".metaconfigure.page"
+        />
+
+  </meta:directives>
+
+</configure>

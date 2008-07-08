@@ -1,31 +1,20 @@
-from zope.interface import classProvides
-from zope.interface import implements
-
-from repoze.bfg.interfaces import IViewFactory
-from repoze.bfg.interfaces import IView
+from repoze.bfg.template import View
 
 from webob import Response
 
-class View(object):
-    classProvides(IViewFactory)
-    implements(IView)
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
 class BlogDefaultView(View):
-    def __call__(self):
-        return Response('Hello world from the blog %s!' % self.context.id)
+    def getInfo(self):
+        return {'greeting':'Hello, I\'m the default view',
+                'id':self.context.id}
 
 class BlogWooHooView(View):
-    def __call__(self):
-        return Response('Woo hoo from the blog named %s!' % self.context.id)
+    def getInfo(self):
+        return {'greeting':'Woo hoo, I\'m another view' ,
+                'id':self.context.id}
 
 class DefaultView(View):
     def __call__(self):
         return Response('Default page, context is %s' % self.context)
-
 
 if __name__ == '__main__':
     from repoze.bfg import sampleapp
