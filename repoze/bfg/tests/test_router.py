@@ -60,6 +60,30 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(status, '404 Not Found')
         self.failUnless('http://localhost:8080' in result[0], result)
 
+    def test_call_default_view_redirect(self):
+        rootpolicy = make_rootpolicy(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        response = DummyResponse()
+        viewfactory = make_view_factory(response)
+        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        environ = self._makeEnviron(PATH_INFO='/doesnt/end/in/slash')
+        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerViewFactory(viewfactory, '', None, None)
+        self._registerWSGIFactory(wsgifactory, '', None, None)
+        router = self._makeOne(rootpolicy)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 3)
+        self.assertEqual(
+            headers[0],
+            ('content-type', 'text/html; charset=UTF-8'))
+        self.assertEqual(
+            headers[1],
+            ('location', 'http://localhost:8080/doesnt/end/in/slash/'))
+        self.assertEqual(start_response.status, '302 Found')
+
     def test_call_view_registered_nonspecific_default_path(self):
         rootpolicy = make_rootpolicy(None)
         context = DummyContext()

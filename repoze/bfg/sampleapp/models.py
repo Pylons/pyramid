@@ -1,12 +1,28 @@
 from zope.interface import Interface
-from zope.interface import Attribute
 from zope.interface import implements
 
-class IBlogModel(Interface):
-    id = Attribute('id')
+import datetime
 
-class BlogModel(object):
-    implements(IBlogModel)
-    def __init__(self, id):
-        self.id = id
+class IMapping(Interface):
+    pass
 
+class IBlog(Interface):
+    pass
+
+class Blog(dict):
+    implements(IBlog, IMapping)
+    def __init__(self, name):
+        self.__name__ = name
+        dict.__init__(self)
+
+class IBlogEntry(Interface):
+    pass
+
+class BlogEntry(object):
+    implements(IBlogEntry)
+    def __init__(self, name, title, body, author):
+        self.__name__ = name
+        self.title = title
+        self.body =  body
+        self.author = author
+        self.created = datetime.datetime.now()

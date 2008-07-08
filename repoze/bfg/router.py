@@ -4,6 +4,7 @@ from zope.interface import directlyProvides
 
 from webob import Request
 from webob.exc import HTTPNotFound
+from webob.exc import HTTPFound
 
 from repoze.bfg.interfaces import IPublishTraverserFactory
 from repoze.bfg.interfaces import IViewFactory
@@ -24,13 +25,19 @@ class Router:
         path = environ.get('PATH_INFO', '/')
         traverser = getMultiAdapter((root, request), IPublishTraverserFactory)
         context, name, subpath = traverser(path)
-        request.subpath = subpath
-        app = queryMultiAdapter((context, request), IViewFactory, name=name,
-                                default=_marker)
-        if app is _marker:
-            app = HTTPNotFound(request.url)
+        if (not name) and (not path.endswith('/')):
+            # if this is the default view of the context, and the URL
+            # doesn't end in a slash, redirect to the url + '/' (so we
+            # don't have to play base tag games)
+            app = HTTPFound(add_slash=True)
         else:
-            app = getMultiAdapter((app, request), IWSGIApplicationFactory)
+            request.subpath = subpath
+            app = queryMultiAdapter((context, request), IViewFactory, name=name,
+                                    default=_marker)
+            if app is _marker:
+                app = HTTPNotFound(request.url)
+            else:
+                app = getMultiAdapter((app, request), IWSGIApplicationFactory)
         return app(environ, start_response)
 
 def make_app(root_policy, package=None, filename='configure.zcml'):

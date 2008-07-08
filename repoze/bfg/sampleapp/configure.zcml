@@ -4,24 +4,27 @@
 
   <include package="repoze.bfg" />
 
+  <!-- the default view for a Blog -->
   <browser:page
-      for=".models.IBlogModel"
-      class=".app.BlogWooHooView"
+      for=".models.IBlog"
+      class=".browser.BlogDefaultView"
+      template="www/blog.pt"
       permission="repoze.view"
-      name="woohoo.html"
-      template="www/blog_view.pt"
       />
 
+  <!-- the default view for a BlogEntry -->
   <browser:page
-      for=".models.IBlogModel"
-      class=".app.BlogDefaultView"
+      for=".models.IBlogEntry"
+      class=".browser.BlogEntryDefaultView"
+      template="www/blog_entry.pt"
       permission="repoze.view"
-      template="www/blog_view.pt"
       />
 
+  <!-- the contents view for any mapping (shows dict members) -->
   <browser:page
-      for="*"
-      class=".app.DefaultView"
+      for=".models.IMapping"
+      template="www/contents.pt"
+      name="contents.html"
       permission="repoze.view"
       />
 
