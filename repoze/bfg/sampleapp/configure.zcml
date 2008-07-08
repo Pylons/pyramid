@@ -20,6 +20,22 @@
       permission="repoze.view"
       />
 
+  <!-- the add template for a BlogEntry -->
+  <browser:page
+      for=".models.IBlog"
+      template="www/blog_entry_add.pt"
+      name="add_entry.html"
+      permission="repoze.view"
+      />
+
+  <!-- the add handler for a BlogEntry -->
+  <browser:page
+      for=".models.IBlog"
+      class=".browser.BlogEntryAddView"
+      permission="repoze.view"
+      name="add_entry_handler"
+      />
+
   <!-- the contents view for any mapping (shows dict members) -->
   <browser:page
       for=".models.IMapping"

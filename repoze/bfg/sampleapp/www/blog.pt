@@ -15,5 +15,8 @@
       <td>${entry.created}</td>
     </tr>
   </table>
+  <p>
+    <a href="add_entry.html">Add blog entry</a>
+  </p>
 </body>
 </html>

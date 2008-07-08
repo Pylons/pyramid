@@ -41,7 +41,7 @@ def page(_context,
         if not os.path.isfile(template):
             raise ConfigurationError("No such file", template)
 
-    template_inst = PageTemplateFile(template)
+        template_inst = PageTemplateFile(template)
 
     def view_factory(context, request):
         if template:

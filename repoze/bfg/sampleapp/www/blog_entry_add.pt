@@ -1,0 +1,26 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head></head>
+<body>
+  <form action="add_entry_handler" method="POST">
+    <h1>Add a blog entry</h1>
+    <table border="0">
+      <tr> 
+        <th>Title</th>
+       <td><input type="text" name="title"/></td>
+      </tr>
+      <tr>
+        <th>Author</th>
+        <td><input type="text" name="author"/></td>
+      </tr>
+      <tr>
+        <th>Body</th>
+        <td><textarea name="body" rows="10" value=""> </textarea></td>
+      </tr>
+      <tr>
+        <td><input type="submit" name="add" value="Add"/></td>
+      </tr>
+    </table>
+  </form>
+</body>
+</html>
