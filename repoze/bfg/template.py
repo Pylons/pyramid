@@ -14,8 +14,8 @@ class PageTemplateFile(PageTemplateFileBase):
         return Response(result)
 
 class ViewPageTemplateFile(property):
-    def __init__(self, filename, **kwargs):
-        self.template = PageTemplateFile(filename, **kwargs)
+    def __init__(self, template):
+        self.template = template
         property.__init__(self, self.render)
 
     def render(self, view):

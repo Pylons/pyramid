@@ -11,5 +11,10 @@ if __name__ == '__main__':
     def get_root(environ):
         return blog
     app = make_app(get_root, sampleapp)
+##     from repoze.profile.profiler import AccumulatingProfileMiddleware
+##     profiler = AccumulatingProfileMiddleware(
+##         app,
+##         log_filename='profile.log',
+##         )
     from paste import httpserver
     httpserver.serve(app, host='0.0.0.0', port='5432')

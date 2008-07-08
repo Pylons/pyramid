@@ -13,6 +13,7 @@ from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IViewFactory
 
 from repoze.bfg.template import ViewPageTemplateFile
+from repoze.bfg.template import PageTemplateFile
 
 class ViewBase:
     def __init__(self, context, request):
@@ -40,6 +41,8 @@ def page(_context,
         if not os.path.isfile(template):
             raise ConfigurationError("No such file", template)
 
+    template_inst = PageTemplateFile(template)
+
     def view_factory(context, request):
         if template:
             if class_ is None:
@@ -48,7 +51,7 @@ def page(_context,
                 base = class_
             class ViewClass(base):
                 __name__ = name
-                index = ViewPageTemplateFile(template)
+                index = ViewPageTemplateFile(template_inst)
             return ViewClass(context, request)
                     
         else:

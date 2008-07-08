@@ -63,19 +63,18 @@ class ViewPageTemplateFileTests(unittest.TestCase, Base):
 
     def test_render(self):
         self._zcmlConfigure()
-        minimal = self._getTemplatePath('minimal.pt')
-        instance = self._makeOne(minimal)
+        f = DummyPageTemplateFile()
+        instance = self._makeOne(f)
         class View:
             context = 'context'
             request = 'request'
         view = View()
         template = instance.render(view)
-        result = template()
-        from webob import Response
-        self.failUnless(isinstance(result, Response))
-        self.assertEqual(result.app_iter, ['<div>\n</div>'])
-        self.assertEqual(result.status, '200 OK')
-        self.assertEqual(len(result.headerlist), 2)
+        args, kw = template(foo='bar')
+        self.assertEqual(kw['request'], 'request')
+        self.assertEqual(kw['options'], {'foo':'bar'})
+        self.assertEqual(kw['context'], 'context')
+        self.assertEqual(kw['view'], view)
 
 class TemplateViewTests(unittest.TestCase, Base):
     def setUp(self):
@@ -99,5 +98,6 @@ class TemplateViewTests(unittest.TestCase, Base):
         result = view('foo')
         self.assertEqual(result, _marker)
         
-        
-        
+class DummyPageTemplateFile:
+    def render(self, *arg, **kw):
+        return arg, kw
