@@ -15,8 +15,9 @@ from repoze.bfg.interfaces import IRequest
 _marker = ()
 
 class Router:
-    def __init__(self, root_policy):
+    def __init__(self, root_policy, default_redirects=True):
         self.root_policy = root_policy
+        self.default_redirects = True
 
     def __call__(self, environ, start_response):
         request = Request(environ)
@@ -25,7 +26,7 @@ class Router:
         path = environ.get('PATH_INFO', '/')
         traverser = getMultiAdapter((root, request), IPublishTraverserFactory)
         context, name, subpath = traverser(path)
-        if (not name) and (not path.endswith('/')):
+        if self.default_redirects and (not name) and (not path.endswith('/')):
             # if this is the default view of the context, and the URL
             # doesn't end in a slash, redirect to the url + '/' (so we
             # don't have to play base tag games)
@@ -40,9 +41,10 @@ class Router:
                 app = getMultiAdapter((app, request), IWSGIApplicationFactory)
         return app(environ, start_response)
 
-def make_app(root_policy, package=None, filename='configure.zcml'):
+def make_app(root_policy, package=None, default_redirects=True,
+             filename='configure.zcml'):
     import zope.configuration.xmlconfig
     zope.configuration.xmlconfig.file(filename, package=package)
-    return Router(root_policy)
+    return Router(root_policy, default_redirects)
 
     
