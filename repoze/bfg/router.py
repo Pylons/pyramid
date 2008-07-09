@@ -17,7 +17,7 @@ _marker = ()
 class Router:
     def __init__(self, root_policy, default_redirects=True):
         self.root_policy = root_policy
-        self.default_redirects = True
+        self.default_redirects = default_redirects
 
     def __call__(self, environ, start_response):
         request = Request(environ)
