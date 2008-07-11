@@ -18,7 +18,7 @@
   <adapter
       factory=".wsgiadapter.NaiveWSGIViewAdapter"
       provides=".interfaces.IWSGIApplicationFactory"
-      for="* *"
+      for="* * *"
    />
 
   <include file="meta.zcml" />

@@ -1,6 +1,14 @@
 import unittest
 
-class NaiveWSGIAdapterTests(unittest.TestCase):
+from zope.component.testing import PlacelessSetup
+
+class NaiveWSGIAdapterTests(unittest.TestCase, PlacelessSetup):
+    def setUp(self):
+        PlacelessSetup.setUp(self)
+
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
+
     def _getTargetClass(self):
         from repoze.bfg.wsgiadapter import NaiveWSGIViewAdapter
         return NaiveWSGIViewAdapter
@@ -15,7 +23,8 @@ class NaiveWSGIAdapterTests(unittest.TestCase):
         def view():
             return response
         request = DummyRequest()
-        adapter = self._makeOne(view, request)
+        context = DummyContext()
+        adapter = self._makeOne(context, request, view)
         environ = {}
         start_response = DummyStartResponse()
         result = adapter(environ, start_response)
@@ -31,7 +40,8 @@ class NaiveWSGIAdapterTests(unittest.TestCase):
             response.start_response = start_response
             return response
         request = DummyRequest()
-        adapter = self._makeOne(view, request)
+        context = DummyContext()
+        adapter = self._makeOne(context, request, view)
         environ = {}
         start_response = DummyStartResponse()
         result = adapter(environ, start_response)
@@ -48,7 +58,8 @@ class NaiveWSGIAdapterTests(unittest.TestCase):
         def view(request):
             response.request = request
             return response
-        adapter = self._makeOne(view, request)
+        context = DummyContext()
+        adapter = self._makeOne(context, request, view)
         environ = {}
         start_response = DummyStartResponse()
         result = adapter(environ, start_response)
@@ -56,6 +67,62 @@ class NaiveWSGIAdapterTests(unittest.TestCase):
         self.assertEqual(start_response.headers, ())
         self.assertEqual(start_response.status, '200 OK')
         self.assertEqual(response.request, request)
+
+    def test_view_fails_security_policy(self):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.wsgiadapter import IViewSecurityPolicy
+        def failed(context, request):
+            def view():
+                response = DummyResponse()
+                response.app_iter = ['failed']
+                response.status = '401 Unauthorized'
+                response.headerlist = ()
+                return response
+            return view
+        gsm.registerAdapter(failed, (None, None), IViewSecurityPolicy)
+        request = DummyRequest()
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        def view(request):
+            response.request = request
+            return response
+        context = DummyContext()
+        adapter = self._makeOne(context, request, view)
+        environ = {}
+        start_response = DummyStartResponse()
+        result = adapter(environ, start_response)
+        self.assertEqual(result, ['failed'])
+        self.assertEqual(start_response.headers, ())
+        self.assertEqual(start_response.status, '401 Unauthorized')
+
+    def test_view_passes_security_policy(self):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.wsgiadapter import IViewSecurityPolicy
+        def failed(context, request):
+            def view():
+                return None
+            return view
+        gsm.registerAdapter(failed, (None, None), IViewSecurityPolicy)
+        request = DummyRequest()
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        def view(request):
+            response.request = request
+            return response
+        context = DummyContext()
+        adapter = self._makeOne(context, request, view)
+        environ = {}
+        start_response = DummyStartResponse()
+        result = adapter(environ, start_response)
+        self.assertEqual(result, ['Hello world'])
+        self.assertEqual(start_response.headers, ())
+        self.assertEqual(start_response.status, '200 OK')
+        self.assertEqual(response.request, request)
+
+class DummyContext:
+    pass
 
 class DummyRequest:
     pass

@@ -36,10 +36,11 @@ class IWSGIApplication(Interface):
         """ A PEP 333 application """
 
 class IWSGIApplicationFactory(Interface):
-    def __call__(view, request):
+    def __call__(context, request, view):
         """ Return an object that implements IWSGIApplication """
 
 class ILocation(Interface):
     """Objects that have a structural location"""
     __parent__ = Attribute("The parent in the location hierarchy")
     __name__ = Attribute("The name of the object")
+

@@ -70,7 +70,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         environ = self._makeEnviron(PATH_INFO='/doesnt/end/in/slash')
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, '', None, None)
-        self._registerWSGIFactory(wsgifactory, '', None, None)
+        self._registerWSGIFactory(wsgifactory, '', None, None, None)
         router = self._makeOne(rootpolicy)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -94,7 +94,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, '', None, None)
-        self._registerWSGIFactory(wsgifactory, '', None, None)
+        self._registerWSGIFactory(wsgifactory, '', None, None, None)
         router = self._makeOne(rootpolicy)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -115,7 +115,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, 'foo', None, None)
-        self._registerWSGIFactory(wsgifactory, '', None, None)
+        self._registerWSGIFactory(wsgifactory, '', None, None, None)
         router = self._makeOne(rootpolicy)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -142,7 +142,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, '', IContext, IRequest)
-        self._registerWSGIFactory(wsgifactory, '', None, None)
+        self._registerWSGIFactory(wsgifactory, '', None, None, None)
         router = self._makeOne(rootpolicy)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -171,7 +171,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, '', IContext, IRequest)
-        self._registerWSGIFactory(wsgifactory, '', None, None)
+        self._registerWSGIFactory(wsgifactory, '', None, None, None)
         router = self._makeOne(rootpolicy)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -183,13 +183,15 @@ class DummyContext:
 
 def make_wsgi_factory(status, headers, app_iter):
     class DummyWSGIApplicationFactory:
-        def __init__(self, view, request):
-            self.view = view
+        def __init__(self, context, request, view):
+            self.context = context
             self.request = request
+            self.view = view
 
         def __call__(self, environ, start_response):
-            environ['view'] = self.view
+            environ['context'] = self.context
             environ['request'] = self.request
+            environ['view'] = self.view
             start_response(status, headers)
             return app_iter
 

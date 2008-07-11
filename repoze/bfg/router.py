@@ -33,12 +33,14 @@ class Router:
             app = HTTPFound(add_slash=True)
         else:
             request.subpath = subpath
+            request.view_name = name
             app = queryMultiAdapter((context, request), IViewFactory, name=name,
                                     default=_marker)
             if app is _marker:
                 app = HTTPNotFound(request.url)
             else:
-                app = getMultiAdapter((app, request), IWSGIApplicationFactory)
+                app = getMultiAdapter((context, request, app),
+                                      IWSGIApplicationFactory)
         return app(environ, start_response)
 
 def make_app(root_policy, package=None, default_redirects=True,
