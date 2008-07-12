@@ -7,7 +7,7 @@
   <!-- the default view for a Blog -->
   <browser:page
       for=".models.IBlog"
-      class=".browser.BlogDefaultView"
+      class=".views.BlogDefaultView"
       template="www/blog.pt"
       permission="repoze.view"
       />
@@ -15,15 +15,15 @@
   <!-- the default view for a BlogEntry -->
   <browser:page
       for=".models.IBlogEntry"
-      class=".browser.BlogEntryDefaultView"
-      template="www/blog_entry.pt"
+      class=".views.BlogEntryDefaultView"
+      template="templates/blog_entry.pt"
       permission="repoze.view"
       />
 
   <!-- the add template for a BlogEntry -->
   <browser:page
       for=".models.IBlog"
-      template="www/blog_entry_add.pt"
+      template="templates/blog_entry_add.pt"
       name="add_entry.html"
       permission="repoze.view"
       />
@@ -31,7 +31,7 @@
   <!-- the add handler for a BlogEntry -->
   <browser:page
       for=".models.IBlog"
-      class=".browser.BlogEntryAddView"
+      class=".views.BlogEntryAddView"
       permission="repoze.view"
       name="add_entry_handler"
       />
@@ -39,7 +39,7 @@
   <!-- the contents view for any mapping (shows dict members) -->
   <browser:page
       for=".models.IMapping"
-      template="www/contents.pt"
+      template="templates/contents.pt"
       name="contents.html"
       permission="repoze.view"
       />
