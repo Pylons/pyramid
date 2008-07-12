@@ -13,8 +13,9 @@ from repoze.bfg.interfaces import IRequest
 _marker = ()
 
 class Router:
-    def __init__(self, root_policy):
+    def __init__(self, root_policy, app_context):
         self.root_policy = root_policy
+        self.app_context = app_context
 
     def __call__(self, environ, start_response):
         request = Request(environ)
@@ -34,9 +35,18 @@ class Router:
                                   IWSGIApplicationFactory)
         return app(environ, start_response)
 
+# enable the below when we figure out app-local registries
+
+## def app_component_registry(app_context):
+##     registry = getattr(app_context, 'registry', None)
+##     if registry is None:
+##         from zope.component.registry import Components
+##         app_context.registry = Components()
+##     return app_context.registry
+
 def make_app(root_policy, package=None, filename='configure.zcml'):
     import zope.configuration.xmlconfig
-    zope.configuration.xmlconfig.file(filename, package=package)
-    return Router(root_policy)
+    context = zope.configuration.xmlconfig.file(filename, package=package)
+    return Router(root_policy, context)
 
     

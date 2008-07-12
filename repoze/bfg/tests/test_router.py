@@ -51,7 +51,8 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         traversalfactory = make_traversal_factory(context, '', [])
         self._registerTraverserFactory(traversalfactory, '', None, None)
-        router = self._makeOne(rootpolicy)
+        app_context = make_appcontext()
+        router = self._makeOne(rootpolicy, app_context)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         headers = start_response.headers
@@ -71,7 +72,8 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, '', None, None)
         self._registerWSGIFactory(wsgifactory, '', None, None, None)
-        router = self._makeOne(rootpolicy)
+        app_context = make_appcontext()
+        router = self._makeOne(rootpolicy, app_context)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
@@ -92,7 +94,8 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, 'foo', None, None)
         self._registerWSGIFactory(wsgifactory, '', None, None, None)
-        router = self._makeOne(rootpolicy)
+        app_context = make_appcontext()
+        router = self._makeOne(rootpolicy, app_context)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
@@ -119,7 +122,8 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, '', IContext, IRequest)
         self._registerWSGIFactory(wsgifactory, '', None, None, None)
-        router = self._makeOne(rootpolicy)
+        app_context = make_appcontext()
+        router = self._makeOne(rootpolicy, app_context)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
@@ -148,11 +152,25 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerTraverserFactory(traversalfactory, '', None, None)
         self._registerViewFactory(viewfactory, '', IContext, IRequest)
         self._registerWSGIFactory(wsgifactory, '', None, None, None)
-        router = self._makeOne(rootpolicy)
+        app_context = make_appcontext()
+        router = self._makeOne(rootpolicy, app_context)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.failUnless('404' in result[0])
         self.assertEqual(start_response.status, '404 Not Found')
+
+class MakeAppTests(unittest.TestCase, PlacelessSetup):
+    def _getFUT(self):
+        from repoze.bfg.router import make_app
+        return make_app
+
+    def test_sampleapp(self):
+        from repoze.bfg.tests import fixtureapp
+        make_app = self._getFUT()
+        rootpolicy = make_rootpolicy(None)
+        app = make_app(rootpolicy, fixtureapp)
+        self.assertEqual(app.app_context.package, fixtureapp)
+        self.assertEqual(app.root_policy, rootpolicy)
 
 class DummyContext:
     pass
@@ -197,6 +215,13 @@ def make_rootpolicy(root):
     def rootpolicy(environ):
         return root
     return rootpolicy
+
+def make_appcontext():
+    from zope.configuration.interfaces import IConfigurationContext
+    from zope.interface import directlyProvides
+    app_context = DummyContext()
+    directlyProvides(app_context, IConfigurationContext)
+    return app_context
 
 class DummyStartResponse:
     status = ()
