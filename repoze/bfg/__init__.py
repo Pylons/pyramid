@@ -1,1 +1,2 @@
-# this is a package
+from repoze.bfg.router import make_app # for import elsewhere
+
