@@ -28,7 +28,7 @@ class SplitPathTests(unittest.TestCase):
         self.assertEqual(f('/foo/space%20thing/bar'), ['foo', 'space thing',
                                                        'bar'])
 
-class NaivePolicyTests(unittest.TestCase, PlacelessSetup):
+class NaivePublishTraverserTests(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)
 
@@ -40,8 +40,6 @@ class NaivePolicyTests(unittest.TestCase, PlacelessSetup):
         return NaivePublishTraverser
 
     def _makeOne(self, *arg, **kw):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
@@ -94,6 +92,16 @@ class NaivePolicyTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(name, 'bar')
         self.assertEqual(subpath, ['baz', 'buz'])
 
+    def test_call_with_explicit_viewname(self):
+        foo = DummyContext()
+        request = DummyRequest()
+        root = DummyContext(foo)
+        policy = self._makeOne(root, request)
+        ctx, name, subpath = policy('/@@foo')
+        self.assertEqual(ctx, root)
+        self.assertEqual(name, 'foo')
+        self.assertEqual(subpath, [])
+
 class DummyContext:
     def __init__(self, next=None):
         self.next = next
@@ -112,6 +120,6 @@ class DummyTraverser:
 
     def __call__(self, environ, name):
         try:
-            return self.context[name]
+            return name, self.context[name]
         except KeyError:
-            return None
+            return name, None

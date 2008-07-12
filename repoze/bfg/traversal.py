@@ -23,12 +23,14 @@ def split_path(path):
     return clean
 
 def step(ob, name, default):
+    if name.startswith('@@'):
+        return name[2:], default
     if not hasattr(ob, '__getitem__'):
-        return default
+        return name, default
     try:
-        return ob[name]
+        return name, ob[name]
     except KeyError:
-        return default
+        return name, default
 
 _marker = ()
 
@@ -47,7 +49,7 @@ class NaivePublishTraverser:
 
         while path:
             segment = path.pop(0)
-            next = step(ob, segment, _marker)
+            segment, next = step(ob, segment, _marker)
             if next is _marker:
                 name = segment
                 break
