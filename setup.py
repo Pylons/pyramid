@@ -45,7 +45,7 @@ setup(name='repoze.bfg',
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,
-      namespace_packages=['repoze', 'repoze.bfg'],
+      namespace_packages=['repoze'],
       zip_safe=False,
       install_requires=[
             'zope.interface',
