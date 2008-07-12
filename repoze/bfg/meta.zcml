@@ -6,8 +6,8 @@
 
     <meta:directive
         name="page"
-        schema=".metaconfigure.IPageDirective"
-        handler=".metaconfigure.page"
+        schema=".zcml.IPageDirective"
+        handler=".zcml.page"
         />
 
   </meta:directives>

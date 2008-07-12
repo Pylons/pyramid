@@ -10,7 +10,7 @@ class TestPageDirective(unittest.TestCase, PlacelessSetup):
         PlacelessSetup.tearDown(self)
 
     def _getFUT(self):
-        from repoze.bfg.metaconfigure import page
+        from repoze.bfg.zcml import page
         return page
 
     def test_no_class_or_template(self):
