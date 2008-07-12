@@ -4,7 +4,6 @@ from zope.interface import directlyProvides
 
 from webob import Request
 from webob.exc import HTTPNotFound
-from webob.exc import HTTPFound
 
 from repoze.bfg.interfaces import IPublishTraverserFactory
 from repoze.bfg.interfaces import IViewFactory
