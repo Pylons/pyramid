@@ -160,6 +160,12 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(start_response.status, '404 Not Found')
 
 class MakeAppTests(unittest.TestCase, PlacelessSetup):
+    def setUp(self):
+        PlacelessSetup.setUp(self)
+
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
+
     def _getFUT(self):
         from repoze.bfg.router import make_app
         return make_app
