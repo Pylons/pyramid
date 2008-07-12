@@ -293,7 +293,7 @@ A models.py might look like so::
   from zope.interface import Attribute
   from zope.interface import Interface
 
-  class IMyModel:
+  class IMyModel(Interface):
       __name__ = Attribute('Name of the model instance')
 
   class MyModel(UserDict):
