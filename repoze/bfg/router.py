@@ -9,7 +9,6 @@ from webob.exc import HTTPFound
 from repoze.bfg.interfaces import IPublishTraverserFactory
 from repoze.bfg.interfaces import IViewFactory
 from repoze.bfg.interfaces import IWSGIApplicationFactory
-
 from repoze.bfg.interfaces import IRequest
 
 _marker = ()
