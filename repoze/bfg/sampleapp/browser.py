@@ -1,6 +1,5 @@
 import time
 
-from webob import Response
 from webob.exc import HTTPFound
 
 from repoze.bfg.template import TemplateView
