@@ -8,7 +8,7 @@
   <browser:page
       for=".models.IBlog"
       class=".views.BlogDefaultView"
-      template="www/blog.pt"
+      template="templates/blog.pt"
       permission="repoze.view"
       />
 
