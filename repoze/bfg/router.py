@@ -10,19 +10,24 @@ from repoze.bfg.interfaces import IViewFactory
 from repoze.bfg.interfaces import IWSGIApplicationFactory
 from repoze.bfg.interfaces import IRequest
 
+from repoze.bfg.registry import registry_manager
+
 _marker = ()
 
 class Router:
-    def __init__(self, root_policy, app_context):
+    def __init__(self, root_policy, app_context, app_registry):
         self.root_policy = root_policy
         self.app_context = app_context
+        self.app_registry = app_registry
 
     def __call__(self, environ, start_response):
+        registry_manager.set(self.app_registry)
         request = Request(environ)
         directlyProvides(request, IRequest)
         root = self.root_policy(environ)
         path = environ.get('PATH_INFO', '/')
-        traverser = getMultiAdapter((root, request), IPublishTraverserFactory)
+        traverser = getMultiAdapter((root, request),
+                                    IPublishTraverserFactory)
         context, name, subpath = traverser(path)
         request.subpath = subpath
         request.view_name = name
@@ -35,18 +40,9 @@ class Router:
                                   IWSGIApplicationFactory)
         return app(environ, start_response)
 
-# enable the below when we figure out app-local registries
-
-## def app_component_registry(app_context):
-##     registry = getattr(app_context, 'registry', None)
-##     if registry is None:
-##         from zope.component.registry import Components
-##         app_context.registry = Components()
-##     return app_context.registry
-
 def make_app(root_policy, package=None, filename='configure.zcml'):
-    import zope.configuration.xmlconfig
-    context = zope.configuration.xmlconfig.file(filename, package=package)
-    return Router(root_policy, context)
+    from repoze.bfg.registry import makeRegistry
+    context, registry = makeRegistry(filename, package)
+    return Router(root_policy, context, registry)
 
     

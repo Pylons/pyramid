@@ -4,14 +4,6 @@
   <include package="z3c.pt" />
   <include package="zope.security" file="meta.zcml"/>
 
-  <!-- enable when we figure out app-local registries
-  <adapter
-     factory=".router.app_component_registry"
-     provides="zope.component.interfaces.IComponentLookup"
-     for="zope.configuration.interfaces.IConfigurationContext"
-     />
-  -->
-
   <permission
       id="repoze.view"
       title="View"
