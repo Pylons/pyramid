@@ -50,8 +50,8 @@ def makeRegistry(filename, package, lock=threading.Lock()):
         registry_manager.set(registry)
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
-        context = xmlconfig.file(filename, package=package)
-        return context, registry
+        xmlconfig.file(filename, package=package)
+        return registry
     finally:
         lock.release()
         zope.component.getGlobalSiteManager = getGlobalSiteManager

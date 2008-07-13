@@ -15,13 +15,12 @@ from repoze.bfg.registry import registry_manager
 _marker = ()
 
 class Router:
-    def __init__(self, root_policy, app_context, app_registry):
+    def __init__(self, root_policy, registry):
         self.root_policy = root_policy
-        self.app_context = app_context
-        self.app_registry = app_registry
+        self.registry = registry
 
     def __call__(self, environ, start_response):
-        registry_manager.set(self.app_registry)
+        registry_manager.set(self.registry)
         request = Request(environ)
         directlyProvides(request, IRequest)
         root = self.root_policy(environ)
@@ -42,7 +41,7 @@ class Router:
 
 def make_app(root_policy, package=None, filename='configure.zcml'):
     from repoze.bfg.registry import makeRegistry
-    context, registry = makeRegistry(filename, package)
-    return Router(root_policy, context, registry)
+    registry = makeRegistry(filename, package)
+    return Router(root_policy, registry)
 
     

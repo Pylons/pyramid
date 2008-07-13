@@ -21,10 +21,9 @@ class TestMakeRegistry(unittest.TestCase, PlacelessSetup):
         import repoze.bfg.registry
         try:
             old = repoze.bfg.registry.setRegistryManager(dummyregmgr)
-            context, registry = makeRegistry('configure.zcml',
-                                             fixtureapp,
-                                             lock=dummylock)
-            self.assertEqual(context.package, fixtureapp)
+            registry = makeRegistry('configure.zcml',
+                                    fixtureapp,
+                                    lock=dummylock)
             from zope.component.registry import Components
             self.failUnless(isinstance(registry, Components))
             self.assertEqual(dummylock.acquired, True)
