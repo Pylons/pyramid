@@ -199,6 +199,28 @@ class TestTemplateViewFactory(unittest.TestCase):
                          'DynamicTemplateView_For_TemplateViewSubclass')
         self.assertEqual(view.template, template)
 
+class TestSampleApp(unittest.TestCase, PlacelessSetup):
+    def setUp(self):
+        PlacelessSetup.setUp(self)
+
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
+
+    def test_registry_actions_can_be_pickled_and_unpickled(self):
+        import repoze.bfg.sampleapp as package
+        from zope.configuration import config
+        from zope.configuration import xmlconfig
+        context = config.ConfigurationMachine()
+        xmlconfig.registerCommonDirectives(context)
+        context.package = package
+        xmlconfig.include(context, 'configure.zcml', package)
+        context.execute_actions(clear=False)
+        actions = context.actions
+        import cPickle
+        dumped = cPickle.dumps(actions, -1)
+        new = cPickle.loads(dumped)
+        self.assertEqual(len(actions), len(new))
+
 class Dummy:
     pass
 
