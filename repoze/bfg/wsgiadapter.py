@@ -19,7 +19,8 @@ def isResponse(ob):
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
          hasattr(ob, 'status') ):
         if ( hasattr(ob.app_iter, '__iter__') and
-             hasattr(ob.headerlist, '__iter__') ):
+             hasattr(ob.headerlist, '__iter__') and
+             isinstance(ob.status, basestring) ) :
             return True
 
 class NaiveWSGIViewAdapter:
