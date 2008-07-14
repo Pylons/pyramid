@@ -22,8 +22,8 @@ def blog_default_view(context, request):
             }
             )
 
-        return render_template('templates/blog.pt', name=context.__name__,
-                               entries=entrydata)
+    return render_template('templates/blog.pt', name=context.__name__,
+                           entries=entrydata)
 
 def blog_entry_default_view(context, request):
     info = {
