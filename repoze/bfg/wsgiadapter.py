@@ -55,6 +55,8 @@ class NaiveWSGIViewAdapter:
             response = view
         else:
             response =  mapply(view, positional = (), keyword = kwdict)
+        if not isResponse(response):
+            raise ValueError('response was not IResponse: %s' % response)
         if not catch_response:
             catch_response = (response.status, response.headerlist)
         start_response(*catch_response)

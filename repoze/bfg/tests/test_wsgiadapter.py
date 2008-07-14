@@ -80,7 +80,17 @@ class NaiveWSGIAdapterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(result, ['Hello world'])
         self.assertEqual(start_response.headers, ())
         self.assertEqual(start_response.status, '200 OK')
- 
+
+    def test_view_returns_nonresponse(self):
+        request = DummyRequest()
+        def view(request):
+            return None
+        context = DummyContext()
+        adapter = self._makeOne(context, request, view)
+        environ = {}
+        start_response = DummyStartResponse()
+        self.assertRaises(ValueError, adapter, environ, start_response)
+
     def test_view_fails_security_policy(self):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
