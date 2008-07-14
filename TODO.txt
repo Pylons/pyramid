@@ -1,1 +1,9 @@
-List todo items here.
+- Provide sugar to make it easier to use other templating languages in
+  views.
+
+- Implement authorization against model objects.
+
+- Decide what else gets mapped in by mapply.
+
+
+
