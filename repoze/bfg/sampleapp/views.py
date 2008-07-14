@@ -11,27 +11,27 @@ def datestring(dt):
 
 def blog_default_view(context, request):
     entrydata = []
-    for name, entry in self.context.items():
+    for name, entry in context.items():
         entrydata.append(
             {
             'name':name,
             'title':entry.title,
             'author':entry.author,
             'created':datestring(entry.created),
-            'message':self.request.params.get('message'),
+            'message':request.params.get('message'),
             }
             )
 
-    info = {'name':self.context.__name__, entries:entrydata}
-    return render_template('templates/blog.pt', info)
+    return render_template('templates/blog.pt', name=context.__name__,
+                           entries=entrydata)
 
 def blog_entry_default_view(context, request):
     info = {
-        'name':self.context.__name__,
-        'title':self.context.title,
-        'body':self.context.body,
-        'author':self.context.author,
-        'created':datestring(self.context.created),
+        'name':context.__name__,
+        'title':context.title,
+        'body':context.body,
+        'author':context.author,
+        'created':datestring(context.created),
         }
     return render_template('templates/blog_entry.pt', **info)
 
@@ -42,15 +42,15 @@ class BlogAddSchema(formencode.Schema):
     title = formencode.validators.NotEmpty()
 
 def blog_entry_add_view(context, request):
-    params = self.request.params
+    params = request.params
 
     message = None
 
     author = params.get('author', '')
     body = params.get('body', '')
     title = params.get('title', '')
-    info = dict(request=self.request,
-                author=author, body=body, title=title, message=None)
+    info = dict(request=request, author=author, body=body, title=title,
+                message=None)
 
     if params.has_key('form.submitted'):
         schema = BlogAddSchema()
@@ -65,7 +65,7 @@ def blog_entry_add_view(context, request):
             title = form['title']
             name = str(time.time())
             new_entry = BlogEntry(name, title, body, author)
-            self.context[name] = new_entry
+            context[name] = new_entry
             return HTTPFound(location='/')
     else:
         return render_template('templates/blog_entry_add.pt', **info)
