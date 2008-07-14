@@ -45,7 +45,6 @@ def makeRegistry(filename, package, lock=threading.Lock()):
     # application's registry.
     lock.acquire()
     try:
-        # Do I actually want a globalregistry.BaseGlobalComponents?
         registry = Components(package.__name__)
         registry_manager.set(registry)
         original_getSiteManager.sethook(getSiteManager)
