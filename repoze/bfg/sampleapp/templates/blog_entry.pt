@@ -6,7 +6,7 @@
     <p><a href="..">Up</a></p>
     <h1>${title}</h1>
     <p>by ${author}</p>
-    <div tal:content="structure info.body"></div>
+    <div tal:content="structure body"></div>
   </div>
 </body>
 </html>

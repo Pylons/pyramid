@@ -22,8 +22,8 @@ def blog_default_view(context, request):
             }
             )
 
-    return render_template('templates/blog.pt', name=context.__name__,
-                           entries=entrydata)
+        return render_template('templates/blog.pt', name=context.__name__,
+                               entries=entrydata)
 
 def blog_entry_default_view(context, request):
     info = {
@@ -67,8 +67,8 @@ def blog_entry_add_view(context, request):
             new_entry = BlogEntry(name, title, body, author)
             context[name] = new_entry
             return HTTPFound(location='/')
-    else:
-        return render_template('templates/blog_entry_add.pt', **info)
+
+    return render_template('templates/blog_entry_add.pt', **info)
                       
 def contents_view(context, request):
     return render_template('templates/contents.pt', context=context)

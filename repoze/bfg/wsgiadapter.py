@@ -15,6 +15,13 @@ class IViewSecurityPolicy(Interface):
         otherwise it should return a WSGI application representing an
         unauthorized view"""
 
+def isResponse(ob):
+    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
+         hasattr(ob, 'status') ):
+        if ( hasattr(ob.app_iter, '__iter__') and
+             hasattr(ob.headerlist, '__iter__') ):
+            return True
+
 class NaiveWSGIViewAdapter:
     classProvides(IWSGIApplicationFactory)
     implements(IWSGIApplication)
@@ -44,7 +51,10 @@ class NaiveWSGIViewAdapter:
             'start_response':start_response,
             }
 
-        response =  mapply(view, positional = (), keyword = kwdict)
+        if isResponse(view):
+            response = view
+        else:
+            response =  mapply(view, positional = (), keyword = kwdict)
         if not catch_response:
             catch_response = (response.status, response.headerlist)
         start_response(*catch_response)

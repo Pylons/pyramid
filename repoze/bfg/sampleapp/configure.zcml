@@ -18,7 +18,7 @@
       permission="repoze.view"
       />
 
-  <!-- the add template for a BlogEntry -->
+  <!-- the add view for a BlogEntry -->
   <bfg:view
       for=".models.IBlog"
       factory=".views.blog_entry_add_view"

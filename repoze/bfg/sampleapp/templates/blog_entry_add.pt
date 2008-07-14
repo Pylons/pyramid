@@ -9,16 +9,16 @@
     <table border="0">
       <tr> 
         <th>Title</th>
-       <td><input type="text" name="title"/>${title}</td>
+       <td><input type="text" name="title" tal:attributes="value title"/></td>
       </tr>
       <tr>
         <th>Author</th>
-        <td><input type="text" name="author"/>${author}</td>
+        <td><input type="text" name="author" tal:attributes="value author"/></td>
       </tr>
       <tr>
         <th>Body</th>
-        <td><textarea name="body" rows="10" cols="80"> ${body}</textarea
-                ></td>
+        <td><textarea name="body" rows="10" cols="80" tal:content="body"
+                ></textarea></td>
       </tr>
       <tr>
         <td><input type="submit" name="form.submitted" value="Add"/></td>
