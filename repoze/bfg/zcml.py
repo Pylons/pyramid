@@ -18,7 +18,7 @@ from repoze.bfg.interfaces import IViewFactory
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.template import Z3CPTTemplateFactory
-from repoze.bfg.template import render_template_explicit
+from repoze.bfg.template import render_template
 
 class TemplateOnlyView(object):
     implements(IView)
@@ -35,7 +35,7 @@ class TemplateOnlyView(object):
                              'a TemplateOnlyView')
         kw = dict(view=self, context=self.context, request=self.request,
                   options=kw)
-        return render_template_explicit(self.template, **kw)
+        return render_template(self.template, **kw)
 
     def __repr__(self):
         klass = self.__class__

@@ -37,7 +37,7 @@ def registerTemplate(template, path):
     else:
         sm.registerUtility(template, IView, name=path)
 
-def render_template_explicit(path, **kw):
+def render_template(path, **kw):
     # XXX use pkg_resources
 
     if not os.path.isabs(path):
@@ -56,5 +56,3 @@ def render_template_explicit(path, **kw):
         registerTemplate(template, path)
 
     return template(**kw)
-
-render_template = render_template_explicit
