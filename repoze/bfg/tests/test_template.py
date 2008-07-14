@@ -78,9 +78,8 @@ class RenderTemplateTests(unittest.TestCase, Base):
         from repoze.bfg.interfaces import IView
         minimal = self._getTemplatePath('minimal.pt')
         self.assertEqual(queryUtility(IView, minimal), None)
-        view = DummyView()
         render = self._getFUT()
-        result = render(view, minimal)
+        result = render(minimal)
         from webob import Response
         self.failUnless(isinstance(result, Response))
         self.assertEqual(result.app_iter, ['<div>\n</div>'])
@@ -100,9 +99,8 @@ class RenderTemplateTests(unittest.TestCase, Base):
         utility = Z3CPTTemplateFactory(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, IView, name=minimal)
-        view = DummyView()
         render = self._getFUT()
-        result = render(view, minimal)
+        result = render(minimal)
         from webob import Response
         self.failUnless(isinstance(result, Response))
         self.assertEqual(result.app_iter, ['<div>\n</div>'])

@@ -1,24 +1,27 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal">
-<head></head>
+<head>
+</head>
 <body>
-  <form action="add_entry_handler" method="POST">
+  <form action="${request.path_url}" method="POST">
+    <h2 tal:condition="message" tal:content="message"></h2>
     <h1>Add a blog entry</h1>
     <table border="0">
       <tr> 
         <th>Title</th>
-       <td><input type="text" name="title"/></td>
+       <td><input type="text" name="title"/>${title}</td>
       </tr>
       <tr>
         <th>Author</th>
-        <td><input type="text" name="author"/></td>
+        <td><input type="text" name="author"/>${author}</td>
       </tr>
       <tr>
         <th>Body</th>
-        <td><textarea name="body" rows="10" value=""> </textarea></td>
+        <td><textarea name="body" rows="10" cols="80"> ${body}</textarea
+                ></td>
       </tr>
       <tr>
-        <td><input type="submit" name="add" value="Add"/></td>
+        <td><input type="submit" name="form.submitted" value="Add"/></td>
       </tr>
     </table>
   </form>

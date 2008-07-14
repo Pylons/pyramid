@@ -268,23 +268,14 @@ A views.py module might look like so::
   from webob import Response
   from repoze.bfg.view import TemplateView
 
-  class MyHelloView(object):
-      def __init__(self, context, request):
-          self.context = context
-          self.request = request
+  def my_hello_view(context, request):
+      response = Response('Hello from %s @ %s' % (
+                          context.__name__, 
+                          request.environ['PATH_INFO']))
+      return response
 
-      def __call__(self):
-          response = Response('Hello from %s @ %s' % (
-                                  self.context.__name__, 
-                                  self.request.environ['PATH_INFO']))
-          return response
-
-  class MyTemplateView(TemplateView):
-
-       template = 'templates/my.pt'
-
-       def getInfo(self):
-           return {'name':self.context.__name__}
+   def my_template_view(context, request):
+       return render_template('templates/my.pt', name=context.__name__)
 
 models.py
 ~~~~~~~~~
@@ -335,7 +326,7 @@ A view registry might look like so::
         permission="repoze.view"
         />
 
-    <!-- the templated view for a MyModel -->
+    <!-- the templated.html view for a MyModel -->
     <bfg:view
         for=".models.IMyModel"
         factory=".views.MyTemplateView"
@@ -353,8 +344,8 @@ A template that is used by a view might look like so::
   <html xmlns="http://www.w3.org/1999/xhtml"
        xmlns:tal="http://xml.zope.org/namespaces/tal">
   <head></head>
-  <body tal:define="info view.getInfo()">
-    <h1>My template viewing ${info.name}</h1>
+  <body>
+    <h1>My template viewing ${name}</h1>
   </body>
   </html>
 

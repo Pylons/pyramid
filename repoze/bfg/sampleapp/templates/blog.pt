@@ -1,15 +1,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal">
 <head></head>
-<body tal:define="info view.getInfo()">
-  <h1 tal:content="info.name">Blog Name</h1>
+<body>
+  <h1 tal:content="name">Blog Name</h1>
   <table border="0">
     <thead>
       <th>Title</th>
       <th>Author</th>
       <th>Created</th>
     </thead>
-    <tr tal:repeat="entry info.entries">
+    <tr tal:repeat="entry entries">
       <td><a href="${entry.name}/">${entry.title}</a></td>
       <td>${entry.author}</td>
       <td>${entry.created}</td>

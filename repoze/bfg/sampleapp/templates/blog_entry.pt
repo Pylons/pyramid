@@ -2,10 +2,10 @@
      xmlns:tal="http://xml.zope.org/namespaces/tal">
 <head></head>
 <body>
-  <div tal:define="info view.getInfo()">
+  <div>
     <p><a href="..">Up</a></p>
-    <h1>${info.title}</h1>
-    <p>by ${info.author}</p>
+    <h1>${title}</h1>
+    <p>by ${author}</p>
     <div tal:content="structure info.body"></div>
   </div>
 </body>

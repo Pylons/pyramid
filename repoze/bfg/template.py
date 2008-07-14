@@ -29,28 +29,32 @@ class Z3CPTTemplateFactory(object):
 def package_path(package):
     return os.path.abspath(os.path.dirname(package.__file__))
 
-def render_template(view, template_path, **kw):
+def registerTemplate(template, path):
+    try:
+        sm = getSiteManager()
+    except ComponentLookupError:
+        pass
+    else:
+        sm.registerUtility(template, IView, name=path)
+
+def render_template_explicit(path, **kw):
     # XXX use pkg_resources
 
-    if not os.path.isabs(template_path):
+    if not os.path.isabs(path):
         package_globals = sys._getframe(1).f_globals
         package_name = package_globals['__name__']
         package = sys.modules[package_name]
         prefix = package_path(package)
-        template_path = os.path.join(prefix, template_path)
+        path = os.path.join(prefix, path)
 
-    template = queryUtility(IView, template_path)
+    template = queryUtility(IView, path)
 
     if template is None:
-        if not os.path.exists(template_path):
-            raise ValueError('Missing template file: %s' % template_path)
-        template = Z3CPTTemplateFactory(template_path)
-        try:
-            sm = getSiteManager()
-        except ComponentLookupError:
-            pass
-        else:
-            sm.registerUtility(template, IView, name=template_path)
+        if not os.path.exists(path):
+            raise ValueError('Missing template file: %s' % path)
+        template = Z3CPTTemplateFactory(path)
+        registerTemplate(template, path)
 
-    return template(view=view, context=view.context, request=view.request,
-                    options=kw)
+    return template(**kw)
+
+render_template = render_template_explicit

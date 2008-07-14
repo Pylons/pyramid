@@ -7,39 +7,29 @@
   <!-- the default view for a Blog -->
   <bfg:view
       for=".models.IBlog"
-      factory=".views.BlogDefaultView"
-      template="templates/blog.pt"
+      factory=".views.blog_default_view"
       permission="repoze.view"
       />
 
   <!-- the default view for a BlogEntry -->
   <bfg:view
       for=".models.IBlogEntry"
-      factory=".views.BlogEntryDefaultView"
-      template="templates/blog_entry.pt"
+      factory=".views.blog_entry_default_view"
       permission="repoze.view"
       />
 
   <!-- the add template for a BlogEntry -->
   <bfg:view
       for=".models.IBlog"
-      template="templates/blog_entry_add.pt"
+      factory=".views.blog_entry_add_view"
       name="add_entry.html"
       permission="repoze.view"
-      />
-
-  <!-- the add handler for a BlogEntry -->
-  <bfg:view
-      for=".models.IBlog"
-      factory=".views.BlogEntryAddView"
-      permission="repoze.view"
-      name="add_entry_handler"
       />
 
   <!-- the contents view for any mapping (shows dict members) -->
   <bfg:view
       for=".models.IMapping"
-      template="templates/contents.pt"
+      factory=".views.contents_view"
       name="contents.html"
       permission="repoze.view"
       />

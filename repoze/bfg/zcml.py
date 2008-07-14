@@ -1,6 +1,4 @@
-import inspect
 import os
-import new
 
 from zope.component.zcml import handler
 from zope.component.interface import provideInterface
@@ -8,10 +6,11 @@ from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
 from zope.configuration.fields import Path
 
-from zope.schema import TextLine
 from zope.interface import Interface
 from zope.interface import implements
+from zope.interface import classProvides
 
+from zope.schema import TextLine
 from zope.security.zcml import Permission
 
 from repoze.bfg.interfaces import IRequest
@@ -19,31 +18,42 @@ from repoze.bfg.interfaces import IViewFactory
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.template import Z3CPTTemplateFactory
-from repoze.bfg.view import TemplateView
+from repoze.bfg.template import render_template_explicit
 
-class TemplateViewFactory(object):
-    """ Pickleable template view factory """
+class TemplateOnlyView(object):
+    implements(IView)
+    classProvides(IViewFactory)
+    template = None
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, **kw):
+        if self.template is None:
+            raise ValueError('a "template" attribute must be attached to '
+                             'a TemplateOnlyView')
+        kw = dict(view=self, context=self.context, request=self.request,
+                  options=kw)
+        return render_template_explicit(self.template, **kw)
+
+    def __repr__(self):
+        klass = self.__class__
+        return '<%s.%s object at %s for %s>' % (klass.__module__,
+                                                klass.__mame__,
+                                                id(self),
+                                                self.template)
+
+class TemplateOnlyViewFactory(object):
+    """ Pickleable template-only view factory """
 
     implements(IViewFactory)
 
-    def __init__(self, template, base=None):
-        if base is not None:
-            if not inspect.isclass(base):
-                raise ValueError('Factory must be a class to be used '
-                                 'with a template, but %s was supplied' % base)
+    def __init__(self, template):
         self.template = template
-        self.base = base
 
     def __call__(self, context, request):
-        if self.base and self.base is not TemplateView:
-            if issubclass(self.base, TemplateView):
-                bases = (self.base,)
-            else:
-                bases = (self.base, TemplateView)
-            name = 'DynamicTemplateView_For_%s' % self.base.__name__
-            factory = new.classobj(name, bases, {})
-        else:
-            factory = TemplateView(context, request)
+        factory = TemplateOnlyView(context, request)
         factory.template = self.template
         return factory
         
@@ -57,9 +67,9 @@ def view(_context,
 
     # XXX we do nothing yet with permission
 
-    if not (template or factory):
+    if (template and factory):
         raise ConfigurationError(
-            'One of template or factory (or both) must be specified')
+            'One of template or factory must be specified, not both')
 
     if template:
         template_abs = os.path.abspath(str(_context.path(template)))
@@ -71,7 +81,12 @@ def view(_context,
             callable = handler,
             args = ('registerUtility', utility, IView, template_abs),
             )
-        factory = TemplateViewFactory(template_abs, factory)
+        factory = TemplateOnlyViewFactory(template_abs)
+
+    if not factory:
+        raise ConfigurationError(
+            'Neither template nor factory was specified, though one must be '
+            'specified.')
 
     if for_ is not None:
         _context.action(
