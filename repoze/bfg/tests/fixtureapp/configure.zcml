@@ -12,6 +12,7 @@
 
   <bfg:view
       for=".models.IFixture"
+      factory=".views.FixtureTemplateView"
       template="templates/fixture.pt"
       permission="repoze.view"
       name="fixture.html"

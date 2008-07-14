@@ -1,4 +1,6 @@
+import inspect
 import os
+import new
 
 from zope.component.zcml import handler
 from zope.component.interface import provideInterface
@@ -24,11 +26,24 @@ class TemplateViewFactory(object):
 
     implements(IViewFactory)
 
-    def __init__(self, template):
+    def __init__(self, template, base=None):
+        if base is not None:
+            if not inspect.isclass(base):
+                raise ValueError('Factory must be a class to be used '
+                                 'with a template, but %s was supplied' % base)
         self.template = template
+        self.base = base
 
     def __call__(self, context, request):
-        factory = TemplateView(context, request)
+        if self.base and self.base is not TemplateView:
+            if issubclass(self.base, TemplateView):
+                bases = (self.base,)
+            else:
+                bases = (self.base, TemplateView)
+            name = 'DynamicTemplateView_For_%s' % self.base.__name__
+            factory = new.classobj(name, bases, {})
+        else:
+            factory = TemplateView(context, request)
         factory.template = self.template
         return factory
         
@@ -42,14 +57,9 @@ def view(_context,
 
     # XXX we do nothing yet with permission
 
-    if template and factory:
-        raise ConfigurationError('A template must not be specified if a '
-                                 'factory is also specified')
-
     if not (template or factory):
         raise ConfigurationError(
-            'One of template or factory must be specified')
-        
+            'One of template or factory (or both) must be specified')
 
     if template:
         template_abs = os.path.abspath(str(_context.path(template)))
@@ -61,7 +71,7 @@ def view(_context,
             callable = handler,
             args = ('registerUtility', utility, IView, template_abs),
             )
-        factory = TemplateViewFactory(template_abs)
+        factory = TemplateViewFactory(template_abs, factory)
 
     if for_ is not None:
         _context.action(

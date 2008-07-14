@@ -12,8 +12,6 @@ def datestring(dt):
 
 class BlogDefaultView(TemplateView):
 
-    template = 'templates/blog.pt'
-
     def getInfo(self):
         entrydata = []
         for name, entry in self.context.items():
@@ -29,8 +27,6 @@ class BlogDefaultView(TemplateView):
 
 class BlogEntryDefaultView(TemplateView):
 
-    template = 'templates/blog_entry.pt'
-    
     def getInfo(self):
         return {
             'name':self.context.__name__,

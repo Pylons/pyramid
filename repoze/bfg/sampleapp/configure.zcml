@@ -8,6 +8,7 @@
   <bfg:view
       for=".models.IBlog"
       factory=".views.BlogDefaultView"
+      template="templates/blog.pt"
       permission="repoze.view"
       />
 
@@ -15,6 +16,7 @@
   <bfg:view
       for=".models.IBlogEntry"
       factory=".views.BlogEntryDefaultView"
+      template="templates/blog_entry.pt"
       permission="repoze.view"
       />
 
