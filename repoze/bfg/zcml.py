@@ -1,62 +1,68 @@
 import os
 
-from zope.schema import TextLine
-from zope.configuration.fields import Path
-from zope.interface import Interface
 from zope.component.zcml import handler
 from zope.component.interface import provideInterface
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
+from zope.configuration.fields import Path
+
+from zope.schema import TextLine
+from zope.interface import Interface
+from zope.interface import implements
+
 from zope.security.zcml import Permission
 
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IViewFactory
+from repoze.bfg.interfaces import IView
 
-from repoze.bfg.template import ViewPageTemplateFile
-from repoze.bfg.template import PageTemplateFile
+from repoze.bfg.template import Z3CPTTemplateFactory
+from repoze.bfg.view import TemplateView
 
-class ViewBase:
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
+class TemplateViewFactory(object):
+    """ Pickleable template view factory """
 
-    def __call__(self, *arg, **kw):
-        return self.index(*arg, **kw)
+    implements(IViewFactory)
 
-def page(_context,
+    def __init__(self, template):
+        self.template = template
+
+    def __call__(self, context, request):
+        factory = TemplateView(context, request)
+        factory.template = self.template
+        return factory
+        
+def view(_context,
          permission,
-         for_,
+         for_=None,
+         factory=None,
          name="",
          template=None,
-         class_=None,
          ):
 
     # XXX we do nothing yet with permission
 
-    if not (class_ or template):
-        raise ConfigurationError("Must specify a class or a template")
+    if template and factory:
+        raise ConfigurationError('A template must not be specified if a '
+                                 'factory is also specified')
+
+    if not (template or factory):
+        raise ConfigurationError(
+            'One of template or factory must be specified')
+        
 
     if template:
-        template = os.path.abspath(str(_context.path(template)))
-        if not os.path.isfile(template):
-            raise ConfigurationError("No such file", template)
+        template_abs = os.path.abspath(str(_context.path(template)))
+        if not os.path.exists(template_abs):
+            raise ConfigurationError('No template file named %s' % template_abs)
+        utility = Z3CPTTemplateFactory(template_abs)
+        _context.action(
+            discriminator = ('utility', IView, template_abs),
+            callable = handler,
+            args = ('registerUtility', utility, IView, template_abs),
+            )
+        factory = TemplateViewFactory(template_abs)
 
-        template_inst = PageTemplateFile(template)
-
-    def view_factory(context, request):
-        if template:
-            if class_ is None:
-                base = ViewBase
-            else:
-                base = class_
-            class ViewClass(base):
-                __name__ = name
-                index = ViewPageTemplateFile(template_inst)
-            return ViewClass(context, request)
-                    
-        else:
-            return class_(context, request)
-        
     if for_ is not None:
         _context.action(
             discriminator = None,
@@ -68,11 +74,11 @@ def page(_context,
         discriminator = ('view', for_, name, IRequest, IViewFactory),
         callable = handler,
         args = ('registerAdapter',
-                view_factory, (for_, IRequest), IViewFactory, name,
+                factory, (for_, IRequest), IViewFactory, name,
                 _context.info),
         )
 
-class IPageDirective(Interface):
+class IViewDirective(Interface):
     """
     The page directive is used to create views that provide a single
     url or page.
@@ -92,7 +98,7 @@ class IPageDirective(Interface):
         required=True
         )
 
-    class_ = GlobalObject(
+    factory = GlobalObject(
         title=u"Class",
         description=u"A class that provides a __call__ used by the view.",
         required=False,
@@ -108,9 +114,8 @@ class IPageDirective(Interface):
 
     template = Path(
         title=u"The name of a template that implements the page.",
-        description=u"""
-        Refers to a file containing a page template (should end in
-        extension '.pt' or '.html').""",
+        description=u"""Refers to a file containing a z3c.pt page template""",
         required=False
         )
+
 

@@ -266,7 +266,7 @@ views.py
 A views.py module might look like so::
 
   from webob import Response
-  from repoze.bfg.template import TemplateView
+  from repoze.bfg.view import TemplateView
 
   class MyHelloView(object):
       def __init__(self, context, request):
@@ -274,11 +274,15 @@ A views.py module might look like so::
           self.request = request
 
       def __call__(self):
-          response = Response('Hello from %s @ %s' % (self.context.__name__, 
-                                                      self.request['PATH_INFO'])
+          response = Response('Hello from %s @ %s' % (
+                                  self.context.__name__, 
+                                  self.request.environ['PATH_INFO']))
           return response
 
   class MyTemplateView(TemplateView):
+
+       template = 'templates/my.pt'
+
        def getInfo(self):
            return {'name':self.context.__name__}
 
@@ -318,24 +322,23 @@ configure.zcml
 A view registry might look like so::
 
   <configure xmlns="http://namespaces.zope.org/zope"
-      xmlns:browser="http://namespaces.repoze.org/browser"
-  	           i18n_domain="repoze.bfg">
+      xmlns:bfg="http://namespaces.repoze.org/bfg"
+      i18n_domain="repoze.bfg">
 
     <!-- this must be included for the view declarations to work -->
     <include package="repoze.bfg" />
 
     <!-- the default view for a MyModel -->
-    <browser:page
+    <bfg:view
         for=".models.IMyModel"
-        class=".views.MyHelloView"
+        factory=".views.MyHelloView"
         permission="repoze.view"
         />
 
     <!-- the templated view for a MyModel -->
-    <browser:page
+    <bfg:view
         for=".models.IMyModel"
-        class=".views.MyTemplateView"
-        template="templates/my.pt"
+        factory=".views.MyTemplateView"
         name="templated.html"
         permission="repoze.view"
         />

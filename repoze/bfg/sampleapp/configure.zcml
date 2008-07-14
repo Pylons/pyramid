@@ -1,27 +1,25 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-    xmlns:browser="http://namespaces.repoze.org/browser"
+    xmlns:bfg="http://namespaces.repoze.org/bfg"
 	           i18n_domain="repoze.bfg">
 
   <include package="repoze.bfg" />
 
   <!-- the default view for a Blog -->
-  <browser:page
+  <bfg:view
       for=".models.IBlog"
-      class=".views.BlogDefaultView"
-      template="templates/blog.pt"
+      factory=".views.BlogDefaultView"
       permission="repoze.view"
       />
 
   <!-- the default view for a BlogEntry -->
-  <browser:page
+  <bfg:view
       for=".models.IBlogEntry"
-      class=".views.BlogEntryDefaultView"
-      template="templates/blog_entry.pt"
+      factory=".views.BlogEntryDefaultView"
       permission="repoze.view"
       />
 
   <!-- the add template for a BlogEntry -->
-  <browser:page
+  <bfg:view
       for=".models.IBlog"
       template="templates/blog_entry_add.pt"
       name="add_entry.html"
@@ -29,15 +27,15 @@
       />
 
   <!-- the add handler for a BlogEntry -->
-  <browser:page
+  <bfg:view
       for=".models.IBlog"
-      class=".views.BlogEntryAddView"
+      factory=".views.BlogEntryAddView"
       permission="repoze.view"
       name="add_entry_handler"
       />
 
   <!-- the contents view for any mapping (shows dict members) -->
-  <browser:page
+  <bfg:view
       for=".models.IMapping"
       template="templates/contents.pt"
       name="contents.html"

@@ -1,40 +1,56 @@
+import os
+import sys
+
+from zope.component import queryUtility
+from zope.component.interfaces import ComponentLookupError
+from zope.component import getSiteManager
+
 from zope.interface import classProvides
 from zope.interface import implements
 
-from z3c.pt import PageTemplateFile as PageTemplateFileBase
 from webob import Response
 
-from repoze.bfg.interfaces import IViewFactory
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import ITemplateFactory
 
-
-class PageTemplateFile(PageTemplateFileBase):
-    def render(self, *arg, **kw):
-        result = PageTemplateFileBase.render(self, *arg, **kw)
-        return Response(result)
-
-class ViewPageTemplateFile(property):
-    def __init__(self, template):
-        self.template = template
-        property.__init__(self, self.render)
-
-    def render(self, view):
-        def template(**kwargs):
-            return self.template.render(view=view,
-                                        context=view.context,
-                                        request=view.request,
-                                        options=kwargs)
-        return template        
-    
-class TemplateView(object):
-    classProvides(IViewFactory)
+class Z3CPTTemplateFactory(object):
+    classProvides(ITemplateFactory)
     implements(IView)
 
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
+    def __init__(self, path):
+        from z3c.pt import PageTemplateFile
+        self.template = PageTemplateFile(path)
 
     def __call__(self, *arg, **kw):
-        """ See metaconfigure.py to see where 'index' comes from """
-        return self.index(*arg, **kw)
+        result = self.template.render(**kw)
+        response = Response(result)
+        return response
 
+def package_path(package):
+    return os.path.abspath(os.path.dirname(package.__file__))
+
+def render_template(view, template_path, **kw):
+    # XXX use pkg_resources
+
+    if not os.path.isabs(template_path):
+        package_globals = sys._getframe(1).f_globals
+        package_name = package_globals['__name__']
+        package = sys.modules[package_name]
+        prefix = package_path(package)
+        template_path = os.path.join(prefix, template_path)
+
+    template = queryUtility(IView, template_path)
+
+    if template is None:
+        if not os.path.exists(template_path):
+            raise ValueError('Missing template file: %s' % template_path)
+        template = Z3CPTTemplateFactory(template_path)
+        try:
+            sm = getSiteManager()
+        except ComponentLookupError:
+            pass
+        else:
+            sm.registerUtility(template, IView, name=template_path)
+
+    return template(view=view, context=view.context, request=view.request,
+                    options=kw)

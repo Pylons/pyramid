@@ -1,14 +1,20 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-    xmlns:browser="http://namespaces.repoze.org/browser"
+    xmlns:bfg="http://namespaces.repoze.org/bfg"
 	           i18n_domain="repoze.bfg">
 
   <include package="repoze.bfg" />
 
-  <browser:page
+  <bfg:view
       for=".models.IFixture"
-      class=".views.FixtureView"
+      factory=".views.FixtureView"
+      permission="repoze.view"
+      />
+
+  <bfg:view
+      for=".models.IFixture"
       template="templates/fixture.pt"
       permission="repoze.view"
+      name="fixture.html"
       />
 
 </configure>

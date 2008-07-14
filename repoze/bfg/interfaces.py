@@ -39,3 +39,7 @@ class IWSGIApplicationFactory(Interface):
     def __call__(context, request, view):
         """ Return an object that implements IWSGIApplication """
 
+class ITemplateFactory(Interface):
+    def __call__(template_path):
+        """ Return an IView given a template path """
+        

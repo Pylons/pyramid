@@ -2,12 +2,12 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:meta="http://namespaces.zope.org/meta">
 
-  <meta:directives namespace="http://namespaces.repoze.org/browser">
+  <meta:directives namespace="http://namespaces.repoze.org/bfg">
 
     <meta:directive
-        name="page"
-        schema=".zcml.IPageDirective"
-        handler=".zcml.page"
+        name="view"
+        schema=".zcml.IViewDirective"
+        handler=".zcml.view"
         />
 
   </meta:directives>

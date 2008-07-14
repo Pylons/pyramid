@@ -2,13 +2,18 @@ import time
 
 from webob.exc import HTTPFound
 
-from repoze.bfg.template import TemplateView
+from repoze.bfg.view import TemplateView
+from repoze.bfg.view import View
+
 from repoze.bfg.sampleapp.models import BlogEntry
 
 def datestring(dt):
-    return dt.strftime('%Y-%m-%dT%H:%M:%S')
+    return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 class BlogDefaultView(TemplateView):
+
+    template = 'templates/blog.pt'
+
     def getInfo(self):
         entrydata = []
         for name, entry in self.context.items():
@@ -23,6 +28,9 @@ class BlogDefaultView(TemplateView):
         return {'name':self.context.__name__, 'entries':entrydata}
 
 class BlogEntryDefaultView(TemplateView):
+
+    template = 'templates/blog_entry.pt'
+    
     def getInfo(self):
         return {
             'name':self.context.__name__,
@@ -32,10 +40,7 @@ class BlogEntryDefaultView(TemplateView):
             'created':datestring(self.context.created),
             }
 
-class BlogEntryAddView(object):
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
+class BlogEntryAddView(View):
 
     def __call__(self):
         author = self.request.params['author']
