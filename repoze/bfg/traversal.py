@@ -2,6 +2,8 @@ import urllib
 
 from zope.interface import classProvides
 from zope.interface import implements
+from zope.location.location import located
+from zope.location.interfaces import ILocation
 
 from repoze.bfg.interfaces import IPublishTraverser
 from repoze.bfg.interfaces import IPublishTraverserFactory
@@ -34,14 +36,16 @@ def step(ob, name, default):
 
 _marker = ()
 
-class NaivePublishTraverser:
+class NaivePublishTraverser(object):
     classProvides(IPublishTraverserFactory)
     implements(IPublishTraverser)
     def __init__(self, root, request):
         self.root = root
+        self.locatable = ILocation.providedBy(root)
         self.request = request
 
     def __call__(self, path):
+        root = self.root
         path = split_path(path)
 
         ob = self.root
@@ -53,8 +57,9 @@ class NaivePublishTraverser:
             if next is _marker:
                 name = segment
                 break
+            if self.locatable:
+                next = located(next, ob, segment)
             ob = next
 
         return ob, name, path
-
 

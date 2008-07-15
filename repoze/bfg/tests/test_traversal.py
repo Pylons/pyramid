@@ -102,7 +102,35 @@ class NaivePublishTraverserTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(name, 'foo')
         self.assertEqual(subpath, [])
 
-class DummyContext:
+    def test_call_with_ILocation_root(self):
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        request = DummyRequest()
+        from zope.interface import directlyProvides
+        from zope.location.interfaces import ILocation
+        directlyProvides(root, ILocation)
+        root.__name__ = None
+        root.__parent__ = None
+        # give bar a direct parent and name to mix things up a bit
+        bar.__name__ = 'bar'
+        bar.__parent__ = foo
+        policy = self._makeOne(root, request)
+        ctx, name, subpath = policy('/foo/bar/baz')
+        self.assertEqual(ctx, baz)
+        self.assertEqual(name, '')
+        self.assertEqual(subpath, [])
+        self.assertEqual(ctx.__name__, 'baz')
+        self.assertEqual(ctx.__parent__, bar)
+        self.assertEqual(ctx.__parent__.__name__, 'bar')
+        self.assertEqual(ctx.__parent__.__parent__, foo)
+        self.assertEqual(ctx.__parent__.__parent__.__name__, 'foo')
+        self.assertEqual(ctx.__parent__.__parent__.__parent__, root)
+        self.assertEqual(ctx.__parent__.__parent__.__parent__.__name__, None)
+        self.assertEqual(ctx.__parent__.__parent__.__parent__.__parent__, None)
+
+class DummyContext(object):
     def __init__(self, next=None):
         self.next = next
         
