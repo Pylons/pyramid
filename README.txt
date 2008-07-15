@@ -266,7 +266,7 @@ views.py
 A views.py module might look like so::
 
   from webob import Response
-  from repoze.bfg.view import TemplateView
+  from repoze.bfg.template import render_template
 
   def my_hello_view(context, request):
       response = Response('Hello from %s @ %s' % (
@@ -300,9 +300,9 @@ A models.py might look like so::
   # model instance info would typically be stored in a database of some
   # kind; here we put it at module scope for demonstration purposes.
 
-  root = Model('root')
-  root['a'] = Model('a')
-  root['b'] = Model('b')
+  root = MyModel('root')
+  root['a'] = MyModel('a')
+  root['b'] = MyModel('b')
 
   def get_root(environ):
       return root
@@ -322,14 +322,14 @@ A view registry might look like so::
     <!-- the default view for a MyModel -->
     <bfg:view
         for=".models.IMyModel"
-        factory=".views.MyHelloView"
+        factory=".views.my_hello_view"
         permission="repoze.view"
         />
 
     <!-- the templated.html view for a MyModel -->
     <bfg:view
         for=".models.IMyModel"
-        factory=".views.MyTemplateView"
+        factory=".views.my_template_view"
         name="templated.html"
         permission="repoze.view"
         />
