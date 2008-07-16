@@ -171,7 +171,8 @@ context
 
 view registry
 
-  A registry which maps a context and view name to a view constructor.
+  A registry which maps a context and view name to a view constructor
+  and optionally a permission.
 
 template
 
