@@ -24,9 +24,9 @@ code using pattern matching against URL components.  Examples:
 <http://www.djangoproject.com/documentation/url_dispatch/>`_ and the
 `Routes URL mapping system <http://routes.groovie.org/>`_ .
 
-It is however possible to map URLs to code slightly differently, using
-object graph traversal. The venerable Zope and CherryPy web frameworks
-offer traversal-based URL dispatch.  ``repoze.bfg`` also provides
+It is however possible to map URLs to code differently, using object
+graph traversal. The venerable Zope and CherryPy web frameworks offer
+traversal-based URL dispatch.  ``repoze.bfg`` also provides
 graph-traversal-based dispatch of URLs to code.  Graph-traversal based
 dispatching is useful if you like the URL to be representative of an
 arbitrary hierarchy of potentially heterogeneous items.
@@ -42,10 +42,9 @@ sets of URLs such as ``http://example.com/members/Chris/document`` vs.
 ``/stuff/page`` in the second to represent, e.g. an OpenOffice
 document in a "stuff" folder.  It takes more pattern matching
 assertions to be able to make URLs like these work in URL-dispatch
-based systems.  Over time, the more assertions you make, the more
-fragile the URL dispatch lookup logic becomes.  URL-dispatch based
-systems don't deal very well with URLs that represent arbitrary-depth
-hierarchies.
+based systems, and some assertions just aren't possible.  For example,
+URL-dispatch based systems don't deal very well with URLs that
+represent arbitrary-depth hierarchies.
 
 Graph traversal works well if you need to divine meaning out of these
 types of "ambiguous" URLs and URLs that represent arbitrary-depth
@@ -66,23 +65,6 @@ traversal vs. URL dispatch is largely "religious" in some sense and
 often doesn't make sense for completely "square" data, but old habits
 die hard for folks used to graph-traversal-based lookup.
 ``repoze.bfg`` is for those folks.
-
-How ``repoze.bfg`` is Configured
---------------------------------
-
-Users interact with your ``repoze.bfg``-based application via a
-"router", which is itself a WSGI application.  At system startup time,
-the router must be configured with a root object from which all
-traversal will begin.  The root object is a mapping object, such as a
-Python dictionary.  In fact, all items contained in the graph are
-either leaf nodes (these have no __getitem__) or container nodes
-(these do have a __getitem__).
-
-Items contained within the graph are analogous to the concept of
-``model`` objects used by many other frameworks.  They are typically
-instances of classes.  Each containerish instance is willing to return
-a child or raise a KeyError based on a name passed to its __getitem__.
-No leaf-level instance is required to have a __getitem__.
 
 Similarities with Other Frameworks
 ----------------------------------
@@ -119,16 +101,28 @@ happens to be true for ``repoze.bfg``::
   framework — that is, "model", "template", and "view." That breakdown
   makes much more sense.
 
+How ``repoze.bfg`` is Configured
+--------------------------------
+
+Users interact with your ``repoze.bfg``-based application via a
+"router", which is itself a WSGI application.  At system startup time,
+the router must be configured with a root object from which all
+traversal will begin.  The root object is a mapping object, such as a
+Python dictionary.  In fact, all items contained in the graph are
+either leaf nodes (these have no __getitem__) or container nodes
+(these do have a __getitem__).
+
+Items contained within the graph are analogous to the concept of
+``model`` objects used by many other frameworks.  They are typically
+instances of classes.  Each containerish instance is willing to return
+a child or raise a KeyError based on a name passed to its __getitem__.
+No leaf-level instance is required to have a __getitem__.
+
 Jargon
 ------
 
 The following jargon is used casually in descriptions of
 ``repoze.bfg`` operations.
-
-mapply
-
-  code which dynamically ("magically") determines which arguments to
-  pass to a view based on environment and request parameters.
 
 request
 
@@ -141,15 +135,29 @@ response
   upstream), and status (representing the http status string).  This
   is the interface defined for ``WebOb`` response objects.
 
-view
+mapply
 
-  A callable that accepts arbitrary values (mapped into it by
-  "mapply") and which returns a response object.
+  code which dynamically ("magically") determines which arguments to
+  pass to a view based on environment and request parameters.
 
-view constructor
+view constructor and view
 
-  A callable which returns a view object.  It should accept two
-  values: context and request.
+  A "view constructor" is a callable which returns a view object.  It
+  should accept two values: context and request.
+
+  A "view" is a callable that accepts arbitrary values (mapped into it
+  by "mapply") and which returns a response object.
+
+  A view constructor may *be* a view in a repoze.bfg application
+  (e.g. it may accept "context" and "request" and return a response
+  object directly instead of returning a view object).  This makes it
+  possible to support views as simple functions.
+
+view name
+
+  The "URL name" of a view, e.g "index.html".  If a view is configured
+  without a name, its name is considered to be the empty string (which
+  implies the "default view").
 
 model
 
@@ -172,6 +180,29 @@ template
 interface
 
   An attribute of a model object that determines its type.
+
+security policy
+
+  An object that provides a mechanism to check authorization using
+  authentication data and a permission associated with a model.  It
+  essentially returns "true" if the combination of the authorization
+  information in the model (e.g. an ACL) and the authentication data
+  in the request (e.g. the REMOTE_USER) allow the action implied by
+  the permission (e.g. "view").
+
+principal
+
+  A user id or group id.
+
+permission
+
+  A permission is a string token that is associated with a view name
+  and a model type by the developer.  Models are decorated with
+  security declarations (e.g. ACLs), which reference these tokens
+  also.  A security policy attempts to match the view permission
+  against the model's statements about which permissions are granted
+  to which principal to answer the question "is this user allowed to
+  do this".
 
 How ``repoze.bfg`` Processes a Request
 --------------------------------------
@@ -227,7 +258,15 @@ code to execute:
      name ``b``, the router deems that the context is object A, the
      view name is ``b`` and the subpath is ``['c']``.
 
- 7.  Armed with the context, the view name, and the subpath, the
+ 7.  If a security policy is configured, the router performs a
+     permission lookup.  If a permission declaration is found for the
+     view name and context implied by the current request, the
+     security policy is consulted to see if the "current user" (also
+     determined by the security policy) can perform the action.  If he
+     can, processing continues.  If he cannot, an HTTPUnauthorized
+     error is raised.
+
+ 8.  Armed with the context, the view name, and the subpath, the
      router performs a view lookup.  It attemtps to look up a view
      constructor from the ``repoze.bfg`` view registry using the view
      name and the context.  If a view constructor is found, it is
