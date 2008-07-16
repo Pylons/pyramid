@@ -7,7 +7,7 @@ API documentation
 -----------------
 
 The :mod:`repoze.bfg` package contains the code nececessary to create
-and run an application.
+and run a web application.
 
 Sub-packages
 ------------
@@ -15,6 +15,9 @@ Sub-packages
 .. toctree::
    :maxdepth: 2
 
+   push
    router
    security
+   template
+   view
 
