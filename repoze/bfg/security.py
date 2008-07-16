@@ -14,6 +14,13 @@ Allow = 'Allow'
 Deny = 'Deny'
 
 def has_permission(permission, context, request):
+    """ Provided a permission (a string or unicode object), a context
+    (a model instance) and a request object, return ``Allowed`` if the
+    permission is granted in this context to the user implied by the
+    request. Return ``Denied`` if this permission is not granted in
+    this context to this user.  This delegates to the current security
+    policy.  Return True unconditionally if no security policy has
+    been configured in this application."""
     policy = queryUtility(ISecurityPolicy)
     if policy is None:
         return True
@@ -55,6 +62,23 @@ class ACLAuthorizer(object):
         
 
 class RemoteUserACLSecurityPolicy(object):
+    """ A security policy which:
+
+    - examines the request.environ for the REMOTE_USER variable and
+      uses any non-false value as a principal id for this request.
+
+    - uses an ACL-based authorization model which attempts to find an
+      ACL on the context, and which returns ``Allowed`` from its
+      'permits' method if the ACL found grants access to the current
+      principal.  It returns ``Denied`` if permission was not granted
+      (either explicitly via a deny or implicitly by not finding a
+      matching ACE action).  An ACL is an ordered sequence of ACE
+      tuples, e.g.  ``[(Allow, Everyone, 'read'), (Deny, 'george',
+      'write')]``.  ACLs stored on model instance objects as their
+      __acl__ attribute will be used by the security machinery to
+      grant or deny access.
+
+    """
     implements(ISecurityPolicy)
     authorizer_factory = ACLAuthorizer
     
@@ -62,6 +86,8 @@ class RemoteUserACLSecurityPolicy(object):
         self.logger = logger
 
     def permits(self, context, request, permission):
+        """ Return ``Allowed`` if the policy permits access,
+        ``Denied`` if not."""
         userid = request.environ.get('REMOTE_USER', None)
         effective_principals = [Everyone]
 
@@ -94,6 +120,11 @@ class PermitsResult:
         return msg
 
 class Denied(PermitsResult):
+    """ The value type returned by an ACL denial.  It evaluates equal
+    to all boolean false types.  It also has attributes which indicate
+    which acl, ace, permission, principals, and context were involved
+    in the request.  Its __str__ method prints a summary of these
+    attributes for debugging purposes. """
     def __nonzero__(self):
         return False
 
@@ -102,6 +133,11 @@ class Denied(PermitsResult):
             return True
 
 class Allowed(PermitsResult):
+    """ The value type returned by an ACL denial.  It evaluates equal
+    to all boolean true types.  It also has attributes which indicate
+    which acl, ace, permission, principals, and context were involved
+    in the request.  Its __str__ method prints a summary of these
+    attributes for debugging purposes. """
     def __nonzero__(self):
         return True
 

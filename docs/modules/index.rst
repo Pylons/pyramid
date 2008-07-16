@@ -16,3 +16,5 @@ Sub-packages
    :maxdepth: 2
 
    router
+   security
+

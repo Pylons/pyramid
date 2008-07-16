@@ -17,6 +17,8 @@ from repoze.bfg.interfaces import IRequest
 from repoze.bfg.registry import registry_manager
 
 class Router:
+    """ WSGI application which routes requests to 'view' code based on
+    a view registry"""
     def __init__(self, root_policy, registry):
         self.root_policy = root_policy
         self.registry = registry
@@ -51,6 +53,12 @@ class Router:
         return app(environ, start_response)
 
 def make_app(root_policy, package=None, filename='configure.zcml'):
+    """ Create a view registry based on the application's ZCML.  and
+    return a Router object, representing a repoze.bfg WSGI
+    application.  'root_policy' must be a callable that accepts an
+    environ and returns a graph root object.  'package' is the
+    dotted-Python-path packagename of the application, 'filename' is
+    the ZCML file that should be parsed to create the view registry."""
     from repoze.bfg.registry import makeRegistry
     registry = makeRegistry(filename, package)
     return Router(root_policy, registry)
