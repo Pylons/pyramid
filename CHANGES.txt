@@ -6,6 +6,8 @@ After 0.1
 
   - Added ACL-based security.
 
+  - Support for XSLT templates via a render_transform method
+
 0.1
 
   - Initial release.
