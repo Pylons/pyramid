@@ -11,14 +11,16 @@ from zope.interface import implements
 from zope.interface import classProvides
 
 from zope.schema import TextLine
-from zope.security.zcml import Permission
 
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IViewFactory
+from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.template import Z3CPTTemplateFactory
 from repoze.bfg.template import render_template
+
+from repoze.bfg.security import ViewPermissionFactory
 
 class TemplateOnlyView(object):
     implements(IView)
@@ -58,7 +60,7 @@ class TemplateOnlyViewFactory(object):
         return factory
         
 def view(_context,
-         permission,
+         permission=None,
          for_=None,
          factory=None,
          name="",
@@ -95,6 +97,16 @@ def view(_context,
             args = ('', for_)
             )
 
+    if permission:
+        pfactory = ViewPermissionFactory(permission)
+        _context.action(
+            discriminator = ('permission', for_,name, IRequest,IViewPermission),
+            callable = handler,
+            args = ('registerAdapter',
+                    pfactory, (for_, IRequest), IViewPermission, name,
+                    _context.info),
+            )
+
     _context.action(
         discriminator = ('view', for_, name, IRequest, IViewFactory),
         callable = handler,
@@ -104,23 +116,15 @@ def view(_context,
         )
 
 class IViewDirective(Interface):
-    """
-    The page directive is used to create views that provide a single
-    url or page.
-
-    The page directive creates a new view class from a given template
-    and/or class and registers it.
-    """
-
     for_ = GlobalObject(
         title=u"The interface or class this view is for.",
         required=False
         )
 
-    permission = Permission(
+    permission = TextLine(
         title=u"Permission",
         description=u"The permission needed to use the view.",
-        required=True
+        required=False
         )
 
     factory = GlobalObject(

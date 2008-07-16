@@ -63,8 +63,8 @@ def blog_entry_add_view(context, request):
             author = form['author']
             body = form['body']
             title = form['title']
+            new_entry = BlogEntry(title, body, author)
             name = str(time.time())
-            new_entry = BlogEntry(name, title, body, author)
             context[name] = new_entry
             return HTTPFound(location='/')
 

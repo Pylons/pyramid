@@ -2,12 +2,6 @@
 	           i18n_domain="repoze.bfg">
 
   <include package="z3c.pt" />
-  <include package="zope.security" file="meta.zcml"/>
-
-  <permission
-      id="repoze.view"
-      title="View"
-      />
 
   <adapter
       factory=".traversal.NaivePublishTraverser"

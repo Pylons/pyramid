@@ -36,10 +36,12 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IViewFactory
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
         from zope.component.zcml import handler
         from zope.component.interface import provideInterface
 
-        self.assertEqual(len(actions), 3)
+        self.assertEqual(len(actions), 4)
 
         regutil_discriminator = ('utility', IView, context.path('minimal.pt'))
         regutil = actions[0]
@@ -57,7 +59,20 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(provide['args'][0], '')
         self.assertEqual(provide['args'][1], IFoo)
         
-        regadapt = actions[2]
+        permission = actions[2]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+
+        regadapt = actions[3]
         regadapt_discriminator = ('view', IFoo, '', IRequest, IViewFactory)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
@@ -78,18 +93,33 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         actions = context.actions
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IViewFactory
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
         from zope.component.zcml import handler
         from zope.component.interface import provideInterface
 
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 3)
 
         provide = actions[0]
         self.assertEqual(provide['discriminator'], None)
         self.assertEqual(provide['callable'], provideInterface)
         self.assertEqual(provide['args'][0], '')
         self.assertEqual(provide['args'][1], IFoo)
+
+        permission = actions[1]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
         
-        regadapt = actions[1]
+        regadapt = actions[2]
         regadapt_discriminator = ('view', IFoo, '', IRequest, IViewFactory)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)

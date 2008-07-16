@@ -1,19 +1,13 @@
 from zope.component import queryMultiAdapter
+from zope.component import queryUtility
 from zope.interface import classProvides
 from zope.interface import implements
 from zope.interface import Interface
 
 from repoze.bfg.interfaces import IWSGIApplicationFactory
 from repoze.bfg.interfaces import IWSGIApplication
+from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.mapply import mapply
-
-class IViewSecurityPolicy(Interface):
-    """ Marker interface for a view security policy; a view security
-    policy. """
-    def __call__():
-        """ Return None if the security check succeeded,
-        otherwise it should return a WSGI application representing an
-        unauthorized view"""
 
 def isResponse(ob):
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
@@ -36,12 +30,6 @@ class NaiveWSGIViewAdapter:
         context = self.context
         request = self.request
         view = self.view
-        security_policy = queryMultiAdapter((context, request),
-                                            IViewSecurityPolicy)
-        if security_policy:
-            failed_view = security_policy()
-            if failed_view:
-                view = failed_view
 
         catch_response = []
         def replace_start_response(status, headers):

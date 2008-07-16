@@ -21,11 +21,23 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.interfaces import IViewFactory
         gsm.registerAdapter(app, for_, IViewFactory, name)
 
+    def _registerPermission(self, permission, name, *for_):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import IViewPermission
+        gsm.registerAdapter(permission, for_, IViewPermission, name)
+
     def _registerWSGIFactory(self, app, name, *for_):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import IWSGIApplicationFactory
         gsm.registerAdapter(app, for_, IWSGIApplicationFactory, name)
+
+    def _registerSecurityPolicy(self, secpol):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ISecurityPolicy
+        gsm.registerUtility(secpol, ISecurityPolicy)
 
     def _getTargetClass(self):
         from repoze.bfg.router import Router
@@ -155,6 +167,88 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.failUnless('404' in result[0])
         self.assertEqual(start_response.status, '404 Not Found')
 
+    def test_call_view_registered_security_policy_permission_none(self):
+        rootpolicy = make_rootpolicy(None)
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        traversalfactory = make_traversal_factory(context, '', [''])
+        response = DummyResponse()
+        viewfactory = make_view_factory(response)
+        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerViewFactory(viewfactory, '', IContext, IRequest)
+        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        secpol = DummySecurityPolicy()
+        self._registerSecurityPolicy(secpol)
+        app_context = make_appcontext()
+        router = self._makeOne(rootpolicy, None)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(start_response.status, '200 OK')
+
+    def test_call_view_registered_security_policy_permission_succeeds(self):
+        rootpolicy = make_rootpolicy(None)
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        traversalfactory = make_traversal_factory(context, '', [''])
+        response = DummyResponse()
+        viewfactory = make_view_factory(response)
+        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        secpol = DummySecurityPolicy()
+        permissionfactory = make_permission_factory(True)
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerViewFactory(viewfactory, '', IContext, IRequest)
+        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerSecurityPolicy(secpol)
+        self._registerPermission(permissionfactory, '', IContext, IRequest)
+        app_context = make_appcontext()
+        router = self._makeOne(rootpolicy, None)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(start_response.status, '200 OK')
+        self.assertEqual(permissionfactory.checked_with, secpol)
+
+    def test_call_view_registered_security_policy_permission_failss(self):
+        rootpolicy = make_rootpolicy(None)
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        traversalfactory = make_traversal_factory(context, '', [''])
+        response = DummyResponse()
+        viewfactory = make_view_factory(response)
+        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        secpol = DummySecurityPolicy()
+        permissionfactory = make_permission_factory(False)
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerViewFactory(viewfactory, '', IContext, IRequest)
+        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerSecurityPolicy(secpol)
+        self._registerPermission(permissionfactory, '', IContext, IRequest)
+        app_context = make_appcontext()
+        router = self._makeOne(rootpolicy, None)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(start_response.status, '401 Unauthorized')
+        self.failUnless('permission' in result[0])
+        self.assertEqual(permissionfactory.checked_with, secpol)
+
 class MakeAppTests(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)
@@ -213,6 +307,20 @@ def make_traversal_factory(context, name, subpath):
             return context, name, subpath
     return DummyTraversalFactory
 
+def make_permission_factory(result):
+    class DummyPermissionFactory:
+        def __init__(self, context, request):
+            self.context = context
+            self.request = request
+
+        def __call__(self, secpol):
+            self.__class__.checked_with = secpol
+            return result
+
+        def __repr__(self):
+            return 'permission'
+    return DummyPermissionFactory
+
 def make_rootpolicy(root):
     def rootpolicy(environ):
         return root
@@ -237,3 +345,6 @@ class DummyResponse:
     headerlist = ()
     app_iter = ()
     
+class DummySecurityPolicy:
+    pass
+

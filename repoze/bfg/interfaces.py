@@ -43,3 +43,22 @@ class ITemplateFactory(Interface):
     def __call__(template_path):
         """ Return an IView given a template path """
         
+class ISecurityPolicy(Interface):
+    """ A utility that provides a mechanism to check authorization
+       using authentication data """
+    def permits(context, request, permission):
+        """ Returns True if the combination of the authorization
+            information in the context and the authentication data in
+            the request allow the action implied by the permission """
+
+class NoAuthorizationInformation(Exception):
+    pass
+
+class IViewPermission(Interface):
+    def __call__(security_policy):
+        """ Return True if the permission allows, return False if it denies. """
+
+class IViewPermissionFactory(Interface):
+    def __call__(context, request):
+        """ Return an IViewPermission """
+
