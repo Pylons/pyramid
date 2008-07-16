@@ -1,3 +1,9 @@
+After 0.1
+
+  - Added 'repoze.bfg.push:pushpage' decorator, which creates BFG views
+    from callables which take (context, request) and return a mapping of
+    top-level names.
+
 0.1
 
   - Initial release.
