@@ -26,6 +26,38 @@ class Z3CPTTemplateFactory(object):
         response = Response(result)
         return response
 
+class XSLTemplateFactory(object):
+    classProvides(ITemplateFactory)
+    implements(IView)
+
+    def __init__(self, path):
+        self.path = path
+
+    def __call__(self, *arg, **kw):
+        node = kw.get("node")
+        processor = get_processor(self.path)
+        result = str(processor(node))
+        response = Response(result)
+        return response
+
+# Manage XSLT processors on a per-thread basis
+import threading
+from lxml import etree
+xslt_pool = threading.local()
+def get_processor(xslt_fn):
+    try:
+        return xslt_pool.processors[xslt_fn]
+    except AttributeError:
+        xslt_pool.processors = {}
+    except KeyError:
+        pass
+
+    # Make a processor and add it to the pool
+    source = etree.ElementTree(file=xslt_fn)
+    proc = etree.XSLT(source)
+    xslt_pool.processors[xslt_fn] = proc
+    return proc
+
 def package_path(package):
     return os.path.abspath(os.path.dirname(package.__file__))
 
@@ -53,6 +85,26 @@ def render_template(path, **kw):
         if not os.path.exists(path):
             raise ValueError('Missing template file: %s' % path)
         template = Z3CPTTemplateFactory(path)
+        registerTemplate(template, path)
+
+    return template(**kw)
+
+def render_transform(path, **kw):
+    # Render using XSLT
+
+    if not os.path.isabs(path):
+        package_globals = sys._getframe(1).f_globals
+        package_name = package_globals['__name__']
+        package = sys.modules[package_name]
+        prefix = package_path(package)
+        path = os.path.join(prefix, path)
+
+    template = queryUtility(IView, path)
+    node = kw.get("node")
+    if template is None:
+        if not os.path.exists(path):
+            raise ValueError('Missing template file: %s' % path)
+        template = XSLTemplateFactory(path)
         registerTemplate(template, path)
 
     return template(**kw)
