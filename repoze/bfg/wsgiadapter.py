@@ -1,12 +1,8 @@
-from zope.component import queryMultiAdapter
-from zope.component import queryUtility
 from zope.interface import classProvides
 from zope.interface import implements
-from zope.interface import Interface
 
 from repoze.bfg.interfaces import IWSGIApplicationFactory
 from repoze.bfg.interfaces import IWSGIApplication
-from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.mapply import mapply
 
 def isResponse(ob):
