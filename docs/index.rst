@@ -1,7 +1,7 @@
-.. repoze.bfg documentation.
+.. _index:
 
-Welcome to repoze.bfg's documentation!
-======================================
+repoze.bfg Documentation
+========================
 
 Contents:
 
