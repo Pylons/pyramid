@@ -2,13 +2,19 @@ import os.path
 from repoze.bfg.template import render_template
 
 class pushpage(object):
-    """ Decorator for functions which return template namespaces.
+    """ Decorator for functions which return ZPT template namespaces.
 
-    E.g.:
+    E.g.::
 
       @pushpage('www/my_template.pt')
       def my_view(context, request):
           return {'a': 1, 'b': ()}
+
+    Equates to::
+
+      def my_view(context, request):
+          return render_template('www/my_template.pt', a=1, b=())
+        
     """
     def __init__(self, template):
         self.template = template

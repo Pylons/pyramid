@@ -5,7 +5,8 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewFactory
 
 class View(object):
-    """ Convenience base class for user-defined views """
+    """ Convenience base class for user-defined views (just accepts
+    context and request)"""
     implements(IView)
     classProvides(IViewFactory)
     def __init__(self, context, request):

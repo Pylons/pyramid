@@ -70,6 +70,9 @@ def registerTemplate(template, path):
         sm.registerUtility(template, IView, name=path)
 
 def render_template(path, **kw):
+    """ Render a z3c.pt (ZPT) template at the package-relative path
+    (may also be absolute) using the kwargs in ``*kw`` as top-level
+    names and return a Response object. """
     # XXX use pkg_resources
 
     if not os.path.isabs(path):
@@ -90,6 +93,9 @@ def render_template(path, **kw):
     return template(**kw)
 
 def render_transform(path, **kw):
+    """ Render a XSL template at the package-relative path (may also
+    be absolute) using the kwargs in ``*kw`` as top-level names and
+    return a Response object."""
     # Render using XSLT
 
     if not os.path.isabs(path):
