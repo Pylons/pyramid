@@ -4,6 +4,8 @@ After 0.1
     from callables which take (context, request) and return a mapping of
     top-level names.
 
+  - Added ACL-based security.
+
 0.1
 
   - Initial release.
