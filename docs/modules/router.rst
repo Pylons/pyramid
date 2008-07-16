@@ -5,9 +5,6 @@
 
 .. automodule:: repoze.bfg.router
 
-    :class:`Router`
-    ===================
-
-    .. autoclass:: Router
+.. autoclass:: Router
 
 .. autofunction:: repoze.bfg.router.make_app

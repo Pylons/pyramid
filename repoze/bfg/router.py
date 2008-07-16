@@ -58,7 +58,8 @@ def make_app(root_policy, package=None, filename='configure.zcml'):
     application.  'root_policy' must be a callable that accepts an
     environ and returns a graph root object.  'package' is the
     dotted-Python-path packagename of the application, 'filename' is
-    the ZCML file that should be parsed to create the view registry."""
+    the ZCML file (relative to the package path) that should be parsed
+    to create the view registry."""
     from repoze.bfg.registry import makeRegistry
     registry = makeRegistry(filename, package)
     return Router(root_policy, registry)

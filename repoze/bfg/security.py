@@ -15,12 +15,13 @@ Deny = 'Deny'
 
 def has_permission(permission, context, request):
     """ Provided a permission (a string or unicode object), a context
-    (a model instance) and a request object, return ``Allowed`` if the
-    permission is granted in this context to the user implied by the
-    request. Return ``Denied`` if this permission is not granted in
-    this context to this user.  This delegates to the current security
-    policy.  Return True unconditionally if no security policy has
-    been configured in this application."""
+    (a model instance) and a request object, return an instance of
+    ``Allowed`` if the permission is granted in this context to the
+    user implied by the request. Return an instance of ``Denied`` if
+    this permission is not granted in this context to this user.  This
+    delegates to the current security policy.  Return True
+    unconditionally if no security policy has been configured in this
+    application."""
     policy = queryUtility(ISecurityPolicy)
     if policy is None:
         return True
@@ -120,11 +121,11 @@ class PermitsResult:
         return msg
 
 class Denied(PermitsResult):
-    """ The value type returned by an ACL denial.  It evaluates equal
-    to all boolean false types.  It also has attributes which indicate
-    which acl, ace, permission, principals, and context were involved
-    in the request.  Its __str__ method prints a summary of these
-    attributes for debugging purposes. """
+    """ An instance of ``Denied`` is returned by an ACL denial.  It
+    evaluates equal to all boolean false types.  It also has
+    attributes which indicate which acl, ace, permission, principals,
+    and context were involved in the request.  Its __str__ method
+    prints a summary of these attributes for debugging purposes."""
     def __nonzero__(self):
         return False
 
@@ -133,11 +134,11 @@ class Denied(PermitsResult):
             return True
 
 class Allowed(PermitsResult):
-    """ The value type returned by an ACL denial.  It evaluates equal
-    to all boolean true types.  It also has attributes which indicate
-    which acl, ace, permission, principals, and context were involved
-    in the request.  Its __str__ method prints a summary of these
-    attributes for debugging purposes. """
+    """ An instance of ``Allowed`` is returned by an ACL allow.  It
+    evaluates equal to all boolean true types.  It also has attributes
+    which indicate which acl, ace, permission, principals, and context
+    were involved in the request.  Its __str__ method prints a summary
+    of these attributes for debugging purposes."""
     def __nonzero__(self):
         return True
 

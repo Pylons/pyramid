@@ -66,6 +66,8 @@ setup(name='repoze.bfg',
             'Paste',
             'z3c.pt',
             'FormEncode',
+            'Sphinx',
+            'docutils',
             ],
       test_suite="repoze.bfg.tests",
       entry_points = """\
