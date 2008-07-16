@@ -415,7 +415,7 @@ perform this task)::
   from myapp.models import get_root
   import myapp
 
-  app = make_app(myapp.get_root, myapp)
+  app = make_app(get_root, myapp)
   httpserver.serve(app, host='0.0.0.0', port='5432')
   
 Viewing the Application
