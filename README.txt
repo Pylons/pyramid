@@ -189,7 +189,7 @@ security policy
   essentially returns "true" if the combination of the authorization
   information in the model (e.g. an ACL) and the authentication data
   in the request (e.g. the REMOTE_USER) allow the action implied by
-  the permission (e.g. "view").
+  the permission associated with the view (e.g. "add").
 
 principal
 
