@@ -66,4 +66,8 @@ def getSiteManager(context=None):
             raise ComponentLookupError(*error.args)
 
 from zope.testing.cleanup import addCleanUp
-addCleanUp(original_getSiteManager.reset)
+try:
+    addCleanUp(original_getSiteManager.reset)
+except AttributeError:
+    # zope.hookable not yet installed
+    pass
