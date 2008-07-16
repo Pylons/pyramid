@@ -26,7 +26,7 @@ code using pattern matching against URL components.  Examples:
 
 It is however possible to map URLs to code differently, using object
 graph traversal. The venerable Zope and CherryPy web frameworks offer
-traversal-based URL dispatch.  ``repoze.bfg`` also provides
+graph-traversal-based URL dispatch.  ``repoze.bfg`` also provides
 graph-traversal-based dispatch of URLs to code.  Graph-traversal based
 dispatching is useful if you like the URL to be representative of an
 arbitrary hierarchy of potentially heterogeneous items.
@@ -53,6 +53,12 @@ an edge of the graph.  So a URL like ``http://example.com/a/b/c`` can
 be thought of as a graph traversal on the example.com site through the
 edges "a", "b", and "c".
 
+Finally, if you're willing to treat your application models as a graph
+that can be traversed, it also becomes trivial to provide "row-level
+security" (in common relational parlance): you just attach a security
+declaration to each instance in the graph.  This is not as easy in
+frameworks that use URL-based dispatch.
+
 Graph traversal is materially more complex than URL-based dispatch,
 however, if only because it requires the construction and maintenance
 of a graph, and it requires the developer to think about mapping URLs
@@ -60,11 +66,14 @@ to code in terms of traversing the graph.  (How's *that* for
 self-referential! ;-) That said, for developers comfortable with Zope,
 in particular, and comfortable with hierarchical data stores like
 ZODB, mapping a URL to a graph traversal it's a natural way to think
-about creating a web application.  In essence, the choice to use graph
-traversal vs. URL dispatch is largely "religious" in some sense and
-often doesn't make sense for completely "square" data, but old habits
-die hard for folks used to graph-traversal-based lookup.
-``repoze.bfg`` is for those folks.
+about creating a web application.
+
+In essence, the choice to use graph traversal vs. URL dispatch is
+largely religious in some sense.  Graph traversal dispatch probably
+just doesn't make any sense when you possess completely "square" data
+stored in a relational database.  However, when you have a
+hierarchical data store, it can provide advantages over using
+URL-based dispatch.
 
 Similarities with Other Frameworks
 ----------------------------------
@@ -299,6 +308,10 @@ A typical simple ``repoze.bfg`` application consists of four things:
 
 An application must be a Python package (meaning it must have an
 __init__.py and it must be findable on the PYTHONPATH).
+
+We don't describe any security in our very simple sample application.
+Security is optional in a repoze.bfg application; it needn't be used
+until necessary.
 
 views.py
 ~~~~~~~~
