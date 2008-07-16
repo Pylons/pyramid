@@ -71,3 +71,4 @@ try:
 except AttributeError:
     # zope.hookable not yet installed
     pass
+addCleanUp(registry_manager.clear)
