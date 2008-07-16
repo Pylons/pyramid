@@ -15,7 +15,7 @@
       <td>${entry.created}</td>
     </tr>
   </table>
-  <p>
+  <p tal:condition="can_add">
     <a href="add_entry.html">Add blog entry</a>
   </p>
 </body>

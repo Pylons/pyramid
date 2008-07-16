@@ -276,6 +276,27 @@ class RemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         self.assertEqual(authorizer_factory.permission, 'view')
         self.assertEqual(authorizer_factory.context, context)
 
+class TestHasPermission(unittest.TestCase):
+    def _getFUT(self):
+        from repoze.bfg.security import has_permission
+        return has_permission
+
+    def _registerSecurityPolicy(self, secpol):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ISecurityPolicy
+        gsm.registerUtility(secpol, ISecurityPolicy)
+
+    def test_registered(self):
+        secpol = DummySecurityPolicy(False)
+        self._registerSecurityPolicy(secpol)
+        has_permission = self._getFUT()
+        self.assertEqual(has_permission('view', None, None), False)
+        
+    def test_not_registered(self):
+        has_permission = self._getFUT()
+        self.assertEqual(has_permission('view', None, None), True)
+
 
 class TestViewPermission(unittest.TestCase):
     def _getTargetClass(self):
@@ -352,7 +373,9 @@ class make_authorizer_factory:
                     raise NoAuthorizationInformation()
                 return result
         return Authorizer()
-        
+
+    
+
 
             
                 

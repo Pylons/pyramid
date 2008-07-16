@@ -5,12 +5,17 @@ from webob.exc import HTTPFound
 
 from repoze.bfg.template import render_template
 from repoze.bfg.sampleapp.models import BlogEntry
+from repoze.bfg.security import has_permission
 
 def datestring(dt):
     return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 def blog_default_view(context, request):
     entrydata = []
+
+    can_add = False
+    if has_permission('add', context, request):
+        can_add = True
     for name, entry in context.items():
         entrydata.append(
             {
@@ -23,7 +28,7 @@ def blog_default_view(context, request):
             )
 
     return render_template('templates/blog.pt', name=context.__name__,
-                           entries=entrydata)
+                           entries=entrydata, can_add=can_add)
 
 def blog_entry_default_view(context, request):
     info = {

@@ -1,4 +1,6 @@
 from zope.interface import implements
+from zope.component import queryUtility
+
 from zope.location.location import LocationIterator
 
 from repoze.bfg.interfaces import ISecurityPolicy
@@ -10,6 +12,12 @@ Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
 Allow = 'Allow'
 Deny = 'Deny'
+
+def has_permission(permission, context, request):
+    policy = queryUtility(ISecurityPolicy)
+    if policy is None:
+        return True
+    return policy.permits(context, request, permission)
 
 class ACLAuthorizer(object):
 
