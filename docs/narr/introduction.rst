@@ -149,15 +149,15 @@ mapply
   code which dynamically ("magically") determines which arguments to
   pass to a view based on environment and request parameters.
 
-view constructor and view
+view factory and view
 
-  A "view constructor" is a callable which returns a view object.  It
+  A "view factory" is a callable which returns a view object.  It
   should accept two values: context and request.
 
   A "view" is a callable that accepts arbitrary values (mapped into it
   by "mapply") and which returns a response object.
 
-  A view constructor may *be* a view in a repoze.bfg application
+  A view factory may *be* a view in a repoze.bfg application
   (e.g. it may accept "context" and "request" and return a response
   object directly instead of returning a view object).  This makes it
   possible to support views as simple functions.
@@ -180,7 +180,7 @@ context
 
 view registry
 
-  A registry which maps a context and view name to a view constructor
+  A registry which maps a context and view name to a view factory
   and optionally a permission.
 
 template
@@ -278,12 +278,12 @@ code to execute:
 
  8.  Armed with the context, the view name, and the subpath, the
      router performs a view lookup.  It attemtps to look up a view
-     constructor from the ``repoze.bfg`` view registry using the view
-     name and the context.  If a view constructor is found, it is
+     factory from the ``repoze.bfg`` view registry using the view
+     name and the context.  If a view factory is found, it is
      converted into a WSGI application: it is "wrapped in" ( aka
      "adapted to") a WSGI application using mapply.  The WSGI adapter
      uses mapply to map request and environment variables into the
-     view when it is called.  If a view constructor is not found, a
+     view when it is called.  If a view factory is not found, a
      generic WSGI ``NotFound`` application is constructed. 
 
 In either case, the resulting WSGI application is called.  The WSGI

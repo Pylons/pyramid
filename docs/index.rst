@@ -13,6 +13,7 @@ Narrative documentation in chapter form explaining how to use
    :maxdepth: 2
 
    narr/introduction
+   narr/views
 
 API documentation
 -----------------
