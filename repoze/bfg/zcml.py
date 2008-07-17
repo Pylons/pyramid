@@ -67,8 +67,6 @@ def view(_context,
          template=None,
          ):
 
-    # XXX we do nothing yet with permission
-
     if (template and factory):
         raise ConfigurationError(
             'One of template or factory must be specified, not both')
