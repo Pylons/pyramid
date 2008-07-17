@@ -19,10 +19,10 @@ class Base(PlacelessSetup):
         here = os.path.abspath(os.path.dirname(__file__))
         return os.path.join(here, 'fixtures', name)
 
-class ViewTests(unittest.TestCase):
+class ViewFactoryTests(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.view import View
-        return View
+        from repoze.bfg.view import ViewFactory
+        return ViewFactory
 
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
