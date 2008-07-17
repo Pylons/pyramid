@@ -5,5 +5,5 @@
 
 .. currentmodule:: repoze.bfg.view
 
-.. autoclass:: View
+.. autoclass:: ViewFactory
    :members:
