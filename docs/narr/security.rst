@@ -33,7 +33,7 @@ ACL
   attached to a model instance, and that model instance is findable
   via the context, it will be consulted by the security policy to
   determine wither a particular request can be fulfilled given the
-  *authorization* information in the request.
+  *authentication* information in the request.
 
 Authentication
 
