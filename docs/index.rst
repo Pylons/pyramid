@@ -15,6 +15,7 @@ Narrative documentation in chapter form explaining how to use
    narr/introduction
    narr/views
    narr/templates
+   narr/models
    narr/security
 
 API documentation
