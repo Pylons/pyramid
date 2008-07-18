@@ -24,9 +24,9 @@ named "templates", you can render the template in a view via::
   from repoze.bfg.template import render_template
   render_template('templates/foo.html', foo=1, bar=2)
 
-You can also wire up page templates via ZCML::
+You can also wire up page templates via ZCML:
 
-.. code-block:: xml
+.. sourcecode:: xml
 
   <bfg:view
       for=".models.IMapping"
