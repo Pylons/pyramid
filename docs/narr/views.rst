@@ -30,7 +30,7 @@ function it returns *another* callable instead of a response.  The
 returned callable is then called by ``repoze.bfg``, with its arguments
 filled in "magically".
 
-The easiest way to implement a view factory is to imlement it as a
+The easiest way to implement a view factory is to implement it as a
 class.  Here's a hello world view factory that is implemented as a
 class::
 
@@ -105,7 +105,7 @@ magically during view call time::
 View Functions Revisited
 ------------------------
 
-Above we provided an example of a "view" imlemented as a function::
+Above we provided an example of a "view" implemented as a function::
 
   def hello_world(context, request):
       from webob import Response
