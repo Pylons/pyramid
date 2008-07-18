@@ -296,7 +296,7 @@ A Traversal Example
 
 Let's pretend the user asks for
 ``http://example.com/foo/bar/baz/biz/buz.txt``. Let's pretend that the
-request's PATH_INFO in that case is ``foo/bar/baz/biz/buz.txt``.
+request's PATH_INFO in that case is ``/foo/bar/baz/biz/buz.txt``.
 Let's further pretend that when this request comes in that we're
 traversing the follwing graph::
 
