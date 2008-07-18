@@ -386,8 +386,8 @@ this question:
 
 Let's say that question is answered "here you go, here'a a bit of code
 that is willing to deal with that case", and returns a view.  It is
-passed both "biz" as the "context" and the request.  It returns a
-response.
+passed the "biz" object as the "context" and the current WebOb request
+as the "request".  It returns a response.
 
 The only "special case" is when you end up with a "view name" that is
 the empty string.  In this case the "default view" is looked up.  The
