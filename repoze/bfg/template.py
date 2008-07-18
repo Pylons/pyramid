@@ -11,6 +11,7 @@ from zope.interface import implements
 from webob import Response
 
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import INodeView
 from repoze.bfg.interfaces import ITemplateFactory
 
 class Z3CPTTemplateFactory(object):
@@ -28,15 +29,14 @@ class Z3CPTTemplateFactory(object):
 
 class XSLTemplateFactory(object):
     classProvides(ITemplateFactory)
-    implements(IView)
+    implements(INodeView)
 
     def __init__(self, path):
         self.path = path
 
-    def __call__(self, *arg, **kw):
-        node = kw.get("node")
+    def __call__(self, node, **kw):
         processor = get_processor(self.path)
-        result = str(processor(node))
+        result = str(processor(node, **kw))
         response = Response(result)
         return response
 
@@ -92,7 +92,7 @@ def render_template(path, **kw):
 
     return template(**kw)
 
-def render_transform(path, **kw):
+def render_transform(path, node, **kw):
     """ Render a XSL template at the package-relative path (may also
     be absolute) using the kwargs in ``*kw`` as top-level names and
     return a Response object."""
@@ -106,11 +106,10 @@ def render_transform(path, **kw):
         path = os.path.join(prefix, path)
 
     template = queryUtility(IView, path)
-    node = kw.get("node")
     if template is None:
         if not os.path.exists(path):
             raise ValueError('Missing template file: %s' % path)
         template = XSLTemplateFactory(path)
         registerTemplate(template, path)
 
-    return template(**kw)
+    return template(node, **kw)

@@ -13,6 +13,12 @@ class IView(Interface):
     def __call__(*arg, **kw):
         """ Must return an object that implements IResponse; args are
         mapped into an IView's __call__ by mapply-like code """
+
+class INodeView(IView):
+   def __call__(node, **kw):
+       """ Must return an object that implements IResponse; node is an
+       lxml.etree Element and **kw provides parameters to an XSLT
+       processor """
         
 class IViewFactory(Interface):
     def __call__(context, request):

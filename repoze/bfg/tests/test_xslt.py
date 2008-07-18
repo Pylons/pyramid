@@ -34,16 +34,16 @@ class XSLTemplateFactoryTests(unittest.TestCase, Base):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
-    def test_instance_conforms_to_IView(self):
+    def test_instance_conforms_to_INodeView(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import INodeView
         path = self._getTemplatePath('minimal.xsl')
-        verifyObject(IView, self._makeOne(path))
+        verifyObject(INodeView, self._makeOne(path))
 
-    def test_class_conforms_to_IView(self):
+    def test_class_conforms_to_INodeView(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IView
-        verifyClass(IView, self._getTargetClass())
+        from repoze.bfg.interfaces import INodeView
+        verifyClass(INodeView, self._getTargetClass())
 
     def test_class_conforms_to_ITemplateFactory(self):
         from zope.interface.verify import verifyObject
