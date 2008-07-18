@@ -298,7 +298,7 @@ Let's pretend the user asks for
 ``http://example.com/foo/bar/baz/biz/buz.txt``. Let's pretend that the
 request's PATH_INFO in that case is ``foo/bar/baz/biz/buz.txt``.
 Let's further pretend that when this request comes in that we're
-traversing the follwing graph:
+traversing the follwing graph::
 
   /--
      |
@@ -382,7 +382,7 @@ registry" (configured separately, in our case in "configure.zcml")
 this question:
 
   - Please find me a "view" (controller in some religions) with the name
-   "buz.txt" that can be used for type IBiz.
+    "buz.txt" that can be used for type IBiz.
 
 Let's say that question is answered "here you go, here'a a bit of code
 that is willing to deal with that case", and returns a view.  It is
