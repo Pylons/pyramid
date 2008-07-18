@@ -291,6 +291,108 @@ application's return value is an iterable.  This is returned upstream
 to the WSGI server.  The WSGI application also calls start_response
 with a status code and a header list.
 
+A Traversal Example
+-------------------
+
+Let's pretend the user asks for
+``http://example.com/foo/bar/baz/biz/buz.txt``. Let's pretend that the
+request's PATH_INFO in that case is ``foo/bar/baz/biz/buz.txt``.
+Let's further pretend that when this request comes in that we're
+traversing the follwing graph:
+
+  /--
+     |
+     |-- foo
+          |
+          ----bar
+
+Here's what happens:
+
+  - bfg traverses the root, and attempts to find foo, which it finds.
+
+  - bfg traverses foo, and attempts to find bar, which it finds.
+
+  - bfg traverses bar, and attempts to find baz, which it does not
+    find ('bar' raises a KeyError when asked for baz).
+
+The fact that it does not find "baz" at this point does not signify an
+error condition.  It signifies that:
+
+  - the "context" is bar (the context is the last item found during
+    traversal).
+
+  - the "view name" is ``baz``
+
+  - the "subpath" is ``['biz', 'buz.txt']``
+
+Because it's the "context", bfg examimes "baz" to find out what "type"
+it is. Let's say it finds that the context an IBar type (because "bar"
+happens to have an attribute attached to it that indicates it's an
+IBar).
+
+Using the "view name" ("baz") and the type, it asks the "view
+registry" (configured separately, in our case via "configure.zcml")
+this question:
+
+  - Please find me a "view" (controller in some religions) with the
+    name "baz" that can be used for the type IBar.
+
+Let's say it finds no matching view type.  It then returns a NotFound.
+The request ends.  Everyone is sad.
+
+But!  For this graph::
+
+  /--
+     |
+     |-- foo
+          |
+          ----bar
+               |
+               ----baz
+                      |
+                      biz
+
+The user asks for http://example.com/foo/bar/baz/biz/buz.txt
+
+  - bfg traverses foo, and attempts to find bar, which it finds.
+
+  - bfg traverses bar, and attempts to find baz, which it finds.
+
+  - bfg traverses baz, and attempts to find biz, which it finds.
+
+  - bfg traverses biz, and attemtps to find "buz.txt" which it does
+    not find.
+
+The fact that it does not find "biz.txt" at this point does not
+signify an error condition.  It signifies that:
+
+  - the "context" is biz (the context is the last item found during traversal).
+
+  - the "view name" is "buz.txt"
+
+  - the "subpath" is the empty list []
+
+Because it's the "context", bfg examimes "biz" to find out what "type"
+it is. Let's say it finds that the context an IBiz type (because "biz"
+happens to have an attribute attached to it that happens indicates
+it's an IBiz).
+
+Using the "view name" ("buz.txt") and the type, it asks the "view
+registry" (configured separately, in our case in "configure.zcml")
+this question:
+
+  - Please find me a "view" (controller in some religions) with the name
+   "buz.txt" that can be used for type IBiz.
+
+Let's say that question is answered "here you go, here'a a bit of code
+that is willing to deal with that case", and returns a view.  It is
+passed both "biz" as the "context" and the request.  It returns a
+response.
+
+The only "special case" is when you end up with a "view name" that is
+the empty string.  In this case the "default view" is looked up.  The
+default view has a name that equals the empty string.
+
 A Sample Application
 --------------------
 
