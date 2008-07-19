@@ -12,21 +12,21 @@
   <!-- the default view for a Blog -->
   <bfg:view
       for=".models.IBlog"
-      factory=".views.blog_default_view"
+      view=".views.blog_default_view"
       permission="view"
       />
 
   <!-- the default view for a BlogEntry -->
   <bfg:view
       for=".models.IBlogEntry"
-      factory=".views.blog_entry_default_view"
+      view=".views.blog_entry_default_view"
       permission="view"
       />
 
   <!-- the add view for a BlogEntry -->
   <bfg:view
       for=".models.IBlog"
-      factory=".views.blog_entry_add_view"
+      view=".views.blog_entry_add_view"
       name="add_entry.html"
       permission="add"
       />
@@ -34,7 +34,7 @@
   <!-- the contents view for any mapping (shows dict members) -->
   <bfg:view
       for=".models.IMapping"
-      factory=".views.contents_view"
+      view=".views.contents_view"
       name="contents.html"
       permission="manage"
       />

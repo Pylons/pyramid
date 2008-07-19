@@ -34,21 +34,16 @@ class XSLTemplateFactoryTests(unittest.TestCase, Base):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
-    def test_instance_conforms_to_INodeView(self):
+    def test_instance_implements_INodeTemplate(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import INodeView
+        from repoze.bfg.interfaces import INodeTemplate
         path = self._getTemplatePath('minimal.xsl')
-        verifyObject(INodeView, self._makeOne(path))
+        verifyObject(INodeTemplate, self._makeOne(path))
 
-    def test_class_conforms_to_INodeView(self):
+    def test_class_implements_INodeTemplate(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import INodeView
-        verifyClass(INodeView, self._getTargetClass())
-
-    def test_class_conforms_to_ITemplateFactory(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ITemplateFactory
-        verifyObject(ITemplateFactory, self._getTargetClass())
+        from repoze.bfg.interfaces import INodeTemplate
+        verifyClass(INodeTemplate, self._getTargetClass())
 
     def test_call(self):
         self._zcmlConfigure()
@@ -57,14 +52,64 @@ class XSLTemplateFactoryTests(unittest.TestCase, Base):
         from lxml import etree
         info = etree.Element("info")
         result = instance(node=info)
+        self.failUnless(isinstance(result, str))
+        resultstr = """<?xml version="1.0"?>\n<div/>\n"""
+        self.assertEqual(result, resultstr)
+
+class RenderTransformToResponseTests(unittest.TestCase, Base):
+    def setUp(self):
+        Base.setUp(self)
+
+    def tearDown(self):
+        Base.tearDown(self)
+
+    def _getFUT(self):
+        from repoze.bfg.template import render_transform_to_response
+        return render_transform_to_response
+
+    def test_nonabs_unregistered(self):
+        self._zcmlConfigure()
+        from zope.component import queryUtility
+        from repoze.bfg.interfaces import INodeTemplate
+        minimal = self._getTemplatePath('minimal.xsl')
+        self.assertEqual(queryUtility(INodeTemplate, minimal), None)
+        render = self._getFUT()
+        from lxml import etree
+        info = etree.Element("info")
+        result = render(minimal, node=info)
         from webob import Response
         self.failUnless(isinstance(result, Response))
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
         self.assertEqual(result.app_iter, [resultstr])
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
+        from repoze.bfg.template import XSLTemplateFactory
+        self.failUnless(isinstance(queryUtility(INodeTemplate, minimal),
+                                   XSLTemplateFactory))
 
-class RenderTemplateTests(unittest.TestCase, Base):
+    def test_nonabs_registered(self):
+        self._zcmlConfigure()
+        from zope.component import getGlobalSiteManager
+        from zope.component import queryUtility
+        from repoze.bfg.template import XSLTemplateFactory
+        from repoze.bfg.interfaces import INodeTemplate
+        minimal = self._getTemplatePath('minimal.xsl')
+        utility = XSLTemplateFactory(minimal)
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(utility, INodeTemplate, name=minimal)
+        render = self._getFUT()
+        from lxml import etree
+        info = etree.Element("info")
+        result = render(minimal, node=info)
+        from webob import Response
+        self.failUnless(isinstance(result, Response))
+        resultstr = """<?xml version="1.0"?>\n<div/>\n"""
+        self.assertEqual(result.app_iter, [resultstr])
+        self.assertEqual(result.status, '200 OK')
+        self.assertEqual(len(result.headerlist), 2)
+        self.assertEqual(queryUtility(INodeTemplate, minimal), utility)
+
+class RenderTransformTests(unittest.TestCase, Base):
     def setUp(self):
         Base.setUp(self)
 
@@ -78,21 +123,18 @@ class RenderTemplateTests(unittest.TestCase, Base):
     def test_nonabs_unregistered(self):
         self._zcmlConfigure()
         from zope.component import queryUtility
-        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import INodeTemplate
         minimal = self._getTemplatePath('minimal.xsl')
-        self.assertEqual(queryUtility(IView, minimal), None)
+        self.assertEqual(queryUtility(INodeTemplate, minimal), None)
         render = self._getFUT()
         from lxml import etree
         info = etree.Element("info")
         result = render(minimal, node=info)
-        from webob import Response
-        self.failUnless(isinstance(result, Response))
+        self.failUnless(isinstance(result, str))
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
-        self.assertEqual(result.app_iter, [resultstr])
-        self.assertEqual(result.status, '200 OK')
-        self.assertEqual(len(result.headerlist), 2)
+        self.assertEqual(result, resultstr)
         from repoze.bfg.template import XSLTemplateFactory
-        self.failUnless(isinstance(queryUtility(IView, minimal),
+        self.failUnless(isinstance(queryUtility(INodeTemplate, minimal),
                                    XSLTemplateFactory))
 
     def test_nonabs_registered(self):
@@ -100,24 +142,17 @@ class RenderTemplateTests(unittest.TestCase, Base):
         from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.template import XSLTemplateFactory
-        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import INodeTemplate
         minimal = self._getTemplatePath('minimal.xsl')
         utility = XSLTemplateFactory(minimal)
         gsm = getGlobalSiteManager()
-        gsm.registerUtility(utility, IView, name=minimal)
+        gsm.registerUtility(utility, INodeTemplate, name=minimal)
         render = self._getFUT()
         from lxml import etree
         info = etree.Element("info")
         result = render(minimal, node=info)
-        from webob import Response
-        self.failUnless(isinstance(result, Response))
+        self.failUnless(isinstance(result, str))
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
-        self.assertEqual(result.app_iter, [resultstr])
-        self.assertEqual(result.status, '200 OK')
-        self.assertEqual(len(result.headerlist), 2)
-        self.assertEqual(queryUtility(IView, minimal), utility)
-        
-class DummyView:
-    context = 'context'
-    request = 'request'
-        
+        self.assertEqual(result, resultstr)
+        self.assertEqual(queryUtility(INodeTemplate, minimal), utility)
+

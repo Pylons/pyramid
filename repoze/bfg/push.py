@@ -1,5 +1,5 @@
 import os.path
-from repoze.bfg.template import render_template
+from repoze.bfg.template import render_template_to_response
 
 class pushpage(object):
     """ Decorator for functions which return ZPT template namespaces.
@@ -25,7 +25,7 @@ class pushpage(object):
 
         def _curried(context, request):
             kw = wrapped(context, request)
-            return render_template(path, **kw)
+            return render_template_to_response(path, **kw)
         _curried.__name__ = wrapped.__name__
 
         return _curried

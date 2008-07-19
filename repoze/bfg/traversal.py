@@ -5,8 +5,8 @@ from zope.interface import implements
 from zope.location.location import located
 from zope.location.interfaces import ILocation
 
-from repoze.bfg.interfaces import IPublishTraverser
-from repoze.bfg.interfaces import IPublishTraverserFactory
+from repoze.bfg.interfaces import ITraverser
+from repoze.bfg.interfaces import ITraverserFactory
 
 def split_path(path):
     if path.startswith('/'):
@@ -36,9 +36,9 @@ def step(ob, name, default):
 
 _marker = ()
 
-class NaivePublishTraverser(object):
-    classProvides(IPublishTraverserFactory)
-    implements(IPublishTraverser)
+class NaiveTraverser(object):
+    classProvides(ITraverserFactory)
+    implements(ITraverser)
     def __init__(self, root, request):
         self.root = root
         self.locatable = ILocation.providedBy(root)

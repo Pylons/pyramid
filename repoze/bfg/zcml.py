@@ -13,63 +13,39 @@ from zope.interface import classProvides
 from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import IViewFactory
+from repoze.bfg.interfaces import ITemplateFactory
+from repoze.bfg.interfaces import ITemplate
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.template import Z3CPTTemplateFactory
-from repoze.bfg.template import render_template
+from repoze.bfg.template import render_template_to_response
 
 from repoze.bfg.security import ViewPermissionFactory
 
-class TemplateOnlyView(object):
-    implements(IView)
-    classProvides(IViewFactory)
-    template = None
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def __call__(self, **kw):
-        if self.template is None:
-            raise ValueError('a "template" attribute must be attached to '
-                             'a TemplateOnlyView')
-        kw = dict(view=self, context=self.context, request=self.request,
-                  options=kw)
-        return render_template(self.template, **kw)
-
-    def __repr__(self):
-        klass = self.__class__
-        return '<%s.%s object at %s for %s>' % (klass.__module__,
-                                                klass.__mame__,
-                                                id(self),
-                                                self.template)
-
 class TemplateOnlyViewFactory(object):
     """ Pickleable template-only view factory """
-
-    implements(IViewFactory)
+    classProvides(ITemplateFactory)
+    implements(IView)
 
     def __init__(self, template):
         self.template = template
 
     def __call__(self, context, request):
-        factory = TemplateOnlyView(context, request)
-        factory.template = self.template
-        return factory
+        kw = dict(view=self, context=context, request=request)
+        return render_template_to_response(self.template, **kw)
         
 def view(_context,
          permission=None,
          for_=None,
-         factory=None,
+         view=None,
          name="",
          template=None,
          ):
 
-    if (template and factory):
+    if (template and view):
         raise ConfigurationError(
-            'One of template or factory must be specified, not both')
+            'One of template or view must be specified, not both')
 
     if template:
         template_abs = os.path.abspath(str(_context.path(template)))
@@ -77,13 +53,13 @@ def view(_context,
             raise ConfigurationError('No template file named %s' % template_abs)
         utility = Z3CPTTemplateFactory(template_abs)
         _context.action(
-            discriminator = ('utility', IView, template_abs),
+            discriminator = ('utility', ITemplate, template_abs),
             callable = handler,
-            args = ('registerUtility', utility, IView, template_abs),
+            args = ('registerUtility', utility, ITemplate, template_abs),
             )
-        factory = TemplateOnlyViewFactory(template_abs)
+        view = TemplateOnlyViewFactory(template_abs)
 
-    if not factory:
+    if not view:
         raise ConfigurationError(
             'Neither template nor factory was specified, though one must be '
             'specified.')
@@ -106,10 +82,10 @@ def view(_context,
             )
 
     _context.action(
-        discriminator = ('view', for_, name, IRequest, IViewFactory),
+        discriminator = ('view', for_, name, IRequest, IView),
         callable = handler,
         args = ('registerAdapter',
-                factory, (for_, IRequest), IViewFactory, name,
+                view, (for_, IRequest), IView, name,
                 _context.info),
         )
 
@@ -125,14 +101,14 @@ class IViewDirective(Interface):
         required=False
         )
 
-    factory = GlobalObject(
-        title=u"Class",
-        description=u"A class that provides a __call__ used by the view.",
+    view = GlobalObject(
+        title=u"",
+        description=u"The view function",
         required=False,
         )
 
     name = TextLine(
-        title=u"The name of the page (view)",
+        title=u"The name of the view",
         description=u"""
         The name shows up in URLs/paths. For example 'foo' or
         'foo.html'.""",
@@ -140,7 +116,7 @@ class IViewDirective(Interface):
         )
 
     template = Path(
-        title=u"The name of a template that implements the page.",
+        title=u"The name of a template that implements the view.",
         description=u"""Refers to a file containing a z3c.pt page template""",
         required=False
         )

@@ -1,5 +1,16 @@
 After 0.1
 
+  - The concept of "view factories" was removed in favor of always
+    calling a view, which is a callable that returns a response
+    directly (as opposed to returning a view).  As a result, the
+    ``factory`` attribute in the bfg:view ZCML statement has been
+    renamed to ``view``.  Various interface names were changed also.
+
+  - ``render_template`` and ``render_transform`` no longer return a
+    Response object.  Instead, these return strings.  The old behavior
+    can be obtained by using ``render_template_to_response`` and
+    ``render_transform_to_response``.
+
   - Added 'repoze.bfg.push:pushpage' decorator, which creates BFG views
     from callables which take (context, request) and return a mapping of
     top-level names.

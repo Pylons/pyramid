@@ -6,7 +6,7 @@
 
   <bfg:view
       for=".models.IFixture"
-      factory=".views.FixtureView"
+      view=".views.fixture_view"
       permission="repoze.view"
       />
 

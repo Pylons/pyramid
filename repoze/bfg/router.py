@@ -7,14 +7,15 @@ from webob import Request
 from webob.exc import HTTPNotFound
 from webob.exc import HTTPUnauthorized
 
-from repoze.bfg.interfaces import IPublishTraverserFactory
-from repoze.bfg.interfaces import IViewFactory
+from repoze.bfg.interfaces import ITraverserFactory
+from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import ISecurityPolicy
-from repoze.bfg.interfaces import IWSGIApplicationFactory
 from repoze.bfg.interfaces import IRequest
 
 from repoze.bfg.registry import registry_manager
+
+_marker = ()
 
 class Router:
     """ WSGI application which routes requests to 'view' code based on
@@ -29,10 +30,12 @@ class Router:
         directlyProvides(request, IRequest)
         root = self.root_policy(environ)
         path = environ.get('PATH_INFO', '/')
-        traverser = getMultiAdapter((root, request), IPublishTraverserFactory)
+        traverser = getMultiAdapter((root, request), ITraverserFactory)
         context, name, subpath = traverser(path)
-        request.subpath = subpath
+
+        request.context = context
         request.view_name = name
+        request.subpath = subpath
 
         security_policy = queryUtility(ISecurityPolicy)
         if security_policy:
@@ -44,13 +47,27 @@ class Router:
                     app.explanation = repr(permission)
                     return app(environ, start_response)
 
-        app = queryMultiAdapter((context, request), IViewFactory, name=name)
-        if app is None:
+        response = queryMultiAdapter((context, request), IView, name=name,
+                                     default=_marker)
+        if response is _marker:
             app = HTTPNotFound(request.url)
-        else:
-            app = getMultiAdapter((context, request, app),
-                                  IWSGIApplicationFactory)
-        return app(environ, start_response)
+            return app(environ, start_response)
+
+        if not isResponse(response):
+            raise ValueError('response was not IResponse: %s' % response)
+
+        start_response(response.status, response.headerlist)
+        return response.app_iter
+
+def isResponse(ob):
+    # response objects aren't obligated to implement a Zope interface,
+    # so we do it the hard way
+    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
+         hasattr(ob, 'status') ):
+        if ( hasattr(ob.app_iter, '__iter__') and
+             hasattr(ob.headerlist, '__iter__') and
+             isinstance(ob.status, basestring) ) :
+            return True
 
 def make_app(root_policy, package=None, filename='configure.zcml'):
     """ Create a view registry based on the application's ZCML.  and

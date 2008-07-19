@@ -12,26 +12,20 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
     def _registerTraverserFactory(self, app, name, *for_):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import IPublishTraverserFactory
-        gsm.registerAdapter(app, for_, IPublishTraverserFactory, name)
+        from repoze.bfg.interfaces import ITraverserFactory
+        gsm.registerAdapter(app, for_, ITraverserFactory, name)
 
-    def _registerViewFactory(self, app, name, *for_):
+    def _registerView(self, app, name, *for_):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import IViewFactory
-        gsm.registerAdapter(app, for_, IViewFactory, name)
+        from repoze.bfg.interfaces import IView
+        gsm.registerAdapter(app, for_, IView, name)
 
     def _registerPermission(self, permission, name, *for_):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import IViewPermission
         gsm.registerAdapter(permission, for_, IViewPermission, name)
-
-    def _registerWSGIFactory(self, app, name, *for_):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import IWSGIApplicationFactory
-        gsm.registerAdapter(app, for_, IWSGIApplicationFactory, name)
 
     def _registerSecurityPolicy(self, secpol):
         import zope.component
@@ -77,42 +71,40 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         traversalfactory = make_traversal_factory(context, '', [])
         response = DummyResponse()
-        viewfactory = make_view_factory(response)
-        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        response.app_iter = ['Hello world']
+        view = make_view(response)
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
-        self._registerViewFactory(viewfactory, '', None, None)
-        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerView(view, '', None, None)
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
         self.assertEqual(start_response.headers, ())
         self.assertEqual(start_response.status, '200 OK')
-        request = environ['request']
-        self.assertEqual(environ['request'].subpath, [])
-        self.assertEqual(environ['view'].context, context)
+        self.assertEqual(environ['webob.adhoc_attrs']['view_name'], '')
+        self.assertEqual(environ['webob.adhoc_attrs']['subpath'], [])
+        self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
 
     def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
         rootpolicy = make_rootpolicy(None)
         context = DummyContext()
         traversalfactory = make_traversal_factory(context, 'foo', ['bar'])
         response = DummyResponse()
-        viewfactory = make_view_factory(response)
-        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        response.app_iter = ['Hello world']
+        view = make_view(response)
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
-        self._registerViewFactory(viewfactory, 'foo', None, None)
-        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerView(view, 'foo', None, None)
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
         self.assertEqual(start_response.headers, ())
         self.assertEqual(start_response.status, '200 OK')
-        request = environ['request']
-        self.assertEqual(environ['request'].subpath, ['bar'])
-        self.assertEqual(environ['view'].context, context)
+        self.assertEqual(environ['webob.adhoc_attrs']['view_name'], 'foo')
+        self.assertEqual(environ['webob.adhoc_attrs']['subpath'], ['bar'])
+        self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
 
     def test_call_view_registered_specific_success(self):
         rootpolicy = make_rootpolicy(None)
@@ -125,21 +117,20 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         directlyProvides(context, IContext)
         traversalfactory = make_traversal_factory(context, '', [])
         response = DummyResponse()
-        viewfactory = make_view_factory(response)
-        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        response.app_iter = ['Hello world']
+        view = make_view(response)
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
-        self._registerViewFactory(viewfactory, '', IContext, IRequest)
-        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerView(view, '', IContext, IRequest)
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
         self.assertEqual(start_response.headers, ())
         self.assertEqual(start_response.status, '200 OK')
-        request = environ['request']
-        self.assertEqual(environ['request'].subpath, [])
-        self.assertEqual(environ['view'].context, context)
+        self.assertEqual(environ['webob.adhoc_attrs']['view_name'], '')
+        self.assertEqual(environ['webob.adhoc_attrs']['subpath'], [])
+        self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
 
     def test_call_view_registered_specific_fail(self):
         rootpolicy = make_rootpolicy(None)
@@ -154,18 +145,16 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         directlyProvides(context, INotContext)
         traversalfactory = make_traversal_factory(context, '', [''])
         response = DummyResponse()
-        viewfactory = make_view_factory(response)
-        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        view = make_view(response)
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
-        self._registerViewFactory(viewfactory, '', IContext, IRequest)
-        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerView(view, '', IContext, IRequest)
         app_context = make_appcontext()
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
-        self.failUnless('404' in result[0])
         self.assertEqual(start_response.status, '404 Not Found')
+        self.failUnless('404' in result[0])
 
     def test_call_view_registered_security_policy_permission_none(self):
         rootpolicy = make_rootpolicy(None)
@@ -178,12 +167,10 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         directlyProvides(context, IContext)
         traversalfactory = make_traversal_factory(context, '', [''])
         response = DummyResponse()
-        viewfactory = make_view_factory(response)
-        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        view = make_view(response)
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
-        self._registerViewFactory(viewfactory, '', IContext, IRequest)
-        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerView(view, '', IContext, IRequest)
         secpol = DummySecurityPolicy()
         self._registerSecurityPolicy(secpol)
         app_context = make_appcontext()
@@ -203,14 +190,12 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         directlyProvides(context, IContext)
         traversalfactory = make_traversal_factory(context, '', [''])
         response = DummyResponse()
-        viewfactory = make_view_factory(response)
-        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        view = make_view(response)
         secpol = DummySecurityPolicy()
         permissionfactory = make_permission_factory(True)
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
-        self._registerViewFactory(viewfactory, '', IContext, IRequest)
-        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
         app_context = make_appcontext()
@@ -220,7 +205,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(start_response.status, '200 OK')
         self.assertEqual(permissionfactory.checked_with, secpol)
 
-    def test_call_view_registered_security_policy_permission_failss(self):
+    def test_call_view_registered_security_policy_permission_fails(self):
         rootpolicy = make_rootpolicy(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
@@ -231,14 +216,12 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         directlyProvides(context, IContext)
         traversalfactory = make_traversal_factory(context, '', [''])
         response = DummyResponse()
-        viewfactory = make_view_factory(response)
-        wsgifactory = make_wsgi_factory('200 OK', (), ['Hello world'])
+        view = make_view(response)
         secpol = DummySecurityPolicy()
         permissionfactory = make_permission_factory(False)
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None, None)
-        self._registerViewFactory(viewfactory, '', IContext, IRequest)
-        self._registerWSGIFactory(wsgifactory, '', None, None, None)
+        self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
         app_context = make_appcontext()
@@ -287,15 +270,10 @@ def make_wsgi_factory(status, headers, app_iter):
 
     return DummyWSGIApplicationFactory
 
-def make_view_factory(response):
-    class DummyViewFactory:
-        def __init__(self, context, request):
-            self.context = context
-            self.request = request
-
-        def __call__(self):
-            return response
-    return DummyViewFactory
+def make_view(response):
+    def view(context, request):
+        return response
+    return view
 
 def make_traversal_factory(context, name, subpath):
     class DummyTraversalFactory:

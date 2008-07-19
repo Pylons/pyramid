@@ -10,44 +10,33 @@ class IResponse(Interface):
     app_iter = Attribute('Iterable representing the response body')
 
 class IView(Interface):
-    def __call__(*arg, **kw):
-        """ Must return an object that implements IResponse; args are
-        mapped into an IView's __call__ by mapply-like code """
-
-class INodeView(IView):
-   def __call__(node, **kw):
-       """ Must return an object that implements IResponse; node is an
-       lxml.etree Element and **kw provides parameters to an XSLT
-       processor """
-        
-class IViewFactory(Interface):
     def __call__(context, request):
-        """ Return an object that implements IView """
+        """ Must return an object that implements IResponse """
 
 class IRootPolicy(Interface):
     def __call__(environ):
         """ Return a root object """
 
-class IPublishTraverser(Interface):
+class ITraverser(Interface):
     def __call__(path):
         """ Return a tuple in the form (context, name, subpath), typically
         the result of an object graph traversal """
 
-class IPublishTraverserFactory(Interface):
+class ITraverserFactory(Interface):
     def __call__(context, request):
         """ Return an object that implements IPublishTraverser """
 
-class IWSGIApplication(Interface):
-    def __call__(environ, start_response):
-        """ A PEP 333 application """
-
-class IWSGIApplicationFactory(Interface):
-    def __call__(context, request, view):
-        """ Return an object that implements IWSGIApplication """
-
 class ITemplateFactory(Interface):
-    def __call__(template_path):
-        """ Return an IView given a template path """
+    def __call__(path):
+        """ Return an an ITemplate given a filesystem path """
+
+class ITemplate(Interface):
+    def __call__(**kw):
+        """ Return a string result given a template path """
+
+class INodeTemplate(Interface):
+    def __call__(node, **kw):
+        """ Return a string result given a template path """
         
 class ISecurityPolicy(Interface):
     """ A utility that provides a mechanism to check authorization

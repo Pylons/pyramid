@@ -15,8 +15,11 @@ class IBlog(Interface):
     pass
 
 class Blog(dict, Location):
-    __acl__ = [ (Allow, Everyone, 'view'), (Allow, 'group:editors', 'add'),
-                (Allow, 'group:managers', 'manage') ]
+    __acl__ = [
+        (Allow, Everyone, 'view'),
+        (Allow, 'group:editors', 'add'),
+        (Allow, 'group:editors', 'edit'),
+        ]
     implements(IBlog, IMapping, ILocation)
 
 class IBlogEntry(Interface):

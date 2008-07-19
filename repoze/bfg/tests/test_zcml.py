@@ -33,9 +33,9 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
             pass
         f(context, 'repoze.view', IFoo, template='minimal.pt')
         actions = context.actions
+        from repoze.bfg.interfaces import ITemplate
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewFactory
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg.security import ViewPermissionFactory
         from zope.component.zcml import handler
@@ -43,14 +43,15 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
 
         self.assertEqual(len(actions), 4)
 
-        regutil_discriminator = ('utility', IView, context.path('minimal.pt'))
+        regutil_discriminator = ('utility', ITemplate,
+                                 context.path('minimal.pt'))
         regutil = actions[0]
         self.assertEqual(regutil['discriminator'], regutil_discriminator)
         self.assertEqual(regutil['callable'], handler)
         self.assertEqual(regutil['args'][0], 'registerUtility')
         self.assertEqual(regutil['args'][1].template.filename,
                          context.path('minimal.pt'))
-        self.assertEqual(regutil['args'][2], IView)
+        self.assertEqual(regutil['args'][2], ITemplate)
         self.assertEqual(regutil['args'][3], context.path('minimal.pt'))
 
         provide = actions[1]
@@ -73,14 +74,14 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(permission['args'][5], None)
 
         regadapt = actions[3]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IViewFactory)
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
         self.assertEqual(regadapt['args'][1].template,
                          context.path('minimal.pt'))
         self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IViewFactory)
+        self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
 
@@ -89,10 +90,12 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         class IFoo:
             pass
-        f(context, 'repoze.view', IFoo, factory=Dummy)
+        def view(context, request):
+            pass
+        f(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
         from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewFactory
+        from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg.security import ViewPermissionFactory
         from zope.component.zcml import handler
@@ -120,13 +123,13 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(permission['args'][5], None)
         
         regadapt = actions[2]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IViewFactory)
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], Dummy)
+        self.assertEqual(regadapt['args'][1], view)
         self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IViewFactory)
+        self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
 
@@ -135,31 +138,9 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         from zope.configuration.exceptions import ConfigurationError
         self.assertRaises(ConfigurationError, f, context, 'repoze.view',
-                          None, factory=object, template='minimal.pt')
+                          None, view=object, template='minimal.pt')
 
-class TestTemplateOnlyViewFactory(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.zcml import TemplateOnlyViewFactory
-        return TemplateOnlyViewFactory
-
-    def _makeOne(self, template):
-        return self._getTargetClass()(template)
-
-    def test_instance_conforms_to_IViewFactory(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IViewFactory
-        verifyObject(IViewFactory, self._makeOne('a'))
-
-    def test_call(self):
-        context = DummyContext()
-        template = context.path('minimal.pt')
-        factory = self._makeOne(template)
-        view = factory(None, None)
-        from repoze.bfg.zcml import TemplateOnlyView
-        self.failUnless(isinstance(view, TemplateOnlyView))
-        self.assertEqual(view.template, template)
-
-class TemplateOnlyViewTests(unittest.TestCase, PlacelessSetup):
+class TemplateOnlyViewFactoryTests(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)
 
@@ -167,8 +148,8 @@ class TemplateOnlyViewTests(unittest.TestCase, PlacelessSetup):
         PlacelessSetup.tearDown(self)
 
     def _getTargetClass(self):
-        from repoze.bfg.zcml import TemplateOnlyView
-        return TemplateOnlyView
+        from repoze.bfg.zcml import TemplateOnlyViewFactory
+        return TemplateOnlyViewFactory
 
     def _zcmlConfigure(self):
         import repoze.bfg
@@ -186,9 +167,9 @@ class TemplateOnlyViewTests(unittest.TestCase, PlacelessSetup):
 
     def test_call(self):
         self._zcmlConfigure()
-        view = self._makeOne(None, None)
-        view.template = self._getTemplatePath('minimal.pt')
-        result = view(foo='foo')
+        path = self._getTemplatePath('minimal.pt')
+        view = self._makeOne(path)
+        result = view(None, None)
         from webob import Response
         self.failUnless(isinstance(result, Response))
         self.assertEqual(result.app_iter, ['<div>\n</div>'])
@@ -197,8 +178,8 @@ class TemplateOnlyViewTests(unittest.TestCase, PlacelessSetup):
         
     def test_call_no_template(self):
         self._zcmlConfigure()
-        view = self._makeOne(None, None)
-        self.assertRaises(ValueError, view)
+        view = self._makeOne('nosuch')
+        self.assertRaises(ValueError, view, None, None)
 
 class TestSampleApp(unittest.TestCase, PlacelessSetup):
     def setUp(self):

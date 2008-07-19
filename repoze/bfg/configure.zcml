@@ -4,16 +4,10 @@
   <include package="z3c.pt" />
 
   <adapter
-      factory=".traversal.NaivePublishTraverser"
-      provides=".interfaces.IPublishTraverserFactory"
+      factory=".traversal.NaiveTraverser"
+      provides=".interfaces.ITraverserFactory"
       for="* *"
   />
-
-  <adapter
-      factory=".wsgiadapter.NaiveWSGIViewAdapter"
-      provides=".interfaces.IWSGIApplicationFactory"
-      for="* * *"
-   />
 
   <include file="meta.zcml" />
 

@@ -1,8 +1,3 @@
-class FixtureView(object):
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
+def fixture_view(context, request):
+    return None
 
-    def __call__(self):
-        pass
-    

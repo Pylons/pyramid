@@ -36,8 +36,8 @@ class NaivePublishTraverserTests(unittest.TestCase, PlacelessSetup):
         PlacelessSetup.tearDown(self)
         
     def _getTargetClass(self):
-        from repoze.bfg.traversal import NaivePublishTraverser
-        return NaivePublishTraverser
+        from repoze.bfg.traversal import NaiveTraverser
+        return NaiveTraverser
 
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
@@ -45,15 +45,15 @@ class NaivePublishTraverserTests(unittest.TestCase, PlacelessSetup):
 
     def test_class_conforms_to_IPublishTraverser(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IPublishTraverser
-        verifyClass(IPublishTraverser, self._getTargetClass())
+        from repoze.bfg.interfaces import ITraverser
+        verifyClass(ITraverser, self._getTargetClass())
 
     def test_instance_conforms_to_IPublishTraverser(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IPublishTraverser
+        from repoze.bfg.interfaces import ITraverser
         context = DummyContext()
         request = DummyRequest()
-        verifyObject(IPublishTraverser, self._makeOne(context, request))
+        verifyObject(ITraverser, self._makeOne(context, request))
 
     def test_call_pathel_with_no_getitem(self):
         request = DummyRequest()
