@@ -144,23 +144,10 @@ response
   upstream), and status (representing the http status string).  This
   is the interface defined for ``WebOb`` response objects.
 
-mapply
+view
 
-  code which dynamically ("magically") determines which arguments to
-  pass to a view based on environment and request parameters.
-
-view factory and view
-
-  A "view factory" is a callable which returns a view object.  It
-  should accept two values: context and request.
-
-  A "view" is a callable that accepts arbitrary values (mapped into it
-  by "mapply") and which returns a response object.
-
-  A view factory may *be* a view in a repoze.bfg application
-  (e.g. it may accept "context" and "request" and return a response
-  object directly instead of returning a view object).  This makes it
-  possible to support views as simple functions.
+  A "view" is a callable which returns a response object.  It should
+  accept two values: context and request.
 
 view name
 
@@ -178,10 +165,10 @@ context
 
   A model in the system that is the subject of a view.
 
-view registry
+view registry (aka application registry)
 
-  A registry which maps a context and view name to a view factory
-  and optionally a permission.
+  A registry which maps a context and view name to a view callable and
+  optionally a permission.
 
 template
 
@@ -278,18 +265,13 @@ code to execute:
 
  8.  Armed with the context, the view name, and the subpath, the
      router performs a view lookup.  It attemtps to look up a view
-     factory from the ``repoze.bfg`` view registry using the view
-     name and the context.  If a view factory is found, it is
-     converted into a WSGI application: it is "wrapped in" ( aka
-     "adapted to") a WSGI application using mapply.  The WSGI adapter
-     uses mapply to map request and environment variables into the
-     view when it is called.  If a view factory is not found, a
-     generic WSGI ``NotFound`` application is constructed. 
+     from the ``repoze.bfg`` view registry using the view name and the
+     context.  If a view factory is found, it is called with the
+     context and the request.  It returns a response, which is fed
+     back upstream.  If a view is not found, a generic WSGI
+     ``NotFound`` application is constructed.
 
-In either case, the resulting WSGI application is called.  The WSGI
-application's return value is an iterable.  This is returned upstream
-to the WSGI server.  The WSGI application also calls start_response
-with a status code and a header list.
+In either case, the result is returned upstream via the WSGI protocol.
 
 A Traversal Example
 -------------------
@@ -479,16 +461,16 @@ A view registry might look like so::
     <!-- the default view for a MyModel -->
     <bfg:view
         for=".models.IMyModel"
-        factory=".views.my_hello_view"
-        permission="repoze.view"
+        view=".views.my_hello_view"
+        permission="read"
         />
 
     <!-- the templated.html view for a MyModel -->
     <bfg:view
         for=".models.IMyModel"
-        factory=".views.my_template_view"
+        view=".views.my_template_view"
         name="templated.html"
-        permission="repoze.view"
+        permission="read"
         />
 
   </configure>

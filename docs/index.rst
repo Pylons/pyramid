@@ -34,7 +34,6 @@ and run a web application.
    api/router
    api/security
    api/template
-   api/view
 
 Indices and tables
 ==================

@@ -30,7 +30,7 @@ You can also wire up page templates via ZCML:
 
   <bfg:view
       for=".models.IMapping"
-      factory=".views.contents_view"
+      view=".views.contents_view"
       name="contents.html"
       />
 
