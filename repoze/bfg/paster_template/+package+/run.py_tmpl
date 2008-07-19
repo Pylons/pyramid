@@ -1,5 +1,8 @@
-def make_app(global_config):
-    from {{project}}.models import get_root
-    import {{project}}
-    from repoze.bfg.router import make_app
-    return make_app(get_root, {{project}})
+from paste import httpserver
+
+from repoze.bfg import make_app
+from {{project}}.models import get_root
+import {{project}}
+
+app = make_app(get_root, {{project}})
+httpserver.serve(app, host='0.0.0.0', port='5432')
