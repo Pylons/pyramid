@@ -405,7 +405,7 @@ views.py
 A views.py module might look like so::
 
   from webob import Response
-  from repoze.bfg.template import render_template
+  from repoze.bfg.template import render_template_to_response
 
   def my_hello_view(context, request):
       response = Response('Hello from %s @ %s' % (
@@ -414,7 +414,7 @@ A views.py module might look like so::
       return response
 
    def my_template_view(context, request):
-       return render_template('templates/my.pt', name=context.__name__)
+       return render_template_to_response('templates/my.pt', name=context.__name__)
 
 models.py
 ~~~~~~~~~
