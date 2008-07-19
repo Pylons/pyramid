@@ -371,11 +371,19 @@ that is willing to deal with that case", and returns a view.  It is
 passed the "biz" object as the "context" and the current WebOb request
 as the "request".  It returns a response.
 
-The only "special case" is when you end up with a "view name" that is
-the empty string.  In this case the "default view" is looked up.  The
-default view has a name that equals the empty string.  If a view is
-configured in the view registry without a name, it is the default
-view.
+There are two special cases:
+
+- During traversal you will often end up with a "view name" that is
+  the empty string.  This indicates that ``repoze.bfg`` should look up
+  the *default view*.  The default view is a view that is registered
+  with no name or a view which is registered with a name that equals
+  the empty string.
+
+- If any path segment element begins with the special characters
+  ``@@`` (think of them as goggles), that element is considered the
+  view name immediately and traversal stops there.  This allows you to
+  address views that may have the same names as model instance names
+  without conflict.
 
 A Sample Application
 --------------------
