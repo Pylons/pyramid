@@ -1,0 +1,11 @@
+[DEFAULT]
+debug = true
+
+[app:main]
+use = egg:{{project}}#make_app
+
+[server:main]
+use = egg:PasteScript#cherrypy
+host = 0.0.0.0
+port = 5432
+numthreads = 4

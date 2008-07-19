@@ -2,6 +2,6 @@
      xmlns:tal="http://xml.zope.org/namespaces/tal">
 <head></head>
 <body>
-  <h1>${greeting}</h1>
+  <h1>Welcome to ${project}</h1>
 </body>
 </html>

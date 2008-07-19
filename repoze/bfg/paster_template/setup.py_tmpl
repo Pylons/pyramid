@@ -1,5 +1,3 @@
-__version__ = '{{version}}'
-
 import os
 
 from ez_setup import use_setuptools
@@ -12,7 +10,7 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 setup(name='{{project}}',
-      version=__version__,
+      version='0.1',
       description='{{project}}',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -24,6 +22,9 @@ setup(name='{{project}}',
         "Topic :: Internet :: WWW/HTTP :: WSGI",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
+      author='',
+      author_email='',
+      url='',
       keywords='web wsgi bfg zope',
       packages=find_packages(),
       include_package_data=True,
@@ -37,7 +38,7 @@ setup(name='{{project}}',
       test_suite="{{project}}.tests",
       entry_points = """\
       [paste.app_factory]
-      {{project}} = {{project}}.run:make_app
+      make_app = {{project}}.run:make_app
       """
       )
 
