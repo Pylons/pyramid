@@ -35,6 +35,7 @@ and run a web application.
    api/router
    api/security
    api/template
+   api/wsgi
 
 Indices and tables
 ==================

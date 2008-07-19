@@ -1,5 +1,7 @@
 After 0.1
 
+  - Add wsgiapp decorator.
+
   - The concept of "view factories" was removed in favor of always
     calling a view, which is a callable that returns a response
     directly (as opposed to returning a view).  As a result, the
