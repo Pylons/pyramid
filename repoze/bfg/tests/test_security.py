@@ -157,6 +157,26 @@ class TestACLAuthorizer(unittest.TestCase):
         result = authorizer.permits('read', *principals)
         self.assertEqual(result, False)
 
+    def test_permits_allow_via_location_parent(self):
+        context = DummyContext()
+        context.__parent__ = None
+        context.__name__ = None
+        logger = DummyLogger()
+        from repoze.bfg.security import Allow
+        ace = (Allow, 'fred', 'read')
+        acl = [ace]
+        context.__acl__ = acl
+        context2 = DummyContext()
+        context2.__parent__ = context
+        context2.__name__ = 'myname'
+        from zope.location import ILocation
+        from zope.interface import directlyProvides
+        directlyProvides(ILocation)
+        authorizer = self._makeOne(context, logger)
+        principals = ['fred']
+        result = authorizer.permits('read', *principals)
+        self.assertEqual(result, True)
+
     def test_logging_deny_implicit(self):
         context = DummyContext()
         logger = DummyLogger()
