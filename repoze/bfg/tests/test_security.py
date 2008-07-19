@@ -169,9 +169,6 @@ class TestACLAuthorizer(unittest.TestCase):
         context2 = DummyContext()
         context2.__parent__ = context
         context2.__name__ = 'myname'
-        from zope.location import ILocation
-        from zope.interface import directlyProvides
-        directlyProvides(ILocation)
         authorizer = self._makeOne(context, logger)
         principals = ['fred']
         result = authorizer.permits('read', *principals)
