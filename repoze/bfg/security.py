@@ -97,7 +97,7 @@ class RemoteUserACLSecurityPolicy(object):
             effective_principals.append(userid)
 
         for location in LocationIterator(context):
-            authorizer = self.authorizer_factory(context, self.logger)
+            authorizer = self.authorizer_factory(location, self.logger)
             try:
                 return authorizer.permits(permission, *effective_principals)
             except NoAuthorizationInformation:
