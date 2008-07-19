@@ -82,4 +82,27 @@ see the following::
    easier, as changes to Python code under ``repoze.bfg`` is not put
    into effect until the server restarts.
 
+Running The Tests For Your Application
+--------------------------------------
 
+To run unit tests for your application, you should invoke them like so::
+
+  $ python setup.py test -q
+  running test
+  running egg_info
+  writing requirements to myproject.egg-info/requires.txt
+  writing myproject.egg-info/PKG-INFO
+  writing top-level names to myproject.egg-info/top_level.txt
+  writing dependency_links to myproject.egg-info/dependency_links.txt
+  writing entry points to myproject.egg-info/entry_points.txt
+  reading manifest file 'myproject.egg-info/SOURCES.txt'
+  writing manifest file 'myproject.egg-info/SOURCES.txt'
+  running build_ext
+  .
+  ----------------------------------------------------------------------
+  Ran 1 test in 0.566s
+
+  OK
+
+The tests are found in the ``tests.py`` module in your generated
+project.  One sample test exists.
