@@ -1,0 +1,5 @@
+def make_app(global_config):
+    from {{project}}.models import get_root
+    import {{project}}
+    from repoze.bfg.router import make_app
+    return make_app(get_root, {{project}})

@@ -56,6 +56,7 @@ setup(name='repoze.bfg',
             'Paste',
             'z3c.pt',
             'FormEncode',
+            'PasteScript',
             ],
       tests_require=[
             'zope.interface',
@@ -66,11 +67,14 @@ setup(name='repoze.bfg',
             'Paste',
             'z3c.pt',
             'FormEncode',
+            'PasteScript',
             'Sphinx',
             'docutils',
             ],
       test_suite="repoze.bfg.tests",
       entry_points = """\
+        [paste.paster_create_template]
+        bfg=repoze.bfg.paster:BFGProjectTemplate
       """
       )
 
