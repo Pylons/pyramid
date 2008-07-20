@@ -225,6 +225,24 @@ class RemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def tearDown(self):
         PlacelessSetup.tearDown(self)
 
+    def test_authenticated_userid(self):
+        context = DummyContext()
+        request = DummyRequest({'REMOTE_USER':'fred'})
+        logger = DummyLogger()
+        policy = self._makeOne(logger)
+        result = policy.authenticated_userid(request)
+        self.assertEqual(result, 'fred')
+
+    def test_effective_principals(self):
+        context = DummyContext()
+        request = DummyRequest({'REMOTE_USER':'fred'})
+        logger = DummyLogger()
+        policy = self._makeOne(logger)
+        result = policy.effective_principals(request)
+        from repoze.bfg.security import Everyone
+        from repoze.bfg.security import Authenticated
+        self.assertEqual(result, [Everyone, Authenticated, 'fred'])
+
     def test_permits_no_remote_user_no_acl_info_on_context(self):
         context = DummyContext()
         request = DummyRequest({})

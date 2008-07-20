@@ -89,21 +89,33 @@ class RemoteUserACLSecurityPolicy(object):
     def permits(self, context, request, permission):
         """ Return ``Allowed`` if the policy permits access,
         ``Denied`` if not."""
-        userid = request.environ.get('REMOTE_USER', None)
+        principals = self.effective_principals(request)
+        for location in LocationIterator(context):
+            authorizer = self.authorizer_factory(location, self.logger)
+            try:
+                return authorizer.permits(permission, *principals)
+            except NoAuthorizationInformation:
+                continue
+
+        return False
+
+    def authenticated_userid(self, request):
+        """ Return the id of the currently authenticated user or
+        None if the user is not authenticated """
+        return request.environ.get('REMOTE_USER', None)
+
+    def effective_principals(self, request):
+        """ Return the list of 'effective' principals for the request.
+        This will include the userid of the currently authenticated
+        user if a user is currently authenticated. """
+        userid = self.authenticated_userid(request)
         effective_principals = [Everyone]
 
         if userid is not None:
             effective_principals.append(Authenticated)
             effective_principals.append(userid)
+        return effective_principals
 
-        for location in LocationIterator(context):
-            authorizer = self.authorizer_factory(location, self.logger)
-            try:
-                return authorizer.permits(permission, *effective_principals)
-            except NoAuthorizationInformation:
-                continue
-
-        return False
 
 class PermitsResult:
     def __init__(self, ace, acl, permission, principals, context):
