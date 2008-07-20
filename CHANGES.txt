@@ -1,3 +1,7 @@
+After 0.2
+
+  - Add find_interface API.
+
 0.2
 
   - Add wsgiapp decorator.

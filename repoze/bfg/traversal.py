@@ -3,6 +3,7 @@ import urllib
 from zope.interface import classProvides
 from zope.interface import implements
 from zope.location.location import located
+from zope.location.location import LocationIterator
 from zope.location.interfaces import ILocation
 
 from repoze.bfg.interfaces import ITraverser
@@ -63,3 +64,10 @@ class NaiveTraverser(object):
 
         return ob, name, path
 
+def find_interface(context, interface):
+    """ Return an object providing 'interface' anywhere in the parent
+    chain of 'context' or None if no object providing that interface
+    can be found in the parent chain """
+    for location in LocationIterator(context):
+        if interface.providedBy(location):
+            return location

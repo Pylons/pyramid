@@ -130,6 +130,34 @@ class NaivePublishTraverserTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(ctx.__parent__.__parent__.__parent__.__name__, None)
         self.assertEqual(ctx.__parent__.__parent__.__parent__.__parent__, None)
 
+class FindInterfaceTests(unittest.TestCase):
+    def _getFUT(self):
+        from repoze.bfg.traversal import find_interface
+        return find_interface
+
+    def test_it(self):
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        root.__parent__ = None
+        root.__name__ = 'root'
+        foo.__parent__ = root
+        foo.__name__ = 'foo'
+        bar.__parent__ = foo
+        bar.__name__ = 'bar'
+        baz.__parent__ = bar
+        baz.__name__ = 'baz'
+        request = DummyRequest()
+        from zope.interface import directlyProvides
+        from zope.interface import Interface
+        class IFoo(Interface):
+            pass
+        directlyProvides(root, IFoo)
+        finder = self._getFUT()
+        result = finder(baz, IFoo)
+        self.assertEqual(result.__name__, 'root')
+
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next
