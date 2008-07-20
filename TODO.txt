@@ -2,6 +2,8 @@
 
 - URL-based dispatch should get first crack at a request.
 
+- z3c.pt needs to support common XML entities.
+
 
 
 

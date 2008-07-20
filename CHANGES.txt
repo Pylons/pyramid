@@ -1,3 +1,7 @@
+0.2.3
+
+  - Add API functions for authenticated_userid and effective_principals.
+
 0.2.2
 
   - Add authenticated_userid and effective_principals API to security

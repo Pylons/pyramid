@@ -225,6 +225,17 @@ class RemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def tearDown(self):
         PlacelessSetup.tearDown(self)
 
+    def test_instance_implements_ISecurityPolicy(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import ISecurityPolicy
+        logger = DummyLogger()
+        verifyObject(ISecurityPolicy, self._makeOne(logger))
+
+    def test_class_implements_ISecurityPolicy(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.interfaces import ISecurityPolicy
+        verifyClass(ISecurityPolicy, self._getTargetClass())
+
     def test_authenticated_userid(self):
         context = DummyContext()
         request = DummyRequest({'REMOTE_USER':'fred'})
@@ -311,10 +322,12 @@ class RemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         self.assertEqual(authorizer_factory.permission, 'view')
         self.assertEqual(authorizer_factory.context, context)
 
-class TestHasPermission(unittest.TestCase):
-    def _getFUT(self):
-        from repoze.bfg.security import has_permission
-        return has_permission
+class TestAPIFunctions(unittest.TestCase, PlacelessSetup):
+    def setUp(self):
+        PlacelessSetup.setUp(self)
+        
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
 
     def _registerSecurityPolicy(self, secpol):
         import zope.component
@@ -322,16 +335,39 @@ class TestHasPermission(unittest.TestCase):
         from repoze.bfg.interfaces import ISecurityPolicy
         gsm.registerUtility(secpol, ISecurityPolicy)
 
-    def test_registered(self):
+    def test_has_permission_registered(self):
         secpol = DummySecurityPolicy(False)
         self._registerSecurityPolicy(secpol)
-        has_permission = self._getFUT()
+        from repoze.bfg.security import has_permission
         self.assertEqual(has_permission('view', None, None), False)
         
-    def test_not_registered(self):
-        has_permission = self._getFUT()
+    def test_has_permission_not_registered(self):
+        from repoze.bfg.security import has_permission
         self.assertEqual(has_permission('view', None, None), True)
 
+    def test_authenticated_userid_registered(self):
+        secpol = DummySecurityPolicy(False)
+        self._registerSecurityPolicy(secpol)
+        from repoze.bfg.security import authenticated_userid
+        request = DummyRequest({})
+        self.assertEqual(authenticated_userid(request), 'fred')
+        
+    def test_authenticated_userid_not_registered(self):
+        from repoze.bfg.security import authenticated_userid
+        request = DummyRequest({})
+        self.assertEqual(authenticated_userid(request), None)
+
+    def test_effective_principals_registered(self):
+        secpol = DummySecurityPolicy(False)
+        self._registerSecurityPolicy(secpol)
+        from repoze.bfg.security import effective_principals
+        request = DummyRequest({})
+        self.assertEqual(effective_principals(request), ['fred', 'bob'])
+        
+    def test_effective_principals_not_registered(self):
+        from repoze.bfg.security import effective_principals
+        request = DummyRequest({})
+        self.assertEqual(effective_principals(request), [])
 
 class TestViewPermission(unittest.TestCase):
     def _getTargetClass(self):
@@ -383,6 +419,12 @@ class DummySecurityPolicy:
     def permits(self, *args):
         self.checked = args
         return self.result
+
+    def authenticated_userid(self, request):
+        return 'fred'
+
+    def effective_principals(self, request):
+        return ['fred', 'bob']
 
 class DummyLogger:
     def __init__(self):

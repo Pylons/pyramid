@@ -46,6 +46,15 @@ class ISecurityPolicy(Interface):
             information in the context and the authentication data in
             the request allow the action implied by the permission """
 
+    def authenticated_userid(request):
+        """ Return the userid of the currently authenticated user or
+        None if there is no currently authenticated user """
+
+    def effective_principals(request):
+        """ Return the list of 'effective' principals for the request.
+        This must include the userid of the currently authenticated
+        user if a user is currently authenticated."""
+
 class NoAuthorizationInformation(Exception):
     pass
 

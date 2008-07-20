@@ -27,6 +27,25 @@ def has_permission(permission, context, request):
         return True
     return policy.permits(context, request, permission)
 
+def authenticated_userid(request):
+    """ Return the userid of the currently authenticated user or None
+    if there is no security policy in effect or there is no currently
+    authenticated user """
+    policy = queryUtility(ISecurityPolicy)
+    if policy is None:
+        return None
+    return policy.authenticated_userid(request)
+
+def effective_principals(request):
+    """ Return the list of 'effective' principals for the request.
+    This will include the userid of the currently authenticated user
+    if a user is currently authenticated. If no security policy is in
+    effect, this will return an empty sequence."""
+    policy = queryUtility(ISecurityPolicy)
+    if policy is None:
+        return []
+    return policy.effective_principals(request)
+
 class ACLAuthorizer(object):
 
     def __init__(self, context, logger=None):
@@ -60,7 +79,6 @@ class ACLAuthorizer(object):
         result = Denied(None, acl, permission, principals, self.context)
         self.logger and self.logger.debug(str(result))
         return result
-        
 
 class RemoteUserACLSecurityPolicy(object):
     """ A security policy which:
@@ -100,14 +118,9 @@ class RemoteUserACLSecurityPolicy(object):
         return False
 
     def authenticated_userid(self, request):
-        """ Return the id of the currently authenticated user or
-        None if the user is not authenticated """
         return request.environ.get('REMOTE_USER', None)
 
     def effective_principals(self, request):
-        """ Return the list of 'effective' principals for the request.
-        This will include the userid of the currently authenticated
-        user if a user is currently authenticated. """
         userid = self.authenticated_userid(request)
         effective_principals = [Everyone]
 
@@ -115,7 +128,6 @@ class RemoteUserACLSecurityPolicy(object):
             effective_principals.append(Authenticated)
             effective_principals.append(userid)
         return effective_principals
-
 
 class PermitsResult:
     def __init__(self, ace, acl, permission, principals, context):

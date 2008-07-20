@@ -5,6 +5,10 @@
 
 .. automodule:: repoze.bfg.security
 
+  .. autofunction:: authenticated_userid
+
+  .. autofunction:: effective_principals
+
   .. autofunction:: has_permission
 
   .. attribute:: Everyone
@@ -31,9 +35,6 @@
     The ACE "action" (the first element in an ACE e.g. ``(Deny,
     'george', 'read')`` that means deny access.  A sequence of ACEs
     makes up an ACL.  It is a string, and it's actual value is "Deny".
-
-  .. autoclass:: RemoteUserACLSecurityPolicy
-     :members:
 
   .. autoclass:: Denied
      :members:
