@@ -14,6 +14,7 @@ Narrative documentation in chapter form explaining how to use
 
    narr/introduction
    narr/project
+   narr/traversal
    narr/views
    narr/templates
    narr/models

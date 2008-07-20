@@ -8,6 +8,7 @@ class MyModel(object):
     implements(IMyModel)
     pass
 
+root = MyModel()
+
 def get_root(environ):
-    root = MyModel()
     return root
