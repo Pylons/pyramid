@@ -1,5 +1,5 @@
-repoze.bfg Introduction
-=======================
+``repoze.bfg`` Introduction
+===========================
 
 ``repoze.bfg`` is a web application framework based on graph
 traversal.  It is inspired by Zope's publisher, and uses Zope
