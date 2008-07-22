@@ -18,7 +18,7 @@ class IRootPolicy(Interface):
         """ Return a root object """
 
 class ITraverser(Interface):
-    def __call__(path):
+    def __call__(environ):
         """ Return a tuple in the form (context, name, subpath), typically
         the result of an object graph traversal """
 
