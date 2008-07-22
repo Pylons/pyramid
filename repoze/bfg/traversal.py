@@ -37,7 +37,7 @@ def step(ob, name, default):
 
 _marker = ()
 
-class NaiveTraverser(object):
+class ModelGraphTraverser(object):
     classProvides(ITraverserFactory)
     implements(ITraverser)
     def __init__(self, root, request):

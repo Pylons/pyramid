@@ -4,9 +4,9 @@
   <include package="z3c.pt" />
 
   <adapter
-      factory=".traversal.NaiveTraverser"
+      factory=".traversal.ModelGraphTraverser"
       provides=".interfaces.ITraverserFactory"
-      for="* *"
+      for="* .interfaces.IRequest"
   />
 
   <include file="meta.zcml" />

@@ -28,7 +28,7 @@ class SplitPathTests(unittest.TestCase):
         self.assertEqual(f('/foo/space%20thing/bar'), ['foo', 'space thing',
                                                        'bar'])
 
-class NaivePublishTraverserTests(unittest.TestCase, PlacelessSetup):
+class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)
 
@@ -36,8 +36,8 @@ class NaivePublishTraverserTests(unittest.TestCase, PlacelessSetup):
         PlacelessSetup.tearDown(self)
         
     def _getTargetClass(self):
-        from repoze.bfg.traversal import NaiveTraverser
-        return NaiveTraverser
+        from repoze.bfg.traversal import ModelGraphTraverser
+        return ModelGraphTraverser
 
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
