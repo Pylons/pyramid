@@ -66,3 +66,6 @@ class IViewPermissionFactory(Interface):
     def __call__(context, request):
         """ Return an IViewPermission """
 
+class IURLDispatchModel(Interface):
+    """ A model that is created as a result of URL dispatching """
+

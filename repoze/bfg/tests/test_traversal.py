@@ -48,12 +48,12 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         environ.update(kw)
         return environ
 
-    def test_class_conforms_to_IPublishTraverser(self):
+    def test_class_conforms_to_ITraverser(self):
         from zope.interface.verify import verifyClass
         from repoze.bfg.interfaces import ITraverser
         verifyClass(ITraverser, self._getTargetClass())
 
-    def test_instance_conforms_to_IPublishTraverser(self):
+    def test_instance_conforms_to_ITraverser(self):
         from zope.interface.verify import verifyObject
         from repoze.bfg.interfaces import ITraverser
         context = DummyContext()
