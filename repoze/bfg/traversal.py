@@ -45,9 +45,10 @@ class ModelGraphTraverser(object):
         self.locatable = ILocation.providedBy(root)
         self.request = request
 
-    def __call__(self, path):
-        root = self.root
+    def __call__(self, environ):
+        path = environ.get('PATH_INFO', '/')
         path = split_path(path)
+        root = self.root
 
         ob = self.root
         name = ''

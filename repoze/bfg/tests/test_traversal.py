@@ -43,6 +43,11 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
+    def _getEnviron(self, **kw):
+        environ = {}
+        environ.update(kw)
+        return environ
+
     def test_class_conforms_to_IPublishTraverser(self):
         from zope.interface.verify import verifyClass
         from repoze.bfg.interfaces import ITraverser
@@ -58,7 +63,8 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
     def test_call_pathel_with_no_getitem(self):
         request = DummyRequest()
         policy = self._makeOne(None, request)
-        ctx, name, subpath = policy('/foo/bar')
+        environ = self._getEnviron(PATH_INFO='/foo/bar')
+        ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, None)
         self.assertEqual(name, 'foo')
         self.assertEqual(subpath, ['bar'])
@@ -67,7 +73,8 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         root = DummyContext()
         request = DummyRequest()
         policy = self._makeOne(root, request)
-        ctx, name, subpath = policy('')
+        environ = self._getEnviron(PATH_INFO='')
+        ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, root)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])
@@ -77,7 +84,8 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         root = DummyContext(foo)
         request = DummyRequest()
         policy = self._makeOne(root, request)
-        ctx, name, subpath = policy('/foo/bar')
+        environ = self._getEnviron(PATH_INFO='/foo/bar')
+        ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, foo)
         self.assertEqual(name, 'bar')
         self.assertEqual(subpath, [])
@@ -87,7 +95,8 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         request = DummyRequest()
         root = DummyContext(foo)
         policy = self._makeOne(root, request)
-        ctx, name, subpath = policy('/foo/bar/baz/buz')
+        environ = self._getEnviron(PATH_INFO='/foo/bar/baz/buz')
+        ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, foo)
         self.assertEqual(name, 'bar')
         self.assertEqual(subpath, ['baz', 'buz'])
@@ -97,7 +106,8 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         request = DummyRequest()
         root = DummyContext(foo)
         policy = self._makeOne(root, request)
-        ctx, name, subpath = policy('/@@foo')
+        environ = self._getEnviron(PATH_INFO='/@@foo')
+        ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, root)
         self.assertEqual(name, 'foo')
         self.assertEqual(subpath, [])
@@ -117,7 +127,8 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         bar.__name__ = 'bar'
         bar.__parent__ = foo
         policy = self._makeOne(root, request)
-        ctx, name, subpath = policy('/foo/bar/baz')
+        environ = self._getEnviron(PATH_INFO='/foo/bar/baz')
+        ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, baz)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])

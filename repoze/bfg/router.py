@@ -29,9 +29,8 @@ class Router:
         request = Request(environ)
         directlyProvides(request, IRequest)
         root = self.root_policy(environ)
-        path = environ.get('PATH_INFO', '/')
         traverser = getMultiAdapter((root, request), ITraverserFactory)
-        context, name, subpath = traverser(path)
+        context, name, subpath = traverser(environ)
 
         request.context = context
         request.view_name = name
