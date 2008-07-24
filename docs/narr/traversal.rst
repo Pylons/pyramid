@@ -11,27 +11,37 @@ code using pattern matching against URL components.  Examples:
 <http://www.djangoproject.com/documentation/url_dispatch/>`_ and the
 `Routes URL mapping system <http://routes.groovie.org/>`_ .
 
-It is however possible to map URLs to code differently, using object
-graph traversal. The venerable Zope and CherryPy web frameworks offer
-graph-traversal-based URL dispatch.  :mod:`repoze.bfg` also provides
-graph-traversal-based dispatch of URLs to code.  Graph-traversal based
-dispatching is useful if you like the URL to be representative of an
-arbitrary hierarchy of potentially heterogeneous items.
+It is possible, however, to map URLs to code differently, using
+"object graph traversal". The venerable Zope and CherryPy web
+frameworks offer graph-traversal-based URL dispatch.
+:mod:`repoze.bfg` also provides graph-traversal-based dispatch of URLs
+to code.  Graph-traversal based dispatching is useful if you like the
+URL to represent an arbitrary hierarchy of potentially heterogeneous
+items.
+
+.. note::
+
+  :mod:`repozebfg` features graph traversal.  However, via the
+  inclusion of Routes, URL dispatch is also supported for the parts of
+  your URL space that better fit that model.
 
 Non-graph traversal based URL dispatch can easily handle URLs such as
 ``http://example.com/members/Chris``, where it's assumed that each
 item "below" ``members`` in the URL represents a member in the system.
 You just match everything "below" ``members`` to a particular view.
 They are not very good, however, at inferring the difference between
-sets of URLs such as ``http://example.com/members/Chris/document`` vs.
-``http://example.com/members/Chris/stuff/page`` wherein you'd like the
-``document`` in the first URL to represent, e.g. a PDF document, and
-``/stuff/page`` in the second to represent, e.g. an OpenOffice
-document in a "stuff" folder.  It takes more pattern matching
-assertions to be able to make URLs like these work in URL-dispatch
-based systems, and some assertions just aren't possible.  For example,
-URL-dispatch based systems don't deal very well with URLs that
-represent arbitrary-depth hierarchies.
+sets of URLs such as::
+
+       http://example.com/members/Chris/document
+       http://example.com/members/Chris/stuff/page
+
+...wherein you'd like the ``document`` in the first URL to represent a
+PDF document, and ``/stuff/page`` in the second to represent an
+OpenOffice document in a "stuff" folder.  It takes more pattern
+matching assertions to be able to make URLs like these work in
+URL-dispatch based systems, and some assertions just aren't possible.
+For example, URL-dispatch based systems don't deal very well with URLs
+that represent arbitrary-depth hierarchies.
 
 Graph traversal works well if you need to divine meaning out of these
 types of "ambiguous" URLs and URLs that represent arbitrary-depth
@@ -50,10 +60,10 @@ Graph traversal is materially more complex than URL-based dispatch,
 however, if only because it requires the construction and maintenance
 of a graph, and it requires the developer to think about mapping URLs
 to code in terms of traversing the graph.  (How's *that* for
-self-referential! ;-) That said, for developers comfortable with Zope,
-in particular, and comfortable with hierarchical data stores like
-ZODB, mapping a URL to a graph traversal it's a natural way to think
-about creating a web application.
+self-referential! ;-) That said, for developers comfortable with Zope
+(and comfortable with hierarchical data stores like ZODB), mapping a
+URL to a graph traversal is a natural way to think about creating a
+web application.
 
 In essence, the choice to use graph traversal vs. URL dispatch is
 largely religious in some sense.  Graph traversal dispatch probably
@@ -61,6 +71,9 @@ just doesn't make any sense when you possess completely "square" data
 stored in a relational database.  However, when you have a
 hierarchical data store, it can provide advantages over using
 URL-based dispatch.
+
+Thus :mod:`repoze.bfg` provides support for both approaches, even
+though the focus is on object graph traversal.
 
 The Model Graph
 ---------------
@@ -93,7 +106,8 @@ code to execute:
 
  1.  The request for the page is presented to :mod:`repoze.bfg`'s
      "router" in terms of a standard WSGI request, which is
-     represented by a WSGI environment and a start_response callable.
+     represented by a WSGI environment and a ``start_response``
+     callable.
 
  2.  The router creates a `WebOb <http://pythonpaste.org/webob/>`_
      request object based on the WSGI environment.
@@ -127,17 +141,19 @@ code to execute:
      the the last object found during traversal is deemed to be the
      "context".  If the path has been exhausted when traversal ends,
      the "view name" is deemed to be the empty string (``''``).
-     However, if the path was not exhausted before traversal
+     However, if the path was *not* exhausted before traversal
      terminated, the first remaining path element is treated as the
-     view name.  Any subseqent path elements after the view name are
-     deemed the "subpath".  For instance, if ``PATH_INFO`` was
-     ``/a/b`` and the root returned an "A" object, and the "A" object
-     returned a "B" object, the router deems that the context is
-     "object B", the view name is the empty string, and the subpath is
-     the empty sequence.  On the other hand, if ``PATH_INFO`` was
-     ``/a/b/c`` and "object A" was found but raised a KeyError for the
-     name ``b``, the router deems that the context is object A, the
-     view name is ``b`` and the subpath is ``['c']``.
+     view name.
+
+     Any subseqent path elements after the view name are deemed the
+     "subpath".  For instance, if ``PATH_INFO`` was ``/a/b`` and the
+     root returned an "A" object, and the "A" object returned a "B"
+     object, the router deems that the context is "object B", the view
+     name is the empty string, and the subpath is the empty sequence.
+     On the other hand, if ``PATH_INFO`` was ``/a/b/c`` and "object A"
+     was found but raised a KeyError for the name ``b``, the router
+     deems that the context is object A, the view name is ``b`` and
+     the subpath is ``['c']``.
 
  7.  If a security policy is configured, the router performs a
      permission lookup.  If a permission declaration is found for the
@@ -192,9 +208,9 @@ error condition.  It signifies that:
   - the "subpath" is ``['biz', 'buz.txt']``
 
 Because it's the "context", bfg examimes "baz" to find out what "type"
-it is. Let's say it finds that the context an ``IBar`` type (because
-"bar" happens to have an attribute attached to it that indicates it's
-an ``IBar``).
+it is. Let's say it finds that the context is an ``IBar`` type
+(because "bar" happens to have an attribute attached to it that
+indicates it's an ``IBar``).
 
 Using the "view name" ("baz") and the type, it asks the "application
 registry" (configured separately, via "configure.zcml") this question:
@@ -266,5 +282,5 @@ There are two special cases:
   ``@@`` (think of them as goggles), that segment is considered the
   "view name" immediately and traversal stops there.  This allows you
   to address views that may have the same names as model instance
-  names in the graph umambiguously.
+  names in the graph unambiguously.
 
