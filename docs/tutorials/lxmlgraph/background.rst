@@ -24,7 +24,7 @@ In summary:
   you'll thoroughly detest this sample application.  Just to be
   stupendously clear, ``repoze.bfg`` is in no way dependent on XML.
   On the other hand, ``repoze.bfg`` happens to make XML publishing
-  kind fun.
+  kinda fun.
 
 What It Does
 -------------------
@@ -109,5 +109,3 @@ investigations:
    *really* easy in XSLT to make a very powerful, flexible, and
    extensisible form rendering system.  For the latter, I'll have to
    learn more about POST handlers in ``repoze.bfg``.
-
-
