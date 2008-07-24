@@ -1,0 +1,11 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+	   xmlns:bfg="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg" />
+
+  <bfg:view
+     for=".models.IMyModel"
+     view=".views.my_hello_view"
+     />
+
+</configure>

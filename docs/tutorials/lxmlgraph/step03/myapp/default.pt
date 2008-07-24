@@ -1,0 +1,8 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <head></head>
+  <body>
+    <h1>My template is viewing item: ${name}</h1>
+    <p>The node has a tag name of: ${node.tag}.</p>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+	   xmlns:bfg="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg" />
+
+  <bfg:view
+     for=".models.IMyModel"
+     view=".views.zpt_default_view"
+     />
+
+  <bfg:view
+     for=".models.IMyModel"
+     view=".views.xslt_view"
+     name="xsltview.html"
+     />
+
+</configure>

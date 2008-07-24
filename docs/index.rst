@@ -21,14 +21,19 @@ Narrative documentation in chapter form explaining how to use
    narr/models
    narr/security
 
+Tutorials
+----------
+
+Step-by-step sample applications that use ``repoze.bfg``.
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorials/lxmlgraph/index.rst
+
+
 API documentation
 -----------------
-
-:mod:`repoze.bfg`
------------------
-
-The :mod:`repoze.bfg` package contains the code nececessary to create
-and run a web application.
 
 .. toctree::
    :maxdepth: 2
