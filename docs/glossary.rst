@@ -1,7 +1,7 @@
 .. _glossary:
 
 ============================
- :mod:`repoze.bfg` Glossary
+Glossary
 ============================
 
 .. glossary::
@@ -111,4 +111,6 @@
     `Web Server Gateway Interface <http://wsgi.org/>`_.  This is a
     Python standard for connecting web applications to web servers,
     similar to the concept of Java Servlets.
-
+  Zope
+    `The Z Object Publishing Framework <http://zope.org>`_.  The granddaddy 
+    of Python web frameworks.
