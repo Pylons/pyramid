@@ -24,6 +24,11 @@
     The "URL name" of a view, e.g "index.html".  If a view is
     configured without a name, its name is considered to be the empty
     string (which implies the "default view").
+  virtualenv
+    An isolated Python environment.  Allows you to control which
+    packages are used on a particular project by cloning your main
+    Python.  `virtualenv <http://pypi.python.org/pypi/virtualenv>`_
+    was created by Ian Bicking.
   model
     An object representing data in the system.  A model is part of the
     object graph traversed by the system.  Models are traversed to

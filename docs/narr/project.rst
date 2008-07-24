@@ -68,7 +68,7 @@ generated ``setup.py``::
    Finished processing dependencies for myproject==0.1
 
 This will install your application 's package into the interpreter so
-it can be found and run under a webserver.
+it can be found and run as a WSGI application inside a WSGI server.
 
 Running The Tests For Your Application
 --------------------------------------
@@ -241,8 +241,15 @@ the HTML given back to the browser.
    hop in the URL.  (That data comes from the model.)  The request is
    an instance of a WebOb request.
 
-#. The model renders a remplate and returns the result as the
+#. The model renders a template and returns the result as the
    response.
+
+.. note::
+
+  This example uses ``render_template_to_response`` which allows the
+  view author to think only in terms of templates.  If you want more
+  control over the response, use ``render_template`` and create your
+  own WebOb Response object to return.
 
 ``models.py``
 ~~~~~~~~~~~~~
@@ -275,9 +282,10 @@ the root.
 ``run.py``
 ~~~~~~~~~~
 
-We need a small Python module that sets everything, fires up a web
-server, and handles incoming requests.  Later we'll see how to use a
-Paste configuration file to do this work for us.
+We need a small Python module that configures our application and
+advertises itself to our Paste ``.ini`` file.  For convenience, we
+also make it possible to run this module directory without the Paste
+configuration file:
 
 .. literalinclude:: myproject/myproject/run.py
    :linenos:
