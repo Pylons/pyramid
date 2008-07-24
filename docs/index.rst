@@ -31,7 +31,6 @@ Step-by-step sample applications that use ``repoze.bfg``.
    :maxdepth: 3
 
    tutorials/lxmlgraph/index.rst
-   tutorials/cluegun/index.rst
 
 API documentation
 -----------------
