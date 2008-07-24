@@ -1,8 +1,8 @@
 .. _index:
 
-==========================
- repoze.bfg Documentation
-==========================
+===========
+repoze.bfg
+===========
 
 ``repoze.bfg`` is a web application framework based on graph
 traversal.  It is inspired by Zope's publisher, though less ambitious
