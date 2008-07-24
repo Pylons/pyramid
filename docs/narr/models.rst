@@ -51,11 +51,26 @@ instance nodes in the graph:
 Location-Aware Model Instances
 ------------------------------
 
- - For :mod:`repoze.bfg` security and convenience URL-generation
-   functions to work properly against a model instance graph, all
-   nodes in the graph should have two attributes:: ``__parent__`` and
-   ``__name__``.  The ``__parent__`` attribute should be a reference
-   to the node's parent model instance in the graph.  The ``__name__``
-   attribute should be the name that a node's parent refers to the
-   node by via ``__getitem__``.
+ For :mod:`repoze.bfg` security and convenience URL-generation
+ functions to work properly against a model instance graph, all nodes
+ in the graph should have two attributes:: ``__parent__`` and
+ ``__name__``.  The ``__parent__`` attribute should be a reference to
+ the node's parent model instance in the graph.  The ``__name__``
+ attribute should be the name that a node's parent refers to the node
+ by via ``__getitem__``.
 
+ If you choose not to manage the ``__name__`` and ``__parent__``
+ attributes of your models "by hand", :mod:``repoze.bfg`` is willing
+ to help you do this.  If your "root" node claims it implements the
+ interface ``zope.location.interfaces.ILocation``, you don't need to
+ manage these attributes by hand.  During traversal, if the root node
+ says it implements ``ILocation``, bfg will wrap each child in a
+ LocationProxy which will dynamically assign a ``__name__`` and a
+ ``__parent__`` to it, recursively.
+
+ If you choose to make use of the dynamic assignment of ``__parent__``
+ and ``__name__``, the root node must have a ``__parent__`` and a
+ ``__name__`` that are both None, and it must provide the
+ ``ILocation`` interface.  The easiest way to do this is to claim that
+ the class representing the root node
+ ``implements(ILocation)``.
