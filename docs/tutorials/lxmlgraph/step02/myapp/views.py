@@ -1,6 +1,6 @@
 from webob import Response
 
-def my_hello_view(context, request):
+def my_view(context, request):
     response = Response('Hello to %s from %s @ %s' % (
             context.tag, 
             context.__name__, 

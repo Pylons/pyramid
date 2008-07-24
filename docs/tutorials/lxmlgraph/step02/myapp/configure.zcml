@@ -5,7 +5,7 @@
 
   <bfg:view
      for=".models.IMyModel"
-     view=".views.my_hello_view"
+     view=".views.my_view"
      />
 
 </configure>
