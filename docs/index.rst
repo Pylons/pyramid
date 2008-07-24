@@ -4,7 +4,7 @@
 repoze.bfg
 ===========
 
-``repoze.bfg`` is a web application framework based on graph
+``repoze.bfg`` is a Python web application framework based on graph
 traversal.  It is inspired by Zope's publisher, though less ambitious
 in scope.  Instead, it embraces WSGI and existing WSGI software.
 

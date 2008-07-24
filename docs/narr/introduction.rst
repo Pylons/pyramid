@@ -1,7 +1,7 @@
 :mod:`repoze.bfg` Introduction
 ==============================
 
-:mod:`repoze.bfg` is a web application framework based on graph
+:mod:`repoze.bfg` is a Python web application framework based on graph
 traversal.  It is inspired by Zope's publisher, and uses Zope
 libraries to do much of its work.  However, it is less ambitious and
 less featureful than any released version of Zope's publisher.
