@@ -4,6 +4,10 @@
  repoze.bfg Documentation
 ==========================
 
+``repoze.bfg`` is a web application framework based on graph
+traversal.  It is inspired by Zope's publisher, though less ambitious
+in scope.  Instead, it embraces WSGI and existing WSGI software.
+
 Narrative documentation
 -----------------------
 
@@ -21,6 +25,7 @@ Narrative documentation in chapter form explaining how to use
    narr/templates
    narr/models
    narr/security
+   glossary
 
 Tutorials
 ----------
@@ -52,4 +57,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
