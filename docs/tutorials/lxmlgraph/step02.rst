@@ -1,11 +1,12 @@
 ================================================
-Step 02: Hello World as XML
+Step 2: Hello World as XML
 ================================================
 
-We now have a default project.
+We now have a default project named ``lxmlgraph``.  It contains a
+*package* (also) named ``lxmlgraph``.
 
-In this step we will add an XML document as our model data.  We will
-leverage the following ``repoze.bfg`` machinery:
+In this step we will add an XML document to the *package* as our model
+data.  We will leverage the following ``repoze.bfg`` machinery:
 
   - Model data with interfaces that define "types"
 
@@ -18,8 +19,11 @@ Our application will need to do these things:
 
   - That model class needs to implement the "handshake"
 
-File ``myapp/samplemodel.xml``
---------------------------------
+All of the below filenames are relative to the ``lxmlgraph`` *package*
+rather than the project.
+
+File ``samplemodel.xml``
+-----------------------------------
 
 We're going to add an XML document that will serve as a source for
 model data named ``samplemodel.xml``.
@@ -45,7 +49,7 @@ with an attribute matching the next hop.  Also, the value of the
 ``@name`` should be unique in its containing node.
 
 
-Module ``myapp/models.py``
+Module ``models.py``
 ------------------------------
 
 At a high level, we make write a class that "extends" lxml Element
@@ -80,8 +84,8 @@ parser.
    the custom Python class registered.  We then load some XML and
    return the top of the tree.
 
-Module `myapp/views.py``
---------------------------
+Module ``views.py``
+-----------------------------
 
 Our ``views.py`` module does the following:
 

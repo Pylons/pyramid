@@ -1,5 +1,5 @@
 ================================================
-Step 04: Hierarchical Rendering With XSLT
+Step 4: Hierarchical Rendering With XSLT
 ================================================
 
 Now that we have basic templating for our XML graph in place, let's
@@ -23,7 +23,7 @@ Pre-Flight Cleanup
 
 In the last example, we had a default template that used ZPT.  We're
 shifting the rest of the steps over to XSLT.  Thus, our
-``myapp/configure.zcml`` is now simpler:
+``configure.zcml`` is now simpler:
 
 .. literalinclude:: step04/myapp/configure.zcml
    :linenos:
@@ -76,8 +76,8 @@ That's the big picture.  Each of these changes will be explained in
 detail below.
 
 
-File ``myapp/samplemodel.xml``
-================================
+File ``samplemodel.xml``
+===================================
 
 The XML document with the information for our website has quite a
 number of changes:

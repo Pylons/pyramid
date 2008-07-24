@@ -14,4 +14,7 @@ To get started, run ``paster create -t bfg`` as described in
   ...
  $
   
+You now have a project named ``lxmlgraph`` in your current directory.
+We'll add to this project in subsequent steps.
+
 

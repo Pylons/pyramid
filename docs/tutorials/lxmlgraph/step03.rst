@@ -1,5 +1,5 @@
 ================================================
-Step 03: Basic Rendering With ZPT and XSLT
+Step 3: Basic Rendering With ZPT and XSLT
 ================================================
 
 Our XML-based model is now usable.  However, we're using Python to
@@ -25,7 +25,7 @@ The ZCML for this would look like this:
      view=".views.zpt_default_view"
      />
 
-Here we point to a function in ``myapp/views.py`` that looks like the
+Here we point to a function in ``views.py`` that looks like the
 following:
 
 .. code-block:: python
@@ -99,8 +99,8 @@ might XSLT look?
   code, rather than snippets.  You can then follow along by looking at
   the files in ``docs/step03/myapp``.
 
-File ``myapp/configure.zcml``
---------------------------------
+File ``configure.zcml``
+----------------------------------
 
 The ZCML statement for the XSLT template looks almost exactly the same
 as the ZPT template:
@@ -119,11 +119,11 @@ view.  The difference is only in the function that is pointed to by
 the ``view=`` attribute.
 
 
-Module ``myapp/views.py``
+Module ``views.py``
 --------------------------------
 
 The ZCML says that our XSLT view (``xsltview.html`` on the URL) comes
-from the ``myapp.views.xslt_view`` function:
+from the ``lxmlgraph.views.xslt_view`` function:
 
 .. literalinclude:: step03/myapp/views.py
    :linenos:
@@ -142,7 +142,7 @@ from the ``myapp.views.xslt_view`` function:
    document that corresponds to the current hop in the URL.
 
 
-File ``myapp/xsltview.xsl``
+File ``xsltview.xsl``
 --------------------------------
 
 How different does the XSLT itself look?  At this stage, not too different:
