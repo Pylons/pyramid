@@ -12,8 +12,9 @@ class pushpage(object):
 
     Equates to::
 
+      from repoze.bfg.template import render_template_to_response
       def my_view(context, request):
-          return render_template('www/my_template.pt', a=1, b=())
+          return render_template_to_response('www/my_template.pt', a=1, b=())
         
     """
     def __init__(self, template):
