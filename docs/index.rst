@@ -1,7 +1,8 @@
 .. _index:
 
-repoze.bfg Documentation
-========================
+==========================
+ repoze.bfg Documentation
+==========================
 
 Narrative documentation
 -----------------------
@@ -30,7 +31,7 @@ Step-by-step sample applications that use ``repoze.bfg``.
    :maxdepth: 2
 
    tutorials/lxmlgraph/index.rst
-
+   tutorials/cluegun/index.rst
 
 API documentation
 -----------------

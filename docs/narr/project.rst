@@ -122,62 +122,144 @@ The Project Structure
 ---------------------
 
 Our generated ``repoze.bfg`` application is a setuptools *project*
-(named ``myproject``), which contains a Python package (also named
-``myproject``).
+(named ``myproject``), which contains a Python package (which is
+*also* named ``myproject``; the paster template generates a project
+which contains a package that shares its name).
 
-The ``myproject`` package has the following files and directories:
+The ``myproject`` project has the following directory structure::
 
-  1. A ``views.py`` module, which contains view code.
+  myproject/
+  |-- CHANGES.txt
+  |-- README.txt
+  |-- ez_setup.py
+  |-- myproject
+  |   |-- __init__.py
+  |   |-- configure.zcml
+  |   |-- models.py
+  |   |-- run.py
+  |   |-- templates
+  |   |   `-- mytemplate.pt
+  |   |-- tests.py
+  |   `-- views.py
+  |-- myproject.ini
+  `-- setup.py
 
-  2. A ``models.py`` module, which contains model code.
+The ``myproject`` *Project*
+---------------------------
 
-  3. A ``run.py`` module, which contains code that helps users run the
-     application.
+The ``myproject`` project is the distribution and deployment wrapper
+for your application.  It contains both the ``myproject`` *package*
+representing your application as well as files used to describe, run,
+and test your application.
 
-  4. A ``configure.zcml`` file which maps view names to model types.
-     This is also known as the "application registry", although it
-     also often contains non-view-related declarations.
+#. ``CHANGES.txt`` describes the changes you've made to the application.
 
-  5. A ``templates`` directory, which is full of zc3.pt and/or XSL
-     templates.
+#. ``README.txt`` describes the application in general.
 
-This is purely by convention: ``repoze.bfg`` doesn't insist that you
-name things in any particular way.
+#. ``ez_setup.py`` is a file that is used by ``setup.py`` to install
+   setuptools if the executing user does not have it installed.
 
-We don't describe any security in our sample application.  Security is
-optional in a repoze.bfg application; it needn't be used until
-necessary.
+#. ``myproject.ini`` is a PasteDeploy configuration file that can be
+   used to execute your application.
+
+#. ``setup.py`` is the file you'll use to test and distribute your
+   application.  It is a standard distutils/setuptools ``setup.py`` file.
+
+It also contains the ``myproject`` *package*, described below.
+
+The ``myproject`` *Package*
+---------------------------
+
+The ``myproject`` package lives inside the ``myproject`` project.  It
+contains:
+
+#. An ``__init__.py`` file which signifies that this is a Python
+   package.  It is conventionally empty, save for a single comment at
+   the top.
+
+#. A ``configure.zcml`` file which maps view names to model types.
+   This is also known as the "application registry", although it
+   also often contains non-view-related declarations.
+
+#. A ``models.py`` module, which contains model code.
+
+#. A ``run.py`` module, which contains code that helps users run the
+   application.
+
+#. A ``templates`` directory, which is full of zc3.pt and/or XSL
+   templates.
+
+#. A ``tests.py`` module, which contains test code.
+
+#. A ``views.py`` module, which contains view code.
+
+These are purely conventions established by the Paster template:
+``repoze.bfg`` doesn't insist that you name things in any particular
+way.
+
+``configure.zcml``
+~~~~~~~~~~~~~~~~~~
+
+The ``configure.zcml`` (representing the application registry) looks
+like so:
+
+.. literalinclude:: myproject/myproject/configure.zcml
+   :linenos:
+   :language: xml
+
+#. Lines 1-3 provide the root node and namespaces for the
+   configuration language.  ``bfg`` is the namespace for
+   ``repoze.bfg``-specific configuration directives.
+
+#. Line 6 initializes ``repoze.bfg``-specific configuration
+   directives by including it as a package.
+
+#. Lines 8-11 register a single view.  It is ``for`` model objects
+   that support the IMyModel interface.  The ``view`` attribute points
+   at a Python function that does all the work for this view.
 
 ``views.py``
-------------
+~~~~~~~~~~~~
 
-The code in the views.py project looks like this::
+Much of the heavy lifting in a ``repoze.bfg`` application comes in the
+views.  Views are the bridge between the content in the model, and the
+HTML given back to the browser.
 
-  from repoze.bfg.template import render_template_to_response
+.. literalinclude:: myproject/myproject/views.py
+   :linenos:
 
-  def my_view(context, request):
-      return render_template_to_response('templates/mytemplate.pt',
-                                         project = 'myproject')
+#. Lines 3-5 provide the ``my_view`` that was registered as the view.
+   ``configure.zcml`` said that the default URL for IMyModel content
+   should run this ``my_view`` function.
+
+   The function is handed two pieces of information: the ``context``
+   and the ``request``.  The ``context`` is the data at the current
+   hop in the URL.  (That data comes from the model.)  The request is
+   an instance of a WebOb request.
+
+#. The model renders a remplate and returns the result as the
+   response.
 
 ``models.py``
--------------
+~~~~~~~~~~~~~
 
-The code in the models.py looks like this::
+In our sample app, the ``models.py`` module provides the model data.
+We create an interface ``IMyModel`` that gives us the "type" for our
+data.  We then write a class ``MyModel`` that provides the behavior
+for instances of the ``IMyModel`` type.
 
-  from zope.interface import Interface
-  from zope.interface import implements
+.. literalinclude:: myproject/myproject/models.py
+   :linenos:
 
-  class IMyModel(Interface):
-      pass
+#. Lines 4-5 define the interface.
 
-  class MyModel(object):
-      implements(IMyModel)
-      pass
+#. Lines 7-9 provide a class that implements this interface.
 
-  root = MyModel()
+#. Line 11 defines an instance of MyModel as the root.
 
-  def get_root(environ):
-      return root
+#. Line 13 is a function that will be called by the ``repoze.bfg``
+   *Router* for each request when it wants to find the root of the model
+   graph.  Conventionally this is called ``get_root``.
 
 In a "real" application, the root object would not be such a simple
 object.  Instead, it would be an object that could access some
@@ -186,54 +268,39 @@ make any assumption about which sort of datastore you'll want to use,
 so the sample application uses an instance of ``MyModel`` to represent
 the root.
 
-``configure.zcml``
-------------------
-
-The ``configure.zcml`` (representing the application registry) looks
-like so::
-
-  <configure xmlns="http://namespaces.zope.org/zope"
-  	   xmlns:bfg="http://namespaces.repoze.org/bfg"
-  	   i18n_domain="repoze.bfg">
-
-    <!-- this must be included for the view declarations to work -->
-    <include package="repoze.bfg" />
-
-    <bfg:view
-       for=".models.IMyModel"
-       view=".views.my_view"
-       />
-
-  </configure>
-
-``templates/my.pt``
--------------------
-
-The single template in the project looks like so::
-
-  <html xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:tal="http://xml.zope.org/namespaces/tal">
-  <head></head>
-  <body>
-    <h1>Welcome to ${project}</h1>
-  </body>
-  </html>
-
 ``run.py``
-----------
+~~~~~~~~~~
 
-The run.py file looks like so::
+We need a small Python module that sets everything, fires up a web
+server, and handles incoming requests.  Later we'll see how to use a
+Paste configuration file to do this work for us.
 
-  def make_app(global_config, **kw):
-      # paster app config callback
-      from repoze.bfg import make_app
-      from myproject.models import get_root
-      import myproject
-      app = make_app(get_root, myproject)
-      return app
+.. literalinclude:: myproject/myproject/run.py
+   :linenos:
 
-  if __name__ == '__main__':
-      from paste import httpserver
-      app = make_app(None)
-      httpserver.serve(app, host='0.0.0.0', port='5432')
+#. Lines 1 - 7 define a function that returns a ``repoze.bfg`` Router
+   application.  This is meant to be called by the PasteDeploy framework
+   as a result of running ``paster serve``.
+
+#. Lines 9 - 12 allow this file to serve as a shortcut for executing
+   our program if the ``run.py`` file is executed directly.  It starts
+   our application under a web server on port 5432.
+
+``templates/mytemplate.pt``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The single template in the project looks like so:
+
+.. literalinclude:: myproject/myproject/templates/mytemplate.pt
+   :linenos:
+   :language: xml
+
+``tests.py``
+~~~~~~~~~~~~
+
+The ``tests.py`` module includes unit tests for your application.
+
+.. literalinclude:: myproject/myproject/tests.py
+   :linenos:
+
 
