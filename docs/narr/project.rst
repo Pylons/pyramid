@@ -1,15 +1,16 @@
 .. _project_narr:
 
-Starting a ``repoze.bfg`` Project
-=================================
+Starting a :mod:`repoze.bfg` Project
+====================================
 
-You can use ``repoze.bfg`` 's sample application generator to get
-started.
+You can use :mod:`repoze.bfg` 's sample application generator to get
+started.  This generator leverages Paste templates to allow creation
+of a new project by answering a series of questions.
 
 Creating the Project
 --------------------
 
-To start a ``repoze.bfg`` project, use the ``paster create``
+To start a :mod:`repoze.bfg` project, use the ``paster create``
 facility::
 
   $ paster create -t bfg
@@ -41,12 +42,12 @@ facility::
   Running /Users/chrism/projects/repoze-devel/bfg/bin/python setup.py egg_info
 
 The project will be created in a directory named ``myproject``.  That
-directory is a setuptools *project* directory from which a Python
-setuptools *distribution* can be created.  The ``setup.py`` file in
-that directory can be used to distribute your application, or install
-your application for deployment or development. A sample PasteDeploy
-``.ini`` file named ``myproject.ini`` will also be created in the
-project directory.  You can use this to run your application.
+directory is a :term:`setuptools` *project* directory from which a
+Python setuptools *distribution* can be created.  The ``setup.py``
+file in that directory can be used to distribute your application, or
+install your application for deployment or development. A sample
+PasteDeploy ``.ini`` file named ``myproject.ini`` will also be created
+in the project directory.  You can use this to run your application.
 
 The main ``myproject`` contains an additional subdirectory (also named
 ``myproject``) representing a Python pakckage which holds very simple
@@ -72,7 +73,8 @@ it can be found and run under a webserver.
 Running The Tests For Your Application
 --------------------------------------
 
-To run unit tests for your application, you should invoke them like so::
+To run unit tests for your application, you should invoke them like
+so::
 
   $ python setup.py test -q
   running test
@@ -107,11 +109,11 @@ the generated ``myproject.ini`` configuration file::
 
 It will listen on port 5432.  
 
-.. note:: During development, it's often useful to run ``paster serve``
-   using its ``--reload`` option.  When any Python module your project
-   uses, changes, it will restart the server, which makes development
-   easier, as changes to Python code under ``repoze.bfg`` is not put
-   into effect until the server restarts.
+.. note:: During development, it's often useful to run ``paster
+   serve`` using its ``--reload`` option.  When any Python module your
+   project uses, changes, it will restart the server, which makes
+   development easier, as changes to Python code under
+   :mod:`repoze.bfg` is not put into effect until the server restarts.
 
 Viewing the Application
 -----------------------
@@ -123,7 +125,7 @@ Visit http://localhost:5432/ in your browser.  You will see::
 The Project Structure
 ---------------------
 
-Our generated ``repoze.bfg`` application is a setuptools *project*
+Our generated :mod:`repoze.bfg` application is a setuptools *project*
 (named ``myproject``), which contains a Python package (which is
 *also* named ``myproject``; the paster template generates a project
 which contains a package that shares its name).
@@ -196,8 +198,8 @@ contains:
 #. A ``views.py`` module, which contains view code.
 
 These are purely conventions established by the Paster template:
-``repoze.bfg`` doesn't insist that you name things in any particular
-way.
+:mod:`repoze.bfg` doesn't insist that you name things in any
+particular way.
 
 ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~
@@ -211,9 +213,9 @@ like so:
 
 #. Lines 1-3 provide the root node and namespaces for the
    configuration language.  ``bfg`` is the namespace for
-   ``repoze.bfg``-specific configuration directives.
+   :mod:`repoze.bfg`-specific configuration directives.
 
-#. Line 6 initializes ``repoze.bfg``-specific configuration
+#. Line 6 initializes :mod:`repoze.bfg`-specific configuration
    directives by including it as a package.
 
 #. Lines 8-11 register a single view.  It is ``for`` model objects
@@ -223,9 +225,9 @@ like so:
 ``views.py``
 ~~~~~~~~~~~~
 
-Much of the heavy lifting in a ``repoze.bfg`` application comes in the
-views.  Views are the bridge between the content in the model, and the
-HTML given back to the browser.
+Much of the heavy lifting in a :mod:`repoze.bfg` application comes in
+the views.  Views are the bridge between the content in the model, and
+the HTML given back to the browser.
 
 .. literalinclude:: myproject/myproject/views.py
    :linenos:
@@ -259,13 +261,13 @@ for instances of the ``IMyModel`` type.
 
 #. Line 11 defines an instance of MyModel as the root.
 
-#. Line 13 is a function that will be called by the ``repoze.bfg``
+#. Line 13 is a function that will be called by the :mod:`repoze.bfg`
    *Router* for each request when it wants to find the root of the model
    graph.  Conventionally this is called ``get_root``.
 
 In a "real" application, the root object would not be such a simple
 object.  Instead, it would be an object that could access some
-persistent data store, such as a database.  ``repoze.bfg`` doesn't
+persistent data store, such as a database.  :mod:`repoze.bfg` doesn't
 make any assumption about which sort of datastore you'll want to use,
 so the sample application uses an instance of ``MyModel`` to represent
 the root.
@@ -280,9 +282,9 @@ Paste configuration file to do this work for us.
 .. literalinclude:: myproject/myproject/run.py
    :linenos:
 
-#. Lines 1 - 7 define a function that returns a ``repoze.bfg`` Router
-   application.  This is meant to be called by the PasteDeploy framework
-   as a result of running ``paster serve``.
+#. Lines 1 - 7 define a function that returns a :mod:`repoze.bfg`
+   Router application.  This is meant to be called by the PasteDeploy
+   framework as a result of running ``paster serve``.
 
 #. Lines 9 - 12 allow this file to serve as a shortcut for executing
    our program if the ``run.py`` file is executed directly.  It starts

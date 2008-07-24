@@ -2,8 +2,8 @@ Models
 ======
 
 *Models* are typically simple Python classes defined in a module.
- Model *instances* make up the graph that ``repoze.bfg`` is willing to
- traverse.
+ Model *instances* make up the graph that :mod:`repoze.bfg` is willing
+ to traverse.
 
 Defining a Model
 ----------------
@@ -34,8 +34,8 @@ object can implement zero or more interfaces.
 Defining a Graph of Model Instances
 -----------------------------------
 
-``repoze.bfg`` expects to be able to traverse a graph of model
-instances.  ``repoze.bfg`` imposes the following policy on model
+:mod:`repoze.bfg` expects to be able to traverse a graph of model
+instances.  :mod:`repoze.bfg` imposes the following policy on model
 instance nodes in the graph:
 
  - Nodes which contain other nodes (aka "container" nodes) must supply
@@ -51,7 +51,7 @@ instance nodes in the graph:
 Location-Aware Model Instances
 ------------------------------
 
- - For ``repoze.bfg`` security and convenience URL-generation
+ - For :mod:`repoze.bfg` security and convenience URL-generation
    functions to work properly against a model instance graph, all
    nodes in the graph should have two attributes:: ``__parent__`` and
    ``__name__``.  The ``__parent__`` attribute should be a reference

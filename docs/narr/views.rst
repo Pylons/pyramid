@@ -2,9 +2,9 @@ Views
 =====
 
 A view is a callable which is called when a a request enters your
-application.  ``repoze.bfg's`` primary job is to find and call a view
-when a request reaches it.  The view's return value must implement the
-Response object interface.
+application.  :mod:`repoze.bfg's` primary job is to find and call a
+view when a request reaches it.  The view's return value must
+implement the Response object interface.
 
 Defining a View as a Function
 -----------------------------

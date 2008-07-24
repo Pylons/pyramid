@@ -13,6 +13,10 @@
     iterable body), headerlist (representing the http headers sent
     upstream), and status (representing the http status string).  This
     is the interface defined for ``WebOb`` response objects.
+  setuptools
+    `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
+    builds on Python's ``distutils`` to provide easier building,
+    distribution, and installation of packages.
   view
     A "view" is a callable which returns a response object.  It should
     accept two values: context and request.

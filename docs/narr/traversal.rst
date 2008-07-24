@@ -13,7 +13,7 @@ code using pattern matching against URL components.  Examples:
 
 It is however possible to map URLs to code differently, using object
 graph traversal. The venerable Zope and CherryPy web frameworks offer
-graph-traversal-based URL dispatch.  ``repoze.bfg`` also provides
+graph-traversal-based URL dispatch.  :mod:`repoze.bfg` also provides
 graph-traversal-based dispatch of URLs to code.  Graph-traversal based
 dispatching is useful if you like the URL to be representative of an
 arbitrary hierarchy of potentially heterogeneous items.
@@ -65,7 +65,7 @@ URL-based dispatch.
 The Model Graph
 ---------------
 
-Users interact with your ``repoze.bfg``-based application via a
+Users interact with your :mod:`repoze.bfg`-based application via a
 "router", which is itself a WSGI application.  At system startup time,
 the router is configured with a root object from which all traversal
 will begin.  The root object is a mapping object, such as a Python
@@ -74,23 +74,24 @@ nodes (these have no ``__getitem__``) or container nodes (these do
 have a ``__getitem__``).
 
 Items contained within the graph are analogous to the concept of
-``model`` objects used by many other frameworks (and ``repoze.bfg``
+``model`` objects used by many other frameworks (and :mod:`repoze.bfg`
 refers to them as models, as well).  They are typically instances of
 classes.  Each containerish instance is willing to return a child or
 raise a KeyError based on a name passed to its ``__getitem__``.  No
 leaf-level instance is required to have a ``__getitem__``.
 
-``repoze.bfg`` traverses the model graph in order to find a *context*.
-It then attempts to find a *view* based on the type of the context.
+:mod:`repoze.bfg` traverses the model graph in order to find a
+*context*.  It then attempts to find a *view* based on the type of the
+context.
 
-How ``repoze.bfg`` Processes a Request Using Traversal
-------------------------------------------------------
+How :mod:`repoze.bfg` Processes a Request Using Traversal
+---------------------------------------------------------
 
-When a user requests a page from your ``repoze.bfg`` -powered
+When a user requests a page from your :mod:`repoze.bfg` -powered
 application, the system uses this algorithm to determine which Python
 code to execute:
 
- 1.  The request for the page is presented to ``repoze.bfg``'s
+ 1.  The request for the page is presented to :mod:`repoze.bfg`'s
      "router" in terms of a standard WSGI request, which is
      represented by a WSGI environment and a start_response callable.
 
@@ -148,10 +149,10 @@ code to execute:
 
  8.  Armed with the context, the view name, and the subpath, the
      router performs a view lookup.  It attemtps to look up a view
-     from the ``repoze.bfg`` application registry using the view name
-     and the context.  If a view factory is found, it is called with
-     the context and the request.  It returns a response, which is fed
-     back upstream.  If a view is not found, a generic WSGI
+     from the :mod:`repoze.bfg` application registry using the view
+     name and the context.  If a view factory is found, it is called
+     with the context and the request.  It returns a response, which
+     is fed back upstream.  If a view is not found, a generic WSGI
      ``NotFound`` application is constructed.
 
 In either case, the result is returned upstream via the WSGI protocol.
@@ -245,8 +246,8 @@ Using the "view name" ("buz.txt") and the type, it asks the
 "application registry" (configured separately, in "configure.zcml")
 this question:
 
-  - Please find me a "view" (controller in some religions) with the name
-    "buz.txt" that can be used for type ``IBiz``.
+  - Please find me a "view" (controller in some religions) with the
+    name "buz.txt" that can be used for type ``IBiz``.
 
 Let's say that question is answered "here you go, here'a a bit of code
 that is willing to deal with that case", and returns a view.  It is
@@ -256,10 +257,10 @@ as the "request".  It returns a response.
 There are two special cases:
 
 - During traversal you will often end up with a "view name" that is
-  the empty string.  This indicates that ``repoze.bfg`` should look up
-  the *default view*.  The default view is a view that is registered
-  with no name or a view which is registered with a name that equals
-  the empty string.
+  the empty string.  This indicates that :mod:`repoze.bfg` should look
+  up the *default view*.  The default view is a view that is
+  registered with no name or a view which is registered with a name
+  that equals the empty string.
 
 - If any path segment element begins with the special characters
   ``@@`` (think of them as goggles), that segment is considered the

@@ -8,15 +8,15 @@ provided by a *view* in a form that is meaningful for a particular
 Default Templating With z3c.pt Page Templates
 ------------------------------------------------
 
-Like Zope, ``repoze.bfg`` uses Zope Page Templates (ZPT) as its default
-templating language. However, ``repoze.bfg`` uses a different
-implementation of the ZPT specification: the `z3c.pt
+Like Zope, :mod:`repoze.bfg` uses Zope Page Templates (ZPT) as its
+default templating language. However, :mod:`repoze.bfg` uses a
+different implementation of the ZPT specification: the `z3c.pt
 <http://pypi.python.org/pypi/z3c.pt>`_ templating engine. This
 templating engine complies with the `Zope Page Template
 <http://wiki.zope.org/ZPT/FrontPage>`_ template specification. While
 ``z3c.pt`` doesn't implement the METAL specification (feature or
-drawback, depending on your viewpoint,) it is significantly faster. And
-faster, of course, is the zen of ``repoze.bfg``.
+drawback, depending on your viewpoint,) it is significantly
+faster. And faster, of course, is the zen of :mod:`repoze.bfg`.
 
 Given a template named ``foo.html`` in a directory in your application
 named "templates", you can render the template in a view via::
@@ -41,8 +41,9 @@ before you can see the changes.
 Templating with XSLT
 ------------------------
 
-``repoze.bfg`` also supports XSLT as an optional templating language.
-Like ZPT, an XSLT template is loaded once and re-used between requests.
+:mod:`repoze.bfg` also supports XSLT as an optional templating
+language.  Like ZPT, an XSLT template is loaded once and re-used
+between requests.
 
 Given a template ``foo.xsl`` in the templates directory, you can render
 an XSLT as follows::
