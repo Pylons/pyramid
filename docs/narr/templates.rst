@@ -15,7 +15,7 @@ different implementation of the ZPT specification: the `z3c.pt
 templating engine complies with the `Zope Page Template
 <http://wiki.zope.org/ZPT/FrontPage>`_ template specification. While
 ``z3c.pt`` doesn't implement the METAL specification (feature or
-drawback, depending on your viewpoint,) it is significantly
+drawback, depending on your viewpoint), it is significantly
 faster. And faster, of course, is the zen of :mod:`repoze.bfg`.
 
 Given a template named ``foo.html`` in a directory in your application
