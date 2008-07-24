@@ -2,31 +2,27 @@
 Step 02: Hello World as XML
 ================================================
 
-We now have a website with ``/a`` and ``/b`` URLs.  Each has a default
-view that returns a teensy weensy response.
+We now have a default project.
 
-In this step we will do the exact some scope, but using an XML
-document as our model data.  We will leverage the same ``repoze.bfg``
-machinery:
+In this step we will add an XML document as our model data.  We will
+leverage the following ``repoze.bfg`` machinery:
 
   - Model data with interfaces that define "types"
 
   - ZCML configuration to provide type-specific views
 
-We do, however, need to do some things differently:
+Our application will need to do these things:
 
   - Our model class needs to use lxml to inject itelf into the XML
     nodes
 
   - That model class needs to implement the "handshake"
 
-Let's look at what changed.
-
 File ``myapp/samplemodel.xml``
 --------------------------------
 
-Our hierarchy in Step 01 was very simple.  Mimicking it in XML is,
-thus, also very simple:
+We're going to add an XML document that will serve as a source for
+model data named ``samplemodel.xml``.
 
 .. literalinclude:: step02/myapp/samplemodel.xml
    :linenos:
@@ -51,9 +47,6 @@ with an attribute matching the next hop.  Also, the value of the
 
 Module ``myapp/models.py``
 ------------------------------
-
-Here is the serious change: we have made an XML-aware model.  Or is it
-a model-aware XML document?  Such questions, harrumph.
 
 At a high level, we make write a class that "extends" lxml Element
 nodes, create an lxml parser, and register the custom class with the
@@ -87,11 +80,10 @@ parser.
    the custom Python class registered.  We then load some XML and
    return the top of the tree.
 
-
 Module `myapp/views.py``
 --------------------------
 
-We only made two changes here.
+Our ``views.py`` module does the following:
 
 .. literalinclude:: step02/myapp/views.py
    :linenos:
@@ -102,17 +94,14 @@ We only made two changes here.
 #. Line 6 uses the special property we defined in our custom Python
    class to get the ``__name__`` of the context.
 
-
 Browsing the Model
 ------------------------
 
-We can use the same URLs from Step 01 to browser the model and see
-results::
+We can use these URLs to browse the model graph and see results::
 
   http://localhost:5432/a
   http://localhost:5432/b
   http://localhost:5432/c (Not Found)
 
 In this case, each request grabs a node in the XML and uses it as the
-data for the view.  ``repoze.bfg`` doesn't really know that, unlike
-Step 01, we no longer have "real" Python data.
+data for the view.

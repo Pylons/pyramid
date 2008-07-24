@@ -1,3 +1,5 @@
+.. _project_narr:
+
 Starting a ``repoze.bfg`` Project
 =================================
 

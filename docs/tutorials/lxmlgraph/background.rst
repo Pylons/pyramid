@@ -2,10 +2,10 @@ Background
 ====================
 
 This demo application presumes that you have an interest in XML
-technologies and might want to leverage them for a fast-as-hell, but
-rich and dynamic, website.  In this demo application, we build up,
-bit-by-bit, the functionality.  Thus, you don't have to know squatola
-about XML to follow along.
+technologies and might want to leverage them for a fast, but rich and
+dynamic, website.  In this demo application, we build up, bit-by-bit,
+the functionality.  Thus, you don't have to know squatola about XML to
+follow along.
 
 In fact, the real purpose of this demo app is to teach its author how
 to use the stack (repoze.bfg, Paster, eggs, etc.)

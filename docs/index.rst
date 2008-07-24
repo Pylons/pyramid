@@ -28,7 +28,7 @@ Tutorials
 Step-by-step sample applications that use ``repoze.bfg``.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    tutorials/lxmlgraph/index.rst
    tutorials/cluegun/index.rst

@@ -52,8 +52,10 @@ This function is relatively simple:
    (context).  The second is the XML node object for that hop
    (context).
 
-In Step 01 and 02, we returned a WebOb Response object that we
-created.  ``render_template_to_response`` makes a Response itself.
+In Step 02, we returned a WebOb Response object that we created.
+``render_template_to_response`` makes a Response itself.  The
+response's status is always ``200 OK`` if you use this shortcut
+function.
 
 Here's what the ZPT looks like:
 
