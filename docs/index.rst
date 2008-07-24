@@ -40,6 +40,8 @@ Step-by-step sample applications that use ``repoze.bfg``.
 API documentation
 -----------------
 
+Per-module ``repoze.bfg`` API documentation.
+
 .. toctree::
    :maxdepth: 2
 
@@ -57,3 +59,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+* :ref:`glossary`
+
