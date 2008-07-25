@@ -100,9 +100,10 @@ investigations:
 
 #. **Multiple views**.  Instead of just having a single default view
    on a node, I can allow other view names, all pointing at the same
-   factory and XSLT.  I simple grab that name and pass it in as a
-   paramter to the XSLT, which will run a different rule for
-   rendering.
+   view function and XSLT.  I simple grab that name and pass it in as
+   a paramter to the XSLT, which will run a different rule for
+   rendering.  Adding a view would no longer required editing ZCML and
+   adding a function.
 
 #. **Forms**.  To edit data in the model, I need to render a form,
    then handle post data on the way back in.  For the former, it's

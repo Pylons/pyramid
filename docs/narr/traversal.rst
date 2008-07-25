@@ -166,7 +166,7 @@ code to execute:
  8.  Armed with the context, the view name, and the subpath, the
      router performs a view lookup.  It attemtps to look up a view
      from the :mod:`repoze.bfg` application registry using the view
-     name and the context.  If a view factory is found, it is called
+     name and the context.  If a view function is found, it is called
      with the context and the request.  It returns a response, which
      is fed back upstream.  If a view is not found, a generic WSGI
      ``NotFound`` application is constructed.
