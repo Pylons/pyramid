@@ -26,8 +26,8 @@ Add this to your project's ``configure.zcml``:
      />
 
 This view stanza indicates that the *default view* for a model that
-implements ``myapp.models.IMyModel`` should be the
-``myapp.views.zpt_view`` function.  It is the *default* view because
+implements ``lxmlgraph.models.IMyModel`` should be the
+``lxmlgraph.views.zpt_view`` function.  It is the *default* view because
 this stanza does not have a ``name`` attribute.
 
 Additonally, add a template to your project's ``templates`` directory
