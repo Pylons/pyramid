@@ -35,7 +35,8 @@ your package:
    :language: xml
 
 #. Line 2 provides the root of the model as an XML ``<site>`` node.
-   The element name doesn't have to be ``<site>``.
+   The element name doesn't have to be ``<site>``.  It has a name of
+   ``site``.
 
 #. In lines 3-4, the ``<site>`` contains 2 top-level children: a and
    b.  These are provided as an element name ``<document>``.  This,

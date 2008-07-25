@@ -16,19 +16,29 @@ ZPT Templates
 ========================
 
 Let's start with a ZPT-based default view for the nodes in the XML.
-Add this to your project's ``configure.zcml``:
+Change your project's ``configure.zcml`` so that it looks like this:
 
 .. code-block:: xml
 
-  <bfg:view
-     for=".models.IMyModel"
-     view=".views.zpt_view"
-     />
+  <configure xmlns="http://namespaces.zope.org/zope"
+	     xmlns:bfg="http://namespaces.repoze.org/bfg"
+	     i18n_domain="repoze.bfg">
 
-This view stanza indicates that the *default view* for a model that
-implements ``lxmlgraph.models.IMyModel`` should be the
-``lxmlgraph.views.zpt_view`` function.  It is the *default* view because
-this stanza does not have a ``name`` attribute.
+    <!-- this must be included for the view declarations to work -->
+    <include package="repoze.bfg" />
+
+    <bfg:view
+       for=".models.IMyModel"
+       view=".views.zpt_view"
+       />
+
+  </configure>
+
+In other words, replace the default view function with
+``.views.zpt_view``.  This view stanza indicates that the *default
+view* for a model that implements ``lxmlgraph.models.IMyModel`` should
+be the ``lxmlgraph.views.zpt_view`` function.  It is the *default*
+view because this stanza does not have a ``name`` attribute.
 
 Additonally, add a template to your project's ``templates`` directory
 named ``default.pt`` with this content:
@@ -97,8 +107,15 @@ following::
 
   The node has a tag name of: document.
 
+If you visit ``http://localhost:5432/`` you will see::
+
+  My template is viewing item: site
+
+  The node has a tag name of: site.
+
 We've successfully rendered a view that uses a template against a
 model using the ZPT templating language.
+
 
 XSLT Templates
 ====================
@@ -153,7 +170,8 @@ to your ``views.py`` file:
 ``xsltview.xsl``
 --------------------------------
 
-How different does the XSLT itself look?  At this stage, not too different:
+Add a file named ``xsltview.xsl`` to your application's ``templates``
+directory and give it the following contents:
 
 .. literalinclude:: step03/myapp/templates/xsltview.xsl
    :linenos:
@@ -176,13 +194,16 @@ How different does the XSLT itself look?  At this stage, not too different:
 Viewing the XSLT
 --------------------
 
-With this in place, runnning the application provides a URL such as
-``http://localhost:5432/a/xsltview.html``.  Going to that URL should
-show::
+With those changes in place, restart the application.  Visiting to the
+``http://localhost:5432/a/xsltview.html`` URL should show::
 
   My template is viewing item: a
 
   The node has a name of: document.
 
 We've successfully run an XSL template against our model object.
+
+We've now seen how to use ZPT and XSL templates against model objects
+created via an XML tree.
+
 
