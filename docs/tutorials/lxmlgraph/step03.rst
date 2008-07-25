@@ -16,95 +16,100 @@ ZPT Templates
 ========================
 
 Let's start with a ZPT-based default view for the nodes in the XML.
-The ZCML for this would look like this:
+Add this to your project's ``configure.zcml``:
 
 .. code-block:: xml
 
   <bfg:view
      for=".models.IMyModel"
-     view=".views.zpt_default_view"
+     view=".views.zpt_view"
      />
 
-Here we point to a function in ``views.py`` that looks like the
-following:
+This view stanza indicates that the *default view* for a model that
+implements ``myapp.models.IMyModel`` should be the
+``myapp.views.zpt_view`` function.  It is the *default* view because
+this stanza does not have a ``name`` attribute.
+
+Additonally, add a template to your project's ``templates`` directory
+named ``default.pt`` with this content:
+
+.. literalinclude:: step03/myapp/templates/default.pt
+   :linenos:
+   :language: xml
+
+Also add a function in ``views.py`` that looks like the following:
 
 .. code-block:: python
    :linenos:
 
    from repoze.bfg.template import render_template_to_response
-   def zpt_default_view(context, request):
-      fn = "default.pt"
-      return render_template_to_response(fn, name=context.__name__, node=context)
+   def zpt_view(context, request):
+      return render_template_to_response('templates/default.pt', 
+                                         name=context.__name__, 
+                                         node=context)
 
 This function is relatively simple:
 
-#. Line 1 imports a ``repoze.bfg`` function that renders ZPT
-   templates.  ``repoze.bfg`` uses the ``z3c.pt`` ZPT engine.
+#. Line 1 imports a ``repoze.bfg`` function that renders ZPT templates
+   to a response.  ``repoze.bfg`` uses the ``z3c.pt`` ZPT engine.
 
 #. Line 2, like our other view functions, gets passed a ``context``
    (the current hop in the URL) and WebOb ``request`` object.
 
-#. Line 3 points at the filename of the ZPT.
-
-#. Line 4 calls the ``render_template_to_response`` function, passing in the
-   filename for the ZPT and two top-level variables that can be used
-   in the ZPT.  The first is the name of the current URL hop
+#. Line 3 calls the ``render_template_to_response`` function, passing
+   in the filename for the ZPT and two top-level variables that can be
+   used in the ZPT.  The first is the name of the current URL hop
    (context).  The second is the XML node object for that hop
    (context).
 
-In Step 02, we returned a WebOb Response object that we created.
-``render_template_to_response`` makes a Response itself.  The
-response's status is always ``200 OK`` if you use this shortcut
-function.
+In Step 02, we returned a :term:`WebOb` Response object that we
+created.  ``render_template_to_response`` makes a Response itself.
+The response's status is always ``200 OK`` and the content-type is
+always ``text/html`` if you use this shortcut function.
 
-Here's what the ZPT looks like:
+Here's what the ZPT looks like again:
 
-.. literalinclude:: step03/myapp/default.pt
+.. literalinclude:: step03/myapp/templates/default.pt
    :linenos:
    :language: xml
 
-Look, a template!  Life is better with templating:
+Life is better with templating:
 
 #. Lines 1-2 make an ``<html>`` node with a namespace for TAL.
 
 #. Line 5 inserts the value of the ``name`` that we passed into
    ``render_template_to_response``.
 
-#. Line 6 sure looks interesting.  It uses the ``node`` that we passed
-   in via ``render_template_to_response``.  Since ``z3c.pt`` uses
-   Python as its expession language, we can put anything Python-legal
-   between the braces.  And since ``node`` is an ``lxml`` ``Element``
-   object, we just ask for its ``.tag``, like regular Python ``lxml``
-   code.
+#. Line 6 looks interesting.  It uses the ``node`` that we passed in
+   via ``render_template_to_response``.  Since ``z3c.pt`` uses Python
+   as its expession language, we can put anything Python-legal between
+   the braces.  And since ``node`` is an ``lxml`` ``Element`` object,
+   we just ask for its ``.tag``, like regular Python ``lxml`` code.
 
 Viewing the ZPT
 ------------------
 
-With all of that in place, going to ``http://localhost:5432/a`` now
-generates, via the ZPT, the following::
+With all of that in place, restarting the application and visiting
+``http://localhost:5432/a`` now generates, via the ZPT, the
+following::
 
   My template is viewing item: a
 
   The node has a tag name of: document.
 
+We've successfully rendered a view that uses a template against a
+model using the ZPT templating language.
 
 XSLT Templates
 ====================
 
-So that's the ZPT way of rendering HTML for an XML document.  How
-might XSLT look?
-
-.. note::
-
-  For the following, we'll switch back to showing the complete module
-  code, rather than snippets.  You can then follow along by looking at
-  the files in ``docs/step03/myapp``.
+So that's the ZPT way of rendering HTML for an XML document.  We can
+additonally use XSLT to do templating.  How might XSLT look?
 
 File ``configure.zcml``
 ----------------------------------
 
-The ZCML statement for the XSLT template looks almost exactly the same
-as the ZPT template:
+Make your ``configure.zcml`` look like so:
 
 .. literalinclude:: step03/myapp/configure.zcml
    :linenos:
@@ -113,18 +118,20 @@ as the ZPT template:
 #. Lines 10-14 wire up a new view, in addition to the default view.
 
 #. Line 13 provides the difference: ``name="xsltview.html"`` means
-   that all our URLs now can have ``/xsltview.xml`` appended to them.
+   that URLs invoked against our model can have ``/xsltview.html``
+   appended to them, which will invoke our XSLT view.
 
 In the ZCML, there is no distinction between a ZPT view and an XSLT
 view.  The difference is only in the function that is pointed to by
-the ``view=`` attribute.
-
+the ``view=`` attribute.  The view itself controls which templating
+language is in use.
 
 Module ``views.py``
 --------------------------------
 
 The ZCML says that our XSLT view (``xsltview.html`` on the URL) comes
-from the ``lxmlgraph.views.xslt_view`` function:
+from the ``lxmlgraph.views.xslt_view`` function, which you should add
+to your ``views.py`` file:
 
 .. literalinclude:: step03/myapp/views.py
    :linenos:
@@ -148,7 +155,7 @@ File ``xsltview.xsl``
 
 How different does the XSLT itself look?  At this stage, not too different:
 
-.. literalinclude:: step03/myapp/xsltview.xsl
+.. literalinclude:: step03/myapp/templates/xsltview.xsl
    :linenos:
    :language: xml
 
@@ -176,3 +183,6 @@ show::
   My template is viewing item: a
 
   The node has a name of: document.
+
+We've successfully run an XSL template against our model object.
+
