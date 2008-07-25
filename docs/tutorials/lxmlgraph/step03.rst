@@ -106,7 +106,7 @@ XSLT Templates
 So that's the ZPT way of rendering HTML for an XML document.  We can
 additonally use XSLT to do templating.  How might XSLT look?
 
-File ``configure.zcml``
+``configure.zcml``
 ----------------------------------
 
 Make your ``configure.zcml`` look like so:
@@ -126,7 +126,7 @@ view.  The difference is only in the function that is pointed to by
 the ``view=`` attribute.  The view itself controls which templating
 language is in use.
 
-Module ``views.py``
+``views.py``
 --------------------------------
 
 The ZCML says that our XSLT view (``xsltview.html`` on the URL) comes
@@ -150,7 +150,7 @@ to your ``views.py`` file:
    document that corresponds to the current hop in the URL.
 
 
-File ``xsltview.xsl``
+``xsltview.xsl``
 --------------------------------
 
 How different does the XSLT itself look?  At this stage, not too different:
