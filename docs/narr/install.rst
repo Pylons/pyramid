@@ -10,7 +10,7 @@ primarily under Python 2.4, so that version is recommended.
 :mod:`repoze.bfg` does *not* run under any version of Python before
 2.4, and does *not* run under Python 3.X.
 
-.. note:: To succesfully install :mod:`repoze.bfg`, you will need an
+.. warning:: To succesfully install :mod:`repoze.bfg`, you will need an
    environment capable of compiling C code.  See the documentation
    about installing, e.g. ``gcc`` for your system.  Additionally, the
    Python development libraries for your Python version will need to
