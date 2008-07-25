@@ -14,6 +14,13 @@ To start a :mod:`repoze.bfg` project, use the ``paster create``
 facility::
 
   $ paster create -t bfg
+
+``paster create`` will ask you a single question: the *name* of the
+project.  You should use a string without spaces and with only letters
+in it.  Here's sample output from a run of ``paster create`` for a
+project we name ``myproject``::
+
+  $ paster create -t bfg
   Selected and implied templates:
     repoze.bfg#bfg  repoze.bfg starter project
 
@@ -41,13 +48,14 @@ facility::
     Copying setup.py_tmpl to ./myproject/setup.py
   Running /Users/chrism/projects/repoze-devel/bfg/bin/python setup.py egg_info
 
-The project will be created in a directory named ``myproject``.  That
-directory is a :term:`setuptools` *project* directory from which a
-Python setuptools *distribution* can be created.  The ``setup.py``
-file in that directory can be used to distribute your application, or
-install your application for deployment or development. A sample
-PasteDeploy ``.ini`` file named ``myproject.ini`` will also be created
-in the project directory.  You can use this to run your application.
+As a result of the above, a project is created in a directory named
+``myproject``.  That directory is a :term:`setuptools` *project*
+directory from which a Python setuptools *distribution* can be
+created.  The ``setup.py`` file in that directory can be used to
+distribute your application, or install your application for
+deployment or development. A sample PasteDeploy ``.ini`` file named
+``myproject.ini`` will also be created in the project directory.  You
+can use this to run your application.
 
 The main ``myproject`` contains an additional subdirectory (also named
 ``myproject``) representing a Python pakckage which holds very simple
@@ -64,6 +72,10 @@ the following command when inside the project directory against the
 generated ``setup.py``::
 
   $ python setup.py develop
+
+Elided output from a run of this command is shown below::
+
+  $ python setup.py develop
    ...
    Finished processing dependencies for myproject==0.1
 
@@ -75,6 +87,10 @@ Running The Tests For Your Application
 
 To run unit tests for your application, you should invoke them like
 so::
+
+  $ python setup.py test -q
+
+Here's sample output from a test run::
 
   $ python setup.py test -q
   running test
@@ -104,10 +120,15 @@ application it represents using the ``paster serve`` command against
 the generated ``myproject.ini`` configuration file::
 
   $ paster serve myproject/myproject.ini
+
+Here's sample output from a run::
+
+  $ paster serve myproject/myproject.ini
   Starting server in PID 16601.
   serving on 0.0.0.0:5432 view at http://127.0.0.1:5432
 
-It will listen on port 5432.  
+By default, generated :mod:``repoze.bfg`` applications will listen on
+port 5432.
 
 .. note:: During development, it's often useful to run ``paster
    serve`` using its ``--reload`` option.  When any Python module your
@@ -121,6 +142,9 @@ Viewing the Application
 Visit http://localhost:5432/ in your browser.  You will see::
 
   Welcome to myproject
+
+That's the page shown by default when you visit a generated
+application.
 
 The Project Structure
 ---------------------
