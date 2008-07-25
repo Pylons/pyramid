@@ -3,8 +3,8 @@
 :mod:`repoze.bfg.traversal`
 ---------------------------
 
-.. currentmodule:: repoze.bfg.traversal
+.. automodule:: repoze.bfg.traversal
 
-.. autofunction:: find_interface
+  .. autofunction:: find_interface
 
 

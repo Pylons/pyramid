@@ -3,7 +3,7 @@
 :mod:`repoze.bfg.wsgi`
 --------------------------
 
-.. currentmodule:: repoze.bfg.wsgi
+.. automodule:: repoze.bfg.wsgi
 
-.. autofunction:: wsgiapp
+  .. autofunction:: wsgiapp
 

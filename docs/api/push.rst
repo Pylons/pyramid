@@ -3,7 +3,7 @@
 :mod:`repoze.bfg.push`
 --------------------------
 
-.. currentmodule:: repoze.bfg.push
+.. automodule:: repoze.bfg.push
 
-.. autoclass:: pushpage
+  .. autoclass:: pushpage
 
