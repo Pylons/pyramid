@@ -23,23 +23,23 @@ Pre-Flight Cleanup
 
 In the last example, we had a default template that used ZPT.  We're
 shifting the rest of the steps over to XSLT.  Thus, our
-``configure.zcml`` is now simpler:
+``configure.zcml`` can now be madesimpler.  Change your
+``configure.zcml`` to lok like so:
 
 .. literalinclude:: step04/myapp/configure.zcml
    :linenos:
    :language: xml
 
-We also remove the ZPT view function from ``views.py``, as we'll see
-in a moment.
+We'll also remove the ``zpt_view`` function from ``views.py``, as
+we'll see in a moment.
 
 Design Change: Trees and Context IDs
 ========================================
 
-In ``repoze.bfg``, the ``context`` variable that is passed into our
+In :mod:`repoze.bfg`, the ``context`` variable that is passed into our
 view function equates to the Python object that was grabbed on the
-current hop in the URL.  For ``repoze.lxmlgraph``, that "context"
-object is a node in the XML document, found by traversing node
-children.
+current hop in the URL.  For ``lxmlgraph``, that "context" object is a
+node in the XML document, found by traversing node children.
 
 For the XSLT in Step 3, we passed in the context node.  From the
 XSLT's perpective, the universe started at the context node.  It could
@@ -74,7 +74,6 @@ We will thus make the following changes in our approach:
 
 That's the big picture.  Each of these changes will be explained in
 detail below.
-
 
 ``samplemodel.xml``
 =====================
