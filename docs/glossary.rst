@@ -120,4 +120,7 @@ Glossary
   Paste
     `Paste <http://pythonpaste.org>`_ is a WSGI development and
     deployment system developed by Ian Bicking.
+  LXML
+    `lxml <http://codespeak.net/lxml/>`_ is a XML processing library
+    for Python.
 

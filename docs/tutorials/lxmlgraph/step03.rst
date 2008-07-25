@@ -73,8 +73,9 @@ Look, a template!  Life is better with templating:
 #. Line 6 sure looks interesting.  It uses the ``node`` that we passed
    in via ``render_template_to_response``.  Since ``z3c.pt`` uses
    Python as its expession language, we can put anything Python-legal
-   between the braces.  And since ``node`` is an lxml Element object,
-   we just ask for its ``.tag``, like regular Python lxml code.
+   between the braces.  And since ``node`` is an ``lxml`` ``Element``
+   object, we just ask for its ``.tag``, like regular Python ``lxml``
+   code.
 
 Viewing the ZPT
 ------------------

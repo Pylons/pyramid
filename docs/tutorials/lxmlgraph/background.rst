@@ -14,7 +14,7 @@ In summary:
 
   - Represent a hierarchical site as hierarchical XML
 
-  - Inject ``repoze.bfg`` semantics into elements using ``lxml``
+  - Inject ``repoze.bfg`` semantics into elements using :term:`lxml`
 
   - Support flexible-but-fast rendering with XSLT
 
@@ -60,7 +60,7 @@ this method.  Moreover, I want some specific behavior: run an XPath
 express on the node to get the child with the ``@name`` attribute
 matching the URL hop.
 
-Fortunately ``lxml`` makes this easy.  I can inject my nodes with a
+Fortunately :term:`lxml` makes this easy.  I can inject my nodes with a
 class that I write, thus providing my own ``__getitem__`` behavior.
 
 That class can also assert that my XML nodes provide an interface.
@@ -71,7 +71,7 @@ Neato torpedo.  And stinking fast.
 
 Next up, I need to provide views for the elements in the model.  I
 could, for example, use ZPT and manipulate the XML data using Python
-expressions against the lxml API.  Or, I could use XSLT.
+expressions against the :term:`lxml` API.  Or, I could use XSLT.
 
 For the latter, I could register a different XSLT for every "view" on
 every interface.  Or, I could write one big XSLT, and let its template
@@ -95,7 +95,7 @@ investigations:
    property, I can store ACL information on a single node, on an
    ancestor, on the ``<site>`` root, on the Python class, or any
    combination thereof.  Additionally, I can wire up the
-   ``__parent__`` attribute as a property that makes an lxml
+   ``__parent__`` attribute as a property that makes an :term:`lxml`
    ``node.getparent()`` call.
 
 #. **Multiple views**.  Instead of just having a single default view
