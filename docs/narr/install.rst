@@ -10,7 +10,7 @@ primarily under Python 2.4, so that version is recommended.
 :mod:`repoze.bfg` does *not* run under any version of Python before
 2.4, and does *not* run under Python 3.X.
 
-.. note:: To succesfully install :mod:``repoze.bfg``, you will need an
+.. note:: To succesfully install :mod:`repoze.bfg`, you will need an
    environment capable of compiling C code.  See the documentation
    about installing, e.g. ``gcc`` for your system.  Additionally, the
    Python development libraries for your Python version will need to
@@ -37,9 +37,9 @@ are not compatible with your system Python).
 What Gets Installed
 -------------------
 
-When you ``easy_install`` repoze.bfg, various Zope libraries, WebOb,
-PasteScript, PasteDeploy, PasteScript, and FormEncode libraries are
-installed.
+When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
+WebOb, PasteScript, PasteDeploy, PasteScript, and FormEncode libraries
+are installed.
 
 Additionally, as shown in the next section, PasteScript (aka *paster*)
 templates will be registered that make it easy to start a new
