@@ -41,7 +41,7 @@ current hop in the URL.  For ``repoze.lxmlgraph``, that "context"
 object is a node in the XML document, found by traversing node
 children.
 
-For the XSLT in Step 03, we passed in the context node.  From the
+For the XSLT in Step 3, we passed in the context node.  From the
 XSLT's perpective, the universe started at the context node.  It could
 only see information in that node and the children beneath it.
 
