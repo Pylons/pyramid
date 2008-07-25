@@ -21,7 +21,7 @@ items.
 
 .. note::
 
-  :mod:`repozebfg` features graph traversal.  However, via the
+  :mod:`repoze.bfg` features graph traversal.  However, via the
   inclusion of Routes, URL dispatch is also supported for the parts of
   your URL space that better fit that model.
 
