@@ -1,3 +1,5 @@
+import os
+
 from zope.interface import implements
 from zope.interface import Attribute
 from zope.interface import Interface
@@ -32,7 +34,9 @@ def get_root(environ):
     parser.set_element_class_lookup(parser_lookup)
 
     # Now load the XML file
-    xmlstring = open("myapp/samplemodel.xml").read()
+    here = os.path.join(os.path.dirname(__file__))
+    samplemodel = os.path.join(here, 'samplemodel.xml')
+    xmlstring = open(samplemodel).read()
     root = etree.XML(xmlstring, parser)
 
     return root
