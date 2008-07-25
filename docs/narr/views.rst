@@ -54,7 +54,7 @@ app_iter
   world!</body></html>']`` or it can be a filelike object, or any
   other sort of iterable.
 
-If a view happens to return something to the :mod:``repoze.bfg``
+If a view happens to return something to the :mod:`repoze.bfg`
 publisher that does not implement this interface, the publisher will
 raise an error.
 
