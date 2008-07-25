@@ -114,3 +114,10 @@ Glossary
   Zope
     `The Z Object Publishing Framework <http://zope.org>`_.  The granddaddy 
     of Python web frameworks.
+  WebOb
+    `WebOb <http://pythonpaste.org/webob/>`_ is a WSGI request/response
+    library created by Ian Bicking.
+  Paste
+    `Paste <http://pythonpaste.org>`_ is a WSGI development and
+    deployment system developed by Ian Bicking.
+

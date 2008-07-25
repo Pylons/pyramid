@@ -7,8 +7,9 @@ libraries to do much of its work.  However, it is less ambitious and
 less featureful than any released version of Zope's publisher.
 
 :mod:`repoze.bfg` uses the :term:`WSGI` protocol to handle requests
-and responses, and integrates Zope, Paste, and WebOb libraries to form
-the basis for a simple web object publishing framework.
+and responses, and integrates :term:`Zope`, :term:`Paste`, and
+:term:`WebOb` libraries to form the basis for a simple web object
+publishing framework.
 
 Similarities with Other Frameworks
 ----------------------------------
