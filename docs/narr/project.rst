@@ -127,7 +127,7 @@ Here's sample output from a run::
   Starting server in PID 16601.
   serving on 0.0.0.0:5432 view at http://127.0.0.1:5432
 
-By default, generated :mod:``repoze.bfg`` applications will listen on
+By default, generated :mod:`repoze.bfg` applications will listen on
 port 5432.
 
 .. note:: During development, it's often useful to run ``paster
