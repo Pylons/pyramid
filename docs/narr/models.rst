@@ -60,7 +60,7 @@ Location-Aware Model Instances
  by via ``__getitem__``.
 
  If you choose not to manage the ``__name__`` and ``__parent__``
- attributes of your models "by hand", :mod:``repoze.bfg`` is willing
+ attributes of your models "by hand", :mod:`repoze.bfg`` is willing
  to help you do this.  If your "root" node claims it implements the
  interface ``zope.location.interfaces.ILocation``, you don't need to
  manage these attributes by hand.  During traversal, if the root node
@@ -70,7 +70,6 @@ Location-Aware Model Instances
 
  If you choose to make use of the dynamic assignment of ``__parent__``
  and ``__name__``, the root node must have a ``__parent__`` and a
- ``__name__`` that are both None, and it must provide the
+ ``__name__`` that are both ``None``, and it must provide the
  ``ILocation`` interface.  The easiest way to do this is to claim that
- the class representing the root node
- ``implements(ILocation)``.
+ the class representing the root node ``implements(ILocation)``.
