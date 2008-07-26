@@ -1,10 +1,10 @@
 :mod:`repoze.bfg` Introduction
 ==============================
 
-:mod:`repoze.bfg` is a Python web application framework based on graph
-traversal.  It is inspired by Zope's publisher, and uses Zope
-libraries to do much of its work.  However, it is less ambitious and
-less featureful than any released version of Zope's publisher.
+:mod:`repoze.bfg` is a Python web application framework.  It is
+inspired by Zope's publisher, and uses :term:`Zope` libraries to do
+much of its work.  However, it is less ambitious and less featureful
+than any released version of Zope's publisher.
 
 :mod:`repoze.bfg` uses the :term:`WSGI` protocol to handle requests
 and responses, and integrates :term:`Zope`, :term:`Paste`, and
@@ -25,9 +25,9 @@ developer rather than the application developer.
 Like Pylons, :mod:`repoze.bfg` is mostly policy-free.  It makes no
 assertions about which database you should use, and its built-in
 templating facilities are only for convenience.  In essence, it only
-supplies a mechanism to map URLs to view code, along with a convention
-for calling those views.  You are free to use third-party components
-in your application that fit your needs.  Also like Pylons,
+supplies a mechanism to map URLs to :term:`view` code, along with a
+convention for calling those views.  You are free to use third-party
+components in your application that fit your needs.  Also like Pylons,
 :mod:`repoze.bfg` is heavily dependent on WSGI.
 
 The Django docs state that Django is an "MTV" framework in their `FAQ
