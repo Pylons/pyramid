@@ -4,8 +4,8 @@ Starting a :mod:`repoze.bfg` Project
 ====================================
 
 You can use :mod:`repoze.bfg` 's sample application generator to get
-started.  This generator leverages Paste templates to allow creation
-of a new project by answering a series of questions.
+started.  This generator uses :term:`Paste` templates to allow
+creation of a new project by answering a series of questions.
 
 Creating the Project
 --------------------
@@ -53,9 +53,9 @@ As a result of the above, a project is created in a directory named
 directory from which a Python setuptools *distribution* can be
 created.  The ``setup.py`` file in that directory can be used to
 distribute your application, or install your application for
-deployment or development. A sample PasteDeploy ``.ini`` file named
-``myproject.ini`` will also be created in the project directory.  You
-can use this to run your application.
+deployment or development. A sample ``PasteDeploy`` ``.ini`` file
+named ``myproject.ini`` will also be created in the project directory.
+You can use this to run your application.
 
 The main ``myproject`` contains an additional subdirectory (also named
 ``myproject``) representing a Python pakckage which holds very simple
@@ -237,7 +237,7 @@ like so:
 
 #. Lines 1-3 provide the root node and namespaces for the
    configuration language.  ``bfg`` is the namespace for
-   :mod:`repoze.bfg`-specific configuration directives.
+   :mod:`repoze.bfg` -specific configuration directives.
 
 #. Line 6 initializes :mod:`repoze.bfg`-specific configuration
    directives by including it as a package.
@@ -250,8 +250,8 @@ like so:
 ~~~~~~~~~~~~
 
 Much of the heavy lifting in a :mod:`repoze.bfg` application comes in
-the views.  Views are the bridge between the content in the model, and
-the HTML given back to the browser.
+the form of *views*.  A :term:`view` is the bridge between the content
+in the model, and the HTML given back to the browser.
 
 .. literalinclude:: myproject/myproject/views.py
    :linenos:
@@ -273,7 +273,7 @@ the HTML given back to the browser.
   This example uses ``render_template_to_response`` which allows the
   view author to think only in terms of templates.  If you want more
   control over the response, use ``render_template`` and create your
-  own WebOb Response object to return.
+  own ``WebOb`` Response object to return.
 
 ``models.py``
 ~~~~~~~~~~~~~
@@ -331,6 +331,10 @@ The single template in the project looks like so:
    :linenos:
    :language: xml
 
+This is a :term:`z3c.pt` template.  It displays the current project
+name when it is rendered.  It is referenced by the ``my_view``
+function in the ``views.py`` module.
+
 ``tests.py``
 ~~~~~~~~~~~~
 
@@ -339,4 +343,7 @@ The ``tests.py`` module includes unit tests for your application.
 .. literalinclude:: myproject/myproject/tests.py
    :linenos:
 
+This sample ``tests.py`` file has a single unit test defined within
+it.  This is the code that is executed when you run ``setup.py test
+-q``.  You may add more tests here as you build your application.
 

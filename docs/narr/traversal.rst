@@ -22,8 +22,10 @@ items.
 .. note::
 
   :mod:`repoze.bfg` features graph traversal.  However, via the
-  inclusion of Routes, URL dispatch is also supported for the parts of
-  your URL space that better fit that model.
+  inclusion of :term:`Routes`, URL dispatch is also supported for the
+  parts of your URL space that better fit that model.  See the
+  :ref:`urldispatch_module` for more information about using URL
+  dispatch.
 
 Non-graph traversal based URL dispatch can easily handle URLs such as
 ``http://example.com/members/Chris``, where it's assumed that each

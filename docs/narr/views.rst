@@ -20,11 +20,11 @@ world view implemented as a function::
 View Arguments
 --------------
 
-context
+:term:`context`
 
   An instance of a model found via graph traversal.
 
-request
+:term:`request`
 
   A WebOb request object representing the current request.
 

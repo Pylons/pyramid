@@ -10,29 +10,28 @@ primarily under Python 2.4, so that version is recommended.
 :mod:`repoze.bfg` does *not* run under any version of Python before
 2.4, and does *not* run under Python 3.X.
 
-.. warning:: To succesfully install :mod:`repoze.bfg`, you will need an
-   environment capable of compiling C code.  See the documentation
+.. warning:: To succesfully install :mod:`repoze.bfg`, you will need
+   an environment capable of compiling C code.  See the documentation
    about installing, e.g. ``gcc`` for your system.  Additionally, the
    Python development libraries for your Python version will need to
    be installed and the ``lixbml2`` and ``libxslt`` development
    libraries will need to be installed.  These requirements are often
    satisfied by installing the ``python-devel``, ``libxml2-devel`` and
-   ``libxslt-devel`` packages into your system.
-
-After you've got the requisite dependencies installed, you may install
-:mod:`repoze.bfg` into your Python environment using the following
-command::
-
-  $ easy_install -i http://dist.repoze.org/lemonade/dev/simple repoze.bfg
-
-You will need :term:`setuptools` installed on within your Python
-system in order to run the ``easy_install`` command.
+   ``libxslt-devel`` packages into your system.  You will also need
+   :term:`setuptools` installed on within your Python system in order
+   to run the ``easy_install`` command.
 
 It is advisable to install :mod:`repoze.bfg` into a :term:`virtualenv`
 in order to obtain isolation from any "system" packages you've got
 installed in your Python version (and likewise, to prevent
 :mod:`repoze.bfg` from globally installing versions of packages that
 are not compatible with your system Python).
+
+After you've got the requisite dependencies installed, you may install
+:mod:`repoze.bfg` into your Python environment using the following
+command::
+
+  $ easy_install -i http://dist.repoze.org/lemonade/dev/simple repoze.bfg
 
 What Gets Installed
 -------------------

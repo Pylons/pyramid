@@ -122,5 +122,18 @@ Glossary
     deployment system developed by Ian Bicking.
   LXML
     `lxml <http://codespeak.net/lxml/>`_ is a XML processing library
-    for Python.
-
+    for Python by Martijn Faassen and others.
+  z3c.pt
+    `z3c.pt <http://pypi.python.org/pypi/z3c.pt>`_ is an
+    implementation of the `Zope Page Template
+    <http://wiki.zope.org/ZPT/FrontPage>`_ templating language by
+    Malthe Borch.  It has serveral extensions, such as the ability
+    to use bracketed- ``${name}`` syntax.  It is also much faster
+    than the reference implementation of ZPT.
+  Routes
+    A `system by Ben Bangert <http://routes.groovie.org/>`_ which
+    parses URLs and compares them against a number of user defined
+    mappings. In terms of :mod:`repoze.bfg`, a Route can supplant
+    graph traversal when deciding which *view* should be called.  See
+    :ref:`urldispatch_module` for more information about (optional)
+    Routes integration in bfg.

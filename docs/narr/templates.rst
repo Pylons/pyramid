@@ -2,21 +2,19 @@ Templates
 =========
 
 A *template* is a file on disk which can be used to render data
-provided by a *view* in a form that is meaningful for a particular
-*context*.
+provided by a *view*.
 
 Default Templating With z3c.pt Page Templates
 ------------------------------------------------
 
 Like Zope, :mod:`repoze.bfg` uses Zope Page Templates (ZPT) as its
 default templating language. However, :mod:`repoze.bfg` uses a
-different implementation of the ZPT specification: the `z3c.pt
-<http://pypi.python.org/pypi/z3c.pt>`_ templating engine. This
-templating engine complies with the `Zope Page Template
-<http://wiki.zope.org/ZPT/FrontPage>`_ template specification. While
-``z3c.pt`` doesn't implement the METAL specification (feature or
-drawback, depending on your viewpoint), it is significantly
-faster. And faster, of course, is the zen of :mod:`repoze.bfg`.
+different implementation of the ZPT specification: the :term:`z3c.pt`
+templating engine. This templating engine complies with the `Zope Page
+Template <http://wiki.zope.org/ZPT/FrontPage>`_ template
+specification. While :term:`z3c.pt` doesn't implement the *METAL*
+specification (feature or drawback, depending on your viewpoint), it
+is significantly faster.
 
 Given a template named ``foo.html`` in a directory in your application
 named "templates", you can render the template in a view via::
@@ -24,7 +22,7 @@ named "templates", you can render the template in a view via::
   from repoze.bfg.template import render_template_to_response
   return render_template_to_response('templates/foo.html', foo=1, bar=2)
 
-You can also wire up page templates via ZCML:
+You associate a view with a URL by adding information to your ZCML.
 
 .. sourcecode:: xml
 
@@ -34,7 +32,7 @@ You can also wire up page templates via ZCML:
       name="contents.html"
       />
 
-Both approaches load the template and keep it in memory between
+:mod:`repoze.bfg` loads the template and keeps it in memory between
 requests. This means that modifications to the ZPT require a restart
 before you can see the changes.
 

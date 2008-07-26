@@ -25,11 +25,17 @@ An example of a model describing a blog entry::
           self.author = author
           self.created = datetime.datetime.now()
 
-A model consists of basically two things: the object which defines the
-model (above as the class ``IBlogEntry``), and an *interface* attached
-to the model object.  An interface simply tags the model object with a
+A model consists of two things: the object which defines the model
+(above as the class ``IBlogEntry``), and an *interface* attached to
+the model object.  An interface simply tags the model object with a
 "type" that can be referred to within view configuration.  A model
-object can implement zero or more interfaces.
+object can implement zero or more interfaces.  The interface must be
+an instance of a class that inherits from
+``zope.interface.Interface``.
+
+You specify that a model *implements* an interface by using the
+``zope.interface.implements`` function at class scope.  The above
+``BlogEntry`` model implements the ``IBlogEntry`` interface.
 
 Defining a Graph of Model Instances
 -----------------------------------
@@ -41,12 +47,13 @@ instance nodes in the graph:
  - Nodes which contain other nodes (aka "container" nodes) must supply
    a ``__getitem__`` method which is willing to resolve a string or
    unicode name to a subobject.  If a subobject by that name does not
-   exist in the container, ``__getitem__`` must raise a KeyError.  If
-   a subobject by that name *does* exist, the container should return
-   the subobject (another model instance).  
+   exist in the container, ``__getitem__`` must raise a ``KeyError``.
+   If a subobject by that name *does* exist, the container should
+   return the subobject (another model instance).
 
  - Nodes which do not contain other nodes (aka "leaf" nodes) must not
-   implement ``__getitem__``.
+   implement a ``__getitem__``, or if they do, their ``__getitem__``
+   method must raise a ``KeyError``.
 
 Location-Aware Model Instances
 ------------------------------
@@ -68,8 +75,10 @@ Location-Aware Model Instances
  LocationProxy which will dynamically assign a ``__name__`` and a
  ``__parent__`` to it, recursively.
 
- If you choose to make use of the dynamic assignment of ``__parent__``
- and ``__name__``, the root node must have a ``__parent__`` and a
- ``__name__`` that are both ``None``, and it must provide the
- ``ILocation`` interface.  The easiest way to do this is to claim that
- the class representing the root node ``implements(ILocation)``.
+ If you choose to make use of the location-based dynamic assignment of
+ ``__parent__`` and ``__name__``, the root node must have a
+ ``__parent__`` and a ``__name__`` that are both ``None``, and it must
+ provide the ``ILocation`` interface.  The easiest way to do this is
+ to claim that the class representing the root node
+ ``implements(ILocation)``, as above.
+

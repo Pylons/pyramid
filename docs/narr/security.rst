@@ -6,11 +6,8 @@ prevents views that are protected by a :term:`permission` from being
 rendered when the user represented by the request does not have the
 appropriate level of access in a context.
 
-Jargon
-------
-
-To learn about the jargon tossed around in this chapter, you may want
-to review the :ref:`glossary`.
+Security is enabled by adding configuration to your ``configure.zcml``
+which specifies a :term:`security policy`.
 
 Enabling a Security Policy
 --------------------------
@@ -30,18 +27,19 @@ The above insrcutable stanza enables the
 ``RemoteUserACLSecurityPolicy`` to be in effect for every request to
 your application.  The ``RemoteUserACLSecurityPolicy`` is a policy
 which compares the ``REMOTE_USER`` variable passed in the reqest's
-environment (as the sole *principal*) against any *ACL* found in model
-data when attempting to call some *view*.  The policy either allows
-the view that the permission was declared for to be called, or returns
-a ``401 Unathorized`` response code to the upstream WSGI server.
+environment (as the sole :term:`principal`) against any *ACL* found in
+model data when attempting to call some :term:`view`.  The policy
+either allows the view that the permission was declared for to be
+called, or returns a ``401 Unathorized`` response code to the upstream
+WSGI server.
 
 Protecting Views with Permissions
 ---------------------------------
 
 You declaratively protected a particular view with a permisson via the
 ``configure.zcml`` application registry.  For example, the following
-declaration protects the view named "add_entry.html" when invoked
-against an IBlog context with the ``add`` permission::
+declaration protects the view named ``add_entry.html`` when invoked
+against an ``IBlog`` context with the ``add`` permission::
 
   <bfg:view
       for=".models.IBlog"
@@ -62,12 +60,12 @@ Assigning ACLs to your Model Objects
 ------------------------------------
 
 When ``repoze.bfg`` determines whether a user possesses a particular
-permission in a context, it examines the ACL associated with the
-context.  An ACL is associated with a context by virtue of the
-``__acl__`` attribute of the model object representing the context.
-This attribute can be defined on the model *instance* (if you need
-instance-level security), or it can be defined on the model *class*
-(if you just need type-level security).
+permission in a :term:`context`, it examines the :term:`ACL`
+associated with the context.  An ACL is associated with a context by
+virtue of the ``__acl__`` attribute of the model object representing
+the context.  This attribute can be defined on the model *instance*
+(if you need instance-level security), or it can be defined on the
+model *class* (if you just need type-level security).
 
 For example, an ACL might be attached to model for a blog via its
 class::
@@ -91,6 +89,11 @@ class::
 The above ACL indicates that the Everyone principal (a system-defined
 principal) is allowed to view the blog, the ``group:editors``
 principal is allowed to add to and edit the blog.
+
+A principal is usually a user id, however it also may be a group id if
+your authentication system provides group information and the security
+policy is written to respect them.  The
+``RemoteUserACLSecurityPolicy`` does not respect group information.
 
 ACL Inheritance
 ---------------
