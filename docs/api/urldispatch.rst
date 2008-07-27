@@ -13,8 +13,9 @@ configure.zcml like so::
 
   <adapter
       factory="repoze.bfg.urldispatch.RoutesModelTraverser"
-      provides=".interfaces.ITraverserFactory"
-      for="repoze.bfg.interfaces.IURLDispatchModel repoze.bfg.interfaces.IRequest"
+      provides="repoze.bfg.interfaces.ITraverserFactory"
+      for="repoze.bfg.interfaces.IURLDispatchModel
+           repoze.bfg.interfaces.IRequest"
   />
 
 An example of configuring a view that is willing to handle this sort
