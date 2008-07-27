@@ -66,7 +66,7 @@ happens to be true for :mod:`repoze.bfg`::
 layout very simliar to the directory layout suggested by the `Django
 Book <http://www.djangobook.com/>`_ .  Additionally, as suggested
 above, the concepts of :term:`view`, :term:`model` and
-:term:`template` are used by :module:`repoze.bfg` as they would be by
+:term:`template` are used by :mod:`repoze.bfg` as they would be by
 Django.
 
 To learn more about the concepts used by :mod:`repoze.bfg`, visit the
