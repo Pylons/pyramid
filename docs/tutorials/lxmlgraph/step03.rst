@@ -60,8 +60,9 @@ Also add a function in ``views.py`` that looks like the following:
 
 This function is relatively simple:
 
-#. Line 1 imports a ``repoze.bfg`` function that renders ZPT templates
-   to a response.  ``repoze.bfg`` uses the ``z3c.pt`` ZPT engine.
+#. Line 1 imports a :mod:`repoze.bfg` function that renders ZPT
+   templates to a response.  :mod:`repoze.bfg` uses the ``z3c.pt`` ZPT
+   engine.
 
 #. Line 2, like our other view functions, gets passed a ``context``
    (the current hop in the URL) and WebOb ``request`` object.
@@ -160,11 +161,12 @@ to your ``views.py`` file:
 
 #. Line 10 implements the difference.  We call
    ``render_transform_to_response`` instead of
-   ``render_template_to_response``.  This tells ``repoze.bfg`` to make
-   an XSLT processor for this template, instead of a ZPT.  The second
-   argument passes in ``context`` to the XSLT transform.  ``context```
-   is an instance of an Element node.  Namely, a node from the XML
-   document that corresponds to the current hop in the URL.
+   ``render_template_to_response``.  This tells :mod:`repoze.bfg` to
+   make an XSLT processor for this template, instead of a ZPT.  The
+   second argument passes in ``context`` to the XSLT transform.
+   ``context``` is an instance of an Element node.  Namely, a node
+   from the XML document that corresponds to the current hop in the
+   URL.
 
 
 ``xsltview.xsl``
@@ -189,7 +191,6 @@ directory and give it the following contents:
    document we are sitting on.
 
 #. Line 8 shows the element name of the current node.
-
 
 Viewing the XSLT
 --------------------

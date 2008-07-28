@@ -1,9 +1,9 @@
 Models
 ======
 
-*Models* are typically simple Python classes defined in a module.
- Model *instances* make up the graph that :mod:`repoze.bfg` is willing
- to traverse.
+A :term:`model` is typically a simple Python class defined in a
+module.  Model *instances* make up the graph that :mod:`repoze.bfg` is
+willing to traverse.
 
 Defining a Model
 ----------------
@@ -26,11 +26,11 @@ An example of a model describing a blog entry::
           self.created = datetime.datetime.now()
 
 A model consists of two things: the object which defines the model
-(above as the class ``IBlogEntry``), and an *interface* attached to
-the model object.  An interface simply tags the model object with a
-"type" that can be referred to within view configuration.  A model
-object can implement zero or more interfaces.  The interface must be
-an instance of a class that inherits from
+(above as the class ``IBlogEntry``), and an :term:`interface` attached
+to the model object.  An interface simply tags the model object with a
+"type" that can be referred to within the :term:`application
+registry`.  A model object can implement zero or more interfaces.  The
+interface must be an instance of a class that inherits from
 ``zope.interface.Interface``.
 
 You specify that a model *implements* an interface by using the
@@ -67,13 +67,14 @@ Location-Aware Model Instances
  by via ``__getitem__``.
 
  If you choose not to manage the ``__name__`` and ``__parent__``
- attributes of your models "by hand", :mod:`repoze.bfg`` is willing
- to help you do this.  If your "root" node claims it implements the
+ attributes of your models "by hand", :mod:`repoze.bfg`` is willing to
+ help you do this.  If your "root" node claims it implements the
  interface ``zope.location.interfaces.ILocation``, you don't need to
- manage these attributes by hand.  During traversal, if the root node
- says it implements ``ILocation``, bfg will wrap each child in a
- LocationProxy which will dynamically assign a ``__name__`` and a
- ``__parent__`` to it, recursively.
+ manage these attributes by hand.  During :term:`traversal`, if the
+ root node says it implements the ``ILocation`` :term:`interface`,
+ :mod:`repoze.bfg` will wrap each child in a ``LocationProxy`` which
+ will dynamically assign a ``__name__`` and a ``__parent__`` to it,
+ recursively.
 
  If you choose to make use of the location-based dynamic assignment of
  ``__parent__`` and ``__name__``, the root node must have a

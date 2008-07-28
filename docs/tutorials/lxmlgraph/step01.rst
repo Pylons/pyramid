@@ -3,10 +3,9 @@ Step 1: Getting Started
 =======================
 
 To get started, using the ``paster`` command from a :term:`virtualenv`
-you've created that has ``repoze.bfg`` installed, run ``paster create
--t bfg`` as described in :ref:`project_narr` to create your lxmlgraph
-project::
-
+you've created that has :mod:`repoze.bfg` installed, run ``paster
+create -t bfg`` as described in :ref:`project_narr` to create your
+``lxmlgraph`` project::
 
  $ paster create -t bfg Selected and implied templates: repoze.bfg#bfg
   repoze.bfg starter project

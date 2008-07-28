@@ -16,11 +16,15 @@ Similarities with Other Frameworks
 
 :mod:`repoze.bfg` was inspired by Zope, Django, and Pylons.
 
-:mod:`repoze.bfg`'s traversal is inspired by Zope.  :mod:`repoze.bfg`
+:mod:`repoze.bfg` traversal is inspired by Zope.  :mod:`repoze.bfg`
 uses the Zope Component Architecture ("CA") internally, as do Zope 2,
 Zope 3, and Grok.  Developers don't interact with the CA very much
 during typical development, however; it's mostly used by the framework
-developer rather than the application developer.
+developer rather than the application developer.  :mod:`repoze.bfg`
+developers use :term:`ZCML` (an XML dialect) to perform various
+configuration tasks; in particular, as in Zope3, one more more
+:term:`view` functions is associated with a :term:`model` type via
+ZCML.
 
 Like Pylons, :mod:`repoze.bfg` is mostly policy-free.  It makes no
 assertions about which database you should use, and its built-in
@@ -62,7 +66,7 @@ happens to be true for :mod:`repoze.bfg`::
   framework - that is, "model", "template", and "view." That breakdown
   makes much more sense.
 
-:mod:`repoze.bfg` 's skeleton code generator generates a directory
+The skeleton code generator of :mod:`repoze.bfg` generates a directory
 layout very simliar to the directory layout suggested by the `Django
 Book <http://www.djangobook.com/>`_ .  Additionally, as suggested
 above, the concepts of :term:`view`, :term:`model` and

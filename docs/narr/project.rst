@@ -10,8 +10,8 @@ creation of a new project by answering a series of questions.
 Creating the Project
 --------------------
 
-To start a :mod:`repoze.bfg` project, use the ``paster create``
-facility::
+To start a :mod:`repoze.bfg` :term:`project`, use the ``paster
+create`` facility::
 
   $ paster create -t bfg
 
@@ -49,27 +49,26 @@ project we name ``myproject``::
   Running /Users/chrism/projects/repoze-devel/bfg/bin/python setup.py egg_info
 
 As a result of the above, a project is created in a directory named
-``myproject``.  That directory is a :term:`setuptools` *project*
-directory from which a Python setuptools *distribution* can be
+``myproject``.  That directory is a :term:`setuptools` :term:`project`
+directory from which a Python setuptools :term:`distribution` can be
 created.  The ``setup.py`` file in that directory can be used to
 distribute your application, or install your application for
-deployment or development. A sample ``PasteDeploy`` ``.ini`` file
+deployment or development. A sample :term:`PasteDeploy` ``.ini`` file
 named ``myproject.ini`` will also be created in the project directory.
-You can use this to run your application.
+You will use the ``paster serve`` command against this ``ini`` file to
+run your application.
 
-The main ``myproject`` contains an additional subdirectory (also named
-``myproject``) representing a Python pakckage which holds very simple
-bfg sample code.  This is where you'll edit your application's Python
-code and templates.
+The main ``myproject`` directory contains an additional subdirectory
+(also named ``myproject``) representing a Python :term:`package` which
+holds very simple :mod:`repoze.bfg` sample code.  This is where you'll
+edit your application's Python code and templates.
 
 Installing your Newly Created Project for Development
 -----------------------------------------------------
 
-Using your favorite Python interpreter (using a `virtualenv
-<http://pypi.python.org/pypi/virtualenv>`_ is suggested in order to
-isolate your application from your system Python's packages), invoke
-the following command when inside the project directory against the
-generated ``setup.py``::
+Using your favorite Python interpreter (or, better, the interpreter
+from a :term:`virtualenv`), invoke the following command when inside
+the project directory against the generated ``setup.py``::
 
   $ python setup.py develop
 
@@ -79,8 +78,9 @@ Elided output from a run of this command is shown below::
    ...
    Finished processing dependencies for myproject==0.1
 
-This will install your application 's package into the interpreter so
-it can be found and run as a WSGI application inside a WSGI server.
+This will install your application 's :term:`package` into the
+interpreter so it can be found and run as a :term:`WSGI` application
+inside a WSGI server.
 
 Running The Tests For Your Application
 --------------------------------------
@@ -139,20 +139,21 @@ port 5432.
 Viewing the Application
 -----------------------
 
-Visit http://localhost:5432/ in your browser.  You will see::
+Visit *http://localhost:5432/* in your browser.  You will see::
 
   Welcome to myproject
 
-That's the page shown by default when you visit a generated
-application.
+That's the page shown by default when you visit an unmodified ``paster
+create``-generated application.
 
 The Project Structure
 ---------------------
 
-Our generated :mod:`repoze.bfg` application is a setuptools *project*
-(named ``myproject``), which contains a Python package (which is
-*also* named ``myproject``; the paster template generates a project
-which contains a package that shares its name).
+Our generated :mod:`repoze.bfg` application is a setuptools
+:term:`project` (named ``myproject``), which contains a Python
+:term:`package` (which is *also* named ``myproject``; the paster
+template generates a project which contains a package that shares its
+name).
 
 The ``myproject`` project has the following directory structure::
 
@@ -172,64 +173,71 @@ The ``myproject`` project has the following directory structure::
   |-- myproject.ini
   `-- setup.py
 
-The ``myproject`` *Project*
----------------------------
+The ``myproject`` :term:`Project`
+---------------------------------
 
-The ``myproject`` project is the distribution and deployment wrapper
-for your application.  It contains both the ``myproject`` *package*
-representing your application as well as files used to describe, run,
-and test your application.
+The ``myproject`` :term:`project` is the distribution and deployment
+wrapper for your application.  It contains both the ``myproject``
+:term:`package` representing your application as well as files used to
+describe, run, and test your application.
 
-#. ``CHANGES.txt`` describes the changes you've made to the application.
+#. ``CHANGES.txt`` describes the changes you've made to the
+   application.  It is conventionally written in
+   :term:`ReStructuredText` format.
 
-#. ``README.txt`` describes the application in general.
+#. ``README.txt`` describes the application in general.  It is
+   conventionally written in :term:`RestructuredText` format.
 
 #. ``ez_setup.py`` is a file that is used by ``setup.py`` to install
-   setuptools if the executing user does not have it installed.
+   :term:`setuptools` if the executing user does not have it
+   installed.
 
-#. ``myproject.ini`` is a PasteDeploy configuration file that can be
-   used to execute your application.
+#. ``myproject.ini`` is a :term:`PasteDeploy` configuration file that
+   can be used to execute your application.
 
 #. ``setup.py`` is the file you'll use to test and distribute your
-   application.  It is a standard distutils/setuptools ``setup.py`` file.
+   application.  It is a standard :term:`setuptools` ``setup.py``
+   file.
 
-It also contains the ``myproject`` *package*, described below.
+It also contains the ``myproject`` :term:`package`, described below.
 
-The ``myproject`` *Package*
----------------------------
+The ``myproject`` :term:`Package`
+---------------------------------
 
-The ``myproject`` package lives inside the ``myproject`` project.  It
-contains:
+The ``myproject`` :term:`package` lives inside the ``myproject``
+:term:`project`.  It contains:
 
 #. An ``__init__.py`` file which signifies that this is a Python
-   package.  It is conventionally empty, save for a single comment at
-   the top.
+   :term:`package`.  It is conventionally empty, save for a single
+   comment at the top.
 
-#. A ``configure.zcml`` file which maps view names to model types.
-   This is also known as the "application registry", although it
-   also often contains non-view-related declarations.
+#. A ``configure.zcml`` is a :term:`ZCML` file which maps view names
+   to model types.  This is also known as the :term:`application
+   registry`.
 
-#. A ``models.py`` module, which contains model code.
+#. A ``models.py`` module, which contains :term:`model` code.
 
 #. A ``run.py`` module, which contains code that helps users run the
    application.
 
-#. A ``templates`` directory, which is full of zc3.pt and/or XSL
-   templates.
+#. A ``templates`` directory, which is full of :term:`z3c.pt` and/or
+   :term:`XSLT` templates.
 
-#. A ``tests.py`` module, which contains test code.
+#. A ``tests.py`` module, which contains unit test code for the
+   application.
 
-#. A ``views.py`` module, which contains view code.
+#. A ``views.py`` module, which contains view code for the
+   application.
 
-These are purely conventions established by the Paster template:
+These are purely conventions established by the ``paster`` template:
 :mod:`repoze.bfg` doesn't insist that you name things in any
 particular way.
 
 ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~
 
-The ``configure.zcml`` (representing the application registry) looks
-like so:
+The ``configure.zcml`` represents the :term:`application
+registry`. It looks like so:
 
 .. literalinclude:: myproject/myproject/configure.zcml
    :linenos:
@@ -244,7 +252,17 @@ like so:
 
 #. Lines 8-11 register a single view.  It is ``for`` model objects
    that support the IMyModel interface.  The ``view`` attribute points
-   at a Python function that does all the work for this view.
+   at a Python function that does all the work for this view.  Note
+   that the values of both the ``for`` attribute and the ``view``
+   attribute begin with a single period.  Names that begin with a
+   period are "shortcuts" which point at files relative to the
+   :term:`package` in which the ``configure.zcml`` file lives.  In
+   this case, since the ``configure.zcml`` file lives within the
+   ``myproject`` project, the shorcut ``.models.IMyModel`` could also
+   be spelled ``myproject.models.IMyModel`` (forming a full Python
+   dotted-path name to the ``IMyModel`` class).  Likewise the shortcut
+   ``.views.my_view`` could be replaced with
+   ``myproject.views.my_view``.
 
 ``views.py``
 ~~~~~~~~~~~~
@@ -257,31 +275,36 @@ in the model, and the HTML given back to the browser.
    :linenos:
 
 #. Lines 3-5 provide the ``my_view`` that was registered as the view.
-   ``configure.zcml`` said that the default URL for IMyModel content
-   should run this ``my_view`` function.
+   ``configure.zcml`` said that the default URL for ``IMyModel``
+   content should run this ``my_view`` function.
 
-   The function is handed two pieces of information: the ``context``
-   and the ``request``.  The ``context`` is the data at the current
-   hop in the URL.  (That data comes from the model.)  The request is
-   an instance of a WebOb request.
+   The function is handed two pieces of information: the
+   :term:`context` and the term:`request`.  The *context* is the term
+   :term:`model` found via :term:`traversal` (or via :term:`URL
+   dispatch`).  The *request* is an instance of the :term:`WebOb`
+   ``Request`` class representing the browser's request to our server.
 
-#. The model renders a template and returns the result as the
-   response.
+#. The view renders a :term:`template` and returns the result as the
+   :term:`response`.
 
 .. note::
 
-  This example uses ``render_template_to_response`` which allows the
-  view author to think only in terms of templates.  If you want more
-  control over the response, use ``render_template`` and create your
-  own ``WebOb`` Response object to return.
+  This example uses ``render_template_to_response`` which is a
+  shortcut function.  If you want more control over the response, use
+  the ``render_template`` function, also present in
+  :ref:`template_module`.  You may then create your own :term:`WebOb`
+  Response object, using the result of ``render_template`` as the
+  response's body.
 
 ``models.py``
 ~~~~~~~~~~~~~
 
-In our sample app, the ``models.py`` module provides the model data.
-We create an interface ``IMyModel`` that gives us the "type" for our
-data.  We then write a class ``MyModel`` that provides the behavior
-for instances of the ``IMyModel`` type.
+The ``models.py`` module provides the :term:`model` data for our
+application.  We write a class named ``MyModel`` that provides the
+behavior.  We then create an interface ``IMyModel`` that is a
+:term:`interface` which serves as the "type" for our data, and we
+associate it without our ``MyModel`` class by claiming that the class
+``implements`` the interface.
 
 .. literalinclude:: myproject/myproject/models.py
    :linenos:
@@ -303,29 +326,39 @@ make any assumption about which sort of datastore you'll want to use,
 so the sample application uses an instance of ``MyModel`` to represent
 the root.
 
+What will likely frighten new developers in the model file is the use
+of :term:`interface` classes.  In their simplest form (which is the
+only form that :mod:`repoze.bfg` requires you to understand),
+interfaces are simply "marker" attributes indicating the *type* of a
+model object.  These can be attached to classes (via the
+``implements`` function with one or more interfaces as arguments at
+class scope).  In more advanced usage, they can be attached directly
+to instances.  We do not demonstrate that here.
+
 ``run.py``
 ~~~~~~~~~~
 
 We need a small Python module that configures our application and
-advertises itself to our Paste ``.ini`` file.  For convenience, we
-also make it possible to run this module directory without the Paste
-configuration file:
+advertises itself to our :term:`PasteDeploy` ``.ini`` file.  For
+convenience, we also make it possible to run this module directory
+without the PasteDeploy configuration file:
 
 .. literalinclude:: myproject/myproject/run.py
    :linenos:
 
 #. Lines 1 - 7 define a function that returns a :mod:`repoze.bfg`
-   Router application.  This is meant to be called by the PasteDeploy
-   framework as a result of running ``paster serve``.
+   Router application from :ref:`router_module` .  This is meant to be
+   called by the :term:`PasteDeploy` framework as a result of running
+   ``paster serve``.
 
-#. Lines 9 - 12 allow this file to serve as a shortcut for executing
-   our program if the ``run.py`` file is executed directly.  It starts
-   our application under a web server on port 5432.
+#. Lines 9 - 12 allow this file to serve optionally as a shortcut for
+   executing our program if the ``run.py`` file is executed directly.
+   It starts our application under a web server on port 5432.
 
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The single template in the project looks like so:
+The single :term:`template` in the project looks like so:
 
 .. literalinclude:: myproject/myproject/templates/mytemplate.pt
    :linenos:
@@ -333,7 +366,8 @@ The single template in the project looks like so:
 
 This is a :term:`z3c.pt` template.  It displays the current project
 name when it is rendered.  It is referenced by the ``my_view``
-function in the ``views.py`` module.
+function in the ``views.py`` module.  Templates are accessed and used
+by view functions.
 
 ``tests.py``
 ~~~~~~~~~~~~
@@ -345,5 +379,7 @@ The ``tests.py`` module includes unit tests for your application.
 
 This sample ``tests.py`` file has a single unit test defined within
 it.  This is the code that is executed when you run ``setup.py test
--q``.  You may add more tests here as you build your application.
+-q``.  You may add more tests here as you build your application.  You
+are not required to write tests to use :mod:`repoze.bfg`, this file is
+simply provided as convenience and example.
 
