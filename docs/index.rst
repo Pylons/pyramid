@@ -56,7 +56,7 @@ Per-module :mod:`repoze.bfg` API documentation.
 Sample Applications
 ===================
 
-`repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is an
+`repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is a
 simple pastebin application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
 processing, security, and the use of *ZODB* within a :mod:`repoze.bfg`
