@@ -4,9 +4,9 @@
 repoze.bfg
 ===========
 
-``repoze.bfg`` is a Python web application framework.  It is inspired
-by Zope's publisher, though it is less ambitious in scope.  It relies
-heavily on :term:`Zope` libraries and :term:`WSGI`.
+:mod:`repoze.bfg` is a Python web application framework.  It is
+inspired by Zope's publisher, though it is less ambitious in scope.
+It relies heavily on :term:`Zope` libraries and :term:`WSGI`.
 
 Narrative documentation
 -----------------------
@@ -30,7 +30,7 @@ Narrative documentation in chapter form explaining how to use
 Tutorials
 ----------
 
-Step-by-step sample applications that use ``repoze.bfg``.
+Step-by-step sample applications that use :mod:`repoze.bfg`.
 
 .. toctree::
    :maxdepth: 3
@@ -40,7 +40,7 @@ Step-by-step sample applications that use ``repoze.bfg``.
 API documentation
 -----------------
 
-Per-module ``repoze.bfg`` API documentation.
+Per-module :mod:`repoze.bfg` API documentation.
 
 .. toctree::
    :maxdepth: 2
