@@ -75,3 +75,37 @@ Django.
 
 To learn more about the concepts used by :mod:`repoze.bfg`, visit the
 :ref:`glossary` for a listing of definitions.
+
+Why?
+----
+
+*Familiarity*: As web developers, we've become accustomed to working
+in very particular ways (primarily using Zope 2) over the years.  This
+framework is a canonization of practices that "fit our brains".
+
+*Simplicity*: :mod:`repoze.bfg` attempts to be a *"pay only for what
+you eat"* framework in which you can be productive quickly with
+partial knowledge, in contrast to *"pay up front for what anyone might
+eventually want to eat"* frameworks, which tend to expect you to
+understand a great many concepts and technologies fully before you can
+be truly productive.  :mod:`repoze.bfg` doesn't force you to use any
+particular technology to get your application written, and we try to
+keep the core set of concepts you need to understand to a minimum.
+We've thrown out all the cruft.
+
+*Minimalism*: :mod:`repoze.bfg` provides only the very basics: *URL to
+code mapping*, *templating*, and *security*.  There is not much more
+to the framework than these pieces: you are expected to provide the
+rest.
+
+*Documentation*: Because :mod:`repoze.bfg` is so minimal, it's
+relatively easy to keep its documentation up-to-date, which is helpful
+to bring new developers up to speed.  It's our goal that nothing
+remain undocumented about :mod:`repoze.bfg`.
+
+*Speed*: :mod:`repoze.bfg` is meant to be fast, capable of serving on
+the order of 100+ requests per second on today's commodity hardware
+for views that do "real work" given proper application implementation.
+The *hardware is cheap* mantra has its limits when you're responsible
+for managing a great many machines: the fewer you need, the less pain
+you'll have.
