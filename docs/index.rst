@@ -9,7 +9,7 @@ inspired by Zope's publisher, though it is less ambitious in scope.
 It relies heavily on :term:`Zope` libraries and :term:`WSGI`.
 
 Narrative documentation
------------------------
+=======================
 
 Narrative documentation in chapter form explaining how to use
 :mod:`repoze.bfg`.
@@ -28,7 +28,7 @@ Narrative documentation in chapter form explaining how to use
    glossary
 
 Tutorials
-----------
+=========
 
 Step-by-step sample applications that use :mod:`repoze.bfg`.
 
@@ -38,7 +38,7 @@ Step-by-step sample applications that use :mod:`repoze.bfg`.
    tutorials/lxmlgraph/index.rst
 
 API documentation
------------------
+=================
 
 Per-module :mod:`repoze.bfg` API documentation.
 
@@ -52,6 +52,26 @@ Per-module :mod:`repoze.bfg` API documentation.
    api/traversal
    api/urldispatch
    api/wsgi
+
+Sample Applications
+===================
+
+`repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is an
+simple pastebin application based on Rocky Burt's `ClueBin
+<http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
+processing, security, and the use of *ZODB* within a :mod:`repoze.bfg`
+application.  Check this application out of Subversion via::
+
+  svn co http://svn.repoze.org/repoze.cluegun/trunk repoze.cluebin
+
+`repoze.virginia <http://svn.repoze.org/repoze.virginia/trunk/>`_ is a
+very simple dynamic file rendering application.  It is willing to
+render structured text documents, HTML documents, and images from a
+disk directory.  This application runs the `repoze.org
+<http://repoze.org>`_ website.  Check this application out of
+Subversion via::
+
+  svn co http://svn.repoze.org/repoze.virginia/trunk repoze.virginia
 
 Indices and tables
 ==================
