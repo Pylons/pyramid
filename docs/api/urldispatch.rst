@@ -42,7 +42,8 @@ You might then configure the ``RoutesMapper`` like so::
 
 At this point, if any URL matches the pattern ``archives/:article``,
 the ``.views.articles_view`` view will be called with its context as a
-only-the-fly-generated-model with attributes matching the Routes
-routing dictionary associated with the request.  In particular, in
-this case the model will have an ``article`` attribute matching the
-article picked off the URL by Routes.
+only-the-fly-generated-model with attributes matching the keys and
+values in the Routes routing dictionary associated with the request.
+In this case in particular, when a user visits
+``/archives/something``, the model will have an ``article`` attribute
+with the value of ``something``.
