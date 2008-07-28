@@ -16,21 +16,39 @@ specification. While :term:`z3c.pt` doesn't implement the *METAL*
 specification (feature or drawback, depending on your viewpoint), it
 is significantly faster.
 
-Given a template named ``foo.html`` in a directory in your application
-named "templates", you can render the template in a view via::
+Given that there is a template named ``foo.html`` in a directory in
+your application named ``templates``, you can render the template from
+a view like so::
 
   from repoze.bfg.template import render_template_to_response
-  return render_template_to_response('templates/foo.html', foo=1, bar=2)
 
-You associate a view with a URL by adding information to your ZCML.
+  def sample_view(context, request)
+      return render_template_to_response('templates/foo.html', foo=1, bar=2)
 
-.. sourcecode:: xml
+The first argument to ``render_template_to_response`` shown above (and
+its sister function ``render_template``, not shown, which just returns
+a string body) is the template *path*.  Above, the path
+``templates/foo.html`` is *relative*.  Relative to what, you ask?
+Relative to the directory in which the ``views.py`` file which names
+it lives, which is usually the :mod:`repoze.bfg` application's
+:term:`package` directory.
 
-  <bfg:view
-      for=".models.IMapping"
-      view=".views.contents_view"
-      name="contents.html"
-      />
+``render_template_to_response`` always renders a :term:`z3c.pt`
+template, and always returns a Response object which has a *status
+code* of ``200 OK`` and a *content-type* of ``text-html``.  If you
+need more control over the status code and content-type, use the
+``render_template`` function instead, which also renders a z3c.pt
+template but returns a string instead of a Response.  You can use
+the string manually as a response body::
+
+  from repoze.bfg.template import render_template
+  from webob import Response
+
+  def sample_view(context, request)
+      result = render_template('templates/foo.html', foo=1, bar=2)
+      response = Response(result)
+      response.content_type = 'text/plain'
+      return response
 
 :mod:`repoze.bfg` loads the template and keeps it in memory between
 requests. This means that modifications to the ZPT require a restart
