@@ -18,12 +18,15 @@ By default, :mod:`repoze.bfg` enables no security policy.  All views
 are accessible by completely anonymous users.
 
 However, if you add the following bit of code to your application's
-``configure.zcml``, you will enable a security policy::
+``configure.zcml``, you will enable a security policy:
 
-  <utility
-    provides="repoze.bfg.interfaces.ISecurityPolicy"
-    factory="repoze.bfg.security.RemoteUserACLSecurityPolicy"
-    />
+.. code-block:: xml
+   :linenos:
+
+   <utility
+     provides="repoze.bfg.interfaces.ISecurityPolicy"
+     factory="repoze.bfg.security.RemoteUserACLSecurityPolicy"
+     />
 
 The above insrcutable stanza enables the
 ``RemoteUserACLSecurityPolicy`` to be in effect for every request to
@@ -42,14 +45,17 @@ You declaratively protected a particular view with a
 :term:`permission` via the ``configure.zcml`` application registry.
 For example, the following declaration protects the view named
 ``add_entry.html`` when invoked against an ``IBlog`` context with the
-``add`` permission::
+``add`` permission:
 
-  <bfg:view
-      for=".models.IBlog"
-      view=".views.blog_entry_add_view"
-      name="add_entry.html"
-      permission="add"
-      />
+.. code-block:: xml
+   :linenos:
+
+   <bfg:view
+       for=".models.IBlog"
+       view=".views.blog_entry_add_view"
+       name="add_entry.html"
+       permission="add"
+       />
 
 If a security policy is in place when this view is found during normal
 application operations, the user will need to possess the ``add``
@@ -71,23 +77,26 @@ the context.  This attribute can be defined on the model *instance*
 model *class* (if you just need type-level security).
 
 For example, an ACL might be attached to model for a blog via its
-class::
+class:
 
-  from repoze.bfg.security import Everyone
-  from repoze.bfg.security import Allow
-  from zope.location.interfaces import ILocation
-  from zope.location.location import Location
+.. code-block:: python
+   :linenos:
 
-  class IBlog(Interface):
-      pass
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
+   from zope.location.interfaces import ILocation
+   from zope.location.location import Location
 
-  class Blog(dict, Location):
-      __acl__ = [
-          (Allow, Everyone, 'view'),
-          (Allow, 'group:editors', 'add'),
-          (Allow, 'group:editors', 'edit'),
-          ]
-      implements(IBlog, ILocation)
+   class IBlog(Interface):
+       pass
+
+   class Blog(dict, Location):
+       __acl__ = [
+           (Allow, Everyone, 'view'),
+           (Allow, 'group:editors', 'add'),
+           (Allow, 'group:editors', 'edit'),
+           ]
+       implements(IBlog, ILocation)
 
 The above ACL indicates that the ``Everyone`` principal (a special
 system-defined principal indicating, literally, everyone) is allowed
