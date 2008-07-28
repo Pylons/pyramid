@@ -62,7 +62,7 @@ simple pastebin application based on Rocky Burt's `ClueBin
 processing, security, and the use of *ZODB* within a :mod:`repoze.bfg`
 application.  Check this application out of Subversion via::
 
-  svn co http://svn.repoze.org/repoze.cluegun/trunk repoze.cluebin
+  svn co http://svn.repoze.org/repoze.cluegun/trunk repoze.cluegun
 
 `repoze.virginia <http://svn.repoze.org/repoze.virginia/trunk/>`_ is a
 very simple dynamic file rendering application.  It is willing to
