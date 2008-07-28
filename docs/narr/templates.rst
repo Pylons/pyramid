@@ -1,8 +1,8 @@
 Templates
 =========
 
-A *template* is a file on disk which can be used to render data
-provided by a *view*.
+A :term:`template` is a file on disk which can be used to render data
+provided by a :term:`view`.
 
 Default Templating With z3c.pt Page Templates
 ------------------------------------------------
@@ -18,12 +18,14 @@ is significantly faster.
 
 Given that there is a template named ``foo.html`` in a directory in
 your application named ``templates``, you can render the template from
-a view like so::
+a view like so:
 
-  from repoze.bfg.template import render_template_to_response
+.. code-block:: python
+   :linenos:
 
-  def sample_view(context, request)
-      return render_template_to_response('templates/foo.html', foo=1, bar=2)
+   from repoze.bfg.template import render_template_to_response
+   def sample_view(context, request):
+       return render_template_to_response('templates/foo.html', foo=1, bar=2)
 
 The first argument to ``render_template_to_response`` shown above (and
 its sister function ``render_template``, not shown, which just returns
@@ -39,16 +41,18 @@ code* of ``200 OK`` and a *content-type* of ``text-html``.  If you
 need more control over the status code and content-type, use the
 ``render_template`` function instead, which also renders a z3c.pt
 template but returns a string instead of a Response.  You can use
-the string manually as a response body::
+the string manually as a response body:
 
-  from repoze.bfg.template import render_template
-  from webob import Response
+.. code-block:: python
+   :linenos:
 
-  def sample_view(context, request)
-      result = render_template('templates/foo.html', foo=1, bar=2)
-      response = Response(result)
-      response.content_type = 'text/plain'
-      return response
+   from repoze.bfg.template import render_template
+   from webob import Response
+   def sample_view(context, request):
+       result = render_template('templates/foo.html', foo=1, bar=2)
+       response = Response(result)
+       response.content_type = 'text/plain'
+       return response
 
 :mod:`repoze.bfg` loads the template and keeps it in memory between
 requests. This means that modifications to the ZPT require a restart
@@ -62,24 +66,30 @@ language.  Like ZPT, an XSLT template is loaded once and re-used
 between requests.
 
 Given a template ``foo.xsl`` in the templates directory, you can render
-an XSLT as follows::
+an XSLT as follows:
 
-  from repoze.bfg.template import render_transform_to_response
-  from lxml import etree
-  node = etree.Element("root")  
-  return render_transform_to_response('templates/foo.xsl', node)
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.template import render_transform_to_response
+   from lxml import etree
+   node = etree.Element("root")  
+   return render_transform_to_response('templates/foo.xsl', node)
 
 As shown, the second argument to ``render_transform_to_response`` is
 the element (and children) that you want as the top of the data for
 the XSLT.
 
-You can also pass XSLT parameters in as keyword arguments::
+You can also pass XSLT parameters in as keyword arguments:
 
-  from repoze.bfg.template import render_transform_to_response
-  from lxml import etree
-  node = etree.Element("root")
-  value1 = "'app1'"
-  return render_transform_to_response('templates/foo.xsl', node, param1=value1)
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.template import render_transform_to_response
+   from lxml import etree
+   node = etree.Element("root")
+   value1 = "'app1'"
+   return render_transform_to_response('templates/foo.xsl', node, param1=value1)
 
 This would then assign 'app1' as the value of an ``<xsl:param
 name="param1"/>`` parameter in the XSLT template.
