@@ -74,7 +74,8 @@ Glossary
   Interface
     An attribute of an object that determines its type.
   Location
-    The path to an object in a model graph.
+    The path to an object in a model graph.  See :ref:`location_aware`
+    for more information about how to make a model object *location-aware*.
   Security policy
     An object that provides a mechanism to check authorization using
     authentication data and a permission associated with a model.  It

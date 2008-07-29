@@ -58,6 +58,8 @@ instance nodes in the graph:
   implement a ``__getitem__``, or if they do, their ``__getitem__``
   method must raise a ``KeyError``.
 
+.. _location_aware:
+
 Location-Aware Model Instances
 ------------------------------
 

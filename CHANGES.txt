@@ -1,3 +1,7 @@
+0.2.5
+
+  - Add ``model_url`` API.
+
 0.2.4
 
   - Added url-based dispatch.

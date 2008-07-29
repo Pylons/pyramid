@@ -7,4 +7,5 @@
 
   .. autofunction:: find_interface
 
+  .. autofunction:: model_url
 

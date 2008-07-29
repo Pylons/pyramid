@@ -169,6 +169,33 @@ class FindInterfaceTests(unittest.TestCase):
         result = finder(baz, IFoo)
         self.assertEqual(result.__name__, 'root')
 
+class ModelURLTests(unittest.TestCase):
+    def _getFUT(self):
+        from repoze.bfg.traversal import model_url
+        return model_url
+
+    def test_it(self):
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        root.__parent__ = None
+        root.__name__ = None
+        foo.__parent__ = root
+        foo.__name__ = 'foo '
+        bar.__parent__ = foo
+        bar.__name__ = 'bar'
+        baz.__parent__ = bar
+        baz.__name__ = 'baz'
+        request = DummyRequest()
+        model_url = self._getFUT()
+        request = DummyRequest()
+        result = model_url(baz, request, 'this/theotherthing', 'that')
+
+        self.assertEqual(
+            result,
+            'http://example.com:5432/foo%20/bar/baz/this/theotherthing/that')
+
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next
@@ -179,8 +206,8 @@ class DummyContext(object):
         return self.next
 
 class DummyRequest:
-    pass
-    
+    application_url = 'http://example.com:5432/'
+
 class DummyTraverser:
     def __init__(self, context):
         self.context = context
