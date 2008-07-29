@@ -169,11 +169,20 @@ Glossary
     for transforming XML documents into other XML documents.
   z3c.pt
     `z3c.pt <http://pypi.python.org/pypi/z3c.pt>`_ is an
-    implementation of the `Zope Page Template
-    <http://wiki.zope.org/ZPT/FrontPage>`_ templating language by
-    Malthe Borch.  It has serveral extensions, such as the ability
-    to use bracketed- ``${name}`` syntax.  It is also much faster
-    than the reference implementation of ZPT.
+    implementation of :term:`ZPT` by Malthe Borch.  It has serveral
+    extensions, such as the ability to use bracketed- ``${name}``
+    syntax.  It is also much faster than the reference implementation
+    of ZPT.  :mod:`repoze.bfg` offers z3c.pt templating out of the
+    box.
+  ZPT
+    The `Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_
+    templating language.
+  METAL
+    `Macro Expansion for TAL <http://wiki.zope.org/ZPT/METAL>`_, a
+    part of :term:`ZPT` which makes it possible to share common look
+    and feel between templates.  :term:`z3c.pt`, the implementation of
+    ZPT that :mod:`repoze.bfg` ships with does not implement the METAL
+    specification.
   Routes
     A `system by Ben Bangert <http://routes.groovie.org/>`_ which
     parses URLs and compares them against a number of user defined

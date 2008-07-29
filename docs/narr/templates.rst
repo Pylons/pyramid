@@ -1,24 +1,25 @@
 Templates
 =========
 
-A :term:`template` is a file on disk which can be used to render data
-provided by a :term:`view`.
+A :term:`template` is a usually file on disk which can be used to
+render data provided by a :term:`view`, surrounded by more static
+information.
 
-Default Templating With z3c.pt Page Templates
-------------------------------------------------
+Templating With :term:`z3c.pt` (ZPT) Page Templates
+---------------------------------------------------
 
-Like Zope, :mod:`repoze.bfg` uses Zope Page Templates (ZPT) as its
-default templating language. However, :mod:`repoze.bfg` uses a
-different implementation of the ZPT specification: the :term:`z3c.pt`
-templating engine. This templating engine complies with the `Zope Page
-Template <http://wiki.zope.org/ZPT/FrontPage>`_ template
-specification. While :term:`z3c.pt` doesn't implement the *METAL*
-specification (feature or drawback, depending on your viewpoint), it
+Like Zope, :mod:`repoze.bfg` uses Zope Page Templates (:term:`ZPT`) as
+its default templating language. However, :mod:`repoze.bfg` uses a
+different implementation of the :term:`ZPT` specification than Zope
+does: the :term:`z3c.pt` templating engine. This templating engine
+complies with the `Zope Page Template
+<http://wiki.zope.org/ZPT/FrontPage>`_ template specification. While
+:term:`z3c.pt` doesn't implement the :term:`METAL` specification, it
 is significantly faster.
 
-Given that there is a template named ``foo.html`` in a directory in
-your application named ``templates``, you can render the template from
-a view like so:
+Given that there is a :term:`z3c.pt` template named ``foo.html`` in a
+directory in your application named ``templates``, you can render the
+template from a view like so:
 
 .. code-block:: python
    :linenos:
@@ -93,3 +94,30 @@ You can also pass XSLT parameters in as keyword arguments:
 
 This would then assign 'app1' as the value of an ``<xsl:param
 name="param1"/>`` parameter in the XSLT template.
+
+Templating with other Templating Languages
+------------------------------------------
+
+Because :term:`view` functions are typically the only code in
+:mod:`repoze.bfg` that need to know anything about templates, and
+because view functions are very simple Python, you can use whatever
+templating system you're most comfortable with within
+:mod:`repoze.bfg`.  Install the templating system, import its API
+functions into your views module, use those APIs to generate a string,
+then return that string as the body of a :term:`WebOb` ``Response``
+object.  Assuming you have `Mako <http://www.makotemplates.org/>`_
+installed, here's an example of using Mako from within a
+:mod:`repoze.bfg` :term:`view`:
+
+.. code-block:: python
+   :linenos:
+
+   from mako.template import Template
+   from webob import Response
+
+   def make_view(context, request):
+       template = Template(filename='/templates/template.mak')
+       result = template.render(name=context.name)
+       response = Response(result)
+       return response
+
