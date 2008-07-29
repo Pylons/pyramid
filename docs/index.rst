@@ -61,6 +61,15 @@ Per-module :mod:`repoze.bfg` API documentation.
 Sample Applications
 ===================
 
+`repoze.wiki <http://svn.repoze.org/repoze.wiki/trunk/>`_ is a port of
+the `TurboGears 20-Minute Wiki
+<http://turbogears.org/2.0/docs/main/Wiki20/wiki20.html>`_.  It
+demonstrates integration with `SQLAlchemy
+<http://www.sqlalchemy.org/>`_, customized traversal, and form
+processing.  Check this application out of Subversion via::
+
+  svn co http://svn.repoze.org/repoze.wiki/trunk repoze.wiki
+
 `repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is a
 simple pastebin application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
@@ -72,7 +81,7 @@ application.  Check this application out of Subversion via::
 `repoze.virginia <http://svn.repoze.org/repoze.virginia/trunk/>`_ is a
 very simple dynamic file rendering application.  It is willing to
 render structured text documents, HTML documents, and images from a
-disk directory.  This application runs the `repoze.org
+filesystem directory.  This application runs the `repoze.org
 <http://repoze.org>`_ website.  Check this application out of
 Subversion via::
 
