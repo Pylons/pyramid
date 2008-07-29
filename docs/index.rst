@@ -10,7 +10,7 @@ It relies heavily on :term:`Zope` libraries and :term:`WSGI`.
 
 :mod:`repoze.bfg` is developed as part of the `Repoze
 <http://repoze.org>`_ project by `Agendaless Consulting
-<http://agendaless.com>`_ and other contributors.  .  It is licensed
+<http://agendaless.com>`_ and other contributors.  It is licensed
 under a `BSD-like license <http://repoze.org/license.html>`_.
 
 Narrative documentation
