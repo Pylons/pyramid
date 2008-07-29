@@ -8,6 +8,11 @@ repoze.bfg
 inspired by Zope's publisher, though it is less ambitious in scope.
 It relies heavily on :term:`Zope` libraries and :term:`WSGI`.
 
+:mod:`repoze.bfg` is developed as part of the `Repoze
+<http://repoze.org>`_ project by `Agendaless Consulting
+<http://agendaless.com>`_ and other contributors.  .  It is licensed
+under a `BSD-like license <http://repoze.org/license.html>`_.
+
 Narrative documentation
 =======================
 
@@ -72,6 +77,26 @@ disk directory.  This application runs the `repoze.org
 Subversion via::
 
   svn co http://svn.repoze.org/repoze.virginia/trunk repoze.virginia
+
+Support and Development
+=======================
+
+To report bugs, use the `Repoze bug tracker <http://bugs.repoze.org>`_.
+
+If you've got questions that aren't answered by this documentation,
+contact the `Repoze-dev maillist
+<http://lists.repoze.org/listinfo/repoze-dev>`_ or join the `#repoze
+IRC channel <irc://irc.freenode.net/#repoze>`_.
+
+Browse and check out tagged and trunk versions of :mod:`repoze.bfg`
+via the `Repoze Subversion repository
+<http://http://svn.repoze.org/repoze.bfg/>`_.  To check out the trunk
+via Subversion, use this command::
+
+  svn co http://svn.repoze.org/repoze.bfg/trunk repoze.bfg
+
+To find out how to become a contributor to :mod:`repoze.bfg`, please
+see the `contributor's page <http://repoze.org/contributing.html>`_.
 
 Indices and tables
 ==================
