@@ -186,10 +186,10 @@ describe, run, and test your application.
    :term:`ReStructuredText` format.
 
 #. ``README.txt`` describes the application in general.  It is
-   conventionally written in :term:`RestructuredText` format.
+   conventionally written in :term:`ReStructuredText` format.
 
 #. ``ez_setup.py`` is a file that is used by ``setup.py`` to install
-   :term:`setuptools` if the executing user does not have it
+   :term:`Setuptools` if the executing user does not have it
    installed.
 
 #. ``myproject.ini`` is a :term:`PasteDeploy` configuration file that
@@ -199,7 +199,173 @@ describe, run, and test your application.
    application.  It is a standard :term:`setuptools` ``setup.py``
    file.
 
-It also contains the ``myproject`` :term:`package`, described below.
+We won't describe the ``CHANGES.txt`` or ``README.txt`` files.
+``ez_setup.py`` is a file only used by ``setup.py`` in case a user who
+wants to install your package does not have :term:`Setuptools` already
+installed.  It is only imported by and used by ``setup.py``, so we
+won't describe it here.
+
+``myproject.ini``
+~~~~~~~~~~~~~~~~~
+
+The ``myproject.ini`` file is a :term:`PasteDeploy` configuration
+file.  Its purpose is to specify an application to run when you invoke
+``paster serve`` when you start an application, as well as the options
+provided to that application.
+
+The generated ``myproject.ini`` file looks like so:
+
+.. literalinclude:: myproject/myproject.ini
+   :linenos:
+
+This file contains several "sections" including ``[DEFAULT]``,
+``[app:main]``, and ``[server:main]``.
+
+The ``[DEFAULT]`` section consists of global parameters that are
+shared by all the applications, servers and :term:`middleware` defined
+within the configuration file.  By default it contains one key
+``debug``, which is set to ``true``.  This key is used by various
+components to decide whether to act in a "debugging" mode.
+``repoze.bfg`` itself does not do anything with this parameter as of
+this writing, and neither does the generated sample application.
+
+The ``[app:main]`` section represents configuration for your
+application.  This section name represents the ``main`` application
+(and it's an ``app`` -lication, thus ``app:main``), sigifiying that
+this is the default application run by ``paster serve`` when it is
+invoked against this configuration file.  The name ``main`` is a
+convention signifying that it the default application.
+
+The ``use`` setting is required in the ``[app:main]`` section.  The
+``use`` setting points at a :term:`setuptools` "entry point" named
+``myproject#make_app`` (the ``egg:`` prefix in
+``egg:myproject#make_app`` indicates that this is an entry point
+specifier).
+
+.. note::
+
+   This part of configuration can be confusing so let's try to clear
+   things up a bit.  Take a look at the generated ``setup.py`` file
+   for this project.  Note that the ``entry_point`` line in
+   ``setup.py`` points at a string which looks a lot like an ``.ini``
+   file.  This string representation of an ``.ini`` file has a section
+   named ``[paste.app_factory]``.  Within this section, there is a key
+   named ``make_app`` (the entry point name) which has a value
+   ``myproject.run:make_app``.  The *key* ``make_app`` is what our
+   ``egg:myproject#make_app`` value of the ``use`` section in our
+   config file is pointing at.  The value represents a Python
+   "dotted-name" path, which refers to a callable in our ``myproject``
+   package's ``run.py`` module.
+
+   In English, this entry point can thus be referred to as a "Paste
+   application factory in the ``myproject`` package which has the
+   entry point named ``make_app`` where the entry point refers to a
+   ``make_app`` function in the ``mypackage.run`` module".  If indeed
+   if you open up the ``run.py`` module generated within the
+   ``myproject`` package, you'll see a ``make_app`` function.  This is
+   the function called :term:`PasteDeploy` when the ``paster serve``
+   command is invoked against our application.  It accepts a global
+   configuration object and *returns* an instance of our application.
+
+The ``use`` setting is the only setting required in the ``[app:main]``
+section unless you've changed the callable referred to by the
+``myproject#make_app`` entry point to accept more arguments: other
+settings you add to this section are passed as keywords arguments to
+the callable represented by this entry point (``make_app`` in our
+``run.py`` module).  You can provide startup-time configuration
+parameters to your application by requiring more settings in this
+section.
+
+The ``[server:main]`` section of the configuration file configures a
+WSGI server which listens on port 5432.  It is configured to listen on
+all interfaces (``0.0.0.0``), and is configured to use four threads
+for our application.
+
+.. note::
+
+  In general, ``repoze.bfg`` applications should be threading-aware.
+  It is not required that a ``repoze.bfg`` application be nonblocking
+  as all application code will run in its own thread, provided by the
+  server you're using.
+
+See the :term:`PasteDeploy` documentation for more information about
+other types of things you can put into this ``.ini`` file, such as
+other applications, :term:`middleware` and alternate servers.
+
+``setup.py``
+~~~~~~~~~~~~
+
+The ``setup.py`` file is a :term:`setuptools` setup file.  It is meant
+to be run directly from the command line to perform a variety of
+functions, such as testing your application, packaging, and
+distributing your application.
+
+.. note::
+
+  ``setup.py`` is the defacto standard which Python developers use to
+  distribute their reusable code.  You can read more about
+  ``setup.py`` files and their usage in the :term:`Setuptools`
+  documentation.
+
+Our generated ``setup.py`` looks like this:
+
+.. literalinclude:: myproject/setup.py
+   :linenos:
+
+The top of the file imports and uses ``ez_setup``, which causes
+:term:`Setuptools` to be installed on an invoking user's computer if
+it isn't already.  The ``setup.py`` file calls the setuptools
+``setup`` function, which does various things depending on the
+arguments passed to ``setup.py`` on the command line.
+
+Within the arguments to this function call, information about your
+application is kept.  While it's beyond the scope of this
+documentation to explan everything about setuptools setup files, we'll
+provide a whirlwind tour of what exists in this file here.
+
+Your application's name (this can be any string) is specified in the
+``name`` field.  The version number is specified in the ``version``
+value.  A short description is provided in the ``description`` field.
+The ``long_description`` is conventionally the content of the README
+and CHANGES file appended together.  The ``classifiers`` field is a
+list of `Trove
+<http://pypi.python.org/pypi?%3Aaction=list_classifiers>`_ classifiers
+describing your application.  ``author`` and ``author_email`` are text
+fields which probably don't need any description.  ``url`` is a field
+that should point at your application project's URL (if any).
+``packages=find_packages()`` causes all packages within the project to
+be found when packaging the application.  ``include_package_data``
+will include non-Python files when the application is packaged (if
+those files are checked into version control).  ``zip_safe` indicates
+that this package is not safe to ship as a zipped egg (it will unpack
+as a directory, which is more convenient).  ``install_requires`` and
+``tests_require`` indicate that this package depends on the
+``repoze.bfg`` package.  ``test_suite`` points at the unittest module
+for our application.  We examined ``entry_points`` in our discussion
+of the ``myproject.ini`` file.
+
+Usually you only need to think about the contents of the ``setup.py``
+file when distributing your application to other people, or when
+versioning your application for your own use.  For fun, you can try
+this command now::
+
+  python setup.py sdist
+
+This will create a tarball of your application in a ``dist``
+subdirectory named ``myproject-0.1.tar.gz``.  You can send this
+tarball to other people who want to use your application.
+
+.. note::
+
+   By default, ``setup.py sdist`` does not place non-Python-source
+   files in generated tarballs.  This means, in this case, that the
+   ``mytemplate.pt`` file that's in our ``templates`` directory is not
+   packaged in the tarball.  To allow this to happen, check all the
+   files that you'd like to be distributed along with your
+   application's Python files into a version control system such as
+   Subversion.  After you do this, when you rerun ``setup.py sdist``,
+   all files checked into the version control system will be included
+   in the tarball.
 
 The ``myproject`` :term:`Package`
 ---------------------------------
