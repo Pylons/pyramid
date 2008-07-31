@@ -159,6 +159,9 @@ Glossary
   Zope
     `The Z Object Publishing Framework <http://zope.org>`_.  The granddaddy 
     of Python web frameworks.
+  ZODB
+     `Zope Object Database <http://wiki.zope.org/ZODB/FrontPage>`_, a
+     persistent Python object store.
   WebOb
     `WebOb <http://pythonpaste.org/webob/>`_ is a WSGI request/response
     library created by Ian Bicking.

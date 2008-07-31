@@ -3,100 +3,57 @@
 Traversal
 =========
 
-In many popular web frameworks, :term:`URL dispatch` is used to
-associate a particular URL with a bit of code (known somewhat
-ambiguously as a "controller" or :term:`view` depending upon the
-particular vocabulary religion to which you subscribe).  These systems
-allow the developer to create "urlconfs" or "routes" to
-controller/view Python code using pattern matching against URL
-components.  Examples: `Django's URL dispatcher
-<http://www.djangoproject.com/documentation/url_dispatch/>`_ and the
-:term:`Routes` URL mapping system.
-
-:mod:`repoze.bfg` supports :term:`URL dispatch` via :term:`Routes`.
-See the :ref:`urldispatch_module` for more information about using URL
-dispatch.
-
-By default, however, :mod:`repoze.bfg` does not use URL dispatch to
-map URLs to code.  Instead, it maps URLs to code slightly differently,
-using object graph :term:`traversal`. The venerable Zope and CherryPy
-web frameworks offer graph-traversal-based URL dispatch.
-Graph-traversal based dispatching is useful if you like the URL to
-represent an arbitrary hierarchy of potentially heterogeneous items.
-
-:term:`URL dispatch` can easily handle URLs such as
-``http://example.com/members/Chris``, where it's assumed that each
-item "below" ``members`` in the URL represents a member in the system.
-You just match everything "below" ``members`` to a particular view.
-They are not very good, however, at inferring the difference between
-sets of URLs such as::
-
-       http://example.com/members/Chris/document
-       http://example.com/members/Chris/stuff/page
-
-...wherein you'd like the ``document`` in the first URL to represent a
-PDF document, and ``/stuff/page`` in the second to represent an
-*OpenOffice* document in a "stuff" folder.  It takes more pattern
-matching assertions to be able to make URLs like these work in
-URL-dispatch based systems, and some assertions just aren't possible.
-For example, URL-dispatch based systems don't deal very well with URLs
-that represent arbitrary-depth hierarchies.
-
-Graph :term:`traversal` works well if you need to divine meaning out
-of these types of "ambiguous" URLs and URLs that represent
-arbitrary-depth hierarchies.  Each URL segment represents a single
-traversal through an edge of the graph.  So a URL like
-``http://example.com/a/b/c`` can be thought of as a graph traversal on
-the example.com site through the edges ``a``, ``b``, and ``c``.
-
-Finally, if you're willing to treat your application models as a graph
-that can be traversed, it also becomes trivial to provide "row-level
-security" (in common relational parlance): you just attach a security
-declaration to each instance in the graph.  This is not as easy in
-frameworks that use URL-based dispatch.
-
-Graph traversal is materially more complex than URL-based dispatch,
-however, if only because it requires the construction and maintenance
-of a graph, and it requires the developer to think about mapping URLs
-to code in terms of traversing the graph.  (How's *that* for
-self-referential! ;-) ) That said, for developers comfortable with
-:term:`Zope` or comfortable with hierarchical data stores like *ZODB*
-or a filesystem, mapping a URL to a graph traversal is a natural way
-to think about creating a web application.
-
-In essence, the choice to use graph traversal vs. URL dispatch is
-largely religious in some sense.  Graph traversal dispatch probably
-just doesn't make any sense when you possess completely "square" data
-stored in a relational database.  However, when you have a
-hierarchical data store, it can provide advantages over using
-URL-based dispatch.
-
-:mod:`repoze.bfg` provides support for both approaches.  Graph
-traversal is described in detail below.
+The :mod:`repoze.bfg` *Router* parses the URL associated with the
+request and traverses the graph based on path segments in the URL.
+Based on these path segments, :mod:`repoze.bfg` traverses the *model
+graph* in order to find a :term:`context`.  It then attempts to find a
+:term:`view` based on the *type* of the context (specified by an
+:term:`interface`).  If :mod:`repoze.bfg` finds a :term:`view` for the
+context, it calls it and returns a response to the user.
 
 The Model Graph
 ---------------
 
+When your application uses :term:`traversal` to resolve URLs to code,
+your application must supply a *model graph* to :mod:`repoze.bfg`.
+
 Users interact with your :mod:`repoze.bfg` -based application via a
-"router", which is itself a WSGI application.  At system startup time,
-the router is configured with a root object from which all traversal
-will begin.  The root object is usually a mapping object, such as a
-Python dictionary.  Usually the root is a *container* node, and thus
-contains other items.  In fact, all items contained in the graph are
-either *leaf* nodes (these have no ``__getitem__``) or *container*
-nodes (these do have a ``__getitem__``).
+*router*, which is just a fancy :term:`WSGI` application.  At system
+startup time, the router is configured with a single object which
+represents the root of the model graph.  All traversal will begin at
+this root object.  The root object is usually a *mapping* object (such
+as a Python dictionary).
 
 Items contained within the graph are analogous to the concept of
 :term:`model` objects used by many other frameworks (and
 :mod:`repoze.bfg` refers to them as models, as well).  They are
-typically instances of Python classes.  Each containerish instance is
-willing to return a child or raise a ``KeyError`` based on a name
-passed to its ``__getitem__``.  No leaf-level instance is required to
-have a ``__getitem__``.
+typically instances of Python classes.
 
-:mod:`repoze.bfg` traverses the model graph in order to find a
-:term:`context`.  It then attempts to find a :term`view` based on the
-type (specified by an :term:`interface`) of the context.
+The model graph consists of *container* nodes and *leaf* nodes.  There
+is only one difference between *container* node and a *leaf* node:
+*container* nodes a ``__getitem__`` method while *leaf* nodes do not.
+The ``__getitem__`` method was chosen as the signifying difference
+between the two types of nodes because the presence of this method is
+how Python itself typically determines whether an object is
+"containerish" or not.
+
+A container node is presumed to be willing to return a child node or
+raise a ``KeyError`` based on a name passed to its ``__getitem__``.
+
+No leaf-level instance is required to have a ``__getitem__``.  If
+leaf-level instances happen to have a ``__getitem__`` (through some
+historical inequity), you should subclass these node types and cause
+their ``__getitem__`` methods to simply raise a ``KeyError``.  Or just
+disuse them and think up another strategy.
+
+Usually, the traversal root is a *container* node, and as such it
+contains other nodes.  However, it doesn't *need* to be a container.
+Your model graph can be as shallow or as deep as you require.
+
+Traversal "stops" when :mod:`repoze.bfg` either reaches a leaf level
+model instance in your object graph or when the path segments implied
+by the URL "run out".  The object that traversal "stops on" becomes
+the :term:`context`.
 
 How :mod:`repoze.bfg` Processes a Request Using Traversal
 ---------------------------------------------------------
