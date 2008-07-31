@@ -39,4 +39,16 @@
       permission="manage"
       />
 
+   <!-- event listener for a new request -->
+   <subscriber
+      for="repoze.bfg.interfaces.INewRequest"
+      handler=".listeners.handle_new_request"
+    />
+
+   <!-- event listener for a new response -->
+   <subscriber
+      for="repoze.bfg.interfaces.INewResponse"
+      handler=".listeners.handle_new_response"
+    />
+
 </configure>

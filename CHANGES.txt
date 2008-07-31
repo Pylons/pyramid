@@ -1,3 +1,8 @@
+0.2.6
+
+  - Add event sends for INewRequest and INewResponse.  See the
+    events.rst chapter in the documentation's ``api`` directory.
+
 0.2.5
 
   - Add ``model_url`` API.

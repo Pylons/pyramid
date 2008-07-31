@@ -1,12 +1,15 @@
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
+from zope.component.event import dispatch
 from zope.interface import directlyProvides
 
 from webob import Request
 from webob.exc import HTTPNotFound
 from webob.exc import HTTPUnauthorized
 
+from repoze.bfg.events import NewRequest
+from repoze.bfg.events import NewResponse
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
@@ -28,6 +31,7 @@ class Router:
         registry_manager.set(self.registry)
         request = Request(environ)
         directlyProvides(request, IRequest)
+        dispatch(NewRequest(request))
         root = self.root_policy(environ)
         traverser = getMultiAdapter((root, request), ITraverserFactory)
         context, name, subpath = traverser(environ)
@@ -54,6 +58,8 @@ class Router:
 
         if not isResponse(response):
             raise ValueError('response was not IResponse: %s' % response)
+
+        dispatch(NewResponse(response))
 
         start_response(response.status, response.headerlist)
         return response.app_iter

@@ -69,3 +69,12 @@ class IViewPermissionFactory(Interface):
 class IURLDispatchModel(Interface):
     """ A model that is created as a result of URL dispatching """
 
+class INewRequest(Interface):
+    """ An event type that is emitted whenever repoze.bfg begins to
+    process a new request """
+    request = Attribute('The request object')
+    
+class INewResponse(Interface):
+    """ An event type that is emitted whenever any repoze.bfg view
+    returns a response."""
+    response = Attribute('The response object')

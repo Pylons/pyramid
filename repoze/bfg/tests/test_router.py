@@ -33,6 +33,11 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.interfaces import ISecurityPolicy
         gsm.registerUtility(secpol, ISecurityPolicy)
 
+    def _registerEventListener(self, listener, iface):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        gsm.registerHandler(listener, (iface,))
+
     def _getTargetClass(self):
         from repoze.bfg.router import Router
         return Router
@@ -231,6 +236,34 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(start_response.status, '401 Unauthorized')
         self.failUnless('permission' in result[0])
         self.assertEqual(permissionfactory.checked_with, secpol)
+
+    def test_call_eventsends(self):
+        rootpolicy = make_rootpolicy(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerView(view, '', None, None)
+        from repoze.bfg.interfaces import INewRequest
+        from repoze.bfg.interfaces import INewResponse
+        request_events = []
+        response_events = []
+        def handle_request(event):
+            request_events.append(event)
+        def handle_response(event):
+            response_events.append(event)
+        self._registerEventListener(handle_request, INewRequest)
+        self._registerEventListener(handle_response, INewResponse)
+        router = self._makeOne(rootpolicy, None)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(len(request_events), 1)
+        self.assertEqual(request_events[0].request.environ, environ)
+        self.assertEqual(len(response_events), 1)
+        self.assertEqual(response_events[0].response, response)
 
 class MakeAppTests(unittest.TestCase, PlacelessSetup):
     def setUp(self):
