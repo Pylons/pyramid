@@ -1,0 +1,16 @@
+- Document z3c.pt
+
+- Spaces in project names (allow for separate project / package names?)
+
+- Subpath and view name in request
+
+- WebOb Request basics
+
+- "push" style templating
+
+- .001 case where there is a template without a view.
+
+- Warn if permissions are defined but no security policy is in place.
+
+- Change port num due to conflict with Postgres.
+

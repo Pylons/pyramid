@@ -1,3 +1,5 @@
+.. _views_chapter:
+
 Views
 =====
 
@@ -11,11 +13,14 @@ Defining a View as a Function
 
 The easiest way to define a view is to create a function that accepts
 two arguments: :term:`context`, and :term:`request`.  For example,
-this is a hello world view implemented as a function::
+this is a hello world view implemented as a function:
 
-  def hello_world(context, request):
-      from webob import Response
-      return Response('Hello world!')
+.. code-block:: python
+   :linenos:
+
+   def hello_world(context, request):
+       from webob import Response
+       return Response('Hello world!')
 
 The :term:`context` and :term:`request` arguments can be defined as
 follows:
@@ -63,13 +68,14 @@ You must associate a view with a URL by adding information to your
 :term:`application registry` via :term:`ZCML` in your
 ``configure.zcml`` file using a ``bfg:view`` declaration.
 
-.. sourcecode:: xml
+.. code-block:: xml
+   :linenos:
 
-  <bfg:view
-      for=".models.IHello"
-      view=".views.hello_world"
-      name="hello.html"
-      />
+   <bfg:view
+       for=".models.IHello"
+       view=".views.hello_world"
+       name="hello.html"
+       />
 
 The above maps the ``.views.hello_world`` view function to
 :term:`context` objects which implement the ``.models.IHello``
@@ -89,12 +95,13 @@ changes.  It's also shorter to type.
 
 You can also declare a *default view* for a model type:
 
-.. sourcecode:: xml
+.. code-block:: xml
+   :linenos:
 
-  <bfg:view
-      for=".models.IHello"
-      view=".views.hello_world"
-      />
+   <bfg:view
+       for=".models.IHello"
+       view=".views.hello_world"
+       />
 
 A *default view* has no ``name`` attribute.  When a :term:`context` is
 traversed and there is no *view name* in the request, the *default
@@ -103,17 +110,114 @@ view* is the view that is used.
 You can also declare that a view is good for any model type by using
 the special ``*`` character in the ``for`` attribute:
 
-.. sourcecode:: xml
+.. code-block:: xml
+   :linenos:
 
-  <bfg:view
-      for="*"
-      view=".views.hello_world"
-      name="hello.html"
-      />
+   <bfg:view
+       for="*"
+       view=".views.hello_world"
+       name="hello.html"
+       />
 
 This indicates that when :mod:`repoze.bfg` identifies that the *view
 name* is ``hello.html`` against *any* :term:`context`, this view will
 be called.
+
+The ``bfg:view`` ZCML Element
+-----------------------------
+
+The ``bfg:view`` ZCML element has these possible attributes:
+
+view
+
+  The Python dotted-path name to the view callable.
+
+for
+
+  A Python dotted-path name representing the :term:`interface` that
+  the :term:`context` must have in order for this view to be found and
+  called.
+
+name
+
+  The *view name*.  Read and understand :ref:`traversal_chapter` to
+  understand the concept of a view name.
+
+permission
+
+  The name of a *permission* that the user must possess in order to
+  call the view.  See :ref:`view_security_section` for more
+  information about view security and permissions.
+
+request_type
+
+  A Python dotted-path name representing the :term:`interface` that
+  the :term:`request` must have in order for this view to be found and
+  called.  See :ref:`view_request_types_section` for more
+  information about view security and permissions.
+
+.. _view_request_types_section:
+
+View Request Types
+------------------
+
+You can optionally add a *request_type* attribute to your ``bfg:view``
+declaration, which indicates what "kind" of request the view should be
+used for.  For example:
+
+.. code-block:: xml
+   :linenos:
+
+   <bfg:view
+       for=".models.IHello"
+       view=".views.hello_json"
+       name="hello.json"
+       request_type=".interfaces.IJSONRequest"
+       />
+
+Where the code behind ``.interfaces.IJSONRequest`` might look like:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.interfaces import IRequest
+
+   class IJSONRequest(IRequest):
+      """ An marker interface for representing a JSON request """
+
+This is an example of simple "content negotiation", using JSON as an
+example.  To make sure that this view will be called when the request
+comes from a JSON client, you can use an ``INewRequest`` event
+subscriber to attach the ``IJSONRequest`` interface to the request if
+and only if the request headers indicate that the request has come
+from a JSON client.  Since we've indicated that the ``request_type``
+in our ZCML for this particular view is ``.interfaces.IJSONRequest``,
+the view will only be called if the request provides this interface.
+
+You can also use this facility for "skinning" a by using request
+parameters to vary the interface(s) that a request provides.  By
+attaching to the request an arbitrary interface after examining the
+hostname or any other information available in the request within an
+``INewRequest`` event subscriber, you can control view lookup
+precisely.  For example, if you wanted to have two slightly different
+views for requests to two different hostnames, you might register one
+view with a ``request_type`` of ``.interfaces.IHostnameFoo`` and
+another with a ``request_type`` of ``.interfaces.IHostnameBar`` and
+then arrange for an event subscriber to attach
+``.interfaces.IHostnameFoo`` to the request when the HTTP_HOST is
+``foo`` and ``.interfaces.IHostnameBar`` to the request when the
+HTTP_HOST is ``bar``.  The appropriate view will be called.
+
+You can also form an inheritance hierarchy out of ``request_type``
+interfaces.  When :mod:`repoze.bfg` looks up a view, the most specific
+view for the interface(s) found on the request based on standard
+Python method resolution order through the interface class hierarchy
+will be called.
+
+See :ref:`events_chapter` for more information about event
+subscribers.
+
+.. _view_security_section:
 
 View Security
 -------------
@@ -125,16 +229,24 @@ against the context before the view function is actually called.
 Here's an example of specifying a permission in a ``bfg:view``
 declaration:
 
-.. sourcecode:: xml
+.. code-block:: xml
+   :linenos:
 
-  <bfg:view
-      for=".models.IBlog"
-      view=".views.add_entry"
-      name="add.html"
-      permission="add"
-      />
+   <bfg:view
+       for=".models.IBlog"
+       view=".views.add_entry"
+       name="add.html"
+       permission="add"
+       />
 
 When a security policy is enabled, this view will be protected with
-the ``add`` permission.  See the :ref:`security_chapter` chapter to
-find out how to turn on a security policy.
+the ``add`` permission.  The view will not be called if the user does
+not possess the ``add`` permission relative to the current
+:term:`context`.  Instead an HTTP ``Unauthorized`` status will be
+returned to the client.
+
+.. note::
+
+   See the :ref:`security_chapter` chapter to find out how to turn on
+   a security policy.
 

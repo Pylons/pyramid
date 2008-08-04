@@ -1,3 +1,14 @@
+After 0.2.6
+
+  - Add a ``request_type`` attribute to the available attributes of a
+    ``bfg:view`` configure.zcml element.  This attribute will have a
+    value which is a dotted Python path, pointing at an interface.  If
+    the request object implements this interface when the view lookup
+    is performed, the appropriate view will be called.
+
+  - Remove "template only" views.  These were just confusing and were
+    never documented.
+
 0.2.6
 
   - Add event sends for INewRequest and INewResponse.  See the

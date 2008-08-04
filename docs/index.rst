@@ -32,6 +32,7 @@ Narrative documentation in chapter form explaining how to use
    narr/templates
    narr/models
    narr/security
+   narr/events
    glossary
 
 Tutorials

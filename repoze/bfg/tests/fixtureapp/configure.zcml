@@ -5,16 +5,17 @@
   <include package="repoze.bfg" />
 
   <bfg:view
-      for=".models.IFixture"
       view=".views.fixture_view"
+      for=".models.IFixture"
       permission="repoze.view"
       />
 
   <bfg:view
+      view=".views.fixture_view"
       for=".models.IFixture"
-      template="templates/fixture.pt"
+      name="dummyskin.html"
       permission="repoze.view"
-      name="fixture.html"
+      request_type=".views.IDummy"
       />
 
 </configure>
