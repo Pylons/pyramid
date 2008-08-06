@@ -9,6 +9,12 @@
       for="* .interfaces.IRequest"
   />
 
+  <adapter
+      factory=".urldispatch.RoutesModelTraverser"
+      provides=".interfaces.ITraverserFactory"
+      for=".interfaces.IRoutesContext .interfaces.IRequest"
+  />
+
   <include file="meta.zcml" />
 
 </configure>

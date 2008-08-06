@@ -1,13 +1,26 @@
-After 0.2.6
+0.2.7
 
   - Add a ``request_type`` attribute to the available attributes of a
     ``bfg:view`` configure.zcml element.  This attribute will have a
     value which is a dotted Python path, pointing at an interface.  If
     the request object implements this interface when the view lookup
-    is performed, the appropriate view will be called.
+    is performed, the appropriate view will be called.  This is meant
+    to allow for simple "skinning" of sites based on request type.  An
+    event subscriber should attach the interface to the request on
+    ingress to support skins.
 
   - Remove "template only" views.  These were just confusing and were
     never documented.
+
+  - Small url dispatch overhaul: the ``connect`` method of the
+    ``urldispatch.RoutesMapper`` object now accepts a keyword
+    parameter named ``context_factory``.  If this parameter is
+    supplied, it must be a callable which returns an instance.  This
+    instance is used as the context for the request when a route is
+    matched.
+
+  - The registration of a RoutesModelTraverser no longer needs to be
+    performed by the application; it's in the bfg ZCML now.
 
 0.2.6
 
