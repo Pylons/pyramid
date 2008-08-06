@@ -22,12 +22,11 @@ class RoutesMapper(object):
     application in such a way that the `Routes
     <http://routes.groovie.org/index.html>`_ engine has the 'first
     crack' at resolving the current request URL to a repoze.bfg view.
-    If the ``RoutesModelTraverser`` is configured in your
-    application's configure.zcml, any view that claims it is 'for' the
-    interface ``repoze.bfg.interfaces.IRoutesContext`` will be called
-    if its *name* matches the Routes 'controller' name for the match.
-    It will be passed a context object that has attributes that match
-    the Routes match arguments dictionary keys.  If no Routes route
+    Any view that claims it is 'for' the interface
+    ``repoze.bfg.interfaces.IRoutesContext`` will be called if its
+    *name* matches the Routes 'controller' name for the match.  It
+    will be passed a context object that has attributes that match the
+    Routes match arguments dictionary keys.  If no Routes route
     matches the current request, the 'fallback' get_root is called."""
     def __init__(self, get_root):
         self.get_root = get_root
@@ -68,7 +67,7 @@ class RoutesMapper(object):
         *Mapper* object.  One difference exists: if the
         ``context_factory`` is passed in with a value as a keyword
         argument, this callable will be called when a model object
-        representing the ``context``` for the request needs to be
+        representing the ``context`` for the request needs to be
         constructed.  It will be called with the (all-keyword)
         arguments supplied by the Routes mapper's ``match`` method for
         this route, and should return an instance of a class.  If
