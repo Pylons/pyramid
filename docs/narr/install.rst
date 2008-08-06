@@ -47,11 +47,13 @@ command::
 
 .. note:: If you can't get :mod:`repoze.bfg` installed using
    ``easy_install`` because ``lxml`` fails to compile on your system,
-   you can try the `repoze.bfg buildout at
+   you can try the `repoze.bfg buildout
    <http://svn.repoze.org/buildouts/repoze.bfg/trunk/README.txt>`_.
-   This buildout builds known-compatible ``libxml2`` and ``libxslt``
-   from source and causes ``lxml`` to link against these instead of
-   your system packages.
+   This installation mechanism builds known-compatible ``libxml2`` and
+   ``libxslt`` from source and causes ``lxml`` to link against these
+   instead of your system packages, as version incompatibilities
+   between system packages and ``lxml`` versions are typically to
+   blame for compilation problems.
 
 What Gets Installed
 -------------------
