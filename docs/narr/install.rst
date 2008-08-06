@@ -21,6 +21,18 @@ primarily under Python 2.4, so that version is recommended.
    :term:`setuptools` installed on within your Python system in order
    to run the ``easy_install`` command.
 
+At the time of this writing, ``repoze.bfg`` will not install on
+Windows systems unless you have development tools (e.g. *Visual C++*)
+installed.
+
+.. note:: If you'd like to help produce and maintain a version of
+   :mod:`repoze.bfg` that works on Windows, we'd love to hear from
+   you.  There's nothing intrinsic about :mod:`repoze.bfg` that would
+   prevent it from running on Windows, but none of the current
+   developers use the platform.  Please contact us via the `repoze.dev
+   maillist <http://lists.repoze.org/listinfo/repoze-dev>`_ if you'd
+   like to try to tackle the job of compilation and maintenance.
+
 It is advisable to install :mod:`repoze.bfg` into a :term:`virtualenv`
 in order to obtain isolation from any "system" packages you've got
 installed in your Python version (and likewise, to prevent
@@ -32,6 +44,14 @@ After you've got the requisite dependencies installed, you may install
 command::
 
   $ easy_install -i http://dist.repoze.org/lemonade/dev/simple repoze.bfg
+
+.. note:: If you can't get :mod:`repoze.bfg` installed using
+   ``easy_install`` because ``lxml`` fails to compile on your system,
+   you can try the `repoze.bfg buildout at
+   <http://svn.repoze.org/buildouts/repoze.bfg/trunk/README.txt>`_.
+   This buildout builds known-compatible ``libxml2`` and ``libxslt``
+   from source and causes ``lxml`` to link against these instead of
+   your system packages.
 
 What Gets Installed
 -------------------
