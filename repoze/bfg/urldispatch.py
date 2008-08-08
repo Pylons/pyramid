@@ -81,9 +81,8 @@ class RoutesMapper(object):
 class RoutesModelTraverser(object):
     classProvides(ITraverserFactory)
     implements(ITraverser)
-    def __init__(self, context, request):
+    def __init__(self, context):
         self.context = context
-        self.request = request
 
     def __call__(self, environ):
         return self.context, self.context.controller, ''

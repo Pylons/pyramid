@@ -76,9 +76,9 @@ class TestRoutesModelTraverser(unittest.TestCase):
         from repoze.bfg.urldispatch import RoutesModelTraverser
         return RoutesModelTraverser
 
-    def _makeOne(self, model, request):
+    def _makeOne(self, model):
         klass = self._getTargetClass()
-        return klass(model, request)
+        return klass(model)
 
     def test_class_conforms_to_ITraverser(self):
         from zope.interface.verify import verifyClass
@@ -88,11 +88,11 @@ class TestRoutesModelTraverser(unittest.TestCase):
     def test_instance_conforms_to_ITraverser(self):
         from zope.interface.verify import verifyObject
         from repoze.bfg.interfaces import ITraverser
-        verifyObject(ITraverser, self._makeOne(None, None))
+        verifyObject(ITraverser, self._makeOne(None))
 
     def test_call(self):
         model = DummyModel()
-        traverser = self._makeOne(model, None)
+        traverser = self._makeOne(model)
         result = traverser({})
         self.assertEqual(result[0], model)
         self.assertEqual(result[1], 'controller')

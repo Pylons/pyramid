@@ -57,12 +57,10 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         from zope.interface.verify import verifyObject
         from repoze.bfg.interfaces import ITraverser
         context = DummyContext()
-        request = DummyRequest()
-        verifyObject(ITraverser, self._makeOne(context, request))
+        verifyObject(ITraverser, self._makeOne(context))
 
     def test_call_pathel_with_no_getitem(self):
-        request = DummyRequest()
-        policy = self._makeOne(None, request)
+        policy = self._makeOne(None)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
         ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, None)
@@ -71,8 +69,7 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
 
     def test_call_withconn_getitem_emptypath_nosubpath(self):
         root = DummyContext()
-        request = DummyRequest()
-        policy = self._makeOne(root, request)
+        policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='')
         ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, root)
@@ -82,8 +79,7 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
     def test_call_withconn_getitem_withpath_nosubpath(self):
         foo = DummyContext()
         root = DummyContext(foo)
-        request = DummyRequest()
-        policy = self._makeOne(root, request)
+        policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
         ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, foo)
@@ -92,9 +88,8 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
 
     def test_call_withconn_getitem_withpath_withsubpath(self):
         foo = DummyContext()
-        request = DummyRequest()
         root = DummyContext(foo)
-        policy = self._makeOne(root, request)
+        policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz/buz')
         ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, foo)
@@ -103,9 +98,8 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
 
     def test_call_with_explicit_viewname(self):
         foo = DummyContext()
-        request = DummyRequest()
         root = DummyContext(foo)
-        policy = self._makeOne(root, request)
+        policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/@@foo')
         ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, root)
@@ -117,7 +111,6 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         bar = DummyContext(baz)
         foo = DummyContext(bar)
         root = DummyContext(foo)
-        request = DummyRequest()
         from zope.interface import directlyProvides
         from zope.location.interfaces import ILocation
         directlyProvides(root, ILocation)
@@ -126,7 +119,7 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         # give bar a direct parent and name to mix things up a bit
         bar.__name__ = 'bar'
         bar.__parent__ = foo
-        policy = self._makeOne(root, request)
+        policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz')
         ctx, name, subpath = policy(environ)
         self.assertEqual(ctx, baz)
@@ -196,6 +189,99 @@ class ModelURLTests(unittest.TestCase):
             result,
             'http://example.com:5432/foo%20/bar/baz/this/theotherthing/that')
 
+class FindRootTests(unittest.TestCase):
+    def _getFUT(self):
+        from repoze.bfg.traversal import find_root
+        return find_root
+
+    def test_it(self):
+        dummy = DummyContext()
+        baz = DummyContext()
+        baz.__parent__ = dummy
+        baz.__name__ = 'baz'
+        dummy.__parent__ = None
+        dummy.__name__ = None
+        find = self._getFUT()
+        result = find(baz)
+        self.assertEqual(result, dummy)
+
+class FindContextFromPathTests(unittest.TestCase):
+    def _getFUT(self):
+        from repoze.bfg.traversal import find_context_from_path
+        return find_context_from_path
+
+    def _registerTraverser(self, traverser):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ITraverser
+        from zope.interface import Interface
+        gsm.registerAdapter(traverser, (Interface,), ITraverser)
+
+    def test_relative_found(self):
+        dummy = DummyContext()
+        baz = DummyContext()
+        find = self._getFUT()
+        traverser = make_traverser(baz, '', [])
+        self._registerTraverser(traverser)
+        result = find(dummy, 'baz')
+        self.assertEqual(result, baz)
+
+    def test_relative_notfound(self):
+        dummy = DummyContext()
+        baz = DummyContext()
+        find = self._getFUT()
+        traverser = make_traverser(baz, 'bar', [])
+        self._registerTraverser(traverser)
+        self.assertRaises(KeyError, find, dummy, 'baz')
+
+    def test_absolute_found(self):
+        dummy = DummyContext()
+        baz = DummyContext()
+        baz.__parent__ = dummy
+        baz.__name__ = 'baz'
+        dummy.__parent__ = None
+        dummy.__name__ = None
+        find = self._getFUT()
+        traverser = make_traverser(dummy, '', [])
+        self._registerTraverser(traverser)
+        result = find(baz, '/')
+        self.assertEqual(result, dummy)
+
+    def test_absolute_found(self):
+        dummy = DummyContext()
+        baz = DummyContext()
+        baz.__parent__ = dummy
+        baz.__name__ = 'baz'
+        dummy.__parent__ = None
+        dummy.__name__ = None
+        find = self._getFUT()
+        traverser = make_traverser(dummy, '', [])
+        self._registerTraverser(traverser)
+        result = find(baz, '/')
+        self.assertEqual(result, dummy)
+        self.assertEqual(dummy.wascontext, True)
+
+    def test_absolute_notfound(self):
+        dummy = DummyContext()
+        baz = DummyContext()
+        baz.__parent__ = dummy
+        baz.__name__ = 'baz'
+        dummy.__parent__ = None
+        dummy.__name__ = None
+        find = self._getFUT()
+        traverser = make_traverser(dummy, 'fuz', [])
+        self._registerTraverser(traverser)
+        self.assertRaises(KeyError, find, baz, '/')
+        self.assertEqual(dummy.wascontext, True)
+
+def make_traverser(*args):
+    class DummyTraverser(object):
+        def __init__(self, context):
+            context.wascontext = True
+        def __call__(self, environ):
+            return args
+    return DummyTraverser
+        
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next
@@ -208,12 +294,3 @@ class DummyContext(object):
 class DummyRequest:
     application_url = 'http://example.com:5432/'
 
-class DummyTraverser:
-    def __init__(self, context):
-        self.context = context
-
-    def __call__(self, environ, name):
-        try:
-            return name, self.context[name]
-        except KeyError:
-            return name, None

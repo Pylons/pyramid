@@ -6,13 +6,13 @@
   <adapter
       factory=".traversal.ModelGraphTraverser"
       provides=".interfaces.ITraverserFactory"
-      for="* .interfaces.IRequest"
+      for="*"
   />
 
   <adapter
       factory=".urldispatch.RoutesModelTraverser"
       provides=".interfaces.ITraverserFactory"
-      for=".interfaces.IRoutesContext .interfaces.IRequest"
+      for=".interfaces.IRoutesContext"
   />
 
   <include file="meta.zcml" />

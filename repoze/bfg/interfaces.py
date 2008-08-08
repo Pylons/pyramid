@@ -23,7 +23,7 @@ class ITraverser(Interface):
         the result of an object graph traversal """
 
 class ITraverserFactory(Interface):
-    def __call__(context, request):
+    def __call__(context):
         """ Return an object that implements IPublishTraverser """
 
 class ITemplateFactory(Interface):

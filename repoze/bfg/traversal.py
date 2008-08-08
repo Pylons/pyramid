@@ -41,10 +41,9 @@ _marker = ()
 class ModelGraphTraverser(object):
     classProvides(ITraverserFactory)
     implements(ITraverser)
-    def __init__(self, root, request):
+    def __init__(self, root):
         self.root = root
         self.locatable = ILocation.providedBy(root)
-        self.request = request
 
     def __call__(self, environ):
         path = environ.get('PATH_INFO', '/')
@@ -65,6 +64,35 @@ class ModelGraphTraverser(object):
             ob = next
 
         return ob, name, path
+
+def find_root(model):
+    """ Find the root node in the graph to which ``model``
+    belongs. Note that ``model`` should be :term:`location`-aware."""
+    for location in LocationIterator(model):
+        if location.__parent__ is None:
+            model = location
+            break
+    return model
+
+def find_context_from_path(model, path):
+    """ Given a model object and a string representing a path
+    reference (a set of names delimited by forward-slashes), return an
+    context in this application's model graph at the specified path.
+    If the path starts with a slash, the path is considered absolute
+    and the graph traversal will start at the root object.  If the
+    path does not start with a slash, the path is considered relative
+    and graph traversal will begin at the model object supplied to the
+    function.  In either case, if the path cannot be resolved, a
+    KeyError will be thrown. Note that the model passed in should be
+    :term:`location`-aware."""
+
+    if path.startswith('/'):
+        model = find_root(model)
+        
+    ob, name, path = ITraverser(model)({'PATH_INFO':path})
+    if name:
+        raise KeyError('%r has no subelement %s' % (ob, name))
+    return ob
 
 def find_interface(context, interface):
     """ Return an object providing ``interface`` anywhere in the
