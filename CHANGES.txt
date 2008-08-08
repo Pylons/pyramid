@@ -1,8 +1,8 @@
 After 0.2.7
 
-  - Add ``find_context_from_path`` and ``find_root`` traversal APIs.
-    In the process, make ITraverser a uni-adapter (on context) rather
-    than a multiadapter (on context and request).
+  - Add ``find_model`` and ``find_root`` traversal APIs.  In the
+    process, make ITraverser a uni-adapter (on context) rather than a
+    multiadapter (on context and request).
 
 0.2.7
 

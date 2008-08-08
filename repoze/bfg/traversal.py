@@ -74,7 +74,7 @@ def find_root(model):
             break
     return model
 
-def find_context_from_path(model, path):
+def find_model(model, path):
     """ Given a model object and a string representing a path
     reference (a set of names delimited by forward-slashes), return an
     context in this application's model graph at the specified path.
@@ -94,11 +94,12 @@ def find_context_from_path(model, path):
         raise KeyError('%r has no subelement %s' % (ob, name))
     return ob
 
-def find_interface(context, interface):
-    """ Return an object providing ``interface`` anywhere in the
-    parent chain of ``context`` or ``None`` if no object providing
-    that interface can be found in the parent chain"""
-    for location in LocationIterator(context):
+def find_interface(model, interface):
+    """ Return the first object found which provides the interface
+    ``interface`` in the parent chain of ``model`` or ``None`` if no
+    object providing ``interface`` can be found in the parent chain.
+    The ``model`` passed in should be :term:`location`-aware."""
+    for location in LocationIterator(model):
         if interface.providedBy(location):
             return location
 

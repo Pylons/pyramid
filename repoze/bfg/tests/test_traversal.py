@@ -205,10 +205,10 @@ class FindRootTests(unittest.TestCase):
         result = find(baz)
         self.assertEqual(result, dummy)
 
-class FindContextFromPathTests(unittest.TestCase):
+class FindModelTests(unittest.TestCase):
     def _getFUT(self):
-        from repoze.bfg.traversal import find_context_from_path
-        return find_context_from_path
+        from repoze.bfg.traversal import find_model
+        return find_model
 
     def _registerTraverser(self, traverser):
         import zope.component
