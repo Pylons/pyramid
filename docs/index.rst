@@ -91,6 +91,14 @@ Subversion via::
 
   svn co http://svn.repoze.org/repoze.virginia/trunk repoze.virginia
 
+`repoze.shootout <http://svn.repoze.org/repoze.shootout/trunk/>`_ is
+an example "idea competition" application by Carlos de la Guardia.  It
+demonstrates :term:`URL dispatch` and integration with `SQLAlchemy
+<http://www.sqlalchemy.org/>`_.  Check this application out of
+Subversion via::
+
+  svn co http://svn.repoze.org/repoze.shootout/trunk repoze.shootout
+
 Support and Development
 =======================
 
