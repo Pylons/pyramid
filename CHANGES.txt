@@ -1,4 +1,4 @@
-After 0.2.7
+0.2.8
 
   - Add ``find_model`` and ``find_root`` traversal APIs.  In the
     process, make ITraverser a uni-adapter (on context) rather than a
