@@ -1,4 +1,4 @@
-from zope.component import getMultiAdapter
+from zope.component import getAdapter
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.component.event import dispatch
@@ -33,7 +33,7 @@ class Router:
         directlyProvides(request, IRequest)
         dispatch(NewRequest(request))
         root = self.root_policy(environ)
-        traverser = getMultiAdapter((root, request), ITraverserFactory)
+        traverser = getAdapter(root, ITraverserFactory)
         context, name, subpath = traverser(environ)
 
         request.context = context

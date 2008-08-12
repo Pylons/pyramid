@@ -61,7 +61,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         environ = self._makeEnviron()
         context = DummyContext()
         traversalfactory = make_traversal_factory(context, '', [])
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -79,7 +79,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
@@ -99,7 +99,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, 'foo', None, None)
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
@@ -125,7 +125,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
@@ -152,7 +152,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         response = DummyResponse()
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         app_context = make_appcontext()
         router = self._makeOne(rootpolicy, None)
@@ -174,7 +174,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         response = DummyResponse()
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         secpol = DummySecurityPolicy()
         self._registerSecurityPolicy(secpol)
@@ -199,7 +199,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         secpol = DummySecurityPolicy()
         permissionfactory = make_permission_factory(True)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
@@ -225,7 +225,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         secpol = DummySecurityPolicy()
         permissionfactory = make_permission_factory(False)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
@@ -245,7 +245,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None, None)
+        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         from repoze.bfg.interfaces import INewRequest
         from repoze.bfg.interfaces import INewResponse
@@ -310,9 +310,8 @@ def make_view(response):
 
 def make_traversal_factory(context, name, subpath):
     class DummyTraversalFactory:
-        def __init__(self, root, request):
+        def __init__(self, root):
             self.root = root
-            self.request = request
 
         def __call__(self, path):
             return context, name, subpath

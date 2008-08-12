@@ -1,3 +1,8 @@
+0.2.9
+
+  - 0.2.8 was "brown bag" release.  It didn't work at all.  Symptom:
+    ComponentLookupError when trying to render a page.
+
 0.2.8
 
   - Add ``find_model`` and ``find_root`` traversal APIs.  In the
