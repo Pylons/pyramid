@@ -5,6 +5,8 @@
 
 .. automodule:: repoze.bfg.template
 
+  .. autofunction:: get_template
+
   .. autofunction:: render_template
 
   .. autofunction:: render_template_to_response

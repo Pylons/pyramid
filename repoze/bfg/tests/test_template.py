@@ -64,35 +64,13 @@ class RenderTemplateTests(unittest.TestCase, Base):
         from repoze.bfg.template import render_template
         return render_template
 
-    def test_nonabs_unregistered(self):
+    def test_it(self):
         self._zcmlConfigure()
-        from zope.component import queryUtility
-        from repoze.bfg.interfaces import ITemplate
         minimal = self._getTemplatePath('minimal.pt')
-        self.assertEqual(queryUtility(ITemplate, minimal), None)
         render = self._getFUT()
         result = render(minimal)
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, '<div>\n</div>')
-        from repoze.bfg.template import Z3CPTTemplateFactory
-        self.failUnless(isinstance(queryUtility(ITemplate, minimal),
-                                   Z3CPTTemplateFactory))
-
-    def test_nonabs_registered(self):
-        self._zcmlConfigure()
-        from zope.component import getGlobalSiteManager
-        from zope.component import queryUtility
-        from repoze.bfg.template import Z3CPTTemplateFactory
-        from repoze.bfg.interfaces import ITemplate
-        minimal = self._getTemplatePath('minimal.pt')
-        utility = Z3CPTTemplateFactory(minimal)
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(utility, ITemplate, name=minimal)
-        render = self._getFUT()
-        result = render(minimal)
-        self.failUnless(isinstance(result, str))
-        self.assertEqual(result, '<div>\n</div>')
-        self.assertEqual(queryUtility(ITemplate, minimal), utility)
 
 class RenderTemplateToResponseTests(unittest.TestCase, Base):
     def setUp(self):
@@ -105,12 +83,9 @@ class RenderTemplateToResponseTests(unittest.TestCase, Base):
         from repoze.bfg.template import render_template_to_response
         return render_template_to_response
 
-    def test_nonabs_unregistered(self):
+    def test_it(self):
         self._zcmlConfigure()
-        from zope.component import queryUtility
-        from repoze.bfg.interfaces import ITemplate
         minimal = self._getTemplatePath('minimal.pt')
-        self.assertEqual(queryUtility(ITemplate, minimal), None)
         render = self._getFUT()
         result = render(minimal)
         from webob import Response
@@ -118,9 +93,17 @@ class RenderTemplateToResponseTests(unittest.TestCase, Base):
         self.assertEqual(result.app_iter, ['<div>\n</div>'])
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
-        from repoze.bfg.template import Z3CPTTemplateFactory
-        self.failUnless(isinstance(queryUtility(ITemplate, minimal),
-                                   Z3CPTTemplateFactory))
+
+class GetTemplateTests(unittest.TestCase, Base):
+    def setUp(self):
+        Base.setUp(self)
+
+    def tearDown(self):
+        Base.tearDown(self)
+
+    def _getFUT(self):
+        from repoze.bfg.template import get_template
+        return get_template
 
     def test_nonabs_registered(self):
         self._zcmlConfigure()
@@ -132,13 +115,39 @@ class RenderTemplateToResponseTests(unittest.TestCase, Base):
         utility = Z3CPTTemplateFactory(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplate, name=minimal)
-        render = self._getFUT()
-        result = render(minimal)
-        from webob import Response
-        self.failUnless(isinstance(result, Response))
-        self.assertEqual(result.app_iter, ['<div>\n</div>'])
-        self.assertEqual(result.status, '200 OK')
-        self.assertEqual(len(result.headerlist), 2)
+        get = self._getFUT()
+        result = get(minimal)
+        self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplate, minimal), utility)
         
-        
+    def test_nonabs_unregistered(self):
+        self._zcmlConfigure()
+        from zope.component import getGlobalSiteManager
+        from zope.component import queryUtility
+        from repoze.bfg.template import Z3CPTTemplateFactory
+        from repoze.bfg.interfaces import ITemplate
+        minimal = self._getTemplatePath('minimal.pt')
+        self.assertEqual(queryUtility(ITemplate, minimal), None)
+        utility = Z3CPTTemplateFactory(minimal)
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(utility, ITemplate, name=minimal)
+        get = self._getFUT()
+        result = get(minimal)
+        self.assertEqual(result.filename, minimal)
+        self.assertEqual(queryUtility(ITemplate, minimal), utility)
+
+    def test_nonabs_registered(self):
+        self._zcmlConfigure()
+        from zope.component import getGlobalSiteManager
+        from zope.component import queryUtility
+        from repoze.bfg.template import Z3CPTTemplateFactory
+        from repoze.bfg.interfaces import ITemplate
+        minimal = self._getTemplatePath('minimal.pt')
+        utility = Z3CPTTemplateFactory(minimal)
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(utility, ITemplate, name=minimal)
+        get = self._getFUT()
+        result = get(minimal)
+        self.assertEqual(result.filename, minimal)
+        self.assertEqual(queryUtility(ITemplate, minimal), utility)
+    

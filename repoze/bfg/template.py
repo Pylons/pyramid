@@ -67,13 +67,8 @@ def registerTemplate(type, template, path):
     else:
         sm.registerUtility(template, type, name=path)
 
-def render_template(path, **kw):
-    """ Render a z3c.pt (ZPT) template at the package-relative path
-    (may also be absolute) using the kwargs in ``*kw`` as top-level
-    names and return a string. """
+def _get_template(path, **kw):
     # XXX use pkg_resources
-    path = caller_path(path)
-
     template = queryUtility(ITemplate, path)
 
     if template is None:
@@ -82,6 +77,20 @@ def render_template(path, **kw):
         template = Z3CPTTemplateFactory(path)
         registerTemplate(ITemplate, template, path)
 
+    return template
+
+def get_template(path):
+    """ Return a z3c.pt template object at the package-relative path
+    (may also be absolute) """
+    path = caller_path(path)
+    return _get_template(path).template
+
+def render_template(path, **kw):
+    """ Render a z3c.pt (ZPT) template at the package-relative path
+    (may also be absolute) using the kwargs in ``*kw`` as top-level
+    names and return a string. """
+    path = caller_path(path)
+    template = get_template(path)
     return template(**kw)
 
 def render_template_to_response(path, **kw):
