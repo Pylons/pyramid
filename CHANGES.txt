@@ -1,3 +1,7 @@
+0.3.0
+
+  - Add ``get_template`` API to template module.
+
 0.2.9
 
   - 0.2.8 was "brown bag" release.  It didn't work at all.  Symptom:
