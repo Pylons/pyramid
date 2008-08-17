@@ -4,6 +4,9 @@
 
   <include package="repoze.bfg" />
 
+  <bfg:settings
+       reload_templates="true"/>
+
   <utility
     provides="repoze.bfg.interfaces.ISecurityPolicy"
     factory="repoze.bfg.security.RemoteUserACLSecurityPolicy"

@@ -416,7 +416,10 @@ registry`. It looks like so:
 #. Line 6 initializes :mod:`repoze.bfg`-specific configuration
    directives by including it as a package.
 
-#. Lines 8-11 register a single view.  It is ``for`` model objects
+#. Line 10 tells :mod:`repoze.bfg` to detect changes made to
+ ``z3c.pt`` and XSLT templates immediately.
+
+#. Lines 12-15 register a single view.  It is ``for`` model objects
    that support the IMyModel interface.  The ``view`` attribute points
    at a Python function that does all the work for this view.  Note
    that the values of both the ``for`` attribute and the ``view``
@@ -451,7 +454,16 @@ in the model, and the HTML given back to the browser.
    ``Request`` class representing the browser's request to our server.
 
 #. The view renders a :term:`template` and returns the result as the
-   :term:`response`.
+   :term:`response`.  Note that because our ``configure.zcml`` has a
+   ``bfg:settings`` directive indicating that templates should be
+   reloaded when they change, you won't need to restart the
+   application server to see changes you make to templates.  During
+   development, this is handy.  If this directive had been ``false``
+   (or if the directive did not exist), you would need to restart the
+   application server for each template change.  For production
+   applications, you should set your ``bfg:settings``
+   ``reload_templates`` to ``false`` to increase the speed at which
+   templates may be rendered.
 
 .. note::
 
@@ -460,7 +472,9 @@ in the model, and the HTML given back to the browser.
   the ``render_template`` function, also present in
   :ref:`template_module`.  You may then create your own :term:`WebOb`
   Response object, using the result of ``render_template`` as the
-  response's body.
+  response's body.  There is also a ``get_template`` API in the same
+  module, which you can use to retrieve the template object without
+  rendering it at all, for additional control.
 
 ``models.py``
 ~~~~~~~~~~~~~

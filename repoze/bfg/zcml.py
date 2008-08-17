@@ -2,16 +2,43 @@ from zope.component.zcml import handler
 from zope.component.interface import provideInterface
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
+from zope.configuration.fields import Bool
 
 from zope.interface import Interface
+from zope.interface import implements
 
 from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import ISettings
 
 from repoze.bfg.security import ViewPermissionFactory
+
+def _handler(*arg, **kw):
+    import pdb; pdb.set_trace()
+    return handler(*arg, **kw)
+
+class Settings(object):
+    implements(ISettings)
+    def __init__(self, reload_templates=False):
+        self.reload_templates = reload_templates
+
+def settings(_context, reload_templates=False):
+    settings = Settings(reload_templates=reload_templates)
+    _context.action(
+        discriminator = ('settings', ISettings),
+        callable = handler,
+        args = ('registerUtility', settings, ISettings, '', _context.info),
+        )
+
+class ISettingsDirective(Interface):
+    reload_templates = Bool(
+        title=u"Reload templates when they change",
+        description=(u"Specifies whether templates should be reloaded when"
+                     "a change is made"),
+        default=False)
 
 def view(_context,
          permission=None,

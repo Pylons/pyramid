@@ -1,3 +1,14 @@
+Next release
+
+  - Add ``<bfg:settings>`` directive.  This directive currently allows
+    only one attribute: ``reload_templates``.  If e.g.::
+
+         <bfg:settings reload_templates="true"/>
+
+    is in your application's ZCML, you will not need to restart the
+    appserver in order for ``z3c.pt`` or XSLT template changes to be
+    detected and displayed.
+
 0.3.0
 
   - Add ``get_template`` API to template module.

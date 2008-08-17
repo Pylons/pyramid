@@ -27,7 +27,7 @@ class ITraverserFactory(Interface):
         """ Return an object that implements IPublishTraverser """
 
 class ITemplateFactory(Interface):
-    def __call__(path):
+    def __call__(path, auto_reload=False):
         """ Return an an ITemplate given a filesystem path """
 
 class ITemplate(Interface):
@@ -79,3 +79,8 @@ class INewResponse(Interface):
     """ An event type that is emitted whenever any repoze.bfg view
     returns a response."""
     response = Attribute('The response object')
+
+class ISettings(Interface):
+    """ Runtime settings for repoze.bfg """
+    reload_templates = Attribute('Reload templates when they change')
+    

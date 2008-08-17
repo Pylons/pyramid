@@ -13,14 +13,19 @@ from zope.interface import implements
 from repoze.bfg.interfaces import ITemplateFactory
 from repoze.bfg.interfaces import ITemplate
 from repoze.bfg.interfaces import INodeTemplate
+from repoze.bfg.interfaces import ISettings
 
 class Z3CPTTemplateFactory(object):
     classProvides(ITemplateFactory)
     implements(ITemplate)
 
-    def __init__(self, path):
+    def __init__(self, path, auto_reload=False):
         from z3c.pt import PageTemplateFile
-        self.template = PageTemplateFile(path)
+        try:
+            self.template = PageTemplateFile(path, auto_reload=auto_reload)
+        except TypeError:
+            # z3c.pt before 1.0
+            self.template = PageTemplateFile(path)
 
     def __call__(self, **kw):
         result = self.template.render(**kw)
@@ -30,11 +35,12 @@ class XSLTemplateFactory(object):
     classProvides(ITemplateFactory)
     implements(INodeTemplate)
 
-    def __init__(self, path):
+    def __init__(self, path, auto_reload=False):
         self.path = path
+        self.auto_reload = auto_reload
 
     def __call__(self, node, **kw):
-        processor = get_processor(self.path)
+        processor = get_processor(self.path, self.auto_reload)
         result = str(processor(node, **kw))
         return result
 
@@ -42,13 +48,14 @@ class XSLTemplateFactory(object):
 import threading
 from lxml import etree
 xslt_pool = threading.local()
-def get_processor(xslt_fn):
-    try:
-        return xslt_pool.processors[xslt_fn]
-    except AttributeError:
-        xslt_pool.processors = {}
-    except KeyError:
-        pass
+def get_processor(xslt_fn, auto_reload=False):
+    if not auto_reload:
+        try:
+            return xslt_pool.processors[xslt_fn]
+        except AttributeError:
+            xslt_pool.processors = {}
+        except KeyError:
+            pass
 
     # Make a processor and add it to the pool
     source = etree.ElementTree(file=xslt_fn)
@@ -74,7 +81,9 @@ def _get_template(path, **kw):
     if template is None:
         if not os.path.exists(path):
             raise ValueError('Missing template file: %s' % path)
-        template = Z3CPTTemplateFactory(path)
+        settings = queryUtility(ISettings)
+        auto_reload = settings and settings.reload_templates
+        template = Z3CPTTemplateFactory(path, auto_reload)
         registerTemplate(ITemplate, template, path)
 
     return template

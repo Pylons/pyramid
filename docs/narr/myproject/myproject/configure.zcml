@@ -2,8 +2,12 @@
 	   xmlns:bfg="http://namespaces.repoze.org/bfg"
 	   i18n_domain="repoze.bfg">
 
-  <!-- this must be included for the view declarations to work -->
+  <!-- this directive must be included for the view declarations to work -->
   <include package="repoze.bfg" />
+
+  <!-- this directive indicates that changes to templates should show up
+       immediately -->
+  <bfg:settings reload_templates="true"/>
 
   <bfg:view
      for=".models.IMyModel"
