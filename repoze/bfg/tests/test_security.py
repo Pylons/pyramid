@@ -210,7 +210,102 @@ class TestACLAuthorizer(unittest.TestCase):
         result = authorizer.permits('read', *principals)
         self.assertEqual(len(logger.messages), 1)
 
-class RemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
+class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
+    def _getTargetClass(self):
+        from repoze.bfg.security import ACLSecurityPolicy
+        return ACLSecurityPolicy
+
+    def _makeOne(self, *arg, **kw):
+        klass = self._getTargetClass()
+        return klass(*arg, **kw)
+
+    def setUp(self):
+        PlacelessSetup.setUp(self)
+
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
+
+    def test_class_implements_ISecurityPolicy(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.interfaces import ISecurityPolicy
+        verifyClass(ISecurityPolicy, self._getTargetClass())
+
+    def test_instance_implements_ISecurityPolicy(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import ISecurityPolicy
+        logger = DummyLogger()
+        verifyObject(ISecurityPolicy, self._makeOne(logger, lambda *arg: None))
+
+    def test_permits_no_principals_no_acl_info_on_context(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        logger = DummyLogger()
+        policy = self._makeOne(logger, lambda *arg: None)
+        authorizer_factory = make_authorizer_factory(None)
+        policy.authorizer_factory = authorizer_factory
+        result = policy.permits(context, request, 'view')
+        self.assertEqual(result, False)
+        from repoze.bfg.security import Everyone
+        self.assertEqual(authorizer_factory.principals, (Everyone,))
+        self.assertEqual(authorizer_factory.permission, 'view')
+        self.assertEqual(authorizer_factory.context, context)
+
+    def test_permits_no_principals_acl_info_on_context(self):
+        context = DummyContext()
+        context.__acl__ = []
+        request = DummyRequest({})
+        logger = DummyLogger()
+        policy = self._makeOne(logger, lambda *arg: None)
+        authorizer_factory = make_authorizer_factory(None)
+        policy.authorizer_factory = authorizer_factory
+        result = policy.permits(context, request, 'view')
+        self.assertEqual(result, False)
+        from repoze.bfg.security import Everyone
+        self.assertEqual(authorizer_factory.principals, (Everyone,))
+        self.assertEqual(authorizer_factory.permission, 'view')
+        self.assertEqual(authorizer_factory.context, context)
+
+    def test_permits_no_principals_withparents_root_has_acl_info(self):
+        context = DummyContext()
+        context.__name__ = None
+        context.__parent__ = None
+        context2 = DummyContext()
+        context2.__name__ = 'context2'
+        context2.__parent__ = context
+        context.__acl__ = []
+        request = DummyRequest({})
+        logger = DummyLogger()
+        policy = self._makeOne(logger, lambda *arg: None)
+        authorizer_factory = make_authorizer_factory(None)
+        policy.authorizer_factory = authorizer_factory
+        result = policy.permits(context, request, 'view')
+        self.assertEqual(result, False)
+        from repoze.bfg.security import Everyone
+        self.assertEqual(authorizer_factory.principals, (Everyone,))
+        self.assertEqual(authorizer_factory.permission, 'view')
+        self.assertEqual(authorizer_factory.context, context)
+
+    def test_permits_no_principals_withparents_root_allows_everyone(self):
+        context = DummyContext()
+        context.__name__ = None
+        context.__parent__ = None
+        context2 = DummyContext()
+        context2.__name__ = 'context2'
+        context2.__parent__ = context
+        request = DummyRequest({})
+        logger = DummyLogger()
+        policy = self._makeOne(logger, lambda *arg: None)
+        authorizer_factory = make_authorizer_factory(context)
+        policy.authorizer_factory = authorizer_factory
+        result = policy.permits(context, request, 'view')
+        self.assertEqual(result, True)
+        from repoze.bfg.security import Everyone
+        self.assertEqual(authorizer_factory.principals, (Everyone,))
+        self.assertEqual(authorizer_factory.permission, 'view')
+        self.assertEqual(authorizer_factory.context, context)
+    
+
+class TestRemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def _getTargetClass(self):
         from repoze.bfg.security import RemoteUserACLSecurityPolicy
         return RemoteUserACLSecurityPolicy
@@ -231,11 +326,6 @@ class RemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         logger = DummyLogger()
         verifyObject(ISecurityPolicy, self._makeOne(logger))
 
-    def test_class_implements_ISecurityPolicy(self):
-        from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ISecurityPolicy
-        verifyClass(ISecurityPolicy, self._getTargetClass())
-
     def test_authenticated_userid(self):
         context = DummyContext()
         request = DummyRequest({'REMOTE_USER':'fred'})
@@ -254,73 +344,48 @@ class RemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.security import Authenticated
         self.assertEqual(result, [Everyone, Authenticated, 'fred'])
 
-    def test_permits_no_remote_user_no_acl_info_on_context(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        logger = DummyLogger()
-        policy = self._makeOne(logger)
-        authorizer_factory = make_authorizer_factory(None)
-        policy.authorizer_factory = authorizer_factory
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, False)
-        from repoze.bfg.security import Everyone
-        self.assertEqual(authorizer_factory.principals, (Everyone,))
-        self.assertEqual(authorizer_factory.permission, 'view')
-        self.assertEqual(authorizer_factory.context, context)
 
-    def test_permits_no_remote_user_acl_info_on_context(self):
-        context = DummyContext()
-        context.__acl__ = []
-        request = DummyRequest({})
-        logger = DummyLogger()
-        policy = self._makeOne(logger)
-        authorizer_factory = make_authorizer_factory(None)
-        policy.authorizer_factory = authorizer_factory
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, False)
-        from repoze.bfg.security import Everyone
-        self.assertEqual(authorizer_factory.principals, (Everyone,))
-        self.assertEqual(authorizer_factory.permission, 'view')
-        self.assertEqual(authorizer_factory.context, context)
+class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
+    def _getTargetClass(self):
+        from repoze.bfg.security import RepozeWhoIdentityACLSecurityPolicy
+        return RepozeWhoIdentityACLSecurityPolicy
 
-    def test_permits_no_remote_user_withparents_root_has_acl_info(self):
-        context = DummyContext()
-        context.__name__ = None
-        context.__parent__ = None
-        context2 = DummyContext()
-        context2.__name__ = 'context2'
-        context2.__parent__ = context
-        context.__acl__ = []
-        request = DummyRequest({})
-        logger = DummyLogger()
-        policy = self._makeOne(logger)
-        authorizer_factory = make_authorizer_factory(None)
-        policy.authorizer_factory = authorizer_factory
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, False)
-        from repoze.bfg.security import Everyone
-        self.assertEqual(authorizer_factory.principals, (Everyone,))
-        self.assertEqual(authorizer_factory.permission, 'view')
-        self.assertEqual(authorizer_factory.context, context)
+    def _makeOne(self, *arg, **kw):
+        klass = self._getTargetClass()
+        return klass(*arg, **kw)
 
-    def test_permits_no_remote_user_withparents_root_allows_everyone(self):
+    def setUp(self):
+        PlacelessSetup.setUp(self)
+
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
+
+    def test_instance_implements_ISecurityPolicy(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import ISecurityPolicy
+        logger = DummyLogger()
+        verifyObject(ISecurityPolicy, self._makeOne(logger))
+
+    def test_authenticated_userid(self):
         context = DummyContext()
-        context.__name__ = None
-        context.__parent__ = None
-        context2 = DummyContext()
-        context2.__name__ = 'context2'
-        context2.__parent__ = context
-        request = DummyRequest({})
+        identity = {'repoze.who.identity':{'repoze.who.userid':'fred'}}
+        request = DummyRequest(identity)
         logger = DummyLogger()
         policy = self._makeOne(logger)
-        authorizer_factory = make_authorizer_factory(context)
-        policy.authorizer_factory = authorizer_factory
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, True)
+        result = policy.authenticated_userid(request)
+        self.assertEqual(result, 'fred')
+
+    def test_effective_principals(self):
+        context = DummyContext()
+        identity = {'repoze.who.identity':{'repoze.who.userid':'fred'}}
+        request = DummyRequest(identity)
+        logger = DummyLogger()
+        policy = self._makeOne(logger)
+        result = policy.effective_principals(request)
         from repoze.bfg.security import Everyone
-        self.assertEqual(authorizer_factory.principals, (Everyone,))
-        self.assertEqual(authorizer_factory.permission, 'view')
-        self.assertEqual(authorizer_factory.context, context)
+        from repoze.bfg.security import Authenticated
+        self.assertEqual(result, [Everyone, Authenticated, 'fred'])
+
 
 class TestAPIFunctions(unittest.TestCase, PlacelessSetup):
     def setUp(self):

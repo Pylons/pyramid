@@ -1,3 +1,7 @@
+import logging
+import os
+import sys
+
 from zope.interface import implements
 from zope.component import queryUtility
 
@@ -80,7 +84,59 @@ class ACLAuthorizer(object):
         self.logger and self.logger.debug(str(result))
         return result
 
-class RemoteUserACLSecurityPolicy(object):
+class ACLSecurityPolicy(object):
+    implements(ISecurityPolicy)
+    authorizer_factory = ACLAuthorizer
+    
+    def __init__(self, logger, get_principals):
+        self.logger = logger
+        self.get_principals = get_principals
+
+    def permits(self, context, request, permission):
+        """ Return ``Allowed`` if the policy permits access,
+        ``Denied`` if not."""
+        principals = self.effective_principals(request)
+        for location in LocationIterator(context):
+            authorizer = self.authorizer_factory(location, self.logger)
+            try:
+                return authorizer.permits(permission, *principals)
+            except NoAuthorizationInformation:
+                continue
+
+        return False
+
+    def authenticated_userid(self, request):
+        principals = self.get_principals(request)
+        if principals:
+            return principals[0]
+
+    def effective_principals(self, request):
+        effective_principals = [Everyone]
+        principal_ids = self.get_principals(request)
+
+        if principal_ids:
+            effective_principals.append(Authenticated)
+            effective_principals.extend(principal_ids)
+
+        return effective_principals
+
+DEBUG_LOG_KEY = 'BFG_SECURITY_DEBUG'
+
+def debug_logger(logger):
+    if logger is None:
+        do_debug_log = os.environ.get(DEBUG_LOG_KEY, '')
+        if str(do_debug_log).lower() in ('1', 'y', 'true', 't', 'on'):
+            handler = logging.StreamHandler(sys.stdout)
+            fmt = '%(asctime)s %(message)s'
+            formatter = logging.Formatter(fmt)
+            handler.setFormatter(formatter)
+            logger = logging.Logger('repoze.bfg.security')
+            logger.addHandler(handler)
+            logger.setLevel(logging.DEBUG)
+            return logger
+    return logger
+
+def RemoteUserACLSecurityPolicy(logger=None):
     """ A security policy which:
 
     - examines the request.environ for the REMOTE_USER variable and
@@ -98,36 +154,44 @@ class RemoteUserACLSecurityPolicy(object):
       grant or deny access.
 
     """
-    implements(ISecurityPolicy)
-    authorizer_factory = ACLAuthorizer
-    
-    def __init__(self, logger=None):
-        self.logger = logger
+    logger = debug_logger(logger)
+    def get_principals(request):
+        user_id = request.environ.get('REMOTE_USER')
+        if user_id:
+            return [user_id]
+        return []
+    return ACLSecurityPolicy(logger, get_principals)
 
-    def permits(self, context, request, permission):
-        """ Return ``Allowed`` if the policy permits access,
-        ``Denied`` if not."""
-        principals = self.effective_principals(request)
-        for location in LocationIterator(context):
-            authorizer = self.authorizer_factory(location, self.logger)
-            try:
-                return authorizer.permits(permission, *principals)
-            except NoAuthorizationInformation:
-                continue
+def RepozeWhoIdentityACLSecurityPolicy(logger=None):
+    """ A security policy which:
 
-        return False
+    - examines the request.environ for the ``repoze.who.identity``
+      dictionary.  If one is found, the principal ids for the request
+      are composed of ``repoze.who.identity['repoze.who.userid']``
+      plus ``repoze.who.identity.get('groups', []).
 
-    def authenticated_userid(self, request):
-        return request.environ.get('REMOTE_USER', None)
+    - uses an ACL-based authorization model which attempts to find an
+      ACL on the context, and which returns ``Allowed`` from its
+      'permits' method if the ACL found grants access to the current
+      principal.  It returns ``Denied`` if permission was not granted
+      (either explicitly via a deny or implicitly by not finding a
+      matching ACE action).  An ACL is an ordered sequence of ACE
+      tuples, e.g.  ``[(Allow, Everyone, 'read'), (Deny, 'george',
+      'write')]``.  ACLs stored on model instance objects as their
+      __acl__ attribute will be used by the security machinery to
+      grant or deny access.
 
-    def effective_principals(self, request):
-        userid = self.authenticated_userid(request)
-        effective_principals = [Everyone]
-
-        if userid is not None:
-            effective_principals.append(Authenticated)
-            effective_principals.append(userid)
-        return effective_principals
+    """
+    logger = debug_logger(logger)
+    def get_principals(request):
+        identity = request.environ.get('repoze.who.identity')
+        if not identity:
+            return []
+        principals = [identity['repoze.who.userid']]
+        principals.extend(identity.get('groups', []))
+        return principals
+        
+    return ACLSecurityPolicy(logger, get_principals)
 
 class PermitsResult:
     def __init__(self, ace, acl, permission, principals, context):
