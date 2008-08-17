@@ -417,7 +417,7 @@ registry`. It looks like so:
    directives by including it as a package.
 
 #. Line 10 tells :mod:`repoze.bfg` to detect changes made to
- ``z3c.pt`` and XSLT templates immediately.
+   ``z3c.pt`` and XSLT templates immediately.
 
 #. Lines 12-15 register a single view.  It is ``for`` model objects
    that support the IMyModel interface.  The ``view`` attribute points
