@@ -125,10 +125,10 @@ Here's sample output from a run::
 
   $ paster serve myproject/myproject.ini
   Starting server in PID 16601.
-  serving on 0.0.0.0:5432 view at http://127.0.0.1:5432
+  serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 By default, generated :mod:`repoze.bfg` applications will listen on
-port 5432.
+port 6543.
 
 .. note:: During development, it's often useful to run ``paster
    serve`` using its ``--reload`` option.  When any Python module your
@@ -139,7 +139,7 @@ port 5432.
 Viewing the Application
 -----------------------
 
-Visit *http://localhost:5432/* in your browser.  You will see::
+Visit ``http://localhost:6542/`` in your browser.  You will see::
 
   Welcome to myproject
 
@@ -238,9 +238,8 @@ convention signifying that it the default application.
 
 The ``use`` setting is required in the ``[app:main]`` section.  The
 ``use`` setting points at a :term:`setuptools` "entry point" named
-``myproject#make_app`` (the ``egg:`` prefix in
-``egg:myproject#make_app`` indicates that this is an entry point
-specifier).
+``myproject#app`` (the ``egg:`` prefix in ``egg:myproject#app``
+indicates that this is an entry point specifier).
 
 .. note::
 
@@ -250,34 +249,42 @@ specifier).
    ``setup.py`` points at a string which looks a lot like an ``.ini``
    file.  This string representation of an ``.ini`` file has a section
    named ``[paste.app_factory]``.  Within this section, there is a key
-   named ``make_app`` (the entry point name) which has a value
-   ``myproject.run:make_app``.  The *key* ``make_app`` is what our
-   ``egg:myproject#make_app`` value of the ``use`` section in our
-   config file is pointing at.  The value represents a Python
-   "dotted-name" path, which refers to a callable in our ``myproject``
-   package's ``run.py`` module.
+   named ``app`` (the entry point name) which has a value
+   ``myproject.run:app``.  The *key* ``app`` is what our
+   ``egg:myproject#app`` value of the ``use`` section in our config
+   file is pointing at.  The value represents a Python "dotted-name"
+   path, which refers to a callable in our ``myproject`` package's
+   ``run.py`` module.
 
    In English, this entry point can thus be referred to as a "Paste
    application factory in the ``myproject`` package which has the
-   entry point named ``make_app`` where the entry point refers to a
-   ``make_app`` function in the ``mypackage.run`` module".  If indeed
-   if you open up the ``run.py`` module generated within the
-   ``myproject`` package, you'll see a ``make_app`` function.  This is
-   the function called :term:`PasteDeploy` when the ``paster serve``
-   command is invoked against our application.  It accepts a global
-   configuration object and *returns* an instance of our application.
+   entry point named ``app`` where the entry point refers to a ``app``
+   function in the ``mypackage.run`` module".  If indeed if you open
+   up the ``run.py`` module generated within the ``myproject``
+   package, you'll see a ``app`` function.  This is the function
+   called :term:`PasteDeploy` when the ``paster serve`` command is
+   invoked against our application.  It accepts a global configuration
+   object and *returns* an instance of our application.
 
 The ``use`` setting is the only setting required in the ``[app:main]``
 section unless you've changed the callable referred to by the
-``myproject#make_app`` entry point to accept more arguments: other
-settings you add to this section are passed as keywords arguments to
-the callable represented by this entry point (``make_app`` in our
-``run.py`` module).  You can provide startup-time configuration
-parameters to your application by requiring more settings in this
-section.
+``myproject#app`` entry point to accept more arguments: other settings
+you add to this section are passed as keywords arguments to the
+callable represented by this entry point (``app`` in our ``run.py``
+module).  You can provide startup-time configuration parameters to
+your application by requiring more settings in this section.
+
+The ``reload_templates`` setting in the ``[app:main]`` section is a
+:mod:`repoze.bfg`-specific setting which is passed into the framework.
+If it exists, and is ``true``, :term:`z3c.pt` and XSLT template
+changes will not require an application restart to be detected.
+
+.. warning:: The ``reload_templates`` option should be turned off for
+   production applications, as template rendering is slowed when it is
+   turned on.
 
 The ``[server:main]`` section of the configuration file configures a
-WSGI server which listens on port 5432.  It is configured to listen on
+WSGI server which listens on port 6543.  It is configured to listen on
 all interfaces (``0.0.0.0``), and is configured to use four threads
 for our application.
 
@@ -340,9 +347,11 @@ those files are checked into version control).  ``zip_safe` indicates
 that this package is not safe to ship as a zipped egg (it will unpack
 as a directory, which is more convenient).  ``install_requires`` and
 ``tests_require`` indicate that this package depends on the
-``repoze.bfg`` package.  ``test_suite`` points at the unittest module
-for our application.  We examined ``entry_points`` in our discussion
-of the ``myproject.ini`` file.
+``repoze.bfg`` package.  ``test_suite`` points at the package for our
+application, which means all tests found in the package will be
+installed.  We examined ``entry_points`` in our discussion of the
+``myproject.ini`` file; this file defines the ``app`` entry point that
+represent's our project's application.
 
 Usually you only need to think about the contents of the ``setup.py``
 file when distributing your application to other people, or when
@@ -416,10 +425,7 @@ registry`. It looks like so:
 #. Line 6 initializes :mod:`repoze.bfg`-specific configuration
    directives by including it as a package.
 
-#. Line 10 tells :mod:`repoze.bfg` to detect changes made to
-   ``z3c.pt`` and XSLT templates immediately.
-
-#. Lines 12-15 register a single view.  It is ``for`` model objects
+#. Lines 8-11 register a single view.  It is ``for`` model objects
    that support the IMyModel interface.  The ``view`` attribute points
    at a Python function that does all the work for this view.  Note
    that the values of both the ``for`` attribute and the ``view``
@@ -454,16 +460,15 @@ in the model, and the HTML given back to the browser.
    ``Request`` class representing the browser's request to our server.
 
 #. The view renders a :term:`template` and returns the result as the
-   :term:`response`.  Note that because our ``configure.zcml`` has a
-   ``bfg:settings`` directive indicating that templates should be
-   reloaded when they change, you won't need to restart the
+   :term:`response`.  Note that because our ``myproject.ini`` has a
+   ``reload_templates = true`` directive indicating that templates
+   should be reloaded when they change, you won't need to restart the
    application server to see changes you make to templates.  During
    development, this is handy.  If this directive had been ``false``
    (or if the directive did not exist), you would need to restart the
    application server for each template change.  For production
-   applications, you should set your ``bfg:settings``
-   ``reload_templates`` to ``false`` to increase the speed at which
-   templates may be rendered.
+   applications, you should set your project's ``reload_templates`` to
+   ``false`` to increase the speed at which templates may be rendered.
 
 .. note::
 
@@ -526,14 +531,16 @@ without the PasteDeploy configuration file:
 .. literalinclude:: myproject/myproject/run.py
    :linenos:
 
-#. Lines 1 - 7 define a function that returns a :mod:`repoze.bfg`
-   Router application from :ref:`router_module` .  This is meant to be
-   called by the :term:`PasteDeploy` framework as a result of running
+#. Lines 1 - 2 import functions from :mod:`repoze.bfg` that we use later.
+
+#. Lines 4-9 define a function that returns a :mod:`repoze.bfg` Router
+   application from :ref:`router_module` .  This is meant to be called
+   by the :term:`PasteDeploy` framework as a result of running
    ``paster serve``.
 
-#. Lines 9 - 12 allow this file to serve optionally as a shortcut for
+#. Lines 11 - 13 allow this file to serve optionally as a shortcut for
    executing our program if the ``run.py`` file is executed directly.
-   It starts our application under a web server on port 5432.
+   It starts our application under a web server on port 6543.
 
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

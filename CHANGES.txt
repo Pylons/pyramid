@@ -1,13 +1,22 @@
 Next release
 
-  - Add ``<bfg:settings>`` directive.  This directive currently allows
-    only one attribute: ``reload_templates``.  If e.g.::
+  - Generated application differences: ``make_app`` entry point
+    renamed to ``app`` in order to have a different name than the bfg
+    function of the same name, to prevent confusion.
 
-         <bfg:settings reload_templates="true"/>
+  - Add "options" processing to bfg's ``make_app`` to support runtime
+    options.  A new API function named ``get_options`` was added to
+    the registry module.  This function is typically used in an
+    application's ``app`` entry point.  The Paste config file section
+    for the app can now supply the ``reload_templates`` option, which,
+    if true, will prevent the need to restart the appserver in order
+    for ``z3c.pt`` or XSLT template changes to be detected.
 
-    is in your application's ZCML, you will not need to restart the
-    appserver in order for ``z3c.pt`` or XSLT template changes to be
-    detected and displayed.
+  - Use only the module name in generated project's "test_suite" (run
+    all tests found in the package).
+
+  - Default port for generated apps changed from 5432 to 6543
+    (Postgres default port is 6543).
 
 0.3.0
 

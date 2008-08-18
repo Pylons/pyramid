@@ -74,16 +74,21 @@ def isResponse(ob):
              isinstance(ob.status, basestring) ) :
             return True
 
-def make_app(root_policy, package=None, filename='configure.zcml'):
+def make_app(root_policy, package=None, filename='configure.zcml',
+             options=None):
     """ Create a view registry based on the application's ZCML.  and
     return a Router object, representing a ``repoze.bfg`` WSGI
-    application.  'root_policy' must be a callable that accepts a WSGI
-    environment and returns a graph root object.  'package' is the
-    dotted-Python-path packagename of the application, 'filename' is
-    the filesystem path to a ZCML file (optionally relative to the
-    package path) that should be parsed to create the view registry."""
+    application.  ``root_policy`` must be a callable that accepts a
+    WSGI environment and returns a graph root object.  ``package`` is
+    a Python module representing the application's package,
+    ``filename`` is the filesystem path to a ZCML file (optionally
+    relative to the package path) that should be parsed to create the
+    view registry.  ``options``, if used, should be a dictionary
+    containing bfg-specific runtime options, with each key
+    representing the option and the key's value representing the
+    specific option value, e.g. ``{'reload_templates':True}``"""
     from repoze.bfg.registry import makeRegistry
-    registry = makeRegistry(filename, package)
+    registry = makeRegistry(filename, package, options)
     return Router(root_policy, registry)
 
     

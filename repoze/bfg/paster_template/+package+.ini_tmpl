@@ -2,10 +2,11 @@
 debug = true
 
 [app:main]
-use = egg:{{project}}#make_app
+use = egg:{{project}}#app
+reload_templates = true
 
 [server:main]
 use = egg:PasteScript#cherrypy
 host = 0.0.0.0
-port = 5432
+port = 6543
 numthreads = 4

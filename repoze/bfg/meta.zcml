@@ -10,12 +10,6 @@
         handler=".zcml.view"
         />
 
-    <meta:directive
-        name="settings"
-        schema=".zcml.ISettingsDirective"
-        handler=".zcml.settings"
-        />
-
   </meta:directives>
 
 </configure>

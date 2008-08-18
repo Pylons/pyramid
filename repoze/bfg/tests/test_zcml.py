@@ -114,37 +114,6 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
 
-class TestSettingsDirective(unittest.TestCase, PlacelessSetup):
-    def setUp(self):
-        PlacelessSetup.setUp(self)
-
-    def tearDown(self):
-        PlacelessSetup.tearDown(self)
-
-    def _getFUT(self):
-        from repoze.bfg.zcml import settings
-        return settings
-
-    def test_defaults(self):
-        context = DummyContext()
-        settings = self._getFUT()
-        settings(context)
-        actions = context.actions
-        from repoze.bfg.interfaces import ISettings
-        from zope.component.zcml import handler
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        self.assertEqual(action['discriminator'], ('settings', ISettings))
-        self.assertEqual(action['callable'], handler)
-        self.assertEqual(len(action['args']), 5)
-        self.assertEqual(action['args'][0], 'registerUtility')
-        settings = action['args'][1]
-        self.assertEqual(settings.reload_templates, False)
-        self.failUnless(ISettings.providedBy(settings), settings)
-        self.assertEqual(action['args'][2], ISettings)
-        self.assertEqual(action['args'][3], '')
-        self.assertEqual(action['args'][4], context.info)
-
 class TestSampleApp(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)

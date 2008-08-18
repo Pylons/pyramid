@@ -1,13 +1,13 @@
-def make_app(global_config, **kw):
+from repoze.bfg import make_app
+from repoze.bfg import get_options
+
+def app(global_config, **kw):
     # paster app config callback
-    from repoze.bfg import make_app
     from {{project}}.models import get_root
     import {{ project}}
-    app = make_app(get_root, {{project}})
-    return app
+    return make_app(get_root, {{project}}, options=get_options(kw))
 
 if __name__ == '__main__':
     from paste import httpserver
-    app = make_app(None)
-    httpserver.serve(app, host='0.0.0.0', port='5432')
+    httpserver.serve(app(None), host='0.0.0.0', port='6543')
     

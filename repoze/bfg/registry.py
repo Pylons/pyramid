@@ -6,8 +6,11 @@ from zope.component.interfaces import ComponentLookupError
 from zope.component.interfaces import IComponentLookup
 from zope.component.registry import Components
 from zope.component import getSiteManager as original_getSiteManager
-
 from zope.configuration import xmlconfig
+
+from zope.interface import implements
+
+from repoze.bfg.interfaces import ISettings
 
 class ThreadLocalRegistryManager(threading.local):
     registry = getGlobalSiteManager()
@@ -28,7 +31,7 @@ def setRegistryManager(manager): # for unit tests
     registry_manager = manager
     return old_registry_manager
 
-def makeRegistry(filename, package, lock=threading.Lock()):
+def makeRegistry(filename, package, options=None, lock=threading.Lock()):
     # This is absurd and probably not worth it.  We want to try to
     # push our ZCML-defined configuration into an app-local component
     # registry in order to allow more than one bfg app to live in the
@@ -50,11 +53,20 @@ def makeRegistry(filename, package, lock=threading.Lock()):
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
         xmlconfig.file(filename, package=package)
+        if options is None:
+            options = {}
+        settings = Settings(options)
+        registry.registerUtility(settings, ISettings)
         return registry
     finally:
         zope.component.getGlobalSiteManager = getGlobalSiteManager
         lock.release()
         registry_manager.clear()
+
+class Settings(object):
+    implements(ISettings)
+    def __init__(self, options):
+        self.reload_templates = options.get('reload_templates', False)
 
 def getSiteManager(context=None):
     if context is None:
@@ -64,6 +76,14 @@ def getSiteManager(context=None):
             return IComponentLookup(context)
         except TypeError, error:
             raise ComponentLookupError(*error.args)
+
+def asbool(s):
+    s = str(s).strip()
+    return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
+
+def get_options(kw):
+    reload_templates = asbool(kw.get('reload_templates'))
+    return {'reload_templates':reload_templates}
 
 from zope.testing.cleanup import addCleanUp
 try:

@@ -35,10 +35,10 @@ setup(name='myproject',
       tests_require=[
             'repoze.bfg',
             ],
-      test_suite="myproject.tests",
+      test_suite="myproject",
       entry_points = """\
       [paste.app_factory]
-      make_app = myproject.run:make_app
+      app = myproject.run:app
       """
       )
 

@@ -23,14 +23,36 @@ class TestMakeRegistry(unittest.TestCase, PlacelessSetup):
             old = repoze.bfg.registry.setRegistryManager(dummyregmgr)
             registry = makeRegistry('configure.zcml',
                                     fixtureapp,
+                                    options={'reload_templates':True},
                                     lock=dummylock)
             from zope.component.registry import Components
             self.failUnless(isinstance(registry, Components))
             self.assertEqual(dummylock.acquired, True)
             self.assertEqual(dummylock.released, True)
             self.assertEqual(dummyregmgr.registry, registry)
+            from zope.component import getUtility
+            from repoze.bfg.interfaces import ISettings
+            settings = getUtility(ISettings)
+            self.assertEqual(settings.reload_templates, True)
         finally:
             repoze.bfg.registry.setRegistryManager(old)
+
+class TestGetOptions(unittest.TestCase):
+    def _getFUT(self):
+        from repoze.bfg.registry import get_options
+        return get_options
+
+    def test_it(self):
+        get_options = self._getFUT()
+        self.assertEqual(get_options({}),
+                         {'reload_templates':False})
+        self.assertEqual(get_options({'reload_templates':'false'}),
+                                     {'reload_templates':False})
+        self.assertEqual(get_options({'reload_templates':'t'}),
+                                     {'reload_templates':True})
+        self.assertEqual(get_options({'reload_templates':'1'}),
+                                     {'reload_templates':True})
+
 
 class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
     def setUp(self):
