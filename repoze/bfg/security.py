@@ -136,6 +136,12 @@ def debug_logger(logger):
             return logger
     return logger
 
+def get_remoteuser(request):
+    user_id = request.environ.get('REMOTE_USER')
+    if user_id:
+        return [user_id]
+    return []
+
 def RemoteUserACLSecurityPolicy(logger=None):
     """ A security policy which:
 
@@ -155,12 +161,15 @@ def RemoteUserACLSecurityPolicy(logger=None):
 
     """
     logger = debug_logger(logger)
-    def get_principals(request):
-        user_id = request.environ.get('REMOTE_USER')
-        if user_id:
-            return [user_id]
+    return ACLSecurityPolicy(logger, get_remoteuser)
+
+def get_who_principals(request):
+    identity = request.environ.get('repoze.who.identity')
+    if not identity:
         return []
-    return ACLSecurityPolicy(logger, get_principals)
+    principals = [identity['repoze.who.userid']]
+    principals.extend(identity.get('groups', []))
+    return principals
 
 def RepozeWhoIdentityACLSecurityPolicy(logger=None):
     """ A security policy which:
@@ -183,15 +192,7 @@ def RepozeWhoIdentityACLSecurityPolicy(logger=None):
 
     """
     logger = debug_logger(logger)
-    def get_principals(request):
-        identity = request.environ.get('repoze.who.identity')
-        if not identity:
-            return []
-        principals = [identity['repoze.who.userid']]
-        principals.extend(identity.get('groups', []))
-        return principals
-        
-    return ACLSecurityPolicy(logger, get_principals)
+    return ACLSecurityPolicy(logger, get_who_principals)
 
 class PermitsResult:
     def __init__(self, ace, acl, permission, principals, context):
