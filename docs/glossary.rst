@@ -213,10 +213,9 @@ Glossary
     application represents the application's :term:`application
     registry`.
   repoze.who
-    `Authentication middleware
-    <http://svn.repoze.org/repoze.who/trunk/README.txt>`_ for
-    :term:`WSGI` applications.  It can be used by :mod:`repoze.bfg` to
-    provide authentication information.
+    `Authentication middleware <http://static.repoze.org/whodocs>`_
+    for :term:`WSGI` applications.  It can be used by
+    :mod:`repoze.bfg` to provide authentication information.
   ReStructuredText
     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
     that is the defacto standard for descriptive text shipped in

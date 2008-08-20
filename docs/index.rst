@@ -77,8 +77,10 @@ processing.  Check this application out of Subversion via::
 `repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is a
 simple pastebin application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
-processing, security, and the use of *ZODB* within a :mod:`repoze.bfg`
-application.  Check this application out of Subversion via::
+processing, security, and the use of :term:`ZODB` within a
+:mod:`repoze.bfg` application.  It also has very simple
+:term:`repoze.who` integration. Check this application out of
+Subversion via::
 
   svn co http://svn.repoze.org/repoze.cluegun/trunk repoze.cluegun
 
@@ -94,8 +96,8 @@ Subversion via::
 `repoze.shootout <http://svn.repoze.org/repoze.shootout/trunk/>`_ is
 an example "idea competition" application by Carlos de la Guardia.  It
 demonstrates :term:`URL dispatch` and integration with `SQLAlchemy
-<http://www.sqlalchemy.org/>`_.  Check this application out of
-Subversion via::
+<http://www.sqlalchemy.org/>`_ and :term:`repoze.who`.  Check this
+application out of Subversion via::
 
   svn co http://svn.repoze.org/repoze.shootout/trunk repoze.shootout
 
