@@ -1,4 +1,4 @@
-Next release
+0.3.1 (8/20/2008)
 
   - Generated application differences: ``make_app`` entry point
     renamed to ``app`` in order to have a different name than the bfg
