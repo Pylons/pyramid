@@ -1,4 +1,5 @@
 import threading
+
 import zope.component
 
 from zope.component import getGlobalSiteManager
@@ -6,11 +7,11 @@ from zope.component.interfaces import ComponentLookupError
 from zope.component.interfaces import IComponentLookup
 from zope.component.registry import Components
 from zope.component import getSiteManager as original_getSiteManager
-from zope.configuration import xmlconfig
 
 from zope.interface import implements
 
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.zcml import zcml_configure
 
 class ThreadLocalRegistryManager(threading.local):
     registry = getGlobalSiteManager()
@@ -52,7 +53,7 @@ def makeRegistry(filename, package, options=None, lock=threading.Lock()):
         registry_manager.set(registry)
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
-        xmlconfig.file(filename, package=package)
+        zcml_configure(filename, package=package)
         if options is None:
             options = {}
         settings = Settings(options)

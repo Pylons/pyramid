@@ -1,3 +1,11 @@
+Next release
+
+  - Read and write a pickled ZCML actions list, stored as
+    ``configure.zcml.pck`` next to the applications's "normal" 
+    configuration file.  A given bfg app will usually start faster
+    if it's able to read the pickle data.  It fails gracefully
+    to reading the real ZCML file if it cannot read the pickle.
+
 0.3.1 (8/20/2008)
 
   - Generated application differences: ``make_app`` entry point

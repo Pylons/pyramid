@@ -1,5 +1,4 @@
 import os
-import sys
 
 from webob import Response
 
@@ -10,6 +9,7 @@ from zope.component import getSiteManager
 from zope.interface import classProvides
 from zope.interface import implements
 
+from repoze.bfg.path import caller_path
 from repoze.bfg.interfaces import ITemplateFactory
 from repoze.bfg.interfaces import ITemplate
 from repoze.bfg.interfaces import INodeTemplate
@@ -62,9 +62,6 @@ def get_processor(xslt_fn, auto_reload=False):
     proc = etree.XSLT(source)
     xslt_pool.processors[xslt_fn] = proc
     return proc
-
-def package_path(package):
-    return os.path.abspath(os.path.dirname(package.__file__))
 
 def registerTemplate(type, template, path):
     try:
@@ -133,14 +130,5 @@ def render_transform_to_response(path, node, **kw):
     path = caller_path(path)
     result = render_transform(path, node, **kw)
     return Response(result)
-
-def caller_path(path):
-    if not os.path.isabs(path):
-        package_globals = sys._getframe(2).f_globals
-        package_name = package_globals['__name__']
-        package = sys.modules[package_name]
-        prefix = package_path(package)
-        path = os.path.join(prefix, path)
-    return path
 
     

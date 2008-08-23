@@ -1,3 +1,11 @@
+import cPickle
+import os
+from os.path import realpath
+import time
+
+from zope.configuration import xmlconfig
+import zope.configuration.config
+
 from zope.component.zcml import handler
 from zope.component.interface import provideInterface
 from zope.configuration.exceptions import ConfigurationError
@@ -10,6 +18,7 @@ from zope.schema import TextLine
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
+from repoze.bfg.path import package_path
 
 from repoze.bfg.security import ViewPermissionFactory
 
@@ -83,5 +92,81 @@ class IViewDirective(Interface):
                      u"default request type is repoze.bfg.interfaces.IRequest"),
         required=False
         )
+
+PVERSION = 0
+
+def pickle_name(name, package):
+    path = package_path(package)
+    basename = os.path.join(path, name)
+    return os.path.join(path, basename + '.pck')
+
+def zcml_configure(name, package, load=cPickle.load):
+    """ Execute pickled zcml actions or fall back to parsing from file
+    """
+    pckname = pickle_name(name, package)
+
+    if not (os.path.isfile(pckname) or os.path.islink(pckname)):
+        return file_configure(name, package)
+
+    try:
+        vers, ptime, actions = load(open(pckname, 'rb'))
+    except (IOError, cPickle.UnpicklingError, EOFError, TypeError, ValueError):
+        return file_configure(name, package)
+
+    if vers != PVERSION:
+        return file_configure(name, package)
+
+    try:
+        ptime = int(ptime)
+    except:
+        return file_configure(name, package)
+
+    if not hasattr(actions, '__iter__'):
+        return file_configure(name, package)
+
+    files = set()
+    for action in actions:
+        # files list used by pickled action is an element of the tuple
+        try:
+            files.update(action[4])
+        except (TypeError, IndexError):
+            return file_configure(name, package)
+
+    for file in files:
+        if not(os.path.isfile(file) or os.path.islink(file)):
+            return file_configure(name, package)
+
+        mtime = os.stat(realpath(file)).st_mtime
+
+        if  mtime >= ptime:
+            return file_configure(name, package)
+
+    context = zope.configuration.config.ConfigurationMachine()
+    xmlconfig.registerCommonDirectives(context)
+    context.actions = actions
+    context.execute_actions()
+    return True
+
+def file_configure(name, package, dump=cPickle.dump):
+    context = zope.configuration.config.ConfigurationMachine()
+    xmlconfig.registerCommonDirectives(context)
+    context.package = package
+
+    xmlconfig.include(context, name, package)
+    context.execute_actions(clear=False)
+
+    actions = context.actions
+    pckname = pickle_name(name, package)
+
+    try:
+        data = (PVERSION, time.time(), actions)
+        dump(data, open(pckname, 'wb'), -1)
+    except (OSError, IOError, TypeError, cPickle.PickleError):
+        try:
+            os.remove(pckname)
+        except:
+            pass
+
+    return False
 
 

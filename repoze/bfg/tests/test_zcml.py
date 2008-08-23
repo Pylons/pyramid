@@ -136,6 +136,189 @@ class TestSampleApp(unittest.TestCase, PlacelessSetup):
         new = cPickle.loads(dumped)
         self.assertEqual(len(actions), len(new))
 
+class TestZCMLPickling(unittest.TestCase, PlacelessSetup):
+    i = 0
+    def setUp(self):
+        self.tempdir = None
+        PlacelessSetup.setUp(self)
+        import sys
+        import os
+        import tempfile
+        from repoze.bfg.path import package_path
+        from repoze.bfg.tests import fixtureapp as package
+        import shutil
+        tempdir = tempfile.mkdtemp()
+        modname = 'myfixture%s' % self.i
+        self.i += 1
+        self.packagepath = os.path.join(tempdir, modname)
+        fixturedir = package_path(package)
+        pckname = os.path.join(fixturedir, 'configure.zcml.pck')
+        if os.path.isfile(pckname):
+            os.remove(pckname)
+        shutil.copytree(fixturedir, self.packagepath)
+        sys.path.insert(0, tempdir)
+        self.module = __import__(modname)
+        self.tempdir = tempdir
+
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
+        import sys
+        import shutil
+        if self.module is not None:
+            del sys.modules[self.module.__name__]
+        if self.tempdir is not None:
+            sys.path.pop(0)
+            shutil.rmtree(self.tempdir)
+
+    def test_file_configure(self):
+        import os
+        import cPickle
+        from repoze.bfg.zcml import file_configure
+        self.assertEqual(False, file_configure('configure.zcml', self.module))
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        self.failUnless(os.path.exists(picklename))
+        actions = cPickle.load(open(picklename, 'rb'))
+        self.failUnless(actions)
+
+    def test_file_configure_nonexistent_configure_dot_zcml(self):
+        import os
+        from repoze.bfg.zcml import file_configure
+        os.remove(os.path.join(self.packagepath, 'configure.zcml'))
+        self.assertRaises(IOError, file_configure, 'configure.zcml',
+                          self.module)
+
+    def test_file_configure_pickling_error(self):
+        import os
+        from repoze.bfg.zcml import file_configure
+        def dumpfail(actions, f):
+            raise IOError
+        self.assertEqual(False,
+                      file_configure('configure.zcml', self.module, dumpfail))
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        self.failIf(os.path.exists(picklename))
+
+    def test_zcml_configure_writes_pickle_when_none_exists(self):
+        import os
+        import cPickle
+        from repoze.bfg.zcml import zcml_configure
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        self.failUnless(os.path.exists(picklename))
+        actions = cPickle.load(open(picklename, 'rb'))
+        self.failUnless(actions)
+
+    def test_zcml_configure_uses_file_configure_with_bad_pickle1(self):
+        import os
+        import cPickle
+        from repoze.bfg.zcml import zcml_configure
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        f = open(picklename, 'wb')
+        cPickle.dump((), f)
+        f.close()
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+
+    def test_zcml_configure_uses_file_configure_with_bad_pickle2(self):
+        import os
+        from repoze.bfg.zcml import zcml_configure
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        f = open(picklename, 'wb')
+        f.write('garbage')
+        f.close()
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+
+    def test_zcml_configure_uses_file_configure_with_outofdate_pickle1(self):
+        import os
+        import cPickle
+        import time
+        from repoze.bfg.zcml import zcml_configure
+        basename = os.path.join(self.packagepath, 'configure.zcml')
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+        self.failUnless(os.path.exists(picklename))
+        actions = cPickle.load(open(picklename, 'rb'))
+        self.failUnless(actions)
+        os.utime(basename, (-1, time.time() + 100))
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+
+    def test_zcml_configure_uses_file_configure_with_outofdate_pickle2(self):
+        import os
+        import cPickle
+        import time
+        from repoze.bfg.zcml import zcml_configure
+        basename = os.path.join(self.packagepath, 'another.zcml')
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+        self.failUnless(os.path.exists(picklename))
+        actions = cPickle.load(open(picklename, 'rb'))
+        self.failUnless(actions)
+        os.utime(basename, (-1, time.time() + 100))
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+
+    def test_zcml_configure_uses_file_configure_with_missing_dependent(self):
+        import os
+        import cPickle
+        from repoze.bfg.zcml import zcml_configure
+        from zope.configuration.xmlconfig import ZopeXMLConfigurationError
+        basename = os.path.join(self.packagepath, 'another.zcml')
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+        self.failUnless(os.path.exists(picklename))
+        actions = cPickle.load(open(picklename, 'rb'))
+        self.failUnless(actions)
+        os.remove(basename)
+        self.assertRaises(ZopeXMLConfigurationError, zcml_configure,
+                          'configure.zcml', self.module)
+
+    def test_zcml_configure_uses_file_configure_with_bad_version(self):
+        import os
+        from repoze.bfg.zcml import zcml_configure
+        from repoze.bfg.zcml import PVERSION
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        f = open(picklename, 'wb')
+        import cPickle
+        data = (PVERSION+1, 0, [])
+        cPickle.dump(data, open(picklename, 'wb'))
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+
+    def test_zcml_configure_uses_file_configure_with_bad_time(self):
+        import os
+        from repoze.bfg.zcml import zcml_configure
+        from repoze.bfg.zcml import PVERSION
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        f = open(picklename, 'wb')
+        import cPickle
+        data = (PVERSION, None, [])
+        cPickle.dump(data, open(picklename, 'wb'))
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+
+    def test_zcml_configure_uses_file_configure_with_bad_actions(self):
+        import os
+        from repoze.bfg.zcml import zcml_configure
+        from repoze.bfg.zcml import PVERSION
+        import time
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        f = open(picklename, 'wb')
+        import cPickle
+        data = (PVERSION, time.time()+500, None)
+        cPickle.dump(data, open(picklename, 'wb'))
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+
+    def test_zcml_configure_uses_good_pickle(self):
+        import os
+        import cPickle
+        import time
+        from repoze.bfg.zcml import zcml_configure
+        from repoze.bfg.zcml import PVERSION
+        basename = os.path.join(self.packagepath, 'another.zcml')
+        picklename = os.path.join(self.packagepath, 'configure.zcml.pck')
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+        self.failUnless(os.path.exists(picklename))
+        actions = cPickle.load(open(picklename, 'rb'))
+        self.failUnless(actions)
+        actions = (PVERSION, time.time()+100, actions[2])
+        cPickle.dump(actions, open(picklename, 'wb'))
+        self.assertEqual(True, zcml_configure('configure.zcml', self.module))
+
 class Dummy:
     pass
 
