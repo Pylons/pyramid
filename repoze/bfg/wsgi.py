@@ -1,4 +1,9 @@
 from webob import Response
+try:
+    from functools import wraps
+except ImportError:
+    # < 2.5
+    from repoze.bfg.functional import wraps
 
 def wsgiapp(wrapped):
     """ Decorator to turn a WSGI application into a repoze.bfg view callable.
@@ -24,7 +29,7 @@ def wsgiapp(wrapped):
     application to a Response and return it to repoze.bfg as if the
     WSGI app were a repoze.bfg view.
     """
-    def _curried(context, request):
+    def decorator(context, request):
         caught = []
         def catch_start_response(status, headers, exc_info=None):
             caught[:] = (status, headers, exc_info)
@@ -39,6 +44,5 @@ def wsgiapp(wrapped):
             return response
         else:
             raise RuntimeError('WSGI start_response not called')
-    _curried.__name__ = wrapped.__name__
-    return _curried
+    return wraps(wrapped)(decorator) # for pickleability
     
