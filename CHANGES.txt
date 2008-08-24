@@ -1,3 +1,8 @@
+0.3.3 (8/23/2008)
+
+  - Fix generated test.py module to use project name rather than package
+    name.
+
 0.3.2 (8/23/2008)
 
   - Remove ``sampleapp`` sample application from bfg package itself.
