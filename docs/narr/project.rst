@@ -191,7 +191,7 @@ The ``MyProject`` project has the following directory structure::
 The ``MyProject`` :term:`Project`
 ---------------------------------
 
-The ``myproject`` :term:`project` is the distribution and deployment
+The ``MyProject`` :term:`project` is the distribution and deployment
 wrapper for your application.  It contains both the ``myproject``
 :term:`package` representing your application as well as files used to
 describe, run, and test your application.
