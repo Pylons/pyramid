@@ -1,4 +1,4 @@
-Next release
+0.3.2 (8/23/2008)
 
   - Remove ``sampleapp`` sample application from bfg package itself.
 
