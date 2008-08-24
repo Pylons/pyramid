@@ -18,50 +18,52 @@ create`` facility::
 ``paster create`` will ask you a single question: the *name* of the
 project.  You should use a string without spaces and with only letters
 in it.  Here's sample output from a run of ``paster create`` for a
-project we name ``myproject``::
+project we name ``MyProject``::
 
-  $ paster create -t bfg
+  $ bin/paster create -t bfg
   Selected and implied templates:
     repoze.bfg#bfg  repoze.bfg starter project
 
-  Enter project name: myproject
+  Enter project name: MyProject
   Variables:
-    egg:      myproject
+    egg:      MyProject
     package:  myproject
-    project:  myproject
+    project:  MyProject
   Creating template bfg
-  Creating directory ./myproject
+  Creating directory ./MyProject
     Recursing into +package+
-      Creating ./myproject/myproject/
-      Copying __init__.py to ./myproject/myproject/__init__.py
-      Copying configure.zcml to ./myproject/myproject/configure.zcml
-      Copying models.py to ./myproject/myproject/models.py
-      Copying run.py_tmpl to ./myproject/myproject/run.py
+      Creating ./MyProject/myproject/
+      Copying __init__.py to ./MyProject/myproject/__init__.py
+      Copying configure.zcml to ./MyProject/myproject/configure.zcml
+      Copying models.py to ./MyProject/myproject/models.py
+      Copying run.py_tmpl to ./MyProject/myproject/run.py
       Recursing into templates
-        Creating ./myproject/myproject/templates/
-        Copying mytemplate.pt to ./myproject/myproject/templates/mytemplate.pt
-      Copying views.py_tmpl to ./myproject/myproject/views.py
-    Copying +package+.ini_tmpl to ./myproject/myproject.ini
-    Copying CHANGES.txt_tmpl to ./myproject/CHANGES.txt
-    Copying README.txt_tmpl to ./myproject/README.txt
-    Copying ez_setup.py to ./myproject/ez_setup.py
-    Copying setup.py_tmpl to ./myproject/setup.py
-  Running /Users/chrism/projects/repoze-devel/bfg/bin/python setup.py egg_info
+        Creating ./MyProject/myproject/templates/
+        Copying mytemplate.pt to ./MyProject/myproject/templates/mytemplate.pt
+      Copying tests.py_tmpl to ./MyProject/myproject/tests.py
+      Copying views.py_tmpl to ./MyProject/myproject/views.py
+    Copying +project+.ini_tmpl to ./MyProject/MyProject.ini
+    Copying CHANGES.txt_tmpl to ./MyProject/CHANGES.txt
+    Copying README.txt_tmpl to ./MyProject/README.txt
+    Copying ez_setup.py to ./MyProject/ez_setup.py
+    Copying setup.py_tmpl to ./MyProject/setup.py
+  Running /Users/chrism/projects/repoze/bfg/bin/python setup.py egg_info
 
 As a result of the above, a project is created in a directory named
-``myproject``.  That directory is a :term:`setuptools` :term:`project`
+``MyProject``.  That directory is a :term:`setuptools` :term:`project`
 directory from which a Python setuptools :term:`distribution` can be
 created.  The ``setup.py`` file in that directory can be used to
 distribute your application, or install your application for
 deployment or development. A sample :term:`PasteDeploy` ``.ini`` file
-named ``myproject.ini`` will also be created in the project directory.
-You will use the ``paster serve`` command against this ``ini`` file to
-run your application.
+named ``MyProject.ini`` will also be created in the project directory.
+You will use the ``paster serve`` command against this ``.ini`` file
+to run your application.
 
-The main ``myproject`` directory contains an additional subdirectory
-(also named ``myproject``) representing a Python :term:`package` which
-holds very simple :mod:`repoze.bfg` sample code.  This is where you'll
-edit your application's Python code and templates.
+The ``MyProject`` project directory contains an additional
+subdirectory named ``myproject`` (note the case difference)
+representing a Python :term:`package` which holds very simple
+:mod:`repoze.bfg` sample code.  This is where you'll edit your
+application's Python code and templates.
 
 Installing your Newly Created Project for Development
 -----------------------------------------------------
@@ -76,9 +78,9 @@ Elided output from a run of this command is shown below::
 
   $ python setup.py develop
    ...
-   Finished processing dependencies for myproject==0.1
+   Finished processing dependencies for MyProject==0.1
 
-This will install your application 's :term:`package` into the
+This will install your application's :term:`package` into the
 interpreter so it can be found and run as a :term:`WSGI` application
 inside a WSGI server.
 
@@ -95,35 +97,35 @@ Here's sample output from a test run::
   $ python setup.py test -q
   running test
   running egg_info
-  writing requirements to myproject.egg-info/requires.txt
-  writing myproject.egg-info/PKG-INFO
-  writing top-level names to myproject.egg-info/top_level.txt
-  writing dependency_links to myproject.egg-info/dependency_links.txt
-  writing entry points to myproject.egg-info/entry_points.txt
-  reading manifest file 'myproject.egg-info/SOURCES.txt'
-  writing manifest file 'myproject.egg-info/SOURCES.txt'
+  writing requirements to MyProject.egg-info/requires.txt
+  writing MyProject.egg-info/PKG-INFO
+  writing top-level names to MyProject.egg-info/top_level.txt
+  writing dependency_links to MyProject.egg-info/dependency_links.txt
+  writing entry points to MyProject.egg-info/entry_points.txt
+  reading manifest file 'MyProject.egg-info/SOURCES.txt'
+  writing manifest file 'MyProject.egg-info/SOURCES.txt'
   running build_ext
   .
   ----------------------------------------------------------------------
-  Ran 1 test in 0.566s
+  Ran 1 test in 0.647s
 
-  OK
+OK
 
-The tests are found in the ``tests.py`` module in your
-paster-create-generated project.  One sample test exists.
+The tests are found in the ``tests.py`` module in your ``paster
+create``-generated project.  One sample test exists.
 
 Runnning The Project Application
 --------------------------------
 
 Once the project is installed for development, you can run the
 application it represents using the ``paster serve`` command against
-the generated ``myproject.ini`` configuration file::
+the generated ``MyProject.ini`` configuration file::
 
-  $ paster serve myproject/myproject.ini
+  $ paster serve myproject/MyProject.ini
 
 Here's sample output from a run::
 
-  $ paster serve myproject/myproject.ini
+  $ paster serve myproject/MyProject.ini
   Starting server in PID 16601.
   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
@@ -136,23 +138,25 @@ port 6543.
    development easier, as changes to Python code under
    :mod:`repoze.bfg` is not put into effect until the server restarts.
 
-.. note:: When :mod:`repoze.bfg` starts, it writes a ``.pck`` file.
-   In a typical setup this file will be written as
-   ``configure.zcml.pck`` in the same directory that your
-   application's ``configure.zcml`` is stored.  This is temporary,
-   cached data that can help your :mod:`repoze.bfg` application start
-   slightly faster (its existence prevents the need to parse the XML
-   in the .zcml file).  You can delete it at will as necessary; it
-   will be recreated.  If it cannot be written due to filesystem
-   permissions, :mod:`repoze.bfg` will just reparse the .zcml file
-   every time it starts.
+.. note:: When :mod:`repoze.bfg` starts, it attempts to write a
+   ``.cache`` file which stores a cached version of your
+   :term:`application registry`.  In a typical setup this file will be
+   written as ``configure.zcml.cache`` in the same directory that your
+   application's ``configure.zcml`` is stored.  This is temporary data
+   that can help your :mod:`repoze.bfg` application start slightly
+   faster (its existence prevents the need to parse the XML stored in
+   the ``.zcml`` file if that file or any of files upon which it
+   depends files have not changed).  You can delete it at will as
+   necessary; it will be recreated.  If a ``.cache`` file cannot be
+   written due to filesystem permissions, :mod:`repoze.bfg` will just
+   reparse the ``.zcml`` file every time it starts.
 
 Viewing the Application
 -----------------------
 
 Visit ``http://localhost:6542/`` in your browser.  You will see::
 
-  Welcome to myproject
+  Welcome to MyProject
 
 That's the page shown by default when you visit an unmodified ``paster
 create``-generated application.
@@ -166,9 +170,9 @@ Our generated :mod:`repoze.bfg` application is a setuptools
 template generates a project which contains a package that shares its
 name).
 
-The ``myproject`` project has the following directory structure::
+The ``MyProject`` project has the following directory structure::
 
-  myproject/
+  MyProject/
   |-- CHANGES.txt
   |-- README.txt
   |-- ez_setup.py
@@ -181,10 +185,10 @@ The ``myproject`` project has the following directory structure::
   |   |   `-- mytemplate.pt
   |   |-- tests.py
   |   `-- views.py
-  |-- myproject.ini
+  |-- MyProject.ini
   `-- setup.py
 
-The ``myproject`` :term:`Project`
+The ``MyProject`` :term:`Project`
 ---------------------------------
 
 The ``myproject`` :term:`project` is the distribution and deployment
@@ -203,7 +207,7 @@ describe, run, and test your application.
    :term:`Setuptools` if the executing user does not have it
    installed.
 
-#. ``myproject.ini`` is a :term:`PasteDeploy` configuration file that
+#. ``MyProject.ini`` is a :term:`PasteDeploy` configuration file that
    can be used to execute your application.
 
 #. ``setup.py`` is the file you'll use to test and distribute your
@@ -216,17 +220,17 @@ wants to install your package does not have :term:`Setuptools` already
 installed.  It is only imported by and used by ``setup.py``, so we
 won't describe it here.
 
-``myproject.ini``
+``MyProject.ini``
 ~~~~~~~~~~~~~~~~~
 
-The ``myproject.ini`` file is a :term:`PasteDeploy` configuration
+The ``MyProject.ini`` file is a :term:`PasteDeploy` configuration
 file.  Its purpose is to specify an application to run when you invoke
 ``paster serve`` when you start an application, as well as the options
 provided to that application.
 
-The generated ``myproject.ini`` file looks like so:
+The generated ``MyProject.ini`` file looks like so:
 
-.. literalinclude:: myproject/myproject.ini
+.. literalinclude:: MyProject/MyProject.ini
    :linenos:
 
 This file contains several "sections" including ``[DEFAULT]``,
@@ -249,7 +253,7 @@ convention signifying that it the default application.
 
 The ``use`` setting is required in the ``[app:main]`` section.  The
 ``use`` setting points at a :term:`setuptools` "entry point" named
-``myproject#app`` (the ``egg:`` prefix in ``egg:myproject#app``
+``MyProject#app`` (the ``egg:`` prefix in ``egg:MyProject#app``
 indicates that this is an entry point specifier).
 
 .. note::
@@ -262,13 +266,13 @@ indicates that this is an entry point specifier).
    named ``[paste.app_factory]``.  Within this section, there is a key
    named ``app`` (the entry point name) which has a value
    ``myproject.run:app``.  The *key* ``app`` is what our
-   ``egg:myproject#app`` value of the ``use`` section in our config
+   ``egg:MyProject#app`` value of the ``use`` section in our config
    file is pointing at.  The value represents a Python "dotted-name"
    path, which refers to a callable in our ``myproject`` package's
    ``run.py`` module.
 
    In English, this entry point can thus be referred to as a "Paste
-   application factory in the ``myproject`` package which has the
+   application factory in the ``MyProject`` project which has the
    entry point named ``app`` where the entry point refers to a ``app``
    function in the ``mypackage.run`` module".  If indeed if you open
    up the ``run.py`` module generated within the ``myproject``
@@ -279,7 +283,7 @@ indicates that this is an entry point specifier).
 
 The ``use`` setting is the only setting required in the ``[app:main]``
 section unless you've changed the callable referred to by the
-``myproject#app`` entry point to accept more arguments: other settings
+``MyProject#app`` entry point to accept more arguments: other settings
 you add to this section are passed as keywords arguments to the
 callable represented by this entry point (``app`` in our ``run.py``
 module).  You can provide startup-time configuration parameters to
@@ -327,7 +331,7 @@ distributing your application.
 
 Our generated ``setup.py`` looks like this:
 
-.. literalinclude:: myproject/setup.py
+.. literalinclude:: MyProject/setup.py
    :linenos:
 
 The top of the file imports and uses ``ez_setup``, which causes
@@ -361,7 +365,7 @@ as a directory, which is more convenient).  ``install_requires`` and
 ``repoze.bfg`` package.  ``test_suite`` points at the package for our
 application, which means all tests found in the package will be
 installed.  We examined ``entry_points`` in our discussion of the
-``myproject.ini`` file; this file defines the ``app`` entry point that
+``MyProject.ini`` file; this file defines the ``app`` entry point that
 represent's our project's application.
 
 Usually you only need to think about the contents of the ``setup.py``
@@ -372,7 +376,7 @@ this command now::
   python setup.py sdist
 
 This will create a tarball of your application in a ``dist``
-subdirectory named ``myproject-0.1.tar.gz``.  You can send this
+subdirectory named ``MyProject-0.1.tar.gz``.  You can send this
 tarball to other people who want to use your application.
 
 .. note::
@@ -390,7 +394,7 @@ tarball to other people who want to use your application.
 The ``myproject`` :term:`Package`
 ---------------------------------
 
-The ``myproject`` :term:`package` lives inside the ``myproject``
+The ``myproject`` :term:`package` lives inside the ``MyProject``
 :term:`project`.  It contains:
 
 #. An ``__init__.py`` file which signifies that this is a Python
@@ -425,7 +429,7 @@ particular way.
 The ``configure.zcml`` represents the :term:`application
 registry`. It looks like so:
 
-.. literalinclude:: myproject/myproject/configure.zcml
+.. literalinclude:: MyProject/myproject/configure.zcml
    :linenos:
    :language: xml
 
@@ -444,7 +448,7 @@ registry`. It looks like so:
    period are "shortcuts" which point at files relative to the
    :term:`package` in which the ``configure.zcml`` file lives.  In
    this case, since the ``configure.zcml`` file lives within the
-   ``myproject`` project, the shorcut ``.models.IMyModel`` could also
+   ``myproject`` package, the shorcut ``.models.IMyModel`` could also
    be spelled ``myproject.models.IMyModel`` (forming a full Python
    dotted-path name to the ``IMyModel`` class).  Likewise the shortcut
    ``.views.my_view`` could be replaced with
@@ -457,7 +461,7 @@ Much of the heavy lifting in a :mod:`repoze.bfg` application comes in
 the form of *views*.  A :term:`view` is the bridge between the content
 in the model, and the HTML given back to the browser.
 
-.. literalinclude:: myproject/myproject/views.py
+.. literalinclude:: MyProject/myproject/views.py
    :linenos:
 
 #. Lines 3-5 provide the ``my_view`` that was registered as the view.
@@ -471,7 +475,7 @@ in the model, and the HTML given back to the browser.
    ``Request`` class representing the browser's request to our server.
 
 #. The view renders a :term:`template` and returns the result as the
-   :term:`response`.  Note that because our ``myproject.ini`` has a
+   :term:`response`.  Note that because our ``MyProject.ini`` has a
    ``reload_templates = true`` directive indicating that templates
    should be reloaded when they change, you won't need to restart the
    application server to see changes you make to templates.  During
@@ -502,7 +506,7 @@ behavior.  We then create an interface ``IMyModel`` that is a
 associate it without our ``MyModel`` class by claiming that the class
 ``implements`` the interface.
 
-.. literalinclude:: myproject/myproject/models.py
+.. literalinclude:: MyProject/myproject/models.py
    :linenos:
 
 #. Lines 4-5 define the interface.
@@ -539,7 +543,7 @@ advertises itself to our :term:`PasteDeploy` ``.ini`` file.  For
 convenience, we also make it possible to run this module directory
 without the PasteDeploy configuration file:
 
-.. literalinclude:: myproject/myproject/run.py
+.. literalinclude:: MyProject/myproject/run.py
    :linenos:
 
 #. Lines 1 - 2 import functions from :mod:`repoze.bfg` that we use later.
@@ -558,7 +562,7 @@ without the PasteDeploy configuration file:
 
 The single :term:`template` in the project looks like so:
 
-.. literalinclude:: myproject/myproject/templates/mytemplate.pt
+.. literalinclude:: MyProject/myproject/templates/mytemplate.pt
    :linenos:
    :language: xml
 
@@ -572,7 +576,7 @@ by view functions.
 
 The ``tests.py`` module includes unit tests for your application.
 
-.. literalinclude:: myproject/myproject/tests.py
+.. literalinclude:: MyProject/myproject/tests.py
    :linenos:
 
 This sample ``tests.py`` file has a single unit test defined within
