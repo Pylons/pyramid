@@ -165,10 +165,10 @@ The Project Structure
 ---------------------
 
 Our generated :mod:`repoze.bfg` application is a setuptools
-:term:`project` (named ``myproject``), which contains a Python
-:term:`package` (which is *also* named ``myproject``; the paster
-template generates a project which contains a package that shares its
-name).
+:term:`project` (named ``MyProject``), which contains a Python
+:term:`package` (which is *also* named ``myproject``, but lowercased;
+the paster template generates a project which contains a package that
+shares its name except for case).
 
 The ``MyProject`` project has the following directory structure::
 
