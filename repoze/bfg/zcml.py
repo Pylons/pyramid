@@ -98,7 +98,7 @@ PVERSION = 0
 def pickle_name(name, package):
     path = package_path(package)
     basename = os.path.join(path, name)
-    return os.path.join(path, basename + '.pck')
+    return os.path.join(path, basename + '.cache')
 
 def zcml_configure(name, package, load=cPickle.load):
     """ Execute pickled zcml actions or fall back to parsing from file

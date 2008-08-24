@@ -3,9 +3,9 @@ from repoze.bfg import get_options
 
 def app(global_config, **kw):
     # paster app config callback
-    from {{project}}.models import get_root
-    import {{ project}}
-    return make_app(get_root, {{project}}, options=get_options(kw))
+    from {{package}}.models import get_root
+    import {{package}}
+    return make_app(get_root, {{package}}, options=get_options(kw))
 
 if __name__ == '__main__':
     from paste import httpserver

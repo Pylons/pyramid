@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 import os
 
@@ -54,10 +54,8 @@ setup(name='repoze.bfg',
             'zope.hookable',
             'zope.event',
             'WebOb',
-            'Paste',
-            'z3c.pt',
-            'FormEncode',
             'PasteScript',
+            'z3c.pt [lxml]',
             'Routes',
             ],
       tests_require=[
@@ -67,10 +65,8 @@ setup(name='repoze.bfg',
             'zope.hookable',
             'zope.event',
             'WebOb',
+            'z3c.pt [lxml]',
             'Paste',
-            'z3c.pt',
-            'FormEncode',
-            'PasteScript',
             'Routes',
             'Sphinx',
             'docutils',

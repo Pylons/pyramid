@@ -276,7 +276,7 @@ class MakeAppTests(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.router import make_app
         return make_app
 
-    def test_sampleapp(self):
+    def test_fixtureapp(self):
         from repoze.bfg.tests import fixtureapp
         make_app = self._getFUT()
         rootpolicy = make_rootpolicy(None)

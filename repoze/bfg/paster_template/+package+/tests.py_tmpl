@@ -11,10 +11,10 @@ class ViewTests(unittest.TestCase):
         # should explore ways to do that rather than rely on ZCML (see
         # the repoze.bfg tests for inspiration).
         self._cleanup()
-        import {{project}}
+        import {{package}}
         import zope.configuration.xmlconfig
         zope.configuration.xmlconfig.file('configure.zcml',
-                                          package={{project}})
+                                          package={{package}})
 
     def tearDown(self):
         self._cleanup()
@@ -25,13 +25,13 @@ class ViewTests(unittest.TestCase):
         cleanUp()
         
     def test_my_view(self):
-        from {{project}}.views import my_view
+        from {{package}}.views import my_view
         context = DummyContext()
         request = DummyRequest()
         result = my_view(context, request)
         self.assertEqual(result.status, '200 OK')
         body = result.app_iter[0]
-        self.failUnless('Welcome to {{project}}' in body)
+        self.failUnless('Welcome to {{package}}' in body)
         self.assertEqual(len(result.headerlist), 2)
         self.assertEqual(result.headerlist[0],
                          ('content-type', 'text/html; charset=UTF-8'))
