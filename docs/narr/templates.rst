@@ -13,9 +13,8 @@ its default templating language. However, :mod:`repoze.bfg` uses a
 different implementation of the :term:`ZPT` specification than Zope
 does: the :term:`z3c.pt` templating engine. This templating engine
 complies with the `Zope Page Template
-<http://wiki.zope.org/ZPT/FrontPage>`_ template specification. While
-:term:`z3c.pt` doesn't implement the :term:`METAL` specification, it
-is significantly faster.
+<http://wiki.zope.org/ZPT/FrontPage>`_ template specification and is
+significantly faster.
 
 Given that there is a :term:`z3c.pt` template named ``foo.html`` in a
 directory in your application named ``templates``, you can render the
