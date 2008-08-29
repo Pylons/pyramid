@@ -92,7 +92,9 @@ def make_app(root_policy, package=None, filename='configure.zcml',
     from repoze.bfg.registry import makeRegistry
     registry = makeRegistry(filename, package, options)
     app = Router(root_policy, registry)
+    registry_manager.set(registry)
     dispatch(WSGIApplicationCreatedEvent(app))
+    registry_manager.clear()
     return app
 
     
