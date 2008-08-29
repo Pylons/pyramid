@@ -1,3 +1,8 @@
+  Features
+
+  - Event notification is issued after application is created and
+    configured.
+
 0.3.4 (08/28/2008)
 
   Backwards incompatibilities
