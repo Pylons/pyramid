@@ -13,5 +13,6 @@
 
   .. autofunction:: model_url
 
+  .. autofunction:: model_path
 
 

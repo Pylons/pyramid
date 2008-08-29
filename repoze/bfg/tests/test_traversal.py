@@ -246,19 +246,6 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         result = find(baz, '/')
         self.assertEqual(result, dummy)
-
-    def test_absolute_found(self):
-        dummy = DummyContext()
-        baz = DummyContext()
-        baz.__parent__ = dummy
-        baz.__name__ = 'baz'
-        dummy.__parent__ = None
-        dummy.__name__ = None
-        find = self._getFUT()
-        traverser = make_traverser(dummy, '', [])
-        self._registerTraverser(traverser)
-        result = find(baz, '/')
-        self.assertEqual(result, dummy)
         self.assertEqual(dummy.wascontext, True)
 
     def test_absolute_notfound(self):
@@ -273,6 +260,31 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         self.assertRaises(KeyError, find, baz, '/')
         self.assertEqual(dummy.wascontext, True)
+
+class ModelPathTests(unittest.TestCase):
+    def _getFUT(self):
+        from repoze.bfg.traversal import model_path
+        return model_path
+
+    def test_it(self):
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        root.__parent__ = None
+        root.__name__ = None
+        foo.__parent__ = root
+        foo.__name__ = 'foo '
+        bar.__parent__ = foo
+        bar.__name__ = 'bar'
+        baz.__parent__ = bar
+        baz.__name__ = 'baz'
+        request = DummyRequest()
+        model_path = self._getFUT()
+        request = DummyRequest()
+        result = model_path(baz, 'this/theotherthing', 'that')
+        self.assertEqual(result, '/foo /bar/baz/this/theotherthing/that')
+
 
 def make_traverser(*args):
     class DummyTraverser(object):

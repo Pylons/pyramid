@@ -8,9 +8,9 @@
 
 - "push" style templating
 
-- .001 case where there is a template without a view.
-
 - Warn if permissions are defined but no security policy is in place.
 
-- Change port num due to conflict with Postgres.
+- Describe better that render_template_to_response is a shortcut.
+
+- Show usage of, e.g. HTTPFound(location=url).
 

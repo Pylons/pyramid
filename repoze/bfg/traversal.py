@@ -106,10 +106,11 @@ def find_interface(model, interface):
 def model_url(model, request, *elements):
     """ Return the absolute URL of the model object based on the
     ``wsgi.url_scheme``, ``HTTP_HOST`` or ``SERVER_NAME`` in the
-    request, plus any ``SCRIPT_NAME``.  Any positional passed in as
-    ``elements`` will be joined by slashes and appended to the
-    generated URL.  The passed in elements are *not* URL-quoted.  The
-    ``model`` passed in must be :term:`location`-aware."""
+    request, plus any ``SCRIPT_NAME``.  Any positional arguments
+    passed in as ``elements`` will be joined by slashes and appended
+    to the generated URL.  The passed in elements are *not*
+    URL-quoted.  The ``model`` passed in must be
+    :term:`location`-aware."""
     rpath = []
     for location in LocationIterator(model):
         if location.__name__:
@@ -118,3 +119,18 @@ def model_url(model, request, *elements):
     path.extend(elements)
     path = '/'.join(path)
     return urlparse.urljoin(request.application_url, path)
+
+def model_path(model, *elements):
+    """ Return a string representing the absolute path of the model
+    object based on its position in the model graph, e.g
+    ``/foo/bar``. Any positional arguments passed in as ``elements``
+    will be joined by slashes and appended to the generated path.  The
+    ``model`` passed in must be :term:`location`-aware."""
+    rpath = []
+    for location in LocationIterator(model):
+        if location.__name__:
+            rpath.append(location.__name__)
+    path = list(reversed(rpath))
+    path.extend(elements)
+    path.insert(0, '')
+    return '/'.join(path)

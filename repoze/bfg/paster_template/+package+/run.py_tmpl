@@ -1,5 +1,5 @@
-from repoze.bfg import make_app
-from repoze.bfg import get_options
+from repoze.bfg.router import make_app
+from repoze.bfg.registry import get_options
 
 def app(global_config, **kw):
     # paster app config callback
