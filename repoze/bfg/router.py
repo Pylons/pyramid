@@ -3,7 +3,6 @@ from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.component.event import dispatch
 from zope.interface import directlyProvides
-from zope.event import notify
 
 from webob import Request
 from webob.exc import HTTPNotFound
@@ -92,7 +91,7 @@ def make_app(root_policy, package=None, filename='configure.zcml',
     from repoze.bfg.registry import makeRegistry
     registry = makeRegistry(filename, package, options)
     app = Router(root_policy, registry)
-    notify(WSGIApplicationCreatedEvent(app))
+    dispatch(WSGIApplicationCreatedEvent(app))
     return app
 
     
