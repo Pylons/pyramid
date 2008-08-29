@@ -14,3 +14,4 @@
 
 - Show usage of, e.g. HTTPFound(location=url).
 
+- Document ``make_app`` better; particularly how zcml is found.
