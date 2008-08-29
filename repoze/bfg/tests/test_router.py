@@ -264,7 +264,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(request_events[0].request.environ, environ)
         self.assertEqual(len(response_events), 1)
         self.assertEqual(response_events[0].response, response)
-
+    
 class MakeAppTests(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)
@@ -283,6 +283,19 @@ class MakeAppTests(unittest.TestCase, PlacelessSetup):
         app = make_app(rootpolicy, fixtureapp)
         self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
         self.assertEqual(app.root_policy, rootpolicy)
+
+    def test_event(self):
+        def subscriber(event):
+            event.app.created = True        
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        getGlobalSiteManager().registerHandler(
+            subscriber, (IWSGIApplicationCreatedEvent,))        
+        from repoze.bfg.tests import fixtureapp
+        make_app = self._getFUT()
+        rootpolicy = make_rootpolicy(None)
+        app = make_app(rootpolicy, fixtureapp)
+        assert app.created is True
 
 class DummyContext:
     pass

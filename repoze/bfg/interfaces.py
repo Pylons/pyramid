@@ -1,5 +1,8 @@
+from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import Attribute
+
+from zope.component.interfaces import IObjectEvent
 
 class IRequest(Interface):
     """ Marker interface for a request object """
@@ -84,3 +87,14 @@ class ISettings(Interface):
     """ Runtime settings for repoze.bfg """
     reload_templates = Attribute('Reload templates when they change')
     
+class IWSGIApplicationCreatedEvent(IObjectEvent):
+    """ Event issued after the application has been created and
+    configured."""
+    
+    app = Attribute(u"Published application")
+
+class WSGIApplicationCreatedEvent(object):    
+    implements(IWSGIApplicationCreatedEvent)
+    
+    def __init__(self, app):
+        self.app = app

@@ -3,6 +3,7 @@ from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.component.event import dispatch
 from zope.interface import directlyProvides
+from zope.event import notify
 
 from webob import Request
 from webob.exc import HTTPNotFound
@@ -15,6 +16,7 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import WSGIApplicationCreatedEvent
 
 from repoze.bfg.registry import registry_manager
 
@@ -89,6 +91,8 @@ def make_app(root_policy, package=None, filename='configure.zcml',
     specific option value, e.g. ``{'reload_templates':True}``"""
     from repoze.bfg.registry import makeRegistry
     registry = makeRegistry(filename, package, options)
-    return Router(root_policy, registry)
+    app = Router(root_policy, registry)
+    notify(WSGIApplicationCreatedEvent(app))
+    return app
 
     
