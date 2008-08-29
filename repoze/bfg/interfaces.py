@@ -92,9 +92,3 @@ class IWSGIApplicationCreatedEvent(IObjectEvent):
     configured."""
     
     app = Attribute(u"Published application")
-
-class WSGIApplicationCreatedEvent(object):    
-    implements(IWSGIApplicationCreatedEvent)
-    
-    def __init__(self, app):
-        self.app = app

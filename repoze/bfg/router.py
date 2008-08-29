@@ -10,12 +10,13 @@ from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
+from repoze.bfg.events import WSGIApplicationCreatedEvent
+
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import WSGIApplicationCreatedEvent
 
 from repoze.bfg.registry import registry_manager
 
