@@ -59,8 +59,7 @@ What Gets Installed
 -------------------
 
 When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
-WebOb, PasteScript, PasteDeploy, PasteScript, and FormEncode libraries
-are installed.
+WebOb, Paste, PasteScript, and PasteDeploy libraries are installed.
 
 Additionally, as shown in the next section, PasteScript (aka *paster*)
 templates will be registered that make it easy to start a new
