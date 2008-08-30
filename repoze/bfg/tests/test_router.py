@@ -287,15 +287,30 @@ class MakeAppTests(unittest.TestCase, PlacelessSetup):
     def test_event(self):
         def subscriber(event):
             event.app.created = True        
-        from zope.component import getGlobalSiteManager
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        import repoze.bfg.router
+        from zope.component import getGlobalSiteManager
+        old_registry_manager = repoze.bfg.router.registry_manager
+        repoze.bfg.router.registry_manager = DummyRegistryManager()
         getGlobalSiteManager().registerHandler(
-            subscriber, (IWSGIApplicationCreatedEvent,))        
-        from repoze.bfg.tests import fixtureapp
-        make_app = self._getFUT()
-        rootpolicy = make_rootpolicy(None)
-        app = make_app(rootpolicy, fixtureapp)
-        assert app.created is True
+            subscriber,
+            (IWSGIApplicationCreatedEvent,)
+            )
+        try:
+            from repoze.bfg.tests import fixtureapp
+            make_app = self._getFUT()
+            rootpolicy = make_rootpolicy(None)
+            app = make_app(rootpolicy, fixtureapp)
+            assert app.created is True
+        finally:
+            repoze.bfg.router.registry_manager = old_registry_manager
+
+class DummyRegistryManager:
+    def set(self, registry):
+        pass
+
+    def clear(self):
+        pass
 
 class DummyContext:
     pass

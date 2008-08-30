@@ -19,6 +19,7 @@ from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IRequest
 
 from repoze.bfg.registry import registry_manager
+from repoze.bfg.registry import makeRegistry
 
 _marker = ()
 
@@ -89,12 +90,15 @@ def make_app(root_policy, package=None, filename='configure.zcml',
     containing bfg-specific runtime options, with each key
     representing the option and the key's value representing the
     specific option value, e.g. ``{'reload_templates':True}``"""
-    from repoze.bfg.registry import makeRegistry
     registry = makeRegistry(filename, package, options)
     app = Router(root_policy, registry)
-    registry_manager.set(registry)
-    dispatch(WSGIApplicationCreatedEvent(app))
-    registry_manager.clear()
+
+    try:
+        registry_manager.set(registry)
+        dispatch(WSGIApplicationCreatedEvent(app))
+    finally:
+        registry_manager.clear()
+
     return app
 
     

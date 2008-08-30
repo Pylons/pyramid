@@ -33,20 +33,19 @@ def setRegistryManager(manager): # for unit tests
     return old_registry_manager
 
 def makeRegistry(filename, package, options=None, lock=threading.Lock()):
-    # This is absurd and probably not worth it.  We want to try to
-    # push our ZCML-defined configuration into an app-local component
-    # registry in order to allow more than one bfg app to live in the
-    # same process space without one unnecessarily stomping on the
-    # other's component registrations (although I suspect directives
-    # that side effects are going to fail).  The only way to do that
-    # currently is to override zope.component.getGlobalSiteManager for
-    # the duration of the ZCML includes.  We acquire a lock in case
-    # another make_app runs in a different thread simultaneously, in a
-    # vain attempt to prevent mixing of registrations.  There's not
-    # much we can do about non-make_app code that tries to use the
-    # global site manager API directly in a different thread while we
-    # hold the lock.  Those registrations will end up in our
-    # application's registry.
+    # We push our ZCML-defined configuration into an app-local
+    # component registry in order to allow more than one bfg app to
+    # live in the same process space without one unnecessarily
+    # stomping on the other's component registrations (although I
+    # suspect directives that have side effects are going to fail).
+    # The only way to do that currently is to override
+    # zope.component.getGlobalSiteManager for the duration of the ZCML
+    # includes.  We acquire a lock in case another make_app runs in a
+    # different thread simultaneously, in a vain attempt to prevent
+    # mixing of registrations.  There's not much we can do about
+    # non-make_app code that tries to use the global site manager API
+    # directly in a different thread while we hold the lock.  Those
+    # registrations will end up in our application's registry.
     lock.acquire()
     try:
         registry = Components(package.__name__)
