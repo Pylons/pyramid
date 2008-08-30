@@ -65,6 +65,10 @@ representing a Python :term:`package` which holds very simple
 :mod:`repoze.bfg` sample code.  This is where you'll edit your
 application's Python code and templates.
 
+.. note:: You can skip the interrogative question about a project
+   name during ``paster create`` by adding the project name to the
+   command line, e.g. ``paster create -t bfg MyProject``.
+
 Installing your Newly Created Project for Development
 -----------------------------------------------------
 
