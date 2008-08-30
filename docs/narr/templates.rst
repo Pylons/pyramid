@@ -120,3 +120,12 @@ installed, here's an example of using Mako from within a
        response = Response(result)
        return response
 
+.. note:: It's reasonably easy to write custom templating system
+   binding packages for use under :mod:`repoze.bfg`.  See
+   `repoze.bfg.jinja2
+   <http://svn.repoze.org/repoze.bfg.jinja2/trunk/>`_ for an example
+   of one such package.  This particular one creates
+   :mod:`repoze.bfg`-style bindings for the `Jinja2
+   <http://jinja.pocoo.org/2/documentation>`_ templating system.
+
+
