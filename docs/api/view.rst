@@ -9,4 +9,6 @@
 
   .. autofunction:: render_view_to_iterable
 
+  .. autofunction:: render_view
+
   .. autofunction:: is_response

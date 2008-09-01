@@ -230,6 +230,112 @@ class RenderViewToIterableTests(unittest.TestCase, BaseTest):
         self.assertRaises(ValueError, renderer, context, request,
                           name='registered', secure=False)
 
+class RenderViewTests(unittest.TestCase, BaseTest):
+    def _getFUT(self):
+        from repoze.bfg.view import render_view
+        return render_view
+    
+    def test_call_no_view_registered(self):
+        environ = self._makeEnviron()
+        from webob import Request
+        request = Request(environ)
+        context = DummyContext()
+        renderer = self._getFUT()
+        result = renderer(context, request, name='notregistered')
+        self.assertEqual(result, None)
+
+    def test_call_view_registered_secure_permission_disallows(self):
+        context = DummyContext()
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import IRequest
+        class IContext(Interface):
+            pass
+        directlyProvides(context, IContext)
+        response = DummyResponse()
+        secpol = DummySecurityPolicy()
+        permissionfactory = make_permission_factory(False)
+        view = make_view(response)
+        self._registerView(view, 'registered', IContext, IRequest)
+        self._registerSecurityPolicy(secpol)
+        self._registerPermission(permissionfactory, 'registered', IContext,
+                                 IRequest)
+        environ = self._makeEnviron()
+        from webob import Request
+        request = Request(environ)
+        directlyProvides(request, IRequest)
+        renderer = self._getFUT()
+        from repoze.bfg.security import Unauthorized
+        self.assertRaises(Unauthorized, renderer, context, request,
+                          name='registered', secure=True)
+
+    def test_call_view_registered_secure_permission_allows(self):
+        context = DummyContext()
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import IRequest
+        class IContext(Interface):
+            pass
+        directlyProvides(context, IContext)
+        response = DummyResponse()
+        secpol = DummySecurityPolicy()
+        permissionfactory = make_permission_factory(True)
+        view = make_view(response)
+        self._registerView(view, 'registered', IContext, IRequest)
+        self._registerSecurityPolicy(secpol)
+        self._registerPermission(permissionfactory, 'registered', IContext,
+                                 IRequest)
+        environ = self._makeEnviron()
+        from webob import Request
+        request = Request(environ)
+        directlyProvides(request, IRequest)
+        renderer = self._getFUT()
+        s = renderer(context, request, name='registered', secure=True)
+        self.assertEqual(s, '')
+
+    def test_call_view_registered_insecure_permission_disallows(self):
+        context = DummyContext()
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import IRequest
+        class IContext(Interface):
+            pass
+        directlyProvides(context, IContext)
+        response = DummyResponse()
+        secpol = DummySecurityPolicy()
+        permissionfactory = make_permission_factory(False)
+        view = make_view(response)
+        self._registerView(view, 'registered', IContext, IRequest)
+        self._registerSecurityPolicy(secpol)
+        self._registerPermission(permissionfactory, 'registered', IContext,
+                                 IRequest)
+        environ = self._makeEnviron()
+        from webob import Request
+        request = Request(environ)
+        directlyProvides(request, IRequest)
+        renderer = self._getFUT()
+        s = renderer(context, request, name='registered', secure=False)
+        self.assertEqual(s, '')
+
+    def test_call_view_response_doesnt_implement_IResponse(self):
+        context = DummyContext()
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import IRequest
+        class IContext(Interface):
+            pass
+        directlyProvides(context, IContext)
+        response = 'abc'
+        view = make_view(response)
+        self._registerView(view, 'registered', IContext, IRequest)
+        environ = self._makeEnviron()
+        from webob import Request
+        request = Request(environ)
+        directlyProvides(request, IRequest)
+        renderer = self._getFUT()
+        self.assertRaises(ValueError, renderer, context, request,
+                          name='registered', secure=False)
+
 class TestIsResponse(unittest.TestCase):
     def _getFUT(self):
         from repoze.bfg.view import is_response
