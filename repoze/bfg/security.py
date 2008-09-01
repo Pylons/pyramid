@@ -203,7 +203,7 @@ class PermitsResult:
         self.context_repr = repr(context)
 
     def __str__(self):
-        msg = '%s: %r via ace %r in acl %s or principals %r in context %s'
+        msg = '%s: %r via ace %r in acl %r or principals %r in context %s'
         msg = msg % (self.__class__.__name__,
                      self.permission, self.ace, self.acl, self.principals,
                      self.context_repr)
@@ -219,8 +219,7 @@ class Denied(PermitsResult):
         return False
 
     def __eq__(self, other):
-        if bool(other) is False:
-            return True
+        return bool(other) is False
 
 class Allowed(PermitsResult):
     """ An instance of ``Allowed`` is returned by an ACL allow.  It
@@ -232,8 +231,7 @@ class Allowed(PermitsResult):
         return True
 
     def __eq__(self, other):
-        if bool(other) is True:
-            return True
+        return bool(other) is True
 
 def flatten(x):
     """flatten(sequence) -> list
@@ -281,4 +279,12 @@ class ViewPermissionFactory(object):
     def __call__(self, context, request):
         return ViewPermission(context, request, self.permission_name)
 
+class Unauthorized(Exception):
+    def __init__(self, message='Unauthorized'):
+        self.message = message
+
+    def __str__(self):
+        return str(self.message)
+    
+    
     

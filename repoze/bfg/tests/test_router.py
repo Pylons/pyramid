@@ -154,7 +154,6 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
-        app_context = make_appcontext()
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -178,7 +177,6 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerView(view, '', IContext, IRequest)
         secpol = DummySecurityPolicy()
         self._registerSecurityPolicy(secpol)
-        app_context = make_appcontext()
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -203,7 +201,6 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
-        app_context = make_appcontext()
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -223,13 +220,15 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         response = DummyResponse()
         view = make_view(response)
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(False)
+        from repoze.bfg.security import Denied
+        permissionfactory = make_permission_factory(
+            Denied('ace', 'acl', 'permission', ['principals'], context)
+            )
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
-        app_context = make_appcontext()
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -363,13 +362,6 @@ def make_rootpolicy(root):
     def rootpolicy(environ):
         return root
     return rootpolicy
-
-def make_appcontext():
-    from zope.configuration.interfaces import IConfigurationContext
-    from zope.interface import directlyProvides
-    app_context = DummyContext()
-    directlyProvides(app_context, IConfigurationContext)
-    return app_context
 
 class DummyStartResponse:
     status = ()

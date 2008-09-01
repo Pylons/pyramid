@@ -1,7 +1,14 @@
+Next release
+
   Features
 
   - Event notification is issued after application is created and
-    configured.
+    configured (``IWSGIApplicationCreatedEvent``).
+
+  - New API module: ``repoze.bfg.view``.  This module contains the functions
+    named ``render_view_to_response``, ``render_view_to_iterable`` and
+    ``is_response``, which are documented in the API docs.  These features
+    aid programmatic (non-request-driven) view execution.
 
 0.3.4 (08/28/2008)
 

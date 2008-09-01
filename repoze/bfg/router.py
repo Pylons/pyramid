@@ -1,6 +1,4 @@
 from zope.component import getAdapter
-from zope.component import queryMultiAdapter
-from zope.component import queryUtility
 from zope.component.event import dispatch
 from zope.interface import directlyProvides
 
@@ -13,13 +11,15 @@ from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ITraverserFactory
-from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import IViewPermission
-from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IRequest
 
 from repoze.bfg.registry import registry_manager
 from repoze.bfg.registry import makeRegistry
+
+from repoze.bfg.security import Unauthorized
+
+from repoze.bfg.view import is_response
+from repoze.bfg.view import render_view_to_response
 
 _marker = ()
 
@@ -43,39 +43,26 @@ class Router:
         request.view_name = name
         request.subpath = subpath
 
-        security_policy = queryUtility(ISecurityPolicy)
-        if security_policy:
-            permission = queryMultiAdapter((context, request), IViewPermission,
-                                           name=name)
-            if permission is not None:
-                if not permission(security_policy):
-                    app = HTTPUnauthorized()
-                    app.explanation = repr(permission)
-                    return app(environ, start_response)
+        try:
+            response = render_view_to_response(context, request, name,
+                                               secure=True)
+        except Unauthorized, why:
+            app = HTTPUnauthorized()
+            app.explanation = str(why)
+            return app(environ, start_response)
 
-        response = queryMultiAdapter((context, request), IView, name=name,
-                                     default=_marker)
-        if response is _marker:
+        if response is None:
             app = HTTPNotFound(request.url)
             return app(environ, start_response)
 
-        if not isResponse(response):
-            raise ValueError('response was not IResponse: %s' % response)
+        if not is_response(response):
+            raise ValueError('response did not implement IResponse: %r'
+                             % response)
 
         dispatch(NewResponse(response))
 
         start_response(response.status, response.headerlist)
         return response.app_iter
-
-def isResponse(ob):
-    # response objects aren't obligated to implement a Zope interface,
-    # so we do it the hard way
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        if ( hasattr(ob.app_iter, '__iter__') and
-             hasattr(ob.headerlist, '__iter__') and
-             isinstance(ob.status, basestring) ) :
-            return True
 
 def make_app(root_policy, package=None, filename='configure.zcml',
              options=None):
