@@ -1,3 +1,11 @@
+Next Release
+
+  Bug Fixes
+
+  - When a zcml application registry cache was unpickled, and it
+    contained a reference to an object that no longer existed (such as
+    a view), bfg would not start properly.
+
 0.3.5 (09/01/2008)
 
   Features
