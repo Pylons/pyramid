@@ -162,11 +162,10 @@ press ``return`` after running ``paster serve MyProject.ini``.
    6543``).  It will serve up the application using 4 simultaneous
    threads (``numthreads = 4``), which means it will handle four
    simultaneous requests before needing to put a request in a wait
-   queue.  The server code itself is what prints `serving on
+   queue.  The server code itself is what prints ``serving on
    0.0.0.0:6543 view at http://127.0.0.1:6543``.  The server serves
-   the application.
-
-#.  The application is running.
+   the application, and the application is running, waiting to receive
+   requests.
 
 
 
