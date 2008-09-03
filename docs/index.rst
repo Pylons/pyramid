@@ -25,6 +25,7 @@ Narrative documentation in chapter form explaining how to use
    narr/introduction
    narr/install
    narr/project
+   narr/startup
    narr/urlmapping
    narr/traversal
    narr/urldispatch

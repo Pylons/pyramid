@@ -31,6 +31,15 @@ Glossary
     files that have the suffix of ``.egg``, ``.tar.gz``, or ``.zip``.
     Distributions are the target of Setuptools commands such as
     ``easy_install``.
+  Entry Point
+    A :term:`setuptools` indirection, defined within a setuptools
+    :term:`distribution` setup.py.  It is usually a name which refers
+    to a function somewhere in a package which is held by the
+    distribution.
+  Dotted Python name
+    A reference to a Python object by name using a string, in the form
+    ``path.to.modulename:attributename``.  Often used in Paste and
+    setuptools configurations.
   View
     A "view" is a callable which returns a response object.  It should
     accept two values: context and request.
@@ -52,6 +61,11 @@ Glossary
     model in order to find a :term:`context`.  The :mod:`repoze.bfg`
     *router* performs traversal of model objects.  See the
     :ref:`traversal_chapter` chapter for more information.
+  Router
+    The :term:`WSGI` application created when you start a
+    :mod:`repoze.bfg` application.  The router intercepts requests,
+    invokes traversal, calls view functions, and returns responses to
+    the WSGI server.
   URL dispatch
     An alternative to graph traversal as a mechanism for locating a
     :term:`context` for a :term:`view`.  When you use :term:`Routes`
@@ -156,6 +170,12 @@ Glossary
      encoding, and other functions.  See `WSGI.org <http://wsgi.org>`_
      or `PyPI <http://python.org/pypi>`_ to find middleware for your
      application.
+  Pipeline
+    The :term:`Paste` term for a single configuration of a WSGI
+    server, a WSGI application, with a set of middleware in-between.
+  mod_wsgi
+    An `Apache module <http://code.google.com/p/modwsgi/>`_ for hosting
+    Python WSGI applications.
   Zope
     `The Z Object Publishing Framework <http://zope.org>`_.  The granddaddy 
     of Python web frameworks.
@@ -220,4 +240,8 @@ Glossary
     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
     that is the defacto standard for descriptive text shipped in
     :term:`distribution` files, and Python docstrings.
-    
+  Subpath
+    A list of element "left over" after the :term:`router` has
+    performed a successful traversal to a view.  The subpath is a
+    sequence of strings, e.g. ``['left', 'over', 'names']``.
+

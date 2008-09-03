@@ -1,6 +1,6 @@
 .. _project_narr:
 
-Starting a :mod:`repoze.bfg` Project
+Creating a :mod:`repoze.bfg` Project
 ====================================
 
 You can use :mod:`repoze.bfg` 's sample application generator to get
@@ -224,6 +224,8 @@ wants to install your package does not have :term:`Setuptools` already
 installed.  It is only imported by and used by ``setup.py``, so we
 won't describe it here.
 
+.. _MyProject_ini:
+
 ``MyProject.ini``
 ~~~~~~~~~~~~~~~~~
 
@@ -256,9 +258,11 @@ invoked against this configuration file.  The name ``main`` is a
 convention signifying that it the default application.
 
 The ``use`` setting is required in the ``[app:main]`` section.  The
-``use`` setting points at a :term:`setuptools` "entry point" named
-``MyProject#app`` (the ``egg:`` prefix in ``egg:MyProject#app``
-indicates that this is an entry point specifier).
+``use`` setting points at a :term:`setuptools` :term:`entry point`
+named ``MyProject#app`` (the ``egg:`` prefix in ``egg:MyProject#app``
+indicates that this is an entry point *URI* specifier, where the
+"scheme" is "egg"; there are no other schemes currently, so the
+``egg:`` prefix is arguably not very useful).
 
 .. note::
 
@@ -442,7 +446,10 @@ registry`. It looks like so:
    :mod:`repoze.bfg` -specific configuration directives.
 
 #. Line 6 initializes :mod:`repoze.bfg`-specific configuration
-   directives by including it as a package.
+   directives by including the ``repoze.bfg.includes`` package.  This
+   causes all of the ZCML within the ``configure.zcml`` of the
+   ``repoze.bfg.includes`` package (which can be found in the main
+   :mod:`repoze.bfg` sources).
 
 #. Lines 8-11 register a single view.  It is ``for`` model objects
    that support the IMyModel interface.  The ``view`` attribute points
@@ -552,14 +559,10 @@ without the PasteDeploy configuration file:
 
 #. Lines 1 - 2 import functions from :mod:`repoze.bfg` that we use later.
 
-#. Lines 4-9 define a function that returns a :mod:`repoze.bfg` Router
+#. Lines 4-12 define a function that returns a :mod:`repoze.bfg` Router
    application from :ref:`router_module` .  This is meant to be called
    by the :term:`PasteDeploy` framework as a result of running
    ``paster serve``.
-
-#. Lines 11 - 13 allow this file to serve optionally as a shortcut for
-   executing our program if the ``run.py`` file is executed directly.
-   It starts our application under a web server on port 6543.
 
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

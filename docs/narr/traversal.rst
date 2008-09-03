@@ -62,72 +62,74 @@ When a user requests a page from your :mod:`repoze.bfg` -powered
 application, the system uses this algorithm to determine which Python
 code to execute:
 
- 1.  The request for the page is presented to :mod:`repoze.bfg`'s
+#.  The request for the page is presented to :mod:`repoze.bfg`'s
      "router" in terms of a standard :term:`WSGI` request, which is
      represented by a WSGI environment and a ``start_response``
      callable.
 
- 2.  The router creates a :term:`WebOb` request object based on the
-     WSGI environment.
+#.  The router creates a :term:`WebOb` request object based on the
+    WSGI environment.
 
- 3.  The router uses the WSGI environment's ``PATH_INFO`` variable to
-     determine the path segments to traverse.  The leading slash is
-     stripped off ``PATH_INFO``, and the remaining path segments are
-     split on the slash character to form a traversal sequence, so a
-     request with a ``PATH_INFO`` variable of ``/a/b/c`` maps to the
-     traversal sequence ``['a', 'b', 'c']``.
+#.  The router uses the WSGI environment's ``PATH_INFO`` variable to
+    determine the path segments to traverse.  The leading slash is
+    stripped off ``PATH_INFO``, and the remaining path segments are
+    split on the slash character to form a traversal sequence, so a
+    request with a ``PATH_INFO`` variable of ``/a/b/c`` maps to the
+    traversal sequence ``['a', 'b', 'c']``.
 
- 4.  :term:`Traversal` begins at the root object.  For the traversal
-     sequence ``['a', 'b', 'c']``, the root object's ``__getitem__``
-     is called with the name ``a``.  Traversal continues through the
-     sequence.  In our example, if the root object's ``__getitem__``
-     called with the name ``a`` returns an object (aka "object A"),
-     that object's ``__getitem__`` is called with the name ``b``.  If
-     object A returns an object when asked for ``b``, object B's
-     ``__getitem__`` is then asked for the name ``c``, and may return
-     object C.
+#.  :term:`Traversal` begins at the root object.  For the traversal
+    sequence ``['a', 'b', 'c']``, the root object's ``__getitem__`` is
+    called with the name ``a``.  Traversal continues through the
+    sequence.  In our example, if the root object's ``__getitem__``
+    called with the name ``a`` returns an object (aka "object ``a``"),
+    that object's ``__getitem__`` is called with the name ``b``.  If
+    object A returns an object when asked for ``b``, "object ``b``"'s
+    ``__getitem__`` is then asked for the name ``c``, and may return
+    "object ``c``".
 
- 5.  Traversal ends when a) the entire path is exhausted or b) when
-     any graph element raises a ``KeyError`` from its ``__getitem__``
-     or c) when any non-final path element traversal does not have a
-     ``__getitem__`` method (resulting in a ``NameError``) or d) when
-     any path element is prefixed with the set of characters ``@@``
-     (indicating that the characters following the ``@@`` token should
-     be treated as a "view name").
+#.  Traversal ends when a) the entire path is exhausted or b) when any
+    graph element raises a ``KeyError`` from its ``__getitem__`` or c)
+    when any non-final path element traversal does not have a
+    ``__getitem__`` method (resulting in a ``NameError``) or d) when
+    any path element is prefixed with the set of characters ``@@``
+    (indicating that the characters following the ``@@`` token should
+    be treated as a "view name").
 
- 6.  When traversal ends for any of the reasons in the previous step,
-     the the last object found during traversal is deemed to be the
-     :term:`context`.  If the path has been exhausted when traversal
-     ends, the "view name" is deemed to be the empty string (``''``).
-     However, if the path was *not* exhausted before traversal
-     terminated, the first remaining path element is treated as the
-     view name.
+#.  When traversal ends for any of the reasons in the previous step,
+    the the last object found during traversal is deemed to be the
+    :term:`context`.  If the path has been exhausted when traversal
+    ends, the "view name" is deemed to be the empty string (``''``).
+    However, if the path was *not* exhausted before traversal
+    terminated, the first remaining path element is treated as the
+    view name.
 
-     Any subseqent path elements after the view name are deemed the
-     *subpath*.  For instance, if ``PATH_INFO`` was ``/a/b`` and the
-     root returned an "A" object, and the "A" object returned a "B"
-     object, the router deems that the context is "object B", the view
-     name is the empty string, and the subpath is the empty sequence.
-     On the other hand, if ``PATH_INFO`` was ``/a/b/c`` and "object A"
-     was found but raised a ``KeyError`` for the name ``b``, the
-     router deems that the context is object A, the view name is ``b``
-     and the subpath is ``['c']``.
+    Any subseqent path elements after the view name are deemed the
+    :term:`subpath`.  The subpath is always a sequence of strings that
+    come from ``PATH_INFO`` that are "left over" after traversal has
+    completed. For instance, if ``PATH_INFO`` was ``/a/b`` and the
+    root returned an "object ``a``", and "object ``a``" subsequently
+    returned an "object ``b``", the router deems that the context is
+    "object ``b``", the view name is the empty string, and the subpath
+    is the empty sequence.  On the other hand, if ``PATH_INFO`` was
+    ``/a/b/c`` and "object ``a``" was found but raised a ``KeyError``
+    for the name ``b``, the router deems that the context is "object
+    ``a``", the view name is ``b`` and the subpath is ``['c']``.
 
- 7.  If a :term:`security policy` is configured, the router performs a
-     permission lookup.  If a permission declaration is found for the
-     view name and context implied by the current request, the
-     security policy is consulted to see if the "current user" (also
-     determined by the security policy) can perform the action.  If he
-     can, processing continues.  If he cannot, an ``HTTPUnauthorized``
-     error is raised.
+#.  If a :term:`security policy` is configured, the router performs a
+    permission lookup.  If a permission declaration is found for the
+    view name and context implied by the current request, the security
+    policy is consulted to see if the "current user" (also determined
+    by the security policy) can perform the action.  If he can,
+    processing continues.  If he cannot, an ``HTTPUnauthorized`` error
+    is raised.
 
- 8.  Armed with the context, the view name, and the subpath, the
-     router performs a view lookup.  It attemtps to look up a view
-     from the :mod:`repoze.bfg` :term:`application registry` using the
-     view name and the context.  If a view function is found, it is
-     called with the context and the request.  It returns a response,
-     which is fed back upstream.  If a view is not found, a generic
-     WSGI ``NotFound`` application is constructed.
+#.  Armed with the context, the view name, and the subpath, the router
+    performs a view lookup.  It attemtps to look up a view from the
+    :mod:`repoze.bfg` :term:`application registry` using the view name
+    and the context.  If a view function is found, it is called with
+    the context and the request.  It returns a response, which is fed
+    back upstream.  If a view is not found, a generic WSGI
+    ``NotFound`` application is constructed.
 
 In either case, the result is returned upstream via the :term:`WSGI`
 protocol.
@@ -243,4 +245,16 @@ There are two special cases:
   "view name" immediately and traversal stops there.  This allows you
   to address views that may have the same names as model instance
   names in the graph unambiguously.
+
+Traversal-Related Side Effects
+------------------------------
+
+The :term:`subpath` will always be available to a view as a the
+``subpath`` attribute of the :term:`request` object.  It will be a
+list containing zero or more elements (which will be strings).
+
+The :term:`view name` will always be available to a view as the
+``view_name`` attribute of the :term:`request` object.  It will be a
+single string (possibly the empty string if we're rendering a default
+view).
 

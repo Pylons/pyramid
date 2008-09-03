@@ -1,6 +1,15 @@
 Next Release
 
+  Features
+
+  - Add startup process docs.
+
   Bug Fixes
+
+  - Move core repoze.bfg ZCML into a ``repoze.bfg.includes`` package so we can 
+    use repoze.bfg better as a namespace package.  Adjust the code generator to
+    use it.  We've left around the older configure.zcml in the repoze.bfg
+    package directly so as not to break older apps.
 
   - When a zcml application registry cache was unpickled, and it
     contained a reference to an object that no longer existed (such as
