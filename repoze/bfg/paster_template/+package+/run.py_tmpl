@@ -2,12 +2,12 @@ from repoze.bfg.router import make_app
 from repoze.bfg.registry import get_options
 
 def app(global_config, **kw):
+    """ This function returns a repoze.bfg.router.Router object.  It
+    is usually called by the PasteDeploy framework during ``paster
+    serve``"""
     # paster app config callback
     from {{package}}.models import get_root
     import {{package}}
-    return make_app(get_root, {{package}}, options=get_options(kw))
+    options = get_options(kw)
+    return make_app(get_root, {{package}}, options=options)
 
-if __name__ == '__main__':
-    from paste import httpserver
-    httpserver.serve(app(None), host='0.0.0.0', port='6543')
-    

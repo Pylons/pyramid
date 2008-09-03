@@ -2,14 +2,12 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:meta="http://namespaces.zope.org/meta">
 
-  <!-- superseded by includes/meta.zcml -->
-
   <meta:directives namespace="http://namespaces.repoze.org/bfg">
 
     <meta:directive
         name="view"
-        schema=".zcml.IViewDirective"
-        handler=".zcml.view"
+        schema="repoze.bfg.zcml.IViewDirective"
+        handler="repoze.bfg.zcml.view"
         />
 
   </meta:directives>

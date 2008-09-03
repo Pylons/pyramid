@@ -1,0 +1,20 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+	           i18n_domain="repoze.bfg">
+
+  <include package="z3c.pt" />
+
+  <adapter
+      factory="repoze.bfg.traversal.ModelGraphTraverser"
+      provides="repoze.bfg.interfaces.ITraverserFactory"
+      for="*"
+  />
+
+  <adapter
+      factory="repoze.bfg.urldispatch.RoutesModelTraverser"
+      provides="repoze.bfg.interfaces.ITraverserFactory"
+      for="repoze.bfg.interfaces.IRoutesContext"
+  />
+
+  <include file="meta.zcml" />
+
+</configure>

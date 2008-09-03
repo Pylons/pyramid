@@ -1,6 +1,8 @@
 <configure xmlns="http://namespaces.zope.org/zope"
 	           i18n_domain="repoze.bfg">
 
+  <!-- superseded by includes/configure.zcml -->
+
   <include package="z3c.pt" />
 
   <adapter

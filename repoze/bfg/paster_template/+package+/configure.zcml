@@ -3,7 +3,7 @@
 	   i18n_domain="repoze.bfg">
 
   <!-- this must be included for the view declarations to work -->
-  <include package="repoze.bfg" />
+  <include package="repoze.bfg.includes" />
 
   <bfg:view
      for=".models.IMyModel"
