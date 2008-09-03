@@ -59,13 +59,13 @@ Glossary
   Traversal
     The act of descending "down" a graph of model objects from a root
     model in order to find a :term:`context`.  The :mod:`repoze.bfg`
-    *router* performs traversal of model objects.  See the
+    :term:`router` performs traversal of model objects.  See the
     :ref:`traversal_chapter` chapter for more information.
   Router
     The :term:`WSGI` application created when you start a
     :mod:`repoze.bfg` application.  The router intercepts requests,
     invokes traversal, calls view functions, and returns responses to
-    the WSGI server.
+    the WSGI server on behalf of your :mod:`repoze.bfg` application.
   URL dispatch
     An alternative to graph traversal as a mechanism for locating a
     :term:`context` for a :term:`view`.  When you use :term:`Routes`

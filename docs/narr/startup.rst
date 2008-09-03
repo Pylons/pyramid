@@ -60,7 +60,7 @@ press ``return`` after running ``paster serve MyProject.ini``.
 #. The application's *constructor* (named by the entry point reference
    or dotted Python name on the ``use=`` line) is passed the key/value
    parameters mentioned within the section in which it's defined.  The
-   constructor is meant to return :term:`router` instance.
+   constructor is meant to return a :term:`router` instance.
 
    For ``repoze.bfg`` applications, the constructor will be a function
    named ``app`` in the ``run.py`` file within the :term:`package` in
@@ -72,14 +72,14 @@ press ``return`` after running ``paster serve MyProject.ini``.
       :linenos:
 
    Note that the constructor function accepts a ``global_config``
-   argument (which are the key/value pairs mentioned in the
-   ``[DEFAULT]`` section of the configuration file.  It also accepts a
-   ``**kw`` argument, which collects arbitrary key/value pairs.  The
-   arbitrary key/value pairs received by this function in ``**kw``
-   will be composed of all the key/value pairs that are present in the
-   ``[app:main]`` section (except for the ``use=`` setting) when this
-   function is called by the :term:`PasteDeploy` framework when you
-   run ``paster serve``.
+   argument (which is a dictionary of key/value pairs mentioned in the
+   ``[DEFAULT]`` section of the configuration file).  It also accepts
+   a ``**kw`` argument, which collects another set of arbitrary
+   key/value pairs.  The arbitrary key/value pairs received by this
+   function in ``**kw`` will be composed of all the key/value pairs
+   that are present in the ``[app:main]`` section (except for the
+   ``use=`` setting) when this function is called by the
+   :term:`PasteDeploy` framework when you run ``paster serve``.
 
    Our generated ``MyProject.ini`` file looks like so:
 
@@ -108,12 +108,15 @@ press ``return`` after running ``paster serve MyProject.ini``.
    ``get_options`` is a function imported from a :mod:`repoze.bfg`
    package which allows the user to pass framework-related (as opposed
    to application-related) options to an application constructor.  It
-   picks off framework-related options from the ``*kw`` dict passed in
-   to the constructor.  We actually use a framework option named
-   ``reload_templates`` in our configuration.  Note that we make no
-   use of this option in our application, but the fact that we use
+   picks off framework-related options from the ``**kw`` dictionary
+   passed in to the constructor.  We actually use a framework option
+   named ``reload_templates`` in our configuration.  Note that we make
+   no use of this option in our application, but the fact that we use
    ``get_options`` to parse the ``*kw`` dict, and subsequently pass
    along the result as the ``options`` argument to ``make_app``.
+   ``reload_templates`` has special meaning to the framework: if it's
+   ``true``, we will cause templates to be automatically reloaded by
+   the application when they are changed.
 
    ``get_root`` is the first argument to ``make_app``, and it is a
    callable that is invoked on every request to retrieve the
@@ -129,26 +132,28 @@ press ``return`` after running ``paster serve MyProject.ini``.
    application, you can pass an optional ``filename=`` paramter to
    make_app (e.g. ``make_app(get_root, myproject,
    filename='meta.zcml', options=options``).  If the filename is
-   absolute, the package is ignored.
+   absolute, the ``package`` argument is ignored.
 
-#. The ``make_app`` function does its work.  It parses the ZCML
-   represented by the application registry file (or may obtain the
-   application registry from a previously cached pickle file,
+#. The ``make_app`` function does its work.  It finds and parses the
+   ZCML represented by the application registry file (or may obtain
+   the application registry from a previously cached pickle file,
    e.g. ``configure.zcml.cache``).  If it fails to parse one or more
-   ZCML files, a ``XMLConfigurationError`` is raised.  If it succeeds,
-   the :term:`application registry` is created, a :term:`router`
-   instance is created, and the router is associated with the
-   application registry.  The router represents your application; the
-   settings in this application registry will be used for your
-   application.
+   ZCML files, a ``XMLConfigurationError`` is raised (or possibly
+   another error if the ZCML file just doesn't exist).  If it
+   succeeds, an :term:`application registry` is created, representing
+   the view registrations (and other registrations) for your
+   application.  A :term:`router` instance is created, and the router
+   is associated with the application registry.  The router represents
+   your application; the settings in the application registry that is
+   created will be used for your application.
 
 #. A ``WSGIApplicationCreatedEvent`` event is emitted (see
    :ref:`events_chapter` for more informations about events).
 
 #. Assuming there were no errors, our ``myproject`` ``app`` function
    returns the router instance created by ``make_app`` back to
-   PasteDeploy.  As far as PasteDeploy is concerned, it is just
-   another WSGI application.
+   PasteDeploy.  As far as PasteDeploy is concerned, it is "just
+   another WSGI application".
 
 #. PasteDeploy starts the WSGI *server* defined within the
    ``[server:main]`` section.  In our case, this is the "CherryPy"
@@ -158,7 +163,8 @@ press ``return`` after running ``paster serve MyProject.ini``.
    threads (``numthreads = 4``), which means it will handle four
    simultaneous requests before needing to put a request in a wait
    queue.  The server code itself is what prints `serving on
-   0.0.0.0:6543 view at http://127.0.0.1:6543``.
+   0.0.0.0:6543 view at http://127.0.0.1:6543``.  The server serves
+   the application.
 
 #.  The application is running.
 
