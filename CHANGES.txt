@@ -4,6 +4,10 @@ Next Release
 
   - Add startup process docs.
 
+  - Allow configuration cache to be bypassed by actions which include
+    special "uncacheable" discriminators (for actions that have
+    variable results).
+
   Bug Fixes
 
   - Move core repoze.bfg ZCML into a ``repoze.bfg.includes`` package so we can 

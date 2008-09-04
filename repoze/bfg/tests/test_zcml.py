@@ -57,7 +57,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(permission['args'][5], None)
         
         regadapt = actions[2]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView, True)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
@@ -104,7 +104,34 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(permission['args'][5], None)
         
         regadapt = actions[2]
-        regadapt_discriminator = ('view', IFoo, '', IDummy, IView)
+        regadapt_discriminator = ('view', IFoo, '', IDummy, IView, True)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        self.assertEqual(regadapt['args'][1], view)
+        self.assertEqual(regadapt['args'][2], (IFoo, IDummy))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
+    def test_uncacheable(self):
+        f = self._getFUT()
+        context = DummyContext()
+        class IFoo:
+            pass
+        def view(context, request):
+            pass
+        f(context, 'repoze.view', IFoo, view=view, request_type=IDummy,
+          cacheable=False)
+        actions = context.actions
+        from repoze.bfg.interfaces import IView
+        from zope.component.zcml import handler
+        from repoze.bfg.zcml import Uncacheable
+
+        self.assertEqual(len(actions), 3)
+
+        regadapt = actions[2]
+        regadapt_discriminator = ('view', IFoo, '', IDummy, IView, Uncacheable)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
@@ -179,6 +206,28 @@ class TestZCMLPickling(unittest.TestCase, PlacelessSetup):
         self.failUnless(os.path.exists(picklename))
         actions = cPickle.load(open(picklename, 'rb'))
         self.failUnless(actions)
+
+    def test_file_configure_uncacheable_removes_cache(self):
+        import os
+        from repoze.bfg.zcml import file_configure
+        picklename = os.path.join(self.packagepath, 'configure.zcml.cache')
+        f = open(picklename, 'w')
+        f.write('imhere')
+        self.failUnless(os.path.exists(picklename))
+
+        import repoze.bfg.zcml
+        keep_view = repoze.bfg.zcml.view
+
+        def wrap_view(*arg, **kw):
+            kw['cacheable'] = False
+            return keep_view(*arg, **kw)
+
+        try:
+            repoze.bfg.zcml.view = wrap_view
+            file_configure('configure.zcml', self.module)
+            self.failIf(os.path.exists(picklename)) # should be deleted
+        finally:
+            repoze.bfg.zcml.view = keep_view
 
     def test_file_configure_nonexistent_configure_dot_zcml(self):
         import os

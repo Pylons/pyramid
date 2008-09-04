@@ -50,13 +50,13 @@ def makeRegistry(filename, package, options=None, lock=threading.Lock()):
     try:
         registry = Components(package.__name__)
         registry_manager.set(registry)
-        original_getSiteManager.sethook(getSiteManager)
-        zope.component.getGlobalSiteManager = registry_manager.get
-        zcml_configure(filename, package=package)
         if options is None:
             options = {}
         settings = Settings(options)
         registry.registerUtility(settings, ISettings)
+        original_getSiteManager.sethook(getSiteManager)
+        zope.component.getGlobalSiteManager = registry_manager.get
+        zcml_configure(filename, package=package)
         return registry
     finally:
         zope.component.getGlobalSiteManager = getGlobalSiteManager
@@ -66,7 +66,7 @@ def makeRegistry(filename, package, options=None, lock=threading.Lock()):
 class Settings(object):
     implements(ISettings)
     def __init__(self, options):
-        self.reload_templates = options.get('reload_templates', False)
+        self.__dict__.update(options)
 
 def getSiteManager(context=None):
     if context is None:
@@ -82,8 +82,9 @@ def asbool(s):
     return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
 
 def get_options(kw):
-    reload_templates = asbool(kw.get('reload_templates'))
-    return {'reload_templates':reload_templates}
+    return {
+        'reload_templates':asbool(kw.get('reload_templates')),
+        }
 
 from zope.testing.cleanup import addCleanUp
 try:

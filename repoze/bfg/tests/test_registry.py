@@ -42,17 +42,16 @@ class TestGetOptions(unittest.TestCase):
         from repoze.bfg.registry import get_options
         return get_options
 
-    def test_it(self):
+    def test_reload_templates(self):
         get_options = self._getFUT()
-        self.assertEqual(get_options({}),
-                         {'reload_templates':False})
-        self.assertEqual(get_options({'reload_templates':'false'}),
-                                     {'reload_templates':False})
-        self.assertEqual(get_options({'reload_templates':'t'}),
-                                     {'reload_templates':True})
-        self.assertEqual(get_options({'reload_templates':'1'}),
-                                     {'reload_templates':True})
-
+        result = get_options({})
+        self.assertEqual(result['reload_templates'], False)
+        result = get_options({'reload_templates':'false'})
+        self.assertEqual(result['reload_templates'], False)
+        result = get_options({'reload_templates':'t'})
+        self.assertEqual(result['reload_templates'], True)
+        result = get_options({'reload_templates':'1'})
+        self.assertEqual(result['reload_templates'], True)
 
 class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
     def setUp(self):

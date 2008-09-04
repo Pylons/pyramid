@@ -22,12 +22,17 @@ from repoze.bfg.path import package_path
 
 from repoze.bfg.security import ViewPermissionFactory
 
+class Uncacheable(object):
+    """ Include in discriminators of actions which are not cacheable """
+    pass
+
 def view(_context,
          permission=None,
          for_=None,
          view=None,
          name="",
          request_type=IRequest,
+         cacheable=True,
          ):
 
     if not view:
@@ -43,7 +48,7 @@ def view(_context,
     if permission:
         pfactory = ViewPermissionFactory(permission)
         _context.action(
-            discriminator = ('permission', for_,name, request_type,
+            discriminator = ('permission', for_, name, request_type,
                              IViewPermission),
             callable = handler,
             args = ('registerAdapter',
@@ -51,8 +56,10 @@ def view(_context,
                     _context.info),
             )
 
+    cacheable = cacheable or Uncacheable
+
     _context.action(
-        discriminator = ('view', for_, name, request_type, IView),
+        discriminator = ('view', for_, name, request_type, IView, cacheable),
         callable = handler,
         args = ('registerAdapter',
                 view, (for_, request_type), IView, name,
@@ -93,7 +100,7 @@ class IViewDirective(Interface):
         required=False
         )
 
-PVERSION = 0
+PVERSION = 1
 
 def pickle_name(name, package):
     path = package_path(package)
@@ -127,9 +134,9 @@ def zcml_configure(name, package, load=cPickle.load):
 
     files = set()
     for action in actions:
-        # files list used by pickled action is an element of the tuple
         try:
-            files.update(action[4])
+            fileset = action[4]
+            files.update(fileset)
         except (TypeError, IndexError):
             return file_configure(name, package)
 
@@ -145,6 +152,7 @@ def zcml_configure(name, package, load=cPickle.load):
     context = zope.configuration.config.ConfigurationMachine()
     xmlconfig.registerCommonDirectives(context)
     context.actions = actions
+    context.cached_execution = True
     context.execute_actions()
     return True
 
@@ -158,6 +166,16 @@ def file_configure(name, package, dump=cPickle.dump):
 
     actions = context.actions
     pckname = pickle_name(name, package)
+
+    for action in actions:
+        
+        discriminator = action[0]
+        if discriminator and Uncacheable in discriminator:
+            try:
+                os.remove(pckname)
+            except:
+                pass
+            return False
 
     try:
         data = (PVERSION, time.time(), actions)
