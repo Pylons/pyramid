@@ -152,7 +152,7 @@ If your application is allowing or denying access inappropriately (in
 your judgment), start your application under a shell using the
 ``BFG_SECURITY_DEBUG`` environment variable.  For example::
 
-  BFG_SECURITY_DEBUG=1 bin/paster serve myproject.ini
+  $ BFG_SECURITY_DEBUG=1 bin/paster serve myproject.ini
 
 When any authorization takes place, a message will be logged to the
 console about what ACE in which ACL permitted or denied the
