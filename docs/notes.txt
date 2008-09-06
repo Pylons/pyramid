@@ -10,7 +10,3 @@
 
 - Show usage of, e.g. HTTPFound(location=url).
 
-- Document ``make_app`` better; particularly how zcml is found.
-
-- What is ``global_conf`` passed to the app constructor?  How is it
-  composed?
