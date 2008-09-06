@@ -144,3 +144,17 @@ but otherwise acts the same as your model object.
 You can of course supply ``__name__`` and ``__parent__`` attributes
 explicitly on all of your model objects, and no location proxying will
 be performed.
+
+Debugging Security Failures
+---------------------------
+
+If your application is allowing or denying access inappropriately (in
+your judgment), start your application under a shell using the
+``BFG_SECURITY_DEBUG`` environment variable.  For example::
+
+  BFG_SECURITY_DEBUG=1 bin/paster serve myproject.ini
+
+When any authorization takes place, a message will be logged to the
+console about what ACE in which ACL permitted or denied the
+authorization based on authentication information.
+
