@@ -57,6 +57,7 @@ setup(name='repoze.bfg',
             'PasteScript',
             'z3c.pt [lxml]',
             'Routes',
+            'setuptools',
             ],
       tests_require=[
             'zope.interface',
