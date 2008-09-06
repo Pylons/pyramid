@@ -103,6 +103,9 @@ system-defined principal indicating, literally, everyone) is allowed
 to view the blog, the ``group:editors`` principal is allowed to add to
 and edit the blog.
 
+.. note:: Each tuple within the above ``__acl__`` structure is known
+          as a :term:`ACE`, which stands for "access control entry".
+
 A principal is usually a user id, however it also may be a group id if
 your authentication system provides group information and the security
 policy is written to respect them.  The
