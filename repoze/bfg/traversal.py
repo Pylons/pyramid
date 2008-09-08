@@ -89,7 +89,7 @@ def find_model(model, path):
     if path.startswith('/'):
         model = find_root(model)
         
-    ob, name, path = ITraverser(model)({'PATH_INFO':path})
+    ob, name, path = ITraverserFactory(model)({'PATH_INFO':path})
     if name:
         raise KeyError('%r has no subelement %s' % (ob, name))
     return ob

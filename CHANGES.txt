@@ -1,3 +1,10 @@
+Next release
+
+  Bug fixes
+
+  - ``repoze.bfg.traversal.find_model`` function did not function
+    properly.
+
 0.3.6 (09/04/2008)
 
   Features

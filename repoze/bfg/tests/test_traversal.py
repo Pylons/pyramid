@@ -210,19 +210,19 @@ class FindModelTests(unittest.TestCase):
         from repoze.bfg.traversal import find_model
         return find_model
 
-    def _registerTraverser(self, traverser):
+    def _registerTraverserFactory(self, traverser):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import ITraverser
+        from repoze.bfg.interfaces import ITraverserFactory
         from zope.interface import Interface
-        gsm.registerAdapter(traverser, (Interface,), ITraverser)
+        gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
 
     def test_relative_found(self):
         dummy = DummyContext()
         baz = DummyContext()
         find = self._getFUT()
         traverser = make_traverser(baz, '', [])
-        self._registerTraverser(traverser)
+        self._registerTraverserFactory(traverser)
         result = find(dummy, 'baz')
         self.assertEqual(result, baz)
 
@@ -231,7 +231,7 @@ class FindModelTests(unittest.TestCase):
         baz = DummyContext()
         find = self._getFUT()
         traverser = make_traverser(baz, 'bar', [])
-        self._registerTraverser(traverser)
+        self._registerTraverserFactory(traverser)
         self.assertRaises(KeyError, find, dummy, 'baz')
 
     def test_absolute_found(self):
@@ -243,7 +243,7 @@ class FindModelTests(unittest.TestCase):
         dummy.__name__ = None
         find = self._getFUT()
         traverser = make_traverser(dummy, '', [])
-        self._registerTraverser(traverser)
+        self._registerTraverserFactory(traverser)
         result = find(baz, '/')
         self.assertEqual(result, dummy)
         self.assertEqual(dummy.wascontext, True)
@@ -257,7 +257,7 @@ class FindModelTests(unittest.TestCase):
         dummy.__name__ = None
         find = self._getFUT()
         traverser = make_traverser(dummy, 'fuz', [])
-        self._registerTraverser(traverser)
+        self._registerTraverserFactory(traverser)
         self.assertRaises(KeyError, find, baz, '/')
         self.assertEqual(dummy.wascontext, True)
 
