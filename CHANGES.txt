@@ -1,4 +1,8 @@
-Next release
+0.3.7 (09/09/2008)
+
+  Features
+ 
+  - Add compatibility with z3c.pt 1.0a7+ (z3c.pt became a namespace package).
 
   Bug fixes
 

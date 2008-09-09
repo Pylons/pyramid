@@ -20,7 +20,11 @@ class Z3CPTTemplateFactory(object):
     implements(ITemplate)
 
     def __init__(self, path, auto_reload=False):
-        from z3c.pt import PageTemplateFile
+        try:
+            from z3c.pt import PageTempateFile
+        except ImportError:
+            # after 1.0a7
+            from z3c.pt.pagetemplate import PageTemplateFile
         try:
             self.template = PageTemplateFile(path, auto_reload=auto_reload)
         except TypeError:
