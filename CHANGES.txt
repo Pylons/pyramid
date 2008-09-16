@@ -1,3 +1,9 @@
+Next release
+
+  Docs
+
+   Documented URL dispatch better in narrative form.
+
 0.3.7 (09/09/2008)
 
   Features
