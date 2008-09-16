@@ -12,6 +12,7 @@ from repoze.bfg.interfaces import ITraverser
 _marker = ()
 
 class RoutesContext(object):
+    implements(IRoutesContext)
     def __init__(self, **kw):
         self.__dict__.update(kw)
 

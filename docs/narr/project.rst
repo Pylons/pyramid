@@ -507,6 +507,8 @@ in the model, and the HTML given back to the browser.
   module, which you can use to retrieve the template object without
   rendering it at all, for additional control.
 
+.. _modelspy_project_section:
+
 ``models.py``
 ~~~~~~~~~~~~~
 
