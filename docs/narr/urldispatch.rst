@@ -57,7 +57,7 @@ willing to check the requested URL against a *routes map*, and
 subsequently look up and call a :mod:`repoze.bfg` view with the
 information it finds within a particular route, if any configured
 route matches the currently requested URL.  If no URL matches, the
-:class:``RoutesMapper`` will fall back to calling a ``get_root``
+:class:`RoutesMapper` will fall back to calling a ``get_root``
 callable that is passed in to it at construction time, which allows
 your application to fall back to a different "root" (perhaps one based
 on traversal).  By configuring a :class:`RoutesMapper` appropriately,
