@@ -22,6 +22,7 @@ class RoutesMapperTests(unittest.TestCase):
         environ = self._getEnviron(PATH_INFO='/')
         result = mapper(environ)
         self.assertEqual(result, marker)
+        self.assertEqual(mapper.mapper.environ, environ)
 
     def test_routes_mapper_route_matches(self):
         marker = ()

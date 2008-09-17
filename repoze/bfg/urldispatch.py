@@ -41,6 +41,7 @@ class RoutesMapper(object):
             self.mapper.create_regs([])
             self._regs_created = True
         path = environ.get('PATH_INFO', '/')
+        self.mapper.environ = environ
         args = self.mapper.match(path)
         if args:
             context_factory = args.get('context_factory', _marker)

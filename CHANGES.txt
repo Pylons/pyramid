@@ -2,7 +2,12 @@ Next release
 
   Docs
 
-   Documented URL dispatch better in narrative form.
+   - Documented URL dispatch better in narrative form.
+
+  Bug fixes
+
+   - Routes URL dispatch did not have access to the WSGI environment,
+     so conditions such as method=GET did not work.
 
 0.3.7 (09/09/2008)
 
