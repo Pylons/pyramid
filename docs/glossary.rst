@@ -244,4 +244,8 @@ Glossary
     A list of element "left over" after the :term:`router` has
     performed a successful traversal to a view.  The subpath is a
     sequence of strings, e.g. ``['left', 'over', 'names']``.
+  repoze.lemonade
+    Zope2 CMF-like `data structures and helper facilities
+    <http://svn.repoze.org/repoze.lemonade/trunk>`_ for
+    CA-and-ZODB-based applications useful within bfg applications.
 
