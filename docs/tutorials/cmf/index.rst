@@ -11,7 +11,6 @@ Missing:
 
    templates.rst
    forms.rst
-   cataloging.rst
    workflow.rst
    skins.rst
    actions.rst
@@ -24,4 +23,5 @@ Missing:
    :maxdepth: 2
 
    content.rst
+   catalog.rst
 
