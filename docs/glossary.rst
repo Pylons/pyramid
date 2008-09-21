@@ -232,10 +232,6 @@ Glossary
     declaration.  The ``configure.zcml`` file in a :mod:`repoze.bfg`
     application represents the application's :term:`application
     registry`.
-  repoze.who
-    `Authentication middleware <http://static.repoze.org/whodocs>`_
-    for :term:`WSGI` applications.  It can be used by
-    :mod:`repoze.bfg` to provide authentication information.
   ReStructuredText
     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
     that is the defacto standard for descriptive text shipped in
@@ -244,8 +240,62 @@ Glossary
     A list of element "left over" after the :term:`router` has
     performed a successful traversal to a view.  The subpath is a
     sequence of strings, e.g. ``['left', 'over', 'names']``.
+  Interface
+    A `Zope interface <http://pypi.python.org/pypi/zope.interface>`_
+    object.  In bfg, an interface may be attached to an model object
+    or a request object in order to identify that the object is "of a
+    type".  Interfaces are used internally by :mod:`repoze.bfg` to
+    perform view lookups and security policy lookups.  Interfaces are
+    exposed to application programmers by the ``bfg:view`` ZCML
+    directive in the form of both the ``for_`` attribute and the
+    ``request_type`` attribute.  They may be exposed to application
+    developers when using the :term:`event` system as
+    well. Fundamentally, :mod:`repoze.bfg` programmers can think of an
+    interface as something that they can attach to an object that
+    stamps it with a "type".  Interfaces can also be used to describe
+    the behavior of an object (its methods and attributes), but unless
+    they choose to, :mod:`repoze.bfg` programmers do not need to
+    understand or use this feature of interfaces.  In other words, bfg
+    developers need to only understand "marker" interfaces.
+  Event
+    An object broadcast to zero or more :term:`subscriber` callables
+    during normal system operations.  :mod:`repoze.bfg` emits events
+    during its lifetime routine.  Application code can subscribe to
+    these events by using the subscriber functionality described in
+    :ref:`events_chapter`.  Application code can also generate its own
+    events using the ``zope.component.event.dispatch`` function.
+    Application-code generated events may be subscribed to in the same
+    way as system-generated events.
+  Subscriber
+    A callable which receives an event.  A callable becomes a
+    subscriber through an application registry registration.  See
+    :ref:`events_chapter` for more information.
+  Request type
+    An attribute of a :term:`request` that allows for specialization
+    of view code based on arbitrary categorization.  The every
+    :term:`request` object that bfg generates and manipulates has one
+    or more :term:`interface` objects attached to it.  The default
+    interface attached to a request object is
+    ``repoze.bfg.interfaces.IRequest``.  When a user writes view code,
+    and registers a view without specifying a particular request type,
+    the view is assumed to be registered for requests that have
+    ``repoze.bfg.interfaces.IRequest` attached to them.  However if
+    the view is registered with a different interface as its request
+    type, the view will be invoked only when the request possesses
+    that particular interface.  Application code can cause requests to
+    possess a different interface by adding the interface to the
+    request object within a :term:`subscriber` to the
+    ``repoze.bfg.interfaces.INewRequest`` event type.
   repoze.lemonade
     Zope2 CMF-like `data structures and helper facilities
     <http://svn.repoze.org/repoze.lemonade/trunk>`_ for
     CA-and-ZODB-based applications useful within bfg applications.
-
+  repoze.catalog
+    An indexing and search facility (fielded and full-text) based on
+    `zope.index <http://pypi.python.org/pypi/zope.index>`_.  It is
+    available from `repoze.org SVN
+    <http://svn.repoze.org/repoze.catalog/trunk/>`_.
+  repoze.who
+    `Authentication middleware <http://static.repoze.org/whodocs>`_
+    for :term:`WSGI` applications.  It can be used by
+    :mod:`repoze.bfg` to provide authentication information.

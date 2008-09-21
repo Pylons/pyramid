@@ -12,7 +12,6 @@ Missing:
    templates.rst
    forms.rst
    workflow.rst
-   skins.rst
    actions.rst
    membership.rst
    discussions.rst
@@ -24,4 +23,6 @@ Missing:
 
    content.rst
    catalog.rst
+   skins.rst
+
 
