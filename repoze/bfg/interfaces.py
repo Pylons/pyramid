@@ -45,8 +45,8 @@ class ISecurityPolicy(Interface):
        using authentication data """
     def permits(context, request, permission):
         """ Returns True if the combination of the authorization
-            information in the context and the authentication data in
-            the request allow the action implied by the permission """
+        information in the context and the authentication data in
+        the request allow the action implied by the permission """
 
     def authenticated_userid(request):
         """ Return the userid of the currently authenticated user or
@@ -56,6 +56,13 @@ class ISecurityPolicy(Interface):
         """ Return the list of 'effective' principals for the request.
         This must include the userid of the currently authenticated
         user if a user is currently authenticated."""
+
+    def principals_allowed_by_permission(context, permission):
+        """ Return a sequence of principal identifiers allowed by the
+        ``permission`` in the model implied by ``context``.  This
+        method may not be supported by a given security policy
+        implementation, in which case, it should raise a
+        ``NotImplementedError`` exception."""
 
 class NoAuthorizationInformation(Exception):
     pass

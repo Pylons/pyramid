@@ -304,6 +304,38 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         self.assertEqual(authorizer_factory.permission, 'view')
         self.assertEqual(authorizer_factory.context, context)
     
+    def test_principals_allowed_by_permission_direct(self):
+        from repoze.bfg.security import Allow
+        context = DummyContext()
+        acl = [ (Allow, 'chrism', ('read', 'write')),
+                (Allow, 'other', ('read',)) ]
+        context.__acl__ = acl
+        logger = DummyLogger()
+        policy = self._makeOne(logger, lambda *arg: None)
+        result = policy.principals_allowed_by_permission(context, 'read')
+        self.assertEqual(result, ['chrism', 'other'])
+
+    def test_principals_allowed_by_permission_acquired(self):
+        from repoze.bfg.security import Allow
+        context = DummyContext()
+        acl = [ (Allow, 'chrism', ('read', 'write')),
+                (Allow, 'other', ('read',)) ]
+        context.__acl__ = acl
+        context.__parent__ = None
+        context.__name__ = 'context'
+        inter = DummyContext()
+        inter.__name__ = None
+        inter.__parent__ = context
+        logger = DummyLogger()
+        policy = self._makeOne(logger, lambda *arg: None)
+        result = policy.principals_allowed_by_permission(inter, 'read')
+        self.assertEqual(result, ['chrism', 'other'])
+
+    def test_principals_allowed_by_permission_no_acls(self):
+        logger = DummyLogger()
+        policy = self._makeOne(logger, lambda *arg: None)
+        result = policy.principals_allowed_by_permission(None, 'read')
+        self.assertEqual(result, [])
 
 class TestRemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def _getTargetClass(self):
@@ -434,6 +466,19 @@ class TestAPIFunctions(unittest.TestCase, PlacelessSetup):
         request = DummyRequest({})
         self.assertEqual(effective_principals(request), [])
 
+    def test_principals_allowed_by_permission_not_registered(self):
+        from repoze.bfg.security import principals_allowed_by_permission
+        from repoze.bfg.security import Everyone
+        self.assertEqual(principals_allowed_by_permission(None, None),
+                         [Everyone])
+
+    def test_principals_allowed_by_permission_registered(self):
+        secpol = DummySecurityPolicy(False)
+        self._registerSecurityPolicy(secpol)
+        from repoze.bfg.security import principals_allowed_by_permission
+        self.assertEqual(principals_allowed_by_permission(None, None),
+                         ['fred', 'bob'])
+
 class TestViewPermission(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.security import ViewPermission
@@ -489,6 +534,9 @@ class DummySecurityPolicy:
         return 'fred'
 
     def effective_principals(self, request):
+        return ['fred', 'bob']
+
+    def principals_allowed_by_permission(self, context, permission):
         return ['fred', 'bob']
 
 class DummyLogger:

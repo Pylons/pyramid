@@ -9,6 +9,10 @@ Next release
    - Routes URL dispatch did not have access to the WSGI environment,
      so conditions such as method=GET did not work.
 
+  Features
+
+   - Add ``principals_allowed_by_permission`` API to security module.
+
 0.3.7 (09/09/2008)
 
   Features

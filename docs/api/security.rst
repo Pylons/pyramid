@@ -11,6 +11,8 @@
 
   .. autofunction:: has_permission
 
+  .. autofunction:: principals_allowed_by_permission
+
   .. attribute:: Everyone
 
     The special principal id named 'Everyone'.  This principal id is

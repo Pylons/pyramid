@@ -9,6 +9,8 @@ application to :mod:`repoze.bfg`.
 
 Missing:
 
+   templates.rst
+   forms.rst
    cataloging.rst
    workflow.rst
    skins.rst
@@ -17,7 +19,6 @@ Missing:
    discussions.rst
    syndication.rst
    dublincore.rst
-
 
 .. toctree::
    :maxdepth: 2

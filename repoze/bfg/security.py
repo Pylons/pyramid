@@ -32,23 +32,39 @@ def has_permission(permission, context, request):
     return policy.permits(context, request, permission)
 
 def authenticated_userid(request):
-    """ Return the userid of the currently authenticated user or None
-    if there is no security policy in effect or there is no currently
-    authenticated user """
+    """ Return the userid of the currently authenticated user or
+    ``None`` if there is no security policy in effect or there is no
+    currently authenticated user"""
     policy = queryUtility(ISecurityPolicy)
     if policy is None:
         return None
     return policy.authenticated_userid(request)
 
 def effective_principals(request):
-    """ Return the list of 'effective' principals for the request.
-    This will include the userid of the currently authenticated user
-    if a user is currently authenticated. If no security policy is in
-    effect, this will return an empty sequence."""
+    """ Return the list of 'effective' principal identifiers for the
+    request.  This will include the userid of the currently
+    authenticated user if a user is currently authenticated. If no
+    security policy is in effect, this will return an empty sequence."""
     policy = queryUtility(ISecurityPolicy)
     if policy is None:
         return []
     return policy.effective_principals(request)
+
+def principals_allowed_by_permission(context, permission):
+    """ Provided a context (a model object), and a permission (a
+    string or unicode object), return a sequence of principal ids that
+    possess the permission in the context.  If no security policy is
+    in effect, this will return a sequence with the single value
+    representing ``Everyone`` (the special principal identifier
+    representing all principals).  Note that even if a security policy
+    *is* in effect, some security policies may not implement the
+    required machinery for this function; those will cause a
+    ``NotImplementedError`` exception to be raised when this function
+    is invoked."""
+    policy = queryUtility(ISecurityPolicy)
+    if policy is None:
+        return [Everyone]
+    return policy.principals_allowed_by_permission(context, permission)
 
 class ACLAuthorizer(object):
 
@@ -56,11 +72,8 @@ class ACLAuthorizer(object):
         self.context = context
         self.logger = logger
 
-    def get_acl(self, default=None):
-        return getattr(self.context, '__acl__', default)
-
     def permits(self, permission, *principals):
-        acl = self.get_acl()
+        acl = getattr(self.context, '__acl__', None)
         if acl is None:
             raise NoAuthorizationInformation('%s item has no __acl__' % acl)
 
@@ -119,6 +132,21 @@ class ACLSecurityPolicy(object):
             effective_principals.extend(principal_ids)
 
         return effective_principals
+
+    def principals_allowed_by_permission(self, context, permission):
+        for location in LocationIterator(context):
+            acl = getattr(location, '__acl__', None)
+            if acl is not None:
+                allowed = {}
+                for ace in acl:
+                    ace_action, ace_principal, ace_permissions = ace
+                    if ace_action == Allow:
+                        ace_permissions = flatten(ace_permissions)
+                        for ace_permission in ace_permissions:
+                            if ace_permission == permission:
+                                allowed[ace_principal] = True
+                return sorted(allowed.keys())
+        return []
 
 DEBUG_LOG_KEY = 'BFG_SECURITY_DEBUG'
 
