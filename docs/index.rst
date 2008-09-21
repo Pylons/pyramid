@@ -43,10 +43,14 @@ Tutorials
 Step-by-step tutorials which demonstrate how you might use
 :mod:`repoze.bfg`.
 
+``lxmlgraph`` Tutorial
+
 .. toctree::
    :maxdepth: 3
 
    tutorials/lxmlgraph/index.rst
+
+:mod:`repoze.bfg` for Zope CMF Developers
 
 .. toctree::
    :maxdepth: 3
