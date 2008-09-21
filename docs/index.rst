@@ -40,12 +40,19 @@ Narrative documentation in chapter form explaining how to use
 Tutorials
 =========
 
-Step-by-step sample applications that use :mod:`repoze.bfg`.
+Step-by-step tutorials which demonstrate how you might use
+:mod:`repoze.bfg`.
 
 .. toctree::
    :maxdepth: 3
 
    tutorials/lxmlgraph/index.rst
+
+.. toctree::
+   :maxdepth: 3
+
+   tutorials/cmf/index.rst
+  
 
 API documentation
 =================

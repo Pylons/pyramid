@@ -17,9 +17,10 @@ which has keys that are action names, and values which are tuples of
 have some passable actions tool replacement within a single application.
 
 The `repoze.bfg.viewgroup
-<http://svn.repoze.org/repoze.bfg.viewgroup/trunk/>` package provides
+<http://svn.repoze.org/repoze.bfg.viewgroup/trunk/>`_ package provides
 some functionality for creating "view groups".  Each view in a
 viewgroup can provide some snippet of HTML (e.g. a single "tab"), and
-views (tabs) which cannot be displayed to the user due to the user's
-lack of permissions will be omitted from the group.
+individual views (tabs) within the group which cannot be displayed to
+the user due to the user's lack of permissions will be omitted from
+the rendered output.
 

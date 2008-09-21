@@ -165,11 +165,11 @@ Glossary
     that your application be served as a WSGI application.
   Middleware
     *Middleware* is a :term:`WSGI` concept.  It is a WSGI component
-     that acts both as a server and an application.  Interesting uses
-     for middleware exist, such as caching, content-transport
-     encoding, and other functions.  See `WSGI.org <http://wsgi.org>`_
-     or `PyPI <http://python.org/pypi>`_ to find middleware for your
-     application.
+    that acts both as a server and an application.  Interesting uses
+    for middleware exist, such as caching, content-transport
+    encoding, and other functions.  See `WSGI.org <http://wsgi.org>`_
+    or `PyPI <http://python.org/pypi>`_ to find middleware for your
+    application.
   Pipeline
     The :term:`Paste` term for a single configuration of a WSGI
     server, a WSGI application, with a set of middleware in-between.
@@ -279,7 +279,7 @@ Glossary
     ``repoze.bfg.interfaces.IRequest``.  When a user writes view code,
     and registers a view without specifying a particular request type,
     the view is assumed to be registered for requests that have
-    ``repoze.bfg.interfaces.IRequest` attached to them.  However if
+    ``repoze.bfg.interfaces.IRequest`` attached to them.  However if
     the view is registered with a different interface as its request
     type, the view will be invoked only when the request possesses
     that particular interface.  Application code can cause requests to
