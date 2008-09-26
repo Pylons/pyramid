@@ -27,7 +27,7 @@ class XSLTemplateFactoryTests(unittest.TestCase, Base):
         Base.tearDown(self)
 
     def _getTargetClass(self):
-        from repoze.bfg.template import XSLTemplateFactory
+        from repoze.bfg.xslt import XSLTemplateFactory
         return XSLTemplateFactory
 
     def _makeOne(self, *arg, **kw):
@@ -64,7 +64,7 @@ class RenderTransformToResponseTests(unittest.TestCase, Base):
         Base.tearDown(self)
 
     def _getFUT(self):
-        from repoze.bfg.template import render_transform_to_response
+        from repoze.bfg.xslt import render_transform_to_response
         return render_transform_to_response
 
     def test_nonabs_unregistered(self):
@@ -83,7 +83,7 @@ class RenderTransformToResponseTests(unittest.TestCase, Base):
         self.assertEqual(result.app_iter, [resultstr])
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
-        from repoze.bfg.template import XSLTemplateFactory
+        from repoze.bfg.xslt import XSLTemplateFactory
         self.failUnless(isinstance(queryUtility(INodeTemplate, minimal),
                                    XSLTemplateFactory))
 
@@ -91,7 +91,7 @@ class RenderTransformToResponseTests(unittest.TestCase, Base):
         self._zcmlConfigure()
         from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
-        from repoze.bfg.template import XSLTemplateFactory
+        from repoze.bfg.xslt import XSLTemplateFactory
         from repoze.bfg.interfaces import INodeTemplate
         minimal = self._getTemplatePath('minimal.xsl')
         utility = XSLTemplateFactory(minimal)
@@ -117,7 +117,7 @@ class RenderTransformTests(unittest.TestCase, Base):
         Base.tearDown(self)
 
     def _getFUT(self):
-        from repoze.bfg.template import render_transform
+        from repoze.bfg.xslt import render_transform
         return render_transform
 
     def test_nonabs_unregistered(self):
@@ -133,7 +133,7 @@ class RenderTransformTests(unittest.TestCase, Base):
         self.failUnless(isinstance(result, str))
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
         self.assertEqual(result, resultstr)
-        from repoze.bfg.template import XSLTemplateFactory
+        from repoze.bfg.xslt import XSLTemplateFactory
         self.failUnless(isinstance(queryUtility(INodeTemplate, minimal),
                                    XSLTemplateFactory))
 
@@ -141,7 +141,7 @@ class RenderTransformTests(unittest.TestCase, Base):
         self._zcmlConfigure()
         from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
-        from repoze.bfg.template import XSLTemplateFactory
+        from repoze.bfg.xslt import XSLTemplateFactory
         from repoze.bfg.interfaces import INodeTemplate
         minimal = self._getTemplatePath('minimal.xsl')
         utility = XSLTemplateFactory(minimal)

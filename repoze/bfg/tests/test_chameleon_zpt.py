@@ -19,6 +19,40 @@ class Base(PlacelessSetup):
         here = os.path.abspath(os.path.dirname(__file__))
         return os.path.join(here, 'fixtures', name)
         
+class ZPTTemplateFactoryTests(unittest.TestCase, Base):
+    def setUp(self):
+        Base.setUp(self)
+
+    def tearDown(self):
+        Base.tearDown(self)
+
+    def _getTargetClass(self):
+        from repoze.bfg.chameleon_zpt import ZPTTemplateFactory
+        return ZPTTemplateFactory
+
+    def _makeOne(self, *arg, **kw):
+        klass = self._getTargetClass()
+        return klass(*arg, **kw)
+
+    def test_instance_implements_ITemplate(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import ITemplate
+        path = self._getTemplatePath('minimal.pt')
+        verifyObject(ITemplate, self._makeOne(path))
+
+    def test_class_implements_ITemplate(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.interfaces import ITemplate
+        verifyClass(ITemplate, self._getTargetClass())
+
+    def test_call(self):
+        self._zcmlConfigure()
+        minimal = self._getTemplatePath('minimal.pt')
+        instance = self._makeOne(minimal)
+        result = instance()
+        self.failUnless(isinstance(result, str))
+        self.assertEqual(result, '<div>\n</div>\n')
+
 class RenderTemplateTests(unittest.TestCase, Base):
     def setUp(self):
         Base.setUp(self)
@@ -27,7 +61,7 @@ class RenderTemplateTests(unittest.TestCase, Base):
         Base.tearDown(self)
 
     def _getFUT(self):
-        from repoze.bfg.template import render_template
+        from repoze.bfg.chameleon_zpt import render_template
         return render_template
 
     def test_it(self):
@@ -46,7 +80,7 @@ class RenderTemplateToResponseTests(unittest.TestCase, Base):
         Base.tearDown(self)
 
     def _getFUT(self):
-        from repoze.bfg.template import render_template_to_response
+        from repoze.bfg.chameleon_zpt import render_template_to_response
         return render_template_to_response
 
     def test_it(self):
@@ -68,7 +102,7 @@ class GetTemplateTests(unittest.TestCase, Base):
         Base.tearDown(self)
 
     def _getFUT(self):
-        from repoze.bfg.template import get_template
+        from repoze.bfg.chameleon_zpt import get_template
         return get_template
 
     def test_nonabs_registered(self):
@@ -101,4 +135,5 @@ class GetTemplateTests(unittest.TestCase, Base):
         result = get(minimal)
         self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplate, minimal), utility)
+
 

@@ -13,6 +13,35 @@ Next release
 
    - Add ``principals_allowed_by_permission`` API to security module.
 
+   - Replace ``z3c.pt`` support with support for ``chameleon.zpt``.
+     Chameleon is the new name for the package that used to be named
+     ``z3c.pt``.  NOTE: If you update a ``repoze.bfg`` SVN checkout
+     that you're using for development, you will need to run "setup.py
+     install" or "setup.py develop" again in order to obtain the
+     proper Chameleon packages.  ``z3c.pt`` is no longer supported by
+     ``repoze.bfg``.  All API functions that used to render ``z3c.pt``
+     templates will work fine with the new packages, and your
+     templates should render almost identically.
+
+   - Add a ``repoze.bfg.chameleon_zpt`` module.  This module provides
+     Chameleon ZPT support.
+
+   - Add a ``repoze.bfg.xslt`` module.  This module provides XSLT
+     support.
+
+   - Add a ``repoze.bfg.chameleon_genshi`` module.  This provides
+     direct Genshi support, which did not exist previously.
+
+  Deprecations
+
+   - Importing API functions directly from ``repoze.bfg.template`` is
+     now deprecated.  The ``get_template``, ``render_template``,
+     ``render_template_to_response`` functions should now be imported
+     from ``repoze.chameleon_zpt``.  The ``render_transform``, and
+     ``render_transform_to_response`` functions should now be imported
+     from ``repoze.bfg.xslt``.  The ``repoze.bfg.template`` module
+     will remain around "forever" to support backwards compatibility.
+
 0.3.7 (09/09/2008)
 
   Features

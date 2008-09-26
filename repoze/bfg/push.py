@@ -1,8 +1,8 @@
 import os.path
-from repoze.bfg.template import render_template_to_response
+from repoze.bfg.chameleon_zpt import render_template_to_response
 
 class pushpage(object):
-    """ Decorator for functions which return ZPT template namespaces.
+    """ Decorator for functions which return Chameleon template namespaces.
 
     E.g.::
 
@@ -12,7 +12,7 @@ class pushpage(object):
 
     Equates to::
 
-      from repoze.bfg.template import render_template_to_response
+      from repoze.bfg.chameleon import render_template_to_response
       def my_view(context, request):
           return render_template_to_response('www/my_template.pt', a=1, b=())
         

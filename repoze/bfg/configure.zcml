@@ -3,7 +3,9 @@
 
   <!-- superseded by includes/configure.zcml -->
 
-  <include package="z3c.pt" />
+  <include package="zope.component" file="meta.zcml" />
+
+  <include package="chameleon.zpt" file="configure.zcml"/>
 
   <adapter
       factory=".traversal.ModelGraphTraverser"

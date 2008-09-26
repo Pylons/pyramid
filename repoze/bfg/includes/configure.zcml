@@ -1,7 +1,9 @@
 <configure xmlns="http://namespaces.zope.org/zope"
 	           i18n_domain="repoze.bfg">
 
-  <include package="z3c.pt" />
+  <include package="zope.component" file="meta.zcml" />
+
+  <include package="chameleon.zpt" file="configure.zcml"/>
 
   <adapter
       factory="repoze.bfg.traversal.ModelGraphTraverser"

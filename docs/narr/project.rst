@@ -299,7 +299,7 @@ your application by requiring more settings in this section.
 
 The ``reload_templates`` setting in the ``[app:main]`` section is a
 :mod:`repoze.bfg`-specific setting which is passed into the framework.
-If it exists, and is ``true``, :term:`z3c.pt` and XSLT template
+If it exists, and is ``true``, :term:`Chameleon` and XSLT template
 changes will not require an application restart to be detected.
 
 .. warning:: The ``reload_templates`` option should be turned off for
@@ -418,8 +418,8 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 #. A ``run.py`` module, which contains code that helps users run the
    application.
 
-#. A ``templates`` directory, which is full of :term:`z3c.pt` and/or
-   :term:`XSLT` templates.
+#. A ``templates`` directory, which contains :term:`Chameleon` (or
+   other types of) templates.
 
 #. A ``tests.py`` module, which contains unit test code for the
    application.
@@ -485,16 +485,17 @@ in the model, and the HTML given back to the browser.
    dispatch`).  The *request* is an instance of the :term:`WebOb`
    ``Request`` class representing the browser's request to our server.
 
-#. The view renders a :term:`template` and returns the result as the
-   :term:`response`.  Note that because our ``MyProject.ini`` has a
-   ``reload_templates = true`` directive indicating that templates
-   should be reloaded when they change, you won't need to restart the
-   application server to see changes you make to templates.  During
-   development, this is handy.  If this directive had been ``false``
-   (or if the directive did not exist), you would need to restart the
-   application server for each template change.  For production
-   applications, you should set your project's ``reload_templates`` to
-   ``false`` to increase the speed at which templates may be rendered.
+#. The view renders a :term:`Chameleon` template and returns the
+   result as the :term:`response`.  Note that because our
+   ``MyProject.ini`` has a ``reload_templates = true`` directive
+   indicating that templates should be reloaded when they change, you
+   won't need to restart the application server to see changes you
+   make to templates.  During development, this is handy.  If this
+   directive had been ``false`` (or if the directive did not exist),
+   you would need to restart the application server for each template
+   change.  For production applications, you should set your project's
+   ``reload_templates`` to ``false`` to increase the speed at which
+   templates may be rendered.
 
 .. note::
 
@@ -569,16 +570,15 @@ without the PasteDeploy configuration file:
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The single :term:`template` in the project looks like so:
+The single :term:`Chameleon` template in the project looks like so:
 
 .. literalinclude:: MyProject/myproject/templates/mytemplate.pt
    :linenos:
    :language: xml
 
-This is a :term:`z3c.pt` template.  It displays the current project
-name when it is rendered.  It is referenced by the ``my_view``
-function in the ``views.py`` module.  Templates are accessed and used
-by view functions.
+It displays the current project name when it is rendered.  It is
+referenced by the ``my_view`` function in the ``views.py`` module.
+Templates are accessed and used by view functions.
 
 ``tests.py``
 ~~~~~~~~~~~~

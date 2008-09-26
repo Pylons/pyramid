@@ -118,7 +118,7 @@ def zcml_configure(name, package, load=cPickle.load):
     try:
         vers, ptime, actions = load(open(pckname, 'rb'))
     except (IOError, cPickle.UnpicklingError, EOFError, TypeError, ValueError,
-            AttributeError, NameError):
+            AttributeError, NameError, ImportError):
         return file_configure(name, package)
 
     if vers != PVERSION:

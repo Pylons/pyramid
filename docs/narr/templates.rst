@@ -5,25 +5,35 @@ A :term:`template` is a usually file on disk which can be used to
 render data provided by a :term:`view`, surrounded by more static
 information.
 
-Templating With :term:`z3c.pt` (ZPT) Page Templates
----------------------------------------------------
+Templating With :term:`Chameleon` (:term:`chameleon.zpt`) Page Templates
+------------------------------------------------------------------------
 
 Like Zope, :mod:`repoze.bfg` uses Zope Page Templates (:term:`ZPT`) as
-its default templating language. However, :mod:`repoze.bfg` uses a
-different implementation of the :term:`ZPT` specification than Zope
-does: the :term:`z3c.pt` templating engine. This templating engine
+its default and best-supported templating language. However,
+:mod:`repoze.bfg` uses a different implementation of the :term:`ZPT`
+specification than Zope does: the :term:`Chameleon`
+:term:`chameleon.zpt` templating engine. This templating engine
 complies with the `Zope Page Template
 <http://wiki.zope.org/ZPT/FrontPage>`_ template specification and is
 significantly faster.
 
-Given that there is a :term:`z3c.pt` template named ``foo.html`` in a
-directory in your application named ``templates``, you can render the
-template from a view like so:
+.. note:: :mod:`repoze.bfg` can also allow for the use of Genshi-style
+   templates via the ``chameleon.genshi`` package, support for which
+   is built-in to :mod:`repoze.bfg`.  The :mod:`repoze.bfg` API
+   functions for getting and rendering Chameleon Genshi-style
+   templates mirrors the Chameleon ZPT-style API completely; only the
+   template files themselves must differ.  See :ref:`template_module`
+   for more information about using Genshi-style templates within
+   :mod:`repoze.bfg`.
+
+Given that there is a :term:`chameleon.zpt` template named
+``foo.html`` in a directory in your application named ``templates``,
+you can render the template from a view like so:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.template import render_template_to_response
+   from repoze.bfg.chameleon_zpt import render_template_to_response
    def sample_view(context, request):
        return render_template_to_response('templates/foo.html', foo=1, bar=2)
 
@@ -35,18 +45,18 @@ Relative to the directory in which the ``views.py`` file which names
 it lives, which is usually the :mod:`repoze.bfg` application's
 :term:`package` directory.
 
-``render_template_to_response`` always renders a :term:`z3c.pt`
+``render_template_to_response`` always renders a :term:`chameleon.zpt`
 template, and always returns a Response object which has a *status
 code* of ``200 OK`` and a *content-type* of ``text-html``.  If you
 need more control over the status code and content-type, use the
-``render_template`` function instead, which also renders a z3c.pt
-template but returns a string instead of a Response.  You can use
-the string manually as a response body:
+``render_template`` function instead, which also renders a ZPT
+template but returns a string instead of a Response.  You can use the
+string manually as a response body:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.template import render_template
+   from repoze.bfg.chameleon_zpt import render_template
    from webob import Response
    def sample_view(context, request):
        result = render_template('templates/foo.html', foo=1, bar=2)
@@ -71,7 +81,7 @@ an XSLT as follows:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.template import render_transform_to_response
+   from repoze.bfg.xslt import render_transform_to_response
    from lxml import etree
    node = etree.Element("root")  
    return render_transform_to_response('templates/foo.xsl', node)
@@ -85,7 +95,7 @@ You can also pass XSLT parameters in as keyword arguments:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.template import render_transform_to_response
+   from repoze.bfg.xslt import render_transform_to_response
    from lxml import etree
    node = etree.Element("root")
    value1 = "'app1'"

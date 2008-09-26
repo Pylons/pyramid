@@ -1,4 +1,4 @@
-from repoze.bfg.template import render_transform_to_response
+from repoze.bfg.xslt import render_transform_to_response
 
 # Some constants
 XML_NAMESPACE='http://www.w3.org/XML/1998/namespace'

@@ -199,22 +199,36 @@ Glossary
   XSLT
     `XSL Transformations <http://www.w3.org/TR/xslt>`_.  A language
     for transforming XML documents into other XML documents.
+  Chameleon
+    `chameleon <http://pypi.python.org/pypi/chameleon.core>`_ is an
+    attribute language template compiler which supports both the
+    :term:`ZPT` and :term:`Genshi` templating specifications.  It is
+    written and maintained by Malthe Borch.  It has serveral
+    extensions, such as the ability to use bracketed (Genshi-style)
+    ``${name}`` syntax, even within ZPT.  It is also much faster than
+    the reference implementations of both ZPT and Genshi.
+    :mod:`repoze.bfg` offers Chameleon templating out of the box in
+    both ZPT and Genshi "flavors".
+  chameleon.zpt
+    ``chameleon.zpt`` is the package which provides :term:`ZPT`
+    templating support under the :term:`Chameleon` templating engine.
+  chameleon.genshi
+    ``chameleon.genshi`` is the package which provides :term:`Genshi`
+    templating support under the :term:`Chameleon` templating engine.
   z3c.pt
-    `z3c.pt <http://pypi.python.org/pypi/z3c.pt>`_ is an
-    implementation of :term:`ZPT` by Malthe Borch.  It has serveral
-    extensions, such as the ability to use bracketed- ``${name}``
-    syntax.  It is also much faster than the reference implementation
-    of ZPT.  :mod:`repoze.bfg` offers z3c.pt templating out of the
-    box.
+    This was the previous name for :term:`Chameleon`, and is now a
+    Zope 3 compatibility package for Chameleon.
   ZPT
     The `Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_
     templating language.
+  Genshi
+    `Genshi <http://genshi.edgewall.org/>`_ is an attribute-based XML
+    templating language similar to ZPT.  Its syntax is supported
+    within :mod:`repoze.bfg` via :term:`Chameleon`.
   METAL
     `Macro Expansion for TAL <http://wiki.zope.org/ZPT/METAL>`_, a
     part of :term:`ZPT` which makes it possible to share common look
-    and feel between templates.  :term:`z3c.pt`, the implementation of
-    ZPT that :mod:`repoze.bfg` ships with does not implement the METAL
-    specification.
+    and feel between templates.  
   Routes
     A `system by Ben Bangert <http://routes.groovie.org/>`_ which
     parses URLs and compares them against a number of user defined

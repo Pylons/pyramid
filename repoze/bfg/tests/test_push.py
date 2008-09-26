@@ -31,7 +31,7 @@ class Test_pushpage(unittest.TestCase, PlacelessSetup):
         pp = self._makeOne('pp.pt')
         wrapped = pp(to_wrap)
         response = wrapped(object(), object())
-        self.assertEqual(response.body, '<p>WRAPPED</p>')
+        self.assertEqual(response.body, '<p>WRAPPED</p>\n')
 
 def to_wrap(context, request):
     return {'wrapped': 'WRAPPED'}

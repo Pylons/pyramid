@@ -52,7 +52,7 @@ Also add a function in ``views.py`` that looks like the following:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.template import render_template_to_response
+   from repoze.bfg.chameleon_zpt import render_template_to_response
    def zpt_view(context, request):
       return render_template_to_response('templates/default.pt', 
                                          name=context.__name__, 
@@ -61,8 +61,8 @@ Also add a function in ``views.py`` that looks like the following:
 This function is relatively simple:
 
 #. Line 1 imports a :mod:`repoze.bfg` function that renders ZPT
-   templates to a response.  :mod:`repoze.bfg` uses the ``z3c.pt`` ZPT
-   engine.
+   templates to a response.  :mod:`repoze.bfg` uses the
+   :term:`chameleon.zpt` ZPT engine.
 
 #. Line 2, like our other view functions, gets passed a ``context``
    (the current hop in the URL) and WebOb ``request`` object.
@@ -92,10 +92,11 @@ Life is better with templating:
    ``render_template_to_response``.
 
 #. Line 6 looks interesting.  It uses the ``node`` that we passed in
-   via ``render_template_to_response``.  Since ``z3c.pt`` uses Python
-   as its expession language, we can put anything Python-legal between
-   the braces.  And since ``node`` is an ``lxml`` ``Element`` object,
-   we just ask for its ``.tag``, like regular Python ``lxml`` code.
+   via ``render_template_to_response``.  Since :term:`chameleon.zpt`
+   uses Python as its expession language, we can put anything
+   Python-legal between the braces.  And since ``node`` is an ``lxml``
+   ``Element`` object, we just ask for its ``.tag``, like regular
+   Python ``lxml`` code.
 
 Viewing the ZPT
 ------------------
@@ -119,7 +120,7 @@ model using the ZPT templating language.
 
 
 XSLT Templates
-====================
+==============
 
 So that's the ZPT way of rendering HTML for an XML document.  We can
 additonally use XSLT to do templating.  How might XSLT look?

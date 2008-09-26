@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.3.7'
+__version__ = '0.3.8'
 
 import os
 
@@ -24,6 +24,21 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+
+install_requires=[
+    'zope.interface',
+    'zope.component',
+    'zope.testing',
+    'zope.hookable',
+    'zope.event',
+    'WebOb',
+    'PasteScript',
+    'chameleon.core [lxml]',
+    'chameleon.zpt',
+    'chameleon.genshi',
+    'Routes',
+    'setuptools',
+    ]
 
 setup(name='repoze.bfg',
       version=__version__,
@@ -47,31 +62,8 @@ setup(name='repoze.bfg',
       include_package_data=True,
       namespace_packages=['repoze', 'repoze.bfg'],
       zip_safe=False,
-      install_requires=[
-            'zope.interface',
-            'zope.component',
-            'zope.testing',
-            'zope.hookable',
-            'zope.event',
-            'WebOb',
-            'PasteScript',
-            'z3c.pt [lxml]',
-            'Routes',
-            'setuptools',
-            ],
-      tests_require=[
-            'zope.interface',
-            'zope.component',
-            'zope.testing',
-            'zope.hookable',
-            'zope.event',
-            'WebOb',
-            'z3c.pt [lxml]',
-            'Paste',
-            'Routes',
-            'Sphinx',
-            'docutils',
-            ],
+      install_requires = install_requires,
+      tests_require= install_requires + ['Sphinx', 'docutils'],
       test_suite="repoze.bfg.tests",
       entry_points = """\
         [paste.paster_create_template]
