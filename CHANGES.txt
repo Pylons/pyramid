@@ -1,4 +1,4 @@
-Next release
+0.3.8 (08/26/2008)
 
   Docs
 
