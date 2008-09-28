@@ -32,7 +32,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg.security import ViewPermissionFactory
-        from zope.component.zcml import handler
+        from repoze.bfg.zcml import handler
         from zope.component.interface import provideInterface
 
         self.assertEqual(len(actions), 3)
@@ -79,7 +79,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg.security import ViewPermissionFactory
-        from zope.component.zcml import handler
+        from repoze.bfg.zcml import handler
         from zope.component.interface import provideInterface
 
         self.assertEqual(len(actions), 3)
@@ -125,7 +125,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
           cacheable=False)
         actions = context.actions
         from repoze.bfg.interfaces import IView
-        from zope.component.zcml import handler
+        from repoze.bfg.zcml import handler
         from repoze.bfg.zcml import Uncacheable
 
         self.assertEqual(len(actions), 3)

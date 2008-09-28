@@ -74,7 +74,7 @@ by via ``__getitem__``.
 If you choose not to manage the ``__name__`` and ``__parent__``
 attributes of your models "by hand", :mod:`repoze.bfg`` is willing to
 help you do this.  If your "root" node claims it implements the
-interface ``zope.location.interfaces.ILocation``, you don't need to
+interface ``repoze.bfg.interfaces.ILocation``, you don't need to
 manage these attributes by hand.  During :term:`traversal`, if the
 root node says it implements the ``ILocation`` :term:`interface`,
 :mod:`repoze.bfg` will wrap each child in a ``LocationProxy`` which
@@ -84,7 +84,20 @@ recursively.
 If you choose to make use of the location-based dynamic assignment of
 ``__parent__`` and ``__name__``, the root node must have a
 ``__parent__`` and a ``__name__`` that are both ``None``, and it must
-provide the ``ILocation`` interface.  The easiest way to do this is to
-claim that the class representing the root node
-``implements(ILocation)``, as above.
+provide the ``repoze.bfg.interfaces.ILocation`` interface.  The
+easiest way to do this is to claim that the class representing the
+root node ``implements(ILocation)``:
+
+.. code-block::
+   :linenos:
+
+   from repoze.bfg.interfaces import ILocation
+   from zope.interface import implements
+
+   class MyRootObject(object):
+       implements(ILocation)
+       __parent__ = None
+       __name__ = ''
+
+
 

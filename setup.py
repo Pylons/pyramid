@@ -26,18 +26,18 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 install_requires=[
-    'zope.interface',
-    'zope.component',
-    'zope.testing',
-    'zope.hookable',
-    'zope.event',
-    'WebOb',
-    'PasteScript',
     'chameleon.core [lxml]',
-    'chameleon.zpt',
     'chameleon.genshi',
+    'chameleon.zpt',
+    'PasteScript',
     'Routes',
     'setuptools',
+    'WebOb',
+    'zope.component',
+    'zope.configuration',
+    'zope.hookable',
+    'zope.interface',
+    'zope.proxy',
     ]
 
 setup(name='repoze.bfg',

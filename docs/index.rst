@@ -72,6 +72,7 @@ Per-module :mod:`repoze.bfg` API documentation.
    api/security
    api/template
    api/traversal
+   api/location
    api/urldispatch
    api/view
    api/wsgi

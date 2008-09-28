@@ -3,10 +3,10 @@ import urlparse
 
 from zope.interface import classProvides
 from zope.interface import implements
-from zope.location.location import located
-from zope.location.location import LocationIterator
-from zope.location.interfaces import ILocation
+from repoze.bfg.location import locate
+from repoze.bfg.location import lineage
 
+from repoze.bfg.interfaces import ILocation
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
 
@@ -60,7 +60,7 @@ class ModelGraphTraverser(object):
                 name = segment
                 break
             if self.locatable:
-                next = located(next, ob, segment)
+                next = locate(next, ob, segment)
             ob = next
 
         return ob, name, path
@@ -68,7 +68,7 @@ class ModelGraphTraverser(object):
 def find_root(model):
     """ Find the root node in the graph to which ``model``
     belongs. Note that ``model`` should be :term:`location`-aware."""
-    for location in LocationIterator(model):
+    for location in lineage(model):
         if location.__parent__ is None:
             model = location
             break
@@ -99,7 +99,7 @@ def find_interface(model, interface):
     ``interface`` in the parent chain of ``model`` or ``None`` if no
     object providing ``interface`` can be found in the parent chain.
     The ``model`` passed in should be :term:`location`-aware."""
-    for location in LocationIterator(model):
+    for location in lineage(model):
         if interface.providedBy(location):
             return location
 
@@ -112,7 +112,7 @@ def model_url(model, request, *elements):
     URL-quoted.  The ``model`` passed in must be
     :term:`location`-aware."""
     rpath = []
-    for location in LocationIterator(model):
+    for location in lineage(model):
         if location.__name__:
             rpath.append(urllib.quote(location.__name__))
     path = list(reversed(rpath))
@@ -127,7 +127,7 @@ def model_path(model, *elements):
     will be joined by slashes and appended to the generated path.  The
     ``model`` passed in must be :term:`location`-aware."""
     rpath = []
-    for location in LocationIterator(model):
+    for location in lineage(model):
         if location.__name__:
             rpath.append(location.__name__)
     path = list(reversed(rpath))

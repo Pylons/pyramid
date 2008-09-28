@@ -84,19 +84,17 @@ class:
 
    from repoze.bfg.security import Everyone
    from repoze.bfg.security import Allow
-   from zope.location.interfaces import ILocation
-   from zope.location.location import Location
 
    class IBlog(Interface):
        pass
 
-   class Blog(dict, Location):
+   class Blog(dict):
        __acl__ = [
            (Allow, Everyone, 'view'),
            (Allow, 'group:editors', 'add'),
            (Allow, 'group:editors', 'edit'),
            ]
-       implements(IBlog, ILocation)
+       implements(IBlog)
 
 The above ACL indicates that the ``Everyone`` principal (a special
 system-defined principal indicating, literally, everyone) is allowed
@@ -128,25 +126,43 @@ Location-Awareness
 ------------------
 
 In order to allow the security machinery to perform ACL inheritance,
-model objects should provide *location-awareness*.
+model objects must provide *location-awareness*.  Providing
+location-awareness means two things: the root object in the graph must
+have a ``_name__`` and a ``__parent__`` attribute and the root object
+must be declared to implement the ``repoze.bfg.interfaces.ILocation``
+interface.  For example:
 
-Objects have parents when they define an ``__parent__`` attribute
-which points at their parent object.  The root object's ``__parent__``
-is ``None``.  An object with a ``__parent__`` attribute and a
-``__name__`` attribute is said to be *location-aware*.
+.. code-block::
+   :linenos:
+
+   from repoze.bfg.interfaces import ILocation
+   from zope.interface import implements
+
+   class Blog(object):
+       implements(ILocation)
+       __name__ = ''
+       __parent__ = None
+
+An object with a ``__parent__`` attribute and a ``__name__`` attribute
+is said to be *location-aware*.  Location-aware objects define an
+``__parent__`` attribute which points at their parent object.  The
+root object's ``__parent__`` is ``None``.
 
 If the root object in a :mod:`repoze.bfg` application declares that it
-implements the ``ILocation`` interface, it is assumed that the objects
-in the rest of the model are location-aware.  Even if they are not
-explictly, if the root object is marked as ``ILocation``, the bfg
-framework will wrap each object during traversal in a *location
-proxy*, which will wrap each object found during traversal in a proxy
-object that has both the ``__name__`` and ``__parent__`` attributes,
-but otherwise acts the same as your model object.
+implements the ``repoze.bfg.interfaces.ILocation`` interface, it is
+assumed that the objects in the rest of the model are location-aware.
+If those objects are not explictly location-aware, if the root object
+is marked as ``ILocation``, the bfg framework will wrap each object
+during traversal in a *location proxy* that has both the ``__name__``
+and ``__parent__`` attributes, but otherwise acts the same as your
+model object.
 
 You can of course supply ``__name__`` and ``__parent__`` attributes
 explicitly on all of your model objects, and no location proxying will
 be performed.
+
+See :ref:`location_module` for documentations of functions which use
+location-awareness.
 
 Debugging Security Failures
 ---------------------------

@@ -98,3 +98,11 @@ class IWSGIApplicationCreatedEvent(IObjectEvent):
     configured."""
     
     app = Attribute(u"Published application")
+
+class ILocation(Interface):
+    """Objects that have a structural location"""
+
+    __parent__ = Attribute("The parent in the location hierarchy")
+
+    __name__ = Attribute("The name within the parent")
+

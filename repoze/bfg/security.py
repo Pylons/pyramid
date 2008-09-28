@@ -5,7 +5,7 @@ import sys
 from zope.interface import implements
 from zope.component import queryUtility
 
-from zope.location.location import LocationIterator
+from repoze.bfg.location import lineage
 
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
@@ -109,7 +109,7 @@ class ACLSecurityPolicy(object):
         """ Return ``Allowed`` if the policy permits access,
         ``Denied`` if not."""
         principals = self.effective_principals(request)
-        for location in LocationIterator(context):
+        for location in lineage(context):
             authorizer = self.authorizer_factory(location, self.logger)
             try:
                 return authorizer.permits(permission, *principals)
@@ -134,7 +134,7 @@ class ACLSecurityPolicy(object):
         return effective_principals
 
     def principals_allowed_by_permission(self, context, permission):
-        for location in LocationIterator(context):
+        for location in lineage(context):
             acl = getattr(location, '__acl__', None)
             if acl is not None:
                 allowed = {}

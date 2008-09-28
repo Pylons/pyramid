@@ -1,3 +1,30 @@
+Next release
+
+  Features
+
+   - A ``repoze.bfg.location`` API module was added.
+
+  Backwards incompatibilities
+
+   - Applications must now use the ``repoze.bfg.interfaces.ILocation``
+     interface rather than ``zope.location.interfaces.ILocation`` to
+     represent that a model object is "location-aware".  We've removed
+     a dependency on ``zope.location`` for cleanliness purposes: as
+     new versions of zope libraries are released which have improved
+     dependency information, getting rid of our dependence on
+     ``zope.location`` will prevent a newly installed repoze.bfg
+     application from requiring the ``zope.security``, egg, which not
+     truly used at all in a "stock" repoze.bfg setup.  These
+     dependencies are still required by the stack at this time; this
+     is purely a futureproofing move.
+
+     The security and model documentation for previous versions of
+     ``repoze.bfg`` recommended using the
+     ``zope.location.interfaces.ILocation`` interface to represent
+     that a model object is "location-aware".  This documentation has
+     been changed to reflect that this interface should now be
+     imported from ``repoze.bfg.interfaces.ILocation`` instead.
+
 0.3.8 (08/26/2008)
 
   Docs

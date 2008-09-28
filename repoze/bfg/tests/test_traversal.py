@@ -112,7 +112,7 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         foo = DummyContext(bar)
         root = DummyContext(foo)
         from zope.interface import directlyProvides
-        from zope.location.interfaces import ILocation
+        from repoze.bfg.interfaces import ILocation
         directlyProvides(root, ILocation)
         root.__name__ = None
         root.__parent__ = None

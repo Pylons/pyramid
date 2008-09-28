@@ -4,9 +4,11 @@ from os.path import realpath
 import time
 
 from zope.configuration import xmlconfig
+
+from zope.component import getGlobalSiteManager
 import zope.configuration.config
 
-from zope.component.zcml import handler
+
 from zope.component.interface import provideInterface
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
@@ -21,6 +23,10 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.path import package_path
 
 from repoze.bfg.security import ViewPermissionFactory
+
+def handler(methodName, *args, **kwargs):
+    method = getattr(getGlobalSiteManager(), methodName)
+    method(*args, **kwargs)
 
 class Uncacheable(object):
     """ Include in discriminators of actions which are not cacheable """
