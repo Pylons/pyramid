@@ -5,9 +5,8 @@ import time
 
 from zope.configuration import xmlconfig
 
-from zope.component import getGlobalSiteManager
+from zope.component import getSiteManager
 import zope.configuration.config
-
 
 from zope.component.interface import provideInterface
 from zope.configuration.exceptions import ConfigurationError
@@ -25,7 +24,7 @@ from repoze.bfg.path import package_path
 from repoze.bfg.security import ViewPermissionFactory
 
 def handler(methodName, *args, **kwargs):
-    method = getattr(getGlobalSiteManager(), methodName)
+    method = getattr(getSiteManager(), methodName)
     method(*args, **kwargs)
 
 class Uncacheable(object):
