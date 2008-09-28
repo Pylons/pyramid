@@ -132,7 +132,7 @@ have a ``_name__`` and a ``__parent__`` attribute and the root object
 must be declared to implement the ``repoze.bfg.interfaces.ILocation``
 interface.  For example:
 
-.. code-block::
+.. code-block:: python
    :linenos:
 
    from repoze.bfg.interfaces import ILocation

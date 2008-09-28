@@ -88,7 +88,7 @@ provide the ``repoze.bfg.interfaces.ILocation`` interface.  The
 easiest way to do this is to claim that the class representing the
 root node ``implements(ILocation)``:
 
-.. code-block::
+.. code-block:: python
    :linenos:
 
    from repoze.bfg.interfaces import ILocation
