@@ -4,9 +4,13 @@ from zope.component.testing import PlacelessSetup
 
 class Base(PlacelessSetup):
     def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
         PlacelessSetup.setUp(self)
 
     def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
         PlacelessSetup.tearDown(self)
 
     def _zcmlConfigure(self):

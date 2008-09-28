@@ -1,5 +1,12 @@
 Next release
 
+  Deprecations
+
+   - A deprecation warning is now issued when old API names from the
+     ``repoze.bfg.templates`` module are imported.
+
+0.3.9 (08/27/2008)
+
   Features
 
    - A ``repoze.bfg.location`` API module was added.
