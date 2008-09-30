@@ -75,6 +75,13 @@ class IViewPermissionFactory(Interface):
     def __call__(context, request):
         """ Return an IViewPermission """
 
+class IRouter(Interface):
+    """WSGI application which routes requests to 'view' code based on
+    a view registry."""
+
+    registry = interface.Attribute(
+        """Component architecture registry local to this application.""")
+    
 class IRoutesContext(Interface):
     """ A context (model instance) that is created as a result of URL
     dispatching"""

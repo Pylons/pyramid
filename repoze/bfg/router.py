@@ -1,6 +1,6 @@
 from zope.component import getAdapter
 from zope.component.event import dispatch
-from zope.interface import directlyProvides
+from zope.interface import directlyProvides, implements
 
 from webob import Request
 from webob.exc import HTTPNotFound
@@ -12,6 +12,8 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IRouter
 
 from repoze.bfg.registry import registry_manager
 from repoze.bfg.registry import makeRegistry
@@ -23,9 +25,12 @@ from repoze.bfg.view import render_view_to_response
 
 _marker = ()
 
-class Router:
+class Router(object):
     """ WSGI application which routes requests to 'view' code based on
     a view registry"""
+
+    implements(IRouter)
+    
     def __init__(self, root_policy, registry):
         self.root_policy = root_policy
         self.registry = registry
