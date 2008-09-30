@@ -79,7 +79,7 @@ class IRouter(Interface):
     """WSGI application which routes requests to 'view' code based on
     a view registry."""
 
-    registry = interface.Attribute(
+    registry = Attribute(
         """Component architecture registry local to this application.""")
     
 class IRoutesContext(Interface):
