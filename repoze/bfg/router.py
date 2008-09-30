@@ -1,6 +1,7 @@
 from zope.component import getAdapter
 from zope.component.event import dispatch
-from zope.interface import directlyProvides, implements
+from zope.interface import directlyProvides
+from zope.interface import implements
 
 from webob import Request
 from webob.exc import HTTPNotFound
