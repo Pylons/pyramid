@@ -32,3 +32,7 @@ class WSGIApplicationCreatedEvent(object):
     implements(IWSGIApplicationCreatedEvent)
     def __init__(self, app):
         self.app = app
+
+    @property
+    def object(self):
+        return self.app
