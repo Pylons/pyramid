@@ -53,13 +53,20 @@ class NewResponseEventTests(unittest.TestCase):
         self.assertEqual(inst.response, response)
 
 class WSGIAppEventTests(unittest.TestCase):
-    def test_class_implements(self):
+    def test_object_implements(self):
         from repoze.bfg.events import WSGIApplicationCreatedEvent
         event = WSGIApplicationCreatedEvent(object())
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        from zope.interface.verify import verifyObject
+        verifyObject(IWSGIApplicationCreatedEvent, event)
+
+    def test_class_implements(self):
+        from repoze.bfg.events import WSGIApplicationCreatedEvent
+        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
         from zope.interface.verify import verifyClass
-        verifyClass(IWSGIApplicationCreatedEvent, event)
-        
+        verifyClass(IWSGIApplicationCreatedEvent, WSGIApplicationCreatedEvent)
+
+
 class DummyRequest:
     pass
 
