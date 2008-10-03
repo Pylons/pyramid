@@ -13,7 +13,6 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRouter
 
 from repoze.bfg.registry import registry_manager
