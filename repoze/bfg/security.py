@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 
@@ -11,6 +10,7 @@ from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IViewPermissionFactory
 from repoze.bfg.interfaces import NoAuthorizationInformation
+from repoze.bfg.interfaces import ILogger
 
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
@@ -68,7 +68,7 @@ def principals_allowed_by_permission(context, permission):
 
 class ACLAuthorizer(object):
 
-    def __init__(self, context, logger=None):
+    def __init__(self, context, logger):
         self.context = context
         self.logger = logger
 
@@ -101,16 +101,16 @@ class ACLSecurityPolicy(object):
     implements(ISecurityPolicy)
     authorizer_factory = ACLAuthorizer
     
-    def __init__(self, logger, get_principals):
-        self.logger = logger
+    def __init__(self, get_principals):
         self.get_principals = get_principals
 
     def permits(self, context, request, permission):
         """ Return ``Allowed`` if the policy permits access,
         ``Denied`` if not."""
+        logger = queryUtility(ILogger, name='repoze.bfg.authdebug')
         principals = self.effective_principals(request)
         for location in lineage(context):
-            authorizer = self.authorizer_factory(location, self.logger)
+            authorizer = self.authorizer_factory(location, logger)
             try:
                 return authorizer.permits(permission, *principals)
             except NoAuthorizationInformation:
@@ -148,29 +148,13 @@ class ACLSecurityPolicy(object):
                 return sorted(allowed.keys())
         return []
 
-DEBUG_LOG_KEY = 'BFG_SECURITY_DEBUG'
-
-def debug_logger(logger):
-    if logger is None:
-        do_debug_log = os.environ.get(DEBUG_LOG_KEY, '')
-        if str(do_debug_log).lower() in ('1', 'y', 'true', 't', 'on'):
-            handler = logging.StreamHandler(sys.stdout)
-            fmt = '%(asctime)s %(message)s'
-            formatter = logging.Formatter(fmt)
-            handler.setFormatter(formatter)
-            logger = logging.Logger('repoze.bfg.security')
-            logger.addHandler(handler)
-            logger.setLevel(logging.DEBUG)
-            return logger
-    return logger
-
 def get_remoteuser(request):
     user_id = request.environ.get('REMOTE_USER')
     if user_id:
         return [user_id]
     return []
 
-def RemoteUserACLSecurityPolicy(logger=None):
+def RemoteUserACLSecurityPolicy():
     """ A security policy which:
 
     - examines the request.environ for the REMOTE_USER variable and
@@ -188,8 +172,7 @@ def RemoteUserACLSecurityPolicy(logger=None):
       grant or deny access.
 
     """
-    logger = debug_logger(logger)
-    return ACLSecurityPolicy(logger, get_remoteuser)
+    return ACLSecurityPolicy(get_remoteuser)
 
 def get_who_principals(request):
     identity = request.environ.get('repoze.who.identity')
@@ -199,7 +182,7 @@ def get_who_principals(request):
     principals.extend(identity.get('groups', []))
     return principals
 
-def RepozeWhoIdentityACLSecurityPolicy(logger=None):
+def RepozeWhoIdentityACLSecurityPolicy():
     """ A security policy which:
 
     - examines the request.environ for the ``repoze.who.identity``
@@ -219,8 +202,7 @@ def RepozeWhoIdentityACLSecurityPolicy(logger=None):
       grant or deny access.
 
     """
-    logger = debug_logger(logger)
-    return ACLSecurityPolicy(logger, get_who_principals)
+    return ACLSecurityPolicy(get_who_principals)
 
 class PermitsResult:
     def __init__(self, ace, acl, permission, principals, context):

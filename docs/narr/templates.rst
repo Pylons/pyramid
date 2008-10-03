@@ -104,6 +104,38 @@ You can also pass XSLT parameters in as keyword arguments:
 This would then assign 'app1' as the value of an ``<xsl:param
 name="param1"/>`` parameter in the XSLT template.
 
+.. _reload_templates_section:
+
+Automatically Reloading Templates
+---------------------------------
+
+It's often convenient to see changes you make to a template file
+appear immediately without needing to restart the application process.
+:mod:`repoze.bfg` allows you configure your application development
+environment so that a change to a template will be automatically
+detected, and the template will be reloaded on the next rendering.
+
+.. warning:: auto-template-reload behavior is not recommended for
+             production sites as it slows rendering; it's usually only
+             desirable during development.
+
+In order to turn on automatic reloading of templates, you can use an
+environment variable setting or a configuration file setting.
+
+To use an environment variable, start your application under a shell
+using the ``BFG_RELOAD_TEMPLATES`` environment variable set to ``1``,
+For example::
+
+  $ BFG_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
+
+To use a setting in the the application ``.ini`` file for the same
+purpose, set the ``reload_templates`` key to ``true`` within the
+application's configuration section, e.g.::
+
+  [app:main]
+  use = egg:MyProject#app
+  reload_templates = true
+
 Templating with other Templating Languages
 ------------------------------------------
 
@@ -138,4 +170,6 @@ installed, here's an example of using Mako from within a
    :mod:`repoze.bfg`-style bindings for the `Jinja2
    <http://jinja.pocoo.org/2/documentation>`_ templating system.
 
-
+Note that if you use third-party templating languages, the
+auto-template-reload strategy explained in
+:ref:`reload_templates_section` will not be available.

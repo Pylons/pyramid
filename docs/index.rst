@@ -34,6 +34,7 @@ Narrative documentation in chapter form explaining how to use
    narr/models
    narr/security
    narr/events
+   narr/environment
    changes
    glossary
 

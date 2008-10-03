@@ -1,3 +1,5 @@
+import os
+import sys
 import threading
 
 import zope.component
@@ -11,7 +13,9 @@ from zope.component import getSiteManager as original_getSiteManager
 from zope.interface import implements
 
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.interfaces import ILogger
 from repoze.bfg.zcml import zcml_configure
+from repoze.bfg.log import make_stream_logger
 
 class ThreadLocalRegistryManager(threading.local):
     registry = getGlobalSiteManager()
@@ -54,6 +58,10 @@ def makeRegistry(filename, package, options=None, lock=threading.Lock()):
             options = {}
         settings = Settings(options)
         registry.registerUtility(settings, ISettings)
+        if options.get('debug_authorization'):
+            auth_logger = make_stream_logger('repoze.bfg.authdebug',sys.stderr)
+            registry.registerUtility(auth_logger, ILogger,
+                                     'repoze.bfg.authdebug')
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
         zcml_configure(filename, package=package)
@@ -82,9 +90,18 @@ def asbool(s):
     s = str(s).strip()
     return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
 
-def get_options(kw):
+def get_options(kw, environ=os.environ):
+    # environ is passed in for unit tests
+    eget = environ.get
+    config_debug_auth = kw.get('debug_authorization', '')
+    effective_debug_auth = asbool(eget('BFG_DEBUG_AUTHORIZATION',
+                                       config_debug_auth))
+    config_reload_templates = kw.get('reload_templates')
+    effective_reload_templates = asbool(eget('BFG_RELOAD_TEMPLATES',
+                                        config_reload_templates))
     return {
-        'reload_templates':asbool(kw.get('reload_templates')),
+        'debug_authorization': effective_debug_auth,
+        'reload_templates':effective_reload_templates,
         }
 
 from zope.testing.cleanup import addCleanUp

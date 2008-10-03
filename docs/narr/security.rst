@@ -164,16 +164,27 @@ be performed.
 See :ref:`location_module` for documentations of functions which use
 location-awareness.
 
-Debugging Security Failures
----------------------------
+.. _debug_authorization_section:
 
-If your application is allowing or denying access inappropriately (in
-your judgment), start your application under a shell using the
-``BFG_SECURITY_DEBUG`` environment variable.  For example::
+Debugging Authorization Failures
+--------------------------------
 
-  $ BFG_SECURITY_DEBUG=1 bin/paster serve myproject.ini
+If your application in your judgment is allowing or denying access
+inappropriately, start your application under a shell using the
+``BFG_DEBUG_AUTHORIZATION`` environment variable set to ``1``.  For
+example::
+
+  $ BFG_DEBUG_AUTHORIZATION=1 bin/paster serve myproject.ini
 
 When any authorization takes place, a message will be logged to the
-console about what ACE in which ACL permitted or denied the
-authorization based on authentication information.
+console (to stderr) about what ACE in which ACL permitted or denied
+the authorization based on authentication information.
+
+This behavior can also be turned on in the application ``.ini`` file
+by setting the ``debug_authorization`` key to ``true`` within the
+application's configuration section, e.g.::
+
+  [app:main]
+  use = egg:MyProject#app
+  debug_authorization = true
 

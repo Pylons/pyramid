@@ -113,3 +113,6 @@ class ILocation(Interface):
 
     __name__ = Attribute("The name within the parent")
 
+class ILogger(Interface):
+    """ Interface representing a PEP 282 logger """
+

@@ -23,7 +23,8 @@ class TestMakeRegistry(unittest.TestCase, PlacelessSetup):
             old = repoze.bfg.registry.setRegistryManager(dummyregmgr)
             registry = makeRegistry('configure.zcml',
                                     fixtureapp,
-                                    options={'reload_templates':True},
+                                    options={'reload_templates':True,
+                                             'debug_authorization':True},
                                     lock=dummylock)
             from zope.component.registry import Components
             self.failUnless(isinstance(registry, Components))
@@ -32,8 +33,12 @@ class TestMakeRegistry(unittest.TestCase, PlacelessSetup):
             self.assertEqual(dummyregmgr.registry, registry)
             from zope.component import getUtility
             from repoze.bfg.interfaces import ISettings
+            from repoze.bfg.interfaces import ILogger
             settings = getUtility(ISettings)
+            logger = getUtility(ILogger, name='repoze.bfg.authdebug')
+            self.assertEqual(logger.name, 'repoze.bfg.authdebug')
             self.assertEqual(settings.reload_templates, True)
+            self.assertEqual(settings.debug_authorization, True)
         finally:
             repoze.bfg.registry.setRegistryManager(old)
 
@@ -52,6 +57,27 @@ class TestGetOptions(unittest.TestCase):
         self.assertEqual(result['reload_templates'], True)
         result = get_options({'reload_templates':'1'})
         self.assertEqual(result['reload_templates'], True)
+        result = get_options({}, {'BFG_RELOAD_TEMPLATES':'1'})
+        self.assertEqual(result['reload_templates'], True)
+        result = get_options({'reload_templates':'false'},
+                             {'BFG_RELOAD_TEMPLATES':'1'})
+        self.assertEqual(result['reload_templates'], True)
+
+    def test_debug_authorization(self):
+        get_options = self._getFUT()
+        result = get_options({})
+        self.assertEqual(result['debug_authorization'], False)
+        result = get_options({'debug_authorization':'false'})
+        self.assertEqual(result['debug_authorization'], False)
+        result = get_options({'debug_authorization':'t'})
+        self.assertEqual(result['debug_authorization'], True)
+        result = get_options({'debug_authorization':'1'})
+        self.assertEqual(result['debug_authorization'], True)
+        result = get_options({}, {'BFG_DEBUG_AUTHORIZATION':'1'})
+        self.assertEqual(result['debug_authorization'], True)
+        result = get_options({'debug_authorization':'false'},
+                             {'BFG_DEBUG_AUTHORIZATION':'1'})
+        self.assertEqual(result['debug_authorization'], True)
 
 class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
     def setUp(self):

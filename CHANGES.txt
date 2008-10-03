@@ -1,14 +1,37 @@
-Next release
+0.4.0 (10/03/2008)
+
+  Docs 
+
+   - An "Environment and Configuration" chapter was added to the narrative 
+     portion of the documentation.
 
   Features
 
    - Ensure bfg doesn't generate warnings when running under Python
      2.6.
 
+   - The environment variable ``BFG_RELOAD_TEMPLATES`` is now available
+     (serves the same purpose as ``reload_templates`` in the config file).
+
+   - A new configuration file option ``debug_authorization`` was added.
+     This turns on printing of security authorization debug statements
+     to ``sys.stderr``.  The ``BFG_DEBUG_AUTHORIZATION`` environment
+     variable was also added; this performs the same duty.
+
+  Bug Fixes
+
+   - The environment variable ``BFG_SECURITY_DEBUG`` did not always work.
+     It has been renamed to ``BFG_DEBUG_AUTHORIZATION`` and fixed.
+
   Deprecations
 
    - A deprecation warning is now issued when old API names from the
      ``repoze.bfg.templates`` module are imported.
+
+  Backwards incompatibilities
+
+   - The ``BFG_SECURITY_DEBUG`` environment variable was renamed to
+     ``BFG_DEBUG_AUTHORIZATION``.
 
 0.3.9 (08/27/2008)
 

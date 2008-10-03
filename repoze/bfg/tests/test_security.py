@@ -219,6 +219,12 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
+    def _registerLogger(self, logger):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ILogger
+        gsm.registerUtility(logger, ILogger, name='repoze.bfg.authdebug')
+
     def setUp(self):
         PlacelessSetup.setUp(self)
 
@@ -233,14 +239,12 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def test_instance_implements_ISecurityPolicy(self):
         from zope.interface.verify import verifyObject
         from repoze.bfg.interfaces import ISecurityPolicy
-        logger = DummyLogger()
-        verifyObject(ISecurityPolicy, self._makeOne(logger, lambda *arg: None))
+        verifyObject(ISecurityPolicy, self._makeOne(lambda *arg: None))
 
     def test_permits_no_principals_no_acl_info_on_context(self):
         context = DummyContext()
         request = DummyRequest({})
-        logger = DummyLogger()
-        policy = self._makeOne(logger, lambda *arg: None)
+        policy = self._makeOne(lambda *arg: None)
         authorizer_factory = make_authorizer_factory(None)
         policy.authorizer_factory = authorizer_factory
         result = policy.permits(context, request, 'view')
@@ -254,8 +258,7 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         context.__acl__ = []
         request = DummyRequest({})
-        logger = DummyLogger()
-        policy = self._makeOne(logger, lambda *arg: None)
+        policy = self._makeOne(lambda *arg: None)
         authorizer_factory = make_authorizer_factory(None)
         policy.authorizer_factory = authorizer_factory
         result = policy.permits(context, request, 'view')
@@ -274,8 +277,7 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         context2.__parent__ = context
         context.__acl__ = []
         request = DummyRequest({})
-        logger = DummyLogger()
-        policy = self._makeOne(logger, lambda *arg: None)
+        policy = self._makeOne(lambda *arg: None)
         authorizer_factory = make_authorizer_factory(None)
         policy.authorizer_factory = authorizer_factory
         result = policy.permits(context, request, 'view')
@@ -293,8 +295,7 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         context2.__name__ = 'context2'
         context2.__parent__ = context
         request = DummyRequest({})
-        logger = DummyLogger()
-        policy = self._makeOne(logger, lambda *arg: None)
+        policy = self._makeOne(lambda *arg: None)
         authorizer_factory = make_authorizer_factory(context)
         policy.authorizer_factory = authorizer_factory
         result = policy.permits(context, request, 'view')
@@ -303,15 +304,34 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         self.assertEqual(authorizer_factory.principals, (Everyone,))
         self.assertEqual(authorizer_factory.permission, 'view')
         self.assertEqual(authorizer_factory.context, context)
-    
+
+    def test_permits_with_logger(self):
+        logger = DummyLogger()
+        self._registerLogger(logger)
+        context = DummyContext()
+        request = DummyRequest({})
+        policy = self._makeOne(lambda *arg: None)
+        authorizer_factory = make_authorizer_factory(context)
+        policy.authorizer_factory = authorizer_factory
+        policy.permits(context, request, 'view')
+        self.assertEqual(authorizer_factory.logger, logger)
+
+    def test_permits_no_logger(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        policy = self._makeOne(lambda *arg: None)
+        authorizer_factory = make_authorizer_factory(context)
+        policy.authorizer_factory = authorizer_factory
+        policy.permits(context, request, 'view')
+        self.assertEqual(authorizer_factory.logger, None)
+
     def test_principals_allowed_by_permission_direct(self):
         from repoze.bfg.security import Allow
         context = DummyContext()
         acl = [ (Allow, 'chrism', ('read', 'write')),
                 (Allow, 'other', ('read',)) ]
         context.__acl__ = acl
-        logger = DummyLogger()
-        policy = self._makeOne(logger, lambda *arg: None)
+        policy = self._makeOne(lambda *arg: None)
         result = policy.principals_allowed_by_permission(context, 'read')
         self.assertEqual(result, ['chrism', 'other'])
 
@@ -326,14 +346,12 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         inter = DummyContext()
         inter.__name__ = None
         inter.__parent__ = context
-        logger = DummyLogger()
-        policy = self._makeOne(logger, lambda *arg: None)
+        policy = self._makeOne(lambda *arg: None)
         result = policy.principals_allowed_by_permission(inter, 'read')
         self.assertEqual(result, ['chrism', 'other'])
 
     def test_principals_allowed_by_permission_no_acls(self):
-        logger = DummyLogger()
-        policy = self._makeOne(logger, lambda *arg: None)
+        policy = self._makeOne(lambda *arg: None)
         result = policy.principals_allowed_by_permission(None, 'read')
         self.assertEqual(result, [])
 
@@ -355,22 +373,19 @@ class TestRemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def test_instance_implements_ISecurityPolicy(self):
         from zope.interface.verify import verifyObject
         from repoze.bfg.interfaces import ISecurityPolicy
-        logger = DummyLogger()
-        verifyObject(ISecurityPolicy, self._makeOne(logger))
+        verifyObject(ISecurityPolicy, self._makeOne())
 
     def test_authenticated_userid(self):
         context = DummyContext()
         request = DummyRequest({'REMOTE_USER':'fred'})
-        logger = DummyLogger()
-        policy = self._makeOne(logger)
+        policy = self._makeOne()
         result = policy.authenticated_userid(request)
         self.assertEqual(result, 'fred')
 
     def test_effective_principals(self):
         context = DummyContext()
         request = DummyRequest({'REMOTE_USER':'fred'})
-        logger = DummyLogger()
-        policy = self._makeOne(logger)
+        policy = self._makeOne()
         result = policy.effective_principals(request)
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
@@ -395,15 +410,13 @@ class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def test_instance_implements_ISecurityPolicy(self):
         from zope.interface.verify import verifyObject
         from repoze.bfg.interfaces import ISecurityPolicy
-        logger = DummyLogger()
-        verifyObject(ISecurityPolicy, self._makeOne(logger))
+        verifyObject(ISecurityPolicy, self._makeOne())
 
     def test_authenticated_userid(self):
         context = DummyContext()
         identity = {'repoze.who.identity':{'repoze.who.userid':'fred'}}
         request = DummyRequest(identity)
-        logger = DummyLogger()
-        policy = self._makeOne(logger)
+        policy = self._makeOne()
         result = policy.authenticated_userid(request)
         self.assertEqual(result, 'fred')
 
@@ -411,8 +424,7 @@ class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         identity = {'repoze.who.identity':{'repoze.who.userid':'fred'}}
         request = DummyRequest(identity)
-        logger = DummyLogger()
-        policy = self._makeOne(logger)
+        policy = self._makeOne()
         result = policy.effective_principals(request)
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
@@ -557,6 +569,7 @@ class make_authorizer_factory:
                 authorizer.permission = permission
                 authorizer.principals = principals
                 authorizer.context = context
+                authorizer.logger = logger
                 result = authorizer.expected_context == context
                 if not result and authorizer.intermediates_raise:
                     from repoze.bfg.interfaces import NoAuthorizationInformation
