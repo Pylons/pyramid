@@ -1,5 +1,10 @@
 Next release
 
+  Features
+
+   - Ensure bfg doesn't generate warnings when running under Python
+     2.6.
+
   Deprecations
 
    - A deprecation warning is now issued when old API names from the
