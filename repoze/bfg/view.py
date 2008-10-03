@@ -16,7 +16,7 @@ def render_view_to_response(context, request, name='', secure=True):
     calling the view function.  If the permission check disallows view
     execution (based on the current security policy), a
     ``repoze.bfg.security.Unauthorized`` exception will be raised; its
-    ``message`` attribute explains why the view access was disallowed.
+    ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     if secure:
         security_policy = queryUtility(ISecurityPolicy)
@@ -45,7 +45,7 @@ def render_view_to_iterable(context, request, name='', secure=True):
     view function.  If the permission check disallows view execution
     (based on the current security policy), a
     ``repoze.bfg.security.Unauthorized`` exception will be raised; its
-    ``message`` attribute explains why the view access was disallowed.
+    ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     response = render_view_to_response(context, request, name, secure)
     if response is None:
@@ -68,7 +68,7 @@ def render_view(context, request, name='', secure=True):
     function.  If the permission check disallows view execution (based
     on the current security policy), a
     ``repoze.bfg.security.Unauthorized`` exception will be raised; its
-    ``message`` attribute explains why the view access was disallowed.
+    ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     iterable = render_view_to_iterable(context, request, name, secure)
     if iterable is None:

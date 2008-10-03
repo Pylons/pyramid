@@ -308,11 +308,7 @@ class ViewPermissionFactory(object):
         return ViewPermission(context, request, self.permission_name)
 
 class Unauthorized(Exception):
-    def __init__(self, message='Unauthorized'):
-        self.message = message
+    pass
 
-    def __str__(self):
-        return str(self.message)
-    
     
     
