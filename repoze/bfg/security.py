@@ -1,6 +1,3 @@
-import os
-import sys
-
 from zope.interface import implements
 from zope.component import queryUtility
 
