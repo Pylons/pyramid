@@ -313,3 +313,7 @@ Glossary
     `Authentication middleware <http://static.repoze.org/whodocs>`_
     for :term:`WSGI` applications.  It can be used by
     :mod:`repoze.bfg` to provide authentication information.
+  repoze.workflow
+    `Barebones workflow for Python apps
+    <http://svn.repoze.org/repoze.workflow>`_ .  It can be used by
+    :mod:`repoze.bfg` to form a workflow system.
