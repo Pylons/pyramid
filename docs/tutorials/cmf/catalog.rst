@@ -25,7 +25,7 @@ Here's some code which creates an ``allowed`` index for use in a
 ``repoze.catalog`` catalog::
 
     from repoze.bfg.security import principals_allowed_by_permission
-    from repoze.catalog.catalog import CatalogKeywordIndex
+    from repoze.catalog.indexes.keyword import CatalogKeywordIndex
     from repoze.catalog.catalog import Catalog
 
     class Allowed:
