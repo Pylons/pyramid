@@ -159,7 +159,7 @@ configure the ``RoutesMapper`` like so:
 
    class Article(object):
        def __init__(self, **kw):
-           self.__dict__update(kw)
+           self.__dict__.update(kw)
 
    get_root = RoutesMapper(fallback_get_root)
    get_root.connect('archives/:article', controller='articles',
