@@ -12,10 +12,10 @@ div.sphinxsidebar h3,h4,h5,li,a {
 }
 
 div.related {
-    color: #dad3bd;
+    color: #dad3bd !important;
     background-color: #00744a;
 }
  
 div.related a {
-    color: #dad3bd;
+    color: #dad3bd !important;
 }
