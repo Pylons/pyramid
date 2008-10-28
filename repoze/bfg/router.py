@@ -60,10 +60,6 @@ class Router(object):
             app = HTTPNotFound(request.url)
             return app(environ, start_response)
 
-        if not is_response(response):
-            raise ValueError('response did not implement IResponse: %r'
-                             % response)
-
         dispatch(NewResponse(response))
 
         start_response(response.status, response.headerlist)

@@ -1,3 +1,14 @@
+0.4.1 (10/28/2008)
+
+  Bug Fixes
+
+   - If the ``render_view_to_response`` function was called, if the
+     view was found and called, but it returned something that did not
+     implement IResponse, the error would pass by unflagged.  This was
+     noticed when I created a view function that essentially returned
+     None, but received a NotFound error rather than a ValueError when
+     the view was rendered.  This was fixed.
+
 0.4.0 (10/03/2008)
 
   Docs 

@@ -6,15 +6,20 @@ from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
 from repoze.bfg.security import Unauthorized
 
+_marker = ()
+
 def render_view_to_response(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
     ``context`` and ``request`` to an object implementing
     ``repoze.bfg.interfaces.IResponse`` or ``None`` if no such view
     exists.  This function will return ``None`` if a corresponding
-    view cannot be found.  If ``secure`` is ``True``, and the view is
-    protected by a permission, the permission will be checked before
-    calling the view function.  If the permission check disallows view
-    execution (based on the current security policy), a
+    view cannot be found.  Additionally, this function will raise a
+    ``ValueError`` if a view function is found and called but the view
+    returns an object which does not implement
+    ``repoze.bfg.interfaces.IResponse``.  If ``secure`` is ``True``,
+    and the view is protected by a permission, the permission will be
+    checked before calling the view function.  If the permission check
+    disallows view execution (based on the current security policy), a
     ``repoze.bfg.security.Unauthorized`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
@@ -27,7 +32,15 @@ def render_view_to_response(context, request, name='', secure=True):
                 result = permission(security_policy)
                 if not result:
                     raise Unauthorized(result)
-    return queryMultiAdapter((context, request), IView, name=name)
+    response = queryMultiAdapter((context, request), IView, name=name,
+                                 default=_marker)
+    if response is _marker:
+        return None
+
+    if not is_response(response):
+        raise ValueError('response did not implement IResponse: %r' % response)
+
+    return response
 
 def render_view_to_iterable(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
@@ -50,8 +63,6 @@ def render_view_to_iterable(context, request, name='', secure=True):
     response = render_view_to_response(context, request, name, secure)
     if response is None:
         return None
-    if not is_response(response):
-        raise ValueError('response did not implement IResponse: %r' % response)
     return response.app_iter
 
 def render_view(context, request, name='', secure=True):
