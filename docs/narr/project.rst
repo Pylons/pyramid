@@ -125,11 +125,11 @@ Once the project is installed for development, you can run the
 application it represents using the ``paster serve`` command against
 the generated ``MyProject.ini`` configuration file::
 
-  $ paster serve myproject/MyProject.ini
+  $ paster serve MyProject.ini
 
 Here's sample output from a run::
 
-  $ paster serve myproject/MyProject.ini
+  $ paster serve MyProject.ini
   Starting server in PID 16601.
   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
@@ -158,7 +158,7 @@ port 6543.
 Viewing the Application
 -----------------------
 
-Visit ``http://localhost:6542/`` in your browser.  You will see::
+Visit ``http://localhost:6543/`` in your browser.  You will see::
 
   Welcome to MyProject
 
