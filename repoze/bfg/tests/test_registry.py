@@ -35,8 +35,8 @@ class TestMakeRegistry(unittest.TestCase, PlacelessSetup):
             from repoze.bfg.interfaces import ISettings
             from repoze.bfg.interfaces import ILogger
             settings = getUtility(ISettings)
-            logger = getUtility(ILogger, name='repoze.bfg.authdebug')
-            self.assertEqual(logger.name, 'repoze.bfg.authdebug')
+            logger = getUtility(ILogger, name='repoze.bfg.debug')
+            self.assertEqual(logger.name, 'repoze.bfg.debug')
             self.assertEqual(settings.reload_templates, True)
             self.assertEqual(settings.debug_authorization, True)
         finally:

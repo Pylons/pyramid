@@ -1,5 +1,13 @@
 Next release
 
+  Features
+
+  - Expose a single ILogger named "repoze.bfg.debug" as a utility;
+    this logger is registered unconditionally and is used by the
+    authorization debug machinery.  Applications may also make use of
+    it as necessary rather than inventing their own logger, for
+    convenience.
+
   Bug Fixes
 
   - Change default paster template generator to use ``Paste#http``

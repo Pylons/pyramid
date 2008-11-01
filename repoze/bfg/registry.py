@@ -58,10 +58,8 @@ def makeRegistry(filename, package, options=None, lock=threading.Lock()):
             options = {}
         settings = Settings(options)
         registry.registerUtility(settings, ISettings)
-        if options.get('debug_authorization'):
-            auth_logger = make_stream_logger('repoze.bfg.authdebug',sys.stderr)
-            registry.registerUtility(auth_logger, ILogger,
-                                     'repoze.bfg.authdebug')
+        debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
+        registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
         zcml_configure(filename, package=package)

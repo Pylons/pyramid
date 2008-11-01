@@ -104,7 +104,7 @@ class ACLSecurityPolicy(object):
     def permits(self, context, request, permission):
         """ Return ``Allowed`` if the policy permits access,
         ``Denied`` if not."""
-        logger = queryUtility(ILogger, name='repoze.bfg.authdebug')
+        logger = queryUtility(ILogger, name='repoze.bfg.debug')
         principals = self.effective_principals(request)
         for location in lineage(context):
             authorizer = self.authorizer_factory(location, logger)

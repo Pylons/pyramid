@@ -223,7 +223,7 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import ILogger
-        gsm.registerUtility(logger, ILogger, name='repoze.bfg.authdebug')
+        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
 
     def setUp(self):
         PlacelessSetup.setUp(self)
