@@ -309,8 +309,8 @@ changes will not require an application restart to be detected.  See
 
 The ``[server:main]`` section of the configuration file configures a
 WSGI server which listens on port 6543.  It is configured to listen on
-all interfaces (``0.0.0.0``), and is configured to use four threads
-for our application.
+all interfaces (``0.0.0.0``).  The ``Paste#http`` server will create a
+new thread for each request.
 
 .. note::
 

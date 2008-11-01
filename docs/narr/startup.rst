@@ -156,13 +156,10 @@ press ``return`` after running ``paster serve MyProject.ini``.
    another WSGI application".
 
 #. PasteDeploy starts the WSGI *server* defined within the
-   ``[server:main]`` section.  In our case, this is the "CherryPy"
-   server (``use = egg:PasteScript#cherrypy``), and it will listen on
-   all interfaces (``host = 0.0.0.0``), on port number 6543 (``port =
-   6543``).  It will serve up the application using 4 simultaneous
-   threads (``numthreads = 4``), which means it will handle four
-   simultaneous requests before needing to put a request in a wait
-   queue.  The server code itself is what prints ``serving on
+   ``[server:main]`` section.  In our case, this is the ``Paste#http``
+   server (``use = egg:Paste#http``), and it will listen on all
+   interfaces (``host = 0.0.0.0``), on port number 6543 (``port =
+   6543``).  The server code itself is what prints ``serving on
    0.0.0.0:6543 view at http://127.0.0.1:6543``.  The server serves
    the application, and the application is running, waiting to receive
    requests.
