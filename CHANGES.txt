@@ -1,5 +1,7 @@
 Next release
 
+  Bug Fixes
+
   - Change default paster template generator to use ``Paste#http``
     server rather than ``PasteScript#cherrpy`` server.  The cherrypy
     server has a security risk in it when ``REMOTE_USER`` is trusted
