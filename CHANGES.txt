@@ -8,7 +8,7 @@ Next Release
     the Settings objects defaults for ``debug_authorization`` and
     ``debug_notfound``.
 
-  0.4.2 (11/2/2008)
+0.4.2 (11/2/2008)
 
   Features
 
