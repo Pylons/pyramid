@@ -117,6 +117,27 @@ class TestGetOptions(unittest.TestCase):
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_authorization'], True)
 
+class TestSettings(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.registry import Settings
+        return Settings
+
+    def _makeOne(self, **options):
+        klass = self._getTargetClass()
+        return klass(options)
+
+    def test_no_options(self):
+        settings = self._makeOne()
+        self.assertEqual(settings.reload_templates, False)
+        self.assertEqual(settings.debug_notfound, False)
+        self.assertEqual(settings.debug_authorization, False)
+
+    def test_with_option(self):
+        settings = self._makeOne(reload_templates=True)
+        self.assertEqual(settings.reload_templates, True)
+        self.assertEqual(settings.debug_notfound, False)
+        self.assertEqual(settings.debug_authorization, False)
+
 class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)

@@ -1,4 +1,14 @@
-0.4.2 (11/2/2008)
+Next Release
+
+  Bug Fixes
+
+  - Not passing the result of "get_options" as the second argument of
+    make_app could cause attribute errors when attempting to look up
+    settings against the ISettings object (internal).  Fixed by giving
+    the Settings objects defaults for ``debug_authorization`` and
+    ``debug_notfound``.
+
+  0.4.2 (11/2/2008)
 
   Features
 

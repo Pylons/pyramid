@@ -72,6 +72,8 @@ def makeRegistry(filename, package, options=None, lock=threading.Lock()):
 class Settings(object):
     implements(ISettings)
     reload_templates = False
+    debug_notfound = False
+    debug_authorization = False
     def __init__(self, options):
         self.__dict__.update(options)
 
