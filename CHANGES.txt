@@ -1,4 +1,4 @@
-Next Release
+0.4.3 (11/2/2008)
 
   Bug Fixes
 
