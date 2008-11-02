@@ -27,10 +27,17 @@ application-specific configuration settings.
 |                             |                          |  See also:                          |
 |                             |                          |  :ref:`reload_templates_section`    |
 +-----------------------------+--------------------------+-------------------------------------+
-| ``BFG_DEBUG_AUTHORIZATION`` |  ``debug_authorization`` |  Print authorization failure/success|
-|                             |                          |  messages to stderr when true       |
+| ``BFG_DEBUG_AUTHORIZATION`` |  ``debug_authorization`` |  Print view authorization failure & |
+|                             |                          |  success info to stderr when true   |
 |                             |                          |  See also:                          |
 |                             |                          |  :ref:`debug_authorization_section` |
++-----------------------------+--------------------------+-------------------------------------+
+| ``BFG_DEBUG_NOTFOUND``      |  ``debug_notfound``      |  Print view-related NotFound debug  |
+|                             |                          |  messages to stderr when true       |
+|                             |                          |  See also:                          |
+|                             |                          |  :ref:`debug_notfound_section`      |
++-----------------------------+--------------------------+-------------------------------------+
+| ``BFG_DEBUG_ALL``           |  ``debug_all``           |  Turns all debug_* settings on.     |
 +-----------------------------+--------------------------+-------------------------------------+
 
 Examples
@@ -58,3 +65,10 @@ If you started your application this way, your :mod:`repoze.bfg`
 application would behave in the same manner as if you had placed the
 respective settings in the ``[app:main]`` section of your
 application's ``.ini`` file.
+
+If you want to turn all ``debug`` settings (every debug setting that
+starts with ``debug_``). on in one fell swoop, you can use
+``BFG_DEBUG_ALL=1`` as an environment variable setting or you may use
+``debug_all=true`` in the config file.  Note that this does not effect
+settings that do not start with ``debug_*`` such as
+``reload_templates``.

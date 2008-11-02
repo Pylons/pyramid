@@ -129,10 +129,24 @@ code to execute:
     and the context.  If a view function is found, it is called with
     the context and the request.  It returns a response, which is fed
     back upstream.  If a view is not found, a generic WSGI
-    ``NotFound`` application is constructed.
+    ``NotFound`` application is constructed and returned.
 
 In either case, the result is returned upstream via the :term:`WSGI`
 protocol.
+
+.. _debug_notfound_section:
+
+NotFound Errors
+---------------
+
+It's useful to be able to debug ``NotFound`` errors when they occur
+unexpectedly due to an application registry misconfiguration.  To
+debug these errors, use the ``BFG_DEBUG_NOTFOUND`` environment
+variable or the ``debug_notfound`` configuration file setting.
+Details of why a view was not found will be printed to stderr, and the
+browser representation of the error will include the same information.
+See :ref:`environment_chapter` for more information about how and
+where to set these values.
 
 A Traversal Example
 -------------------

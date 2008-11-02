@@ -11,72 +11,85 @@ class TestACLAuthorizer(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
 
+    def test_deny_implicit(self):
+        context = DummyContext()
+        from repoze.bfg.security import Allow
+        ace = (Allow, 'somebodyelse', 'read')
+        acl = [ace]
+        context.__acl__ = acl
+        authorizer = self._makeOne(context)
+        principals = ['fred']
+        result = authorizer.permits('read', *principals)
+
+    def test_deny_explicit(self):
+        context = DummyContext()
+        from repoze.bfg.security import Deny
+        ace = (Deny, 'somebodyelse', 'read')
+        acl = [ace]
+        context.__acl__ = acl
+        authorizer = self._makeOne(context)
+        principals = ['somebodyelse']
+        result = authorizer.permits('read', *principals)
+
     def test_permits_no_acl_raises(self):
         context = DummyContext()
-        logger = DummyLogger()
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         from repoze.bfg.interfaces import NoAuthorizationInformation
         self.assertRaises(NoAuthorizationInformation,
                           authorizer.permits, (), None)
 
     def test_permits_deny_implicit_empty_acl(self):
         context = DummyContext()
-        logger = DummyLogger()
         context.__acl__ = []
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         result = authorizer.permits((), None)
         self.assertEqual(result, False)
         self.assertEqual(result.ace, None)
 
     def test_permits_deny_no_principals_implicit(self):
         context = DummyContext()
-        logger = DummyLogger()
         from repoze.bfg.security import Allow
         from repoze.bfg.security import Everyone
         acl = [(Allow, Everyone, 'view')]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         result = authorizer.permits(None)
         self.assertEqual(result, False)
         self.assertEqual(result.ace, None)
 
     def test_permits_deny_oneacl_implicit(self):
         context = DummyContext()
-        logger = DummyLogger()
         from repoze.bfg.security import Allow
         acl = [(Allow, 'somebody', 'view')]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         result = authorizer.permits('view', 'somebodyelse')
         self.assertEqual(result, False)
         self.assertEqual(result.ace, None)
 
     def test_permits_deny_twoacl_implicit(self):
         context = DummyContext()
-        logger = DummyLogger()
         from repoze.bfg.security import Allow
         acl = [(Allow, 'somebody', 'view'), (Allow, 'somebody', 'write')]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         result = authorizer.permits('view', 'somebodyelse')
         self.assertEqual(result, False)
         self.assertEqual(result.ace, None)
 
     def test_permits_deny_oneacl_explcit(self):
         context = DummyContext()
-        logger = DummyLogger()
         from repoze.bfg.security import Deny
         ace = (Deny, 'somebody', 'view')
         acl = [ace]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         result = authorizer.permits('view', 'somebody')
         self.assertEqual(result, False)
         self.assertEqual(result.ace, ace)
 
     def test_permits_deny_oneacl_multiperm_explcit(self):
         context = DummyContext()
-        logger = DummyLogger()
         acl = []
         from repoze.bfg.security import Deny
         from repoze.bfg.security import Allow
@@ -84,14 +97,13 @@ class TestACLAuthorizer(unittest.TestCase):
         allow = (Allow, 'somebody', 'view')
         acl = [deny, allow]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         result = authorizer.permits('view', 'somebody')
         self.assertEqual(result, False)
         self.assertEqual(result.ace, deny)
 
     def test_permits_deny_twoacl_explicit(self):
         context = DummyContext()
-        logger = DummyLogger()
         acl = []
         from repoze.bfg.security import Deny
         from repoze.bfg.security import Allow
@@ -99,34 +111,32 @@ class TestACLAuthorizer(unittest.TestCase):
         deny = (Deny, 'somebody', 'view')
         acl = [allow, deny]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         result = authorizer.permits('view', 'somebody')
         self.assertEqual(result, False)
         self.assertEqual(result.ace, deny)
 
     def test_permits_allow_twoacl_explicit(self):
         context = DummyContext()
-        logger = DummyLogger()
         from repoze.bfg.security import Deny
         from repoze.bfg.security import Allow
         allow = (Allow, 'somebody', 'read')
         deny = (Deny, 'somebody', 'view')
         acl = [allow, deny]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         result = authorizer.permits('read', 'somebody')
         self.assertEqual(result, True)
         self.assertEqual(result.ace, allow)
 
     def test_permits_nested_principals_list_allow(self):
         context = DummyContext()
-        logger = DummyLogger()
         acl = []
         from repoze.bfg.security import Allow
         ace = (Allow, 'larry', 'read')
         acl = [ace]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         principals = (['fred', ['jim', ['bob', 'larry']]])
         result = authorizer.permits('read', *principals)
         self.assertEqual(result, True)
@@ -134,12 +144,11 @@ class TestACLAuthorizer(unittest.TestCase):
 
     def test_permits_nested_principals_list_deny_explicit(self):
         context = DummyContext()
-        logger = DummyLogger()
         from repoze.bfg.security import Deny
         ace = (Deny, 'larry', 'read')
         acl = [ace]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         principals = (['fred', ['jim', ['bob', 'larry']]])
         result = authorizer.permits('read', *principals)
         self.assertEqual(result, False)
@@ -147,12 +156,11 @@ class TestACLAuthorizer(unittest.TestCase):
 
     def test_permits_nested_principals_list_deny_implicit(self):
         context = DummyContext()
-        logger = DummyLogger()
         from repoze.bfg.security import Allow
         ace = (Allow, 'somebodyelse', 'read')
         acl = [ace]
         context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         principals = (['fred', ['jim', ['bob', 'larry']]])
         result = authorizer.permits('read', *principals)
         self.assertEqual(result, False)
@@ -161,7 +169,6 @@ class TestACLAuthorizer(unittest.TestCase):
         context = DummyContext()
         context.__parent__ = None
         context.__name__ = None
-        logger = DummyLogger()
         from repoze.bfg.security import Allow
         ace = (Allow, 'fred', 'read')
         acl = [ace]
@@ -169,46 +176,11 @@ class TestACLAuthorizer(unittest.TestCase):
         context2 = DummyContext()
         context2.__parent__ = context
         context2.__name__ = 'myname'
-        authorizer = self._makeOne(context, logger)
+        authorizer = self._makeOne(context)
         principals = ['fred']
         result = authorizer.permits('read', *principals)
         self.assertEqual(result, True)
 
-    def test_logging_deny_implicit(self):
-        context = DummyContext()
-        logger = DummyLogger()
-        from repoze.bfg.security import Allow
-        ace = (Allow, 'somebodyelse', 'read')
-        acl = [ace]
-        context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
-        principals = ['fred']
-        result = authorizer.permits('read', *principals)
-        self.assertEqual(len(logger.messages), 1)
-
-    def test_logging_deny_explicit(self):
-        context = DummyContext()
-        logger = DummyLogger()
-        from repoze.bfg.security import Deny
-        ace = (Deny, 'somebodyelse', 'read')
-        acl = [ace]
-        context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
-        principals = ['somebodyelse']
-        result = authorizer.permits('read', *principals)
-        self.assertEqual(len(logger.messages), 1)
-
-    def test_logging_allow(self):
-        context = DummyContext()
-        logger = DummyLogger()
-        from repoze.bfg.security import Allow
-        ace = (Allow, 'somebodyelse', 'read')
-        acl = [ace]
-        context.__acl__ = acl
-        authorizer = self._makeOne(context, logger)
-        principals = ['somebodyelse']
-        result = authorizer.permits('read', *principals)
-        self.assertEqual(len(logger.messages), 1)
 
 class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def _getTargetClass(self):
@@ -218,12 +190,6 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
-
-    def _registerLogger(self, logger):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import ILogger
-        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
 
     def setUp(self):
         PlacelessSetup.setUp(self)
@@ -304,26 +270,6 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         self.assertEqual(authorizer_factory.principals, (Everyone,))
         self.assertEqual(authorizer_factory.permission, 'view')
         self.assertEqual(authorizer_factory.context, context)
-
-    def test_permits_with_logger(self):
-        logger = DummyLogger()
-        self._registerLogger(logger)
-        context = DummyContext()
-        request = DummyRequest({})
-        policy = self._makeOne(lambda *arg: None)
-        authorizer_factory = make_authorizer_factory(context)
-        policy.authorizer_factory = authorizer_factory
-        policy.permits(context, request, 'view')
-        self.assertEqual(authorizer_factory.logger, logger)
-
-    def test_permits_no_logger(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        policy = self._makeOne(lambda *arg: None)
-        authorizer_factory = make_authorizer_factory(context)
-        policy.authorizer_factory = authorizer_factory
-        policy.permits(context, request, 'view')
-        self.assertEqual(authorizer_factory.logger, None)
 
     def test_principals_allowed_by_permission_direct(self):
         from repoze.bfg.security import Allow
@@ -526,6 +472,82 @@ class TestViewPermissionFactory(unittest.TestCase):
         self.assertEqual(result.permission_name, 'repoze.view')
         self.assertEqual(result.context, context)
         self.assertEqual(result.request, request)
+
+class TestAllowed(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.security import Allowed
+        return Allowed
+    
+    def _makeOne(self, *arg, **kw):
+        klass = self._getTargetClass()
+        return klass(*arg, **kw)
+
+    def test_it(self):
+        allowed = self._makeOne('hello')
+        self.assertEqual(allowed.msg, 'hello')
+        self.assertEqual(allowed, True)
+        self.failUnless(allowed)
+        self.assertEqual(str(allowed), 'hello')
+        self.failUnless('<Allowed instance at ' in repr(allowed))
+        self.failUnless("with msg 'hello'>" in repr(allowed))
+
+class TestDenied(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.security import Denied
+        return Denied
+    
+    def _makeOne(self, *arg, **kw):
+        klass = self._getTargetClass()
+        return klass(*arg, **kw)
+
+    def test_it(self):
+        denied = self._makeOne('hello')
+        self.assertEqual(denied.msg, 'hello')
+        self.assertEqual(denied, False)
+        self.failIf(denied)
+        self.assertEqual(str(denied), 'hello')
+        self.failUnless('<Denied instance at ' in repr(denied))
+        self.failUnless("with msg 'hello'>" in repr(denied))
+
+class TestACLAllowed(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.security import ACLAllowed
+        return ACLAllowed
+    
+    def _makeOne(self, *arg, **kw):
+        klass = self._getTargetClass()
+        return klass(*arg, **kw)
+
+    def test_it(self):
+        msg = ("ACLAllowed permission 'permission' via ACE 'ace' in ACL 'acl' "
+               "on context 'ctx' for principals 'principals'")
+        allowed = self._makeOne('ace', 'acl', 'permission', 'principals', 'ctx')
+        self.failUnless(msg in allowed.msg)
+        self.assertEqual(allowed, True)
+        self.failUnless(allowed)
+        self.assertEqual(str(allowed), msg)
+        self.failUnless('<ACLAllowed instance at ' in repr(allowed))
+        self.failUnless("with msg %r>" % msg in repr(allowed))
+
+class TestACLDenied(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.security import ACLDenied
+        return ACLDenied
+    
+    def _makeOne(self, *arg, **kw):
+        klass = self._getTargetClass()
+        return klass(*arg, **kw)
+
+    def test_it(self):
+        msg = ("ACLDenied permission 'permission' via ACE 'ace' in ACL 'acl' "
+               "on context 'ctx' for principals 'principals'")
+        denied = self._makeOne('ace', 'acl', 'permission', 'principals', 'ctx')
+        self.failUnless(msg in denied.msg)
+        self.assertEqual(denied, False)
+        self.failIf(denied)
+        self.assertEqual(str(denied), msg)
+        self.failUnless('<ACLDenied instance at ' in repr(denied))
+        self.failUnless("with msg %r>" % msg in repr(denied))
     
 class DummyContext:
     pass
@@ -551,25 +573,18 @@ class DummySecurityPolicy:
     def principals_allowed_by_permission(self, context, permission):
         return ['fred', 'bob']
 
-class DummyLogger:
-    def __init__(self):
-        self.messages = []
-    def debug(self, msg):
-        self.messages.append(msg)
-
 class make_authorizer_factory:
     def __init__(self, expected_context, intermediates_raise=False):
         self.expected_context = expected_context
         self.intermediates_raise = intermediates_raise
 
-    def __call__(self, context, logger):
+    def __call__(self, context):
         authorizer = self
         class Authorizer:
             def permits(self, permission, *principals):
                 authorizer.permission = permission
                 authorizer.principals = principals
                 authorizer.context = context
-                authorizer.logger = logger
                 result = authorizer.expected_context == context
                 if not result and authorizer.intermediates_raise:
                     from repoze.bfg.interfaces import NoAuthorizationInformation

@@ -8,6 +8,53 @@ Next release
     it as necessary rather than inventing their own logger, for
     convenience.
 
+  - The ``BFG_DEBUG_AUTHORIZATION`` envvar and the
+    ``debug_authorization`` config file value now only imply debugging
+    of view-invoked security checks.  Previously, information was
+    printed for every call to ``has_permission`` as well, which made
+    output confusing.  To debug ``has_permission`` checks and other
+    manual permission checks, use the debugger and print statements in
+    your own code.
+
+  - Authorization debugging info is now only present in the HTTP
+    response body oif ``debug_authorization`` is true.
+
+  - The format of authorization debug messages was improved.
+
+  - A new ``BFG_DEBUG_NOTFOUND`` envvar was added and a symmetric
+    ``debug_notfound`` config file value was added.  When either is
+    true, and a NotFound response is returned by the BFG router
+    (because a view could not be found), debugging information is
+    printed to stderr.  When this value is set true, the body of
+    HTTPNotFound responses will also contain the same debugging
+    information.
+
+  - ``Allowed`` and ``Denied`` responses from the security machinery
+    are now specialized into two types: ACL types, and non-ACL types.
+    The ACL-related responses are instances of
+    ``repoze.bfg.security.ACLAllowed`` and
+    ``repoze.bfg.security.ACLDenied``.  The non-ACL-related responses
+    are ``repoze.bfg.security.Allowed`` and
+    ``repoze.bfg.security.Denied``.  The allowed-type responses
+    continue to evaluate equal to things that themselves evaluate
+    equal to the ``True`` boolean, while the denied-type responses
+    continue to evaluate equal to things that themselves evaluate
+    equal to the ``False`` boolean.  The only difference between the
+    two types is the information attached to them for debugging
+    purposes.
+
+  - Added a new ``BFG_DEBUG_ALL`` envvar and a symmetric ``debug_all``
+    config file value.  When either is true, all other debug-related
+    flags are set true unconditionally (e.g. ``debug_notfound`` and
+    ``debug_authorization``).
+
+  Documentation
+
+  - Added info about debug flag changes.
+
+  - Added a section to the security chapter named "Debugging
+    Imperative Authorization Failures" (for e.g. ``has_permssion``).
+
   Bug Fixes
 
   - Change default paster template generator to use ``Paste#http``

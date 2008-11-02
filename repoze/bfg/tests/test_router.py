@@ -9,6 +9,33 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
     def tearDown(self):
         PlacelessSetup.tearDown(self)
 
+    def _registerLogger(self):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ILogger
+        class Logger:
+            def __init__(self):
+                self.messages = []
+            def info(self, msg):
+                self.messages.append(msg)
+            debug = info
+        logger = Logger()
+        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
+        return logger
+
+    def _registerSettings(self, **kw):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ISettings
+        class Settings:
+            def __init__(self, **kw):
+                self.__dict__.update(kw)
+
+        defaultkw = {'debug_authorization':False, 'debug_notfound':False}
+        defaultkw.update(kw)
+        settings = Settings(**defaultkw)
+        gsm.registerUtility(settings, ISettings)
+
     def _registerTraverserFactory(self, app, name, *for_):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
@@ -56,12 +83,13 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         environ.update(extras)
         return environ
 
-    def test_call_no_view_registered(self):
+    def test_call_no_view_registered_no_isettings(self):
         rootpolicy = make_rootpolicy(None)
         environ = self._makeEnviron()
         context = DummyContext()
         traversalfactory = make_traversal_factory(context, '', [])
         self._registerTraverserFactory(traversalfactory, '', None)
+        logger = self._registerLogger()
         router = self._makeOne(rootpolicy, None)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -70,6 +98,56 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         status = start_response.status
         self.assertEqual(status, '404 Not Found')
         self.failUnless('http://localhost:8080' in result[0], result)
+        self.failIf('debug_notfound' in result[0])
+        self.assertEqual(len(logger.messages), 0)
+
+    def test_call_no_view_registered_debug_notfound_false(self):
+        rootpolicy = make_rootpolicy(None)
+        environ = self._makeEnviron()
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(traversalfactory, '', None)
+        logger = self._registerLogger()
+        self._registerSettings(debug_notfound=False)
+        router = self._makeOne(rootpolicy, None)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '404 Not Found')
+        self.failUnless('http://localhost:8080' in result[0], result)
+        self.failIf('debug_notfound' in result[0])
+        self.assertEqual(len(logger.messages), 0)
+
+    def test_call_no_view_registered_debug_notfound_true(self):
+        rootpolicy = make_rootpolicy(None)
+        environ = self._makeEnviron()
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerSettings(debug_notfound=True)
+        logger = self._registerLogger()
+        router = self._makeOne(rootpolicy, None)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '404 Not Found')
+        self.failUnless(
+            "debug_notfound of url http://localhost:8080; path_info: '', "
+            "context:" in result[0])
+        self.failUnless(
+            "view_name: '', subpath: []" in result[0])
+        self.failUnless('http://localhost:8080' in result[0], result)
+        self.assertEqual(len(logger.messages), 1)
+        message = logger.messages[0]
+        self.failUnless('of url http://localhost:8080' in message)
+        self.failUnless("path_info: ''" in message)
+        self.failUnless('DummyContext instance at' in message)
+        self.failUnless("view_name: ''" in message)
+        self.failUnless("subpath: []" in message)
 
     def test_call_view_registered_nonspecific_default_path(self):
         rootpolicy = make_rootpolicy(None)
@@ -207,7 +285,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(start_response.status, '200 OK')
         self.assertEqual(permissionfactory.checked_with, secpol)
 
-    def test_call_view_registered_security_policy_permission_fails(self):
+    def test_call_view_permission_fails_nosettings(self):
         rootpolicy = make_rootpolicy(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
@@ -220,9 +298,9 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         response = DummyResponse()
         view = make_view(response)
         secpol = DummySecurityPolicy()
-        from repoze.bfg.security import Denied
+        from repoze.bfg.security import ACLDenied
         permissionfactory = make_permission_factory(
-            Denied('ace', 'acl', 'permission', ['principals'], context)
+            ACLDenied('ace', 'acl', 'permission', ['principals'], context)
             )
         environ = self._makeEnviron()
         self._registerTraverserFactory(traversalfactory, '', None)
@@ -233,8 +311,85 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(start_response.status, '401 Unauthorized')
-        self.failUnless('permission' in result[0])
+        message = result[0]
+        self.failUnless('failed security policy check' in message)
         self.assertEqual(permissionfactory.checked_with, secpol)
+
+    def test_call_view_permission_fails_no_debug_auth(self):
+        rootpolicy = make_rootpolicy(None)
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        traversalfactory = make_traversal_factory(context, '', [''])
+        response = DummyResponse()
+        view = make_view(response)
+        secpol = DummySecurityPolicy()
+        from repoze.bfg.security import ACLDenied
+        permissionfactory = make_permission_factory(
+            ACLDenied('ace', 'acl', 'permission', ['principals'], context)
+            )
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', IContext, IRequest)
+        self._registerSecurityPolicy(secpol)
+        self._registerPermission(permissionfactory, '', IContext, IRequest)
+        self._registerSettings(debug_authorization=False)
+        router = self._makeOne(rootpolicy, None)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(start_response.status, '401 Unauthorized')
+        message = result[0]
+        self.failUnless('failed security policy check' in message)
+        self.assertEqual(permissionfactory.checked_with, secpol)
+
+    def test_call_view_permission_fails_with_debug_auth(self):
+        rootpolicy = make_rootpolicy(None)
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        traversalfactory = make_traversal_factory(context, '', [''])
+        response = DummyResponse()
+        view = make_view(response)
+        secpol = DummySecurityPolicy()
+        from repoze.bfg.security import ACLDenied
+        permissionfactory = make_permission_factory(
+            ACLDenied('ace', 'acl', 'permission', ['principals'], context)
+            )
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', IContext, IRequest)
+        self._registerSecurityPolicy(secpol)
+        self._registerPermission(permissionfactory, '', IContext, IRequest)
+        self._registerSettings(debug_authorization=True)
+        logger = self._registerLogger()
+        router = self._makeOne(rootpolicy, None)
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(start_response.status, '401 Unauthorized')
+        message = result[0]
+        self.failUnless(
+            "ACLDenied permission 'permission' via ACE 'ace' in ACL 'acl' "
+            "on context" in message)
+        self.failUnless("for principals ['principals']" in message)
+        self.assertEqual(permissionfactory.checked_with, secpol)
+        self.assertEqual(len(logger.messages), 1)
+        logged = logger.messages[0]
+        self.failUnless(
+            "debug_authorization of url http://localhost:8080 (view name "
+            "'' against context" in logged)
+        self.failUnless(
+            "ACLDenied permission 'permission' via ACE 'ace' in ACL 'acl' on "
+            "context" in logged)
+        self.failUnless(
+            "for principals ['principals']" in logged)
 
     def test_call_eventsends(self):
         rootpolicy = make_rootpolicy(None)

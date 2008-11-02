@@ -7,7 +7,6 @@ from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IViewPermissionFactory
 from repoze.bfg.interfaces import NoAuthorizationInformation
-from repoze.bfg.interfaces import ILogger
 
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
@@ -65,14 +64,14 @@ def principals_allowed_by_permission(context, permission):
 
 class ACLAuthorizer(object):
 
-    def __init__(self, context, logger):
+    def __init__(self, context):
         self.context = context
-        self.logger = logger
 
     def permits(self, permission, *principals):
         acl = getattr(self.context, '__acl__', None)
         if acl is None:
-            raise NoAuthorizationInformation('%s item has no __acl__' % acl)
+            raise NoAuthorizationInformation('%s item has no __acl__' %
+                                             self.context)
 
         for ace in acl:
             ace_action, ace_principal, ace_permissions = ace
@@ -80,18 +79,14 @@ class ACLAuthorizer(object):
                 if ace_principal == principal:
                     permissions = flatten(ace_permissions)
                     if permission in permissions:
-                        action = ace_action
-                        if action == Allow:
-                            result = Allowed(ace, acl, permission, principals,
+                        if ace_action == Allow:
+                            return ACLAllowed(ace, acl, permission, principals,
+                                              self.context)
+                        else:
+                            return ACLDenied(ace, acl, permission, principals,
                                              self.context)
-                            self.logger and self.logger.debug(str(result))
-                            return result
-                        result = Denied(ace, acl, permission, principals,
-                                        self.context)
-                        self.logger and self.logger.debug(str(result))
-                        return result
-        result = Denied(None, acl, permission, principals, self.context)
-        self.logger and self.logger.debug(str(result))
+        # default deny
+        result = ACLDenied(None, acl, permission, principals, self.context)
         return result
 
 class ACLSecurityPolicy(object):
@@ -102,18 +97,18 @@ class ACLSecurityPolicy(object):
         self.get_principals = get_principals
 
     def permits(self, context, request, permission):
-        """ Return ``Allowed`` if the policy permits access,
-        ``Denied`` if not."""
-        logger = queryUtility(ILogger, name='repoze.bfg.debug')
+        """ Return ``ACLAllowed`` if the policy permits access,
+        ``ACLDenied`` if not. """
         principals = self.effective_principals(request)
         for location in lineage(context):
-            authorizer = self.authorizer_factory(location, logger)
+            authorizer = self.authorizer_factory(location)
             try:
                 return authorizer.permits(permission, *principals)
+
             except NoAuthorizationInformation:
                 continue
 
-        return False
+        return Denied(None, None, permission, principals, self.context)
 
     def authenticated_userid(self, request):
         principals = self.get_principals(request)
@@ -202,26 +197,22 @@ def RepozeWhoIdentityACLSecurityPolicy():
     return ACLSecurityPolicy(get_who_principals)
 
 class PermitsResult:
-    def __init__(self, ace, acl, permission, principals, context):
-        self.acl = acl
-        self.ace = ace
-        self.permission = permission
-        self.principals = principals
-        self.context_repr = repr(context)
-
     def __str__(self):
-        msg = '%s: %r via ace %r in acl %r or principals %r in context %s'
-        msg = msg % (self.__class__.__name__,
-                     self.permission, self.ace, self.acl, self.principals,
-                     self.context_repr)
-        return msg
+        return self.msg
+
+    def __repr__(self):
+        return '<%s instance at %s with msg %r>' % (self.__class__.__name__,
+                                                    id(self),
+                                                    self.msg)
 
 class Denied(PermitsResult):
-    """ An instance of ``Denied`` is returned by an ACL denial.  It
-    evaluates equal to all boolean false types.  It also has
-    attributes which indicate which acl, ace, permission, principals,
-    and context were involved in the request.  Its __str__ method
-    prints a summary of these attributes for debugging purposes."""
+    """ An instance of ``Denied`` is returned when a security policy
+    or other ``repoze.bfg`` code denies an action unlrelated to an ACL
+    check.  It evaluates equal to all boolean false types.  It has an
+    attribute named ``msg`` describing the circumstances for the deny."""
+    def __init__(self, msg):
+        self.msg = msg
+
     def __nonzero__(self):
         return False
 
@@ -229,16 +220,54 @@ class Denied(PermitsResult):
         return bool(other) is False
 
 class Allowed(PermitsResult):
-    """ An instance of ``Allowed`` is returned by an ACL allow.  It
-    evaluates equal to all boolean true types.  It also has attributes
-    which indicate which acl, ace, permission, principals, and context
-    were involved in the request.  Its __str__ method prints a summary
-    of these attributes for debugging purposes."""
+    """ An instance of ``Allowed`` is returned when a security policy
+    or other ``repoze.bfg`` code allows an action unrelated to an ACL
+    check.  It evaluates equal to all boolean true types.  It has an
+    attribute named ``msg`` describing the circumstances for the
+    allow."""
+    def __init__(self, msg):
+        self.msg = msg
+
     def __nonzero__(self):
         return True
 
     def __eq__(self, other):
         return bool(other) is True
+
+class ACLPermitsResult:
+    def __init__(self, ace, acl, permission, principals, context):
+        self.permission = permission
+        self.ace = ace
+        self.acl = acl
+        self.principals = principals
+        self.context = context
+        msg = ('%s permission %r via ACE %r in ACL %r on context %r for '
+               'principals %r')
+        msg = msg % (self.__class__.__name__,
+                     self.permission,
+                     self.ace,
+                     self.acl,
+                     self.context,
+                     self.principals)
+        self.msg = msg
+
+class ACLDenied(ACLPermitsResult, Denied):
+    """ An instance of ``ACLDenied`` represents that a security check
+    made explicitly against ACL was denied.  It evaluates equal to all
+    boolean false types.  It also has attributes which indicate which
+    acl, ace, permission, principals, and context were involved in the
+    request.  Its __str__ method prints a summary of these attributes
+    for debugging purposes.  The same summary is available as he
+    ``msg`` attribute."""
+
+class ACLAllowed(ACLPermitsResult, Allowed):
+    """ An instance of ``ACLDenied`` represents that a security check
+    made explicitly against ACL was allowed.  It evaluates equal to
+    all boolean true types.  It also has attributes which indicate
+    which acl, ace, permission, principals, and context were involved
+    in the request.  Its __str__ method prints a summary of these
+    attributes for debugging purposes.  The same summary is available
+    as he ``msg`` attribute."""
 
 def flatten(x):
     """flatten(sequence) -> list
@@ -269,8 +298,9 @@ class ViewPermission(object):
         self.request = request
         self.permission_name = permission_name
     
-    def __call__(self, security_policy):
-        return security_policy.permits(self.context, self.request,
+    def __call__(self, security_policy, debug_info=None):
+        return security_policy.permits(self.context,
+                                       self.request,
                                        self.permission_name)
 
     def __repr__(self):
@@ -288,6 +318,7 @@ class ViewPermissionFactory(object):
 
 class Unauthorized(Exception):
     pass
+
 
     
     

@@ -79,6 +79,44 @@ class TestGetOptions(unittest.TestCase):
                              {'BFG_DEBUG_AUTHORIZATION':'1'})
         self.assertEqual(result['debug_authorization'], True)
 
+    def test_debug_notfound(self):
+        get_options = self._getFUT()
+        result = get_options({})
+        self.assertEqual(result['debug_notfound'], False)
+        result = get_options({'debug_notfound':'false'})
+        self.assertEqual(result['debug_notfound'], False)
+        result = get_options({'debug_notfound':'t'})
+        self.assertEqual(result['debug_notfound'], True)
+        result = get_options({'debug_notfound':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        result = get_options({}, {'BFG_DEBUG_NOTFOUND':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        result = get_options({'debug_notfound':'false'},
+                             {'BFG_DEBUG_NOTFOUND':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        
+    def test_debug_all(self):
+        get_options = self._getFUT()
+        result = get_options({})
+        self.assertEqual(result['debug_notfound'], False)
+        self.assertEqual(result['debug_authorization'], False)
+        result = get_options({'debug_all':'false'})
+        self.assertEqual(result['debug_notfound'], False)
+        self.assertEqual(result['debug_authorization'], False)
+        result = get_options({'debug_all':'t'})
+        self.assertEqual(result['debug_notfound'], True)
+        self.assertEqual(result['debug_authorization'], True)
+        result = get_options({'debug_all':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        self.assertEqual(result['debug_authorization'], True)
+        result = get_options({}, {'BFG_DEBUG_ALL':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        self.assertEqual(result['debug_authorization'], True)
+        result = get_options({'debug_all':'false'},
+                             {'BFG_DEBUG_ALL':'1'})
+        self.assertEqual(result['debug_notfound'], True)
+        self.assertEqual(result['debug_authorization'], True)
+
 class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)

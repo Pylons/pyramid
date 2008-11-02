@@ -91,15 +91,22 @@ def asbool(s):
 def get_options(kw, environ=os.environ):
     # environ is passed in for unit tests
     eget = environ.get
+    config_debug_all = kw.get('debug_all', '')
+    effective_debug_all = asbool(eget('BFG_DEBUG_ALL',
+                                      config_debug_all))
     config_debug_auth = kw.get('debug_authorization', '')
     effective_debug_auth = asbool(eget('BFG_DEBUG_AUTHORIZATION',
                                        config_debug_auth))
+    config_debug_notfound = kw.get('debug_notfound', '')
+    effective_debug_notfound = asbool(eget('BFG_DEBUG_NOTFOUND',
+                                           config_debug_notfound))
     config_reload_templates = kw.get('reload_templates')
     effective_reload_templates = asbool(eget('BFG_RELOAD_TEMPLATES',
                                         config_reload_templates))
     return {
-        'debug_authorization': effective_debug_auth,
-        'reload_templates':effective_reload_templates,
+        'debug_authorization': effective_debug_all or effective_debug_auth,
+        'debug_notfound': effective_debug_all or effective_debug_notfound,
+        'reload_templates': effective_reload_templates,
         }
 
 from zope.testing.cleanup import addCleanUp

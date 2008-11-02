@@ -166,19 +166,20 @@ location-awareness.
 
 .. _debug_authorization_section:
 
-Debugging Authorization Failures
---------------------------------
+Debugging View Authorization Failures
+-------------------------------------
 
-If your application in your judgment is allowing or denying access
-inappropriately, start your application under a shell using the
+If your application in your judgment is allowing or denying view
+access inappropriately, start your application under a shell using the
 ``BFG_DEBUG_AUTHORIZATION`` environment variable set to ``1``.  For
 example::
 
   $ BFG_DEBUG_AUTHORIZATION=1 bin/paster serve myproject.ini
 
-When any authorization takes place, a message will be logged to the
-console (to stderr) about what ACE in which ACL permitted or denied
-the authorization based on authentication information.
+When any authorization takes place during a top-level view rendering,
+a message will be logged to the console (to stderr) about what ACE in
+which ACL permitted or denied the authorization based on
+authentication information.
 
 This behavior can also be turned on in the application ``.ini`` file
 by setting the ``debug_authorization`` key to ``true`` within the
@@ -188,3 +189,20 @@ application's configuration section, e.g.::
   use = egg:MyProject#app
   debug_authorization = true
 
+With this debug flag turned on, the response sent to the browser will
+also contain security debugging information in its body.
+
+Debugging Imperative Authorization Failures
+-------------------------------------------
+
+The ``has_permission`` API (see :ref:`security_module`) is used to
+check security within view functions imperatively.  It returns
+instances of objects that are effectively booleans.  But these objects
+are not raw ``True`` or ``False`` objects, and have information
+attached to them about why the permission was allowed or denied.  The
+object will be one of ``ACLAllowed``, ``ACLDenied``, ``Allowed``, and
+``Denied``, documented in :ref:`security_module`.  At very minimum
+these objects will have a ``msg`` attribute, which is a string
+indicating why permission was denied or allowed.  Introspecting this
+information in the debugger or via print statements when a
+``has_permission`` fails is often useful.

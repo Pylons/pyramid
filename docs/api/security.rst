@@ -38,9 +38,14 @@
     'george', 'read')`` that means deny access.  A sequence of ACEs
     makes up an ACL.  It is a string, and it's actual value is "Deny".
 
+  .. autoclass:: ACLDenied
+     :members:
+
+  .. autoclass:: ACLAllowed
+     :members:
+
   .. autoclass:: Denied
      :members:
 
   .. autoclass:: Allowed
      :members:
-

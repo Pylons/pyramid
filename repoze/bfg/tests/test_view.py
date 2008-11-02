@@ -372,7 +372,71 @@ class TestIsResponse(unittest.TestCase):
         f = self._getFUT()
         self.assertEqual(f(response), False)
 
+class TestViewExecutionPermitted(unittest.TestCase, PlacelessSetup):
+    def setUp(self):
+        PlacelessSetup.setUp(self)
+
+    def tearDown(self):
+        PlacelessSetup.tearDown(self)
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.view import view_execution_permitted
+        return view_execution_permitted(*arg, **kw)
+
+    def _registerSecurityPolicy(self, secpol):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ISecurityPolicy
+        gsm.registerUtility(secpol, ISecurityPolicy)
+
+    def _registerPermission(self, permission, name, *for_):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import IViewPermission
+        gsm.registerAdapter(permission, for_, IViewPermission, name)
+
+    def test_no_secpol(self):
+        context = DummyContext()
+        request = DummyRequest()
+        result = self._callFUT(context, request, '')
+        msg = result.msg
+        self.failUnless("Allowed: view name '' in context" in msg)
+        self.failUnless('(no security policy in use)' in msg)
+        self.assertEqual(result, True)
+
+    def test_secpol_no_permission(self):
+        secpol = DummySecurityPolicy()
+        self._registerSecurityPolicy(secpol)
+        context = DummyContext()
+        request = DummyRequest()
+        result = self._callFUT(context, request, '')
+        msg = result.msg
+        self.failUnless("Allowed: view name '' in context" in msg)
+        self.failUnless("(no permission registered for name '')" in msg)
+        self.assertEqual(result, True)
+
+    def test_secpol_and_permission(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import IRequest
+        class IContext(Interface):
+            pass
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        permissionfactory = make_permission_factory(True)
+        self._registerPermission(permissionfactory, '', IContext,
+                                 IRequest)
+        secpol = DummySecurityPolicy()
+        self._registerSecurityPolicy(secpol)
+        request = DummyRequest()
+        directlyProvides(request, IRequest)
+        result = self._callFUT(context, request, '')
+        self.failUnless(result is True)
+
 class DummyContext:
+    pass
+
+class DummyRequest:
     pass
 
 def make_view(response):

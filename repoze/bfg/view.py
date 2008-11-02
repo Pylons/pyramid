@@ -4,9 +4,30 @@ from zope.component import queryUtility
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
+
 from repoze.bfg.security import Unauthorized
+from repoze.bfg.security import Allowed
 
 _marker = ()
+
+def view_execution_permitted(context, request, name=''):
+    """ If the view specified by ``context`` and ``name`` is protected
+    by a permission, return the result of checking the permission
+    associated with the view using the effective security policy and
+    the ``request``.  If no security policy is in effect, or if the
+    view is not protected by a permission, return a True value. """
+    security_policy = queryUtility(ISecurityPolicy)
+    if security_policy:
+        permission = queryMultiAdapter((context, request), IViewPermission,
+                                       name=name)
+        if permission is None:
+            return Allowed(
+                'Allowed: view name %r in context %r (no permission '
+                'registered for name %r).' % (name, context, name)
+                )
+        return permission(security_policy)
+    return Allowed('Allowed: view name %r in context %r (no security policy '
+                   'in use).' % (name, context))
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
@@ -24,16 +45,13 @@ def render_view_to_response(context, request, name='', secure=True):
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     if secure:
-        security_policy = queryUtility(ISecurityPolicy)
-        if security_policy:
-            permission = queryMultiAdapter((context, request), IViewPermission,
-                                           name=name)
-            if permission is not None:
-                result = permission(security_policy)
-                if not result:
-                    raise Unauthorized(result)
+        permitted = view_execution_permitted(context, request, name)
+        if not permitted:
+            raise Unauthorized(permitted)
+
     response = queryMultiAdapter((context, request), IView, name=name,
                                  default=_marker)
+
     if response is _marker:
         return None
 
