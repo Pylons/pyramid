@@ -24,7 +24,7 @@ def has_permission(permission, context, request):
     application."""
     policy = queryUtility(ISecurityPolicy)
     if policy is None:
-        return True
+        return Allowed('No security policy in use.')
     return policy.permits(context, request, permission)
 
 def authenticated_userid(request):
@@ -85,7 +85,8 @@ class ACLAuthorizer(object):
                         else:
                             return ACLDenied(ace, acl, permission, principals,
                                              self.context)
-        # default deny
+
+        # default deny if no ACE matches in the ACL found
         result = ACLDenied(None, acl, permission, principals, self.context)
         return result
 
@@ -104,11 +105,11 @@ class ACLSecurityPolicy(object):
             authorizer = self.authorizer_factory(location)
             try:
                 return authorizer.permits(permission, *principals)
-
             except NoAuthorizationInformation:
                 continue
 
-        return Denied(None, None, permission, principals, self.context)
+        # default deny if no ACL in lineage at all
+        return ACLDenied(None, None, permission, principals, context)
 
     def authenticated_userid(self, request):
         principals = self.get_principals(request)

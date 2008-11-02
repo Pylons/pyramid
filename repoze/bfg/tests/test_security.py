@@ -234,6 +234,21 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         self.assertEqual(authorizer_factory.permission, 'view')
         self.assertEqual(authorizer_factory.context, context)
 
+    def test_permits_default_deny(self):
+        context = DummyContext()
+        context.__acl__ = []
+        request = DummyRequest({})
+        policy = self._makeOne(lambda *arg: None)
+        authorizer_factory = make_authorizer_factory(None,
+                                                     intermediates_raise=True)
+        policy.authorizer_factory = authorizer_factory
+        result = policy.permits(context, request, 'view')
+        self.assertEqual(result, False)
+        from repoze.bfg.security import Everyone
+        self.assertEqual(authorizer_factory.principals, (Everyone,))
+        self.assertEqual(authorizer_factory.permission, 'view')
+        self.assertEqual(authorizer_factory.context, context)
+
     def test_permits_no_principals_withparents_root_has_acl_info(self):
         context = DummyContext()
         context.__name__ = None
@@ -398,7 +413,9 @@ class TestAPIFunctions(unittest.TestCase, PlacelessSetup):
         
     def test_has_permission_not_registered(self):
         from repoze.bfg.security import has_permission
-        self.assertEqual(has_permission('view', None, None), True)
+        result = has_permission('view', None, None)
+        self.assertEqual(result, True)
+        self.assertEqual(result.msg, 'No security policy in use.')
 
     def test_authenticated_userid_registered(self):
         secpol = DummySecurityPolicy(False)
@@ -591,13 +608,3 @@ class make_authorizer_factory:
                     raise NoAuthorizationInformation()
                 return result
         return Authorizer()
-
-    
-
-
-            
-                
-    
-        
-
-    

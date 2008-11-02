@@ -8,6 +8,12 @@ Next Release
     the Settings objects defaults for ``debug_authorization`` and
     ``debug_notfound``.
 
+  - Return an instance of ``Allowed`` (rather than ``True``) from
+    ``has_permission`` when no security policy is in use.
+
+  - Fix bug where default deny in authorization check would throw a
+    TypeError (use ``ACLDenied`` instead of ``Denied``).
+
 0.4.2 (11/2/2008)
 
   Features
