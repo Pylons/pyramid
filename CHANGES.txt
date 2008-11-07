@@ -1,3 +1,37 @@
+Next Release
+
+  Features
+
+  - Added a ``repoze.bfg.testing`` module to attempt to make it
+    slightly easier to write unittest-based automated tests of BFG
+    applications.  Information about this class is in the
+    documentation.
+
+  - The default template renderer now supports testing better by
+    looking for ``ITestingTemplateRenderer`` using a relative
+    pathname.  This is exposed indirectly through the API named
+    ``registerTemplate`` in ``repoze.bfg.testing``.
+
+  Deprecations
+
+  - The names ``repoze.bfg.interfaces.ITemplate`` ,
+    ``repoze.bfg.interfaces.ITemplateFactory`` and
+    ``repoze.bfg.interfaces.INodeTemplate`` have been deprecated.
+    These should now be imported as
+    ``repoze.bfg.interfaces.ITemplateRenderer`` and
+    ``repoze.bfg.interfaces.ITemplateRendererFactory``, and
+    ``INodeTemplateRenderer`` respectively.
+
+  - The name ``repoze.bfg.chameleon_zpt.ZPTTemplateFactory`` is
+    deprecated.  Use ``repoze.bfg.chameleon_zpt.ZPTTemplateRenderer``.
+
+  - The name ``repoze.bfg.chameleon_genshi.GenshiTemplateFactory`` is
+    deprecated.  Use
+    ``repoze.bfg.chameleon_genshi.GenshiTemplateRenderer``.
+
+  - The name ``repoze.bfg.xslt.XSLTemplateFactory`` is deprecated.
+    Use ``repoze.bfg.xslt.XSLTemplateRenderer``.
+
 0.4.3 (11/2/2008)
 
   Bug Fixes

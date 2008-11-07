@@ -5,14 +5,15 @@ from webob import Response
 from zope.component import queryUtility
 from zope.component import getSiteManager
 from zope.component.interfaces import ComponentLookupError
+from zope.deprecation import deprecated
 
 from zope.interface import classProvides
 from zope.interface import implements
 
 from repoze.bfg.path import caller_path
 
-from repoze.bfg.interfaces import INodeTemplate
-from repoze.bfg.interfaces import ITemplateFactory
+from repoze.bfg.interfaces import INodeTemplateRenderer
+from repoze.bfg.interfaces import ITemplateRendererFactory
 
 def get_transform(path, node):
     """ Return a callable transform object.  When called, the
@@ -23,18 +24,18 @@ def get_transform(path, node):
     # Render using XSLT
     path = caller_path(path)
 
-    template = queryUtility(INodeTemplate, path)
-    if template is None:
+    renderer = queryUtility(INodeTemplateRenderer, path)
+    if renderer is None:
         if not os.path.exists(path):
             raise ValueError('Missing template file: %s' % path)
-        template = XSLTemplateFactory(path)
+        renderer = XSLTemplateRenderer(path)
         try:
             sm = getSiteManager()
         except ComponentLookupError:
             pass
         else:
-            sm.registerUtility(template, INodeTemplate, name=path)
-    return template
+            sm.registerUtility(renderer, INodeTemplateRenderer, name=path)
+    return renderer
 
 def render_transform(path, node, **kw):
     """ Render a XSL template at the package-relative path (may also
@@ -52,9 +53,9 @@ def render_transform_to_response(path, node, **kw):
     result = render_transform(path, node, **kw)
     return Response(result)
 
-class XSLTemplateFactory(object):
-    classProvides(ITemplateFactory)
-    implements(INodeTemplate)
+class XSLTemplateRenderer(object):
+    classProvides(ITemplateRendererFactory)
+    implements(INodeTemplateRenderer)
 
     def __init__(self, path, auto_reload=False):
         self.path = path
@@ -64,6 +65,12 @@ class XSLTemplateFactory(object):
         processor = get_processor(self.path, self.auto_reload)
         result = str(processor(node, **kw))
         return result
+
+XSLTemplateFactory = XSLTemplateRenderer
+deprecated('ZPTTemplateFactory',
+           ('repoze.bfg.xslt.XSLTemplateFactory should now be '
+            'imported as repoze.bfg.xslt.XSLTTemplateRenderer'))
+
 
 # Manage XSLT processors on a per-thread basis
 import threading

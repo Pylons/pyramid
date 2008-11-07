@@ -1,5 +1,6 @@
 from zope.interface import Interface
 from zope.interface import Attribute
+from zope.deprecation import deprecated
 
 from zope.component.interfaces import IObjectEvent
 
@@ -26,20 +27,47 @@ class ITraverser(Interface):
 
 class ITraverserFactory(Interface):
     def __call__(context):
-        """ Return an object that implements IPublishTraverser """
+        """ Return an object that implements ITraverser """
 
-class ITemplateFactory(Interface):
-    def __call__(path, auto_reload=False):
-        """ Return an an ITemplate given a filesystem path """
+class ITemplateRenderer(Interface):
+    def implementation():
+        """ Return the object that the underlying templating system
+        uses to render the template; it is typically a callable that
+        accepts arbitrary keyword arguments and returns a string or
+        unicode object """
 
-class ITemplate(Interface):
     def __call__(**kw):
-        """ Return a string result given a template path """
+        """ Call a the template implementation with the keywords
+        passed in as arguments and return the result (a string or
+        unicode object) """
 
-class INodeTemplate(Interface):
+class ITestingTemplateRenderer(Interface):
+    def __call__(**kw):
+        """ Accept keywords and process for test comparison purposes
+        (usually set all keywords as attributes of self); return value
+        is a string """
+
+class ITemplateRendererFactory(Interface):
+    def __call__(path, auto_reload=False):
+        """ Return an object that implements ``ITemplateRenderer``  """
+
+class INodeTemplateRenderer(Interface):
     def __call__(node, **kw):
-        """ Return a string result given a template path """
-        
+        """ Return a string result given a node and a template path """
+
+ITemplate = ITemplateRenderer
+deprecated('ITemplate',
+           ('repoze.bfg.interfaces.ITemplate should now be imported '
+            'as repoze.bfg.interfaces.ITemplateRenderer'))
+INodeTemplate = INodeTemplateRenderer
+deprecated('INodeTemplate',
+           ('repoze.bfg.interfaces.INodeTemplate should now be imported '
+            'as repoze.bfg.interfaces.INodeTemplateRenderer'))
+ITemplateFactory = ITemplateRendererFactory
+deprecated('ITemplateFactory',
+           ('repoze.bfg.interfaces.ITemplateFactory should now be imported '
+            'as repoze.bfg.interfaces.ITemplateRendererFactory'))
+
 class ISecurityPolicy(Interface):
     """ A utility that provides a mechanism to check authorization
        using authentication data """

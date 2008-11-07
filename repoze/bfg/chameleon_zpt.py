@@ -3,22 +3,22 @@ import os
 from webob import Response
 
 from zope.component import queryUtility
-from zope.component.interfaces import ComponentLookupError
-from zope.component import getSiteManager
 
 from zope.interface import classProvides
 from zope.interface import implements
+from zope.deprecation import deprecated
 
-from repoze.bfg.path import caller_path
-from repoze.bfg.interfaces import ITemplateFactory
-from repoze.bfg.interfaces import ITemplate
+from repoze.bfg.interfaces import ITemplateRenderer
+from repoze.bfg.interfaces import ITemplateRendererFactory
 from repoze.bfg.interfaces import ISettings
+
+from repoze.bfg.templating import renderer_from_cache
 
 from chameleon.zpt.template import PageTemplateFile
 
-class ZPTTemplateFactory(object):
-    classProvides(ITemplateFactory)
-    implements(ITemplate)
+class ZPTTemplateRenderer(object):
+    classProvides(ITemplateRendererFactory)
+    implements(ITemplateRenderer)
 
     def __init__(self, path, auto_reload=False):
         try:
@@ -34,48 +34,56 @@ class ZPTTemplateFactory(object):
             else:
                 raise
 
+    def implementation(self):
+        return self.template
+    
     def __call__(self, **kw):
-        result = self.template.render(**kw)
-        return result
+        return self.template(**kw)
 
-def _get_template(path, **kw):
-    # XXX use pkg_resources
-    template = queryUtility(ITemplate, path)
+ZPTTemplateFactory = ZPTTemplateRenderer
+deprecated('ZPTTemplateFactory',
+           ('repoze.bfg.chameleon_zpt.ZPTTemplateFactory should now be '
+            'imported as repoze.bfg.chameleon_zpt.ZPTTemplateRenderer'))
 
-    if template is None:
-        if not os.path.exists(path):
-            raise ValueError('Missing template file: %s' % path)
-        settings = queryUtility(ISettings)
-        auto_reload = settings and settings.reload_templates
-        template = ZPTTemplateFactory(path, auto_reload)
-        try:
-            sm = getSiteManager()
-        except ComponentLookupError:
-            pass
-        else:
-            sm.registerUtility(template, ITemplate, name=path)
-        
-    return template
+def _auto_reload():
+    settings = queryUtility(ISettings)
+    auto_reload = settings and settings.reload_templates
+    return auto_reload
+
+def get_renderer(path):
+    """ Return a callable ``ITemplateRenderer`` object representing a
+    ``chameleon.zpt`` template at the package-relative path (may also
+    be absolute). """
+    auto_reload = _auto_reload()
+    renderer = renderer_from_cache(path, ZPTTemplateRenderer,
+                                   auto_reload=auto_reload)
+    return renderer
 
 def get_template(path):
-    """ Return a ``chameleon.zpt`` template object at the
-    package-relative path (may also be absolute)"""
-    path = caller_path(path)
-    return _get_template(path).template
+    """ Return a ``chameleon.zpt`` template at the package-relative
+    path (may also be absolute).  """
+    auto_reload = _auto_reload()
+    renderer = renderer_from_cache(path, ZPTTemplateRenderer,
+                                   auto_reload=auto_reload)
+    return renderer.implementation()
 
 def render_template(path, **kw):
     """ Render a ``chameleon.zpt`` template at the package-relative
     path (may also be absolute) using the kwargs in ``*kw`` as
     top-level names and return a string."""
-    path = caller_path(path)
-    template = get_template(path)
-    return template(**kw)
+    auto_reload = _auto_reload()
+    renderer = renderer_from_cache(path, ZPTTemplateRenderer,
+                                   auto_reload=auto_reload)
+    return renderer(**kw)
 
 def render_template_to_response(path, **kw):
     """ Render a ``chameleon.zpt`` template at the package-relative
     path (may also be absolute) using the kwargs in ``*kw`` as
-    top-level names and return a Response object."""
-    path = caller_path(path)
-    result = render_template(path, **kw)
+    top-level names and return a Response object with the body as the
+    template result. """
+    auto_reload = _auto_reload()
+    renderer = renderer_from_cache(path, ZPTTemplateRenderer,
+                                  auto_reload=auto_reload)
+    result = renderer(**kw)
     return Response(result)
 

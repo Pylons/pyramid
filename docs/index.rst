@@ -35,6 +35,7 @@ Narrative documentation in chapter form explaining how to use
    narr/security
    narr/events
    narr/environment
+   narr/unittesting
    changes
    glossary
 
@@ -72,6 +73,7 @@ Per-module :mod:`repoze.bfg` API documentation.
    api/router
    api/security
    api/template
+   api/testing
    api/traversal
    api/location
    api/urldispatch
