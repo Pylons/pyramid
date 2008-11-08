@@ -49,7 +49,7 @@ class BFGTestCase(unittest.TestCase, PlacelessSetup):
         registerTraverserFactory(traverser)
         return models
 
-    def registerTemplate(self, name):
+    def registerDummyTemplate(self, name):
         """ Registers a 'dummy' template renderer implementation and
         returns it. This is most useful when dealing with code that
         wants to call ``repoze.bfg.chameleon_zpt.render_template*``or

@@ -31,14 +31,14 @@ classes.
 
    class MyTest(BFGTestCase):
        def test_view_fn_not_submitted(self):
-           template = self.registerTemplate('templates/show.pt')
+           template = self.registerDummyTemplate('templates/show.pt')
            request = self.makeRequest()
            context = self.makeModel()
            response = view_fn(context, request)
            self.assertEqual(template.say, 'Hello')
 
         def test_view_fn_submitted(self):
-           template = self.registerTemplate('templates/submitted.pt')
+           template = self.registerDummyTemplate('templates/submitted.pt')
            request = self.makeRequest()
            request.params['say'] = 'Yo'
            context = self.makeModel()
@@ -49,8 +49,8 @@ In the above example, we create a ``MyTest`` test case that inherits
 from ``BFGTestCase``.  It has two test methods.  The first test
 method, ``test_view_fn_not_submitted`` tests the ``view_fn`` function
 in the case that no "form" values (represented by request.params) have
-been submitted.  Its first line registers a "template" named
-``templates/show.pt`` via the ``registerTemplate`` method (a
+been submitted.  Its first line registers a "dummy template" named
+``templates/show.pt`` via the ``registerDummyTemplate`` method (a
 ``BFGTestCase`` API); this function returns a DummyTemplate instance
 which we hang on to for later.  We then call ``makeRequest`` to get a
 DummyRequest object, and ``makeModel`` to get a DummyModel object.  We

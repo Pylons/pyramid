@@ -54,9 +54,9 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.traversal import find_model
         self.assertEqual(find_model(None, '/ob1'), ob1)
 
-    def test_registerTemplate(self):
+    def test_registerDummyTemplate(self):
         case = self._makeOne()
-        template = case.registerTemplate('templates/foo')
+        template = case.registerDummyTemplate('templates/foo')
         from repoze.bfg.testing import DummyTemplateRenderer
         self.failUnless(isinstance(template, DummyTemplateRenderer))
         from repoze.bfg.chameleon_zpt import render_template_to_response
