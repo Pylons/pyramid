@@ -4,13 +4,13 @@ Next Release
 
   - Added a ``repoze.bfg.testing`` module to attempt to make it
     slightly easier to write unittest-based automated tests of BFG
-    applications.  Information about this class is in the
+    applications.  Information about this module is in the
     documentation.
 
   - The default template renderer now supports testing better by
     looking for ``ITestingTemplateRenderer`` using a relative
     pathname.  This is exposed indirectly through the API named
-    ``registerTemplate`` in ``repoze.bfg.testing``.
+    ``registerTemplateRenderer`` in ``repoze.bfg.testing``.
 
   Deprecations
 

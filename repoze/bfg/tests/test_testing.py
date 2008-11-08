@@ -1,24 +1,17 @@
 from zope.component.testing import PlacelessSetup
 import unittest
 
-class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
+class TestTestingFunctions(unittest.TestCase, PlacelessSetup):
     def setUp(self):
         PlacelessSetup.setUp(self)
 
     def tearDown(self):
         PlacelessSetup.tearDown(self)
 
-    def _getTargetClass(self):
-        from repoze.bfg.testing import BFGTestCase
-        return BFGTestCase
-
-    def _makeOne(self):
-        return self._getTargetClass()(methodName='__doc__')
-
-    def test_registerSecurityPolicy_permissive(self):
-        case = self._makeOne()
-        case.registerSecurityPolicy('user', ('group1', 'group2'),
-                                    permissive=True)
+    def test_registerDummySecurityPolicy_permissive(self):
+        from repoze.bfg import testing
+        testing.registerDummySecurityPolicy('user', ('group1', 'group2'),
+                                            permissive=True)
         from repoze.bfg.interfaces import ISecurityPolicy
         from zope.component import getUtility
         ut = getUtility(ISecurityPolicy)
@@ -27,10 +20,10 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         self.assertEqual(ut.userid, 'user')
         self.assertEqual(ut.groupids, ('group1', 'group2'))
         
-    def test_registerSecurityPolicy_nonpermissive(self):
-        case = self._makeOne()
-        case.registerSecurityPolicy('user', ('group1', 'group2'),
-                                    permissive=False)
+    def test_registerDummySecurityPolicy_nonpermissive(self):
+        from repoze.bfg import testing
+        testing.registerDummySecurityPolicy('user', ('group1', 'group2'),
+                                            permissive=False)
         from repoze.bfg.interfaces import ISecurityPolicy
         from zope.component import getUtility
         ut = getUtility(ISecurityPolicy)
@@ -43,8 +36,8 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         ob1 = object()
         ob2 = object()
         models = {'/ob1':ob1, '/ob2':ob2}
-        case = self._makeOne()
-        case.registerModels(models)
+        from repoze.bfg import testing
+        testing.registerModels(models)
         from zope.component import getAdapter
         from repoze.bfg.interfaces import ITraverserFactory
         adapter = getAdapter(None, ITraverserFactory)
@@ -54,9 +47,9 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.traversal import find_model
         self.assertEqual(find_model(None, '/ob1'), ob1)
 
-    def test_registerDummyTemplate(self):
-        case = self._makeOne()
-        template = case.registerDummyTemplate('templates/foo')
+    def test_registerTemplateRenderer(self):
+        from repoze.bfg import testing
+        template = testing.registerTemplateRenderer('templates/foo')
         from repoze.bfg.testing import DummyTemplateRenderer
         self.failUnless(isinstance(template, DummyTemplateRenderer))
         from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -66,14 +59,14 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         self.assertEqual(response.body, '')
 
     def test_registerEventListener_single(self):
-        case = self._makeOne()
+        from repoze.bfg import testing
         from zope.interface import implements
         from zope.interface import Interface
         class IEvent(Interface):
             pass
         class Event:
             implements(IEvent)
-        L = case.registerEventListener(IEvent)
+        L = testing.registerEventListener(IEvent)
         from zope.component.event import dispatch
         event = Event()
         dispatch(event)
@@ -83,8 +76,8 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         self.assertEqual(len(L), 1)
         
     def test_registerEventListener_defaults(self):
-        case = self._makeOne()
-        L = case.registerEventListener()
+        from repoze.bfg import testing
+        L = testing.registerEventListener()
         from zope.component.event import dispatch
         event = object()
         dispatch(event)
@@ -94,8 +87,8 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         self.assertEqual(len(L), 3)
 
     def test_registerView_defaults(self):
-        case = self._makeOne()
-        view = case.registerView('moo.html')
+        from repoze.bfg import testing
+        view = testing.registerView('moo.html')
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
@@ -103,8 +96,8 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         self.assertEqual(view(None, None).body, response.body)
         
     def test_registerView_withresult(self):
-        case = self._makeOne()
-        view = case.registerView('moo.html', 'yo')
+        from repoze.bfg import testing
+        view = testing.registerView('moo.html', 'yo')
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
@@ -112,11 +105,11 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         self.assertEqual(response.body, 'yo')
 
     def test_registerView_custom(self):
-        case = self._makeOne()
+        from repoze.bfg import testing
         def view(context, request):
             from webob import Response
             return Response('123')
-        view = case.registerView('moo.html', view=view)
+        view = testing.registerView('moo.html', view=view)
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
@@ -124,19 +117,19 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         self.assertEqual(response.body, '123')
 
     def test_registerViewPermission_defaults(self):
-        case = self._makeOne()
-        view = case.registerViewPermission('moo.html')
+        from repoze.bfg import testing
+        view = testing.registerViewPermission('moo.html')
         from repoze.bfg.view import view_execution_permitted
-        case.registerSecurityPolicy()
+        testing.registerDummySecurityPolicy()
         result = view_execution_permitted(None, None, 'moo.html')
         self.failUnless(result)
         self.assertEqual(result.msg, 'message')
         
     def test_registerViewPermission_denying(self):
-        case = self._makeOne()
-        view = case.registerViewPermission('moo.html', result=False)
+        from repoze.bfg import testing
+        view = testing.registerViewPermission('moo.html', result=False)
         from repoze.bfg.view import view_execution_permitted
-        case.registerSecurityPolicy()
+        testing.registerDummySecurityPolicy()
         result = view_execution_permitted(None, None, 'moo.html')
         self.failIf(result)
         self.assertEqual(result.msg, 'message')
@@ -150,11 +143,11 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
             def __call__(self, secpol):
                 return True
                 
-        case = self._makeOne()
-        view = case.registerViewPermission('moo.html',
-                                           viewpermission=ViewPermission)
+        from repoze.bfg import testing
+        view = testing.registerViewPermission('moo.html',
+                                              viewpermission=ViewPermission)
         from repoze.bfg.view import view_execution_permitted
-        case.registerSecurityPolicy()
+        testing.registerDummySecurityPolicy()
         result = view_execution_permitted(None, None, 'moo.html')
         self.failUnless(result is True)
 
@@ -175,8 +168,8 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
             implements(for_)
         for1 = For_()
         for2 = For_()
-        case = self._makeOne()
-        case.registerAdapter(Provider, (for_, for_), provides, name='foo')
+        from repoze.bfg import testing
+        testing.registerAdapter(Provider, (for_, for_), provides, name='foo')
         adapter = getMultiAdapter((for1, for2), provides, name='foo')
         self.failUnless(isinstance(adapter, Provider))
         self.assertEqual(adapter.context, for1)
@@ -192,32 +185,10 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
             implements(iface)
             def __call__(self):
                 return 'foo'
-        case = self._makeOne()
         utility = impl()
-        case.registerUtility(utility, iface, name='mudge')
+        from repoze.bfg import testing
+        testing.registerUtility(utility, iface, name='mudge')
         self.assertEqual(getUtility(iface, name='mudge')(), 'foo')
-
-    def test_makeModel(self):
-        case = self._makeOne()
-        parent = object()
-        model = case.makeModel('name', parent)
-        self.assertEqual(model.__name__, 'name')
-        self.assertEqual(model.__parent__, parent)
-
-    def test_makeRequest(self):
-        case = self._makeOne()
-        request = case.makeRequest('/abc',
-                                   params = {'say':'Hello'},
-                                   environ = {'PATH_INFO':'/foo'},
-                                   headers = {'X-Foo':'YUP'},
-                                   water = 1)
-        self.assertEqual(request.path, '/abc')
-        self.assertEqual(request.params['say'], 'Hello')
-        self.assertEqual(request.GET['say'], 'Hello')
-        self.assertEqual(request.POST['say'], 'Hello')
-        self.assertEqual(request.headers['X-Foo'], 'YUP')
-        self.assertEqual(request.environ['PATH_INFO'], '/foo')
-        self.assertEqual(request.water, 1)
 
 class TestDummyAllowingSecurityPolicy(unittest.TestCase):
     def _getTargetClass(self):
@@ -310,3 +281,26 @@ class TestDummyModel(unittest.TestCase):
         self.assertEqual(model['abc'], dummy)
         self.assertRaises(KeyError, model.__getitem__, 'none')
 
+class TestDummyRequest(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.testing import DummyRequest
+        return DummyRequest
+
+    def _makeOne(self, *arg, **kw):
+        return self._getTargetClass()(*arg, **kw)
+
+    def test_it(self):
+        request = self._makeOne('/abc',
+                                params = {'say':'Hello'},
+                                environ = {'PATH_INFO':'/foo'},
+                                headers = {'X-Foo':'YUP'},
+                                water = 1)
+        self.assertEqual(request.path, '/abc')
+        self.assertEqual(request.params['say'], 'Hello')
+        self.assertEqual(request.GET['say'], 'Hello')
+        self.assertEqual(request.POST['say'], 'Hello')
+        self.assertEqual(request.headers['X-Foo'], 'YUP')
+        self.assertEqual(request.environ['PATH_INFO'], '/foo')
+        self.assertEqual(request.water, 1)
+
+        
