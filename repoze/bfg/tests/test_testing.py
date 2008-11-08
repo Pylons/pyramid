@@ -204,6 +204,21 @@ class TestBFGTestCase(unittest.TestCase, PlacelessSetup):
         self.assertEqual(model.__name__, 'name')
         self.assertEqual(model.__parent__, parent)
 
+    def test_makeRequest(self):
+        case = self._makeOne()
+        request = case.makeRequest('/abc',
+                                   params = {'say':'Hello'},
+                                   environ = {'PATH_INFO':'/foo'},
+                                   headers = {'X-Foo':'YUP'},
+                                   water = 1)
+        self.assertEqual(request.path, '/abc')
+        self.assertEqual(request.params['say'], 'Hello')
+        self.assertEqual(request.GET['say'], 'Hello')
+        self.assertEqual(request.POST['say'], 'Hello')
+        self.assertEqual(request.headers['X-Foo'], 'YUP')
+        self.assertEqual(request.environ['PATH_INFO'], '/foo')
+        self.assertEqual(request.water, 1)
+
 class TestDummyAllowingSecurityPolicy(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.testing import DummyAllowingSecurityPolicy

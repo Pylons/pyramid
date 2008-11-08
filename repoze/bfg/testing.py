@@ -140,6 +140,19 @@ class BFGTestCase(unittest.TestCase, PlacelessSetup):
         ``__name__`` attribute that is the value of the key.
         A dummy model has no other attributes or methods."""
         return DummyModel(name, parent)
+
+    def makeRequest(self, path='/', params=None, environ=None, headers=None,
+                    **kw):
+        """ Returns a ``DummyRequest`` object (mimics a WebOb Request
+        object) using ``path`` as the path.  If ``environ`` is
+        non-None, it should contain keys that will form the request's
+        environment.  If ``base_url`` is passed in, then the
+        ``wsgi.url_scheme``, ``HTTP_HOST``, and ``SCRIPT_NAME`` will
+        be filled in from that value.  If ``headers`` is not None,
+        these will be used as ``request.headers``.  The returned
+        request object will implement the ``repoze.bfg.IRequest``
+        interface."""
+        return makeRequest(path, params, environ, headers, **kw)
     
 def registerUtility(impl, iface, name=''):
     import zope.component 
@@ -186,6 +199,39 @@ def registerView(view, name, for_=(Interface, Interface)):
 def registerViewPermission(viewpermission, name, for_=(Interface, Interface)):
     from repoze.bfg.interfaces import IViewPermission
     return registerAdapter(viewpermission, for_, IViewPermission, name)
+
+def makeRequest(path, environ=None, base_url=None, headers=None, **kw):
+    return DummyRequest(path, environ, base_url, headers, **kw)
+
+from zope.interface import implements
+from repoze.bfg.interfaces import IRequest
+
+class DummyRequest:
+    implements(IRequest)
+    def __init__(self, path, params=None, environ=None, headers=None, **kw):
+        if environ is None:
+            environ = {}
+        if params is None:
+            params = {}
+        if headers is None:
+            headers = {}
+        self.environ = environ
+        self.headers = headers
+        self.params = params
+        self.GET = params
+        self.POST = params
+        self.application_url = 'http://example.com'
+        self.host_url = self.application_url
+        self.path_url = self.application_url
+        self.path = path
+        self.path_info = path
+        self.script_name = ''
+        self.path_qs = ''
+        self.url = self.application_url
+        self.host = 'example.com:80'
+        self.body = ''
+        self.cookies = {}
+        self.__dict__.update(kw)
 
 class _DummySecurityPolicy:
     def __init__(self, userid=None, groupids=()):
@@ -269,7 +315,4 @@ class DummyModel:
     def __getitem__(self, name):
         ob = self.subs[name]
         return ob
-    
-    
-    
     
