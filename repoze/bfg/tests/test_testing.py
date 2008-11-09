@@ -290,10 +290,10 @@ class TestDummyRequest(unittest.TestCase):
         return self._getTargetClass()(*arg, **kw)
 
     def test_it(self):
-        request = self._makeOne('/abc',
-                                params = {'say':'Hello'},
+        request = self._makeOne(params = {'say':'Hello'},
                                 environ = {'PATH_INFO':'/foo'},
                                 headers = {'X-Foo':'YUP'},
+                                path = '/abc',
                                 water = 1)
         self.assertEqual(request.path, '/abc')
         self.assertEqual(request.params['say'], 'Hello')

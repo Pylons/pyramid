@@ -230,28 +230,37 @@ class DummyModel:
 class DummyRequest:
     """ A dummy request object (imitates a WebOb request object) """
     implements(IRequest)
-    def __init__(self, path='/', params=None, environ=None, headers=None, **kw):
+    method = 'GET'
+    application_url = 'http://example.com'
+    host = 'example.com:80'
+    def __init__(self, params=None, environ=None, headers=None, path='/',
+                 cookies=None, **kw):
         if environ is None:
             environ = {}
         if params is None:
             params = {}
         if headers is None:
             headers = {}
+        if cookies is None:
+            cookies = {}
         self.environ = environ
         self.headers = headers
         self.params = params
+        self.cookies = cookies
         self.GET = params
         self.POST = params
-        self.application_url = 'http://example.com'
         self.host_url = self.application_url
         self.path_url = self.application_url
+        self.url = self.application_url
         self.path = path
         self.path_info = path
         self.script_name = ''
         self.path_qs = ''
-        self.url = self.application_url
-        self.host = 'example.com:80'
         self.body = ''
         self.cookies = {}
+        self.view_name = ''
+        self.subpath = []
+        self.context = None
+        self.marshalled = params # repoze.monty
         self.__dict__.update(kw)
 
