@@ -7,15 +7,15 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     """ Registers a dummy ``repoze.bfg`` security policy using the
     userid ``userid`` and the group ids ``groupids``.  If
     ``permissive`` is true, a 'permissive' security policy is
-    registered; this policy allows all access.  If ``permissive``
-    is false, a nonpermissive security policy is registered; this
-    policy denies all access.  To register your own (possibly more
-    granular) security policy, see the ``registerSecurityPolicy``
-    *function* in the testing package.  This function is most
-    useful when dealing with code that uses the
-    ``repoze.bfg.security``APIs named ``has_permission``,
-    ``authenticated_userid``, effective_principals, and
-    ``principals_allowed_by_permission``."""
+    registered; this policy allows all access.  If ``permissive`` is
+    false, a nonpermissive security policy is registered; this policy
+    denies all access.  This function is most useful when testing code
+    that uses the ``repoze.bfg.security`` APIs named
+    ``has_permission``, ``authenticated_userid``,
+    effective_principals, and ``principals_allowed_by_permission``.
+    To register your own (possibly more granular) security policy, see
+    the ``registerSecurityPolicy`` function in the testing package
+    (read the source)."""
     if permissive:
         policy = DummyAllowingSecurityPolicy(userid, groupids)
     else:
@@ -24,10 +24,10 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
 
 def registerModels(models):
     """ Registers a dictionary of models.  This is most useful for
-    dealing with code that wants to call the
-    ``repoze.bfg.traversal.find_model`` API.  This API is called
-    with a path as one of its arguments.  If the dictionary you
-    register when calling this method contains that path as a key
+    testing code that wants to call the
+    ``repoze.bfg.traversal.find_model`` API.  This API is called with
+    a path as one of its arguments.  If the dictionary you register
+    when calling this method contains that path as a key
     (e.g. '/foo/bar' or 'foo'), the corresponding value will be
     returned to ``find_model`` (and thus to your code)."""
     traverser = make_traverser_factory(models)
@@ -35,14 +35,13 @@ def registerModels(models):
     return models
 
 def registerEventListener(event_iface=Interface):
-    """ Registers an event listener (aka 'subscriber') listening
-    for events of the type ``event_iface`` and returns a list
-    which is appended to by the subscriber.  When an event is
-    dispatched that matches ``event_iface``, that event will be
-    appended to the list.  You can then compare the values in the
-    list to expected event notifications.  This method is useful
-    when dealing with code that wants to call
-    ``zope.component.event.dispatch``."""
+    """ Registers an event listener (aka 'subscriber') listening for
+    events of the type ``event_iface`` and returns a list which is
+    appended to by the subscriber.  When an event is dispatched that
+    matches ``event_iface``, that event will be appended to the list.
+    You can then compare the values in the list to expected event
+    notifications.  This method is useful when testing code that wants
+    to call ``zope.component.event.dispatch``."""
     L = []
     def subscriber(event):
         L.append(event)
@@ -52,9 +51,11 @@ def registerEventListener(event_iface=Interface):
 def registerTemplateRenderer(path, renderer=None, for_=None):
     """ Create and register a dummy template renderer at ``path``
     (usually a relative filename ala ``templates/foo.pt``) and return
-    the renderer object.  If ``renderer`` is non-None, it will be
+    the renderer object.  If ``renderer`` is not ``None``, it will be
     registered as the renderer and returned (no dummy renderer object
-    will be created)."""
+    will be created).  This function is useful when testing code that
+    calls the ``render_template_to_response`` or any other
+    ``render_template*`` API of the built-in templating systems. """
     if for_ is None:
         from repoze.bfg.interfaces import ITestingTemplateRenderer
         for_ = ITestingTemplateRenderer
@@ -68,8 +69,8 @@ def registerView(name, result='', view=None, for_=(Interface, Interface)):
     ``result`` value as its body attribute.  To gain more control, if
     you pass in a non-None ``view``, this view function will be used
     instead of an automatically generated view function (and
-    ``result`` is not used).  This method is useful when dealing with
-    code that wants to call,
+    ``result`` is not used).  This function is useful when dealing
+    with code that wants to call,
     e.g. ``repoze.bfg.view.render_view_to_response``."""
     if view is None:
         view = make_view(result)
@@ -200,7 +201,10 @@ def make_view_permission(result):
     return DummyViewPermission
         
 class DummyModel:
-    """ A dummy :mod:`repoze.bfg` model object """
+    """ A dummy :mod:`repoze.bfg` model object.  The value of ``name``
+    to the constructor will be used as the ``__name__`` attribute of
+    the model.  the value of ``parent`` will be used as the
+    ``__parent__`` attribute of the model. """
     def __init__(self, name=None, parent=None):
         """ The he model's ``__name__`` attribute will be set to the
         value of ``name``, and the model's ``__parent__`` attribute
@@ -228,7 +232,10 @@ class DummyModel:
         return ob
     
 class DummyRequest:
-    """ A dummy request object (imitates a WebOb request object) """
+    """ A dummy request object (imitates a :term:`WebOb` ``Request``
+    object).  The named constructor arguments correspond to their
+    WebOb equivalents.  Extra keyword arguments are assigned as
+    attributes of the request itself."""
     implements(IRequest)
     method = 'GET'
     application_url = 'http://example.com'

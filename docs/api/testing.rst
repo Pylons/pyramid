@@ -5,6 +5,22 @@
 
 .. automodule:: repoze.bfg.testing
 
-  .. autoclass:: BFGTestCase
+  .. autofunction:: registerDummySecurityPolicy
+
+  .. autofunction:: registerModels
+
+  .. autofunction:: registerEventListener
+
+  .. autofunction:: registerTemplateRenderer
+
+  .. autofunction:: registerView
+
+  .. autofunction:: registerViewPermission
+
+  .. autoclass:: DummyModel
      :members:
+
+  .. autoclass:: DummyRequest
+     :members:
+
 

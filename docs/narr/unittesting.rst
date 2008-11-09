@@ -30,10 +30,10 @@ Without invoking any ZCML or using the testing API, an attempt to run
 this view function will result in an error.  When a :mod:`repoze.bfg`
 application starts normally, it will create an application registry
 from the information it finds in the application's ``configure.zcml``
-file.  If this application registry is not created and populated
-(e.g. with ``bfg:view`` statements), such as when you invoke
-application code via unit tests, :mod:`repoze.bfg` API functions will
-tend to fail.
+file.  But if this application registry is not created and populated
+(e.g. with ``bfg:view`` statements), like when you invoke application
+code via a unit test, :mod:`repoze.bfg` API functions will tend to
+fail.
 
 The testing API provided by ``repoze.bfg`` allows you to simulate
 various application registry registrations for use under a unit
@@ -47,7 +47,7 @@ unittest TestCase that used the testing API.
 
    import unittest
    from zope.testing.cleanup import cleanUp
-   from.repoze.bfg import testing
+   from repoze.bfg import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
@@ -57,13 +57,15 @@ unittest TestCase that used the testing API.
            cleanUp()
        
        def test_view_fn_not_submitted(self):
+           from my.package import view_fn
            renderer = testing.registerTemplateRenderer('templates/show.pt')
            context = testing.DummyModel()
            request = testing.DummyRequest()
            response = view_fn(context, request)
            self.assertEqual(renderer.say, 'Hello')
 
-        def test_view_fn_submitted(self):
+       def test_view_fn_submitted(self):
+           from my.package import view_fn
            renderer = testing.registerTemplateRenderer('templates/submitted.pt')
            context = testing.DummyModel()
            request = testing.DummyRequest()
