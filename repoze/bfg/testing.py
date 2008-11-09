@@ -13,14 +13,13 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     that uses the ``repoze.bfg.security`` APIs named
     ``has_permission``, ``authenticated_userid``,
     effective_principals, and ``principals_allowed_by_permission``.
-    To register your own (possibly more granular) security policy, see
-    the ``registerSecurityPolicy`` function in the testing package
-    (read the source)."""
+    """
     if permissive:
         policy = DummyAllowingSecurityPolicy(userid, groupids)
     else:
         policy = DummyDenyingSecurityPolicy(userid, groupids)
-    return registerSecurityPolicy(policy)
+    from repoze.bfg.interfaces import ISecurityPolicy
+    return registerUtility(policy, ISecurityPolicy)
 
 def registerModels(models):
     """ Registers a dictionary of models.  This is most useful for
@@ -123,10 +122,6 @@ def registerSubscriber(subscriber, iface=Interface):
         iface = (iface,)
     gsm.registerHandler(subscriber, iface)
     return subscriber
-
-def registerSecurityPolicy(policy):
-    from repoze.bfg.interfaces import ISecurityPolicy
-    return registerUtility(policy, ISecurityPolicy)
 
 def registerTraverserFactory(traverser, for_=Interface):
     from repoze.bfg.interfaces import ITraverserFactory
