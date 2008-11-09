@@ -12,7 +12,7 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     denies all access.  This function is most useful when testing code
     that uses the ``repoze.bfg.security`` APIs named
     ``has_permission``, ``authenticated_userid``,
-    effective_principals, and ``principals_allowed_by_permission``.
+    ``effective_principals``, and ``principals_allowed_by_permission``.
     """
     if permissive:
         policy = DummyAllowingSecurityPolicy(userid, groupids)
