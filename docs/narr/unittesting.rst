@@ -5,19 +5,19 @@ Unit Testing
 
 The suggested mechanism for unit testing :mod:`repoze.bfg`
 applications is the Python ``unittest`` module.  :mod:`repoze.bfg`
-provides a number of facilities that make writing ``unittest`` -based
-test cases easier to write.  The facilities become particularly useful
-when your code calls into :mod:`repoze.bfg` -related framework
-functions.
+provides a number of facilities that make unit tests easier to write.
+The facilities become particularly useful when your code calls into
+:mod:`repoze.bfg` -related framework functions.
 
-Writing A Unit Test
--------------------
+Using the ``repoze.bfg.testing`` API
+------------------------------------
 
 The ``repoze.bfg.testing`` module provides a number of functions which
-can be used during unit testing.  An example of a unit test class that
-uses these functions is below.
+can be used during unit testing.  For example, let's imagine you want
+to unit test a :mod:`repoze.bfg` view function.
 
-.. code-block:: python :linenos:
+.. code-block:: python
+   :linenos:
 
    def view_fn(context, request):
        from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -25,6 +25,25 @@ uses these functions is below.
            return render_template_to_response('templates/submitted.pt',
                                                say=request.params['say'])
        return render_template_to_response('templates/show.pt', say='Hello')
+
+Without invoking any ZCML or using the testing API, an attempt to run
+this view function will result in an error.  When a :mod:`repoze.bfg`
+application starts normally, it will create an application registry
+from the information it finds in the application's ``configure.zcml``
+file.  If this application registry is not created and populated
+(e.g. with ``bfg:view`` statements), such as when you invoke
+application code via unit tests, :mod:`repoze.bfg` API functions will
+tend to fail.
+
+The testing API provided by ``repoze.bfg`` allows you to simulate
+various application registry registrations for use under a unit
+testing framework without needing to invoke the actual application
+ZCML configuration.  For example, if you wanted to test the above
+``view_fn`` (assming it lived in ``my.package``), you could write a
+unittest TestCase that used the testing API.
+
+.. code-block:: python
+   :linenos:
 
    import unittest
    from zope.testing.cleanup import cleanUp
@@ -53,7 +72,9 @@ uses these functions is below.
            self.assertEqual(renderer.say, 'Yo')
 
 In the above example, we create a ``MyTest`` test case that inherits
-from ``unittest.TestCase``.  It has two test methods.
+from ``unittest.TestCase``.  If it's in our :mod:`repoze.bfg`
+application, it will be found when ``setup.py test`` is run.  It has
+two test methods.
 
 The first test method, ``test_view_fn_not_submitted`` tests the
 ``view_fn`` function in the case that no "form" values (represented by
@@ -61,12 +82,13 @@ request.params) have been submitted.  Its first line registers a
 "dummy template renderer" named ``templates/show.pt`` via the
 ``registerTemplateRenderer`` function (a ``repoze.bfg.testing`` API);
 this function returns a DummyTemplateRenderer instance which we hang
-on to for later.  We then call ``DummyRequest`` to get a dummy request
-object, and ``DummyModel`` to get a dummy context object.  We call the
-function being tested with the manufactured context and request.  When
-the function is called, ``render_template_to_response`` will call the
-"dummy" template renderer object instead of the real template renderer
-object.  When it's called, it will set attributes on itself
+on to for later.  We then create a ``DummyRequest`` object (it
+simulates a WebOb request object), and we create a ``DummyModel``
+context object.  We call the function being tested with the
+manufactured context and request.  When the function is called,
+``render_template_to_response`` will call the "dummy" template
+renderer object instead of the real template renderer object.  When
+the dummy renderer is called, it will set attributes on itself
 corresponding to the non-path keyword arguments provided to the
 ``render_template_to_response`` function.  We check that the ``say``
 parameter sent into the template rendering function was ``Hello`` in
@@ -75,7 +97,9 @@ this specific example.
 The second test method, named ``test_view_fn_submitted`` tests the
 alternate case, where the ``say`` form value has already been set in
 the request and performs a similar template registration and
-assertion.
+assertion.  We assert at the end of this that the renderer's ``say``
+attribute is ``Yo``, as this is what is expected of the view function
+in the branch it's testing.
 
 Note that the test calls the ``zope.testing.cleanup.cleanUp`` function
 in its ``setUp`` and ``tearDown`` functions.  This is required to
@@ -83,6 +107,9 @@ perform cleanup between the test runs.  If you use any of the testing
 API, be sure to call this function at setup and teardown of individual
 tests.
 
-See the :ref:`testing_module` chapter for the entire
-:mod:`repoze.bfg` -specific testing API.
+See the :ref:`testing_module` chapter for the entire :mod:`repoze.bfg`
+-specific testing API.  This chapter describes APIs for registering a
+security policy, registering models at paths, registering event
+listeners, registering views and view permissions, and classes
+representing "dummy" implementations of a request and a model.
 
