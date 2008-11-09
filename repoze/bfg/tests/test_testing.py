@@ -47,9 +47,9 @@ class TestTestingFunctions(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.traversal import find_model
         self.assertEqual(find_model(None, '/ob1'), ob1)
 
-    def test_registerTemplateRenderer(self):
+    def test_registerDummyRenderer(self):
         from repoze.bfg import testing
-        template = testing.registerTemplateRenderer('templates/foo')
+        template = testing.registerDummyRenderer('templates/foo')
         from repoze.bfg.testing import DummyTemplateRenderer
         self.failUnless(isinstance(template, DummyTemplateRenderer))
         from repoze.bfg.chameleon_zpt import render_template_to_response

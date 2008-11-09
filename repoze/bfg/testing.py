@@ -24,9 +24,9 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
 def registerModels(models):
     """ Registers a dictionary of models.  This is most useful for
     testing code that wants to call the
-    ``repoze.bfg.traversal.find_model`` API.  This API is called with
-    a path as one of its arguments.  If the dictionary you register
-    when calling this method contains that path as a key
+    ``repoze.bfg.traversal.find_model`` API.  The ``find_model`` API
+    is called with a path as one of its arguments.  If the dictionary
+    you register when calling this method contains that path as a key
     (e.g. '/foo/bar' or 'foo'), the corresponding value will be
     returned to ``find_model`` (and thus to your code)."""
     traverser = make_traverser_factory(models)
@@ -47,20 +47,16 @@ def registerEventListener(event_iface=Interface):
     registerSubscriber(subscriber, event_iface)
     return L
 
-def registerTemplateRenderer(path, renderer=None, for_=None):
+def registerDummyRenderer(path):
     """ Create and register a dummy template renderer at ``path``
     (usually a relative filename ala ``templates/foo.pt``) and return
-    the renderer object.  If ``renderer`` is not ``None``, it will be
-    registered as the renderer and returned (no dummy renderer object
-    will be created).  This function is useful when testing code that
-    calls the ``render_template_to_response`` or any other
-    ``render_template*`` API of the built-in templating systems. """
-    if for_ is None:
-        from repoze.bfg.interfaces import ITestingTemplateRenderer
-        for_ = ITestingTemplateRenderer
-    if renderer is None:
-        renderer = DummyTemplateRenderer()
-    return registerUtility(renderer, for_, path)
+    the renderer object.  This function is useful when testing code
+    that calls the ``render_template_to_response`` or any other
+    ``render_template*`` API of any of the built-in templating
+    systems."""
+    from repoze.bfg.interfaces import ITestingTemplateRenderer
+    renderer = DummyTemplateRenderer()
+    return registerUtility(renderer, ITestingTemplateRenderer, path)
 
 def registerView(name, result='', view=None, for_=(Interface, Interface)):
     """ Registers ``repoze.bfg`` view function under the name

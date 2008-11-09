@@ -58,7 +58,7 @@ unittest TestCase that used the testing API.
        
        def test_view_fn_not_submitted(self):
            from my.package import view_fn
-           renderer = testing.registerTemplateRenderer('templates/show.pt')
+           renderer = testing.registerDummyRenderer('templates/show.pt')
            context = testing.DummyModel()
            request = testing.DummyRequest()
            response = view_fn(context, request)
@@ -66,7 +66,7 @@ unittest TestCase that used the testing API.
 
        def test_view_fn_submitted(self):
            from my.package import view_fn
-           renderer = testing.registerTemplateRenderer('templates/submitted.pt')
+           renderer = testing.registerDummyRenderer('templates/submitted.pt')
            context = testing.DummyModel()
            request = testing.DummyRequest()
            request.params['say'] = 'Yo'
@@ -82,7 +82,7 @@ The first test method, ``test_view_fn_not_submitted`` tests the
 ``view_fn`` function in the case that no "form" values (represented by
 request.params) have been submitted.  Its first line registers a
 "dummy template renderer" named ``templates/show.pt`` via the
-``registerTemplateRenderer`` function (a ``repoze.bfg.testing`` API);
+``registerDummyRenderer`` function (a ``repoze.bfg.testing`` API);
 this function returns a DummyTemplateRenderer instance which we hang
 on to for later.  We then create a ``DummyRequest`` object (it
 simulates a WebOb request object), and we create a ``DummyModel``
