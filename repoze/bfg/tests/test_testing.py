@@ -266,9 +266,9 @@ class TestDummyModel(unittest.TestCase):
         from repoze.bfg.testing import DummyModel
         return DummyModel
 
-    def _makeOne(self, name=None, parent=None):
+    def _makeOne(self, name=None, parent=None, **kw):
         klass = self._getTargetClass()
-        return klass(name, parent)
+        return klass(name, parent, **kw)
 
     def test__setitem__and__getitem__(self):
         class Dummy:
@@ -280,6 +280,18 @@ class TestDummyModel(unittest.TestCase):
         self.assertEqual(dummy.__parent__, model)
         self.assertEqual(model['abc'], dummy)
         self.assertRaises(KeyError, model.__getitem__, 'none')
+
+    def test_extra_params(self):
+        model = self._makeOne(foo=1)
+        self.assertEqual(model.foo, 1)
+        
+    def test_clone(self):
+        model = self._makeOne('name', 'parent', foo=1, bar=2)
+        clone = model.clone('name2', 'parent2', bar=1)
+        self.assertEqual(clone.bar, 1)
+        self.assertEqual(clone.__name__, 'name2')
+        self.assertEqual(clone.__parent__, 'parent2')
+        self.assertEqual(clone.foo, 1)
 
 class TestDummyRequest(unittest.TestCase):
     def _getTargetClass(self):

@@ -1,3 +1,15 @@
+0.4.5 (11/9/2008)
+
+  Features
+
+  - Added a ``clone`` method and a ``__contains__`` method to the
+    DummyModel testing object.
+
+  - Allow DummyModel objects to receive extra keyword arguments, which
+    will be attached as attributes.
+
+  - The DummyTemplateRenderer now returns ``self`` as its implementation.
+
 0.4.4 (11/8/2008)
 
   Features

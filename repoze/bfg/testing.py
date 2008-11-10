@@ -1,7 +1,11 @@
+import copy
+
 from zope.interface import Interface
 from zope.interface import implements
 
 from repoze.bfg.interfaces import IRequest
+
+_marker = ()
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     """ Registers a dummy ``repoze.bfg`` security policy using the
@@ -168,7 +172,7 @@ def make_traverser_factory(root):
 
 class DummyTemplateRenderer:
     def implementation(self):
-        return None
+        return self
     
     def __call__(self, **kw):
         self.__dict__.update(kw)
@@ -196,19 +200,20 @@ class DummyModel:
     to the constructor will be used as the ``__name__`` attribute of
     the model.  the value of ``parent`` will be used as the
     ``__parent__`` attribute of the model. """
-    def __init__(self, name=None, parent=None):
+    def __init__(self, __name__=None, __parent__=None, **kw):
         """ The he model's ``__name__`` attribute will be set to the
-        value of ``name``, and the model's ``__parent__`` attribute
-        will be set to the value of ``parent``.  A dummy model has a
-        ``__setitem__`` method and a ``__getitem__`` method. A dummy
-        model has no other attributes or methods."""
-        self.__name__ = name
-        self.__parent__ = parent
+        value of ``__name__``, and the model's ``__parent__``
+        attribute will be set to the value of ``__parent__``.  Any
+        extra keywords will be set as direct attributes of the model."""
+        self.__name__ = __name__
+        self.__parent__ = __parent__
+        self.kw = kw
+        self.__dict__.update(**kw)
         self.subs = {}
 
     def __setitem__(self, name, val):
         """ When the ``__setitem__`` method is called, the object
-        passed in as ``value`` will be decorated with a ``__parent__``
+        passed in as ``val`` will be decorated with a ``__parent__``
         attribute pointing at the dummy model and a ``__name__``
         attribute that is the value of ``name``.  The value will then
         be returned when dummy model's ``__getitem__`` is called with
@@ -221,6 +226,25 @@ class DummyModel:
         """ Return a named subobject (see ``__setitem__``)"""
         ob = self.subs[name]
         return ob
+
+    def clone(self, __name__=_marker, __parent__=_marker, **kw):
+        """ Create a clone of the model object.  If ``__name__`` or
+        ``__parent__`` is passed in, use the value to override the
+        existing ``__name__`` or ``__parent__`` of the model.  If any
+        extra keyword args are passed in, use these keywords to add to
+        or override existing model keywords (attributes)."""
+        oldkw = self.kw.copy()
+        oldkw.update(kw)
+        inst = self.__class__(self.__name__, self.__parent__, **oldkw)
+        inst.subs = copy.deepcopy(self.subs)
+        if __name__ is not _marker:
+            inst.__name__ = __name__
+        if __parent__ is not _marker:
+            inst.__parent__ = __parent__
+        return inst
+
+    def __contains__(self, name):
+        return name in self.subs
     
 class DummyRequest:
     """ A dummy request object (imitates a :term:`WebOb` ``Request``
