@@ -189,6 +189,16 @@ class ModelURLTests(unittest.TestCase):
             result,
             'http://example.com:5432/foo%20/bar/baz/this/theotherthing/that')
 
+    def test_root(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        model_url = self._getFUT()
+        request = DummyRequest()
+        result = model_url(root, request)
+        self.assertEqual(result, 'http://example.com:5432/')
+        
+
 class FindRootTests(unittest.TestCase):
     def _getFUT(self):
         from repoze.bfg.traversal import find_root
@@ -279,12 +289,19 @@ class ModelPathTests(unittest.TestCase):
         bar.__name__ = 'bar'
         baz.__parent__ = bar
         baz.__name__ = 'baz'
-        request = DummyRequest()
         model_path = self._getFUT()
-        request = DummyRequest()
         result = model_path(baz, 'this/theotherthing', 'that')
         self.assertEqual(result, '/foo /bar/baz/this/theotherthing/that')
 
+    def test_root(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        model_path = self._getFUT()
+        request = DummyRequest()
+        result = model_path(root)
+        self.assertEqual(result, '/')
+        
 
 def make_traverser(*args):
     class DummyTraverser(object):

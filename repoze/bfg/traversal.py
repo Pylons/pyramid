@@ -103,6 +103,14 @@ def find_interface(model, interface):
         if interface.providedBy(location):
             return location
 
+def _pjoin(path):
+    path = list(path)
+    path.insert(0, '')
+    result = '/'.join(path)
+    if not result:
+        result = '/'
+    return result
+
 def model_url(model, request, *elements):
     """ Return the absolute URL of the model object based on the
     ``wsgi.url_scheme``, ``HTTP_HOST`` or ``SERVER_NAME`` in the
@@ -117,7 +125,7 @@ def model_url(model, request, *elements):
             rpath.append(urllib.quote(location.__name__))
     path = list(reversed(rpath))
     path.extend(elements)
-    path = '/'.join(path)
+    path = _pjoin(path)
     return urlparse.urljoin(request.application_url, path)
 
 def model_path(model, *elements):
@@ -132,5 +140,6 @@ def model_path(model, *elements):
             rpath.append(location.__name__)
     path = list(reversed(rpath))
     path.extend(elements)
-    path.insert(0, '')
-    return '/'.join(path)
+    path = _pjoin(path)
+    return path
+
