@@ -74,6 +74,23 @@ class TestTestingFunctions(unittest.TestCase, PlacelessSetup):
         self.assertEqual(L[0], event)
         dispatch(object())
         self.assertEqual(len(L), 1)
+
+    def test_registerEventListener_multiple(self):
+        from repoze.bfg import testing
+        from zope.interface import implements
+        from zope.interface import Interface
+        class IEvent(Interface):
+            pass
+        class Event:
+            object = 'foo'
+            implements(IEvent)
+        L = testing.registerEventListener((Interface, IEvent))
+        from zope.component.event import objectEventNotify
+        event = Event()
+        objectEventNotify(event)
+        self.assertEqual(len(L), 2)
+        self.assertEqual(L[0], 'foo')
+        self.assertEqual(L[1], event)
         
     def test_registerEventListener_defaults(self):
         from repoze.bfg import testing

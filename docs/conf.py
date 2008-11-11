@@ -51,9 +51,9 @@ copyright = '2008, Agendaless Consulting'
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '0.4.6'
+version = '0.4.7'
 # The full version, including alpha/beta/rc tags.
-release = '0.4.6'
+release = '0.4.7'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:

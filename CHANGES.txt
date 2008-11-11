@@ -1,11 +1,20 @@
+0.4.7 (11/11/2008)
+
+  Features
+
+  - Allow ``testing.registerEventListener`` to be used with Zope 3
+    style "object events" (subscribers accept more than a single event
+    argument).  We extend the list with the arguments, rather than
+    append.
+
 0.4.6 (11/10/2008)
 
   Bug Fixes
 
-    - The ``model_path`` and ``model_url`` traversal APIs returned the
-      wrong value for the root object (e.g. ``model_path`` returned
-      ``''`` for the root object, while it should have been returning
-      ``'/'``).
+  - The ``model_path`` and ``model_url`` traversal APIs returned the
+    wrong value for the root object (e.g. ``model_path`` returned
+    ``''`` for the root object, while it should have been returning
+    ``'/'``).
 
 0.4.5 (11/9/2008)
 

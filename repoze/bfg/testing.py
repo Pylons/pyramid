@@ -44,10 +44,11 @@ def registerEventListener(event_iface=Interface):
     matches ``event_iface``, that event will be appended to the list.
     You can then compare the values in the list to expected event
     notifications.  This method is useful when testing code that wants
-    to call ``zope.component.event.dispatch``."""
+    to call ``zope.component.event.dispatch`` or
+    ``zope.component.event.objectEventNotify``."""
     L = []
-    def subscriber(event):
-        L.append(event)
+    def subscriber(*event):
+        L.extend(event)
     registerSubscriber(subscriber, event_iface)
     return L
 
