@@ -103,30 +103,25 @@ def find_interface(model, interface):
         if interface.providedBy(location):
             return location
 
-def _pjoin(path):
-    path = list(path)
-    path.insert(0, '')
-    result = '/'.join(path)
-    if not result:
-        result = '/'
-    return result
-
 def model_url(model, request, *elements):
     """ Return the absolute URL of the model object based on the
     ``wsgi.url_scheme``, ``HTTP_HOST`` or ``SERVER_NAME`` in the
-    request, plus any ``SCRIPT_NAME``.  Any positional arguments
-    passed in as ``elements`` will be joined by slashes and appended
-    to the generated URL.  The passed in elements are *not*
-    URL-quoted.  The ``model`` passed in must be
-    :term:`location`-aware."""
+    request, plus any ``SCRIPT_NAME``.  The model URL will end with a
+    trailing slash.  Any positional arguments passed in as
+    ``elements`` will be joined by slashes and appended to the model
+    URL.  The passed in elements are *not* URL-quoted.  The ``model``
+    passed in must be :term:`location`-aware."""
     rpath = []
     for location in lineage(model):
         if location.__name__:
             rpath.append(urllib.quote(location.__name__))
-    path = list(reversed(rpath))
-    path.extend(elements)
-    path = _pjoin(path)
-    return urlparse.urljoin(request.application_url, path)
+    prefix = '/'.join(reversed(rpath))
+    suffix = '/'.join(elements)
+    path = '/'.join([prefix, suffix]) # always have trailing slash
+    app_url = request.application_url
+    if not app_url.endswith('/'):
+        app_url = app_url+'/'
+    return urlparse.urljoin(app_url, path)
 
 def model_path(model, *elements):
     """ Return a string representing the absolute path of the model
@@ -138,8 +133,9 @@ def model_path(model, *elements):
     for location in lineage(model):
         if location.__name__:
             rpath.append(location.__name__)
-    path = list(reversed(rpath))
-    path.extend(elements)
-    path = _pjoin(path)
+    path = '/' + '/'.join(reversed(rpath))
+    if elements: # never have a trailing slash
+        suffix = '/'.join(elements)
+        path = '/'.join([path, suffix])
     return path
 

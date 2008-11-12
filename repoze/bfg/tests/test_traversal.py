@@ -3,30 +3,25 @@ import unittest
 from zope.component.testing import PlacelessSetup
 
 class SplitPathTests(unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, path):
         from repoze.bfg.traversal import split_path
-        return split_path
+        return split_path(path)
         
     def test_cleanPath_path_startswith_endswith(self):
-        f = self._getFUT()
-        self.assertEqual(f('/foo/'), ['foo'])
+        self.assertEqual(self._callFUT('/foo/'), ['foo'])
 
     def test_cleanPath_empty_elements(self):
-        f = self._getFUT()
-        self.assertEqual(f('foo///'), ['foo'])
+        self.assertEqual(self._callFUT('foo///'), ['foo'])
 
     def test_cleanPath_onedot(self):
-        f = self._getFUT()
-        self.assertEqual(f('foo/./bar'), ['foo', 'bar'])
+        self.assertEqual(self._callFUT('foo/./bar'), ['foo', 'bar'])
 
     def test_cleanPath_twodots(self):
-        f = self._getFUT()
-        self.assertEqual(f('foo/../bar'), ['bar'])
+        self.assertEqual(self._callFUT('foo/../bar'), ['bar'])
 
     def test_cleanPath_element_urllquoted(self):
-        f = self._getFUT()
-        self.assertEqual(f('/foo/space%20thing/bar'), ['foo', 'space thing',
-                                                       'bar'])
+        self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
+                         ['foo', 'space thing', 'bar'])
 
 class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
     def setUp(self):
@@ -135,9 +130,9 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(ctx.__parent__.__parent__.__parent__.__parent__, None)
 
 class FindInterfaceTests(unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, context, iface):
         from repoze.bfg.traversal import find_interface
-        return find_interface
+        return find_interface(context, iface)
 
     def test_it(self):
         baz = DummyContext()
@@ -158,16 +153,15 @@ class FindInterfaceTests(unittest.TestCase):
         class IFoo(Interface):
             pass
         directlyProvides(root, IFoo)
-        finder = self._getFUT()
-        result = finder(baz, IFoo)
+        result = self._callFUT(baz, IFoo)
         self.assertEqual(result.__name__, 'root')
 
 class ModelURLTests(unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, model, request, *elements):
         from repoze.bfg.traversal import model_url
-        return model_url
+        return model_url(model, request, *elements)
 
-    def test_it(self):
+    def test_extra_args(self):
         baz = DummyContext()
         bar = DummyContext(baz)
         foo = DummyContext(bar)
@@ -181,28 +175,58 @@ class ModelURLTests(unittest.TestCase):
         baz.__parent__ = bar
         baz.__name__ = 'baz'
         request = DummyRequest()
-        model_url = self._getFUT()
-        request = DummyRequest()
-        result = model_url(baz, request, 'this/theotherthing', 'that')
+        result = self._callFUT(baz, request, 'this/theotherthing', 'that')
 
         self.assertEqual(
             result,
             'http://example.com:5432/foo%20/bar/baz/this/theotherthing/that')
 
-    def test_root(self):
+    def test_root_default_app_url_endswith_slash(self):
         root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
-        model_url = self._getFUT()
         request = DummyRequest()
-        result = model_url(root, request)
+        request.application_url = 'http://example.com:5432/'
+        result = self._callFUT(root, request)
         self.assertEqual(result, 'http://example.com:5432/')
-        
+
+    def test_root_default_app_url_endswith_nonslash(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        request = DummyRequest()
+        request.application_url = 'http://example.com:5432'
+        result = self._callFUT(root, request)
+        self.assertEqual(result, 'http://example.com:5432/')
+
+    def test_nonroot_default_app_url_endswith_slash(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        other = DummyContext()
+        other.__parent__ = root
+        other.__name__ = 'nonroot object'
+        request = DummyRequest()
+        request.application_url = 'http://example.com:5432/'
+        result = self._callFUT(other, request)
+        self.assertEqual(result, 'http://example.com:5432/nonroot%20object/')
+
+    def test_nonroot_default_app_url_endswith_nonslash(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        other = DummyContext()
+        other.__parent__ = root
+        other.__name__ = 'nonroot object'
+        request = DummyRequest()
+        request.application_url = 'http://example.com:5432'
+        result = self._callFUT(other, request)
+        self.assertEqual(result, 'http://example.com:5432/nonroot%20object/')
 
 class FindRootTests(unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, context):
         from repoze.bfg.traversal import find_root
-        return find_root
+        return find_root(context)
 
     def test_it(self):
         dummy = DummyContext()
@@ -211,14 +235,13 @@ class FindRootTests(unittest.TestCase):
         baz.__name__ = 'baz'
         dummy.__parent__ = None
         dummy.__name__ = None
-        find = self._getFUT()
-        result = find(baz)
+        result = self._callFUT(baz)
         self.assertEqual(result, dummy)
 
 class FindModelTests(unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, context, name):
         from repoze.bfg.traversal import find_model
-        return find_model
+        return find_model(context, name)
 
     def _registerTraverserFactory(self, traverser):
         import zope.component
@@ -230,19 +253,17 @@ class FindModelTests(unittest.TestCase):
     def test_relative_found(self):
         dummy = DummyContext()
         baz = DummyContext()
-        find = self._getFUT()
         traverser = make_traverser(baz, '', [])
         self._registerTraverserFactory(traverser)
-        result = find(dummy, 'baz')
+        result = self._callFUT(dummy, 'baz')
         self.assertEqual(result, baz)
 
     def test_relative_notfound(self):
         dummy = DummyContext()
         baz = DummyContext()
-        find = self._getFUT()
         traverser = make_traverser(baz, 'bar', [])
         self._registerTraverserFactory(traverser)
-        self.assertRaises(KeyError, find, dummy, 'baz')
+        self.assertRaises(KeyError, self._callFUT, dummy, 'baz')
 
     def test_absolute_found(self):
         dummy = DummyContext()
@@ -251,10 +272,9 @@ class FindModelTests(unittest.TestCase):
         baz.__name__ = 'baz'
         dummy.__parent__ = None
         dummy.__name__ = None
-        find = self._getFUT()
         traverser = make_traverser(dummy, '', [])
         self._registerTraverserFactory(traverser)
-        result = find(baz, '/')
+        result = self._callFUT(baz, '/')
         self.assertEqual(result, dummy)
         self.assertEqual(dummy.wascontext, True)
 
@@ -265,16 +285,15 @@ class FindModelTests(unittest.TestCase):
         baz.__name__ = 'baz'
         dummy.__parent__ = None
         dummy.__name__ = None
-        find = self._getFUT()
         traverser = make_traverser(dummy, 'fuz', [])
         self._registerTraverserFactory(traverser)
-        self.assertRaises(KeyError, find, baz, '/')
+        self.assertRaises(KeyError, self._callFUT, baz, '/')
         self.assertEqual(dummy.wascontext, True)
 
 class ModelPathTests(unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, model, *elements):
         from repoze.bfg.traversal import model_path
-        return model_path
+        return model_path(model, *elements)
 
     def test_it(self):
         baz = DummyContext()
@@ -289,19 +308,27 @@ class ModelPathTests(unittest.TestCase):
         bar.__name__ = 'bar'
         baz.__parent__ = bar
         baz.__name__ = 'baz'
-        model_path = self._getFUT()
-        result = model_path(baz, 'this/theotherthing', 'that')
+        result = self._callFUT(baz, 'this/theotherthing', 'that')
         self.assertEqual(result, '/foo /bar/baz/this/theotherthing/that')
 
-    def test_root(self):
+    def test_root_default(self):
         root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
-        model_path = self._getFUT()
         request = DummyRequest()
-        result = model_path(root)
+        result = self._callFUT(root)
         self.assertEqual(result, '/')
         
+    def test_nonroot_default(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        other = DummyContext()
+        other.__parent__ = root
+        other.__name__ = 'other'
+        request = DummyRequest()
+        result = self._callFUT(other)
+        self.assertEqual(result, '/other')
 
 def make_traverser(*args):
     class DummyTraverser(object):

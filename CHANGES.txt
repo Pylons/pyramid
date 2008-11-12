@@ -1,3 +1,21 @@
+0.4.8 (11/12/2008)
+
+  Backwards Incompatibilities
+
+  - ``repoze.bfg.traversal.model_url`` now always appends a slash to
+    all generated URLs unless further elements are passed in as the
+    third and following arguments.  Rationale: views often use
+    ``model_url`` without the third-and-following arguments in order
+    to generate a URL for a model in order to point at the default
+    view of a model.  The URL that points to the default view of the
+    *root* model is technically ``http://mysite/`` as opposed to
+    ``http://mysite`` (browsers happen to ask for '/' implicitly in
+    the GET request).  Because URLs are never automatically generated
+    for anything *except* models by ``model_url``, and because the
+    root model is not really special, we continue this pattern.  The
+    impact of this change is minimal (at most you will have too many
+    slashes in your URL, which BFG deals with gracefully anyway).
+
 0.4.7 (11/11/2008)
 
   Features
