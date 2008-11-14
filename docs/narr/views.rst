@@ -214,6 +214,12 @@ Any time a model that is determined to be the :term:`context` provides
 this interface, and a view named ``hello.html`` is looked up against
 it as per the URL, the ``.views.hello_world`` view will be invoked.
 
+Note that views registered against a class take precedence over views
+registered for an interfaces when an ambiguity arises.  If a view is
+registered for both the class type of the context and an interface
+implemented by the context, the view registered for the class will
+"win".
+
 See :term:`Interface` in the glossary to find more information about
 interfaces.
 
