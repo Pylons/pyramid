@@ -38,6 +38,7 @@ install_requires=[
     'zope.hookable',
     'zope.interface',
     'zope.proxy',
+    'zope.testing',
     ]
 
 setup(name='repoze.bfg',

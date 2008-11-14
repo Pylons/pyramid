@@ -85,8 +85,6 @@ Glossary
   Template
     A file with replaceable parts that is capable of representing some
     text, XML, or HTML when rendered.
-  Interface
-    An attribute of an object that determines its type.
   Location
     The path to an object in a model graph.  See :ref:`location_aware`
     for more information about how to make a model object *location-aware*.
@@ -245,7 +243,8 @@ Glossary
     :mod:`repoze.bfg` is to perform view mappings via the ``bfg:view``
     declaration.  The ``configure.zcml`` file in a :mod:`repoze.bfg`
     application represents the application's :term:`application
-    registry`.
+    registry`.  See :term:`repoze.bfg.convention` for an alternative
+    to ZCML for application configuration.
   ReStructuredText
     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
     that is the defacto standard for descriptive text shipped in
@@ -317,3 +316,8 @@ Glossary
     `Barebones workflow for Python apps
     <http://svn.repoze.org/repoze.workflow>`_ .  It can be used by
     :mod:`repoze.bfg` to form a workflow system.
+  repoze.bfg.convention
+    `An add-on for repoze.bfg
+    <http://svn.repoze.org/repoze.bfg/trunk>`_ which provides
+    alternative mechanisms for common :mod:`repoze.bfg` application
+    configuration tasks.  Useful for the :term:`ZCML` -allergic.

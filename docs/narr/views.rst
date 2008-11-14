@@ -64,7 +64,7 @@ raise an error.
 Mapping Views to URLs
 ----------------------
 
-You must associate a view with a URL by adding information to your
+You may associate a view with a URL by adding information to your
 :term:`application registry` via :term:`ZCML` in your
 ``configure.zcml`` file using a ``bfg:view`` declaration.
 
@@ -72,26 +72,28 @@ You must associate a view with a URL by adding information to your
    :linenos:
 
    <bfg:view
-       for=".models.IHello"
+       for=".models.Hello"
        view=".views.hello_world"
        name="hello.html"
        />
 
 The above maps the ``.views.hello_world`` view function to
-:term:`context` objects which implement the ``.models.IHello``
-interface when the *view name* is ``hello.html``.
+:term:`context` objects which are instances of the Python class
+represented by ``.models.Hello`` when the *view name* is
+``hello.html``.
 
-Note that values prefixed with a period (``.``)for the ``for`` and
-``view`` attributes of a ``bfg:view`` (such as those above) mean
-"relative to the Python package directory in which this :term:`ZCML`
-file is stored".  So if the above ``bfg:view`` declaration was made
-inside a ``configure.zcml`` file that lived in the ``hello`` package,
-you could replace the relative ``.models.IHello`` with the absolute
-``hello.models.IHello``; likewise you could replace the relative
-``.views.hello_world`` with the absolute ``hello.views.hello_world``.
-Either the relative or absolute form is functionally equivalent.  It's
-often useful to use the relative form, in case your package's name
-changes.  It's also shorter to type.
+.. note:: Values prefixed with a period (``.``)for the ``for`` and
+   ``view`` attributes of a ``bfg:view`` (such as those above) mean
+   "relative to the Python package directory in which this
+   :term:`ZCML` file is stored".  So if the above ``bfg:view``
+   declaration was made inside a ``configure.zcml`` file that lived in
+   the ``hello`` package, you could replace the relative
+   ``.models.Hello`` with the absolute ``hello.models.Hello``;
+   likewise you could replace the relative ``.views.hello_world`` with
+   the absolute ``hello.views.hello_world``.  Either the relative or
+   absolute form is functionally equivalent.  It's often useful to use
+   the relative form, in case your package's name changes.  It's also
+   shorter to type.
 
 You can also declare a *default view* for a model type:
 
@@ -99,7 +101,7 @@ You can also declare a *default view* for a model type:
    :linenos:
 
    <bfg:view
-       for=".models.IHello"
+       for=".models.Hello"
        view=".views.hello_world"
        />
 
@@ -123,6 +125,98 @@ This indicates that when :mod:`repoze.bfg` identifies that the *view
 name* is ``hello.html`` against *any* :term:`context`, this view will
 be called.
 
+.. note::
+
+   If you're allergic to reading and writing :term:`ZCML`, or you're
+   just more comfortable defining your view declarations using Python,
+   you may use the :term:`repoze.bfg.convention` package.  This
+   package provides a decorator named ``bfg_view`` that can be used to
+   associate ``for``, ``name``, ``permission`` and ``request_type``
+   information with a function that acts as a BFG view instead of
+   needing to rely on ZCML for the same task.  You only need to add a
+   single ZCML stanza to your ``configure.zcml`` for
+   :term:`repoze.bfg.convention` to find all views decorated in this
+   fashion.
+
+Using Model Interfaces
+----------------------
+
+Instead of registering your views ``for`` a Python *class*, you can
+instead register a view for an :term:`interface`.  Since an interface
+can be attached arbitrarily to any instance (as opposed to its
+identity being implied by only its class), associating a view with an
+interface can provide more flexibility for sharing a single view
+between two or more different implementations of a model type.  For
+example, if two model object instances of different Python class types
+share the same interface, you can use the same view against each of
+them.
+
+In order to make use of interfaces in your application during view
+dispatch, you must create an interface and mark up your classes or
+instances with interface declarations that refer to this interface.
+
+To attach an interface to a *class*, you define the interface and use
+the ``zope.interface.implements`` function to associate the interface
+with the class.
+
+.. code-block:: python
+   :linenos:
+
+   from zope.interface import Interface
+   from zope.interface import implements
+
+   class IHello(Interface):
+       """ A marker interface """
+
+   class Hello(object):
+       implements(IHello)
+
+To attach an interface to an *instance*, you define the interface and
+use the ``zope.interface.alsoProvides`` function to associate the
+interface with the instance.  This function mutates the instance in
+such a way that the interface is attached to it.
+
+.. code-block:: python
+   :linenos:
+
+   from zope.interface import Interface
+   from zope.interface import alsoProvides
+
+   class IHello(Interface):
+       """ A marker interface """
+
+   class Hello(object):
+       pass
+
+   def make_hello():
+       hello = Hello()
+       alsoProvides(hello, IHello)
+       return hello
+
+Regardless of how you associate an interface with an instance or
+class, the resulting ZCML to associate that interface with a view is
+the same.  Assuming the above code that defines an ``IHello``
+interface lives in the root of your application, and its module is
+named "models.py", the below interface declaration will associate the
+``.views.hello_world`` view with models that implement (aka provide)
+this interface.
+
+.. code-block:: xml
+   :linenos:
+
+   <bfg:view
+       for=".models.IHello"
+       view=".views.hello_world"
+       name="hello.html"
+       />
+
+Any time a model that is determined to be the :term:`context` provides
+this interface, and a view named ``hello.html`` is looked up against
+it as per the URL, the ``.views.hello_world`` view will be invoked.
+
+See :term:`Interface` in the glossary to find more information about
+interfaces.
+
 The ``bfg:view`` ZCML Element
 -----------------------------
 
@@ -134,9 +228,10 @@ view
 
 for
 
-  A Python dotted-path name representing the :term:`interface` that
-  the :term:`context` must have in order for this view to be found and
-  called.
+  A Python dotted-path name representing the Python class that the
+  :term:`context` must be an instance of, *or* the :term:`interface`
+  that the :term:`context` must provide in order for this view to be
+  found and called.
 
 name
 
