@@ -109,14 +109,14 @@ Here's sample output from a test run::
   reading manifest file 'MyProject.egg-info/SOURCES.txt'
   writing manifest file 'MyProject.egg-info/SOURCES.txt'
   running build_ext
-  .
+  ..
   ----------------------------------------------------------------------
-  Ran 1 test in 0.647s
+  Ran 2 tests in 0.647s
 
 OK
 
 The tests are found in the ``tests.py`` module in your ``paster
-create``-generated project.  One sample test exists.
+create``-generated project.  Two sample tests exist.
 
 Runnning The Project Application
 --------------------------------
@@ -589,9 +589,10 @@ The ``tests.py`` module includes unit tests for your application.
 .. literalinclude:: MyProject/myproject/tests.py
    :linenos:
 
-This sample ``tests.py`` file has a single unit test defined within
-it.  This is the code that is executed when you run ``setup.py test
--q``.  You may add more tests here as you build your application.  You
-are not required to write tests to use :mod:`repoze.bfg`, this file is
-simply provided as convenience and example.
+This sample ``tests.py`` file has a single unit test and a single
+integration test defined within it.  These two tests are executed when
+you run ``setup.py test -q``.  You may add more tests here as you
+build your application.  You are not required to write tests to use
+:mod:`repoze.bfg`, this file is simply provided as convenience and
+example.
 

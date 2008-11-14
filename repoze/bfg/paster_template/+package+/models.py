@@ -6,7 +6,6 @@ class IMyModel(Interface):
 
 class MyModel(object):
     implements(IMyModel)
-    pass
 
 root = MyModel()
 
