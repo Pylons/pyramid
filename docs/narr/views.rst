@@ -351,3 +351,22 @@ returned to the client.
    See the :ref:`security_chapter` chapter to find out how to turn on
    a security policy.
 
+Using a View to Do A HTTP Redirect
+----------------------------------
+
+You can issue an HTTP redirect from within a view by returning a
+slightly different response.
+
+.. code-block:: python
+   :linenos:
+
+   from webob.exc import HTTPFound
+
+   def myview(context, request):
+       return HTTPFound(location='http://example.com')
+
+All exception types from the :mod:`webob.exc` module implement the
+``IResponse`` interface; any can be returned as the response from a
+view.  See :term:`WebOb` for the documentation for this module; it
+includes other response types for Unauthorized, etc.
+
