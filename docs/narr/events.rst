@@ -106,16 +106,17 @@ Using An Event to Vary the Request Type
 ---------------------------------------
 
 The most common usage of the ``INewRequestEvent`` is to attach an
-:term:`interface` to the request to be able to differentiate a request
-issued by a browser from a request issued by an XML-RPC from a request
-issued by a REST client. This makes it possible to register different
-views against different ``request_type`` interfaces; for instance,
-depending on request headers, you might return JSON or XML data.
+:term:`interface` to the request to be able to differentiate, for
+example, a request issued by a browser from a request issued by an
+XML-RPC from a request issued by a REST client. This differentiation
+makes it possible to register different views against different
+``request_type`` interfaces; for instance, depending on request
+headers, you might return JSON or XML data.
 
 To do this, you should subscribe an function to the ``INewRequest``
-event type, and use the ``zope.interface.alsoProvides`` API within the
-function to add one or more interfaces to the request object provided
-by the event.  Here's an example.
+event type, and you should use the ``zope.interface.alsoProvides`` API
+within the function to add one or more interfaces to the request
+object provided by the event.  Here's an example.
 
 .. code-block:: python
    :linenos:
@@ -128,14 +129,15 @@ by the event.  Here's an example.
        application/xml header"""
 
    class IJSONRequest(Interface):
-       """ A request from a JSON client """
+       """ A request from a JSON client that sets and Accept: 
+       application/json header """
  
    def categorize_request(event):
        request = event.request
        accept = request.headers.get('accept', '')
        if 'application/xml' in accept:
            alsoProvides(request, IRestRequest)
-       if 'application.json' in accept:
+       if 'application/json' in accept:
            alsoProvides(request, IJSONRequest)
 
 Then in your view registration ZCML, you can use the ``request_type``
