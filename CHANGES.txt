@@ -9,6 +9,9 @@ Next release
   - Change the default paster template to register its single view
     against a class rather than an interface.
 
+  - Document adding a request type interface to the request via a
+    subscriber function in the events narrative documentation.
+
 0.4.8 (11/12/2008)
 
   Backwards Incompatibilities

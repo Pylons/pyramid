@@ -88,6 +88,12 @@ application, because the interface defined at
 ``repoze.bfg.interfaces.INewResponse`` says it must.  These particular
 interfaces are documented in the :ref:`events_module` API chapter.
 
+.. note::
+
+   Usually postprocessing requests is better handled in middleware
+   components.  The ``INewResponse`` event exists purely for symmetry
+   with ``INewRequest``, really.
+
 The *subscriber* ZCML element takes two values: ``for``, which is the
 interface the subscriber is registered for (which limits the events
 that the subscriber will receive to those specified by the interface),
@@ -96,24 +102,81 @@ function.
 
 The return value of a subscriber function is ignored.
 
-Uses For Events
----------------
+Using An Event to Vary the Request Type
+---------------------------------------
 
-Here are some things that events are useful for:
+The most common usage of the ``INewRequestEvent`` is to attach an
+:term:`interface` to the request to be able to differentiate a request
+issued by a browser from a request issued by an XML-RPC from a request
+issued by a REST client. This makes it possible to register different
+views against different ``request_type`` interfaces; for instance,
+depending on request headers, you might return JSON or XML data.
 
-- Attaching different interfaces to the request to be able to
-  differentiate e.g. requests from a browser against requests from an
-  XML-RPC client within view code.  To do this, you'd subscribe a
-  function to ```INewRequest``, and use the
-  ``zope.interface.alsoProvides`` function to add one or more
-  interfaces to the request object.
+To do this, you should subscribe an function to the ``INewRequest``
+event type, and use the ``zope.interface.alsoProvides`` API within the
+function to add one or more interfaces to the request object provided
+by the event.  Here's an example.
 
-- Post-processing all response output by subscribing to
-  ``INewResponse``, for example, modifying headers.
+.. code-block:: python
+   :linenos:
 
-  .. note::
+   from zope.interface import alsoProvides
+   from zope.interface import Interface
 
-     Usually postprocessing requests is better handled in middleware
-     components.  The ``INewResponse`` event exists purely for
-     symmetry with ``INewRequest``, really.
+   class IRESTRequest(Interface):
+       """ A request from a REST client that sets an Accept:
+       application/xml header"""
 
+   class IJSONRequest(Interface):
+       """ A request from a JSON client """
+ 
+   def categorize_request(event):
+       request = event.request
+       accept = request.headers.get('accept', '')
+       if 'application/xml' in accept:
+           alsoProvides(request, IRestRequest)
+       if 'application.json' in accept:
+           alsoProvides(request, IJSONRequest)
+
+Then in your view registration ZCML, you can use the ``request_type``
+attribute to point at different view functions depending upon the
+interface implemented by the request.  For example, if the above
+subscriber function was registered, the three view registrations below
+could be used to point at separate view functions using separate
+request type interfaces for the same model object.
+
+.. code-block:: xml
+   :linenos:
+
+   <!-- html view -->
+   <bfg:view
+      for=".models.MyModel"
+      request_type="repoze.bfg.interfaces.IRequest"
+      view=".views.html_view"/>
+
+   <!-- xml (REST) view -->
+   <bfg:view
+      for=".models.MyModel"
+      request_type=".interfaces.IRESTRequest"
+      view=".views.rest_view"/>
+
+   <!-- JSON view -->
+   <bfg:view
+      for=".models.MyModel"
+      request_type=".interfaces.IJSONRequest"
+      view=".views.json_view"/>
+
+The interface ``repoze.bfg.interfaces.IRequest`` is automatically
+implemented by every :mod:`repoze.bfg` request, so all requests will
+implement that type, and views registered against models which do not
+supply a ``request_type`` will be considered to be registered for this
+``IRequest`` as a default.
+
+Of course, you are not limited to using the ``Accept`` header to
+determine which interfaces to attach to a request.  For example, you
+might also choose to use hostname
+(e.g. ``request.environ.get('HTTP_HOST',
+request.environ['SERVER_NAME'])``) in order to "skin" your application
+differently based on whether the user should see the "management"
+(e.g. "manage.myapp.com") presentation of the application or the
+"retail" presentation (e.g. "www.myapp.com").
