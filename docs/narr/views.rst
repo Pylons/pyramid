@@ -78,8 +78,8 @@ You may associate a view with a URL by adding information to your
        />
 
 The above maps the ``.views.hello_world`` view function to
-:term:`context` objects which are instances of the Python class
-represented by ``.models.Hello`` when the *view name* is
+:term:`context` objects which are instances (or subclasses) of the
+Python class represented by ``.models.Hello`` when the *view name* is
 ``hello.html``.
 
 .. note:: Values prefixed with a period (``.``)for the ``for`` and
