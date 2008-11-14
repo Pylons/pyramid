@@ -8,7 +8,33 @@ willing to traverse.
 Defining a Model
 ----------------
 
-An example of a model describing a blog entry:
+Here's an example of a model describing a blog entry:
+
+.. code-block:: python
+   :linenos:
+
+   import datetime
+
+   class BlogEntry(object):
+       def __init__(self, title, body, author):
+           self.title = title
+           self.body =  body
+           self.author = author
+           self.created = datetime.datetime.now()
+
+A model may be essentially any Python object.  In the above example,
+an instance of the ``BlogEntry`` class can be created and used as a
+model.
+
+Models Which Implement Interfaces
+---------------------------------
+
+Models can optionally be made to implement an :term:`interface`.  This
+makes it possible to register views against the interface itself
+instead of the *class* within view statement in the application
+registry.  For example, here's some code which describes a blog entry
+whicg also declares that the blog entry implements an
+:term:`interface`.
 
 .. code-block:: python
    :linenos:
@@ -28,7 +54,7 @@ An example of a model describing a blog entry:
            self.author = author
            self.created = datetime.datetime.now()
 
-A model consists of two things: the object which defines the model
+This model consists of two things: the object which defines the model
 (above as the class ``BlogEntry``), and an :term:`interface` attached
 to the model object (above as the class ``IBlogEntry``).  An interface
 simply tags the model object with a "type" that can be referred to
@@ -39,6 +65,9 @@ that inherits from ``zope.interface.Interface``.
 You specify that a model *implements* an interface by using the
 ``zope.interface.implements`` function at class scope.  The above
 ``BlogEntry`` model implements the ``IBlogEntry`` interface.
+
+See the :ref:`views_chapter` for more information about why providing
+models with an interface can be an interesing thing to do.
 
 Defining a Graph of Model Instances
 -----------------------------------
@@ -99,5 +128,24 @@ root node ``implements(ILocation)``:
        __parent__ = None
        __name__ = ''
 
+:mod:`repoze.bfg` API Functions That Act Against Models
+-------------------------------------------------------
 
+A model instance is used as the :term:`context` argument provided to a
+view.  See :ref:`traversal_chapter` for more information about how a
+model becomes the context.
 
+The APIs provided by :ref:`traversal_module` are used against model
+instances.  These functions can be used to find the "path" of a model,
+find the URL of a model, the root model in a model graph, and so on.
+
+The APIs provided by :ref:`location_module` are used against model
+instances.  These can be used to walk down a model graph, or
+conveniently locate one object "inside" another.
+
+Some APIs in :ref:`security_module` accept a model object as a
+parameter.  For example, the ``has_permission`` API accepts a
+"context" (a model object) as one of its arguments; the "acl" is
+obtained from this model or one of its ancestors.  Other APIs in the
+same module also accept :term:`context` as an argument, and a context
+is always a model.
