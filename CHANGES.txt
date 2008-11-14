@@ -6,6 +6,9 @@ Next release
   - Document view registrations against classes and
     ``repoze.bfg.convention`` in context.
 
+  - Change the default paster template to register its single view
+    against a class rather than an interface.
+
 0.4.8 (11/12/2008)
 
   Backwards Incompatibilities

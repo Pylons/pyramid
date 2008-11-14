@@ -453,16 +453,16 @@ registry`. It looks like so:
    :mod:`repoze.bfg` sources).
 
 #. Lines 8-11 register a single view.  It is ``for`` model objects
-   that support the IMyModel interface.  The ``view`` attribute points
-   at a Python function that does all the work for this view.  Note
-   that the values of both the ``for`` attribute and the ``view``
-   attribute begin with a single period.  Names that begin with a
-   period are "shortcuts" which point at files relative to the
-   :term:`package` in which the ``configure.zcml`` file lives.  In
-   this case, since the ``configure.zcml`` file lives within the
-   ``myproject`` package, the shorcut ``.models.IMyModel`` could also
-   be spelled ``myproject.models.IMyModel`` (forming a full Python
-   dotted-path name to the ``IMyModel`` class).  Likewise the shortcut
+   that are instances of the ``MyModel`` class.  The ``view``
+   attribute points at a Python function that does all the work for
+   this view.  Note that the values of both the ``for`` attribute and
+   the ``view`` attribute begin with a single period.  Names that
+   begin with a period are "shortcuts" which point at files relative
+   to the :term:`package` in which the ``configure.zcml`` file lives.
+   In this case, since the ``configure.zcml`` file lives within the
+   ``myproject`` package, the shorcut ``.models.MyModel`` could also
+   be spelled ``myproject.models.MyModel`` (forming a full Python
+   dotted-path name to the ``MyModel`` class).  Likewise the shortcut
    ``.views.my_view`` could be replaced with
    ``myproject.views.my_view``.
 
@@ -477,8 +477,8 @@ in the model, and the HTML given back to the browser.
    :linenos:
 
 #. Lines 3-5 provide the ``my_view`` that was registered as the view.
-   ``configure.zcml`` said that the default URL for ``IMyModel``
-   content should run this ``my_view`` function.
+   ``configure.zcml`` said that the default URL for instances that are
+   of the class ``MyModel`` should run this ``my_view`` function.
 
    The function is handed two pieces of information: the
    :term:`context` and the term:`request`.  The *context* is the term
@@ -516,21 +516,16 @@ in the model, and the HTML given back to the browser.
 
 The ``models.py`` module provides the :term:`model` data for our
 application.  We write a class named ``MyModel`` that provides the
-behavior.  We then create an interface ``IMyModel`` that is a
-:term:`interface` which serves as the "type" for our data, and we
-associate it without our ``MyModel`` class by claiming that the class
-``implements`` the interface.
+behavior.  
 
 .. literalinclude:: MyProject/myproject/models.py
    :linenos:
 
-#. Lines 4-5 define the interface.
+#. Lines 1-2 define the MyModel class.
 
-#. Lines 7-9 provide a class that implements this interface.
+#. Line 4 defines an instance of MyModel as the root.
 
-#. Line 11 defines an instance of MyModel as the root.
-
-#. Line 13 is a function that will be called by the :mod:`repoze.bfg`
+#. Line 6 is a function that will be called by the :mod:`repoze.bfg`
    *Router* for each request when it wants to find the root of the model
    graph.  Conventionally this is called ``get_root``.
 
@@ -540,15 +535,6 @@ persistent data store, such as a database.  :mod:`repoze.bfg` doesn't
 make any assumption about which sort of datastore you'll want to use,
 so the sample application uses an instance of ``MyModel`` to represent
 the root.
-
-What will likely frighten new developers in the model file is the use
-of :term:`interface` classes.  In their simplest form (which is the
-only form that :mod:`repoze.bfg` requires you to understand),
-interfaces are simply "marker" attributes indicating the *type* of a
-model object.  These can be attached to classes (via the
-``implements`` function with one or more interfaces as arguments at
-class scope).  In more advanced usage, they can be attached directly
-to instances.  We do not demonstrate that here.
 
 ``run.py``
 ~~~~~~~~~~

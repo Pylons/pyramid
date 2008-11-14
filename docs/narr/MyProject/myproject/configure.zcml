@@ -6,7 +6,7 @@
   <include package="repoze.bfg.includes" />
 
   <bfg:view
-     for=".models.IMyModel"
+     for=".models.MyModel"
      view=".views.my_view"
      />
 
