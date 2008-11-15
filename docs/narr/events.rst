@@ -107,11 +107,10 @@ Using An Event to Vary the Request Type
 
 The most common usage of the ``INewRequestEvent`` is to attach an
 :term:`interface` to the request to be able to differentiate, for
-example, a request issued by a browser from a request issued by an
-XML-RPC from a request issued by a REST client. This differentiation
-makes it possible to register different views against different
-``request_type`` interfaces; for instance, depending on request
-headers, you might return JSON or XML data.
+example, a request issued by a browser from a request issued by a REST
+client.  This differentiation makes it possible to register different
+views against different ``request_type`` interfaces; for instance,
+depending on request headers, you might return JSON or XML data.
 
 To do this, you should subscribe an function to the ``INewRequest``
 event type, and you should use the ``zope.interface.alsoProvides`` API
