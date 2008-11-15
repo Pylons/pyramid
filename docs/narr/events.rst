@@ -134,10 +134,10 @@ object provided by the event.  Here's an example.
    def categorize_request(event):
        request = event.request
        accept = request.headers.get('accept', '')
-       if 'application/xml' in accept:
-           alsoProvides(request, IRestRequest)
        if 'application/json' in accept:
            alsoProvides(request, IJSONRequest)
+       elif 'application/xml' in accept:
+           alsoProvides(request, IRestRequest)
 
 Then in your view registration ZCML, you can use the ``request_type``
 attribute to point at different view functions depending upon the
