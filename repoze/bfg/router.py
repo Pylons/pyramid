@@ -23,8 +23,6 @@ from repoze.bfg.interfaces import ISettings
 from repoze.bfg.registry import registry_manager
 from repoze.bfg.registry import makeRegistry
 
-from repoze.bfg.security import Unauthorized
-
 from repoze.bfg.view import render_view_to_response
 from repoze.bfg.view import view_execution_permitted
 
