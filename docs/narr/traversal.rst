@@ -31,10 +31,10 @@ typically instances of Python classes.
 
 The model graph consists of *container* nodes and *leaf* nodes.  There
 is only one difference between *container* node and a *leaf* node:
-*container* nodes a ``__getitem__`` method while *leaf* nodes do not.
-The ``__getitem__`` method was chosen as the signifying difference
-between the two types of nodes because the presence of this method is
-how Python itself typically determines whether an object is
+*container* nodes posess a ``__getitem__`` method while *leaf* nodes
+do not.  The ``__getitem__`` method was chosen as the signifying
+difference between the two types of nodes because the presence of this
+method is how Python itself typically determines whether an object is
 "containerish" or not.
 
 A container node is presumed to be willing to return a child node or
