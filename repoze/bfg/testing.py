@@ -256,6 +256,7 @@ class DummyRequest:
     method = 'GET'
     application_url = 'http://example.com'
     host = 'example.com:80'
+    content_length = 0
     def __init__(self, params=None, environ=None, headers=None, path='/',
                  cookies=None, **kw):
         if environ is None:

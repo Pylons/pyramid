@@ -1,5 +1,7 @@
 Next release
 
+  - Add content_length attribute to testing.DummyRequest.
+
   - Change paster template ``tests.py`` to include a true unit test.
     Retain old test as an integration test.  Update documentation.
 
