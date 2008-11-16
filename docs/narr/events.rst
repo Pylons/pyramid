@@ -107,10 +107,11 @@ Using An Event to Vary the Request Type
 
 The most common usage of the ``INewRequestEvent`` is to attach an
 :term:`interface` to the request to be able to differentiate, for
-example, a request issued by a browser from a request issued by a REST
+example, a request issued by a browser from a request issued by a JSON
 client.  This differentiation makes it possible to register different
 views against different ``request_type`` interfaces; for instance,
-depending on request headers, you might return JSON or XML data.
+depending on the presence of a request header, you might return JSON
+data.
 
 To do this, you should subscribe an function to the ``INewRequest``
 event type, and you should use the ``zope.interface.alsoProvides`` API
@@ -123,10 +124,6 @@ object provided by the event.  Here's an example.
    from zope.interface import alsoProvides
    from zope.interface import Interface
 
-   class IRESTRequest(Interface):
-       """ A request from a REST client that sets an Accept:
-       application/xml header"""
-
    class IJSONRequest(Interface):
        """ A request from a JSON client that sets and Accept: 
        application/json header """
@@ -136,8 +133,6 @@ object provided by the event.  Here's an example.
        accept = request.headers.get('accept', '')
        if 'application/json' in accept:
            alsoProvides(request, IJSONRequest)
-       elif 'application/xml' in accept:
-           alsoProvides(request, IRestRequest)
 
 Then in your view registration ZCML, you can use the ``request_type``
 attribute to point at different view functions depending upon the
@@ -154,12 +149,6 @@ request type interfaces for the same model object.
       for=".models.MyModel"
       request_type="repoze.bfg.interfaces.IRequest"
       view=".views.html_view"/>
-
-   <!-- xml (REST) view -->
-   <bfg:view
-      for=".models.MyModel"
-      request_type=".interfaces.IRESTRequest"
-      view=".views.rest_view"/>
 
    <!-- JSON view -->
    <bfg:view
