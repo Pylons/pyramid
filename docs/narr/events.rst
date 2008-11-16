@@ -134,23 +134,30 @@ object provided by the event.  Here's an example.
        if 'application/json' in accept:
            alsoProvides(request, IJSONRequest)
 
-Then in your view registration ZCML, you can use the ``request_type``
-attribute to point at different view functions depending upon the
-interface implemented by the request.  For example, if the above
-subscriber function was registered, the three view registrations below
-could be used to point at separate view functions using separate
-request type interfaces for the same model object.
+Then in your view registration ZCML, if you subscribe
+``categorize_request`` for the ``repoze.bfg.interfaces.INewRequest``
+type, you can use the ``request_type`` attribute to point at different
+view functions depending upon the interface implemented by the
+request.  For example, if the above subscriber function was
+registered, the three view registrations below could be used to point
+at separate view functions using separate request type interfaces for
+the same model object.
 
 .. code-block:: xml
    :linenos:
 
-   <!-- html view -->
+   <subscriber
+      for="repoze.bfg.interfaces.INewRequest"
+      handler=".subscribers.categorize_request"
+    />
+
+   <!-- html default view -->
    <bfg:view
       for=".models.MyModel"
       request_type="repoze.bfg.interfaces.IRequest"
       view=".views.html_view"/>
 
-   <!-- JSON view -->
+   <!-- JSON default view -->
    <bfg:view
       for=".models.MyModel"
       request_type=".interfaces.IJSONRequest"
