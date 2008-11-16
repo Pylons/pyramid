@@ -25,6 +25,7 @@ class Test_pushpage(unittest.TestCase, PlacelessSetup):
         pp = self._makeOne('pp.pt')
         wrapped = pp(to_wrap)
         self.assertEqual(wrapped.__name__, 'to_wrap')
+        self.assertEqual(wrapped.__grok_module__, to_wrap.__module__)
 
     def test___call___passes_names_from_wrapped(self):
         self._zcmlConfigure()

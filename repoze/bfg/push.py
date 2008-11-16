@@ -28,5 +28,6 @@ class pushpage(object):
             kw = wrapped(context, request)
             return render_template_to_response(path, **kw)
         _curried.__name__ = wrapped.__name__
+        _curried.__grok_module__ = wrapped.__module__ # r.bfg.convention support
 
         return _curried

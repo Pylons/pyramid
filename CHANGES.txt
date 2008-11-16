@@ -1,5 +1,8 @@
 Next release
 
+  - Make pushpage decorator compatible with repoze.bfg.convention's
+    ``bfg_view`` decorator when they're stacked.
+
   - Add content_length attribute to testing.DummyRequest.
 
   - Change paster template ``tests.py`` to include a true unit test.
