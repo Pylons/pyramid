@@ -147,7 +147,7 @@ the generated ``MyProject.ini`` configuration file:
 .. code-block:: bash
    :linenos:
 
-   $ bin/paster serve MyProject.ini
+   $ ../bin/paster serve MyProject.ini
 
 Here's sample output from a run:
 
