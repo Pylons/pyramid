@@ -1,3 +1,5 @@
+.. _installing_chapter:
+
 Installing :mod:`repoze.bfg`
 ============================
 
@@ -33,27 +35,49 @@ installed.
    maillist <http://lists.repoze.org/listinfo/repoze-dev>`_ if you'd
    like to try to tackle the job of compilation and maintenance.
 
+Creating a Virtualenv
+---------------------
+
 It is advisable to install :mod:`repoze.bfg` into a :term:`virtualenv`
 in order to obtain isolation from any "system" packages you've got
 installed in your Python version (and likewise, to prevent
 :mod:`repoze.bfg` from globally installing versions of packages that
 are not compatible with your system Python).
 
-After you've got the requisite dependencies installed, you may install
-:mod:`repoze.bfg` into your Python environment using the following
-command::
+To set up a virtualenv to install :mod:`repoze.bfg` within, make sure
+that the :term:`virtualenv` package is installed in your Python, then
+invoke:
 
-  $ easy_install -i http://dist.repoze.org/lemonade/dev/simple repoze.bfg
+.. code-block:: bash
+   :linenos:
 
-.. note:: If you can't get :mod:`repoze.bfg` installed using
-   ``easy_install`` because ``lxml`` fails to compile on your system,
-   you can try the `repoze.bfg buildout
-   <http://svn.repoze.org/buildouts/repoze.bfg/trunk/README.txt>`_.
-   This installation mechanism builds known-compatible ``libxml2`` and
-   ``libxslt`` from source and causes ``lxml`` to link against these
-   instead of your system packages, as version incompatibilities
-   between system packages and ``lxml`` versions are typically to
-   blame for compilation problems.
+   $ virtualenv --no-site-packages bfgenv
+   New python executable in bfgenv/bin/python
+   Installing setuptools.............done.
+
+.. warning:: Using ``--no-site-packages`` when generating your
+   virtualenv is important. This flag provides the necessary isolation
+   for running the set of packages required by :mod:`repoze.bfg`.  If
+   you do not specify ``--no-site-packages``, it's possible that
+   :mod:`repoze.bfg` will not install properly into the virtualenv,
+   or, even if it does, may not run properly, depending on the
+   packages you've already got installed into your Python's "main"
+   site-packages dir.
+
+You should perform any following commands that mention a "bin"
+directory from within the ``bfgenv`` virtualenv dir.
+
+Installing :mod:`repoze.bfg` Into A Virtualenv
+----------------------------------------------
+
+After you've got your ``bfgenv`` virtualenv installed, you may install
+:mod:`repoze.bfg` itself using the following commands from within the
+virtualenv (``bfgenv``) directory:
+
+.. code-block:: bash
+   :linenos:
+
+   $ bin/easy_install -i http://dist.repoze.org/lemonade/dev/simple repoze.bfg
 
 What Gets Installed
 -------------------
@@ -64,3 +88,18 @@ WebOb, Paste, PasteScript, and PasteDeploy libraries are installed.
 Additionally, as shown in the next section, PasteScript (aka *paster*)
 templates will be registered that make it easy to start a new
 :mod:`repoze.bfg` project.
+
+If You Can't Install Via ``easy_install`` (Alternate Installation)
+------------------------------------------------------------------
+
+If you can't get :mod:`repoze.bfg` installed using ``easy_install``
+because ``lxml`` fails to compile on your system, you can try the
+`repoze.bfg buildout
+<http://svn.repoze.org/buildouts/repoze.bfg/trunk/README.txt>`_.  This
+installation mechanism builds known-compatible ``libxml2`` and
+``libxslt`` from source and causes ``lxml`` to link against these
+instead of your system packages, as version incompatibilities between
+system packages and ``lxml`` versions are typically to blame for
+compilation problems.
+
+

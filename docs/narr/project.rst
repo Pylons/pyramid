@@ -11,43 +11,50 @@ Creating the Project
 --------------------
 
 To start a :mod:`repoze.bfg` :term:`project`, use the ``paster
-create`` facility::
+create`` facility using the interpreter from the virtualenv
+(``bfgenv``) directory you created in :ref:`installing_chapter`.
 
-  $ paster create -t bfg
+.. code-block:: bash
+   :linenos:
+
+   $ bin/paster create -t bfg
 
 ``paster create`` will ask you a single question: the *name* of the
 project.  You should use a string without spaces and with only letters
 in it.  Here's sample output from a run of ``paster create`` for a
-project we name ``MyProject``::
+project we name ``MyProject``:
 
-  $ bin/paster create -t bfg
-  Selected and implied templates:
-    repoze.bfg#bfg  repoze.bfg starter project
+.. code-block:: bash
+   :linenos:
 
-  Enter project name: MyProject
-  Variables:
-    egg:      MyProject
-    package:  myproject
-    project:  MyProject
-  Creating template bfg
-  Creating directory ./MyProject
-    Recursing into +package+
-      Creating ./MyProject/myproject/
-      Copying __init__.py to ./MyProject/myproject/__init__.py
-      Copying configure.zcml to ./MyProject/myproject/configure.zcml
-      Copying models.py to ./MyProject/myproject/models.py
-      Copying run.py_tmpl to ./MyProject/myproject/run.py
-      Recursing into templates
-        Creating ./MyProject/myproject/templates/
-        Copying mytemplate.pt to ./MyProject/myproject/templates/mytemplate.pt
-      Copying tests.py_tmpl to ./MyProject/myproject/tests.py
-      Copying views.py_tmpl to ./MyProject/myproject/views.py
-    Copying +project+.ini_tmpl to ./MyProject/MyProject.ini
-    Copying CHANGES.txt_tmpl to ./MyProject/CHANGES.txt
-    Copying README.txt_tmpl to ./MyProject/README.txt
-    Copying ez_setup.py to ./MyProject/ez_setup.py
-    Copying setup.py_tmpl to ./MyProject/setup.py
-  Running /Users/chrism/projects/repoze/bfg/bin/python setup.py egg_info
+   $ bin/paster create -t bfg
+   Selected and implied templates:
+     repoze.bfg#bfg  repoze.bfg starter project
+
+   Enter project name: MyProject
+   Variables:
+     egg:      MyProject
+     package:  myproject
+     project:  MyProject
+   Creating template bfg
+   Creating directory ./MyProject
+     Recursing into +package+
+       Creating ./MyProject/myproject/
+       Copying __init__.py to ./MyProject/myproject/__init__.py
+       Copying configure.zcml to ./MyProject/myproject/configure.zcml
+       Copying models.py to ./MyProject/myproject/models.py
+       Copying run.py_tmpl to ./MyProject/myproject/run.py
+       Recursing into templates
+         Creating ./MyProject/myproject/templates/
+         Copying mytemplate.pt to ./MyProject/myproject/templates/mytemplate.pt
+       Copying tests.py_tmpl to ./MyProject/myproject/tests.py
+       Copying views.py_tmpl to ./MyProject/myproject/views.py
+     Copying +project+.ini_tmpl to ./MyProject/MyProject.ini
+     Copying CHANGES.txt_tmpl to ./MyProject/CHANGES.txt
+     Copying README.txt_tmpl to ./MyProject/README.txt
+     Copying ez_setup.py to ./MyProject/ez_setup.py
+     Copying setup.py_tmpl to ./MyProject/setup.py
+   Running /Users/chrism/projects/repoze/bfg/bin/python setup.py egg_info
 
 As a result of the above, a project is created in a directory named
 ``MyProject``.  That directory is a :term:`setuptools` :term:`project`
@@ -72,15 +79,21 @@ application's Python code and templates.
 Installing your Newly Created Project for Development
 -----------------------------------------------------
 
-Using your favorite Python interpreter (or, better, the interpreter
-from a :term:`virtualenv`), invoke the following command when inside
-the project directory against the generated ``setup.py``::
+Using the interpreter from the :term:`virtualenv` you create during
+:ref:`installing_chapter`, invoke the following command when inside
+the project directory against the generated ``setup.py``:
 
-  $ python setup.py develop
+.. code-block:: bash
+   :linenos:
 
-Elided output from a run of this command is shown below::
+   $ ../bin/python setup.py develop
 
-  $ python setup.py develop
+Elided output from a run of this command is shown below:
+
+.. code-block:: bash
+   :linenos:
+
+   $ ../bin/python setup.py develop
    ...
    Finished processing dependencies for MyProject==0.1
 
@@ -92,28 +105,34 @@ Running The Tests For Your Application
 --------------------------------------
 
 To run unit tests for your application, you should invoke them like
-so::
+so:
 
-  $ python setup.py test -q
+.. code-block:: bash
+   :linenos:
 
-Here's sample output from a test run::
+   $ ../bin/python setup.py test -q
 
-  $ python setup.py test -q
-  running test
-  running egg_info
-  writing requirements to MyProject.egg-info/requires.txt
-  writing MyProject.egg-info/PKG-INFO
-  writing top-level names to MyProject.egg-info/top_level.txt
-  writing dependency_links to MyProject.egg-info/dependency_links.txt
-  writing entry points to MyProject.egg-info/entry_points.txt
-  reading manifest file 'MyProject.egg-info/SOURCES.txt'
-  writing manifest file 'MyProject.egg-info/SOURCES.txt'
-  running build_ext
-  ..
-  ----------------------------------------------------------------------
-  Ran 2 tests in 0.647s
+Here's sample output from a test run:
 
-OK
+.. code-block:: bash
+   :linenos:
+
+   $ python setup.py test -q
+   running test
+   running egg_info
+   writing requirements to MyProject.egg-info/requires.txt
+   writing MyProject.egg-info/PKG-INFO
+   writing top-level names to MyProject.egg-info/top_level.txt
+   writing dependency_links to MyProject.egg-info/dependency_links.txt
+   writing entry points to MyProject.egg-info/entry_points.txt
+   reading manifest file 'MyProject.egg-info/SOURCES.txt'
+   writing manifest file 'MyProject.egg-info/SOURCES.txt'
+   running build_ext
+   ..
+   ----------------------------------------------------------------------
+   Ran 2 tests in 0.647s
+
+   OK
 
 The tests are found in the ``tests.py`` module in your ``paster
 create``-generated project.  Two sample tests exist.
@@ -123,15 +142,21 @@ Runnning The Project Application
 
 Once the project is installed for development, you can run the
 application it represents using the ``paster serve`` command against
-the generated ``MyProject.ini`` configuration file::
+the generated ``MyProject.ini`` configuration file:
 
-  $ paster serve MyProject.ini
+.. code-block:: bash
+   :linenos:
 
-Here's sample output from a run::
+   $ bin/paster serve MyProject.ini
 
-  $ paster serve MyProject.ini
-  Starting server in PID 16601.
-  serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
+Here's sample output from a run:
+
+.. code-block:: bash
+   :linenos:
+
+   $ paster serve MyProject.ini
+   Starting server in PID 16601.
+   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 By default, generated :mod:`repoze.bfg` applications will listen on
 port 6543.
