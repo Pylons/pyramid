@@ -3,12 +3,12 @@
 :mod:`repoze.bfg` Built-in Templating Facilties
 ===============================================
 
-Three templating facilities are provided by :mod:`repoze.bfg` "out of
-the box": :term:`ZPT` -style, :term:`Genshi` -style, and :term:`XSLT`
-templating.
+Four templating facilities are provided by :mod:`repoze.bfg` "out of
+the box": :term:`ZPT` -style, :term:`Genshi` -style, text templating,
+and :term:`XSLT` templating.
 
-ZPT-style and Genshi-style templates are in :mod:`repoze.bfg` are
-supported by the :term:`Chameleon` (nee :term:`z3c.pt`) templating
+ZPT-style, Genshi-style, and text templates are in :mod:`repoze.bfg`
+are supported by the :term:`Chameleon` (nee :term:`z3c.pt`) templating
 engine, which contains alternate implementations of both the ZPT and
 Genshi language specifications.
 
@@ -32,6 +32,7 @@ statement, e.g.:
 
   from repoze.chameleon_zpt import render_template as zpt_render
   from repoze.chameleon_genshi import render_template as genshi_render
+  from repoze.chameleon_text import render_template as text_render
 
 :mod:`repoze.bfg.chameleon_zpt`
 -------------------------------
@@ -51,6 +52,17 @@ statement, e.g.:
 ----------------------------------
 
 .. automodule:: repoze.bfg.chameleon_genshi
+
+  .. autofunction:: get_template
+
+  .. autofunction:: render_template
+
+  .. autofunction:: render_template_to_response
+
+:mod:`repoze.bfg.chameleon_text`
+----------------------------------
+
+.. automodule:: repoze.bfg.chameleon_text
 
   .. autofunction:: get_template
 

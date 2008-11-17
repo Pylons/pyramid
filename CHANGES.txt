@@ -1,4 +1,8 @@
-Next release
+0.4.9 (11/17/2008)
+
+  - Add chameleon text template API (chameleon ${name} renderings
+    where the template does not need to be wrapped in any containing
+    XML).
 
   - Change docs to explain install in terms of a virtualenv
     (unconditionally).

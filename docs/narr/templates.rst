@@ -136,6 +136,16 @@ application's configuration section, e.g.::
   use = egg:MyProject#app
   reload_templates = true
 
+Using Text Templates
+--------------------
+
+:mod:`repoze.bfg` also allows for the use of templates which are
+composed entirely of non-XML text via :term:`Chameleon`.  To do so,
+you can create templates that are entirely composed of text except for
+``${name}`` -style substitution points.  The rendering API is a mirror
+of the ZPT rendering facility, it's just imported from another place;
+see :ref:`template_module` for more information.
+
 Templating with other Templating Languages
 ------------------------------------------
 
