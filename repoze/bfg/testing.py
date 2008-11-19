@@ -228,6 +228,21 @@ class DummyModel:
         ob = self.subs[name]
         return ob
 
+    def values(self):
+        """ Return the values set by __setitem__ """
+        return self.subs.values()
+
+    def items(self):
+        """ Return the items set by __setitem__ """
+        return self.subs.items()
+
+    def keys(self):
+        """ Return the keys set by __setitem__ """
+        return self.subs.keys()
+
+    def __contains__(self, name):
+        return name in self.subs
+    
     def clone(self, __name__=_marker, __parent__=_marker, **kw):
         """ Create a clone of the model object.  If ``__name__`` or
         ``__parent__`` is passed in, use the value to override the
@@ -244,9 +259,6 @@ class DummyModel:
             inst.__parent__ = __parent__
         return inst
 
-    def __contains__(self, name):
-        return name in self.subs
-    
 class DummyRequest:
     """ A dummy request object (imitates a :term:`WebOb` ``Request``
     object).  The named constructor arguments correspond to their

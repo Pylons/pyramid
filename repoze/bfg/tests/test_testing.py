@@ -287,7 +287,7 @@ class TestDummyModel(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(name, parent, **kw)
 
-    def test__setitem__and__getitem__(self):
+    def test__setitem__and__getitem__and__contains__(self):
         class Dummy:
             pass
         dummy = Dummy()
@@ -297,6 +297,7 @@ class TestDummyModel(unittest.TestCase):
         self.assertEqual(dummy.__parent__, model)
         self.assertEqual(model['abc'], dummy)
         self.assertRaises(KeyError, model.__getitem__, 'none')
+        self.failUnless('abc' in model)
 
     def test_extra_params(self):
         model = self._makeOne(foo=1)
@@ -309,6 +310,16 @@ class TestDummyModel(unittest.TestCase):
         self.assertEqual(clone.__name__, 'name2')
         self.assertEqual(clone.__parent__, 'parent2')
         self.assertEqual(clone.foo, 1)
+
+    def test_keys_items_values(self):
+        class Dummy:
+            pass
+        model = self._makeOne()
+        model['abc'] = Dummy()
+        model['def'] = Dummy()
+        self.assertEqual(model.values(), model.subs.values())
+        self.assertEqual(model.items(), model.subs.items())
+        self.assertEqual(model.keys(), model.subs.keys())
 
 class TestDummyRequest(unittest.TestCase):
     def _getTargetClass(self):
