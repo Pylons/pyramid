@@ -101,33 +101,66 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(name, 'foo')
         self.assertEqual(subpath, [])
 
-    def test_call_with_ILocation_root(self):
+    def test_call_with_ILocation_root_proxies(self):
         baz = DummyContext()
         bar = DummyContext(baz)
         foo = DummyContext(bar)
         root = DummyContext(foo)
         from zope.interface import directlyProvides
         from repoze.bfg.interfaces import ILocation
+        from zope.proxy import isProxy
         directlyProvides(root, ILocation)
         root.__name__ = None
         root.__parent__ = None
-        # give bar a direct parent and name to mix things up a bit
-        bar.__name__ = 'bar'
-        bar.__parent__ = foo
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz')
         ctx, name, subpath = policy(environ)
-        self.assertEqual(ctx, baz)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])
+        self.assertEqual(ctx, baz)
+        self.failUnless(isProxy(ctx))
         self.assertEqual(ctx.__name__, 'baz')
         self.assertEqual(ctx.__parent__, bar)
+        self.failUnless(isProxy(ctx.__parent__))
         self.assertEqual(ctx.__parent__.__name__, 'bar')
         self.assertEqual(ctx.__parent__.__parent__, foo)
+        self.failUnless(isProxy(ctx.__parent__.__parent__))
         self.assertEqual(ctx.__parent__.__parent__.__name__, 'foo')
         self.assertEqual(ctx.__parent__.__parent__.__parent__, root)
+        self.failIf(isProxy(ctx.__parent__.__parent__.__parent__))
         self.assertEqual(ctx.__parent__.__parent__.__parent__.__name__, None)
         self.assertEqual(ctx.__parent__.__parent__.__parent__.__parent__, None)
+
+    def test_call_with_ILocation_root_proxies_til_next_ILocation(self):
+        # This is a test of an insane setup; it tests the case where
+        # intermediate objects (foo and bar) do not implement
+        # ILocation, and so are returned as proxies to the traverser,
+        # but when we reach the "baz" object, it *does* implement
+        # ILocation, and its parent should be the *real* "bar" object
+        # rather than the proxied bar.
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import ILocation
+        baz = DummyContext()
+        directlyProvides(baz, ILocation)
+        baz.__name__ = 'baz'
+        bar = DummyContext(baz)
+        baz.__parent__ = bar
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        from zope.proxy import isProxy
+        directlyProvides(root, ILocation)
+        root.__name__ = None
+        root.__parent__ = None
+        policy = self._makeOne(root)
+        environ = self._getEnviron(PATH_INFO='/foo/bar/baz')
+        ctx, name, subpath = policy(environ)
+        self.assertEqual(name, '')
+        self.assertEqual(subpath, [])
+        self.assertEqual(ctx, baz)
+        self.failIf(isProxy(ctx))
+        self.assertEqual(ctx.__name__, 'baz')
+        self.assertEqual(ctx.__parent__, bar)
+        self.failIf(isProxy(ctx.__parent__))
 
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):

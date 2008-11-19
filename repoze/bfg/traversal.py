@@ -3,7 +3,7 @@ import urlparse
    
 from zope.interface import classProvides
 from zope.interface import implements
-from repoze.bfg.location import locate
+from repoze.bfg.location import LocationProxy
 from repoze.bfg.location import lineage
 
 from repoze.bfg.interfaces import ILocation
@@ -48,9 +48,8 @@ class ModelGraphTraverser(object):
     def __call__(self, environ):
         path = environ.get('PATH_INFO', '/')
         path = split_path(path)
-        root = self.root
-
         ob = self.root
+
         name = ''
 
         while path:
@@ -59,8 +58,8 @@ class ModelGraphTraverser(object):
             if next is _marker:
                 name = segment
                 break
-            if self.locatable:
-                next = locate(next, ob, segment)
+            if (self.locatable) and (not ILocation.providedBy(next)):
+                next = LocationProxy(next, ob, segment)
             ob = next
 
         return ob, name, path

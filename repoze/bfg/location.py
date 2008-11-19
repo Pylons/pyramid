@@ -39,10 +39,10 @@ def inside(model1, model2):
 def locate(model, parent, name=None):
     """
     If ``model`` explicitly provides the
-    ``repoze.bfg.interfaces.ILocation`` interface, locate ``model``
-    directly set ``model`` 's ``__parent__`` attribute to the
-    ``parent`` object (also a model), and its ``__name__`` to the
-    supplied ``name`` argument.
+    ``repoze.bfg.interfaces.ILocation`` interface, directly set
+    ``model`` 's ``__parent__`` attribute to the ``parent`` object
+    (also a model), and its ``__name__`` to the supplied ``name``
+    argument, and return the model.
 
     If ``model`` does *not* explicitly provide the
     ``repoze.bfg.interfaces.ILocation`` interface, return a
@@ -53,8 +53,8 @@ def locate(model, parent, name=None):
     instances.
     """
     if ILocation.providedBy(model):
-        if parent is not model.__parent__ or name != model.__name__:
-            _locate(model, parent, name)
+        model.__parent__ = parent
+        model.__name__ = name
         return model
     return LocationProxy(model, parent, name)
 
@@ -82,10 +82,6 @@ def lineage(model):
     while model is not None:
         yield model
         model = getattr(model, '__parent__', None)
-
-def _locate(model, parent, name=None):
-    model.__parent__ = parent
-    model.__name__ = name
 
 class ClassAndInstanceDescr(object):
 
