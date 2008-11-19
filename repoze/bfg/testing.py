@@ -228,6 +228,9 @@ class DummyModel:
         ob = self.subs[name]
         return ob
 
+    def __delitem__(self, name):
+        del self.subs[name]
+
     def values(self):
         """ Return the values set by __setitem__ """
         return self.subs.values()

@@ -3,6 +3,8 @@ Next release
   - Add ``keys``, ``items``, and ``values`` methods to
     ``testing.DummyModel``.
 
+  - Add __delitem__ method to ``testing.DummyModel``.
+
 0.5.0 (11/18/2008)
 
   - Fix ModelGraphTraverser; don't try to change the ``__name__`` or

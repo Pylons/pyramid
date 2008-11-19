@@ -287,7 +287,7 @@ class TestDummyModel(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(name, parent, **kw)
 
-    def test__setitem__and__getitem__and__contains__(self):
+    def test__setitem__and__getitem__and__delitem__and__contains__(self):
         class Dummy:
             pass
         dummy = Dummy()
@@ -298,6 +298,8 @@ class TestDummyModel(unittest.TestCase):
         self.assertEqual(model['abc'], dummy)
         self.assertRaises(KeyError, model.__getitem__, 'none')
         self.failUnless('abc' in model)
+        del model['abc']
+        self.failIf('abc' in model)
 
     def test_extra_params(self):
         model = self._makeOne(foo=1)
