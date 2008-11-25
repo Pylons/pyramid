@@ -315,8 +315,9 @@ view for the interface(s) found on the request based on standard
 Python method resolution order through the interface class hierarchy
 will be called.
 
-See :ref:`events_chapter` for more information about event
-subscribers.
+.. note:: see :ref:`events_chapter` for more information about event
+   subscribers, and how to provide requests with differing request
+   types.
 
 .. _view_security_section:
 
