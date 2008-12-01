@@ -1,3 +1,8 @@
+Next release
+
+  - Strip all slashes from end and beginning of path in clean_path
+    within traversal machinery.
+
 0.5.1 (11/25/2008)
 
   - Add ``keys``, ``items``, and ``values`` methods to

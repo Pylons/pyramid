@@ -11,11 +11,11 @@ from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
 
 def split_path(path):
-    if path.startswith('/'):
+    while path.startswith('/'):
         path = path[1:]
-    if path.endswith('/'):
+    while path.endswith('/'):
         path = path[:-1]
-    clean=[]
+    clean = []
     for segment in path.split('/'):
         segment = urllib.unquote(segment) # deal with spaces in path segment
         if not segment or segment=='.':
