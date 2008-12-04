@@ -2,10 +2,12 @@ import cPickle
 import os
 from os.path import realpath
 import time
+import types
 
 from zope.configuration import xmlconfig
 
 from zope.component import getSiteManager
+from zope.component import adaptedBy
 import zope.configuration.config
 
 from zope.component.interface import provideInterface
@@ -36,7 +38,7 @@ def view(_context,
          for_=None,
          view=None,
          name="",
-         request_type=IRequest,
+         request_type=None,
          cacheable=True,
          ):
 
@@ -49,6 +51,26 @@ def view(_context,
             callable = provideInterface,
             args = ('', for_)
             )
+
+    # views may be either functions or class instances
+    if isinstance(view, types.FunctionType):
+        adapted_by = adaptedBy(view)
+    else:
+        adapted_by = adaptedBy(type(view))
+
+    if adapted_by is not None:
+        try:
+            if for_ is None:
+                for_, _ = adapted_by
+            if request_type is None:
+                _, request_type = adapted_by
+        except ValueError:
+            # the component adaptation annotation does not conform to
+            # the view specification; we ignore it.
+            pass
+
+    if request_type is None:
+        request_type = IRequest
 
     if permission:
         pfactory = ViewPermissionFactory(permission)
@@ -150,7 +172,7 @@ def zcml_configure(name, package, load=cPickle.load):
             return file_configure(name, package)
 
         mtime = os.stat(realpath(file)).st_mtime
-
+        
         if  mtime >= ptime:
             return file_configure(name, package)
 
