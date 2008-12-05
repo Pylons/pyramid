@@ -1,11 +1,18 @@
-Next release
+0.5.2 (12/5/2008)
 
   - The component registration handler for views (functions or class
     instances) now observes component adaptation annotations (see
     ``zope.component.adaptedBy``) and uses them before the fallback
     values for ``for_`` and ``request_type``. This change does not
     affect existing code insomuch as the code does not rely on these
-    defaults when an annotation is set on the view (unlikely).
+    defaults when an annotation is set on the view (unlikely).  This
+    means that for a new-style class you can do
+    ``zope.component.adapts(ISomeContext, ISomeRequest)`` at class
+    scope or at module scope as a decorator to a bfg view function you
+    can do ``@zope.component.adapter(ISomeContext, ISomeRequest)``.
+    This differs from r.bfg.convention inasmuch as you still need to
+    put something in ZCML for the registrations to get done; it's only
+    the defaults that will change if these declarations exist.
 
   - Strip all slashes from end and beginning of path in clean_path
     within traversal machinery.
