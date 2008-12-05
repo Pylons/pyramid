@@ -176,6 +176,75 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
+
+    def test_adapted_function(self):
+        from zope.interface import Interface
+        import zope.component
+
+        class IFoo(Interface):
+            pass
+        class IBar(Interface):
+            pass
+
+        @zope.component.adapter(IFoo, IBar)
+        def aview(self, context, request):
+            pass
+
+        context = DummyContext()
+        self._callFUT(context, view=aview)
+
+        actions = context.actions
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 1)
+
+        regadapt = actions[0]
+        regadapt_discriminator = ('view', IFoo, '', IBar, IView, True)
+
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        self.assertEqual(regadapt['args'][1], aview)
+        self.assertEqual(regadapt['args'][2], (IFoo, IBar))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
+    def test_adapted_nonsense(self):
+        from repoze.bfg.interfaces import IRequest
+        from zope.interface import Interface
+        import zope.component
+
+        class IFoo(Interface):
+            pass
+        class IBar(Interface):
+            pass
+
+        @zope.component.adapter(IFoo) # too few arguments
+        def aview(self, context, request):
+            pass
+
+        context = DummyContext()
+        self._callFUT(context, view=aview)
+
+        actions = context.actions
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 1)
+
+        regadapt = actions[0]
+        regadapt_discriminator = ('view', None, '', IRequest, IView, True)
+
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        self.assertEqual(regadapt['args'][1], aview)
+        self.assertEqual(regadapt['args'][2], (None, IRequest))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
         
 
 class TestFixtureApp(unittest.TestCase, PlacelessSetup):
