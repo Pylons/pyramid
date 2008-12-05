@@ -52,7 +52,8 @@ def view(_context,
             args = ('', for_)
             )
 
-    # views may be either functions or class instances
+    # adapts() decorations may be used against either functions or
+    # class instances
     if isinstance(view, types.FunctionType):
         adapted_by = adaptedBy(view)
     else:

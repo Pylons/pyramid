@@ -9,24 +9,23 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
     def tearDown(self):
         PlacelessSetup.tearDown(self)
 
-    def _getFUT(self):
+    def _callFUT(self, *arg, **kw):
         from repoze.bfg.zcml import view
-        return view
+        return view(*arg, **kw)
 
     def test_no_view(self):
-        f = self._getFUT()
         from zope.configuration.exceptions import ConfigurationError
         context = DummyContext()
-        self.assertRaises(ConfigurationError, f, context, 'repoze.view', None)
+        self.assertRaises(ConfigurationError, self._callFUT, context,
+                          'repoze.view', None)
 
     def test_only_view(self):
-        f = self._getFUT()
         context = DummyContext()
         class IFoo:
             pass
         def view(context, request):
             pass
-        f(context, 'repoze.view', IFoo, view=view)
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
@@ -68,13 +67,13 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(regadapt['args'][5], None)
 
     def test_request_type(self):
-        f = self._getFUT()
         context = DummyContext()
         class IFoo:
             pass
         def view(context, request):
             pass
-        f(context, 'repoze.view', IFoo, view=view, request_type=IDummy)
+        self._callFUT(context, 'repoze.view', IFoo, view=view,
+                      request_type=IDummy)
         actions = context.actions
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewPermission
@@ -115,14 +114,13 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(regadapt['args'][5], None)
 
     def test_uncacheable(self):
-        f = self._getFUT()
         context = DummyContext()
         class IFoo:
             pass
         def view(context, request):
             pass
-        f(context, 'repoze.view', IFoo, view=view, request_type=IDummy,
-          cacheable=False)
+        self._callFUT(context, 'repoze.view', IFoo, view=view,
+                      request_type=IDummy, cacheable=False)
         actions = context.actions
         from repoze.bfg.interfaces import IView
         from repoze.bfg.zcml import handler
@@ -140,6 +138,43 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
+
+    def test_adapted_class(self):
+        from zope.interface import Interface
+        import zope.component
+
+        class IFoo(Interface):
+            pass
+        class IBar(Interface):
+            pass
+
+        class AView:
+            zope.component.adapts(IFoo, IBar)
+            def __call__(self, context, request):
+                pass
+
+        aview = AView()
+
+        context = DummyContext()
+        self._callFUT(context, view=aview)
+
+        actions = context.actions
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 1)
+
+        regadapt = actions[0]
+        regadapt_discriminator = ('view', IFoo, '', IBar, IView, True)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        self.assertEqual(regadapt['args'][1], aview)
+        self.assertEqual(regadapt['args'][2], (IFoo, IBar))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+        
 
 class TestFixtureApp(unittest.TestCase, PlacelessSetup):
     def setUp(self):
