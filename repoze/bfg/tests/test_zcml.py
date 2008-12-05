@@ -148,8 +148,9 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         class IBar(Interface):
             pass
 
-        class AView:
+        class AView(object):
             zope.component.adapts(IFoo, IBar)
+            
             def __call__(self, context, request):
                 pass
 
@@ -166,6 +167,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
 
         regadapt = actions[0]
         regadapt_discriminator = ('view', IFoo, '', IBar, IView, True)
+
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
