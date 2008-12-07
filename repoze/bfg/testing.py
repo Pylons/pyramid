@@ -59,9 +59,9 @@ def registerDummyRenderer(path):
     that calls the ``render_template_to_response`` or any other
     ``render_template*`` API of any of the built-in templating
     systems."""
-    from repoze.bfg.interfaces import ITestingTemplateRenderer
+    from repoze.bfg.interfaces import ITemplateRenderer
     renderer = DummyTemplateRenderer()
-    return registerUtility(renderer, ITestingTemplateRenderer, path)
+    return registerUtility(renderer, ITemplateRenderer, path)
 
 def registerView(name, result='', view=None, for_=(Interface, Interface)):
     """ Registers ``repoze.bfg`` view function under the name

@@ -143,16 +143,16 @@ class GetRendererTests(unittest.TestCase, Base):
         self.assertEqual(result, utility)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
 
-    def test_testing(self):
+    def test_explicit_registration(self):
         from zope.component import getGlobalSiteManager
-        from repoze.bfg.interfaces import ITestingTemplateRenderer
+        from repoze.bfg.interfaces import ITemplateRenderer
         class Dummy:
             template = object()
             def implementation(self):
                 return self.template
         gsm = getGlobalSiteManager()
         utility = Dummy()
-        gsm.registerUtility(utility, ITestingTemplateRenderer, name='foo')
+        gsm.registerUtility(utility, ITemplateRenderer, name='foo')
         get = self._getFUT()
         result = get('foo')
         self.failUnless(result is utility)
@@ -199,16 +199,16 @@ class GetTemplateTests(unittest.TestCase, Base):
         self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
 
-    def test_testing(self):
+    def test_explicit_registration(self):
         from zope.component import getGlobalSiteManager
-        from repoze.bfg.interfaces import ITestingTemplateRenderer
+        from repoze.bfg.interfaces import ITemplateRenderer
         class Dummy:
             template = object()
             def implementation(self):
                 return self.template
         gsm = getGlobalSiteManager()
         utility = Dummy()
-        gsm.registerUtility(utility, ITestingTemplateRenderer, name='foo')
+        gsm.registerUtility(utility, ITemplateRenderer, name='foo')
         get = self._getFUT()
         result = get('foo')
         self.failUnless(result is utility.template)

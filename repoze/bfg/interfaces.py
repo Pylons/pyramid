@@ -41,12 +41,6 @@ class ITemplateRenderer(Interface):
         passed in as arguments and return the result (a string or
         unicode object) """
 
-class ITestingTemplateRenderer(Interface):
-    def __call__(**kw):
-        """ Accept keywords and process for test comparison purposes
-        (usually set all keywords as attributes of self); return value
-        is a string """
-
 class ITemplateRendererFactory(Interface):
     def __call__(path, auto_reload=False):
         """ Return an object that implements ``ITemplateRenderer``  """
