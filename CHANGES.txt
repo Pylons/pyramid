@@ -1,13 +1,13 @@
-Next release
+0.5.3 (12/7/2008)
 
   - Remove the ``ITestingTemplateRenderer`` interface.  When
-    ``testing.registerDummyRenderer`` is used, it now registers a
+    ``testing.registerDummyRenderer`` is used, it instead registers a
     dummy implementation using ``ITemplateRenderer`` interface, which
     is checked for when the built-in templating facilities do
     rendering.  This change also allows developers to make explcit
     named utility registrations in the ZCML registry against
     ``ITemplateRenderer``; these will be found before any on-disk
-    template.
+    template is looked up.
  
 0.5.2 (12/5/2008)
 
