@@ -168,6 +168,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(environ['webob.adhoc_attrs']['view_name'], '')
         self.assertEqual(environ['webob.adhoc_attrs']['subpath'], [])
         self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
+        self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
 
     def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
         rootpolicy = make_rootpolicy(None)
@@ -188,6 +189,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(environ['webob.adhoc_attrs']['view_name'], 'foo')
         self.assertEqual(environ['webob.adhoc_attrs']['subpath'], ['bar'])
         self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
+        self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
 
     def test_call_view_registered_specific_success(self):
         rootpolicy = make_rootpolicy(None)
@@ -214,6 +216,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(environ['webob.adhoc_attrs']['view_name'], '')
         self.assertEqual(environ['webob.adhoc_attrs']['subpath'], [])
         self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
+        self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
 
     def test_call_view_registered_specific_fail(self):
         rootpolicy = make_rootpolicy(None)
