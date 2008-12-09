@@ -66,7 +66,10 @@ class ModelGraphTraverser(object):
 
 def find_root(model):
     """ Find the root node in the graph to which ``model``
-    belongs. Note that ``model`` should be :term:`location`-aware."""
+    belongs. Note that ``model`` should be :term:`location`-aware.
+    Note that the root node is available in the request object by 
+    accessing the ``request.root`` attribute.
+    """
     for location in lineage(model):
         if location.__parent__ is None:
             model = location

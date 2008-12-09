@@ -272,3 +272,10 @@ The :term:`view name` will always be available to a view as the
 single string (possibly the empty string if we're rendering a default
 view).
 
+The :term:`root` will always be available to a view as the
+``root`` attribute of the :term:`request` object.  It will be the
+root model instance of the current application.
+
+The :term:`context` will always be available to a view as the
+``context`` attribute of the :term:`request` object.  It will be the
+model instance of the current application.

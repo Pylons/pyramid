@@ -48,6 +48,7 @@ class Router(object):
         settings = queryUtility(ISettings)
         context, name, subpath = traverser(environ)
 
+        request.root = root
         request.context = context
         request.view_name = name
         request.subpath = subpath
