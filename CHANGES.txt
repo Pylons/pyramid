@@ -1,4 +1,7 @@
-0.5.4 (12/9/2008)
+Next release
+
+  - Make it possible to run unit tests using a buildout-generated
+    Python "interpreter".  
 
   - Add ``request.root`` to ``router.Router`` in order to have easy
     access to the application root.
