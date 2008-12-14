@@ -1,4 +1,4 @@
-Next release
+0.5.4 (12/13/2008)
 
   Backwards Incompatibilities
 
