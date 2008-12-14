@@ -256,6 +256,45 @@ class ModelURLTests(unittest.TestCase):
         result = self._callFUT(other, request)
         self.assertEqual(result, 'http://example.com:5432/nonroot%20object/')
 
+    def test_unicode_mixed_with_bytes_in_model_names(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = unicode('La Pe\xc3\xb1a', 'utf-8')
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'La Pe\xc3\xb1a'
+        request = DummyRequest()
+        request.application_url = 'http://example.com:5432'
+        result = self._callFUT(two, request)
+        self.assertEqual(result,
+                     'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
+
+    def test_unicode_in_element_names(self):
+        uc = unicode('La Pe\xc3\xb1a', 'utf-8')
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = uc
+        request = DummyRequest()
+        request.application_url = 'http://example.com:5432'
+        result = self._callFUT(one, request, uc)
+        self.assertEqual(result,
+                     'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a')
+
+    def test_element_names_url_quoted(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        request = DummyRequest()
+        request.application_url = 'http://example.com:5432'
+        result = self._callFUT(root, request, 'a b c')
+        self.assertEqual(result, 'http://example.com:5432/a%20b%20c')
+
 class FindRootTests(unittest.TestCase):
     def _callFUT(self, context):
         from repoze.bfg.traversal import find_root

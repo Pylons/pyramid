@@ -1,5 +1,23 @@
 Next release
 
+  Backwards Incompatibilities
+
+  - URL-quote "extra" element names passed in as ``**elements`` to the
+    ``traversal.model_url`` API.  If any of these names is a Unicode
+    string, encode it to UTF-8 before URL-quoting.  This is a slight
+    backwards incompatibility that will impact you if you were already
+    UTF-8 encoding or URL-quoting the values you passed in as
+    ``elements`` to this API.
+
+  Bugfixes
+
+  - UTF-8 encode each segment in the model path used to generate a URL
+    before url-quoting it within the ``traversal.model_url`` API.
+    This is a bugfix, as Unicode cannot always be successfully
+    URL-quoted.
+
+  Features
+
   - Make it possible to run unit tests using a buildout-generated
     Python "interpreter".  
 
