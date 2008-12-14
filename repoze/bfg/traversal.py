@@ -125,7 +125,7 @@ def model_url(model, request, *elements):
     before being appended; if any element is unicode, it will
     converted to a UTF-8 bytestring before being URL-quoted.
 
-     If ``elements`` are not used, the model URL will end with a
+    If ``elements`` are not used, the model URL will end with a
     trailing slash.  If ``elements`` are used, the generated URL will
     *not* end in trailing a slash.
 
