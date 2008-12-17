@@ -117,6 +117,22 @@ class TestGetOptions(unittest.TestCase):
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_authorization'], True)
 
+    def test_unicode_path_segments(self):
+        get_options = self._getFUT()
+        result = get_options({})
+        self.assertEqual(result['unicode_path_segments'], False)
+        result = get_options({'unicode_path_segments':'false'})
+        self.assertEqual(result['unicode_path_segments'], False)
+        result = get_options({'unicode_path_segments':'t'})
+        self.assertEqual(result['unicode_path_segments'], True)
+        result = get_options({'unicode_path_segments':'1'})
+        self.assertEqual(result['unicode_path_segments'], True)
+        result = get_options({}, {'BFG_UNICODE_PATH_SEGMENTS':'1'})
+        self.assertEqual(result['unicode_path_segments'], True)
+        result = get_options({'unicode_path_segments':'false'},
+                             {'BFG_UNICODE_PATH_SEGMENTS':'1'})
+        self.assertEqual(result['unicode_path_segments'], True)
+
 class TestSettings(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.registry import Settings
@@ -131,12 +147,14 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(settings.reload_templates, False)
         self.assertEqual(settings.debug_notfound, False)
         self.assertEqual(settings.debug_authorization, False)
+        self.assertEqual(settings.unicode_path_segments, True)
 
     def test_with_option(self):
         settings = self._makeOne(reload_templates=True)
         self.assertEqual(settings.reload_templates, True)
         self.assertEqual(settings.debug_notfound, False)
         self.assertEqual(settings.debug_authorization, False)
+        self.assertEqual(settings.unicode_path_segments, True)
 
 class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
     def setUp(self):

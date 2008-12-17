@@ -74,6 +74,7 @@ class Settings(object):
     reload_templates = False
     debug_notfound = False
     debug_authorization = False
+    unicode_path_segments = True
     def __init__(self, options):
         self.__dict__.update(options)
 
@@ -102,13 +103,17 @@ def get_options(kw, environ=os.environ):
     config_debug_notfound = kw.get('debug_notfound', '')
     effective_debug_notfound = asbool(eget('BFG_DEBUG_NOTFOUND',
                                            config_debug_notfound))
-    config_reload_templates = kw.get('reload_templates')
+    config_reload_templates = kw.get('reload_templates', '')
     effective_reload_templates = asbool(eget('BFG_RELOAD_TEMPLATES',
                                         config_reload_templates))
+    config_unicode_path_segments = kw.get('unicode_path_segments', '')
+    effective_unicode_path_segments = asbool(eget('BFG_UNICODE_PATH_SEGMENTS',
+                                                  config_unicode_path_segments))
     return {
         'debug_authorization': effective_debug_all or effective_debug_auth,
         'debug_notfound': effective_debug_all or effective_debug_notfound,
         'reload_templates': effective_reload_templates,
+        'unicode_path_segments': effective_unicode_path_segments,
         }
 
 from zope.testing.cleanup import addCleanUp

@@ -162,6 +162,42 @@ class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(ctx.__parent__, bar)
         self.failIf(isProxy(ctx.__parent__))
 
+    def test_non_utf8_path_segment_unicode_path_segments_fails(self):
+        foo = DummyContext()
+        root = DummyContext(foo)
+        policy = self._makeOne(root)
+        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        environ = self._getEnviron(PATH_INFO='/%s' % segment)
+        self.assertRaises(TypeError, policy, environ)
+
+    def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
+        defaultkw = {'unicode_path_segments':True}
+        settings = DummySettings(**defaultkw)
+        from repoze.bfg.interfaces import ISettings
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        gsm.registerUtility(settings, ISettings)
+        foo = DummyContext()
+        root = DummyContext(foo)
+        policy = self._makeOne(root)
+        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        environ = self._getEnviron(PATH_INFO='/%s' % segment)
+        self.assertRaises(TypeError, policy, environ)
+
+    def test_non_utf8_path_segment_str_path_segments_succeeds(self):
+        defaultkw = {'unicode_path_segments':False}
+        settings = DummySettings(**defaultkw)
+        from repoze.bfg.interfaces import ISettings
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        gsm.registerUtility(settings, ISettings)
+        foo = DummyContext()
+        root = DummyContext(foo)
+        policy = self._makeOne(root)
+        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        environ = self._getEnviron(PATH_INFO='/%s' % segment)
+        ctx, name, subpath = policy(environ) # test is: this doesn't fail
+
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from repoze.bfg.traversal import find_interface
@@ -422,3 +458,6 @@ class DummyContext(object):
 class DummyRequest:
     application_url = 'http://example.com:5432/'
 
+class DummySettings:
+    def __init__(self, **kw):
+        self.__dict__.update(kw)

@@ -1,5 +1,7 @@
 import urllib
 import urlparse
+
+from zope.component import queryUtility
    
 from zope.interface import classProvides
 from zope.interface import implements
@@ -9,6 +11,7 @@ from repoze.bfg.location import lineage
 from repoze.bfg.interfaces import ILocation
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
+from repoze.bfg.interfaces import ISettings
 
 def split_path(path):
     while path.startswith('/'):
@@ -26,7 +29,13 @@ def split_path(path):
             clean.append(segment)
     return clean
 
-def step(ob, name, default):
+def step(ob, name, default, as_unicode=True):
+    if as_unicode:
+        try:
+            name = name.decode('utf-8')
+        except UnicodeDecodeError:
+            raise TypeError('Could not decode path segment "%s" using the '
+                            'UTF-8 decoding scheme' % name)
     if name.startswith('@@'):
         return name[2:], default
     if not hasattr(ob, '__getitem__'):
@@ -36,7 +45,7 @@ def step(ob, name, default):
     except KeyError:
         return name, default
 
-_marker = ()
+_marker = []
 
 class ModelGraphTraverser(object):
     classProvides(ITraverserFactory)
@@ -44,8 +53,13 @@ class ModelGraphTraverser(object):
     def __init__(self, root):
         self.root = root
         self.locatable = ILocation.providedBy(root)
+        self.unicode_path_segments = True
+        settings = queryUtility(ISettings)
+        if settings is not None:
+            self.unicode_path_segments = settings.unicode_path_segments
 
     def __call__(self, environ):
+        unicode_path_segments = self.unicode_path_segments
         path = environ.get('PATH_INFO', '/')
         path = split_path(path)
         ob = self.root
@@ -54,7 +68,7 @@ class ModelGraphTraverser(object):
 
         while path:
             segment = path.pop(0)
-            segment, next = step(ob, segment, _marker)
+            segment, next = step(ob, segment, _marker, unicode_path_segments)
             if next is _marker:
                 name = segment
                 break

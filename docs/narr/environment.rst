@@ -19,26 +19,36 @@ setting names documented in this chapter are reserved for
 :mod:`repoze.bfg` use.  You should not use them to indicate
 application-specific configuration settings.
 
-+-----------------------------+--------------------------+-------------------------------------+
-| Environment Variable Name   | Config File Setting Name |       Further Information           |
-+=============================+==========================+=====================================+
-| ``BFG_RELOAD_TEMPLATES``    |  ``reload_templates``    |  Reload templates without restart   |
-|                             |                          |  when true                          |
-|                             |                          |  See also:                          |
-|                             |                          |  :ref:`reload_templates_section`    |
-+-----------------------------+--------------------------+-------------------------------------+
-| ``BFG_DEBUG_AUTHORIZATION`` |  ``debug_authorization`` |  Print view authorization failure & |
-|                             |                          |  success info to stderr when true   |
-|                             |                          |  See also:                          |
-|                             |                          |  :ref:`debug_authorization_section` |
-+-----------------------------+--------------------------+-------------------------------------+
-| ``BFG_DEBUG_NOTFOUND``      |  ``debug_notfound``      |  Print view-related NotFound debug  |
-|                             |                          |  messages to stderr when true       |
-|                             |                          |  See also:                          |
-|                             |                          |  :ref:`debug_notfound_section`      |
-+-----------------------------+--------------------------+-------------------------------------+
-| ``BFG_DEBUG_ALL``           |  ``debug_all``           |  Turns all debug_* settings on.     |
-+-----------------------------+--------------------------+-------------------------------------+
++---------------------------------+-----------------------------+----------------------------------------+
+| Environment Variable Name       | Config File Setting Name    |       Further Information              |
++=================================+=============================+========================================+
+| ``BFG_RELOAD_TEMPLATES``        |  ``reload_templates``       |  Reload templates without restart      |
+|                                 |                             |  when true                             |
+|                                 |                             |  See also:                             |
+|                                 |                             |  :ref:`reload_templates_section`       |
++---------------------------------+-----------------------------+----------------------------------------+
+| ``BFG_DEBUG_AUTHORIZATION``     |  ``debug_authorization``    |  Print view authorization failure &    |
+|                                 |                             |  success info to stderr when true      |
+|                                 |                             |  See also:                             |
+|                                 |                             |  :ref:`debug_authorization_section`    | 
++---------------------------------+-----------------------------+----------------------------------------+
+| ``BFG_DEBUG_NOTFOUND``          |  ``debug_notfound``         |  Print view-related NotFound debug     |
+|                                 |                             |  messages to stderr when true          |
+|                                 |                             |  See also:                             |
+|                                 |                             |  :ref:`debug_notfound_section`         |
++---------------------------------+-----------------------------+----------------------------------------+
+| ``BFG_DEBUG_ALL``               |  ``debug_all``              |  Turns all debug_* settings on.        |
++---------------------------------+-----------------------------+----------------------------------------+
+| ``BFG_UNICODE_PATH_SEGMENTS``   |  ``unicode_path_segments``  |  Defaults to ``true``.  When ``true``, |
+|                                 |                             |  URL path segment names will be passed |
+|                                 |                             |  to model object ``__getitem__``       |
+|                                 |                             |  methods by the BFG model graph        |
+|                                 |                             |  traverser as ``unicode`` types rather |
+|                                 |                             |  than as ``str`` types; path segments  |
+|                                 |                             |  will be assumed to be UTF-8 encoded.  |
+|                                 |                             |  When ``false``, pass path segments    |
+|                                 |                             |  as undecoded ``str`` types.           |
++---------------------------------+-----------------------------+----------------------------------------+
 
 Examples
 --------
