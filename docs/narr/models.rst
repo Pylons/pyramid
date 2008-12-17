@@ -112,8 +112,8 @@ recursively.
 
 If you choose to make use of the location-based dynamic assignment of
 ``__parent__`` and ``__name__``, the root node must have a
-``__parent__`` and a ``__name__`` that are both ``None``, and it must
-provide the ``repoze.bfg.interfaces.ILocation`` interface.  The
+``__parent__`` that is ``None``, a ``__name__`` with any value, and it
+must provide the ``repoze.bfg.interfaces.ILocation`` interface.  The
 easiest way to do this is to claim that the class representing the
 root node ``implements(ILocation)``:
 
