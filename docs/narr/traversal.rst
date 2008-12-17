@@ -75,11 +75,13 @@ code to execute:
     stripped off ``PATH_INFO``, and the remaining path segments are
     split on the slash character to form a traversal sequence, so a
     request with a ``PATH_INFO`` variable of ``/a/b/c`` maps to the
-    traversal sequence ``['a', 'b', 'c']``.
+    traversal sequence ``[u'a', u'b', u'c']``.  Note that each of the
+    path segments in the sequence is converted to Unicode using the
+    UTF-8 decoding (if the decoding fails, a ``TypeError`` is raised).
 
 #.  :term:`Traversal` begins at the root object.  For the traversal
-    sequence ``['a', 'b', 'c']``, the root object's ``__getitem__`` is
-    called with the name ``a``.  Traversal continues through the
+    sequence ``[u'a', u'b', u'c']``, the root object's ``__getitem__``
+    is called with the name ``a``.  Traversal continues through the
     sequence.  In our example, if the root object's ``__getitem__``
     called with the name ``a`` returns an object (aka "object ``a``"),
     that object's ``__getitem__`` is called with the name ``b``.  If
@@ -279,3 +281,18 @@ at which traversal started (the root).
 The :term:`context` will always be available to a view as the
 ``context`` attribute of the :term:`request` object.  It will be the
 context object implied by the current request.
+
+Unicode and Traversal
+---------------------
+
+By default, the traversal machinery by default attempts to decode each
+path element in ``PATH_INFO`` from its natural byte string (``str``
+type) representation into Unicode using the UTF-8 encoding before
+passing it to the ``__getitem__`` of a model object.  If any path
+segment in ``PATH_INFO`` is not decodeable using the UTF-8 decoding, a
+TypeError is raised.
+
+The option named ``unicode_path_segments`` in
+:ref:`environment_chapter` provides a mechanism that will disable this
+behavior, causing traversal to pass path segments as plain byte string
+objects to all model ``__getitem__`` methods.
