@@ -1,6 +1,6 @@
-Next release
+0.5.5 (12/17/2008)
 
-  Backwards Incompatbilities
+  Backwards Incompatibilities
 
   - In the past, during traversal, the ModelGraphTraverser (the
     default traverser) always passed each URL path segment to any
