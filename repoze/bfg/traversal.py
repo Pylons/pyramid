@@ -134,6 +134,8 @@ def _urlsegment(s):
             result = _url_quote(s.encode('utf-8'))
         else:
             result = _url_quote(s)
+        # we don't need a lock to mutate _segment_cache, as the below
+        # will generate exactly one Python bytecode (STORE_SUBSCR)
         _segment_cache[s] = result
     return result
 
