@@ -250,25 +250,15 @@ class ModelURLTests(unittest.TestCase):
             result,
             'http://example.com:5432/foo%20/bar/baz/this/theotherthing/that')
 
-    def test_root_default_app_url_endswith_slash(self):
+    def test_root_default_app_url(self):
         root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
         request = DummyRequest()
-        request.application_url = 'http://example.com:5432/'
         result = self._callFUT(root, request)
         self.assertEqual(result, 'http://example.com:5432/')
 
-    def test_root_default_app_url_endswith_nonslash(self):
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
-        request = DummyRequest()
-        request.application_url = 'http://example.com:5432'
-        result = self._callFUT(root, request)
-        self.assertEqual(result, 'http://example.com:5432/')
-
-    def test_nonroot_default_app_url_endswith_slash(self):
+    def test_nonroot_default_app_url(self):
         root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
@@ -276,19 +266,6 @@ class ModelURLTests(unittest.TestCase):
         other.__parent__ = root
         other.__name__ = 'nonroot object'
         request = DummyRequest()
-        request.application_url = 'http://example.com:5432/'
-        result = self._callFUT(other, request)
-        self.assertEqual(result, 'http://example.com:5432/nonroot%20object/')
-
-    def test_nonroot_default_app_url_endswith_nonslash(self):
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
-        other = DummyContext()
-        other.__parent__ = root
-        other.__name__ = 'nonroot object'
-        request = DummyRequest()
-        request.application_url = 'http://example.com:5432'
         result = self._callFUT(other, request)
         self.assertEqual(result, 'http://example.com:5432/nonroot%20object/')
 
@@ -303,7 +280,6 @@ class ModelURLTests(unittest.TestCase):
         two.__parent__ = one
         two.__name__ = 'La Pe\xc3\xb1a'
         request = DummyRequest()
-        request.application_url = 'http://example.com:5432'
         result = self._callFUT(two, request)
         self.assertEqual(result,
                      'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
@@ -317,7 +293,6 @@ class ModelURLTests(unittest.TestCase):
         one.__parent__ = root
         one.__name__ = uc
         request = DummyRequest()
-        request.application_url = 'http://example.com:5432'
         result = self._callFUT(one, request, uc)
         self.assertEqual(result,
                      'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a')
@@ -327,7 +302,6 @@ class ModelURLTests(unittest.TestCase):
         root.__parent__ = None
         root.__name__ = None
         request = DummyRequest()
-        request.application_url = 'http://example.com:5432'
         result = self._callFUT(root, request, 'a b c')
         self.assertEqual(result, 'http://example.com:5432/a%20b%20c')
 
@@ -456,7 +430,7 @@ class DummyContext(object):
         return self.next
 
 class DummyRequest:
-    application_url = 'http://example.com:5432/'
+    application_url = 'http://example.com:5432' # app_url never ends with slash
 
 class DummySettings:
     def __init__(self, **kw):

@@ -1,5 +1,5 @@
+import re
 import urllib
-import urlparse
 
 from zope.component import queryUtility
    
@@ -120,10 +120,22 @@ def find_interface(model, interface):
         if interface.providedBy(location):
             return location
 
+_segment_cache = {}
+
 def _urlsegment(s):
-    if isinstance(s, unicode):
-        s = s.encode('utf-8')
-    return urllib.quote(s)
+    """ The bit of this code that deals with ``_segment_cache`` is an
+    optimization: we cache all the computation of URL path segments in
+    this module-scope dictionary with the original string (or unicode
+    value) as the key, so we can look it up later without needing to
+    reencode or re-url-quote it """
+    result = _segment_cache.get(s)
+    if result is None:
+        if isinstance(s, unicode):
+            result = _url_quote(s.encode('utf-8'))
+        else:
+            result = _url_quote(s)
+        _segment_cache[s] = result
+    return result
 
 def model_url(model, request, *elements):
     """ Return a string representing the absolute URL of the model
@@ -154,10 +166,10 @@ def model_url(model, request, *elements):
     prefix = '/'.join(reversed(rpath))
     suffix = '/'.join([_urlsegment(s) for s in elements])
     path = '/'.join([prefix, suffix])
-    app_url = request.application_url
-    if not app_url.endswith('/'):
-        app_url = app_url + '/'
-    return urlparse.urljoin(app_url, path)
+    if not path.startswith('/'):
+        path = '/' + path
+    app_url = request.application_url # never ends in a slash
+    return app_url + path
 
 def model_path(model, *elements):
     """ Return a string representing the absolute path of the model
@@ -185,3 +197,48 @@ def model_path(model, *elements):
         path = '/'.join([path, suffix])
     return path
 
+always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+               'abcdefghijklmnopqrstuvwxyz'
+               '0123456789' '_.-')
+_safemaps = {}
+_must_quote = {}
+
+def _url_quote(s, safe = '/'):
+    """quote('abc def') -> 'abc%20def'
+
+    Faster version of Python stdlib urllib.quote.  See
+    http://bugs.python.org/issue1285086 for more information.
+
+    Each part of a URL, e.g. the path info, the query, etc., has a
+    different set of reserved characters that must be quoted.
+
+    RFC 2396 Uniform Resource Identifiers (URI): Generic Syntax lists
+    the following reserved characters.
+
+    reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
+                  "$" | ","
+
+    Each of these characters is reserved in some component of a URL,
+    but not necessarily in all of them.
+
+    By default, the quote function is intended for quoting the path
+    section of a URL.  Thus, it will not encode '/'.  This character
+    is reserved, but in typical usage the quote function is being
+    called on a path where the existing slash characters are used as
+    reserved characters.
+    """
+    cachekey = (safe, always_safe)
+    try:
+        safe_map = _safemaps[cachekey]
+        if not _must_quote[cachekey].search(s):
+            return s
+    except KeyError:
+        safe += always_safe
+        _must_quote[cachekey] = re.compile(r'[^%s]' % safe)
+        safe_map = {}
+        for i in range(256):
+            c = chr(i)
+            safe_map[c] = (c in safe) and c or ('%%%02X' % i)
+        _safemaps[cachekey] = safe_map
+    res = map(safe_map.__getitem__, s)
+    return ''.join(res)
