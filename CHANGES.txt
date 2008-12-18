@@ -1,4 +1,4 @@
-Next release
+0.5.6 (12/18/2008)
 
   - Speed up ``traversal.model_url`` execution by using a custom url
     quoting function instead of Python's ``urllib.quote``, by caching
