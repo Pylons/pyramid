@@ -130,7 +130,7 @@ def _urlsegment(s):
     reencode or re-url-quote it """
     result = _segment_cache.get(s)
     if result is None:
-        if isinstance(s, unicode):
+        if s.__class__ is unicode: # isinstance slighly slower (~15%)
             result = _url_quote(s.encode('utf-8'))
         else:
             result = _url_quote(s)

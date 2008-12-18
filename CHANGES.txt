@@ -2,9 +2,10 @@ Next release
 
   - Speed up ``traversal.model_url`` execution by using a custom url
     quoting function instead of Python's ``urllib.quote``, by caching
-    URL path segment quoting and encoding results, and by disusing
+    URL path segment quoting and encoding results, by disusing
     Python's ``urlparse.urljoin`` in favor of a simple string
-    concatenation.
+    concatenation, and by using ``ob.__class__ is unicode`` rather
+    than ``isinstance(ob, unicode)`` in one strategic place.
 
 0.5.5 (12/17/2008)
 
