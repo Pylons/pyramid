@@ -69,6 +69,9 @@ Next release
 
   - Doc cleanups.
 
+  - Documented how to create a view capable of serving static
+    resources.
+
 0.5.6 (12/18/2008)
 
   - Speed up ``traversal.model_url`` execution by using a custom url
