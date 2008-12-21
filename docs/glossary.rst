@@ -314,7 +314,7 @@ Glossary
     :mod:`repoze.bfg` to provide authentication information.
   repoze.workflow
     `Barebones workflow for Python apps
-    <http://svn.repoze.org/repoze.workflow>`_ .  It can be used by
+    <http://static.repoze.org/workflowdocs>`_ .  It can be used by
     :mod:`repoze.bfg` to form a workflow system.
   repoze.bfg.convention
     `An add-on for repoze.bfg
