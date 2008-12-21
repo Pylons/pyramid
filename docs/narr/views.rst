@@ -395,6 +395,14 @@ the view):
    def static_view(environ, start_response):
        return static(environ, start_response) 
 
+This view uses the Paste class ``paste.urlparser.StaticURLParser`` to
+do the actual serving of content.  This class is a WSGI application;
+we wrap it into a BFG view by using the ``@wsgiapp`` decorator (see
+:ref:`wsgi_module` for the documentation for ``@wsgiapp``).  See `the
+Paste documentation for urlparser
+<http://pythonpaste.org/modules/urlparser.html>`_ for more information
+about ``urlparser.StaticURLParser``.
+
 Put your static files (JS, etc) on your filesystem in the directory
 represented as ``/path/to/static/dir``, then wire it up to be
 accessible as ``/static`` using ZCML in your application's
