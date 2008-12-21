@@ -371,3 +371,62 @@ All exception types from the :mod:`webob.exc` module implement the
 view.  See :term:`WebOb` for the documentation for this module; it
 includes other response types for Unauthorized, etc.
 
+Serving Static Resources Using a View
+-------------------------------------
+
+Using a view is the preferred way to serve static resources (like
+JavaScript and CSS files) within :mod:`repoze.bfg`.  To create a view
+that is capable of serving static resources from a directory that is
+mounted as ``/static``, first create a view in a file in your
+application named "static.py" (this name is arbitrary, it just needs
+to match the following ZCML):
+
+.. code-block:: python
+   :linenos:
+
+   from paste import urlparser
+   from repoze.bfg.wsgi import wsgiapp
+ 
+   static_dir = '/path/to/static/dir'
+   static = urlparser.StaticURLParser(static_dir, cache_max_age=3600)
+ 
+   @wsgiapp
+   def static_view(environ, start_response):
+       return static(environ, start_response) 
+
+Put your static files in ``path/to/static/dir``, then wire it up to be
+accessible as "/static" using ZCML in your application's
+``configure.zcml`` against either the class or interface that
+represents your root object.
+
+.. code-block:: xml
+   :linenos:
+
+    <view
+      for=".models.Root"
+      view=".static.static_view"
+      name="static"
+    />   
+
+In this case, ``.models.Root`` refers to the class of which your BFG
+application's root object is an instance.
+
+.. note:: You can also give a ``for`` of ``*`` if you want the name
+   ``static`` to be accessible as the static view against any model
+   (this will also allow ``/static/foo.js`` to work, but it will allow
+   for ``/anything/static/foo.js`` too, as long as ``anything`` itself
+   is resolved).
+
+After this is done, you should be able to view your static files via
+URLs prefixed with ``/static/``, for instance ``/static/foo.js``.
+
+To ensure that model objects contained in the root don't "shadow" your
+static view (model objects take precedence during traversal), yor to
+ensure that your root object's ``__getitem__`` is never called when a
+static resource is requested, you can refer to your static resources
+as registered above via ``/@@static/foo.js``.  This is completely
+equivalent to ``/static/foo.js``.  See :ref:`traversal_chapter` for
+information about "goggles" (``@@``).
+
+
+
