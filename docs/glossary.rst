@@ -301,7 +301,7 @@ Glossary
     ``repoze.bfg.interfaces.INewRequest`` event type.
   repoze.lemonade
     Zope2 CMF-like `data structures and helper facilities
-    <http://svn.repoze.org/repoze.lemonade/trunk>`_ for
+    <http://static.repoze.org/lemonadedocs>`_ for
     CA-and-ZODB-based applications useful within bfg applications.
   repoze.catalog
     An indexing and search facility (fielded and full-text) based on
