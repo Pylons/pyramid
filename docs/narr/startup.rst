@@ -90,7 +90,8 @@ press ``return`` after running ``paster serve MyProject.ini``.
    entry point URI ``egg:MyProject#app`` (see :ref:`MyProject_ini` for
    more information about entry point URIs, and how they relate to
    callables), will receive the key/value pairs
-   ``{'reload_templates':'true'}``.
+   ``{'reload_templates':'true', 'debug_authorization':'false',
+   'debug_notfound':'false'}``.
 
 #. The constructor itself is invoked.  A generated :mod:`repoze.bfg`
    ``app`` function will look like the below.
@@ -109,14 +110,14 @@ press ``return`` after running ``paster serve MyProject.ini``.
    package which allows the user to pass framework-related (as opposed
    to application-related) options to an application constructor.  It
    picks off framework-related options from the ``**kw`` dictionary
-   passed in to the constructor.  We actually use a framework option
-   named ``reload_templates`` in our configuration.  Note that we make
-   no use of this option in our application, but the fact that we use
-   ``get_options`` to parse the ``*kw`` dict, and subsequently pass
-   along the result as the ``options`` argument to ``make_app``.
-   ``reload_templates`` has special meaning to the framework: if it's
-   ``true``, we will cause templates to be automatically reloaded by
-   the application when they are changed.
+   passed in to the constructor.  For example, we actually use a
+   framework option named ``reload_templates`` in our configuration.
+   Note that we make no use of this option in our application, but the
+   fact that we use ``get_options`` to parse the ``*kw`` dict, and
+   subsequently pass along the result as the ``options`` argument to
+   ``make_app``.  ``reload_templates`` has special meaning to the
+   framework: if it's ``true``, we will cause templates to be
+   automatically reloaded by the application when they are changed.
 
    ``get_root`` is the first argument to ``make_app``, and it is a
    callable that is invoked on every request to retrieve the

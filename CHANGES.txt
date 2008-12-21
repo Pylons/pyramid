@@ -1,6 +1,6 @@
 Next release
 
-  Backwards Incompatibilities (Major)
+  Backwards Incompatibilities
 
   - Rather than prepare the "stock" implementations of the ZCML
     directives from the ``zope.configuration`` package for use under
@@ -60,6 +60,14 @@ Next release
   - The minimum requirement for ``chameleon.core`` is now 1.0b13.  The
     minimum requirement for ``chameleon.zpt`` is now 1.0b7.  The
     minimum requirement for ``chameleon.genshi`` is now 1.0b2.
+
+  - Updated paster template "ez_setup.py" to one that requires
+    setuptools 0.6c9.
+
+  - Turn ``view_execution_permitted`` from the :mod:`repoze.bfg.view`
+    module into a documented API.
+
+  - Doc cleanups.
 
 0.5.6 (12/18/2008)
 

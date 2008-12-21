@@ -4,6 +4,8 @@ debug = true
 [app:main]
 use = egg:{{project}}#app
 reload_templates = true
+debug_authorization = false
+debug_notfound = false
 
 [server:main]
 use = egg:Paste#http

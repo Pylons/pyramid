@@ -12,3 +12,6 @@
   .. autofunction:: render_view
 
   .. autofunction:: is_response
+
+  .. autofunction:: view_execution_permitted
+

@@ -332,6 +332,10 @@ changes will not require an application restart to be detected.  See
    production applications, as template rendering is slowed when it is
    turned on.
 
+Various other settings may exist in this section having to do with
+debugging a :mod:`repoze.bfg` application.  See
+:ref:`environment_chapter` for more information about these settings.
+
 The ``[server:main]`` section of the configuration file configures a
 WSGI server which listens on port 6543.  It is configured to listen on
 all interfaces (``0.0.0.0``).  The ``Paste#http`` server will create a
@@ -392,7 +396,7 @@ that should point at your application project's URL (if any).
 ``packages=find_packages()`` causes all packages within the project to
 be found when packaging the application.  ``include_package_data``
 will include non-Python files when the application is packaged (if
-those files are checked into version control).  ``zip_safe` indicates
+those files are checked into version control).  ``zip_safe`` indicates
 that this package is not safe to ship as a zipped egg (it will unpack
 as a directory, which is more convenient).  ``install_requires`` and
 ``tests_require`` indicate that this package depends on the
@@ -468,8 +472,9 @@ registry`. It looks like so:
    :language: xml
 
 #. Lines 1-3 provide the root node and namespaces for the
-   configuration language.  ``bfg`` is the namespace for
-   :mod:`repoze.bfg` -specific configuration directives.
+   configuration language.  ``http://namespaces.repoze.org/bfg`` is
+   the default XML namespace.  Add-on packages may require other
+   namespaces.
 
 #. Line 6 initializes :mod:`repoze.bfg`-specific configuration
    directives by including the ``repoze.bfg.includes`` package.  This

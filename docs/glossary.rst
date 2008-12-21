@@ -305,9 +305,9 @@ Glossary
     CA-and-ZODB-based applications useful within bfg applications.
   repoze.catalog
     An indexing and search facility (fielded and full-text) based on
-    `zope.index <http://pypi.python.org/pypi/zope.index>`_.  It is
-    available from `repoze.org SVN
-    <http://svn.repoze.org/repoze.catalog/trunk/>`_.
+    `zope.index <http://pypi.python.org/pypi/zope.index>`_.  See
+    `the documentation <http://static.repoze.org/catalogdocs>`_ for more 
+    information.
   repoze.who
     `Authentication middleware <http://static.repoze.org/whodocs>`_
     for :term:`WSGI` applications.  It can be used by
@@ -318,6 +318,6 @@ Glossary
     :mod:`repoze.bfg` to form a workflow system.
   repoze.bfg.convention
     `An add-on for repoze.bfg
-    <http://svn.repoze.org/repoze.bfg/trunk>`_ which provides
+    <http://static.repoze.org/conventiondocs>`_ which provides
     alternative mechanisms for common :mod:`repoze.bfg` application
     configuration tasks.  Useful for the :term:`ZCML` -allergic.

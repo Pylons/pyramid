@@ -8,9 +8,10 @@ How To Install
 
 You will need `Python <http://python.org>`_ version 2.4 or better to
 run :mod:`repoze.bfg`.  It has been tested under Python 2.4.5, Python
-2.5.2 and Python 2.6.  Development of :mod:`repoze.bfg` is done
-primarily under Python 2.4.  :mod:`repoze.bfg` does *not* run under
-any version of Python before 2.4, and does *not* run under Python 3.X.
+2.5.2 and Python 2.6.  Development of :mod:`repoze.bfg` is currently
+done primarily under Python 2.4.  :mod:`repoze.bfg` does *not* run
+under any version of Python before 2.4, and does *not* run under
+Python 3.X.
 
 .. warning:: To succesfully install :mod:`repoze.bfg`, you will need
    an environment capable of compiling C code.  See the documentation

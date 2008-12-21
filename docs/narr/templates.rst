@@ -13,7 +13,7 @@ its default and best-supported templating language. However,
 :mod:`repoze.bfg` uses a different implementation of the :term:`ZPT`
 specification than Zope does: the :term:`Chameleon`
 :term:`chameleon.zpt` templating engine. This templating engine
-complies with the `Zope Page Template
+complies largely with the `Zope Page Template
 <http://wiki.zope.org/ZPT/FrontPage>`_ template specification and is
 significantly faster.
 
@@ -27,7 +27,7 @@ significantly faster.
    :mod:`repoze.bfg`.
 
 Given that there is a :term:`chameleon.zpt` template named
-``foo.html`` in a directory in your application named ``templates``,
+``foo.pt`` in a directory in your application named ``templates``,
 you can render the template from a view like so:
 
 .. code-block:: python
@@ -35,12 +35,12 @@ you can render the template from a view like so:
 
    from repoze.bfg.chameleon_zpt import render_template_to_response
    def sample_view(context, request):
-       return render_template_to_response('templates/foo.html', foo=1, bar=2)
+       return render_template_to_response('templates/foo.pt', foo=1, bar=2)
 
 The first argument to ``render_template_to_response`` shown above (and
 its sister function ``render_template``, not shown, which just returns
 a string body) is the template *path*.  Above, the path
-``templates/foo.html`` is *relative*.  Relative to what, you ask?
+``templates/foo.pt`` is *relative*.  Relative to what, you ask?
 Relative to the directory in which the ``views.py`` file which names
 it lives, which is usually the :mod:`repoze.bfg` application's
 :term:`package` directory.
@@ -59,7 +59,7 @@ string manually as a response body:
    from repoze.bfg.chameleon_zpt import render_template
    from webob import Response
    def sample_view(context, request):
-       result = render_template('templates/foo.html', foo=1, bar=2)
+       result = render_template('templates/foo.pt', foo=1, bar=2)
        response = Response(result)
        response.content_type = 'text/plain'
        return response
