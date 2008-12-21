@@ -28,7 +28,7 @@ However, if you add the following bit of code to your application's
      factory="repoze.bfg.security.RemoteUserACLSecurityPolicy"
      />
 
-The above insrcutable stanza enables the
+The above inscrutable stanza enables the
 ``RemoteUserACLSecurityPolicy`` to be in effect for every request to
 your application.  The ``RemoteUserACLSecurityPolicy`` is a policy
 which compares the ``REMOTE_USER`` variable passed in the reqest's
