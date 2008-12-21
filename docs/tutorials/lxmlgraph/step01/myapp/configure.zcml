@@ -1,11 +1,10 @@
-<configure xmlns="http://namespaces.zope.org/zope"
-	   xmlns:bfg="http://namespaces.repoze.org/bfg">
+<configure xmlns="http://namespaces.repoze.org/bfg">
 
   <!-- this must be included for the view declarations to work -->
-  <include package="repoze.bfg" />
+  <include package="repoze.bfg.includes" />
 
   <!-- the default view for a MyModel -->
-  <bfg:view
+  <view
      for=".models.IMyModel"
      view=".views.my_hello_view"
      />

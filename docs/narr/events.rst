@@ -152,13 +152,13 @@ the same model object.
     />
 
    <!-- html default view -->
-   <bfg:view
+   <view
       for=".models.MyModel"
       request_type="repoze.bfg.interfaces.IRequest"
       view=".views.html_view"/>
 
    <!-- JSON default view -->
-   <bfg:view
+   <view
       for=".models.MyModel"
       request_type=".interfaces.IJSONRequest"
       view=".views.json_view"/>

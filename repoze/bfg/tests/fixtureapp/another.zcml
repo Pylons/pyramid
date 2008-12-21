@@ -1,8 +1,6 @@
-<configure xmlns="http://namespaces.zope.org/zope"
-    xmlns:bfg="http://namespaces.repoze.org/bfg"
-	           i18n_domain="repoze.bfg">
+<configure xmlns="http://namespaces.repoze.org/bfg">
 
-  <bfg:view
+  <view
       view=".views.fixture_view"
       for="*"
       name="another.html"

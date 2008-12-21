@@ -20,14 +20,12 @@ Change your project's ``configure.zcml`` so that it looks like this:
 
 .. code-block:: xml
 
-  <configure xmlns="http://namespaces.zope.org/zope"
-	     xmlns:bfg="http://namespaces.repoze.org/bfg"
-	     i18n_domain="repoze.bfg">
+  <configure xmlns="http://namespaces.repoze.org/bfg">
 
     <!-- this must be included for the view declarations to work -->
-    <include package="repoze.bfg" />
+    <include package="repoze.bfg.includes" />
 
-    <bfg:view
+    <view
        for=".models.IMyModel"
        view=".views.zpt_view"
        />

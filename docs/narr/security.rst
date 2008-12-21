@@ -50,7 +50,7 @@ For example, the following declaration protects the view named
 .. code-block:: xml
    :linenos:
 
-   <bfg:view
+   <view
        for=".models.IBlog"
        view=".views.blog_entry_add_view"
        name="add_entry.html"

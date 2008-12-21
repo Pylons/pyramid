@@ -134,14 +134,14 @@ call the "fallback" ``get_root`` callable provided to it above.
 Example 2
 ---------
 
-An example of configuring a ``bfg:view`` stanza in ``configure.zcml``
+An example of configuring a ``view`` declaration in ``configure.zcml``
 that maps a context found via :term:`Routes` URL dispatch to a view
 function is as follows:
 
 .. code-block:: xml
    :linenos:
 
-   <bfg:view
+   <view
        for="repoze.bfg.interfaces.IRoutesContext"
        view=".views.articles_view"
        name="articles"

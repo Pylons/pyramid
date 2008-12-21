@@ -1,3 +1,54 @@
+Next release
+
+  Backwards Incompatibilities (Major)
+
+  - Rather than prepare the "stock" implementations of the ZCML
+    directives from the ``zope.configuration`` package for use under
+    :mod:`repoze.bfg`, :mod:`repoze.bfg` now makes available the
+    implementations of directives from the ``repoze.zcml`` package
+    (see http://static.repoze.org/zcmldocs).  As a result, the
+    :mod:`repoze.bfg` package now depends on the ``repoze.zcml``
+    package, and no longer depends directly on the ``zope.component``,
+    ``zope.configuration``, ``zope.interface``, or ``zope.proxy``
+    packages.
+
+    The primary reason for this change is to enable us to eventually
+    reduce the number of inappropriate :mod:`repoze.bfg` Zope package
+    dependencies, as well as to shed features of dependent package
+    directives that don't make sense for :mod:`repoze.bfg`.
+
+    Note that currently the set of requirements necessary to use bfg
+    has not changed.  This is due to inappropriate Zope package
+    requirements in ``chameleon.zpt``, which will hopefully be
+    remedied soon.
+
+  - BFG applications written prior to this release which expect the
+    "stock" ``zope.component`` ZCML directive implementations
+    (e.g. ``adapter``, ``subscriber``, or ``utility``) to function now
+    must either 1) include the ``meta.zcml`` file from
+    ``zope.component`` manually (e.g. ``<include
+    package="zope.component" file="meta.zcml">``) and include the
+    ``zope.security`` package as an ``install_requires`` dependency or
+    2) change the ZCML in their applications to use the declarations
+    from `repoze.zcml <http://static.repoze.org/zcmldocs/>`_ instead
+    of the stock declarations.  ``repoze.zcml`` only makes available
+    the ``adapter``, ``subscriber`` and ``utility`` directives.
+
+  - The ``http://namespaces.repoze.org/bfg`` XML namespace is now the
+    default XML namespace in ZCML for paster-generated applications.
+
+  - The copies of BFG's ``meta.zcml`` and ``configure.zcml`` were
+    removed from the root of the ``repoze.bfg`` package.  In 0.3.6, a
+    new package named ``repoze.bfg.includes`` was added, which
+    contains the "correct" copies of these ZCML files; the ones that
+    were removed were for backwards compatibility purposes.
+
+  Other
+
+  - The minimum requirement for ``chameleon.core`` is now 1.0b13.  The
+    minimum requirement for ``chameleon.zpt`` is now 1.0b7.  The
+    minimum requirement for ``chameleon.genshi`` is now 1.0b2.
+
 0.5.6 (12/18/2008)
 
   - Speed up ``traversal.model_url`` execution by using a custom url

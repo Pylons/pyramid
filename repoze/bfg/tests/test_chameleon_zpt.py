@@ -10,9 +10,10 @@ class Base(PlacelessSetup):
         PlacelessSetup.tearDown(self)
 
     def _zcmlConfigure(self):
-        import repoze.bfg
+        import repoze.bfg.includes
         import zope.configuration.xmlconfig
-        zope.configuration.xmlconfig.file('configure.zcml', package=repoze.bfg)
+        zope.configuration.xmlconfig.file('configure.zcml',
+                                          package=repoze.bfg.includes)
 
     def _getTemplatePath(self, name):
         import os
@@ -51,7 +52,8 @@ class ZPTTemplateRendererTests(unittest.TestCase, Base):
         instance = self._makeOne(minimal)
         result = instance()
         self.failUnless(isinstance(result, str))
-        self.assertEqual(result, '<div>\n</div>\n')
+        self.assertEqual(result,
+                     '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
     def test_implementation(self):
         self._zcmlConfigure()
@@ -59,7 +61,8 @@ class ZPTTemplateRendererTests(unittest.TestCase, Base):
         instance = self._makeOne(minimal)
         result = instance.implementation()()
         self.failUnless(isinstance(result, str))
-        self.assertEqual(result, '<div>\n</div>\n')
+        self.assertEqual(result,
+                     '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
         
 
 class RenderTemplateTests(unittest.TestCase, Base):
@@ -79,7 +82,8 @@ class RenderTemplateTests(unittest.TestCase, Base):
         render = self._getFUT()
         result = render(minimal)
         self.failUnless(isinstance(result, str))
-        self.assertEqual(result, '<div>\n</div>\n')
+        self.assertEqual(result,
+                     '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
 class RenderTemplateToResponseTests(unittest.TestCase, Base):
     def setUp(self):
@@ -99,7 +103,8 @@ class RenderTemplateToResponseTests(unittest.TestCase, Base):
         result = render(minimal)
         from webob import Response
         self.failUnless(isinstance(result, Response))
-        self.assertEqual(result.app_iter, ['<div>\n</div>\n'])
+        self.assertEqual(result.app_iter,
+                     ['<div xmlns="http://www.w3.org/1999/xhtml">\n</div>'])
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 

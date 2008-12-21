@@ -240,7 +240,7 @@ Glossary
     used by Zope and :mod:`repoze.bfg` to describe associating a view
     with a model type.  ZCML is capable of performing many different
     registrations and declarations, but its primary purpose in
-    :mod:`repoze.bfg` is to perform view mappings via the ``bfg:view``
+    :mod:`repoze.bfg` is to perform view mappings via the ``view``
     declaration.  The ``configure.zcml`` file in a :mod:`repoze.bfg`
     application represents the application's :term:`application
     registry`.  See :term:`repoze.bfg.convention` for an alternative
@@ -259,7 +259,7 @@ Glossary
     or a request object in order to identify that the object is "of a
     type".  Interfaces are used internally by :mod:`repoze.bfg` to
     perform view lookups and security policy lookups.  Interfaces are
-    exposed to application programmers by the ``bfg:view`` ZCML
+    exposed to application programmers by the ``view`` ZCML
     directive in the form of both the ``for_`` attribute and the
     ``request_type`` attribute.  They may be exposed to application
     developers when using the :term:`event` system as

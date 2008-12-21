@@ -66,12 +66,12 @@ Mapping Views to URLs
 
 You may associate a view with a URL by adding information to your
 :term:`application registry` via :term:`ZCML` in your
-``configure.zcml`` file using a ``bfg:view`` declaration.
+``configure.zcml`` file using a ``view`` declaration.
 
 .. code-block:: xml
    :linenos:
 
-   <bfg:view
+   <view
        for=".models.Hello"
        view=".views.hello_world"
        name="hello.html"
@@ -83,9 +83,9 @@ Python class represented by ``.models.Hello`` when the *view name* is
 ``hello.html``.
 
 .. note:: Values prefixed with a period (``.``)for the ``for`` and
-   ``view`` attributes of a ``bfg:view`` (such as those above) mean
+   ``view`` attributes of a ``view`` (such as those above) mean
    "relative to the Python package directory in which this
-   :term:`ZCML` file is stored".  So if the above ``bfg:view``
+   :term:`ZCML` file is stored".  So if the above ``view``
    declaration was made inside a ``configure.zcml`` file that lived in
    the ``hello`` package, you could replace the relative
    ``.models.Hello`` with the absolute ``hello.models.Hello``;
@@ -100,7 +100,7 @@ You can also declare a *default view* for a model type:
 .. code-block:: xml
    :linenos:
 
-   <bfg:view
+   <view
        for=".models.Hello"
        view=".views.hello_world"
        />
@@ -115,7 +115,7 @@ the special ``*`` character in the ``for`` attribute:
 .. code-block:: xml
    :linenos:
 
-   <bfg:view
+   <view
        for="*"
        view=".views.hello_world"
        name="hello.html"
@@ -204,7 +204,7 @@ this interface.
 .. code-block:: xml
    :linenos:
 
-   <bfg:view
+   <view
        for=".models.IHello"
        view=".views.hello_world"
        name="hello.html"
@@ -223,10 +223,10 @@ implemented by the context, the view registered for the class will
 See :term:`Interface` in the glossary to find more information about
 interfaces.
 
-The ``bfg:view`` ZCML Element
------------------------------
+The ``view`` ZCML Element
+-------------------------
 
-The ``bfg:view`` ZCML element has these possible attributes:
+The ``view`` ZCML element has these possible attributes:
 
 view
 
@@ -262,14 +262,14 @@ request_type
 View Request Types
 ------------------
 
-You can optionally add a *request_type* attribute to your ``bfg:view``
+You can optionally add a *request_type* attribute to your ``view``
 declaration, which indicates what "kind" of request the view should be
 used for.  For example:
 
 .. code-block:: xml
    :linenos:
 
-   <bfg:view
+   <view
        for=".models.IHello"
        view=".views.hello_json"
        name="hello.json"
@@ -325,16 +325,16 @@ View Security
 -------------
 
 If a :term:`security policy` is active, any :term:`permission`
-attached to a ``bfg:view`` declaration will be consulted to ensure
+attached to a ``view`` declaration will be consulted to ensure
 that the currently authenticated user possesses that permission
 against the context before the view function is actually called.
-Here's an example of specifying a permission in a ``bfg:view``
+Here's an example of specifying a permission in a ``view``
 declaration:
 
 .. code-block:: xml
    :linenos:
 
-   <bfg:view
+   <view
        for=".models.IBlog"
        view=".views.add_entry"
        name="add.html"

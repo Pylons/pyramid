@@ -31,9 +31,9 @@ this view function will result in an error.  When a :mod:`repoze.bfg`
 application starts normally, it will create an application registry
 from the information it finds in the application's ``configure.zcml``
 file.  But if this application registry is not created and populated
-(e.g. with ``bfg:view`` statements), like when you invoke application
-code via a unit test, :mod:`repoze.bfg` API functions will tend to
-fail.
+(e.g. with ``view`` declarations in ZCML), like when you invoke
+application code via a unit test, :mod:`repoze.bfg` API functions will
+tend to fail.
 
 The testing API provided by ``repoze.bfg`` allows you to simulate
 various application registry registrations for use under a unit

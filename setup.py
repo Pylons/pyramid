@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.5.6'
+__version__ = '0.6.0'
 
 import os
 
@@ -29,18 +29,15 @@ except IOError:
     README = CHANGES = ''
 
 install_requires=[
-    'chameleon.core [lxml]',
-    'chameleon.genshi',
-    'chameleon.zpt',
+    'chameleon.core [lxml] >= 1.0b13',
+    'chameleon.genshi >= 1.0b2',
+    'chameleon.zpt >= 1.0b7',
     'PasteScript',
     'Routes',
     'setuptools',
     'WebOb',
-    'zope.component',
-    'zope.configuration',
+    'repoze.zcml',
     'zope.hookable',
-    'zope.interface',
-    'zope.proxy',
     'zope.testing',
     ]
 

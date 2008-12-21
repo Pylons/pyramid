@@ -10,9 +10,10 @@ class Base:
         cleanUp()
 
     def _zcmlConfigure(self):
-        import repoze.bfg
+        import repoze.bfg.includes
         import zope.configuration.xmlconfig
-        zope.configuration.xmlconfig.file('configure.zcml', package=repoze.bfg)
+        zope.configuration.xmlconfig.file('configure.zcml',
+                                          package=repoze.bfg.includes)
 
     def _getTemplatePath(self, name):
         import os
