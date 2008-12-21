@@ -34,8 +34,20 @@ Next release
     of the stock declarations.  ``repoze.zcml`` only makes available
     the ``adapter``, ``subscriber`` and ``utility`` directives.
 
+    In short, if you've got an existing BFG application, after this
+    update, if your application won't start due to an import error for
+    "zope.security", the fastest way to get it working again is to add
+    ``zope.security`` to the "install_requires" of your BFG
+    application's ``setup.py``, then add the following ZCML anywhere
+    in your application's ``configure.zcml``::
+
+      <include package="zope.component" file="meta.zcml">
+
+    Then re-``setup.py develop`` or reinstall your application.
+
   - The ``http://namespaces.repoze.org/bfg`` XML namespace is now the
     default XML namespace in ZCML for paster-generated applications.
+    The docs have been updated to reflect this.
 
   - The copies of BFG's ``meta.zcml`` and ``configure.zcml`` were
     removed from the root of the ``repoze.bfg`` package.  In 0.3.6, a
