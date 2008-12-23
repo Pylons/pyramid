@@ -32,17 +32,10 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg.security import ViewPermissionFactory
         from repoze.bfg.zcml import handler
-        from zope.component.interface import provideInterface
 
-        self.assertEqual(len(actions), 3)
+        self.assertEqual(len(actions), 2)
 
-        provide = actions[0]
-        self.assertEqual(provide['discriminator'], None)
-        self.assertEqual(provide['callable'], provideInterface)
-        self.assertEqual(provide['args'][0], '')
-        self.assertEqual(provide['args'][1], IFoo)
-
-        permission = actions[1]
+        permission = actions[0]
         permission_discriminator = ('permission', IFoo, '', IRequest,
                                     IViewPermission)
         self.assertEqual(permission['discriminator'], permission_discriminator)
@@ -55,7 +48,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(permission['args'][4], '')
         self.assertEqual(permission['args'][5], None)
         
-        regadapt = actions[2]
+        regadapt = actions[1]
         regadapt_discriminator = ('view', IFoo, '', IRequest, IView, True)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
@@ -79,17 +72,10 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg.security import ViewPermissionFactory
         from repoze.bfg.zcml import handler
-        from zope.component.interface import provideInterface
 
-        self.assertEqual(len(actions), 3)
+        self.assertEqual(len(actions), 2)
 
-        provide = actions[0]
-        self.assertEqual(provide['discriminator'], None)
-        self.assertEqual(provide['callable'], provideInterface)
-        self.assertEqual(provide['args'][0], '')
-        self.assertEqual(provide['args'][1], IFoo)
-
-        permission = actions[1]
+        permission = actions[0]
         permission_discriminator = ('permission', IFoo, '', IDummy,
                                     IViewPermission)
         self.assertEqual(permission['discriminator'], permission_discriminator)
@@ -102,7 +88,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(permission['args'][4], '')
         self.assertEqual(permission['args'][5], None)
         
-        regadapt = actions[2]
+        regadapt = actions[1]
         regadapt_discriminator = ('view', IFoo, '', IDummy, IView, True)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
@@ -126,9 +112,9 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.zcml import handler
         from repoze.bfg.zcml import Uncacheable
 
-        self.assertEqual(len(actions), 3)
+        self.assertEqual(len(actions), 2)
 
-        regadapt = actions[2]
+        regadapt = actions[1]
         regadapt_discriminator = ('view', IFoo, '', IDummy, IView, Uncacheable)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)

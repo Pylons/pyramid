@@ -55,6 +55,11 @@ Next release
     contains the "correct" copies of these ZCML files; the ones that
     were removed were for backwards compatibility purposes.
 
+  - The BFG ``view`` ZCML directive no longer calls
+    ``zope.component.interface.provideInterface`` for the ``for``
+    interface.  We don't support ``provideInterface`` in BFG because
+    it mutates the global registry.
+
   Other
 
   - The minimum requirement for ``chameleon.core`` is now 1.0b13.  The

@@ -10,7 +10,6 @@ from zope.component import getSiteManager
 from zope.component import adaptedBy
 import zope.configuration.config
 
-from zope.component.interface import provideInterface
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
 
@@ -44,13 +43,6 @@ def view(_context,
 
     if not view:
         raise ConfigurationError('"view" attribute was not specified')
-
-    if for_ is not None:
-        _context.action(
-            discriminator = None,
-            callable = provideInterface,
-            args = ('', for_)
-            )
 
     # adapts() decorations may be used against either functions or
     # class instances
