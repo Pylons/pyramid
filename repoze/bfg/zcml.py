@@ -208,13 +208,3 @@ def file_configure(name, package, dump=cPickle.dump):
 
     return False
 
-def _rolledUpFactory(factories):
-    # This has to be named 'factory', aparently, so as not to confuse
-    # apidoc :(
-    def factory(ob):
-        for f in factories:
-            ob = f(ob)
-        return ob
-    # Store the original factory for documentation
-    factory.factory = factories[0]
-    return factory
