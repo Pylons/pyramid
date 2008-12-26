@@ -1,4 +1,4 @@
-Next release
+0.6 (12/26/2008)
 
   Backwards Incompatibilities
 
@@ -20,8 +20,9 @@ Next release
     Note that currently the set of requirements necessary to use bfg
     has not changed.  This is due to inappropriate Zope package
     requirements in ``chameleon.zpt``, which will hopefully be
-    remedied soon.
-
+    remedied soon. NOTE: in lemonade index a 1.0b8-repozezcml0
+    package exists which does away with these requirements.
+ 
   - BFG applications written prior to this release which expect the
     "stock" ``zope.component`` ZCML directive implementations
     (e.g. ``adapter``, ``subscriber``, or ``utility``) to function now
@@ -63,7 +64,7 @@ Next release
   Other
 
   - The minimum requirement for ``chameleon.core`` is now 1.0b13.  The
-    minimum requirement for ``chameleon.zpt`` is now 1.0b7.  The
+    minimum requirement for ``chameleon.zpt`` is now 1.0b8.  The
     minimum requirement for ``chameleon.genshi`` is now 1.0b2.
 
   - Updated paster template "ez_setup.py" to one that requires
