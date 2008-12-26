@@ -31,14 +31,16 @@ except IOError:
 install_requires=[
     'chameleon.core [lxml] >= 1.0b13',
     'chameleon.genshi >= 1.0b2',
-    'chameleon.zpt >= 1.0b7',
+    'chameleon.zpt >= 1.0b8',
     'PasteScript',
     'Routes',
     'setuptools',
     'WebOb',
-    'repoze.zcml',
+    'zope.interface',
+    'zope.component',
     'zope.hookable',
     'zope.testing',
+    'repoze.zcml',
     ]
 
 setup(name='repoze.bfg',
