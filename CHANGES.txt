@@ -1,4 +1,31 @@
-0.6 (12/26/2008)
+Next Release
+
+  New Modules
+
+   - A new module ``repoze.bfg.url`` has been added.  It contains the
+     ``model_url`` API (moved from ``repoze.bfg.traversal``) and an
+     implementation of ``urlencode`` (like Python's
+     ``urllib.urlencode``) which can handle Unicode keys and values in
+     parameters to the ``query`` argument.
+
+  Deprecations
+
+   - The ``model_url`` function has been moved from
+     ``repoze.bfg.traversal`` into ``repoze.bfg.url``.  It can still
+     be imported from ``repoze.bfg.traversal`` but an import from
+     ``repoze.bfg.traversal`` will emit a DeprecationWarning.
+
+  Features
+
+   - The ``repoze.bfg.url.model_url`` API (nee'
+     ``repoze.bfg.traversal.model_url``) now accepts and honors a
+     keyword argument named ``query``.  The value of this argument
+     will be used to compose a query string, which will be attached to
+     the generated URL before it is returned.  See the API docs (in
+     the docs directory or `on the web
+     <http://static.repoze.org/bfgdocs>`_) for more information.
+
+ 0.6 (12/26/2008)
 
   Backwards Incompatibilities
 
