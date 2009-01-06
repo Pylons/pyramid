@@ -71,11 +71,11 @@ def model_url(model, request, *elements, **kw):
 def urlencode(query, doseq=False):
     """
     A wrapper around Python's stdlib `urllib.urlencode function
-    <http://docs.python.org/library/urllib.html>`_ which
-    accepts unicode keys and values within the ``query``
-    dict/sequence; all keys and values are first converted to UTF-8
-    before being used to compose the query string.  The behavior of
-    the function is otherwise the same as the stdlib version.
+    <http://docs.python.org/library/urllib.html>`_ which accepts
+    unicode keys and values within the ``query`` dict/sequence; all
+    Unicode keys and values are first converted to UTF-8 before being
+    used to compose the query string.  The behavior of the function is
+    otherwise the same as the stdlib version.
 
     The value of ``query`` must be a sequence of two-tuples
     representing key/value pairs *or* an object (often a dictionary)
