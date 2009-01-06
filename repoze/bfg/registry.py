@@ -92,6 +92,10 @@ def asbool(s):
     return s.lower() in ('t', 'true', 'y', 'yes', 'on', '1')
 
 def get_options(kw, environ=os.environ):
+    """ Update PasteDeploy application settings keywords with
+    framework-specific key/value pairs (e.g. find
+    'BFG_DEBUG_AUTHORIZATION' in os.environ and jam into keyword
+    args)."""
     # environ is passed in for unit tests
     eget = environ.get
     config_debug_all = kw.get('debug_all', '')
@@ -109,12 +113,15 @@ def get_options(kw, environ=os.environ):
     config_unicode_path_segments = kw.get('unicode_path_segments', '')
     effective_unicode_path_segments = asbool(eget('BFG_UNICODE_PATH_SEGMENTS',
                                                   config_unicode_path_segments))
-    return {
+    update = {
         'debug_authorization': effective_debug_all or effective_debug_auth,
         'debug_notfound': effective_debug_all or effective_debug_notfound,
         'reload_templates': effective_reload_templates,
         'unicode_path_segments': effective_unicode_path_segments,
         }
+
+    kw.update(update)
+    return kw
 
 from zope.testing.cleanup import addCleanUp
 try:

@@ -7,6 +7,14 @@ Features
 - Renamed the existing BFG paster template to ``bfg_starter``.  Added
   another template showing default ZODB setup using ``repoze.zodbconn``.
 
+- The ``repoze.bfg.registry.get_options`` callable used to return only
+  framework-specific keys and values in the dictionary it returned.
+  It now returns all the keys and values in the dictionary it is
+  passed *plus* any framework-specific settings culled from the
+  environment.  As a side effect, all PasteDeploy application-specific
+  config file settings are made available as attributes of the
+  ``ISettings`` utility from within BFG.
+
 0.6.1 (2009-01-06)
 ==================
 

@@ -133,6 +133,11 @@ class TestGetOptions(unittest.TestCase):
                              {'BFG_UNICODE_PATH_SEGMENTS':'1'})
         self.assertEqual(result['unicode_path_segments'], True)
 
+    def test_originals_kept(self):
+        get_options = self._getFUT()
+        result = get_options({'a':'i am so a'})
+        self.assertEqual(result['a'], 'i am so a')
+
 class TestSettings(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.registry import Settings
