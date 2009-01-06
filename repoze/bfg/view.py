@@ -130,13 +130,15 @@ class static(object):
     directory may contain subdirectories (recursively); the static
     view implementation will descend into these directories as
     necessary based on the components of the URL in order to resolve a
-    path into a response."""
+    path into a response
 
+    Pass the absolute filesystem path to the directory containing
+    static files directory to the constructor as the ``root_dir``
+    argument.  ``cache_max_age`` influences the Expires and Max-Age
+    response headers returned by the view (default is 3600 seconds or
+    five minutes).
+    """
     def __init__(self, root_dir, cache_max_age=3600):
-        """ Pass the absolute filesystem path to the directory
-        containing static files directory as ``root_dir``,
-        ``cache_max_age`` influences the Expires and Max-Age caching
-        headers (default is 3600 seconds or five minutes)."""
         self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
 
     def __call__(self, context, request):
