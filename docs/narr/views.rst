@@ -374,40 +374,25 @@ includes other response types for Unauthorized, etc.
 Serving Static Resources Using a View
 -------------------------------------
 
-Using a view is the preferred way to serve static resources (like
-JavaScript and CSS files) within :mod:`repoze.bfg`.  To create a view
-that is capable of serving static resources from a directory that is
-mounted at the URL path ``/static``, first create a ``static_view``
-view function in a file in your application named ``static.py`` (this
-name is arbitrary, it just needs to match the ZCML registration for
-the view):
+Using the :mod:repoze.bfg.view ``static`` helper class is the
+preferred way to serve static resources (like JavaScript and CSS
+files) within :mod:`repoze.bfg`.  This class creates a callable that
+is capable acting as a :mod:`repoze.bfg` view which serves static
+resources from a directory.  For instance, to serve files within a
+directory located on your filesystem at ``/path/to/static/dir``
+mounted at the URL path ``/static`` in your application, create an
+instance of :mod:`repoze.bfg.view` 's ``static`` class inside a
+``static.py`` file in your application root as below.
 
 .. code-block:: python
    :linenos:
 
-   from paste import urlparser
-   from repoze.bfg.wsgi import wsgiapp
+   from repoze.bfg.view import static
+   static_view = static('/path/to/static/dir')
  
-   static_dir = '/path/to/static/dir'
-   static = urlparser.StaticURLParser(static_dir, cache_max_age=3600)
- 
-   @wsgiapp
-   def static_view(environ, start_response):
-       return static(environ, start_response) 
-
-This view uses the Paste class ``paste.urlparser.StaticURLParser`` to
-do the actual serving of content.  This class is a WSGI application;
-we wrap it into a BFG view by using the ``@wsgiapp`` decorator (see
-:ref:`wsgi_module` for the documentation for ``@wsgiapp``).  See `the
-Paste documentation for urlparser
-<http://pythonpaste.org/modules/urlparser.html>`_ for more information
-about ``urlparser.StaticURLParser``.
-
-Put your static files (JS, etc) on your filesystem in the directory
-represented as ``/path/to/static/dir``, then wire it up to be
-accessible as ``/static`` using ZCML in your application's
-``configure.zcml`` against either the class or interface that
-represents your root object.
+Subsequently, wire this view up to be accessible as ``/static`` using
+ZCML in your application's ``configure.zcml`` against either the class
+or interface that represents your root object.
 
 .. code-block:: xml
    :linenos:
@@ -425,18 +410,31 @@ application's root object is an instance.
    ``static`` to be accessible as the static view against any model.
    This will also allow ``/static/foo.js`` to work, but it will allow
    for ``/anything/static/foo.js`` too, as long as ``anything`` itself
-   is resolved.
+   is resolveable.
 
-After this is done, you should be able to view your static files via
-URLs prefixed with ``/static/``, for instance ``/static/foo.js``.
+Now put your static files (JS, etc) on your filesystem in the
+directory represented as ``/path/to/static/dir``.  After this is done,
+you should be able to view the static files in this directory via a
+browser at URLs prefixed with ``/static/``, for instance
+``/static/foo.js`` will return the file
+``/path/to/static/dir/foo.js``.  The static directory may contain
+subdirectories recursively, and any subdirectories may hold files;
+these will be resolved by the static view as you would expect.
 
-To ensure that model objects contained in the root don't "shadow" your
-static view (model objects take precedence during traversal), or to
-ensure that your root object's ``__getitem__`` is never called when a
-static resource is requested, you can refer to your static resources
-as registered above in URLs as, e.g. ``/@@static/foo.js``.  This is
-completely equivalent to ``/static/foo.js``.  See
-:ref:`traversal_chapter` for information about "goggles" (``@@``).
+.. note:: To ensure that model objects contained in the root don't
+   "shadow" your static view (model objects take precedence during
+   traversal), or to ensure that your root object's ``__getitem__`` is
+   never called when a static resource is requested, you can refer to
+   your static resources as registered above in URLs as,
+   e.g. ``/@@static/foo.js``.  This is completely equivalent to
+   ``/static/foo.js``.  See :ref:`traversal_chapter` for information
+   about "goggles" (``@@``).
+
+.. note:: Under the hood, the ``repoze.bfg.view.static`` class employs
+   the ``urlparser.StaticURLParser`` WSGI application to serve static
+   files.  See `the Paste documentation for urlparser
+   <http://pythonpaste.org/modules/urlparser.html>`_ for more
+   information about ``urlparser.StaticURLParser``.
 
 
 

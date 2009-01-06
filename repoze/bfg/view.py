@@ -1,3 +1,6 @@
+from paste.urlparser import StaticURLParser
+from webob import Response
+
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
@@ -119,4 +122,42 @@ def is_response(ob):
              isinstance(ob.status, basestring) ) :
             return True
     return False
+
+class static(object):
+    """ An instance of this class is a callable which can act as a BFG
+    view; this view will serve static files from a directory on disk
+    based on the ``root_dir`` you provide to its constructor.  The
+    directory may contain subdirectories (recursively); the static
+    view implementation will descend into these directories as
+    necessary based on the components of the URL in order to resolve a
+    path into a response."""
+
+    def __init__(self, root_dir, cache_max_age=3600):
+        """ Pass the absolute filesystem path to the directory
+        containing static files directory as ``root_dir``,
+        ``cache_max_age`` influences the Expires and Max-Age caching
+        headers (default is 3600 seconds or five minutes)."""
+        self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
+
+    def __call__(self, context, request):
+        subpath = '/'.join(request.subpath)
+        caught = []
+        def catch_start_response(status, headers, exc_info=None):
+            caught[:] = (status, headers, exc_info)
+        ecopy = request.environ.copy()
+        # Fix up PATH_INFO to get rid of everything but the "subpath"
+        # (the actual path to the file relative to the root dir).
+        # Zero out SCRIPT_NAME for good measure.
+        ecopy['PATH_INFO'] = '/' + subpath
+        ecopy['SCRIPT_NAME'] = ''
+        body = self.app(ecopy, catch_start_response)
+        if caught: 
+            status, headers, exc_info = caught
+            response = Response()
+            response.app_iter = body
+            response.status = status
+            response.headerlist = headers
+            return response
+        else:
+            raise RuntimeError('WSGI start_response not called')
 

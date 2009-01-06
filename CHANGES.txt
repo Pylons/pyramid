@@ -17,6 +17,11 @@ Next Release
 
   Features
 
+   - A ``static`` helper class was added to the ``repoze.bfg.views``
+     module.  Instances of this class are willing to act as BFG views
+     which return static resources using files on disk.  See the
+     :mod:`repoze.bfg.view` docs for more info.
+
    - The ``repoze.bfg.url.model_url`` API (nee'
      ``repoze.bfg.traversal.model_url``) now accepts and honors a
      keyword argument named ``query``.  The value of this argument

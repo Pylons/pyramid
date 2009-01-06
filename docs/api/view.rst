@@ -15,3 +15,6 @@
 
   .. autofunction:: view_execution_permitted
 
+  .. autoclass:: static
+     :members:
+

@@ -19,11 +19,11 @@ def wsgiapp(wrapped):
 
     Allows the following view declaration to be made::
 
-       <bfg:view
-            view=".views.hello_world"
-            name="hello_world.txt"
-            context="*"
-            />
+       <view
+          view=".views.hello_world"
+          name="hello_world.txt"
+          context="*"
+        />
 
     The wsgiapp decorator will convert the result of the WSGI
     application to a Response and return it to repoze.bfg as if the

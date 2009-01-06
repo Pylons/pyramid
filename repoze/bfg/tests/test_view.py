@@ -1,13 +1,13 @@
 import unittest
 
-from zope.component.testing import PlacelessSetup
+from zope.testing.cleanup import cleanUp
 
-class BaseTest(PlacelessSetup):
+class BaseTest(object):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _registerView(self, app, name, *for_):
         import zope.component
@@ -30,6 +30,7 @@ class BaseTest(PlacelessSetup):
     def _makeEnviron(self, **extras):
         environ = {
             'wsgi.url_scheme':'http',
+            'wsgi.version':(1,0),
             'SERVER_NAME':'localhost',
             'SERVER_PORT':'8080',
             'REQUEST_METHOD':'GET',
@@ -372,12 +373,12 @@ class TestIsResponse(unittest.TestCase):
         f = self._getFUT()
         self.assertEqual(f(response), False)
 
-class TestViewExecutionPermitted(unittest.TestCase, PlacelessSetup):
+class TestViewExecutionPermitted(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.view import view_execution_permitted
@@ -432,6 +433,40 @@ class TestViewExecutionPermitted(unittest.TestCase, PlacelessSetup):
         directlyProvides(request, IRequest)
         result = self._callFUT(context, request, '')
         self.failUnless(result is True)
+
+class TestStaticView(unittest.TestCase, BaseTest):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from repoze.bfg.view import static
+        return static
+
+    def _getStaticDir(self):
+        import os
+        here = os.path.abspath(os.path.normpath(os.path.dirname(__file__)))
+        fixtureapp = os.path.join(here, 'fixtureapp')
+        return fixtureapp
+
+    def _makeOne(self):
+        static_dir = self._getStaticDir()
+        return self._getTargetClass()(static_dir)
+        
+    def test_it(self):
+        view = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        result = ''.join(list(response.app_iter))
+        static_dir = self._getStaticDir()
+        import os
+        filedata = open(os.path.join(static_dir, '__init__.py')).read()
+        self.assertEqual(result, filedata)
 
 class DummyContext:
     pass
