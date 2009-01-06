@@ -80,14 +80,26 @@ class ModelURLTests(unittest.TestCase):
         result = self._callFUT(root, request, 'a b c')
         self.assertEqual(result, 'http://example.com:5432/a%20b%20c')
 
-    def test_with_query(self):
+    def test_with_query_dict(self):
         root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
         request = DummyRequest()
-        result = self._callFUT(root, request, 'a', query=[('a', 1), ('b', 2)])
-        self.assertEqual(result, 'http://example.com:5432/a?a=1&b=2')
+        uc = unicode('La Pe\xc3\xb1a', 'utf-8')
+        result = self._callFUT(root, request, 'a', query={'a':uc})
+        self.assertEqual(result,
+                         'http://example.com:5432/a?a=La+Pe%C3%B1a')
 
+    def test_with_query_seq(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        request = DummyRequest()
+        uc = unicode('La Pe\xc3\xb1a', 'utf-8')
+        result = self._callFUT(root, request, 'a', query=[('a', 'hi there'),
+                                                          ('b', uc)])
+        self.assertEqual(result,
+                         'http://example.com:5432/a?a=hi+there&b=La+Pe%C3%B1a')
 
 class UrlEncodeTests(unittest.TestCase):
     def _callFUT(self, query, doseq=False):
