@@ -1,0 +1,19 @@
+from repoze.bfg.router import make_app as bfg_make_app
+from repoze.bfg.registry import get_options
+from repoze.zodbconn.finder import dbfactory_from_uri
+from repoze.zodbconn.finder import PersistentApplicationFinder
+
+def app(global_config, **kw):
+    """ This function returns a repoze.bfg.router.Router object.
+    
+    It is usually called by the PasteDeploy framework during ``paster serve``.
+    """
+    # paster app config callback
+    import {{package}}
+    from {{package}}.models import appmaker
+    zodb_uri = kw.get('zodb_uri')
+    if zodb_uri is None:
+        raise ValueError("No 'zodb_uri' in application configuration.")
+
+    get_root = PersistentApplicationFinder(zodb_uri, appmaker)
+    return bfg_make_app(get_root, {{package}}, options=get_options(kw))

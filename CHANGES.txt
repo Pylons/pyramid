@@ -21,6 +21,9 @@ Deprecations
 Features
 --------
 
+- Renamed the existing BFG paster template to ``bfg_starter``.  Added
+  another template showing default ZODB setup using ``repoze.zodbconn``.
+
 - A ``static`` helper class was added to the ``repoze.bfg.views``
   module.  Instances of this class are willing to act as BFG views
   which return static resources using files on disk.  See the

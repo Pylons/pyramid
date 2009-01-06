@@ -71,6 +71,7 @@ setup(name='repoze.bfg',
       entry_points = """\
         [paste.paster_create_template]
         bfg_starter=repoze.bfg.paster:StarterProjectTemplate
+        bfg_zodb=repoze.bfg.paster:ZODBProjectTemplate
       """
       )
 
