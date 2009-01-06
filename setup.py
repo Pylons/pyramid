@@ -70,7 +70,7 @@ setup(name='repoze.bfg',
       test_suite="repoze.bfg.tests",
       entry_points = """\
         [paste.paster_create_template]
-        bfg=repoze.bfg.paster:BFGProjectTemplate
+        bfg_starter=repoze.bfg.paster:StarterProjectTemplate
       """
       )
 

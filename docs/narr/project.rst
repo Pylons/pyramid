@@ -17,7 +17,7 @@ create`` facility using the interpreter from the virtualenv
 .. code-block:: bash
    :linenos:
 
-   $ bin/paster create -t bfg
+   $ bin/paster create -t bfg_starter
 
 ``paster create`` will ask you a single question: the *name* of the
 project.  You should use a string without spaces and with only letters
@@ -27,7 +27,7 @@ project we name ``MyProject``:
 .. code-block:: bash
    :linenos:
 
-   $ bin/paster create -t bfg
+   $ bin/paster create -t bfg_starter
    Selected and implied templates:
      repoze.bfg#bfg  repoze.bfg starter project
 
@@ -74,7 +74,7 @@ application's Python code and templates.
 
 .. note:: You can skip the interrogative question about a project
    name during ``paster create`` by adding the project name to the
-   command line, e.g. ``paster create -t bfg MyProject``.
+   command line, e.g. ``paster create -t bfg_starter MyProject``.
 
 Installing your Newly Created Project for Development
 -----------------------------------------------------
