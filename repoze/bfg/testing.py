@@ -243,6 +243,12 @@ class DummyModel:
         """ Return the keys set by __setitem__ """
         return self.subs.keys()
 
+    def __nonzero__(self):
+        return True
+
+    def __len__(self):
+        return len(self.subs)
+
     def __contains__(self, name):
         return name in self.subs
     

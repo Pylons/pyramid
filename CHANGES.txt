@@ -4,6 +4,8 @@ After 0.6.1
 Features
 --------
 
+- Added ``__len__`` and ``__nonzero__`` to ``repoze.bfg.testing:DummyModel``.
+
 - Renamed the existing BFG paster template to ``bfg_starter``.  Added
   another template showing default ZODB setup using ``repoze.zodbconn``.
 
