@@ -4,6 +4,9 @@ After 0.6.1
 Features
 --------
 
+- Added a ``post`` argument to the ``repoze.bfg.testing:DummyRequest``
+  constructor.
+  
 - Added ``__len__`` and ``__nonzero__`` to ``repoze.bfg.testing:DummyModel``.
 
 - The ``repoze.bfg.registry.get_options`` callable used to return only
