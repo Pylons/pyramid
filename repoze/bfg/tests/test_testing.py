@@ -1,12 +1,12 @@
-from zope.component.testing import PlacelessSetup
+from zope.testing.cleanup import cleanUp
 import unittest
 
-class TestTestingFunctions(unittest.TestCase, PlacelessSetup):
+class TestTestingFunctions(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def test_registerDummySecurityPolicy_permissive(self):
         from repoze.bfg import testing
@@ -49,14 +49,12 @@ class TestTestingFunctions(unittest.TestCase, PlacelessSetup):
 
     def test_registerDummyRenderer(self):
         from repoze.bfg import testing
-        template = testing.registerDummyRenderer('templates/foo')
+        renderer = testing.registerDummyRenderer('templates/foo')
         from repoze.bfg.testing import DummyTemplateRenderer
-        self.failUnless(isinstance(template, DummyTemplateRenderer))
+        self.failUnless(isinstance(renderer, DummyTemplateRenderer))
         from repoze.bfg.chameleon_zpt import render_template_to_response
         response = render_template_to_response('templates/foo', foo=1, bar=2)
-        self.assertEqual(template.foo, 1)
-        self.assertEqual(template.bar, 2)
-        self.assertEqual(response.body, '')
+        self.assertEqual(dict(foo=1, bar=2), renderer._received)
 
     def test_registerEventListener_single(self):
         from repoze.bfg import testing
@@ -345,4 +343,29 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/foo')
         self.assertEqual(request.water, 1)
 
+class TestDummyTemplateRenderer(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.testing import DummyTemplateRenderer
+        return DummyTemplateRenderer
+
+    def _makeOne(self,):
+        return self._getTargetClass()()
+
+    def test_implementation(self):
+        renderer = self._makeOne()
+        self.assertEqual(renderer.implementation(), renderer)
+
+    def test_getattr(self):
+        renderer = self._makeOne()
+        renderer(a=1)
+        self.assertEqual(renderer.a, 1)
+        self.assertRaises(AttributeError, renderer.__getattr__, 'b')
+
+    def test_assert_(self):
+        renderer = self._makeOne()
+        renderer(a=1, b=2)
+        self.assertRaises(AssertionError, renderer.assert_, c=1)
+        self.assertRaises(AssertionError, renderer.assert_, b=3)
+        self.failUnless(renderer.assert_(a=1, b=2))
+        
         

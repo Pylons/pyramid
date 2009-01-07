@@ -28,7 +28,7 @@ class ViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/mytemplate.pt')
         response = my_view(context, request)
-        self.assertEqual(renderer.project, 'myproject')
+        renderer.assert_(project='myproject')
 
 class ViewIntegrationTests(unittest.TestCase):
     """ These tests are integration tests for the view.  These test

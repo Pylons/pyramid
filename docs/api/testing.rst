@@ -23,4 +23,8 @@
   .. autoclass:: DummyRequest
      :members:
 
+  .. autoclass:: DummyTemplateRenderer
+     :members:
+
+
 

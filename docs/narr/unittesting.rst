@@ -62,7 +62,7 @@ unittest TestCase that used the testing API.
            context = testing.DummyModel()
            request = testing.DummyRequest()
            response = view_fn(context, request)
-           self.assertEqual(renderer.say, 'Hello')
+           renderer.assert_(say='Hello')
 
        def test_view_fn_submitted(self):
            from my.package import view_fn
@@ -71,7 +71,7 @@ unittest TestCase that used the testing API.
            request = testing.DummyRequest()
            request.params['say'] = 'Yo'
            response = view_fn(context, request)
-           self.assertEqual(renderer.say, 'Yo')
+           renderer.assert_(say='Yo')
 
 In the above example, we create a ``MyTest`` test case that inherits
 from ``unittest.TestCase``.  If it's in our :mod:`repoze.bfg`
@@ -94,7 +94,10 @@ the dummy renderer is called, it will set attributes on itself
 corresponding to the non-path keyword arguments provided to the
 ``render_template_to_response`` function.  We check that the ``say``
 parameter sent into the template rendering function was ``Hello`` in
-this specific example.
+this specific example.  The ``assert_`` method of the renderer we've
+created will raise an ``AssertionError`` if the value passed to the
+renderer as ``say`` does not equal ``Hello`` (any number of keyword
+arguments are supported).
 
 The second test method, named ``test_view_fn_submitted`` tests the
 alternate case, where the ``say`` form value has already been set in

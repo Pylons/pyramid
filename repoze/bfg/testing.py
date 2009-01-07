@@ -5,7 +5,7 @@ from zope.interface import implements
 
 from repoze.bfg.interfaces import IRequest
 
-_marker = ()
+_marker = []
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     """ Registers a dummy ``repoze.bfg`` security policy using the
@@ -172,12 +172,49 @@ def make_traverser_factory(root):
     return DummyTraverserFactory
 
 class DummyTemplateRenderer:
+    """
+    An instance of this class is returned from
+    ``registerDummyRenderer``.  It has a helper function (``assert_``)
+    that makes it possible to make an assertion which compares data
+    passed to the renderer by the view function against expected
+    key/value pairs. 
+    """
+
+    def __init__(self):
+        self._received = {}
+        
     def implementation(self):
         return self
     
     def __call__(self, **kw):
-        self.__dict__.update(kw)
+        self._received.update(kw)
         return ''
+
+    def __getattr__(self, k):
+        """ Backwards compatibiity """
+        val = self._received.get(k, _marker)
+        if val is _marker:
+            raise AttributeError(k)
+        return val
+
+    def assert_(self, **kw):
+        """ Accept an arbitrary set of assertion key/value pairs.  For
+        each assertion key/value pair assert that the renderer
+        (eg. ``render_template_to_response``) received the key with a
+        value that equals the asserted value. If the renderer did not
+        receive the key at all, or the value received by the renderer
+        doesn't match the assertion value, raise an AssertionError."""
+        for k, v in kw.items():
+            myval = self._received.get(k, _marker)
+            if myval is _marker:
+                raise AssertionError(
+                    'A value for key "%s" was not passed to the renderer' % k)
+                    
+            if myval != v:
+                raise AssertionError(
+                    '\nasserted value for %s: %r\nactual value: %r' % (
+                    v, k, myval))
+        return True
 
 def make_view(result):
     def dummy_view(context, request):
