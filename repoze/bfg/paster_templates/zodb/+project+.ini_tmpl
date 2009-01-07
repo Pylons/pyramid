@@ -10,7 +10,8 @@ zodb_uri = file://%(here)s/Data.fs?connection_cache_size=20000
 
 [pipeline:main]
 pipeline =
-    egg:repoze.tm2#tm
+    egg:repoze.zodbconn#closer
+    egg:repoze.tm#tm
     zodb
 
 [server:main]

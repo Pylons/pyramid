@@ -1,6 +1,5 @@
 from repoze.bfg.router import make_app as bfg_make_app
 from repoze.bfg.registry import get_options
-from repoze.zodbconn.finder import dbfactory_from_uri
 from repoze.zodbconn.finder import PersistentApplicationFinder
 
 def app(global_config, **kw):

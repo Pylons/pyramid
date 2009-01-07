@@ -32,7 +32,7 @@ setup(name='{{project}}',
       install_requires=[
             'repoze.bfg',
             'repoze.zodbconn',
-            'repoze.tm2',
+            'repoze.tm',
             'ZODB3',
             ],
       tests_require=[
