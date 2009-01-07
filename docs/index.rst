@@ -36,29 +36,7 @@ Narrative documentation in chapter form explaining how to use
    narr/events
    narr/environment
    narr/unittesting
-   changes
    glossary
-
-Tutorials
-=========
-
-Step-by-step tutorials which demonstrate how you might use
-:mod:`repoze.bfg`.
-
-``lxmlgraph`` Tutorial
-
-.. toctree::
-   :maxdepth: 3
-
-   tutorials/lxmlgraph/index.rst
-
-:mod:`repoze.bfg` for Zope CMF Developers
-
-.. toctree::
-   :maxdepth: 3
-
-   tutorials/cmf/index.rst
-  
 
 API documentation
 =================
@@ -80,6 +58,35 @@ Per-module :mod:`repoze.bfg` API documentation.
    api/urldispatch
    api/view
    api/wsgi
+
+Tutorials
+=========
+
+Step-by-step tutorials which demonstrate how you might use
+:mod:`repoze.bfg`.
+
+``lxmlgraph`` Tutorial
+
+.. toctree::
+   :maxdepth: 3
+
+   tutorials/lxmlgraph/index.rst
+
+:mod:`repoze.bfg` for Zope CMF Developers
+
+.. toctree::
+   :maxdepth: 3
+
+   tutorials/cmf/index.rst
+
+Change History
+==============
+
+.. toctree::
+   :maxdepth: 2
+
+   changes
+  
 
 Sample Applications
 ===================
