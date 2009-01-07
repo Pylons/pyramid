@@ -339,7 +339,6 @@ class DummyRequest:
         self.script_name = ''
         self.path_qs = ''
         self.body = ''
-        self.cookies = {}
         self.view_name = ''
         self.subpath = []
         self.context = None

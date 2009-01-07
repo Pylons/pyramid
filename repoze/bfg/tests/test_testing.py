@@ -329,19 +329,68 @@ class TestDummyRequest(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         return self._getTargetClass()(*arg, **kw)
 
-    def test_it(self):
+    def test_params(self):
         request = self._makeOne(params = {'say':'Hello'},
                                 environ = {'PATH_INFO':'/foo'},
                                 headers = {'X-Foo':'YUP'},
-                                path = '/abc',
-                                water = 1)
-        self.assertEqual(request.path, '/abc')
+                               )
         self.assertEqual(request.params['say'], 'Hello')
         self.assertEqual(request.GET['say'], 'Hello')
         self.assertEqual(request.POST['say'], 'Hello')
         self.assertEqual(request.headers['X-Foo'], 'YUP')
         self.assertEqual(request.environ['PATH_INFO'], '/foo')
+
+    def test_defaults(self):
+        request = self._makeOne()
+        self.assertEqual(request.method, 'GET')
+        self.assertEqual(request.application_url, 'http://example.com')
+        self.assertEqual(request.host_url, 'http://example.com')
+        self.assertEqual(request.path_url, 'http://example.com')
+        self.assertEqual(request.url, 'http://example.com')
+        self.assertEqual(request.host, 'example.com:80')
+        self.assertEqual(request.content_length, 0)
+        self.assertEqual(request.environ.get('PATH_INFO'), None)
+        self.assertEqual(request.headers.get('X-Foo'), None)
+        self.assertEqual(request.params.get('foo'), None)
+        self.assertEqual(request.GET.get('foo'), None)
+        self.assertEqual(request.POST.get('foo'), None)
+        self.assertEqual(request.cookies.get('type'), None)
+        self.assertEqual(request.path, '/')
+        self.assertEqual(request.path_info, '/')
+        self.assertEqual(request.script_name, '')
+        self.assertEqual(request.path_qs, '')
+        self.assertEqual(request.view_name, '')
+        self.assertEqual(request.subpath, [])
+        self.assertEqual(request.context, None)
+
+    def test_environ_explicit(self):
+        request = self._makeOne(environ = {'PATH_INFO':'/foo'})
+        self.assertEqual(request.environ['PATH_INFO'], '/foo')
+
+    def test_headers_explicit(self):
+        request = self._makeOne(headers = {'X-Foo':'YUP'})
+        self.assertEqual(request.headers['X-Foo'], 'YUP')
+
+    def test_path_explicit(self):
+        request = self._makeOne(path = '/abc')
+        self.assertEqual(request.path, '/abc')
+
+    def test_cookies_explicit(self):
+        request = self._makeOne(cookies = {'type': 'gingersnap'})
+        self.assertEqual(request.cookies['type'], 'gingersnap')
+
+    def test_kwargs(self):
+        request = self._makeOne(water = 1)
         self.assertEqual(request.water, 1)
+
+    def test_with_post(self):
+        POST = {'foo': 'bar', 'baz': 'qux'}
+        request = self._makeOne(post=POST)
+        self.assertEqual(request.method, 'POST')
+        self.assertEqual(request.POST, POST)
+        # Unlike a normal request, *don't* put explict POST data into params:
+        # doing so masks a possible XSS bug in the app.
+        self.assertEqual(request.params, {})
 
 class TestDummyTemplateRenderer(unittest.TestCase):
     def _getTargetClass(self):
