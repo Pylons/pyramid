@@ -363,6 +363,12 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.subpath, [])
         self.assertEqual(request.context, None)
 
+    def test_params_explicit(self):
+        request = self._makeOne(params = {'foo':'bar'})
+        self.assertEqual(request.params['foo'], 'bar')
+        self.assertEqual(request.GET['foo'], 'bar')
+        self.assertEqual(request.POST['foo'], 'bar')
+
     def test_environ_explicit(self):
         request = self._makeOne(environ = {'PATH_INFO':'/foo'})
         self.assertEqual(request.environ['PATH_INFO'], '/foo')
@@ -379,18 +385,26 @@ class TestDummyRequest(unittest.TestCase):
         request = self._makeOne(cookies = {'type': 'gingersnap'})
         self.assertEqual(request.cookies['type'], 'gingersnap')
 
-    def test_kwargs(self):
-        request = self._makeOne(water = 1)
-        self.assertEqual(request.water, 1)
-
-    def test_with_post(self):
+    def test_post_explicit(self):
         POST = {'foo': 'bar', 'baz': 'qux'}
         request = self._makeOne(post=POST)
         self.assertEqual(request.method, 'POST')
         self.assertEqual(request.POST, POST)
-        # Unlike a normal request, *don't* put explict POST data into params:
-        # doing so masks a possible XSS bug in the app.
+        # N.B.:  Unlike a normal request, passing 'post' should *not* put
+        #        explict POST data into params: doing so masks a possible
+        #        XSS bug in the app.  Tests for apps which don't care about
+        #        the distinction should just use 'params'.
         self.assertEqual(request.params, {})
+
+    def test_post_empty_shadows_params(self):
+        request = self._makeOne(params={'foo': 'bar'}, post={})
+        self.assertEqual(request.method, 'POST')
+        self.assertEqual(request.params.get('foo'), 'bar')
+        self.assertEqual(request.POST.get('foo'), None)
+
+    def test_kwargs(self):
+        request = self._makeOne(water = 1)
+        self.assertEqual(request.water, 1)
 
 class TestDummyTemplateRenderer(unittest.TestCase):
     def _getTargetClass(self):

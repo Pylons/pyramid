@@ -306,17 +306,26 @@ class DummyModel:
         return inst
 
 class DummyRequest:
-    """ A dummy request object (imitates a :term:`WebOb` ``Request``
-    object).  The named constructor arguments correspond to their
-    WebOb equivalents.  Extra keyword arguments are assigned as
-    attributes of the request itself."""
+    """ A dummy request object (imitates a :term:`WebOb` ``Request`` object).
+    
+    The ``params``, ``environ``, ``headers``, ``path``, and ``cookies`` 
+    arguments  correspond to their WebOb equivalents.
+
+    The ``post`` argument,  if passed, populates the request's
+    ``POST`` attribute, but *not* ``params``, in order to allow testing
+    that the app accepts data for a given view only from POST requests.
+    This argument also sets ``self.method`` to "POST".
+
+    Extra keyword arguments are assigned as attributes of the request
+    itself.
+    """
     implements(IRequest)
     method = 'GET'
     application_url = 'http://example.com'
     host = 'example.com:80'
     content_length = 0
     def __init__(self, params=None, environ=None, headers=None, path='/',
-                 cookies=None, **kw):
+                 cookies=None, post=None, **kw):
         if environ is None:
             environ = {}
         if params is None:
@@ -330,7 +339,11 @@ class DummyRequest:
         self.params = params
         self.cookies = cookies
         self.GET = params
-        self.POST = params
+        if post is not None:
+            self.method = 'POST'
+            self.POST = post
+        else:
+            self.POST = params
         self.host_url = self.application_url
         self.path_url = self.application_url
         self.url = self.application_url
