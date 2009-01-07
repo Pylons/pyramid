@@ -76,6 +76,10 @@ application's Python code and templates.
    name during ``paster create`` by adding the project name to the
    command line, e.g. ``paster create -t bfg_starter MyProject``.
 
+.. note:: A convenience template for projects which will depend on
+   :term:`ZODB` projects also exists.  Use ``paster create -t
+   bfg_zodb`` to use this template instead of the "starter" template.
+
 Installing your Newly Created Project for Development
 -----------------------------------------------------
 
