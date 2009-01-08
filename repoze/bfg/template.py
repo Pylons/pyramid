@@ -21,4 +21,4 @@ for name in ('get_template', 'render_template', 'render_template_to_response'):
 for name in ('render_transform', 'render_transform_to_response'):
     deprecated(name,
                ('repoze.bfg.template.%s should now be imported as '
-                'repoze.bfg.xlst.%s' % (name, name)))
+                'repoze.bfg.xslt.%s' % (name, name)))
