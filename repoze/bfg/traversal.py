@@ -1,4 +1,3 @@
-import re
 import urllib
 
 from zope.component import queryUtility
@@ -8,8 +7,6 @@ from zope.interface import classProvides
 from zope.interface import implements
 from repoze.bfg.location import LocationProxy
 from repoze.bfg.location import lineage
-from repoze.bfg.url import urlencode
-
 
 from repoze.bfg.interfaces import ILocation
 from repoze.bfg.interfaces import ITraverser
