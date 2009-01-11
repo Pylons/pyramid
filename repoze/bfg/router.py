@@ -53,14 +53,14 @@ class Router(object):
         root_factory = getUtility(IRootFactory)
         root = root_factory(environ)
         traverser = getAdapter(root, ITraverserFactory)
-        context, name, subpath = traverser(environ)
+        context, view_name, subpath = traverser(environ)
 
         request.root = root
         request.context = context
-        request.view_name = name
+        request.view_name = view_name
         request.subpath = subpath
 
-        permitted = view_execution_permitted(context, request, name)
+        permitted = view_execution_permitted(context, request, view_name)
 
         settings = queryUtility(ISettings)
         debug_authorization = settings and settings.debug_authorization
@@ -69,7 +69,7 @@ class Router(object):
             logger = queryUtility(ILogger, 'repoze.bfg.debug')
             logger and logger.debug(
                 'debug_authorization of url %s (view name %r against context '
-                '%r): %s' % (request.url, name, context, permitted.msg)
+                '%r): %s' % (request.url, view_name, context, permitted.msg)
                 )
         if not permitted:
             if debug_authorization:
@@ -79,7 +79,7 @@ class Router(object):
             app = HTTPUnauthorized(escape(msg))
             return app(environ, start_response)
             
-        response = render_view_to_response(context, request, name,
+        response = render_view_to_response(context, request, view_name,
                                            secure=False)
 
         if response is None:
@@ -89,7 +89,7 @@ class Router(object):
                 msg = (
                     'debug_notfound of url %s; path_info: %r, context: %r, '
                     'view_name: %r, subpath: %r' % (
-                    request.url, request.path_info, context, name, subpath)
+                    request.url, request.path_info, context, view_name, subpath)
                     )
                 logger and logger.debug(msg)
             else:
