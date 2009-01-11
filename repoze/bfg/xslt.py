@@ -29,12 +29,8 @@ def get_transform(path, node):
         if not os.path.exists(path):
             raise ValueError('Missing template file: %s' % path)
         renderer = XSLTemplateRenderer(path)
-        try:
-            sm = getSiteManager()
-        except ComponentLookupError:
-            pass
-        else:
-            sm.registerUtility(renderer, INodeTemplateRenderer, name=path)
+        sm = getSiteManager()
+        sm.registerUtility(renderer, INodeTemplateRenderer, name=path)
     return renderer
 
 def render_transform(path, node, **kw):

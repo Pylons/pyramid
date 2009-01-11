@@ -1,13 +1,12 @@
 import unittest
+from zope.testing.cleanup import cleanUp
 
-from zope.component.testing import PlacelessSetup
-
-class Base(PlacelessSetup):
+class Base(object):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _zcmlConfigure(self):
         import repoze.bfg.includes
@@ -20,13 +19,7 @@ class Base(PlacelessSetup):
         here = os.path.abspath(os.path.dirname(__file__))
         return os.path.join(here, 'fixtures', name)
         
-class XSLTemplateRendererTests(unittest.TestCase, Base):
-    def setUp(self):
-        Base.setUp(self)
-
-    def tearDown(self):
-        Base.tearDown(self)
-
+class XSLTemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.xslt import XSLTemplateRenderer
         return XSLTemplateRenderer
@@ -57,16 +50,52 @@ class XSLTemplateRendererTests(unittest.TestCase, Base):
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
         self.assertEqual(result, resultstr)
 
-class RenderTransformToResponseTests(unittest.TestCase, Base):
-    def setUp(self):
-        Base.setUp(self)
+class GetTransformTests(Base, unittest.TestCase):
+    def _callFUT(self, path, node):
+        from repoze.bfg.xslt import get_transform
+        return get_transform(path, node)
 
-    def tearDown(self):
-        Base.tearDown(self)
+    def test_nonabs_registered(self):
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import INodeTemplateRenderer
+        renderer = {}
+        gsm = getGlobalSiteManager()
+        minimal = self._getTemplatePath('minimal.xsl')
+        gsm.registerUtility(renderer, INodeTemplateRenderer, name=minimal)
+        result = self._callFUT('fixtures/minimal.xsl', None)
+        self.failUnless(result is renderer)
+        
+    def test_abs_registered(self):
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import INodeTemplateRenderer
+        renderer = {}
+        gsm = getGlobalSiteManager()
+        minimal = self._getTemplatePath('minimal.xsl')
+        gsm.registerUtility(renderer, INodeTemplateRenderer, name=minimal)
+        result = self._callFUT(minimal, None)
+        self.failUnless(result is renderer)
 
-    def _getFUT(self):
+    def test_unregistered(self):
+        from zope.component import getGlobalSiteManager
+        from zope.component import queryUtility
+        from repoze.bfg.interfaces import INodeTemplateRenderer
+        minimal = self._getTemplatePath('minimal.xsl')
+        self.assertEqual(queryUtility(INodeTemplateRenderer, minimal), None)
+        gsm = getGlobalSiteManager()
+        result = self._callFUT(minimal, None)
+        self.assertEqual(queryUtility(INodeTemplateRenderer, minimal).path,
+                         minimal)
+
+    def test_unregistered_missing(self):
+        from zope.component import getGlobalSiteManager
+        minimal = self._getTemplatePath('notthere.xsl')
+        gsm = getGlobalSiteManager()
+        self.assertRaises(ValueError, self._callFUT, minimal, None)
+
+class RenderTransformToResponseTests(Base, unittest.TestCase):
+    def _callFUT(self, minimal, node):
         from repoze.bfg.xslt import render_transform_to_response
-        return render_transform_to_response
+        return render_transform_to_response(minimal, node=node)
 
     def test_nonabs_unregistered(self):
         self._zcmlConfigure()
@@ -74,10 +103,9 @@ class RenderTransformToResponseTests(unittest.TestCase, Base):
         from repoze.bfg.interfaces import INodeTemplateRenderer
         minimal = self._getTemplatePath('minimal.xsl')
         self.assertEqual(queryUtility(INodeTemplateRenderer, minimal), None)
-        render = self._getFUT()
         from lxml import etree
         info = etree.Element("info")
-        result = render(minimal, node=info)
+        result = self._callFUT(minimal, node=info)
         from webob import Response
         self.failUnless(isinstance(result, Response))
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
@@ -98,10 +126,9 @@ class RenderTransformToResponseTests(unittest.TestCase, Base):
         utility = XSLTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, INodeTemplateRenderer, name=minimal)
-        render = self._getFUT()
         from lxml import etree
         info = etree.Element("info")
-        result = render(minimal, node=info)
+        result = self._callFUT(minimal, node=info)
         from webob import Response
         self.failUnless(isinstance(result, Response))
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
@@ -110,16 +137,10 @@ class RenderTransformToResponseTests(unittest.TestCase, Base):
         self.assertEqual(len(result.headerlist), 2)
         self.assertEqual(queryUtility(INodeTemplateRenderer, minimal), utility)
 
-class RenderTransformTests(unittest.TestCase, Base):
-    def setUp(self):
-        Base.setUp(self)
-
-    def tearDown(self):
-        Base.tearDown(self)
-
-    def _getFUT(self):
+class RenderTransformTests(Base, unittest.TestCase):
+    def _callFUT(self, path, node):
         from repoze.bfg.xslt import render_transform
-        return render_transform
+        return render_transform(path, node=node)
 
     def test_nonabs_unregistered(self):
         self._zcmlConfigure()
@@ -127,10 +148,9 @@ class RenderTransformTests(unittest.TestCase, Base):
         from repoze.bfg.interfaces import INodeTemplateRenderer
         minimal = self._getTemplatePath('minimal.xsl')
         self.assertEqual(queryUtility(INodeTemplateRenderer, minimal), None)
-        render = self._getFUT()
         from lxml import etree
         info = etree.Element("info")
-        result = render(minimal, node=info)
+        result = self._callFUT(minimal, node=info)
         self.failUnless(isinstance(result, str))
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
         self.assertEqual(result, resultstr)
@@ -148,10 +168,9 @@ class RenderTransformTests(unittest.TestCase, Base):
         utility = XSLTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, INodeTemplateRenderer, name=minimal)
-        render = self._getFUT()
         from lxml import etree
         info = etree.Element("info")
-        result = render(minimal, node=info)
+        result = self._callFUT(minimal, node=info)
         self.failUnless(isinstance(result, str))
         resultstr = """<?xml version="1.0"?>\n<div/>\n"""
         self.assertEqual(result, resultstr)
