@@ -4,7 +4,6 @@ from webob import Response
 
 from zope.component import queryUtility
 from zope.component import getSiteManager
-from zope.component.interfaces import ComponentLookupError
 from zope.deprecation import deprecated
 
 from zope.interface import classProvides
