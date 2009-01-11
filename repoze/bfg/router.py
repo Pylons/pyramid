@@ -36,15 +36,18 @@ from repoze.bfg.view import view_execution_permitted
 _marker = ()
 
 class Router(object):
-    """ WSGI application which routes requests to 'view' code based on
-    a view registry"""
-
+    """ The main repoze.bfg WSGI application. """
     implements(IRouter)
     
     def __init__(self, registry):
         self.registry = registry
 
     def __call__(self, environ, start_response):
+        """
+        Accept ``environ`` and ``start_response``; route requests to
+        'view' code based on registrations within the application
+        registry; call ``start_response`` and return an iterable.
+        """
         registry_manager.set(self.registry)
         request = Request(environ)
         directlyProvides(request, IRequest)
