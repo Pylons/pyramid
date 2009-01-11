@@ -9,7 +9,8 @@ Features
   
 - Added ``__len__`` and ``__nonzero__`` to ``repoze.bfg.testing:DummyModel``.
 
-- The ``repoze.bfg.registry.get_options`` callable used to return only
+- The ``repoze.bfg.registry.get_options`` callable (now renamed to
+  ``repoze.bfg.setings.get_options``) used to return only
   framework-specific keys and values in the dictionary it returned.
   It now returns all the keys and values in the dictionary it is
   passed *plus* any framework-specific settings culled from the
@@ -44,20 +45,30 @@ Bug Fixes
 - A new module was added: ``repoze.bfg.settings``.  This contains
   deployment-settings-related code.
 
-Behavior Changes
-----------------
+Implementation Changes
+----------------------
 
 - The ``make_app`` callable within ``repoze.bfg.router`` now registers
   the ``root_policy`` argument as a utility (unnamed, using the new
   ``repoze.bfg.interfaces.IRootFactory`` as a provides interface)
   rather than passing it as the first argument to the
-  ``repoze.bfg.router.Router`` class.  As a result the
+  ``repoze.bfg.router.Router`` class.  As a result, the
   ``repoze.bfg.router.Router`` router class only accepts a single
   argument: ``registry``.  The ``repoze.bfg.router.Router`` class
   retrieves the root policy via a utility lookup now.  The
   ``repoze.bfg.router.make_app`` API also now performs some important
   application registrations that were previously handled inside
   ``repoze.bfg.registry.makeRegistry``.
+
+New Modules
+-----------
+
+- A ``repoze.bfg.settings`` module was added.  It contains code
+  related to deployment settings.  Most of the code it contains was
+  moved to it from the ``repoze.bfg.registry`` module.
+
+Behavior Changes
+----------------
 
 - The ``repoze.bfg.settings.Settings`` class (an instance of which is
   registered as a utility providing
