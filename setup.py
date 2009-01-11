@@ -29,12 +29,12 @@ except IOError:
     README = CHANGES = ''
 
 install_requires=[
+    'setuptools',
     'chameleon.core [lxml] >= 1.0b13',
     'chameleon.genshi >= 1.0b2',
     'chameleon.zpt >= 1.0b8',
     'PasteScript',
     'Routes',
-    'setuptools',
     'WebOb',
     'zope.interface',
     'zope.component',
@@ -66,7 +66,7 @@ setup(name='repoze.bfg',
       namespace_packages=['repoze', 'repoze.bfg'],
       zip_safe=False,
       install_requires = install_requires,
-      tests_require= install_requires + ['Sphinx', 'docutils'],
+      tests_require= install_requires + ['Sphinx', 'docutils', 'coverage'],
       test_suite="repoze.bfg.tests",
       entry_points = """\
         [paste.paster_create_template]
