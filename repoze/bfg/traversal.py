@@ -111,7 +111,13 @@ def find_model(model, path):
 
     if path.startswith('/'):
         model = find_root(model)
-        
+
+    if path.__class__ is unicode:
+        # the traverser factory expects PATH_INFO to be a string,
+        # not unicode (it's the same traverser which accepts PATH_INFO
+        # from user agents; user agents always send strings).
+        path = path.encode('utf-8')
+
     ob, name, path = ITraverserFactory(model)({'PATH_INFO':path})
     if name:
         raise KeyError('%r has no subelement %s' % (ob, name))

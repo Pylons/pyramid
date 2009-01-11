@@ -1,8 +1,32 @@
 from zope.interface import Interface
 from zope.interface import Attribute
-from zope.deprecation import deprecated
+from zope.deferredimport import deprecated
 
 from zope.component.interfaces import IObjectEvent
+
+deprecated(
+    '(repoze.bfg.interfaces.ITemplate should now be imported '
+    'as repoze.bfg.interfaces.ITemplateRenderer)',
+    ITemplate = 'repoze.bfg.interfaces:INodeTemplateRenderer',
+    )
+
+deprecated(
+    '(repoze.bfg.interfaces.INodeTemplate should now be imported '
+     'as repoze.bfg.interfaces.INodeTemplateRenderer)',
+    INodeTemplate = 'repoze.bfg.interfaces:INodeTemplateRenderer',
+    )
+
+deprecated(
+    '(repoze.bfg.interfaces.ITemplateFactory should now be imported '
+    'as repoze.bfg.interfaces.ITemplateRendererFactory)',
+    ITemplateFactory = 'repoze.bfg.interfaces:ITemplateRendererFactory',
+    )
+
+deprecated(
+    '(repoze.bfg.interfaces.IRootPolicy should now be imported '
+    'as repoze.bfg.interfaces.IRootFactory)',
+    IRootPolicy = "repoze.bfg.interfaces:IRootFactory",
+    )
 
 class IRequest(Interface):
     """ Marker interface for a request object """
@@ -16,7 +40,7 @@ class IView(Interface):
     def __call__(context, request):
         """ Must return an object that implements IResponse """
 
-class IRootPolicy(Interface):
+class IRootFactory(Interface):
     def __call__(environ):
         """ Return a root object """
 
@@ -48,19 +72,6 @@ class ITemplateRendererFactory(Interface):
 class INodeTemplateRenderer(Interface):
     def __call__(node, **kw):
         """ Return a string result given a node and a template path """
-
-ITemplate = ITemplateRenderer
-deprecated('ITemplate',
-           ('repoze.bfg.interfaces.ITemplate should now be imported '
-            'as repoze.bfg.interfaces.ITemplateRenderer'))
-INodeTemplate = INodeTemplateRenderer
-deprecated('INodeTemplate',
-           ('repoze.bfg.interfaces.INodeTemplate should now be imported '
-            'as repoze.bfg.interfaces.INodeTemplateRenderer'))
-ITemplateFactory = ITemplateRendererFactory
-deprecated('ITemplateFactory',
-           ('repoze.bfg.interfaces.ITemplateFactory should now be imported '
-            'as repoze.bfg.interfaces.ITemplateRendererFactory'))
 
 class ISecurityPolicy(Interface):
     """ A utility that provides a mechanism to check authorization

@@ -1,8 +1,11 @@
+import sys
 from cgi import escape
 
 from zope.component import getAdapter
+from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component.event import dispatch
+
 from zope.interface import directlyProvides
 from zope.interface import implements
 
@@ -18,10 +21,14 @@ from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRouter
+from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import ISettings
+
+from repoze.bfg.log import make_stream_logger
 
 from repoze.bfg.registry import registry_manager
 from repoze.bfg.registry import makeRegistry
+from repoze.bfg.settings import Settings
 
 from repoze.bfg.view import render_view_to_response
 from repoze.bfg.view import view_execution_permitted
@@ -34,8 +41,7 @@ class Router(object):
 
     implements(IRouter)
     
-    def __init__(self, root_policy, registry):
-        self.root_policy = root_policy
+    def __init__(self, registry):
         self.registry = registry
 
     def __call__(self, environ, start_response):
@@ -43,9 +49,10 @@ class Router(object):
         request = Request(environ)
         directlyProvides(request, IRequest)
         dispatch(NewRequest(request))
-        root = self.root_policy(environ)
+
+        root_factory = getUtility(IRootFactory)
+        root = root_factory(environ)
         traverser = getAdapter(root, ITraverserFactory)
-        settings = queryUtility(ISettings)
         context, name, subpath = traverser(environ)
 
         request.root = root
@@ -54,6 +61,8 @@ class Router(object):
         request.subpath = subpath
 
         permitted = view_execution_permitted(context, request, name)
+
+        settings = queryUtility(ISettings)
         debug_authorization = settings and settings.debug_authorization
 
         if debug_authorization:
@@ -93,21 +102,29 @@ class Router(object):
         start_response(response.status, response.headerlist)
         return response.app_iter
 
-def make_app(root_policy, package=None, filename='configure.zcml',
+def make_app(root_factory, package=None, filename='configure.zcml',
              options=None):
-    """ Create a view registry based on the application's ZCML.  and
-    return a Router object, representing a ``repoze.bfg`` WSGI
-    application.  ``root_policy`` must be a callable that accepts a
-    WSGI environment and returns a graph root object.  ``package`` is
-    a Python module representing the application's package,
-    ``filename`` is the filesystem path to a ZCML file (optionally
-    relative to the package path) that should be parsed to create the
-    view registry.  ``options``, if used, should be a dictionary
-    containing bfg-specific runtime options, with each key
-    representing the option and the key's value representing the
-    specific option value, e.g. ``{'reload_templates':True}``"""
-    registry = makeRegistry(filename, package, options)
-    app = Router(root_policy, registry)
+    """ Return a Router object, representing a ``repoze.bfg`` WSGI
+    application.  ``root_factory`` must be a callable that accepts a
+    WSGI environment and returns a root object.  ``package`` is a
+    Python module representing the application's package, ``filename``
+    is the filesystem path to a ZCML file (optionally relative to the
+    package path) that should be parsed to create the application
+    registry.  ``options``, if used, should be a dictionary containing
+    runtime options (e.g. the key/value pairs in an app section of a
+    PasteDeploy file), with each key representing the option and the
+    key's value representing the specific option value,
+    e.g. ``{'reload_templates':True}``"""
+    if options is None:
+        options = {}
+
+    registry = makeRegistry(filename, package)
+    settings = Settings(options)
+    registry.registerUtility(settings, ISettings)
+    debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
+    registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
+    registry.registerUtility(root_factory, IRootFactory)
+    app = Router(registry)
 
     try:
         registry_manager.set(registry)
@@ -117,4 +134,3 @@ def make_app(root_policy, package=None, filename='configure.zcml',
 
     return app
 
-    

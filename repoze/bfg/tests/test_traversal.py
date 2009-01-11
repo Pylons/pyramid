@@ -292,6 +292,24 @@ class FindModelTests(unittest.TestCase):
         self.assertRaises(KeyError, self._callFUT, baz, '/')
         self.assertEqual(dummy.wascontext, True)
 
+    def test_unicode_pathinfo_converted_to_utf8(self):
+        la = unicode('LaPe\xc3\xb1a', 'utf-8')
+
+        dummy = DummyContext()
+        dummy.__parent__ = None
+        dummy.__name__ = None
+        baz = DummyContext()
+        baz.__parent__ = dummy
+        baz.__name__ = la
+
+        traverser = make_traverser(baz, '', [])
+        self._registerTraverserFactory(traverser)
+        path = '/' + la
+        result = self._callFUT(baz, path)
+        self.assertEqual(result, baz)
+        self.assertEqual(dummy.wascontext, True)
+        self.assertEqual(dummy.environ['PATH_INFO'], path.encode('utf-8'))
+
 class ModelPathTests(unittest.TestCase):
     def _callFUT(self, model, *elements):
         from repoze.bfg.traversal import model_path
@@ -335,8 +353,10 @@ class ModelPathTests(unittest.TestCase):
 def make_traverser(*args):
     class DummyTraverser(object):
         def __init__(self, context):
+            self.context = context
             context.wascontext = True
         def __call__(self, environ):
+            self.context.environ = environ
             return args
     return DummyTraverser
         
