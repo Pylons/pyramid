@@ -153,13 +153,10 @@ class static(object):
         ecopy['PATH_INFO'] = '/' + subpath
         ecopy['SCRIPT_NAME'] = ''
         body = self.app(ecopy, catch_start_response)
-        if caught: 
-            status, headers, exc_info = caught
-            response = Response()
-            response.app_iter = body
-            response.status = status
-            response.headerlist = headers
-            return response
-        else:
-            raise RuntimeError('WSGI start_response not called')
+        status, headers, exc_info = caught
+        response = Response()
+        response.app_iter = body
+        response.status = status
+        response.headerlist = headers
+        return response
 

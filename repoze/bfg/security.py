@@ -305,9 +305,10 @@ class ViewPermission(object):
                                        self.permission_name)
 
     def __repr__(self):
+        view_name = getattr(self.request, 'view_name', None)
         return '<Permission at %s named %r for %r>' % (id(self),
                                                        self.permission_name,
-                                                       self.request.view_name)
+                                                       view_name)
         
 class ViewPermissionFactory(object):
     implements(IViewPermissionFactory)

@@ -4,6 +4,21 @@ After 0.6.1
 Features
 --------
 
+- Tests can be run with coverage output if you've got ``nose``
+  installed in the interpreter which you use to run tests.  Using an
+  interpreter with ``nose`` installed, do ``python setup.py
+  nosetests`` within a checkout of the ``repoze.bfg`` package to see
+  test coverage output.
+
+- Improve test coverage.
+
+- Remove old cold which attempts to recover from trying to unpickle a
+  ``z3c.pt`` template; Chameleon has been the templating engine for a
+  good long time now.  Running repoze.bfg against a sandbox that has
+  pickled ``z3c.pt`` templates it will now just fail with an
+  unpickling error, but can be fixed by deleting the template cache
+  files.
+
 - Added a ``post`` argument to the ``repoze.bfg.testing:DummyRequest``
   constructor.
   

@@ -311,7 +311,7 @@ class TestDummyModel(unittest.TestCase):
         self.assertEqual(clone.__parent__, 'parent2')
         self.assertEqual(clone.foo, 1)
 
-    def test_keys_items_values(self):
+    def test_keys_items_values_len(self):
         class Dummy:
             pass
         model = self._makeOne()
@@ -320,6 +320,11 @@ class TestDummyModel(unittest.TestCase):
         self.assertEqual(model.values(), model.subs.values())
         self.assertEqual(model.items(), model.subs.items())
         self.assertEqual(model.keys(), model.subs.keys())
+        self.assertEqual(len(model), 2)
+
+    def test_nonzero(self):
+        model = self._makeOne()
+        self.assertEqual(model.__nonzero__(), True)
 
 class TestDummyRequest(unittest.TestCase):
     def _getTargetClass(self):

@@ -75,6 +75,28 @@ class TestLocation(unittest.TestCase):
         result = list(lineage(o1))
         self.assertEqual(result, [o1])
 
+class TestClassAndInstanceDescr(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.location import ClassAndInstanceDescr
+        return ClassAndInstanceDescr
+
+    def _makeOne(self, *arg):
+        return self._getTargetClass()(*arg)
+
+    def test__get__noinst(self):
+        def f(ob):
+            return ob
+        ob = self._makeOne(f, f)
+        result = ob.__get__(None, 1)
+        self.assertEqual(result, 1)
+    
+    def test__get__withinst(self):
+        def f(ob):
+            return ob
+        ob = self._makeOne(f, f)
+        result = ob.__get__(1, 2)
+        self.assertEqual(result, 1)
+
 from repoze.bfg.interfaces import ILocation
 from zope.interface import implements
 class Location(object):

@@ -343,6 +343,13 @@ class TestRemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         result = policy.authenticated_userid(request)
         self.assertEqual(result, 'fred')
 
+    def test_authenticated_userid_no_remote_user(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        policy = self._makeOne()
+        result = policy.authenticated_userid(request)
+        self.assertEqual(result, None)
+
     def test_effective_principals(self):
         context = DummyContext()
         request = DummyRequest({'REMOTE_USER':'fred'})
@@ -352,6 +359,13 @@ class TestRemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.security import Authenticated
         self.assertEqual(result, [Everyone, Authenticated, 'fred'])
 
+    def test_effective_principals_no_remote_user(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        policy = self._makeOne()
+        result = policy.effective_principals(request)
+        from repoze.bfg.security import Everyone
+        self.assertEqual(result, [Everyone])
 
 class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def _getTargetClass(self):
@@ -381,6 +395,13 @@ class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         result = policy.authenticated_userid(request)
         self.assertEqual(result, 'fred')
 
+    def test_authenticated_userid_no_who_ident(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        policy = self._makeOne()
+        result = policy.authenticated_userid(request)
+        self.assertEqual(result, None)
+
     def test_effective_principals(self):
         context = DummyContext()
         identity = {'repoze.who.identity':{'repoze.who.userid':'fred'}}
@@ -391,6 +412,13 @@ class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.security import Authenticated
         self.assertEqual(result, [Everyone, Authenticated, 'fred'])
 
+    def test_effective_principals_no_who_ident(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        policy = self._makeOne()
+        result = policy.effective_principals(request)
+        from repoze.bfg.security import Everyone
+        self.assertEqual(result, [Everyone])
 
 class TestAPIFunctions(unittest.TestCase, PlacelessSetup):
     def setUp(self):
@@ -471,6 +499,16 @@ class TestViewPermission(unittest.TestCase):
         result = permission(secpol)
         self.assertEqual(result, True)
         self.assertEqual(secpol.checked, (context, request, 'repoze.view'))
+
+    def test_repr(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        request.view_name = 'viewname'
+        secpol = DummySecurityPolicy(True)
+        permission = self._makeOne(context, request, 'repoze.view')
+        result = repr(permission)
+        self.failUnless(result.startswith('<Permission at '))
+        self.failUnless(result.endswith(" named 'repoze.view' for 'viewname'>"))
 
 class TestViewPermissionFactory(unittest.TestCase):
     def _getTargetClass(self):

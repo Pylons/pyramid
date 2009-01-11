@@ -1,5 +1,3 @@
-import os
-
 from webob import Response
 
 from zope.component import queryUtility
@@ -21,18 +19,7 @@ class ZPTTemplateRenderer(object):
     implements(ITemplateRenderer)
 
     def __init__(self, path, auto_reload=False):
-        try:
-            self.template = PageTemplateFile(path, auto_reload=auto_reload)
-        except ImportError, why:
-            why = str(why)
-            if 'z3c.pt' in why:
-                # unpickling error due to move from z3c.pt -> chameleon
-                cachefile = '%s.cache' % path
-                if os.path.isfile(cachefile):
-                    os.remove(cachefile)
-                self.template = PageTemplateFile(path, auto_reload=auto_reload)
-            else:
-                raise
+        self.template = PageTemplateFile(path, auto_reload=auto_reload)
 
     def implementation(self):
         return self.template
