@@ -1,5 +1,4 @@
-from repoze.bfg.router import make_app as bfg_make_app
-from repoze.bfg.registry import get_options
+from repoze.bfg.router import make_app
 from repoze.zodbconn.finder import PersistentApplicationFinder
 
 def app(global_config, **kw):
@@ -15,4 +14,4 @@ def app(global_config, **kw):
         raise ValueError("No 'zodb_uri' in application configuration.")
 
     get_root = PersistentApplicationFinder(zodb_uri, appmaker)
-    return bfg_make_app(get_root, {{package}}, options=get_options(kw))
+    return make_app(get_root, {{package}}, options=kw)

@@ -1,5 +1,4 @@
 from repoze.bfg.router import make_app
-from repoze.bfg.registry import get_options
 
 def app(global_config, **kw):
     """ This function returns a repoze.bfg.router.Router object.  It
@@ -8,6 +7,5 @@ def app(global_config, **kw):
     # paster app config callback
     from {{package}}.models import get_root
     import {{package}}
-    options = get_options(kw)
-    return make_app(get_root, {{package}}, options=options)
+    return make_app(get_root, {{package}}, options=kw)
 
