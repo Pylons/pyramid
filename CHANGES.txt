@@ -19,7 +19,8 @@ Features
   ``ISettings`` utility from within BFG.
 
 - Renamed the existing BFG paster template to ``bfg_starter``.  Added
-  another template showing default ZODB setup using ``repoze.zodbconn``.
+  another template (``bfg_zodb``) showing default ZODB setup using
+  ``repoze.zodbconn``.
 
 - Add a method named ``assert_`` to the DummyTemplateRenderer.  This
   method accepts keyword arguments.  Each key/value pair in the
