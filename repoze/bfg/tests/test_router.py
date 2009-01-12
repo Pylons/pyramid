@@ -440,6 +440,60 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self.assertEqual(request_events[0].request.environ, environ)
         self.assertEqual(len(response_events), 1)
         self.assertEqual(response_events[0].response, response)
+
+    def test_call_post_method(self):
+        from repoze.bfg.interfaces import INewRequest
+        from repoze.bfg.interfaces import IPOSTRequest
+        from repoze.bfg.interfaces import IPUTRequest
+        from repoze.bfg.interfaces import IRequest
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron(REQUEST_METHOD='POST')
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne(None)
+        start_response = DummyStartResponse()
+        request_events = []
+        def handle_request(event):
+            request_events.append(event)
+        self._registerEventListener(handle_request, INewRequest)
+        result = router(environ, start_response)
+        request = request_events[0].request
+        self.failUnless(IPOSTRequest.providedBy(request))
+        self.failIf(IPUTRequest.providedBy(request))
+        self.failUnless(IRequest.providedBy(request))
+
+    def test_call_put_method(self):
+        from repoze.bfg.interfaces import INewRequest
+        from repoze.bfg.interfaces import IPUTRequest
+        from repoze.bfg.interfaces import IPOSTRequest
+        from repoze.bfg.interfaces import IRequest
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron(REQUEST_METHOD='PUT')
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne(None)
+        start_response = DummyStartResponse()
+        request_events = []
+        def handle_request(event):
+            request_events.append(event)
+        self._registerEventListener(handle_request, INewRequest)
+        result = router(environ, start_response)
+        request = request_events[0].request
+        self.failUnless(IPUTRequest.providedBy(request))
+        self.failIf(IPOSTRequest.providedBy(request))
+        self.failUnless(IRequest.providedBy(request))
     
 class MakeAppTests(unittest.TestCase, PlacelessSetup):
     def setUp(self):

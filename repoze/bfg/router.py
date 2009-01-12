@@ -7,6 +7,7 @@ from zope.component import queryUtility
 from zope.component.event import dispatch
 
 from zope.interface import directlyProvides
+from zope.interface import alsoProvides
 from zope.interface import implements
 
 from webob import Request
@@ -20,6 +21,8 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import HTTP_METHOD_INTERFACES
+
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import ISettings
@@ -52,9 +55,13 @@ class Router(object):
 
         try:
             request = Request(environ)
-            directlyProvides(request, IRequest)
-            dispatch(NewRequest(request))
 
+            directlyProvides(request, IRequest)
+            also = HTTP_METHOD_INTERFACES.get(request.method)
+            if also is not None:
+                alsoProvides(request, also)
+
+            dispatch(NewRequest(request))
             root_factory = getUtility(IRootFactory)
             root = root_factory(environ)
             traverser = getAdapter(root, ITraverserFactory)

@@ -40,6 +40,22 @@ Features
   of registries in order to make it possible to call one BFG
   application from inside another.
 
+- An interface specific to the HTTP verb (GET/PUT/POST/DELETE/HEAD) is
+  attached to each request object on ingress.  The HTTP-verb-related
+  interfaces are defined in ``repoze.bfg.interfaces`` and are
+  ``IGETRequest``, ``IPOSTRequest``, ``IPUTRequest``,
+  ``IDELETERequest`` and ``IHEADRequest``.  These interfaces can be
+  specified as the ``request_type`` attribute of a bfg view
+  declaration.  A view naming a specific HTTP-verb-matching interface
+  will be found only if the view is defined with a request_type that
+  matches the HTTP verb in the incoming request.  The more general
+  ``IRequest`` interface can be used as the request_type to catch all
+  requests (and this is indeed the default).  All requests implement
+  ``IRequest``. The HTTP-verb-matching idea was pioneered by
+  `repoze.bfg.restrequest
+  <http://pypi.python.org/pypi/repoze.bfg.restrequest/1.0.1>`_ . That
+  package is no longer required, but still functions fine.
+
 Bug Fixes
 ---------
 

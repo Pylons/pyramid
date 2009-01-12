@@ -264,13 +264,52 @@ View Request Types
 
 You can optionally add a *request_type* attribute to your ``view``
 declaration, which indicates what "kind" of request the view should be
-used for.  For example:
+used for.  If the request type for a request doesn't match the request
+type that a view defines as its ``request_type`` argument, that view
+won't be called.
+
+For example:
 
 .. code-block:: xml
    :linenos:
 
    <view
-       for=".models.IHello"
+       for=".models.Hello"
+       view=".views.handle_post"
+       name="handle_post"
+       request_type="repoze.bfg.interfaces.IPOSTRequest"
+       />
+
+The above example registers a view for the ``IPOSTRequest`` type, so
+it will only be called if the request is a POST request.  Even if all
+the other specifiers match (e.g. the model type is the class
+``.models.Hello``, and the view_name is ``handle_post``), if the
+request verb is not POST, it will not be invoked.  This provides a way
+to ensure that views you write are only called via specific HTTP
+verbs.
+
+The least specific request type is ``repoze.bfg.interfaces.IRequest``.
+All requests are guaranteed to implement this request type.  It is
+also the default request type for views that omit a ``request_type``
+argument.
+
+:mod:`repoze.bfg` also makes available more specific request types
+matching HTTP verbs.  When these are specified as a ``request_type``
+for a view, the view will be called only when the request has an HTTP
+verb (aka HTTP method) matching the request type.  See
+:ref:`interfaces_module` for more information about available request
+types.
+
+Custom View Request Types
+-------------------------
+
+You can make use of *custom* view request types.  For example:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       for=".models.Hello"
        view=".views.hello_json"
        name="hello.json"
        request_type=".interfaces.IJSONRequest"

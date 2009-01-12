@@ -29,7 +29,22 @@ deprecated(
     )
 
 class IRequest(Interface):
-    """ Marker interface for a request object """
+    """ Request type interface attached to all request objects """
+
+class IPOSTRequest(IRequest):
+    """ Request type interface attached to POST requests"""
+
+class IGETRequest(IRequest):
+    """ Request type interface attached to GET requests"""
+
+class IPUTRequest(IRequest):
+    """ Request type interface attached to PUT requests"""
+
+class IDELETERequest(IRequest):
+    """ Request type interface attached to DELETE requests"""
+
+class IHEADRequest(IRequest):
+    """ Request type interface attached to HEAD requests"""
     
 class IResponse(Interface):
     status = Attribute('WSGI status code of response')
@@ -149,3 +164,11 @@ class ILocation(Interface):
 class ILogger(Interface):
     """ Interface representing a PEP 282 logger """
 
+HTTP_METHOD_INTERFACES = {
+    'GET':IGETRequest,
+    'POST':IPOSTRequest,
+    'PUT':IPUTRequest,
+    'DELETE':IDELETERequest,
+    'HEAD':IHEADRequest,
+    }
+    
