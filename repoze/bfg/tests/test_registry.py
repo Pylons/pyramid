@@ -49,16 +49,28 @@ class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
     def test_init(self):
         local = self._makeOne()
         from zope.component import getGlobalSiteManager
-        self.assertEqual(local.registry, getGlobalSiteManager())
+        self.assertEqual(local.stack, [])
+        self.assertEqual(local.get(), getGlobalSiteManager())
+
+    def test_push_and_pop(self):
+        local = self._makeOne()
+        from zope.component import getGlobalSiteManager
+        local.push(True)
+        self.assertEqual(local.get(), True)
+        self.assertEqual(local.pop(), True)
+        self.assertEqual(local.pop(), None)
+        self.assertEqual(local.get(), getGlobalSiteManager())
 
     def test_set_get_and_clear(self):
         local = self._makeOne()
         from zope.component import getGlobalSiteManager
         local.set(None)
-        self.failIfEqual(local.registry, getGlobalSiteManager())
+        self.assertEqual(local.stack, [None])
         self.assertEqual(local.get(), None)
         local.clear()
-        self.assertEqual(local.registry, getGlobalSiteManager())
+        self.assertEqual(local.get(), getGlobalSiteManager())
+        local.clear()
+        self.assertEqual(local.get(), getGlobalSiteManager())
 
 class GetSiteManagerTests(unittest.TestCase):
     def _getFUT(self):
@@ -76,15 +88,14 @@ class GetSiteManagerTests(unittest.TestCase):
         self.assertRaises(ComponentLookupError, gsm, object)
         
 class DummyRegistrationManager:
-    registry = None
-    def set(self, registry):
+    def push(self, registry):
         self.registry = registry
+
+    def pop(self):
+        self.popped = True
 
     def get(self):
         return self.registry
-
-    def clear(self):
-        self.cleared = True
 
 class DummyLock:
     def acquire(self):

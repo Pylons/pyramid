@@ -48,62 +48,69 @@ class Router(object):
         'view' code based on registrations within the application
         registry; call ``start_response`` and return an iterable.
         """
-        registry_manager.set(self.registry)
-        request = Request(environ)
-        directlyProvides(request, IRequest)
-        dispatch(NewRequest(request))
+        registry_manager.push(self.registry)
 
-        root_factory = getUtility(IRootFactory)
-        root = root_factory(environ)
-        traverser = getAdapter(root, ITraverserFactory)
-        context, view_name, subpath = traverser(environ)
+        try:
+            request = Request(environ)
+            directlyProvides(request, IRequest)
+            dispatch(NewRequest(request))
 
-        request.root = root
-        request.context = context
-        request.view_name = view_name
-        request.subpath = subpath
+            root_factory = getUtility(IRootFactory)
+            root = root_factory(environ)
+            traverser = getAdapter(root, ITraverserFactory)
+            context, view_name, subpath = traverser(environ)
 
-        permitted = view_execution_permitted(context, request, view_name)
+            request.root = root
+            request.context = context
+            request.view_name = view_name
+            request.subpath = subpath
 
-        settings = queryUtility(ISettings)
-        debug_authorization = settings and settings.debug_authorization
+            permitted = view_execution_permitted(context, request, view_name)
 
-        if debug_authorization:
-            logger = queryUtility(ILogger, 'repoze.bfg.debug')
-            logger and logger.debug(
-                'debug_authorization of url %s (view name %r against context '
-                '%r): %s' % (request.url, view_name, context, permitted.msg)
-                )
-        if not permitted:
+            settings = queryUtility(ISettings)
+            debug_authorization = settings and settings.debug_authorization
+
             if debug_authorization:
-                msg = permitted.msg
-            else:
-                msg = 'Unauthorized: failed security policy check'
-            app = HTTPUnauthorized(escape(msg))
-            return app(environ, start_response)
-            
-        response = render_view_to_response(context, request, view_name,
-                                           secure=False)
-
-        if response is None:
-            debug_notfound = settings and settings.debug_notfound
-            if debug_notfound:
                 logger = queryUtility(ILogger, 'repoze.bfg.debug')
-                msg = (
-                    'debug_notfound of url %s; path_info: %r, context: %r, '
-                    'view_name: %r, subpath: %r' % (
-                    request.url, request.path_info, context, view_name, subpath)
+                logger and logger.debug(
+                    'debug_authorization of url %s (view name %r against '
+                    'context %r): %s' % (
+                    request.url, view_name, context, permitted.msg)
                     )
-                logger and logger.debug(msg)
-            else:
-                msg = request.url
-            app = HTTPNotFound(escape(msg))
-            return app(environ, start_response)
+            if not permitted:
+                if debug_authorization:
+                    msg = permitted.msg
+                else:
+                    msg = 'Unauthorized: failed security policy check'
+                app = HTTPUnauthorized(escape(msg))
+                return app(environ, start_response)
 
-        dispatch(NewResponse(response))
+            response = render_view_to_response(context, request, view_name,
+                                               secure=False)
 
-        start_response(response.status, response.headerlist)
-        return response.app_iter
+            if response is None:
+                debug_notfound = settings and settings.debug_notfound
+                if debug_notfound:
+                    logger = queryUtility(ILogger, 'repoze.bfg.debug')
+                    msg = (
+                        'debug_notfound of url %s; path_info: %r, context: %r, '
+                        'view_name: %r, subpath: %r' % (
+                        request.url, request.path_info, context, view_name,
+                        subpath)
+                        )
+                    logger and logger.debug(msg)
+                else:
+                    msg = request.url
+                app = HTTPNotFound(escape(msg))
+                return app(environ, start_response)
+
+            dispatch(NewResponse(response))
+
+            start_response(response.status, response.headerlist)
+            return response.app_iter
+
+        finally:
+            registry_manager.pop()
 
 def make_app(root_factory, package=None, filename='configure.zcml',
              options=None):
@@ -130,10 +137,10 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     app = Router(registry)
 
     try:
-        registry_manager.set(registry)
+        registry_manager.push(registry)
         dispatch(WSGIApplicationCreatedEvent(app))
     finally:
-        registry_manager.clear()
+        registry_manager.pop()
 
     return app
 

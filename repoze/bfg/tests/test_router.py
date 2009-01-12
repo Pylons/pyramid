@@ -483,7 +483,8 @@ class MakeAppTests(unittest.TestCase, PlacelessSetup):
                   'debug_authorization':True}
         import repoze.bfg.router
         old_registry_manager = repoze.bfg.router.registry_manager
-        repoze.bfg.router.registry_manager = DummyRegistryManager()
+        dummy_registry_manager = DummyRegistryManager()
+        repoze.bfg.router.registry_manager = dummy_registry_manager
         try:
             from repoze.bfg.tests import fixtureapp
             rootpolicy = make_rootfactory(None)
@@ -498,15 +499,17 @@ class MakeAppTests(unittest.TestCase, PlacelessSetup):
             self.assertEqual(settings.reload_templates, True)
             self.assertEqual(settings.debug_authorization, True)
             self.assertEqual(rootfactory, rootpolicy)
+            self.assertEqual(dummy_registry_manager.pushed, True)
+            self.assertEqual(dummy_registry_manager.popped, True)
         finally:
             repoze.bfg.router.registry_manager = old_registry_manager
 
 class DummyRegistryManager:
-    def set(self, registry):
-        pass
+    def push(self, registry):
+        self.pushed = True
 
-    def clear(self):
-        pass
+    def pop(self):
+        self.popped = True
 
 class DummyContext:
     pass

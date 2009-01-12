@@ -25,15 +25,26 @@ deprecated(
     )
 
 class ThreadLocalRegistryManager(threading.local):
-    registry = getGlobalSiteManager()
-    def set(self, registry):
-        self.registry = registry
+    def __init__(self):
+        self.stack = []
+        
+    def push(self, registry):
+        self.stack.append(registry)
+
+    set = push # backwards compatibility
+
+    def pop(self):
+        if self.stack:
+            return self.stack.pop()
 
     def get(self):
-        return self.registry
+        try:
+            return self.stack[-1]
+        except IndexError:
+            return getGlobalSiteManager()
 
     def clear(self):
-        self.registry = getGlobalSiteManager()
+        self.stack[:] = []
 
 registry_manager = ThreadLocalRegistryManager()
 
@@ -62,7 +73,7 @@ def makeRegistry(filename, package, lock=threading.Lock()):
     lock.acquire()
     try:
         registry = Components(package.__name__)
-        registry_manager.set(registry)
+        registry_manager.push(registry)
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
         zcml_configure(filename, package=package)
@@ -70,7 +81,7 @@ def makeRegistry(filename, package, lock=threading.Lock()):
     finally:
         zope.component.getGlobalSiteManager = getGlobalSiteManager
         lock.release()
-        registry_manager.clear()
+        registry_manager.pop()
 
 def getSiteManager(context=None):
     if context is None:
