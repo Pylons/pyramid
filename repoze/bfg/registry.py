@@ -71,9 +71,9 @@ def makeRegistry(filename, package, lock=threading.Lock()):
     registry."""
     
     lock.acquire()
+    registry = Components(package.__name__)
+    registry_manager.push(registry)
     try:
-        registry = Components(package.__name__)
-        registry_manager.push(registry)
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
         zcml_configure(filename, package=package)
