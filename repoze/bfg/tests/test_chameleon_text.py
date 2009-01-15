@@ -65,28 +65,26 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(result, 'Hello.\n')
 
 class RenderTemplateTests(Base, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, name, **kw):
         from repoze.bfg.chameleon_text import render_template
-        return render_template
+        return render_template(name, **kw)
 
     def test_it(self):
         self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.txt')
-        render = self._getFUT()
-        result = render(minimal)
+        result = self._callFUT(minimal)
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
 class RenderTemplateToResponseTests(Base, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, name, **kw):
         from repoze.bfg.chameleon_text import render_template_to_response
-        return render_template_to_response
+        return render_template_to_response(name, **kw)
 
     def test_minimal(self):
         self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.txt')
-        render = self._getFUT()
-        result = render(minimal)
+        result = self._callFUT(minimal)
         from webob import Response
         self.failUnless(isinstance(result, Response))
         self.assertEqual(result.app_iter, ['Hello.\n'])
@@ -102,14 +100,13 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         from repoze.bfg.interfaces import IResponseFactory
         gsm.registerUtility(Response2, IResponseFactory)
         minimal = self._getTemplatePath('minimal.txt')
-        render = self._getFUT()
-        result = render(minimal)
+        result = self._callFUT(minimal)
         self.failUnless(isinstance(result, Response2))
 
 class GetRendererTests(Base, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, name):
         from repoze.bfg.chameleon_text import get_renderer
-        return get_renderer
+        return get_renderer(name)
 
     def test_nonabs_registered(self):
         from zope.component import getGlobalSiteManager
@@ -120,8 +117,7 @@ class GetRendererTests(Base, unittest.TestCase):
         utility = TextTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
-        get = self._getFUT()
-        result = get(minimal)
+        result = self._callFUT(minimal)
         self.assertEqual(result, utility)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
         
@@ -135,8 +131,7 @@ class GetRendererTests(Base, unittest.TestCase):
         utility = TextTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
-        get = self._getFUT()
-        result = get(minimal)
+        result = self._callFUT(minimal)
         self.assertEqual(result, utility)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
 
@@ -148,8 +143,7 @@ class GetRendererTests(Base, unittest.TestCase):
         gsm = getGlobalSiteManager()
         utility = Dummy()
         gsm.registerUtility(utility, ITemplateRenderer, name='foo')
-        get = self._getFUT()
-        result = get('foo')
+        result = self._callFUT('foo')
         self.failUnless(result is utility)
 
 class GetTemplateTests(unittest.TestCase, Base):
@@ -159,9 +153,9 @@ class GetTemplateTests(unittest.TestCase, Base):
     def tearDown(self):
         Base.tearDown(self)
 
-    def _getFUT(self):
+    def _callFUT(self, name):
         from repoze.bfg.chameleon_text import get_template
-        return get_template
+        return get_template(name)
 
     def test_nonabs_registered(self):
         self._zcmlConfigure()
@@ -173,8 +167,7 @@ class GetTemplateTests(unittest.TestCase, Base):
         utility = TextTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
-        get = self._getFUT()
-        result = get(minimal)
+        result = self._callFUT(minimal)
         self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
         
@@ -189,8 +182,7 @@ class GetTemplateTests(unittest.TestCase, Base):
         utility = TextTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
-        get = self._getFUT()
-        result = get(minimal)
+        result = self._callFUT(minimal)
         self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
 
@@ -204,8 +196,7 @@ class GetTemplateTests(unittest.TestCase, Base):
         gsm = getGlobalSiteManager()
         utility = Dummy()
         gsm.registerUtility(utility, ITemplateRenderer, name='foo')
-        get = self._getFUT()
-        result = get('foo')
+        result = self._callFUT('foo')
         self.failUnless(result is utility.template)
         
         

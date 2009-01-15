@@ -59,27 +59,25 @@ class GenshiTemplateRendererTests(Base, unittest.TestCase):
                          '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
 class RenderTemplateTests(Base, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, name, **kw):
         from repoze.bfg.chameleon_genshi import render_template
-        return render_template
+        return render_template(name, **kw)
 
     def test_it(self):
         minimal = self._getTemplatePath('minimal.genshi')
-        render = self._getFUT()
-        result = render(minimal)
+        result = self._callFUT(minimal)
         self.failUnless(isinstance(result, str))
         self.assertEqual(result,
                       '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
 class RenderTemplateToResponseTests(Base, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, name, **kw):
         from repoze.bfg.chameleon_genshi import render_template_to_response
-        return render_template_to_response
+        return render_template_to_response(name, **kw)
 
     def test_it(self):
         minimal = self._getTemplatePath('minimal.genshi')
-        render = self._getFUT()
-        result = render(minimal)
+        result = self._callFUT(minimal)
         from webob import Response
         self.failUnless(isinstance(result, Response))
         self.assertEqual(result.app_iter,
@@ -96,14 +94,13 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         from repoze.bfg.interfaces import IResponseFactory
         gsm.registerUtility(Response2, IResponseFactory)
         minimal = self._getTemplatePath('minimal.genshi')
-        render = self._getFUT()
-        result = render(minimal)
+        result = self._callFUT(minimal)
         self.failUnless(isinstance(result, Response2))
 
 class GetRendererTests(Base, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, name):
         from repoze.bfg.chameleon_genshi import get_renderer
-        return get_renderer
+        return get_renderer(name)
 
     def test_nonabs_registered(self):
         from zope.component import getGlobalSiteManager
@@ -114,8 +111,7 @@ class GetRendererTests(Base, unittest.TestCase):
         utility = GenshiTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
-        get = self._getFUT()
-        result = get(minimal)
+        result = self._callFUT(minimal)
         self.assertEqual(result, utility)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
         
@@ -129,8 +125,7 @@ class GetRendererTests(Base, unittest.TestCase):
         utility = GenshiTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
-        get = self._getFUT()
-        result = get(minimal)
+        result = self._callFUT(minimal)
         self.assertEqual(result, utility)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
 
@@ -142,15 +137,14 @@ class GetRendererTests(Base, unittest.TestCase):
         gsm = getGlobalSiteManager()
         utility = Dummy()
         gsm.registerUtility(utility, ITemplateRenderer, name='foo')
-        get = self._getFUT()
-        result = get('foo')
+        result = self._callFUT('foo')
         self.failUnless(result is utility)
     
 
 class GetTemplateTests(Base, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, name):
         from repoze.bfg.chameleon_genshi import get_template
-        return get_template
+        return get_template(name)
 
     def test_nonabs_registered(self):
         from zope.component import getGlobalSiteManager
@@ -161,8 +155,7 @@ class GetTemplateTests(Base, unittest.TestCase):
         utility = GenshiTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
-        get = self._getFUT()
-        result = get(minimal)
+        result = self._callFUT(minimal)
         self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
         
@@ -176,8 +169,7 @@ class GetTemplateTests(Base, unittest.TestCase):
         utility = GenshiTemplateRenderer(minimal)
         gsm = getGlobalSiteManager()
         gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
-        get = self._getFUT()
-        result = get(minimal)
+        result = self._callFUT(minimal)
         self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
 
@@ -191,6 +183,5 @@ class GetTemplateTests(Base, unittest.TestCase):
         gsm = getGlobalSiteManager()
         utility = Dummy()
         gsm.registerUtility(utility, ITemplateRenderer, name='foo')
-        get = self._getFUT()
-        result = get('foo')
+        result = self._callFUT('foo')
         self.failUnless(result is utility.template)
