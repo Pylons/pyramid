@@ -112,3 +112,88 @@ for views that do "real work" given proper application implementation.
 The *hardware is cheap* mantra has its limits when you're responsible
 for managing a great many machines: the fewer you need, the less pain
 you'll have.
+
+It's Tested
+-----------
+
+*If it ain't tested, it's broke.* We strive to test :mod:`repoze.bfg`
+completely.  Below a run of the ``nosetests`` command configured to
+show code coverage information (run against the :mod:`repoze.bfg`
+trunk just before the 0.6.3 release).
+
+.. code-block:: bash
+
+  [chrism@vitaminf trunk]$ python setup.py nosetests
+  running nosetests
+  running egg_info
+  writing requirements to repoze.bfg.egg-info/requires.txt
+  writing repoze.bfg.egg-info/PKG-INFO
+  writing namespace_packages to repoze.bfg.egg-info/namespace_packages.txt
+  writing top-level names to repoze.bfg.egg-info/top_level.txt
+  writing dependency_links to repoze.bfg.egg-info/dependency_links.txt
+  writing entry points to repoze.bfg.egg-info/entry_points.txt
+  writing manifest file 'repoze.bfg.egg-info/SOURCES.txt'
+  running build_ext
+  ............................................................................
+  ............................................................................
+  ............................................................................
+  ........................................................................
+  Name                                     Stmts   Exec  Cover   Missing
+  ----------------------------------------------------------------------
+  repoze.bfg                                   1      1   100%   
+  repoze.bfg.chameleon_genshi                 44     44   100%   
+  repoze.bfg.chameleon_text                   48     48   100%   
+  repoze.bfg.chameleon_zpt                    44     44   100%   
+  repoze.bfg.events                           18     18   100%   
+  repoze.bfg.functional                       17     15    88%   99-100
+  repoze.bfg.includes                          0      0   100%   
+  repoze.bfg.interfaces                       64     64   100%   
+  repoze.bfg.location                         42     42   100%   
+  repoze.bfg.log                               9      9   100%   
+  repoze.bfg.path                             12     12   100%   
+  repoze.bfg.push                             14     14   100%   
+  repoze.bfg.registry                         57     55    96%   98-100
+  repoze.bfg.router                           95     95   100%   
+  repoze.bfg.security                        163    163   100%   
+  repoze.bfg.settings                         30     30   100%   
+  repoze.bfg.template                         10     10   100%   
+  repoze.bfg.templating                       17     17   100%   
+  repoze.bfg.testing                         204    204   100%   
+  repoze.bfg.tests                             0      0   100%   
+  repoze.bfg.tests.fixtureapp                  0      0   100%   
+  repoze.bfg.tests.fixtureapp.models           3      3   100%   
+  repoze.bfg.tests.fixtureapp.views            5      4    80%   4
+  repoze.bfg.tests.test_chameleon_genshi     157    157   100%   
+  repoze.bfg.tests.test_chameleon_text       172    172   100%   
+  repoze.bfg.tests.test_chameleon_zpt        161    161   100%   
+  repoze.bfg.tests.test_events                59     59   100%   
+  repoze.bfg.tests.test_location              83     83   100%   
+  repoze.bfg.tests.test_log                   11     11   100%   
+  repoze.bfg.tests.test_push                  29     29   100%   
+  repoze.bfg.tests.test_registry              79     79   100%   
+  repoze.bfg.tests.test_router               566    566   100%   
+  repoze.bfg.tests.test_security             550    550   100%   
+  repoze.bfg.tests.test_settings              98     98   100%   
+  repoze.bfg.tests.test_template              73     73   100%   
+  repoze.bfg.tests.test_templating            45     45   100%   
+  repoze.bfg.tests.test_testing              365    365   100%   
+  repoze.bfg.tests.test_traversal            324    324   100%   
+  repoze.bfg.tests.test_url                  112    112   100%   
+  repoze.bfg.tests.test_urldispatch           92     92   100%   
+  repoze.bfg.tests.test_view                 424    424   100%   
+  repoze.bfg.tests.test_wsgi                  58     58   100%   
+  repoze.bfg.tests.test_xslt                 191    191   100%   
+  repoze.bfg.tests.test_zcml                 393    393   100%   
+  repoze.bfg.traversal                        96     96   100%   
+  repoze.bfg.url                              65     65   100%   
+  repoze.bfg.urldispatch                      51     51   100%   
+  repoze.bfg.view                             64     64   100%   
+  repoze.bfg.wsgi                             24     24   100%   
+  repoze.bfg.xslt                             57     57   100%   
+  repoze.bfg.zcml                            112    108    96%   160-161, 197, 207
+  ----------------------------------------------------------------------
+  TOTAL                                     5408   5399    99%   
+  ----------------------------------------------------------------------
+  Ran 300 tests in 9.523s
+
+  OK
