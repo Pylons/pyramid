@@ -1,29 +1,28 @@
 import unittest
 
-from zope.component.testing import PlacelessSetup
+from zope.testing.cleanup import cleanUp
 
-class TestMakeRegistry(unittest.TestCase, PlacelessSetup):
+class TestMakeRegistry(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
-    def _getFUT(self):
+    def _callFUT(self, *arg, **kw):
         from repoze.bfg.registry import makeRegistry
-        return makeRegistry
+        return makeRegistry(*arg, **kw)
 
     def test_it(self):
         from repoze.bfg.tests import fixtureapp
-        makeRegistry = self._getFUT()
         dummylock = DummyLock()
         dummyregmgr = DummyRegistrationManager()
         import repoze.bfg.registry
         try:
             old = repoze.bfg.registry.setRegistryManager(dummyregmgr)
-            registry = makeRegistry('configure.zcml',
-                                    fixtureapp,
-                                    lock=dummylock)
+            registry = self._callFUT('configure.zcml',
+                                     fixtureapp,
+                                     lock=dummylock)
             from zope.component.registry import Components
             self.failUnless(isinstance(registry, Components))
             self.assertEqual(dummylock.acquired, True)
@@ -32,12 +31,12 @@ class TestMakeRegistry(unittest.TestCase, PlacelessSetup):
         finally:
             repoze.bfg.registry.setRegistryManager(old)
 
-class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
+class TestThreadLocalRegistryManager(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _getTargetClass(self):
         from repoze.bfg.registry import ThreadLocalRegistryManager
@@ -73,19 +72,17 @@ class TestThreadLocalRegistryManager(unittest.TestCase, PlacelessSetup):
         self.assertEqual(local.get(), getGlobalSiteManager())
 
 class GetSiteManagerTests(unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, context=None):
         from repoze.bfg.registry import getSiteManager
-        return getSiteManager
+        return getSiteManager(context)
 
     def test_no_context(self):
-        gsm = self._getFUT()
         from zope.component import getGlobalSiteManager
-        self.assertEqual(gsm(), getGlobalSiteManager())
+        self.assertEqual(self._callFUT(), getGlobalSiteManager())
     
     def test_with_context(self):
-        gsm = self._getFUT()
         from zope.component.interfaces import ComponentLookupError
-        self.assertRaises(ComponentLookupError, gsm, object)
+        self.assertRaises(ComponentLookupError, self._callFUT, object)
         
 class DummyRegistrationManager:
     def push(self, registry):
