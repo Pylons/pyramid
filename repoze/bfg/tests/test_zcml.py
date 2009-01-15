@@ -167,8 +167,9 @@ class TestViewDirective(unittest.TestCase):
             pass
 
         @zope.component.adapter(IFoo, IBar)
-        def aview(self, context, request):
+        def aview(context, request):
             pass
+        aview(None, None) # dead chicken for test coverage
 
         context = DummyContext()
         self._callFUT(context, view=aview)
@@ -202,8 +203,9 @@ class TestViewDirective(unittest.TestCase):
             pass
 
         @zope.component.adapter(IFoo) # too few arguments
-        def aview(self, context, request):
+        def aview(context, request):
             pass
+        aview(None, None) # dead chicken for test coverage
 
         context = DummyContext()
         self._callFUT(context, view=aview)
