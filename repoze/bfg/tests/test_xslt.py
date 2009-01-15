@@ -198,3 +198,24 @@ class RenderTransformTests(Base, unittest.TestCase):
         self.assertEqual(result, resultstr)
         self.assertEqual(queryUtility(INodeTemplateRenderer, minimal), utility)
 
+class TestGetProcessor(Base, unittest.TestCase):
+    def _callFUT(self, fn, auto_reload=False):
+        from repoze.bfg.xslt import get_processor
+        return get_processor(fn, auto_reload)
+
+    def test_no_processors(self):
+        from lxml.etree import XSLT
+        from repoze.bfg.xslt import xslt_pool
+        del xslt_pool.processors
+        path = self._getTemplatePath('minimal.xsl')
+        result = self._callFUT(path)
+        self.failUnless(isinstance(result, XSLT))
+        
+    def test_empty_processors(self):
+        from lxml.etree import XSLT
+        from repoze.bfg.xslt import xslt_pool
+        xslt_pool.processors = {}
+        path = self._getTemplatePath('minimal.xsl')
+        result = self._callFUT(path)
+        self.failUnless(isinstance(result, XSLT))
+    

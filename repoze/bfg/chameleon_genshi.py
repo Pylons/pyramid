@@ -73,4 +73,3 @@ def render_template_to_response(path, **kw):
     result = renderer(**kw)
     response_factory = queryUtility(IResponseFactory, default=Response)
     return response_factory(result)
-

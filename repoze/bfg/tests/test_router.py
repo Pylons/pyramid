@@ -93,6 +93,17 @@ class RouterTests(unittest.TestCase):
         environ.update(extras)
         return environ
 
+    def test_root_policy(self):
+        rootfactory = make_rootfactory(None)
+        environ = self._makeEnviron()
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(traversalfactory, '', None)
+        logger = self._registerLogger()
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne(None)
+        self.assertEqual(router.root_policy, rootfactory)
+
     def test_call_no_view_registered_no_isettings(self):
         rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()

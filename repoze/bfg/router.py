@@ -49,7 +49,7 @@ class Router(object):
     @property
     def root_policy(self):
         """  Backwards compatibility alias """
-        return self.registry.getUtility(IRootFactory)
+        return getUtility(IRootFactory)
 
     def __call__(self, environ, start_response):
         """
