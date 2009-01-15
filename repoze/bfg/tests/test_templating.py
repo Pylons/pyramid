@@ -53,7 +53,3 @@ class DummyFactory:
     def __init__(self, renderer):
         self.renderer = renderer
 
-    def __call__(self, path, **kw):
-        self.path = path
-        self.kw = kw
-        return self.renderer

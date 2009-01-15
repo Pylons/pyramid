@@ -133,14 +133,6 @@ class DummyContext(object):
     def __init__(self, next=None):
         self.next = next
         
-    def __getitem__(self, name):
-        if self.next is None:
-            raise KeyError, name
-        return self.next
-
 class DummyRequest:
     application_url = 'http://example.com:5432' # app_url never ends with slash
 
-class DummySettings:
-    def __init__(self, **kw):
-        self.__dict__.update(kw)

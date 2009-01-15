@@ -38,7 +38,7 @@ class BaseTest(object):
         environ.update(extras)
         return environ
 
-class RenderViewToResponseTests(unittest.TestCase, BaseTest):
+class RenderViewToResponseTests(BaseTest, unittest.TestCase):
     def _getFUT(self):
         from repoze.bfg.view import render_view_to_response
         return render_view_to_response
@@ -146,7 +146,7 @@ class RenderViewToResponseTests(unittest.TestCase, BaseTest):
                           name='registered', secure=False)
 
 
-class RenderViewToIterableTests(unittest.TestCase, BaseTest):
+class RenderViewToIterableTests(BaseTest, unittest.TestCase):
     def _getFUT(self):
         from repoze.bfg.view import render_view_to_iterable
         return render_view_to_iterable
@@ -505,16 +505,7 @@ def make_permission_factory(result):
             self.__class__.checked_with = secpol
             return result
 
-        def __repr__(self):
-            return 'permission'
     return DummyPermissionFactory
-
-def make_appcontext():
-    from zope.configuration.interfaces import IConfigurationContext
-    from zope.interface import directlyProvides
-    app_context = DummyContext()
-    directlyProvides(app_context, IConfigurationContext)
-    return app_context
 
 class DummyResponse:
     status = '200 OK'

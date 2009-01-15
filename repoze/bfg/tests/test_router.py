@@ -597,22 +597,6 @@ class DummyRegistryManager:
 class DummyContext:
     pass
 
-def make_wsgi_factory(status, headers, app_iter):
-    class DummyWSGIApplicationFactory:
-        def __init__(self, context, request, view):
-            self.context = context
-            self.request = request
-            self.view = view
-
-        def __call__(self, environ, start_response):
-            environ['context'] = self.context
-            environ['request'] = self.request
-            environ['view'] = self.view
-            start_response(status, headers)
-            return app_iter
-
-    return DummyWSGIApplicationFactory
-
 def make_view(response):
     def view(context, request):
         return response
@@ -637,8 +621,6 @@ def make_permission_factory(result):
             self.__class__.checked_with = secpol
             return result
 
-        def __repr__(self):
-            return 'permission'
     return DummyPermissionFactory
 
 def make_rootfactory(root):

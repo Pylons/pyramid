@@ -23,8 +23,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         class IFoo:
             pass
-        def view(context, request):
-            pass
+        view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
         from repoze.bfg.interfaces import IRequest
@@ -63,8 +62,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         class IFoo:
             pass
-        def view(context, request):
-            pass
+        view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IFoo, view=view,
                       request_type=IDummy)
         actions = context.actions
@@ -103,8 +101,7 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         context = DummyContext()
         class IFoo:
             pass
-        def view(context, request):
-            pass
+        view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IFoo, view=view,
                       request_type=IDummy, cacheable=False)
         actions = context.actions
@@ -136,9 +133,6 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
 
         class AView(object):
             zope.component.adapts(IFoo, IBar)
-            
-            def __call__(self, context, request):
-                pass
 
         aview = AView()
 
@@ -331,7 +325,7 @@ class TestZCMLPickling(unittest.TestCase, PlacelessSetup):
     def test_file_configure_pickling_error(self):
         import os
         from repoze.bfg.zcml import file_configure
-        def dumpfail(actions, f):
+        def dumpfail(actions, f, num):
             raise IOError
         self.assertEqual(False,
                       file_configure('configure.zcml', self.module, dumpfail))
@@ -467,12 +461,6 @@ class DummyContext:
     def __init__(self):
         self.actions = []
         self.info = None
-
-    def path(self, name):
-        import os
-        here = os.path.dirname(__file__)
-        fixtures = os.path.join(here, 'fixtures')
-        return os.path.join(fixtures, name)
 
     def action(self, discriminator, callable, args):
         self.actions.append(
