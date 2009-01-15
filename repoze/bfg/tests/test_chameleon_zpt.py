@@ -142,8 +142,6 @@ class GetRendererTests(Base, unittest.TestCase):
         from repoze.bfg.interfaces import ITemplateRenderer
         class Dummy:
             template = object()
-            def implementation(self):
-                return self.template
         gsm = getGlobalSiteManager()
         utility = Dummy()
         gsm.registerUtility(utility, ITemplateRenderer, name='foo')
