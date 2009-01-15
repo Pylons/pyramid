@@ -30,7 +30,7 @@ deprecated(
 
 class IRequestFactory(Interface):
     """ A utility which generates a request factory """
-    def __call__(self):
+    def __call__(environ):
         """ Return a request factory (e.g. a callable that accepts an
         environ and returns an object implementing IRequest,
         e.g. ``webob.Request``)"""
@@ -55,7 +55,7 @@ class IHEADRequest(IRequest):
     
 class IResponseFactory(Interface):
     """ A utility which generates a response factory """
-    def __call__(self):
+    def __call__(*arg, **kw):
         """ Return a response factory (e.g. a callable that returns an
         object implementing IResponse, e.g. ``webob.Response``; it
         should accept all the arguments that the webob.Response class
