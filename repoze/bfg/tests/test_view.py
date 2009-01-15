@@ -468,6 +468,22 @@ class TestStaticView(unittest.TestCase, BaseTest):
         filedata = open(os.path.join(static_dir, '__init__.py')).read()
         self.assertEqual(result, filedata)
 
+    def test_it_with_alternate_iresponsefactory(self):
+        view = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        from repoze.bfg.interfaces import IResponseFactory
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
+        from webob import Response
+        class Response2(Response):
+            pass
+        gsm.registerUtility(Response2, IResponseFactory)
+        response = view(context, request)
+        self.failUnless(isinstance(response, Response2))
+
 class DummyContext:
     pass
 

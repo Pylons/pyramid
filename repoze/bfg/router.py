@@ -21,6 +21,7 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IRequestFactory
 from repoze.bfg.interfaces import HTTP_METHOD_INTERFACES
 
 from repoze.bfg.interfaces import IRouter
@@ -45,6 +46,11 @@ class Router(object):
     def __init__(self, registry):
         self.registry = registry
 
+    @property
+    def root_policy(self):
+        """  Backwards compatibility alias """
+        return self.registry.getUtility(IRootFactory)
+
     def __call__(self, environ, start_response):
         """
         Accept ``environ`` and ``start_response``; route requests to
@@ -54,7 +60,8 @@ class Router(object):
         registry_manager.push(self.registry)
 
         try:
-            request = Request(environ)
+            request_factory = queryUtility(IRequestFactory, default=Request)
+            request = request_factory(environ)
 
             directlyProvides(request, IRequest)
             also = HTTP_METHOD_INTERFACES.get(request.method)

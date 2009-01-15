@@ -20,13 +20,7 @@ class Base:
         here = os.path.abspath(os.path.dirname(__file__))
         return os.path.join(here, 'fixtures', name)
         
-class TextTemplateRendererTests(unittest.TestCase, Base):
-    def setUp(self):
-        Base.setUp(self)
-
-    def tearDown(self):
-        Base.tearDown(self)
-
+class TextTemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         return TextTemplateRenderer
@@ -70,13 +64,7 @@ class TextTemplateRendererTests(unittest.TestCase, Base):
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
-class RenderTemplateTests(unittest.TestCase, Base):
-    def setUp(self):
-        Base.setUp(self)
-
-    def tearDown(self):
-        Base.tearDown(self)
-
+class RenderTemplateTests(Base, unittest.TestCase):
     def _getFUT(self):
         from repoze.bfg.chameleon_text import render_template
         return render_template
@@ -89,13 +77,7 @@ class RenderTemplateTests(unittest.TestCase, Base):
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
-class RenderTemplateToResponseTests(unittest.TestCase, Base):
-    def setUp(self):
-        Base.setUp(self)
-
-    def tearDown(self):
-        Base.tearDown(self)
-
+class RenderTemplateToResponseTests(Base, unittest.TestCase):
     def _getFUT(self):
         from repoze.bfg.chameleon_text import render_template_to_response
         return render_template_to_response
@@ -111,13 +93,20 @@ class RenderTemplateToResponseTests(unittest.TestCase, Base):
         self.assertEqual(result.status, '200 OK')
         self.assertEqual(len(result.headerlist), 2)
 
-class GetRendererTests(unittest.TestCase, Base):
-    def setUp(self):
-        Base.setUp(self)
+    def test_iresponsefactory_override(self):
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
+        from webob import Response
+        class Response2(Response):
+            pass
+        from repoze.bfg.interfaces import IResponseFactory
+        gsm.registerUtility(Response2, IResponseFactory)
+        minimal = self._getTemplatePath('minimal.txt')
+        render = self._getFUT()
+        result = render(minimal)
+        self.failUnless(isinstance(result, Response2))
 
-    def tearDown(self):
-        Base.tearDown(self)
-
+class GetRendererTests(Base, unittest.TestCase):
     def _getFUT(self):
         from repoze.bfg.chameleon_text import get_renderer
         return get_renderer

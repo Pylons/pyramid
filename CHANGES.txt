@@ -1,3 +1,15 @@
+After 0.6.2
+===========
+
+Features
+--------
+
+- Instead of invariably using ``webob.Request`` as the "request
+  factory" (e.g. in the ``Router`` class) and ``webob.Response`` and
+  the "response factory" (e.g. in ``render_template_to_response``),
+  allow both to be overridden via a ZCML utility hook.  See the "Using
+  ZCML Hooks" chapter of the documentation for more information.
+
 0.6.2 (2009-01-13)
 ==================
 

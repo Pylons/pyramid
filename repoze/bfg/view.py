@@ -4,6 +4,7 @@ from webob import Response
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
+from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
@@ -154,7 +155,8 @@ class static(object):
         ecopy['SCRIPT_NAME'] = ''
         body = self.app(ecopy, catch_start_response)
         status, headers, exc_info = caught
-        response = Response()
+        response_factory = queryUtility(IResponseFactory, default=Response)
+        response = response_factory()
         response.app_iter = body
         response.status = status
         response.headerlist = headers

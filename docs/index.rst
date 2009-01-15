@@ -36,6 +36,7 @@ Narrative documentation in chapter form explaining how to use
    narr/events
    narr/environment
    narr/unittesting
+   narr/hooks
    glossary
 
 API documentation

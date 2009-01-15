@@ -1,17 +1,15 @@
 import unittest
 
-from zope.component.testing import PlacelessSetup
+from zope.testing.cleanup import cleanUp
 
-class RouterTests(unittest.TestCase, PlacelessSetup):
+class RouterTests(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _registerLogger(self):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import ILogger
         class Logger:
             def __init__(self):
@@ -20,12 +18,12 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
                 self.messages.append(msg)
             debug = info
         logger = Logger()
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
         gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
         return logger
 
     def _registerSettings(self, **kw):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import ISettings
         class Settings:
             def __init__(self, **kw):
@@ -34,41 +32,47 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         defaultkw = {'debug_authorization':False, 'debug_notfound':False}
         defaultkw.update(kw)
         settings = Settings(**defaultkw)
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
         gsm.registerUtility(settings, ISettings)
 
     def _registerTraverserFactory(self, app, name, *for_):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import ITraverserFactory
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
         gsm.registerAdapter(app, for_, ITraverserFactory, name)
 
     def _registerView(self, app, name, *for_):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import IView
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
         gsm.registerAdapter(app, for_, IView, name)
 
     def _registerPermission(self, permission, name, *for_):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import IViewPermission
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
         gsm.registerAdapter(permission, for_, IViewPermission, name)
 
     def _registerSecurityPolicy(self, secpol):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import ISecurityPolicy
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
         gsm.registerUtility(secpol, ISecurityPolicy)
 
-    def _registerEventListener(self, listener, iface):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
+    def _registerEventListener(self, iface):
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
+        L = []
+        def listener(event):
+            L.append(event)
         gsm.registerHandler(listener, (iface,))
+        return L
 
     def _registerRootFactory(self, root_factory):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import IRootFactory
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
         gsm.registerUtility(root_factory, IRootFactory)
 
     def _getTargetClass(self):
@@ -424,14 +428,8 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerView(view, '', None, None)
         from repoze.bfg.interfaces import INewRequest
         from repoze.bfg.interfaces import INewResponse
-        request_events = []
-        response_events = []
-        def handle_request(event):
-            request_events.append(event)
-        def handle_response(event):
-            response_events.append(event)
-        self._registerEventListener(handle_request, INewRequest)
-        self._registerEventListener(handle_response, INewResponse)
+        request_events = self._registerEventListener(INewRequest)
+        response_events = self._registerEventListener(INewResponse)
         self._registerRootFactory(rootfactory)
         router = self._makeOne(None)
         start_response = DummyStartResponse()
@@ -458,10 +456,7 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerRootFactory(rootfactory)
         router = self._makeOne(None)
         start_response = DummyStartResponse()
-        request_events = []
-        def handle_request(event):
-            request_events.append(event)
-        self._registerEventListener(handle_request, INewRequest)
+        request_events = self._registerEventListener(INewRequest)
         result = router(environ, start_response)
         request = request_events[0].request
         self.failUnless(IPOSTRequest.providedBy(request))
@@ -485,22 +480,45 @@ class RouterTests(unittest.TestCase, PlacelessSetup):
         self._registerRootFactory(rootfactory)
         router = self._makeOne(None)
         start_response = DummyStartResponse()
-        request_events = []
-        def handle_request(event):
-            request_events.append(event)
-        self._registerEventListener(handle_request, INewRequest)
+        request_events = self._registerEventListener(INewRequest)
         result = router(environ, start_response)
         request = request_events[0].request
         self.failUnless(IPUTRequest.providedBy(request))
         self.failIf(IPOSTRequest.providedBy(request))
         self.failUnless(IRequest.providedBy(request))
+
+    def test_call_irequestfactory_override(self):
+        from repoze.bfg.interfaces import INewRequest
+        from repoze.bfg.interfaces import IRequestFactory
+        from webob import Request
+        class Request2(Request):
+            pass
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(Request2, IRequestFactory)
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne(None)
+        start_response = DummyStartResponse()
+        request_events = self._registerEventListener(INewRequest)
+        result = router(environ, start_response)
+        request = request_events[0].request
+        self.failUnless(isinstance(request, Request2))
     
-class MakeAppTests(unittest.TestCase, PlacelessSetup):
+class MakeAppTests(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.router import make_app

@@ -137,6 +137,28 @@ class RenderTransformToResponseTests(Base, unittest.TestCase):
         self.assertEqual(len(result.headerlist), 2)
         self.assertEqual(queryUtility(INodeTemplateRenderer, minimal), utility)
 
+    def test_alternate_iresponse_factory(self):
+        self._zcmlConfigure()
+        from repoze.bfg.interfaces import IResponseFactory
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
+        from webob import Response
+        class Response2(Response):
+            pass
+        gsm.registerUtility(Response2, IResponseFactory)
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.xslt import XSLTemplateRenderer
+        from repoze.bfg.interfaces import INodeTemplateRenderer
+        minimal = self._getTemplatePath('minimal.xsl')
+        utility = XSLTemplateRenderer(minimal)
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(utility, INodeTemplateRenderer, name=minimal)
+        from lxml import etree
+        info = etree.Element("info")
+        result = self._callFUT(minimal, node=info)
+        self.failUnless(isinstance(result, Response2))
+
+
 class RenderTransformTests(Base, unittest.TestCase):
     def _callFUT(self, path, node):
         from repoze.bfg.xslt import render_transform

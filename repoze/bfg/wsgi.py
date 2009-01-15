@@ -1,3 +1,7 @@
+from zope.component import queryUtility
+
+from repoze.bfg.interfaces import IResponseFactory
+
 from webob import Response
 try:
     from functools import wraps
@@ -37,7 +41,8 @@ def wsgiapp(wrapped):
         body = wrapped(environ, catch_start_response)
         if caught: 
             status, headers, exc_info = caught
-            response = Response()
+            response_factory = queryUtility(IResponseFactory, default=Response)
+            response = response_factory()
             response.app_iter = body
             response.status = status
             response.headerlist = headers

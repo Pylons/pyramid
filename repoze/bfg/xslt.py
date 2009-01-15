@@ -12,6 +12,7 @@ from zope.interface import implements
 from repoze.bfg.path import caller_path
 
 from repoze.bfg.interfaces import INodeTemplateRenderer
+from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRendererFactory
 
 def get_transform(path, node):
@@ -46,7 +47,8 @@ def render_transform_to_response(path, node, **kw):
     the lxml node at ``node`` and return a Response object."""
     path = caller_path(path)
     result = render_transform(path, node, **kw)
-    return Response(result)
+    response_factory = queryUtility(IResponseFactory, default=Response)
+    return response_factory(result)
 
 class XSLTemplateRenderer(object):
     classProvides(ITemplateRendererFactory)

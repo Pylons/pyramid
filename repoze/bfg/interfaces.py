@@ -28,6 +28,13 @@ deprecated(
     IRootPolicy = "repoze.bfg.interfaces:IRootFactory",
     )
 
+class IRequestFactory(Interface):
+    """ A utility which generates a request factory """
+    def __call__(self):
+        """ Return a request factory (e.g. a callable that accepts an
+        environ and returns an object implementing IRequest,
+        e.g. ``webob.Request``)"""
+
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
@@ -46,6 +53,14 @@ class IDELETERequest(IRequest):
 class IHEADRequest(IRequest):
     """ Request type interface attached to HEAD requests"""
     
+class IResponseFactory(Interface):
+    """ A utility which generates a response factory """
+    def __call__(self):
+        """ Return a response factory (e.g. a callable that returns an
+        object implementing IResponse, e.g. ``webob.Response``; it
+        should accept all the arguments that the webob.Response class
+        accepts)"""
+
 class IResponse(Interface):
     status = Attribute('WSGI status code of response')
     headerlist = Attribute('List of response headers')

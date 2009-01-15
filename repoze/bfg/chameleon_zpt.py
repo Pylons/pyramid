@@ -6,6 +6,7 @@ from zope.interface import classProvides
 from zope.interface import implements
 from zope.deprecation import deprecated
 
+from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
 from repoze.bfg.interfaces import ITemplateRendererFactory
 from repoze.bfg.interfaces import ISettings
@@ -72,5 +73,6 @@ def render_template_to_response(path, **kw):
     renderer = renderer_from_cache(path, ZPTTemplateRenderer,
                                   auto_reload=auto_reload)
     result = renderer(**kw)
-    return Response(result)
+    response_factory = queryUtility(IResponseFactory, default=Response)
+    return response_factory(result)
 
