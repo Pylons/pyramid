@@ -1,6 +1,6 @@
 import unittest
 
-from zope.component.testing import PlacelessSetup
+from zope.testing.cleanup import cleanUp
 
 class SplitPathTests(unittest.TestCase):
     def _callFUT(self, path):
@@ -23,12 +23,12 @@ class SplitPathTests(unittest.TestCase):
         self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
                          ['foo', 'space thing', 'bar'])
 
-class ModelGraphTraverserTests(unittest.TestCase, PlacelessSetup):
+class ModelGraphTraverserTests(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
         
     def _getTargetClass(self):
         from repoze.bfg.traversal import ModelGraphTraverser

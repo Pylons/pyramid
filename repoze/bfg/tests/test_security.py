@@ -1,6 +1,6 @@
 import unittest
 
-from zope.component.testing import PlacelessSetup
+from zope.testing.cleanup import cleanUp
 
 class TestACLAuthorizer(unittest.TestCase):
     def _getTargetClass(self):
@@ -182,7 +182,13 @@ class TestACLAuthorizer(unittest.TestCase):
         self.assertEqual(result, True)
 
 
-class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
+class TestACLSecurityPolicy(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
     def _getTargetClass(self):
         from repoze.bfg.security import ACLSecurityPolicy
         return ACLSecurityPolicy
@@ -190,12 +196,6 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
-
-    def setUp(self):
-        PlacelessSetup.setUp(self)
-
-    def tearDown(self):
-        PlacelessSetup.tearDown(self)
 
     def test_class_implements_ISecurityPolicy(self):
         from zope.interface.verify import verifyClass
@@ -316,7 +316,13 @@ class TestACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         result = policy.principals_allowed_by_permission(None, 'read')
         self.assertEqual(result, [])
 
-class TestRemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
+class TestRemoteUserACLSecurityPolicy(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
     def _getTargetClass(self):
         from repoze.bfg.security import RemoteUserACLSecurityPolicy
         return RemoteUserACLSecurityPolicy
@@ -324,12 +330,6 @@ class TestRemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
-
-    def setUp(self):
-        PlacelessSetup.setUp(self)
-
-    def tearDown(self):
-        PlacelessSetup.tearDown(self)
 
     def test_instance_implements_ISecurityPolicy(self):
         from zope.interface.verify import verifyObject
@@ -367,7 +367,13 @@ class TestRemoteUserACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.security import Everyone
         self.assertEqual(result, [Everyone])
 
-class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
+class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
     def _getTargetClass(self):
         from repoze.bfg.security import RepozeWhoIdentityACLSecurityPolicy
         return RepozeWhoIdentityACLSecurityPolicy
@@ -375,12 +381,6 @@ class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
     def _makeOne(self, *arg, **kw):
         klass = self._getTargetClass()
         return klass(*arg, **kw)
-
-    def setUp(self):
-        PlacelessSetup.setUp(self)
-
-    def tearDown(self):
-        PlacelessSetup.tearDown(self)
 
     def test_instance_implements_ISecurityPolicy(self):
         from zope.interface.verify import verifyObject
@@ -420,12 +420,12 @@ class TestRepozeWhoIdentityACLSecurityPolicy(unittest.TestCase, PlacelessSetup):
         from repoze.bfg.security import Everyone
         self.assertEqual(result, [Everyone])
 
-class TestAPIFunctions(unittest.TestCase, PlacelessSetup):
+class TestAPIFunctions(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
         
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _registerSecurityPolicy(self, secpol):
         import zope.component

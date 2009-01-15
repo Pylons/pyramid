@@ -1,13 +1,13 @@
 import unittest
 
-from zope.component.testing import PlacelessSetup
+from zope.testing.cleanup import cleanUp
 
-class Test_pushpage(unittest.TestCase, PlacelessSetup):
+class Test_pushpage(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _zcmlConfigure(self):
         import repoze.bfg.includes

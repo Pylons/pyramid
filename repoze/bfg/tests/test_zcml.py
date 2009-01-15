@@ -1,13 +1,13 @@
 import unittest
 
-from zope.component.testing import PlacelessSetup
+from zope.testing.cleanup import cleanUp
 
-class TestViewDirective(unittest.TestCase, PlacelessSetup):
+class TestViewDirective(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.zcml import view
@@ -227,12 +227,12 @@ class TestViewDirective(unittest.TestCase, PlacelessSetup):
         self.assertEqual(regadapt['args'][5], None)
         
 
-class TestFixtureApp(unittest.TestCase, PlacelessSetup):
+class TestFixtureApp(unittest.TestCase):
     def setUp(self):
-        PlacelessSetup.setUp(self)
+        cleanUp()
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
 
     def test_registry_actions_can_be_pickled_and_unpickled(self):
         import repoze.bfg.tests.fixtureapp as package
@@ -249,11 +249,11 @@ class TestFixtureApp(unittest.TestCase, PlacelessSetup):
         new = cPickle.loads(dumped)
         self.assertEqual(len(actions), len(new))
 
-class TestZCMLPickling(unittest.TestCase, PlacelessSetup):
+class TestZCMLPickling(unittest.TestCase):
     i = 0
     def setUp(self):
+        cleanUp()
         self.tempdir = None
-        PlacelessSetup.setUp(self)
         import sys
         import os
         import tempfile
@@ -274,7 +274,7 @@ class TestZCMLPickling(unittest.TestCase, PlacelessSetup):
         self.tempdir = tempdir
 
     def tearDown(self):
-        PlacelessSetup.tearDown(self)
+        cleanUp()
         import sys
         import shutil
         if self.module is not None:
