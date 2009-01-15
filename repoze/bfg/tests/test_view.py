@@ -39,17 +39,16 @@ class BaseTest(object):
         return environ
 
 class RenderViewToResponseTests(BaseTest, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, *arg, **kw):
         from repoze.bfg.view import render_view_to_response
-        return render_view_to_response
+        return render_view_to_response(*arg, **kw)
     
     def test_call_no_view_registered(self):
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
         context = DummyContext()
-        renderer = self._getFUT()
-        result = renderer(context, request, name='notregistered')
+        result = self._callFUT(context, request, name='notregistered')
         self.assertEqual(result, None)
 
     def test_call_view_registered_secure_permission_disallows(self):
@@ -72,9 +71,8 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
         from repoze.bfg.security import Unauthorized
-        self.assertRaises(Unauthorized, renderer, context, request,
+        self.assertRaises(Unauthorized, self._callFUT, context, request,
                           name='registered', secure=True)
 
     def test_call_view_registered_secure_permission_allows(self):
@@ -97,8 +95,8 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        response = renderer(context, request, name='registered', secure=True)
+        response = self._callFUT(context, request, name='registered',
+                                 secure=True)
         self.assertEqual(response.status, '200 OK')
 
     def test_call_view_registered_insecure_permission_disallows(self):
@@ -121,8 +119,8 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        response = renderer(context, request, name='registered', secure=False)
+        response = self._callFUT(context, request, name='registered',
+                                 secure=False)
         self.assertEqual(response.status, '200 OK')
 
 
@@ -141,23 +139,21 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        self.assertRaises(ValueError, renderer, context, request,
+        self.assertRaises(ValueError, self._callFUT, context, request,
                           name='registered', secure=False)
 
 
 class RenderViewToIterableTests(BaseTest, unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, *arg, **kw):
         from repoze.bfg.view import render_view_to_iterable
-        return render_view_to_iterable
+        return render_view_to_iterable(*arg, **kw)
     
     def test_call_no_view_registered(self):
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
         context = DummyContext()
-        renderer = self._getFUT()
-        result = renderer(context, request, name='notregistered')
+        result = self._callFUT(context, request, name='notregistered')
         self.assertEqual(result, None)
 
     def test_call_view_registered_secure_permission_disallows(self):
@@ -180,9 +176,8 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
         from repoze.bfg.security import Unauthorized
-        self.assertRaises(Unauthorized, renderer, context, request,
+        self.assertRaises(Unauthorized, self._callFUT, context, request,
                           name='registered', secure=True)
 
     def test_call_view_registered_secure_permission_allows(self):
@@ -205,8 +200,8 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        iterable = renderer(context, request, name='registered', secure=True)
+        iterable = self._callFUT(context, request, name='registered',
+                                 secure=True)
         self.assertEqual(iterable, ())
 
     def test_call_view_registered_insecure_permission_disallows(self):
@@ -229,8 +224,8 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        iterable = renderer(context, request, name='registered', secure=False)
+        iterable = self._callFUT(context, request, name='registered',
+                                 secure=False)
         self.assertEqual(iterable, ())
 
     def test_call_view_response_doesnt_implement_IResponse(self):
@@ -248,22 +243,20 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        self.assertRaises(ValueError, renderer, context, request,
+        self.assertRaises(ValueError, self._callFUT, context, request,
                           name='registered', secure=False)
 
 class RenderViewTests(unittest.TestCase, BaseTest):
-    def _getFUT(self):
+    def _callFUT(self, *arg, **kw):
         from repoze.bfg.view import render_view
-        return render_view
+        return render_view(*arg, **kw)
     
     def test_call_no_view_registered(self):
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
         context = DummyContext()
-        renderer = self._getFUT()
-        result = renderer(context, request, name='notregistered')
+        result = self._callFUT(context, request, name='notregistered')
         self.assertEqual(result, None)
 
     def test_call_view_registered_secure_permission_disallows(self):
@@ -286,9 +279,8 @@ class RenderViewTests(unittest.TestCase, BaseTest):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
         from repoze.bfg.security import Unauthorized
-        self.assertRaises(Unauthorized, renderer, context, request,
+        self.assertRaises(Unauthorized, self._callFUT, context, request,
                           name='registered', secure=True)
 
     def test_call_view_registered_secure_permission_allows(self):
@@ -311,8 +303,7 @@ class RenderViewTests(unittest.TestCase, BaseTest):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        s = renderer(context, request, name='registered', secure=True)
+        s = self._callFUT(context, request, name='registered', secure=True)
         self.assertEqual(s, '')
 
     def test_call_view_registered_insecure_permission_disallows(self):
@@ -335,8 +326,7 @@ class RenderViewTests(unittest.TestCase, BaseTest):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        s = renderer(context, request, name='registered', secure=False)
+        s = self._callFUT(context, request, name='registered', secure=False)
         self.assertEqual(s, '')
 
     def test_call_view_response_doesnt_implement_IResponse(self):
@@ -354,24 +344,21 @@ class RenderViewTests(unittest.TestCase, BaseTest):
         from webob import Request
         request = Request(environ)
         directlyProvides(request, IRequest)
-        renderer = self._getFUT()
-        self.assertRaises(ValueError, renderer, context, request,
+        self.assertRaises(ValueError, self._callFUT, context, request,
                           name='registered', secure=False)
 
 class TestIsResponse(unittest.TestCase):
-    def _getFUT(self):
+    def _callFUT(self, *arg, **kw):
         from repoze.bfg.view import is_response
-        return is_response
+        return is_response(*arg, **kw)
 
     def test_is(self):
         response = DummyResponse()
-        f = self._getFUT()
-        self.assertEqual(f(response), True)
+        self.assertEqual(self._callFUT(response), True)
 
     def test_isnt(self):
         response = None
-        f = self._getFUT()
-        self.assertEqual(f(response), False)
+        self.assertEqual(self._callFUT(response), False)
 
 class TestViewExecutionPermitted(unittest.TestCase):
     def setUp(self):
