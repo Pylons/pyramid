@@ -26,8 +26,13 @@ Features
 Implementation Changes
 ----------------------
 
-- The ``wsgiapp`` decorator now uses ``webob.Request.get_response`` to
-  do its work rather than relying on howgrown WSGI code.
+- The ``repoze.bfg.wsgi.wsgiapp`` decorator now uses
+  ``webob.Request.get_response`` to do its work rather than relying on
+  howgrown WSGI code.
+
+- The ``repoze.bfg.view.static`` helper now uses
+  ``webob.Request.get_response`` to do its work rather than relying on
+  howgrown WSGI code.
 
 0.6.2 (2009-01-13)
 ==================

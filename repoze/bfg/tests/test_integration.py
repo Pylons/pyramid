@@ -1,8 +1,10 @@
+import os
 import unittest
 
+from repoze.bfg.push import pushpage
 from repoze.bfg.wsgi import wsgiapp
 from repoze.bfg.view import bfg_view
-from repoze.bfg.push import pushpage
+from repoze.bfg.view import static
 
 from zope.interface import Interface
 
@@ -86,6 +88,29 @@ class PushPagePlusBFGViewTests(unittest.TestCase):
         self.assertEqual(action['args'],
                          ('registerAdapter',
                           pushtest, (INothing, IRequest), IView, '', None))
+
+here = os.path.dirname(__file__)
+staticapp = static(os.path.join(here, 'fixtures'))
+
+class TestStaticApp(unittest.TestCase):
+    def test_it(self):
+        from webob import Request
+        context = DummyContext()
+        from StringIO import StringIO
+        request = Request({'PATH_INFO':'',
+                           'SCRIPT_NAME':'',
+                           'SERVER_NAME':'localhost',
+                           'SERVER_PORT':'80',
+                           'REQUEST_METHOD':'GET',
+                           'wsgi.version':(1,0),
+                           'wsgi.url_scheme':'http',
+                           'wsgi.input':StringIO()})
+        request.subpath = ['minimal.pt']
+        result = staticapp(context, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertEqual(
+            result.body,
+            open(os.path.join(here, 'fixtures/minimal.pt'), 'r').read())
 
 class TestFixtureApp(unittest.TestCase):
     def setUp(self):

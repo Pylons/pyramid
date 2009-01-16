@@ -432,15 +432,13 @@ class TestStaticView(unittest.TestCase, BaseTest):
         from repoze.bfg.view import static
         return static
 
-    def _getStaticDir(self):
+    def _getHere(self):
         import os
-        here = os.path.abspath(os.path.normpath(os.path.dirname(__file__)))
-        fixtureapp = os.path.join(here, 'fixtureapp')
-        return fixtureapp
+        return os.path.dirname(__file__)
 
     def _makeOne(self):
-        static_dir = self._getStaticDir()
-        return self._getTargetClass()(static_dir)
+        here = self._getHere()
+        return self._getTargetClass()(here)
         
     def test_it(self):
         view = self._makeOne()
@@ -449,27 +447,9 @@ class TestStaticView(unittest.TestCase, BaseTest):
         request.subpath = ['__init__.py']
         request.environ = self._makeEnviron()
         response = view(context, request)
-        result = ''.join(list(response.app_iter))
-        static_dir = self._getStaticDir()
-        import os
-        filedata = open(os.path.join(static_dir, '__init__.py')).read()
-        self.assertEqual(result, filedata)
-
-    def test_it_with_alternate_iresponsefactory(self):
-        view = self._makeOne()
-        context = DummyContext()
-        request = DummyRequest()
-        request.subpath = ['__init__.py']
-        request.environ = self._makeEnviron()
-        from repoze.bfg.interfaces import IResponseFactory
-        from zope.component import getGlobalSiteManager
-        gsm = getGlobalSiteManager()
-        from webob import Response
-        class Response2(Response):
-            pass
-        gsm.registerUtility(Response2, IResponseFactory)
-        response = view(context, request)
-        self.failUnless(isinstance(response, Response2))
+        self.assertEqual(request.copied, True)
+        here = self._getHere()
+        self.assertEqual(response.directory, here)
 
 class TestBFGViewDecorator(unittest.TestCase):
     def setUp(self):
@@ -523,7 +503,12 @@ class DummyContext:
     pass
 
 class DummyRequest:
-    pass
+    def get_response(self, application):
+        return application
+
+    def copy(self):
+        self.copied = True
+        return self
 
 def make_view(response):
     def view(context, request):

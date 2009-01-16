@@ -1,10 +1,7 @@
 from paste.urlparser import StaticURLParser
-from webob import Response
-
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 
-from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
@@ -148,23 +145,13 @@ class static(object):
 
     def __call__(self, context, request):
         subpath = '/'.join(request.subpath)
-        caught = []
-        def catch_start_response(status, headers, exc_info=None):
-            caught[:] = (status, headers, exc_info)
-        ecopy = request.environ.copy()
+        request_copy = request.copy()
         # Fix up PATH_INFO to get rid of everything but the "subpath"
         # (the actual path to the file relative to the root dir).
+        request_copy.environ['PATH_INFO'] = '/' + subpath
         # Zero out SCRIPT_NAME for good measure.
-        ecopy['PATH_INFO'] = '/' + subpath
-        ecopy['SCRIPT_NAME'] = ''
-        body = self.app(ecopy, catch_start_response)
-        status, headers, exc_info = caught
-        response_factory = queryUtility(IResponseFactory, default=Response)
-        response = response_factory()
-        response.app_iter = body
-        response.status = status
-        response.headerlist = headers
-        return response
+        request_copy.environ['SCRIPT_NAME'] = ''
+        return request_copy.get_response(self.app)
 
 class bfg_view(object):
     """ Decorator which allows Python code to make view registrations
