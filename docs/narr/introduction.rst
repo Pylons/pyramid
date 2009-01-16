@@ -134,7 +134,8 @@ trunk just before the 0.6.3 release).
   ............................................................................
   ............................................................................
   ............................................................................
-  ........................................................................
+  ............................................................................
+  ........
   Name                                     Stmts   Exec  Cover   Missing
   ----------------------------------------------------------------------
   repoze.bfg                                   1      1   100%   
@@ -148,11 +149,11 @@ trunk just before the 0.6.3 release).
   repoze.bfg.location                         42     42   100%   
   repoze.bfg.log                               9      9   100%   
   repoze.bfg.path                             12     12   100%   
-  repoze.bfg.push                             14     14   100%   
+  repoze.bfg.push                             16     16   100%   
   repoze.bfg.registry                         57     55    96%   98-100
   repoze.bfg.router                           95     95   100%   
   repoze.bfg.security                        163    163   100%   
-  repoze.bfg.settings                         30     30   100%   
+  repoze.bfg.settings                         26     26   100%   
   repoze.bfg.template                         10     10   100%   
   repoze.bfg.templating                       17     17   100%   
   repoze.bfg.testing                         204    204   100%   
@@ -160,10 +161,12 @@ trunk just before the 0.6.3 release).
   repoze.bfg.tests.fixtureapp                  0      0   100%   
   repoze.bfg.tests.fixtureapp.models           3      3   100%   
   repoze.bfg.tests.fixtureapp.views            5      4    80%   4
+  repoze.bfg.tests.grokkedapp                  5      5   100%   
   repoze.bfg.tests.test_chameleon_genshi     157    157   100%   
   repoze.bfg.tests.test_chameleon_text       172    172   100%   
   repoze.bfg.tests.test_chameleon_zpt        161    161   100%   
   repoze.bfg.tests.test_events                59     59   100%   
+  repoze.bfg.tests.test_integration          127    127   100%   
   repoze.bfg.tests.test_location              83     83   100%   
   repoze.bfg.tests.test_log                   11     11   100%   
   repoze.bfg.tests.test_push                  29     29   100%   
@@ -177,20 +180,20 @@ trunk just before the 0.6.3 release).
   repoze.bfg.tests.test_traversal            324    324   100%   
   repoze.bfg.tests.test_url                  112    112   100%   
   repoze.bfg.tests.test_urldispatch           92     92   100%   
-  repoze.bfg.tests.test_view                 424    424   100%   
-  repoze.bfg.tests.test_wsgi                  58     58   100%   
+  repoze.bfg.tests.test_view                 448    448   100%   
+  repoze.bfg.tests.test_wsgi                  20     20   100%   
   repoze.bfg.tests.test_xslt                 191    191   100%   
-  repoze.bfg.tests.test_zcml                 393    393   100%   
+  repoze.bfg.tests.test_zcml                 468    468   100%   
   repoze.bfg.traversal                        96     96   100%   
   repoze.bfg.url                              65     65   100%   
   repoze.bfg.urldispatch                      51     51   100%   
-  repoze.bfg.view                             64     64   100%   
-  repoze.bfg.wsgi                             24     24   100%   
+  repoze.bfg.view                             73     73   100%   
+  repoze.bfg.wsgi                              8      8   100%   
   repoze.bfg.xslt                             57     57   100%   
-  repoze.bfg.zcml                            112    108    96%   160-161, 197, 207
+  repoze.bfg.zcml                            137    135    98%   162-163
   ----------------------------------------------------------------------
-  TOTAL                                     5408   5399    99%   
+  TOTAL                                     5617   5610    99%   
   ----------------------------------------------------------------------
-  Ran 300 tests in 9.523s
+  Ran 312 tests in 11.693s
 
   OK
