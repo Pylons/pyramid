@@ -165,10 +165,11 @@ Mapping Views to URLs Using a Decorator
 If you're allergic to reading and writing :term:`ZCML`, or you're just
 more comfortable defining your view declarations using Python, you may
 use the ``repoze.bfg.view.bfg_view`` decorator to associate your view
-functions with URLs instead of using :term:`ZCML` for the same purpose.
-``repoze.bfg.view.bfg_view`` can be used to associate ``for``,
-``name``, ``permission`` and ``request_type`` information -- as done
-via the equivalent ZCML -- with a function that acts as a BFG view.
+functions with URLs instead of using :term:`ZCML` for the same
+purpose.  ``repoze.bfg.view.bfg_view`` can be used to associate
+``for``, ``name``, ``permission`` and ``request_type`` information --
+as done via the equivalent ZCML -- with a function that acts as a
+:mod:`repoze.bfg` view.
 
 To make :mod:`repoze.bfg` process your ``bfg_view`` declarations, you
 *must* insert the following boilerplate into your application's
@@ -527,8 +528,8 @@ or interface that represents your root object.
       name="static"
     />   
 
-In this case, ``.models.Root`` refers to the class of which your BFG
-application's root object is an instance.
+In this case, ``.models.Root`` refers to the class of which your
+:mod:`repoze.bfg` application's root object is an instance.
 
 .. note:: You can also give a ``for`` of ``*`` if you want the name
    ``static`` to be accessible as the static view against any model.

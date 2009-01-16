@@ -42,6 +42,12 @@ Implementation Changes
   ``webob.Request.get_response`` to do its work rather than relying on
   homegrown WSGI code.
 
+Documentation Additions
+-----------------------
+
+- Add a section on "Using BFG Security With URL Dispatch" into the
+  urldispatch chapter of the documentation.
+
 0.6.2 (2009-01-13)
 ==================
 

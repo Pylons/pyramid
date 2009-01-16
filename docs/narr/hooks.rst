@@ -13,9 +13,9 @@ Changing the request factory
 You may change the class used as the "request factory" from within the
 :mod:`repoze.bfg` ``Router`` class (the ``Router`` class turns the
 WSGI environment into a "request" object which is used ubiquitously
-throughout BFG).  The default "request factory" is the class
-``webob.Request``.  You may change it by placing the following ZCML in
-your ``configure.zcml`` file.
+throughout :mod:`repoze.bfg`).  The default "request factory" is the
+class ``webob.Request``.  You may change it by placing the following
+ZCML in your ``configure.zcml`` file.
 
 .. code-block:: xml
    :linenos:

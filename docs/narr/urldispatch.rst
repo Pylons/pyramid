@@ -154,6 +154,9 @@ configure the ``RoutesMapper`` like so:
 .. code-block:: python
    :linenos:
 
+   from repoze.bfg.router import make_app
+   from repoze.bfg.urldispatch import RoutesMapper
+
    def fallback_get_root(environ):
        return {} # the graph traversal root is empty in this example
 
@@ -166,8 +169,6 @@ configure the ``RoutesMapper`` like so:
                     context_factory=Article)
 
    import myapp
-   from repoze.bfg.router import make_app
-
    app = make_app(get_root, myapp)
 
 The effect of this configuration: when this :mod:`repoze.bfg`
@@ -183,10 +184,81 @@ In this case in particular, when a user visits
 Article class and it will have an ``article`` attribute with the value
 of ``something``.
 
+Using :mod:`repoze.bfg` Security With URL Dispatch
+--------------------------------------------------
+
+:mod:`repoze.bfg` provides its own security framework which consults a
+:term:`security policy` before allowing any application code to be
+called.  This framework operates in terms of ACLs (Access Control
+Lists, see :ref:`security_chapter` for more information about the
+:mod:`repoze.bfg` security subsystem).  A common thing to want to do
+is to attach an ``__acl__`` to the context object dynamically for
+declarative security purposes.  A Routes 'trick' can allow for this.
+
+Routes makes it possible to pass a ``conditions`` argument to the
+``connect`` method of a mapper.  The value of ``conditions`` is a
+dictionary.  If you pass a ``conditions`` dictionary to this
+``connect`` method with a `function`` key that has a value which is a
+function, this function can be used to update the ``__acl__`` of the
+model object.
+
+When Routes tries to resolve a particular route via a match, the route
+object itself will pass the environment and the "match_dict" to the
+``conditions`` function.  Typically, a ``conditions`` function decides
+whether or not the route match should "succeed".  But we'll use it
+differently: we'll use it to update the "match dict".  The match dict
+is what is eventually returned by Routes to :mod:`repoze.bfg`.  If the
+function that is used as the ``conditions`` function adds an
+``__acl__`` key/value pair to the match dict and subsequently always
+returns ``True`` (indicating that the "condition" passed), the
+resulting ``__acl__`` key and its value will appear in the match
+dictionary.  Since all values returned in the match dictionary are
+eventually set on your context object, :mod:`repoze.bfg` will set an
+``__acl__`` attribute on the context object returned to
+:mod:`repoze.bfg` matching the value you've put into the match
+dictionary under ``__acl__``, just in time for the :mod:`repoze.bfg`
+security machinery to find it.  :mod:`repoze.bfg` security will allow
+or deny further processing of the request based on the ACL.
+
+Here's an example:
+
+.. code-block:: python
+
+   from repoze.bfg.router import make_app
+   from repoze.bfg.security import Allow
+   from repoze.bfg.urldispatch import RoutesMapper
+
+   class Article(object):
+       def __init__(self, **kw):
+           self.__dict__.update(kw)
+
+   def add_acl(environ, match_dict):
+       if match_dict.get('article') == 'article1':
+           routes_dict['__acl__'] = [ (Allow, 'editor', 'view') ]
+
+   get_root = RoutesMapper(fallback_get_root)
+   get_root.connect('archives/:article', controller='articles',
+                    context_factory=Article, conditions={'function':add_acl})
+
+   import myapp
+   app = make_app(get_root, myapp)
+
+Obviously you can do more generic things that inspect the routes match
+dict to see if the ``article`` argument matches a particular string;
+our sample ``add_acl`` function is not very ambitious.
+
+.. note:: See :ref:`security_chapter` for more information about
+   :mod:`repoze.bfg` security and ACLs.
+
+.. note:: See `Conditions
+   <http://routes.groovie.org/manual.html#conditions>`_ in the
+   :term:`Routes` manual for a general overview of what the
+   ``condition`` argument to ``.connect`` does.
+
 Further Documentation and Examples
 ----------------------------------
 
-URL-dispatch related API documentation is available in the
+URL-dispatch related API documentation is available in
 :ref:`urldispatch_module` .
 
 The `repoze.shootout <http://svn.repoze.org/repoze.shootout/trunk/>`_

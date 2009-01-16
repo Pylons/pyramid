@@ -77,7 +77,9 @@ class RoutesMapper(object):
         default context factory (the ``RoutesContext`` class) will be
         used.  The interface ``repoze.bfg.interfaces.IRoutesContext``
         will always be tacked on to the context instance in addition
-        to whatever interfaces the context instance already supplies."""
+        to whatever interfaces the context instance already supplies.
+        """
+        
         self.mapper.connect(*arg, **kw)
 
 class RoutesModelTraverser(object):
