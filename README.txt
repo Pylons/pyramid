@@ -1,11 +1,9 @@
 repoze.bfg
 ==========
 
-``repoze.bfg`` is a system for routing web requests to applications
-based on graph traversal.  It is inspired by Zope's publisher, and
-uses Zope libraries to do much of its work.  However, it is less
-ambitious and less featureful than any released version of Zope's
-publisher.
+``repoze.bfg`` is a web application framework.  It is inspired by
+Zope, and uses Zope-related libraries to do much of its work, however
+it's simpler than any released version of Zope.
 
 Installation
 ------------

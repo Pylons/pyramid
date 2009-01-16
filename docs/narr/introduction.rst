@@ -2,14 +2,10 @@
 ==============================
 
 :mod:`repoze.bfg` is a Python web application framework.  It is
-inspired by Zope's publisher, and uses :term:`Zope` libraries to do
-much of its work.  However, it is less ambitious and less featureful
-than any released version of Zope's publisher.
-
+inspired by Zope, and uses :term:`Zope` libraries to do much of its
+work.  However, it simpler than any than any released version of Zope.
 :mod:`repoze.bfg` uses the :term:`WSGI` protocol to handle requests
-and responses, and integrates :term:`Zope`, :term:`Paste`, and
-:term:`WebOb` libraries to form the basis for a simple web object
-publishing framework.
+and responses.
 
 Similarities with Other Frameworks
 ----------------------------------
@@ -104,11 +100,11 @@ to bring new developers up to speed.  It's our goal that nothing
 remain undocumented about :mod:`repoze.bfg`.
 
 *Speed*: :mod:`repoze.bfg` is meant to be fast, capable of serving on
-the order of 100+ requests per second on today's commodity hardware
-for views that do "real work" given proper application implementation.
-The *hardware is cheap* mantra has its limits when you're responsible
-for managing a great many machines: the fewer you need, the less pain
-you'll have.
+the order of 100-1000 requests per second on today's commodity
+hardware for views that do "real work" given proper application
+implementation.  The *hardware is cheap* mantra has its limits when
+you're responsible for managing a great many machines: the fewer you
+need, the less pain you'll have.
 
 It's Tested
 -----------
