@@ -21,13 +21,10 @@ uses the Zope Component Architecture ("CA") internally, as do Zope 2,
 Zope 3, and Grok.  Developers don't interact with the CA very much
 during typical development, however; it's mostly used by the framework
 developer rather than the application developer.  :mod:`repoze.bfg`
-developers use :term:`ZCML` (an XML dialect) to perform various
-configuration tasks; in particular, as in Zope3, one more more
+developers use :term:`ZCML` (an XML dialect) or decorators to perform
+various configuration tasks; in particular, as in Zope3, one more more
 :term:`view` functions is associated with a :term:`model` type via
-ZCML.  It is also possible to configure :mod:`repoze.bfg` views
-without :term:`ZCML` (instead configuration is done inside Python
-decorators) by using an add-on package named
-:term:`repoze.bfg.convention`.
+ZCML or a decorator.
 
 Like Pylons, :mod:`repoze.bfg` is mostly policy-free.  It makes no
 assertions about which database you should use, and its built-in

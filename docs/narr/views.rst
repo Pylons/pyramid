@@ -61,8 +61,8 @@ If a view happens to return something to the :mod:`repoze.bfg`
 publisher that does not implement this interface, the publisher will
 raise an error.
 
-Mapping Views to URLs
-----------------------
+Mapping Views to URLs Using ZCML
+--------------------------------
 
 You may associate a view with a URL by adding information to your
 :term:`application registry` via :term:`ZCML` in your
@@ -125,18 +125,137 @@ This indicates that when :mod:`repoze.bfg` identifies that the *view
 name* is ``hello.html`` against *any* :term:`context`, this view will
 be called.
 
-.. note::
+The ``view`` ZCML Element
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   If you're allergic to reading and writing :term:`ZCML`, or you're
-   just more comfortable defining your view declarations using Python,
-   you may use the :term:`repoze.bfg.convention` package.  This
-   package provides a decorator named ``bfg_view`` that can be used to
-   associate ``for``, ``name``, ``permission`` and ``request_type``
-   information with a function that acts as a BFG view instead of
-   needing to rely on ZCML for the same task.  You only need to add a
-   single ZCML stanza to your ``configure.zcml`` for
-   :term:`repoze.bfg.convention` to find all views decorated in this
-   fashion.
+The ``view`` ZCML element has these possible attributes:
+
+view
+
+  The Python dotted-path name to the view callable.
+
+for
+
+  A Python dotted-path name representing the Python class that the
+  :term:`context` must be an instance of, *or* the :term:`interface`
+  that the :term:`context` must provide in order for this view to be
+  found and called.
+
+name
+
+  The *view name*.  Read and understand :ref:`traversal_chapter` to
+  understand the concept of a view name.
+
+permission
+
+  The name of a *permission* that the user must possess in order to
+  call the view.  See :ref:`view_security_section` for more
+  information about view security and permissions.
+
+request_type
+
+  A Python dotted-path name representing the :term:`interface` that
+  the :term:`request` must have in order for this view to be found and
+  called.  See :ref:`view_request_types_section` for more
+  information about view security and permissions.
+
+Mapping Views to URLs Using a Decorator
+---------------------------------------
+
+If you're allergic to reading and writing :term:`ZCML`, or you're just
+more comfortable defining your view declarations using Python, you may
+use the ``repoze.bfg.view.bfg_view`` decorator to associate your view
+functions with URLs instead of using :term:`ZCML` for the same purpose.
+``repoze.bfg.view.bfg_view`` can be used to associate ``for``,
+``name``, ``permission`` and ``request_type`` information -- as done
+via the equivalent ZCML -- with a function that acts as a BFG view.
+
+To make :mod:`repoze.bfg` process your ``bfg_view`` declarations, you
+*must* insert the following boilerplate into your application's
+``configure.zcml``::
+
+  <grok package="."/>
+
+After you do so, you will not need to use any other ZCML to configure
+:mod:`repoze.bfg` view declarations.  Instead, you will use a
+decorator to do this work.
+
+.. warning:: using this feature tends to slows down application
+   startup, as the application registry is not capable of being cached
+   within a ``configure.zcml.cache`` file when this package is in use,
+   and more work is performed at application startup to scan for view
+   declarations.  Also, if you use decorators, it means that other
+   people will not be able to override your view declarations
+   externally using ZCML: this is a common requirement if you're
+   developing an exensible application (e.g. a framework).
+
+The ``bfg_view`` Decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``repoze.bfg.view.bfg_view`` is a decorator which allows Python code
+to make view registrations instead of using ZCML for the same purpose.
+
+An example might reside in a bfg application module ``views.py``:
+
+.. code-block:: python
+   :linenos:
+
+   from models import MyModel
+   from repoze.bfg.interfaces import IPOSTRequest
+   from repoze.bfg.view import bfg_view
+   from repoze.bfg.chameleon_zpt import render_template_to_response
+
+   @bfg_view(name='my_view', request_type=IPOSTRequest, for_=MyModel,
+             permission='read')
+   def my_view(context, request):
+       return render_template_to_response('templates/my.pt')
+
+Using this decorator as above replaces the need to add this ZCML to
+your application registry:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+    for=".models.MyModel"
+    view=".views.my_view"
+    name="my_view"
+    permission="read"
+    request_type="repoze.bfg.interfaces.IPOSTRequest"
+    />
+
+All arguments to ``bfg_view`` are optional.
+
+If ``name`` is not supplied, the empty string is used (implying
+the default view).
+
+If ``request_type`` is not supplied, the interface
+``repoze.bfg.interfaces.IRequest`` is used.
+
+If ``for_`` is not supplied, the interface
+``zope.interface.Interface`` (which matches any model) is used.
+``for_`` can also name a class, like its ZCML brother.
+
+If ``permission`` is not supplied, no permission is registered for
+this view (it's accessible by any caller).
+
+All arguments may be omitted.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+
+   @bfg_view()
+   def my_view(context, request):
+       """ My view """
+       return Response()
+
+Such a registration as the one directly above implies that the view
+name will be ``my_view``, registered for models with the
+``zope.interface.Interface`` interface (which matches anything), using
+no permission, registered against requests which implement the default
+``IRequest`` interface.
 
 Using Model Interfaces
 ----------------------
@@ -222,40 +341,6 @@ implemented by the context, the view registered for the class will
 
 See :term:`Interface` in the glossary to find more information about
 interfaces.
-
-The ``view`` ZCML Element
--------------------------
-
-The ``view`` ZCML element has these possible attributes:
-
-view
-
-  The Python dotted-path name to the view callable.
-
-for
-
-  A Python dotted-path name representing the Python class that the
-  :term:`context` must be an instance of, *or* the :term:`interface`
-  that the :term:`context` must provide in order for this view to be
-  found and called.
-
-name
-
-  The *view name*.  Read and understand :ref:`traversal_chapter` to
-  understand the concept of a view name.
-
-permission
-
-  The name of a *permission* that the user must possess in order to
-  call the view.  See :ref:`view_security_section` for more
-  information about view security and permissions.
-
-request_type
-
-  A Python dotted-path name representing the :term:`interface` that
-  the :term:`request` must have in order for this view to be found and
-  called.  See :ref:`view_request_types_section` for more
-  information about view security and permissions.
 
 .. _view_request_types_section:
 
