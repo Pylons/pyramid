@@ -1,6 +1,13 @@
 After 0.6.2
 ===========
 
+Bug Fixes
+---------
+
+- Readd ``root_policy`` attribute on Router object (as a property
+  which returns the IRootFactory utility).  Code in the wild depended
+  upon its presence (esp. scripts and "debug" helpers).
+
 Features
 --------
 
