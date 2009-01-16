@@ -6,7 +6,6 @@ from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component.event import dispatch
 
-from zope.interface import directlyProvides
 from zope.interface import alsoProvides
 from zope.interface import implements
 
@@ -63,10 +62,10 @@ class Router(object):
             request_factory = queryUtility(IRequestFactory, default=Request)
             request = request_factory(environ)
 
-            directlyProvides(request, IRequest)
-            also = HTTP_METHOD_INTERFACES.get(request.method)
-            if also is not None:
-                alsoProvides(request, also)
+            alsoProvides(request, IRequest)
+            also_http = HTTP_METHOD_INTERFACES.get(request.method)
+            if also_http is not None:
+                alsoProvides(request, also_http)
 
             dispatch(NewRequest(request))
             root_factory = getUtility(IRootFactory)
@@ -143,11 +142,11 @@ def make_app(root_factory, package=None, filename='configure.zcml',
         options = {}
 
     registry = makeRegistry(filename, package)
-    settings = Settings(options)
-    registry.registerUtility(settings, ISettings)
+    registry.registerUtility(root_factory, IRootFactory)
     debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
     registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
-    registry.registerUtility(root_factory, IRootFactory)
+    settings = Settings(options)
+    registry.registerUtility(settings, ISettings)
     app = Router(registry)
 
     try:
