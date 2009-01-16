@@ -6,13 +6,6 @@ from repoze.bfg.interfaces import ISettings
 
 class Settings(object):
     implements(ISettings)
-
-    # defaults
-    reload_templates = False
-    debug_notfound = False
-    debug_authorization = False
-    unicode_path_segments = True
-
     def __init__(self, options):
         options = get_options(options)
         self.__dict__.update(options)
