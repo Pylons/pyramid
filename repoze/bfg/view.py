@@ -12,6 +12,10 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.security import Unauthorized
 from repoze.bfg.security import Allowed
 
+from zope.interface import Interface
+
+from repoze.bfg.interfaces import IRequest
+
 _marker = ()
 
 def view_execution_permitted(context, request, name=''):
@@ -161,4 +165,89 @@ class static(object):
         response.status = status
         response.headerlist = headers
         return response
+
+class bfg_view(object):
+    """ Decorator which allows Python code to make view registrations
+    instead of using ZCML for the same purpose.
+
+    E.g. in the module ``views.py``::
+
+      from models import IMyModel
+      from repoze.bfg.interfaces import IRequest
+
+      @bfg_view(name='my_view', request_type=IRequest, for_=IMyModel,
+                permission='read'))
+      def my_view(context, request):
+          return render_template_to_response('templates/my.pt')
+
+    Equates to the ZCML::
+
+      <bfg:view
+       for='.models.IMyModel'
+       view='.views.my_view'
+       name='my_view'
+       permission='read'
+       />
+
+    If ``name`` is not supplied, the empty string is used (implying
+    the default view).
+
+    If ``request_type`` is not supplied, the interface
+    ``repoze.bfg.interfaces.IRequest`` is used.
+
+    If ``for_`` is not supplied, the interface
+    ``zope.interface.Interface`` (implying *all* interfaces) is used.
+
+    If ``permission`` is not supplied, no permission is registered for
+    this view (it's accessible by any caller).
+
+    Any individual or all parameters can be omitted.  The simplest
+    bfg_view declaration then becomes::
+
+        @bfg_view()
+        def my_view(...):
+            ...
+
+    Such a registration implies that the view name will be
+    ``my_view``, registered for models with the
+    ``zope.interface.Interface`` interface, using no permission,
+    registered against requests which implement the default IRequest
+    interface.
+
+    To make use of bfg_view declarations, insert the following
+    boilerplate into your application registry's ZCML::
+    
+      <grok package="."/>
+    """
+    def __init__(self, name='', request_type=IRequest, for_=Interface,
+               permission=None):
+        self.name = name
+        self.request_type = request_type
+        self.for_ = for_
+        self.permission = permission
+
+    def __call__(self, wrapped):
+        # We intentionally return a do-little un-functools-wrapped
+        # decorator here so as to make the decorated function
+        # unpickleable; applications which use bfg_view decorators
+        # should never be able to load actions from an actions cache;
+        # instead they should rerun the file_configure function each
+        # time the application starts in case any of the decorators
+        # has been changed.  Disallowing these functions from being
+        # pickled enforces that.
+        def decorator(context, request):
+            return wrapped(context, request)
+        decorator.__is_bfg_view__ = True
+        decorator.__permission__ = self.permission
+        decorator.__for__ = self.for_
+        decorator.__view_name__ = self.name
+        decorator.__request_type__ = self.request_type
+        # we assign to __grok_module__ here rather than __module__ to
+        # make it unpickleable but allow for the grokker to be able to
+        # find it
+        decorator.__grok_module__ = wrapped.__module__
+        decorator.__name__ = wrapped.__name__
+        decorator.__doc__ = wrapped.__doc__
+        decorator.__dict__.update(wrapped.__dict__)
+        return decorator
 

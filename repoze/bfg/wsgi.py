@@ -1,8 +1,3 @@
-from zope.component import queryUtility
-
-from repoze.bfg.interfaces import IResponseFactory
-
-from webob import Response
 try:
     from functools import wraps
 except ImportError:
@@ -34,20 +29,5 @@ def wsgiapp(wrapped):
     WSGI app were a repoze.bfg view.
     """
     def decorator(context, request):
-        caught = []
-        def catch_start_response(status, headers, exc_info=None):
-            caught[:] = (status, headers, exc_info)
-        environ = request.environ
-        body = wrapped(environ, catch_start_response)
-        if caught: 
-            status, headers, exc_info = caught
-            response_factory = queryUtility(IResponseFactory, default=Response)
-            response = response_factory()
-            response.app_iter = body
-            response.status = status
-            response.headerlist = headers
-            return response
-        else:
-            raise RuntimeError('WSGI start_response not called')
-    return wraps(wrapped)(decorator) # for pickleability
-    
+        return request.get_response(wrapped)
+    return wraps(wrapped)(decorator) # pickleability

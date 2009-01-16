@@ -41,6 +41,7 @@ install_requires=[
     'zope.hookable',
     'zope.testing',
     'repoze.zcml',
+    'martian',
     ]
 
 setup(name='repoze.bfg',

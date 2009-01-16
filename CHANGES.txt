@@ -4,11 +4,30 @@ After 0.6.2
 Features
 --------
 
+- The functionality of ``repoze.bfg.convention`` has been merged into
+  the core.  Applications which make use of ``repoze.bfg.convention``
+  will continue to work indefinitely, but it is recommended that apps
+  stop depending upon it.  To do so, substitute imports of
+  ``repoze.bfg.convention.bfg_view`` with imports of
+  ``repoze.bfg.view.bfg_view``, and change the stanza in ZCML from
+  ``<convention package=".">`` to ``<grok package=".">``.  As a result
+  of the merge, bfg has grown a new dependency: ``martian``.
+
+- View functions which use the pushpage decorator are now pickleable
+  (meaning their use won't prevent a ``configure.zcml.cache`` file
+  from being written to disk).
+
 - Instead of invariably using ``webob.Request`` as the "request
   factory" (e.g. in the ``Router`` class) and ``webob.Response`` and
   the "response factory" (e.g. in ``render_template_to_response``),
   allow both to be overridden via a ZCML utility hook.  See the "Using
   ZCML Hooks" chapter of the documentation for more information.
+
+Implementation Changes
+----------------------
+
+- The ``wsgiapp`` decorator now uses ``webob.Request.get_response`` to
+  do its work rather than relying on howgrown WSGI code.
 
 0.6.2 (2009-01-13)
 ==================

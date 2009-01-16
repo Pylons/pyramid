@@ -229,28 +229,6 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regadapt['args'][5], None)
         
 
-class TestFixtureApp(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def test_registry_actions_can_be_pickled_and_unpickled(self):
-        import repoze.bfg.tests.fixtureapp as package
-        from zope.configuration import config
-        from zope.configuration import xmlconfig
-        context = config.ConfigurationMachine()
-        xmlconfig.registerCommonDirectives(context)
-        context.package = package
-        xmlconfig.include(context, 'configure.zcml', package)
-        context.execute_actions(clear=False)
-        actions = context.actions
-        import cPickle
-        dumped = cPickle.dumps(actions, -1)
-        new = cPickle.loads(dumped)
-        self.assertEqual(len(actions), len(new))
-
 class TestZCMLPickling(unittest.TestCase):
     i = 0
     def setUp(self):
@@ -456,8 +434,121 @@ class TestZCMLPickling(unittest.TestCase):
         cPickle.dump(actions, open(picklename, 'wb'))
         self.assertEqual(True, zcml_configure('configure.zcml', self.module))
 
-class Dummy:
-    pass
+class TestRemove(unittest.TestCase):
+    def _callFUT(self, name, os):
+        from repoze.bfg.zcml import remove
+        return remove(name, os)
+
+    def test_fail(self):
+        class FakeOS:
+            def remove(self, name):
+                raise IOError('foo')
+        self.assertEqual(self._callFUT('name', FakeOS()), False)
+
+    def test_succeed(self):
+        class FakeOS:
+            def remove(self, name):
+                pass
+        self.assertEqual(self._callFUT('name', FakeOS()), True)
+
+class TestBFGViewFunctionGrokker(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from repoze.bfg.zcml import BFGViewFunctionGrokker
+        return BFGViewFunctionGrokker
+
+    def _makeOne(self, *arg, **kw):
+        return self._getTargetClass()(*arg, **kw)
+
+    def test_grok_is_bfg_view(self):
+        from repoze.bfg.interfaces import IRequest
+        from zope.interface import Interface
+        grokker = self._makeOne()
+        class obj:
+            pass
+        obj.__is_bfg_view__ = True
+        obj.__permission__ = 'foo'
+        obj.__for__ = Interface
+        obj.__view_name__ = 'foo.html'
+        obj.__request_type__ = IRequest
+        context = DummyContext()
+        result = grokker.grok('name', obj, context=context)
+        self.assertEqual(result, True)
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+    def test_grok_is_not_bfg_view(self):
+        grokker = self._makeOne()
+        class obj:
+            pass
+        context = DummyContext()
+        result = grokker.grok('name', obj, context=context)
+        self.assertEqual(result, False)
+        actions = context.actions
+        self.assertEqual(len(actions), 0)
+
+class TestZCMLGrokFunction(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, package, martian):
+        from repoze.bfg.zcml import grok
+        return grok(context, package, martian)
+
+    def test_it(self):
+        martian = DummyMartianModule()
+        module_grokker = DummyModuleGrokker()
+        dummy_module = DummyModule()
+        from repoze.bfg.zcml import exclude
+        self._callFUT(None, dummy_module, martian)
+        self.assertEqual(martian.name, 'dummy')
+        self.assertEqual(len(martian.module_grokker.registered), 1)
+        self.assertEqual(martian.context, None)
+        self.assertEqual(martian.exclude_filter, exclude)
+
+class TestExcludeFunction(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, name):
+        from repoze.bfg.zcml import exclude
+        return exclude(name)
+
+    def test_it(self):
+        self.assertEqual(self._callFUT('.foo'), True)
+        self.assertEqual(self._callFUT('foo'), False)
+    
+class DummyModule:
+    __name__ = 'dummy'
+
+class DummyModuleGrokker:
+    def __init__(self):
+        self.registered = []
+        
+    def register(self, other):
+        self.registered.append(other)
+        
+class DummyMartianModule:
+    def grok_dotted_name(self, name, grokker, context, exclude_filter=None):
+        self.name = name
+        self.context = context
+        self.exclude_filter = exclude_filter
+        return True
+
+    def ModuleGrokker(self):
+        self.module_grokker = DummyModuleGrokker()
+        return self.module_grokker
 
 class DummyContext:
     def __init__(self):
@@ -470,6 +561,9 @@ class DummyContext:
              'callable':callable,
              'args':args}
             )
+
+class Dummy:
+    pass
 
 from zope.interface import Interface
 class IDummy(Interface):

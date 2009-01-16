@@ -1,8 +1,17 @@
 import os.path
+
 from repoze.bfg.chameleon_zpt import render_template_to_response
 
+try:
+    from functools import wraps
+except ImportError:
+    # < 2.5
+    from repoze.bfg.functional import wraps
+
 class pushpage(object):
-    """ Decorator for functions which return Chameleon template namespaces.
+    """ Decorator for a function which returns a response object after
+     running the namespace the wrapped function returns through a
+     Chameleon ZPT template.
 
     E.g.::
 
@@ -27,7 +36,4 @@ class pushpage(object):
         def _curried(context, request):
             kw = wrapped(context, request)
             return render_template_to_response(path, **kw)
-        _curried.__name__ = wrapped.__name__
-        _curried.__grok_module__ = wrapped.__module__ # r.bfg.convention support
-
-        return _curried
+        return wraps(wrapped)(_curried) # pickleability and grokkability

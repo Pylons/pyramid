@@ -10,6 +10,12 @@
         handler="repoze.bfg.zcml.view"
         />
 
+    <meta:directive
+        name="grok"
+        schema="repoze.bfg.zcml.IGrokDirective"
+        handler="repoze.bfg.zcml.grok"
+        />
+
   </meta:directives>
 
 </configure>

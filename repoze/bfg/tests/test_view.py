@@ -471,6 +471,54 @@ class TestStaticView(unittest.TestCase, BaseTest):
         response = view(context, request)
         self.failUnless(isinstance(response, Response2))
 
+class TestBFGViewDecorator(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from repoze.bfg.view import bfg_view
+        return bfg_view
+
+    def _makeOne(self, *arg, **kw):
+        return self._getTargetClass()(*arg, **kw)
+
+    def test_create_defaults(self):
+        from repoze.bfg.interfaces import IRequest
+        from zope.interface import Interface
+        decorator = self._makeOne()
+        self.assertEqual(decorator.name, '')
+        self.assertEqual(decorator.request_type, IRequest)
+        self.assertEqual(decorator.for_, Interface)
+        self.assertEqual(decorator.permission, None)
+        
+    def test_create_nondefaults(self):
+        decorator = self._makeOne(name=None, request_type=None, for_=None,
+                                  permission='foo')
+        self.assertEqual(decorator.name, None)
+        self.assertEqual(decorator.request_type, None)
+        self.assertEqual(decorator.for_, None)
+        self.assertEqual(decorator.permission, 'foo')
+        
+    def test_call(self):
+        from repoze.bfg.interfaces import IRequest
+        from zope.interface import Interface
+        decorator = self._makeOne()
+        class foo:
+            """ docstring """
+        wrapped = decorator(foo)
+        self.assertEqual(wrapped.__is_bfg_view__, True)
+        self.assertEqual(wrapped.__permission__, None)
+        self.assertEqual(wrapped.__for__, Interface)
+        self.assertEqual(wrapped.__request_type__, IRequest)
+        self.assertEqual(wrapped.__grok_module__, foo.__module__)
+        self.assertEqual(wrapped.__name__, foo.__name__)
+        self.assertEqual(wrapped.__doc__, foo.__doc__)
+        for k, v in foo.__dict__.items():
+            self.assertEqual(v, wrapped.__dict__[k])
+
 class DummyContext:
     pass
 

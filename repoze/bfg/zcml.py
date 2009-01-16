@@ -24,6 +24,8 @@ from repoze.bfg.path import package_path
 
 from repoze.bfg.security import ViewPermissionFactory
 
+import martian
+
 def handler(methodName, *args, **kwargs):
     method = getattr(getSiteManager(), methodName)
     method(*args, **kwargs)
@@ -176,6 +178,14 @@ def zcml_configure(name, package, load=cPickle.load):
     context.execute_actions()
     return True
 
+def remove(name, os=os): # os parameterized for unit tests
+    try:
+        os.remove(name)
+        return True
+    except:
+        pass
+    return False
+
 def file_configure(name, package, dump=cPickle.dump):
     context = zope.configuration.config.ConfigurationMachine()
     xmlconfig.registerCommonDirectives(context)
@@ -191,20 +201,52 @@ def file_configure(name, package, dump=cPickle.dump):
         
         discriminator = action[0]
         if discriminator and Uncacheable in discriminator:
-            try:
-                os.remove(pckname)
-            except:
-                pass
+            remove(pckname)
             return False
 
     try:
         data = (PVERSION, time.time(), actions)
         dump(data, open(pckname, 'wb'), -1)
     except (OSError, IOError, TypeError, cPickle.PickleError):
-        try:
-            os.remove(pckname)
-        except:
-            pass
+        remove(pckname)
 
     return False
 
+def exclude(name):
+    if name.startswith('.'):
+        return True
+    return False
+
+def grok(_context, package, martian=martian):
+    # martian overrideable only for unit tests
+    module_grokker = martian.ModuleGrokker()
+    module_grokker.register(BFGViewFunctionGrokker())
+    martian.grok_dotted_name(package.__name__, grokker=module_grokker,
+                             context=_context, exclude_filter=exclude)
+
+class IGrokDirective(Interface):
+    package = GlobalObject(
+        title=u"The package we'd like to grok.",
+        required=True,
+        )
+
+class BFGViewFunctionGrokker(martian.InstanceGrokker):
+    martian.component(types.FunctionType)
+
+    def grok(self, name, obj, **kw):
+        if hasattr(obj, '__is_bfg_view__'):
+            permission = obj.__permission__
+            for_ = obj.__for__
+            name = obj.__view_name__
+            request_type = obj.__request_type__
+            context = kw['context']
+            # we dont tecnically need to pass "Uncacheable" here; any
+            # view function decorated with an __is_bfg_view__ attr via
+            # repoze.bfg.view.bfg_view is unpickleable; but the
+            # uncacheable bit helps pickling fail more quickly
+            # (pickling is never attempted)
+            view(context, permission=permission, for_=for_,
+                 view=obj, name=name, request_type=request_type,
+                 cacheable=Uncacheable)
+            return True
+        return False
