@@ -159,7 +159,7 @@ request_type
   A Python dotted-path name representing the :term:`interface` that
   the :term:`request` must have in order for this view to be found and
   called.  See :ref:`view_request_types_section` for more
-  information about view security and permissions.
+  information about request types.
 
 .. _mapping_views_to_urls_using_a_decorator_section:
 
