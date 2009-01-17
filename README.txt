@@ -1,9 +1,10 @@
 repoze.bfg
 ==========
 
-``repoze.bfg`` is a web application framework.  It is inspired by
-Zope, and uses Zope-related libraries to do much of its work, however
-it's simpler than any released version of Zope.
+``repoze.bfg`` is a Python web application framework.  It is inspired
+by Zope, and uses Zope libraries to do much of its work.  However, it
+simpler than any than any released version of Zope.  ``repoze.bfg``
+uses the WSGI protocol to handle requests and responses.
 
 Installation
 ------------
@@ -15,8 +16,9 @@ Install using setuptools, e.g. (within a virtualenv)::
 Further Documentation
 ---------------------
 
-See the ``docs`` directory of the repoze.bfg distribution package
-(also available via http://svn.repoze.org/repoze.bfg/trunk/docs).
+See the ``docs`` directory of the ``repoze.bfg`` distribution package
+(also available `on the web <http://static.repoze.org/bfgdocs>`_ for
+released versions).
 
 Reporting Bugs / Development Versions
 -------------------------------------
