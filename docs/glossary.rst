@@ -261,6 +261,10 @@ Glossary
     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
     that is the defacto standard for descriptive text shipped in
     :term:`distribution` files, and Python docstrings.
+  Root
+    The object at which :term:`traversal` begins when
+    :mod:`repoze.bfg` searches for a context (for :term:`URL
+    Dispatch`, the root is *always* the context).
   Subpath
     A list of element "left over" after the :term:`router` has
     performed a successful traversal to a view.  The subpath is a

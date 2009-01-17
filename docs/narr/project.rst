@@ -47,6 +47,17 @@ project we name ``MyProject``:
        Recursing into templates
          Creating ./MyProject/myproject/templates/
          Copying mytemplate.pt to ./MyProject/myproject/templates/mytemplate.pt
+         Recursing into static
+           Creating ./MyProject/myproject/templates/static/
+           Copying default.css to ./MyProject/myproject/templates/static/default.css
+           Recursing into images
+             Creating ./MyProject/myproject/templates/static/images/
+             Copying img01.gif to ./MyProject/myproject/templates/static/images/img01.gif
+             Copying img02.gif to ./MyProject/myproject/templates/static/images/img02.gif
+             Copying img03.gif to ./MyProject/myproject/templates/static/images/img03.gif
+             Copying img04.gif to ./MyProject/myproject/templates/static/images/img04.gif
+             Copying spacer.gif to ./MyProject/myproject/templates/static/images/spacer.gif
+           Copying templatelicense.txt to ./MyProject/myproject/templates/static/templatelicense.txt
        Copying tests.py_tmpl to ./MyProject/myproject/tests.py
        Copying views.py_tmpl to ./MyProject/myproject/views.py
      Copying +project+.ini_tmpl to ./MyProject/MyProject.ini
@@ -188,9 +199,10 @@ port 6543.
 Viewing the Application
 -----------------------
 
-Visit ``http://localhost:6543/`` in your browser.  You will see::
+Visit ``http://localhost:6543/`` in your browser.  You will see
+something in your browser like what is displayed below:
 
-  Welcome to MyProject
+.. image:: project.png
 
 That's the page shown by default when you visit an unmodified ``paster
 create``-generated application.
@@ -216,7 +228,8 @@ The ``MyProject`` project has the following directory structure::
   |   |-- models.py
   |   |-- run.py
   |   |-- templates
-  |   |   `-- mytemplate.pt
+  |   |   |-- mytemplate.pt
+  |   |   `-- static/
   |   |-- tests.py
   |   `-- views.py
   |-- MyProject.ini
@@ -426,13 +439,13 @@ tarball to other people who want to use your application.
 
    By default, ``setup.py sdist`` does not place non-Python-source
    files in generated tarballs.  This means, in this case, that the
-   ``mytemplate.pt`` file that's in our ``templates`` directory is not
-   packaged in the tarball.  To allow this to happen, check all the
-   files that you'd like to be distributed along with your
-   application's Python files into a version control system such as
-   Subversion.  After you do this, when you rerun ``setup.py sdist``,
-   all files checked into the version control system will be included
-   in the tarball.
+   ``templates/mytemplate.pt`` file and the files in the
+   ``templates/static`` directory are not packaged in the tarball.  To
+   allow this to happen, check all the files that you'd like to be
+   distributed along with your application's Python files into a
+   version control system such as Subversion.  After you do this, when
+   you rerun ``setup.py sdist``, all files checked into the version
+   control system will be included in the tarball.
 
 The ``myproject`` :term:`Package`
 ---------------------------------
@@ -476,30 +489,35 @@ registry`. It looks like so:
    :linenos:
    :language: xml
 
-#. Lines 1-3 provide the root node and namespaces for the
-   configuration language.  ``http://namespaces.repoze.org/bfg`` is
-   the default XML namespace.  Add-on packages may require other
-   namespaces.
+#. Lines 1 provides the root node and namespaces for the configuration
+   language.  ``http://namespaces.repoze.org/bfg`` is the default XML
+   namespace.  Add-on packages may require other namespaces.
 
-#. Line 6 initializes :mod:`repoze.bfg`-specific configuration
+#. Lines 4 initializes :mod:`repoze.bfg`-specific configuration
    directives by including the ``repoze.bfg.includes`` package.  This
    causes all of the ZCML within the ``configure.zcml`` of the
    ``repoze.bfg.includes`` package (which can be found in the main
    :mod:`repoze.bfg` sources).
 
-#. Lines 8-11 register a single view.  It is ``for`` model objects
-   that are instances of the ``MyModel`` class.  The ``view``
-   attribute points at a Python function that does all the work for
-   this view.  Note that the values of both the ``for`` attribute and
-   the ``view`` attribute begin with a single period.  Names that
-   begin with a period are "shortcuts" which point at files relative
-   to the :term:`package` in which the ``configure.zcml`` file lives.
-   In this case, since the ``configure.zcml`` file lives within the
-   ``myproject`` package, the shorcut ``.models.MyModel`` could also
-   be spelled ``myproject.models.MyModel`` (forming a full Python
-   dotted-path name to the ``MyModel`` class).  Likewise the shortcut
+#. Lines 6-9 register a "default view" (a view that has no ``name``
+   attribute).  It is ``for`` model objects that are instances of the
+   ``MyModel`` class.  The ``view`` attribute points at a Python
+   function that does all the work for this view.  Note that the
+   values of both the ``for`` attribute and the ``view`` attribute
+   begin with a single period.  Names that begin with a period are
+   "shortcuts" which point at files relative to the :term:`package` in
+   which the ``configure.zcml`` file lives.  In this case, since the
+   ``configure.zcml`` file lives within the ``myproject`` package, the
+   shorcut ``.models.MyModel`` could also be spelled
+   ``myproject.models.MyModel`` (forming a full Python dotted-path
+   name to the ``MyModel`` class).  Likewise the shortcut
    ``.views.my_view`` could be replaced with
    ``myproject.views.my_view``.
+
+#. Lines 11-15 register a view named ``static``.  This view
+   declaration points at the ``static_view``, which is a view
+   implementation that serves static files from the filesystem for the
+   default application.
 
 ``views.py``
 ~~~~~~~~~~~~
@@ -511,7 +529,15 @@ in the model, and the HTML given back to the browser.
 .. literalinclude:: MyProject/myproject/views.py
    :linenos:
 
-#. Lines 3-5 provide the ``my_view`` that was registered as the view.
+#. Lines 1-2 import required functions.
+
+#. Line 4 sets up a ``static_view`` which will be consulted when
+   visitors visit ``/static/<something>``.  This view will serve up
+   CSS and images in our default application.  This view is registered
+   in ``configure.zcml`` as the ``static`` view name for the class
+   ``MyModel`` (the root).
+
+#. Lines 6-9 provide the ``my_view`` that was registered as the view.
    ``configure.zcml`` said that the default URL for instances that are
    of the class ``MyModel`` should run this ``my_view`` function.
 
@@ -543,6 +569,11 @@ in the model, and the HTML given back to the browser.
   response's body.  There is also a ``get_template`` API in the same
   module, which you can use to retrieve the template object without
   rendering it at all, for additional control.
+
+.. note::
+
+   For more information about the ``static`` view helper function see
+   :ref:`static_resources_section`.
 
 .. _modelspy_project_section:
 
@@ -585,7 +616,7 @@ without the PasteDeploy configuration file:
 #. Line 1 imports the ``make_app`` functions from
    :mod:`repoze.bfg.router` that we use later.
 
-#. Lines 3-9 define a function that returns a :mod:`repoze.bfg` Router
+#. Lines 3-10 define a function that returns a :mod:`repoze.bfg` Router
    application from :ref:`router_module` .  This is meant to be called
    by the :term:`PasteDeploy` framework as a result of running
    ``paster serve``.
@@ -599,9 +630,15 @@ The single :term:`Chameleon` template in the project looks like so:
    :linenos:
    :language: xml
 
-It displays the current project name when it is rendered.  It is
-referenced by the ``my_view`` function in the ``views.py`` module.
-Templates are accessed and used by view functions.
+It displays a default page when rendered.  It is referenced by the
+``my_view`` function in the ``views.py`` module.  Templates are
+accessed and used by view functions.
+
+``templates/static``
+~~~~~~~~~~~~~~~~~~~~
+
+This directory contains static resources which support the
+``mytemplate.pt`` template.  It includes CSS and images.
 
 ``tests.py``
 ~~~~~~~~~~~~

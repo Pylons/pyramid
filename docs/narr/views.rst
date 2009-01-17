@@ -500,6 +500,8 @@ All exception types from the :mod:`webob.exc` module implement the
 view.  See :term:`WebOb` for the documentation for this module; it
 includes other response types for Unauthorized, etc.
 
+.. _static_resources_section:
+
 Serving Static Resources Using a View
 -------------------------------------
 

@@ -8,4 +8,10 @@
      view=".views.my_view"
      />
 
+  <view
+     for=".models.MyModel"
+     view=".views.static_view"
+     name="static"
+     />
+
 </configure>

@@ -28,7 +28,7 @@ class ViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = testing.registerDummyRenderer('templates/mytemplate.pt')
         response = my_view(context, request)
-        renderer.assert_(project='myproject')
+        renderer.assert_(project='MyProject')
 
 class ViewIntegrationTests(unittest.TestCase):
     """ These tests are integration tests for the view.  These test
@@ -51,7 +51,8 @@ class ViewIntegrationTests(unittest.TestCase):
         cleanUp()
         import myproject
         import zope.configuration.xmlconfig
-        zope.configuration.xmlconfig.file('configure.zcml', package=myproject)
+        zope.configuration.xmlconfig.file('configure.zcml',
+                                          package=myproject)
 
     def tearDown(self):
         """ Clear out the application registry """
@@ -64,7 +65,7 @@ class ViewIntegrationTests(unittest.TestCase):
         result = my_view(context, request)
         self.assertEqual(result.status, '200 OK')
         body = result.app_iter[0]
-        self.failUnless('Welcome to myproject' in body)
+        self.failUnless('Welcome to' in body)
         self.assertEqual(len(result.headerlist), 2)
         self.assertEqual(result.headerlist[0],
                          ('content-type', 'text/html; charset=UTF-8'))
