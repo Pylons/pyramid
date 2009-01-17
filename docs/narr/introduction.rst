@@ -95,6 +95,18 @@ during :mod:`repoze.bfg` application development.  Instead, the
 :mod:`repoze.bfg` framework tends to "hide" most interaction with the
 CA behind special-purpose API functions.
 
+Also unlike :term:`Zope` and unlike other "full-featured" frameworks
+such as :term:`Django`, :mod:`repoze.bfg` makes no assumptions about
+what persistence mechanisms you want to use to build an application.
+Zope applications are typically reliant on :term:`ZODB`;
+:mod:`repoze.bfg` allows you to build :term:`ZODB` applications, but
+it has no reliance on the ZODB package.  Likewise, :term:`Django`
+tends to make the assumption that you're going to want to store your
+application's data in a relational database.  :mod:`repoze.bfg` makes
+no such assumption; it allows you to use a relational database but
+doesn't enourage or discourage an application developer about such a
+decision.
+
 Why?
 ----
 
