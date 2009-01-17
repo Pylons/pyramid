@@ -65,7 +65,7 @@ class ViewIntegrationTests(unittest.TestCase):
         result = my_view(context, request)
         self.assertEqual(result.status, '200 OK')
         body = result.app_iter[0]
-        self.failUnless('Welcome to {{project}}' in body)
+        self.failUnless('Welcome to' in body)
         self.assertEqual(len(result.headerlist), 2)
         self.assertEqual(result.headerlist[0],
                          ('content-type', 'text/html; charset=UTF-8'))
