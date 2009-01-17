@@ -246,9 +246,12 @@ Here's an example:
    import myapp
    app = make_app(get_root, myapp)
 
-Obviously you can do more generic things that inspect the routes match
-dict to see if the ``article`` argument matches a particular string;
-our sample ``add_acl`` function is not very ambitious.
+If the route ``archives/:article`` is matched, :mod:`repoze.bfg` will
+generate an ``Article`` :term:`context` with an ACL on it that allows
+the ``editor`` principal the ``view`` permission.  Obviously you can
+do more generic things that inspect the routes match dict to see if
+the ``article`` argument matches a particular string; our sample
+``add_acl`` function is not very ambitious.
 
 .. note:: See :ref:`security_chapter` for more information about
    :mod:`repoze.bfg` security and ACLs.
