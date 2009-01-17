@@ -68,6 +68,64 @@ string manually as a response body:
 requests. This means that modifications to the ZPT require a restart
 before you can see the changes.
 
+Using ZPT Macros in :mod:`repoze.bfg`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unlike Zope 3 "browser views", :mod:`repoze.bfg` doesn't make any
+names (such as ``context`` and ``view``) available to
+:term:`chameleon.zpt` templates by default.  Instead, it expects you
+to pass all the names you need into the template.  One of the common
+needs in ZPT-based template is to one template's "macros" from within
+a different template.  In Zope, this is typically handled by
+retrieving the template from the ``context``.  To do the same thing in
+:mod:`repoze.bfg`, you need to make the macro template itself
+available to the rendered template by passing the macro template
+itself (or even the macro itself) into the rendered template.  To make
+a macro available to the rendered template, you can retrieve a
+different template using the ``get_template`` API, and pass it in to
+the template being rendered.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.chameleon_zpt import render_template_to_response
+   from repoze.bfg.chameleon_zpt import get_template
+
+   def my_view(context, request):
+       main = get_template('templates/master.pt')
+       return render_template_to_response('templates/mytemplate.pt', main=main)
+
+Where ``templates/master.pt`` might look like so:
+
+.. code-block:: xml
+   :linenos:
+
+    <html xmlns="http://www.w3.org/1999/xhtml" 
+          xmlns:tal="http://xml.zope.org/namespaces/tal"
+          xmlns:metal="http://xml.zope.org/namespaces/metal">
+       <span tal:define-macro="hello">
+          <h1>
+             Hello <span metal:define-slot="name">Fred</span>!
+          </h1>
+       </span>
+    </html>
+
+And ``templates/mytemplate.pt`` might look like so:
+
+.. code-block:: xml
+   :linenos:
+
+    <html xmlns="http://www.w3.org/1999/xhtml" 
+          xmlns:tal="http://xml.zope.org/namespaces/tal"
+          xmlns:metal="http://xml.zope.org/namespaces/metal">
+       <span tal:use-macro="main['hello']">
+          <span metal:use-macro="name">
+             <span metal:fill-slot="name">Chris</span>
+          </span>
+       </span>
+    </html>
+
+
 Templating with XSLT
 ------------------------
 

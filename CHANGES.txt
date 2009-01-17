@@ -59,6 +59,9 @@ Documentation Additions
 - Better documentation of security policy implementations that ship
   with repoze.bfg.
 
+- Added a "Using ZPT Macros in repoze.bfg" section to the narrative
+  templating chapter.
+
 0.6.2 (2009-01-13)
 ==================
 
