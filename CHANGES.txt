@@ -56,6 +56,9 @@ Documentation Additions
 - Add a section on "Using BFG Security With URL Dispatch" into the
   urldispatch chapter of the documentation.
 
+- Better documentation of security policy implementations that ship
+  with repoze.bfg.
+
 0.6.2 (2009-01-13)
 ==================
 
