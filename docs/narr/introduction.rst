@@ -7,30 +7,29 @@ work.  However, it simpler than any than any released version of Zope.
 :mod:`repoze.bfg` uses the :term:`WSGI` protocol to handle requests
 and responses.
 
-Similarities with Other Frameworks
-----------------------------------
+Similarities to Other Frameworks
+--------------------------------
 
-:mod:`repoze.bfg` was inspired by Zope, Django, and Pylons.
+:mod:`repoze.bfg` was inspired by :term:`Zope`, :term:`Django`, and
+:term:`Pylons`.
 
-:mod:`repoze.bfg` traversal is inspired by Zope.  :mod:`repoze.bfg`
-uses the Zope Component Architecture ("CA") internally, as do Zope 2,
-Zope 3, and Grok.  Developers don't interact with the CA very much
-during typical development, however; it's mostly used by the framework
-developer rather than the application developer.  :mod:`repoze.bfg`
-developers use :term:`ZCML` (an XML dialect) or decorators to perform
-various configuration tasks; in particular, as in Zope3, one more more
-:term:`view` functions is associated with a :term:`model` type via
-ZCML or a decorator.
+The :mod:`repoze.bfg` concept of traversal is inspired by
+:term:`Zope`.  Additionally, :mod:`repoze.bfg` uses the Zope Component
+Architecture ("CA") internally, as do Zope 2, Zope 3, and
+:term:`Grok`.  Application :mod:`repoze.bfg` developers use either
+:term:`ZCML` (an XML dialect, used in Zope) or decorators to perform
+various configuration tasks.  The decorator support is provided by the
+:term:`Grok` project.
 
-Like Pylons, :mod:`repoze.bfg` is mostly policy-free.  It makes no
-assertions about which database you should use, and its built-in
-templating facilities are only for convenience.  In essence, it only
-supplies a mechanism to map URLs to :term:`view` code, along with a
-convention for calling those views.  You are free to use third-party
-components in your application that fit your needs.  Also like Pylons,
-:mod:`repoze.bfg` is heavily dependent on WSGI.
+Like :term:`Pylons`, :mod:`repoze.bfg` is mostly policy-free.  It
+makes no assertions about which database you should use, and its
+built-in templating facilities are only for convenience.  In essence,
+it only supplies a mechanism to map URLs to :term:`view` code, along
+with a convention for calling those views.  You are free to use
+third-party components in your application that fit your needs.  Also
+like Pylons, :mod:`repoze.bfg` is heavily dependent on WSGI.
 
-The Django docs state that Django is an "MTV" framework in their `FAQ
+The "Django docs state that Django is an "MTV" framework in their `FAQ
 <http://www.djangoproject.com/documentation/faq/>`_.  This also
 happens to be true for :mod:`repoze.bfg`::
 
@@ -71,6 +70,30 @@ Django.
 
 To learn more about the concepts used by :mod:`repoze.bfg`, visit the
 :ref:`glossary` for a listing of definitions.
+
+Differences from Other Frameworks
+---------------------------------
+
+Like :term:`Zope`, the :mod:`repoze.bfg` framework imposes slightly
+more `control inversion <http://plope.com/control_inversion>`_ upon
+application developers than other Python frameworks such as
+:term:`Pylons`.  For example :mod:`repoze.bfg` assumes that you're
+wiling to resolve a URL to a :term:`context` object before passing it
+to a :term:`view`.  Pylons and other Python "MVC" frameworks have no
+such intermediate step; they resolve a URL directly to a controller.
+Another example: using the :mod:`repoze.bfg` security subsystem
+assumes that you're willing to attach an :term:`ACL` to a
+:term:`context` object; the ACL is checked by the framework itself
+instead of by user code, and access is permitted or denied by the
+framework itself rather than by user code.  Such a task would
+typically be performed by user-space decorators in other Python web
+frameworks.
+
+Unlike application development using Zope, application developers
+don't interact with the Zope Component Architecture ("CA") very much
+during :mod:`repoze.bfg` application development.  Instead, the
+:mod:`repoze.bfg` framework tends to "hide" most interaction with the
+CA behind special-purpose API functions.
 
 Why?
 ----

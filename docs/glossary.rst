@@ -72,10 +72,15 @@ Glossary
     in your :mod:`repoze.bfg` application, you are using URL dispatch.
     See the :ref:`urldispatch_module` for more information.
   Context
-    A :term:`model` in the system that is "found" during
-    :term:`traversal` or :term:`URL dispatch`; it becomes the subject
-    of a :term:`view`.  See the :ref:`traversal_chapter` chapter for
-    more information.
+    A object in the system that is found during :term:`traversal` or
+    :term:`URL dispatch` based on URL data; if it's found via
+    traversal, it's usually a :term:`model` object; if it's found via
+    :term:`URL dispatch`, it's a manufactured context object that
+    contains routing information.  A context becomes the subject of a
+    :term:`view`, and typically has security information attached to
+    it.  See the :ref:`traversal_chapter` chapter and the
+    :ref:`urldispatch_chapter` chapter for more information about how
+    a URL is resolved to a context.
   Application registry
     A registry which maps model types to views, as well as performing
     other application-specific component registrations.  Every
@@ -175,8 +180,14 @@ Glossary
     An `Apache module <http://code.google.com/p/modwsgi/>`_ for hosting
     Python WSGI applications.
   Zope
-    `The Z Object Publishing Framework <http://zope.org>`_.  The granddaddy 
-    of Python web frameworks.
+    `The Z Object Publishing Framework <http://zope.org>`_, a
+    full-featured Python web framework.
+  Grok
+    `A web framework based on Zope 3 <http://grok.zope.org>`_.
+  Django
+    `A full-featured Python web framework <http://djangoproject.com>`_.
+  Pylons
+    `A lightweight Python web framework <http://pylonshq.com>`_.
   ZODB
      `Zope Object Database <http://wiki.zope.org/ZODB/FrontPage>`_, a
      persistent Python object store.
@@ -243,8 +254,9 @@ Glossary
     :mod:`repoze.bfg` is to perform view mappings via the ``view``
     declaration.  The ``configure.zcml`` file in a :mod:`repoze.bfg`
     application represents the application's :term:`application
-    registry`.  See :term:`repoze.bfg.convention` for an alternative
-    to ZCML for application configuration.
+    registry`.  You can also use decorators to configure views in
+    :mod:`repoze.bfg`; see
+    :ref:`mapping_views_to_urls_using_a_decorator_section`.
   ReStructuredText
     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
     that is the defacto standard for descriptive text shipped in
@@ -259,13 +271,14 @@ Glossary
     or a request object in order to identify that the object is "of a
     type".  Interfaces are used internally by :mod:`repoze.bfg` to
     perform view lookups and security policy lookups.  Interfaces are
-    exposed to application programmers by the ``view`` ZCML
-    directive in the form of both the ``for_`` attribute and the
-    ``request_type`` attribute.  They may be exposed to application
-    developers when using the :term:`event` system as
-    well. Fundamentally, :mod:`repoze.bfg` programmers can think of an
-    interface as something that they can attach to an object that
-    stamps it with a "type".  Interfaces can also be used to describe
+    exposed to application programmers by the ``view`` ZCML directive
+    or the corresponding ``bfg_view`` decorator in the form of both
+    the ``for`` attribute and the ``request_type`` attribute.  They
+    may be exposed to application developers when using the
+    :term:`event` system as well. Fundamentally, :mod:`repoze.bfg`
+    programmers can think of an interface as something that they can
+    attach to an object that stamps it with a "type" unrelated to its
+    underlying Python type.  Interfaces can also be used to describe
     the behavior of an object (its methods and attributes), but unless
     they choose to, :mod:`repoze.bfg` programmers do not need to
     understand or use this feature of interfaces.  In other words, bfg
@@ -320,4 +333,5 @@ Glossary
     `An add-on for repoze.bfg
     <http://static.repoze.org/conventiondocs>`_ which provides
     alternative mechanisms for common :mod:`repoze.bfg` application
-    configuration tasks.  Useful for the :term:`ZCML` -allergic.
+    configuration tasks.  The functionality of this package has been
+    merged into the :mod:`repoze.bfg` core as of version 0.6.3.

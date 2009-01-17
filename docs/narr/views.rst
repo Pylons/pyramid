@@ -61,6 +61,8 @@ If a view happens to return something to the :mod:`repoze.bfg`
 publisher that does not implement this interface, the publisher will
 raise an error.
 
+.. _mapping_views_to_urls_using_zcml_section:
+
 Mapping Views to URLs Using ZCML
 --------------------------------
 
@@ -158,6 +160,8 @@ request_type
   the :term:`request` must have in order for this view to be found and
   called.  See :ref:`view_request_types_section` for more
   information about view security and permissions.
+
+.. _mapping_views_to_urls_using_a_decorator_section:
 
 Mapping Views to URLs Using a Decorator
 ---------------------------------------
