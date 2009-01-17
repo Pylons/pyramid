@@ -432,24 +432,34 @@ class TestStaticView(unittest.TestCase, BaseTest):
         from repoze.bfg.view import static
         return static
 
-    def _getHere(self):
-        import os
-        return os.path.dirname(__file__)
-
-    def _makeOne(self):
-        here = self._getHere()
-        return self._getTargetClass()(here)
+    def _makeOne(self, path):
+        return self._getTargetClass()(path)
         
-    def test_it(self):
-        view = self._makeOne()
+    def test_abspath(self):
+        import os
+        path = os.path.dirname(__file__)
+        view = self._makeOne(path)
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ['__init__.py']
         request.environ = self._makeEnviron()
         response = view(context, request)
         self.assertEqual(request.copied, True)
-        here = self._getHere()
-        self.assertEqual(response.directory, here)
+        self.assertEqual(response.directory, path)
+
+    def test_relpath(self):
+        import os
+        path = 'fixtures'
+        view = self._makeOne(path)
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertEqual(request.copied, True)
+        here = os.path.abspath(os.path.dirname(__file__))
+        abspath = os.path.join(here, 'fixtures')
+        self.assertEqual(response.directory, abspath)
 
 class TestBFGViewDecorator(unittest.TestCase):
     def setUp(self):

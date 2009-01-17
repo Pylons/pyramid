@@ -6,6 +6,7 @@ from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
 
+from repoze.bfg.path import caller_path
 from repoze.bfg.security import Unauthorized
 from repoze.bfg.security import Allowed
 
@@ -132,15 +133,20 @@ class static(object):
     directory may contain subdirectories (recursively); the static
     view implementation will descend into these directories as
     necessary based on the components of the URL in order to resolve a
-    path into a response
+    path into a response.
 
-    Pass the absolute filesystem path to the directory containing
-    static files directory to the constructor as the ``root_dir``
-    argument.  ``cache_max_age`` influences the Expires and Max-Age
-    response headers returned by the view (default is 3600 seconds or
-    five minutes).
+    You may pass an absolute or relative filesystem path to the
+    directory containing static files directory to the constructor as
+    the ``root_dir`` argument.  If the path is relative, it will be
+    considered relative to the directory in which the Python file
+    which calls ``static`` resides.  ``cache_max_age`` influences the
+    Expires and Max-Age response headers returned by the view (default
+    is 3600 seconds or five minutes).  ``level`` influences how
+    relative directories are resolved (the number of hops in the call
+    stack), not used very often.
     """
-    def __init__(self, root_dir, cache_max_age=3600):
+    def __init__(self, root_dir, cache_max_age=3600, level=2):
+        root_dir = caller_path(root_dir, level=level)
         self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
 
     def __call__(self, context, request):
