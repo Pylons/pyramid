@@ -12,6 +12,14 @@ Bug Fixes
 Features
 --------
 
+- The ``bfg_starter`` and ``bfg_zodb`` "paster create" templates now
+  contain images and CSS which are displayed when the default page is
+  displayed after initial project generation.
+
+- Allow the ``repoze.bfg.view.static`` helper to be passed a relative
+  ``root_path`` name; it will be considered relative to the file in
+  which it was called.
+
 - The functionality of ``repoze.bfg.convention`` has been merged into
   the core.  Applications which make use of ``repoze.bfg.convention``
   will continue to work indefinitely, but it is recommended that apps
