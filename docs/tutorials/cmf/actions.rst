@@ -24,3 +24,6 @@ individual views (tabs) within the group which cannot be displayed to
 the user due to the user's lack of permissions will be omitted from
 the rendered output.
 
+The :term:`repoze.lemonade` package provides "list item" support that
+may be used to construct action lists.
+

@@ -31,12 +31,22 @@ However, if you add the following bit of code to your application's
 The above inscrutable stanza enables the
 ``RemoteUserACLSecurityPolicy`` to be in effect for every request to
 your application.  The ``RemoteUserACLSecurityPolicy`` is a policy
-which compares the ``REMOTE_USER`` variable passed in the reqest's
-environment (as the sole :term:`principal`) against any *ACL* found in
-model data when attempting to call some :term:`view`.  The policy
-either allows the view that the permission was declared for to be
-called, or returns a ``401 Unathorized`` response code to the upstream
-WSGI server.
+which compares the ``REMOTE_USER`` variable passed in the request's
+environment (as the sole :term:`principal`) against the principals
+present in any :term:`ACL` found in model data when attempting to call
+some :term:`view`.  The policy either allows the view that the
+permission was declared for to be called, or returns a ``401
+Unathorized`` response code to the upstream WSGI server.
+
+.. note:: Another security policy also exists:
+   ``RepozeWhoIdentityACLSecurityPolicy``.  This policy uses principal
+   information found in the ``repoze.who.identity`` value set into the
+   WSGI environment by the :term:`repoze.who` middleware rather than
+   ``REMOTE_USER`` information. This policy only works when
+   :term:`repoze.who` middleware is present in the WSGI pipeline.
+
+.. note:: See :ref:`security_policies_api_section` for more
+   information about the features of the default security policies.
 
 Protecting Views with Permissions
 ---------------------------------

@@ -8,5 +8,3 @@
 
 - Describe better that render_template_to_response is a shortcut.
 
-- Show usage of, e.g. HTTPFound(location=url).
-

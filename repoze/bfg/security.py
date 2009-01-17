@@ -164,6 +164,16 @@ def RemoteUserACLSecurityPolicy():
       __acl__ attribute will be used by the security machinery to
       grant or deny access.
 
+    Enable this security policy by adding the following to your
+    application's ``configure.zcml``:
+
+    .. code-block:: xml
+
+       <utility
+        provides="repoze.bfg.interfaces.ISecurityPolicy"
+        factory="repoze.bfg.security.RemoteUserACLSecurityPolicy"
+        />
+
     """
     return ACLSecurityPolicy(get_remoteuser)
 
@@ -176,12 +186,13 @@ def get_who_principals(request):
     return principals
 
 def RepozeWhoIdentityACLSecurityPolicy():
-    """ A security policy which:
+    """
+    A security policy which:
 
     - examines the request.environ for the ``repoze.who.identity``
       dictionary.  If one is found, the principal ids for the request
       are composed of ``repoze.who.identity['repoze.who.userid']``
-      plus ``repoze.who.identity.get('groups', []).
+      plus ``repoze.who.identity.get('groups', [])``.
 
     - uses an ACL-based authorization model which attempts to find an
       ACL on the context, and which returns ``Allowed`` from its
@@ -194,6 +205,15 @@ def RepozeWhoIdentityACLSecurityPolicy():
       __acl__ attribute will be used by the security machinery to
       grant or deny access.
 
+    Enable this security policy by adding the following to your
+    application's ``configure.zcml``:
+
+    .. code-block:: xml
+
+       <utility
+        provides="repoze.bfg.interfaces.ISecurityPolicy"
+        factory="repoze.bfg.security.RepozeWhoIdentityACLSecurityPolicy"
+        />
     """
     return ACLSecurityPolicy(get_who_principals)
 

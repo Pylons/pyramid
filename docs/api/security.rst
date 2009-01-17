@@ -5,47 +5,65 @@
 
 .. automodule:: repoze.bfg.security
 
-  .. autofunction:: authenticated_userid
+API Functions
+~~~~~~~~~~~~~
 
-  .. autofunction:: effective_principals
+.. autofunction:: authenticated_userid
 
-  .. autofunction:: has_permission
+.. autofunction:: effective_principals
 
-  .. autofunction:: principals_allowed_by_permission
+.. autofunction:: has_permission
 
-  .. attribute:: Everyone
+.. autofunction:: principals_allowed_by_permission
+
+Constants
+~~~~~~~~~
+
+.. attribute:: Everyone
 
     The special principal id named 'Everyone'.  This principal id is
     granted to all requests.  Its actual value is the string
     'system.Everyone'.
 
-  .. attribute:: Authenticated
+.. attribute:: Authenticated
 
     The special principal id named 'Authenticated'.  This principal id
     is granted to all requests which contain any other non-Everyone
     principal id (according to the security policy).  Its actual value
     is the string 'system.Authenticated'.
 
-  .. attribute:: Allow
+Return Values
+~~~~~~~~~~~~~
+
+.. attribute:: Allow
 
     The ACE "action" (the first element in an ACE e.g. ``(Allow, Everyone,
     'read')`` that means allow access.  A sequence of ACEs makes up an
     ACL.  It is a string, and it's actual value is "Allow".
 
-  .. attribute:: Deny
+.. attribute:: Deny
 
     The ACE "action" (the first element in an ACE e.g. ``(Deny,
     'george', 'read')`` that means deny access.  A sequence of ACEs
     makes up an ACL.  It is a string, and it's actual value is "Deny".
 
-  .. autoclass:: ACLDenied
-     :members:
+.. autoclass:: ACLDenied
+   :members:
 
-  .. autoclass:: ACLAllowed
-     :members:
+.. autoclass:: ACLAllowed
+   :members:
 
-  .. autoclass:: Denied
-     :members:
+.. autoclass:: Denied
+   :members:
 
-  .. autoclass:: Allowed
-     :members:
+.. autoclass:: Allowed
+   :members:
+
+.. _security_policies_api_section:
+
+Security Policies
+~~~~~~~~~~~~~~~~~
+
+.. autofunction:: RepozeWhoIdentityACLSecurityPolicy
+
+.. autofunction:: RemoteUserACLSecurityPolicy

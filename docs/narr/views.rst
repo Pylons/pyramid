@@ -266,10 +266,10 @@ Using Model Interfaces
 ----------------------
 
 Instead of registering your views ``for`` a Python *class*, you can
-instead register a view for an :term:`interface`.  Since an interface
-can be attached arbitrarily to any instance (as opposed to its
-identity being implied by only its class), associating a view with an
-interface can provide more flexibility for sharing a single view
+optionally register a view for an :term:`interface`.  Since an
+interface can be attached arbitrarily to any instance (as opposed to
+its identity being implied by only its class), associating a view with
+an interface can provide more flexibility for sharing a single view
 between two or more different implementations of a model type.  For
 example, if two model object instances of different Python class types
 share the same interface, you can use the same view against each of
@@ -471,15 +471,22 @@ declaration:
        />
 
 When a security policy is enabled, this view will be protected with
-the ``add`` permission.  The view will not be called if the user does
-not possess the ``add`` permission relative to the current
-:term:`context`.  Instead an HTTP ``Unauthorized`` status will be
-returned to the client.
+the ``add`` permission.  The view will *not be called* if the user
+does not possess the ``add`` permission relative to the current
+:term:`context` and a security policy is enabled.  Instead an HTTP
+``Unauthorized`` status will be returned to the client.
 
 .. note::
 
    See the :ref:`security_chapter` chapter to find out how to turn on
    a security policy.
+
+.. note::
+
+   Packages such as :term:`repoze.who` are capable of intercepting an
+   ``Unauthorized`` response and displaying a form that asks a user to
+   authenticate.  Use this kind of package to ask the user for
+   authentication credentials.
 
 Using a View to Do A HTTP Redirect
 ----------------------------------
