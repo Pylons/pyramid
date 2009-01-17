@@ -198,9 +198,9 @@ declarative security purposes.  A Routes 'trick' can allow for this.
 Routes makes it possible to pass a ``conditions`` argument to the
 ``connect`` method of a mapper.  The value of ``conditions`` is a
 dictionary.  If you pass a ``conditions`` dictionary to this
-``connect`` method with a `function`` key that has a value which is a
-function, this function can be used to update the ``__acl__`` of the
-model object.
+``connect`` method with a ``function`` key that has a value which is a
+Python function, this function can be used to update the ``__acl__``
+of the model object.
 
 When Routes tries to resolve a particular route via a match, the route
 object itself will pass the environment and the "match_dict" to the
@@ -227,6 +227,9 @@ Here's an example:
    from repoze.bfg.router import make_app
    from repoze.bfg.security import Allow
    from repoze.bfg.urldispatch import RoutesMapper
+
+   def fallback_get_root(environ):
+       return {} # the graph traversal root is empty in this example
 
    class Article(object):
        def __init__(self, **kw):
