@@ -49,22 +49,24 @@ a :mod:`repoze.bfg` ``get_root`` callable, and is willing to be
 configured with *route mappings* as necessary via its ``.connect``
 method.
 
-A ``get_root`` callable is a callable passed to the :mod:`repoze.bfg`
-framework by an application, allowing bfg to find the "root" object of
-a traversal graph.  The :class:`RoutesMapper` is essentially willing
-to act as the "root callable".  When it acts as such a callable, it is
-willing to check the requested URL against a *routes map*, and
-subsequently look up and call a :mod:`repoze.bfg` view with the
-information it finds within a particular route, if any configured
-route matches the currently requested URL.  If no URL matches, the
-:class:`RoutesMapper` will fall back to calling a ``get_root``
-callable that is passed in to it at construction time, which allows
-your application to fall back to a different "root" (perhaps one based
-on traversal).  By configuring a :class:`RoutesMapper` appropriately,
-you can mix and match URL dispatch and traversal in this way.
+The :class:`RoutesMapper` is essentially willing to act as the "root
+callable".  When it acts as such a callable, it is willing to check
+the requested URL against a *routes map*, and subsequently look up and
+call a :mod:`repoze.bfg` view with the information it finds within a
+particular route, if any configured route matches the currently
+requested URL.  A ``get_root`` callable is a callable passed to the
+:mod:`repoze.bfg` framework by an application, allowing
+:mod:`repoze.bfg` to fail over to another "root" object in case the
+routes mapper can't find a match for a particular URL.  If no URL
+matches, the :class:`RoutesMapper` will fall back to calling the
+fallback ``get_root`` callable that is passed in to it at construction
+time, which allows your application to fall back to a different "root"
+(perhaps one based on traversal).  By configuring a
+:class:`RoutesMapper` appropriately, you can mix and match URL
+dispatch and traversal in this way.
 
 .. note:: See :ref:`modelspy_project_section` for an example of a
-          simple ``get_root`` callable.
+          simple ``get_root`` callable that uses traversal.
 
 Configuring a :class:`RoutesMapper` with individual routes is
 performed by creating an instance of a :class:`RoutesMapper`, and
