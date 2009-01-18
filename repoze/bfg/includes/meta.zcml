@@ -11,9 +11,9 @@
         />
 
     <meta:directive
-        name="grok"
-        schema="repoze.bfg.zcml.IGrokDirective"
-        handler="repoze.bfg.zcml.grok"
+        name="scan"
+        schema="repoze.bfg.zcml.IScanDirective"
+        handler="repoze.bfg.zcml.scan"
         />
 
   </meta:directives>

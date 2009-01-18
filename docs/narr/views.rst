@@ -179,7 +179,7 @@ To make :mod:`repoze.bfg` process your ``bfg_view`` declarations, you
 *must* insert the following boilerplate into your application's
 ``configure.zcml``::
 
-  <grok package="."/>
+  <scan package="."/>
 
 After you do so, you will not need to use any other ZCML to configure
 :mod:`repoze.bfg` view declarations.  Instead, you will use a

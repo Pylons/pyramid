@@ -210,7 +210,7 @@ class bfg_view(object):
     To make use of bfg_view declarations, insert the following
     boilerplate into your application registry's ZCML::
     
-      <grok package="."/>
+      <scan package="."/>
     """
     def __init__(self, name='', request_type=IRequest, for_=Interface,
                permission=None):

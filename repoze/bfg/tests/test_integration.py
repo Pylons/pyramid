@@ -35,13 +35,13 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         result = wsgiapptest(context, request)
         self.assertEqual(result, '123')
 
-    def test_grokkage(self):
+    def test_scanned(self):
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.zcml import grok
+        from repoze.bfg.zcml import scan
         context = DummyContext()
         from repoze.bfg.tests import test_integration
-        grok(context, test_integration)
+        scan(context, test_integration)
         actions = context.actions
         self.assertEqual(len(actions), 2)
         action = actions[1]
@@ -75,13 +75,13 @@ class PushPagePlusBFGViewTests(unittest.TestCase):
         result = pushtest(context, request)
         self.assertEqual(result.status, '200 OK')
 
-    def test_grokkage(self):
+    def test_scanned(self):
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.zcml import grok
+        from repoze.bfg.zcml import scan
         context = DummyContext()
         from repoze.bfg.tests import test_integration
-        grok(context, test_integration)
+        scan(context, test_integration)
         actions = context.actions
         self.assertEqual(len(actions), 2)
         action = actions[0]

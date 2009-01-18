@@ -492,7 +492,7 @@ class TestBFGViewFunctionGrokker(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 0)
 
-class TestZCMLGrokFunction(unittest.TestCase):
+class TestZCMLScanFunction(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -500,8 +500,8 @@ class TestZCMLGrokFunction(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, package, martian):
-        from repoze.bfg.zcml import grok
-        return grok(context, package, martian)
+        from repoze.bfg.zcml import scan
+        return scan(context, package, martian)
 
     def test_it(self):
         martian = DummyMartianModule()

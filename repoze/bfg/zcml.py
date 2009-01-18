@@ -217,16 +217,16 @@ def exclude(name):
         return True
     return False
 
-def grok(_context, package, martian=martian):
+def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
     module_grokker = martian.ModuleGrokker()
     module_grokker.register(BFGViewFunctionGrokker())
     martian.grok_dotted_name(package.__name__, grokker=module_grokker,
                              context=_context, exclude_filter=exclude)
 
-class IGrokDirective(Interface):
+class IScanDirective(Interface):
     package = GlobalObject(
-        title=u"The package we'd like to grok.",
+        title=u"The package we'd like to scan.",
         required=True,
         )
 
