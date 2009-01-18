@@ -15,7 +15,8 @@
 
   .. autofunction:: view_execution_permitted
 
-  .. autofunction:: bfg_view
+  .. autoclass:: bfg_view
+     :members:
 
   .. autoclass:: static
      :members:

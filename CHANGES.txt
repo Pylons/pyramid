@@ -12,6 +12,26 @@ Bug Fixes
 Features
 --------
 
+- URL-dispatch has been overhauled: it is no longer necessary to
+  manually create a RoutesMapper in your application's entry point
+  callable in order to use URL-dispatch (aka `Routes
+  <http://routes.groovie.org>`_).  A new ``route`` directive has been
+  added to the available list of ZCML directives.  Each ``route``
+  directive inserted into your application's ``configure.zcml``
+  establishes a Routes mapper connection.  If any ``route``
+  declarations are made via ZCML within a particular application, the
+  ``get_root`` callable passed in to ``repoze.bfg.router.make_app``
+  will automatically be wrapped in the equivalent of a RoutesMapper.
+  Additionally, the new ``route`` directive allows the specification
+  of a ``context_interfaces`` attribute for a route, this will be used
+  to tag the manufactured routes context with specific interfaces when
+  a route specifying a ``context_interfaces`` attribute is matched.
+
+- A new interface ``repoze.bfg.interfaces.IContextNotFound`` was
+  added.  This interface is attached to a "dummy" context generated
+  when Routes cannot find a match and there is no "fallback" get_root
+  callable that uses traversal.
+
 - The ``bfg_starter`` and ``bfg_zodb`` "paster create" templates now
   contain images and CSS which are displayed when the default page is
   displayed after initial project generation.
@@ -39,6 +59,15 @@ Features
   allow both to be overridden via a ZCML utility hook.  See the "Using
   ZCML Hooks" chapter of the documentation for more information.
 
+Deprecations
+------------
+
+- The class ``repoze.bfg.urldispatch.RoutesContext`` has been renamed
+  to ``repoze.bfg.urldispatch.DefaultRoutesContext``.  The class
+  should be imported by the new name as necessary (although in reality
+  it probably shouldn't be imported from anywhere except internally
+  within BFG, as it's not part of the API).
+
 Implementation Changes
 ----------------------
 
@@ -50,8 +79,19 @@ Implementation Changes
   ``webob.Request.get_response`` to do its work rather than relying on
   homegrown WSGI code.
 
+- The ``repoze.bfg.urldispatch.RoutesModelTraverser`` class has been
+  moved to ``repoze.bfg.traversal.RoutesModelTraverser``.
+
+- The ``repoze.bfg.registry.makeRegistry`` function was renamed to
+  ``repoze.bfg.registry.populateRegistry`` and now accepts a
+  ``registry`` argument (which should be an instance of
+  ``zope.component.registry.Components``).
+
 Documentation Additions
 -----------------------
+
+- Updated narrative urldispatch chapter with changes required by
+  ``<route..>`` ZCML directive.
 
 - Add a section on "Using BFG Security With URL Dispatch" into the
   urldispatch chapter of the documentation.

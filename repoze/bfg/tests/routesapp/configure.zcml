@@ -1,0 +1,16 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg.includes" />
+
+  <route
+    path=":id/:view_name"
+    context_interfaces=".models.IFixture"/>
+
+  <view
+      name="default"
+      view=".views.fixture_view"
+      for=".models.IFixture"
+      permission="repoze.view"
+      />
+
+</configure>

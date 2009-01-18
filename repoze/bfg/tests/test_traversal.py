@@ -198,6 +198,61 @@ class ModelGraphTraverserTests(unittest.TestCase):
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         ctx, name, subpath = policy(environ) # test is: this doesn't fail
 
+class RoutesModelTraverserTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.traversal import RoutesModelTraverser
+        return RoutesModelTraverser
+
+    def _makeOne(self, model):
+        klass = self._getTargetClass()
+        return klass(model)
+
+    def test_class_conforms_to_ITraverser(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.interfaces import ITraverser
+        verifyClass(ITraverser, self._getTargetClass())
+
+    def test_instance_conforms_to_ITraverser(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import ITraverser
+        verifyObject(ITraverser, self._makeOne(None))
+
+    def test_call_with_only_controller(self):
+        model = DummyContext()
+        model.controller = 'controller'
+        traverser = self._makeOne(model)
+        result = traverser({})
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'controller')
+        self.assertEqual(result[2], [])
+
+    def test_call_with_only_view_name(self):
+        model = DummyContext()
+        model.view_name = 'view_name'
+        traverser = self._makeOne(model)
+        result = traverser({})
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], [])
+
+    def test_call_with_subpath(self):
+        model = DummyContext()
+        model.view_name = 'view_name'
+        model.subpath = '/a/b/c'
+        traverser = self._makeOne(model)
+        result = traverser({})
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], ['a', 'b', 'c'])
+
+    def test_call_with_no_view_name_or_controller(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        result = traverser({})
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], '')
+        self.assertEqual(result[2], [])
+
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from repoze.bfg.traversal import find_interface

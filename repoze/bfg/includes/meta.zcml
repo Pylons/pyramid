@@ -18,4 +18,19 @@
 
   </meta:directives>
 
+  <meta:groupingDirective
+      namespace="http://namespaces.repoze.org/bfg"
+      name="route"
+      schema="repoze.bfg.zcml.IRouteDirective"
+      handler="repoze.bfg.zcml.Route"
+      />
+
+  <meta:directive
+      name="requirement"
+      namespace="http://namespaces.repoze.org/bfg"
+      usedIn="repoze.bfg.zcml.IRouteDirective"
+      schema="repoze.bfg.zcml.IRouteRequirementDirective"
+      handler="repoze.bfg.zcml.route_requirement"
+      />
+
 </configure>

@@ -5,7 +5,6 @@ import zope.component
 from zope.component import getGlobalSiteManager
 from zope.component.interfaces import ComponentLookupError
 from zope.component.interfaces import IComponentLookup
-from zope.component.registry import Components
 from zope.component import getSiteManager as original_getSiteManager
 
 from zope.deferredimport import deprecated
@@ -54,7 +53,7 @@ def setRegistryManager(manager): # for unit tests
     registry_manager = manager
     return old_registry_manager
 
-def makeRegistry(filename, package, lock=threading.Lock()):
+def populateRegistry(registry, filename, package, lock=threading.Lock()):
 
     """ We push our ZCML-defined configuration into an app-local
     component registry in order to allow more than one bfg app to live
@@ -71,13 +70,11 @@ def makeRegistry(filename, package, lock=threading.Lock()):
     registry."""
     
     lock.acquire()
-    registry = Components(package.__name__)
     registry_manager.push(registry)
     try:
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
         zcml_configure(filename, package=package)
-        return registry
     finally:
         zope.component.getGlobalSiteManager = getGlobalSiteManager
         lock.release()

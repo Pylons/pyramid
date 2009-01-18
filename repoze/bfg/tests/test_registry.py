@@ -2,7 +2,7 @@ import unittest
 
 from zope.testing.cleanup import cleanUp
 
-class TestMakeRegistry(unittest.TestCase):
+class TestPopulateRegistry(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -10,8 +10,8 @@ class TestMakeRegistry(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.registry import makeRegistry
-        return makeRegistry(*arg, **kw)
+        from repoze.bfg.registry import populateRegistry
+        return populateRegistry(*arg, **kw)
 
     def test_it(self):
         from repoze.bfg.tests import fixtureapp
@@ -20,11 +20,12 @@ class TestMakeRegistry(unittest.TestCase):
         import repoze.bfg.registry
         try:
             old = repoze.bfg.registry.setRegistryManager(dummyregmgr)
-            registry = self._callFUT('configure.zcml',
-                                     fixtureapp,
-                                     lock=dummylock)
             from zope.component.registry import Components
-            self.failUnless(isinstance(registry, Components))
+            registry = Components('hello')
+            self._callFUT(registry,
+                          'configure.zcml',
+                          fixtureapp,
+                          lock=dummylock)
             self.assertEqual(dummylock.acquired, True)
             self.assertEqual(dummylock.released, True)
             self.assertEqual(dummyregmgr.registry, registry)

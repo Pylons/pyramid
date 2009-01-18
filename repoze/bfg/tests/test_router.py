@@ -123,6 +123,24 @@ class RouterTests(unittest.TestCase):
         self.failIf('debug_notfound' in result[0])
         self.assertEqual(len(logger.messages), 0)
 
+    def test_call_root_is_icontextnotfound(self):
+        from zope.interface import implements
+        from repoze.bfg.interfaces import IContextNotFound
+        class NotFound(object):
+            implements(IContextNotFound)
+        context = NotFound()
+        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(traversalfactory, '', None)
+        environ = self._makeEnviron()
+        start_response = DummyStartResponse()
+        rootfactory = make_rootfactory(NotFound())
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne(None)
+        result = router(environ, start_response)
+        status = start_response.status
+        self.assertEqual(status, '404 Not Found')
+        self.failUnless('http://localhost:8080' in result[0], result)
+
     def test_call_no_view_registered_debug_notfound_false(self):
         rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
@@ -584,6 +602,75 @@ class MakeAppTests(unittest.TestCase):
             self.assertEqual(rootfactory, rootpolicy)
             self.assertEqual(dummy_registry_manager.pushed, True)
             self.assertEqual(dummy_registry_manager.popped, True)
+        finally:
+            repoze.bfg.router.registry_manager = old_registry_manager
+
+    def test_routes_in_config_with_rootpolicy(self):
+        options= {'reload_templates':True,
+                  'debug_authorization':True}
+        import repoze.bfg.router
+        old_registry_manager = repoze.bfg.router.registry_manager
+        dummy_registry_manager = DummyRegistryManager()
+        repoze.bfg.router.registry_manager = dummy_registry_manager
+        from repoze.bfg.urldispatch import RoutesRootFactory
+        try:
+            from repoze.bfg.tests import routesapp
+            rootpolicy = make_rootfactory(None)
+            app = self._callFUT(rootpolicy, routesapp, options=options)
+            from repoze.bfg.interfaces import ISettings
+            from repoze.bfg.interfaces import ILogger
+            from repoze.bfg.interfaces import IRootFactory
+            settings = app.registry.getUtility(ISettings)
+            logger = app.registry.getUtility(ILogger, name='repoze.bfg.debug')
+            rootfactory = app.registry.getUtility(IRootFactory)
+            self.assertEqual(logger.name, 'repoze.bfg.debug')
+            self.assertEqual(settings.reload_templates, True)
+            self.assertEqual(settings.debug_authorization, True)
+            self.failUnless(isinstance(rootfactory, RoutesRootFactory))
+            self.assertEqual(rootfactory.get_root, rootpolicy)
+            self.assertEqual(dummy_registry_manager.pushed, True)
+            self.assertEqual(dummy_registry_manager.popped, True)
+        finally:
+            repoze.bfg.router.registry_manager = old_registry_manager
+
+    def test_routes_in_config_no_rootpolicy(self):
+        options= {'reload_templates':True,
+                  'debug_authorization':True}
+        import repoze.bfg.router
+        old_registry_manager = repoze.bfg.router.registry_manager
+        dummy_registry_manager = DummyRegistryManager()
+        repoze.bfg.router.registry_manager = dummy_registry_manager
+        from repoze.bfg.urldispatch import RoutesRootFactory
+        try:
+            from repoze.bfg.tests import routesapp
+            app = self._callFUT(None, routesapp, options=options)
+            from repoze.bfg.interfaces import ISettings
+            from repoze.bfg.interfaces import ILogger
+            from repoze.bfg.interfaces import IRootFactory
+            settings = app.registry.getUtility(ISettings)
+            logger = app.registry.getUtility(ILogger, name='repoze.bfg.debug')
+            rootfactory = app.registry.getUtility(IRootFactory)
+            self.assertEqual(logger.name, 'repoze.bfg.debug')
+            self.assertEqual(settings.reload_templates, True)
+            self.assertEqual(settings.debug_authorization, True)
+            self.failUnless(isinstance(rootfactory, RoutesRootFactory))
+            self.assertEqual(rootfactory.get_root, None)
+            self.assertEqual(dummy_registry_manager.pushed, True)
+            self.assertEqual(dummy_registry_manager.popped, True)
+        finally:
+            repoze.bfg.router.registry_manager = old_registry_manager
+        
+    def test_no_routes_in_config_no_rootpolicy(self):
+        options= {'reload_templates':True,
+                  'debug_authorization':True}
+        import repoze.bfg.router
+        old_registry_manager = repoze.bfg.router.registry_manager
+        dummy_registry_manager = DummyRegistryManager()
+        repoze.bfg.router.registry_manager = dummy_registry_manager
+        try:
+            from repoze.bfg.tests import fixtureapp
+            self.assertRaises(ValueError, self._callFUT, None, fixtureapp,
+                              options=options)
         finally:
             repoze.bfg.router.registry_manager = old_registry_manager
 

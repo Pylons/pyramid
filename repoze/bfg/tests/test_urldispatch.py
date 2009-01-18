@@ -1,6 +1,14 @@
 import unittest
 
 class RoutesMapperTests(unittest.TestCase):
+    def setUp(self):
+        from zope.deprecation import __show__
+        __show__.off()
+
+    def tearDown(self):
+        from zope.deprecation import __show__
+        __show__.on()
+
     def _getEnviron(self, **kw):
         environ = {'SERVER_NAME':'localhost',
                    'wsgi.url_scheme':'http'}
@@ -72,36 +80,141 @@ class RoutesMapperTests(unittest.TestCase):
         result = url_for(controller='foo', action='action2', article='article2')
         self.assertEqual(result, '/archives/action2/article2')
 
-class TestRoutesModelTraverser(unittest.TestCase):
+class RoutesRootFactoryTests(unittest.TestCase):
+    def _getEnviron(self, **kw):
+        environ = {'SERVER_NAME':'localhost',
+                   'wsgi.url_scheme':'http'}
+        environ.update(kw)
+        return environ
+
     def _getTargetClass(self):
-        from repoze.bfg.urldispatch import RoutesModelTraverser
-        return RoutesModelTraverser
+        from repoze.bfg.urldispatch import RoutesRootFactory
+        return RoutesRootFactory
 
-    def _makeOne(self, model):
+    def _makeOne(self, get_root):
         klass = self._getTargetClass()
-        return klass(model)
+        return klass(get_root)
 
-    def test_class_conforms_to_ITraverser(self):
-        from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ITraverser
-        verifyClass(ITraverser, self._getTargetClass())
+    def test_no_route_matches(self):
+        marker = ()
+        get_root = make_get_root(marker)
+        mapper = self._makeOne(get_root)
+        environ = self._getEnviron(PATH_INFO='/')
+        result = mapper(environ)
+        self.assertEqual(result, marker)
+        self.assertEqual(mapper.environ, environ)
 
-    def test_instance_conforms_to_ITraverser(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ITraverser
-        verifyObject(ITraverser, self._makeOne(None))
+    def test_route_matches(self):
+        marker = ()
+        get_root = make_get_root(marker)
+        mapper = self._makeOne(get_root)
+        mapper.connect('archives/:action/:article', view_name='foo')
+        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
+        result = mapper(environ)
+        from repoze.bfg.interfaces import IRoutesContext
+        self.failUnless(IRoutesContext.providedBy(result))
+        self.assertEqual(result.view_name, 'foo')
+        self.assertEqual(result.action, 'action1')
+        self.assertEqual(result.article, 'article1')
 
-    def test_call(self):
-        model = DummyModel()
-        traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'controller')
-        self.assertEqual(result[2], '')
+    def test_unicode_in_route_default(self):
+        marker = ()
+        get_root = make_get_root(marker)
+        mapper = self._makeOne(get_root)
+        class DummyRoute:
+            routepath = ':id'
+            context_factory = None
+            context_interfaces = ()
+        la = unicode('\xc3\xb1a', 'utf-8')
+        mapper.routematch = lambda *arg: ({la:'id'}, DummyRoute)
+        mapper.connect(':la')
+        environ = self._getEnviron(PATH_INFO='/foo')
+        result = mapper(environ)
+        from repoze.bfg.interfaces import IRoutesContext
+        self.failUnless(IRoutesContext.providedBy(result))
+        self.assertEqual(getattr(result, la.encode('utf-8')), 'id')
 
-class DummyModel:
-    controller = 'controller'
-    
+    def test_no_fallback_get_root(self):
+        marker = ()
+        mapper = self._makeOne(None)
+        mapper.connect('wont/:be/:found', view_name='foo')
+        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
+        result = mapper(environ)
+        from repoze.bfg.urldispatch import RoutesContextNotFound
+        self.failUnless(isinstance(result, RoutesContextNotFound))
+
+    def test_custom_context_factory(self):
+        marker = ()
+        get_root = make_get_root(marker)
+        mapper = self._makeOne(get_root)
+        from zope.interface import implements, Interface
+        class IDummy(Interface):
+            pass
+        class Dummy(object):
+            implements(IDummy)
+            def __init__(self, **kw):
+                self.__dict__.update(kw)
+        mapper.connect('archives/:action/:article', view_name='foo',
+                       context_factory=Dummy)
+        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
+        result = mapper(environ)
+        self.assertEqual(result.view_name, 'foo')
+        self.assertEqual(result.action, 'action1')
+        self.assertEqual(result.article, 'article1')
+        from repoze.bfg.interfaces import IRoutesContext
+        self.failUnless(IRoutesContext.providedBy(result))
+        self.failUnless(isinstance(result, Dummy))
+        self.failUnless(IDummy.providedBy(result))
+        self.failIf(hasattr(result, 'context_factory'))
+
+    def test_custom_context_interfaces(self):
+        marker = ()
+        get_root = make_get_root(marker)
+        mapper = self._makeOne(get_root)
+        from zope.interface import Interface
+        class IDummy(Interface):
+            pass
+        mapper.connect('archives/:action/:article', view_name='foo',
+                       context_interfaces = [IDummy])
+        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
+        result = mapper(environ)
+        self.assertEqual(result.view_name, 'foo')
+        self.assertEqual(result.action, 'action1')
+        self.assertEqual(result.article, 'article1')
+        from repoze.bfg.interfaces import IRoutesContext
+        self.failUnless(IRoutesContext.providedBy(result))
+        self.failUnless(IDummy.providedBy(result))
+        self.failIf(hasattr(result, 'context_interfaces'))
+
+    def test_has_routes(self):
+        mapper = self._makeOne(None)
+        self.assertEqual(mapper.has_routes(), False)
+        mapper.connect('archives/:action/:article', view_name='foo')
+        self.assertEqual(mapper.has_routes(), True)
+
+    def test_url_for(self):
+        marker = ()
+        get_root = make_get_root(marker)
+        mapper = self._makeOne(get_root)
+        mapper.connect('archives/:action/:article', view_name='foo')
+        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
+        result = mapper(environ)
+        from routes import url_for
+        result = url_for(view_name='foo', action='action2', article='article2')
+        self.assertEqual(result, '/archives/action2/article2')
+
+class TestRoutesContextNotFound(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.urldispatch import RoutesContextNotFound
+        return RoutesContextNotFound
+
+    def _makeOne(self, msg):
+        return self._getTargetClass()(msg)
+
+    def test_it(self):
+        inst = self._makeOne('hi')
+        self.assertEqual(inst.msg, 'hi')
+
 def make_get_root(result):
     def dummy_get_root(environ):
         return result

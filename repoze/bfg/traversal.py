@@ -19,71 +19,6 @@ deprecated(
     model_url = "repoze.bfg.url:model_url",
     )
 
-def split_path(path):
-    while path.startswith('/'):
-        path = path[1:]
-    while path.endswith('/'):
-        path = path[:-1]
-    clean = []
-    for segment in path.split('/'):
-        segment = urllib.unquote(segment) # deal with spaces in path segment
-        if not segment or segment=='.':
-            continue
-        elif segment == '..':
-            del clean[-1]
-        else:
-            clean.append(segment)
-    return clean
-
-def step(ob, name, default, as_unicode=True):
-    if as_unicode:
-        try:
-            name = name.decode('utf-8')
-        except UnicodeDecodeError:
-            raise TypeError('Could not decode path segment "%s" using the '
-                            'UTF-8 decoding scheme' % name)
-    if name.startswith('@@'):
-        return name[2:], default
-    if not hasattr(ob, '__getitem__'):
-        return name, default
-    try:
-        return name, ob[name]
-    except KeyError:
-        return name, default
-
-_marker = []
-
-class ModelGraphTraverser(object):
-    classProvides(ITraverserFactory)
-    implements(ITraverser)
-    def __init__(self, root):
-        self.root = root
-        self.locatable = ILocation.providedBy(root)
-        self.unicode_path_segments = True
-        settings = queryUtility(ISettings)
-        if settings is not None:
-            self.unicode_path_segments = settings.unicode_path_segments
-
-    def __call__(self, environ):
-        unicode_path_segments = self.unicode_path_segments
-        path = environ.get('PATH_INFO', '/')
-        path = split_path(path)
-        ob = self.root
-
-        name = ''
-
-        while path:
-            segment = path.pop(0)
-            segment, next = step(ob, segment, _marker, unicode_path_segments)
-            if next is _marker:
-                name = segment
-                break
-            if (self.locatable) and (not ILocation.providedBy(next)):
-                next = LocationProxy(next, ob, segment)
-            ob = next
-
-        return ob, name, path
-
 def find_root(model):
     """ Find the root node in the graph to which ``model``
     belongs. Note that ``model`` should be :term:`location`-aware.
@@ -164,3 +99,82 @@ def model_path(model, *elements):
         path = '/'.join([path, suffix])
     return path
 
+
+def split_path(path):
+    while path.startswith('/'):
+        path = path[1:]
+    while path.endswith('/'):
+        path = path[:-1]
+    clean = []
+    for segment in path.split('/'):
+        segment = urllib.unquote(segment) # deal with spaces in path segment
+        if not segment or segment=='.':
+            continue
+        elif segment == '..':
+            del clean[-1]
+        else:
+            clean.append(segment)
+    return clean
+
+def step(ob, name, default, as_unicode=True):
+    if as_unicode:
+        try:
+            name = name.decode('utf-8')
+        except UnicodeDecodeError:
+            raise TypeError('Could not decode path segment "%s" using the '
+                            'UTF-8 decoding scheme' % name)
+    if name.startswith('@@'):
+        return name[2:], default
+    if not hasattr(ob, '__getitem__'):
+        return name, default
+    try:
+        return name, ob[name]
+    except KeyError:
+        return name, default
+
+_marker = []
+
+class ModelGraphTraverser(object):
+    classProvides(ITraverserFactory)
+    implements(ITraverser)
+    def __init__(self, root):
+        self.root = root
+        self.locatable = ILocation.providedBy(root)
+        self.unicode_path_segments = True
+        settings = queryUtility(ISettings)
+        if settings is not None:
+            self.unicode_path_segments = settings.unicode_path_segments
+
+    def __call__(self, environ):
+        unicode_path_segments = self.unicode_path_segments
+        path = environ.get('PATH_INFO', '/')
+        path = split_path(path)
+        ob = self.root
+
+        name = ''
+
+        while path:
+            segment = path.pop(0)
+            segment, next = step(ob, segment, _marker, unicode_path_segments)
+            if next is _marker:
+                name = segment
+                break
+            if (self.locatable) and (not ILocation.providedBy(next)):
+                next = LocationProxy(next, ob, segment)
+            ob = next
+
+        return ob, name, path
+
+class RoutesModelTraverser(object):
+    classProvides(ITraverserFactory)
+    implements(ITraverser)
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self, environ):
+        view_name = getattr(self.context, 'controller', None) # b/w compat<0.6.3
+        if view_name is None:
+            view_name = getattr(self.context, 'view_name', '') # 0.6.3+
+        subpath = getattr(self.context, 'subpath', '') # 0.6.3+
+        subpath = filter(None, subpath.split('/'))
+        return self.context, view_name, subpath

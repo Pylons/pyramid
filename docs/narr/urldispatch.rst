@@ -14,17 +14,10 @@ is a mechanism which allows you to declaratively map URLs to code.
           to is defined by a *controller* and an *action*.  However,
           neither concept (controller nor action) exists within
           :mod:`repoze.bfg`.  Instead, when you map a URL pattern to
-          code in bfg, you will map the URL patterm to a :term:`view`.
-          As a result, there is a bit of mental gynmastics you'll need
-          to do when dealing with Routes URL dispatch in bfg.  In
-          general, whenever you see the name *controller* in the
-          context of :term:`Routes`, you should map that mentally to
-          the bfg term :term:`view`.  *Actions* do not exist in
-          :mod:`repoze.bfg`: in other frameworks these may refer to
-          methods of a *controller class*, but since views in
-          :mod:`repoze.bfg` are simple callables (usually functions)
-          as opposed to classes, there is no direct concept mapping of
-          an action.
+          code in bfg, you will map the URL patterm to a
+          :term:`context` and a :term:`view name`.  Once the context
+          is found, "normal" :mod:`repoze.bfg` :term:`view` lookup
+          will be done using the context and the view name.
 
 It often makes a lot of sense to use :term:`URL dispatch` instead of
 :term:`traversal` in an application that has no natural hierarchy.
@@ -42,96 +35,90 @@ natural :term:`traversal`, allowing a :term:`Routes` "mapper" object
 to have the "first crack" at resolving a given URL, allowing the
 framework to fall back to traversal as necessary.
 
-To this end, the :mod:`repoze.bfg` framework defines a module named
-:mod:`repoze.bfg.urldispatch`.  This module contains a class named
-:class:`RoutesMapper`.  An Instance of this class is willing to act as
-a :mod:`repoze.bfg` ``get_root`` callable, and is willing to be
-configured with *route mappings* as necessary via its ``.connect``
-method.
+To this end, the :mod:`repoze.bfg` framework allows you to inject
+``route` ZCML directives into your application's ``configure.zcml``
+file.  These directives have much the same job as imperatively using
+the ``.connect`` method of a routes Mapper object, with some
+BFG-specific behavior.
 
-The :class:`RoutesMapper` is essentially willing to act as the "root
-callable".  When it acts as such a callable, it is willing to check
-the requested URL against a *routes map*, and subsequently look up and
-call a :mod:`repoze.bfg` view with the information it finds within a
+When any ``route`` ZCML directive is used, BFG wraps the "default"
+"root factory" (aka ``get_root``) in a special ``RoutesRootFactory``
+instance.  This then acts as the root factory (a callable).  When it
+acts as such a callable, it is willing to check the requested URL
+against a *routes map* to find the :term:`context` and the
+:term:`view name`.  Subsequently, BFG will look up and call a
+:mod:`repoze.bfg` view with the information it finds within a
 particular route, if any configured route matches the currently
-requested URL.  A ``get_root`` callable is a callable passed to the
-:mod:`repoze.bfg` framework by an application, allowing
-:mod:`repoze.bfg` to fail over to another "root" object in case the
-routes mapper can't find a match for a particular URL.  If no URL
-matches, the :class:`RoutesMapper` will fall back to calling the
-fallback ``get_root`` callable that is passed in to it at construction
-time, which allows your application to fall back to a different "root"
-(perhaps one based on traversal).  By configuring a
-:class:`RoutesMapper` appropriately, you can mix and match URL
-dispatch and traversal in this way.
+requested URL.  If no route matches the configured routes,
+:mod:`repoze.bfg` will fail over to calling the ``get_root`` callable
+passed to the application in it's ``make_app`` function.  By
+configuring your ZCML ``route`` statements appropriately, you can mix
+and match URL dispatch and traversal in this way.
 
 .. note:: See :ref:`modelspy_project_section` for an example of a
-          simple ``get_root`` callable that uses traversal.
+          simple ``get_root`` callable that will use traversal.
 
-Configuring a :class:`RoutesMapper` with individual routes is
-performed by creating an instance of a :class:`RoutesMapper`, and
-calling its ``.connect`` method with the same arguments you'd use if
-you were creating a route mapping using a "raw" :term:`Routes`
-``Mapper`` object.  See `Setting up routes
+Each ZCML ``route``statement equals a call to the term:`Routes`
+``Mapper`` object's ``connect`` method.  See `Setting up routes
 <http://routes.groovie.org/manual.html#setting-up-routes>`_ for
-examples of using a Routes ``Mapper`` object.  When you are finished
-configuring it, you can pass it as a ``get_root`` callable to
+examples of using a Routes ``Mapper`` object outside of
 :mod:`repoze.bfg`.
-
-When you configure a :class:`RoutesMapper` with a route via
-``.connect``, you'll pass in the name of a ``controller`` as a keyword
-argument.  This will be a string.  The string should match the
-**name** of a :mod:`repoze.bfg` :term:`view` callable that is
-registered for the type ``repoze.bfg.interfaces.IRoutesContext`` (via
-a ZCML directive, see :ref:`views_chapter` for more information about
-registering bfg views).  When a URL is matched, this view will be
-called with a :term:`context` manufactured "on the fly" by the
-:class:`RoutesMapper`.  The context object will have attributes which
-match all of the :term:`Routes` matching arguments returned by the
-mapper.
 
 Example 1
 ---------
 
-Below is an example of configuring a :class:`RoutesMapper` for usage
-as a ``get_root`` callback.
+Below is an example of some route statements you might add to your
+``configure.zcml``: 
 
-.. code-block:: python
+.. code-block:: xml
    :linenos:
 
-   from repoze.bfg.urldispatch import RoutesMapper
+   <route
+    path="ideas/:idea"
+    view_name="ideas"/>
 
-   def fallback_get_root(environ):
-       return {}
+   <route
+    path="users/:user"
+    view_name="users"/>
 
-   root = RoutesMapper(fallback_get_root)
-   root.connect('ideas/:idea', controller='ideas')
-   root.connect('users/:user', controller='users')
-   root.connect('tags/:tag', controller='tags')
+   <route
+    path="tags/:tag"
+    view_name="tags"/>
 
-The above configuration will allow the mapper to service URLs in the forms::
+The above configuration will allow :mod:`repoze.bfg` to service URLs
+in these forms:
+
+.. code-block:: bash
+   :linenos:
 
    /ideas/<ideaname>
    /users/<username>
    /tags/<tagname>
 
-If this mapper is used as a ``get_root`` callback, when a URL matches
-the pattern ``/ideas/<ideaname>``, the view registered with the name
-'ideas' for the interface ``repoze.bfg.interfaces.IRoutesContext``
-will be called.  An error will be raised if no view can be found with
-that interfaces type or name.
+When a URL matches the pattern ``/ideas/<ideaname>``, the view
+registered with the name 'ideas' for the interface
+``repoze.bfg.interfaces.IRoutesContext`` will be called.  An error
+will be raised if no view can be found with that interfaces type or
+name.
 
 The context object passed to a view found as the result of URL
 dispatch will be an instance of the
 ``repoze.bfg.urldispatch.RoutesContext`` object.  You can override
-this behavior by passing in a ``context_factory`` argument to the
-mapper's connect method for a particular route.  The
-``context_factory`` should be a callable that accepts arbitrary
-keyword arguments and returns an instance of a class that will be the
-context used by the view.
+this behavior by passing in a ``context_factory`` argument to the ZCML
+directive for a particular route.  The ``context_factory`` should be a
+callable that accepts arbitrary keyword arguments and returns an
+instance of a class that will be the context used by the view.
 
-If no route matches in the above configuration, the routes mapper will
-call the "fallback" ``get_root`` callable provided to it above.
+The context object will be decorated by default with the
+``repoze.bfg.interfaces.IRoutesContext`` interface.  To decorate a
+context found via a route with other interfaces, you can use a
+``context_interfaces`` attribute on the ZCML statement.  It should be
+a space-separated list of dotted Python names that point at interfaces.
+
+If no route matches in the above configuration, :mod:`repoze.bfg` will
+call the "fallback" ``get_root`` callable provided to it during
+``make_app`.  If the "fallback" ``get_root`` is None, a ``NotFound``
+error will be raised when no route matches.
 
 Example 2
 ---------
@@ -144,34 +131,30 @@ function is as follows:
    :linenos:
 
    <view
-       for="repoze.bfg.interfaces.IRoutesContext"
+       for=".interfaces.ISomeContext"
        view=".views.articles_view"
        name="articles"
        />
 
+   <route
+      path="archives/:article"
+      view_name="articles"
+      context_factory=".models.Article"
+      context_interfaces=".interfaces.ISomeContext"
+      />
+
 All context objects found via Routes URL dispatch will provide the
-``IRoutesContext`` interface (attached dynamically).  You might then
-configure the ``RoutesMapper`` like so:
+``IRoutesContext`` interface (attached dynamically).  The above
+``route`` statement will also cause contexts generated by the route to
+have the ``.interfaces.ISomeContext`` interface as well.  The
+``.models`` modulemight look like so:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.router import make_app
-   from repoze.bfg.urldispatch import RoutesMapper
-
-   def fallback_get_root(environ):
-       return {} # the graph traversal root is empty in this example
-
    class Article(object):
        def __init__(self, **kw):
            self.__dict__.update(kw)
-
-   get_root = RoutesMapper(fallback_get_root)
-   get_root.connect('archives/:article', controller='articles',
-                    context_factory=Article)
-
-   import myapp
-   app = make_app(get_root, myapp)
 
 The effect of this configuration: when this :mod:`repoze.bfg`
 application runs, if any URL matches the pattern
@@ -195,65 +178,33 @@ called.  This framework operates in terms of ACLs (Access Control
 Lists, see :ref:`security_chapter` for more information about the
 :mod:`repoze.bfg` security subsystem).  A common thing to want to do
 is to attach an ``__acl__`` to the context object dynamically for
-declarative security purposes.  A Routes 'trick' can allow for this.
+declarative security purposes.  You can use the ``context_factory``
+argument that points at a context factory which attaches a custom
+``__acl__`` to an object at its creation time.
 
-Routes makes it possible to pass a ``conditions`` argument to the
-``connect`` method of a mapper.  The value of ``conditions`` is a
-dictionary.  If you pass a ``conditions`` dictionary to this
-``connect`` method with a ``function`` key that has a value which is a
-Python function, this function can be used to update the ``__acl__``
-of the model object.
-
-When Routes tries to resolve a particular route via a match, the route
-object itself will pass the environment and the "match_dict" to the
-``conditions`` function.  Typically, a ``conditions`` function decides
-whether or not the route match should "succeed".  But we'll use it
-differently: we'll use it to update the "match dict".  The match dict
-is what is eventually returned by Routes to :mod:`repoze.bfg`.  If the
-function that is used as the ``conditions`` function adds an
-``__acl__`` key/value pair to the match dict and subsequently always
-returns ``True`` (indicating that the "condition" passed), the
-resulting ``__acl__`` key and its value will appear in the match
-dictionary.  Since all values returned in the match dictionary are
-eventually set on your context object, :mod:`repoze.bfg` will set an
-``__acl__`` attribute on the context object returned to
-:mod:`repoze.bfg` matching the value you've put into the match
-dictionary under ``__acl__``, just in time for the :mod:`repoze.bfg`
-security machinery to find it.  :mod:`repoze.bfg` security will allow
-or deny further processing of the request based on the ACL.
-
-Here's an example:
+Such a ``context_factory`` might look like so:
 
 .. code-block:: python
-
-   from repoze.bfg.router import make_app
-   from repoze.bfg.security import Allow
-   from repoze.bfg.urldispatch import RoutesMapper
-
-   def fallback_get_root(environ):
-       return {} # the graph traversal root is empty in this example
+   :linenos:
 
    class Article(object):
        def __init__(self, **kw):
            self.__dict__.update(kw)
 
-   def add_acl(environ, match_dict):
-       if match_dict.get('article') == 'article1':
-           routes_dict['__acl__'] = [ (Allow, 'editor', 'view') ]
+   def article_context_factory(**kw):
+       model = Article(**kw)
+       article = kw.get('article', None)
+       if article == '1':
+           model.__acl__ = [ (Allow, 'editor', 'view') ]
+       return model
 
-   get_root = RoutesMapper(fallback_get_root)
-   get_root.connect('archives/:article', controller='articles',
-                    context_factory=Article, conditions={'function':add_acl})
-
-   import myapp
-   app = make_app(get_root, myapp)
-
-If the route ``archives/:article`` is matched, :mod:`repoze.bfg` will
-generate an ``Article`` :term:`context` with an ACL on it that allows
-the ``editor`` principal the ``view`` permission.  Obviously you can
-do more generic things that inspect the routes match dict to see if
-the ``article`` argument matches a particular string; our sample
-``add_acl`` function is not very ambitious.
+If the route ``archives/:article`` is matched, and the article number
+is ``1``, :mod:`repoze.bfg` will generate an ``Article``
+:term:`context` with an ACL on it that allows the ``editor`` principal
+the ``view`` permission.  Obviously you can do more generic things
+that inspect the routes match dict to see if the ``article`` argument
+matches a particular string; our sample ``article_context_factory``
+function is not very ambitious.
 
 .. note:: See :ref:`security_chapter` for more information about
    :mod:`repoze.bfg` security and ACLs.
@@ -269,6 +220,3 @@ Further Documentation and Examples
 URL-dispatch related API documentation is available in
 :ref:`urldispatch_module` .
 
-The `repoze.shootout <http://svn.repoze.org/repoze.shootout/trunk/>`_
-application uses URL dispatch to serve its "ideas", "users" and "tags"
-pages.

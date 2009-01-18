@@ -11,7 +11,7 @@
   />
 
   <adapter
-      factory="repoze.bfg.urldispatch.RoutesModelTraverser"
+      factory="repoze.bfg.traversal.RoutesModelTraverser"
       provides="repoze.bfg.interfaces.ITraverserFactory"
       for="repoze.bfg.interfaces.IRoutesContext"
   />

@@ -227,7 +227,184 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
+
+class TestRouteRequirementFunction(unittest.TestCase):
+    def _callFUT(self, context, attr, expr):
+        from repoze.bfg.zcml import route_requirement
+        return route_requirement(context, attr, expr)
+
+    def test_it(self):
+        context = DummyContext()
+        context.context = DummyContext()
+        context.context.requirements = {}
+        self._callFUT(context, 'a', 'b')
+        self.assertEqual(context.context.requirements['a'], 'b')
+        self.assertRaises(ValueError, self._callFUT, context, 'a', 'b')
+
+class TestConnectRouteFunction(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
         
+    def _callFUT(self, directive):
+        from repoze.bfg.zcml import connect_route
+        return connect_route(directive)
+
+    def _registerRoutesMapper(self):
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
+        mapper = DummyMapper()
+        from repoze.bfg.interfaces import IRoutesMapper
+        gsm.registerUtility(mapper, IRoutesMapper)
+        return mapper
+
+    def test_no_mapper(self):
+        directive = DummyRouteDirective()
+        self._callFUT(directive) # doesn't blow up when no routes mapper reg'd
+
+    def test_defaults(self):
+        mapper = self._registerRoutesMapper()
+        directive = DummyRouteDirective()
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][0], ('a/b/c',))
+        self.assertEqual(mapper.connections[0][1], {'requirements': {}})
+
+    def test_name_and_path(self):
+        mapper = self._registerRoutesMapper()
+        directive = DummyRouteDirective(name='abc')
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][0], ('abc', 'a/b/c',))
+        self.assertEqual(mapper.connections[0][1], {'requirements': {}})
+
+    def test_all_directives(self):
+        mapper = self._registerRoutesMapper()
+        def foo():
+            """ """
+        directive = DummyRouteDirective(
+            minimize=True, explicit=True, encoding='utf-8', static=True,
+            filter=foo, absolute=True, member_name='m', collection_name='c',
+            parent_member_name='p', parent_collection_name='c',
+            condition_method='GET', condition_subdomain=True,
+            condition_function=foo, subdomains=['a'],
+            context_factory=foo, context_interfaces=[IDummy])
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][0], ('a/b/c',))
+        pr = {'member_name':'p', 'collection_name':'c'}
+        c = {'method':'GET', 'sub_domain':['a'], 'function':foo}
+        self.assertEqual(mapper.connections[0][1],
+                         {'requirements': {},
+                          '_minimize':True,
+                          '_explicit':True,
+                          '_encoding':'utf-8',
+                          '_static':True,
+                          '_filter':foo,
+                          '_absolute':True,
+                          '_member_name':'m',
+                          '_collection_name':'c',
+                          '_parent_resource':pr,
+                          'conditions':c,
+                          'context_factory':foo,
+                          'context_interfaces':[IDummy],
+                          })
+
+    def test_condition_subdomain_true(self):
+        mapper = self._registerRoutesMapper()
+        directive = DummyRouteDirective(static=True, explicit=True,
+                                        condition_subdomain=True)
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][0], ('a/b/c',))
+        self.assertEqual(mapper.connections[0][1],
+                         {'requirements': {},
+                          '_static':True,
+                          '_explicit':True,
+                          'conditions':{'sub_domain':True}
+                          })
+
+    def test_condition_function(self):
+        mapper = self._registerRoutesMapper()
+        def foo(e, r):
+            """ """
+        directive = DummyRouteDirective(static=True, explicit=True,
+                                        condition_function=foo)
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][0], ('a/b/c',))
+        self.assertEqual(mapper.connections[0][1],
+                         {'requirements': {},
+                          '_static':True,
+                          '_explicit':True,
+                          'conditions':{'function':foo}
+                          })
+
+    def test_condition_method(self):
+        mapper = self._registerRoutesMapper()
+        directive = DummyRouteDirective(static=True, explicit=True,
+                                        condition_method='GET')
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][0], ('a/b/c',))
+        self.assertEqual(mapper.connections[0][1],
+                         {'requirements': {},
+                          '_static':True,
+                          '_explicit':True,
+                          'conditions':{'method':'GET'}
+                          })
+
+    def test_subdomains(self):
+        mapper = self._registerRoutesMapper()
+        directive = DummyRouteDirective(static=True, explicit=True,
+                                        subdomains=['a', 'b'])
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][0], ('a/b/c',))
+        self.assertEqual(mapper.connections[0][1],
+                         {'requirements': {},
+                          '_static':True,
+                          '_explicit':True,
+                          'conditions':{'sub_domain':['a', 'b']}
+                          })
+
+class TestRouteGroupingContextDecorator(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from repoze.bfg.zcml import Route
+        return Route
+
+    def _makeOne(self, context, path, **kw):
+        return self._getTargetClass()(context, path, **kw)
+
+    def test_defaults(self):
+        context = DummyContext()
+        route = self._makeOne(context, 'abc')
+        self.assertEqual(route.requirements, {})
+        self.assertEqual(route.parent_member_name, None)
+        self.assertEqual(route.parent_collection_name, None)
+
+    def test_parent_collection_name_missing(self):
+        context = DummyContext()
+        self.assertRaises(ValueError, self._makeOne, context, 'abc',
+                          parent_member_name='a')
+        
+    def test_parent_collection_name_present(self):
+        context = DummyContext()
+        route = self._makeOne(context, 'abc',
+                              parent_member_name='a',
+                              parent_collection_name='p')
+        self.assertEqual(route.parent_member_name, 'a')
+        self.assertEqual(route.parent_collection_name, 'p')
+        
+            
 
 class TestZCMLPickling(unittest.TestCase):
     i = 0
@@ -564,6 +741,38 @@ class DummyContext:
 
 class Dummy:
     pass
+
+class DummyRouteDirective:
+    encoding = None
+    static = False
+    minimize = False
+    explicit = False
+    static = False
+    filter = None
+    absolute = False
+    member_name = False
+    collection_name = None
+    parent_member_name = None
+    parent_collection_name = None
+    condition_method = None
+    condition_subdomain = None
+    condition_function = None
+    subdomains = None
+    path = 'a/b/c'
+    name = None
+    context_factory = None
+    context_interfaces = ()
+    def __init__(self, **kw):
+        if not 'requirements' in kw:
+            kw['requirements'] = {}
+        self.__dict__.update(kw)
+
+class DummyMapper:
+    def __init__(self):
+        self.connections = []
+
+    def connect(self, *arg, **kw):
+        self.connections.append((arg, kw))
 
 from zope.interface import Interface
 class IDummy(Interface):

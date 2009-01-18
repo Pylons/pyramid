@@ -1,17 +1,30 @@
 from zope.interface import implements
-from zope.interface import classProvides
 from zope.interface import alsoProvides
 
 from routes import Mapper
 from routes import request_config
 
 from repoze.bfg.interfaces import IRoutesContext
-from repoze.bfg.interfaces import ITraverserFactory
-from repoze.bfg.interfaces import ITraverser
+from repoze.bfg.interfaces import IContextNotFound
+
+from zope.deferredimport import deprecated
+from zope.deprecation import deprecated as deprecated2
 
 _marker = ()
 
-class RoutesContext(object):
+deprecated(
+    "('from repoze.bfg.urldispatch import RoutesContext' is now "
+    "deprecated; instead use 'from repoze.bfg.urldispatch import "
+    "DefaultRoutesContext')",
+    RoutesContext = "repoze.bfg.urldispatch:DefaultRoutesContext",
+    )
+
+deprecated2('RoutesMapper',
+            'Usage of the ``RoutesMapper`` class is deprecated.  As of '
+            'repoze.bfg 0.6.3, you should use the ``<route.. >`` ZCML '
+            'directive instead of manually creating a RoutesMapper.')
+
+class DefaultRoutesContext(object):
     implements(IRoutesContext)
     def __init__(self, **kw):
         self.__dict__.update(kw)
@@ -28,7 +41,13 @@ class RoutesMapper(object):
     *name* matches the Routes 'controller' name for the match.  It
     will be passed a context object that has attributes that match the
     Routes match arguments dictionary keys.  If no Routes route
-    matches the current request, the 'fallback' get_root is called."""
+    matches the current request, the 'fallback' get_root is called.
+
+    .. warning:: This class is deprecated.  As of :mod:`repoze.bfg`
+       0.6.3, you should use the ``<route.. >`` ZCML directive instead
+       of manually creating a RoutesMapper.  See :ref:`urldispatch_chapter`
+       for more information.
+    """
     def __init__(self, get_root):
         self.get_root = get_root
         self.mapper = Mapper(controller_scan=None, directory=None,
@@ -46,7 +65,7 @@ class RoutesMapper(object):
         if args:
             context_factory = args.get('context_factory', _marker)
             if context_factory is _marker:
-                context_factory = RoutesContext
+                context_factory = DefaultRoutesContext
             else:
                 args = args.copy()
                 del args['context_factory']
@@ -74,24 +93,100 @@ class RoutesMapper(object):
         arguments supplied by the Routes mapper's ``match`` method for
         this route, and should return an instance of a class.  If
         ``context_factory`` is not supplied in this way for a route, a
-        default context factory (the ``RoutesContext`` class) will be
-        used.  The interface ``repoze.bfg.interfaces.IRoutesContext``
-        will always be tacked on to the context instance in addition
-        to whatever interfaces the context instance already supplies.
+        default context factory (the ``DefaultRoutesContext`` class)
+        will be used.  The interface
+        ``repoze.bfg.interfaces.IRoutesContext`` will always be tacked
+        on to the context instance in addition to whatever interfaces
+        the context instance already supplies.
         """
         
         self.mapper.connect(*arg, **kw)
 
-class RoutesModelTraverser(object):
-    classProvides(ITraverserFactory)
-    implements(ITraverser)
-    def __init__(self, context):
-        self.context = context
+class RoutesContextNotFound(object):
+    implements(IContextNotFound)
+    def __init__(self, msg):
+        self.msg = msg
+
+class RoutesRootFactory(Mapper):
+    """ The ``RoutesRootFactory`` is a wrapper for the ``get_root``
+    callable passed in to the repoze.bfg ``Router`` at initialization
+    time.  When it is instantiated, it wraps the get_root of an
+    application in such a way that the `Routes
+    <http://routes.groovie.org/index.html>`_ engine has the 'first
+    crack' at resolving the current request URL to a repoze.bfg view.
+    Any view that claims it is 'for' the interface
+    ``repoze.bfg.interfaces.IRoutesContext`` will be called if its
+    *name* matches the Routes ``view_name`` name for the match and any
+    of the interfaces named in ``context_interfaces``.  It will be
+    passed a context object that has attributes that match the Routes
+    match arguments dictionary keys.  If no Routes route matches the
+    current request, the 'fallback' get_root is called."""
+    def __init__(self, get_root=None, **kw):
+        self.get_root = get_root
+        kw['controller_scan'] = None
+        kw['always_scan'] = False
+        kw['directory'] = None
+        kw['explicit'] = True
+        Mapper.__init__(self, **kw)
+        self._regs_created = False
+
+    def has_routes(self):
+        return bool(self.matchlist)
+
+    def connect(self, *arg, **kw):
+        # we need to deal with our custom attributes specially :-(
+        context_factory = None
+        context_interfaces = ()
+        if 'context_interfaces' in kw:
+            context_interfaces = kw.pop('context_interfaces')
+        if 'context_factory' in kw:
+            context_factory = kw.pop('context_factory')
+        result = Mapper.connect(self, *arg, **kw)
+        self.matchlist[-1].context_factory = context_factory
+        self.matchlist[-1].context_interfaces = context_interfaces
+        return result
 
     def __call__(self, environ):
-        return self.context, self.context.controller, ''
-    
-    
-        
-        
+        if not self._regs_created:
+            self.create_regs([])
+            self._regs_created = True
+        path = environ.get('PATH_INFO', '/')
+        self.environ = environ # sets the thread local
+        match = self.routematch(path)
+        if match:
+            args, route = match
+        else:
+            args = None
+        if args:
+            args = args.copy()
+            routepath = route.routepath
+            context_factory = route.context_factory
+            if not context_factory:
+                context_factory = DefaultRoutesContext
+            config = request_config()
+            config.mapper = self
+            config.mapper_dict = args
+            config.host = environ.get('HTTP_HOST', environ['SERVER_NAME'])
+            config.protocol = environ['wsgi.url_scheme']
+            config.redirect = None
+            kw = {}
+            for k, v in args.items():
+                # Routes "helpfully" converts default parameter names
+                # into Unicode; these can't be used as attr names
+                if k.__class__ is unicode:
+                    k = k.encode('utf-8')
+                kw[k] = v
+            context = context_factory(**kw)
+            context_interfaces = route.context_interfaces
+            for iface in context_interfaces:
+                alsoProvides(context, iface)
+            alsoProvides(context, IRoutesContext)
+            return context
 
+        if self.get_root is None:
+            # no fallback get_root
+            return RoutesContextNotFound(
+                'Routes context cannot be found and no fallback "get_root"')
+
+        # fall back to original get_root
+        return self.get_root(environ)

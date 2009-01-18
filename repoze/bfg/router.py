@@ -5,6 +5,7 @@ from zope.component import getAdapter
 from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component.event import dispatch
+from zope.component.registry import Components
 
 from zope.interface import alsoProvides
 from zope.interface import implements
@@ -21,6 +22,7 @@ from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRequestFactory
+from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import HTTP_METHOD_INTERFACES
 
 from repoze.bfg.interfaces import IRouter
@@ -30,8 +32,10 @@ from repoze.bfg.interfaces import ISettings
 from repoze.bfg.log import make_stream_logger
 
 from repoze.bfg.registry import registry_manager
-from repoze.bfg.registry import makeRegistry
+from repoze.bfg.registry import populateRegistry
 from repoze.bfg.settings import Settings
+
+from repoze.bfg.urldispatch import RoutesRootFactory
 
 from repoze.bfg.view import render_view_to_response
 from repoze.bfg.view import view_execution_permitted
@@ -140,13 +144,28 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     e.g. ``{'reload_templates':True}``"""
     if options is None:
         options = {}
-
-    registry = makeRegistry(filename, package)
-    registry.registerUtility(root_factory, IRootFactory)
+    regname = filename
+    if package:
+        regname = package.__name__
+    registry = Components(regname)
     debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
     registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
     settings = Settings(options)
     registry.registerUtility(settings, ISettings)
+    mapper = RoutesRootFactory(root_factory)
+    registry.registerUtility(mapper, IRoutesMapper)
+    populateRegistry(registry, filename, package)
+    if mapper.has_routes():
+        # if the user had any <route/> statements in his configuration,
+        # use the RoutesRootFactory as the root factory
+        root_factory = mapper
+    else:
+        # otherwise, use only the supplied root_factory (unless it's None)
+        if root_factory is None:
+            raise ValueError(
+                'root_factory (aka get_root) was None and no routes connected')
+
+    registry.registerUtility(root_factory, IRootFactory)
     app = Router(registry)
 
     try:

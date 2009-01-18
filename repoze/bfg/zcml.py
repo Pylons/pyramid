@@ -6,18 +6,24 @@ import types
 
 from zope.configuration import xmlconfig
 
-from zope.component import getSiteManager
 from zope.component import adaptedBy
+from zope.component import getSiteManager
+from zope.component import queryUtility
+
 import zope.configuration.config
 
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
+from zope.configuration.fields import Tokens
 
 from zope.interface import Interface
+from zope.interface import implements
 
+from zope.schema import Bool
 from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
 from repoze.bfg.path import package_path
@@ -250,3 +256,142 @@ class BFGViewFunctionGrokker(martian.InstanceGrokker):
                  cacheable=Uncacheable)
             return True
         return False
+
+class IRouteRequirementDirective(Interface):
+    """ The interface for the ``requirement`` route subdirective """
+    attr = TextLine(title=u'attr', required=True)
+    expr = TextLine(title=u'expression', required=True)
+
+def route_requirement(context, attr, expr):
+    route = context.context
+    if attr in route.requirements:
+        raise ValueError('Duplicate requirement', attr)
+    route.requirements[attr] = expr
+
+class IRouteDirective(Interface):
+    """ The interface for the ``route`` ZCML directive
+    """
+    path = TextLine(title=u'path', required=True)
+    name = TextLine(title=u'name', required=False)
+    context_factory = GlobalObject(title=u'context_factory', required=False)
+    context_interfaces = Tokens(title=u'context_interfaces', required=False,
+                                value_type=GlobalObject())
+    minimize = Bool(title=u'minimize', required=False)
+    encoding = TextLine(title=u'path', required=False)
+    static = Bool(title=u'static', required=False)
+    filter = GlobalObject(title=u'filter', required=False)
+    absolute = Bool(title=u'absolute', required=False)
+    member_name = TextLine(title=u'member_name', required=False)
+    collection_name = TextLine(title=u'collection_name', required=False)
+    condition_method = TextLine(title=u'condition_method', required=False)
+    condition_subdomain = TextLine(title=u'condition_subdomain', required=False)
+    condition_function = GlobalObject(title=u'condition_function',
+                                      required=False)
+    parent_member_name = TextLine(title=u'parent member_name', required=False)
+    parent_collection_name = TextLine(title=u'parent collection_name',
+                                      required=False)
+    explicit = Bool(title=u'explicit', required=False)
+    subdomains = Tokens(title=u'subdomains', required=False,
+                        value_type=TextLine())
+
+def connect_route(directive):
+    mapper = queryUtility(IRoutesMapper)
+    if mapper is None:
+        return
+    args = []
+    if directive.name:
+        args.append(directive.name)
+    args.append(directive.path)
+    kw = dict(requirements=directive.requirements)
+    if directive.minimize:
+        kw['_minimize'] = True
+    if directive.explicit:
+        kw['_explicit'] = True
+    if directive.encoding:
+        kw['_encoding'] = directive.encoding
+    if directive.static:
+        kw['_static'] = True
+    if directive.filter:
+        kw['_filter'] = directive.filter
+    if directive.absolute:
+        kw['_absolute'] = True
+    if directive.member_name:
+        kw['_member_name'] = directive.member_name
+    if directive.collection_name:
+        kw['_collection_name'] = directive.collection_name
+    if directive.parent_member_name and directive.parent_collection_name:
+            kw['_parent_resource'] = {
+                'member_name':directive.parent_member_name,
+                'collection_name':directive.parent_collection_name,
+                }
+    conditions = {}
+    if directive.condition_method:
+        conditions['method'] = directive.condition_method
+    if directive.condition_subdomain:
+        conditions['sub_domain'] = directive.condition_subdomain
+    if directive.condition_function:
+        conditions['function'] = directive.condition_function
+    if directive.subdomains:
+        conditions['sub_domain'] = directive.subdomains
+    if conditions:
+        kw['conditions'] = conditions
+
+    if directive.context_factory:
+        kw['context_factory'] = directive.context_factory
+    if directive.context_interfaces:
+        kw['context_interfaces'] = directive.context_interfaces
+
+    return mapper.connect(*args, **kw)
+
+class Route(zope.configuration.config.GroupingContextDecorator):
+    """ Handle ``route`` ZCML directives
+    """
+
+    implements(zope.configuration.config.IConfigurationContext,IRouteDirective)
+
+    def __init__(self, context, path, name=None, context_factory=None,
+                 context_interfaces=(), minimize=True, encoding=None,
+                 static=False, filter=None, absolute=False,
+                 member_name=None, collection_name=None, condition_method=None,
+                 condition_subdomain=None, condition_function=None,
+                 parent_member_name=None, parent_collection_name=None,
+                 subdomains=None, explicit=False):
+        self.context = context
+        self.path = path
+        self.name = name
+        self.context_factory = context_factory
+        self.context_interfaces = context_interfaces
+        self.minimize = minimize
+        self.encoding = encoding
+        self.static = static
+        self.filter = filter
+        self.absolute = absolute
+        self.member_name = member_name
+        self.collection_name = collection_name
+        self.condition_method= condition_method
+        self.condition_subdomain = condition_subdomain
+        self.condition_function = condition_function
+        self.explicit = explicit
+        self.subdomains = subdomains
+        if parent_member_name is not None:
+            if parent_collection_name is not None:
+                self.parent_member_name = parent_member_name
+                self.parent_collection_name = parent_collection_name
+            else:
+                raise ValueError(
+                    'parent_member_name and parent_collection_name must be '
+                    'specified together')
+        else:
+            self.parent_member_name = None
+            self.parent_collection_name = None
+        # added by subdirectives
+        self.requirements = {}
+
+    def after(self):
+        self.context.action(
+            discriminator = ('route', self.path, repr(self.requirements),
+                             self.condition_method, self.condition_subdomain,
+                             self.condition_function, self.subdomains),
+            callable = connect_route,
+            args = (self,),
+            )
