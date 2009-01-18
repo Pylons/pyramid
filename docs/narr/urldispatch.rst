@@ -104,16 +104,16 @@ name.
 The context object passed to a view found as the result of URL
 dispatch will be an instance of the
 ``repoze.bfg.urldispatch.RoutesContext`` object.  You can override
-this behavior by passing in a ``context_factory`` argument to the ZCML
-directive for a particular route.  The ``context_factory`` should be a
+this behavior by passing in a ``factory`` argument to the ZCML
+directive for a particular route.  The ``factory`` should be a
 callable that accepts arbitrary keyword arguments and returns an
 instance of a class that will be the context used by the view.
 
 The context object will be decorated by default with the
 ``repoze.bfg.interfaces.IRoutesContext`` interface.  To decorate a
 context found via a route with other interfaces, you can use a
-``context_interfaces`` attribute on the ZCML statement.  It should be
-a space-separated list of dotted Python names that point at interfaces.
+``provides`` attribute on the ZCML statement.  It should be a
+space-separated list of dotted Python names that point at interfaces.
 
 If no route matches in the above configuration, :mod:`repoze.bfg` will
 call the "fallback" ``get_root`` callable provided to it during
@@ -139,8 +139,8 @@ function is as follows:
    <route
       path="archives/:article"
       view_name="articles"
-      context_factory=".models.Article"
-      context_interfaces=".interfaces.ISomeContext"
+      factory=".models.Article"
+      provides=".interfaces.ISomeContext"
       />
 
 All context objects found via Routes URL dispatch will provide the
@@ -178,11 +178,11 @@ called.  This framework operates in terms of ACLs (Access Control
 Lists, see :ref:`security_chapter` for more information about the
 :mod:`repoze.bfg` security subsystem).  A common thing to want to do
 is to attach an ``__acl__`` to the context object dynamically for
-declarative security purposes.  You can use the ``context_factory``
+declarative security purposes.  You can use the ``factory``
 argument that points at a context factory which attaches a custom
 ``__acl__`` to an object at its creation time.
 
-Such a ``context_factory`` might look like so:
+Such a ``factory`` might look like so:
 
 .. code-block:: python
    :linenos:
@@ -191,7 +191,7 @@ Such a ``context_factory`` might look like so:
        def __init__(self, **kw):
            self.__dict__.update(kw)
 
-   def article_context_factory(**kw):
+   def article_factory(**kw):
        model = Article(**kw)
        article = kw.get('article', None)
        if article == '1':
@@ -203,8 +203,9 @@ is ``1``, :mod:`repoze.bfg` will generate an ``Article``
 :term:`context` with an ACL on it that allows the ``editor`` principal
 the ``view`` permission.  Obviously you can do more generic things
 that inspect the routes match dict to see if the ``article`` argument
-matches a particular string; our sample ``article_context_factory``
-function is not very ambitious.
+matches a particular string; our sample ``article_factory`` function
+is not very ambitious.  It could have just as well been done in the
+class' constructor, too.
 
 .. note:: See :ref:`security_chapter` for more information about
    :mod:`repoze.bfg` security and ACLs.

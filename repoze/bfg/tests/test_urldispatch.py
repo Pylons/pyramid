@@ -49,11 +49,7 @@ class RoutesMapperTests(unittest.TestCase):
         marker = ()
         get_root = make_get_root(marker)
         mapper = self._makeOne(get_root)
-        from zope.interface import implements, Interface
-        class IDummy(Interface):
-            pass
         class Dummy(object):
-            implements(IDummy)
             def __init__(self, **kw):
                 self.__dict__.update(kw)
         mapper.connect('archives/:action/:article', controller='foo',
@@ -66,7 +62,6 @@ class RoutesMapperTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRoutesContext
         self.failUnless(IRoutesContext.providedBy(result))
         self.failUnless(isinstance(result, Dummy))
-        self.failUnless(IDummy.providedBy(result))
         self.failIf(hasattr(result, 'context_factory'))
 
     def test_url_for(self):
@@ -123,8 +118,8 @@ class RoutesRootFactoryTests(unittest.TestCase):
         mapper = self._makeOne(get_root)
         class DummyRoute:
             routepath = ':id'
-            context_factory = None
-            context_interfaces = ()
+            _factory = None
+            _provides = ()
         la = unicode('\xc3\xb1a', 'utf-8')
         mapper.routematch = lambda *arg: ({la:'id'}, DummyRoute)
         mapper.connect(':la')
@@ -143,7 +138,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
         from repoze.bfg.urldispatch import RoutesContextNotFound
         self.failUnless(isinstance(result, RoutesContextNotFound))
 
-    def test_custom_context_factory(self):
+    def test_custom_factory(self):
         marker = ()
         get_root = make_get_root(marker)
         mapper = self._makeOne(get_root)
@@ -155,7 +150,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
             def __init__(self, **kw):
                 self.__dict__.update(kw)
         mapper.connect('archives/:action/:article', view_name='foo',
-                       context_factory=Dummy)
+                       _factory=Dummy)
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
         self.assertEqual(result.view_name, 'foo')
@@ -165,9 +160,9 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.failUnless(IRoutesContext.providedBy(result))
         self.failUnless(isinstance(result, Dummy))
         self.failUnless(IDummy.providedBy(result))
-        self.failIf(hasattr(result, 'context_factory'))
+        self.failIf(hasattr(result, '_factory'))
 
-    def test_custom_context_interfaces(self):
+    def test_custom_provides(self):
         marker = ()
         get_root = make_get_root(marker)
         mapper = self._makeOne(get_root)
@@ -175,7 +170,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
         class IDummy(Interface):
             pass
         mapper.connect('archives/:action/:article', view_name='foo',
-                       context_interfaces = [IDummy])
+                       _provides = [IDummy])
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
         self.assertEqual(result.view_name, 'foo')
@@ -184,7 +179,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRoutesContext
         self.failUnless(IRoutesContext.providedBy(result))
         self.failUnless(IDummy.providedBy(result))
-        self.failIf(hasattr(result, 'context_interfaces'))
+        self.failIf(hasattr(result, '_provides'))
 
     def test_has_routes(self):
         mapper = self._makeOne(None)

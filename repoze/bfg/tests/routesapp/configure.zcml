@@ -4,7 +4,7 @@
 
   <route
     path=":id/:view_name"
-    context_interfaces=".models.IFixture"/>
+    provides=".models.IFixture"/>
 
   <view
       name="default"

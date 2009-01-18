@@ -85,7 +85,7 @@ class RoutesMapper(object):
     def connect(self, *arg, **kw):
         """ Add a route to the Routes mapper associated with this
         request. This method accepts the same arguments as a Routes
-        *Mapper* object.  One difference exists: if the
+        *Mapper* object.  One differences exists: if the
         ``context_factory`` is passed in with a value as a keyword
         argument, this callable will be called when a model object
         representing the ``context`` for the request needs to be
@@ -117,7 +117,7 @@ class RoutesRootFactory(Mapper):
     Any view that claims it is 'for' the interface
     ``repoze.bfg.interfaces.IRoutesContext`` will be called if its
     *name* matches the Routes ``view_name`` name for the match and any
-    of the interfaces named in ``context_interfaces``.  It will be
+    of the interfaces named in ``_provides``.  It will be
     passed a context object that has attributes that match the Routes
     match arguments dictionary keys.  If no Routes route matches the
     current request, the 'fallback' get_root is called."""
@@ -135,15 +135,15 @@ class RoutesRootFactory(Mapper):
 
     def connect(self, *arg, **kw):
         # we need to deal with our custom attributes specially :-(
-        context_factory = None
-        context_interfaces = ()
-        if 'context_interfaces' in kw:
-            context_interfaces = kw.pop('context_interfaces')
-        if 'context_factory' in kw:
-            context_factory = kw.pop('context_factory')
+        factory = None
+        provides = ()
+        if '_provides' in kw:
+            provides = kw.pop('_provides')
+        if '_factory' in kw:
+            factory = kw.pop('_factory')
         result = Mapper.connect(self, *arg, **kw)
-        self.matchlist[-1].context_factory = context_factory
-        self.matchlist[-1].context_interfaces = context_interfaces
+        self.matchlist[-1]._factory = factory
+        self.matchlist[-1]._provides = provides
         return result
 
     def __call__(self, environ):
@@ -160,9 +160,9 @@ class RoutesRootFactory(Mapper):
         if args:
             args = args.copy()
             routepath = route.routepath
-            context_factory = route.context_factory
-            if not context_factory:
-                context_factory = DefaultRoutesContext
+            factory = route._factory
+            if not factory:
+                factory = DefaultRoutesContext
             config = request_config()
             config.mapper = self
             config.mapper_dict = args
@@ -176,9 +176,9 @@ class RoutesRootFactory(Mapper):
                 if k.__class__ is unicode:
                     k = k.encode('utf-8')
                 kw[k] = v
-            context = context_factory(**kw)
-            context_interfaces = route.context_interfaces
-            for iface in context_interfaces:
+            context = factory(**kw)
+            provides = route._provides
+            for iface in provides:
                 alsoProvides(context, iface)
             alsoProvides(context, IRoutesContext)
             return context

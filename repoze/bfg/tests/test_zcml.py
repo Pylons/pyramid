@@ -290,7 +290,7 @@ class TestConnectRouteFunction(unittest.TestCase):
             parent_member_name='p', parent_collection_name='c',
             condition_method='GET', condition_subdomain=True,
             condition_function=foo, subdomains=['a'],
-            context_factory=foo, context_interfaces=[IDummy])
+            factory=foo, provides=[IDummy])
         self._callFUT(directive)
         self.assertEqual(len(mapper.connections), 1)
         self.assertEqual(mapper.connections[0][0], ('a/b/c',))
@@ -308,8 +308,8 @@ class TestConnectRouteFunction(unittest.TestCase):
                           '_collection_name':'c',
                           '_parent_resource':pr,
                           'conditions':c,
-                          'context_factory':foo,
-                          'context_interfaces':[IDummy],
+                          '_factory':foo,
+                          '_provides':[IDummy],
                           })
 
     def test_condition_subdomain_true(self):
@@ -760,8 +760,8 @@ class DummyRouteDirective:
     subdomains = None
     path = 'a/b/c'
     name = None
-    context_factory = None
-    context_interfaces = ()
+    factory = None
+    provides = ()
     def __init__(self, **kw):
         if not 'requirements' in kw:
             kw['requirements'] = {}

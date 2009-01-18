@@ -273,9 +273,9 @@ class IRouteDirective(Interface):
     """
     path = TextLine(title=u'path', required=True)
     name = TextLine(title=u'name', required=False)
-    context_factory = GlobalObject(title=u'context_factory', required=False)
-    context_interfaces = Tokens(title=u'context_interfaces', required=False,
-                                value_type=GlobalObject())
+    factory = GlobalObject(title=u'context factory', required=False)
+    provides = Tokens(title=u'context interfaces', required=False,
+                      value_type=GlobalObject())
     minimize = Bool(title=u'minimize', required=False)
     encoding = TextLine(title=u'path', required=False)
     static = Bool(title=u'static', required=False)
@@ -336,10 +336,10 @@ def connect_route(directive):
     if conditions:
         kw['conditions'] = conditions
 
-    if directive.context_factory:
-        kw['context_factory'] = directive.context_factory
-    if directive.context_interfaces:
-        kw['context_interfaces'] = directive.context_interfaces
+    if directive.factory:
+        kw['_factory'] = directive.factory
+    if directive.provides:
+        kw['_provides'] = directive.provides
 
     return mapper.connect(*args, **kw)
 
@@ -349,8 +349,8 @@ class Route(zope.configuration.config.GroupingContextDecorator):
 
     implements(zope.configuration.config.IConfigurationContext,IRouteDirective)
 
-    def __init__(self, context, path, name=None, context_factory=None,
-                 context_interfaces=(), minimize=True, encoding=None,
+    def __init__(self, context, path, name=None, factory=None,
+                 provides=(), minimize=True, encoding=None,
                  static=False, filter=None, absolute=False,
                  member_name=None, collection_name=None, condition_method=None,
                  condition_subdomain=None, condition_function=None,
@@ -359,8 +359,8 @@ class Route(zope.configuration.config.GroupingContextDecorator):
         self.context = context
         self.path = path
         self.name = name
-        self.context_factory = context_factory
-        self.context_interfaces = context_interfaces
+        self.factory = factory
+        self.provides = provides
         self.minimize = minimize
         self.encoding = encoding
         self.static = static
