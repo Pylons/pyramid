@@ -3,9 +3,9 @@
 
 :mod:`repoze.bfg` is a Python web application framework.  It is
 inspired by Zope, and uses :term:`Zope` libraries to do much of its
-work.  However, it simpler than any than any released version of Zope.
-:mod:`repoze.bfg` uses the :term:`WSGI` protocol to handle requests
-and responses.
+work.  However, it is simpler than any than any released version of
+Zope.  :mod:`repoze.bfg` uses the :term:`WSGI` protocol to handle
+requests and responses.
 
 Similarities to Other Frameworks
 --------------------------------
