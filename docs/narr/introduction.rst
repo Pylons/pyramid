@@ -162,11 +162,11 @@ trunk just before the 0.6.3 release).
   writing entry points to repoze.bfg.egg-info/entry_points.txt
   writing manifest file 'repoze.bfg.egg-info/SOURCES.txt'
   running build_ext
-  ............................................................................
-  ............................................................................
-  ............................................................................
-  ............................................................................
-  ........
+  .............................................................................
+  .............................................................................
+  .............................................................................
+  .............................................................................
+  .................................
   Name                                     Stmts   Exec  Cover   Missing
   ----------------------------------------------------------------------
   repoze.bfg                                   1      1   100%   
@@ -176,13 +176,13 @@ trunk just before the 0.6.3 release).
   repoze.bfg.events                           18     18   100%   
   repoze.bfg.functional                       17     15    88%   99-100
   repoze.bfg.includes                          0      0   100%   
-  repoze.bfg.interfaces                       64     64   100%   
+  repoze.bfg.interfaces                       66     66   100%   
   repoze.bfg.location                         42     42   100%   
   repoze.bfg.log                               9      9   100%   
   repoze.bfg.path                             12     12   100%   
   repoze.bfg.push                             16     16   100%   
-  repoze.bfg.registry                         57     55    96%   98-100
-  repoze.bfg.router                           95     95   100%   
+  repoze.bfg.registry                         54     52    96%   95-97
+  repoze.bfg.router                          107    107   100%   
   repoze.bfg.security                        163    163   100%   
   repoze.bfg.settings                         26     26   100%   
   repoze.bfg.template                         10     10   100%   
@@ -191,8 +191,11 @@ trunk just before the 0.6.3 release).
   repoze.bfg.tests                             0      0   100%   
   repoze.bfg.tests.fixtureapp                  0      0   100%   
   repoze.bfg.tests.fixtureapp.models           3      3   100%   
-  repoze.bfg.tests.fixtureapp.views            5      4    80%   4
+  repoze.bfg.tests.fixtureapp.views            4      4   100%   
   repoze.bfg.tests.grokkedapp                  5      5   100%   
+  repoze.bfg.tests.routesapp                   0      0   100%   
+  repoze.bfg.tests.routesapp.models            3      3   100%   
+  repoze.bfg.tests.routesapp.views             4      4   100%   
   repoze.bfg.tests.test_chameleon_genshi     157    157   100%   
   repoze.bfg.tests.test_chameleon_text       172    172   100%   
   repoze.bfg.tests.test_chameleon_zpt        161    161   100%   
@@ -202,29 +205,29 @@ trunk just before the 0.6.3 release).
   repoze.bfg.tests.test_log                   11     11   100%   
   repoze.bfg.tests.test_push                  29     29   100%   
   repoze.bfg.tests.test_registry              79     79   100%   
-  repoze.bfg.tests.test_router               566    566   100%   
+  repoze.bfg.tests.test_router               642    642   100%   
   repoze.bfg.tests.test_security             550    550   100%   
   repoze.bfg.tests.test_settings              98     98   100%   
   repoze.bfg.tests.test_template              73     73   100%   
   repoze.bfg.tests.test_templating            45     45   100%   
   repoze.bfg.tests.test_testing              365    365   100%   
-  repoze.bfg.tests.test_traversal            324    324   100%   
+  repoze.bfg.tests.test_traversal            371    371   100%   
   repoze.bfg.tests.test_url                  112    112   100%   
-  repoze.bfg.tests.test_urldispatch           92     92   100%   
-  repoze.bfg.tests.test_view                 448    448   100%   
+  repoze.bfg.tests.test_urldispatch          187    187   100%   
+  repoze.bfg.tests.test_view                 458    458   100%   
   repoze.bfg.tests.test_wsgi                  20     20   100%   
   repoze.bfg.tests.test_xslt                 191    191   100%   
-  repoze.bfg.tests.test_zcml                 468    468   100%   
-  repoze.bfg.traversal                        96     96   100%   
+  repoze.bfg.tests.test_zcml                 603    603   100%   
+  repoze.bfg.traversal                       108    108   100%   
   repoze.bfg.url                              65     65   100%   
-  repoze.bfg.urldispatch                      51     51   100%   
-  repoze.bfg.view                             73     73   100%   
+  repoze.bfg.urldispatch                     108    108   100%   
+  repoze.bfg.view                             75     75   100%   
   repoze.bfg.wsgi                              8      8   100%   
   repoze.bfg.xslt                             57     57   100%   
-  repoze.bfg.zcml                            137    135    98%   162-163
+  repoze.bfg.zcml                            242    240    99%   168-169
   ----------------------------------------------------------------------
-  TOTAL                                     5617   5610    99%   
+  TOTAL                                     6173   6167    99%   
   ----------------------------------------------------------------------
-  Ran 312 tests in 11.693s
+  Ran 341 tests in 10.093s
 
   OK
