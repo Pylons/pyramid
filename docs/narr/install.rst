@@ -103,4 +103,11 @@ instead of your system packages, as version incompatibilities between
 system packages and ``lxml`` versions are typically to blame for
 compilation problems.
 
+Alternatively, you can try installing ``lxml`` before installing
+:mod:`repoze.bfg`, and instructing ``lxml`` to download its own copy
+of ``libxml2``::
 
+  $ STATIC_DEPS=true easy_install lxml
+
+Once that completes, ``easy_install`` will know that ``lxml`` is
+already installed.
