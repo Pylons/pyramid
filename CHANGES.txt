@@ -46,7 +46,7 @@ Features
   stop depending upon it.  To do so, substitute imports of
   ``repoze.bfg.convention.bfg_view`` with imports of
   ``repoze.bfg.view.bfg_view``, and change the stanza in ZCML from
-  ``<convention package=".">`` to ``<grok package=".">``.  As a result
+  ``<convention package=".">`` to ``<scan package=".">``.  As a result
   of the merge, bfg has grown a new dependency: ``martian``.
 
 - View functions which use the pushpage decorator are now pickleable
