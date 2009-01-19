@@ -238,7 +238,7 @@ instead of specifying it as an argument:
       path="archives/:view_name"
       />
 
-When you do this, the :ref:`view name` will be computed dynamically if
+When you do this, the :term:`view name` will be computed dynamically if
 the route matches.  In the above example, if the ``view_name`` turns
 out to be ``articles``, the articles view will eventually be called.
 
