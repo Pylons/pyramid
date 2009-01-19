@@ -84,7 +84,7 @@ The above maps the ``.views.hello_world`` view function to
 Python class represented by ``.models.Hello`` when the *view name* is
 ``hello.html``.
 
-.. note:: Values prefixed with a period (``.``)for the ``for`` and
+.. note:: Values prefixed with a period (``.``) for the ``for`` and
    ``view`` attributes of a ``view`` (such as those above) mean
    "relative to the Python package directory in which this
    :term:`ZCML` file is stored".  So if the above ``view``
@@ -261,6 +261,8 @@ name will be ``my_view``, registered for models with the
 ``zope.interface.Interface`` interface (which matches anything), using
 no permission, registered against requests which implement the default
 ``IRequest`` interface.
+
+.. _using_model_interfaces:
 
 Using Model Interfaces
 ----------------------

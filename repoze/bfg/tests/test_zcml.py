@@ -290,7 +290,7 @@ class TestConnectRouteFunction(unittest.TestCase):
             parent_member_name='p', parent_collection_name='c',
             condition_method='GET', condition_subdomain=True,
             condition_function=foo, subdomains=['a'],
-            factory=foo, provides=[IDummy])
+            factory=foo, provides=[IDummy], view_name='def')
         self._callFUT(directive)
         self.assertEqual(len(mapper.connections), 1)
         self.assertEqual(mapper.connections[0][0], ('a/b/c',))
@@ -310,6 +310,7 @@ class TestConnectRouteFunction(unittest.TestCase):
                           'conditions':c,
                           '_factory':foo,
                           '_provides':[IDummy],
+                          'view_name':'def',
                           })
 
     def test_condition_subdomain_true(self):
@@ -403,8 +404,11 @@ class TestRouteGroupingContextDecorator(unittest.TestCase):
                               parent_collection_name='p')
         self.assertEqual(route.parent_member_name, 'a')
         self.assertEqual(route.parent_collection_name, 'p')
-        
-            
+
+    def test_explicit_view_name(self):
+        context = DummyContext()
+        route = self._makeOne(context, 'abc', view_name='def')
+        self.assertEqual(route.view_name, 'def')
 
 class TestZCMLPickling(unittest.TestCase):
     i = 0
@@ -760,6 +764,7 @@ class DummyRouteDirective:
     subdomains = None
     path = 'a/b/c'
     name = None
+    view_name = ''
     factory = None
     provides = ()
     def __init__(self, **kw):

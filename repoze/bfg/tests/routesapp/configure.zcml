@@ -3,8 +3,9 @@
   <include package="repoze.bfg.includes" />
 
   <route
-    path=":id/:view_name"
-    provides=".models.IFixture"/>
+    path=":id"
+    provides=".models.IFixture"
+    view_name="default"/>
 
   <view
       name="default"

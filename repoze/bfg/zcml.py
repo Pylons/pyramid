@@ -273,6 +273,7 @@ class IRouteDirective(Interface):
     """
     path = TextLine(title=u'path', required=True)
     name = TextLine(title=u'name', required=False)
+    view_name = TextLine(title=u'view_name', required=False)
     factory = GlobalObject(title=u'context factory', required=False)
     provides = Tokens(title=u'context interfaces', required=False,
                       value_type=GlobalObject())
@@ -303,6 +304,8 @@ def connect_route(directive):
         args.append(directive.name)
     args.append(directive.path)
     kw = dict(requirements=directive.requirements)
+    if directive.view_name:
+        kw['view_name'] = directive.view_name
     if directive.minimize:
         kw['_minimize'] = True
     if directive.explicit:
@@ -349,16 +352,17 @@ class Route(zope.configuration.config.GroupingContextDecorator):
 
     implements(zope.configuration.config.IConfigurationContext,IRouteDirective)
 
-    def __init__(self, context, path, name=None, factory=None,
-                 provides=(), minimize=True, encoding=None,
-                 static=False, filter=None, absolute=False,
-                 member_name=None, collection_name=None, condition_method=None,
+    def __init__(self, context, path, name=None, view_name='', factory=None,
+                 provides=(), minimize=True, encoding=None, static=False,
+                 filter=None, absolute=False, member_name=None,
+                 collection_name=None, condition_method=None,
                  condition_subdomain=None, condition_function=None,
                  parent_member_name=None, parent_collection_name=None,
                  subdomains=None, explicit=False):
         self.context = context
         self.path = path
         self.name = name
+        self.view_name = view_name
         self.factory = factory
         self.provides = provides
         self.minimize = minimize
