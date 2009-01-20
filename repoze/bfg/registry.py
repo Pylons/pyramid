@@ -3,9 +3,10 @@ import threading
 import zope.component
 
 from zope.component import getGlobalSiteManager
+from zope.component import getSiteManager as original_getSiteManager
 from zope.component.interfaces import ComponentLookupError
 from zope.component.interfaces import IComponentLookup
-from zope.component import getSiteManager as original_getSiteManager
+from zope.component.registry import Components
 
 from zope.deferredimport import deprecated
 
@@ -22,6 +23,12 @@ deprecated(
     "deprecated; instead use 'from repoze.bfg.settings import get_options')",
     get_options = "repoze.bfg.settings:get_options",
     )
+
+class Registry(Components):
+    def notify(self, *events):
+        # iterating over subscribers assures they get executed
+        for ignored in self.subscribers(events, None):
+            pass
 
 class ThreadLocalRegistryManager(threading.local):
     def __init__(self):
@@ -90,9 +97,5 @@ def getSiteManager(context=None):
             raise ComponentLookupError(*error.args)
 
 from zope.testing.cleanup import addCleanUp
-try:
-    addCleanUp(original_getSiteManager.reset)
-except AttributeError:
-    # zope.hookable not yet installed
-    pass
+addCleanUp(original_getSiteManager.reset) # AttributeError: zope.hookable not installed
 addCleanUp(registry_manager.clear)

@@ -2,6 +2,24 @@ import unittest
 
 from zope.testing.cleanup import cleanUp
 
+class TestRegistry(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.registry import Registry
+        return Registry
+    
+    def _makeOne(self):
+        return self._getTargetClass()()
+
+    def test_notify(self):
+        registry = self._makeOne()
+        L = []
+        def subscribers(events, *arg):
+            L.extend(events)
+            return ['abc']
+        registry.subscribers = subscribers
+        registry.notify('123')
+        self.assertEqual(L, ['123'])
+
 class TestPopulateRegistry(unittest.TestCase):
     def setUp(self):
         cleanUp()

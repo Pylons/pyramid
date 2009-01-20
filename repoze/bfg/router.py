@@ -1,11 +1,7 @@
 import sys
 from cgi import escape
 
-from zope.component import getAdapter
-from zope.component import getUtility
-from zope.component import queryUtility
 from zope.component.event import dispatch
-from zope.component.registry import Components
 
 from zope.interface import implements
 
@@ -17,19 +13,22 @@ from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ILogger
-from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IRequestFactory
-from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRootFactory
+from repoze.bfg.interfaces import IRouter
+from repoze.bfg.interfaces import IRoutesMapper
+from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import ISettings
 
 from repoze.bfg.log import make_stream_logger
 
+from repoze.bfg.registry import Registry
 from repoze.bfg.registry import registry_manager
 from repoze.bfg.registry import populateRegistry
+
 from repoze.bfg.request import HTTP_METHOD_FACTORIES
 from repoze.bfg.request import Request
+
 from repoze.bfg.settings import Settings
 
 from repoze.bfg.urldispatch import RoutesRootFactory
@@ -49,7 +48,7 @@ class Router(object):
     @property
     def root_policy(self):
         """  Backwards compatibility alias """
-        return getUtility(IRootFactory)
+        return self.registry.getUtility(IRootFactory)
 
     def __call__(self, environ, start_response):
         """
@@ -57,22 +56,23 @@ class Router(object):
         'view' code based on registrations within the application
         registry; call ``start_response`` and return an iterable.
         """
-        registry_manager.push(self.registry)
+        reg = self.registry
+        registry_manager.push(reg)
 
         try:
-            
-            request_factory = queryUtility(IRequestFactory)
+            request_factory = reg.queryUtility(IRequestFactory)
             if request_factory is None:
                 method = environ.get('REQUEST_METHOD', 'GET')
                 request_factory = HTTP_METHOD_FACTORIES.get(method, Request)
             request = request_factory(environ)
 
-            dispatch(NewRequest(request))
-            root_factory = getUtility(IRootFactory)
+            reg.notify(NewRequest(request))
+            root_factory = reg.getUtility(IRootFactory)
             root = root_factory(environ)
-            traverser = getAdapter(root, ITraverserFactory)
+            traverser = reg.getAdapter(root, ITraverserFactory)
             context, view_name, subpath = traverser(environ)
 
+            # XXX webob.Request's __setattr__ is slow here: investigate.
             request.root = root
             request.context = context
             request.view_name = view_name
@@ -80,11 +80,13 @@ class Router(object):
 
             permitted = view_execution_permitted(context, request, view_name)
 
-            settings = queryUtility(ISettings)
+            settings = reg.queryUtility(ISettings)
             debug_authorization = settings and settings.debug_authorization
 
+            logger = None
+
             if debug_authorization:
-                logger = queryUtility(ILogger, 'repoze.bfg.debug')
+                logger = reg.queryUtility(ILogger, 'repoze.bfg.debug')
                 logger and logger.debug(
                     'debug_authorization of url %s (view name %r against '
                     'context %r): %s' % (
@@ -104,7 +106,8 @@ class Router(object):
             if response is None:
                 debug_notfound = settings and settings.debug_notfound
                 if debug_notfound:
-                    logger = queryUtility(ILogger, 'repoze.bfg.debug')
+                    if logger is None:
+                        logger = reg.queryUtility(ILogger, 'repoze.bfg.debug')
                     msg = (
                         'debug_notfound of url %s; path_info: %r, context: %r, '
                         'view_name: %r, subpath: %r' % (
@@ -117,7 +120,7 @@ class Router(object):
                 app = HTTPNotFound(escape(msg))
                 return app(environ, start_response)
 
-            dispatch(NewResponse(response))
+            reg.notify(NewResponse(response))
 
             start_response(response.status, response.headerlist)
             return response.app_iter
@@ -143,7 +146,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     regname = filename
     if package:
         regname = package.__name__
-    registry = Components(regname)
+    registry = Registry(regname)
     debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
     registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
     settings = Settings(options)
@@ -164,8 +167,13 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     registry.registerUtility(root_factory, IRootFactory)
     app = Router(registry)
 
+    # We push the registry on to the stack here in case any ZCA API is
+    # used in listeners subscribed to the WSGIApplicationCreatedEvent
+    # we send.
+    registry_manager.push(registry)
     try:
-        registry_manager.push(registry)
+        # use dispatch here instead of registry.notify to make unit
+        # tests possible
         dispatch(WSGIApplicationCreatedEvent(app))
     finally:
         registry_manager.pop()

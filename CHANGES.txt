@@ -12,6 +12,13 @@ Implementation Changes
   purely an optimization (e.g. preventing calls to ``alsoProvides``
   means the difference between 590 r/s and 690 r/s on a MacBook 2GHz).
 
+- Tease out an extra 4% performance boost by changing the Router;
+  instead of using imported ZCA APIs, use the same APIs directly
+  against the registry that is an attribute of the Router.  As a
+  result, the registry used by BFG is now a subclass of
+  ``zope.component.registry.Components`` (defined as
+  ``repoze.bfg.registry.Registry``); it has a ``notify`` method.
+
 0.6.3 (2009-01-19)
 ==================
 
