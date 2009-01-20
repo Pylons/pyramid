@@ -96,10 +96,10 @@ class TestTestingFunctions(unittest.TestCase):
         from zope.component.event import dispatch
         event = object()
         dispatch(event)
-        self.assertEqual(len(L), 2)
-        self.assertEqual(L[1], event)
-        dispatch(object())
-        self.assertEqual(len(L), 3)
+        self.assertEqual(L[-1], event)
+        event2 = object()
+        dispatch(event2)
+        self.assertEqual(L[-1], event2)
 
     def test_registerView_defaults(self):
         from repoze.bfg import testing
