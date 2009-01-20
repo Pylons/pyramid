@@ -8,7 +8,10 @@ import repoze.bfg.interfaces
 # object rather than using ``alsoProvides`` to attach the proper
 # interface to an unsubclassed webob.Request.  This pattern is purely
 # an optimization (e.g. preventing calls to ``alsoProvides`` means the
-# difference between 590 r/s and 690 r/s on a MacBook 2GHz).
+# difference between 590 r/s and 690 r/s on a MacBook 2GHz).  These
+# classes are *not* APIs.  None of these classes, nor the
+# ``HTTP_METHOD_FACTORIES`` lookup dict should be imported directly by
+# user code.
 
 class Request(WebobRequest):
     implements(repoze.bfg.interfaces.IRequest)
