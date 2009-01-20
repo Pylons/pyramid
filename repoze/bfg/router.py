@@ -7,10 +7,8 @@ from zope.component import queryUtility
 from zope.component.event import dispatch
 from zope.component.registry import Components
 
-from zope.interface import alsoProvides
 from zope.interface import implements
 
-from webob import Request
 from webob.exc import HTTPNotFound
 from webob.exc import HTTPUnauthorized
 
@@ -20,11 +18,8 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import ITraverserFactory
-from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRequestFactory
 from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import HTTP_METHOD_INTERFACES
-
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import ISettings
@@ -33,6 +28,8 @@ from repoze.bfg.log import make_stream_logger
 
 from repoze.bfg.registry import registry_manager
 from repoze.bfg.registry import populateRegistry
+from repoze.bfg.request import HTTP_METHOD_FACTORIES
+from repoze.bfg.request import Request
 from repoze.bfg.settings import Settings
 
 from repoze.bfg.urldispatch import RoutesRootFactory
@@ -63,13 +60,12 @@ class Router(object):
         registry_manager.push(self.registry)
 
         try:
-            request_factory = queryUtility(IRequestFactory, default=Request)
+            
+            request_factory = queryUtility(IRequestFactory)
+            if request_factory is None:
+                method = environ.get('REQUEST_METHOD', 'GET')
+                request_factory = HTTP_METHOD_FACTORIES.get(method, Request)
             request = request_factory(environ)
-
-            alsoProvides(request, IRequest)
-            also_http = HTTP_METHOD_INTERFACES.get(request.method)
-            if also_http is not None:
-                alsoProvides(request, also_http)
 
             dispatch(NewRequest(request))
             root_factory = getUtility(IRootFactory)

@@ -1,8 +1,13 @@
-from zope.interface import Interface
 from zope.interface import Attribute
+from zope.interface import Interface
+from zope.interface import implements
+
 from zope.deferredimport import deprecated
 
 from zope.component.interfaces import IObjectEvent
+
+from webob import Request as WebobRequest
+
 
 deprecated(
     '(repoze.bfg.interfaces.ITemplate should now be imported '
@@ -178,14 +183,6 @@ class ILocation(Interface):
 
 class ILogger(Interface):
     """ Interface representing a PEP 282 logger """
-
-HTTP_METHOD_INTERFACES = {
-    'GET':IGETRequest,
-    'POST':IPOSTRequest,
-    'PUT':IPUTRequest,
-    'DELETE':IDELETERequest,
-    'HEAD':IHEADRequest,
-    }
 
 class IRoutesMapper(Interface):
     """ Interface representing a Routes ``Mapper`` object """
