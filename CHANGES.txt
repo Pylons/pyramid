@@ -1,6 +1,16 @@
 Next release
 ============
 
+Implementation Changes
+----------------------
+
+- Use "precooked" Request subclasses
+  (e.g. ``repoze.bfg.request.GETRequest``) that correspond to HTTP
+  request methods within ``router.py`` when constructing a request
+  object rather than using ``alsoProvides`` to attach the proper
+  interface to an unsubclassed ``webob.Request``.  This pattern is
+  purely an optimization (e.g. preventing calls to ``alsoProvides``
+  means the difference between 590 r/s and 690 r/s on a MacBook 2GHz).
 
 0.6.3 (2009-01-19)
 ==================
