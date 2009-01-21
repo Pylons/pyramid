@@ -26,6 +26,18 @@ ZCML in your ``configure.zcml`` file.
 Replace ``my.request.factory`` with the Python dotted name to the
 request factory you want to use.
 
+.. warning:: If you register an IRequestFactory utility in such a way,
+   you *must* be sure that the factory returns an object that
+   implements *at least* the ``repoze.bfg.interfaces.IRequest``
+   interface.  Otherwise all application view lookups will fail (they
+   will all return a 404 response code).  Likewise, if you want to be
+   able to use method-related interfaces such as ``IGETRequest``,
+   ``IPOSTRequest``, etc. in your view declarations, your factory must
+   also do the same introspection of the environ that the default
+   request factory does, and cause the custom factory to decorate the
+   returned object to implement one of these interfaces based on the
+   ``HTTP_METHOD`` present in the environ.
+
 Changing the response factory
 -----------------------------
 
