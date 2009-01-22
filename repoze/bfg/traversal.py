@@ -5,8 +5,11 @@ from zope.deferredimport import deprecated
    
 from zope.interface import classProvides
 from zope.interface import implements
+
 from repoze.bfg.location import LocationProxy
 from repoze.bfg.location import lineage
+
+from repoze.bfg.lru import lru_cache
 
 from repoze.bfg.interfaces import ILocation
 from repoze.bfg.interfaces import ITraverser
@@ -99,7 +102,7 @@ def model_path(model, *elements):
         path = '/'.join([path, suffix])
     return path
 
-
+@lru_cache(500)
 def split_path(path):
     while path.startswith('/'):
         path = path[1:]
@@ -132,34 +135,36 @@ def step(ob, name, default, as_unicode=True):
     except KeyError:
         return name, default
 
-_marker = []
+_marker = object()
 
 class ModelGraphTraverser(object):
     classProvides(ITraverserFactory)
     implements(ITraverser)
+    unicode_path_segments = True
     def __init__(self, root):
         self.root = root
         self.locatable = ILocation.providedBy(root)
-        self.unicode_path_segments = True
         settings = queryUtility(ISettings)
         if settings is not None:
             self.unicode_path_segments = settings.unicode_path_segments
 
-    def __call__(self, environ):
+    def __call__(self, environ, _marker=_marker):
         unicode_path_segments = self.unicode_path_segments
         path = environ.get('PATH_INFO', '/')
-        path = split_path(path)
-        ob = self.root
+        path = list(split_path(path))
+        locatable = self.locatable
+        _step = step
 
+        ob = self.root
         name = ''
 
         while path:
             segment = path.pop(0)
-            segment, next = step(ob, segment, _marker, unicode_path_segments)
+            segment, next = _step(ob, segment, _marker, unicode_path_segments)
             if next is _marker:
                 name = segment
                 break
-            if (self.locatable) and (not ILocation.providedBy(next)):
+            if locatable and (not ILocation.providedBy(next)):
                 next = LocationProxy(next, ob, segment)
             ob = next
 
