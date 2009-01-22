@@ -360,6 +360,16 @@ class TestIsResponse(unittest.TestCase):
         response = None
         self.assertEqual(self._callFUT(response), False)
 
+    def test_partial_inst(self):
+        response = DummyResponse()
+        response.app_iter = None
+        self.assertEqual(self._callFUT(response), False)
+        
+    def test_status_not_string(self):
+        response = DummyResponse()
+        response.status = None
+        self.assertEqual(self._callFUT(response), False)
+
 class TestViewExecutionPermitted(unittest.TestCase):
     def setUp(self):
         cleanUp()
