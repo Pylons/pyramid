@@ -25,10 +25,26 @@ deprecated(
     )
 
 class Registry(Components):
+
+    # for optimization purposes, if no listeners are listening, don't try
+    # to notify them
+    _has_listeners = False
+
+    def registerSubscriptionAdapter(self, *arg, **kw):
+        result = Components.registerSubscriptionAdapter(self, *arg, **kw)
+        self._has_listeners = True
+        return result
+        
+    def registerHandler(self, *arg, **kw):
+        result = Components.registerHandler(self, *arg, **kw)
+        self._has_listeners = True
+        return result
+
     def notify(self, *events):
-        # iterating over subscribers assures they get executed
-        for ignored in self.subscribers(events, None):
-            pass
+        if self._has_listeners:
+            # iterating over subscribers assures they get executed
+            for ignored in self.subscribers(events, None):
+                pass
 
 class ThreadLocalRegistryManager(threading.local):
     def __init__(self):

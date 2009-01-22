@@ -14,10 +14,14 @@ Implementation Changes
 
 - Tease out an extra 4% performance boost by changing the Router;
   instead of using imported ZCA APIs, use the same APIs directly
-  against the registry that is an attribute of the Router.  As a
-  result, the registry used by BFG is now a subclass of
+  against the registry that is an attribute of the Router.
+
+- The registry used by BFG is now a subclass of
   ``zope.component.registry.Components`` (defined as
-  ``repoze.bfg.registry.Registry``); it has a ``notify`` method.
+  ``repoze.bfg.registry.Registry``); it has a ``notify`` method, a
+  ``registerSubscriptionAdapter`` and a ``registerHandler`` method.
+  If no subscribers are registered via ``registerHandler`` or
+  ``registerSubscriptionAdapter``, ``notify`` is a noop for speed.
 
 0.6.3 (2009-01-19)
 ==================
