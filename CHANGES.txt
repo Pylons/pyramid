@@ -31,6 +31,12 @@ Implementation Changes
 - The ``is_response`` check was sped up by about half at the expense
   of making its code slightly uglier.
 
+New Modules
+===========
+
+- ``repoze.bfg.lru`` implements an LRU cache class and a decorator for
+  internal use.
+
 0.6.3 (2009-01-19)
 ==================
 

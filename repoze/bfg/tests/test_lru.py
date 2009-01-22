@@ -8,6 +8,9 @@ class LRUCacheTests(unittest.TestCase):
     def _makeOne(self, size):
         return self._getTargetClass()(size)
 
+    def test_size_lessthan_1(self):
+        self.assertRaises(ValueError, self._makeOne, 0)
+
     def test_it(self):
         cache = self._makeOne(3)
         self.assertEqual(cache.get('a'), None)
@@ -41,7 +44,12 @@ class LRUCacheTests(unittest.TestCase):
         cache.put('e', '5')
         self.assertEqual(len(cache.data), 3)
         self.assertEqual(cache.data.get('c'), None)
-        
+        self.assertEqual(cache.get('d'), '4')
+        self.assertEqual(cache.get('e'), '5')
+        self.assertEqual(cache.get('a'), '1')
+        self.assertEqual(cache.get('b'), None)
+        self.assertEqual(cache.get('c'), None)
+                         
 class DecoratorTests(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.lru import lru_cache

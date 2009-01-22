@@ -4,11 +4,6 @@ import threading
 
 _marker = object()
 
-class Node(object):
-    def __init__(self, key):
-        self.key = key
-        self.ref = False
-
 class LRUCache(object):
     def __init__(self, size):
         """ Implements a psueudo-LRU algorithm (CLOCK) """
@@ -88,7 +83,3 @@ class lru_cache(object):
                 cache.put(key, val)
             return val
         return lru_cached
-    
-    
-    
-    

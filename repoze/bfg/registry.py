@@ -44,7 +44,7 @@ class Registry(Components):
         if self._has_listeners:
             # iterating over subscribers assures they get executed
             for ignored in self.subscribers(events, None):
-                pass
+                """ """
 
 class ThreadLocalRegistryManager(threading.local):
     def __init__(self):
