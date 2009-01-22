@@ -7,21 +7,41 @@ class SplitPathTests(unittest.TestCase):
         from repoze.bfg.traversal import split_path
         return split_path(path)
         
-    def test_cleanPath_path_startswith_endswith(self):
-        self.assertEqual(self._callFUT('/foo/'), ['foo'])
+    def test_path_startswith_endswith(self):
+        self.assertEqual(self._callFUT('/foo/'), [u'foo'])
 
-    def test_cleanPath_empty_elements(self):
-        self.assertEqual(self._callFUT('foo///'), ['foo'])
+    def test_empty_elements(self):
+        self.assertEqual(self._callFUT('foo///'), [u'foo'])
 
-    def test_cleanPath_onedot(self):
-        self.assertEqual(self._callFUT('foo/./bar'), ['foo', 'bar'])
+    def test_onedot(self):
+        self.assertEqual(self._callFUT('foo/./bar'), [u'foo', u'bar'])
 
-    def test_cleanPath_twodots(self):
-        self.assertEqual(self._callFUT('foo/../bar'), ['bar'])
+    def test_twodots(self):
+        self.assertEqual(self._callFUT('foo/../bar'), [u'bar'])
 
-    def test_cleanPath_element_urllquoted(self):
+    def test_element_urllquoted(self):
         self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
-                         ['foo', 'space thing', 'bar'])
+                         [u'foo', u'space thing', u'bar'])
+
+    def test_segments_are_unicode(self):
+        result = self._callFUT('/foo/bar')
+        self.assertEqual(type(result[0]), unicode)
+        self.assertEqual(type(result[1]), unicode)
+
+    def test_utf8(self):
+        import urllib
+        la = 'La Pe\xc3\xb1a'
+        encoded = urllib.quote(la)
+        decoded = unicode(la, 'utf-8')
+        path = '/'.join([encoded, encoded])
+        self.assertEqual(self._callFUT(path), [decoded, decoded])
+        
+    def test_utf16(self):
+        import urllib
+        la = unicode('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
+        encoded = urllib.quote(la)
+        path = '/'.join([encoded, encoded])
+        self.assertRaises(TypeError, self._callFUT, path)
 
 class ModelGraphTraverserTests(unittest.TestCase):
     def setUp(self):
@@ -171,12 +191,6 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertRaises(TypeError, policy, environ)
 
     def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
-        defaultkw = {'unicode_path_segments':True}
-        settings = DummySettings(**defaultkw)
-        from repoze.bfg.interfaces import ISettings
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
-        gsm.registerUtility(settings, ISettings)
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
@@ -413,6 +427,3 @@ class DummyContext(object):
 class DummyRequest:
     application_url = 'http://example.com:5432' # app_url never ends with slash
 
-class DummySettings:
-    def __init__(self, **kw):
-        self.__dict__.update(kw)

@@ -114,23 +114,13 @@ def split_path(path):
         elif segment == '..':
             del clean[-1]
         else:
+            try:
+                segment = segment.decode('utf-8')
+            except UnicodeDecodeError:
+                raise TypeError('Could not decode path segment %r using the '
+                                'UTF-8 decoding scheme' % segment)
             clean.append(segment)
     return clean
-
-def step(ob, name, default):
-    try:
-        name = name.decode('utf-8')
-    except UnicodeDecodeError:
-        raise TypeError('Could not decode path segment "%s" using the '
-                        'UTF-8 decoding scheme' % name)
-    if name.startswith('@@'):
-        return name[2:], default
-    if not hasattr(ob, '__getitem__'):
-        return name, default
-    try:
-        return name, ob[name]
-    except KeyError:
-        return name, default
 
 _marker = object()
 
@@ -145,14 +135,14 @@ class ModelGraphTraverser(object):
         path = environ.get('PATH_INFO', '/')
         path = list(split_path(path))
         locatable = self.locatable
-        _step = step
+        step = self._step
 
         ob = self.root
         name = ''
 
         while path:
             segment = path.pop(0)
-            segment, next = _step(ob, segment, _marker)
+            segment, next = step(ob, segment, _marker)
             if next is _marker:
                 name = segment
                 break
@@ -161,6 +151,16 @@ class ModelGraphTraverser(object):
             ob = next
 
         return ob, name, path
+
+    def _step(self, ob, name, default):
+        if name.startswith('@@'):
+            return name[2:], default
+        if not hasattr(ob, '__getitem__'):
+            return name, default
+        try:
+            return name, ob[name]
+        except KeyError:
+            return name, default
 
 class RoutesModelTraverser(object):
     classProvides(ITraverserFactory)

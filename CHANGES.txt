@@ -18,6 +18,13 @@ Backwards Incompatibilities
 Implementation Changes
 ----------------------
 
+- ``repoze.bfg.traversal.split_path`` now also handles decoding
+  path segments to unicode (for speed, because its results are
+  LRU cached).
+
+- ``repoze.bfg.traversal.step`` was made a method of the
+   ModelGraphTraverser.
+
 - Use "precooked" Request subclasses
   (e.g. ``repoze.bfg.request.GETRequest``) that correspond to HTTP
   request methods within ``router.py`` when constructing a request
