@@ -231,8 +231,13 @@ class Denied(PermitsResult):
     or other ``repoze.bfg`` code denies an action unlrelated to an ACL
     check.  It evaluates equal to all boolean false types.  It has an
     attribute named ``msg`` describing the circumstances for the deny."""
-    def __init__(self, msg):
-        self.msg = msg
+    def __init__(self, s, *args):
+        self.s = s
+        self.args = args
+
+    @property
+    def msg(self):
+        return self.s % self.args
 
     def __nonzero__(self):
         return False
@@ -246,8 +251,13 @@ class Allowed(PermitsResult):
     check.  It evaluates equal to all boolean true types.  It has an
     attribute named ``msg`` describing the circumstances for the
     allow."""
-    def __init__(self, msg):
-        self.msg = msg
+    def __init__(self, s, *args):
+        self.s = s
+        self.args = args
+
+    @property
+    def msg(self):
+        return self.s % self.args
 
     def __nonzero__(self):
         return True
@@ -262,15 +272,17 @@ class ACLPermitsResult:
         self.acl = acl
         self.principals = principals
         self.context = context
-        msg = ('%s permission %r via ACE %r in ACL %r on context %r for '
-               'principals %r')
-        msg = msg % (self.__class__.__name__,
-                     self.permission,
-                     self.ace,
-                     self.acl,
-                     self.context,
-                     self.principals)
-        self.msg = msg
+
+    @property
+    def msg(self):
+        s = ('%s permission %r via ACE %r in ACL %r on context %r for '
+             'principals %r')
+        return s % (self.__class__.__name__,
+                    self.permission,
+                    self.ace,
+                    self.acl,
+                    self.context,
+                    self.principals)
 
 class ACLDenied(ACLPermitsResult, Denied):
     """ An instance of ``ACLDenied`` represents that a security check

@@ -23,6 +23,14 @@ Implementation Changes
   If no subscribers are registered via ``registerHandler`` or
   ``registerSubscriptionAdapter``, ``notify`` is a noop for speed.
 
+- The Allowed and Denied classes in ``repoze.bfg.security`` now are
+  lazier about constructing the representation of a reason message for
+  speed; ``repoze.bfg.view_execution_permitted`` takes advantage of
+  this.
+
+- The ``is_response`` check was sped up by about half at the expense
+  of making its code slightly uglier.
+
 0.6.3 (2009-01-19)
 ==================
 

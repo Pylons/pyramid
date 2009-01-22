@@ -14,7 +14,7 @@ from zope.interface import Interface
 
 from repoze.bfg.interfaces import IRequest
 
-_marker = ()
+_marker = object()
 
 def view_execution_permitted(context, request, name=''):
     """ If the view specified by ``context`` and ``name`` is protected
@@ -23,17 +23,16 @@ def view_execution_permitted(context, request, name=''):
     the ``request``.  If no security policy is in effect, or if the
     view is not protected by a permission, return a True value. """
     security_policy = queryUtility(ISecurityPolicy)
-    if security_policy:
+    if security_policy is not None:
         permission = queryMultiAdapter((context, request), IViewPermission,
                                        name=name)
         if permission is None:
             return Allowed(
                 'Allowed: view name %r in context %r (no permission '
-                'registered for name %r).' % (name, context, name)
-                )
+                'registered for name %r).', name, context, name)
         return permission(security_policy)
     return Allowed('Allowed: view name %r in context %r (no security policy '
-                   'in use).' % (name, context))
+                   'in use).', name, context)
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
@@ -117,14 +116,19 @@ def is_response(ob):
     duck-typing check, as response objects are not obligated to
     actually implement a Zope interface."""
     # response objects aren't obligated to implement a Zope interface,
-    # so we do it the hard way
-    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
-         hasattr(ob, 'status') ):
-        if ( hasattr(ob.app_iter, '__iter__') and
-             hasattr(ob.headerlist, '__iter__') and
-             isinstance(ob.status, basestring) ) :
-            return True
-    return False
+    # so we do it the hard way; this is written awkwardly for
+    # performance reasons
+    try:
+        ob.app_iter, ob.headerlist, ob.status
+    except AttributeError:
+        return False
+    try:
+        ob.app_iter.__iter__, ob.headerlist.__iter__
+    except AttributeError:
+        return False
+    if not isinstance(ob.status, basestring):
+        return False
+    return True
 
 class static(object):
     """ An instance of this class is a callable which can act as a BFG
@@ -228,19 +232,19 @@ class bfg_view(object):
         # time the application starts in case any of the decorators
         # has been changed.  Disallowing these functions from being
         # pickled enforces that.
-        def decorator(context, request):
+        def _bfg_view(context, request):
             return wrapped(context, request)
-        decorator.__is_bfg_view__ = True
-        decorator.__permission__ = self.permission
-        decorator.__for__ = self.for_
-        decorator.__view_name__ = self.name
-        decorator.__request_type__ = self.request_type
+        _bfg_view.__is_bfg_view__ = True
+        _bfg_view.__permission__ = self.permission
+        _bfg_view.__for__ = self.for_
+        _bfg_view.__view_name__ = self.name
+        _bfg_view.__request_type__ = self.request_type
         # we assign to __grok_module__ here rather than __module__ to
         # make it unpickleable but allow for the grokker to be able to
         # find it
-        decorator.__grok_module__ = wrapped.__module__
-        decorator.__name__ = wrapped.__name__
-        decorator.__doc__ = wrapped.__doc__
-        decorator.__dict__.update(wrapped.__dict__)
-        return decorator
+        _bfg_view.__grok_module__ = wrapped.__module__
+        _bfg_view.__name__ = wrapped.__name__
+        _bfg_view.__doc__ = wrapped.__doc__
+        _bfg_view.__dict__.update(wrapped.__dict__)
+        return _bfg_view
 
