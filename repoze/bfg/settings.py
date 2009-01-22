@@ -33,14 +33,10 @@ def get_options(kw, environ=os.environ):
     config_reload_templates = kw.get('reload_templates', '')
     effective_reload_templates = asbool(eget('BFG_RELOAD_TEMPLATES',
                                         config_reload_templates))
-    config_unicode_path_segments = kw.get('unicode_path_segments', 't')
-    effective_unicode_path_segments = asbool(eget('BFG_UNICODE_PATH_SEGMENTS',
-                                                  config_unicode_path_segments))
     update = {
         'debug_authorization': effective_debug_all or effective_debug_auth,
         'debug_notfound': effective_debug_all or effective_debug_notfound,
         'reload_templates': effective_reload_templates,
-        'unicode_path_segments': effective_unicode_path_segments,
         }
 
     kw.update(update)

@@ -39,16 +39,6 @@ application-specific configuration settings.
 +---------------------------------+-----------------------------+----------------------------------------+
 | ``BFG_DEBUG_ALL``               |  ``debug_all``              |  Turns all debug_* settings on.        |
 +---------------------------------+-----------------------------+----------------------------------------+
-| ``BFG_UNICODE_PATH_SEGMENTS``   |  ``unicode_path_segments``  |  Defaults to ``true``.  When ``true``, |
-|                                 |                             |  URL path segment names will be passed |
-|                                 |                             |  to model object ``__getitem__``       |
-|                                 |                             |  methods by the BFG model graph        |
-|                                 |                             |  traverser as ``unicode`` types rather |
-|                                 |                             |  than as ``str`` types; path segments  |
-|                                 |                             |  will be assumed to be UTF-8 encoded.  |
-|                                 |                             |  When ``false``, pass path segments    |
-|                                 |                             |  as undecoded ``str`` types.           |
-+---------------------------------+-----------------------------+----------------------------------------+
 
 Examples
 --------

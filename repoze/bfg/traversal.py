@@ -1,6 +1,5 @@
 import urllib
 
-from zope.component import queryUtility
 from zope.deferredimport import deprecated
    
 from zope.interface import classProvides
@@ -14,7 +13,6 @@ from repoze.bfg.lru import lru_cache
 from repoze.bfg.interfaces import ILocation
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
-from repoze.bfg.interfaces import ISettings
 
 deprecated(
     "('from repoze.bfg.traversal import model_url' is now "
@@ -119,13 +117,12 @@ def split_path(path):
             clean.append(segment)
     return clean
 
-def step(ob, name, default, as_unicode=True):
-    if as_unicode:
-        try:
-            name = name.decode('utf-8')
-        except UnicodeDecodeError:
-            raise TypeError('Could not decode path segment "%s" using the '
-                            'UTF-8 decoding scheme' % name)
+def step(ob, name, default):
+    try:
+        name = name.decode('utf-8')
+    except UnicodeDecodeError:
+        raise TypeError('Could not decode path segment "%s" using the '
+                        'UTF-8 decoding scheme' % name)
     if name.startswith('@@'):
         return name[2:], default
     if not hasattr(ob, '__getitem__'):
@@ -140,16 +137,11 @@ _marker = object()
 class ModelGraphTraverser(object):
     classProvides(ITraverserFactory)
     implements(ITraverser)
-    unicode_path_segments = True
     def __init__(self, root):
         self.root = root
         self.locatable = ILocation.providedBy(root)
-        settings = queryUtility(ISettings)
-        if settings is not None:
-            self.unicode_path_segments = settings.unicode_path_segments
 
     def __call__(self, environ, _marker=_marker):
-        unicode_path_segments = self.unicode_path_segments
         path = environ.get('PATH_INFO', '/')
         path = list(split_path(path))
         locatable = self.locatable
@@ -160,7 +152,7 @@ class ModelGraphTraverser(object):
 
         while path:
             segment = path.pop(0)
-            segment, next = _step(ob, segment, _marker, unicode_path_segments)
+            segment, next = _step(ob, segment, _marker)
             if next is _marker:
                 name = segment
                 break

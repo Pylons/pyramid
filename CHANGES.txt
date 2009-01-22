@@ -1,6 +1,20 @@
 Next release
 ============
 
+Backwards Incompatibilities
+---------------------------
+
+- The ``unicode_path_segments`` configuration variable and the
+  ``BFG_UNICODE_PATH_SEGMENTS`` configuration variable have been
+  removed.  Path segments are now always passed to model
+  ``__getitem__`` methods as unicode.  "True" has been the default for
+  this setting since 0.5.4, but changing this configuration setting to
+  false allowed you to go back to passing raw path element strings to
+  model ``__getitem__`` methods.  This services a speed goal (we get
+  about +80 req/s by removing the check), and it's clearer just to
+  always expect unicode path segments in model ``__getitem__``
+  methods.
+
 Implementation Changes
 ----------------------
 
