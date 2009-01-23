@@ -1,5 +1,5 @@
-Next release
-============
+0.6.4 (2009-01-23)
+==================
 
 Backwards Incompatibilities
 ---------------------------
@@ -10,17 +10,17 @@ Backwards Incompatibilities
   ``__getitem__`` methods as unicode.  "True" has been the default for
   this setting since 0.5.4, but changing this configuration setting to
   false allowed you to go back to passing raw path element strings to
-  model ``__getitem__`` methods.  This services a speed goal (we get
-  about +80 req/s by removing the check), and it's clearer just to
-  always expect unicode path segments in model ``__getitem__``
-  methods.
+  model ``__getitem__`` methods.  Removal of this knob services a
+  speed goal (we get about +80 req/s by removing the check), and it's
+  clearer just to always expect unicode path segments in model
+  ``__getitem__`` methods.
 
 Implementation Changes
 ----------------------
 
 - ``repoze.bfg.traversal.split_path`` now also handles decoding
   path segments to unicode (for speed, because its results are
-  LRU cached).
+  cached).
 
 - ``repoze.bfg.traversal.step`` was made a method of the
    ModelGraphTraverser.
