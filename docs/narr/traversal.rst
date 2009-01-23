@@ -285,14 +285,10 @@ context object implied by the current request.
 Unicode and Traversal
 ---------------------
 
-By default, the traversal machinery by default attempts to decode each
-path element in ``PATH_INFO`` from its natural byte string (``str``
-type) representation into Unicode using the UTF-8 encoding before
-passing it to the ``__getitem__`` of a model object.  If any path
-segment in ``PATH_INFO`` is not decodeable using the UTF-8 decoding, a
-TypeError is raised.
+The traversal machinery by default attempts to decode each path
+element in ``PATH_INFO`` from its natural byte string (``str`` type)
+representation into Unicode using the UTF-8 encoding before passing it
+to the ``__getitem__`` of a model object.  If any path segment in
+``PATH_INFO`` is not decodeable using the UTF-8 decoding, a TypeError
+is raised.
 
-The option named ``unicode_path_segments`` in
-:ref:`environment_chapter` provides a mechanism that will disable this
-behavior, causing traversal to pass path segments as plain byte string
-objects to all model ``__getitem__`` methods.

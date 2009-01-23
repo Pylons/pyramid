@@ -77,11 +77,11 @@ instances.  :mod:`repoze.bfg` imposes the following policy on model
 instance nodes in the graph:
 
 - Nodes which contain other nodes (aka "container" nodes) must supply
-  a ``__getitem__`` method which is willing to resolve a string or
-  unicode name to a subobject.  If a subobject by that name does not
-  exist in the container, ``__getitem__`` must raise a ``KeyError``.
-  If a subobject by that name *does* exist, the container should
-  return the subobject (another model instance).
+  a ``__getitem__`` method which is willing to resolve a unicode name
+  to a subobject.  If a subobject by that name does not exist in the
+  container, ``__getitem__`` must raise a ``KeyError``.  If a
+  subobject by that name *does* exist, the container should return the
+  subobject (another model instance).
 
 - Nodes which do not contain other nodes (aka "leaf" nodes) must not
   implement a ``__getitem__``, or if they do, their ``__getitem__``
