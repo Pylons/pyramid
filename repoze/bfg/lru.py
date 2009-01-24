@@ -73,8 +73,9 @@ class lru_cache(object):
             cache = LRUCache(maxsize)
         self.cache = cache
 
-    def __call__(self, f, marker=_marker):
+    def __call__(self, f):
         cache = self.cache
+        marker = _marker
         def lru_cached(key):
             val = cache.get(key, marker)
             if val is marker:
