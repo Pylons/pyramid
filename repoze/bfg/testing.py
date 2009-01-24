@@ -268,6 +268,9 @@ class DummyModel:
     def __delitem__(self, name):
         del self.subs[name]
 
+    def get(self, name, default=None):
+        return self.subs.get(name, default)
+
     def values(self):
         """ Return the values set by __setitem__ """
         return self.subs.values()
@@ -279,6 +282,8 @@ class DummyModel:
     def keys(self):
         """ Return the keys set by __setitem__ """
         return self.subs.keys()
+
+    __iter__ = keys
 
     def __nonzero__(self):
         return True
