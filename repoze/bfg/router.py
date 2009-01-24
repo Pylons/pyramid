@@ -5,7 +5,6 @@ from zope.component.event import dispatch
 
 from zope.interface import implements
 
-from webob.exc import HTTPNotFound
 from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.events import NewRequest
@@ -39,8 +38,6 @@ from repoze.bfg.urldispatch import RoutesRootFactory
 from repoze.bfg.view import _view_execution_permitted
 
 _marker = object()
-
-# 95090 function calls (95087 primitive calls) in 0.277 CPU seconds
 
 class Router(object):
     """ The main repoze.bfg WSGI application. """
@@ -135,8 +132,9 @@ class Router(object):
                     logger and logger.debug(msg)
                 else:
                     msg = request.url
-                app = HTTPNotFound(escape(msg))
-                return app(environ, start_response)
+                notfound = NotFound(msg)
+                start_response(notfound.status, notfound.headerlist)
+                return notfound.app_iter
 
             registry.has_listeners and registry.notify(NewResponse(response))
 
@@ -149,6 +147,20 @@ class Router(object):
 
         finally:
             registry_manager.pop()
+
+class NotFound(object):
+    """ Avoid using WebOb's NotFound WSGI response app; it's slow. """
+    def __init__(self, msg=''):
+        html = """<body>
+        <html><title>404 Not Found</title><body><h1>404 Not Found</h1>
+        <code>%s</code>
+        """ % msg
+        self.headerlist = [
+            ('Content-Length', len(html) ),
+            ('Content-Type', 'text/html')
+            ]
+        self.app_iter = [html]
+        self.status = '404 Not Found'
 
 def make_app(root_factory, package=None, filename='configure.zcml',
              options=None):

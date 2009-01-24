@@ -19,6 +19,9 @@ Behavior Changes
 Implementation Changes
 ----------------------
 
+- Use a homegrown NotFound error instead of ``webob.HTTPNotFound``
+  (the latter is slow).
+
 - Various speed micro-tweaks.
 
 Bug Fixes
