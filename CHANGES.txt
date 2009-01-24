@@ -1,5 +1,26 @@
 Next Release
 
+Behavior Changes
+----------------
+
+- The ``repoze.bfg.view.render_view_to_response`` API will no longer
+  raise a ValueError if an object returned by a view function it calls
+  does not possess certain attributes (``headerlist``, ``app_iter``,
+  ``status``).  This API used to attempt to perform a check using the
+  ``is_response`` function in ``repoze.bfg.view``, and raised a
+  ``ValueError`` if the ``is_response`` check failed.  The
+  responsibility is now the caller's to ensure that the return value
+  from a view function is a "real" response.
+
+- WSGI environ dicts passed to ``repoze.bfg`` 's Router must now
+  contain a REQUEST_METHOD key/value; if they do not, a KeyError will
+  be raised (speed).  
+
+Implementation Changes
+----------------------
+
+- Various speed micro-tweaks.
+
 Bug Fixes
 ---------
 

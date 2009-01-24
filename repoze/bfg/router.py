@@ -18,7 +18,10 @@ from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ITraverserFactory
+from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IViewPermission
 
 from repoze.bfg.log import make_stream_logger
 
@@ -33,10 +36,11 @@ from repoze.bfg.settings import Settings
 
 from repoze.bfg.urldispatch import RoutesRootFactory
 
-from repoze.bfg.view import render_view_to_response
-from repoze.bfg.view import view_execution_permitted
+from repoze.bfg.view import _view_execution_permitted
 
-_marker = ()
+_marker = object()
+
+# 95090 function calls (95087 primitive calls) in 0.277 CPU seconds
 
 class Router(object):
     """ The main repoze.bfg WSGI application. """
@@ -44,6 +48,10 @@ class Router(object):
     
     def __init__(self, registry):
         self.registry = registry
+        self.settings = registry.queryUtility(ISettings)
+        self.request_factory = registry.queryUtility(IRequestFactory)
+        self.security_policy = registry.queryUtility(ISecurityPolicy)
+        self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
 
     @property
     def root_policy(self):
@@ -53,23 +61,25 @@ class Router(object):
     def __call__(self, environ, start_response):
         """
         Accept ``environ`` and ``start_response``; route requests to
-        'view' code based on registrations within the application
-        registry; call ``start_response`` and return an iterable.
+        ``repoze.bfg`` views based on registrations within the
+        application registry; call ``start_response`` and return an
+        iterable.
         """
-        reg = self.registry
-        registry_manager.push(reg)
+        registry = self.registry
+        registry_manager.push(registry)
 
         try:
-            request_factory = reg.queryUtility(IRequestFactory)
+            request_factory = self.request_factory
             if request_factory is None:
-                method = environ.get('REQUEST_METHOD', 'GET')
+                method = environ['REQUEST_METHOD']
                 request_factory = HTTP_METHOD_FACTORIES.get(method, Request)
-            request = request_factory(environ)
 
-            reg.notify(NewRequest(request))
-            root_factory = reg.getUtility(IRootFactory)
+            request = request_factory(environ)
+            
+            registry.has_listeners and registry.notify(NewRequest(request))
+            root_factory = registry.getUtility(IRootFactory)
             root = root_factory(environ)
-            traverser = reg.getAdapter(root, ITraverserFactory)
+            traverser = registry.getAdapter(root, ITraverserFactory)
             context, view_name, subpath = traverser(environ)
 
             # XXX webob.Request's __setattr__ is slow here: investigate.
@@ -78,36 +88,44 @@ class Router(object):
             request.view_name = view_name
             request.subpath = subpath
 
-            permitted = view_execution_permitted(context, request, view_name)
+            settings = self.settings
 
-            settings = reg.queryUtility(ISettings)
             debug_authorization = settings and settings.debug_authorization
+            security_policy = self.security_policy
 
-            logger = None
+            permission = None
+
+            if security_policy is not None:
+                permission = registry.queryMultiAdapter((context, request),
+                                                        IViewPermission,
+                                                        name=view_name)
+
+            permitted = _view_execution_permitted(context, request, view_name,
+                                                  security_policy, permission,
+                                                  debug_authorization)
+
+            logger = self.logger
 
             if debug_authorization:
-                logger = reg.queryUtility(ILogger, 'repoze.bfg.debug')
                 logger and logger.debug(
                     'debug_authorization of url %s (view name %r against '
                     'context %r): %s' % (
-                    request.url, view_name, context, permitted.msg)
+                    request.url, view_name, context, permitted)
                     )
             if not permitted:
                 if debug_authorization:
-                    msg = permitted.msg
+                    msg = str(permitted)
                 else:
                     msg = 'Unauthorized: failed security policy check'
                 app = HTTPUnauthorized(escape(msg))
                 return app(environ, start_response)
 
-            response = render_view_to_response(context, request, view_name,
-                                               secure=False)
+            response = registry.queryMultiAdapter(
+                (context, request), IView, name=view_name)
 
             if response is None:
                 debug_notfound = settings and settings.debug_notfound
                 if debug_notfound:
-                    if logger is None:
-                        logger = reg.queryUtility(ILogger, 'repoze.bfg.debug')
                     msg = (
                         'debug_notfound of url %s; path_info: %r, context: %r, '
                         'view_name: %r, subpath: %r' % (
@@ -120,10 +138,14 @@ class Router(object):
                 app = HTTPNotFound(escape(msg))
                 return app(environ, start_response)
 
-            reg.notify(NewResponse(response))
+            registry.has_listeners and registry.notify(NewResponse(response))
 
-            start_response(response.status, response.headerlist)
-            return response.app_iter
+            try:
+                start_response(response.status, response.headerlist)
+                return response.app_iter
+            except AttributeError:
+                raise ValueError(
+                    'Non-response object returned from view: %r' % response)
 
         finally:
             registry_manager.pop()

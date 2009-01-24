@@ -217,7 +217,17 @@ def RepozeWhoIdentityACLSecurityPolicy():
     """
     return ACLSecurityPolicy(get_who_principals)
 
-class PermitsResult:
+class PermitsResult(int):
+    def __new__(cls, s, *args):
+        inst = int.__new__(cls, cls.boolval)
+        inst.s = s
+        inst.args = args
+        return inst
+        
+    @property
+    def msg(self):
+        return self.s % self.args
+
     def __str__(self):
         return self.msg
 
@@ -231,19 +241,7 @@ class Denied(PermitsResult):
     or other ``repoze.bfg`` code denies an action unlrelated to an ACL
     check.  It evaluates equal to all boolean false types.  It has an
     attribute named ``msg`` describing the circumstances for the deny."""
-    def __init__(self, s, *args):
-        self.s = s
-        self.args = args
-
-    @property
-    def msg(self):
-        return self.s % self.args
-
-    def __nonzero__(self):
-        return False
-
-    def __eq__(self, other):
-        return bool(other) is False
+    boolval = 0
 
 class Allowed(PermitsResult):
     """ An instance of ``Allowed`` is returned when a security policy
@@ -251,27 +249,17 @@ class Allowed(PermitsResult):
     check.  It evaluates equal to all boolean true types.  It has an
     attribute named ``msg`` describing the circumstances for the
     allow."""
-    def __init__(self, s, *args):
-        self.s = s
-        self.args = args
+    boolval = 1
 
-    @property
-    def msg(self):
-        return self.s % self.args
-
-    def __nonzero__(self):
-        return True
-
-    def __eq__(self, other):
-        return bool(other) is True
-
-class ACLPermitsResult:
-    def __init__(self, ace, acl, permission, principals, context):
-        self.permission = permission
-        self.ace = ace
-        self.acl = acl
-        self.principals = principals
-        self.context = context
+class ACLPermitsResult(int):
+    def __new__(cls, ace, acl, permission, principals, context):
+        inst = int.__new__(cls, cls.boolval)
+        inst.permission = permission
+        inst.ace = ace
+        inst.acl = acl
+        inst.principals = principals
+        inst.context = context
+        return inst
 
     @property
     def msg(self):
@@ -284,7 +272,15 @@ class ACLPermitsResult:
                     self.context,
                     self.principals)
 
-class ACLDenied(ACLPermitsResult, Denied):
+    def __str__(self):
+        return self.msg
+
+    def __repr__(self):
+        return '<%s instance at %s with msg %r>' % (self.__class__.__name__,
+                                                    id(self),
+                                                    self.msg)
+
+class ACLDenied(ACLPermitsResult):
     """ An instance of ``ACLDenied`` represents that a security check
     made explicitly against ACL was denied.  It evaluates equal to all
     boolean false types.  It also has attributes which indicate which
@@ -292,8 +288,9 @@ class ACLDenied(ACLPermitsResult, Denied):
     request.  Its __str__ method prints a summary of these attributes
     for debugging purposes.  The same summary is available as he
     ``msg`` attribute."""
+    boolval = 0
 
-class ACLAllowed(ACLPermitsResult, Allowed):
+class ACLAllowed(ACLPermitsResult):
     """ An instance of ``ACLDenied`` represents that a security check
     made explicitly against ACL was allowed.  It evaluates equal to
     all boolean true types.  It also has attributes which indicate
@@ -301,6 +298,7 @@ class ACLAllowed(ACLPermitsResult, Allowed):
     in the request.  Its __str__ method prints a summary of these
     attributes for debugging purposes.  The same summary is available
     as he ``msg`` attribute."""
+    boolval = 1
 
 def flatten(x):
     """flatten(sequence) -> list

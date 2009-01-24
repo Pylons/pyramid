@@ -28,20 +28,20 @@ class Registry(Components):
 
     # for optimization purposes, if no listeners are listening, don't try
     # to notify them
-    _has_listeners = False
+    has_listeners = False
 
     def registerSubscriptionAdapter(self, *arg, **kw):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
-        self._has_listeners = True
+        self.has_listeners = True
         return result
         
     def registerHandler(self, *arg, **kw):
         result = Components.registerHandler(self, *arg, **kw)
-        self._has_listeners = True
+        self.has_listeners = True
         return result
 
     def notify(self, *events):
-        if self._has_listeners:
+        if self.has_listeners:
             # iterating over subscribers assures they get executed
             for ignored in self.subscribers(events, None):
                 """ """

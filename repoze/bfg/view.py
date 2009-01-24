@@ -21,31 +21,49 @@ def view_execution_permitted(context, request, name=''):
     by a permission, return the result of checking the permission
     associated with the view using the effective security policy and
     the ``request``.  If no security policy is in effect, or if the
-    view is not protected by a permission, return a True value. """
+    view is not protected by a permission, return True. """
     security_policy = queryUtility(ISecurityPolicy)
-    if security_policy is not None:
-        permission = queryMultiAdapter((context, request), IViewPermission,
-                                       name=name)
-        if permission is None:
+    permission = queryMultiAdapter((context, request), IViewPermission,
+                                   name=name)
+    return _view_execution_permitted(context, request, name, security_policy,
+                                     permission, True)
+
+def _view_execution_permitted(context, request, view_name, security_policy,
+                              permission, debug_authorization):
+    """ Rawer (faster) form of view_execution_permitted which does not
+    need to do a CA lookup for the security policy or other values and
+    which returns plain booleans if debug_authorization is off instead
+    of constructing ``Allowed`` objects.  This function is used by
+    ``view_execution_permitted`` and the Router; it is not a public
+    API."""
+    if security_policy is None:
+        if debug_authorization:
+            return Allowed(
+                'Allowed: view name %r in context %r (no security policy in '
+                'use)', view_name, context)
+        else:
+            return True
+
+    elif permission is None:
+        if debug_authorization:
             return Allowed(
                 'Allowed: view name %r in context %r (no permission '
-                'registered for name %r).', name, context, name)
+                'registered for name %r).', view_name, context, view_name)
+        else:
+            return True
+
+    else:
         return permission(security_policy)
-    return Allowed('Allowed: view name %r in context %r (no security policy '
-                   'in use).', name, context)
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
     ``context`` and ``request`` to an object implementing
     ``repoze.bfg.interfaces.IResponse`` or ``None`` if no such view
     exists.  This function will return ``None`` if a corresponding
-    view cannot be found.  Additionally, this function will raise a
-    ``ValueError`` if a view function is found and called but the view
-    returns an object which does not implement
-    ``repoze.bfg.interfaces.IResponse``.  If ``secure`` is ``True``,
-    and the view is protected by a permission, the permission will be
-    checked before calling the view function.  If the permission check
-    disallows view execution (based on the current security policy), a
+    view cannot be found.  If ``secure`` is ``True``, and the view is
+    protected by a permission, the permission will be checked before
+    calling the view function.  If the permission check disallows view
+    execution (based on the current security policy), a
     ``repoze.bfg.security.Unauthorized`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
@@ -53,17 +71,15 @@ def render_view_to_response(context, request, name='', secure=True):
         permitted = view_execution_permitted(context, request, name)
         if not permitted:
             raise Unauthorized(permitted)
+        
+    # It's no use trying to distinguish below whether response is None
+    # because a) we were returned a default or b) because the view
+    # function returned None: the zope.component/zope.interface
+    # machinery doesn't distinguish a None returned from the view from
+    # a sentinel None returned during queryMultiAdapter (even if we
+    # pass a non-None default).
 
-    response = queryMultiAdapter((context, request), IView, name=name,
-                                 default=_marker)
-
-    if response is _marker:
-        return None
-
-    if not is_response(response):
-        raise ValueError('response did not implement IResponse: %r' % response)
-
-    return response
+    return queryMultiAdapter((context, request), IView, name=name)
 
 def render_view_to_iterable(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
@@ -116,19 +132,14 @@ def is_response(ob):
     duck-typing check, as response objects are not obligated to
     actually implement a Zope interface."""
     # response objects aren't obligated to implement a Zope interface,
-    # so we do it the hard way; this is written awkwardly for
-    # performance reasons
-    try:
-        ob.app_iter, ob.headerlist, ob.status
-    except AttributeError:
-        return False
-    try:
-        ob.app_iter.__iter__, ob.headerlist.__iter__
-    except AttributeError:
-        return False
-    if not isinstance(ob.status, basestring):
-        return False
-    return True
+    # so we do it the hard way
+    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
+         hasattr(ob, 'status') ):
+        if ( hasattr(ob.app_iter, '__iter__') and
+             hasattr(ob.headerlist, '__iter__') and
+             isinstance(ob.status, basestring) ) :
+            return True
+    return False
 
 class static(object):
     """ An instance of this class is a callable which can act as a BFG

@@ -131,8 +131,12 @@ class ModelGraphTraverser(object):
         self.root = root
         self.locatable = ILocation.providedBy(root)
 
+ #61089 function calls (61086 primitive calls) in 0.191 CPU seconds
     def __call__(self, environ, _marker=_marker):
-        path = environ.get('PATH_INFO', '/')
+        try:
+            path = environ['PATH_INFO']
+        except KeyError:
+            path = '/'
         path = list(split_path(path))
         locatable = self.locatable
         step = self._step

@@ -12,7 +12,7 @@ class TestRegistry(unittest.TestCase):
 
     def test_registerHandler_and_notify(self):
         registry = self._makeOne()
-        self.assertEqual(registry._has_listeners, False)
+        self.assertEqual(registry.has_listeners, False)
         from zope.interface import Interface
         from zope.interface import implements
         class IFoo(Interface):
@@ -23,21 +23,21 @@ class TestRegistry(unittest.TestCase):
         def f(event):
             L.append(event)
         registry.registerHandler(f, [IFoo])
-        self.assertEqual(registry._has_listeners, True)
+        self.assertEqual(registry.has_listeners, True)
         event = FooEvent()
         registry.notify(event)
         self.assertEqual(L, [event])
 
     def test_registerSubscriptionAdapter_and_notify(self):
         registry = self._makeOne()
-        self.assertEqual(registry._has_listeners, False)
+        self.assertEqual(registry.has_listeners, False)
         from zope.interface import Interface
         class EventHandler:
             pass
         class IFoo(Interface):
             pass
         registry.registerSubscriptionAdapter(EventHandler, [IFoo], Interface)
-        self.assertEqual(registry._has_listeners, True)
+        self.assertEqual(registry.has_listeners, True)
 
 class TestPopulateRegistry(unittest.TestCase):
     def setUp(self):

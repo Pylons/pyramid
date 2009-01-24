@@ -123,26 +123,6 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
                                  secure=False)
         self.assertEqual(response.status, '200 OK')
 
-
-    def test_call_view_response_doesnt_implement_IResponse(self):
-        context = DummyContext()
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import IRequest
-        class IContext(Interface):
-            pass
-        directlyProvides(context, IContext)
-        response = 'abc'
-        view = make_view(response)
-        self._registerView(view, 'registered', IContext, IRequest)
-        environ = self._makeEnviron()
-        from webob import Request
-        request = Request(environ)
-        directlyProvides(request, IRequest)
-        self.assertRaises(ValueError, self._callFUT, context, request,
-                          name='registered', secure=False)
-
-
 class RenderViewToIterableTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.view import render_view_to_iterable
@@ -228,24 +208,6 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
                                  secure=False)
         self.assertEqual(iterable, ())
 
-    def test_call_view_response_doesnt_implement_IResponse(self):
-        context = DummyContext()
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import IRequest
-        class IContext(Interface):
-            pass
-        directlyProvides(context, IContext)
-        response = 'abc'
-        view = make_view(response)
-        self._registerView(view, 'registered', IContext, IRequest)
-        environ = self._makeEnviron()
-        from webob import Request
-        request = Request(environ)
-        directlyProvides(request, IRequest)
-        self.assertRaises(ValueError, self._callFUT, context, request,
-                          name='registered', secure=False)
-
 class RenderViewTests(unittest.TestCase, BaseTest):
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.view import render_view
@@ -328,24 +290,6 @@ class RenderViewTests(unittest.TestCase, BaseTest):
         directlyProvides(request, IRequest)
         s = self._callFUT(context, request, name='registered', secure=False)
         self.assertEqual(s, '')
-
-    def test_call_view_response_doesnt_implement_IResponse(self):
-        context = DummyContext()
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import IRequest
-        class IContext(Interface):
-            pass
-        directlyProvides(context, IContext)
-        response = 'abc'
-        view = make_view(response)
-        self._registerView(view, 'registered', IContext, IRequest)
-        environ = self._makeEnviron()
-        from webob import Request
-        request = Request(environ)
-        directlyProvides(request, IRequest)
-        self.assertRaises(ValueError, self._callFUT, context, request,
-                          name='registered', secure=False)
 
 class TestIsResponse(unittest.TestCase):
     def _callFUT(self, *arg, **kw):

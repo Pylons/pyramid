@@ -180,6 +180,19 @@ class RouterTests(unittest.TestCase):
         self.failUnless("view_name: ''" in message)
         self.failUnless("subpath: []" in message)
 
+    def test_call_view_returns_nonresponse(self):
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None)
+        view = make_view('abc')
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(ValueError, router, environ, start_response)
+
     def test_call_view_registered_nonspecific_default_path(self):
         rootfactory = make_rootfactory(None)
         context = DummyContext()
