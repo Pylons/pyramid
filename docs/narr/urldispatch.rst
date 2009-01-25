@@ -411,6 +411,6 @@ the ``Article`` class' constructor, too.
 Further Documentation and Examples
 ----------------------------------
 
-URL-dispatch related API documentation is available in
-:ref:`urldispatch_module` .
+The API documentation in :ref:`urldispatch_module` documents an older
+(now-deprecated) version of Routes support in :mod:`repoze.bfg`.
 
