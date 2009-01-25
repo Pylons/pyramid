@@ -106,7 +106,7 @@ provides
 
 encoding
 
-  The `URL encoding http://routes.groovie.org/manual.html#unicode`_
+  The `URL encoding <http://routes.groovie.org/manual.html#unicode>`_
   for a match returned by this route.
 
 static
