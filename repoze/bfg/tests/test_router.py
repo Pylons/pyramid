@@ -541,10 +541,8 @@ class RouterTests(unittest.TestCase):
     def test_call_irequestfactory_override(self):
         from repoze.bfg.interfaces import INewRequest
         from repoze.bfg.interfaces import IRequestFactory
-        from webob import Request
-        class Request2(Request):
-            pass
-        self.registry.registerUtility(Request2, IRequestFactory)
+        from repoze.bfg.testing import DummyRequest
+        self.registry.registerUtility(DummyRequest, IRequestFactory)
         rootfactory = make_rootfactory(None)
         context = DummyContext()
         traversalfactory = make_traversal_factory(context, '', [])
@@ -560,7 +558,11 @@ class RouterTests(unittest.TestCase):
         request_events = self._registerEventListener(INewRequest)
         result = router(environ, start_response)
         request = request_events[0].request
-        self.failUnless(isinstance(request, Request2))
+        self.failUnless(isinstance(request, DummyRequest))
+        self.assertEqual(request.root, None)
+        self.assertEqual(request.context, context)
+        self.assertEqual(request.view_name, '')
+        self.assertEqual(request.subpath, [])
 
     def test_call_inotfound_appfactory_override(self):
         from repoze.bfg.interfaces import INotFoundAppFactory
@@ -597,7 +599,7 @@ class RouterTests(unittest.TestCase):
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
         self.assertEqual(router.unauth_app_factory, app)
-    
+
 class MakeAppTests(unittest.TestCase):
     def setUp(self):
         cleanUp()

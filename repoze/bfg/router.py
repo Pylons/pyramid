@@ -1,4 +1,5 @@
 import sys
+from webob import Request as WebObRequest
 
 from zope.component.event import dispatch
 
@@ -100,11 +101,21 @@ class Router(object):
             traverser = registry.getAdapter(root, ITraverserFactory)
             context, view_name, subpath = traverser(environ)
 
-            # XXX webob.Request's __setattr__ is slow here: investigate.
-            request.root = root
-            request.context = context
-            request.view_name = view_name
-            request.subpath = subpath
+            if isinstance(request, WebObRequest):
+                # webob.Request's __setattr__ (as of 0.9.5 and lower)
+                # is a bottleneck; if we're sure we're using a
+                # webob.Request, go around its back and set stuff into
+                # the environ directly
+                attrs = environ.setdefault('webob.adhoc_attrs', {})
+                attrs['root'] = root
+                attrs['context'] = context
+                attrs['view_name'] = view_name
+                attrs['subpath'] = subpath
+            else:
+                request.root = root
+                request.context = context
+                request.view_name = view_name
+                request.subpath = subpath
 
             security_policy = self.security_policy
 
