@@ -18,9 +18,10 @@ class LRUCache(object):
         self.data = {}
         self.lock = threading.Lock()
 
-    def get(self, key, default=None, _marker=_marker):
-        datum = self.data.get(key, _marker)
-        if datum is _marker:
+    def get(self, key, default=None):
+        try:
+            datum = self.data[key]
+        except KeyError:
             return default
         pos, val = datum
         self.clock[pos]['ref'] = True
