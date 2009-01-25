@@ -25,10 +25,17 @@ Behavior Changes
   be raised (speed).  
 
 - It is no longer permissible to pass a "nested" list of principals to
-  ``repoze.bfg.ACLAuthorizer.permits`` (e.g. ['fred', ['larry',
-  'bob']).  The principals list must be fully expanded.  This feature
-  was never documented, and was never an API, so it's not a backwards
-  incompatibility.
+  ``repoze.bfg.ACLAuthorizer.permits`` (e.g. ``['fred', ['larry',
+  'bob']]``).  The principals list must be fully expanded.  This
+  feature was never documented, and was never an API, so it's not a
+  backwards incompatibility.
+
+- It is no longer permissible for a security ACE to contain a "nested"
+  list of permissions (e.g. ``(Allow, Everyone, ['read', ['view',
+  ['write', 'manage']]])`)`.  The list must instead be fully expanded
+  (e.g. ``(Allow, Everyone, ['read', 'view', 'write', 'manage])``).  This
+  feature was never documented, and was never an API, so it's not a
+  backwards incompatibility.
 
 Implementation Changes
 ----------------------

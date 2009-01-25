@@ -531,27 +531,6 @@ class TestACLDenied(unittest.TestCase):
         self.failUnless('<ACLDenied instance at ' in repr(denied))
         self.failUnless("with msg %r>" % msg in repr(denied))
 
-class TestFlatten(unittest.TestCase):
-    def _callFUT(self, item):
-        from repoze.bfg.security import _flatten
-        return _flatten(item)
-
-    def test_flat_sequence(self):
-        result = self._callFUT([1, 2, 3])
-        self.assertEqual(result, [1, 2, 3])
-
-    def test_singly_nested_sequence(self):
-        result = self._callFUT([1, [2, 3]])
-        self.assertEqual(result, [1, 2, 3])
-        
-    def test_doubly_nested_sequence(self):
-        result = self._callFUT([1, [2, [3]]])
-        self.assertEqual(result, [1, 2, 3])
-
-    def test_mix_str_unicode_sequence(self):
-        result = self._callFUT([1, [2, [3]], u'a', ('b', set(['c', 'd']))])
-        self.assertEqual(result, [1, 2, 3, u'a', 'b', 'c', 'd'])
-
 class DummyContext:
     pass
 

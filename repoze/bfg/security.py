@@ -81,9 +81,7 @@ class ACLSecurityPolicy(object):
             for ace in acl:
                 ace_action, ace_principal, ace_permissions = ace
                 if ace_principal in principals:
-                    if hasattr(ace_permissions, '__iter__'):
-                        ace_permissions = _flatten(ace_permissions)
-                    else:
+                    if not hasattr(ace_permissions, '__iter__'):
                         ace_permissions = [ace_permissions]
                     if permission in ace_permissions:
                         if ace_action == Allow:
@@ -126,9 +124,7 @@ class ACLSecurityPolicy(object):
 
             for ace_action, ace_principal, ace_permissions in acl:
                 if ace_action == Allow:
-                    if hasattr(ace_permissions, '__iter__'):
-                        ace_permissions = _flatten(ace_permissions)
-                    else:
+                    if not hasattr(ace_permissions, '__iter__'):
                         ace_permissions = [ace_permissions]
                     if permission in ace_permissions:
                         allowed[ace_principal] = True
@@ -294,26 +290,6 @@ class ACLAllowed(ACLPermitsResult):
     attributes for debugging purposes.  The same summary is available
     as he ``msg`` attribute."""
     boolval = 1
-
-def _flatten(iterable):
-    """flatten(sequence) -> list
-
-    Returns a single, flat list which contains all elements retrieved
-    from the sequence and all recursively contained sub-sequences
-    (iterables).
-
-    Examples:
-    >>> [1, 2, [3,4], (5,6)]
-    [1, 2, [3, 4], (5, 6)]
-    >>> flatten([[[1,2,3], (42,None)], [4,5], [6], 7, MyVector(8,9,10)])
-    [1, 2, 3, 42, None, 4, 5, 6, 7, 8, 9, 10]"""
-    result = []
-    for el in iterable:
-        if hasattr(el, "__iter__"):
-            result.extend(_flatten(el))
-        else:
-            result.append(el)
-    return result
 
 class ViewPermission(object):
     implements(IViewPermission)
