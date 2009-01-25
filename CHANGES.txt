@@ -1,4 +1,5 @@
 Next Release
+============
 
 Features
 --------
@@ -38,6 +39,17 @@ Behavior Changes
   (e.g. ``(Allow, Everyone, ['read', 'view', 'write', 'manage])``).  This
   feature was never documented, and was never an API, so it's not a
   backwards incompatibility.
+
+- The ``repoze.bfg.urldispatch.RoutesRootFactory`` now injects the
+  ``wsgiorg.routing_args`` environment variable into the environ when
+  a route matches.  This is a tuple of ((), routing_args) where
+  routing_args is the value that comes back from the routes mapper
+  match (the "match dict").
+
+- The ``repoze.bfg.traversal.RoutesModelTraverser`` class now wants to
+  obtain the ``view_name`` and ``subpath`` from the
+  ``wsgiorgs.routing_args`` environment variable.  It falls back to
+  obtaining these from the context for backwards compatibility.
 
 Implementation Changes
 ----------------------

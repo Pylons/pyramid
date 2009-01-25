@@ -225,7 +225,7 @@ class RoutesModelTraverserTests(unittest.TestCase):
         from repoze.bfg.interfaces import ITraverser
         verifyObject(ITraverser, self._makeOne(None))
 
-    def test_call_with_only_controller(self):
+    def test_call_with_only_controller_bwcompat(self):
         model = DummyContext()
         model.controller = 'controller'
         traverser = self._makeOne(model)
@@ -234,7 +234,7 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[1], 'controller')
         self.assertEqual(result[2], [])
 
-    def test_call_with_only_view_name(self):
+    def test_call_with_only_view_name_bwcompat(self):
         model = DummyContext()
         model.view_name = 'view_name'
         traverser = self._makeOne(model)
@@ -243,7 +243,7 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[1], 'view_name')
         self.assertEqual(result[2], [])
 
-    def test_call_with_subpath(self):
+    def test_call_with_subpath_bwcompat(self):
         model = DummyContext()
         model.view_name = 'view_name'
         model.subpath = '/a/b/c'
@@ -253,13 +253,33 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[1], 'view_name')
         self.assertEqual(result[2], ['a', 'b', 'c'])
 
-    def test_call_with_no_view_name_or_controller(self):
+    def test_call_with_no_view_name_or_controller_bwcompat(self):
         model = DummyContext()
         traverser = self._makeOne(model)
         result = traverser({})
         self.assertEqual(result[0], model)
         self.assertEqual(result[1], '')
         self.assertEqual(result[2], [])
+
+    def test_call_with_only_view_name(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        routing_args = ((), {'view_name':'view_name'})
+        environ = {'wsgiorg.routing_args': routing_args}
+        result = traverser(environ)
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], [])
+
+    def test_call_with_view_name_and_subpath(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        routing_args = ((), {'view_name':'view_name', 'subpath':'/a/b/c'})
+        environ = {'wsgiorg.routing_args': routing_args}
+        result = traverser(environ)
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], ['a', 'b','c'])
 
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):

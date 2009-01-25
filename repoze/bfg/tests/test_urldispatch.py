@@ -111,6 +111,10 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(result.view_name, 'foo')
         self.assertEqual(result.action, 'action1')
         self.assertEqual(result.article, 'article1')
+        routing_args = environ['wsgiorg.routing_args'][1]
+        self.assertEqual(routing_args['view_name'], 'foo')
+        self.assertEqual(routing_args['action'], 'action1')
+        self.assertEqual(routing_args['article'], 'article1')
 
     def test_unicode_in_route_default(self):
         marker = ()
@@ -128,6 +132,8 @@ class RoutesRootFactoryTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRoutesContext
         self.failUnless(IRoutesContext.providedBy(result))
         self.assertEqual(getattr(result, la.encode('utf-8')), 'id')
+        routing_args = environ['wsgiorg.routing_args'][1]
+        self.assertEqual(routing_args[la.encode('utf-8')], 'id')
 
     def test_no_fallback_get_root(self):
         marker = ()

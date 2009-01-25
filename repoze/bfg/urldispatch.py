@@ -177,6 +177,7 @@ class RoutesRootFactory(Mapper):
                     k = k.encode('utf-8')
                 kw[k] = v
             context = factory(**kw)
+            environ['wsgiorg.routing_args'] = ((), kw)
             provides = route._provides
             for iface in provides:
                 alsoProvides(context, iface)

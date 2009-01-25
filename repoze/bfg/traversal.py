@@ -172,9 +172,28 @@ class RoutesModelTraverser(object):
         self.context = context
 
     def __call__(self, environ):
-        view_name = getattr(self.context, 'controller', None) # b/w compat<0.6.3
-        if view_name is None:
-            view_name = getattr(self.context, 'view_name', '') # 0.6.3+
-        subpath = getattr(self.context, 'subpath', '') # 0.6.3+
-        subpath = filter(None, subpath.split('/'))
+        # the traverser *wants* to get routing args from the environ
+        # as of 0.6.5; the rest of this stuff is for backwards
+        # compatibility
+        try:
+            # 0.6.5 +
+            routing_args = environ['wsgiorg.routing_args'][1]
+        except KeyError:
+            # <= 0.6.4
+            routing_args = self.context.__dict__
+        try:
+            view_name = routing_args['view_name']
+        except KeyError:
+            # b/w compat < 0.6.3
+            try:
+                view_name = routing_args['controller']
+            except KeyError:
+                view_name = ''
+        try:
+            subpath = routing_args['subpath']
+            subpath = filter(None, subpath.split('/'))
+        except KeyError:
+            # b/w compat < 0.6.5
+            subpath = []
+
         return self.context, view_name, subpath
