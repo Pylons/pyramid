@@ -8,6 +8,8 @@ Features
   invoked due to lack of permission.  See the "ZCML Hooks" chapter in
   the docs for more information.
 
+- Added Routes ZCML directive attribute explanations.
+
 Behavior Changes
 ----------------
 
@@ -53,7 +55,6 @@ Implementation Changes
   ``webob.exc.Unauthorized`` (the latter is slow).
 
 - Various speed micro-tweaks.
-
 
 Bug Fixes
 ---------
@@ -116,7 +117,7 @@ Implementation Changes
   of making its code slightly uglier.
 
 New Modules
-===========
+-----------
 
 - ``repoze.bfg.lru`` implements an LRU cache class and a decorator for
   internal use.
