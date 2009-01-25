@@ -55,4 +55,3 @@ class NotFound(HTTPException):
 class Unauthorized(HTTPException):
     """ The default Unauthorized WSGI application """
     status = '401 Unauthorized'
-

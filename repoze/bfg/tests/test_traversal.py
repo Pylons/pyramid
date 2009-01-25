@@ -74,6 +74,14 @@ class ModelGraphTraverserTests(unittest.TestCase):
         context = DummyContext()
         verifyObject(ITraverser, self._makeOne(context))
 
+    def test_call_with_no_pathinfo(self):
+        policy = self._makeOne(None)
+        environ = self._getEnviron()
+        ctx, name, subpath = policy(environ)
+        self.assertEqual(ctx, None)
+        self.assertEqual(name, '')
+        self.assertEqual(subpath, [])
+
     def test_call_pathel_with_no_getitem(self):
         policy = self._makeOne(None)
         environ = self._getEnviron(PATH_INFO='/foo/bar')

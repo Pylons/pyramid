@@ -94,10 +94,8 @@ def update_wrapper(wrapper,
        function (defaults to functools.WRAPPER_UPDATES)
     """
     for attr in assigned:
-        try:
-            setattr(wrapper, attr, getattr(wrapped, attr))
-        except TypeError: # Python 2.3 doesn't allow assigning to __name__.
-            pass
+        setattr(wrapper, attr, getattr(wrapped, attr))
+
     for attr in updated:
         getattr(wrapper, attr).update(getattr(wrapped, attr))
     # Return the wrapper so this can be used as a decorator via curry()

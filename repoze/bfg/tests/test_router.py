@@ -518,6 +518,26 @@ class RouterTests(unittest.TestCase):
         self.failIf(IPOSTRequest.providedBy(request))
         self.failUnless(IRequest.providedBy(request))
 
+    def test_call_unknown_method(self):
+        from repoze.bfg.interfaces import INewRequest
+        from repoze.bfg.interfaces import IRequest
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron(REQUEST_METHOD='UNKNOWN')
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        request_events = self._registerEventListener(INewRequest)
+        result = router(environ, start_response)
+        request = request_events[0].request
+        self.failUnless(IRequest.providedBy(request))
+
     def test_call_irequestfactory_override(self):
         from repoze.bfg.interfaces import INewRequest
         from repoze.bfg.interfaces import IRequestFactory
@@ -541,6 +561,42 @@ class RouterTests(unittest.TestCase):
         result = router(environ, start_response)
         request = request_events[0].request
         self.failUnless(isinstance(request, Request2))
+
+    def test_call_inotfound_appfactory_override(self):
+        from repoze.bfg.interfaces import INotFoundAppFactory
+        def app():
+            """ """
+        self.registry.registerUtility(app, INotFoundAppFactory)
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne()
+        self.assertEqual(router.notfound_app_factory, app)
+
+    def test_call_iunauth_appfactory_override(self):
+        from repoze.bfg.interfaces import IUnauthorizedAppFactory
+        def app():
+            """ """
+        self.registry.registerUtility(app, IUnauthorizedAppFactory)
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        traversalfactory = make_traversal_factory(context, '', [])
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne()
+        self.assertEqual(router.unauth_app_factory, app)
     
 class MakeAppTests(unittest.TestCase):
     def setUp(self):
