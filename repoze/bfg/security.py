@@ -312,12 +312,15 @@ def flatten(x):
     [1, 2, [3, 4], (5, 6)]
     >>> flatten([[[1,2,3], (42,None)], [4,5], [6], 7, MyVector(8,9,10)])
     [1, 2, 3, 42, None, 4, 5, 6, 7, 8, 9, 10]"""
-    if isinstance(x, basestring):
+    if not hasattr(x, '__iter__'):
         return [x]
+    return _flatten(x)
+
+def _flatten(iterable):
     result = []
-    for el in x:
-        if hasattr(el, "__iter__") and not isinstance(el, basestring):
-            result.extend(flatten(el))
+    for el in iterable:
+        if hasattr(el, "__iter__"):
+            result.extend(_flatten(el))
         else:
             result.append(el)
     return result
