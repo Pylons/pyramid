@@ -128,9 +128,6 @@ class ISecurityPolicy(Interface):
         implementation, in which case, it should raise a
         ``NotImplementedError`` exception."""
 
-class NoAuthorizationInformation(Exception):
-    pass
-
 class IViewPermission(Interface):
     def __call__(security_policy):
         """ Return True if the permission allows, return False if it denies. """

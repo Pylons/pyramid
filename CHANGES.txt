@@ -33,6 +33,12 @@ Behavior Changes
 Implementation Changes
 ----------------------
 
+- Get rid of ``repoze.bfg.security.ACLAuthorizer``: the
+  ``ACLSecurityPolicy`` now does what it did inline.
+
+- Get rid of ``repoze.bfg.interfaces.NoAuthorizationInformation``
+  exception: it was used only by ``ACLAuthorizer``.
+
 - Use a homegrown NotFound error instead of ``webob.exc.HTTPNotFound``
   (the latter is slow).
 
@@ -40,6 +46,7 @@ Implementation Changes
   ``webob.exc.Unauthorized`` (the latter is slow).
 
 - Various speed micro-tweaks.
+
 
 Bug Fixes
 ---------

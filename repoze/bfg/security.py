@@ -6,7 +6,6 @@ from repoze.bfg.location import lineage
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IViewPermissionFactory
-from repoze.bfg.interfaces import NoAuthorizationInformation
 
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
@@ -62,37 +61,8 @@ def principals_allowed_by_permission(context, permission):
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
 
-class ACLAuthorizer(object):
-
-    def __init__(self, context):
-        self.context = context
-
-    def permits(self, permission, *principals):
-        try:
-            acl = self.context.__acl__
-        except AttributeError:
-            raise NoAuthorizationInformation
-
-        for ace in acl:
-            ace_action, ace_principal, ace_permissions = ace
-            for principal in principals:
-                if ace_principal == principal:
-                    permissions = flatten(ace_permissions)
-                    if permission in permissions:
-                        if ace_action == Allow:
-                            return ACLAllowed(ace, acl, permission, principals,
-                                              self.context)
-                        else:
-                            return ACLDenied(ace, acl, permission, principals,
-                                             self.context)
-
-        # default deny if no ACE matches in the ACL found
-        result = ACLDenied(None, acl, permission, principals, self.context)
-        return result
-
 class ACLSecurityPolicy(object):
     implements(ISecurityPolicy)
-    authorizer_factory = ACLAuthorizer
     
     def __init__(self, get_principals):
         self.get_principals = get_principals
@@ -100,14 +70,33 @@ class ACLSecurityPolicy(object):
     def permits(self, context, request, permission):
         """ Return ``ACLAllowed`` if the policy permits access,
         ``ACLDenied`` if not. """
-        principals = self.effective_principals(request)
+        principals = set(self.effective_principals(request))
+
         for location in lineage(context):
-            authorizer = self.authorizer_factory(location)
             try:
-                return authorizer.permits(permission, *principals)
-            except NoAuthorizationInformation:
+                acl = location.__acl__
+            except AttributeError:
                 continue
 
+            for ace in acl:
+                ace_action, ace_principal, ace_permissions = ace
+                if ace_principal not in principals:
+                    continue
+                for principal in principals:
+                    if ace_principal == principal:
+                        permissions = flatten(ace_permissions)
+                        if permission in permissions:
+                            if ace_action == Allow:
+                                return ACLAllowed(ace, acl, permission,
+                                                  principals, location)
+                            else:
+                                return ACLDenied(ace, acl, permission,
+                                                 principals, location)
+
+            # default deny if no ACE matches in the ACL found
+            result = ACLDenied(None, acl, permission, principals, location)
+            return result
+        
         # default deny if no ACL in lineage at all
         return ACLDenied(None, None, permission, principals, context)
 
@@ -131,8 +120,7 @@ class ACLSecurityPolicy(object):
             acl = getattr(location, '__acl__', None)
             if acl is not None:
                 allowed = {}
-                for ace in acl:
-                    ace_action, ace_principal, ace_permissions = ace
+                for ace_action, ace_principal, ace_permissions in acl:
                     if ace_action == Allow:
                         ace_permissions = flatten(ace_permissions)
                         for ace_permission in ace_permissions:
