@@ -1,5 +1,13 @@
 Next Release
 
+Features
+--------
+
+- You can now override the NotFound and Unauthorized responses that
+  :mod:`repoze.bfg` generates when a view cannot be found or cannot be
+  invoked due to lack of permission.  See the "ZCML Hooks" chapter in
+  the docs for more information.
+
 Behavior Changes
 ----------------
 
@@ -19,8 +27,11 @@ Behavior Changes
 Implementation Changes
 ----------------------
 
-- Use a homegrown NotFound error instead of ``webob.HTTPNotFound``
+- Use a homegrown NotFound error instead of ``webob.exc.HTTPNotFound``
   (the latter is slow).
+
+- Use a homegrown Unauthorized error instead of
+  ``webob.exc.Unauthorized`` (the latter is slow).
 
 - Various speed micro-tweaks.
 

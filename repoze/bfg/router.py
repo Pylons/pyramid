@@ -1,17 +1,15 @@
 import sys
-from cgi import escape
 
 from zope.component.event import dispatch
 
 from zope.interface import implements
-
-from webob.exc import HTTPUnauthorized
 
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ILogger
+from repoze.bfg.interfaces import INotFoundAppFactory
 from repoze.bfg.interfaces import IRequestFactory
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
@@ -19,6 +17,7 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.interfaces import IUnauthorizedAppFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 
@@ -36,6 +35,8 @@ from repoze.bfg.settings import Settings
 from repoze.bfg.urldispatch import RoutesRootFactory
 
 from repoze.bfg.view import _view_execution_permitted
+from repoze.bfg.wsgi import Unauthorized
+from repoze.bfg.wsgi import NotFound
 
 _marker = object()
 
@@ -45,15 +46,31 @@ class Router(object):
     
     def __init__(self, registry):
         self.registry = registry
-        self.settings = registry.queryUtility(ISettings)
+
         self.request_factory = registry.queryUtility(IRequestFactory)
         self.security_policy = registry.queryUtility(ISecurityPolicy)
-        self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
 
-    @property
-    def root_policy(self):
-        """  Backwards compatibility alias """
-        return self.registry.getUtility(IRootFactory)
+        notfound_app_factory = registry.queryUtility(INotFoundAppFactory)
+        if notfound_app_factory is None:
+            notfound_app_factory = NotFound
+        self.notfound_app_factory = notfound_app_factory
+
+        unauth_app_factory = registry.queryUtility(IUnauthorizedAppFactory)
+        if unauth_app_factory is None:
+            unauth_app_factory = Unauthorized
+        self.unauth_app_factory = unauth_app_factory
+
+        settings = registry.queryUtility(ISettings)
+        if settings is None:
+            self.debug_authorization = False
+            self.debug_notfound = False
+        else:
+            self.debug_authorization = settings.debug_authorization
+            self.debug_notfound = settings.debug_notfound
+            
+        self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
+        self.root_factory = registry.getUtility(IRootFactory)
+        self.root_policy = self.root_factory # b/w compat
 
     def __call__(self, environ, start_response):
         """
@@ -66,16 +83,20 @@ class Router(object):
         registry_manager.push(registry)
 
         try:
-            request_factory = self.request_factory
-            if request_factory is None:
+            if self.request_factory is None:
                 method = environ['REQUEST_METHOD']
-                request_factory = HTTP_METHOD_FACTORIES.get(method, Request)
+                try:
+                    # for speed we disuse HTTP_METHOD_FACTORIES.get
+                    request_factory = HTTP_METHOD_FACTORIES[method]
+                except KeyError:
+                    request_factory = Request
+            else:
+                request_factory = self.request_factory
 
             request = request_factory(environ)
             
             registry.has_listeners and registry.notify(NewRequest(request))
-            root_factory = registry.getUtility(IRootFactory)
-            root = root_factory(environ)
+            root = self.root_factory(environ)
             traverser = registry.getAdapter(root, ITraverserFactory)
             context, view_name, subpath = traverser(environ)
 
@@ -85,9 +106,6 @@ class Router(object):
             request.view_name = view_name
             request.subpath = subpath
 
-            settings = self.settings
-
-            debug_authorization = settings and settings.debug_authorization
             security_policy = self.security_policy
 
             permission = None
@@ -96,6 +114,8 @@ class Router(object):
                 permission = registry.queryMultiAdapter((context, request),
                                                         IViewPermission,
                                                         name=view_name)
+
+            debug_authorization = self.debug_authorization
 
             permitted = _view_execution_permitted(context, request, view_name,
                                                   security_policy, permission,
@@ -114,15 +134,15 @@ class Router(object):
                     msg = str(permitted)
                 else:
                     msg = 'Unauthorized: failed security policy check'
-                app = HTTPUnauthorized(escape(msg))
-                return app(environ, start_response)
+                environ['message'] = msg
+                unauth_app = self.unauth_app_factory()
+                return unauth_app(environ, start_response)
 
             response = registry.queryMultiAdapter(
                 (context, request), IView, name=view_name)
 
             if response is None:
-                debug_notfound = settings and settings.debug_notfound
-                if debug_notfound:
+                if self.debug_notfound:
                     msg = (
                         'debug_notfound of url %s; path_info: %r, context: %r, '
                         'view_name: %r, subpath: %r' % (
@@ -132,9 +152,9 @@ class Router(object):
                     logger and logger.debug(msg)
                 else:
                     msg = request.url
-                notfound = NotFound(msg)
-                start_response(notfound.status, notfound.headerlist)
-                return notfound.app_iter
+                environ['message'] = msg
+                notfound_app = self.notfound_app_factory()
+                return notfound_app(environ, start_response)
 
             registry.has_listeners and registry.notify(NewResponse(response))
 
@@ -147,20 +167,6 @@ class Router(object):
 
         finally:
             registry_manager.pop()
-
-class NotFound(object):
-    """ Avoid using WebOb's NotFound WSGI response app; it's slow. """
-    def __init__(self, msg=''):
-        html = """<body>
-        <html><title>404 Not Found</title><body><h1>404 Not Found</h1>
-        <code>%s</code>
-        """ % msg
-        self.headerlist = [
-            ('Content-Length', len(html) ),
-            ('Content-Type', 'text/html')
-            ]
-        self.app_iter = [html]
-        self.status = '404 Not Found'
 
 def make_app(root_factory, package=None, filename='configure.zcml',
              options=None):
