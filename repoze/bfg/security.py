@@ -68,10 +68,10 @@ class ACLAuthorizer(object):
         self.context = context
 
     def permits(self, permission, *principals):
-        acl = getattr(self.context, '__acl__', None)
-        if acl is None:
-            raise NoAuthorizationInformation('%s item has no __acl__' %
-                                             self.context)
+        try:
+            acl = self.context.__acl__
+        except AttributeError:
+            raise NoAuthorizationInformation
 
         for ace in acl:
             ace_action, ace_principal, ace_permissions = ace
