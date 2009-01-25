@@ -114,6 +114,18 @@ and edit the blog.
 .. note:: Each tuple within the above ``__acl__`` structure is known
           as a :term:`ACE`, which stands for "access control entry".
 
+The third argument in an ACE can also be a sequence of permission
+names instead of a single permission name.  So instead of the above,
+where we assign a differnt ACE for two grants to the ``group.editors``
+group, we can collapse this into a single ACE, as below.
+
+.. code-block:: python
+
+   __acl__ = [
+       (Allow, Everyone, 'view'),
+       (Allow, 'group:editors', ('add', 'edit')),
+       ]
+
 A principal is usually a user id, however it also may be a group id if
 your authentication system provides group information and the security
 policy is written to respect them.  The
