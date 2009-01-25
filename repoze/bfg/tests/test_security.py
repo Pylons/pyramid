@@ -38,7 +38,7 @@ class TestACLSecurityPolicy(unittest.TestCase):
         self.assertEqual(result.permission, 'view')
         self.assertEqual(result.context, context)
 
-    def test_permits_no_principals_acl_info_on_context(self):
+    def test_permits_no_principals_empty_acl_info_on_context(self):
         context = DummyContext()
         context.__acl__ = []
         request = DummyRequest({})
@@ -50,7 +50,7 @@ class TestACLSecurityPolicy(unittest.TestCase):
         self.assertEqual(result.permission, 'view')
         self.assertEqual(result.context, context)
 
-    def test_permits_no_principals_withparents_root_has_acl_info(self):
+    def test_permits_no_principals_root_has_empty_acl_info(self):
         context = DummyContext()
         context.__name__ = None
         context.__parent__ = None
@@ -67,7 +67,7 @@ class TestACLSecurityPolicy(unittest.TestCase):
         self.assertEqual(result.permission, 'view')
         self.assertEqual(result.context, context)
 
-    def test_permits_no_principals_withparents_root_allows_everyone(self):
+    def test_permits_no_principals_root_allows_everyone(self):
         context = DummyContext()
         context.__name__ = None
         context.__parent__ = None
@@ -127,6 +127,38 @@ class TestACLSecurityPolicy(unittest.TestCase):
         self.assertEqual(result.context, context)
         self.assertEqual(result.ace, None)
 
+    def test_permits_allow_twoacl_multiperm(self):
+        from repoze.bfg.security import Allow, Deny, Authenticated, Everyone
+        context = DummyContext()
+        acl = [ (Allow, 'fred', ('write', 'view') ), (Deny, 'fred', 'view') ]
+        context.__acl__ = acl
+        policy = self._makeOne(lambda *arg: ['fred'])
+        request = DummyRequest({})
+        result = policy.permits(context, request, 'view')
+        self.assertEqual(result, True)
+        self.assertEqual(result.principals,
+                         set(['fred', Authenticated, Everyone]))
+        self.assertEqual(result.permission, 'view')
+        self.assertEqual(result.context, context)
+        self.assertEqual(result.ace, (Allow, 'fred', ('write', 'view') ))
+
+    def test_permits_deny_twoacl_multiperm(self):
+        from repoze.bfg.security import Allow, Deny, Authenticated, Everyone
+        context = DummyContext()
+        acl = []
+        deny = (Deny, 'fred', ('view', 'read'))
+        allow = (Allow, 'fred', 'view')
+        context.__acl__ = [deny, allow]
+        policy = self._makeOne(lambda *arg: ['fred'])
+        request = DummyRequest({})
+        result = policy.permits(context, request, 'read')
+        self.assertEqual(result, False)
+        self.assertEqual(result.principals,
+                         set(['fred', Authenticated, Everyone]))
+        self.assertEqual(result.permission, 'read')
+        self.assertEqual(result.context, context)
+        self.assertEqual(result.ace, deny)
+
     def test_permits_allow_via_location_parent(self):
         from repoze.bfg.security import Allow, Authenticated, Everyone
         context = DummyContext()
@@ -146,23 +178,6 @@ class TestACLSecurityPolicy(unittest.TestCase):
         self.assertEqual(result.permission, 'read')
         self.assertEqual(result.context, context)
         self.assertEqual(result.ace, ('Allow', 'fred', 'read'))
-
-    def test_permits_multipermission(self):
-        from repoze.bfg.security import Allow, Deny, Authenticated, Everyone
-        context = DummyContext()
-        acl = []
-        deny = (Deny, 'fred', ('view', 'read'))
-        allow = (Allow, 'fred', 'view')
-        context.__acl__ = [deny, allow]
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context, request, 'read')
-        self.assertEqual(result, False)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'read')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, deny)
 
     def test_permits_deny_byorder(self):
         from repoze.bfg.security import Allow, Deny, Authenticated, Everyone
@@ -518,16 +533,8 @@ class TestACLDenied(unittest.TestCase):
 
 class TestFlatten(unittest.TestCase):
     def _callFUT(self, item):
-        from repoze.bfg.security import flatten
-        return flatten(item)
-
-    def test_str(self):
-        result = self._callFUT('a')
-        self.assertEqual(result, ['a'])
-
-    def test_unicode(self):
-        result = self._callFUT(u'a')
-        self.assertEqual(result, [u'a'])
+        from repoze.bfg.security import _flatten
+        return _flatten(item)
 
     def test_flat_sequence(self):
         result = self._callFUT([1, 2, 3])

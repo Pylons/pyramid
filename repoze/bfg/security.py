@@ -80,18 +80,18 @@ class ACLSecurityPolicy(object):
 
             for ace in acl:
                 ace_action, ace_principal, ace_permissions = ace
-                if ace_principal not in principals:
-                    continue
-                for principal in principals:
-                    if ace_principal == principal:
-                        permissions = flatten(ace_permissions)
-                        if permission in permissions:
-                            if ace_action == Allow:
-                                return ACLAllowed(ace, acl, permission,
-                                                  principals, location)
-                            else:
-                                return ACLDenied(ace, acl, permission,
-                                                 principals, location)
+                if ace_principal in principals:
+                    if hasattr(ace_permissions, '__iter__'):
+                        ace_permissions = _flatten(ace_permissions)
+                    else:
+                        ace_permissions = [ace_permissions]
+                    if permission in ace_permissions:
+                        if ace_action == Allow:
+                            return ACLAllowed(ace, acl, permission,
+                                              principals, location)
+                        else:
+                            return ACLDenied(ace, acl, permission,
+                                             principals, location)
 
             # default deny if no ACE matches in the ACL found
             result = ACLDenied(None, acl, permission, principals, location)
@@ -117,16 +117,23 @@ class ACLSecurityPolicy(object):
 
     def principals_allowed_by_permission(self, context, permission):
         for location in lineage(context):
-            acl = getattr(location, '__acl__', None)
-            if acl is not None:
-                allowed = {}
-                for ace_action, ace_principal, ace_permissions in acl:
-                    if ace_action == Allow:
-                        ace_permissions = flatten(ace_permissions)
-                        for ace_permission in ace_permissions:
-                            if ace_permission == permission:
-                                allowed[ace_principal] = True
-                return sorted(allowed.keys())
+            try:
+                acl = location.__acl__
+            except AttributeError:
+                continue
+
+            allowed = {}
+
+            for ace_action, ace_principal, ace_permissions in acl:
+                if ace_action == Allow:
+                    if hasattr(ace_permissions, '__iter__'):
+                        ace_permissions = _flatten(ace_permissions)
+                    else:
+                        ace_permissions = [ace_permissions]
+                    if permission in ace_permissions:
+                        allowed[ace_principal] = True
+            return sorted(allowed.keys())
+
         return []
 
 def get_remoteuser(request):
@@ -288,7 +295,7 @@ class ACLAllowed(ACLPermitsResult):
     as he ``msg`` attribute."""
     boolval = 1
 
-def flatten(x):
+def _flatten(iterable):
     """flatten(sequence) -> list
 
     Returns a single, flat list which contains all elements retrieved
@@ -300,11 +307,6 @@ def flatten(x):
     [1, 2, [3, 4], (5, 6)]
     >>> flatten([[[1,2,3], (42,None)], [4,5], [6], 7, MyVector(8,9,10)])
     [1, 2, 3, 42, None, 4, 5, 6, 7, 8, 9, 10]"""
-    if not hasattr(x, '__iter__'):
-        return [x]
-    return _flatten(x)
-
-def _flatten(iterable):
     result = []
     for el in iterable:
         if hasattr(el, "__iter__"):
