@@ -129,42 +129,6 @@ class TestACLAuthorizer(unittest.TestCase):
         self.assertEqual(result, True)
         self.assertEqual(result.ace, allow)
 
-    def test_permits_nested_principals_list_allow(self):
-        context = DummyContext()
-        acl = []
-        from repoze.bfg.security import Allow
-        ace = (Allow, 'larry', 'read')
-        acl = [ace]
-        context.__acl__ = acl
-        authorizer = self._makeOne(context)
-        principals = (['fred', ['jim', ['bob', 'larry']]])
-        result = authorizer.permits('read', *principals)
-        self.assertEqual(result, True)
-        self.assertEqual(result.ace, ace)
-
-    def test_permits_nested_principals_list_deny_explicit(self):
-        context = DummyContext()
-        from repoze.bfg.security import Deny
-        ace = (Deny, 'larry', 'read')
-        acl = [ace]
-        context.__acl__ = acl
-        authorizer = self._makeOne(context)
-        principals = (['fred', ['jim', ['bob', 'larry']]])
-        result = authorizer.permits('read', *principals)
-        self.assertEqual(result, False)
-        self.assertEqual(result.ace, ace)
-
-    def test_permits_nested_principals_list_deny_implicit(self):
-        context = DummyContext()
-        from repoze.bfg.security import Allow
-        ace = (Allow, 'somebodyelse', 'read')
-        acl = [ace]
-        context.__acl__ = acl
-        authorizer = self._makeOne(context)
-        principals = (['fred', ['jim', ['bob', 'larry']]])
-        result = authorizer.permits('read', *principals)
-        self.assertEqual(result, False)
-
     def test_permits_allow_via_location_parent(self):
         context = DummyContext()
         context.__parent__ = None

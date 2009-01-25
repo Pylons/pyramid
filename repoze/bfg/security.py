@@ -75,7 +75,7 @@ class ACLAuthorizer(object):
 
         for ace in acl:
             ace_action, ace_principal, ace_permissions = ace
-            for principal in flatten(principals):
+            for principal in principals:
                 if ace_principal == principal:
                     permissions = flatten(ace_permissions)
                     if permission in permissions:

@@ -24,6 +24,12 @@ Behavior Changes
   contain a REQUEST_METHOD key/value; if they do not, a KeyError will
   be raised (speed).  
 
+- It is no longer permissible to pass a "nested" list of principals to
+  ``repoze.bfg.ACLAuthorizer.permits`` (e.g. ['fred', ['larry',
+  'bob']).  The principals list must be fully expanded.  This feature
+  was never documented, and was never an API, so it's not a backwards
+  incompatibility.
+
 Implementation Changes
 ----------------------
 
