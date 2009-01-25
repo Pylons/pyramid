@@ -99,9 +99,9 @@ press ``return`` after running ``paster serve MyProject.ini``.
    .. literalinclude:: MyProject/myproject/run.py
       :linenos:
 
-   Note that the app function imports the ``get_root`` function from
-   the ``myproject.models`` Python module.  It then also imports the
-   "bare" ``myproject`` package, and passes ``get_root``,
+   Note that the app function imports the ``get_root`` root factory
+   function from the ``myproject.models`` Python module.  It then also
+   imports the "bare" ``myproject`` package, and passes ``get_root``,
    ``myproject``, and the result of ``get_options(kw)`` as the
    ``options`` keyword to the ``make_app`` function of the
    ``repoze.bfg.router`` module.
@@ -120,8 +120,8 @@ press ``return`` after running ``paster serve MyProject.ini``.
    automatically reloaded by the application when they are changed.
 
    ``get_root`` is the first argument to ``make_app``, and it is a
-   callable that is invoked on every request to retrieve the
-   application root.  It is not called during startup, only when a
+   root factory callable that is invoked on every request to retrieve
+   the application root.  It is not called during startup, only when a
    request is handled.
 
    We pass in the bare ``myproject`` package so that the ``make_app``

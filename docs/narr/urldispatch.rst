@@ -52,21 +52,21 @@ allows you to inject ``route`` ZCML directives into your application's
 
 When any ``route`` ZCML directive is present in an application's
 ``configure.zcml``, "under the hood" :mod:`repoze.bfg` wraps the "root
-factory" (aka ``get_root``) in a special ``RoutesRootFactory``
-instance.  This instance then acts as the root factory.  When it acts
-as a root factory, it is willing to check the requested URL against a
-*routes map* to find the :term:`context` and the :term:`view name`
-before traversal has a chance to find it first.  If it finds a context
-and a view name via a route, :mod:`repoze.bfg` will attempt to look up
-and call a :mod:`repoze.bfg` :term:`view` that matches the context and
-the view name.  If no route matches, :mod:`repoze.bfg` will fail over
-to calling the ``get_root`` callable passed to the application in it's
+factory" in a special ``RoutesRootFactory`` instance.  The wrapper
+instance then acts as the root factory.  When it acts as a root
+factory, it is willing to check the requested URL against a *routes
+map* to find the :term:`context` and the :term:`view name` before
+traversal has a chance to find it first.  If it finds a context and a
+view name via a route, :mod:`repoze.bfg` will attempt to look up and
+call a :mod:`repoze.bfg` :term:`view` that matches the context and the
+view name.  If no route matches, :mod:`repoze.bfg` will fail over to
+calling the root factory callable passed to the application in it's
 ``make_app`` function (usually a traversal function).  By configuring
 your ZCML ``route`` statements appropriately, you can mix and match
 URL dispatch and traversal in this way.
 
 .. note:: See :ref:`modelspy_project_section` for an example of a
-          simple ``get_root`` callable that will use traversal.
+          simple root factory callable that will use traversal.
 
 The ``route`` ZCML Directive
 ----------------------------

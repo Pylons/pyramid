@@ -591,9 +591,10 @@ behavior.
 
 #. Line 4 defines an instance of MyModel as the root.
 
-#. Line 6 is a function that will be called by the :mod:`repoze.bfg`
-   *Router* for each request when it wants to find the root of the model
-   graph.  Conventionally this is called ``get_root``.
+#. Line 6 is a "root factory" function that will be called by the
+  :mod:`repoze.bfg` *Router* for each request when it wants to find
+  the root of the model graph.  Conventionally this is called
+  ``get_root``.
 
 In a "real" application, the root object would not be such a simple
 object.  Instead, it would be an object that could access some
