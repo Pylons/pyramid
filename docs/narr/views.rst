@@ -127,10 +127,10 @@ This indicates that when :mod:`repoze.bfg` identifies that the *view
 name* is ``hello.html`` against *any* :term:`context`, this view will
 be called.
 
-The ``view`` ZCML Element
-~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``view`` ZCML Directive
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``view`` ZCML element has these possible attributes:
+The ``view`` ZCML directive has these possible attributes:
 
 view
 

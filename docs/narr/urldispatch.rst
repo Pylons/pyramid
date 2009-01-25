@@ -68,6 +68,126 @@ URL dispatch and traversal in this way.
 .. note:: See :ref:`modelspy_project_section` for an example of a
           simple ``get_root`` callable that will use traversal.
 
+The ``route`` ZCML Directive
+----------------------------
+
+The ``route`` ZCML directive has these possible attributes.  All
+attributes are optional unless the description names them as required.
+
+path
+
+  The `route path
+  <http://routes.groovie.org/manual.html#route-path>`_,
+  e.g. ``ideas/:idea``.  This attribute is required.
+
+name
+
+  The `route name
+  <http://routes.groovie.org/manual.html#route-name>`_,
+  e.g. ``myroute``.
+
+view_name
+
+  The :mod:`repoze.bfg` :term:`view name` that should be looked up
+  when this route matches a URL.
+
+factory
+
+  The Python dotted-path name to a function that will generate a
+  :mod:`repoze.bfg` context object when this route matches.  By
+  default, a ``repoze.bfg.urldispatch.DefaultRoutesContext`` object
+  will be constructed if a factory is not provided.
+
+provides
+
+  One or more Python-dotted path names to :term:`interface` objects
+  that the context should be decorated with when it's constructed
+  (allowing it to be found by a particular view lookup).
+
+encoding
+
+  The `URL encoding http://routes.groovie.org/manual.html#unicode`_
+  for a match returned by this route.
+
+static
+
+  A boolean (true/false) indicating whether this route is `static
+  <http://routes.groovie.org/manual.html#static-named-routes>`_.
+
+filter
+
+  A Python dotted-path name to a Routes `filter function
+  <http://routes.groovie.org/manual.html#filter-functions>`_.
+
+absolute
+
+  A boolean (true/false) indicating whether this route is absolute.
+
+member_name
+
+  The member name for this route.
+
+collection_name
+
+  The collection name for this route.
+
+condition_method
+
+  The nameof the HTTP method used as the Routes `condition method
+  <http://routes.groovie.org/manual.html#conditions>`_.
+
+condition_subdomain
+
+  A field that contain a Routes `condition subdomain
+  <http://routes.groovie.org/manual.html#conditions>`_.
+
+condition_function
+
+  A python-dotted path name to a Routes `condition function
+  <http://routes.groovie.org/manual.html#conditions>`_.
+
+parent_member_name
+
+  The parent member name for this route.
+
+parent_collection_name
+
+  The parent collection name for this route.
+
+explicit
+
+  A boolean (true/false) indicating whether this route is `explicit
+  <http://routes.groovie.org/manual.html#overriding-route-memory>`_.
+
+subdomains
+
+  A field that contain one or more Routes `condition subdomains
+  <http://routes.groovie.org/manual.html#conditions>`_.  If this field
+  is used, the ``condition_subdomain`` attribute is ignored.
+
+Using the ``requirement`` Subdirective
+--------------------------------------
+
+The ``route`` directive supports a subdirective named ``requirement``
+that allows you to specify Routes `requirement
+<http://routes.groovie.org/manual.html#requirements>`_ expressions.
+
+For example:
+
+.. code-block:: xml
+
+   <route path="archives/:year/:month">
+
+   <requirement
+      attr="year"
+      expr="d{2,4}"/>
+
+   <requirement
+      attr="month"
+      expr="d{1,2}"/>
+
+   </route>
+
 Example 1
 ---------
 
