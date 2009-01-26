@@ -120,7 +120,7 @@ def split_path(path):
                 raise TypeError('Could not decode path segment %r using the '
                                 'UTF-8 decoding scheme' % segment)
             clean.append(segment)
-    return clean
+    return tuple(clean)
 
 _marker = object()
 

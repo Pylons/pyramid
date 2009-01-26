@@ -8,25 +8,31 @@ class SplitPathTests(unittest.TestCase):
         return split_path(path)
         
     def test_path_startswith_endswith(self):
-        self.assertEqual(self._callFUT('/foo/'), [u'foo'])
+        self.assertEqual(self._callFUT('/foo/'), (u'foo',))
 
     def test_empty_elements(self):
-        self.assertEqual(self._callFUT('foo///'), [u'foo'])
+        self.assertEqual(self._callFUT('foo///'), (u'foo',))
 
     def test_onedot(self):
-        self.assertEqual(self._callFUT('foo/./bar'), [u'foo', u'bar'])
+        self.assertEqual(self._callFUT('foo/./bar'), (u'foo', u'bar'))
 
     def test_twodots(self):
-        self.assertEqual(self._callFUT('foo/../bar'), [u'bar'])
+        self.assertEqual(self._callFUT('foo/../bar'), (u'bar',))
 
     def test_element_urllquoted(self):
         self.assertEqual(self._callFUT('/foo/space%20thing/bar'),
-                         [u'foo', u'space thing', u'bar'])
+                         (u'foo', u'space thing', u'bar'))
 
     def test_segments_are_unicode(self):
         result = self._callFUT('/foo/bar')
         self.assertEqual(type(result[0]), unicode)
         self.assertEqual(type(result[1]), unicode)
+
+    def test_same_value_returned_if_cached(self):
+        result1 = self._callFUT('/foo/bar')
+        result2 = self._callFUT('/foo/bar')
+        self.assertEqual(result1, (u'foo', u'bar'))
+        self.assertEqual(result2, (u'foo', u'bar'))
 
     def test_utf8(self):
         import urllib
@@ -34,7 +40,7 @@ class SplitPathTests(unittest.TestCase):
         encoded = urllib.quote(la)
         decoded = unicode(la, 'utf-8')
         path = '/'.join([encoded, encoded])
-        self.assertEqual(self._callFUT(path), [decoded, decoded])
+        self.assertEqual(self._callFUT(path), (decoded, decoded))
         
     def test_utf16(self):
         import urllib
