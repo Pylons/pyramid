@@ -217,7 +217,7 @@ class TestACLSecurityPolicy(unittest.TestCase):
         from repoze.bfg.security import Allow
         context = DummyContext()
         acl = [ (Allow, 'chrism', ('read', 'write')),
-                (Allow, 'other', ('read',)) ]
+                (Allow, 'other', 'read') ]
         context.__acl__ = acl
         policy = self._makeOne(lambda *arg: None)
         result = policy.principals_allowed_by_permission(context, 'read')
