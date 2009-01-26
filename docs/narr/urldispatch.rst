@@ -248,15 +248,15 @@ assuming that ``.models.Idea`` resolves to a class that accepts
 arbitrary key/value pair arguments.
 
 .. note:: Values prefixed with a period (``.``) for the ``factory``
-   and ``provides`` attributes of a ``route`` (such as ``.models.Idea`
-   above) mean "relative to the Python package directory in which this
-   :term:`ZCML` file is stored".  So if the above ``route``
-   declaration was made inside a ``configure.zcml`` file that lived in
-   the ``hello`` package, you could replace the relative
-   ``.models.Idea`` with the absolute ``hello.models.Idea`` Either the
-   relative or absolute form is functionally equivalent.  It's often
-   useful to use the relative form, in case your package's name
-   changes.  It's also shorter to type.
+   and ``provides`` attributes of a ``route`` (such as
+   ``.models.Idea`` above) mean "relative to the Python package
+   directory in which this :term:`ZCML` file is stored".  So if the
+   above ``route`` declaration was made inside a ``configure.zcml``
+   file that lived in the ``hello`` package, you could replace the
+   relative ``.models.Idea`` with the absolute ``hello.models.Idea``
+   Either the relative or absolute form is functionally equivalent.
+   It's often useful to use the relative form, in case your package's
+   name changes.  It's also shorter to type.
 
 All context objects manufactured via URL dispatch will be decorated by
 default with the ``repoze.bfg.interfaces.IRoutesContext``
