@@ -1,5 +1,5 @@
-Next Release
-============
+0.6.5 (2009-01-26)
+==================
 
 Features
 --------
@@ -14,7 +14,7 @@ Features
 - Added a ``traversal_path`` API to the traversal module; see the
   "traversal" API chapter in the docs.  This was a function previously
   known as ``split_path`` that was not an API but people were using it
-  anyway.  Unlike ``split_path`` it now returns a tuple instead of a
+  anyway.  Unlike ``split_path``, it now returns a tuple instead of a
   list (as its values are cached).
 
 Behavior Changes
