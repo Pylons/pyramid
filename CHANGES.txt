@@ -9,7 +9,13 @@ Features
   invoked due to lack of permission.  See the "ZCML Hooks" chapter in
   the docs for more information.
 
-- Added Routes ZCML directive attribute explanations.
+- Added Routes ZCML directive attribute explanations in documentation.
+
+- Added a ``traversal_path`` API to the traversal module; see the
+  "traversal" API chapter in the docs.  This was a function previously
+  known as ``split_path`` that was not an API but people were using it
+  anyway.  Unlike ``split_path`` it now returns a tuple instead of a
+  list (as its values are cached).
 
 Behavior Changes
 ----------------
@@ -65,6 +71,9 @@ Implementation Changes
 
 - Use a homegrown Unauthorized error instead of
   ``webob.exc.Unauthorized`` (the latter is slow).
+
+- the ``repoze.bfg.lru.lru_cached`` decorator now uses functools.wraps
+  in order to make documentation of LRU-cached functions possible.
 
 - Various speed micro-tweaks.
 

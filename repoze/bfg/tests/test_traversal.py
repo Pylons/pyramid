@@ -2,10 +2,10 @@ import unittest
 
 from zope.testing.cleanup import cleanUp
 
-class SplitPathTests(unittest.TestCase):
+class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
-        from repoze.bfg.traversal import split_path
-        return split_path(path)
+        from repoze.bfg.traversal import traversal_path
+        return traversal_path(path)
         
     def test_path_startswith_endswith(self):
         self.assertEqual(self._callFUT('/foo/'), (u'foo',))

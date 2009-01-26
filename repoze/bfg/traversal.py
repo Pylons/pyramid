@@ -20,6 +20,15 @@ deprecated(
     model_url = "repoze.bfg.url:model_url",
     )
 
+# ``split_path`` wasn't actually ever an API but people were using it
+# anyway.  I turned it into the ``traversal_path`` API in 0.6.5, and
+# generate the below deprecation to give folks a heads up.
+deprecated(
+    "('from repoze.bfg.traversal import split_path' is now deprecated; "
+    "instead use 'from repoze.bfg.traversal import traversal_path')",
+    split_path = "repoze.bfg.traversal:traversal_path",
+    )
+
 def find_root(model):
     """ Find the root node in the graph to which ``model``
     belongs. Note that ``model`` should be :term:`location`-aware.
@@ -101,7 +110,50 @@ def model_path(model, *elements):
     return path
 
 @lru_cache(500)
-def split_path(path):
+def traversal_path(path):
+    """ Given a PATH_INFO string (slash-separated path elements),
+    return a tuple representing that path which can be used to
+    traverse a graph.  The PATH_INFO is split on slashes, creating a
+    list of segments.  Each segment is URL-unquoted, and decoded into
+    Unicode. Each segment is assumed to be encoded using the UTF-8
+    encoding (or a subset, such as ASCII); a TypeError is raised if a
+    segment cannot be decoded.  If a segment name is empty or if it is
+    ``.``, it is ignored.  If a segment name is ``..``, the previous
+    segment is deleted, and the ``..`` is ignored.  Examples:
+
+    ``/``
+
+        ()
+
+    ``/foo/bar/baz``
+
+        (u'foo', u'bar', u'baz')
+
+    ``foo/bar/baz``
+
+        (u'foo', u'bar', u'baz')
+
+    ``/foo/bar/baz/``
+
+        (u'foo', u'bar', u'baz')
+
+    ``/foo//bar//baz/``
+
+        (u'foo', u'bar', u'baz')
+
+    ``/foo/bar/baz/..``
+
+        (u'foo', u'bar')
+
+    ``/my%20archives/hello``
+
+        (u'my archives', u'hello')
+
+    ``/archives/La%20Pe%C3%B1a``
+
+        (u'archives', u'<unprintable unicode>')
+
+    """
     while path.startswith('/'):
         path = path[1:]
     while path.endswith('/'):
@@ -136,7 +188,7 @@ class ModelGraphTraverser(object):
             path = environ['PATH_INFO']
         except KeyError:
             path = '/'
-        path = list(split_path(path))
+        path = list(traversal_path(path))
         locatable = self.locatable
         step = self._step
 
