@@ -2,6 +2,12 @@
 
 import threading
 
+try:
+    from functools import wraps
+except ImportError:
+    # < 2.5
+    from repoze.bfg.functional import wraps
+
 _marker = object()
 
 class LRUCache(object):
@@ -83,4 +89,4 @@ class lru_cache(object):
                 val = f(key)
                 cache.put(key, val)
             return val
-        return lru_cached
+        return wraps(f)(lru_cached)
