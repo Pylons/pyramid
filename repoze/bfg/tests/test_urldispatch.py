@@ -221,6 +221,130 @@ def make_get_root(result):
         return result
     return dummy_get_root
 
+class RoutesModelTraverserTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.urldispatch import RoutesModelTraverser
+        return RoutesModelTraverser
 
+    def _makeOne(self, model):
+        klass = self._getTargetClass()
+        return klass(model)
+
+    def test_class_conforms_to_ITraverser(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.interfaces import ITraverser
+        verifyClass(ITraverser, self._getTargetClass())
+
+    def test_instance_conforms_to_ITraverser(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import ITraverser
+        verifyObject(ITraverser, self._makeOne(None))
+
+    def test_call_with_only_controller_bwcompat(self):
+        model = DummyContext()
+        model.controller = 'controller'
+        traverser = self._makeOne(model)
+        result = traverser({})
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'controller')
+        self.assertEqual(result[2], [])
+
+    def test_call_with_only_view_name_bwcompat(self):
+        model = DummyContext()
+        model.view_name = 'view_name'
+        traverser = self._makeOne(model)
+        result = traverser({})
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], [])
+
+    def test_call_with_subpath_bwcompat(self):
+        model = DummyContext()
+        model.view_name = 'view_name'
+        model.subpath = '/a/b/c'
+        traverser = self._makeOne(model)
+        result = traverser({})
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], ['a', 'b', 'c'])
+
+    def test_call_with_no_view_name_or_controller_bwcompat(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        result = traverser({})
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], '')
+        self.assertEqual(result[2], [])
+
+    def test_call_with_only_view_name(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        routing_args = ((), {'view_name':'view_name'})
+        environ = {'wsgiorg.routing_args': routing_args}
+        result = traverser(environ)
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], [])
+
+    def test_call_with_view_name_and_subpath(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        routing_args = ((), {'view_name':'view_name', 'subpath':'/a/b/c'})
+        environ = {'wsgiorg.routing_args': routing_args}
+        result = traverser(environ)
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], ['a', 'b','c'])
+
+class RoutesContextURLTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.urldispatch import RoutesContextURL
+        return RoutesContextURL
+
+    def _makeOne(self, context, request):
+        return self._getTargetClass()(context, request)
+
+    def test_class_conforms_to_IContextURL(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.interfaces import IContextURL
+        verifyClass(IContextURL, self._getTargetClass())
+
+    def test_instance_conforms_to_IContextURL(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import IContextURL
+        verifyObject(IContextURL, self._makeOne(None, None))
+
+    def test_get_virtual_root(self):
+        context_url = self._makeOne(1,2)
+        self.assertEqual(context_url.virtual_root(), 1)
+
+    def test_call(self):
+        from routes import Mapper
+        mapper = Mapper(controller_scan=None, directory=None,
+                        explicit=True, always_scan=False)
+        args = {'a':'1', 'b':'2', 'c':'3'}
+        mapper.connect(':a/:b/:c')
+        mapper.create_regs([])
+        environ = {'SERVER_NAME':'example.com', 'wsgi.url_scheme':'http',
+                   'SERVER_PORT':'80', 'wsgiorg.routing_args':((), args)}
+        mapper.environ = environ
+        from routes import request_config
+        config = request_config()
+        config.environ = environ
+        config.mapper = mapper
+        config.mapper_dict = args
+        config.host = 'www.example.com'
+        config.protocol = 'https'
+        config.redirect = None
+        request = DummyRequest()
+        request.environ = environ
+        context_url = self._makeOne(None, request)
+        result = context_url()
+        self.assertEqual(result, '/1/2/3')
+
+class DummyContext(object):
+    """ """
         
-
+class DummyRequest(object):
+    """ """
+    

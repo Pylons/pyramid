@@ -1,150 +1,76 @@
 import unittest
 
-class DefaultURLGeneratorTests(unittest.TestCase):
-    def _makeOne(self):
-        return self._getTargetClass()()
-
-    def _getTargetClass(self):
-        from repoze.bfg.url import DefaultURLGenerator
-        return DefaultURLGenerator
-
-    def test_class_conforms_to_IURLGenerator(self):
-        from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IURLGenerator
-        verifyClass(IURLGenerator, self._getTargetClass())
-
-    def test_instance_conforms_to_IURLGenerator(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IURLGenerator
-        context = DummyContext()
-        verifyObject(IURLGenerator, self._makeOne())
-
-    def test_model_url_withlineage(self):
-        baz = DummyContext()
-        bar = DummyContext(baz)
-        foo = DummyContext(bar)
-        root = DummyContext(foo)
-        root.__parent__ = None
-        root.__name__ = None
-        foo.__parent__ = root
-        foo.__name__ = 'foo '
-        bar.__parent__ = foo
-        bar.__name__ = 'bar'
-        baz.__parent__ = bar
-        baz.__name__ = 'baz'
-        request = DummyRequest()
-        gen = self._makeOne()
-        result = gen.model_url(baz, request)
-        self.assertEqual(result, 'http://example.com:5432/foo%20/bar/baz/')
-
-    def test_model_url_nolineage(self):
-        context = DummyContext()
-        context.__name__ = ''
-        context.__parent__ = None
-        request = DummyRequest()
-        gen = self._makeOne()
-        result = gen.model_url(context, request)
-        self.assertEqual(result, 'http://example.com:5432/')
+from zope.testing.cleanup import cleanUp
 
 class ModelURLTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, model, request, *elements, **kw):
+        self._registerContextURL()
         from repoze.bfg.url import model_url
         return model_url(model, request, *elements, **kw)
 
-    def test_extra_args(self):
-        baz = DummyContext()
-        bar = DummyContext(baz)
-        foo = DummyContext(bar)
-        root = DummyContext(foo)
-        root.__parent__ = None
-        root.__name__ = None
-        foo.__parent__ = root
-        foo.__name__ = 'foo '
-        bar.__parent__ = foo
-        bar.__name__ = 'bar'
-        baz.__parent__ = bar
-        baz.__name__ = 'baz'
-        request = DummyRequest()
-        result = self._callFUT(baz, request, 'this/theotherthing', 'that')
-        self.assertEqual(
-            result,
-            'http://example.com:5432/foo%20/bar/baz/this/theotherthing/that')
+    def _registerContextURL(self):
+        from repoze.bfg.interfaces import IContextURL
+        from zope.interface import Interface
+        from zope.component import getGlobalSiteManager
+        class DummyContextURL(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'http://example.com/context/'
+        gsm = getGlobalSiteManager()
+        gsm.registerAdapter(DummyContextURL, (Interface, Interface),
+                            IContextURL)
 
-    def test_root_default_app_url(self):
+    def test_root_default(self):
         root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
         request = DummyRequest()
         result = self._callFUT(root, request)
-        self.assertEqual(result, 'http://example.com:5432/')
+        self.assertEqual(result, 'http://example.com/context/')
 
-    def test_nonroot_default_app_url(self):
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
-        other = DummyContext()
-        other.__parent__ = root
-        other.__name__ = 'nonroot object'
+    def test_extra_args(self):
+        context = DummyContext()
         request = DummyRequest()
-        result = self._callFUT(other, request)
-        self.assertEqual(result, 'http://example.com:5432/nonroot%20object/')
-
-    def test_unicode_mixed_with_bytes_in_model_names(self):
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
-        one = DummyContext()
-        one.__parent__ = root
-        one.__name__ = unicode('La Pe\xc3\xb1a', 'utf-8')
-        two = DummyContext()
-        two.__parent__ = one
-        two.__name__ = 'La Pe\xc3\xb1a'
-        request = DummyRequest()
-        result = self._callFUT(two, request)
-        self.assertEqual(result,
-                     'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
+        result = self._callFUT(context, request, 'this/theotherthing', 'that')
+        self.assertEqual(
+            result,
+            'http://example.com/context/this/theotherthing/that')
 
     def test_unicode_in_element_names(self):
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
-        one = DummyContext()
-        one.__parent__ = root
-        one.__name__ = uc
+        context = DummyContext()
         request = DummyRequest()
-        result = self._callFUT(one, request, uc)
+        result = self._callFUT(context, request, uc)
         self.assertEqual(result,
-                     'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a')
+                     'http://example.com/context/La%20Pe%C3%B1a')
 
     def test_element_names_url_quoted(self):
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
+        context = DummyContext()
         request = DummyRequest()
-        result = self._callFUT(root, request, 'a b c')
-        self.assertEqual(result, 'http://example.com:5432/a%20b%20c')
+        result = self._callFUT(context, request, 'a b c')
+        self.assertEqual(result, 'http://example.com/context/a%20b%20c')
 
     def test_with_query_dict(self):
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
+        context = DummyContext()
         request = DummyRequest()
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
-        result = self._callFUT(root, request, 'a', query={'a':uc})
+        result = self._callFUT(context, request, 'a', query={'a':uc})
         self.assertEqual(result,
-                         'http://example.com:5432/a?a=La+Pe%C3%B1a')
+                         'http://example.com/context/a?a=La+Pe%C3%B1a')
 
     def test_with_query_seq(self):
-        root = DummyContext()
-        root.__parent__ = None
-        root.__name__ = None
+        context = DummyContext()
         request = DummyRequest()
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
-        result = self._callFUT(root, request, 'a', query=[('a', 'hi there'),
-                                                          ('b', uc)])
+        result = self._callFUT(context, request, 'a', query=[('a', 'hi there'),
+                                                             ('b', uc)])
         self.assertEqual(result,
-                         'http://example.com:5432/a?a=hi+there&b=La+Pe%C3%B1a')
+                     'http://example.com/context/a?a=hi+there&b=La+Pe%C3%B1a')
 
 class UrlEncodeTests(unittest.TestCase):
     def _callFUT(self, query, doseq=False):

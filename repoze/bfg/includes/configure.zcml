@@ -4,6 +4,8 @@
 
   <include package="chameleon.zpt" file="configure.zcml"/>
 
+  <!-- traversal adapters -->
+
   <adapter
       factory="repoze.bfg.traversal.ModelGraphTraverser"
       provides="repoze.bfg.interfaces.ITraverserFactory"
@@ -11,8 +13,22 @@
   />
 
   <adapter
-      factory="repoze.bfg.traversal.RoutesModelTraverser"
+      factory="repoze.bfg.traversal.TraversalContextURL"
+      provides="repoze.bfg.interfaces.IContextURL"
+      for="*"
+  />
+
+  <!-- URL dispatch adapters -->
+
+  <adapter
+      factory="repoze.bfg.urldispatch.RoutesModelTraverser"
       provides="repoze.bfg.interfaces.ITraverserFactory"
+      for="repoze.bfg.interfaces.IRoutesContext"
+  />
+
+  <adapter
+      factory="repoze.bfg.urldispatch.RoutesContextURL"
+      provides="repoze.bfg.interfaces.IContextURL"
       for="repoze.bfg.interfaces.IRoutesContext"
   />
 

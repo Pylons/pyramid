@@ -201,8 +201,14 @@ class IUnauthorizedAppFactory(Interface):
         ``message`` key in the WSGI environ provides information
         pertaining to the reason for the unauthorized."""
 
-class IURLGenerator(Interface):
-    """ A utility which provides virtual hosting services
+class IContextURL(Interface):
+    """ An adapter which deals with URLs related to a context.
     """
-    def model_url(model, request):
-        """ Return a URL that points to the model """
+    def virtual_root():
+        """ Return the virtual root related to a request and the
+        current context"""
+
+    def __call__():
+        """ Return a URL that points to the context """
+
+VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'

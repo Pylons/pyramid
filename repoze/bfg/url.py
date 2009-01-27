@@ -3,43 +3,28 @@
 import re
 import urllib
 
-from zope.component import queryUtility
-from zope.interface import implements
-
-from repoze.bfg.location import lineage
-from repoze.bfg.interfaces import IURLGenerator
-
-class DefaultURLGenerator(object):
-    implements(IURLGenerator)
-    def model_url(self, model, request):
-        rpath = []
-        for location in lineage(model):
-            name = location.__name__
-            if name:
-                rpath.append(_urlsegment(name))
-        if rpath:
-            prefix = '/' + '/'.join(reversed(rpath)) + '/'
-        else:
-            prefix = '/'
-        return request.application_url + prefix
-
-default_url_generator = DefaultURLGenerator()
+from zope.component import getMultiAdapter
+from repoze.bfg.interfaces import IContextURL
+from repoze.bfg.interfaces import VH_ROOT_KEY
 
 def model_url(model, request, *elements, **kw):
     """
-    Generate a string representing the absolute URL of the model
-    object based on the ``wsgi.url_scheme``, ``HTTP_HOST`` or
+    Generate a string representing the absolute URL of the model (or
+    context) object based on the ``wsgi.url_scheme``, ``HTTP_HOST`` or
     ``SERVER_NAME`` in the request, plus any ``SCRIPT_NAME``.  If a
+    'virtual root path' is present in the request environment (the
+    value of the environ key ``%s``), and the ``model`` was obtained
+    via traversal, the URL path will not include the virtual root
+    prefix (it will be stripped out of the generated URL).  If a
     ``query`` keyword argument is provided, a query string based on
     its value will be composed and appended to the generated URL
     string (see details below).  The overall result of this function
-    is always a string (never unicode).  The ``model`` passed in must
-    be :term:`location`-aware.
+    is always a UTF-8 encoded string (never unicode).
 
-    .. note:: If any model in the lineage has a unicode name, it will
-              be converted to UTF-8 before being attached to the URL.
-              When composing the path based on the model lineage,
-              empty names in the model graph are ignored.
+    .. note:: If the ``model`` used is the result of a traversal, it
+       must be :term:`location`-aware.  The 'model' can also be the
+       context of a URL dispatch; contexts found this way do not need
+       to be location-aware.
 
     Any positional arguments passed in as ``elements`` must be strings
     or unicode objects.  These will be joined by slashes and appended
@@ -63,19 +48,16 @@ def model_url(model, request, *elements, **kw):
     the resulting string is appended to the generated URL.
 
     .. note:: Python data structures that are passed as ``query``
-              whichare sequences or dictionaries are turned into a
+              which are sequences or dictionaries are turned into a
               string under the same rules as when run through
               urllib.urlencode with the ``doseq`` argument equal to
               ``True``.  This means that sequences can be passed as
               values, and a k=v pair will be placed into the query
               string for each value.
-    """
+    """ % VH_ROOT_KEY
 
-    urlgenerator = queryUtility(IURLGenerator)
-    if urlgenerator is None:
-        urlgenerator = default_url_generator
-
-    model_url = urlgenerator.model_url(model, request)
+    context_url = getMultiAdapter((model, request), IContextURL)
+    model_url = context_url()
 
     if 'query' in kw:
         qs = '?' + urlencode(kw['query'], doseq=True)
@@ -87,7 +69,6 @@ def model_url(model, request, *elements, **kw):
     else:
         suffix = ''
 
-    app_url = request.application_url # never ends in a slash
     return model_url + suffix + qs
 
 def urlencode(query, doseq=False):

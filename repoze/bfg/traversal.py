@@ -1,5 +1,7 @@
 import urllib
 
+from zope.component import getMultiAdapter
+
 from zope.deferredimport import deprecated
    
 from zope.interface import classProvides
@@ -9,15 +11,25 @@ from repoze.bfg.location import LocationProxy
 from repoze.bfg.location import lineage
 
 from repoze.bfg.lru import lru_cache
+from repoze.bfg.url import _urlsegment
 
+from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import ILocation
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
+from repoze.bfg.interfaces import VH_ROOT_KEY
 
 deprecated(
     "('from repoze.bfg.traversal import model_url' is now "
     "deprecated; instead use 'from repoze.bfg.url import model_url')",
     model_url = "repoze.bfg.url:model_url",
+    )
+
+deprecated(
+    "('from repoze.bfg.traversal import RoutesModelTraverser' is now "
+    "deprecated; instead use 'from repoze.bfg.urldispatch "
+    "import RoutesModelTraverser')",
+    RoutesModelTraverser = "repoze.bfg.urldispatch:RoutesModelTraverser",
     )
 
 # ``split_path`` wasn't actually ever an API but people were using it
@@ -108,6 +120,34 @@ def model_path(model, *elements):
         suffix = '/'.join(elements)
         path = '/'.join([path, suffix])
     return path
+
+def virtual_root(model, request):
+    """ Return the model object representing the 'virtual root' of the
+    current request.  Using a virtual root in a traversal-based
+    :mod:`repoze.bfg` application permits rooting, for example, the
+    object at the traversal path ``/cms`` at ``http://example.com/``
+    instead of rooting it at ``http://example.com/cms/``.
+
+    If the ``model`` passed in is a context obtained via
+    :term:`traversal`, and if the ``%s`` key is in the WSGI
+    environment, the value of this key will be treated as a 'virtual
+    root path': the :mod:``repoze.bfg.traversal.find_model`` API will
+    be used to find the virtual root object using this path; if the
+    object is found, it will found will be returned.  If the ``%s``
+    key is is not present in the WSGI environment, the physical
+    :term:`root` of the graph will be returned instead.
+
+    .. note:: Virtual roots are not useful in at all applications that
+              use :term:`URL dispatch`. Contexts obtained via URL
+              dispatch don't really support being virtually rooted
+              (each URL dispatch context is both its own physical and
+              virtual root).  However, for symmetry, if this API is
+              called with a model which is a context obtained via URL
+              dispatch, the model passed in will be returned
+              unconditonally.
+    """ % (VH_ROOT_KEY, VH_ROOT_KEY)
+    urlgenerator = getMultiAdapter((model, request), IContextURL)
+    return urlgenerator.virtual_root()
 
 @lru_cache(500)
 def traversal_path(path):
@@ -217,35 +257,57 @@ class ModelGraphTraverser(object):
         except KeyError:
             return name, default
 
-class RoutesModelTraverser(object):
-    classProvides(ITraverserFactory)
-    implements(ITraverser)
-    def __init__(self, context):
+class TraversalContextURL(object):
+    """ The IContextURL adapter used to generate URLs for a context
+    object obtained via graph traversal"""
+    implements(IContextURL)
+
+    vroot_varname = VH_ROOT_KEY
+
+    def __init__(self, context, request):
         self.context = context
+        self.request = request
 
-    def __call__(self, environ):
-        # the traverser *wants* to get routing args from the environ
-        # as of 0.6.5; the rest of this stuff is for backwards
-        # compatibility
+    def virtual_root(self):
         try:
-            # 0.6.5 +
-            routing_args = environ['wsgiorg.routing_args'][1]
+            vroot_path = self.request.environ[self.vroot_varname]
         except KeyError:
-            # <= 0.6.4
-            routing_args = self.context.__dict__
-        try:
-            view_name = routing_args['view_name']
-        except KeyError:
-            # b/w compat < 0.6.3
+            # shortcut instead of using find_root; we probably already
+            # have it on the request
             try:
-                view_name = routing_args['controller']
-            except KeyError:
-                view_name = ''
-        try:
-            subpath = routing_args['subpath']
-            subpath = filter(None, subpath.split('/'))
-        except KeyError:
-            # b/w compat < 0.6.5
-            subpath = []
+                return self.request.root
+            except AttributeError:
+                return find_root(self.context)
+        return find_model(self.context, vroot_path)
+        
+    def __call__(self):
+        """ Generate a URL based on the lineage of a model obtained
+        via traversal.  If any model in the context lineage has a
+        unicode name, it will be converted to a UTF-8 string before
+        being attached to the URL.  When composing the path based on
+        the model lineage, empty names in the model graph are ignored.
+        If a ``%s`` key is present in the WSGI environment, its value
+        will be treated as a 'virtual root path': the path of the URL
+        generated by this will be left-stripped of this virtual root
+        path value.
+        """ % VH_ROOT_KEY
+        rpath = []
+        for location in lineage(self.context):
+            name = location.__name__
+            if name:
+                rpath.append(_urlsegment(name))
+        if rpath:
+            path = '/' + '/'.join(reversed(rpath)) + '/'
+        else:
+            path = '/'
+        request = self.request
+        # if the path starts with the virtual root path, trim it out
+        vroot_path = request.environ.get(self.vroot_varname)
+        if vroot_path is not None:
+            if path.startswith(vroot_path):
+                path = path[len(vroot_path):]
+                
+        app_url = request.application_url # never ends in a slash
+        return app_url + path
 
-        return self.context, view_name, subpath
+

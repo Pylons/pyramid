@@ -15,6 +15,8 @@
 
   .. autofunction:: traversal_path(path)
 
+  .. autofunction:: virtual_root
+
 .. note:: A function named ``model_url`` used to be present in this
    module.  It was moved to :ref:`url_module` in version 0.6.1.
 

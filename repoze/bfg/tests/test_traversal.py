@@ -212,81 +212,6 @@ class ModelGraphTraverserTests(unittest.TestCase):
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         self.assertRaises(TypeError, policy, environ)
 
-class RoutesModelTraverserTests(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.traversal import RoutesModelTraverser
-        return RoutesModelTraverser
-
-    def _makeOne(self, model):
-        klass = self._getTargetClass()
-        return klass(model)
-
-    def test_class_conforms_to_ITraverser(self):
-        from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ITraverser
-        verifyClass(ITraverser, self._getTargetClass())
-
-    def test_instance_conforms_to_ITraverser(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ITraverser
-        verifyObject(ITraverser, self._makeOne(None))
-
-    def test_call_with_only_controller_bwcompat(self):
-        model = DummyContext()
-        model.controller = 'controller'
-        traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'controller')
-        self.assertEqual(result[2], [])
-
-    def test_call_with_only_view_name_bwcompat(self):
-        model = DummyContext()
-        model.view_name = 'view_name'
-        traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
-        self.assertEqual(result[2], [])
-
-    def test_call_with_subpath_bwcompat(self):
-        model = DummyContext()
-        model.view_name = 'view_name'
-        model.subpath = '/a/b/c'
-        traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
-        self.assertEqual(result[2], ['a', 'b', 'c'])
-
-    def test_call_with_no_view_name_or_controller_bwcompat(self):
-        model = DummyContext()
-        traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], '')
-        self.assertEqual(result[2], [])
-
-    def test_call_with_only_view_name(self):
-        model = DummyContext()
-        traverser = self._makeOne(model)
-        routing_args = ((), {'view_name':'view_name'})
-        environ = {'wsgiorg.routing_args': routing_args}
-        result = traverser(environ)
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
-        self.assertEqual(result[2], [])
-
-    def test_call_with_view_name_and_subpath(self):
-        model = DummyContext()
-        traverser = self._makeOne(model)
-        routing_args = ((), {'view_name':'view_name', 'subpath':'/a/b/c'})
-        environ = {'wsgiorg.routing_args': routing_args}
-        result = traverser(environ)
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
-        self.assertEqual(result[2], ['a', 'b','c'])
-
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from repoze.bfg.traversal import find_interface
@@ -439,6 +364,152 @@ class ModelPathTests(unittest.TestCase):
         result = self._callFUT(other)
         self.assertEqual(result, '/other')
 
+class TraversalContextURLTests(unittest.TestCase):
+    def _makeOne(self, context, url):
+        return self._getTargetClass()(context, url)
+
+    def _getTargetClass(self):
+        from repoze.bfg.traversal import TraversalContextURL
+        return TraversalContextURL
+
+    def _registerTraverserFactory(self, traverser):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ITraverserFactory
+        from zope.interface import Interface
+        gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
+
+    def test_class_conforms_to_IContextURL(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.interfaces import IContextURL
+        verifyClass(IContextURL, self._getTargetClass())
+
+    def test_instance_conforms_to_IContextURL(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import IContextURL
+        context = DummyContext()
+        request = DummyRequest()
+        verifyObject(IContextURL, self._makeOne(context, request))
+
+    def test_call_withlineage(self):
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        root.__parent__ = None
+        root.__name__ = None
+        foo.__parent__ = root
+        foo.__name__ = 'foo '
+        bar.__parent__ = foo
+        bar.__name__ = 'bar'
+        baz.__parent__ = bar
+        baz.__name__ = 'baz'
+        request = DummyRequest()
+        context_url = self._makeOne(baz, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/foo%20/bar/baz/')
+
+    def test_call_nolineage(self):
+        context = DummyContext()
+        context.__name__ = ''
+        context.__parent__ = None
+        request = DummyRequest()
+        context_url = self._makeOne(context, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/')
+
+    def test_call_unicode_mixed_with_bytes_in_model_names(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = unicode('La Pe\xc3\xb1a', 'utf-8')
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'La Pe\xc3\xb1a'
+        request = DummyRequest()
+        context_url = self._makeOne(two, request)
+        result = context_url()
+        self.assertEqual(result,
+                     'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
+
+    def test_call_with_vroot_path(self):
+        from repoze.bfg.interfaces import VH_ROOT_KEY
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        one = DummyContext()
+        one.__parent__ = root
+        one.__name__ = 'one'
+        two = DummyContext()
+        two.__parent__ = one
+        two.__name__ = 'two'
+        request = DummyRequest({VH_ROOT_KEY:'/one'})
+        context_url = self._makeOne(two, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/two/')
+        
+        request = DummyRequest({VH_ROOT_KEY:'/one/two'})
+        context_url = self._makeOne(two, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432/')
+
+    def test_virtual_root_no_vroot_path(self):
+        root = DummyContext()
+        root.__name__ = None
+        root.__parent__ = None
+        one = DummyContext()
+        one.__name__ = 'one'
+        one.__parent__ = root
+        request = DummyRequest()
+        context_url = self._makeOne(one, request)
+        self.assertEqual(context_url.virtual_root(), root)
+
+    def test_virtual_root_no_vroot_path_with_root_on_request(self):
+        context = DummyContext()
+        context.__parent__ = None
+        request = DummyRequest()
+        request.root = DummyContext()
+        context_url = self._makeOne(context, request)
+        self.assertEqual(context_url.virtual_root(), request.root)
+
+    def test_virtual_root_with_vroot_path(self):
+        from repoze.bfg.interfaces import VH_ROOT_KEY
+        context = DummyContext()
+        context.__parent__ = None
+        traversed_to = DummyContext()
+        environ = {VH_ROOT_KEY:'/one'}
+        request = DummyRequest(environ)
+        traverser = make_traverser(traversed_to, '', [])
+        self._registerTraverserFactory(traverser)
+        context_url = self._makeOne(context, request)
+        self.assertEqual(context_url.virtual_root(), traversed_to)
+        self.assertEqual(context.environ['PATH_INFO'], '/one')
+
+class TestVirtualRoot(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, model, request):
+        from repoze.bfg.traversal import virtual_root
+        return virtual_root(model, request)
+
+    def test_it(self):
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import IContextURL
+        from zope.interface import Interface
+        gsm = getGlobalSiteManager()
+        gsm.registerAdapter(DummyContextURL, (Interface,Interface),
+                            IContextURL)
+        context = DummyContext()
+        request = DummyRequest()
+        result = self._callFUT(context, request)
+        self.assertEqual(result, '123')
+
 def make_traverser(*args):
     class DummyTraverser(object):
         def __init__(self, context):
@@ -460,4 +531,14 @@ class DummyContext(object):
 
 class DummyRequest:
     application_url = 'http://example.com:5432' # app_url never ends with slash
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
+        self.environ = environ
+        
+class DummyContextURL:
+    def __init__(self, context, request):
+        pass
 
+    def virtual_root(self):
+        return '123'

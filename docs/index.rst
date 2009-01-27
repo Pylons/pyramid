@@ -35,6 +35,7 @@ Narrative documentation in chapter form explaining how to use
    narr/templates
    narr/models
    narr/security
+   narr/vhosting
    narr/events
    narr/environment
    narr/unittesting

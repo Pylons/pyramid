@@ -1,11 +1,17 @@
 from zope.interface import implements
 from zope.interface import alsoProvides
 
+from zope.interface import classProvides
+
 from routes import Mapper
 from routes import request_config
+from routes import url_for
 
-from repoze.bfg.interfaces import IRoutesContext
 from repoze.bfg.interfaces import IContextNotFound
+from repoze.bfg.interfaces import IContextURL
+from repoze.bfg.interfaces import IRoutesContext
+from repoze.bfg.interfaces import ITraverser
+from repoze.bfg.interfaces import ITraverserFactory
 
 from zope.deferredimport import deprecated
 from zope.deprecation import deprecated as deprecated2
@@ -191,3 +197,56 @@ class RoutesRootFactory(Mapper):
 
         # fall back to original get_root
         return self.get_root(environ)
+
+class RoutesModelTraverser(object):
+    classProvides(ITraverserFactory)
+    implements(ITraverser)
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self, environ):
+        # the traverser *wants* to get routing args from the environ
+        # as of 0.6.5; the rest of this stuff is for backwards
+        # compatibility
+        try:
+            # 0.6.5 +
+            routing_args = environ['wsgiorg.routing_args'][1]
+        except KeyError:
+            # <= 0.6.4
+            routing_args = self.context.__dict__
+        try:
+            view_name = routing_args['view_name']
+        except KeyError:
+            # b/w compat < 0.6.3
+            try:
+                view_name = routing_args['controller']
+            except KeyError:
+                view_name = ''
+        try:
+            subpath = routing_args['subpath']
+            subpath = filter(None, subpath.split('/'))
+        except KeyError:
+            # b/w compat < 0.6.5
+            subpath = []
+
+        return self.context, view_name, subpath
+
+class RoutesContextURL(object):
+    """ The IContextURL adapter used to generate URLs for a context
+    object obtained via Routes URL dispatch.  This implementation
+    juses the ``url_for`` Routes API to generate a URL based on
+    ``environ['wsgiorg.routing_args']``.  Routes context objects,
+    unlike traversal-based context objects, cannot have a virtual root
+    that differs from its physical root; furthermore, the physical
+    root of a Routes context is always itself, so the ``virtual_root``
+    function returns the context of this adapter unconditionally."""
+    implements(IContextURL)
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def virtual_root(self):
+        return self.context 
+
+    def __call__(self):
+        return url_for(**self.request.environ['wsgiorg.routing_args'][1])

@@ -1,3 +1,36 @@
+Next Release
+============
+
+Features
+--------
+
+- The ``repoze.bfg.url.model_url`` API now works against contexts
+  derived from Routes URL dispatch (``Routes.util.url_for`` is called
+  under the hood).
+
+- "Virtual root" support for traversal-based applications has been
+  added.  Virtual root support is useful when you'd like to host some
+  model in a :mod:`repoze.bfg` model graph as an application under a
+  URL pathname that does not include the model path itself.  For more
+  information, see the (new) "Virtual Hosting" chapter in the
+  documentation.
+
+- A ``repoze.bfg.traversal.virtual_root`` API has been added.  When
+  called, it returns the virtual root object (or the physical root
+  object if no virtual root has been specified).
+
+Implementation Changes
+----------------------
+
+- ``repoze.bfg.traversal.RoutesModelTraverser`` has been moved to
+  ``repoze.bfg.urldispatch``.
+
+- ``model_url`` URL generation is now performed via an adapter lookup
+  based on the context and the request.
+
+- ZCML which registers two adapters for the ``IContextURL`` interface
+  has been added to the configure.zcml in ``repoze.bfg.includes``.
+
 0.6.6 (2009-01-26)
 ==================
 
