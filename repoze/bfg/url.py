@@ -3,7 +3,27 @@
 import re
 import urllib
 
+from zope.component import queryUtility
+from zope.interface import implements
+
 from repoze.bfg.location import lineage
+from repoze.bfg.interfaces import IURLGenerator
+
+class DefaultURLGenerator(object):
+    implements(IURLGenerator)
+    def model_url(self, model, request):
+        rpath = []
+        for location in lineage(model):
+            name = location.__name__
+            if name:
+                rpath.append(_urlsegment(name))
+        if rpath:
+            prefix = '/' + '/'.join(reversed(rpath)) + '/'
+        else:
+            prefix = '/'
+        return request.application_url + prefix
+
+default_url_generator = DefaultURLGenerator()
 
 def model_url(model, request, *elements, **kw):
     """
@@ -43,7 +63,7 @@ def model_url(model, request, *elements, **kw):
     the resulting string is appended to the generated URL.
 
     .. note:: Python data structures that are passed as ``query``
-              which are sequences or dictionaries are turned into a
+              whichare sequences or dictionaries are turned into a
               string under the same rules as when run through
               urllib.urlencode with the ``doseq`` argument equal to
               ``True``.  This means that sequences can be passed as
@@ -51,22 +71,24 @@ def model_url(model, request, *elements, **kw):
               string for each value.
     """
 
-    qs = ''
+    urlgenerator = queryUtility(IURLGenerator)
+    if urlgenerator is None:
+        urlgenerator = default_url_generator
+
+    model_url = urlgenerator.model_url(model, request)
+
     if 'query' in kw:
         qs = '?' + urlencode(kw['query'], doseq=True)
-        
-    rpath = []
-    for location in lineage(model):
-        name = location.__name__
-        if name:
-            rpath.append(_urlsegment(name))
-    prefix = '/'.join(reversed(rpath))
-    suffix = '/'.join([_urlsegment(s) for s in elements])
-    path = '/'.join([prefix, suffix])
-    if not path.startswith('/'):
-        path = '/' + path
+    else:
+        qs = ''
+
+    if elements:
+        suffix = '/'.join([_urlsegment(s) for s in elements])
+    else:
+        suffix = ''
+
     app_url = request.application_url # never ends in a slash
-    return app_url + path + qs
+    return model_url + suffix + qs
 
 def urlencode(query, doseq=False):
     """

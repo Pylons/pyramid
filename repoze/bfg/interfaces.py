@@ -201,3 +201,8 @@ class IUnauthorizedAppFactory(Interface):
         ``message`` key in the WSGI environ provides information
         pertaining to the reason for the unauthorized."""
 
+class IURLGenerator(Interface):
+    """ A utility which provides virtual hosting services
+    """
+    def model_url(model, request):
+        """ Return a URL that points to the model """

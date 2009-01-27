@@ -1,5 +1,51 @@
 import unittest
 
+class DefaultURLGeneratorTests(unittest.TestCase):
+    def _makeOne(self):
+        return self._getTargetClass()()
+
+    def _getTargetClass(self):
+        from repoze.bfg.url import DefaultURLGenerator
+        return DefaultURLGenerator
+
+    def test_class_conforms_to_IURLGenerator(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.interfaces import IURLGenerator
+        verifyClass(IURLGenerator, self._getTargetClass())
+
+    def test_instance_conforms_to_IURLGenerator(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.interfaces import IURLGenerator
+        context = DummyContext()
+        verifyObject(IURLGenerator, self._makeOne())
+
+    def test_model_url_withlineage(self):
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        root.__parent__ = None
+        root.__name__ = None
+        foo.__parent__ = root
+        foo.__name__ = 'foo '
+        bar.__parent__ = foo
+        bar.__name__ = 'bar'
+        baz.__parent__ = bar
+        baz.__name__ = 'baz'
+        request = DummyRequest()
+        gen = self._makeOne()
+        result = gen.model_url(baz, request)
+        self.assertEqual(result, 'http://example.com:5432/foo%20/bar/baz/')
+
+    def test_model_url_nolineage(self):
+        context = DummyContext()
+        context.__name__ = ''
+        context.__parent__ = None
+        request = DummyRequest()
+        gen = self._makeOne()
+        result = gen.model_url(context, request)
+        self.assertEqual(result, 'http://example.com:5432/')
+
 class ModelURLTests(unittest.TestCase):
     def _callFUT(self, model, request, *elements, **kw):
         from repoze.bfg.url import model_url
@@ -20,7 +66,6 @@ class ModelURLTests(unittest.TestCase):
         baz.__name__ = 'baz'
         request = DummyRequest()
         result = self._callFUT(baz, request, 'this/theotherthing', 'that')
-
         self.assertEqual(
             result,
             'http://example.com:5432/foo%20/bar/baz/this/theotherthing/that')
