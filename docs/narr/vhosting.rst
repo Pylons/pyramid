@@ -12,7 +12,7 @@ needs to be done within a :mod:`repoze.bfg` application to make this
 work.
 
 However, :mod:`repoze.bfg` also supports "virtual roots", which can be
-used in :term:`traversal` -based (but not :term:`URL-dispatch` -based)
+used in :term:`traversal` -based (but not :term:`URL dispatch` -based)
 applications.  These are explained below.
 
 Virtual Root Support
