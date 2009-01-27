@@ -15,7 +15,7 @@
   <adapter
       factory="repoze.bfg.traversal.TraversalContextURL"
       provides="repoze.bfg.interfaces.IContextURL"
-      for="*"
+      for="* repoze.bfg.interfaces.IRequest"
   />
 
   <!-- URL dispatch adapters -->
@@ -29,7 +29,7 @@
   <adapter
       factory="repoze.bfg.urldispatch.RoutesContextURL"
       provides="repoze.bfg.interfaces.IContextURL"
-      for="repoze.bfg.interfaces.IRoutesContext"
+      for="repoze.bfg.interfaces.IRoutesContext repoze.bfg.interfaces.IRequest"
   />
 
   <include file="meta.zcml" />

@@ -135,6 +135,19 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(name, 'foo')
         self.assertEqual(subpath, [])
 
+    def test_call_with_vh_root(self):
+        environ = self._getEnviron(PATH_INFO='/baz',
+                                   HTTP_X_VHM_ROOT='/foo/bar')
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        policy = self._makeOne(root)
+        ctx, name, subpath = policy(environ)
+        self.assertEqual(ctx, baz)
+        self.assertEqual(name, '')
+        self.assertEqual(subpath, [])
+
     def test_call_with_ILocation_root_proxies(self):
         baz = DummyContext()
         bar = DummyContext(baz)

@@ -228,6 +228,12 @@ class ModelGraphTraverser(object):
             path = environ['PATH_INFO']
         except KeyError:
             path = '/'
+        try:
+            vroot = environ[VH_ROOT_KEY]
+            path = vroot + path
+        except KeyError:
+            pass
+            
         path = list(traversal_path(path))
         locatable = self.locatable
         step = self._step
