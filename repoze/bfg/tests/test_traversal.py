@@ -225,6 +225,16 @@ class ModelGraphTraverserTests(unittest.TestCase):
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         self.assertRaises(TypeError, policy, environ)
 
+    def test_locatable_bwcompat(self):
+        root = DummyContext()
+        from repoze.bfg.interfaces import ILocation
+        from zope.interface import directlyProvides
+        policy = self._makeOne(root)
+        self.assertEqual(policy.locatable, False)
+        directlyProvides(root, ILocation)
+        self.assertEqual(policy.locatable, True)
+
+
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from repoze.bfg.traversal import find_interface

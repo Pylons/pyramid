@@ -221,7 +221,12 @@ class ModelGraphTraverser(object):
     implements(ITraverser)
     def __init__(self, root):
         self.root = root
-        self.locatable = ILocation.providedBy(root)
+
+    @property
+    def locatable(self):
+        """ Backwards compatibility for Malthe and David, even though
+        they're not supposed to be using this ;-)""" 
+        return ILocation.providedBy(self.root)
 
     def __call__(self, environ, _marker=_marker):
         try:
@@ -235,11 +240,11 @@ class ModelGraphTraverser(object):
             pass
             
         path = list(traversal_path(path))
-        locatable = self.locatable
         step = self._step
 
         ob = self.root
         name = ''
+        locatable = ILocation.providedBy(ob)
 
         while path:
             segment = path.pop(0)
