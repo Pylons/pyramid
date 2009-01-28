@@ -194,10 +194,8 @@ def traversal_path(path):
         (u'archives', u'<unprintable unicode>')
 
     """
-    while path.startswith('/'):
-        path = path[1:]
-    while path.endswith('/'):
-        path = path[:-1]
+    path = path.rstrip('/')
+    path = path.lstrip('/')
     clean = []
     for segment in path.split('/'):
         segment = urllib.unquote(segment) # deal with spaces in path segment
