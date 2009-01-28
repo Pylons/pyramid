@@ -222,12 +222,6 @@ class ModelGraphTraverser(object):
     def __init__(self, root):
         self.root = root
 
-    @property
-    def locatable(self):
-        """ Backwards compatibility for Malthe and David, even though
-        they're not supposed to be using this ;-)""" 
-        return ILocation.providedBy(self.root)
-
     def __call__(self, environ, _marker=_marker):
         try:
             path = environ['PATH_INFO']
@@ -239,34 +233,30 @@ class ModelGraphTraverser(object):
         except KeyError:
             pass
             
-        path = list(traversal_path(path))
-        step = self._step
+        path = traversal_path(path)
 
         ob = self.root
         name = ''
         locatable = ILocation.providedBy(ob)
 
-        while path:
-            segment = path.pop(0)
-            segment, next = step(ob, segment, _marker)
-            if next is _marker:
-                name = segment
-                break
+        i = 1
+        for segment in path:
+            if segment[:2] =='@@':
+                return ob, segment[2:], list(path[i:])
+            try:
+                getitem = ob.__getitem__
+            except AttributeError:
+                return ob, segment, list(path[i:])
+            try:
+                next = getitem(segment)
+            except KeyError:
+                return ob, segment, list(path[i:])
             if locatable and (not ILocation.providedBy(next)):
                 next = LocationProxy(next, ob, segment)
             ob = next
+            i += 1
 
-        return ob, name, path
-
-    def _step(self, ob, name, default):
-        if name.startswith('@@'):
-            return name[2:], default
-        if not hasattr(ob, '__getitem__'):
-            return name, default
-        try:
-            return name, ob[name]
-        except KeyError:
-            return name, default
+        return ob, '', []
 
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context
