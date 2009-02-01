@@ -278,7 +278,7 @@ class IRouteDirective(Interface):
     provides = Tokens(title=u'context interfaces', required=False,
                       value_type=GlobalObject())
     minimize = Bool(title=u'minimize', required=False)
-    encoding = TextLine(title=u'path', required=False)
+    encoding = TextLine(title=u'encoding', required=False)
     static = Bool(title=u'static', required=False)
     filter = GlobalObject(title=u'filter', required=False)
     absolute = Bool(title=u'absolute', required=False)
