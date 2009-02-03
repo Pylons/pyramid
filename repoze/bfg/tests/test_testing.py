@@ -56,6 +56,15 @@ class TestTestingFunctions(unittest.TestCase):
         response = render_template_to_response('templates/foo', foo=1, bar=2)
         self.assertEqual(dict(foo=1, bar=2), renderer._received)
 
+    def test_registerDummyRenderer_explicitrenderer(self):
+        from repoze.bfg import testing
+        def renderer(**kw):
+            raise ValueError
+        renderer = testing.registerDummyRenderer('templates/foo', renderer)
+        from repoze.bfg.chameleon_zpt import render_template_to_response
+        self.assertRaises(ValueError, render_template_to_response,
+                          'templates/foo', foo=1, bar=2)
+
     def test_registerEventListener_single(self):
         from repoze.bfg import testing
         from zope.interface import implements

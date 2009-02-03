@@ -1,3 +1,14 @@
+Next release
+============
+
+Features
+--------
+
+- Add ` `renderer`` argument (defaulting to None) to
+  ``repoze.bfg.testing.registerDummyRenderer``.  This makes it
+  possible, for instance, to register a custom renderer that raises an
+  exception in a unit test.
+
 0.6.7 (2009-01-27)
 ==================
 

@@ -52,15 +52,16 @@ def registerEventListener(event_iface=Interface):
     registerSubscriber(subscriber, event_iface)
     return L
 
-def registerDummyRenderer(path):
-    """ Create and register a dummy template renderer at ``path``
-    (usually a relative filename ala ``templates/foo.pt``) and return
-    the renderer object.  This function is useful when testing code
-    that calls the ``render_template_to_response`` or any other
-    ``render_template*`` API of any of the built-in templating
-    systems."""
+def registerDummyRenderer(path, renderer=None):
+    """ Register a 'renderer' at ``path`` (usually a relative filename
+    ala ``templates/foo.pt``) and return the renderer object.  If the
+    ``renderer`` argument is None, a 'dummy' renderer will be used.
+    This function is useful when testing code that calls the
+    ``render_template_to_response`` or any other ``render_template*``
+    API of any of the built-in templating systems."""
     from repoze.bfg.interfaces import ITemplateRenderer
-    renderer = DummyTemplateRenderer()
+    if renderer is None:
+        renderer = DummyTemplateRenderer()
     return registerUtility(renderer, ITemplateRenderer, path)
 
 def registerView(name, result='', view=None, for_=(Interface, Interface)):
