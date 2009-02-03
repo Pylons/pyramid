@@ -10,7 +10,6 @@ class ModelURLTests(unittest.TestCase):
         cleanUp()
         
     def _callFUT(self, model, request, *elements, **kw):
-        self._registerContextURL()
         from repoze.bfg.url import model_url
         return model_url(model, request, *elements, **kw)
 
@@ -28,12 +27,14 @@ class ModelURLTests(unittest.TestCase):
                             IContextURL)
 
     def test_root_default(self):
+        self._registerContextURL()
         root = DummyContext()
         request = DummyRequest()
         result = self._callFUT(root, request)
         self.assertEqual(result, 'http://example.com/context/')
 
     def test_extra_args(self):
+        self._registerContextURL()
         context = DummyContext()
         request = DummyRequest()
         result = self._callFUT(context, request, 'this/theotherthing', 'that')
@@ -42,6 +43,7 @@ class ModelURLTests(unittest.TestCase):
             'http://example.com/context/this/theotherthing/that')
 
     def test_unicode_in_element_names(self):
+        self._registerContextURL()
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
         context = DummyContext()
         request = DummyRequest()
@@ -50,12 +52,14 @@ class ModelURLTests(unittest.TestCase):
                      'http://example.com/context/La%20Pe%C3%B1a')
 
     def test_element_names_url_quoted(self):
+        self._registerContextURL()
         context = DummyContext()
         request = DummyRequest()
         result = self._callFUT(context, request, 'a b c')
         self.assertEqual(result, 'http://example.com/context/a%20b%20c')
 
     def test_with_query_dict(self):
+        self._registerContextURL()
         context = DummyContext()
         request = DummyRequest()
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
@@ -64,6 +68,7 @@ class ModelURLTests(unittest.TestCase):
                          'http://example.com/context/a?a=La+Pe%C3%B1a')
 
     def test_with_query_seq(self):
+        self._registerContextURL()
         context = DummyContext()
         request = DummyRequest()
         uc = unicode('La Pe\xc3\xb1a', 'utf-8')
@@ -71,6 +76,16 @@ class ModelURLTests(unittest.TestCase):
                                                              ('b', uc)])
         self.assertEqual(result,
                      'http://example.com/context/a?a=hi+there&b=La+Pe%C3%B1a')
+
+    def test_no_IContextURL_registered(self):
+        # falls back to TraversalContextURL
+        root = DummyContext()
+        root.__name__ = ''
+        root.__parent__ = None
+        request = DummyRequest()
+        request.environ = {}
+        result = self._callFUT(root, request)
+        self.assertEqual(result, 'http://example.com:5432/')
 
 class UrlEncodeTests(unittest.TestCase):
     def _callFUT(self, query, doseq=False):
