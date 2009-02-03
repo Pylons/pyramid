@@ -5,7 +5,6 @@ import urllib
 
 from zope.component import queryMultiAdapter
 from repoze.bfg.interfaces import IContextURL
-from repoze.bfg.interfaces import VH_ROOT_KEY
 
 def model_url(model, request, *elements, **kw):
     """
@@ -13,13 +12,13 @@ def model_url(model, request, *elements, **kw):
     context) object based on the ``wsgi.url_scheme``, ``HTTP_HOST`` or
     ``SERVER_NAME`` in the request, plus any ``SCRIPT_NAME``.  If a
     'virtual root path' is present in the request environment (the
-    value of the environ key ``%s``), and the ``model`` was obtained
-    via traversal, the URL path will not include the virtual root
-    prefix (it will be stripped out of the generated URL).  If a
-    ``query`` keyword argument is provided, a query string based on
-    its value will be composed and appended to the generated URL
-    string (see details below).  The overall result of this function
-    is always a UTF-8 encoded string (never unicode).
+    value of the WSGI environ key ``HTTP_X_VHM_ROOT``), and the
+    ``model`` was obtained via traversal, the URL path will not
+    include the virtual root prefix (it will be stripped out of the
+    generated URL).  If a ``query`` keyword argument is provided, a
+    query string based on its value will be composed and appended to
+    the generated URL string (see details below).  The overall result
+    of this function is always a UTF-8 encoded string (never unicode).
 
     .. note:: If the ``model`` used is the result of a traversal, it
        must be :term:`location`-aware.  The 'model' can also be the
@@ -54,8 +53,8 @@ def model_url(model, request, *elements, **kw):
               ``True``.  This means that sequences can be passed as
               values, and a k=v pair will be placed into the query
               string for each value.
-    """ % VH_ROOT_KEY
-
+    """
+    
     context_url = queryMultiAdapter((model, request), IContextURL)
     if context_url is None:
         # b/w compat for unit tests
