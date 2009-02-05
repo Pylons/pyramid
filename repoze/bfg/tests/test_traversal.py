@@ -279,63 +279,119 @@ class FindModelTests(unittest.TestCase):
         from zope.interface import Interface
         gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
 
-    def test_relative_found(self):
-        dummy = DummyContext()
+    def test_list(self):
+        model = DummyContext()
+        traverser = make_traverser(model, '', [])
+        self._registerTraverserFactory(traverser)
+        result = self._callFUT(model, [''])
+        self.assertEqual(result, model)
+        self.assertEqual(model.environ['PATH_INFO'], '/')
+
+    def test_generator(self):
+        model = DummyContext()
+        traverser = make_traverser(model, '', [])
+        self._registerTraverserFactory(traverser)
+        def foo():
+            yield ''
+        result = self._callFUT(model, foo())
+        self.assertEqual(result, model)
+        self.assertEqual(model.environ['PATH_INFO'], '/')
+
+    def test_self_string_found(self):
+        model = DummyContext()
+        traverser = make_traverser(model, '', [])
+        self._registerTraverserFactory(traverser)
+        result = self._callFUT(model, '')
+        self.assertEqual(result, model)
+        self.assertEqual(model.environ['PATH_INFO'], '')
+
+    def test_self_tuple_found(self):
+        model = DummyContext()
+        traverser = make_traverser(model, '', [])
+        self._registerTraverserFactory(traverser)
+        result = self._callFUT(model, ())
+        self.assertEqual(result, model)
+        self.assertEqual(model.environ['PATH_INFO'], '')
+
+    def test_relative_string_found(self):
+        model = DummyContext()
         baz = DummyContext()
         traverser = make_traverser(baz, '', [])
         self._registerTraverserFactory(traverser)
-        result = self._callFUT(dummy, 'baz')
+        result = self._callFUT(model, 'baz')
         self.assertEqual(result, baz)
+        self.assertEqual(model.environ['PATH_INFO'], 'baz')
 
-    def test_relative_notfound(self):
-        dummy = DummyContext()
+    def test_relative_tuple_found(self):
+        model = DummyContext()
+        baz = DummyContext()
+        traverser = make_traverser(baz, '', [])
+        self._registerTraverserFactory(traverser)
+        result = self._callFUT(model, ('baz',))
+        self.assertEqual(result, baz)
+        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+
+    def test_relative_string_notfound(self):
+        model = DummyContext()
         baz = DummyContext()
         traverser = make_traverser(baz, 'bar', [])
         self._registerTraverserFactory(traverser)
-        self.assertRaises(KeyError, self._callFUT, dummy, 'baz')
+        self.assertRaises(KeyError, self._callFUT, model, 'baz')
+        self.assertEqual(model.environ['PATH_INFO'], 'baz')
 
-    def test_absolute_found(self):
-        dummy = DummyContext()
+    def test_relative_tuple_notfound(self):
+        model = DummyContext()
         baz = DummyContext()
-        baz.__parent__ = dummy
-        baz.__name__ = 'baz'
-        dummy.__parent__ = None
-        dummy.__name__ = None
-        traverser = make_traverser(dummy, '', [])
+        traverser = make_traverser(baz, 'bar', [])
         self._registerTraverserFactory(traverser)
-        result = self._callFUT(baz, '/')
-        self.assertEqual(result, dummy)
-        self.assertEqual(dummy.wascontext, True)
+        self.assertRaises(KeyError, self._callFUT, model, ('baz',))
+        self.assertEqual(model.environ['PATH_INFO'], 'baz')
 
-    def test_absolute_notfound(self):
-        dummy = DummyContext()
-        baz = DummyContext()
-        baz.__parent__ = dummy
-        baz.__name__ = 'baz'
-        dummy.__parent__ = None
-        dummy.__name__ = None
-        traverser = make_traverser(dummy, 'fuz', [])
+    def test_absolute_string_found(self):
+        root = DummyContext()
+        model = DummyContext()
+        model.__parent__ = root
+        model.__name__ = 'baz'
+        traverser = make_traverser(root, '', [])
         self._registerTraverserFactory(traverser)
-        self.assertRaises(KeyError, self._callFUT, baz, '/')
-        self.assertEqual(dummy.wascontext, True)
+        result = self._callFUT(model, '/')
+        self.assertEqual(result, root)
+        self.assertEqual(root.wascontext, True)
+        self.assertEqual(root.environ['PATH_INFO'], '/')
 
-    def test_unicode_pathinfo_converted_to_utf8(self):
-        la = unicode('LaPe\xc3\xb1a', 'utf-8')
-
-        dummy = DummyContext()
-        dummy.__parent__ = None
-        dummy.__name__ = None
-        baz = DummyContext()
-        baz.__parent__ = dummy
-        baz.__name__ = la
-
-        traverser = make_traverser(baz, '', [])
+    def test_absolute_tuple_found(self):
+        root = DummyContext()
+        model = DummyContext()
+        model.__parent__ = root
+        model.__name__ = 'baz'
+        traverser = make_traverser(root, '', [])
         self._registerTraverserFactory(traverser)
-        path = '/' + la
-        result = self._callFUT(baz, path)
-        self.assertEqual(result, baz)
-        self.assertEqual(dummy.wascontext, True)
-        self.assertEqual(dummy.environ['PATH_INFO'], path.encode('utf-8'))
+        result = self._callFUT(model, ('',))
+        self.assertEqual(result, root)
+        self.assertEqual(root.wascontext, True)
+        self.assertEqual(root.environ['PATH_INFO'], '/')
+
+    def test_absolute_string_notfound(self):
+        root = DummyContext()
+        model = DummyContext()
+        model.__parent__ = root
+        model.__name__ = 'baz'
+        traverser = make_traverser(root, 'fuz', [])
+        self._registerTraverserFactory(traverser)
+        self.assertRaises(KeyError, self._callFUT, model, '/')
+        self.assertEqual(root.wascontext, True)
+        self.assertEqual(root.environ['PATH_INFO'], '/')
+
+    def test_absolute_tuple_notfound(self):
+        root = DummyContext()
+        model = DummyContext()
+        model.__parent__ = root
+        model.__name__ = 'baz'
+        traverser = make_traverser(root, 'fuz', [])
+        self._registerTraverserFactory(traverser)
+        self.assertRaises(KeyError, self._callFUT, model, ('',))
+        self.assertEqual(root.wascontext, True)
+        self.assertEqual(root.environ['PATH_INFO'], '/')
 
 class ModelPathTests(unittest.TestCase):
     def _callFUT(self, model, *elements):
@@ -356,7 +412,8 @@ class ModelPathTests(unittest.TestCase):
         baz.__parent__ = bar
         baz.__name__ = 'baz'
         result = self._callFUT(baz, 'this/theotherthing', 'that')
-        self.assertEqual(result, '/foo /bar/baz/this/theotherthing/that')
+        self.assertEqual(result, ('','foo ', 'bar', 'baz', 'this/theotherthing',
+                                  'that'))
 
     def test_root_default(self):
         root = DummyContext()
@@ -364,7 +421,7 @@ class ModelPathTests(unittest.TestCase):
         root.__name__ = None
         request = DummyRequest()
         result = self._callFUT(root)
-        self.assertEqual(result, '/')
+        self.assertEqual(result, ('',))
         
     def test_nonroot_default(self):
         root = DummyContext()
@@ -375,7 +432,7 @@ class ModelPathTests(unittest.TestCase):
         other.__name__ = 'other'
         request = DummyRequest()
         result = self._callFUT(other)
-        self.assertEqual(result, '/other')
+        self.assertEqual(result, ('', 'other'))
 
 class TraversalContextURLTests(unittest.TestCase):
     def _makeOne(self, context, url):
@@ -534,6 +591,8 @@ def make_traverser(*args):
     return DummyTraverser
         
 class DummyContext(object):
+    __parent__ = None
+    __name__ = None
     def __init__(self, next=None):
         self.next = next
         

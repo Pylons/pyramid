@@ -1,8 +1,32 @@
 Next release
 ============
 
+Backwards Incompatibilities
+---------------------------
+
+- The ``repoze.bfg.traversal.model_path`` API now returns a tuple
+  instead of a string.  Previously it returned a string representing
+  the model path, with each segment name in the path joined together
+  via ``/`` characters, e.g. ``/foo/bar``.  Now it returns a tuple,
+  where each segment is an element in the tuple e.g. ``('', 'foo',
+  'bar')`` (the leading empty element indicates that this path is
+  absolute).  This change was (as discussed on the repoze-dev
+  maillist) necessary to accomodate model objects which themselves
+  have names that contain the ``/`` character.  See the API
+  documentation for ``repoze.bfg.traversal.model_path`` for more
+  information.
+
+- The ``repoze.bfg.traversal.find_model`` API no longer implicitly
+  converts unicode path representations into a UTF-8 string.  Callers
+  should either use path tuples or use the guidelines about passing a
+  string ``path`` argument described in its API documentation.
+
 Features
 --------
+
+- The ``find_model`` API now accepts "path tuples" (see the above note
+  regarding ``model_path``) as well as string path representations as
+  a ``path`` argument.
 
 - Add ` `renderer`` argument (defaulting to None) to
   ``repoze.bfg.testing.registerDummyRenderer``.  This makes it
