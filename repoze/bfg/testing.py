@@ -31,7 +31,7 @@ def registerModels(models):
     ``repoze.bfg.traversal.find_model`` API.  The ``find_model`` API
     is called with a path as one of its arguments.  If the dictionary
     you register when calling this method contains that path as a
-    string key (e.g. ``/foo/bar`` or ``foo/bar``, the corresponding
+    string key (e.g. ``/foo/bar`` or ``foo/bar``), the corresponding
     value will be returned to ``find_model`` (and thus to your code)
     when ``find_model`` is called with an equivalent path string or
     tuple."""
