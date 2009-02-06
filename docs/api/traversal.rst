@@ -13,7 +13,7 @@
 
   .. autofunction:: model_path
 
-  .. autofunction:: model_path_string
+  .. autofunction:: model_path_tuple
 
   .. autofunction:: quote_path_segment
 
@@ -24,8 +24,6 @@
 
 Secondary APIs
 ~~~~~~~~~~~~~~
-
-.. automodule:: repoze.bfg.traversal
 
   .. autofunction:: traversal_path(path)
 

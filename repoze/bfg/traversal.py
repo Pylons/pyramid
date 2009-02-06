@@ -130,7 +130,7 @@ def find_interface(model, interface):
 def model_path(model, *elements):
     """ Return a string object representing the absolute physical path
     of the model object based on its position in the model graph, e.g
-    ``'/foo/bar``.  Any positional arguments passed in as ``elements``
+    ``/foo/bar``.  Any positional arguments passed in as ``elements``
     will be appended as path segments to the end of the model path.
     For instance, if the model's path is ``/foo/bar`` and ``elements``
     equals ``('a', 'b')``, the returned tuple will be
@@ -150,18 +150,20 @@ def model_path(model, *elements):
     The ``model`` passed in *must* be :term:`location`-aware.
 
     .. note:: Each segment in the path string returned will use the
-    ``__name__`` attribute of the model it represents within the
-    graph.  Each of these segments *should* be a unicode or string
-    object (as per the contract of :term:`location-awareness`).
-    However, no conversion or safety checking of model names is
-    performed.  For instance, if one of the models in your graph has a
-    ``__name__`` which (by error) is a dictionary, the ``model_path``
-    function will attempt to append it to a string and it will cause a
-    TypeError.  A single exception to this rule exists: the
-    :term:`root` model may have a ``__name__`` attribute of any value;
-    the value of this attribute will always be ignored (and
-    effectively replaced with a leading ``/``) when the path is
-    generated.
+              ``__name__`` attribute of the model it represents within
+              the graph.  Each of these segments *should* be a unicode
+              or string object (as per the contract of
+              :term:`location`-awareness).  However, no conversion or
+              safety checking of model names is performed.  For
+              instance, if one of the models in your graph has a
+              ``__name__`` which (by error) is a dictionary, the
+              ``model_path`` function will attempt to append it to a
+              string and it will cause a TypeError.  A single
+              exception to this rule exists: the :term:`root` model
+              may have a ``__name__`` attribute of any value; the
+              value of this attribute will always be ignored (and
+              effectively replaced with a leading ``/``) when the path
+              is generated.
     """
     path = [ quote_path_segment(name) for name in
             model_path_tuple(model, *elements) ]
@@ -169,7 +171,8 @@ def model_path(model, *elements):
     return path
 
 def model_path_tuple(model, *elements):
-    """ Return a tuple representing the absolute physical path of the
+    """
+    Return a tuple representing the absolute physical path of the
     model object based on its position in the model graph, e.g ``('',
     'foo', 'bar')``.  Any positional arguments passed in as
     ``elements`` will be appended as elements in the tuple
@@ -184,20 +187,22 @@ def model_path_tuple(model, *elements):
     used to generate path references that can later be resolved via
     ``find_model``.
 
-    The ``model`` passed in *must* be :term:`location`-aware.  
+    The ``model`` passed in *must* be :term:`location`-aware.
 
     .. note:: Each segment in the path tuple returned will equal the
-    ``__name__`` attribute of the model it represents within the
-    graph.  Each of these segments *should* be a unicode or string
-    object (as per the contract of :term:`location-awareness`).
-    However, no conversion or safety checking of model names is
-    performed.  For instance, if one of the models in your graph has a
-    ``__name__`` which (by error) is a dictionary, that dictionary
-    will be placed in the path tuple; no warning or error will be
-    given.  A single exception to this rule exists: the :term:`root`
-    model may have a ``__name__`` attribute of any value; the value of
-    this attribute will always be ignored (and effectively replaced
-    with ``''``) when the path is generated.
+              ``__name__`` attribute of the model it represents within
+              the graph.  Each of these segments *should* be a unicode
+              or string object (as per the contract of
+              :term:`location`-awareness).  However, no conversion or
+              safety checking of model names is performed.  For
+              instance, if one of the models in your graph has a
+              ``__name__`` which (by error) is a dictionary, that
+              dictionary will be placed in the path tuple; no warning
+              or error will be given.  A single exception to this rule
+              exists: the :term:`root` model may have a ``__name__``
+              attribute of any value; the value of this attribute will
+              always be ignored (and effectively replaced with ``''``)
+              when the path is generated.
     """
     path = []
     for location in lineage(model):
@@ -285,13 +290,15 @@ def traversal_path(path):
         (u'archives', u'<unprintable unicode>')
 
     .. note:: This function does not generate the same type of tuples
-    that ``model_path_tuple`` does.  In particular, the leading empty
-    string is not present in the tuple it returns, unilke
-    ``model_path_tuple``.  As a result, tuples generated by
-    ``traversal_path`` are not resolveable by the ``find_model`` API.
-    ``traversal_path`` is a function mostly used by the internals of
-    :mod:`repoze.bfg` and by people writing their own traversal
-    machinery, as opposed to users writing applications in BFG.
+              that ``model_path_tuple`` does.  In particular, the
+              leading empty string is not present in the tuple it
+              returns, unlike tuples returned by ``model_path_tuple``.
+              As a result, tuples generated by ``traversal_path`` are
+              not resolveable by the ``find_model`` API.
+              ``traversal_path`` is a function mostly used by the
+              internals of :mod:`repoze.bfg` and by people writing
+              their own traversal machinery, as opposed to users
+              writing applications in BFG.
     """
     path = path.rstrip('/')
     path = path.lstrip('/')
