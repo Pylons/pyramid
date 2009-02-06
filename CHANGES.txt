@@ -1,4 +1,4 @@
-Next Release
+0.6.8 (2009-02-05)
 ==================
 
 Backwards Incompatibilities
@@ -78,6 +78,12 @@ Features
   ``repoze.bfg.testing.registerDummyRenderer``.  This makes it
   possible, for instance, to register a custom renderer that raises an
   exception in a unit test.
+
+Implementation Changes
+----------------------
+
+- Moved _url_quote function back to ``repoze.bfg.traversal`` from
+  ``repoze.bfg.url``.  This is not an API.
 
 0.6.7 (2009-01-27)
 ==================
