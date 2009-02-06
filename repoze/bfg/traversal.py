@@ -133,13 +133,13 @@ def model_path(model, *elements):
     ``/foo/bar``.  Any positional arguments passed in as ``elements``
     will be appended as path segments to the end of the model path.
     For instance, if the model's path is ``/foo/bar`` and ``elements``
-    equals ``('a', 'b')``, the returned tuple will be
+    equals ``('a', 'b')``, the returned string will be
     ``/foo/bar/a/b``.  The first character in the string will always
     be the ``/`` character (a leading ``/`` character in a path string
     represents that the path is absolute).
 
     Model path strings returned will be escaped in the following
-    manner: each unicode path segment will be encoded as UTF-8 and as
+    manner: each unicode path segment will be encoded as UTF-8 and
     each path segment will be escaped via Python's ``urllib.quote``.
     For example, ``/path/to%20the/La%20Pe%C3%B1a``.
 
