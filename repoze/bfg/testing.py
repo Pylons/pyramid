@@ -30,9 +30,11 @@ def registerModels(models):
     testing code that wants to call the
     ``repoze.bfg.traversal.find_model`` API.  The ``find_model`` API
     is called with a path as one of its arguments.  If the dictionary
-    you register when calling this method contains that path as a key
-    (e.g. '/foo/bar' or 'foo'), the corresponding value will be
-    returned to ``find_model`` (and thus to your code)."""
+    you register when calling this method contains that path as a
+    string key (e.g. ``/foo/bar`` or ``foo/bar``, the corresponding
+    value will be returned to ``find_model`` (and thus to your code)
+    when ``find_model`` is called with an equivalent path string or
+    tuple."""
     traverser = make_traverser_factory(models)
     registerTraverserFactory(traverser)
     return models
@@ -167,7 +169,8 @@ def make_traverser_factory(root):
             self.context = context
 
         def __call__(self, environ):
-            ob = root[environ['PATH_INFO']]
+            path = environ['PATH_INFO']
+            ob = root[path]
             return ob, '', []
 
     return DummyTraverserFactory
