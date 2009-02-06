@@ -412,6 +412,46 @@ class ModelPathTests(unittest.TestCase):
         baz.__parent__ = bar
         baz.__name__ = 'baz'
         result = self._callFUT(baz, 'this/theotherthing', 'that')
+        self.assertEqual(result, '/foo%20/bar/baz/this%2Ftheotherthing/that')
+
+    def test_root_default(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        request = DummyRequest()
+        result = self._callFUT(root)
+        self.assertEqual(result, '/')
+        
+    def test_nonroot_default(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        other = DummyContext()
+        other.__parent__ = root
+        other.__name__ = 'other'
+        request = DummyRequest()
+        result = self._callFUT(other)
+        self.assertEqual(result, '/other')
+
+class ModelPathTupleTests(unittest.TestCase):
+    def _callFUT(self, model, *elements):
+        from repoze.bfg.traversal import model_path_tuple
+        return model_path_tuple(model, *elements)
+
+    def test_it(self):
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        root.__parent__ = None
+        root.__name__ = None
+        foo.__parent__ = root
+        foo.__name__ = 'foo '
+        bar.__parent__ = foo
+        bar.__name__ = 'bar'
+        baz.__parent__ = bar
+        baz.__name__ = 'baz'
+        result = self._callFUT(baz, 'this/theotherthing', 'that')
         self.assertEqual(result, ('','foo ', 'bar', 'baz', 'this/theotherthing',
                                   'that'))
 
@@ -433,6 +473,21 @@ class ModelPathTests(unittest.TestCase):
         request = DummyRequest()
         result = self._callFUT(other)
         self.assertEqual(result, ('', 'other'))
+
+class QuotePathSegmentTests(unittest.TestCase):
+    def _callFUT(self, s):
+        from repoze.bfg.traversal import quote_path_segment
+        return quote_path_segment(s)
+
+    def test_unicode(self):
+        la = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        result = self._callFUT(la)
+        self.assertEqual(result, '%2FLa%20Pe%C3%B1a')
+
+    def test_string(self):
+        s = '/ hello!'
+        result = self._callFUT(s)
+        self.assertEqual(result, '%2F%20hello%21')
 
 class TraversalContextURLTests(unittest.TestCase):
     def _makeOne(self, context, url):

@@ -40,7 +40,7 @@ class ModelURLTests(unittest.TestCase):
         result = self._callFUT(context, request, 'this/theotherthing', 'that')
         self.assertEqual(
             result,
-            'http://example.com/context/this/theotherthing/that')
+            'http://example.com/context/this%2Ftheotherthing/that')
 
     def test_unicode_in_element_names(self):
         self._registerContextURL()

@@ -1,32 +1,78 @@
-Next release
-============
+Next Release
+==================
 
 Backwards Incompatibilities
 ---------------------------
 
-- The ``repoze.bfg.traversal.model_path`` API now returns a tuple
-  instead of a string.  Previously it returned a string representing
-  the model path, with each segment name in the path joined together
-  via ``/`` characters, e.g. ``/foo/bar``.  Now it returns a tuple,
-  where each segment is an element in the tuple e.g. ``('', 'foo',
-  'bar')`` (the leading empty element indicates that this path is
-  absolute).  This change was (as discussed on the repoze-dev
-  maillist) necessary to accomodate model objects which themselves
-  have names that contain the ``/`` character.  See the API
-  documentation for ``repoze.bfg.traversal.model_path`` for more
-  information.
+- The ``repoze.bfg.traversal.model_path`` API now returns a *quoted*
+  string rather than a string represented by series of unquoted
+  elements joined via ``/`` characters.  Previously it returned a
+  string or unicode object representing the model path, with each
+  segment name in the path joined together via ``/`` characters,
+  e.g. ``/foo /bar``.  Now it returns a string, where each segment is
+  a UTF-8 encoded and URL-quoted element e.g. ``/foo%20/bar``.  This
+  change was (as discussed briefly on the repoze-dev maillist)
+  necessary to accomodate model objects which themselves have
+  ``__name__`` attributes that contain the ``/`` character.
+
+  For people that have no models that have high-order Unicode
+  ``__name__`` attributes or ``__name__`` attributes with values that
+  require URL-quoting with in their model graphs, this won't cause any
+  issue.  However, if you have code that currently expects
+  ``model_path`` to return an unquoted string, or you have an existing
+  application with data generated via the old method, and you're too
+  lazy to change anything, you may wish replace the BFG-imported
+  ``model_path`` in your code with this function (this is the code of
+  the "old" ``model_path`` implementation)::
+
+        from repoze.bfg.location import lineage
+
+        def i_am_too_lazy_to_move_to_the_new_model_path(model, *elements):
+            rpath = []
+            for location in lineage(model):
+                if location.__name__:
+                    rpath.append(location.__name__)
+            path = '/' + '/'.join(reversed(rpath))
+            if elements:
+                suffix = '/'.join(elements)
+                path = '/'.join([path, suffix])
+            return path
 
 - The ``repoze.bfg.traversal.find_model`` API no longer implicitly
-  converts unicode path representations into a UTF-8 string.  Callers
-  should either use path tuples or use the guidelines about passing a
-  string ``path`` argument described in its API documentation.
+  converts unicode representations of a full path passed to it as a
+  Unicode object into a UTF-8 string.  Callers should either use
+  prequoted path strings returned by
+  ``repoze.bfg.traversal.model_path``, or tuple values returned by the
+  result of ``repoze.bfg.traversal.model_path_tuple`` or they should
+  use the guidelines about passing a string ``path`` argument
+  described in the ``find_model`` API documentation.
+
+Bugfixes
+--------
+
+- Each argument contained in ``elements`` passed to
+  ``repoze.bfg.traversal.model_path`` will now have any ``/``
+  characters contained within quoted to ``%2F`` in the returned
+  string.  Previously, ``/`` characters in elements were left unquoted
+  (a bug).
 
 Features
 --------
 
-- The ``find_model`` API now accepts "path tuples" (see the above note
-  regarding ``model_path``) as well as string path representations as
-  a ``path`` argument.
+- A ``repoze.bfg.traversal.model_path_tuple`` API was added.  This API
+  is an alternative to ``model_path`` (which returns a string);
+  ``model_path_tuple`` returns a model path as a tuple (much like
+  Zope's ``getPhysicalPath``).
+
+- A ``repoze.bfg.traversal.quote_path_segment`` API was added.  This
+  API will quote an individual path segment (string or unicode
+  object).  See the ``repoze.bfg.traversal`` API documentation for
+  more information.
+
+- The ``repoze.bfg.traversal.find_model`` API now accepts "path
+  tuples" (see the above note regarding ``model_path_tuple``) as well
+  as string path representations (from
+  ``repoze.bfg.traversal.model_path``) as a ``path`` argument.
 
 - Add ` `renderer`` argument (defaulting to None) to
   ``repoze.bfg.testing.registerDummyRenderer``.  This makes it

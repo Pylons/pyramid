@@ -1,10 +1,12 @@
 """ Utility functions for dealing with URLs in repoze.bfg """
 
-import re
 import urllib
 
 from zope.component import queryMultiAdapter
 from repoze.bfg.interfaces import IContextURL
+
+from repoze.bfg.traversal import TraversalContextURL
+from repoze.bfg.traversal import quote_path_segment
 
 def model_url(model, request, *elements, **kw):
     """
@@ -58,7 +60,6 @@ def model_url(model, request, *elements, **kw):
     context_url = queryMultiAdapter((model, request), IContextURL)
     if context_url is None:
         # b/w compat for unit tests
-        from repoze.bfg.traversal import TraversalContextURL
         context_url = TraversalContextURL(model, request)
     model_url = context_url()
 
@@ -68,7 +69,7 @@ def model_url(model, request, *elements, **kw):
         qs = ''
 
     if elements:
-        suffix = '/'.join([_urlsegment(s) for s in elements])
+        suffix = '/'.join([quote_path_segment(s) for s in elements])
     else:
         suffix = ''
 
@@ -112,69 +113,4 @@ def urlencode(query, doseq=False):
 
     return urllib.urlencode(newquery, doseq=doseq)
 
-_segment_cache = {}
-
-def _urlsegment(s):
-    """ The bit of this code that deals with ``_segment_cache`` is an
-    optimization: we cache all the computation of URL path segments in
-    this module-scope dictionary with the original string (or unicode
-    value) as the key, so we can look it up later without needing to
-    reencode or re-url-quote it """
-    result = _segment_cache.get(s)
-    if result is None:
-        if s.__class__ is unicode: # isinstance slighly slower (~15%)
-            result = _url_quote(s.encode('utf-8'))
-        else:
-            result = _url_quote(s)
-        # we don't need a lock to mutate _segment_cache, as the below
-        # will generate exactly one Python bytecode (STORE_SUBSCR)
-        _segment_cache[s] = result
-    return result
-
-
-always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-               'abcdefghijklmnopqrstuvwxyz'
-               '0123456789' '_.-')
-_safemaps = {}
-_must_quote = {}
-
-def _url_quote(s, safe = '/'):
-    """quote('abc def') -> 'abc%20def'
-
-    Faster version of Python stdlib urllib.quote.  See
-    http://bugs.python.org/issue1285086 for more information.
-
-    Each part of a URL, e.g. the path info, the query, etc., has a
-    different set of reserved characters that must be quoted.
-
-    RFC 2396 Uniform Resource Identifiers (URI): Generic Syntax lists
-    the following reserved characters.
-
-    reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
-                  "$" | ","
-
-    Each of these characters is reserved in some component of a URL,
-    but not necessarily in all of them.
-
-    By default, the quote function is intended for quoting the path
-    section of a URL.  Thus, it will not encode '/'.  This character
-    is reserved, but in typical usage the quote function is being
-    called on a path where the existing slash characters are used as
-    reserved characters.
-    """
-    cachekey = (safe, always_safe)
-    try:
-        safe_map = _safemaps[cachekey]
-        if not _must_quote[cachekey].search(s):
-            return s
-    except KeyError:
-        safe += always_safe
-        _must_quote[cachekey] = re.compile(r'[^%s]' % safe)
-        safe_map = {}
-        for i in range(256):
-            c = chr(i)
-            safe_map[c] = (c in safe) and c or ('%%%02X' % i)
-        _safemaps[cachekey] = safe_map
-    res = map(safe_map.__getitem__, s)
-    return ''.join(res)
 
