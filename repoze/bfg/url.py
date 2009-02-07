@@ -89,26 +89,32 @@ def urlencode(query, doseq=False):
     with an ``.items()`` method that returns a sequence of two-tuples
     representing key/value pairs.  ``doseq`` controls what happens
     when a sequence is presented as one of the values.  See the Python
-    stdlib documentation for more information.
+    stdlib documentation for ``urllib.urlencode`` for more
+    information.
     """
     if hasattr(query, 'items'):
-        # dictionary
+        # presumed to be a dictionary
         query = query.items()
-    # presumed to be a sequence of two-tuples
+
     newquery = []
     for k, v in query:
+
         if k.__class__ is unicode:
             k = k.encode('utf-8')
 
-        if isinstance(v, (tuple, list)):
+        try:
+            v.__iter__
+        except AttributeError:
+            if v.__class__ is unicode:
+                v = v.encode('utf-8')
+        else:
             L = []
             for x in v:
                 if x.__class__ is unicode:
                     x = x.encode('utf-8')
                 L.append(x)
             v = L
-        elif v.__class__ is unicode:
-            v = v.encode('utf-8')
+
         newquery.append((k, v))
 
     return urllib.urlencode(newquery, doseq=doseq)

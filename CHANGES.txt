@@ -1,3 +1,40 @@
+Next Release
+
+Bug Fixes
+---------
+
+- Empty location names in model paths when generating a URL using
+  ``repoze.bfg.model_url`` based on a model obtained via traversal are
+  no longer ignored in the generated URL.  This means that if a
+  non-root model object has a ``__name__`` of ``''``, the URL will
+  reflect it (e.g. ``model_url`` will generate ``http://foo/bar//baz``
+  if an object with the ``__name__`` of ``''`` is a child of bar and
+  the parent of baz).  URLs generated with empty path segments are,
+  however, still irresolveable by the model graph traverser on request
+  ingress (the traverser strips empty path segment names).
+
+Features
+--------
+
+- Microspeedups of ``repoze.bfg.traversal.model_path``,
+  ``repoze.bfg.traversal.model_path_tuple``,
+  ``repoze.bfg.traversal.quote_path_segment``, and
+  ``repoze.bfg.url.urlencode``.
+
+Documentation
+-------------
+
+- Add a note to the ``repoze.bfg.traversal.quote_path_segment`` API
+  docs about caching of computed values.
+
+Implementation Changes
+----------------------
+
+- Simplification of
+  ``repoze.bfg.traversal.TraversalContextURL.__call__`` (it now uses
+  ``repoze.bfg.traversal.model_path`` instead of rolling its own
+  path-generation).
+
 0.6.8 (2009-02-05)
 ==================
 

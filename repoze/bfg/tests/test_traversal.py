@@ -612,6 +612,22 @@ class TraversalContextURLTests(unittest.TestCase):
         self.assertEqual(context_url.virtual_root(), traversed_to)
         self.assertEqual(context.environ['PATH_INFO'], '/one')
 
+    def test_empty_names_not_ignored(self):
+        bar = DummyContext()
+        empty = DummyContext(bar)
+        root = DummyContext(empty)
+        root.__parent__ = None
+        root.__name__ = None
+        empty.__parent__ = root
+        empty.__name__ = ''
+        bar.__parent__ = empty
+        bar.__name__ = 'bar'
+        request = DummyRequest()
+        context_url = self._makeOne(bar, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com:5432//bar/')
+        
+
 class TestVirtualRoot(unittest.TestCase):
     def setUp(self):
         cleanUp()
