@@ -3,6 +3,11 @@ Next Release
 Bug Fixes
 ---------
 
+- lru cache was unstable under concurrency (big surprise) when it
+  tried to redelete a key in the cache that had already been deleted.
+  Symptom: line 64 in put:del data[oldkey]:KeyError: '/some/path'.
+  Now we just ignore the key error if we can't delete the key.
+
 - Empty location names in model paths when generating a URL using
   ``repoze.bfg.model_url`` based on a model obtained via traversal are
   no longer ignored in the generated URL.  This means that if a
@@ -20,6 +25,8 @@ Features
   ``repoze.bfg.traversal.model_path_tuple``,
   ``repoze.bfg.traversal.quote_path_segment``, and
   ``repoze.bfg.url.urlencode``.
+
+- add zip_safe = false to setup.cfg.
 
 Documentation
 -------------

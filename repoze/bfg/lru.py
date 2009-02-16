@@ -61,7 +61,11 @@ class LRUCache(object):
                 try:
                     oldkey = current['key']
                     if oldkey is not _marker:
-                        del data[oldkey]
+                        try:
+                            del data[oldkey]
+                        except KeyError:
+                            # XXX already deleted; seen in wild 5/16/2009?
+                            pass
                     current['key'] = key
                     current['ref'] = True
                     data[key] = (hand, val)
