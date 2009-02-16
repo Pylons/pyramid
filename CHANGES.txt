@@ -1,3 +1,15 @@
+Next release
+============
+
+- Using ``model_url`` or ``model_path`` against a broken model graph
+  (one with models that had a non-root model with a ``__name__`` of
+  ``None``) caused an inscrutable error to be thrown: ( if not
+  ``_must_quote[cachekey].search(s): TypeError: expected string or
+  buffer``).  Now URLs and paths generated against graphs that have
+  None names in intermediate nodes will replace the None with the
+  empty string, and, as a result, the error won't be raised.  Of
+  course the URL or path will still be bogus.
+ 
 0.6.9 (2009-02-16)
 ==================
 

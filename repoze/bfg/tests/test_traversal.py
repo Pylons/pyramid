@@ -418,7 +418,6 @@ class ModelPathTests(unittest.TestCase):
         root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
-        request = DummyRequest()
         result = self._callFUT(root)
         self.assertEqual(result, '/')
         
@@ -429,9 +428,21 @@ class ModelPathTests(unittest.TestCase):
         other = DummyContext()
         other.__parent__ = root
         other.__name__ = 'other'
-        request = DummyRequest()
         result = self._callFUT(other)
         self.assertEqual(result, '/other')
+
+    def test_path_with_None_itermediate_names(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        other = DummyContext()
+        other.__parent__ = root
+        other.__name__ = None
+        other2 = DummyContext()
+        other2.__parent__ = other
+        other2.__name__ = 'other2'
+        result = self._callFUT(other2)
+        self.assertEqual(result, '//other2')
 
 class ModelPathTupleTests(unittest.TestCase):
     def _callFUT(self, model, *elements):
@@ -459,7 +470,6 @@ class ModelPathTupleTests(unittest.TestCase):
         root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
-        request = DummyRequest()
         result = self._callFUT(root)
         self.assertEqual(result, ('',))
         
@@ -470,9 +480,21 @@ class ModelPathTupleTests(unittest.TestCase):
         other = DummyContext()
         other.__parent__ = root
         other.__name__ = 'other'
-        request = DummyRequest()
         result = self._callFUT(other)
         self.assertEqual(result, ('', 'other'))
+
+    def test_path_with_None_itermediate_names(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = None
+        other = DummyContext()
+        other.__parent__ = root
+        other.__name__ = None
+        other2 = DummyContext()
+        other2.__parent__ = other
+        other2.__name__ = 'other2'
+        result = self._callFUT(other2)
+        self.assertEqual(result, ('', '', 'other2'))
 
 class QuotePathSegmentTests(unittest.TestCase):
     def _callFUT(self, s):

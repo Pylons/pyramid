@@ -213,7 +213,7 @@ def model_path_tuple(model, *elements):
 def _model_path_list(model, *elements):
     """ Implementation detail shared by model_path and model_path_tuple """
     lpath = reversed(list(lineage(model))[:-1])
-    path = [ location.__name__ for location in lpath ]
+    path = [ location.__name__ or '' for location in lpath ]
 
     if elements:
         path = path + list(elements)
