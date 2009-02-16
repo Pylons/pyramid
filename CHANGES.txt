@@ -1,12 +1,14 @@
-Next Release
+0.6.9 (2009-02-16)
+==================
 
 Bug Fixes
 ---------
 
-- lru cache was unstable under concurrency (big surprise) when it
+- lru cache was unstable under concurrency (big surprise!) when it
   tried to redelete a key in the cache that had already been deleted.
   Symptom: line 64 in put:del data[oldkey]:KeyError: '/some/path'.
-  Now we just ignore the key error if we can't delete the key.
+  Now we just ignore the key error if we can't delete the key (it has
+  already been deleted).
 
 - Empty location names in model paths when generating a URL using
   ``repoze.bfg.model_url`` based on a model obtained via traversal are
