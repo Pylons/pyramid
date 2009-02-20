@@ -424,12 +424,12 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.water, 1)
 
 class TestDummyTemplateRenderer(unittest.TestCase):
-    def _getTargetClass(self):
+    def _getTargetClass(self, ):
         from repoze.bfg.testing import DummyTemplateRenderer
         return DummyTemplateRenderer
 
-    def _makeOne(self,):
-        return self._getTargetClass()()
+    def _makeOne(self, string_response=''):
+        return self._getTargetClass()(string_response=string_response)
 
     def test_implementation(self):
         renderer = self._makeOne()
@@ -448,4 +448,9 @@ class TestDummyTemplateRenderer(unittest.TestCase):
         self.assertRaises(AssertionError, renderer.assert_, b=3)
         self.failUnless(renderer.assert_(a=1, b=2))
         
+    def test_nondefault_string_response(self):
+        renderer = self._makeOne('abc')
+        result = renderer(a=1, b=2)
+        self.assertEqual(result, 'abc')
+    
         

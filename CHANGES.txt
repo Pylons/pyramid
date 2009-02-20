@@ -9,6 +9,9 @@ Next release
   None names in intermediate nodes will replace the None with the
   empty string, and, as a result, the error won't be raised.  Of
   course the URL or path will still be bogus.
+
+- Make it possible to have ``testing.DummyTemplateRenderer`` return
+  some nondefault string representation.
  
 0.6.9 (2009-02-16)
 ==================

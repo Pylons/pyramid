@@ -184,15 +184,16 @@ class DummyTemplateRenderer:
     key/value pairs. 
     """
 
-    def __init__(self):
+    def __init__(self, string_response=''):
         self._received = {}
+        self.string_response = string_response
         
     def implementation(self):
         return self
     
     def __call__(self, **kw):
         self._received.update(kw)
-        return ''
+        return self.string_response
 
     def __getattr__(self, k):
         """ Backwards compatibiity """
