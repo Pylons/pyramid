@@ -1,12 +1,13 @@
 Next release
 ============
 
-- Add explicit dependencies on ``zope.deferredimport`` and
-  ``zope.deprecation`` for forward compatibility reasons
-  (``zope.component`` will stop relying on ``zope.deferredimport``
-  soon and although we use it directly, it's only a transitive
-  dependency, and ''zope.deprecation`` is used even though it's only a
-  transitive dependency as well).
+- Add explicit dependencies on ``zope.deferredimport``,
+  ``zope.deprecation``, and ``zope.proxy`` for forward compatibility
+  reasons (``zope.component`` will stop relying on
+  ``zope.deferredimport`` soon and although we use it directly, it's
+  only a transitive dependency, and ''zope.deprecation`` and
+  ``zope.proxy`` are used directly even though they're only transitive
+  dependencies as well).
 
 - Using ``model_url`` or ``model_path`` against a broken model graph
   (one with models that had a non-root model with a ``__name__`` of
