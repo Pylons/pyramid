@@ -40,6 +40,8 @@ install_requires=[
     'zope.component',
     'zope.hookable',
     'zope.testing',
+    'zope.deferredimport',
+    'zope.deprecation',
     'repoze.zcml',
     'martian',
     ]
