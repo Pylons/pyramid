@@ -72,7 +72,7 @@ Glossary
     in your :mod:`repoze.bfg` application, you are using URL dispatch.
     See the :ref:`urldispatch_module` for more information.
   Context
-    A object in the system that is found during :term:`traversal` or
+    An object in the system that is found during :term:`traversal` or
     :term:`URL dispatch` based on URL data; if it's found via
     traversal, it's usually a :term:`model` object; if it's found via
     :term:`URL dispatch`, it's a manufactured context object that

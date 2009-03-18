@@ -56,7 +56,7 @@ def find_root(model):
 def find_model(model, path):
     """ Given a model object and a string or tuple representing a path
     (such as the return value of ``model_path`` or
-    ``model_path_tuple``), return an context in this application's
+    ``model_path_tuple``), return a context in this application's
     model graph at the specified path.  The model passed in *must* be
     :term:`location`-aware.  If the path cannot be resolved (if the
     respective node in the graph does not exist), a KeyError will be
