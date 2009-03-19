@@ -68,7 +68,7 @@ class ViewIntegrationTests(unittest.TestCase):
         self.failUnless('Welcome to' in body)
         self.assertEqual(len(result.headerlist), 2)
         self.assertEqual(result.headerlist[0],
-                         ('content-type', 'text/html; charset=UTF-8'))
+                         ('Content-Type', 'text/html; charset=UTF-8'))
         self.assertEqual(result.headerlist[1], ('Content-Length',
                                                 str(len(body))))
 
