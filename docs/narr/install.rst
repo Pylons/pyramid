@@ -14,15 +14,18 @@ under any version of Python before 2.4, and does *not* run under
 Python 3.X.
 
 .. warning:: To succesfully install :mod:`repoze.bfg`, you will need
-   an environment capable of compiling C code.  See the documentation
-   about installing, e.g. ``gcc`` for your system.  Additionally, the
-   Python development libraries for your Python version will need to
-   be installed and the ``lixbml2`` and ``libxslt`` development
-   libraries will need to be installed.  These requirements are often
-   satisfied by installing the ``python-devel``, ``libxml2-devel`` and
-   ``libxslt-devel`` packages into your system.  You will also need
-   :term:`setuptools` installed on within your Python system in order
-   to run the ``easy_install`` command.
+   an environment capable of compiling C code (e.g. ``XCode Tools``
+   will need to be installed if you're using MacOS X, and ``gcc`` and
+   other build tools will need to be installed if you're using other
+   UNIXlike systems).  See the system's documentation about installing
+   this software.  Additionally, the Python development libraries for
+   your Python version will need to be installed and the ``lixbml2``
+   and ``libxslt`` development libraries will need to be installed.
+   These requirements are often satisfied by installing the
+   ``python-devel``, ``libxml2-devel`` and ``libxslt-devel`` packages
+   into your system.  You will also need :term:`setuptools` installed
+   on within your Python system in order to run the ``easy_install``
+   command.
 
 At the time of this writing, ``repoze.bfg`` will not install on
 Windows systems unless you have development tools (e.g. *Visual C++*)
@@ -36,8 +39,8 @@ installed.
    maillist <http://lists.repoze.org/listinfo/repoze-dev>`_ if you'd
    like to try to tackle the job of compilation and maintenance.
 
-Creating a Virtualenv
----------------------
+Installing :mod:`repoze.bfg`
+----------------------------
 
 It is advisable to install :mod:`repoze.bfg` into a :term:`virtualenv`
 in order to obtain isolation from any "system" packages you've got
@@ -72,34 +75,35 @@ setuptools for installation.
 
 To install setuptools by hand, first download `ez_setup.py
 <http://peak.telecommunity.com/dist/ez_setup.py>`_ then invoke it
-using the Python interpreter you want to install setuptools into (you
-may need to be the administrative user on your system to do so,
-depending on the file permissions of your Python files).
+using the Python interpreter you want to install setuptools into.
 
 .. code-block:: bash
 
   $ python ez_setup.py
 
 Once this command is invoked, setuptools should be installed on your
-system.
+system.  If the command fails due to permission errors, you may need
+to be the administrative user on your system to successfully invoke
+the script.
 
-Installing The ``virtualenv`` Package
--------------------------------------
+Installing the ``virtualenv`` Package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you've got setuptools installed, you should install
-:term:`virtualenv`.  This is a package that creates a "virtual" Python
-interpreter.  Software installed into this interpreter will not
-pollute the parent Python, which is useful for evaluation and
-sandboxing.  To install the :term:`virtualenv` package into your
-setuptools-enabled Python interpreter, use the ``easy_install``
-command.
+Once you've got setuptools installed, you should install the
+:term:`virtualenv` package.  To install the :term:`virtualenv` package
+into your setuptools-enabled Python interpreter, use the
+``easy_install`` command.
 
 .. code-block:: bash
 
   $ easy_install virtualenv
 
-Creating a Virtual Python Environment
--------------------------------------
+This command should succeed, and tell you that the virtualenv package
+is now installed.  If it fails due to permission errors, you may need
+to install it as your system's administrative user.
+
+Creating the Virtual Python Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the :term:`virtualenv` package is installed in your Python, you
 can actually create a virtual environment.  To do so, invoke the
@@ -125,7 +129,7 @@ You should perform any following commands that mention a "bin"
 directory from within the ``bfgenv`` virtualenv dir.
 
 Installing :mod:`repoze.bfg` Into the Virtual Python Environment
-----------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After you've got your ``bfgenv`` virtualenv installed, you may install
 :mod:`repoze.bfg` itself using the following commands from within the
@@ -141,8 +145,24 @@ virtualenv (``bfgenv``) directory:
    required.  :mod:`repoze.bfg` software is maintained in its own
    index; :mod:`repoze.bfg` cannot be installed from PyPI.
 
+This command will take longer than the previous ones to complete, as it
+compiles a number of dependencies.
+
+What Gets Installed
+~~~~~~~~~~~~~~~~~~~
+
+When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
+WebOb, Paste, PasteScript, and PasteDeploy libraries are installed.
+
+Additionally, as shown in the next section, PasteScript (aka *paster*)
+templates will be registered that make it easy to start a new
+:mod:`repoze.bfg` project.
+
+Troubleshooting
+---------------
+
 If ``lxml`` Fails to Compile During ``easy_install``
-----------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the installation of :mod:`repoze.bfg` fails due to problems
 compiling ``lxml``, you should try installing ``lxml`` before
@@ -155,7 +175,7 @@ Once that completes, you can start a subsequent ``easy_install`` of
 :mod:`repoze.bfg` as per the instructions above; it should then work.
 
 If You Can't Install Via ``easy_install`` (Alternate Installation)
-------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you can't get :mod:`repoze.bfg` installed using ``easy_install``
 because ``lxml`` fails to compile on your system, you can try the
@@ -167,13 +187,5 @@ instead of your system packages, as version incompatibilities between
 system packages and ``lxml`` versions are typically to blame for
 compilation problems.
 
-What Gets Installed
--------------------
 
-When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
-WebOb, Paste, PasteScript, and PasteDeploy libraries are installed.
-
-Additionally, as shown in the next section, PasteScript (aka *paster*)
-templates will be registered that make it easy to start a new
-:mod:`repoze.bfg` project.
 
