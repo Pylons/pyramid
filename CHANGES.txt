@@ -1,6 +1,12 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- Fix a bug in ``repoze.bfg.wsgi.HTTPException``: the content length
+  was returned as an int rather than as a string.
+ 
 - Add explicit dependencies on ``zope.deferredimport``,
   ``zope.deprecation``, and ``zope.proxy`` for forward compatibility
   reasons (``zope.component`` will stop relying on
@@ -18,9 +24,12 @@ Next release
   empty string, and, as a result, the error won't be raised.  Of
   course the URL or path will still be bogus.
 
+Features
+--------
+
 - Make it possible to have ``testing.DummyTemplateRenderer`` return
   some nondefault string representation.
- 
+
 0.6.9 (2009-02-16)
 ==================
 

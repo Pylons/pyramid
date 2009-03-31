@@ -30,7 +30,7 @@ class TestNotFound(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.failUnless('404 Not Found' in result[0])
         self.assertEqual(L[0][0], '404 Not Found')
-        self.assertEqual(L[0][1], [('Content-Length', len(result[0])),
+        self.assertEqual(L[0][1], [('Content-Length', str(len(result[0]))),
                                    ('Content-Type', 'text/html')])
         
     def test_with_message(self):
@@ -44,7 +44,7 @@ class TestNotFound(unittest.TestCase):
         self.failUnless('404 Not Found' in result[0])
         self.failUnless('&lt;hi!&gt;' in result[0])
         self.assertEqual(L[0][0], '404 Not Found')
-        self.assertEqual(L[0][1], [('Content-Length', len(result[0])),
+        self.assertEqual(L[0][1], [('Content-Length', str(len(result[0]))),
                                    ('Content-Type', 'text/html')])
 
 class TestUnauthorized(unittest.TestCase):
@@ -65,7 +65,7 @@ class TestUnauthorized(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.failUnless('401 Unauthorized' in result[0])
         self.assertEqual(L[0][0], '401 Unauthorized')
-        self.assertEqual(L[0][1], [('Content-Length', len(result[0])),
+        self.assertEqual(L[0][1], [('Content-Length', str(len(result[0]))),
                                    ('Content-Type', 'text/html')])
         
     def test_with_message(self):
@@ -79,7 +79,7 @@ class TestUnauthorized(unittest.TestCase):
         self.failUnless('401 Unauthorized' in result[0])
         self.failUnless('&lt;hi!&gt;' in result[0])
         self.assertEqual(L[0][0], '401 Unauthorized')
-        self.assertEqual(L[0][1], [('Content-Length', len(result[0])),
+        self.assertEqual(L[0][1], [('Content-Length', str(len(result[0]))),
                                    ('Content-Type', 'text/html')])
 
 def dummyapp(environ, start_response):

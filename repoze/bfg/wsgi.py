@@ -44,7 +44,8 @@ class HTTPException(object):
         <html><title>%s</title><body><h1>%s</h1>
         <code>%s</code>
         """ % (self.status, self.status, msg)
-        headers = [('Content-Length', len(html)), ('Content-Type', 'text/html')]
+        headers = [('Content-Length', str(len(html))),
+                   ('Content-Type', 'text/html')]
         start_response(self.status, headers)
         return [html]
 
