@@ -55,6 +55,22 @@ def model_url(model, request, *elements, **kw):
               ``True``.  This means that sequences can be passed as
               values, and a k=v pair will be placed into the query
               string for each value.
+
+    If a keyword argument ``anchor`` is present, its string
+    representation will be used as a named anchor in the generated URL
+    (e.g. if ``anchor`` is passed as ``foo`` and the model URL is
+    ``http://example.com/model/url``, the resulting generated URL will
+    be ``http://example.com/model/url#foo``).
+
+    .. note:: If ``anchor`` is passed as a string, it should be UTF-8
+              encoded. If ``anchor`` is passed as a Unicode object, it
+              will be converted to UTF-8 before being appended to the
+              URL.  The anchor value is not quoted in any way before
+              being appended to the generated URL.
+
+    If both ``anchor`` and ``query`` are specified, the anchor element
+    will always follow the query element,
+    e.g. ``http://example.com?foo=1#bar``.
     """
     
     context_url = queryMultiAdapter((model, request), IContextURL)
@@ -63,17 +79,24 @@ def model_url(model, request, *elements, **kw):
         context_url = TraversalContextURL(model, request)
     model_url = context_url()
 
+    qs = ''
+    anchor = ''
+
     if 'query' in kw:
         qs = '?' + urlencode(kw['query'], doseq=True)
-    else:
-        qs = ''
+
+    if 'anchor' in kw:
+        anchor = kw['anchor']
+        if isinstance(anchor, unicode):
+            anchor = anchor.encode('utf-8')
+        anchor = '#' + anchor
 
     if elements:
         suffix = '/'.join([quote_path_segment(s) for s in elements])
     else:
         suffix = ''
 
-    return model_url + suffix + qs
+    return model_url + suffix + qs + anchor
 
 def urlencode(query, doseq=False):
     """

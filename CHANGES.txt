@@ -30,6 +30,14 @@ Features
 - Make it possible to have ``testing.DummyTemplateRenderer`` return
   some nondefault string representation.
 
+- Added a new ``anchor`` keyword argument to ``model_url``.  If 
+  ``anchor`` is present, its string representation will be used 
+  as a named anchor in the generated URL (e.g. if ``anchor`` is 
+  passed as ``foo`` and the model URL is 
+  ``http://example.com/model/url``, the generated URL will be 
+  ``http://example.com/model/url#foo``).
+
+
 0.6.9 (2009-02-16)
 ==================
 

@@ -77,6 +77,48 @@ class ModelURLTests(unittest.TestCase):
         self.assertEqual(result,
                      'http://example.com/context/a?a=hi+there&b=La+Pe%C3%B1a')
 
+    def test_anchor_is_after_root_when_no_elements(self):
+        self._registerContextURL()
+        context = DummyContext()
+        request = DummyRequest()
+        result = self._callFUT(context, request, anchor='a')
+        self.assertEqual(result,
+                         'http://example.com/context/#a')
+
+    def test_anchor_is_after_elements_when_no_qs(self):
+        self._registerContextURL()
+        context = DummyContext()
+        request = DummyRequest()
+        result = self._callFUT(context, request, 'a', anchor='b')
+        self.assertEqual(result,
+                         'http://example.com/context/a#b')
+
+    def test_anchor_is_after_qs_when_qs_is_present(self):
+        self._registerContextURL()
+        context = DummyContext()
+        request = DummyRequest()
+        result = self._callFUT(context, request, 'a', 
+                                query={'b':'c'}, anchor='d')
+        self.assertEqual(result,
+                         'http://example.com/context/a?b=c#d')
+
+    def test_anchor_is_encoded_utf8_if_unicode(self):
+        self._registerContextURL()
+        context = DummyContext()
+        request = DummyRequest()
+        uc = unicode('La Pe\xc3\xb1a', 'utf-8') 
+        result = self._callFUT(context, request, anchor=uc)
+        self.assertEqual(result,
+                         'http://example.com/context/#La Pe\xc3\xb1a')
+
+    def test_anchor_is_not_urlencoded(self):
+        self._registerContextURL()
+        context = DummyContext()
+        request = DummyRequest()
+        result = self._callFUT(context, request, anchor=' /#')
+        self.assertEqual(result,
+                         'http://example.com/context/# /#')
+
     def test_no_IContextURL_registered(self):
         # falls back to TraversalContextURL
         root = DummyContext()
