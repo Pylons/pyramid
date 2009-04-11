@@ -576,5 +576,130 @@ these will be resolved by the static view as you would expect.
    <http://pythonpaste.org/modules/urlparser.html>`_ for more
    information about ``urlparser.StaticURLParser``.
 
+Using Views to Handle Form Submissions (Unicode and Character Set Issues)
+-------------------------------------------------------------------------
 
+Most web applications need to accept form submissions from web
+browsers and various other clients.  In :mod:`repoze.bfg`, form
+submission handling logic is always part of a :term:`view`.  For a
+general overview of how to handle form submission data using the
+:term:`WebOb` API, see `"Query and POST variables" within the WebOb
+documentation
+<http://pythonpaste.org/webob/reference.html#query-post-variables>`_.
+:mod:`repoze.bfg` defers to WebOb for its request and response
+implementations, and handling form submission data is a property of
+the request implementation.  Understanding WebOb's request API is the
+key to understanding how to process form submission data.
+
+There are some defaults that you need to be aware of when trying to
+handle form submission data in a :mod:`repoze.bfg` view.  Because
+having high-order (non-ASCII) characters in data contained within form
+submissions is exceedingly common, and because the UTF-8 encoding is
+the most common encoding used on the web for non-ASCII character data,
+and because working and storing Unicode values is much saner than
+working with an storing bytestrings, :mod:`repoze.bfg` configures the
+:term:`WebOb` request machinery to attempt to decode form submission
+values into Unicode automatically from the UTF-8 character set
+implicitly.  This implicit decoding happens when view code obtains
+form field values via the :term:`WebOb` ``request.params``,
+``request.GET``, or ``request.POST`` APIs.
+
+For example, let's assume that the following form page is served up to
+a browser client, and its ``action`` points at some :mod:`repoze.bfg`
+view code::
+
+.. code-block: xml
+
+   <html xmlns="http://www.w3.org/1999/xhtml">
+     <head>
+       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+     </head>
+     <form method="POST" action="myview">
+       <div>
+         <input type="text" name="firstname"/>
+       </div> 
+       <div>
+         <input type="text" name="lastname"/>
+       </div>
+       <input type="submit" value="Submit"/>
+     </form>
+   </html>
+
+The ``myview`` view code in the :mod:`repoze.bfg` application *must*
+expect that the values returned by ``request.params`` will be of type
+``unicode``, as opposed to type ``str``. The following will work to
+accept a form post from the above form:
+
+.. code-block:: python
+
+   def myview(context, request):
+       firstname = request.params['firstname']
+       lastname = request.params['lastname']
+
+But the following ``myview`` view code *may not* work, as it tries to
+decode already-decoded (``unicode``) values obtained from
+``request.params``:
+
+.. code-block:: python
+
+   def myview(context, request):
+       # the .decode('utf-8') will break below if there are any high-order
+       # characters in the firstname or lastname
+       firstname = request.params['firstname'].decode('utf-8')
+       lastname = request.params['lastname'].decode('utf-8')
+
+For implicit decoding to work reliably, you must ensure that every
+form you render that posts to a :mod:`repoze.bfg` view is rendered via
+a response that has a ``;charset=UTF-8`` in its ``Content-Type``
+header; or, as in the form above, with a ``meta http-equiv`` tag that
+implies that the charset is UTF-8 within the HTML ``head`` of the page
+containing the form.  This must be done explicitly because all known
+browser clients assume that they should encode form data in the
+character set implied by ``Content-Type`` value of the response
+containing the form when subsequently submitting that form; there is
+no other generally accepted way to tell browser clients which charset
+to use to encode form data.  If you do not specify an encoding
+explicitly, the browser client will choose to encode form data in its
+default character set before submitting it.  The browser client may
+have a non-UTF-8 default encoding.  If such a request is handled by
+your view code, when the form submission data is encoded in a non-UTF8
+charset, eventually the WebOb request code accessed within your view
+will throw an error when it can't decode some high-order character
+encoded in another character set within form data e.g. when
+``request.params['somename']`` is accessed.
+
+If you are using the ``webob.Response`` class to generate a response,
+or if you use the ``render_template``* templating APIs, the UTF-8
+charset is set automatically as the default via the ``Content-Type``
+header.  If you return a ``Content-Type`` header without an explicit
+charset, a WebOb request will add a ``;charset=utf-8`` trailer to the
+``Content-Type`` header value for you for response content types that
+are textual (e.g. ``text/html``, ``application/xml``, etc) as it is
+rendered.  If you are using your own response object, you will need to
+ensure you do this yourself.
+
+To avoid implicit form submission value decoding, so that the values
+returned from ``request.params``, ``request.GET`` and ``request.POST``
+are returned as bytestrings rather than Unicode, add the following to
+your application's ``configure.zcml``::
+
+    <subscriber for="repoze.bfg.interfaces.INewRequest"
+                handler="repoze.bfg.request.make_request_ascii"/>
+
+You can then control form post data decoding "by hand" as necessary.
+For example, when this subscriber is active, the second example above
+will work unconditionally as long as you ensure that your forms are
+rendered in a request that has a ``;charset=utf-8`` stanza on its
+``Content-Type`` header.
+
+.. note:: The behavior that form values are decoded from UTF-8 to
+   Unicode implicitly was introduced in :mod:`repoze.bfg` 0.7.0.
+   Previous versions of :mod:`repoze.bfg` performed no implicit
+   decoding of form values (the default was to treat values as
+   bytestrings).
+
+.. note:: Only the *values* of request params obtained via
+   ``request.params``, ``request.GET`` or ``request.POST`` are decoded
+   to Unicode objects implicitly by :mod:`repoze.bfg`.  The keys are
+   still strings.
 

@@ -37,6 +37,30 @@ Features
   ``http://example.com/model/url``, the generated URL will be 
   ``http://example.com/model/url#foo``).
 
+Backwards Incompatibilities
+---------------------------
+
+- The default request charset encoding is now ``utf-8``.  As a result,
+  the request machinery will attempt to decode values from the utf-8
+  encoding to Unicode automatically when they are obtained via
+  ``request.params``, ``request.GET``, and ``request.POST``.  The
+  previous behavior of BFG was to return a bytestring when a value was
+  accessed in this manner.  This change will break form handling code
+  in apps that rely on values from those APIs being considered
+  bytestrings.  If you are manually decoding values from form
+  submissions in your application, you'll either need to change the
+  code that does that to expect Unicode values from
+  ``request.params``, ``request.GET`` and ``request.POST``, or you'll
+  need to explicitly reenable the previous behavior.  To reenable the
+  previous behavior, add the following to your application's
+  ``configure.zcml``::
+
+    <subscriber for="repoze.bfg.interfaces.INewRequest"
+                handler="repoze.bfg.request.make_request_ascii"/>
+
+  See also the documentation in the "Views" chapter of the BFG docs
+  entitled "Using Views to Handle Form Submissions (Unicode and
+  Character Set Issues)".
 
 0.6.9 (2009-02-16)
 ==================
