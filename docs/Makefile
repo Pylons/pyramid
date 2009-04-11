@@ -31,6 +31,12 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in .build/html."
 
+text:
+	mkdir -p .build/text .build/doctrees
+	$(SPHINXBUILD) -b text $(ALLSPHINXOPTS) .build/text
+	@echo
+	@echo "Build finished. The HTML pages are in .build/text."
+
 pickle:
 	mkdir -p .build/pickle .build/doctrees
 	$(SPHINXBUILD) -b pickle $(ALLSPHINXOPTS) .build/pickle
