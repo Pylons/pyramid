@@ -1,5 +1,5 @@
-Next release
-============
+0.7.0 (2009-04-11)
+==================
 
 Bug Fixes
 ---------
@@ -61,6 +61,13 @@ Backwards Incompatibilities
   See also the documentation in the "Views" chapter of the BFG docs
   entitled "Using Views to Handle Form Submissions (Unicode and
   Character Set Issues)".
+
+Documentation
+-------------
+
+- Add a section to the narrative Views chapter entitled "Using Views
+  to Handle Form Submissions (Unicode and Character Set Issues)"
+  explaining implicit decoding of form data values.
 
 0.6.9 (2009-02-16)
 ==================
