@@ -599,16 +599,16 @@ the most common encoding used on the web for non-ASCII character data,
 and because working and storing Unicode values is much saner than
 working with an storing bytestrings, :mod:`repoze.bfg` configures the
 :term:`WebOb` request machinery to attempt to decode form submission
-values into Unicode automatically from the UTF-8 character set
-implicitly.  This implicit decoding happens when view code obtains
-form field values via the :term:`WebOb` ``request.params``,
-``request.GET``, or ``request.POST`` APIs.
+values into Unicode from the UTF-8 character set implicitly.  This
+implicit decoding happens when view code obtains form field values via
+the :term:`WebOb` ``request.params``, ``request.GET``, or
+``request.POST`` APIs.
 
 For example, let's assume that the following form page is served up to
 a browser client, and its ``action`` points at some :mod:`repoze.bfg`
-view code::
+view code:
 
-.. code-block: xml
+.. code-block:: xml
 
    <html xmlns="http://www.w3.org/1999/xhtml">
      <head>
