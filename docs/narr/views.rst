@@ -700,6 +700,6 @@ rendered in a request that has a ``;charset=utf-8`` stanza on its
 
 .. note:: Only the *values* of request params obtained via
    ``request.params``, ``request.GET`` or ``request.POST`` are decoded
-   to Unicode objects implicitly by :mod:`repoze.bfg`.  The keys are
-   still strings.
+   to Unicode objects implicitly in :mod:`repoze.bfg`'s default
+   configuration.  The keys are still strings.
 
