@@ -346,14 +346,14 @@ class DummyRequest:
             cookies = {}
         self.environ = environ
         self.headers = headers
-        self.params = FauxMultiDict(params)
+        self.params = params
         self.cookies = cookies
-        self.GET = FauxMultiDict(params)
+        self.GET = params
         if post is not None:
             self.method = 'POST'
             self.POST = post
         else:
-            self.POST = FauxMultiDict(params)
+            self.POST = params
         self.host_url = self.application_url
         self.path_url = self.application_url
         self.url = self.application_url
@@ -368,17 +368,3 @@ class DummyRequest:
         self.marshalled = params # repoze.monty
         self.__dict__.update(kw)
 
-class FauxMultiDict(dict):
-    """ GET, POST, and params attrs of WebOb requests are not actually
-    dictionaries; they are 'multi dicts', which means in the actual
-    implementation they can have more than one value per key.  We fake
-    out a multidict here, although our implementation does not allow
-    for more than one value per key. """
-    def getall(self, key):
-        """ Return a single-valued sequence containing the value for
-        key, e.g. ['value']."""
-        val = self.get(key, _marker)
-        if val is _marker:
-            return []
-        return [val]
-    

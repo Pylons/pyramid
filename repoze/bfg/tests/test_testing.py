@@ -423,50 +423,6 @@ class TestDummyRequest(unittest.TestCase):
         request = self._makeOne(water = 1)
         self.assertEqual(request.water, 1)
 
-    def test_paramcompare(self):
-        request = self._makeOne(params={'foo': 'bar'})
-        self.assertEqual(request.params, {'foo':'bar'})
-        self.assertEqual(request.GET, {'foo':'bar'})
-
-class TestFauxMultiDict(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.testing import FauxMultiDict
-        return FauxMultiDict
-
-    def _makeOne(self, dict=None):
-        klass = self._getTargetClass()
-        if dict is not None:
-            return klass(dict)
-        return klass()
-
-    def test_getall_nodefault(self):
-        inst = self._makeOne()
-        inst['a'] = 'b'
-        self.assertEqual(inst.getall('a'), ['b'])
-
-    def test_getall_withdefault(self):
-        inst = self._makeOne({'a':'b'})
-        self.assertEqual(inst.getall('a'), ['b'])
-
-    def test_getall_notexist(self):
-        inst = self._makeOne({'a':'b'})
-        self.assertEqual(inst.getall('nope'), [])
-
-    def test_repr(self):
-        inst = self._makeOne({'a':'b'})
-        r = repr(inst)
-        self.assertEqual(r, "{'a': 'b'}")
-
-    def test_eq(self):
-        inst = self._makeOne({'a':'b'})
-        self.assertEqual(inst, {'a':'b'})
-
-    def test_convert_to_dict(self):
-        inst = self._makeOne({'a':'b'})
-        d = dict(inst)
-        self.assertEqual(d, {'a':'b'})
-        
-
 class TestDummyTemplateRenderer(unittest.TestCase):
     def _getTargetClass(self, ):
         from repoze.bfg.testing import DummyTemplateRenderer

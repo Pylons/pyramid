@@ -1,16 +1,3 @@
-Next release
-============
-
-Features
---------
-
-- ``repoze.bfg.testing.DummyRequest`` will now contain ``params``,
-  ``GET``, and ``POST`` attributes that are instances of the class
-  ``FauxMultiDict``.  A FauxMultiDict differs from a "plain"
-  dictionary inasmuch as it has a ``getall`` method.  ``getall`` is an
-  interface exposed by the MultiDict implementation used by WebOb for
-  ``params``, ``GET``, and ``POST``.
-
 0.7.0 (2009-04-11)
 ==================
 
