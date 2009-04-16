@@ -282,6 +282,22 @@ The :term:`context` will always be available to a view as the
 ``context`` attribute of the :term:`request` object.  It will be the
 context object implied by the current request.
 
+The "traversal path" will always be available to a view as the
+``traversed`` attribute of the :term:`request` object.  It will be a
+sequence representing the ordered set of names that were used to
+traverse to the context, not including the view name or subpath.  If
+there is a virtual root associated with request, the virtual root path
+is included within the traversal path.
+
+The :term:`virtual root` will always be available to a view as the
+``virtual_root`` attribute of the :term:`request` object.  It will be
+the virtual root object implied by the current request.
+
+The :term:`virtual root path` will always be available to a view as
+the ``virtual_root_path`` attribute of the :term:`request` object.  It
+will be a sequence representing the ordered set of names that were
+used to traverse to the virtual root obejct.
+
 Unicode and Traversal
 ---------------------
 

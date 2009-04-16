@@ -7,3 +7,4 @@
 
   .. autofunction:: wsgiapp
 
+  .. autofunction:: wsgiapp2

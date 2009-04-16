@@ -1,3 +1,62 @@
+Next release
+============
+
+Features
+--------
+
+- The interface for ``repoze.bfg.interfaces.ITraverser`` and the
+  built-in implementations that implement the interface
+  (``repoze.bfg.traversal.ModelGraphTraverser``, and
+  ``repoze.bfg.urldispatch.RoutesModelTraverser``) now expect the
+  ``__call__`` method of an ITraverser to return 3 additional
+  arguments: ``traversed``, ``virtual_root``, and
+  ``virtual_root_path`` (the old contract was that the ``__call__``
+  method of an ITraverser returned; three arguments, the contract new
+  is that it returns six).  ``traversed`` will be a sequence of
+  Unicode names that were traversed (including the virtual root path,
+  if any) or ``None`` if no traversal was performed, ``virtual_root``
+  will be a model object representing the virtual root (or the
+  physical root if traversal was not performed), and
+  ``virtual_root_path`` will be a sequence representing the virtual
+  root path (a sequence of Unicode names) or ``None`` if traversal was
+  not performed.
+
+  Six arguments are now returned from BFG ITraversers.  They are
+  returned in this order: ``context``, ``view_name``, ``subpath``,
+  ``traversed``, ``virtual_root``, and ``virtual_root_path``.
+
+  Places in the BFG code which called an ITraverser continue to accept
+  a 3-argument return value, although BFG will generate and log a
+  warning when one is encountered.
+
+- The request object now has the following attributes: ``traversed``
+  (the sequence of names traversed or ``None`` if traversal was not
+  performed), ``virtual_root`` (the model object representing the
+  virtual root, including the virtual root path if any), and
+  ``virtual_root_path`` (the seuquence of names representing the
+  virtual root path or ``None`` if traversal was not performed).
+
+- A new decorator named ``wsgiapp2`` was added to the
+  ``repoze.bfg.wsgi`` module.  This decorator performs the same
+  function as ``repoze.bfg.wsgi.wsgiapp`` except it fixes up the
+  ``SCRIPT_NAME``, and ``PATH_INFO`` environment values before
+  invoking the WSGI subapplication.
+
+- The ``repoze.bfg.testing.DummyRequest`` object now has default
+  attributes for ``traversed``, ``virtual_root``, and
+  ``virtual_root_path``.
+
+- The RoutesModelTraverser now behaves more like the Routes
+  "RoutesMiddleware" object when an element in the match dict is named
+  ``path_info`` (usually when there's a pattern like
+  ``http://foo/*path_info``).  When this is the case, the
+  ``PATH_INFO`` environment variable is set to the value in the match
+  dict, and the ``SCRIPT_NAME`` is appended to with the prefix of the
+  original ``PATH_INFO`` not including the value of the new variable.
+
+- The notfound debug now shows the traversed path, the virtual root,
+  and the virtual root path too.
+
 0.7.0 (2009-04-11)
 ==================
 

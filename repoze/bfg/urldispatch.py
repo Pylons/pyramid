@@ -1,3 +1,5 @@
+import re
+
 from zope.interface import implements
 from zope.interface import alsoProvides
 
@@ -210,26 +212,40 @@ class RoutesModelTraverser(object):
         # compatibility
         try:
             # 0.6.5 +
-            routing_args = environ['wsgiorg.routing_args'][1]
+            match = environ['wsgiorg.routing_args'][1]
         except KeyError:
             # <= 0.6.4
-            routing_args = self.context.__dict__
+            match = self.context.__dict__
         try:
-            view_name = routing_args['view_name']
+            view_name = match['view_name']
         except KeyError:
             # b/w compat < 0.6.3
             try:
-                view_name = routing_args['controller']
+                view_name = match['controller']
             except KeyError:
                 view_name = ''
         try:
-            subpath = routing_args['subpath']
+            subpath = match['subpath']
             subpath = filter(None, subpath.split('/'))
         except KeyError:
             # b/w compat < 0.6.5
             subpath = []
 
-        return self.context, view_name, subpath
+        if 'path_info' in match:
+            # this is stolen from routes.middleware; if the route map
+            # has a *path_info capture, use it to influence the path
+            # info and script_name of the generated environment
+            oldpath = environ['PATH_INFO']
+            newpath = match['path_info'] or ''
+            environ['PATH_INFO'] = newpath
+            if not environ['PATH_INFO'].startswith('/'):
+                environ['PATH_INFO'] = '/' + environ['PATH_INFO']
+            pattern = r'^(.*?)/' + re.escape(newpath) + '$'
+            environ['SCRIPT_NAME'] += re.sub(pattern, r'\1', oldpath)
+            if environ['SCRIPT_NAME'].endswith('/'):
+                environ['SCRIPT_NAME'] = environ['SCRIPT_NAME'][:-1]
+
+        return self.context, view_name, subpath, None, self.context, None
 
 class RoutesContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context

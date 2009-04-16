@@ -160,6 +160,7 @@ class DummyContext:
 
 class DummyRequest:
     subpath = ('__init__.py',)
+    traversed = None
     environ = {'REQUEST_METHOD':'GET', 'wsgi.version':(1,0)}
     def get_response(self, application):
         return application(None, None)

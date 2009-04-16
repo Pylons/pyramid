@@ -72,6 +72,7 @@ class Router(object):
         self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
         self.root_factory = registry.getUtility(IRootFactory)
         self.root_policy = self.root_factory # b/w compat
+        self.traverser_warned = {}
 
     def __call__(self, environ, start_response):
         """
@@ -99,7 +100,24 @@ class Router(object):
             registry.has_listeners and registry.notify(NewRequest(request))
             root = self.root_factory(environ)
             traverser = registry.getAdapter(root, ITraverserFactory)
-            context, view_name, subpath = traverser(environ)
+            vals = traverser(environ)
+
+            try:
+                context, view_name, subpath, traversed, vroot, vroot_path = vals
+            except ValueError:
+                if not (traverser.__class__ in self.traverser_warned):
+                    self.logger and self.logger.warn(
+                        '%s is an pre-0.7.1-style ITraverser returning only '
+                        '3 arguments; please update it to the new '
+                        '6-argument-returning interface for improved '
+                        'functionality.  See the repoze.bfg.interfaces module '
+                        'for the new ITraverser interface '
+                        'definition' % traverser)
+                    self.traverser_warned[traverser.__class__] = True
+                context, view_name, subpath = vals
+                traversed = []
+                vroot = root
+                vroot_path = []
 
             if isinstance(request, WebObRequest):
                 # webob.Request's __setattr__ (as of 0.9.5 and lower)
@@ -111,11 +129,17 @@ class Router(object):
                 attrs['context'] = context
                 attrs['view_name'] = view_name
                 attrs['subpath'] = subpath
+                attrs['traversed'] = traversed
+                attrs['virtual_root'] = vroot
+                attrs['virtual_root_path'] = vroot_path
             else:
                 request.root = root
                 request.context = context
                 request.view_name = view_name
                 request.subpath = subpath
+                request.traversed = traversed
+                request.virtual_root = vroot
+                request.virtual_root_path = vroot_path
 
             security_policy = self.security_policy
 
@@ -156,9 +180,10 @@ class Router(object):
                 if self.debug_notfound:
                     msg = (
                         'debug_notfound of url %s; path_info: %r, context: %r, '
-                        'view_name: %r, subpath: %r' % (
+                        'view_name: %r, subpath: %r, traversed: %r, '
+                        'vroot: %r,  vroot_path: %r' % (
                         request.url, request.path_info, context, view_name,
-                        subpath)
+                        subpath, traversed, vroot, vroot_path)
                         )
                     logger and logger.debug(msg)
                 else:

@@ -2,6 +2,7 @@ import re
 import urllib
 
 from zope.component import getMultiAdapter
+from zope.component import queryUtility
 
 from zope.deferredimport import deprecated
    
@@ -18,6 +19,7 @@ from repoze.bfg.interfaces import ILocation
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import VH_ROOT_KEY
+from repoze.bfg.interfaces import ILogger
 
 deprecated(
     "('from repoze.bfg.traversal import model_url' is now "
@@ -111,7 +113,21 @@ def find_model(model, path):
     if path and path[0] == '/':
         model = find_root(model)
 
-    ob, name, _ = ITraverserFactory(model)({'PATH_INFO':path})
+    traverser = ITraverserFactory(model)
+    val = traverser({'PATH_INFO':path})
+    try:
+        ob, name, _, _, _, _ = val
+    except ValueError:
+        # b/w compat for three-value-returning ITraverser (prior to 0.7.1)
+        logger = queryUtility(ILogger, 'repoze.bfg.debug')
+        logger and logger.warn(
+            '%s is an pre-0.7.1-style ITraverser returning only '
+            '3 arguments; please update it to the new '
+            '6-argument-returning interface for improved '
+            'functionality.  See the repoze.bfg.interfaces module '
+            'for the new ITraverser interface '
+            'definition' % traverser)
+        ob, name, _ = val
     if name:
         raise KeyError('%r has no subelement %s' % (ob, name))
     return ob
@@ -375,35 +391,45 @@ class ModelGraphTraverser(object):
         except KeyError:
             path = '/'
         try:
-            vroot = environ[VH_ROOT_KEY]
-            path = vroot + path
+            vroot_path_string = environ[VH_ROOT_KEY]
         except KeyError:
-            pass
-            
-        path = traversal_path(path)
+            vroot_path = []
+            vroot_idx = 0
+        else:
+            vroot_path = list(traversal_path(vroot_path_string))
+            vroot_idx = len(vroot_path)
+            path = vroot_path_string + path
 
-        ob = self.root
+        path = list(traversal_path(path))
+
+        traversed = []
+
+        ob = vroot = self.root
         name = ''
         locatable = ILocation.providedBy(ob)
 
         i = 1
+
         for segment in path:
             if segment[:2] =='@@':
-                return ob, segment[2:], list(path[i:])
+                return ob, segment[2:], path[i:], traversed, vroot, vroot_path
             try:
                 getitem = ob.__getitem__
             except AttributeError:
-                return ob, segment, list(path[i:])
+                return ob, segment, path[i:], traversed, vroot, vroot_path
             try:
                 next = getitem(segment)
             except KeyError:
-                return ob, segment, list(path[i:])
+                return ob, segment, path[i:], traversed, vroot, vroot_path
             if locatable and (not ILocation.providedBy(next)):
                 next = LocationProxy(next, ob, segment)
+            if vroot_idx == i-1:
+                vroot = ob
+            traversed.append(segment)
             ob = next
             i += 1
 
-        return ob, '', []
+        return ob, '', [], traversed, vroot, vroot_path
 
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context

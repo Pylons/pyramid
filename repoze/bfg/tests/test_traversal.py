@@ -83,70 +83,95 @@ class ModelGraphTraverserTests(unittest.TestCase):
     def test_call_with_no_pathinfo(self):
         policy = self._makeOne(None)
         environ = self._getEnviron()
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(ctx, None)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])
+        self.assertEqual(traversed, [])
+        self.assertEqual(vroot, policy.root)
+        self.assertEqual(vroot_path, [])
 
     def test_call_pathel_with_no_getitem(self):
         policy = self._makeOne(None)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(ctx, None)
         self.assertEqual(name, 'foo')
         self.assertEqual(subpath, ['bar'])
+        self.assertEqual(traversed, [])
+        self.assertEqual(vroot, policy.root)
+        self.assertEqual(vroot_path, [])
 
     def test_call_withconn_getitem_emptypath_nosubpath(self):
         root = DummyContext()
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='')
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(ctx, root)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])
+        self.assertEqual(traversed, [])
+        self.assertEqual(vroot, root)
+        self.assertEqual(vroot_path, [])
 
     def test_call_withconn_getitem_withpath_nosubpath(self):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(ctx, foo)
         self.assertEqual(name, 'bar')
         self.assertEqual(subpath, [])
+        self.assertEqual(traversed, [u'foo'])
+        self.assertEqual(vroot, root)
+        self.assertEqual(vroot_path, [])
 
     def test_call_withconn_getitem_withpath_withsubpath(self):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz/buz')
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(ctx, foo)
         self.assertEqual(name, 'bar')
         self.assertEqual(subpath, ['baz', 'buz'])
+        self.assertEqual(traversed, [u'foo'])
+        self.assertEqual(vroot, root)
+        self.assertEqual(vroot_path, [])
 
     def test_call_with_explicit_viewname(self):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/@@foo')
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(ctx, root)
         self.assertEqual(name, 'foo')
         self.assertEqual(subpath, [])
+        self.assertEqual(traversed, [])
+        self.assertEqual(vroot, root)
+        self.assertEqual(vroot_path, [])
 
     def test_call_with_vh_root(self):
         environ = self._getEnviron(PATH_INFO='/baz',
                                    HTTP_X_VHM_ROOT='/foo/bar')
         baz = DummyContext()
+        baz.name = 'baz'
         bar = DummyContext(baz)
+        bar.name = 'bar'
         foo = DummyContext(bar)
+        foo.name = 'foo'
         root = DummyContext(foo)
+        root.name = 'root'
         policy = self._makeOne(root)
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(ctx, baz)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])
+        self.assertEqual(traversed, [u'foo', u'bar', u'baz'])
+        self.assertEqual(vroot, bar)
+        self.assertEqual(vroot_path, [u'foo', u'bar'])
 
     def test_call_with_ILocation_root_proxies(self):
         baz = DummyContext()
@@ -161,7 +186,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         root.__parent__ = None
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz')
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])
         self.assertEqual(ctx, baz)
@@ -177,6 +202,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.failIf(isProxy(ctx.__parent__.__parent__.__parent__))
         self.assertEqual(ctx.__parent__.__parent__.__parent__.__name__, None)
         self.assertEqual(ctx.__parent__.__parent__.__parent__.__parent__, None)
+        self.assertEqual(traversed, [u'foo', u'bar', u'baz'])
+        self.assertEqual(vroot, root)
+        self.assertEqual(vroot_path, [])
 
     def test_call_with_ILocation_root_proxies_til_next_ILocation(self):
         # This is a test of an insane setup; it tests the case where
@@ -200,7 +228,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         root.__parent__ = None
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz')
-        ctx, name, subpath = policy(environ)
+        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
         self.assertEqual(name, '')
         self.assertEqual(subpath, [])
         self.assertEqual(ctx, baz)
@@ -208,6 +236,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(ctx.__name__, 'baz')
         self.assertEqual(ctx.__parent__, bar)
         self.failIf(isProxy(ctx.__parent__))
+        self.assertEqual(traversed, [u'foo', u'bar', u'baz'])
+        self.assertEqual(vroot, root)
+        self.assertEqual(vroot_path, [])
 
     def test_non_utf8_path_segment_unicode_path_segments_fails(self):
         foo = DummyContext()

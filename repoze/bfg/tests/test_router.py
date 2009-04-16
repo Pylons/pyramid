@@ -21,6 +21,7 @@ class RouterTests(unittest.TestCase):
                 self.messages = []
             def info(self, msg):
                 self.messages.append(msg)
+            warn = info
             debug = info
         logger = Logger()
         self.registry.registerUtility(logger, ILogger, name='repoze.bfg.debug')
@@ -92,6 +93,28 @@ class RouterTests(unittest.TestCase):
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
         self.assertEqual(router.root_policy, rootfactory)
+
+    def test_3arg_policy(self):
+        rootfactory = make_rootfactory(None)
+        environ = self._makeEnviron()
+        context = DummyContext()
+        traversalfactory = make_3arg_traversal_factory(context, '', [])
+        self._registerTraverserFactory(traversalfactory, '', None)
+        logger = self._registerLogger()
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.failUnless(traversalfactory in router.traverser_warned)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '404 Not Found')
+        self.failUnless('http://localhost:8080' in result[0], result)
+        self.failIf('debug_notfound' in result[0])
+        self.assertEqual(len(logger.messages), 1)
+        message = logger.messages[0]
+        self.failUnless('is an pre-0.7.1-style ITraverser ' in message)
 
     def test_call_no_view_registered_no_isettings(self):
         rootfactory = make_rootfactory(None)
@@ -717,7 +740,17 @@ def make_view(response):
         return response
     return view
 
-def make_traversal_factory(context, name, subpath):
+def make_traversal_factory(context, name, subpath, vroot=None,
+                           vroot_path=(), traversed=()):
+    class DummyTraversalFactory:
+        def __init__(self, root):
+            self.root = root
+
+        def __call__(self, path):
+            return context, name, subpath, traversed, vroot, vroot_path
+    return DummyTraversalFactory
+
+def make_3arg_traversal_factory(context, name, subpath):
     class DummyTraversalFactory:
         def __init__(self, root):
             self.root = root
@@ -725,6 +758,7 @@ def make_traversal_factory(context, name, subpath):
         def __call__(self, path):
             return context, name, subpath
     return DummyTraversalFactory
+
 
 def make_permission_factory(result):
     class DummyPermissionFactory:

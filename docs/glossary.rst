@@ -339,3 +339,8 @@ Glossary
     alternative mechanisms for common :mod:`repoze.bfg` application
     configuration tasks.  The functionality of this package has been
     merged into the :mod:`repoze.bfg` core as of version 0.6.3.
+  Virtual root
+    A model object representing the "virtual" root of a request; this
+    is typically the physical root object (the object returned by the
+    application root factory) unless :ref:`vhosting_chapter` is in
+    use.

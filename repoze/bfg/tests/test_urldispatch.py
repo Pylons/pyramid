@@ -248,6 +248,9 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[0], model)
         self.assertEqual(result[1], 'controller')
         self.assertEqual(result[2], [])
+        self.assertEqual(result[3], None)
+        self.assertEqual(result[4], model)
+        self.assertEqual(result[5], None)
 
     def test_call_with_only_view_name_bwcompat(self):
         model = DummyContext()
@@ -257,6 +260,9 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[0], model)
         self.assertEqual(result[1], 'view_name')
         self.assertEqual(result[2], [])
+        self.assertEqual(result[3], None)
+        self.assertEqual(result[4], model)
+        self.assertEqual(result[5], None)
 
     def test_call_with_subpath_bwcompat(self):
         model = DummyContext()
@@ -267,6 +273,9 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[0], model)
         self.assertEqual(result[1], 'view_name')
         self.assertEqual(result[2], ['a', 'b', 'c'])
+        self.assertEqual(result[3], None)
+        self.assertEqual(result[4], model)
+        self.assertEqual(result[5], None)
 
     def test_call_with_no_view_name_or_controller_bwcompat(self):
         model = DummyContext()
@@ -275,6 +284,9 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[0], model)
         self.assertEqual(result[1], '')
         self.assertEqual(result[2], [])
+        self.assertEqual(result[3], None)
+        self.assertEqual(result[4], model)
+        self.assertEqual(result[5], None)
 
     def test_call_with_only_view_name(self):
         model = DummyContext()
@@ -285,6 +297,9 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[0], model)
         self.assertEqual(result[1], 'view_name')
         self.assertEqual(result[2], [])
+        self.assertEqual(result[3], None)
+        self.assertEqual(result[4], model)
+        self.assertEqual(result[5], None)
 
     def test_call_with_view_name_and_subpath(self):
         model = DummyContext()
@@ -295,6 +310,25 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(result[0], model)
         self.assertEqual(result[1], 'view_name')
         self.assertEqual(result[2], ['a', 'b','c'])
+        self.assertEqual(result[3], None)
+        self.assertEqual(result[4], model)
+        self.assertEqual(result[5], None)
+
+    def test_with_path_info(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        routing_args = ((), {'view_name':'view_name', 'path_info':'foo/bar'})
+        environ = {'wsgiorg.routing_args': routing_args,
+                   'PATH_INFO':'/a/b/foo/bar', 'SCRIPT_NAME':''}
+        result = traverser(environ)
+        self.assertEqual(result[0], model)
+        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[2], [])
+        self.assertEqual(result[3], None)
+        self.assertEqual(result[4], model)
+        self.assertEqual(result[5], None)
+        self.assertEqual(environ['PATH_INFO'], '/foo/bar')
+        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
 
 class RoutesContextURLTests(unittest.TestCase):
     def _getTargetClass(self):
