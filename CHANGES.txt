@@ -4,6 +4,9 @@ Next release
 Features
 --------
 
+- Added better documentation for virtual hosting at a URL prefix
+  within the virtual hosting docs chapter.
+
 - The interface for ``repoze.bfg.interfaces.ITraverser`` and the
   built-in implementations that implement the interface
   (``repoze.bfg.traversal.ModelGraphTraverser``, and
