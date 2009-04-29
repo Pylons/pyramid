@@ -382,6 +382,7 @@ _marker = object()
 class ModelGraphTraverser(object):
     classProvides(ITraverserFactory)
     implements(ITraverser)
+    SUPPLY_LOCATION_PROXIES = False
     def __init__(self, root):
         self.root = root
 
@@ -406,7 +407,7 @@ class ModelGraphTraverser(object):
 
         ob = vroot = self.root
         name = ''
-        locatable = ILocation.providedBy(ob)
+        locatable = self.SUPPLY_LOCATION_PROXIES and ILocation.providedBy(ob)
 
         i = 1
 
@@ -430,6 +431,9 @@ class ModelGraphTraverser(object):
             i += 1
 
         return ob, '', [], traversed, vroot, vroot_path
+
+class WrappingModelGraphTraverser(ModelGraphTraverser):
+    SUPPLY_LOCATION_PROXIES = True
 
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context

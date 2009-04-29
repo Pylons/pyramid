@@ -173,6 +173,28 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(vroot, bar)
         self.assertEqual(vroot_path, [u'foo', u'bar'])
 
+    def test_non_utf8_path_segment_unicode_path_segments_fails(self):
+        foo = DummyContext()
+        root = DummyContext(foo)
+        policy = self._makeOne(root)
+        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        environ = self._getEnviron(PATH_INFO='/%s' % segment)
+        self.assertRaises(TypeError, policy, environ)
+
+    def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
+        foo = DummyContext()
+        root = DummyContext(foo)
+        policy = self._makeOne(root)
+        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
+        environ = self._getEnviron(PATH_INFO='/%s' % segment)
+        self.assertRaises(TypeError, policy, environ)
+
+class WrappingModelGraphTraverserTests(ModelGraphTraverserTests):
+ 
+    def _getTargetClass(self):
+        from repoze.bfg.traversal import WrappingModelGraphTraverser
+        return WrappingModelGraphTraverser
+
     def test_call_with_ILocation_root_proxies(self):
         baz = DummyContext()
         bar = DummyContext(baz)
@@ -239,22 +261,6 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(traversed, [u'foo', u'bar', u'baz'])
         self.assertEqual(vroot, root)
         self.assertEqual(vroot_path, [])
-
-    def test_non_utf8_path_segment_unicode_path_segments_fails(self):
-        foo = DummyContext()
-        root = DummyContext(foo)
-        policy = self._makeOne(root)
-        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
-        environ = self._getEnviron(PATH_INFO='/%s' % segment)
-        self.assertRaises(TypeError, policy, environ)
-
-    def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
-        foo = DummyContext()
-        root = DummyContext(foo)
-        policy = self._makeOne(root)
-        segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
-        environ = self._getEnviron(PATH_INFO='/%s' % segment)
-        self.assertRaises(TypeError, policy, environ)
 
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):

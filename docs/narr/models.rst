@@ -110,6 +110,19 @@ root node says it implements the ``ILocation`` :term:`interface`,
 will dynamically assign a ``__name__`` and a ``__parent__`` to it,
 recursively.
 
+.. note::
+   In order to use this feature, you must register the
+   ``WrappingModelGraphTraverser`` as the traversal policy, rather
+   than the standard ``ModelGraphTraverser``.  E.g., your application
+   will need to have the following in its ``configure.zcml``::
+
+    <adapter
+        factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
+        provides="repoze.bfg.interfaces.ITraverserFactory"
+        for="*"
+    />
+
+
 If you choose to make use of the location-based dynamic assignment of
 ``__parent__`` and ``__name__``, the root node must have a
 ``__parent__`` that is ``None``, a ``__name__`` with any value, and it

@@ -179,6 +179,18 @@ during traversal in a *location proxy* that has both the ``__name__``
 and ``__parent__`` attributes, but otherwise acts the same as your
 model object.
 
+.. note::
+   In order to use this feature, you must register the
+   ``WrappingModelGraphTraverser`` as the traversal policy, rather
+   than the standard ``ModelGraphTraverser``.  E.g., your application
+   will need to have the following in its ``configure.zcml``::
+
+    <adapter
+        factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
+        provides="repoze.bfg.interfaces.ITraverserFactory"
+        for="*"
+    />
+
 You can of course supply ``__name__`` and ``__parent__`` attributes
 explicitly on all of your model objects, and no location proxying will
 be performed.
