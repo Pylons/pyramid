@@ -330,6 +330,16 @@ class RoutesModelTraverserTests(unittest.TestCase):
         self.assertEqual(environ['PATH_INFO'], '/foo/bar')
         self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
 
+    def test_with_path_info_PATH_INFO_w_extra_slash(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        routing_args = ((), {'view_name':'view_name', 'path_info':'foo/bar'})
+        environ = {'wsgiorg.routing_args': routing_args,
+                   'PATH_INFO':'/a/b//foo/bar', 'SCRIPT_NAME':''}
+        result = traverser(environ)
+        self.assertEqual(environ['PATH_INFO'], '/foo/bar')
+        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
+
 class RoutesContextURLTests(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.urldispatch import RoutesContextURL
