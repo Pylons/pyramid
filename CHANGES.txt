@@ -1,6 +1,21 @@
 Next release
 ============
 
+Backwards Incompatibilities
+---------------------------
+
+- The traversal feature which wrapped non-ILocation subobjects in
+  proxies has been disabled by default.  In order to enable it, register
+  the ``WrappingModelGraphTraverser`` as the traversal policy, rather
+  than the standard ``ModelGraphTraverser``.  E.g., your application
+  will need to have the following in its ``configure.zcml``::
+
+    <adapter
+        factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
+        provides="repoze.bfg.interfaces.ITraverserFactory"
+        for="*"
+        />
+
 Features
 --------
 
