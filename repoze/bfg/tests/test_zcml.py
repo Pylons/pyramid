@@ -599,6 +599,19 @@ class TestZCMLPickling(unittest.TestCase):
         cPickle.dump(data, open(picklename, 'wb'))
         self.assertEqual(False, zcml_configure('configure.zcml', self.module))
 
+    def test_zcml_configure_uses_file_configure_with_bad_actions2(self):
+        import cPickle
+        import os
+        import time
+        from repoze.bfg.zcml import zcml_configure
+        from repoze.bfg.zcml import PVERSION
+        picklename = os.path.join(self.packagepath, 'configure.zcml.cache')
+        f = open(picklename, 'wb')
+        actions = [(None, None, None, None, None)]
+        data = (PVERSION, time.time()+500, actions)
+        cPickle.dump(data, open(picklename, 'wb'))
+        self.assertEqual(False, zcml_configure('configure.zcml', self.module))
+
     def test_zcml_configure_uses_good_pickle(self):
         import os
         import cPickle
