@@ -153,7 +153,6 @@ class TestGrokkedApp(unittest.TestCase):
         actions = context.actions
         import cPickle
         self.assertRaises(cPickle.PicklingError, cPickle.dumps, actions, -1)
-        self.assertEqual(len(actions), 7)
 
 class DummyContext:
     pass
