@@ -2,9 +2,9 @@ from cgi import escape
 
 try:
     from functools import wraps
-except ImportError:
+except ImportError:                         #pragma NO COVERAGE
     # < 2.5
-    from repoze.bfg.functional import wraps
+    from repoze.bfg.functional import wraps #pragma NO COVERAGE
 
 from repoze.bfg.traversal import quote_path_segment
 
