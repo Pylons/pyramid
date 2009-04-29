@@ -4,9 +4,8 @@ import threading
 
 try:
     from functools import wraps
-except ImportError:
-    # < 2.5
-    from repoze.bfg.functional import wraps
+except ImportError: # < 2.5                     #pragma NO COVERAGE
+    from repoze.bfg.functional import wraps     #pragma NO COVERAGE
 
 _marker = object()
 
@@ -60,12 +59,8 @@ class LRUCache(object):
                 lock.acquire()
                 try:
                     oldkey = current['key']
-                    if oldkey is not _marker:
-                        try:
-                            del data[oldkey]
-                        except KeyError:
-                            # XXX already deleted; seen in wild 5/16/2009?
-                            pass
+                    if oldkey in data:
+                        del data[oldkey]
                     current['key'] = key
                     current['ref'] = True
                     data[key] = (hand, val)
