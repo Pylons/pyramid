@@ -4,9 +4,9 @@ from repoze.bfg.chameleon_zpt import render_template_to_response
 
 try:
     from functools import wraps
-except ImportError:
+except ImportError:                         #pragma NO COVERAGE
     # < 2.5
-    from repoze.bfg.functional import wraps
+    from repoze.bfg.functional import wraps #pragma NO COVERAGE
 
 class pushpage(object):
     """ Decorator for a function which returns a response object after
