@@ -4,11 +4,25 @@ Next release
 Backwards Incompatibilities
 ---------------------------
 
-- The traversal feature which wrapped non-ILocation subobjects in
-  proxies has been disabled by default.  In order to enable it, register
-  the ``WrappingModelGraphTraverser`` as the traversal policy, rather
-  than the standard ``ModelGraphTraverser``.  E.g., your application
-  will need to have the following in its ``configure.zcml``::
+- In all previous releases, to support "toy" applications, which use,
+  for instance, a dictionary as the root object as opposed to an
+  object that supplies the ILocation interface (a ``__parent__``
+  attribute and a ``__name__`` attribute), :mod:`repoze.bfg` provided
+  some "help" during traversal.  This traversal feature wrapped
+  subobjects that did not implement ``ILocation`` in proxies which
+  automatically provided them with a ``__name__`` and ``__parent__``
+  attribute based on the name being traversed.  This feature has now
+  been disabled in the default configuration for purposes of speed.
+  In order to satisfy the new default, your root object and all
+  published subobjects should supply a ``__parent__`` attribute (which
+  is a reference to its direct traversal parent) and a ``__name__``
+  attribute.
+
+  In order to re-enable the ILocation wrapper behavior for older
+  applications which cannot be changed, register the
+  ``WrappingModelGraphTraverser`` as the traversal policy, rather than
+  the standard ``ModelGraphTraverser``.  E.g., your application will
+  need to have the following in its ``configure.zcml``::
 
     <adapter
         factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
