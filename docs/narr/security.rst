@@ -150,18 +150,12 @@ Location-Awareness
 In order to allow the security machinery to perform ACL inheritance,
 model objects must provide *location-awareness*.  Providing
 location-awareness means two things: the root object in the graph must
-have a ``_name__`` and a ``__parent__`` attribute and the root object
-must be declared to implement the ``repoze.bfg.interfaces.ILocation``
-interface.  For example:
+have a ``_name__`` attribute and a ``__parent__`` attribute.
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.interfaces import ILocation
-   from zope.interface import implements
-
    class Blog(object):
-       implements(ILocation)
        __name__ = ''
        __parent__ = None
 
@@ -170,33 +164,8 @@ is said to be *location-aware*.  Location-aware objects define an
 ``__parent__`` attribute which points at their parent object.  The
 root object's ``__parent__`` is ``None``.
 
-If the root object in a :mod:`repoze.bfg` application declares that it
-implements the ``repoze.bfg.interfaces.ILocation`` interface, it is
-assumed that the objects in the rest of the model are location-aware.
-If those objects are not explictly location-aware, if the root object
-is marked as ``ILocation``, the bfg framework will wrap each object
-during traversal in a *location proxy* that has both the ``__name__``
-and ``__parent__`` attributes, but otherwise acts the same as your
-model object.
-
-.. note::
-   In order to use this feature, you must register the
-   ``WrappingModelGraphTraverser`` as the traversal policy, rather
-   than the standard ``ModelGraphTraverser``.  E.g., your application
-   will need to have the following in its ``configure.zcml``::
-
-    <adapter
-        factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
-        provides="repoze.bfg.interfaces.ITraverserFactory"
-        for="*"
-    />
-
-You can of course supply ``__name__`` and ``__parent__`` attributes
-explicitly on all of your model objects, and no location proxying will
-be performed.
-
 See :ref:`location_module` for documentations of functions which use
-location-awareness.
+location-awareness.  See also :ref:`location_aware`.
 
 .. _debug_authorization_section:
 
