@@ -180,11 +180,8 @@ def model_path(model, *elements):
               effectively replaced with a leading ``/``) when the path
               is generated.
     """
-    path_list = _model_path_list(model, *elements)
-    if path_list:
-        path_list = [ quote_path_segment(name) for name in path_list ]
-        return '/' + '/'.join(path_list)
-    return '/'
+    path = _model_path_list(model, *elements)
+    return path and '/'.join([quote_path_segment(x) for x in path]) or '/'
 
 def model_path_tuple(model, *elements):
     """
@@ -220,19 +217,13 @@ def model_path_tuple(model, *elements):
               always be ignored (and effectively replaced with ``''``)
               when the path is generated.
     """
-    path = _model_path_list(model, *elements)
-    if path:
-        return ('',) + tuple(path)
-    return ('',)
+    return tuple(_model_path_list(model, *elements))
 
 def _model_path_list(model, *elements):
     """ Implementation detail shared by model_path and model_path_tuple """
-    lpath = reversed(list(lineage(model))[:-1])
+    lpath = reversed(list(lineage(model)))
     path = [ location.__name__ or '' for location in lpath ]
-
-    if elements:
-        path = path + list(elements)
-
+    path.extend(elements)
     return path
 
 def virtual_root(model, request):

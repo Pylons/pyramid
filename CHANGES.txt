@@ -98,6 +98,9 @@ Features
 - The notfound debug now shows the traversed path, the virtual root,
   and the virtual root path too.
 
+- Speed up / clarify 'traversal' module's 'model_path', 'model_path_tuple',
+  and '_model_path_list' functions.
+
 0.7.0 (2009-04-11)
 ==================
 
