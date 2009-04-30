@@ -15,7 +15,6 @@ from repoze.bfg.location import lineage
 from repoze.bfg.lru import lru_cache
 
 from repoze.bfg.interfaces import IContextURL
-from repoze.bfg.interfaces import ILocation
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import VH_ROOT_KEY
