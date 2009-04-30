@@ -92,29 +92,49 @@ instance nodes in the graph:
 Location-Aware Model Instances
 ------------------------------
 
-For :mod:`repoze.bfg` security and convenience URL-generation
-functions to work properly against a model instance graph, all nodes
-in the graph should have two attributes:: ``__parent__`` and
-``__name__``.  The ``__parent__`` attribute should be a reference to
-the node's parent model instance in the graph.  The ``__name__``
-attribute should be the name that a node's parent refers to the node
-by via ``__getitem__``.
+In order for :mod:`repoze.bfg` location, security, URL-generation, and
+traversal functions (such as the functions exposed in
+:ref:`location_module`, :ref:`traversal_module`, and :ref:`url_module`
+as well as certain functions in :ref:`security_module` ) to work
+properly against a instances in a model graph, all nodes in the graph
+must be "location-aware".  This means they must have two attributes:
+``__parent__`` and ``__name__``.  The ``__parent__`` attribute should
+be a reference to the node's parent model instance in the graph.  The
+``__name__`` attribute should be the name that a node's parent refers
+to the node via ``__getitem__``.  The ``__parent__`` of the root
+object should be ``None`` and its ``__name__`` should be the empty
+string.  For instance:
 
-If you choose not to manage the ``__name__`` and ``__parent__``
-attributes of your models "by hand", :mod:`repoze.bfg`` is willing to
-help you do this.  If your "root" node claims it implements the
-interface ``repoze.bfg.interfaces.ILocation``, you don't need to
-manage these attributes by hand.  During :term:`traversal`, if the
-root node says it implements the ``ILocation`` :term:`interface`,
-:mod:`repoze.bfg` will wrap each child in a ``LocationProxy`` which
-will dynamically assign a ``__name__`` and a ``__parent__`` to it,
-recursively.
+.. code-block:: python
+
+   class MyRootObject(object):
+       __name__ = ''
+       __parent__ = None
+
+A node returned from the root item's ``__getitem__`` method should
+have a ``__parent__`` attribute that is a reference to the root
+object, and its ``__name__`` attribute should match the name by which
+it is are reachable via the root object's ``__getitem__``.  *That*
+object's ``__getitem__`` should return objects that have a
+``__parent__`` attribute that points at that object, and
+``__getitem__``-returned objects should have a ``__name__`` attribute
+that matches the name by which they are retrieved via ``__getitem__``,
+and so on.
 
 .. note::
-   In order to use this feature, you must register the
-   ``WrappingModelGraphTraverser`` as the traversal policy, rather
-   than the standard ``ModelGraphTraverser``.  E.g., your application
-   will need to have the following in its ``configure.zcml``::
+
+  If you'd rather not manage the ``__name__`` and ``__parent__``
+  attributes of your models "by hand", :mod:`repoze.bfg`` can help you
+  do this.
+
+  In order to use this helper feature, you must first register the
+  ``WrappingModelGraphTraverser`` as the traversal policy, rather than
+  the default ``ModelGraphTraverser``. To register the
+  ``WrappingModelGraphTraverser`` as the traversal policy, your
+  application will need to have the following in its
+  ``configure.zcml`` file:
+
+  .. code-block:: xml
 
     <adapter
         factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
@@ -122,24 +142,13 @@ recursively.
         for="*"
     />
 
-
-If you choose to make use of the location-based dynamic assignment of
-``__parent__`` and ``__name__``, the root node must have a
-``__parent__`` that is ``None``, a ``__name__`` with any value, and it
-must provide the ``repoze.bfg.interfaces.ILocation`` interface.  The
-easiest way to do this is to claim that the class representing the
-root node ``implements(ILocation)``:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.interfaces import ILocation
-   from zope.interface import implements
-
-   class MyRootObject(object):
-       implements(ILocation)
-       __parent__ = None
-       __name__ = ''
+  If this statement is made in ZCML, you don't need to manage the
+  ``__parent__`` and ``__name__`` attributes on graph objects "by
+  hand".  Instead, as necessary, during traversal :mod:`repoze.bfg`
+  will wrap each object in a ``LocationProxy`` which will dynamically
+  assign a ``__name__`` and a ``__parent__`` to the traversed object
+  (based on the last traversed object and the name supplied to
+  ``__getitem__``).
 
 :mod:`repoze.bfg` API Functions That Act Against Models
 -------------------------------------------------------

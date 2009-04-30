@@ -380,9 +380,11 @@ def quote_path_segment(segment):
 _marker = object()
 
 class ModelGraphTraverser(object):
+    """ A model graph traverser that should be used (for speed) when
+    every object in the graph supplies a ``__name__`` and
+    ``__parent__`` attribute (ie. every object 'provides ILocation') ."""
     classProvides(ITraverserFactory)
     implements(ITraverser)
-    SUPPLY_LOCATION_PROXIES = False
     def __init__(self, root):
         self.root = root
 
@@ -407,7 +409,6 @@ class ModelGraphTraverser(object):
 
         ob = vroot = self.root
         name = ''
-        locatable = self.SUPPLY_LOCATION_PROXIES and ILocation.providedBy(ob)
 
         i = 1
 
@@ -422,8 +423,6 @@ class ModelGraphTraverser(object):
                 next = getitem(segment)
             except KeyError:
                 return ob, segment, path[i:], traversed, vroot, vroot_path
-            if locatable and (not ILocation.providedBy(next)):
-                next = LocationProxy(next, ob, segment)
             if vroot_idx == i-1:
                 vroot = ob
             traversed.append(segment)
@@ -433,7 +432,57 @@ class ModelGraphTraverser(object):
         return ob, '', [], traversed, vroot, vroot_path
 
 class WrappingModelGraphTraverser(ModelGraphTraverser):
-    SUPPLY_LOCATION_PROXIES = True
+    """ A model graph traverser that should be used (for convenience)
+    when no object in the graph supplies either a ``__name__`` or a
+    ``__parent__`` attribute (ie. no object 'provides ILocation') ."""
+    classProvides(ITraverserFactory)
+    implements(ITraverser)
+    def __init__(self, root):
+        self.root = root
+
+    def __call__(self, environ, _marker=_marker):
+        try:
+            path = environ['PATH_INFO']
+        except KeyError:
+            path = '/'
+        try:
+            vroot_path_string = environ[VH_ROOT_KEY]
+        except KeyError:
+            vroot_path = []
+            vroot_idx = 0
+        else:
+            vroot_path = list(traversal_path(vroot_path_string))
+            vroot_idx = len(vroot_path)
+            path = vroot_path_string + path
+
+        path = list(traversal_path(path))
+
+        traversed = []
+
+        ob = vroot = LocationProxy(self.root)
+        name = ''
+
+        i = 1
+
+        for segment in path:
+            if segment[:2] =='@@':
+                return ob, segment[2:], path[i:], traversed, vroot, vroot_path
+            try:
+                getitem = ob.__getitem__
+            except AttributeError:
+                return ob, segment, path[i:], traversed, vroot, vroot_path
+            try:
+                next = getitem(segment)
+            except KeyError:
+                return ob, segment, path[i:], traversed, vroot, vroot_path
+            next = LocationProxy(next, ob, segment)
+            if vroot_idx == i-1:
+                vroot = ob
+            traversed.append(segment)
+            ob = next
+            i += 1
+
+        return ob, '', [], traversed, vroot, vroot_path
 
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context

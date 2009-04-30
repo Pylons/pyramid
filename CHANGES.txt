@@ -4,31 +4,40 @@ Next release
 Backwards Incompatibilities
 ---------------------------
 
-- In all previous releases, to support "toy" applications, which use,
-  for instance, a dictionary as the root object as opposed to an
-  object that supplies the ILocation interface (a ``__parent__``
-  attribute and a ``__name__`` attribute), :mod:`repoze.bfg` provided
-  some "help" during traversal.  This traversal feature wrapped
-  subobjects that did not implement ``ILocation`` in proxies which
-  automatically provided them with a ``__name__`` and ``__parent__``
-  attribute based on the name being traversed.  This feature has now
-  been disabled in the default configuration for purposes of speed.
-  In order to satisfy the new default, your root object and all
-  published subobjects should supply a ``__parent__`` attribute (which
-  is a reference to its direct traversal parent) and a ``__name__``
-  attribute.
+- In all previous releases, by default, if the root object supplied
+  the``repoze.bfg.interfaces.ILocation`` interface, but the children
+  returned via its ``__getitem__`` did not return objects that
+  implemented the same interface, :mod:`repoze.bfg` provided some
+  implicit help during traversal.  This traversal feature wrapped
+  subobjects from the root that did not implement ``ILocation`` in
+  proxies which automatically provided them with a ``__name__`` and
+  ``__parent__`` attribute based on the name being traversed and the
+  previous object traversed.  This feature has now been disabled in
+  the default configuration for purposes of speed and
+  understandability.
 
   In order to re-enable the ILocation wrapper behavior for older
   applications which cannot be changed, register the
   ``WrappingModelGraphTraverser`` as the traversal policy, rather than
-  the standard ``ModelGraphTraverser``.  E.g., your application will
-  need to have the following in its ``configure.zcml``::
+  the default ``ModelGraphTraverser``. To use this feature, your
+  application will need to have the following in its
+  ``configure.zcml``::
 
     <adapter
         factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
         provides="repoze.bfg.interfaces.ITraverserFactory"
         for="*"
         />
+
+   When this ITraverserFactory is used, no object in the graph (even
+   the root object) must supply a ``__name__`` or ``__parent__``
+   attribute.  Even if subobjects returned from the root *do*
+   implement the ILocation interface, these will still be wrapped in
+   proxies that override the object's "real" ``__parent__`` and
+   ``__name__`` attributes.
+
+   See also changes to the "Models" chapter of the documentation (in
+   the "Location-Aware Model Instances") section.
 
 Features
 --------
