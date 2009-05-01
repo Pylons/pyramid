@@ -79,8 +79,6 @@ Other backwards incompatibilities:
   ``chameleon.zpt`` PageTemplateFile implementation used to return a
   string, but now returns Unicode.
 
-XXX get rid of zope.deferredimport (it relies on zope.proxy)
-
 0.7.1 (2009-05-01)
 ==================
 
