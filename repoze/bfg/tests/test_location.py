@@ -17,8 +17,6 @@ class TestLocation(unittest.TestCase):
 
     def test_locate(self):
         from repoze.bfg.location import locate
-        from repoze.bfg.location import LocationProxy
-        
         a = Location()
         parent = Location()
         a_located = locate(a, parent, 'a')
@@ -30,40 +28,6 @@ class TestLocation(unittest.TestCase):
         a_located_2 = locate(a_located, parent, 'a')
         self.failUnless(a_located_2 is a_located)
 
-        # If the object does not provide ILocation a LocationProxy is returned:
-
-        l = [1, 2, 3]
-        parent = Location()
-        l_located = locate(l, parent, 'l')
-        self.assertEqual(l_located, [1, 2, 3])
-        self.failUnless(l_located.__parent__ is parent)
-        self.assertEqual(l_located.__name__, 'l')
-        self.failIf(l_located is l)
-        self.assertEqual(type(l_located), LocationProxy)
-
-        l_located_2 = locate(l_located, parent, 'l')
-        self.failUnless(l_located_2 is l_located)
-        # When changing the name, we still do not get a different proxied
-        # object:
-
-        l_located_3 = locate(l_located, parent, 'new-name')
-        self.failUnless(l_located_3 is l_located_2)
-
-    def test_LocationProxy(self):
-        from repoze.bfg.location import LocationProxy
-        from repoze.bfg.interfaces import ILocation
-        l = [1, 2, 3]
-        self.assertEqual(ILocation.providedBy(l), False)
-        p = LocationProxy(l, "Dad", "p")
-        self.assertEqual(p, [1, 2, 3])
-        self.assertEqual(ILocation.providedBy(p), True)
-        self.assertEqual(p.__parent__, 'Dad')
-        self.assertEqual(p.__name__, 'p')
-        import pickle
-        self.assertRaises(TypeError, pickle.dumps, p)
-        # Proxies should get their doc strings from the object they proxy:
-        self.assertEqual(p.__doc__, l.__doc__)
-
     def test_lineage(self):
         from repoze.bfg.location import lineage
         o1 = Location()
@@ -74,28 +38,6 @@ class TestLocation(unittest.TestCase):
         self.assertEqual(result, [o3, o2, o1])
         result = list(lineage(o1))
         self.assertEqual(result, [o1])
-
-class TestClassAndInstanceDescr(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.location import ClassAndInstanceDescr
-        return ClassAndInstanceDescr
-
-    def _makeOne(self, *arg):
-        return self._getTargetClass()(*arg)
-
-    def test__get__noinst(self):
-        def f(ob):
-            return ob
-        ob = self._makeOne(f, f)
-        result = ob.__get__(None, 1)
-        self.assertEqual(result, 1)
-    
-    def test__get__withinst(self):
-        def f(ob):
-            return ob
-        ob = self._makeOne(f, f)
-        result = ob.__get__(1, 2)
-        self.assertEqual(result, 1)
 
 from repoze.bfg.interfaces import ILocation
 from zope.interface import implements

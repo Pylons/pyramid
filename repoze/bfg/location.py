@@ -12,14 +12,10 @@
 #
 ##############################################################################
 
-"""Location support borrowed from ``zope.location``, but without
-``zope.security`` support, which is not used by ``repoze.bfg``
+"""Location support loosely based from ``zope.location``, but without
+``zope.security`` support or proxy support, neither of which is used
+by ``repoze.bfg``
 """
-
-import zope.interface
-from repoze.bfg.interfaces import ILocation
-from zope.proxy import ProxyBase, getProxiedObject, non_overridable
-from zope.proxy.decorator import DecoratorSpecificationDescriptor
 
 def inside(model1, model2):
     """Is ``model1`` 'inside' ``model2``?  Return ``True`` if so, else
@@ -38,25 +34,13 @@ def inside(model1, model2):
 
 def locate(model, parent, name=None):
     """
-    If ``model`` explicitly provides the
-    ``repoze.bfg.interfaces.ILocation`` interface, directly set
-    ``model`` 's ``__parent__`` attribute to the ``parent`` object
-    (also a model), and its ``__name__`` to the supplied ``name``
-    argument, and return the model.
-
-    If ``model`` does *not* explicitly provide the
-    ``repoze.bfg.interfaces.ILocation`` interface, return a
-    ``LocationProxy`` object representing ``model`` with its
-    ``__parent__`` attribute assigned to ``parent`` and a ``__name__``
-    attribute assigned to ``__name__``.  A ``LocationProxy`` object is
-    an unpickleable proxy that can 'stand in' for arbitrary object
-    instances.
+    Directly set ``model`` 's ``__parent__`` attribute to the
+    ``parent`` object (also a model), and its ``__name__`` to the
+    supplied ``name`` argument, and return the model.
     """
-    if ILocation.providedBy(model):
-        model.__parent__ = parent
-        model.__name__ = name
-        return model
-    return LocationProxy(model, parent, name)
+    model.__parent__ = parent
+    model.__name__ = name
+    return model
 
 def lineage(model):
     """
@@ -82,47 +66,4 @@ def lineage(model):
     while model is not None:
         yield model
         model = getattr(model, '__parent__', None)
-
-class ClassAndInstanceDescr(object):
-
-    def __init__(self, *args):
-        self.funcs = args
-
-    def __get__(self, inst, cls):
-        if inst is None:
-            return self.funcs[1](cls)
-        return self.funcs[0](inst)
-
-class LocationProxy(ProxyBase):
-    """Location-object proxy
-
-    This is a non-picklable proxy that can be put around objects that
-    don't implement `ILocation`.
-    """
-
-    zope.interface.implements(ILocation)
-
-    __slots__ = '__parent__', '__name__'
-    __safe_for_unpickling__ = True
-
-    def __new__(self, ob, container=None, name=None):
-        return ProxyBase.__new__(self, ob)
-
-    def __init__(self, ob, container=None, name=None):
-        ProxyBase.__init__(self, ob)
-        self.__parent__ = container
-        self.__name__ = name
-
-    @non_overridable
-    def __reduce__(self, proto=None):
-        raise TypeError("Not picklable")
-
-    __doc__ = ClassAndInstanceDescr(
-        lambda inst: getProxiedObject(inst).__doc__,
-        lambda cls, __doc__ = __doc__: __doc__,
-        )
-
-    __reduce_ex__ = __reduce__
-
-    __providedBy__ = DecoratorSpecificationDescriptor()
 

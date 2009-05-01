@@ -179,6 +179,8 @@ class IWSGIApplicationCreatedEvent(IObjectEvent):
     
     app = Attribute(u"Published application")
 
+# this interface, even if it becomes unused within BFG, is imported by
+# other packages (such as repoze.bfg.traversalwrapper)
 class ILocation(Interface):
     """Objects that have a structural location"""
 
@@ -223,4 +225,6 @@ class IContextURL(Interface):
     def __call__():
         """ Return a URL that points to the context """
 
-VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'
+# VH_ROOT_KEY is an interface; its imported from other packages (e.g.
+# traversalwrapper)
+VH_ROOT_KEY = 'HTTP_X_VHM_ROOT' 

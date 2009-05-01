@@ -9,7 +9,6 @@ from zope.deferredimport import deprecated
 from zope.interface import classProvides
 from zope.interface import implements
 
-from repoze.bfg.location import LocationProxy
 from repoze.bfg.location import lineage
 
 from repoze.bfg.lru import lru_cache
@@ -413,59 +412,6 @@ class ModelGraphTraverser(object):
                 next = getitem(segment)
             except KeyError:
                 return ob, segment, path[i:], traversed, vroot, vroot_path
-            if vroot_idx == i-1:
-                vroot = ob
-            traversed.append(segment)
-            ob = next
-            i += 1
-
-        return ob, '', [], traversed, vroot, vroot_path
-
-class WrappingModelGraphTraverser(ModelGraphTraverser):
-    """ A model graph traverser that should be used (for convenience)
-    when no object in the graph supplies either a ``__name__`` or a
-    ``__parent__`` attribute (ie. no object 'provides ILocation') ."""
-    classProvides(ITraverserFactory)
-    implements(ITraverser)
-    def __init__(self, root):
-        self.root = root
-
-    def __call__(self, environ, _marker=_marker):
-        try:
-            path = environ['PATH_INFO']
-        except KeyError:
-            path = '/'
-        try:
-            vroot_path_string = environ[VH_ROOT_KEY]
-        except KeyError:
-            vroot_path = []
-            vroot_idx = 0
-        else:
-            vroot_path = list(traversal_path(vroot_path_string))
-            vroot_idx = len(vroot_path)
-            path = vroot_path_string + path
-
-        path = list(traversal_path(path))
-
-        traversed = []
-
-        ob = vroot = LocationProxy(self.root)
-        name = ''
-
-        i = 1
-
-        for segment in path:
-            if segment[:2] =='@@':
-                return ob, segment[2:], path[i:], traversed, vroot, vroot_path
-            try:
-                getitem = ob.__getitem__
-            except AttributeError:
-                return ob, segment, path[i:], traversed, vroot, vroot_path
-            try:
-                next = getitem(segment)
-            except KeyError:
-                return ob, segment, path[i:], traversed, vroot, vroot_path
-            next = LocationProxy(next, ob, segment)
             if vroot_idx == i-1:
                 vroot = ob
             traversed.append(segment)

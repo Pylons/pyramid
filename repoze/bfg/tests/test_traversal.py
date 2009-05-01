@@ -189,40 +189,6 @@ class ModelGraphTraverserTests(unittest.TestCase):
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         self.assertRaises(TypeError, policy, environ)
 
-class WrappingModelGraphTraverserTests(ModelGraphTraverserTests):
- 
-    def _getTargetClass(self):
-        from repoze.bfg.traversal import WrappingModelGraphTraverser
-        return WrappingModelGraphTraverser
-
-    def test_call_proxies(self):
-        baz = DummyContext()
-        bar = DummyContext(baz)
-        foo = DummyContext(bar)
-        root = DummyContext(foo)
-        from zope.proxy import isProxy
-        policy = self._makeOne(root)
-        environ = self._getEnviron(PATH_INFO='/foo/bar/baz')
-        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
-        self.assertEqual(name, '')
-        self.assertEqual(subpath, [])
-        self.assertEqual(ctx, baz)
-        self.failUnless(isProxy(ctx))
-        self.assertEqual(ctx.__name__, 'baz')
-        self.assertEqual(ctx.__parent__, bar)
-        self.failUnless(isProxy(ctx.__parent__))
-        self.assertEqual(ctx.__parent__.__name__, 'bar')
-        self.assertEqual(ctx.__parent__.__parent__, foo)
-        self.failUnless(isProxy(ctx.__parent__.__parent__))
-        self.assertEqual(ctx.__parent__.__parent__.__name__, 'foo')
-        self.assertEqual(ctx.__parent__.__parent__.__parent__, root)
-        self.failUnless(isProxy(ctx.__parent__.__parent__.__parent__))
-        self.assertEqual(ctx.__parent__.__parent__.__parent__.__name__, None)
-        self.assertEqual(ctx.__parent__.__parent__.__parent__.__parent__, None)
-        self.assertEqual(traversed, [u'foo', u'bar', u'baz'])
-        self.assertEqual(vroot, root)
-        self.assertEqual(vroot_path, [])
-
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from repoze.bfg.traversal import find_interface

@@ -124,31 +124,37 @@ and so on.
 .. note::
 
   If you'd rather not manage the ``__name__`` and ``__parent__``
-  attributes of your models "by hand", :mod:`repoze.bfg`` can help you
-  do this.
+  attributes of your models "by hand", an add-on package to
+  :mod:`repoze.bfg`` named :mod:`repoze.bfg.traversalwrapper` can help
+  you do this.
 
-  In order to use this helper feature, you must first register the
-  ``WrappingModelGraphTraverser`` as the traversal policy, rather than
-  the default ``ModelGraphTraverser``. To register the
-  ``WrappingModelGraphTraverser`` as the traversal policy, your
-  application will need to have the following in its
-  ``configure.zcml`` file:
+  In order to use this helper feature, you must first install the
+  :mod:`repoze.bfg.traversalwrapper` package (available from
+  `http://svn.repoze.org/repoze.bfg.traversalwrapper
+  <http://svn.repoze.org/repoze.bfg.traversalwrapper>`_), then
+  register its ``ModelGraphTraverser`` as the traversal policy, rather
+  than the default BFG ``ModelGraphTraverser``. To register the
+  :mod:`repoze.bfg.traversalwrapper` ``ModelGraphTraverser`` as the
+  traversal policy, your application will need to have the following
+  in its ``configure.zcml`` file:
 
   .. code-block:: xml
 
     <adapter
-        factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
+        factory="repoze.bfg.traversalwrapper.ModelGraphTraverser"
         provides="repoze.bfg.interfaces.ITraverserFactory"
         for="*"
     />
 
-  If this statement is made in ZCML, you don't need to manage the
-  ``__parent__`` and ``__name__`` attributes on graph objects "by
+  If this statement is made in ZCML, you will no longer need to manage
+  the ``__parent__`` and ``__name__`` attributes on graph objects "by
   hand".  Instead, as necessary, during traversal :mod:`repoze.bfg`
-  will wrap each object in a ``LocationProxy`` which will dynamically
-  assign a ``__name__`` and a ``__parent__`` to the traversed object
-  (based on the last traversed object and the name supplied to
-  ``__getitem__``).
+  will wrap each object (even the root object) in a ``LocationProxy``
+  which will dynamically assign a ``__name__`` and a ``__parent__`` to
+  the traversed object (based on the last traversed object and the
+  name supplied to ``__getitem__``).  The root object will have a
+  ``__name__`` attribute of ``None`` and a ``__parent__`` attribute
+  of ``None``.
 
 :mod:`repoze.bfg` API Functions That Act Against Models
 -------------------------------------------------------

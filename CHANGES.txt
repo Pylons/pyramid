@@ -9,12 +9,16 @@ Index-Related
   been superseded by a new index location
   (`http://dist.repoze.org/bfg/current/simple
   <http://dist.repoze.org/bfg/current/simple>`_).  The installation
-  documentation has been updated.  The "lemonade" index still exists,
-  but it is not guaranteed to have the latest BFG software in it, nor
-  will it be maintained in the future.
+  documentation has been updated as well as the ``setup.cfg`` file in
+  this package.  The "lemonade" index still exists, but it is not
+  guaranteed to have the latest BFG software in it, nor will it be
+  maintained in the future.
 
 Features
 --------
+
+- The "paster create" templates have been modified to use links to the
+  new "bfg.repoze.org" and "docs.repoze.org" websites.
 
 - Added better documentation for virtual hosting at a URL prefix
   within the virtual hosting docs chapter.
@@ -78,6 +82,25 @@ Features
 Backwards Incompatibilities
 ---------------------------
 
+- The ``repoze.bfg.location.LocationProxy`` class and the
+  ``repoze.bfg.location.ClassAndInstanceDescr`` class have both been
+  removed in order to be able to eventually shed a dependency on
+  ``zope.proxy``.  Neither of these classes was ever an API.
+
+- In all previous releases, the ``repoze.bfg.location.locate``
+  function worked like so: if a model did not explicitly provide the
+  ``repoze.bfg.interfaces.ILocation`` interface, ``locate`` returned a
+  ``LocationProxy`` object representing ``model`` with its
+  ``__parent__`` attribute assigned to ``parent`` and a ``__name__``
+  attribute assigned to ``__name__``.  In this release, the
+  ``repoze.bfg.location.locate`` function simply jams the ``__name__``
+  and ``__parent__`` attributes on to the supplied model
+  unconditionally, no matter if the object implements ILocation or
+  not, and it never returns a proxy.  This was done because the
+  LocationProxy behavior has now moved into an add-on package
+  (``repoze.bfg.traversalwrapper``), in order to eventually be able to
+  shed a dependency on ``zope.proxy``.
+
 - In all previous releases, by default, if traversal was used (as
   opposed to URL-dispatch), and the root object supplied
   the``repoze.bfg.interfaces.ILocation`` interface, but the children
@@ -88,28 +111,30 @@ Backwards Incompatibilities
   ``ILocation`` in proxies which automatically provided them with a
   ``__name__`` and ``__parent__`` attribute based on the name being
   traversed and the previous object traversed.  This feature has now
-  been disabled in the default configuration for purposes of speed and
-  understandability.
+  been removed from the base ``repoze.bfg`` package for purposes of
+  eventually shedding a dependency on ``zope.proxy``.
 
-  In order to re-enable the ILocation wrapper behavior for older
-  applications which cannot be changed, register the
-  ``WrappingModelGraphTraverser`` as the traversal policy, rather than
-  the default ``ModelGraphTraverser``. To use this feature, your
-  application will need to have the following in its
-  ``configure.zcml``::
+  In order to re-enable the wrapper behavior for older applications
+  which cannot be changed, register the "traversalwrapper"
+  ``ModelGraphTraverser`` as the traversal policy, rather than the
+  default ``ModelGraphTraverser``. To use this feature, you will need
+  to install the ``repoze.bfg.traversalwrapper`` package (an add-on
+  package, available at
+  http://svn.repoze.org/repoze.bfg.traversalwrapper) Then change your
+  application's ``configure.zcml`` to include the following stanza:
 
     <adapter
-        factory="repoze.bfg.traversal.WrappingModelGraphTraverser"
+        factory="repoze.bfg.traversalwrapper.ModelGraphTraverser"
         provides="repoze.bfg.interfaces.ITraverserFactory"
         for="*"
         />
 
-   When this ITraverserFactory is used, no object in the graph (even
-   the root object) must supply a ``__name__`` or ``__parent__``
-   attribute.  Even if subobjects returned from the root *do*
-   implement the ILocation interface, these will still be wrapped in
-   proxies that override the object's "real" ``__parent__`` and
-   ``__name__`` attributes.
+   When this ITraverserFactory is used instead of the default, no
+   object in the graph (even the root object) must supply a
+   ``__name__`` or ``__parent__`` attribute.  Even if subobjects
+   returned from the root *do* implement the ILocation interface,
+   these will still be wrapped in proxies that override the object's
+   "real" ``__parent__`` and ``__name__`` attributes.
 
    See also changes to the "Models" chapter of the documentation (in
    the "Location-Aware Model Instances") section.
