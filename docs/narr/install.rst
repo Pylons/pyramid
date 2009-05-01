@@ -138,12 +138,12 @@ virtualenv (``bfgenv``) directory:
 .. code-block:: bash
    :linenos:
 
-   $ bin/easy_install -i http://dist.repoze.org/lemonade/dev/simple repoze.bfg
+   $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
 
 .. warning:: Note carefully the ``-i
-   http://dist.repoze.org/lemonade/dev/simple`` above.  It is
-   required.  :mod:`repoze.bfg` software is maintained in its own
-   index; :mod:`repoze.bfg` cannot be installed from PyPI.
+   http://dist.repoze.org/bfg/current/simple`` above.  It is required.
+   :mod:`repoze.bfg` software is maintained in its own index;
+   :mod:`repoze.bfg` cannot be installed from PyPI.
 
 This command will take longer than the previous ones to complete, as it
 compiles a number of dependencies.
