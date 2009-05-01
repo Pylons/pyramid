@@ -172,12 +172,14 @@ def model_path(model, *elements):
               instance, if one of the models in your graph has a
               ``__name__`` which (by error) is a dictionary, the
               ``model_path`` function will attempt to append it to a
-              string and it will cause a TypeError.  A single
-              exception to this rule exists: the :term:`root` model
-              may have a ``__name__`` attribute of any value; the
-              value of this attribute will always be ignored (and
-              effectively replaced with a leading ``/``) when the path
-              is generated.
+              string and it will cause a TypeError.
+
+     .. note:: The the :term:`root` model *must* have a ``__name__``
+               attribute with a value of either ``None`` or the empty
+               string for paths to be generated properly.  If the root
+               model has a non-null ``__name__`` attribute, its name
+               will be prepended to the generated path rather than a
+               single leading '/' character.
     """
     path = _model_path_list(model, *elements)
     return path and '/'.join([quote_path_segment(x) for x in path]) or '/'
@@ -210,11 +212,14 @@ def model_path_tuple(model, *elements):
               instance, if one of the models in your graph has a
               ``__name__`` which (by error) is a dictionary, that
               dictionary will be placed in the path tuple; no warning
-              or error will be given.  A single exception to this rule
-              exists: the :term:`root` model may have a ``__name__``
-              attribute of any value; the value of this attribute will
-              always be ignored (and effectively replaced with ``''``)
-              when the path is generated.
+              or error will be given.
+
+     .. note:: The the :term:`root` model *must* have a ``__name__``
+               attribute with a value of either ``None`` or the empty
+               string for path tuples to be generated properly.  If
+               the root model has a non-null ``__name__`` attribute,
+               its name will be the first element in the generated
+               path tuple rather than the empty string.
     """
     return tuple(_model_path_list(model, *elements))
 

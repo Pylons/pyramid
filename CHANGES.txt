@@ -82,6 +82,22 @@ Features
 Backwards Incompatibilities
 ---------------------------
 
+- In previous releases, the ``repoze.bfg.url.model_url``,
+  ``repoze.bfg.traversal.model_path`` and
+  ``repoze.bfg.traversal.model_path_tuple`` functions always ignored
+  the ``__name__`` argument of the root object in a model graph (
+  effectively replacing it with a leading ``/`` in the returned value)
+  when a path or URL was generated.  The code required to perform this
+  operation was not efficient.  As of this release, the root object in
+  a model graph *must* have a ``__name__`` attribute that is either
+  ``None`` or the empty string (``''``) for URLs and paths to be
+  generated properly from these APIs.  If your root model object has a
+  ``__name__`` argument that is not one of these values, you will need
+  to change your code for URLs and paths to be generated properly.  If
+  your model graph has a root node with a string ``__name__`` that is
+  not null, the value of ``__name__`` will be prepended to every path
+  and URL generated.
+
 - The ``repoze.bfg.location.LocationProxy`` class and the
   ``repoze.bfg.location.ClassAndInstanceDescr`` class have both been
   removed in order to be able to eventually shed a dependency on

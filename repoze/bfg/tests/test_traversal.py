@@ -384,7 +384,31 @@ class ModelPathTests(unittest.TestCase):
         root.__name__ = None
         result = self._callFUT(root)
         self.assertEqual(result, '/')
-        
+
+    def test_root_default_emptystring(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = ''
+        result = self._callFUT(root)
+        self.assertEqual(result, '/')
+
+    def test_root_object_nonnull_name_direct(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = 'flubadub'
+        result = self._callFUT(root)
+        self.assertEqual(result, 'flubadub') # insane case
+
+    def test_root_object_nonnull_name_indirect(self):
+        root = DummyContext()
+        root.__parent__ = None
+        root.__name__ = 'flubadub'
+        other = DummyContext()
+        other.__parent__ = root
+        other.__name__ = 'barker'
+        result = self._callFUT(other)
+        self.assertEqual(result, 'flubadub/barker') # insane case
+
     def test_nonroot_default(self):
         root = DummyContext()
         root.__parent__ = None
