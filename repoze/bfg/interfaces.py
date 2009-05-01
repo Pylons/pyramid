@@ -8,13 +8,7 @@ from zope.component.interfaces import IObjectEvent
 deprecated(
     '(repoze.bfg.interfaces.ITemplate should now be imported '
     'as repoze.bfg.interfaces.ITemplateRenderer)',
-    ITemplate = 'repoze.bfg.interfaces:INodeTemplateRenderer',
-    )
-
-deprecated(
-    '(repoze.bfg.interfaces.INodeTemplate should now be imported '
-     'as repoze.bfg.interfaces.INodeTemplateRenderer)',
-    INodeTemplate = 'repoze.bfg.interfaces:INodeTemplateRenderer',
+    ITemplate = 'repoze.bfg.interfaces:ITemplateRenderer',
     )
 
 deprecated(
@@ -111,10 +105,6 @@ class ITemplateRenderer(Interface):
 class ITemplateRendererFactory(Interface):
     def __call__(path, auto_reload=False):
         """ Return an object that implements ``ITemplateRenderer``  """
-
-class INodeTemplateRenderer(Interface):
-    def __call__(node, **kw):
-        """ Return a string result given a node and a template path """
 
 class ISecurityPolicy(Interface):
     """ A utility that provides a mechanism to check authorization

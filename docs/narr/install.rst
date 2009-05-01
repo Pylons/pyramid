@@ -13,31 +13,26 @@ done primarily under Python 2.4.  :mod:`repoze.bfg` does *not* run
 under any version of Python before 2.4, and does *not* run under
 Python 3.X.
 
-.. warning:: To succesfully install :mod:`repoze.bfg`, you will need
-   an environment capable of compiling C code (e.g. ``XCode Tools``
-   will need to be installed if you're using MacOS X, and ``gcc`` and
-   other build tools will need to be installed if you're using other
-   UNIXlike systems).  See the system's documentation about installing
-   this software.  Additionally, the Python development libraries for
-   your Python version will need to be installed and the ``lixbml2``
-   and ``libxslt`` development libraries will need to be installed.
-   These requirements are often satisfied by installing the
-   ``python-devel``, ``libxml2-devel`` and ``libxslt-devel`` packages
-   into your system.  You will also need :term:`setuptools` installed
+.. note:: You will need :term:`setuptools` installed
    on within your Python system in order to run the ``easy_install``
    command.
 
-At the time of this writing, ``repoze.bfg`` will not install on
-Windows systems unless you have development tools (e.g. *Visual C++*)
-installed.
+.. note:: As of version 0.8.0, installation of :mod:`repoze.bfg` does
+   not require the compilation of any C code, so you do not need to
+   have development tools installed on the target machine.
 
-.. note:: If you'd like to help produce and maintain a version of
-   :mod:`repoze.bfg` that works on Windows, we'd love to hear from
-   you.  There's nothing intrinsic about :mod:`repoze.bfg` that would
-   prevent it from running on Windows, but none of the current
-   developers use the platform.  Please contact us via the `repoze.dev
-   maillist <http://lists.repoze.org/listinfo/repoze-dev>`_ if you'd
-   like to try to tackle the job of compilation and maintenance.
+Although BFG is known to run properly on all Unix-like systems, at the
+time of this writing, ``repoze.bfg`` is not tested on Windows systems.
+It might run; it might not.  There's nothing intrinsic about
+:mod:`repoze.bfg` that would prevent it from running on Windows, but
+none of the current developers use the platform.  Likewise for
+platforms like Jython, and Google App Engine; it may run, it may not.
+
+.. note:: If you'd like to help make sure :mod:`repoze.bfg` keeps
+.. running on your favorite alternate platform, we'd love to hear from
+   you.  Please contact us via the `repoze.dev maillist
+   <http://lists.repoze.org/listinfo/repoze-dev>`_ if you'd like to
+   contribute.
 
 Installing :mod:`repoze.bfg`
 ----------------------------
@@ -70,7 +65,7 @@ can usually install a setuptools package using your system's package
 manager.  If you cannot do this, or if you're using a self-installed
 version of Python, you will need to install setuptools "by hand".
 Installing setuptools "by hand" is always a reasonable thing to do,
-even if your package manager already has a prechewed version of
+even if your package manager already has a pre-chewed version of
 setuptools for installation.
 
 To install setuptools by hand, first download `ez_setup.py
@@ -146,46 +141,18 @@ virtualenv (``bfgenv``) directory:
    :mod:`repoze.bfg` cannot be installed from PyPI.
 
 This command will take longer than the previous ones to complete, as it
-compiles a number of dependencies.
+downloads and installs a number of dependencies.
 
 What Gets Installed
 ~~~~~~~~~~~~~~~~~~~
 
 When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
-WebOb, Paste, PasteScript, and PasteDeploy libraries are installed.
+various Chameleon libraries, WebOb, Paste, PasteScript, and
+PasteDeploy libraries are installed.
 
 Additionally, as shown in the next section, PasteScript (aka *paster*)
 templates will be registered that make it easy to start a new
 :mod:`repoze.bfg` project.
-
-Troubleshooting
----------------
-
-If ``lxml`` Fails to Compile During ``easy_install``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If the installation of :mod:`repoze.bfg` fails due to problems
-compiling ``lxml``, you should try installing ``lxml`` before
-installing :mod:`repoze.bfg`.  To do so, invoke ``easy_install``,
-instructing ``lxml`` to download its own copy of ``libxml2``::
-
-  $ STATIC_DEPS=true bin/easy_install lxml
-
-Once that completes, you can start a subsequent ``easy_install`` of
-:mod:`repoze.bfg` as per the instructions above; it should then work.
-
-If You Can't Install Via ``easy_install`` (Alternate Installation)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you can't get :mod:`repoze.bfg` installed using ``easy_install``
-because ``lxml`` fails to compile on your system, you can try the
-`repoze.bfg buildout
-<http://svn.repoze.org/buildouts/repoze.bfg/trunk/README.txt>`_.  This
-installation mechanism builds known-compatible ``libxml2`` and
-``libxslt`` from source and causes ``lxml`` to link against these
-instead of your system packages, as version incompatibilities between
-system packages and ``lxml`` versions are typically to blame for
-compilation problems.
 
 
 

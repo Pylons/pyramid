@@ -1,8 +1,4 @@
-- Document z3c.pt
-
 - WebOb Request basics
-
-- "push" style templating
 
 - Warn if permissions are defined but no security policy is in place.
 

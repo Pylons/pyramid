@@ -17,14 +17,21 @@ complies largely with the `Zope Page Template
 <http://wiki.zope.org/ZPT/FrontPage>`_ template specification and is
 significantly faster.
 
-.. note:: :mod:`repoze.bfg` can also allow for the use of Genshi-style
-   templates via the ``chameleon.genshi`` package, support for which
-   is built-in to :mod:`repoze.bfg`.  The :mod:`repoze.bfg` API
-   functions for getting and rendering Chameleon Genshi-style
-   templates mirrors the Chameleon ZPT-style API completely; only the
-   template files themselves must differ.  See :ref:`template_module`
-   for more information about using Genshi-style templates within
-   :mod:`repoze.bfg`.
+.. note:: The language definition documentation for Chameleon
+   ZPT-style templates is available from `the Chameleon website
+   <http://chameleon.repoze.org>`_.
+
+.. note:: As of version 0.8.0, :mod:`repoze.bfg` no longer supports
+   XSL templates "out of the box".  The :mod:`repoze.bfg.xslt` package
+   is an add-on which provides XSL template bindings.
+
+.. note:: As of version 0.8.0, :mod:`repoze.bfg` no longer supports
+   Genshi-style Chameleon bindings "out of the box".  The
+   :mod:`repoze.bfg.chameleon_genshi` package is an add-on which
+   provides Chameleon Genshi-style template support.
+
+.. note:: Jinja2 template bindings are available for :mod:`repoze.bfg`
+   in the :mod:`repoze.bfg.jinja2` package.
 
 Given that there is a :term:`chameleon.zpt` template named
 ``foo.pt`` in a directory in your application named ``templates``,
@@ -118,49 +125,12 @@ And ``templates/mytemplate.pt`` might look like so:
     <html xmlns="http://www.w3.org/1999/xhtml" 
           xmlns:tal="http://xml.zope.org/namespaces/tal"
           xmlns:metal="http://xml.zope.org/namespaces/metal">
-       <span tal:use-macro="main['hello']">
+       <span tal:use-macro="main.macros['hello']">
           <span metal:use-macro="name">
              <span metal:fill-slot="name">Chris</span>
           </span>
        </span>
     </html>
-
-
-Templating with XSLT
-------------------------
-
-:mod:`repoze.bfg` also supports XSLT as an optional templating
-language.  Like ZPT, an XSLT template is loaded once and re-used
-between requests.
-
-Given a template ``foo.xsl`` in the templates directory, you can render
-an XSLT as follows:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.xslt import render_transform_to_response
-   from lxml import etree
-   node = etree.Element("root")  
-   return render_transform_to_response('templates/foo.xsl', node)
-
-As shown, the second argument to ``render_transform_to_response`` is
-the element (and children) that you want as the top of the data for
-the XSLT.
-
-You can also pass XSLT parameters in as keyword arguments:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.xslt import render_transform_to_response
-   from lxml import etree
-   node = etree.Element("root")
-   value1 = "'app1'"
-   return render_transform_to_response('templates/foo.xsl', node, param1=value1)
-
-This would then assign 'app1' as the value of an ``<xsl:param
-name="param1"/>`` parameter in the XSLT template.
 
 .. _reload_templates_section:
 
@@ -241,3 +211,21 @@ installed, here's an example of using Mako from within a
 Note that if you use third-party templating languages, the
 auto-template-reload strategy explained in
 :ref:`reload_templates_section` will not be available.
+
+Available Add-On Template System Bindings
+-----------------------------------------
+
+:mod:`repoze.bfg.xslt` is an add-on which provides XSL template
+bindings.  It lives in the Repoze Subversion repository at
+`http://svn.repoze.org/repoze.bfg.xslt
+<http://svn.repoze.org/repoze.bfg.xslt>`_.
+
+:mod:`repoze.bfg.chameleon_genshi` package is an add-on which provides
+Chameleon Genshi-style template support.  It lives in the Repoze
+Subversion repository at `http://svn.repoze.org/repoze.bfg.chameleon_genshi
+<http://svn.repoze.org/repoze.bfg.chameleon_genshi>`_.
+
+Jinja2 template bindings are available for :mod:`repoze.bfg` in the
+:mod:`repoze.bfg.jinja2` package.  It lives in the Repoze Subversion
+repository at `http://svn.repoze.org/repoze.bfg.jinja2
+<http://svn.repoze.org/repoze.bfg.jinja2>`_.

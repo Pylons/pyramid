@@ -342,8 +342,8 @@ your application by requiring more settings in this section.
 
 The ``reload_templates`` setting in the ``[app:main]`` section is a
 :mod:`repoze.bfg`-specific setting which is passed into the framework.
-If it exists, and is ``true``, :term:`Chameleon` and XSLT template
-changes will not require an application restart to be detected.  See
+If it exists, and is ``true``, :term:`Chameleon` template changes will
+not require an application restart to be detected.  See
 :ref:`reload_templates_section` for more information.
 
 .. warning:: The ``reload_templates`` option should be turned off for

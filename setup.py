@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.7.1'
+__version__ = '0.8dev'
 
 import os
 
@@ -30,15 +30,13 @@ except IOError:
 
 install_requires=[
     'setuptools',
-    'chameleon.core [lxml] >= 1.0b13',
-    'chameleon.genshi >= 1.0b2',
-    'chameleon.zpt >= 1.0b8',
+    'chameleon.core >= 1.0b32',  # non-lxml version
+    'chameleon.zpt >= 1.0b16',   # newest version as of non-xml core release
     'PasteScript',
     'Routes',
     'WebOb',
-    'zope.interface',
-    'zope.component',
-    'zope.hookable',
+    'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
+    'zope.component >= 3.6.0', # independent of zope.hookable
     'zope.testing',
     'zope.deferredimport',
     'zope.deprecation',

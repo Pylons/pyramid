@@ -33,7 +33,7 @@ class RenderTemplateTests(Base, unittest.TestCase):
         self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
-        self.failUnless(isinstance(result, str))
+        self.failUnless(isinstance(result, unicode))
         self.assertEqual(result,
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 

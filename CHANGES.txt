@@ -1,5 +1,68 @@
-0.7.1
-=====
+0.8dev
+======
+
+Features
+--------
+
+- This release of ``repoze.bfg`` is "C-free".  This means it has no
+  hard dependencies on any software that must be compiled from C
+  source at installation time.  In particular, ``repoze.bfg`` no
+  longer depends on the ``lxml`` package.  XXX zope proxy.
+
+  .. note:: this change has introduced some backwards
+            incompatibilities, described in the "Backwards
+            Incompatibilities" section below.
+
+Backwards Incompatibilities
+---------------------------
+
+Incompatibilities related to making ``repoze.bfg`` "C-free":
+
+- Removed the ``repoze.bfg.chameleon_genshi`` module, and thus support
+  for Genshi-style chameleon templates.  Genshi-style Chameleon
+  templates depend upon ``lxml``, which is implemented in C (as
+  opposed to pure Python) and the ``repoze.bfg`` core is "C-free" as
+  of this release. You may get Genshi-style Chameleon support back by
+  installing the ``repoze.bfg.chameleon_genshi`` package availalable
+  from http://svn.repoze.org/repoze.bfg.chameleon_genshi/ (XXX index
+  path).  All existing code that depended on the ``chameleon_genshi``
+  module prior to this release of ``repoze.bfg`` should work without
+  change after this addon is installed.
+
+- Removed the ``repoze.bfg.xslt`` module and thus support for XSL
+  templates.  The ``repoze.bfg.xslt`` module depended upon ``lxml``,
+  which is implemented in C, and the ``repoze.bfg`` core is "C-free"
+  as of this release.  You bay get XSL templating back by installing
+  the ``repoze.bfg.xslt`` package available from
+  http://svn.repoze.org/repoze.bfg.xslt/ (XXX index path).  All
+  existing code that depended upon the ``xslt`` module prior to this
+  release of ``repoze.bfg`` should work without modification after
+  this addon is installed.
+
+- Removed the ``repoze.bfg.interfaces.INodeTemplateRenderer``
+  interface and the an old b/w compat aliases from that interface to
+  ``repoze.bfg.interfaces.INodeTemplate``.  This interface must now be
+  imported from the ``repoze.bfg.xslt.interfaces`` package after
+  installation of the ``repoze.bfg.xslt`` addon package described
+  above as ``repoze.bfg.interfaces.INodeTemplateRenderer``.  This
+  interface was never part of any public API.
+
+Other backwards incompatibilities:
+
+- The ``render_template`` function in ``repoze.bfg.chameleon_zpt``
+  returns Unicode instead of a string.  Likewise, the individual
+  values returned by the iterable created by the
+  ``render_template_to_iterable`` function are also each Unicode.
+  This is actually a backwards incompatibility inherited from our new
+  use of the combination of ``chameleon.core`` 1.0b32 (the
+  non-lxml-depending version) and ``chameleon.zpt`` 1.0b16+ ; the
+  ``chameleon.zpt`` PageTemplateFile implementation used to return a
+  string, but now returns Unicode.
+
+XXX get rid of zope.deferredimport (it relies on zope.proxy)
+
+0.7.1 (2009-05-01)
+==================
 
 Index-Related
 -------------

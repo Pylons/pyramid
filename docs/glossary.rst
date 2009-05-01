@@ -202,12 +202,6 @@ Glossary
     :mod:`repoze.bfg` which makes it possible to configure
     :term:`WSGI` components together declaratively within an ``.ini``
     file.  It was developed by Ian Bicking as part of :term:`Paste`.
-  LXML
-    `lxml <http://codespeak.net/lxml/>`_ is a XML processing library
-    for Python by Martijn Faassen and others.
-  XSLT
-    `XSL Transformations <http://www.w3.org/TR/xslt>`_.  A language
-    for transforming XML documents into other XML documents.
   Chameleon
     `chameleon <http://pypi.python.org/pypi/chameleon.core>`_ is an
     attribute language template compiler which supports both the
@@ -217,12 +211,10 @@ Glossary
     ``${name}`` syntax, even within ZPT.  It is also much faster than
     the reference implementations of both ZPT and Genshi.
     :mod:`repoze.bfg` offers Chameleon templating out of the box in
-    both ZPT and Genshi "flavors".
+    ZPT flavor and offers the Genshi flavor as an add on within the
+    :mod:`repoze.bfg.chameleon_genshi` package.
   chameleon.zpt
     ``chameleon.zpt`` is the package which provides :term:`ZPT`
-    templating support under the :term:`Chameleon` templating engine.
-  chameleon.genshi
-    ``chameleon.genshi`` is the package which provides :term:`Genshi`
     templating support under the :term:`Chameleon` templating engine.
   z3c.pt
     This was the previous name for :term:`Chameleon`, and is now a
@@ -230,10 +222,6 @@ Glossary
   ZPT
     The `Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_
     templating language.
-  Genshi
-    `Genshi <http://genshi.edgewall.org/>`_ is an attribute-based XML
-    templating language similar to ZPT.  Its syntax is supported
-    within :mod:`repoze.bfg` via :term:`Chameleon`.
   METAL
     `Macro Expansion for TAL <http://wiki.zope.org/ZPT/METAL>`_, a
     part of :term:`ZPT` which makes it possible to share common look
@@ -333,12 +321,6 @@ Glossary
     `Barebones workflow for Python apps
     <http://static.repoze.org/workflowdocs>`_ .  It can be used by
     :mod:`repoze.bfg` to form a workflow system.
-  repoze.bfg.convention
-    `An add-on for repoze.bfg
-    <http://static.repoze.org/conventiondocs>`_ which provides
-    alternative mechanisms for common :mod:`repoze.bfg` application
-    configuration tasks.  The functionality of this package has been
-    merged into the :mod:`repoze.bfg` core as of version 0.6.3.
   Virtual root
     A model object representing the "virtual" root of a request; this
     is typically the physical root object (the object returned by the
