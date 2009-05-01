@@ -38,7 +38,6 @@ install_requires=[
     'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
     'zope.component >= 3.6.0', # independent of zope.hookable
     'zope.testing',
-    'zope.deferredimport',
     'zope.deprecation',
     'repoze.zcml',
     'martian',

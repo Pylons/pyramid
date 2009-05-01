@@ -15,27 +15,21 @@ from repoze.bfg.interfaces import IRoutesContext
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
 
-from zope.deferredimport import deprecated
-from zope.deprecation import deprecated as deprecated2
+from zope.deprecation import deprecated 
 
 _marker = ()
-
-deprecated(
-    "('from repoze.bfg.urldispatch import RoutesContext' is now "
-    "deprecated; instead use 'from repoze.bfg.urldispatch import "
-    "DefaultRoutesContext')",
-    RoutesContext = "repoze.bfg.urldispatch:DefaultRoutesContext",
-    )
-
-deprecated2('RoutesMapper',
-            'Usage of the ``RoutesMapper`` class is deprecated.  As of '
-            'repoze.bfg 0.6.3, you should use the ``<route.. >`` ZCML '
-            'directive instead of manually creating a RoutesMapper.')
 
 class DefaultRoutesContext(object):
     implements(IRoutesContext)
     def __init__(self, **kw):
         self.__dict__.update(kw)
+
+RoutesContext = DefaultRoutesContext
+deprecated('RoutesContext',
+           "('from repoze.bfg.urldispatch import RoutesContext' is now "
+           "deprecated; instead use 'from repoze.bfg.urldispatch import "
+           "DefaultRoutesContext')",
+           )
 
 class RoutesMapper(object):
     """ The ``RoutesMapper`` is a wrapper for the ``get_root``
@@ -109,6 +103,12 @@ class RoutesMapper(object):
         """
         
         self.mapper.connect(*arg, **kw)
+
+deprecated('RoutesMapper',
+           'Usage of the ``RoutesMapper`` class is deprecated.  As of '
+           'repoze.bfg 0.6.3, you should use the ``<route.. >`` ZCML '
+           'directive instead of manually creating a RoutesMapper.',
+           )
 
 class RoutesContextNotFound(object):
     implements(IContextNotFound)

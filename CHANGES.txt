@@ -1,6 +1,26 @@
 0.8dev
 ======
 
+Deprecation Warnings and Import Alias Removals
+---------------------------------------------
+
+- Since version 0.6.1, a deprecation warning has been emitted when the
+  name ``model_url`` is imported from the ``repoze.bfg.traversal``
+  module.  This import alias (and the deprecation warning) has been
+  removed.  Any import of the ``model_url`` function will now need to
+  be done from ``repoze.bfg.url``; any import of the name
+  ``model_url`` from ``repoze.bfg.traversal`` will now fail.  This was
+  done to remove a dependency on zope.deferredimport.
+
+- Since version 0.6.5, a deprecation warning has been emitted when the
+  name ``RoutesModelTraverser`` is imported from the
+  ``repoze.bfg.traversal`` module.  This import alias (and the
+  deprecation warning) has been removed.  Any import of the
+  ``RoutesModelTraverser`` class will now need to be done from
+  ``repoze.bfg.urldispatch``; any import of the name
+  ``RoutesModelTraverser`` from ``repoze.bfg.traversal`` will now
+  fail.  This was done to remove a dependency on zope.deferredimport.
+
 Features
 --------
 

@@ -4,8 +4,8 @@ import urllib
 from zope.component import getMultiAdapter
 from zope.component import queryUtility
 
-from zope.deferredimport import deprecated
-   
+from zope.deprecation import deprecated
+
 from zope.interface import classProvides
 from zope.interface import implements
 
@@ -18,28 +18,6 @@ from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import VH_ROOT_KEY
 from repoze.bfg.interfaces import ILogger
-
-deprecated(
-    "('from repoze.bfg.traversal import model_url' is now "
-    "deprecated; instead use 'from repoze.bfg.url import model_url')",
-    model_url = "repoze.bfg.url:model_url",
-    )
-
-deprecated(
-    "('from repoze.bfg.traversal import RoutesModelTraverser' is now "
-    "deprecated; instead use 'from repoze.bfg.urldispatch "
-    "import RoutesModelTraverser')",
-    RoutesModelTraverser = "repoze.bfg.urldispatch:RoutesModelTraverser",
-    )
-
-# ``split_path`` wasn't actually ever an API but people were using it
-# anyway.  I turned it into the ``traversal_path`` API in 0.6.5, and
-# generate the below deprecation to give folks a heads up.
-deprecated(
-    "('from repoze.bfg.traversal import split_path' is now deprecated; "
-    "instead use 'from repoze.bfg.traversal import traversal_path')",
-    split_path = "repoze.bfg.traversal:traversal_path",
-    )
 
 def find_root(model):
     """ Find the root node in the graph to which ``model``
@@ -330,6 +308,14 @@ def traversal_path(path):
                                 'UTF-8 decoding scheme' % segment)
             clean.append(segment)
     return tuple(clean)
+
+# ``split_path`` wasn't actually ever an API but people were using it
+# anyway.  I turned it into the ``traversal_path`` API in 0.6.5, and
+# generate the below deprecation to give folks a heads up.
+deprecated('split_path',
+    "('from repoze.bfg.traversal import split_path' is now deprecated; "
+    "instead use 'from repoze.bfg.traversal import traversal_path')",
+    )
 
 _segment_cache = {}
 

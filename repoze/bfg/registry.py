@@ -8,20 +8,22 @@ from zope.component.interfaces import ComponentLookupError
 from zope.component.interfaces import IComponentLookup
 from zope.component.registry import Components
 
-from zope.deferredimport import deprecated
+from zope.deprecation import deprecated
 
 from repoze.bfg.zcml import zcml_configure
 
-deprecated(
+from repoze.bfg.settings import Settings  # alias for deprecation below
+
+deprecated('Settings',
     "('from repoze.bfg.registry import Settings' is now "
     "deprecated; instead use 'from repoze.bfg.settings import Settings')",
-    Settings = "repoze.bfg.settings:Settings",
     )
 
-deprecated(
+from repoze.bfg.settings import get_options # alias for deprecation below
+
+deprecated('get_options',
     "('from repoze.bfg.registry import get_options' is now "
     "deprecated; instead use 'from repoze.bfg.settings import get_options')",
-    get_options = "repoze.bfg.settings:get_options",
     )
 
 class Registry(Components):
