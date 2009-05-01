@@ -38,7 +38,6 @@ install_requires=[
     'WebOb',
     'zope.interface',
     'zope.component',
-    'zope.proxy',
     'zope.hookable',
     'zope.testing',
     'zope.deferredimport',
