@@ -27,7 +27,7 @@ Features
 - This release of ``repoze.bfg`` is "C-free".  This means it has no
   hard dependencies on any software that must be compiled from C
   source at installation time.  In particular, ``repoze.bfg`` no
-  longer depends on the ``lxml`` package.  XXX zope proxy.
+  longer depends on the ``lxml`` package.
 
   .. note:: this change has introduced some backwards
             incompatibilities, described in the "Backwards
