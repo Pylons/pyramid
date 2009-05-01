@@ -293,7 +293,7 @@ The :term:`virtual root` will always be available to a view as the
 ``virtual_root`` attribute of the :term:`request` object.  It will be
 the virtual root object implied by the current request.
 
-The :term:`virtual root path` will always be available to a view as
+The :term:`virtual root` *path* will always be available to a view as
 the ``virtual_root_path`` attribute of the :term:`request` object.  It
 will be a sequence representing the ordered set of names that were
 used to traverse to the virtual root obejct.
