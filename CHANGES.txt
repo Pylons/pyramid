@@ -1,5 +1,5 @@
-0.8dev
-======
+0.8a2 (2009-05-02)
+==================
 
 Features
 --------
@@ -12,7 +12,6 @@ Features
  ``chameleon.zpt`` at module scope, deferring the import until later
  within a method call.  The ``chameleon.zpt`` package can't be
  imported on platforms like GAE.
-
 
 0.8a1 (2009-05-02)
 ==================
