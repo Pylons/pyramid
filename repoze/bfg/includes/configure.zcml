@@ -2,8 +2,6 @@
 
   <include package="repoze.zcml" file="meta.zcml" />
 
-  <include package="chameleon.zpt" file="configure.zcml"/>
-
   <!-- traversal adapters -->
 
   <adapter
