@@ -64,20 +64,22 @@ Incompatibilities related to making ``repoze.bfg`` "C-free":
   opposed to pure Python) and the ``repoze.bfg`` core is "C-free" as
   of this release. You may get Genshi-style Chameleon support back by
   installing the ``repoze.bfg.chameleon_genshi`` package availalable
-  from http://svn.repoze.org/repoze.bfg.chameleon_genshi/ (XXX index
-  path).  All existing code that depended on the ``chameleon_genshi``
-  module prior to this release of ``repoze.bfg`` should work without
-  change after this addon is installed.
+  from http://svn.repoze.org/repoze.bfg.chameleon_genshi (also
+  available in the index at http://dist.repoze.org/bfg/0.8/simple).
+  All existing code that depended on the ``chameleon_genshi`` module
+  prior to this release of ``repoze.bfg`` should work without change
+  after this addon is installed.
 
 - Removed the ``repoze.bfg.xslt`` module and thus support for XSL
   templates.  The ``repoze.bfg.xslt`` module depended upon ``lxml``,
   which is implemented in C, and the ``repoze.bfg`` core is "C-free"
   as of this release.  You bay get XSL templating back by installing
   the ``repoze.bfg.xslt`` package available from
-  http://svn.repoze.org/repoze.bfg.xslt/ (XXX index path).  All
-  existing code that depended upon the ``xslt`` module prior to this
-  release of ``repoze.bfg`` should work without modification after
-  this addon is installed.
+  http://svn.repoze.org/repoze.bfg.xslt/ (also available in the index
+  at http://dist.repoze.org/bfg/0.8/simple).  All existing code that
+  depended upon the ``xslt`` module prior to this release of
+  ``repoze.bfg`` should work without modification after this addon is
+  installed.
 
 - Removed the ``repoze.bfg.interfaces.INodeTemplateRenderer``
   interface and the an old b/w compat aliases from that interface to

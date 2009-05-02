@@ -11,7 +11,7 @@ Installation
 
 Install using setuptools, e.g. (within a virtualenv)::
 
-  $ easy_install -i http://dist.repoze.org/lemonade/dev/simple repoze.bfg
+  $ easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
 
 Further Documentation
 ---------------------
