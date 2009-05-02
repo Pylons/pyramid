@@ -23,14 +23,14 @@ class Test_pushpage(unittest.TestCase):
         return self._getTargetClass()(template)
 
     def test_decorated_has_same_name_as_wrapped(self):
-        pp = self._makeOne('pp.pt')
+        pp = self._makeOne('fixtures/pp.pt')
         wrapped = pp(to_wrap)
         self.assertEqual(wrapped.__name__, 'to_wrap')
         self.assertEqual(wrapped.__module__, to_wrap.__module__)
 
     def test___call___passes_names_from_wrapped(self):
         self._zcmlConfigure()
-        pp = self._makeOne('pp.pt')
+        pp = self._makeOne('fixtures/pp.pt')
         wrapped = pp(to_wrap)
         response = wrapped(object(), object())
         self.assertEqual(response.body,

@@ -43,10 +43,10 @@ class TestRendererFromCache(unittest.TestCase):
         factory = DummyFactory(renderer)
         import os
         here = os.path.dirname(__file__)
-        abspath = os.path.join(here, 'pp.pt')
+        abspath = os.path.join(here, 'fixtures/pp.pt')
         from repoze.bfg.interfaces import ITemplateRenderer
         testing.registerUtility(renderer, ITemplateRenderer, name=abspath)
-        result = self._callFUT('pp.pt', factory)
+        result = self._callFUT('fixtures/pp.pt', factory)
         self.failUnless(renderer is result)
         
 class DummyFactory:
