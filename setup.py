@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '0.8dev'
+__version__ = '0.8a1'
 
 import os
 
@@ -48,7 +48,6 @@ setup(name='repoze.bfg',
       description='A web framework for WSGI',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
-        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Topic :: Internet :: WWW/HTTP",
