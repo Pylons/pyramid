@@ -1,6 +1,22 @@
 0.8dev
 ======
 
+Features
+--------
+
+- We no longer include the ``configure.zcml`` of the ``chameleon.zpt``
+  package within the ``configure.zcml`` of the "repoze.bfg.includes"
+  package.  This has been a no-op for some time now.
+
+-The ``repoze.bfg.chameleon_zpt`` package no longer imports from
+ ``chameleon.zpt`` at module scope, deferring the import until later
+ within a method call.  The ``chameleon.zpt`` package can't be
+ imported on platforms like GAE.
+
+
+0.8a1 (2009-05-02)
+==================
+
 Deprecation Warnings and Import Alias Removals
 ---------------------------------------------
 
@@ -32,15 +48,6 @@ Features
   .. note:: this change has introduced some backwards
             incompatibilities, described in the "Backwards
             Incompatibilities" section below.
-
-- We no longer include the ``configure.zcml`` of the ``chameleon.zpt``
-  package within the ``configure.zcml`` of the "repoze.bfg.includes"
-  package.  This has been a no-op for some time now.
-
--The ``repoze.bfg.chameleon_zpt`` package no longer imports from
- ``chameleon.zpt`` at module scope, deferring the import until later
- within a method call.  The ``chameleon.zpt`` package can't be
- imported on platforms like GAE.
 
 Backwards Incompatibilities
 ---------------------------
