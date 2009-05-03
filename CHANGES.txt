@@ -1,7 +1,12 @@
-0.8dev (unreleased)
+0.8a3 (2009-05-03)
 ===================
 
-...
+Features
+--------
+
+- Don't require a successful import of ``zope.testing`` at BFG
+  application runtime.  This allows us to get rid of ``zope.testing``
+  on platforms like GAE which have file limits.
 
 0.8a2 (2009-05-02)
 ==================
