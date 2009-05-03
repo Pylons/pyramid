@@ -226,6 +226,12 @@ Glossary
     `Macro Expansion for TAL <http://wiki.zope.org/ZPT/METAL>`_, a
     part of :term:`ZPT` which makes it possible to share common look
     and feel between templates.  
+  Genshi
+    An `XML templating language <http://pypi.python.org/pypi/Genshi/>`_
+    by Christopher Lenz.
+  Jinja2
+    A `text templating language <http://jinja.pocoo.org/2/>`_ by Armin 
+    Ronacher.
   Routes
     A `system by Ben Bangert <http://routes.groovie.org/>`_ which
     parses URLs and compares them against a number of user defined

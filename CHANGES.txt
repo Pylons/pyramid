@@ -32,7 +32,7 @@ Features
 ==================
 
 Deprecation Warnings and Import Alias Removals
----------------------------------------------
+----------------------------------------------
 
 - Since version 0.6.1, a deprecation warning has been emitted when the
   name ``model_url`` is imported from the ``repoze.bfg.traversal``

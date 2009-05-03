@@ -67,7 +67,7 @@ Per-module :mod:`repoze.bfg` API documentation.
 Tutorials
 =========
 
-Step-by-step tutorials which demonstrate how you might use
+Step-by-step tutorials which demonstrate how you might use and deploy
 :mod:`repoze.bfg`.
 
 :mod:`repoze.bfg` for Zope CMF Developers
@@ -77,6 +77,13 @@ Step-by-step tutorials which demonstrate how you might use
 
    tutorials/cmf/index.rst
 
+:mod:`repoze.bfg` on Google's App Engine
+
+.. toctree::
+   :maxdepth: 3
+
+   tutorials/gae/index.rst
+
 Change History
 ==============
 
@@ -84,7 +91,6 @@ Change History
    :maxdepth: 2
 
    changes
-  
 
 Sample Applications
 ===================
