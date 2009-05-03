@@ -114,6 +114,10 @@ def getSiteManager(context=None):
         except TypeError, error:
             raise ComponentLookupError(*error.args)
 
-from zope.testing.cleanup import addCleanUp
-addCleanUp(original_getSiteManager.reset) # AttributeError: zope.hookable not installed
-addCleanUp(registry_manager.clear)
+try:
+    from zope.testing.cleanup import addCleanUp
+except ImportError:                             #pragma NO COVERAGE
+    """ Do nothing """ #pragma NO COVERAGE doesnt work w/ 'pass' :-(
+else:
+    addCleanUp(original_getSiteManager.reset)
+    addCleanUp(registry_manager.clear)
