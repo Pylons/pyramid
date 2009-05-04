@@ -1,7 +1,7 @@
 0.8dev (unreleased)
 ===================
 
-...
+- ``zope.testing`` is now only a tests_require dependency.
 
 0.8a3 (2009-05-03)
 ===================
