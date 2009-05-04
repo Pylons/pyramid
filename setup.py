@@ -37,7 +37,6 @@ install_requires=[
     'WebOb',
     'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
     'zope.component >= 3.6.0', # independent of zope.hookable
-    'zope.testing',
     'zope.deprecation',
     'repoze.zcml',
     'martian',
@@ -62,10 +61,11 @@ setup(name='repoze.bfg',
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,
-      namespace_packages=['repoze', 'repoze.bfg'],
+      namespace_packages = ['repoze', 'repoze.bfg'],
       zip_safe=False,
       install_requires = install_requires,
-      tests_require= install_requires + ['Sphinx', 'docutils', 'coverage'],
+      tests_require= install_requires + ['zope.testing',
+                                         'Sphinx', 'docutils', 'coverage'],
       test_suite="repoze.bfg.tests",
       entry_points = """\
         [paste.paster_create_template]
