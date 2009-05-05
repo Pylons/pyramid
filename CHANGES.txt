@@ -1,9 +1,22 @@
 0.8dev (unreleased)
 ===================
 
+Features
+--------
+
 - ``zope.testing`` is no longer a direct dependency, although our
   dependencies (such as ``zope.interface``, ``repoze.zcml``, etc)
-  still depend on it. 
+  still depend on it.
+
+Backwards Incompatibilities
+---------------------------
+
+- Applications which rely on ``zope.testing.cleanup.cleanUp` in unit
+  tests can still use that function indefinitely.  However, for
+  maximum forward compatibility, they should import ``cleanUp`` from
+  ``repoze.bfg.testing`` instead of from ``zope.testing.cleanup``.
+  The BFG paster templates and docs have been changed to use this
+  function instead of the ``zope.testing.cleanup`` version.
 
 0.8a3 (2009-05-03)
 ===================
