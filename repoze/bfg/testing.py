@@ -371,3 +371,26 @@ class DummyRequest:
         self.marshalled = params # repoze.monty
         self.__dict__.update(kw)
 
+_cleanups = []
+
+def addCleanUp(func, args=(), kw={}):
+    """Register a cleanup routines
+
+    Pass a function to be called to cleanup global data.
+    Optional argument tuple and keyword arguments may be passed.
+    """
+    _cleanups.append((func, args, kw))
+
+def cleanUp():
+    """Clean up global data."""
+    for func, args, kw in _cleanups:
+        func(*args, **kw)
+
+from zope.component.globalregistry import base
+from zope.configuration.xmlconfig import _clearContext
+from repoze.bfg.registry import original_getSiteManager
+from repoze.bfg.registry import registry_manager
+addCleanUp(original_getSiteManager.reset)
+addCleanUp(registry_manager.clear)
+addCleanUp(lambda: base.__init__('base'))
+addCleanUp(_clearContext)

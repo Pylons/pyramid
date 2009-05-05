@@ -8,7 +8,7 @@ from repoze.bfg.view import static
 
 from zope.interface import Interface
 
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 class INothing(Interface):
     pass

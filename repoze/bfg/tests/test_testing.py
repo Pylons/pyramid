@@ -1,4 +1,4 @@
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 import unittest
 
 class TestTestingFunctions(unittest.TestCase):
@@ -452,5 +452,40 @@ class TestDummyTemplateRenderer(unittest.TestCase):
         renderer = self._makeOne('abc')
         result = renderer(a=1, b=2)
         self.assertEqual(result, 'abc')
+
+class CleanUpTests(object):
+    def setUp(self):
+        from repoze.bfg.testing import _cleanups
+        self._old_cleanups = _cleanups[:]
+
+    def tearDown(self):
+        from repoze.bfg import testing
+        testing._cleanups = self._old_cleanups
     
+class TestAddCleanUp(CleanUpTests, unittest.TestCase):
+    def _getFUT(self, ):
+        from repoze.bfg.testing import addCleanUp
+        return addCleanUp
+
+    def test_it(self):
+        addCleanUp = self._getFUT()
+        addCleanUp(1, ('a', 'b'), {'foo':'bar'})
+        from repoze.bfg.testing import _cleanups
+        self.assertEqual(_cleanups[-1], (1, ('a', 'b'), {'foo':'bar'}))
+
+class TestCleanUp(CleanUpTests, unittest.TestCase):
+    def _getFUT(self, ):
+        from repoze.bfg.testing import cleanUp
+        return cleanUp
+
+    def test_it(self):
+        from repoze.bfg.testing import _cleanups
+        cleanUp = self._getFUT()
+        L = []
+        def f(*arg, **kw):
+            L.append((arg, kw))
+        _cleanups.append((f, ('a', '1'), {'kw':'1'}))
+        cleanUp()
+        self.assertEqual(L, [(('a', '1'), {'kw':'1'})])
+                              
         

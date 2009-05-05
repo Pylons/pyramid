@@ -1,6 +1,6 @@
 import unittest
 
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 class TestACLSecurityPolicy(unittest.TestCase):
     def setUp(self):

@@ -1,6 +1,5 @@
 import unittest
 
-from zope.testing.cleanup import cleanUp
 from repoze.bfg import testing
 
 class ViewTests(unittest.TestCase):
@@ -14,13 +13,13 @@ class ViewTests(unittest.TestCase):
         """ cleanUp() is required to clear out the application registry
         between tests (done in setUp for good measure too)
         """
-        cleanUp()
+        testing.cleanUp()
         
     def tearDown(self):
         """ cleanUp() is required to clear out the application registry
         between tests
         """
-        cleanUp()
+        testing.cleanUp()
 
     def test_my_view(self):
         from {{package}}.views import my_view
@@ -48,7 +47,7 @@ class ViewIntegrationTests(unittest.TestCase):
         registrations your application declares in its configure.zcml
         (including dependent registrations for repoze.bfg itself).
         """
-        cleanUp()
+        testing.cleanUp()
         import {{package}}
         import zope.configuration.xmlconfig
         zope.configuration.xmlconfig.file('configure.zcml',
@@ -56,7 +55,7 @@ class ViewIntegrationTests(unittest.TestCase):
 
     def tearDown(self):
         """ Clear out the application registry """
-        cleanUp()
+        testing.cleanUp()
 
     def test_my_view(self):
         from {{package}}.views import my_view

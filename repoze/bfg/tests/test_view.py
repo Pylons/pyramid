@@ -1,6 +1,6 @@
 import unittest
 
-from zope.testing.cleanup import cleanUp
+from repoze.bfg.testing import cleanUp
 
 class BaseTest(object):
     def setUp(self):
