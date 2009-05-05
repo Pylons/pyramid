@@ -1,5 +1,5 @@
-0.8dev (unreleased)
-===================
+0.8a4 (unreleased)
+==================
 
 Features
 --------
