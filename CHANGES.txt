@@ -46,8 +46,8 @@ Features
 0.8a1 (2009-05-02)
 ==================
 
-Deprecation Warnings and Import Alias Removals
-----------------------------------------------
+Deprecation Warning and Import Alias Removals
+---------------------------------------------
 
 - Since version 0.6.1, a deprecation warning has been emitted when the
   name ``model_url`` is imported from the ``repoze.bfg.traversal``
