@@ -1,4 +1,8 @@
-0.8a4 (unreleased)
+0.8dev (unreleased)
+
+...
+
+0.8a4 (2009-05-04)
 ==================
 
 Features
