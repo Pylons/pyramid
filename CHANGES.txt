@@ -1,7 +1,9 @@
 0.8dev (unreleased)
 ===================
 
-- ``zope.testing`` is now only a tests_require dependency.
+- ``zope.testing`` is no longer a direct dependency, although our
+  dependencies (such as ``zope.interface``, ``repoze.zcml``, etc)
+  still depend on it. 
 
 0.8a3 (2009-05-03)
 ===================
