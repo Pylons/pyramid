@@ -12,16 +12,13 @@ from repoze.bfg.interfaces import ITemplateRendererFactory
 from repoze.bfg.interfaces import ISettings
 
 from repoze.bfg.templating import renderer_from_cache
+from chameleon.zpt.template import PageTemplateFile
 
 class ZPTTemplateRenderer(object):
     classProvides(ITemplateRendererFactory)
     implements(ITemplateRenderer)
 
     def __init__(self, path, auto_reload=False):
-        # import this here so BFG doesn't break at startup times on
-        # platforms that can't deal with even importing Chameleon
-        # (GAE)
-        from chameleon.zpt.template import PageTemplateFile
         self.template = PageTemplateFile(path, auto_reload=auto_reload)
 
     def implementation(self):
