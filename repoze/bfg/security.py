@@ -260,6 +260,7 @@ class InheritingACLSecurityPolicy(object):
                         # clear the entire allowed set, as we've hit a
                         # deny of Everyone ala (Deny, Everyone, ALL)
                         allowed = set()
+                        break
                     elif ace_principal in allowed:
                         allowed.remove(ace_principal)
 

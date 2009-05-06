@@ -356,7 +356,7 @@ class TestInheritingACLSecurityPolicy(unittest.TestCase):
         policy = self._makeOne(lambda *arg: None)
         result = sorted(
             policy.principals_allowed_by_permission(context, 'read'))
-        self.assertEqual(result, ['chrism', 'other'])
+        self.assertEqual(result, ['chrism'])
 
     def test_principals_allowed_by_permission(self):
         from repoze.bfg.security import Allow
