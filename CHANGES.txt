@@ -1,6 +1,42 @@
 0.8dev (unreleased)
 
-...
+Features
+--------
+
+- Two new security policies were added:
+  RemoteUserInheritingACLSecurityPolicy and
+  WhoInheritingACLSecurityPolicy.  These are security policies which
+  take into account *all* ACLs defined in the lineage of a context
+  rather than stopping at the first ACL found in a lineage.  See the
+  "Security" chapter of the API documentation for more information.
+
+- The API and narrative documentation dealing with security was
+  changed to introduce the new "inheriting" security policy variants.
+
+- Added glossary entry for "lineage".
+
+Deprecations
+------------
+
+- The security policy previously named
+  ``RepozeWhoIdentityACLSecurityPolicy`` now has the slightly saner
+  name of ``WhoACLSecurityPolicy``.  A deprecation warning is emitted
+  when this policy is imported under the "old" name; usually this is
+  due to its use in ZCML within your application.  If you're getting
+  this deprecation warning, change your ZCML to use the new name,
+  e.g. change::
+
+   <utility
+     provides="repoze.bfg.interfaces.ISecurityPolicy"
+     factory="repoze.bfg.security.RepozeWhoIdentityACLSecurityPolicy"
+     />
+
+  To::
+
+   <utility
+     provides="repoze.bfg.interfaces.ISecurityPolicy"
+     factory="repoze.bfg.security.WhoACLSecurityPolicy"
+     />
 
 0.8a4 (2009-05-04)
 ==================

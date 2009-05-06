@@ -32,6 +32,20 @@ Constants
     principal id (according to the security policy).  Its actual value
     is the string 'system.Authenticated'.
 
+.. attribute:: ALL_PERMISSIONS
+
+    An object that can be used as the ``permission`` member of an ACE
+    which matches all permissions unconditionally.  For example, an
+    ACE that uses ``ALL_PERMISSIONS`` might be composed like so:
+    ``('Deny', 'system.Everyone', ALL_PERMISSIONS)``.
+
+.. attribute:: DENY_ALL
+
+    A convenience shorthand ACE that defines ``('Deny',
+    'system.Everyone', ALL_PERMISSIONS)``.  This is often used as the
+    last ACE in an ACL in systems that use an "inheriting" security
+    policy, representing the concept "don't inherit any other ACEs".
+
 Return Values
 ~~~~~~~~~~~~~
 
@@ -64,6 +78,10 @@ Return Values
 Security Policies
 ~~~~~~~~~~~~~~~~~
 
-.. autofunction:: RepozeWhoIdentityACLSecurityPolicy
+.. autofunction:: WhoACLSecurityPolicy
+
+.. autofunction:: WhoInheritingACLSecurityPolicy
 
 .. autofunction:: RemoteUserACLSecurityPolicy
+
+.. autofunction:: RemoteUserInheritingACLSecurityPolicy

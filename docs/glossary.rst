@@ -332,3 +332,9 @@ Glossary
     is typically the physical root object (the object returned by the
     application root factory) unless :ref:`vhosting_chapter` is in
     use.
+  Lineage
+    An ordered sequence of objects based on a ":term:`location` -aware"
+    context.  The lineage of any given :term:`context` is composed of
+    itself, its parent, its parent's parent, and so on.  The order of
+    the sequence is context-first, then the parent of the context,
+    then its parent's parent, and so on.

@@ -25,25 +25,33 @@ However, if you add the following bit of code to your application's
 
    <utility
      provides="repoze.bfg.interfaces.ISecurityPolicy"
-     factory="repoze.bfg.security.RemoteUserACLSecurityPolicy"
+     factory="repoze.bfg.security.RemoteUserInheritingACLSecurityPolicy"
      />
 
 The above inscrutable stanza enables the
-``RemoteUserACLSecurityPolicy`` to be in effect for every request to
-your application.  The ``RemoteUserACLSecurityPolicy`` is a policy
-which compares the ``REMOTE_USER`` variable passed in the request's
-environment (as the sole :term:`principal`) against the principals
-present in any :term:`ACL` found in model data when attempting to call
-some :term:`view`.  The policy either allows the view that the
-permission was declared for to be called, or returns a ``401
-Unathorized`` response code to the upstream WSGI server.
+``RemoteUserInheritingACLSecurityPolicy`` to be in effect for every
+request to your application.  The
+``RemoteUserInheritingACLSecurityPolicy`` is a policy which compares
+the ``REMOTE_USER`` variable passed in the request's environment (as
+the sole :term:`principal`) against the principals present in any
+:term:`ACL` found in model data when attempting to call some
+:term:`view`.  The policy either allows the view that the permission
+was declared for to be called, or returns a ``401 Unathorized``
+response code to the upstream WSGI server.
 
-.. note:: Another security policy also exists:
-   ``RepozeWhoIdentityACLSecurityPolicy``.  This policy uses principal
+.. note:: Another "inheriting" security policy also exists:
+   ``WhoInheritingACLSecurityPolicy``.  This policy uses principal
    information found in the ``repoze.who.identity`` value set into the
    WSGI environment by the :term:`repoze.who` middleware rather than
-   ``REMOTE_USER`` information. This policy only works when
+   ``REMOTE_USER`` information. This policy only works properly when
    :term:`repoze.who` middleware is present in the WSGI pipeline.
+
+.. note:: "non-inheriting" security policy variants of the
+   (``WhoACLSecurityPolicy`` and ``RemoteUserACLSecurityPolicy``) also
+   exist.  These policies use the *first* ACL found as the canonical
+   ACL; they do not continue searching up the context lineage to find
+   "inherited" ACLs.  It is recommended that you use the inheriting
+   variants unless you need this feature.
 
 .. note:: See :ref:`security_policies_api_section` for more
    information about the features of the default security policies.
@@ -129,20 +137,45 @@ group, we can collapse this into a single ACE, as below.
 A principal is usually a user id, however it also may be a group id if
 your authentication system provides group information and the security
 policy is written to respect them.  The
-``RemoteUserACLSecurityPolicy`` does not respect group information.
+``RemoteUserInheritingACLSecurityPolicy`` does not respect group
+information.
 
 ACL Inheritance
 ---------------
 
-While the security policy is in place, if a model object does not have
+While any security policy is in place, if a model object does not have
 an ACL when it is the context, its *parent* is consulted for an ACL.
 If that object does not have an ACL, *its* parent is consulted for an
 ACL, ad infinitum, until we've reached the root and there are no more
 parents left.
 
-The *first* ACL found by the security policy will be used as the
+With *non-inheriting* security policy variants
+(e.g. ``WhoACLSecurityPolicy`` and ``RemoteUserACLSecurityPolicy``),
+the *first* ACL found by the security policy will be used as the
 effective ACL.  No combination of ACLs found during traversal or
 backtracking is done.
+
+With *inheriting* security policy variants
+(e.g. ``WhoInheritingACLSecurityPolicy`` and
+``RemoteUserInheritingACLSecurityPolicy``), *all* ACLs in the
+context's :term:`lineage` are consulted when determining whether
+access is allowed or denied.
+
+:ref:`security_policies_api_section` for more information about the
+features of the default security policies and the difference between
+the inheriting and non-inheriting variants.
+
+.. note:: It is recommended that you use the inheriting variant of a
+   security policy.  Inheriting variants of security policies make it
+   possible for you to form a security strategy based on context ACL
+   "inheritance" rather than needing to keep all information about an
+   object's security state in a single ACL attached to that object.
+   It's much easier to code applications that dynamically change ACLs
+   if ACL inheritance is used.  In reality, the non-inheriting
+   security policy variants exist only for backwards compatibility
+   with applications that used them in versions of :mod:`repoze.bfg`
+   before 0.8.  If this backwards compatibility was not required, the
+   non-inheriting variants probably just wouldn't exist.
 
 Location-Awareness
 ------------------
