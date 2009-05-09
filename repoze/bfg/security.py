@@ -552,7 +552,7 @@ class ACLDenied(ACLPermitsResult):
     boolean false types.  It also has attributes which indicate which
     acl, ace, permission, principals, and context were involved in the
     request.  Its __str__ method prints a summary of these attributes
-    for debugging purposes.  The same summary is available as he
+    for debugging purposes.  The same summary is available as the
     ``msg`` attribute."""
     boolval = 0
 
@@ -563,7 +563,7 @@ class ACLAllowed(ACLPermitsResult):
     which acl, ace, permission, principals, and context were involved
     in the request.  Its __str__ method prints a summary of these
     attributes for debugging purposes.  The same summary is available
-    as he ``msg`` attribute."""
+    as the ``msg`` attribute."""
     boolval = 1
 
 class ViewPermission(object):
