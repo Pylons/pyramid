@@ -116,6 +116,14 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(routing_args['action'], 'action1')
         self.assertEqual(routing_args['article'], 'article1')
 
+    def test_unnamed_root_route_matches(self):
+        mapper = self._makeOne(None)
+        mapper.connect('')
+        environ = self._getEnviron(PATH_INFO='/')
+        result = mapper(environ)
+        from repoze.bfg.interfaces import IRoutesContext
+        self.failUnless(IRoutesContext.providedBy(result))
+
     def test_unicode_in_route_default(self):
         marker = ()
         get_root = make_get_root(marker)
