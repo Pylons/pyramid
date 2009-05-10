@@ -1,7 +1,25 @@
 0.8dev (unreleased)
 -------------------
 
-...
+Bug Fixes
+---------
+
+- In version 0.6.3, passing a ``get_root`` callback (a "root factory")
+  to ``repoze.bfg.router.make_app`` became optional if any ``route``
+  declaration was made in ZCML.  The intent was to make it possible to
+  disuse traversal entirely, instead relying entirely on URL dispatch
+  (Routes) to resolve all contexts.  However a compound set of bugs
+  prevented usage of a Routes-based root view (a view which responds
+  to "/").  One bug existed in `repoze.bfg.urldispatch``, another
+  existed in Routes itself.
+
+  To resolve this issue, the urldispatch module was fixed, and a fork
+  of the Routes trunk was put into the "dev" index named
+  ``Routes-1.11dev-chrism-home``.  The source for the fork exists at
+  `http://bitbucket.org/chrism/routes-home/
+  <http://bitbucket.org/chrism/routes-home/>`_; its contents have been
+  reported to the upstream Routes developers and will hopefully be a
+  part of the final Routes 1.11 release.
 
 0.8a5 (2009-05-08)
 ------------------

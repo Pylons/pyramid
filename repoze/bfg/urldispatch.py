@@ -64,7 +64,7 @@ class RoutesMapper(object):
         path = environ.get('PATH_INFO', '/')
         self.mapper.environ = environ
         args = self.mapper.match(path)
-        if args:
+        if isinstance(args, dict): # might be an empty dict
             context_factory = args.get('context_factory', _marker)
             if context_factory is _marker:
                 context_factory = DefaultRoutesContext
@@ -165,7 +165,7 @@ class RoutesRootFactory(Mapper):
             args, route = match
         else:
             args = None
-        if args:
+        if isinstance(args, dict): # might be an empty dict
             args = args.copy()
             routepath = route.routepath
             factory = route._factory
