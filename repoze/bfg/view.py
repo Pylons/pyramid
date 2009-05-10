@@ -18,10 +18,10 @@ _marker = object()
 
 def view_execution_permitted(context, request, name=''):
     """ If the view specified by ``context`` and ``name`` is protected
-    by a permission, return the result of checking the permission
-    associated with the view using the effective security policy and
-    the ``request``.  If no security policy is in effect, or if the
-    view is not protected by a permission, return True. """
+    by a permission, check the permission associated with the view
+    using the effective security policy and the ``request``.  Return a
+    boolean result.  If no security policy is in effect, or if the
+    view is not protected by a permission, return True."""
     security_policy = queryUtility(ISecurityPolicy)
     permission = queryMultiAdapter((context, request), IViewPermission,
                                    name=name)
