@@ -65,6 +65,10 @@ calling the root factory callable passed to the application in it's
 your ZCML ``route`` statements appropriately, you can mix and match
 URL dispatch and traversal in this way.
 
+A root factory is not required for purely URL-dispatch-based apps: if
+the root factory callable is ``None``, :mod:`repoze.bfg` will return a
+NotFound error to the user's browser when no routes match.
+
 .. note:: See :ref:`modelspy_project_section` for an example of a
           simple root factory callable that will use traversal.
 
