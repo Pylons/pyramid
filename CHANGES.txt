@@ -1,6 +1,12 @@
 0.8dev (unreleased)
 -------------------
 
+Features
+--------
+
+- Added documentation to the URL Dispatch chapter about how to catch
+  the root URL.
+
 Bug Fixes
 ---------
 

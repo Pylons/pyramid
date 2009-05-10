@@ -133,7 +133,7 @@ collection_name
 
 condition_method
 
-  The nameof the HTTP method used as the Routes `condition method
+  The name of the HTTP method used as the Routes `condition method
   <http://routes.groovie.org/manual.html#conditions>`_.
 
 condition_subdomain
@@ -361,6 +361,22 @@ instead of specifying it as an argument:
 When you do this, the :term:`view name` will be computed dynamically if
 the route matches.  In the above example, if the ``view_name`` turns
 out to be ``articles``, the articles view will eventually be called.
+
+Catching the Root URL
+---------------------
+
+It's not entirely obvious how to use a route to catch the root URL
+("/").  To do so, give the empty string as a path in a ZCML ``route``
+declaration:
+
+.. code-block:: xml
+   :linenos:
+
+   <route
+       path=""
+       name="root"
+       view_name="root_view"
+       />
 
 Using :mod:`repoze.bfg` Security With URL Dispatch
 --------------------------------------------------
