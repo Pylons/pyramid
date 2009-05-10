@@ -378,6 +378,49 @@ declaration:
        view_name="root_view"
        />
 
+Cleaning Up After a Request
+---------------------------
+
+Often it's required that some cleanup be performed at the end of a
+request when a database connection is involved.  When
+:term:`traversal` is used, this cleanup is often done as a side effect
+of the traversal :term:`root factory`.  Often the root factory will
+insert an object into the WSGI environment that performs some cleanup
+when its ``__del__`` method is called.  When URL dispatch is used,
+however, no root factory is required, so sometimes that option is not
+open to you.
+
+Instead of putting this cleanup logic in the root factory, however,
+you can cause a subscriber to be fired when a new request is detected;
+the subscriber can do this work.  For example, let's say you have a
+``mypackage`` BFG package that uses SQLAlchemy, and you'd like the
+current SQLAlchemy database session to be removed after each request.
+Put the following in the ``mypackage.run`` module:
+
+.. code-block:: python
+
+    from mypackage.sql import DBSession
+
+    class Cleanup:
+        def __init__(self, cleaner):
+            self.cleaner = cleaner
+        def __del__(self):
+            self.cleaner()
+
+    def handle_teardown(event):
+        environ = event.request.environ
+        environ['mypackage.sqlcleaner'] = Cleanup(DBSession.remove)
+
+Then in the ``configure.zcml`` of your package, inject the following:
+
+.. code-block:: xml
+
+  <subscriber for="repoze.bfg.interfaces.INewRequest"
+    handler="mypackage.run.handle_teardown"/>
+
+This will cause the DBSession to be removed whenever the WSGI
+environment is destroyed (usually at the end of every request).
+
 Using :mod:`repoze.bfg` Security With URL Dispatch
 --------------------------------------------------
 
