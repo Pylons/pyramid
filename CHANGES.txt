@@ -5,7 +5,7 @@ Features
 --------
 
 - Added documentation to the URL Dispatch chapter about how to catch
-  the root URL.
+  the root URL using a ZCML ``route`` directive.
 
 Bug Fixes
 ---------

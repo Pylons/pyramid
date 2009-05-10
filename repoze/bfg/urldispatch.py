@@ -115,6 +115,9 @@ class RoutesContextNotFound(object):
     def __init__(self, msg):
         self.msg = msg
 
+_notfound = RoutesContextNotFound(
+    'Routes context cannot be found and no fallback "get_root"')
+
 class RoutesRootFactory(Mapper):
     """ The ``RoutesRootFactory`` is a wrapper for the ``get_root``
     callable passed in to the repoze.bfg ``Router`` at initialization
@@ -193,11 +196,8 @@ class RoutesRootFactory(Mapper):
             return context
 
         if self.get_root is None:
-            # no fallback get_root
-            return RoutesContextNotFound(
-                'Routes context cannot be found and no fallback "get_root"')
+            return _notfound
 
-        # fall back to original get_root
         return self.get_root(environ)
 
 class RoutesModelTraverser(object):
