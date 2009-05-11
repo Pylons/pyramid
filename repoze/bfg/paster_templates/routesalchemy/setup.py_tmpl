@@ -41,7 +41,6 @@ setup(name='{{project}}',
             'transaction',
             'zope.sqlalchemy',
             ],
-      test_suite="{{package}}",
       entry_points = """\
       [paste.app_factory]
       app = {{package}}.run:app
