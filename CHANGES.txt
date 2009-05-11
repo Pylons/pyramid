@@ -1,6 +1,15 @@
 0.8dev (unreleased)
 -------------------
 
+Features
+--------
+
+- Added a ``routesalchemy`` Paster template.  This paster template
+  sets up a BFG project that uses SQAlchemy (with SQLite) and uses
+  Routes exclusively to resolve URLs (no traversal root factory is
+  used).  This template can be used via ``paster create -t
+  bfg_routesalchemy``.
+
 Documentation
 -------------
 

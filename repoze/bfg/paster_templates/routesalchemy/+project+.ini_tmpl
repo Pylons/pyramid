@@ -1,0 +1,14 @@
+[DEFAULT]
+debug = true
+
+[app:main]
+use = egg:{{project}}#app
+reload_templates = true
+debug_authorization = false
+debug_notfound = false
+db_string = sqlite:///%(here)s/{{package}}.db
+
+[server:main]
+use = egg:Paste#http
+host = 0.0.0.0
+port = 6543

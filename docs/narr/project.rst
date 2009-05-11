@@ -87,10 +87,12 @@ application's Python code and templates.
    name during ``paster create`` by adding the project name to the
    command line, e.g. ``paster create -t bfg_starter MyProject``.
 
-.. note:: A convenience :term:`Paste` template for projects which will
-   depend on :term:`ZODB` projects also exists.  Use ``paster create
-   -t bfg_zodb`` to use this template instead of the ``bfg_starter``
-   template.
+.. note:: Convenience :term:`Paste` templates for projects which will
+   depend on :term:`ZODB` or `SQLAlchemy
+   <http://www.sqlalchemy.org/>`_ also exist.  Use ``paster create -t
+   bfg_zodb`` to create a project that depends on ZODB.  Use ``paster
+   create -t bfg_routesalchemy`` to create a project that depends on
+   SQLAlchemy+Routes.
 
 Installing your Newly Created Project for Development
 -----------------------------------------------------
