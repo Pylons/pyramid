@@ -1,4 +1,5 @@
 import os
+import sys
 
 from ez_setup import use_setuptools
 use_setuptools()
@@ -8,6 +9,16 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+
+requires = [
+    'repoze.bfg',
+    'SQLAlchemy',
+    'transaction',
+    'zope.sqlalchemy',
+    ]
+
+if sys.version_info[:3] < (2,5,0):
+    requires.append('pysqlite')
 
 setup(name='{{project}}',
       version='0.1',
@@ -29,18 +40,7 @@ setup(name='{{project}}',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=[
-            'repoze.bfg',
-            'SQLAlchemy',
-            'transaction',
-            'zope.sqlalchemy',
-            ],
-      tests_require=[
-            'repoze.bfg',
-            'SQLAlchemy',
-            'transaction',
-            'zope.sqlalchemy',
-            ],
+      install_requires = requires,
       entry_points = """\
       [paste.app_factory]
       app = {{package}}.run:app
