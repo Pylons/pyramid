@@ -15,3 +15,8 @@ class RoutesAlchemyProjectTemplate(Template):
     _template_dir = 'paster_templates/routesalchemy'
     summary = 'repoze.bfg SQLAlchemy project using Routes (no traversal)'
     template_renderer = staticmethod(paste_script_template_renderer)
+
+class AlchemyProjectTemplate(Template):
+    _template_dir = 'paster_templates/alchemy'
+    summary = 'repoze.bfg SQLAlchemy project using traversal'
+    template_renderer = staticmethod(paste_script_template_renderer)

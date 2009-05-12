@@ -1,0 +1,29 @@
+from repoze.bfg.router import make_app
+
+import {{package}}
+from {{package}}.models import appmaker
+from {{package}}.models import DBSession
+
+class Cleanup:
+    def __init__(self, cleaner):
+        self.cleaner = cleaner
+    def __del__(self):
+        self.cleaner()
+
+def handle_teardown(event):
+    environ = event.request.environ
+    environ['usermanager.sasession'] = Cleanup(DBSession.remove)
+
+def app(global_config, **kw):
+    """ This function returns a repoze.bfg.router.Router object.
+    
+    It is usually called by the PasteDeploy framework during ``paster serve``.
+    """
+    db_string = kw.get('db_string')
+    if db_string is None:
+        raise ValueError("No 'db_string' in application configuration.")
+    db_echo = kw.get('db_echo')
+    if db_echo is None:
+        db_echo = True
+    get_root = appmaker(db_string, db_echo)
+    return make_app(get_root, {{package}}, options=kw)

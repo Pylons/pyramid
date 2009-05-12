@@ -1,0 +1,21 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <!-- this must be included for the view declarations to work -->
+  <include package="repoze.bfg.includes" />
+
+  <view
+     for=".models.MyApp"
+     view=".views.my_view"
+     />
+
+  <view
+     for=".models.MyApp"
+     view=".views.static_view"
+     name="static"
+     />
+
+  <subscriber for="repoze.bfg.interfaces.INewRequest"
+     handler=".run.handle_teardown"
+     />
+
+</configure>
