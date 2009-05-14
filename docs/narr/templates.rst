@@ -3,39 +3,41 @@ Templates
 
 A :term:`template` is a usually file on disk which can be used to
 render data provided by a :term:`view`, surrounded by more static
-information.
+information.  :mod:`repoze.bfg` offers a number of ways to perform
+templating tasks.
 
 Templating With :term:`Chameleon` (:term:`chameleon.zpt`) Page Templates
 ------------------------------------------------------------------------
 
-Like Zope, :mod:`repoze.bfg` uses Zope Page Templates (:term:`ZPT`) as
-its default and best-supported templating language. However,
-:mod:`repoze.bfg` uses a different implementation of the :term:`ZPT`
-specification than Zope does: the :term:`Chameleon`
+Like :term:`Zope`, :mod:`repoze.bfg` uses Zope Page Templates
+(:term:`ZPT`) as its default and best-supported templating
+language. However, :mod:`repoze.bfg` uses a different implementation
+of the :term:`ZPT` specification than Zope does: the :term:`Chameleon`
 :term:`chameleon.zpt` templating engine. This templating engine
 complies largely with the `Zope Page Template
 <http://wiki.zope.org/ZPT/FrontPage>`_ template specification and is
-significantly faster.
+significantly faster.  
 
 .. note:: The language definition documentation for Chameleon
    ZPT-style templates is available from `the Chameleon website
-   <http://chameleon.repoze.org>`_.
+   <http://chameleon.repoze.org>`_.  See its `documentation
+   <http://chameleon.repoze.org/docs/zpt/>`_ for the Chameleon ZPT
+   language specification.
 
 .. note:: As of version 0.8.0, :mod:`repoze.bfg` no longer supports
    XSL templates "out of the box".  The :mod:`repoze.bfg.xslt` package
-   is an add-on which provides XSL template bindings.
+   is an add-on which provides XSL template bindings. See
+   :ref:`available_template_system_bindings`.
 
 .. note:: As of version 0.8.0, :mod:`repoze.bfg` no longer supports
    Genshi-style Chameleon bindings "out of the box".  The
    :mod:`repoze.bfg.chameleon_genshi` package is an add-on which
-   provides Chameleon Genshi-style template support.
+   provides Chameleon Genshi-style template support. See
+   :ref:`available_template_system_bindings`.
 
-.. note:: Jinja2 template bindings are available for :mod:`repoze.bfg`
-   in the :mod:`repoze.bfg.jinja2` package.
-
-Given that there is a :term:`chameleon.zpt` template named
-``foo.pt`` in a directory in your application named ``templates``,
-you can render the template from a view like so:
+Given that there is a :term:`chameleon.zpt` template named ``foo.pt``
+in a directory in your application named ``templates``, you can render
+the template from a view like so:
 
 .. code-block:: python
    :linenos:
@@ -46,19 +48,23 @@ you can render the template from a view like so:
 
 The first argument to ``render_template_to_response`` shown above (and
 its sister function ``render_template``, not shown, which just returns
-a string body) is the template *path*.  Above, the path
+a string body) is the template *path*.  In the example above, the path
 ``templates/foo.pt`` is *relative*.  Relative to what, you ask?
 Relative to the directory in which the ``views.py`` file which names
 it lives, which is usually the :mod:`repoze.bfg` application's
-:term:`package` directory.
+:term:`package` directory.  A path passed to
+``render_template_to_response`` can also be absolute (starting with a
+slash on UNIX).
 
-``render_template_to_response`` always renders a :term:`chameleon.zpt`
-template, and always returns a Response object which has a *status
-code* of ``200 OK`` and a *content-type* of ``text-html``.  If you
-need more control over the status code and content-type, use the
-``render_template`` function instead, which also renders a ZPT
+``render_template_to_response`` always returns a Response object which
+has a *status code* of ``200 OK`` and a *content-type* of
+``text-html``.  If you need more control over the status code and
+content-type, either set attributes on the response that this function
+returns or use the ``render_template`` function instead (see
+:ref:`template_module` for the details), which also renders a ZPT
 template but returns a string instead of a Response.  You can use the
-string manually as a response body:
+string manually as a response body.  Here's an example of using
+``render_template``:
 
 .. code-block:: python
    :linenos:
@@ -71,26 +77,69 @@ string manually as a response body:
        response.content_type = 'text/plain'
        return response
 
-:mod:`repoze.bfg` loads the template and keeps it in memory between
-requests. This means that modifications to the ZPT require a restart
-before you can see the changes.
+Here's an example of using ``render_template_to_response`` but
+changing the content-type and status:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.chameleon_zpt import render_template_to_response
+   def sample_view(context, request):
+       response = render_template_to_response('templates/foo.pt', foo=1, bar=2)
+       response.content_type = 'text/plain'
+       response.status_int = 204
+       return response
+
+A Sample Template
+~~~~~~~~~~~~~~~~~
+
+Here's what a simple :term:`chameleon.zpt` template used under
+:mod:`repoze.bfg` might look like:
+
+.. code-block:: xml
+   :linenos:
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml"
+          xmlns:tal="http://xml.zope.org/namespaces/tal">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>${project} Application</title>
+    </head>
+      <body>
+         <h1 class="title">Welcome to <code>${project}</code>, an
+	  application generated by the <a
+	  href="http://static.repoze.org/bfgdocs">repoze.bfg</a> web
+	  application framework.</h1>
+      </body>
+    </html>
+
+Note the use of :term:`Genshi` -style ``${replacements}`` above.  This
+is one of the ways that :term:`chameleon.zpt` differs from standard
+ZPT.  The above template expects to find a ``project`` key in the set
+of keywords passed in to it via ``render_template`` or
+``render_template_to_response``. Typical ZPT attribute-based syntax
+(e.g. ``tal:content`` and ``tal:replace``) also works in these
+templates.
 
 Using ZPT Macros in :mod:`repoze.bfg`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Unlike Zope 3 "browser views", :mod:`repoze.bfg` doesn't make any
-names (such as ``context`` and ``view``) available to
-:term:`chameleon.zpt` templates by default.  Instead, it expects you
-to pass all the names you need into the template.  One of the common
-needs in ZPT-based template is to one template's "macros" from within
-a different template.  In Zope, this is typically handled by
-retrieving the template from the ``context``.  To do the same thing in
-:mod:`repoze.bfg`, you need to make the macro template itself
-available to the rendered template by passing the macro template
-itself (or even the macro itself) into the rendered template.  To make
-a macro available to the rendered template, you can retrieve a
-different template using the ``get_template`` API, and pass it in to
-the template being rendered.  For example:
+Unlike Zope "browser views", :mod:`repoze.bfg` doesn't make any names
+(such as ``context`` or ``view``) available to :term:`chameleon.zpt`
+templates by default.  Instead, it expects you to pass all the names
+you need into the template.
+
+One of the common needs in ZPT-based template is to one template's
+"macros" from within a different template.  In Zope, this is typically
+handled by retrieving the template from the ``context``.  To do the
+same thing in :mod:`repoze.bfg`, you need to make the macro template
+itself available to the rendered template by passing template in which
+the macro is defined (or even the macro itself) into the rendered
+template.  To make a macro available to the rendered template, you can
+retrieve a different template using the ``get_template`` API, and pass
+it in to the template being rendered.  For example:
 
 .. code-block:: python
    :linenos:
@@ -110,11 +159,11 @@ Where ``templates/master.pt`` might look like so:
     <html xmlns="http://www.w3.org/1999/xhtml" 
           xmlns:tal="http://xml.zope.org/namespaces/tal"
           xmlns:metal="http://xml.zope.org/namespaces/metal">
-       <span tal:define-macro="hello">
-          <h1>
-             Hello <span metal:define-slot="name">Fred</span>!
-          </h1>
-       </span>
+      <span metal:define-macro="hello">
+        <h1>
+          Hello <span metal:define-slot="name">Fred</span>!
+        </h1>
+      </span>
     </html>
 
 And ``templates/mytemplate.pt`` might look like so:
@@ -125,11 +174,9 @@ And ``templates/mytemplate.pt`` might look like so:
     <html xmlns="http://www.w3.org/1999/xhtml" 
           xmlns:tal="http://xml.zope.org/namespaces/tal"
           xmlns:metal="http://xml.zope.org/namespaces/metal">
-       <span tal:use-macro="main.macros['hello']">
-          <span metal:use-macro="name">
-             <span metal:fill-slot="name">Chris</span>
-          </span>
-       </span>
+      <span metal:use-macro="main.macros['hello']">
+        <span metal:fill-slot="name">Chris</span>
+      </span>
     </html>
 
 .. _reload_templates_section:
@@ -204,9 +251,9 @@ installed, here's an example of using Mako from within a
    binding packages for use under :mod:`repoze.bfg`.  See
    :ref:`available_template_system_bindings` for example packages.
 
-Note that if you use third-party templating languages, the
-auto-template-reload strategy explained in
-:ref:`reload_templates_section` will not be available.
+Note that if you use third-party templating languages without
+cooperating BFG bindings, the auto-template-reload strategy explained
+in :ref:`reload_templates_section` will not be available.
 
 .. _available_template_system_bindings:
 
