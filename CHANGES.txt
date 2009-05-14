@@ -116,6 +116,9 @@ Features
   dependencies (such as ``zope.interface``, ``repoze.zcml``, etc)
   still depend on it.
 
+- Tested on Google App Engine.  Added a tutorial to the documentation
+  explaining how to deploy a BFG app to GAE.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -185,6 +188,9 @@ Features
   .. note:: this change has introduced some backwards
             incompatibilities, described in the "Backwards
             Incompatibilities" section below.
+
+- This release was tested on Windows XP.  It appears to work fine and
+  all the tests pass.
 
 Backwards Incompatibilities
 ---------------------------
