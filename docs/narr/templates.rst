@@ -202,15 +202,13 @@ installed, here's an example of using Mako from within a
 
 .. note:: It's reasonably easy to write custom templating system
    binding packages for use under :mod:`repoze.bfg`.  See
-   `repoze.bfg.jinja2
-   <http://svn.repoze.org/repoze.bfg.jinja2/trunk/>`_ for an example
-   of one such package.  This particular one creates
-   :mod:`repoze.bfg`-style bindings for the `Jinja2
-   <http://jinja.pocoo.org/2/documentation>`_ templating system.
+   :ref:`available_template_system_bindings` for example packages.
 
 Note that if you use third-party templating languages, the
 auto-template-reload strategy explained in
 :ref:`reload_templates_section` will not be available.
+
+.. _available_template_system_bindings:
 
 Available Add-On Template System Bindings
 -----------------------------------------
@@ -229,3 +227,9 @@ Jinja2 template bindings are available for :mod:`repoze.bfg` in the
 :mod:`repoze.bfg.jinja2` package.  It lives in the Repoze Subversion
 repository at `http://svn.repoze.org/repoze.bfg.jinja2
 <http://svn.repoze.org/repoze.bfg.jinja2>`_.
+
+Courtesty of Carlos de la Guardia, bindings for the Zope
+``zope.pagetemplate`` package ("old TAL") are available from
+`http://svn.repoze.org/repoze.bfg.zopepagetemplate/
+<http://svn.repoze.org/repoze.bfg.zopepagetemplate/>`_.
+

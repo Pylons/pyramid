@@ -10,6 +10,19 @@ Documentation
 
 - Added glossary entry for "root factory".
 
+- Noted existence of ``repoze.bfg.pagetemplate`` template bindings in
+  "Available Add On Template System Bindings" in Templates chapter in
+  narrative docs.
+
+Features
+--------
+
+- Courtesty Carlos de la Guardia, added an ``alchemy`` Paster
+  template.  This paster template sets up a BFG project that uses
+  SQAlchemy (with SQLite) and uses traversal to resolve URLs.  (no
+  Routes areused).  This template can be used via ``paster create -t
+  bfg_alchemy``.
+
 0.8a6 (2009-05-11)
 ==================
 
