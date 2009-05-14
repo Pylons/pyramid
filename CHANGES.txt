@@ -121,7 +121,7 @@ Features
 Backwards Incompatibilities
 ---------------------------
 
-- Applications which rely on ``zope.testing.cleanup.cleanUp` in unit
+- Applications which rely on ``zope.testing.cleanup.cleanUp`` in unit
   tests can still use that function indefinitely.  However, for
   maximum forward compatibility, they should import ``cleanUp`` from
   ``repoze.bfg.testing`` instead of from ``zope.testing.cleanup``.
