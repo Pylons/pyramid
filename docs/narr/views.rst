@@ -514,7 +514,7 @@ includes other response types for Unauthorized, etc.
 Serving Static Resources Using a View
 -------------------------------------
 
-Using the :mod:repoze.bfg.view ``static`` helper class is the
+Using the :mod:`repoze.bfg.view` ``static`` helper class is the
 preferred way to serve static resources (like JavaScript and CSS
 files) within :mod:`repoze.bfg`.  This class creates a callable that
 is capable acting as a :mod:`repoze.bfg` view which serves static
