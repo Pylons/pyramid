@@ -106,12 +106,35 @@ def registerViewPermission(name, result=True, viewpermission=None,
     return registerAdapter(viewpermission, for_, IViewPermission, name)
 
 def registerUtility(impl, iface=Interface, name=''):
+    """ Register a Zope component architecture utility component.
+    This is exposed as a convenience in this package to avoid needing
+    to import the ``registerUtility`` function from ``zope.component``
+    within unit tests that make use of the ZCA.  ``impl`` is the
+    implementation of the utility.  ``iface`` is the interface type
+    ``zope.interface.Interface`` by default.  ``name`` is the empty
+    string by default.  See `The ZCA book
+    <http://www.muthukadan.net/docs/zca.html>`_ for more information
+    about ZCA utilities."""
     import zope.component 
     gsm = zope.component.getGlobalSiteManager()
     gsm.registerUtility(impl, iface, name=name)
     return impl
 
 def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
+    """ Register a Zope component architecture adapter component.
+    This is exposed as a convenience in this package to avoid needing
+    to import the ``registerAdapter`` function from ``zope.component``
+    within unit tests that make use of the ZCA.  ``impl`` is the
+    implementation of the component (often a class).  ``for_`` is the
+    ``for`` interface type ``zope.interface.Interface`` by default. If
+    ``for`` is not a tuple or list, it will be converted to a
+    one-tuple before being passed to underlying ZCA registerAdapter
+    API.  ``name`` is the empty string by default.  ``provides`` is
+    the ZCA provides interface, also ``zope.interface.Interface`` by
+    default.  ``name`` is the name of the adapter, the empty string by
+    default.  See `The ZCA book
+    <http://www.muthukadan.net/docs/zca.html>`_ for more information
+    about ZCA adapters."""
     import zope.component
     gsm = zope.component.getGlobalSiteManager()
     if not isinstance(for_, (tuple, list)):
@@ -120,6 +143,17 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     return impl
 
 def registerSubscriber(subscriber, iface=Interface):
+    """ Register a Zope component architecture subscriber component.
+    This is exposed as a convenience in this package to avoid needing
+    to import the ``registerHandler`` function from ``zope.component``
+    within unit tests that make use of the ZCA.  ``subscriber`` is the
+    implementation of the component (often a function).  ``iface`` is
+    the interface type the subscriber will be registered for
+    (``zope.interface.Interface`` by default). If ``iface`` is not a
+    tuple or list, it will be converted to a one-tuple before being
+    passed to underlying zca registerHandler query.  See `The ZCA book
+    <http://www.muthukadan.net/docs/zca.html>`_ for more information
+    about ZCA subscribers."""
     import zope.component
     gsm = zope.component.getGlobalSiteManager()
     if not isinstance(iface, (tuple, list)):
@@ -382,7 +416,13 @@ def addCleanUp(func, args=(), kw={}):
     _cleanups.append((func, args, kw))
 
 def cleanUp():
-    """Clean up global data."""
+    """Clean up BFG testing registrations.  Use in the ``tearDown`` of
+    unit tests that use the ``register*`` methods in the testing
+    module (e.g. if your unit test uses
+    ``repoze.bfg.testing.registerDummyRenderer`` or
+    ``repoze.bfg.testing.registerDummySecurityPolicy``).  If you use
+    the ``register*`` functions without calling cleanUp, unit tests
+    will not be isolated with respect to registrations they perform."""
     for func, args, kw in _cleanups:
         func(*args, **kw)
 

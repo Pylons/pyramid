@@ -338,3 +338,13 @@ Glossary
     itself, its parent, its parent's parent, and so on.  The order of
     the sequence is context-first, then the parent of the context,
     then its parent's parent, and so on.
+  Root Factory
+    The "root factory" of an :mod:`repoze.bfg` application is called
+    on every request sent to the application.  The root factory
+    returns the traversal root of an application.  It is
+    conventionally named ``get_root``.  An application must supply a
+    root factory to :mod:`repoze.bfg` within a call to
+    ``repoze.bfg.router.make_app``; however, an application's root
+    factory may be passed to ``make_app`` as ``None``, in which case
+    the application performs no graph traversal and uses :term:`URL
+    dispatch` for all URL-to-view code mappings.

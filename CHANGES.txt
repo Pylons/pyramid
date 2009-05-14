@@ -1,5 +1,17 @@
+0.8dev
+======
+
+Documentation
+-------------
+
+- Added API docs for the ``repoze.bfg.testing`` methods
+  ``registerAdapter``, ``registerUtiity``, ``registerSubscriber``, and
+  ``cleanUp``.
+
+- Added glossary entry for "root factory".
+
 0.8a6 (2009-05-11)
--------------------
+==================
 
 Features
 --------
@@ -41,7 +53,7 @@ Bug Fixes
   part of the final Routes 1.11 release.
 
 0.8a5 (2009-05-08)
-------------------
+==================
 
 Features
 --------

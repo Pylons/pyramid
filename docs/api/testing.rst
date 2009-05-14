@@ -17,6 +17,14 @@
 
   .. autofunction:: registerViewPermission
 
+  .. autofunction:: registerUtility
+
+  .. autofunction:: registerAdapter
+
+  .. autofunction:: registerSubscriber
+
+  .. autofunction:: cleanUp
+
   .. autoclass:: DummyModel
      :members:
 
