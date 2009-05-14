@@ -147,7 +147,7 @@ It's Tested
 *If it ain't tested, it's broke.* We strive to test :mod:`repoze.bfg`
 completely.  Below a run of the ``nosetests`` command configured to
 show code coverage information (run against the :mod:`repoze.bfg`
-trunk as of the 0.8a4 release).
+trunk as of the 0.8a6 release).
 
 .. code-block:: bash
 
@@ -185,7 +185,7 @@ trunk as of the 0.8a4 release).
      repoze.bfg.registry                       64     64   100%   
      repoze.bfg.request                        25     25   100%   
      repoze.bfg.router                        154    154   100%   
-     repoze.bfg.security                      150    150   100%   
+     repoze.bfg.security                      222    222   100%   
      repoze.bfg.settings                       24     24   100%   
      repoze.bfg.template                        6      6   100%   
      repoze.bfg.templating                     17     17   100%   
@@ -209,28 +209,26 @@ trunk as of the 0.8a4 release).
      repoze.bfg.tests.test_registry           112    112   100%   
      repoze.bfg.tests.test_request             31     31   100%   
      repoze.bfg.tests.test_router             697    697   100%   
-     repoze.bfg.tests.test_security           464    464   100%   
+     repoze.bfg.tests.test_security           646    646   100%   
      repoze.bfg.tests.test_settings            83     83   100%   
      repoze.bfg.tests.test_template            73     73   100%   
      repoze.bfg.tests.test_templating          45     45   100%   
      repoze.bfg.tests.test_testing            408    408   100%   
      repoze.bfg.tests.test_traversal          606    606   100%   
      repoze.bfg.tests.test_url                126    126   100%   
-     repoze.bfg.tests.test_urldispatch        338    338   100%   
+     repoze.bfg.tests.test_urldispatch        345    345   100%   
      repoze.bfg.tests.test_view               418    418   100%   
      repoze.bfg.tests.test_wsgi               164    164   100%   
      repoze.bfg.tests.test_zcml               620    620   100%   
      repoze.bfg.traversal                     171    171   100%   
      repoze.bfg.url                            43     43   100%   
-     repoze.bfg.urldispatch                   157    157   100%   
+     repoze.bfg.urldispatch                   158    158   100%   
      repoze.bfg.view                           76     76   100%   
      repoze.bfg.wsgi                           43     43   100%   
      repoze.bfg.zcml                          246    246   100%   
      --------------------------------------------------------------------
-     TOTAL                                   6598   6598   100%   
+     TOTAL                                   6860   6860   100%   
      ----------------------------------------------------------------------
-     Ran 374 tests in 16.951s
+     Ran 397 tests in 18.572s
 
      OK
-
-

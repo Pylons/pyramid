@@ -14,6 +14,9 @@ Documentation
   "Available Add On Template System Bindings" in Templates chapter in
   narrative docs.
 
+- Update "Templates" narrative chapter in docs (expand to show a
+  sample template and correct macro example).
+
 Features
 --------
 
