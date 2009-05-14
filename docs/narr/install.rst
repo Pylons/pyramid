@@ -9,9 +9,9 @@ Before You Install
 You will need `Python <http://python.org>`_ version 2.4 or better to
 run :mod:`repoze.bfg`.  It has been tested under Python 2.4.5, Python
 2.5.2 and Python 2.6.  Development of :mod:`repoze.bfg` is currently
-done primarily under Python 2.4.  :mod:`repoze.bfg` does *not* run
-under any version of Python before 2.4, and does *not* run under
-Python 3.X.
+done primarily under Python 2.4 and Python 2.5.  :mod:`repoze.bfg`
+does *not* run under any version of Python before 2.4, and does *not*
+run under Python 3.X.
 
 .. note:: You will need :term:`setuptools` installed
    on within your Python system in order to run the ``easy_install``
@@ -21,21 +21,29 @@ Python 3.X.
    not require the compilation of any C code, so you do not need to
    have development tools installed on the target machine.
 
-Although BFG is known to run properly on all Unix-like systems, at the
-time of this writing, ``repoze.bfg`` is not tested on Windows systems.
-It might run; it might not.  There's nothing intrinsic about
-:mod:`repoze.bfg` that would prevent it from running on Windows, but
-none of the current developers use the platform.  Likewise for
-platforms like Jython, and Google App Engine; it may run, it may not.
+BFG is known to run properly on all popular (and even some
+less-popular) Unix-like systems such as Linux, MacOS X, and FreeBSD.
+
+At the time of this writing, ``repoze.bfg`` will run on Windows
+systems.  However, none of its developers use the Windows platform, so
+it is not tested regularly on Windows.  Most of the platform-specific
+documentation (including this chapter) assumes you're installing it on
+a UNIX system.
+
+:mod:`repoze.bfg` is known to run on Google's App Engine.  See
+:ref:`appengine_tutorial`.
+
+It is not known whether :mod:`repoze.bfg` will or will not run under
+Jython or IronPython.
 
 .. note:: If you'd like to help make sure :mod:`repoze.bfg` keeps
-.. running on your favorite alternate platform, we'd love to hear from
+   running on your favorite alternate platform, we'd love to hear from
    you.  Please contact us via the `repoze.dev maillist
    <http://lists.repoze.org/listinfo/repoze-dev>`_ if you'd like to
    contribute.
 
-Installing :mod:`repoze.bfg`
-----------------------------
+Installing :mod:`repoze.bfg` on a UNIX System
+---------------------------------------------
 
 It is advisable to install :mod:`repoze.bfg` into a :term:`virtualenv`
 in order to obtain isolation from any "system" packages you've got

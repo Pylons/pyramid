@@ -1,3 +1,5 @@
+.. _appengine_tutorial:
+
 Running :mod:`repoze.bfg` on Google's App Engine
 ================================================
 

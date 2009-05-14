@@ -62,10 +62,10 @@ When a user requests a page from your :mod:`repoze.bfg` -powered
 application, the system uses this algorithm to determine which Python
 code to execute:
 
-#.  The request for the page is presented to :mod:`repoze.bfg`'s
-     "router" in terms of a standard :term:`WSGI` request, which is
-     represented by a WSGI environment and a ``start_response``
-     callable.
+#.  The request for the page is presented to the :mod:`repoze.bfg`
+    "router" in terms of a standard :term:`WSGI` request, which is
+    represented by a WSGI environment and a ``start_response``
+    callable.
 
 #.  The router creates a :term:`WebOb` request object based on the
     WSGI environment.
@@ -246,7 +246,7 @@ Let's say that question is answered "here you go, here'a a bit of code
 that is willing to deal with that case", and returns a :term:`view`.
 It is passed the "biz" object as the "context" and the current
 :term:`WebOb` :term:`request` as the "request".  It returns a
-term:`response`.
+:term:`response`.
 
 There are two special cases:
 
