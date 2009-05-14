@@ -246,7 +246,7 @@ class BFGViewFunctionGrokker(martian.InstanceGrokker):
             name = obj.__view_name__
             request_type = obj.__request_type__
             context = kw['context']
-            # we dont tecnically need to pass "Uncacheable" here; any
+            # we dont technically need to pass "Uncacheable" here; any
             # view function decorated with an __is_bfg_view__ attr via
             # repoze.bfg.view.bfg_view is unpickleable; but the
             # uncacheable bit helps pickling fail more quickly
