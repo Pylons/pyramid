@@ -152,12 +152,12 @@ def model_path(model, *elements):
               ``model_path`` function will attempt to append it to a
               string and it will cause a TypeError.
 
-     .. note:: The the :term:`root` model *must* have a ``__name__``
-               attribute with a value of either ``None`` or the empty
-               string for paths to be generated properly.  If the root
-               model has a non-null ``__name__`` attribute, its name
-               will be prepended to the generated path rather than a
-               single leading '/' character.
+    .. note:: The the :term:`root` model *must* have a ``__name__``
+              attribute with a value of either ``None`` or the empty
+              string for paths to be generated properly.  If the root
+              model has a non-null ``__name__`` attribute, its name
+              will be prepended to the generated path rather than a
+              single leading '/' character.
     """
     path = _model_path_list(model, *elements)
     return path and '/'.join([quote_path_segment(x) for x in path]) or '/'
@@ -192,12 +192,12 @@ def model_path_tuple(model, *elements):
               dictionary will be placed in the path tuple; no warning
               or error will be given.
 
-     .. note:: The the :term:`root` model *must* have a ``__name__``
-               attribute with a value of either ``None`` or the empty
-               string for path tuples to be generated properly.  If
-               the root model has a non-null ``__name__`` attribute,
-               its name will be the first element in the generated
-               path tuple rather than the empty string.
+    .. note:: The the :term:`root` model *must* have a ``__name__``
+              attribute with a value of either ``None`` or the empty
+              string for path tuples to be generated properly.  If
+              the root model has a non-null ``__name__`` attribute,
+              its name will be the first element in the generated
+              path tuple rather than the empty string.
     """
     return tuple(_model_path_list(model, *elements))
 

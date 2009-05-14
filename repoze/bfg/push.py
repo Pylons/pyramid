@@ -9,9 +9,10 @@ except ImportError:                         #pragma NO COVERAGE
     from repoze.bfg.functional import wraps #pragma NO COVERAGE
 
 class pushpage(object):
-    """ Decorator for a function which returns a response object after
-     running the namespace the wrapped function returns through a
-     Chameleon ZPT template.
+    """
+    Decorator for a function which returns a response object after
+    running the namespace the wrapped function returns through a
+    Chameleon ZPT template.
 
     E.g.::
 
