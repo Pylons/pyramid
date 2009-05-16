@@ -1,6 +1,67 @@
 0.8dev
 ======
 
+Backwards Incompatibilities
+---------------------------
+
+- The ``RoutesMapper`` class in ``repoze.bfg.urldispatch`` has been
+  removed, as well as its documentation.  It had been deprecated since
+  0.6.3.  Code in ``repoze.bfg.urldispatch.RoutesModelTraverser``
+  which catered to it has also been removed.
+
+- The semantics of the ``route`` ZCML directive have been simplified.
+  Previously, it was assumed that to use a route, you wanted to map a
+  route to an externally registered view.  The new ``route`` directive
+  instead has a ``view`` attribute which is required, specifying the
+  dotted path to a view callable.  When a route directive is
+  processed, a view is *registered* using the name attribute of the
+  route directive as its name and the callable as its value.  The
+  ``view_name`` and ``provides`` attributes of the ``route`` directive
+  are therefore no longer used.  Effectively, if you were previously
+  using the ``route`` directive, it means you must change a pair of
+  ZCML directives that look like this::
+
+    <route
+       name="home"
+       path=""
+       view_name="login"
+       factory=".models.root.Root"
+     />
+
+    <view
+       for=".models.root.Root"
+       name="login"
+       view=".views.login_view"
+     />
+    
+  To a ZCML directive that looks like this::
+
+    <route
+       name="home"
+       path=""
+       view=".views.login_view"
+       factory=".models.root.Root"
+     />
+
+  In other words, to make old code work, remove the ``view``
+  directives that were only there to serve the purpose of backing
+  ``route`` directives, and move their ``view=`` attribute into the
+  ``route`` directive itself.
+
+  This change also necessitated that the ``name`` attribute of the
+  ``route`` directive is now required.  If you were previously using
+  ``route`` directives without a ``name`` attribute, you'll need to
+  add one (the name is arbitrary, but must be unique among all
+  ``route`` and ``view`` statements).
+
+  The ``provides`` attribute of the ``route`` directive has also been
+  removed.  This directive specified a sequence of interface types
+  that the generated context would be decorated with.  Since route
+  views are always generated now for a single interface
+  (``repoze.bfg.IRoutesContext``) as opposed to being looked up
+  arbitrarily, there is no need to decorate any context to ensure a
+  view is found.
+
 Documentation
 -------------
 
@@ -25,6 +86,9 @@ Features
   SQAlchemy (with SQLite) and uses traversal to resolve URLs.  (no
   Routes areused).  This template can be used via ``paster create -t
   bfg_alchemy``.
+
+- The Routes ``Route`` object used to resolve the match is now put
+  into the environment as ``bfg.route`` when URL dispatch is used.
 
 0.8a6 (2009-05-11)
 ==================

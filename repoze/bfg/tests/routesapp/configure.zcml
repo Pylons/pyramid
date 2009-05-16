@@ -4,14 +4,9 @@
 
   <route
     path=":id"
-    provides=".models.IFixture"
-    view_name="default"/>
-
-  <view
-      name="default"
-      view=".views.fixture_view"
-      for=".models.IFixture"
-      permission="repoze.view"
-      />
+    name="default"
+    view=".views.fixture_view"
+    permission="repoze.view"
+   />
 
 </configure>

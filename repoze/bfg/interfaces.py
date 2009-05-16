@@ -29,7 +29,7 @@ class IDELETERequest(IRequest):
 
 class IHEADRequest(IRequest):
     """ Request type interface attached to HEAD requests"""
-    
+
 class IResponseFactory(Interface):
     """ A utility which generates a response factory """
     def __call__():

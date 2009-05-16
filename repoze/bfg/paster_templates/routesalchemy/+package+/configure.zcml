@@ -8,17 +8,13 @@
 
   <route path=""
     name="home"
+    view=".views.my_view"
     factory=".models.get_root_model"
     />
 
-  <view
-     for=".models.Model"
-     view=".views.my_view"
-     />
-
-  <view
-     view=".views.static_view"
-     name="static"
-     />
+  <route path="static/*subpath"
+    name="static"
+    view=".views.static_view"
+    />
 
 </configure>

@@ -9,19 +9,15 @@ also map URLs to code via :term:`URL dispatch` using the
 :term:`Routes` framework.  The :term:`Routes` framework is a Python
 reimplementation of the `Rails routes system
 <http://manuals.rubyonrails.com/read/chapter/65>`_.  It is a mechanism
-which allows you to declaratively map URLs to code.  Both traversal
-and URL dispatch have the same goal: to find the context and the view
-name.
+which allows you to declaratively map URLs to code.  
 
 .. note:: In common :term:`Routes` lingo, the code that it maps URLs
           to is defined by a *controller* and an *action*.  However,
           neither concept (controller nor action) exists within
           :mod:`repoze.bfg`.  Instead, when you map a URL pattern to
-          code in bfg, you will map the URL patterm to a
-          :term:`context` and a :term:`view name`.  Once the context
-          and view name are found, the same :term:`view` lookup which
-          is detailed in :ref:`traversal_chapter` will be done using
-          the context and view name found via a route.
+          code in bfg, you will map the URL patterm to a :term:`view`.
+          Once the context and view name are found, the view will be
+          called with a :term:`context` and a :term:`request`.
 
 It often makes a lot of sense to use :term:`URL dispatch` instead of
 :term:`traversal` in an application that has no natural hierarchy.
@@ -51,19 +47,20 @@ allows you to inject ``route`` ZCML directives into your application's
           :mod:`repoze.bfg`.
 
 When any ``route`` ZCML directive is present in an application's
-``configure.zcml``, "under the hood" :mod:`repoze.bfg` wraps the "root
-factory" in a special ``RoutesRootFactory`` instance.  The wrapper
-instance then acts as the root factory.  When it acts as a root
-factory, it is willing to check the requested URL against a *routes
-map* to find the :term:`context` and the :term:`view name` before
-traversal has a chance to find it first.  If it finds a context and a
-view name via a route, :mod:`repoze.bfg` will attempt to look up and
-call a :mod:`repoze.bfg` :term:`view` that matches the context and the
-view name.  If no route matches, :mod:`repoze.bfg` will fail over to
-calling the root factory callable passed to the application in it's
-``make_app`` function (usually a traversal function).  By configuring
-your ZCML ``route`` statements appropriately, you can mix and match
-URL dispatch and traversal in this way.
+``configure.zcml``, "under the hood" :mod:`repoze.bfg` wraps the
+:term:`root factory` in a special ``RoutesRootFactory`` instance.  The
+wrapper instance then acts as the effective root factory.  When it
+acts as a root factory, it is willing to check the requested URL
+against a *routes map* to find a :term:`context` and a :term:`view`
+before traversal has a chance to find it first.  If a route matches, a
+:term:`context` is generated and :mod:`repoze.bfg` will call the
+:term:`view` specified with the context and the request.
+
+If no route matches, :mod:`repoze.bfg` will fail over to calling the
+root factory callable passed to the application in it's ``make_app``
+function (usually a traversal function).  By configuring your ZCML
+``route`` statements appropriately, you can mix and match URL dispatch
+and traversal in this way.
 
 A root factory is not required for purely URL-dispatch-based apps: if
 the root factory callable is ``None``, :mod:`repoze.bfg` will return a
@@ -88,25 +85,27 @@ name
 
   The `route name
   <http://routes.groovie.org/manual.html#route-name>`_,
-  e.g. ``myroute``.
+  e.g. ``myroute``.  This attribute is required.
 
-view_name
+view
 
-  The :mod:`repoze.bfg` :term:`view name` that should be looked up
-  when this route matches a URL.
+  The Python dotted-path name to a function that will be used as a
+  view callable when this route matches.
+  e.g. ``mypackage.views.my_view``.  This attribute is required.
+
+permission
+
+  The permission name required to invoke the view.
+  e.g. ``edit``. (see :ref:`using_security_with_urldispatch` for more
+  information about permissions).
 
 factory
 
   The Python dotted-path name to a function that will generate a
-  :mod:`repoze.bfg` context object when this route matches.  By
-  default, a ``repoze.bfg.urldispatch.DefaultRoutesContext`` object
-  will be constructed if a factory is not provided.
-
-provides
-
-  One or more Python-dotted path names to :term:`interface` objects
-  that the context should be decorated with when it's constructed
-  (allowing it to be found by a particular view lookup).
+  :mod:`repoze.bfg` context object when this route matches.
+  e.g. ``mypackage.models.MyFactoryClass``.  By default, a
+  ``repoze.bfg.urldispatch.DefaultRoutesContext`` object will be
+  constructed if a factory is not provided.
 
 encoding
 
@@ -179,39 +178,85 @@ that allows you to specify Routes `requirement
 For example:
 
 .. code-block:: xml
+   :linenos:
 
-   <route path="archives/:year/:month">
+   <route 
+     name="archive"
+     path="archives/:year/:month"
+     view=".views.archive_view">
 
    <requirement
       attr="year"
-      expr="d{2,4}"/>
+      expr="d{2,4}"
+      />
 
    <requirement
       attr="month"
-      expr="d{1,2}"/>
+      expr="d{1,2}"
+      />
 
    </route>
 
 Example 1
 ---------
 
-Below is an example of some route statements you might add to your
-``configure.zcml``: 
+The simplest route delcaration:
 
 .. code-block:: xml
    :linenos:
 
    <route
+    name="idea"
+    path="hello.html"
+    view="mypackage.views.hello_view"
+    />
+
+When the URL matches ``/hello.html``, the view callable at the Python
+dotted path name ``mypackage.views.hello_view`` will be called with a
+default context object and the request.  See :ref:`views_chapter` for
+more information about views.
+
+The ``mypackage.views`` module referred to above might look like so:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+
+   def hello_view(context, request):
+       return Response('Hello!')
+
+In this case the context object passed to the view will be an instance
+of the ``repoze.bfg.urldispatch.DefaultRoutesContext``.  This is the
+type of obejct created for a context when there is no "factory"
+specified in the ``route`` declaration.
+
+Example 2
+---------
+
+Below is an example of some more complicated route statements you
+might add to your ``configure.zcml``:
+
+.. code-block:: xml
+   :linenos:
+
+   <route
+    name="idea"
     path="ideas/:idea"
-    view_name="ideas"/>
+    view="mypackage.views.idea_view"
+    />
 
    <route
+    name="user"
     path="users/:user"
-    view_name="users"/>
+    view="mypackage.views.user_view"
+    />
 
-   <route
+   <route 
+    name="tag" 
     path="tags/:tag"
-    view_name="tags"/>
+    view="mypackage.views.tag_view"
+    />
 
 The above configuration will allow :mod:`repoze.bfg` to service URLs
 in these forms:
@@ -224,10 +269,12 @@ in these forms:
    /tags/<tagname>
 
 When a URL matches the pattern ``/ideas/<ideaname>``, the view
-registered with the name ``ideas`` for the interface
-``repoze.bfg.interfaces.IRoutesContext`` will be called.  An error
-will be raised if no view can be found with that interface type and
-view name combination.
+registered with the name ``idea`` will be called.  This will be the
+view available at the dotted Python pathname
+``mypackage.views.idea_view``.  
+
+Example 3
+---------
 
 The context object passed to a view found as the result of URL
 dispatch will by default be an instance of the
@@ -243,46 +290,31 @@ An example of using a route with a factory:
    :linenos:
 
    <route
+    name="idea"
     path="ideas/:idea"
+    view=".views.idea_view"
     factory=".models.Idea"
-    view_name="ideas"/>
+    />
 
 The above route will manufacture an ``Idea`` model as a context,
-assuming that ``.models.Idea`` resolves to a class that accepts
-arbitrary key/value pair arguments.
+assuming that ``mypackage.models.Idea`` resolves to a class that
+accepts arbitrary key/value pair arguments.
 
 .. note:: Values prefixed with a period (``.``) for the ``factory``
    and ``provides`` attributes of a ``route`` (such as
-   ``.models.Idea`` above) mean "relative to the Python package
-   directory in which this :term:`ZCML` file is stored".  So if the
-   above ``route`` declaration was made inside a ``configure.zcml``
-   file that lived in the ``hello`` package, you could replace the
-   relative ``.models.Idea`` with the absolute ``hello.models.Idea``
-   Either the relative or absolute form is functionally equivalent.
-   It's often useful to use the relative form, in case your package's
-   name changes.  It's also shorter to type.
+   ``.models.Idea`` and ``.views.idea_view``) above) mean "relative to
+   the Python package directory in which this :term:`ZCML` file is
+   stored".  So if the above ``route`` declaration was made inside a
+   ``configure.zcml`` file that lived in the ``hello`` package, you
+   could replace the relative ``.models.Idea`` with the absolute
+   ``hello.models.Idea`` Either the relative or absolute form is
+   functionally equivalent.  It's often useful to use the relative
+   form, in case your package's name changes.  It's also shorter to
+   type.
 
 All context objects manufactured via URL dispatch will be decorated by
 default with the ``repoze.bfg.interfaces.IRoutesContext``
-:term:`interface`.  To decorate a context found via a route with other
-interfaces, you can use a ``provides`` attribute on the ZCML
-statement.  It should be a space-separated list of dotted Python names
-that point at interface definitions.
-
-An example of using a route with a set of ``provides`` interfaces:
-
-.. code-block:: xml
-   :linenos:
-
-   <route
-    path="ideas/:idea"
-    provides=".interfaces.IIdea .interfaces.IContent"
-    view_name="ideas"/>
-
-The above route will manufacture an instance of
-``DefaultRoutesContext`` as a context; it will be decorate with the
-``.interfaces.IIdea`` and ``.interfaces.IContent`` interfaces, as long
-as those dotted names resolve to interfaces.
+:term:`interface`.
 
 If no route matches in the above configuration, :mod:`repoze.bfg` will
 call the "fallback" ``get_root`` callable provided to it during
@@ -294,7 +326,7 @@ error will be raised when no route matches.
           context.  You can also map classes to views; interfaces are
           not used then.
 
-Example 2
+Example 4
 ---------
 
 An example of configuring a ``view`` declaration in ``configure.zcml``
@@ -304,24 +336,14 @@ function is as follows:
 .. code-block:: xml
    :linenos:
 
-   <view
-       for=".interfaces.ISomeContext"
-       view=".views.articles_view"
-       name="articles"
-       />
-
    <route
+      name="article"
       path="archives/:article"
-      view_name="articles"
+      view=".views.article_view"
       factory=".models.Article"
-      provides=".interfaces.ISomeContext"
       />
 
-All context objects found via Routes URL dispatch will provide the
-``IRoutesContext`` interface (attached dynamically).  The above
-``route`` statement will also cause contexts generated by the route to
-have the ``.interfaces.ISomeContext`` interface as well.  The
-``.models`` modulemight look like so:
+The ``.models`` module referred to above might look like so:
 
 .. code-block:: python
    :linenos:
@@ -329,6 +351,16 @@ have the ``.interfaces.ISomeContext`` interface as well.  The
    class Article(object):
        def __init__(self, **kw):
            self.__dict__.update(kw)
+
+The ``.views`` module referred to above might look like so:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+
+   def article_view(context, request):
+       return Response('Article with name' % context.article)
 
 The effect of this configuration: when this :mod:`repoze.bfg`
 application runs, if any URL matches the pattern
@@ -343,29 +375,6 @@ In this case in particular, when a user visits
 Article class and it will have an ``article`` attribute with the value
 of ``something``.
 
-Example 3
----------
-
-You can also make the ``view_name`` into a routes path argument
-instead of specifying it as an argument:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       for="repoze.bfg.interfaces.IRoutesContext"
-       view=".views.articles_view"
-       name="articles"
-       />
-
-   <route
-      path="archives/:view_name"
-      />
-
-When you do this, the :term:`view name` will be computed dynamically if
-the route matches.  In the above example, if the ``view_name`` turns
-out to be ``articles``, the articles view will eventually be called.
-
 Catching the Root URL
 ---------------------
 
@@ -379,7 +388,7 @@ declaration:
    <route
        path=""
        name="root"
-       view_name="root_view"
+       view=".views.root_view"
        />
 
 Cleaning Up After a Request
@@ -424,6 +433,8 @@ Then in the ``configure.zcml`` of your package, inject the following:
 
 This will cause the DBSession to be removed whenever the WSGI
 environment is destroyed (usually at the end of every request).
+
+.. _using_security_with_urldispatch:
 
 Using :mod:`repoze.bfg` Security With URL Dispatch
 --------------------------------------------------
@@ -470,10 +481,4 @@ the ``Article`` class' constructor, too.
    <http://routes.groovie.org/manual.html#conditions>`_ in the
    :term:`Routes` manual for a general overview of what the
    ``condition`` argument to ``.connect`` does.
-
-Further Documentation and Examples
-----------------------------------
-
-The API documentation in :ref:`urldispatch_module` documents an older
-(now-deprecated) version of Routes support in :mod:`repoze.bfg`.
 

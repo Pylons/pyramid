@@ -1,80 +1,5 @@
 import unittest
 
-class RoutesMapperTests(unittest.TestCase):
-    def setUp(self):
-        from zope.deprecation import __show__
-        __show__.off()
-
-    def tearDown(self):
-        from zope.deprecation import __show__
-        __show__.on()
-
-    def _getEnviron(self, **kw):
-        environ = {'SERVER_NAME':'localhost',
-                   'wsgi.url_scheme':'http'}
-        environ.update(kw)
-        return environ
-
-    def _getTargetClass(self):
-        from repoze.bfg.urldispatch import RoutesMapper
-        return RoutesMapper
-
-    def _makeOne(self, get_root):
-        klass = self._getTargetClass()
-        return klass(get_root)
-
-    def test_routes_mapper_no_route_matches(self):
-        marker = ()
-        get_root = make_get_root(marker)
-        mapper = self._makeOne(get_root)
-        environ = self._getEnviron(PATH_INFO='/')
-        result = mapper(environ)
-        self.assertEqual(result, marker)
-        self.assertEqual(mapper.mapper.environ, environ)
-
-    def test_routes_mapper_route_matches(self):
-        marker = ()
-        get_root = make_get_root(marker)
-        mapper = self._makeOne(get_root)
-        mapper.connect('archives/:action/:article', controller='foo')
-        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
-        result = mapper(environ)
-        from repoze.bfg.interfaces import IRoutesContext
-        self.failUnless(IRoutesContext.providedBy(result))
-        self.assertEqual(result.controller, 'foo')
-        self.assertEqual(result.action, 'action1')
-        self.assertEqual(result.article, 'article1')
-
-    def test_routes_mapper_custom_context_factory(self):
-        marker = ()
-        get_root = make_get_root(marker)
-        mapper = self._makeOne(get_root)
-        class Dummy(object):
-            def __init__(self, **kw):
-                self.__dict__.update(kw)
-        mapper.connect('archives/:action/:article', controller='foo',
-                       context_factory=Dummy)
-        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
-        result = mapper(environ)
-        self.assertEqual(result.controller, 'foo')
-        self.assertEqual(result.action, 'action1')
-        self.assertEqual(result.article, 'article1')
-        from repoze.bfg.interfaces import IRoutesContext
-        self.failUnless(IRoutesContext.providedBy(result))
-        self.failUnless(isinstance(result, Dummy))
-        self.failIf(hasattr(result, 'context_factory'))
-
-    def test_url_for(self):
-        marker = ()
-        get_root = make_get_root(marker)
-        mapper = self._makeOne(get_root)
-        mapper.connect('archives/:action/:article', controller='foo')
-        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
-        result = mapper(environ)
-        from routes import url_for
-        result = url_for(controller='foo', action='action2', article='article2')
-        self.assertEqual(result, '/archives/action2/article2')
-
 class RoutesRootFactoryTests(unittest.TestCase):
     def _getEnviron(self, **kw):
         environ = {'SERVER_NAME':'localhost',
@@ -103,18 +28,19 @@ class RoutesRootFactoryTests(unittest.TestCase):
         marker = ()
         get_root = make_get_root(marker)
         mapper = self._makeOne(get_root)
-        mapper.connect('archives/:action/:article', view_name='foo')
+        mapper.connect('foo', 'archives/:action/:article', foo='foo')
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
         from repoze.bfg.interfaces import IRoutesContext
         self.failUnless(IRoutesContext.providedBy(result))
-        self.assertEqual(result.view_name, 'foo')
+        self.assertEqual(result.foo, 'foo')
         self.assertEqual(result.action, 'action1')
         self.assertEqual(result.article, 'article1')
         routing_args = environ['wsgiorg.routing_args'][1]
-        self.assertEqual(routing_args['view_name'], 'foo')
+        self.assertEqual(routing_args['foo'], 'foo')
         self.assertEqual(routing_args['action'], 'action1')
         self.assertEqual(routing_args['article'], 'article1')
+        self.assertEqual(environ['bfg.route'].name, 'foo')
 
     def test_unnamed_root_route_matches(self):
         mapper = self._makeOne(None)
@@ -123,18 +49,28 @@ class RoutesRootFactoryTests(unittest.TestCase):
         result = mapper(environ)
         from repoze.bfg.interfaces import IRoutesContext
         self.failUnless(IRoutesContext.providedBy(result))
+        self.assertEqual(environ['bfg.route'].name, None)
+
+    def test_named_root_route_matches(self):
+        mapper = self._makeOne(None)
+        mapper.connect('root', '')
+        environ = self._getEnviron(PATH_INFO='/')
+        result = mapper(environ)
+        from repoze.bfg.interfaces import IRoutesContext
+        self.failUnless(IRoutesContext.providedBy(result))
+        self.assertEqual(environ['bfg.route'].name, 'root')
 
     def test_unicode_in_route_default(self):
         marker = ()
         get_root = make_get_root(marker)
         mapper = self._makeOne(get_root)
-        class DummyRoute:
+        class DummyRoute2:
             routepath = ':id'
             _factory = None
             _provides = ()
         la = unicode('\xc3\xb1a', 'utf-8')
-        mapper.routematch = lambda *arg: ({la:'id'}, DummyRoute)
-        mapper.connect(':la')
+        mapper.routematch = lambda *arg: ({la:'id'}, DummyRoute2)
+        mapper.connect('whatever', ':la')
         environ = self._getEnviron(PATH_INFO='/foo')
         result = mapper(environ)
         from repoze.bfg.interfaces import IRoutesContext
@@ -146,7 +82,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
     def test_no_fallback_get_root(self):
         marker = ()
         mapper = self._makeOne(None)
-        mapper.connect('wont/:be/:found', view_name='foo')
+        mapper.connect('wont', 'wont/:be/:found')
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
         from repoze.bfg.urldispatch import RoutesContextNotFound
@@ -163,11 +99,10 @@ class RoutesRootFactoryTests(unittest.TestCase):
             implements(IDummy)
             def __init__(self, **kw):
                 self.__dict__.update(kw)
-        mapper.connect('archives/:action/:article', view_name='foo',
+        mapper.connect('article', 'archives/:action/:article',
                        _factory=Dummy)
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
-        self.assertEqual(result.view_name, 'foo')
         self.assertEqual(result.action, 'action1')
         self.assertEqual(result.article, 'article1')
         from repoze.bfg.interfaces import IRoutesContext
@@ -176,40 +111,23 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.failUnless(IDummy.providedBy(result))
         self.failIf(hasattr(result, '_factory'))
 
-    def test_custom_provides(self):
-        marker = ()
-        get_root = make_get_root(marker)
-        mapper = self._makeOne(get_root)
-        from zope.interface import Interface
-        class IDummy(Interface):
-            pass
-        mapper.connect('archives/:action/:article', view_name='foo',
-                       _provides = [IDummy])
-        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
-        result = mapper(environ)
-        self.assertEqual(result.view_name, 'foo')
-        self.assertEqual(result.action, 'action1')
-        self.assertEqual(result.article, 'article1')
-        from repoze.bfg.interfaces import IRoutesContext
-        self.failUnless(IRoutesContext.providedBy(result))
-        self.failUnless(IDummy.providedBy(result))
-        self.failIf(hasattr(result, '_provides'))
-
     def test_has_routes(self):
         mapper = self._makeOne(None)
         self.assertEqual(mapper.has_routes(), False)
-        mapper.connect('archives/:action/:article', view_name='foo')
+        mapper.connect('whatever', 'archives/:action/:article')
         self.assertEqual(mapper.has_routes(), True)
 
     def test_url_for(self):
         marker = ()
         get_root = make_get_root(marker)
         mapper = self._makeOne(get_root)
-        mapper.connect('archives/:action/:article', view_name='foo')
+        mapper.connect('whatever', 'archives/:action/:article')
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
+        route = DummyRoute('yo')
+        environ['bfg.route'] = route
         result = mapper(environ)
         from routes import url_for
-        result = url_for(view_name='foo', action='action2', article='article2')
+        result = url_for(action='action2', article='article2')
         self.assertEqual(result, '/archives/action2/article2')
 
 class TestRoutesContextNotFound(unittest.TestCase):
@@ -248,75 +166,29 @@ class RoutesModelTraverserTests(unittest.TestCase):
         from repoze.bfg.interfaces import ITraverser
         verifyObject(ITraverser, self._makeOne(None))
 
-    def test_call_with_only_controller_bwcompat(self):
-        model = DummyContext()
-        model.controller = 'controller'
-        traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'controller')
-        self.assertEqual(result[2], [])
-        self.assertEqual(result[3], None)
-        self.assertEqual(result[4], model)
-        self.assertEqual(result[5], None)
-
-    def test_call_with_only_view_name_bwcompat(self):
-        model = DummyContext()
-        model.view_name = 'view_name'
-        traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
-        self.assertEqual(result[2], [])
-        self.assertEqual(result[3], None)
-        self.assertEqual(result[4], model)
-        self.assertEqual(result[5], None)
-
-    def test_call_with_subpath_bwcompat(self):
-        model = DummyContext()
-        model.view_name = 'view_name'
-        model.subpath = '/a/b/c'
-        traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
-        self.assertEqual(result[2], ['a', 'b', 'c'])
-        self.assertEqual(result[3], None)
-        self.assertEqual(result[4], model)
-        self.assertEqual(result[5], None)
-
-    def test_call_with_no_view_name_or_controller_bwcompat(self):
+    def test_it_nothingfancy(self):
         model = DummyContext()
         traverser = self._makeOne(model)
-        result = traverser({})
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], '')
-        self.assertEqual(result[2], [])
-        self.assertEqual(result[3], None)
-        self.assertEqual(result[4], model)
-        self.assertEqual(result[5], None)
-
-    def test_call_with_only_view_name(self):
-        model = DummyContext()
-        traverser = self._makeOne(model)
-        routing_args = ((), {'view_name':'view_name'})
-        environ = {'wsgiorg.routing_args': routing_args}
+        routing_args = ((), {})
+        route = DummyRoute('yo')
+        environ = {'wsgiorg.routing_args': routing_args, 'bfg.route': route}
         result = traverser(environ)
         self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[1], 'yo')
         self.assertEqual(result[2], [])
         self.assertEqual(result[3], None)
         self.assertEqual(result[4], model)
         self.assertEqual(result[5], None)
 
-    def test_call_with_view_name_and_subpath(self):
+    def test_call_with_subpath(self):
         model = DummyContext()
         traverser = self._makeOne(model)
-        routing_args = ((), {'view_name':'view_name', 'subpath':'/a/b/c'})
-        environ = {'wsgiorg.routing_args': routing_args}
+        routing_args = ((), {'subpath':'/a/b/c'})
+        route = DummyRoute('yo')
+        environ = {'wsgiorg.routing_args':routing_args, 'bfg.route': route}
         result = traverser(environ)
         self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[1], 'yo')
         self.assertEqual(result[2], ['a', 'b','c'])
         self.assertEqual(result[3], None)
         self.assertEqual(result[4], model)
@@ -325,12 +197,13 @@ class RoutesModelTraverserTests(unittest.TestCase):
     def test_with_path_info(self):
         model = DummyContext()
         traverser = self._makeOne(model)
-        routing_args = ((), {'view_name':'view_name', 'path_info':'foo/bar'})
-        environ = {'wsgiorg.routing_args': routing_args,
+        routing_args = ((), {'path_info':'foo/bar'})
+        route = DummyRoute('yo')
+        environ = {'wsgiorg.routing_args': routing_args, 'bfg.route': route,
                    'PATH_INFO':'/a/b/foo/bar', 'SCRIPT_NAME':''}
         result = traverser(environ)
         self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'view_name')
+        self.assertEqual(result[1], 'yo')
         self.assertEqual(result[2], [])
         self.assertEqual(result[3], None)
         self.assertEqual(result[4], model)
@@ -341,8 +214,9 @@ class RoutesModelTraverserTests(unittest.TestCase):
     def test_with_path_info_PATH_INFO_w_extra_slash(self):
         model = DummyContext()
         traverser = self._makeOne(model)
-        routing_args = ((), {'view_name':'view_name', 'path_info':'foo/bar'})
-        environ = {'wsgiorg.routing_args': routing_args,
+        routing_args = ((), {'path_info':'foo/bar'})
+        route = DummyRoute('yo')
+        environ = {'wsgiorg.routing_args': routing_args, 'bfg.route':route,
                    'PATH_INFO':'/a/b//foo/bar', 'SCRIPT_NAME':''}
         result = traverser(environ)
         self.assertEqual(environ['PATH_INFO'], '/foo/bar')
@@ -400,3 +274,7 @@ class DummyContext(object):
 class DummyRequest(object):
     """ """
     
+class DummyRoute(object):
+    def __init__(self, name):
+        self.name = name
+        

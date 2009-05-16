@@ -24,8 +24,10 @@ from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRoutesMapper
+from repoze.bfg.interfaces import IRoutesContext
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
+
 from repoze.bfg.path import package_path
 
 from repoze.bfg.security import ViewPermissionFactory
@@ -271,12 +273,11 @@ def route_requirement(context, attr, expr):
 class IRouteDirective(Interface):
     """ The interface for the ``route`` ZCML directive
     """
+    name = TextLine(title=u'name', required=True)
     path = TextLine(title=u'path', required=True)
-    name = TextLine(title=u'name', required=False)
-    view_name = TextLine(title=u'view_name', required=False)
+    view = GlobalObject(title=u'view', required=True)
+    permission = TextLine(title=u'permission', required=False)
     factory = GlobalObject(title=u'context factory', required=False)
-    provides = Tokens(title=u'context interfaces', required=False,
-                      value_type=GlobalObject())
     minimize = Bool(title=u'minimize', required=False)
     encoding = TextLine(title=u'encoding', required=False)
     static = Bool(title=u'static', required=False)
@@ -299,13 +300,8 @@ def connect_route(directive):
     mapper = queryUtility(IRoutesMapper)
     if mapper is None:
         return
-    args = []
-    if directive.name:
-        args.append(directive.name)
-    args.append(directive.path)
+    args = [directive.name, directive.path]
     kw = dict(requirements=directive.requirements)
-    if directive.view_name:
-        kw['view_name'] = directive.view_name
     if directive.minimize:
         kw['_minimize'] = True
     if directive.explicit:
@@ -341,57 +337,55 @@ def connect_route(directive):
 
     if directive.factory:
         kw['_factory'] = directive.factory
-    if directive.provides:
-        kw['_provides'] = directive.provides
 
     return mapper.connect(*args, **kw)
 
 class Route(zope.configuration.config.GroupingContextDecorator):
     """ Handle ``route`` ZCML directives
     """
+    view = None
+    permission = None
+    factory = None
+    minimize = True
+    encoding = None
+    static = False
+    filter = None
+    absolute = False
+    member_name = None
+    collection_name = None
+    condition_method = None
+    condition_subdomain = None
+    condition_function = None
+    parent_member_name = None
+    parent_collection_name = None
+    subdomains = None
+    explicit = False
 
-    implements(zope.configuration.config.IConfigurationContext,IRouteDirective)
+    implements(zope.configuration.config.IConfigurationContext,
+               IRouteDirective)
 
-    def __init__(self, context, path, name=None, view_name='', factory=None,
-                 provides=(), minimize=True, encoding=None, static=False,
-                 filter=None, absolute=False, member_name=None,
-                 collection_name=None, condition_method=None,
-                 condition_subdomain=None, condition_function=None,
-                 parent_member_name=None, parent_collection_name=None,
-                 subdomains=None, explicit=False):
+    def __init__(self, context, path, name, view, **kw):
+        self.validate(**kw)
+        self.requirements = {} # mutated by subdirectives
         self.context = context
         self.path = path
         self.name = name
-        self.view_name = view_name
-        self.factory = factory
-        self.provides = provides
-        self.minimize = minimize
-        self.encoding = encoding
-        self.static = static
-        self.filter = filter
-        self.absolute = absolute
-        self.member_name = member_name
-        self.collection_name = collection_name
-        self.condition_method= condition_method
-        self.condition_subdomain = condition_subdomain
-        self.condition_function = condition_function
-        self.explicit = explicit
-        self.subdomains = subdomains
-        if parent_member_name is not None:
-            if parent_collection_name is not None:
-                self.parent_member_name = parent_member_name
-                self.parent_collection_name = parent_collection_name
-            else:
-                raise ValueError(
+        self.view = view
+        self.__dict__.update(**kw)
+
+    def validate(self, **kw):
+        parent_member_name = kw.get('parent_member_name')
+        parent_collection_name = kw.get('parent_collection_name')
+        if parent_member_name or parent_collection_name:
+            if not (parent_member_name and parent_collection_name):
+                raise ConfigurationError(
                     'parent_member_name and parent_collection_name must be '
                     'specified together')
-        else:
-            self.parent_member_name = None
-            self.parent_collection_name = None
-        # added by subdirectives
-        self.requirements = {}
 
     def after(self):
+        view(self.context, self.permission, IRoutesContext, self.view,
+             self.name, None)
+
         self.context.action(
             discriminator = ('route', self.path, repr(self.requirements),
                              self.condition_method, self.condition_subdomain,
@@ -399,3 +393,4 @@ class Route(zope.configuration.config.GroupingContextDecorator):
             callable = connect_route,
             args = (self,),
             )
+
