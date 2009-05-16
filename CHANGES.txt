@@ -219,10 +219,10 @@ Features
   package within the ``configure.zcml`` of the "repoze.bfg.includes"
   package.  This has been a no-op for some time now.
 
--The ``repoze.bfg.chameleon_zpt`` package no longer imports from
- ``chameleon.zpt`` at module scope, deferring the import until later
- within a method call.  The ``chameleon.zpt`` package can't be
- imported on platforms like GAE.
+- The ``repoze.bfg.chameleon_zpt`` package no longer imports from
+  ``chameleon.zpt`` at module scope, deferring the import until later
+  within a method call.  The ``chameleon.zpt`` package can't be
+  imported on platforms like GAE.
 
 0.8a1 (2009-05-02)
 ==================
