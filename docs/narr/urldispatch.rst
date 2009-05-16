@@ -477,8 +477,3 @@ the ``Article`` class' constructor, too.
 .. note:: See :ref:`security_chapter` for more information about
    :mod:`repoze.bfg` security and ACLs.
 
-.. note:: See `Conditions
-   <http://routes.groovie.org/manual.html#conditions>`_ in the
-   :term:`Routes` manual for a general overview of what the
-   ``condition`` argument to ``.connect`` does.
-
