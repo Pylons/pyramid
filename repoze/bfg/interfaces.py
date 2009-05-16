@@ -215,6 +215,10 @@ class IContextURL(Interface):
     def __call__():
         """ Return a URL that points to the context """
 
+class IRoutesContextFactory(Interface):
+    """ A marker interface used to look up the default routes context factory
+    """
+
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)
 VH_ROOT_KEY = 'HTTP_X_VHM_ROOT' 

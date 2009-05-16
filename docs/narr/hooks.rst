@@ -167,3 +167,29 @@ factory:
    Forbidden`` status code, rather than use the default unauthorized
    application factory, which sends a response with a ``401
    Unauthorized`` status code.
+
+Changing the Default Routes Context Factory
+-------------------------------------------
+
+The default Routes "context factory" (the object used to create
+context objects when you use ``<route..>`` statements in your ZCML) is
+``repoze.bfg.urldispatch.DefaultRoutesContext``.  You may change the
+class used as the Routes "context factory" by placing the following
+ZCML in your ``configure.zcml`` file.
+
+.. code-block:: xml
+   :linenos:
+
+   <utility provides="repoze.bfg.interfaces.IRoutesContextFactory"
+            component="helloworld.factories.routes_context_factory"/>
+
+Replace ``helloworld.factories.routes_context_factory`` with the
+Python dotted name to the context factory you want to use.  Here's
+some sample code that implements a minimal context factory:
+
+.. code-block:: python
+
+   class RoutesContextFactory(object):
+       def __init__(self, **kw):
+           self.__dict__.update(kw)
+

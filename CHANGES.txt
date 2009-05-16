@@ -90,6 +90,10 @@ Features
 - The Routes ``Route`` object used to resolve the match is now put
   into the environment as ``bfg.route`` when URL dispatch is used.
 
+- You can now change the default Routes "context factory" globally.
+  See the "ZCML Hooks" chapter of the documentation (in the "Changing
+  the Default Routes Context Factory" section).
+
 0.8a6 (2009-05-11)
 ==================
 

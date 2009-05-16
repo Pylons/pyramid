@@ -1,8 +1,11 @@
 import re
 
+from zope.component import queryUtility
+
+from zope.deprecation import deprecated 
+
 from zope.interface import implements
 from zope.interface import alsoProvides
-
 from zope.interface import classProvides
 
 from routes import Mapper
@@ -12,10 +15,9 @@ from routes import url_for
 from repoze.bfg.interfaces import IContextNotFound
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import IRoutesContext
+from repoze.bfg.interfaces import IRoutesContextFactory
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
-
-from zope.deprecation import deprecated 
 
 _marker = ()
 
@@ -53,6 +55,7 @@ class RoutesRootFactory(Mapper):
     present as Routes match arguments dictionary keys.  If no Routes
     route matches the current request, the 'fallback' get_root is
     called."""
+    decorate_context = True
     def __init__(self, get_root=None, **kw):
         self.get_root = get_root
         kw['controller_scan'] = None
@@ -61,6 +64,11 @@ class RoutesRootFactory(Mapper):
         kw['explicit'] = True
         Mapper.__init__(self, **kw)
         self._regs_created = False
+        context_factory = queryUtility(IRoutesContextFactory,
+                                       default=DefaultRoutesContext)
+        if IRoutesContext.implementedBy(context_factory):
+            self.decorate_context = False
+        self.default_context_factory = context_factory
 
     def has_routes(self):
         return bool(self.matchlist)
@@ -103,8 +111,9 @@ class RoutesRootFactory(Mapper):
                 kw[k] = v
             factory = route._factory
             if factory is None:
-                factory = DefaultRoutesContext
-                context = factory(**kw)
+                context = self.default_context_factory(**kw)
+                if self.decorate_context:
+                    alsoProvides(context, IRoutesContext)
             else:
                 context = factory(**kw)
                 alsoProvides(context, IRoutesContext)

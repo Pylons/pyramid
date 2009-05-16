@@ -1,6 +1,13 @@
 import unittest
+from repoze.bfg.testing import cleanUp
 
 class RoutesRootFactoryTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _getEnviron(self, **kw):
         environ = {'SERVER_NAME':'localhost',
                    'wsgi.url_scheme':'http'}
@@ -14,6 +21,32 @@ class RoutesRootFactoryTests(unittest.TestCase):
     def _makeOne(self, get_root):
         klass = self._getTargetClass()
         return klass(get_root)
+
+    def test_init_custom_default_context_factory_dont_decorate(self):
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import IRoutesContextFactory
+        class Dummy(object):
+            pass
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(Dummy, IRoutesContextFactory)
+        mapper = self._makeOne(None)
+        self.assertEqual(mapper.default_context_factory,
+                         Dummy)
+        self.assertEqual(mapper.decorate_context, True)
+
+    def test_init_custom_default_context_factory_decorate(self):
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import IRoutesContextFactory
+        from repoze.bfg.interfaces import IRoutesContext
+        from zope.interface import implements
+        class Dummy(object):
+            implements(IRoutesContext)
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(Dummy, IRoutesContextFactory)
+        mapper = self._makeOne(None)
+        self.assertEqual(mapper.default_context_factory,
+                         Dummy)
+        self.assertEqual(mapper.decorate_context, False)
 
     def test_no_route_matches(self):
         marker = ()
@@ -80,12 +113,12 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(routing_args[la.encode('utf-8')], 'id')
 
     def test_no_fallback_get_root(self):
+        from repoze.bfg.urldispatch import RoutesContextNotFound
         marker = ()
         mapper = self._makeOne(None)
         mapper.connect('wont', 'wont/:be/:found')
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
-        from repoze.bfg.urldispatch import RoutesContextNotFound
         self.failUnless(isinstance(result, RoutesContextNotFound))
 
     def test_custom_factory(self):
@@ -110,6 +143,32 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.failUnless(isinstance(result, Dummy))
         self.failUnless(IDummy.providedBy(result))
         self.failIf(hasattr(result, '_factory'))
+
+    def test_decorate_context_false(self):
+        from repoze.bfg.interfaces import IRoutesContext
+        class Dummy:
+            def __init__(self, **kw):
+                pass
+        mapper = self._makeOne(None)
+        mapper.connect('root', '')
+        environ = self._getEnviron(PATH_INFO='/')
+        mapper.decorate_context = False
+        mapper.default_context_factory = Dummy
+        result = mapper(environ)
+        self.failIf(IRoutesContext.providedBy(result))
+
+    def test_decorate_context_true(self):
+        from repoze.bfg.interfaces import IRoutesContext
+        class Dummy:
+            def __init__(self, **kw):
+                pass
+        mapper = self._makeOne(None)
+        mapper.connect('root', '')
+        environ = self._getEnviron(PATH_INFO='/')
+        mapper.decorate_context = True
+        mapper.default_context_factory = Dummy
+        result = mapper(environ)
+        self.failUnless(IRoutesContext.providedBy(result))
 
     def test_has_routes(self):
         mapper = self._makeOne(None)
