@@ -40,19 +40,19 @@ _notfound = RoutesContextNotFound(
     'Routes context cannot be found and no fallback "get_root"')
 
 class RoutesRootFactory(Mapper):
-    """ The ``RoutesRootFactory`` is a wrapper for the ``get_root``
+    """ The ``RoutesRootFactory`` is a wrapper for the root factory
     callable passed in to the repoze.bfg ``Router`` at initialization
-    time.  When it is instantiated, it wraps the get_root of an
+    time.  When it is instantiated, it wraps the root factory of an
     application in such a way that the `Routes
     <http://routes.groovie.org/index.html>`_ engine has the 'first
     crack' at resolving the current request URL to a repoze.bfg view.
     Any view that claims it is 'for' the interface
     ``repoze.bfg.interfaces.IRoutesContext`` will be called if its
-    *name* matches the Routes ``view_name`` name for the match and any
-    of the interfaces named in ``_provides``.  It will be
-    passed a context object that has attributes that match the Routes
-    match arguments dictionary keys.  If no Routes route matches the
-    current request, the 'fallback' get_root is called."""
+    name matches the Routes route ``name`` name for the match.  It
+    will be passed a context object that has attributes that are
+    present as Routes match arguments dictionary keys.  If no Routes
+    route matches the current request, the 'fallback' get_root is
+    called."""
     def __init__(self, get_root=None, **kw):
         self.get_root = get_root
         kw['controller_scan'] = None
@@ -68,14 +68,10 @@ class RoutesRootFactory(Mapper):
     def connect(self, *arg, **kw):
         # we need to deal with our custom attributes specially :-(
         factory = None
-        provides = ()
-        if '_provides' in kw:
-            provides = kw.pop('_provides')
         if '_factory' in kw:
             factory = kw.pop('_factory')
         result = Mapper.connect(self, *arg, **kw)
         self.matchlist[-1]._factory = factory
-        self.matchlist[-1]._provides = provides
         return result
 
     def __call__(self, environ):
@@ -92,9 +88,6 @@ class RoutesRootFactory(Mapper):
         if isinstance(args, dict): # might be an empty dict
             args = args.copy()
             routepath = route.routepath
-            factory = route._factory
-            if factory is None:
-                factory = DefaultRoutesContext
             config = request_config()
             config.mapper = self
             config.mapper_dict = args
@@ -108,10 +101,15 @@ class RoutesRootFactory(Mapper):
                 if k.__class__ is unicode:
                     k = k.encode('utf-8')
                 kw[k] = v
-            context = factory(**kw)
+            factory = route._factory
+            if factory is None:
+                factory = DefaultRoutesContext
+                context = factory(**kw)
+            else:
+                context = factory(**kw)
+                alsoProvides(context, IRoutesContext)
             environ['wsgiorg.routing_args'] = ((), kw)
             environ['bfg.route'] = route
-            alsoProvides(context, IRoutesContext)
             return context
 
         if self.get_root is None:
