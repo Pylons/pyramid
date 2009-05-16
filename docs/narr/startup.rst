@@ -102,22 +102,13 @@ press ``return`` after running ``paster serve MyProject.ini``.
    Note that the app function imports the ``get_root`` root factory
    function from the ``myproject.models`` Python module.  It then also
    imports the "bare" ``myproject`` package, and passes ``get_root``,
-   ``myproject``, and the result of ``get_options(kw)`` as the
-   ``options`` keyword to the ``make_app`` function of the
-   ``repoze.bfg.router`` module.
-
-   ``get_options`` is a function imported from a :mod:`repoze.bfg`
-   package which allows the user to pass framework-related (as opposed
-   to application-related) options to an application constructor.  It
-   picks off framework-related options from the ``**kw`` dictionary
-   passed in to the constructor.  For example, we actually use a
-   framework option named ``reload_templates`` in our configuration.
-   Note that we make no use of this option in our application, but the
-   fact that we use ``get_options`` to parse the ``*kw`` dict, and
-   subsequently pass along the result as the ``options`` argument to
-   ``make_app``.  ``reload_templates`` has special meaning to the
-   framework: if it's ``true``, we will cause templates to be
-   automatically reloaded by the application when they are changed.
+   ``myproject``, and the ``options`` keyword as the ``app``
+   function's extra keyword args to the ``make_app`` function of the
+   ``repoze.bfg.router`` module.  ``**kw`` here contains all the
+   options in the ``[app:main]`` section of our .ini file except the
+   "use" option (which is internal to paste).  In this case, ``**kw``
+   will be something like ``{'reload_templates':'true',
+   'debug_authorization':'false', 'debug_notfound':'false'}``.
 
    ``get_root`` is the first argument to ``make_app``, and it is a
    root factory callable that is invoked on every request to retrieve
