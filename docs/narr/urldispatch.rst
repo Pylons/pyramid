@@ -122,18 +122,6 @@ filter
   A Python dotted-path name to a Routes `filter function
   <http://routes.groovie.org/manual.html#filter-functions>`_.
 
-absolute
-
-  A boolean (true/false) indicating whether this route is absolute.
-
-member_name
-
-  The member name for this route.
-
-collection_name
-
-  The collection name for this route.
-
 condition_method
 
   The name of the HTTP method used as the Routes `condition method
@@ -148,14 +136,6 @@ condition_function
 
   A python-dotted path name to a Routes `condition function
   <http://routes.groovie.org/manual.html#conditions>`_.
-
-parent_member_name
-
-  The parent member name for this route.
-
-parent_collection_name
-
-  The parent collection name for this route.
 
 explicit
 
