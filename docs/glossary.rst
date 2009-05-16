@@ -69,8 +69,9 @@ Glossary
   URL dispatch
     An alternative to graph traversal as a mechanism for locating a
     :term:`context` for a :term:`view`.  When you use :term:`Routes`
-    in your :mod:`repoze.bfg` application, you are using URL dispatch.
-    See the :ref:`urldispatch_module` for more information.
+    in your :mod:`repoze.bfg` application via a ``<route>`` declaration in ZCML,
+    you are using URL dispatch. See the :ref:`urldispatch_chapter` for more 
+    information.
   Context
     An object in the system that is found during :term:`traversal` or
     :term:`URL dispatch` based on URL data; if it's found via
@@ -237,8 +238,8 @@ Glossary
     parses URLs and compares them against a number of user defined
     mappings. In terms of :mod:`repoze.bfg`, a Route can supplant
     graph traversal when deciding which *view* should be called.  See
-    :ref:`urldispatch_module` for more information about (optional)
-    Routes integration in bfg.
+    :ref:`urldispatch_chapter` for more information about Routes integration 
+    in bfg.
   ZCML
     `Zope Configuration Markup Language
     <http://www.muthukadan.net/docs/zca.html#zcml>`_, the XML dialect
