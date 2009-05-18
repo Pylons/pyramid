@@ -134,7 +134,7 @@ def model_path(model, *elements):
     return path and '/'.join([quote_path_segment(x) for x in path]) or '/'
 
 def traverse(model, path):
-    """Given a model object as ``model` and a string or tuple
+    """Given a model object as ``model`` and a string or tuple
     representing a path as ``path`` (such as the return value of
     ``repoze.bfg.traversal.model_path`` or
     ``repoze.bfg.traversal.model_path_tuple`` or the value of
