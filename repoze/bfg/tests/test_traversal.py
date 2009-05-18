@@ -55,7 +55,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
 
     def tearDown(self):
         cleanUp()
-        
+
     def _getTargetClass(self):
         from repoze.bfg.traversal import ModelGraphTraverser
         return ModelGraphTraverser
@@ -83,75 +83,75 @@ class ModelGraphTraverserTests(unittest.TestCase):
     def test_call_with_no_pathinfo(self):
         policy = self._makeOne(None)
         environ = self._getEnviron()
-        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
-        self.assertEqual(ctx, None)
-        self.assertEqual(name, '')
-        self.assertEqual(subpath, [])
-        self.assertEqual(traversed, [])
-        self.assertEqual(vroot, policy.root)
-        self.assertEqual(vroot_path, [])
+        result = policy(environ)
+        self.assertEqual(result['context'], None)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['virtual_root'], policy.root)
+        self.assertEqual(result['virtual_root_path'], [])
 
     def test_call_pathel_with_no_getitem(self):
         policy = self._makeOne(None)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
-        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
-        self.assertEqual(ctx, None)
-        self.assertEqual(name, 'foo')
-        self.assertEqual(subpath, ['bar'])
-        self.assertEqual(traversed, [])
-        self.assertEqual(vroot, policy.root)
-        self.assertEqual(vroot_path, [])
+        result = policy(environ)
+        self.assertEqual(result['context'], None)
+        self.assertEqual(result['view_name'], 'foo')
+        self.assertEqual(result['subpath'], ['bar'])
+        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['virtual_root'], policy.root)
+        self.assertEqual(result['virtual_root_path'], [])
 
     def test_call_withconn_getitem_emptypath_nosubpath(self):
         root = DummyContext()
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='')
-        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
-        self.assertEqual(ctx, root)
-        self.assertEqual(name, '')
-        self.assertEqual(subpath, [])
-        self.assertEqual(traversed, [])
-        self.assertEqual(vroot, root)
-        self.assertEqual(vroot_path, [])
+        result = policy(environ)
+        self.assertEqual(result['context'], root)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['virtual_root'], root)
+        self.assertEqual(result['virtual_root_path'], [])
 
     def test_call_withconn_getitem_withpath_nosubpath(self):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar')
-        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
-        self.assertEqual(ctx, foo)
-        self.assertEqual(name, 'bar')
-        self.assertEqual(subpath, [])
-        self.assertEqual(traversed, [u'foo'])
-        self.assertEqual(vroot, root)
-        self.assertEqual(vroot_path, [])
+        result = policy(environ)
+        self.assertEqual(result['context'], foo)
+        self.assertEqual(result['view_name'], 'bar')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [u'foo'])
+        self.assertEqual(result['virtual_root'], root)
+        self.assertEqual(result['virtual_root_path'], [])
 
     def test_call_withconn_getitem_withpath_withsubpath(self):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/foo/bar/baz/buz')
-        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
-        self.assertEqual(ctx, foo)
-        self.assertEqual(name, 'bar')
-        self.assertEqual(subpath, ['baz', 'buz'])
-        self.assertEqual(traversed, [u'foo'])
-        self.assertEqual(vroot, root)
-        self.assertEqual(vroot_path, [])
+        result = policy(environ)
+        self.assertEqual(result['context'], foo)
+        self.assertEqual(result['view_name'], 'bar')
+        self.assertEqual(result['subpath'], ['baz', 'buz'])
+        self.assertEqual(result['traversed'], [u'foo'])
+        self.assertEqual(result['virtual_root'], root)
+        self.assertEqual(result['virtual_root_path'], [])
 
     def test_call_with_explicit_viewname(self):
         foo = DummyContext()
         root = DummyContext(foo)
         policy = self._makeOne(root)
         environ = self._getEnviron(PATH_INFO='/@@foo')
-        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
-        self.assertEqual(ctx, root)
-        self.assertEqual(name, 'foo')
-        self.assertEqual(subpath, [])
-        self.assertEqual(traversed, [])
-        self.assertEqual(vroot, root)
-        self.assertEqual(vroot_path, [])
+        result = policy(environ)
+        self.assertEqual(result['context'], root)
+        self.assertEqual(result['view_name'], 'foo')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['virtual_root'], root)
+        self.assertEqual(result['virtual_root_path'], [])
 
     def test_call_with_vh_root(self):
         environ = self._getEnviron(PATH_INFO='/baz',
@@ -165,13 +165,13 @@ class ModelGraphTraverserTests(unittest.TestCase):
         root = DummyContext(foo)
         root.name = 'root'
         policy = self._makeOne(root)
-        ctx, name, subpath, traversed, vroot, vroot_path = policy(environ)
-        self.assertEqual(ctx, baz)
-        self.assertEqual(name, '')
-        self.assertEqual(subpath, [])
-        self.assertEqual(traversed, [u'foo', u'bar', u'baz'])
-        self.assertEqual(vroot, bar)
-        self.assertEqual(vroot_path, [u'foo', u'bar'])
+        result = policy(environ)
+        self.assertEqual(result['context'], baz)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [u'foo', u'bar', u'baz'])
+        self.assertEqual(result['virtual_root'], bar)
+        self.assertEqual(result['virtual_root_path'], [u'foo', u'bar'])
 
     def test_non_utf8_path_segment_unicode_path_segments_fails(self):
         foo = DummyContext()
@@ -245,7 +245,7 @@ class FindModelTests(unittest.TestCase):
 
     def test_list(self):
         model = DummyContext()
-        traverser = make_traverser(model, '', [])
+        traverser = make_traverser({'context':model, 'view_name':''})
         self._registerTraverserFactory(traverser)
         result = self._callFUT(model, [''])
         self.assertEqual(result, model)
@@ -253,7 +253,7 @@ class FindModelTests(unittest.TestCase):
 
     def test_generator(self):
         model = DummyContext()
-        traverser = make_traverser(model, '', [])
+        traverser = make_traverser({'context':model, 'view_name':''})
         self._registerTraverserFactory(traverser)
         def foo():
             yield ''
@@ -263,7 +263,7 @@ class FindModelTests(unittest.TestCase):
 
     def test_self_string_found(self):
         model = DummyContext()
-        traverser = make_traverser(model, '', [])
+        traverser = make_traverser({'context':model, 'view_name':''})
         self._registerTraverserFactory(traverser)
         result = self._callFUT(model, '')
         self.assertEqual(result, model)
@@ -271,7 +271,7 @@ class FindModelTests(unittest.TestCase):
 
     def test_self_tuple_found(self):
         model = DummyContext()
-        traverser = make_traverser(model, '', [])
+        traverser = make_traverser({'context':model, 'view_name':''})
         self._registerTraverserFactory(traverser)
         result = self._callFUT(model, ())
         self.assertEqual(result, model)
@@ -280,7 +280,7 @@ class FindModelTests(unittest.TestCase):
     def test_relative_string_found(self):
         model = DummyContext()
         baz = DummyContext()
-        traverser = make_traverser(baz, '', [])
+        traverser = make_traverser({'context':baz, 'view_name':''})
         self._registerTraverserFactory(traverser)
         result = self._callFUT(model, 'baz')
         self.assertEqual(result, baz)
@@ -289,7 +289,7 @@ class FindModelTests(unittest.TestCase):
     def test_relative_tuple_found(self):
         model = DummyContext()
         baz = DummyContext()
-        traverser = make_traverser(baz, '', [])
+        traverser = make_traverser({'context':baz, 'view_name':''})
         self._registerTraverserFactory(traverser)
         result = self._callFUT(model, ('baz',))
         self.assertEqual(result, baz)
@@ -298,7 +298,7 @@ class FindModelTests(unittest.TestCase):
     def test_relative_string_notfound(self):
         model = DummyContext()
         baz = DummyContext()
-        traverser = make_traverser(baz, 'bar', [])
+        traverser = make_traverser({'context':baz, 'view_name':'bar'})
         self._registerTraverserFactory(traverser)
         self.assertRaises(KeyError, self._callFUT, model, 'baz')
         self.assertEqual(model.environ['PATH_INFO'], 'baz')
@@ -306,7 +306,7 @@ class FindModelTests(unittest.TestCase):
     def test_relative_tuple_notfound(self):
         model = DummyContext()
         baz = DummyContext()
-        traverser = make_traverser(baz, 'bar', [])
+        traverser = make_traverser({'context':baz, 'view_name':'bar'})
         self._registerTraverserFactory(traverser)
         self.assertRaises(KeyError, self._callFUT, model, ('baz',))
         self.assertEqual(model.environ['PATH_INFO'], 'baz')
@@ -316,7 +316,7 @@ class FindModelTests(unittest.TestCase):
         model = DummyContext()
         model.__parent__ = root
         model.__name__ = 'baz'
-        traverser = make_traverser(root, '', [])
+        traverser = make_traverser({'context':root, 'view_name':''})
         self._registerTraverserFactory(traverser)
         result = self._callFUT(model, '/')
         self.assertEqual(result, root)
@@ -328,7 +328,7 @@ class FindModelTests(unittest.TestCase):
         model = DummyContext()
         model.__parent__ = root
         model.__name__ = 'baz'
-        traverser = make_traverser(root, '', [])
+        traverser = make_traverser({'context':root, 'view_name':''})
         self._registerTraverserFactory(traverser)
         result = self._callFUT(model, ('',))
         self.assertEqual(result, root)
@@ -340,7 +340,7 @@ class FindModelTests(unittest.TestCase):
         model = DummyContext()
         model.__parent__ = root
         model.__name__ = 'baz'
-        traverser = make_traverser(root, 'fuz', [])
+        traverser = make_traverser({'context':root, 'view_name':'fuz'})
         self._registerTraverserFactory(traverser)
         self.assertRaises(KeyError, self._callFUT, model, '/')
         self.assertEqual(root.wascontext, True)
@@ -351,11 +351,12 @@ class FindModelTests(unittest.TestCase):
         model = DummyContext()
         model.__parent__ = root
         model.__name__ = 'baz'
-        traverser = make_traverser(root, 'fuz', [])
+        traverser = make_traverser({'context':root, 'view_name':'fuz'})
         self._registerTraverserFactory(traverser)
         self.assertRaises(KeyError, self._callFUT, model, ('',))
         self.assertEqual(root.wascontext, True)
         self.assertEqual(root.environ['PATH_INFO'], '/')
+
 
 class ModelPathTests(unittest.TestCase):
     def _callFUT(self, model, *elements):
@@ -569,7 +570,7 @@ class TraversalContextURLTests(unittest.TestCase):
         self.assertEqual(result,
                      'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
 
-    def test_call_with_vroot_path(self):
+    def test_call_with_virtual_root_path(self):
         from repoze.bfg.interfaces import VH_ROOT_KEY
         root = DummyContext()
         root.__parent__ = None
@@ -590,7 +591,7 @@ class TraversalContextURLTests(unittest.TestCase):
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432/')
 
-    def test_virtual_root_no_vroot_path(self):
+    def test_virtual_root_no_virtual_root_path(self):
         root = DummyContext()
         root.__name__ = None
         root.__parent__ = None
@@ -601,7 +602,7 @@ class TraversalContextURLTests(unittest.TestCase):
         context_url = self._makeOne(one, request)
         self.assertEqual(context_url.virtual_root(), root)
 
-    def test_virtual_root_no_vroot_path_with_root_on_request(self):
+    def test_virtual_root_no_virtual_root_path_with_root_on_request(self):
         context = DummyContext()
         context.__parent__ = None
         request = DummyRequest()
@@ -609,14 +610,14 @@ class TraversalContextURLTests(unittest.TestCase):
         context_url = self._makeOne(context, request)
         self.assertEqual(context_url.virtual_root(), request.root)
 
-    def test_virtual_root_with_vroot_path(self):
+    def test_virtual_root_with_virtual_root_path(self):
         from repoze.bfg.interfaces import VH_ROOT_KEY
         context = DummyContext()
         context.__parent__ = None
         traversed_to = DummyContext()
         environ = {VH_ROOT_KEY:'/one'}
         request = DummyRequest(environ)
-        traverser = make_traverser(traversed_to, '', [])
+        traverser = make_traverser({'context':traversed_to, 'view_name':''})
         self._registerTraverserFactory(traverser)
         context_url = self._makeOne(context, request)
         self.assertEqual(context_url.virtual_root(), traversed_to)
@@ -661,14 +662,157 @@ class TestVirtualRoot(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result, '123')
 
-def make_traverser(*args):
+class TraverseTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, name):
+        from repoze.bfg.traversal import traverse
+        return traverse(context, name)
+
+    def _registerTraverserFactory(self, traverser):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ITraverserFactory
+        from zope.interface import Interface
+        gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
+
+    def test_list(self):
+        model = DummyContext()
+        traverser = make_traverser({'context':model, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        self._callFUT(model, [''])
+        self.assertEqual(model.environ['PATH_INFO'], '/')
+
+    def test_generator(self):
+        model = DummyContext()
+        traverser = make_traverser({'context':model, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        def foo():
+            yield ''
+        self._callFUT(model, foo())
+        self.assertEqual(model.environ['PATH_INFO'], '/')
+
+    def test_self_string_found(self):
+        model = DummyContext()
+        traverser = make_traverser({'context':model, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        self._callFUT(model, '')
+        self.assertEqual(model.environ['PATH_INFO'], '')
+
+    def test_self_tuple_found(self):
+        model = DummyContext()
+        traverser = make_traverser({'context':model, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        self._callFUT(model, ())
+        self.assertEqual(model.environ['PATH_INFO'], '')
+
+    def test_relative_string_found(self):
+        model = DummyContext()
+        baz = DummyContext()
+        traverser = make_traverser({'context':baz, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        self._callFUT(model, 'baz')
+        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+
+    def test_relative_tuple_found(self):
+        model = DummyContext()
+        baz = DummyContext()
+        traverser = make_traverser({'context':baz, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        self._callFUT(model, ('baz',))
+        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+
+    def test_absolute_string_found(self):
+        root = DummyContext()
+        model = DummyContext()
+        model.__parent__ = root
+        model.__name__ = 'baz'
+        traverser = make_traverser({'context':root, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        self._callFUT(model, '/')
+        self.assertEqual(root.wascontext, True)
+        self.assertEqual(root.environ['PATH_INFO'], '/')
+
+    def test_absolute_tuple_found(self):
+        root = DummyContext()
+        model = DummyContext()
+        model.__parent__ = root
+        model.__name__ = 'baz'
+        traverser = make_traverser({'context':root, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        self._callFUT(model, ('',))
+        self.assertEqual(root.wascontext, True)
+        self.assertEqual(root.environ['PATH_INFO'], '/')
+
+class UnderTraverseTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, context, environ):
+        from repoze.bfg.traversal import _traverse
+        return _traverse(context, environ)
+
+    def _registerTraverserFactory(self, traverser):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ITraverserFactory
+        from zope.interface import Interface
+        gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
+
+    def test_isdict(self):
+        traverser = make_traverser({})
+        self._registerTraverserFactory(traverser)
+        context = DummyContext()
+        result = self._callFUT(context, None)
+        self.assertEqual(result, {})
+
+    def test_issixtuple(self):
+        traverser = make_traverser((1,2,3,4,5,6))
+        self._registerTraverserFactory(traverser)
+        context = DummyContext()
+        result = self._callFUT(context, None)
+        self.assertEqual(result['context'], 1)
+        self.assertEqual(result['view_name'], 2)
+        self.assertEqual(result['subpath'], 3)
+        self.assertEqual(result['traversed'], 4)
+        self.assertEqual(result['virtual_root'], 5)
+        self.assertEqual(result['virtual_root_path'], 6)
+        self.assertEqual(result['root'], None)
+        self.failUnless(result['_deprecation_warning'].startswith(
+               "<class 'repoze.bfg.tests.test_traversal.DummyTraverser'>"))
+        self.failUnless("6-argument tuple" in result['_deprecation_warning'])
+
+    def test_isthreetuple(self):
+        traverser = make_traverser((1,2,3))
+        self._registerTraverserFactory(traverser)
+        context = DummyContext()
+        result = self._callFUT(context, None)
+        self.assertEqual(result['context'], 1)
+        self.assertEqual(result['view_name'], 2)
+        self.assertEqual(result['subpath'], 3)
+        self.assertEqual(result['traversed'], None)
+        self.assertEqual(result['virtual_root'], None)
+        self.assertEqual(result['virtual_root_path'], None)
+        self.assertEqual(result['root'], None)
+        self.failUnless(result['_deprecation_warning'].startswith(
+               "<class 'repoze.bfg.tests.test_traversal.DummyTraverser'>"))
+        self.failUnless("3-argument tuple" in result['_deprecation_warning'])
+
+def make_traverser(result):
     class DummyTraverser(object):
         def __init__(self, context):
             self.context = context
             context.wascontext = True
         def __call__(self, environ):
             self.context.environ = environ
-            return args
+            return result
     return DummyTraverser
         
 class DummyContext(object):

@@ -59,20 +59,21 @@ deprecated('IRootPolicy',
 
 class ITraverser(Interface):
     def __call__(environ):
-        """ Return a tuple in the form ``(context, view_name, subpath,
-        traversed, virtual_root, virtual_root_path)`` , typically the
-        result of an object graph traversal.  ``context`` will be a
-        model object, ``view_name`` will be the view name used (a
-        Unicode name), ``subpath`` will be a sequence of Unicode names
-        that followed the view name but were not traversed,
-        ``traversed`` will be a sequence of Unicode names that were
-        traversed (including the virtual root path, if any) or
-        ``None`` if no traversal was performed, ``virtual_root`` will
-        be a model object representing the virtual root (or the
-        physical root if traversal was not performed), and
-        ``virtual_root_path`` will be a sequence representing the
-        virtual root path (a sequence of Unicode names) or None if
-        traversal was not performed."""
+        """ Return a dictionary with the keys ``root``, ``context``,
+        ``view_name``, ``subpath``, ``traversed``, ``vroot``, and
+        ``vroot_path``.  These values are typically the result of an
+        object graph traversal.  ``root`` is the physical root object,
+        ``context`` will be a model object, ``view_name`` will be the
+        view name used (a Unicode name), ``subpath`` will be a
+        sequence of Unicode names that followed the view name but were
+        not traversed, ``traversed`` will be a sequence of Unicode
+        names that were traversed (including the virtual root path, if
+        any) or ``None`` if no traversal was performed,
+        ``virtual_root`` will be a model object representing the
+        virtual root (or the physical root if traversal was not
+        performed), and ``virtual_root_path`` will be a sequence
+        representing the virtual root path (a sequence of Unicode
+        names) or None if traversal was not performed."""
 
 class ITraverserFactory(Interface):
     def __call__(context):

@@ -41,8 +41,20 @@ class TestTestingFunctions(unittest.TestCase):
         from zope.component import getAdapter
         from repoze.bfg.interfaces import ITraverserFactory
         adapter = getAdapter(None, ITraverserFactory)
-        self.assertEqual(adapter({'PATH_INFO':'/ob1'}), (ob1, '', []))
-        self.assertEqual(adapter({'PATH_INFO':'/ob2'}), (ob2, '', []))
+        result = adapter({'PATH_INFO':'/ob1'})
+        self.assertEqual(result['context'], ob1)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [u'ob1'])
+        self.assertEqual(result['vroot'], ob1)
+        self.assertEqual(result['vroot_path'], [])
+        result = adapter({'PATH_INFO':'/ob2'})
+        self.assertEqual(result['context'], ob2)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [u'ob2'])
+        self.assertEqual(result['vroot'], ob2)
+        self.assertEqual(result['vroot_path'], [])
         self.assertRaises(KeyError, adapter, {'PATH_INFO':'/ob3'})
         from repoze.bfg.traversal import find_model
         self.assertEqual(find_model(None, '/ob1'), ob1)

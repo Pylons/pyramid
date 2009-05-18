@@ -232,12 +232,12 @@ class RoutesModelTraverserTests(unittest.TestCase):
         route = DummyRoute('yo')
         environ = {'wsgiorg.routing_args': routing_args, 'bfg.route': route}
         result = traverser(environ)
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'yo')
-        self.assertEqual(result[2], [])
-        self.assertEqual(result[3], None)
-        self.assertEqual(result[4], model)
-        self.assertEqual(result[5], None)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], 'yo')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], None)
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], None)
 
     def test_call_with_subpath(self):
         model = DummyContext()
@@ -246,12 +246,12 @@ class RoutesModelTraverserTests(unittest.TestCase):
         route = DummyRoute('yo')
         environ = {'wsgiorg.routing_args':routing_args, 'bfg.route': route}
         result = traverser(environ)
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'yo')
-        self.assertEqual(result[2], ['a', 'b','c'])
-        self.assertEqual(result[3], None)
-        self.assertEqual(result[4], model)
-        self.assertEqual(result[5], None)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], 'yo')
+        self.assertEqual(result['subpath'], ['a', 'b','c'])
+        self.assertEqual(result['traversed'], None)
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], None)
 
     def test_with_path_info(self):
         model = DummyContext()
@@ -261,12 +261,12 @@ class RoutesModelTraverserTests(unittest.TestCase):
         environ = {'wsgiorg.routing_args': routing_args, 'bfg.route': route,
                    'PATH_INFO':'/a/b/foo/bar', 'SCRIPT_NAME':''}
         result = traverser(environ)
-        self.assertEqual(result[0], model)
-        self.assertEqual(result[1], 'yo')
-        self.assertEqual(result[2], [])
-        self.assertEqual(result[3], None)
-        self.assertEqual(result[4], model)
-        self.assertEqual(result[5], None)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], 'yo')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], None)
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], None)
         self.assertEqual(environ['PATH_INFO'], '/foo/bar')
         self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
 
@@ -277,7 +277,7 @@ class RoutesModelTraverserTests(unittest.TestCase):
         route = DummyRoute('yo')
         environ = {'wsgiorg.routing_args': routing_args, 'bfg.route':route,
                    'PATH_INFO':'/a/b//foo/bar', 'SCRIPT_NAME':''}
-        result = traverser(environ)
+        traverser(environ)
         self.assertEqual(environ['PATH_INFO'], '/foo/bar')
         self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
 

@@ -38,9 +38,37 @@ class RouterTests(unittest.TestCase):
         settings = Settings(**defaultkw)
         self.registry.registerUtility(settings, ISettings)
 
-    def _registerTraverserFactory(self, app, name, *for_):
+    def _registerTraverserFactory(self, context, view_name='', subpath=None,
+                                  traversed=None, virtual_root=None,
+                                  virtual_root_path=None, **kw):
         from repoze.bfg.interfaces import ITraverserFactory
-        self.registry.registerAdapter(app, for_, ITraverserFactory, name)
+
+        if virtual_root is None:
+            virtual_root = context
+        if subpath is None:
+            subpath = []
+        if traversed is None:
+            traversed = []
+        if virtual_root_path is None:
+            virtual_root_path = []
+
+        class DummyTraverserFactory:
+            def __init__(self, root):
+                self.root = root
+
+            def __call__(self, path):
+                values = {'root':self.root,
+                          'context':context,
+                          'view_name':view_name,
+                          'subpath':subpath,
+                          'traversed':traversed,
+                          'virtual_root':virtual_root,
+                          'virtual_root_path':virtual_root_path}
+                kw.update(values)
+                return kw
+            
+        self.registry.registerAdapter(DummyTraverserFactory, (None,),
+                                      ITraverserFactory, name='')
 
     def _registerView(self, app, name, *for_):
         from repoze.bfg.interfaces import IView
@@ -79,6 +107,7 @@ class RouterTests(unittest.TestCase):
             'SERVER_NAME':'localhost',
             'SERVER_PORT':'8080',
             'REQUEST_METHOD':'GET',
+            'PATH_INFO':'/',
             }
         environ.update(extras)
         return environ
@@ -87,41 +116,16 @@ class RouterTests(unittest.TestCase):
         rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
-        self._registerTraverserFactory(traversalfactory, '', None)
-        logger = self._registerLogger()
+        self._registerTraverserFactory(context)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
         self.assertEqual(router.root_policy, rootfactory)
-
-    def test_3arg_policy(self):
-        rootfactory = make_rootfactory(None)
-        environ = self._makeEnviron()
-        context = DummyContext()
-        traversalfactory = make_3arg_traversal_factory(context, '', [])
-        self._registerTraverserFactory(traversalfactory, '', None)
-        logger = self._registerLogger()
-        self._registerRootFactory(rootfactory)
-        router = self._makeOne()
-        start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        self.failUnless(traversalfactory in router.traverser_warned)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
-        self.failUnless('http://localhost:8080' in result[0], result)
-        self.failIf('debug_notfound' in result[0])
-        self.assertEqual(len(logger.messages), 1)
-        message = logger.messages[0]
-        self.failUnless('is an pre-0.7.1-style ITraverser ' in message)
 
     def test_call_no_view_registered_no_isettings(self):
         rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
-        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerTraverserFactory(context)
         logger = self._registerLogger()
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -141,8 +145,7 @@ class RouterTests(unittest.TestCase):
         class NotFound(object):
             implements(IContextNotFound)
         context = NotFound()
-        traversalfactory = make_traversal_factory(context, '', [])
-        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerTraverserFactory(context)
         environ = self._makeEnviron()
         start_response = DummyStartResponse()
         rootfactory = make_rootfactory(NotFound())
@@ -157,8 +160,7 @@ class RouterTests(unittest.TestCase):
         rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
-        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerTraverserFactory(context)
         logger = self._registerLogger()
         self._registerSettings(debug_notfound=False)
         self._registerRootFactory(rootfactory)
@@ -177,8 +179,7 @@ class RouterTests(unittest.TestCase):
         rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
-        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerTraverserFactory(context)
         self._registerSettings(debug_notfound=True)
         logger = self._registerLogger()
         self._registerRootFactory(rootfactory)
@@ -190,7 +191,7 @@ class RouterTests(unittest.TestCase):
         status = start_response.status
         self.assertEqual(status, '404 Not Found')
         self.failUnless(
-            "debug_notfound of url http://localhost:8080; path_info: '', "
+            "debug_notfound of url http://localhost:8080/; path_info: '/', "
             "context:" in result[0])
         self.failUnless(
             "view_name: '', subpath: []" in result[0])
@@ -198,7 +199,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(len(logger.messages), 1)
         message = logger.messages[0]
         self.failUnless('of url http://localhost:8080' in message)
-        self.failUnless("path_info: ''" in message)
+        self.failUnless("path_info: '/'" in message)
         self.failUnless('DummyContext instance at' in message)
         self.failUnless("view_name: ''" in message)
         self.failUnless("subpath: []" in message)
@@ -206,9 +207,8 @@ class RouterTests(unittest.TestCase):
     def test_call_view_returns_nonresponse(self):
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         view = make_view('abc')
         self._registerView(view, '', None, None)
         self._registerRootFactory(rootfactory)
@@ -219,12 +219,11 @@ class RouterTests(unittest.TestCase):
     def test_call_view_registered_nonspecific_default_path(self):
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -238,15 +237,34 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
         self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
 
-    def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
+    def test_call_deprecation_warning(self):
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, 'foo', ['bar'])
+        self._registerTraverserFactory(context, _deprecation_warning='abc')
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne()
+        logger = self._registerLogger()
+        router.logger = logger
+        start_response = DummyStartResponse()
+        router(environ, start_response)
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0], 'abc')
+
+    def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        self._registerTraverserFactory(context, view_name='foo',
+                                       subpath=['bar'],
+                                       traversed=['context'])
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron()
         self._registerView(view, 'foo', None, None)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -269,12 +287,11 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         directlyProvides(context, IContext)
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -299,11 +316,10 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         directlyProvides(context, INotContext)
-        traversalfactory = make_traversal_factory(context, '', [''])
+        self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -321,11 +337,10 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         directlyProvides(context, IContext)
-        traversalfactory = make_traversal_factory(context, '', [''])
+        self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         secpol = DummySecurityPolicy()
         self._registerSecurityPolicy(secpol)
@@ -344,13 +359,12 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         directlyProvides(context, IContext)
-        traversalfactory = make_traversal_factory(context, '', [''])
+        self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
         secpol = DummySecurityPolicy()
         permissionfactory = make_permission_factory(True)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
@@ -370,7 +384,7 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         directlyProvides(context, IContext)
-        traversalfactory = make_traversal_factory(context, '', [''])
+        self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
         secpol = DummySecurityPolicy()
@@ -379,7 +393,6 @@ class RouterTests(unittest.TestCase):
             ACLDenied('ace', 'acl', 'permission', ['principals'], context)
             )
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
@@ -401,7 +414,7 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         directlyProvides(context, IContext)
-        traversalfactory = make_traversal_factory(context, '', [''])
+        self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
         secpol = DummySecurityPolicy()
@@ -410,7 +423,6 @@ class RouterTests(unittest.TestCase):
             ACLDenied('ace', 'acl', 'permission', ['principals'], context)
             )
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
@@ -433,7 +445,7 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         directlyProvides(context, IContext)
-        traversalfactory = make_traversal_factory(context, '', [''])
+        self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
         secpol = DummySecurityPolicy()
@@ -442,7 +454,6 @@ class RouterTests(unittest.TestCase):
             ACLDenied('ace', 'acl', 'permission', ['principals'], context)
             )
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
@@ -462,7 +473,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(len(logger.messages), 1)
         logged = logger.messages[0]
         self.failUnless(
-            "debug_authorization of url http://localhost:8080 (view name "
+            "debug_authorization of url http://localhost:8080/ (view name "
             "'' against context" in logged)
         self.failUnless(
             "ACLDenied permission 'permission' via ACE 'ace' in ACL 'acl' on "
@@ -473,12 +484,11 @@ class RouterTests(unittest.TestCase):
     def test_call_eventsends(self):
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         from repoze.bfg.interfaces import INewRequest
         from repoze.bfg.interfaces import INewResponse
@@ -500,12 +510,11 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='POST')
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -524,12 +533,11 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='PUT')
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -546,12 +554,11 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='UNKNOWN')
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -568,12 +575,11 @@ class RouterTests(unittest.TestCase):
         self.registry.registerUtility(DummyRequest, IRequestFactory)
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -594,12 +600,11 @@ class RouterTests(unittest.TestCase):
         self.registry.registerUtility(app, INotFoundAppFactory)
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -612,12 +617,11 @@ class RouterTests(unittest.TestCase):
         self.registry.registerUtility(app, IUnauthorizedAppFactory)
         rootfactory = make_rootfactory(None)
         context = DummyContext()
-        traversalfactory = make_traversal_factory(context, '', [])
+        self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
-        self._registerTraverserFactory(traversalfactory, '', None)
         self._registerView(view, '', None, None)
         self._registerRootFactory(rootfactory)
         router = self._makeOne()
@@ -739,26 +743,6 @@ def make_view(response):
     def view(context, request):
         return response
     return view
-
-def make_traversal_factory(context, name, subpath, vroot=None,
-                           vroot_path=(), traversed=()):
-    class DummyTraversalFactory:
-        def __init__(self, root):
-            self.root = root
-
-        def __call__(self, path):
-            return context, name, subpath, traversed, vroot, vroot_path
-    return DummyTraversalFactory
-
-def make_3arg_traversal_factory(context, name, subpath):
-    class DummyTraversalFactory:
-        def __init__(self, root):
-            self.root = root
-
-        def __call__(self, path):
-            return context, name, subpath
-    return DummyTraversalFactory
-
 
 def make_permission_factory(result):
     class DummyPermissionFactory:

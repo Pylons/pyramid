@@ -154,7 +154,9 @@ class RoutesModelTraverser(object):
             if environ['SCRIPT_NAME'].endswith('/'):
                 environ['SCRIPT_NAME'] = environ['SCRIPT_NAME'][:-1]
 
-        return self.context, route.name, subpath, None, self.context, None
+        return dict(context=self.context, view_name=route.name,
+                    subpath=subpath, traversed=None, virtual_root=self.context,
+                    virtual_root_path=None, root=self.context)
 
 class RoutesContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context

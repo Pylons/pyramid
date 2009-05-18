@@ -1,7 +1,36 @@
 0.8dev (unreleased)
 ===================
 
-... 
+Features
+--------
+
+- Added a ``traverse`` function to the ``repoze.bfg.traversal``
+  module.  This function may be used to retrieve certain values
+  computed during path resolution.  See the Traversal API chapter of
+  the documentation for more information about this function.
+
+Deprecations
+------------
+
+- Internal: ``ITraverser`` callables should now return a dictionary
+  rather than a tuple.  Up until 0.7.0, all ITraversers were assumed
+  to return a 3-tuple.  In 0.7.1, ITraversers were assumed to return a
+  6-tuple.  As (by evidence) it's likely we'll need to add further
+  information to the return value of an ITraverser callable, 0.8
+  assumes that an ITraverser return a dictionary with certain elements
+  in it.  See the ``repoze.bfg.interfaces.ITraverser`` interface for
+  the list of keys that should be present in the dictionary.
+  ``ITraversers`` which return tuples will still work, although a
+  deprecation warning will be issued.
+
+Backwards Incompatibilities
+---------------------------
+
+- If your code used the ITraverser interface directly (not via an API
+  function such as ``find_model``) via an adapter lookup, you'll need
+  to change your code to expect a dictionary rather than a 3- or
+  6-tuple if your code ever gets return values from the default
+  ModelGraphTraverser or RoutesModelTraverser adapters.
 
 0.8a7 (2009-05-16)
 ==================

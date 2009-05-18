@@ -205,7 +205,10 @@ def make_traverser_factory(root):
         def __call__(self, environ):
             path = environ['PATH_INFO']
             ob = root[path]
-            return ob, '', []
+            from repoze.bfg.traversal import traversal_path
+            traversed = list(traversal_path(path))
+            return {'context':ob, 'view_name':'','subpath':[],
+                    'traversed':traversed, 'vroot':ob, 'vroot_path':[]}
 
     return DummyTraverserFactory
 
