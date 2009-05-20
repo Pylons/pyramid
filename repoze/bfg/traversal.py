@@ -149,10 +149,10 @@ def traverse(model, path):
       the value of the ``model`` argument passed to this function is
       returned.
 
-    - ``root``: The root model object found via traversal or url
-      dispatch.  If the ``model`` passed in was found via url
-      dispatch, the value of the ``model`` argument passed to this
-      function is returned.
+    - ``root``: The model object at which traversal begins.  If the
+      ``model`` passed in was found via url dispatch or if the
+      ``path`` passed in was relative (non-absolute), the value of the
+      ``model`` argument passed to this function is returned.
 
     - ``view_name``: The 'view name' found during traversal or url
       dispatch; if the ``model`` was found via traversal, this is
@@ -178,20 +178,23 @@ def traverse(model, path):
       of values discerned from ``*subpath`` in the route pattern
       matched or the empty sequence.
 
-    - ``traversed``: The sequence of path elements traversed to find
-      the ``context`` object.  Each of these items is a Unicode
-      object.  If no path segments were traversed to find the
+    - ``traversed``: The sequence of path elements traversed from the
+      root to find the ``context`` object.  Each of these items is a
+      Unicode object.  If no path segments were traversed to find the
       ``context`` object (e.g. if the ``path`` provided is the empty
       string), the ``traversed`` value will be the empty list.  If the
-      ``model`` is a model found via urldispatch, traversed will be None.
+      ``model`` is a model found via urldispatch, traversed will be
+      None.
 
     - ``virtual_root``: A model object representing the 'virtual' root
       of the object graph being traversed.  See
       :ref:`vhosting_chapter` for a definition of the virtual root
-      object.  If no virtual hosting is in effect or if the ``model``
-      passed in was found via URL dispatch, the ``virtual_root`` will
-      always be the physical root of the object graph (the object at
-      which traversal begins).
+      object.  If no virtual hosting is in effect, and the ``path``
+      passed in was absolute, the ``virtual_root`` will be the
+      *physical* root object (the object at which traversal begins).
+      If the ``model`` passed in was found via URL dispatch or if the
+      ``path`` passed in was relative, the ``virtual_root`` will
+      always equal the ``root`` object (the model passed in).
 
     - ``virtual_root_path`` -- If traversal was used to find the
       ``model``, this will be the sequence of path elements traversed
