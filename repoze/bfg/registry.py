@@ -99,7 +99,7 @@ def populateRegistry(registry, filename, package, lock=threading.Lock()):
     try:
         original_getSiteManager.sethook(getSiteManager)
         zope.component.getGlobalSiteManager = registry_manager.get
-        zcml_configure(filename, package=package)
+        zcml_configure(filename, package)
     finally:
         zope.component.getGlobalSiteManager = getGlobalSiteManager
         lock.release()

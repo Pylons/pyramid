@@ -188,19 +188,6 @@ port 6543.
    development easier, as changes to Python code under
    :mod:`repoze.bfg` is not put into effect until the server restarts.
 
-.. note:: When :mod:`repoze.bfg` starts, it attempts to write a
-   ``.cache`` file which stores a cached version of your
-   :term:`application registry`.  In a typical setup this file will be
-   written as ``configure.zcml.cache`` in the same directory that your
-   application's ``configure.zcml`` is stored.  This is temporary data
-   that can help your :mod:`repoze.bfg` application start slightly
-   faster (its existence prevents the need to parse the XML stored in
-   the ``.zcml`` file if that file or any of files upon which it
-   depends files have not changed).  You can delete it at will as
-   necessary; it will be recreated.  If a ``.cache`` file cannot be
-   written due to filesystem permissions, :mod:`repoze.bfg` will just
-   reparse the ``.zcml`` file every time it starts.
-
 Viewing the Application
 -----------------------
 

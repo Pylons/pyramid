@@ -1,3 +1,22 @@
+0.8.1 (unreleased)
+==================
+
+Features
+--------
+
+- Removed the pickling of ZCML actions (the code that wrote
+  ``configure.zcml.cache`` next to ``configure.zcml`` files in
+  projects).  The code which managed writing and reading of the cache
+  file was a source of subtle bugs when users switched between
+  imperative (e.g. ``@bfg_view``) registrations and declarative
+  registrations (e.g. the ``view`` directive in ZCML) on the same
+  project. On a moderately-sized project (535 ZCML actions and 15 ZCML
+  files), executing actions read from the pickle was saving us only
+  about 200ms (2.5 sec vs 2.7 sec average). On very small projects (1
+  ZCML file and 4 actions), startup time was comparable, and sometimes
+  even slower when reading from the pickle, and both ways were so fast
+  that it really just didn't matter anyway.
+
 0.8 (2009-05-18)
 ================
 

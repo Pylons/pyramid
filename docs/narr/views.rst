@@ -186,13 +186,11 @@ After you do so, you will not need to use any other ZCML to configure
 decorator to do this work.
 
 .. warning:: using this feature tends to slows down application
-   startup, as the application registry is not capable of being cached
-   within a ``configure.zcml.cache`` file when this package is in use,
-   and more work is performed at application startup to scan for view
-   declarations.  Also, if you use decorators, it means that other
-   people will not be able to override your view declarations
-   externally using ZCML: this is a common requirement if you're
-   developing an exensible application (e.g. a framework).
+   startup slightly, as more work is performed at application startup
+   to scan for view declarations.  Also, if you use decorators, it
+   means that other people will not be able to override your view
+   declarations externally using ZCML: this is a common requirement if
+   you're developing an exensible application (e.g. a framework).
 
 The ``bfg_view`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

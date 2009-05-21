@@ -127,17 +127,15 @@ press ``return`` after running ``paster serve MyProject.ini``.
    absolute, the ``package`` argument is ignored.
 
 #. The ``make_app`` function does its work.  It finds and parses the
-   ZCML represented by the application registry file (or may obtain
-   the application registry from a previously cached pickle file,
-   e.g. ``configure.zcml.cache``).  If it fails to parse one or more
-   ZCML files, a ``XMLConfigurationError`` is raised (or possibly
-   another error if the ZCML file just doesn't exist).  If it
-   succeeds, an :term:`application registry` is created, representing
-   the view registrations (and other registrations) for your
-   application.  A :term:`router` instance is created, and the router
-   is associated with the application registry.  The router represents
-   your application; the settings in the application registry that is
-   created will be used for your application.
+   ZCML represented by the application registry file.  If it fails to
+   parse one or more ZCML files, a ``XMLConfigurationError`` is raised
+   (or possibly another error if the ZCML file just doesn't exist).
+   If it succeeds, an :term:`application registry` is created,
+   representing the view registrations (and other registrations) for
+   your application.  A :term:`router` instance is created, and the
+   router is associated with the application registry.  The router
+   represents your application; the settings in the application
+   registry that is created will be used for your application.
 
 #. A ``WSGIApplicationCreatedEvent`` event is emitted (see
    :ref:`events_chapter` for more informations about events).
