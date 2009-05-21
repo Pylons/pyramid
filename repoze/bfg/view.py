@@ -235,14 +235,6 @@ class bfg_view(object):
         self.permission = permission
 
     def __call__(self, wrapped):
-        # We intentionally return a do-little un-functools-wrapped
-        # decorator here so as to make the decorated function
-        # unpickleable; applications which use bfg_view decorators
-        # should never be able to load actions from an actions cache;
-        # instead they should rerun the file_configure function each
-        # time the application starts in case any of the decorators
-        # has been changed.  Disallowing these functions from being
-        # pickled enforces that.
         def _bfg_view(context, request):
             return wrapped(context, request)
         _bfg_view.__is_bfg_view__ = True
@@ -250,10 +242,7 @@ class bfg_view(object):
         _bfg_view.__for__ = self.for_
         _bfg_view.__view_name__ = self.name
         _bfg_view.__request_type__ = self.request_type
-        # we assign to __grok_module__ here rather than __module__ to
-        # make it unpickleable but allow for the grokker to be able to
-        # find it
-        _bfg_view.__grok_module__ = wrapped.__module__
+        _bfg_view.__module__ = wrapped.__module__
         _bfg_view.__name__ = wrapped.__name__
         _bfg_view.__doc__ = wrapped.__doc__
         _bfg_view.__dict__.update(wrapped.__dict__)

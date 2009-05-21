@@ -457,7 +457,7 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.assertEqual(wrapped.__permission__, None)
         self.assertEqual(wrapped.__for__, Interface)
         self.assertEqual(wrapped.__request_type__, IRequest)
-        self.assertEqual(wrapped.__grok_module__, foo.__module__)
+        self.assertEqual(wrapped.__module__, foo.__module__)
         self.assertEqual(wrapped.__name__, foo.__name__)
         self.assertEqual(wrapped.__doc__, foo.__doc__)
         for k, v in foo.__dict__.items():

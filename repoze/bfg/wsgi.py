@@ -39,7 +39,7 @@ def wsgiapp(wrapped):
     """
     def decorator(context, request):
         return request.get_response(wrapped)
-    return wraps(wrapped)(decorator) # pickleability
+    return wraps(wrapped)(decorator) # grokkability
 
 def wsgiapp2(wrapped):
     """ Decorator to turn a WSGI application into a repoze.bfg view
@@ -100,7 +100,7 @@ def wsgiapp2(wrapped):
                 script_name = script_name[:-1]
             request.environ['SCRIPT_NAME'] = script_name
         return request.get_response(wrapped)
-    return wraps(wrapped)(decorator) # pickleability
+    return wraps(wrapped)(decorator) # grokkability
 
 class HTTPException(object):
     def __call__(self, environ, start_response, exc_info=False):

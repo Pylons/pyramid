@@ -33,8 +33,8 @@ def handler(methodName, *args, **kwargs):
     method(*args, **kwargs)
 
 class Uncacheable(object):
-    """ Include in discriminators of actions which are not cacheable """
-    pass
+    """ Include in discriminators of actions which are not cacheable;
+    this class only exists for backwards compatibility (<0.8.1)"""
 
 def view(_context,
          permission=None,
@@ -42,7 +42,7 @@ def view(_context,
          view=None,
          name="",
          request_type=None,
-         cacheable=True,
+         cacheable=True, # not used, here for b/w compat < 0.8
          ):
 
     if not view:
@@ -80,10 +80,8 @@ def view(_context,
                     _context.info),
             )
 
-    cacheable = cacheable or Uncacheable
-
     _context.action(
-        discriminator = ('view', for_, name, request_type, IView, cacheable),
+        discriminator = ('view', for_, name, request_type, IView),
         callable = handler,
         args = ('registerAdapter',
                 view, (for_, request_type), IView, name,
@@ -164,14 +162,8 @@ class BFGViewFunctionGrokker(martian.InstanceGrokker):
             name = obj.__view_name__
             request_type = obj.__request_type__
             context = kw['context']
-            # we dont technically need to pass "Uncacheable" here; any
-            # view function decorated with an __is_bfg_view__ attr via
-            # repoze.bfg.view.bfg_view is unpickleable; but the
-            # uncacheable bit helps pickling fail more quickly
-            # (pickling is never attempted)
             view(context, permission=permission, for_=for_,
-                 view=obj, name=name, request_type=request_type,
-                 cacheable=Uncacheable)
+                 view=obj, name=name, request_type=request_type)
             return True
         return False
 

@@ -141,7 +141,7 @@ class TestGrokkedApp(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def test_registry_actions_cannot_be_pickled_and_unpickled(self):
+    def test_it(self):
         import repoze.bfg.tests.grokkedapp as package
         
         from zope.configuration import config
@@ -151,8 +151,7 @@ class TestGrokkedApp(unittest.TestCase):
         context.package = package
         xmlconfig.include(context, 'configure.zcml', package)
         actions = context.actions
-        import cPickle
-        self.assertRaises(cPickle.PicklingError, cPickle.dumps, actions, -1)
+        self.failUnless(actions)
 
 class DummyContext:
     pass

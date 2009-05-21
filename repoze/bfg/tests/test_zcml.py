@@ -48,7 +48,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(permission['args'][5], None)
         
         regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView, True)
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
@@ -87,32 +87,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(permission['args'][5], None)
         
         regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IDummy, IView, True)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], view)
-        self.assertEqual(regadapt['args'][2], (IFoo, IDummy))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
-
-    def test_uncacheable(self):
-        context = DummyContext()
-        class IFoo:
-            pass
-        view = lambda *arg: None
-        self._callFUT(context, 'repoze.view', IFoo, view=view,
-                      request_type=IDummy, cacheable=False)
-        actions = context.actions
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.zcml import handler
-        from repoze.bfg.zcml import Uncacheable
-
-        self.assertEqual(len(actions), 2)
-
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IDummy, IView, Uncacheable)
+        regadapt_discriminator = ('view', IFoo, '', IDummy, IView)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
@@ -146,7 +121,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         regadapt = actions[0]
-        regadapt_discriminator = ('view', IFoo, '', IBar, IView, True)
+        regadapt_discriminator = ('view', IFoo, '', IBar, IView)
 
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
@@ -181,7 +156,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         regadapt = actions[0]
-        regadapt_discriminator = ('view', IFoo, '', IBar, IView, True)
+        regadapt_discriminator = ('view', IFoo, '', IBar, IView)
 
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
@@ -217,7 +192,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         regadapt = actions[0]
-        regadapt_discriminator = ('view', None, '', IRequest, IView, True)
+        regadapt_discriminator = ('view', None, '', IRequest, IView)
 
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
@@ -427,13 +402,12 @@ class TestRoute(unittest.TestCase):
         view_discriminator = view_action['discriminator']
         view_args = view_action['args']
         self.assertEqual(view_callable, handler)
-        self.assertEqual(len(view_discriminator), 6)
+        self.assertEqual(len(view_discriminator), 5)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], IRoutesContext)
         self.assertEqual(view_discriminator[2],'name')
         self.assertEqual(view_discriminator[3], IRequest)
         self.assertEqual(view_discriminator[4], IView)
-        self.assertEqual(view_discriminator[5], True)
         self.assertEqual(view_args, ('registerAdapter', view,
                                      (IRoutesContext, IRequest), IView,
                                      'name', None))

@@ -37,4 +37,4 @@ class pushpage(object):
         def _curried(context, request):
             kw = wrapped(context, request)
             return render_template_to_response(path, **kw)
-        return wraps(wrapped)(_curried) # pickleability and grokkability
+        return wraps(wrapped)(_curried) # grokkability
