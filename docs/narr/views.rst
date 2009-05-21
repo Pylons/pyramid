@@ -360,21 +360,21 @@ Using Model Interfaces
 
 Instead of registering your views ``for`` a Python model *class*, you
 can optionally register a view for an :term:`interface`.  Since an
-interface can be attached arbitrarily to any instance (as opposed to
-its identity being implied by only its class), associating a view with
-an interface can provide more flexibility for sharing a single view
-between two or more different implementations of a model type.  For
-example, if two model object instances of different Python class types
-share the same interface, you can use the same view against each of
-them.
+interface can be attached arbitrarily to any model instance (as
+opposed to its identity being implied by only its class), associating
+a view with an interface can provide more flexibility for sharing a
+single view between two or more different implementations of a model
+type.  For example, if two model object instances of different Python
+class types share the same interface, you can use the same view
+against each of them.
 
 In order to make use of interfaces in your application during view
-dispatch, you must create an interface and mark up your classes or
-instances with interface declarations that refer to this interface.
+dispatch, you must create an interface and mark up your model classes
+or instances with interface declarations that refer to this interface.
 
-To attach an interface to a *class*, you define the interface and use
-the ``zope.interface.implements`` function to associate the interface
-with the class.
+To attach an interface to a model *class*, you define the interface
+and use the ``zope.interface.implements`` function to associate the
+interface with the class.
 
 .. code-block:: python
    :linenos:
@@ -388,8 +388,8 @@ with the class.
    class Hello(object):
        implements(IHello)
 
-To attach an interface to an *instance*, you define the interface and
-use the ``zope.interface.alsoProvides`` function to associate the
+To attach an interface to a model *instance*, you define the interface
+and use the ``zope.interface.alsoProvides`` function to associate the
 interface with the instance.  This function mutates the instance in
 such a way that the interface is attached to it.
 
@@ -410,9 +410,9 @@ such a way that the interface is attached to it.
        alsoProvides(hello, IHello)
        return hello
 
-Regardless of how you associate an interface with an instance or
-class, the resulting ZCML to associate that interface with a view is
-the same.  Assuming the above code that defines an ``IHello``
+Regardless of how you associate an interface with a model instance or
+a model class, the resulting ZCML to associate that interface with a
+view is the same.  Assuming the above code that defines an ``IHello``
 interface lives in the root of your application, and its module is
 named "models.py", the below interface declaration will associate the
 ``.views.hello_world`` view with models that implement (aka provide)
@@ -431,11 +431,11 @@ Any time a model that is determined to be the :term:`context` provides
 this interface, and a view named ``hello.html`` is looked up against
 it as per the URL, the ``.views.hello_world`` view will be invoked.
 
-Note that views registered against a class take precedence over views
-registered for an interfaces when an ambiguity arises.  If a view is
-registered for both the class type of the context and an interface
-implemented by the context, the view registered for the class will
-"win".
+Note that views registered against a model class take precedence over
+views registered for any interface the model class implements when an
+ambiguity arises.  If a view is registered for both the class type of
+the context and an interface implemented by the context's class, the
+view registered for the context's class will "win".
 
 See :term:`Interface` in the glossary to find more information about
 interfaces.
