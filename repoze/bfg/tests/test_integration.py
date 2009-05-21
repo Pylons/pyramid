@@ -1,4 +1,5 @@
 import os
+import sys
 import unittest
 
 from repoze.bfg.push import pushpage
@@ -142,8 +143,8 @@ class TestGrokkedApp(unittest.TestCase):
         cleanUp()
 
     def test_it(self):
+        import inspect
         import repoze.bfg.tests.grokkedapp as package
-        
         from zope.configuration import config
         from zope.configuration import xmlconfig
         context = config.ConfigurationMachine()
@@ -151,7 +152,14 @@ class TestGrokkedApp(unittest.TestCase):
         context.package = package
         xmlconfig.include(context, 'configure.zcml', package)
         actions = context.actions
-        self.failUnless(actions)
+        klassview = actions[-1]
+        self.assertEqual(klassview[0][2], 'grokked_klass')
+        self.assertEqual(klassview[2][1], package.grokked_klass)
+        self.failUnless(inspect.isfunction(package.grokked_klass))
+        self.assertEqual(package.grokked_klass(None, None), None)
+        funcview = actions[-2]
+        self.assertEqual(funcview[0][2], '')
+        self.assertEqual(funcview[2][1], package.grokked)
 
 class DummyContext:
     pass

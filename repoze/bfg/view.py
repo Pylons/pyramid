@@ -1,3 +1,5 @@
+import inspect
+
 from paste.urlparser import StaticURLParser
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
@@ -175,8 +177,8 @@ class static(object):
         return request_copy.get_response(self.app)
 
 class bfg_view(object):
-    """ Decorator which allows Python code to make view registrations
-    instead of using ZCML for the same purpose.
+    """ Function or class decorator which allows Python code to make
+    view registrations instead of using ZCML for the same purpose.
 
     E.g. in the module ``views.py``::
 
@@ -222,8 +224,36 @@ class bfg_view(object):
     registered against requests which implement the default IRequest
     interface.
 
-    To make use of bfg_view declarations, insert the following
-    boilerplate into your application registry's ZCML::
+    The ``bfg_view`` decorator can also be used as a class decorator
+    in Python 2.6 and better (Python 2.5 and below do not support
+    class decorators)::
+
+        from webob import Response
+        from repoze.bfg.view import bfg_view
+
+        @bfg_view()
+        class MyView(object):
+            def __init__(self, context, request):
+                self.context = context
+                self.request = request
+            def __call__(self):
+                return Response('hello from %s!' % self.context)
+
+    .. warning:: This feature is new in 0.8.1.
+
+    .. note:: When a view is a class, the calling semantics are
+              different than when it is a function or another
+              non-class callable.  When a view is a class, the class'
+              ``__init__`` is called with the context and the request
+              parameters, creating an instance.  Subsequently that
+              instance's ``__call__`` method is invoked with no
+              parameters.  The class' ``__call__`` method must return a
+              response.  This provides behavior similar to a Zope
+              'browser view' (Zope 'browser views' are typically classes
+              instead of simple callables).
+
+    To make use of any bfg_view declaration, you *must* insert the
+    following boilerplate into your application registry's ZCML::
     
       <scan package="."/>
     """
@@ -235,16 +265,25 @@ class bfg_view(object):
         self.permission = permission
 
     def __call__(self, wrapped):
-        def _bfg_view(context, request):
-            return wrapped(context, request)
+        _bfg_view = wrapped
+        if inspect.isclass(_bfg_view):
+            # If the object we're decorating is a class, turn it into
+            # a function that operates like a Zope view (when it's
+            # invoked, construct an instance using 'context' and
+            # 'request' as position arguments, then immediately invoke
+            # the __call__ method of the instance with no arguments;
+            # __call__ should return an IResponse).
+            def _bfg_class_view(context, request):
+                inst = wrapped(context, request)
+                return inst()
+            _bfg_class_view.__module__ = wrapped.__module__
+            _bfg_class_view.__name__ = wrapped.__name__
+            _bfg_class_view.__doc__ = wrapped.__doc__
+            _bfg_view = _bfg_class_view
         _bfg_view.__is_bfg_view__ = True
         _bfg_view.__permission__ = self.permission
         _bfg_view.__for__ = self.for_
         _bfg_view.__view_name__ = self.name
         _bfg_view.__request_type__ = self.request_type
-        _bfg_view.__module__ = wrapped.__module__
-        _bfg_view.__name__ = wrapped.__name__
-        _bfg_view.__doc__ = wrapped.__doc__
-        _bfg_view.__dict__.update(wrapped.__dict__)
         return _bfg_view
 

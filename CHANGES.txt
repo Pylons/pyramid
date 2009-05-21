@@ -4,6 +4,28 @@
 Features
 --------
 
+- Class objects may now be used as view callables (both via ZCML and
+  via use of the ``bfg_view`` decorator in Python 2.6 as a class
+  decorator).  The calling semantics when using a class as a view
+  callable is similar to that of using a class as a Zope "browser
+  view": the class' ``__init__`` must accept two positional parameters
+  (conventionally named ``context``, and ``request``).  The resulting
+  instance must be callable (it must have a ``__call__`` method).
+  When called, the instance should return a response.  For example::
+
+    from webob import Response
+
+    class MyView(object):
+        def __init__(self, context, request):
+            self.context = context
+            self.request = request
+
+        def __call__(self):
+            return Response('hello from %s!' % self.context)
+
+   See the "Views" chapter in the documentation and the
+   ``repoze.bfg.view`` API documentation for more information.
+
 - Removed the pickling of ZCML actions (the code that wrote
   ``configure.zcml.cache`` next to ``configure.zcml`` files in
   projects).  The code which managed writing and reading of the cache

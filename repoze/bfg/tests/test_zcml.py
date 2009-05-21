@@ -19,7 +19,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertRaises(ConfigurationError, self._callFUT, context,
                           'repoze.view', None)
 
-    def test_only_view(self):
+    def test_view_as_function(self):
         context = DummyContext()
         class IFoo:
             pass
@@ -53,6 +53,57 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
         self.assertEqual(regadapt['args'][1], view)
+        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
+    def test_view_as_oldstyle_class(self):
+        context = DummyContext()
+        class IFoo:
+            pass
+        class view:
+            def __init__(self, context, request):
+                self.context = context
+                self.request = request
+
+            def __call__(self):
+                return self
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
+        actions = context.actions
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+        
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        wrapper = regadapt['args'][1]
+        self.assertEqual(wrapper.__module__, view.__module__)
+        self.assertEqual(wrapper.__name__, view.__name__)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result.context, None)
+        self.assertEqual(result.request, None)
         self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
         self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')

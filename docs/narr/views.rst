@@ -8,6 +8,8 @@ your application.  :mod:`repoze.bfg's` primary job is to find and call
 a view when a :term:`request` reaches it.  The view's return value
 must implement the :term:`WebOb` ``Response`` object interface.
 
+.. _function_as_view:
+
 Defining a View as a Function
 -----------------------------
 
@@ -18,12 +20,13 @@ this is a hello world view implemented as a function:
 .. code-block:: python
    :linenos:
 
+   from webob import Response
+
    def hello_world(context, request):
-       from webob import Response
        return Response('Hello world!')
 
-The :term:`context` and :term:`request` arguments can be defined as
-follows:
+The :term:`context` and :term:`request` arguments passed to a view
+function can be defined as follows:
 
 context
 
@@ -34,10 +37,55 @@ request
 
   A WebOb request object representing the current WSGI request.
 
-A view must return an object that implements the :term:`WebOb`
-``Response`` interface.  The easiest way to return something that
-implements this interface is to return a ``webob.Response`` object.
-But any object that has the following attributes will work:
+.. _class_as_view:
+
+Defining a View as a Class 
+--------------------------
+
+.. note:: This feature is new as of :mod:`repoze.bfg` 0.8.1.
+
+When a view callable is a class, the calling semantics are slightly
+different than when it is a function or another non-class callable.
+When a view is a class, the class' ``__init__`` is called with the
+context and the request parameters.  As a result, an instance of the
+class is created.  Subsequently, that instance's ``__call__`` method
+is invoked with no parameters.  The class' ``__call__`` method must
+return a response.  This provides behavior similar to a Zope 'browser
+view' (Zope 'browser views' are typically classes instead of simple
+callables).  So the simplest class that can be a view must have:
+
+- an ``__init__`` method that accepts a ``context`` and a ``request``
+  as positional arguments.
+
+- a ``__call__`` method that accepts no parameters and returns a
+  response.
+
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+
+   class MyView(object):
+       def __init__(self, context, request):
+           self.context = context
+           self.request = request
+
+       def __call__(self):
+           return Response('hello from %r!' % self.context)
+
+The context and request objects passed to ``__init__`` are the same
+types of objects as described in :ref:`function_as_view`.
+
+The Response
+------------
+
+A view callable must return an object that implements the
+:term:`WebOb` ``Response`` interface.  The easiest way to return
+something that implements this interface is to return a
+``webob.Response`` object.  But any object that has the following
+attributes will work:
 
 status
 
@@ -126,6 +174,10 @@ the special ``*`` character in the ``for`` attribute:
 This indicates that when :mod:`repoze.bfg` identifies that the *view
 name* is ``hello.html`` against *any* :term:`context`, this view will
 be called.
+
+A ZCML ``view`` declaration's ``view`` attribute can also name a
+class.  In this case, the rules described in :ref:`class_as_view`
+apply for the class which is named.
 
 The ``view`` ZCML Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -259,6 +311,47 @@ name will be ``my_view``, registered for models with the
 ``zope.interface.Interface`` interface (which matches anything), using
 no permission, registered against requests which implement the default
 ``IRequest`` interface.
+
+If your view callable is a class, the ``bfg_view`` decorator can also
+be used as a class decorator in Python 2.6 and better (Python 2.5 and
+below do not support class decorators).  All the arguments to the
+decorator are the same when applied against a class as when they are
+applied against a function.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view()
+   class MyView(object):
+       def __init__(self, context, request):
+           self.context = context
+           self.request = request
+
+       def __call__(self):
+           return Response('hello from %s!' % self.context)
+
+You can use the ``bfg_view`` decorator as a simple callable to
+manually decorate classes in Python 2.5 and below (without the
+decorator syntactic sugar), if you wish:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+   from repoze.bfg.view import bfg_view
+
+   class MyView(object):
+       def __init__(self, context, request):
+           self.context = context
+           self.request = request
+
+       def __call__(self):
+           return Response('hello from %s!' % self.context)
+
+   my_view = bfg_view()(MyView)
 
 .. _using_model_interfaces:
 

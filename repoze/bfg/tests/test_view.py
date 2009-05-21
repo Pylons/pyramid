@@ -446,13 +446,34 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.assertEqual(decorator.for_, None)
         self.assertEqual(decorator.permission, 'foo')
         
-    def test_call(self):
+    def test_call_function(self):
+        from repoze.bfg.interfaces import IRequest
+        from zope.interface import Interface
+        decorator = self._makeOne()
+        def foo():
+            """ docstring """
+        wrapped = decorator(foo)
+        self.failUnless(wrapped is foo)
+        self.assertEqual(wrapped.__is_bfg_view__, True)
+        self.assertEqual(wrapped.__permission__, None)
+        self.assertEqual(wrapped.__for__, Interface)
+        self.assertEqual(wrapped.__request_type__, IRequest)
+
+    def test_call_oldstyle_class(self):
+        import inspect
         from repoze.bfg.interfaces import IRequest
         from zope.interface import Interface
         decorator = self._makeOne()
         class foo:
             """ docstring """
+            def __init__(self, context, request):
+                self.context = context
+                self.request = request
+            def __call__(self):
+                return self
         wrapped = decorator(foo)
+        self.failIf(wrapped is foo)
+        self.failUnless(inspect.isfunction(wrapped))
         self.assertEqual(wrapped.__is_bfg_view__, True)
         self.assertEqual(wrapped.__permission__, None)
         self.assertEqual(wrapped.__for__, Interface)
@@ -460,8 +481,35 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.assertEqual(wrapped.__module__, foo.__module__)
         self.assertEqual(wrapped.__name__, foo.__name__)
         self.assertEqual(wrapped.__doc__, foo.__doc__)
-        for k, v in foo.__dict__.items():
-            self.assertEqual(v, wrapped.__dict__[k])
+        result = wrapped(None, None)
+        self.assertEqual(result.context, None)
+        self.assertEqual(result.request, None)
+
+    def test_call_newstyle_class(self):
+        import inspect
+        from repoze.bfg.interfaces import IRequest
+        from zope.interface import Interface
+        decorator = self._makeOne()
+        class foo(object):
+            """ docstring """
+            def __init__(self, context, request):
+                self.context = context
+                self.request = request
+            def __call__(self):
+                return self
+        wrapped = decorator(foo)
+        self.failIf(wrapped is foo)
+        self.failUnless(inspect.isfunction(wrapped))
+        self.assertEqual(wrapped.__is_bfg_view__, True)
+        self.assertEqual(wrapped.__permission__, None)
+        self.assertEqual(wrapped.__for__, Interface)
+        self.assertEqual(wrapped.__request_type__, IRequest)
+        self.assertEqual(wrapped.__module__, foo.__module__)
+        self.assertEqual(wrapped.__name__, foo.__name__)
+        self.assertEqual(wrapped.__doc__, foo.__doc__)
+        result = wrapped(None, None)
+        self.assertEqual(result.context, None)
+        self.assertEqual(result.request, None)
 
 class DummyContext:
     pass

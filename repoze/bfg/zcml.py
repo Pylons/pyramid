@@ -1,3 +1,4 @@
+import inspect
 import types
 
 from zope.configuration import xmlconfig
@@ -50,7 +51,7 @@ def view(_context,
 
     # adapts() decorations may be used against either functions or
     # class instances
-    if isinstance(view, types.FunctionType):
+    if inspect.isfunction(view):
         adapted_by = adaptedBy(view)
     else:
         adapted_by = adaptedBy(type(view))
@@ -65,6 +66,22 @@ def view(_context,
             # the component adaptation annotation does not conform to
             # the view specification; we ignore it.
             pass
+
+    if inspect.isclass(view):
+        # If the object we've located is a class, turn it into a
+        # function that operates like a Zope view (when it's invoked,
+        # construct an instance using 'context' and 'request' as
+        # position arguments, then immediately invoke the __call__
+        # method of the instance with no arguments; __call__ should
+        # return an IResponse).
+        _view = view
+        def _bfg_class_view(context, request):
+            inst = _view(context, request)
+            return inst()
+        _bfg_class_view.__module__ = view.__module__
+        _bfg_class_view.__name__ = view.__name__
+        _bfg_class_view.__doc__ = view.__doc__
+        view = _bfg_class_view
 
     if request_type is None:
         request_type = IRequest
