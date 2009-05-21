@@ -358,8 +358,8 @@ decorator syntactic sugar), if you wish:
 Using Model Interfaces
 ----------------------
 
-Instead of registering your views ``for`` a Python *class*, you can
-optionally register a view for an :term:`interface`.  Since an
+Instead of registering your views ``for`` a Python model *class*, you
+can optionally register a view for an :term:`interface`.  Since an
 interface can be attached arbitrarily to any instance (as opposed to
 its identity being implied by only its class), associating a view with
 an interface can provide more flexibility for sharing a single view
