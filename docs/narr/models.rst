@@ -1,14 +1,18 @@
 Models
 ======
 
-A :term:`model` is typically a simple Python class defined in a
-module.  Model *instances* make up the graph that :mod:`repoze.bfg` is
-willing to traverse.
+A :term:`model` class is typically a simple Python class defined in a
+module.  These classes are termed model *constructors*.  Model
+*instances* make up the graph that :mod:`repoze.bfg` is willing to
+traverse when :term:`traversal` is used.  A model instance is also
+generated as a result of :term:`url dispatch`.  A model instance is
+exposed to :term:`view` code as the :term:`context` of a view.
 
-Defining a Model
-----------------
+Defining a Model Constructor
+----------------------------
 
-Here's an example of a model describing a blog entry:
+An example of a model constructor, ``BlogEntry`` is presented below.
+It is a class which, when instantiated, becomes a model instance.
 
 .. code-block:: python
    :linenos:
@@ -22,19 +26,22 @@ Here's an example of a model describing a blog entry:
            self.author = author
            self.created = datetime.datetime.now()
 
-A model may be essentially any Python object.  In the above example,
-an instance of the ``BlogEntry`` class can be created and used as a
-model.
+A model constructor may be essentially any Python object which is
+callable, and which returns a model instance.  In the above example,
+the ``BlogEntry`` class can be "called", returning a model instance.
 
-Models Which Implement Interfaces
----------------------------------
+Model Instances Which Implement Interfaces
+------------------------------------------
 
-Models can optionally be made to implement an :term:`interface`.  This
-makes it possible to register views against the interface itself
-instead of the *class* within view statement in the application
-registry.  For example, here's some code which describes a blog entry
-whicg also declares that the blog entry implements an
-:term:`interface`.
+Model instances can *optionally* be made to implement an
+:term:`interface`.  This makes it possible to register views against
+the interface itself instead of the *class* within :term:`view`
+statements within the :term:`application registry`.  If your
+application is simple enough that you see no reason to want to do
+this, you can skip reading this section of the chapter.
+
+For example, here's some code which describes a blog entry which also
+declares that the blog entry implements an :term:`interface`.
 
 .. code-block:: python
    :linenos:
@@ -54,27 +61,84 @@ whicg also declares that the blog entry implements an
            self.author = author
            self.created = datetime.datetime.now()
 
-This model consists of two things: the object which defines the model
-(above as the class ``BlogEntry``), and an :term:`interface` attached
-to the model object (above as the class ``IBlogEntry``).  An interface
-simply tags the model object with a "type" that can be referred to
-within the :term:`application registry`.  A model object can implement
-zero or more interfaces.  The interface must be an instance of a class
-that inherits from ``zope.interface.Interface``.
+This model consists of two things: the class which defines the model
+constructor (above as the class ``BlogEntry``), and an
+:term:`interface` attached to the class (via an ``implements``
+statement at class scope using the ``IBlogEntry`` interface as its
+sole argument).
+
+An interface simply tags the model object with a "type" that can be
+referred to within the :term:`application registry`.  A model object
+can implement zero or more interfaces.  The interface must be an
+instance of a class that inherits from ``zope.interface.Interface``.
 
 You specify that a model *implements* an interface by using the
 ``zope.interface.implements`` function at class scope.  The above
 ``BlogEntry`` model implements the ``IBlogEntry`` interface.
 
+You can also specify that a *particular* model instance provides an
+interface (as opposed to its class).  To do so, use the
+``zope.interface.directlyProvides`` API:
+
+.. code-block:: python
+   :linenos:
+
+   from zope.interface import directlyProvides
+   from zope.interface import Interface
+
+   class IBlogEntry(Interface):
+       pass
+
+   class BlogEntry(object):
+       def __init__(self, title, body, author):
+           self.title = title
+           self.body =  body
+           self.author = author
+           self.created = datetime.datetime.now()
+
+   entry = BlogEntry()
+   directlyProvides(IBlogEntry, entry)
+
+If a model object already has instance interface declarations that you
+don't want to disturb, use the ``zope.interface.alsoProvides`` API:
+
+.. code-block:: python
+   :linenos:
+
+   from zope.interface import alsoProvides
+   from zope.interface import directlyProvides
+   from zope.interface import Interface
+
+   class IBlogEntry1(Interface):
+       pass
+
+   class IBlogEntry2(Interface):
+       pass
+
+   class BlogEntry(object):
+       def __init__(self, title, body, author):
+           self.title = title
+           self.body =  body
+           self.author = author
+           self.created = datetime.datetime.now()
+
+   entry = BlogEntry()
+   directlyProvides(IBlogEntry1, entry)
+   alsoProvides(IBlogEntry2, entry)
+
 See the :ref:`views_chapter` for more information about why providing
-models with an interface can be an interesing thing to do.
+models with an interface can be an interesing thing to do with regard
+to :term:`view` lookup.
 
-Defining a Graph of Model Instances
------------------------------------
+Defining a Graph of Model Instances for Traversal
+-------------------------------------------------
 
-:mod:`repoze.bfg` expects to be able to traverse a graph of model
-instances.  :mod:`repoze.bfg` imposes the following policy on model
-instance nodes in the graph:
+When :term:`traversal` is used (as opposed to a purely :term:`url
+dispatch` based application), mod:`repoze.bfg` expects to be able to
+traverse a graph of model instances.  Traversal begins at a root
+model, and descends into the graph recursively via each found model's
+``__getitem__`` method.  :mod:`repoze.bfg` imposes the following
+policy on model instance nodes in the graph:
 
 - Nodes which contain other nodes (aka "container" nodes) must supply
   a ``__getitem__`` method which is willing to resolve a unicode name
@@ -87,23 +151,29 @@ instance nodes in the graph:
   implement a ``__getitem__``, or if they do, their ``__getitem__``
   method must raise a ``KeyError``.
 
+See :ref:`traversal_chapter` for more information about how traversal
+works against model instances.
+
 .. _location_aware:
 
 Location-Aware Model Instances
 ------------------------------
 
-In order for :mod:`repoze.bfg` location, security, URL-generation, and
-traversal functions (such as the functions exposed in
-:ref:`location_module`, :ref:`traversal_module`, and :ref:`url_module`
-as well as certain functions in :ref:`security_module` ) to work
-properly against a instances in a model graph, all nodes in the graph
-must be "location-aware".  This means they must have two attributes:
-``__parent__`` and ``__name__``.  The ``__parent__`` attribute should
-be a reference to the node's parent model instance in the graph.  The
-``__name__`` attribute should be the name that a node's parent refers
-to the node via ``__getitem__``.  The ``__parent__`` of the root
-object should be ``None`` and its ``__name__`` should be the empty
-string.  For instance:
+Applications which use :term:`traversal` to locate the :term:`context`
+of a view must ensure that the model instances that make up the model
+graph are "location aware".  In order for :mod:`repoze.bfg` location,
+security, URL-generation, and traversal functions (such as the
+functions exposed in :ref:`location_module`, :ref:`traversal_module`,
+and :ref:`url_module` as well as certain functions in
+:ref:`security_module` ) to work properly against a instances in a
+model graph, all nodes in the graph must be "location-aware".  This
+means they must have two attributes: ``__parent__`` and ``__name__``.
+The ``__parent__`` attribute should be a reference to the node's
+parent model instance in the graph.  The ``__name__`` attribute should
+be the name that a node's parent refers to the node via
+``__getitem__``.  The ``__parent__`` of the root object should be
+``None`` and its ``__name__`` should be the empty string.  For
+instance:
 
 .. code-block:: python
 
@@ -111,14 +181,14 @@ string.  For instance:
        __name__ = ''
        __parent__ = None
 
-.. note:: If your root model object has a ``__name__`` argument that
-  is not ``None`` or the empty string, URLs returned by the
-  ``repoze.bfg.url.model_url`` function and paths generated by the
-  ``repoze.bfg.traversal.model_path`` and
-  ``repoze.bfg.traversal.model_path_tuple`` APIs will be generated
-  improperly.  The value of ``__name__`` will be prepended to every
-  path and URL generated (as opposed to a single leading slash or
-  empty tuple element).
+.. warning:: If your root model object has a ``__name__`` argument
+   that is not ``None`` or the empty string, URLs returned by the
+   ``repoze.bfg.url.model_url`` function and paths generated by the
+   ``repoze.bfg.traversal.model_path`` and
+   ``repoze.bfg.traversal.model_path_tuple`` APIs will be generated
+   improperly.  The value of ``__name__`` will be prepended to every
+   path and URL generated (as opposed to a single leading slash or
+   empty tuple element).
 
 A node returned from the root item's ``__getitem__`` method should
 have a ``__parent__`` attribute that is a reference to the root
@@ -169,8 +239,8 @@ and so on.
 -------------------------------------------------------
 
 A model instance is used as the :term:`context` argument provided to a
-view.  See :ref:`traversal_chapter` for more information about how a
-model becomes the context.
+view.  See :ref:`traversal_chapter` and :ref:`urldispatch_chapter` for
+more information about how a model instance becomes the context.
 
 The APIs provided by :ref:`traversal_module` are used against model
 instances.  These functions can be used to find the "path" of a model,

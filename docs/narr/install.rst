@@ -25,10 +25,10 @@ BFG is known to run properly on all popular (and even some
 less-popular) Unix-like systems such as Linux, MacOS X, and FreeBSD.
 
 At the time of this writing, ``repoze.bfg`` will run on Windows
-systems.  However, none of its developers use the Windows platform, so
-it is not tested regularly on Windows.  Most of the platform-specific
-documentation (including this chapter) assumes you're installing it on
-a UNIX system.
+systems.  None of its main developers use the Windows platform
+regularly, so it is not tested on Windows as well as it is on UNIX.
+Most of the platform-specific documentation (including this chapter)
+assumes you're installing it on a UNIX system.
 
 :mod:`repoze.bfg` is known to run on Google's App Engine.  See
 :ref:`appengine_tutorial`.
