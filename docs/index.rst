@@ -131,7 +131,7 @@ application out of Subversion via::
   svn co http://svn.repoze.org/repoze.shootout/trunk repoze.shootout
 
 `bfgsite <http://svn.repoze.org/bfgsite/trunk>`_ is the software which
-runs the `repoze.bfg.org <http://repoze.bfg.org>`_ website.  It
+runs the `bfg.repoze.org <http://bfg.repoze.org>`_ website.  It
 demonstrates integration with Trac, and includes several
 mini-applications such as a pastebin and tutorial engine.  Check a
 buildout for this application out of Subversion via::
