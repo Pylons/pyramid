@@ -3,13 +3,14 @@
 Traversal
 =========
 
-The :mod:`repoze.bfg` *Router* parses the URL associated with the
-request and traverses the graph based on path segments in the URL.
-Based on these path segments, :mod:`repoze.bfg` traverses the *model
-graph* in order to find a :term:`context`.  It then attempts to find a
-:term:`view` based on the *type* of the context (specified by an
-:term:`interface`).  If :mod:`repoze.bfg` finds a :term:`view` for the
-context, it calls it and returns a response to the user.
+When :term:`traversal` is used, the :mod:`repoze.bfg` *Router* parses
+the URL associated with the request and splits the URL into path
+segments.  Based on these path segments, :mod:`repoze.bfg` traverses
+a *model graph* in order to find a :term:`context`.  It then
+attempts to find a :term:`view` based on the *type* of the context
+(specified by an :term:`interface`).  If :mod:`repoze.bfg` finds a
+:term:`view` for the context, it calls it and returns a response to
+the user.
 
 The Model Graph
 ---------------
@@ -30,7 +31,13 @@ dictionary).
 .. note:: If a :term:`root factory` is passed to the :mod:`repoze.bfg`
    "make_app" function as the value ``None``, no traversal is
    performed.  Instead, it's assumed that all URLs will be mapped to
-   code via :term:`URL dispatch`.  No root factory, no traversal.
+   code via :term:`URL dispatch`.  No root factory, no traversal.  It
+   is also possible to mix-and-match traversal with URL dispatch.
+   When both a root factory (and therefore traversal) *and* "routes"
+   declarations (and therefore url dispatch) are used, the url
+   dispatch routes are checked first, and if none match,
+   :mod:`repoze.bfg` will fall back to using traversal to attempt to
+   map the request to a view.
 
 Items contained within the object graph are analogous to the concept
 of :term:`model` objects used by many other frameworks (and
