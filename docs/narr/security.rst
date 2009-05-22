@@ -295,7 +295,7 @@ security policy is in effect might look like so:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
    from repoze.bfg.security import DENY_ALL
 
    __acl__ = [ (Allow, 'fred', 'view'),
