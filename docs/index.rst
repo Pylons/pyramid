@@ -130,6 +130,22 @@ application out of Subversion via::
 
   svn co http://svn.repoze.org/repoze.shootout/trunk repoze.shootout
 
+`bfgsite <http://svn.repoze.org/bfgsite/trunk>`_ is the software which
+runs the `repoze.bfg.org <http://repoze.bfg.org>`_ website.  It
+demonstrates integration with Trac, and includes several
+mini-applications such as a pastebin and tutorial engine.  Check a
+buildout for this application out of Subversion via::
+
+  svn co http://svn.repoze.org/buildouts/bfgsite/ bfgsite_buildout
+
+`KARL <http://karlproject.org>`_ is a moderately-sized application
+built on top of :mod:`repoze.bfg` and other Repoze software.  It is an
+open source web system for collaboration, organizational intranets,
+and knowledge management, It provides facilities for wikis, files,
+calendars, manuals, searching, tagging, commenting, and file uploads.
+See the `KARL site <http://karlproject.org>`_ for download and
+installation details.
+
 Support and Development
 =======================
 
