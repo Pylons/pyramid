@@ -47,7 +47,8 @@ Glossary
     A "view" is a callable which returns a response object.  It should
     accept two values: :term:`context` and :term:`request`.  A view is
     the primary mechanism by which a developer writes user interface
-    code within :mod:`repoze.bfg`.
+    code within :mod:`repoze.bfg`.  See :ref:`views_chapter` for more
+    information about :mod:`repoze.bfg` views.
   View name
     The "URL name" of a view, e.g ``index.html``.  If a view is
     configured without a name, its name is considered to be the empty
