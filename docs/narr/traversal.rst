@@ -19,13 +19,21 @@ your application must supply a *model graph* to :mod:`repoze.bfg`.
 
 Users interact with your :mod:`repoze.bfg` -based application via a
 *router*, which is just a fancy :term:`WSGI` application.  At system
-startup time, the router is configured with a single object which
-represents the root of the model graph.  All traversal will begin at
-this root object.  The root object is usually a *mapping* object (such
-as a Python dictionary).
+startup time, the router is configured with a callback known as a
+:term:`root factory`, supplied by the application developer.  The root
+factory is passed the WSGI "environment" (a dictionary) and it is
+expected to return an object which represents the root of the model
+graph.  All :term:`traversal` will begin at this root object.  The
+root object is usually a *mapping* object (such as a Python
+dictionary).
 
-Items contained within the graph are analogous to the concept of
-:term:`model` objects used by many other frameworks (and
+.. note:: If a :term:`root factory` is passed to the :mod:`repoze.bfg`
+   "make_app" function as the value ``None``, no traversal is
+   performed.  Instead, it's assumed that all URLs will be mapped to
+   code via :term:`URL dispatch`.  No root factory, no traversal.
+
+Items contained within the object graph are analogous to the concept
+of :term:`model` objects used by many other frameworks (and
 :mod:`repoze.bfg` refers to them as models, as well).  They are
 typically instances of Python classes.
 
@@ -70,6 +78,9 @@ code to execute:
 #.  The router creates a :term:`WebOb` request object based on the
     WSGI environment.
 
+#.  The :term:`root factory` is called with the WSGI environment.  It
+    returns a :term:`root` object.
+
 #.  The router uses the WSGI environment's ``PATH_INFO`` variable to
     determine the path segments to traverse.  The leading slash is
     stripped off ``PATH_INFO``, and the remaining path segments are
@@ -79,15 +90,15 @@ code to execute:
     path segments in the sequence is converted to Unicode using the
     UTF-8 decoding (if the decoding fails, a ``TypeError`` is raised).
 
-#.  :term:`Traversal` begins at the root object.  For the traversal
-    sequence ``[u'a', u'b', u'c']``, the root object's ``__getitem__``
-    is called with the name ``a``.  Traversal continues through the
-    sequence.  In our example, if the root object's ``__getitem__``
-    called with the name ``a`` returns an object (aka "object ``a``"),
-    that object's ``__getitem__`` is called with the name ``b``.  If
-    object A returns an object when asked for ``b``, "object ``b``"'s
-    ``__getitem__`` is then asked for the name ``c``, and may return
-    "object ``c``".
+#.  :term:`Traversal` begins at the root object returned by the root
+    factory.  For the traversal sequence ``[u'a', u'b', u'c']``, the
+    root object's ``__getitem__`` is called with the name ``a``.
+    Traversal continues through the sequence.  In our example, if the
+    root object's ``__getitem__`` called with the name ``a`` returns
+    an object (aka "object ``a``"), that object's ``__getitem__`` is
+    called with the name ``b``.  If object A returns an object when
+    asked for ``b``, "object ``b``"'s ``__getitem__`` is then asked
+    for the name ``c``, and may return "object ``c``".
 
 #.  Traversal ends when a) the entire path is exhausted or b) when any
     graph element raises a ``KeyError`` from its ``__getitem__`` or c)
@@ -285,18 +296,20 @@ context object implied by the current request.
 The "traversal path" will always be available to a view as the
 ``traversed`` attribute of the :term:`request` object.  It will be a
 sequence representing the ordered set of names that were used to
-traverse to the context, not including the view name or subpath.  If
-there is a virtual root associated with request, the virtual root path
-is included within the traversal path.
+traverse to the :term:`context`, not including the view name or
+subpath.  If there is a virtual root associated with request, the
+virtual root path is included within the traversal path.
 
 The :term:`virtual root` will always be available to a view as the
 ``virtual_root`` attribute of the :term:`request` object.  It will be
-the virtual root object implied by the current request.
+the virtual root object implied by the current request.  See
+:ref:`vhosting_chapter` for more information about virtual roots.
 
 The :term:`virtual root` *path* will always be available to a view as
 the ``virtual_root_path`` attribute of the :term:`request` object.  It
 will be a sequence representing the ordered set of names that were
-used to traverse to the virtual root obejct.
+used to traverse to the virtual root object.  See
+:ref:`vhosting_chapter` for more information about virtual roots.
 
 Unicode and Traversal
 ---------------------
