@@ -3,13 +3,14 @@
 Security
 ========
 
-:mod:`repoze.bfg` provides an optional declarative security system
-that prevents views that are protected by a :term:`permission` from
-being rendered when the user represented by the request does not have
-the appropriate level of access in a context.
+:mod:`repoze.bfg` provides an optional declarative authorization
+system that prevents views that are protected by a :term:`permission`
+from being invoked when the user represented by credentials in the
+:term:`request` does not have an appropriate level of access in a
+specific context.
 
-Security is enabled by adding configuration to your ``configure.zcml``
-which specifies a :term:`security policy`.
+Authorization is enabled by adding configuration to your
+``configure.zcml`` which specifies a :term:`security policy`.
 
 Enabling a Security Policy
 --------------------------
@@ -62,18 +63,33 @@ Protecting Views with Permissions
 You declaratively protected a particular view with a
 :term:`permission` via the ``configure.zcml`` application registry.
 For example, the following declaration protects the view named
-``add_entry.html`` when invoked against an ``IBlog`` context with the
+``add_entry.html`` when invoked against a ``Blog`` context with the
 ``add`` permission:
 
 .. code-block:: xml
    :linenos:
 
    <view
-       for=".models.IBlog"
+       for=".models.Blog"
        view=".views.blog_entry_add_view"
        name="add_entry.html"
        permission="add"
        />
+
+The equivalent view registration including the 'add' permission may be
+performed via the ``bfg_view`` decorator within the "views" module of
+your project's package
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+   from models import Blog
+
+   @bfg_view(for_=Blog, name='add_entry.html', permission='add')
+   def blog_entry_add_view(context, request):
+       """ Add blog entry code goes here """
+       pass
 
 If a security policy is in place when this view is found during normal
 application operations, the user will need to possess the ``add``
@@ -103,31 +119,72 @@ class:
    from repoze.bfg.security import Everyone
    from repoze.bfg.security import Allow
 
-   class IBlog(Interface):
-       pass
-
-   class Blog(dict):
+   class Blog(object):
        __acl__ = [
            (Allow, Everyone, 'view'),
            (Allow, 'group:editors', 'add'),
            (Allow, 'group:editors', 'edit'),
            ]
-       implements(IBlog)
 
-The above ACL indicates that the ``Everyone`` principal (a special
+Or, if your models are persistent, an ACL might be specified via the
+``__acl__`` attribute of an *instance* of a model:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
+
+   class Blog(object):
+       pass
+
+   blog = Blog()
+
+   blog.__acl__ = [
+           (Allow, Everyone, 'view'),
+           (Allow, 'group:editors', 'add'),
+           (Allow, 'group:editors', 'edit'),
+           ]
+
+Whether an ACL is attached to a model's class or an instance of the
+model itself, the effect is the same.  It is useful to decorate
+individual model instances with an ACL (as opposed to just decorating
+their class) in applications such as "CMS" systems where fine-grained
+access is required on an object-by-object basis.
+
+Elements of an ACL
+------------------
+
+Here's an example ACL:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
+
+   __acl__ = [
+           (Allow, Everyone, 'view'),
+           (Allow, 'group:editors', 'add'),
+           (Allow, 'group:editors', 'edit'),
+           ]
+
+The example ACL indicates that the ``Everyone`` principal (a special
 system-defined principal indicating, literally, everyone) is allowed
 to view the blog, the ``group:editors`` principal is allowed to add to
 and edit the blog.
 
-.. note:: Each tuple within the above ``__acl__`` structure is known
-          as a :term:`ACE`, which stands for "access control entry".
-
 The third argument in an ACE can also be a sequence of permission
-names instead of a single permission name.  So instead of the above,
-where we assign a differnt ACE for two grants to the ``group.editors``
-group, we can collapse this into a single ACE, as below.
+names instead of a single permission name.  So instead of creating
+multiple ACEs representing a number of different permission grants to
+a single ``group.editors`` group, we can collapse this into a single
+ACE, as below.
 
 .. code-block:: python
+   :linenos:
+
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
 
    __acl__ = [
        (Allow, Everyone, 'view'),
@@ -138,7 +195,111 @@ A principal is usually a user id, however it also may be a group id if
 your authentication system provides group information and the security
 policy is written to respect them.  The
 ``RemoteUserInheritingACLSecurityPolicy`` does not respect group
-information.
+information, but other security policies that come with
+:mod:`repoze.bfg` do (see the :mod:`repoze.bfg.security` API docs for
+more info).
+
+Each tuple within an ACL structure is known as a :term:`ACE`, which
+stands for "access control entry".  For example, in the above ACL,
+``(Allow, Everyone, 'view')`` is an ACE.  Each ACE in an ACL is
+processed by a security policy *in the order dictated by the ACL*.  So
+if you have an ACL like this:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
+   from repoze.bfg.security import Deny
+
+   __acl__ = [
+       (Allow, Everyone, 'view'),
+       (Deny, Everyone, 'view'),
+       ]
+
+The security policy will *allow* everyone the view permission, even
+though later in the ACL you have an ACE that denies everyone the view
+permission.  On the other hand, if you have an ACL like this:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
+   from repoze.bfg.security import Deny
+
+   __acl__ = [
+       (Deny, Everyone, 'view'),
+       (Allow, Everyone, 'view'),
+       ]
+
+The security policy will deny Everyone the view permission, even
+though later in the ACL is an ACE that allows everyone.
+
+Special Principal Names
+-----------------------
+
+Special principal names exist in the :mod:`repoze.bfg.security`
+module.  They can be imported for use in your own code to populate
+ACLs, e.g. ``from repoze.bfg.security import Everyone``.
+
+``Everyone``
+
+  Literally, everyone, no matter what.  This object is actually a
+  string "under the hood" (``system.Everyone``).  Every user "is" the
+  principal named Everyone during every request, even if a security
+  policy is not in use.
+
+``Authenticated``
+
+  Any user with credentials as determined by the current security
+  policy.  You might think of it as any user that is "logged in".
+  This object is actually a string "under the hood"
+  (``system.Authenticated``).
+
+Special Permissions
+-------------------
+
+Special permission names exist in the :mod:`repoze.bfg.security`
+module.  These can be imported for use in ACLs.
+
+.. _all_permissions:
+
+``ALL_PERMISSIONS``
+
+  An object representing, literally, *all* permissions.  Useful in an
+  ACL like so: ``(Allow, 'fred', ALL_PERMISSIONS)``.  The
+  ``ALL_PERMISSIONS`` object is actually a standin object that has a
+  ``__contains__`` method that always returns True, which, for all
+  known security policies, has the effect of indicating that a given
+  principal "has" any permission asked for by the system.
+
+Special ACEs
+------------
+
+A convenience :term:`ACE` is defined within the
+:mod:`repoze.bfg.security` module named ``DENY_ALL``.  It equals the
+following:
+
+.. code-block:: python
+
+   (Deny, Everyone, ALL_PERMISSIONS)
+
+This ACE is often used as the *last* ACE of an ACL to explicitly cause
+inheriting security policies to "stop looking up the traversal tree"
+(effectively breaking any inheritance).  For example, an ACL which
+allows *only* ``fred`` the view permission in a particular traversal
+context despite what inherited ACLs may say when an inheriting
+security policy is in effect might look like so:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import DENY_ALL
+
+   __acl__ = [ (Allow, 'fred', 'view'),
+               DENY_ALL ]
 
 ACL Inheritance
 ---------------
