@@ -142,8 +142,8 @@ buildout for this application out of Subversion via::
 (roughly 40K lines of Python code) built on top of :mod:`repoze.bfg`
 and other Repoze software.  It is an open source web system for
 collaboration, organizational intranets, and knowledge management, It
-provides facilities for wikis, files, calendars, manuals, searching,
-tagging, commenting, and file uploads.  See the `KARL site
+provides facilities for wikis, calendars, manuals, searching, tagging,
+commenting, and file uploads.  See the `KARL site
 <http://karlproject.org>`_ for download and installation details.
 
 Support and Development
