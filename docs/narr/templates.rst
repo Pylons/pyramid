@@ -4,7 +4,8 @@ Templates
 A :term:`template` is a usually file on disk which can be used to
 render data provided by a :term:`view`, surrounded by more static
 information.  :mod:`repoze.bfg` offers a number of ways to perform
-templating tasks.
+templating tasks "out of the box", and provides alternative templating
+language support via add-on "bindings" packages.
 
 Templating With :term:`Chameleon` (:term:`chameleon.zpt`) Page Templates
 ------------------------------------------------------------------------
@@ -54,7 +55,7 @@ Relative to the directory in which the ``views.py`` file which names
 it lives, which is usually the :mod:`repoze.bfg` application's
 :term:`package` directory.  A path passed to
 ``render_template_to_response`` can also be absolute (starting with a
-slash on UNIX).
+slash on UNIX or a drive letter prefix on Windows).
 
 ``render_template_to_response`` always returns a Response object which
 has a *status code* of ``200 OK`` and a *content-type* of
