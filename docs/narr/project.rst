@@ -427,7 +427,7 @@ This will create a tarball of your application in a ``dist``
 subdirectory named ``MyProject-0.1.tar.gz``.  You can send this
 tarball to other people who want to use your application.
 
-.. note::
+.. warning::
 
    By default, ``setup.py sdist`` does not place non-Python-source
    files in generated tarballs.  This means, in this case, that the
