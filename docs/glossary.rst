@@ -39,12 +39,17 @@ Glossary
   Dotted Python name
     A reference to a Python object by name using a string, in the form
     ``path.to.modulename:attributename``.  Often used in Paste and
-    setuptools configurations.
+    setuptools configurations.  A variant is used in dotted names
+    within :term:`ZCML` attributes that name objects (such as the ZCML
+    "view" directive's "view" attribute): the colon (``:``) is not
+    used; in its place is a dot.
   View
     A "view" is a callable which returns a response object.  It should
-    accept two values: context and request.
+    accept two values: :term:`context` and :term:`request`.  A view is
+    the primary mechanism by which a developer writes user interface
+    code within :mod:`repoze.bfg`.
   View name
-    The "URL name" of a view, e.g "index.html".  If a view is
+    The "URL name" of a view, e.g ``index.html``.  If a view is
     configured without a name, its name is considered to be the empty
     string (which implies the "default view").
   Virtualenv
@@ -53,9 +58,11 @@ Glossary
     Python.  `virtualenv <http://pypi.python.org/pypi/virtualenv>`_
     was created by Ian Bicking.
   Model
-    An object representing data in the system.  A model is part of the
-    object graph traversed by the system.  Models are traversed to
-    determine a context.
+    An object representing data in the system.  If :mod:`traversal` is
+    used, a model is a node in the object graph traversed by the
+    system.  If :mod:`url dispatch` is used, a model is generated for
+    each request.  A model instance becomes the :term:`context` of a
+    :term:`view`.
   Traversal
     The act of descending "down" a graph of model objects from a root
     model in order to find a :term:`context`.  The :mod:`repoze.bfg`
@@ -64,22 +71,24 @@ Glossary
   Router
     The :term:`WSGI` application created when you start a
     :mod:`repoze.bfg` application.  The router intercepts requests,
-    invokes traversal, calls view functions, and returns responses to
-    the WSGI server on behalf of your :mod:`repoze.bfg` application.
+    invokes traversal and/or URL dispatch, calls view functions, and
+    returns responses to the WSGI server on behalf of your
+    :mod:`repoze.bfg` application.
   URL dispatch
     An alternative to graph traversal as a mechanism for locating a
     :term:`context` for a :term:`view`.  When you use :term:`Routes`
-    in your :mod:`repoze.bfg` application via a ``<route>`` declaration in ZCML,
-    you are using URL dispatch. See the :ref:`urldispatch_chapter` for more 
-    information.
+    in your :mod:`repoze.bfg` application via a ``<route>``
+    declaration in ZCML, you are using URL dispatch. See the
+    :ref:`urldispatch_chapter` for more information.
   Context
     An object in the system that is found during :term:`traversal` or
     :term:`URL dispatch` based on URL data; if it's found via
-    traversal, it's usually a :term:`model` object; if it's found via
-    :term:`URL dispatch`, it's a manufactured context object that
-    contains routing information.  A context becomes the subject of a
-    :term:`view`, and typically has security information attached to
-    it.  See the :ref:`traversal_chapter` chapter and the
+    traversal, it's usually a :term:`model` object that is part of an
+    object graph; if it's found via :term:`URL dispatch`, it's a
+    manufactured context object that contains routing information.  A
+    context becomes the subject of a :term:`view`, and typically has
+    security information attached to it.  See the
+    :ref:`traversal_chapter` chapter and the
     :ref:`urldispatch_chapter` chapter for more information about how
     a URL is resolved to a context.
   Application registry
@@ -87,21 +96,13 @@ Glossary
     other application-specific component registrations.  Every
     :mod:`repoze.bfg` application has one (and only one) application
     registry, which is represented on disk by its ``configure.zcml``
-    file.
+    file (and any other included .zcml files)
   Template
     A file with replaceable parts that is capable of representing some
     text, XML, or HTML when rendered.
   Location
     The path to an object in a model graph.  See :ref:`location_aware`
     for more information about how to make a model object *location-aware*.
-  Security policy
-    An object that provides a mechanism to check authorization using
-    authentication data and a permission associated with a model.  It
-    essentially returns "true" if the combination of the authorization
-    information in the model (e.g. an :term:`ACL`) and the
-    authentication data in the request (e.g. the ``REMOTE_USER``
-    environment variable) allow the action implied by the permission
-    associated with the view (e.g. ``add`` or ``read``).
   Principal
     A user id or group id.
   Permission
@@ -144,7 +145,8 @@ Glossary
     action.  In bfg terms, this means determining whether, for a given
     context, any :term:`principal` (or principals) associated with the
     request have the requisite :term:`permission` to allow the request
-    to continue.
+    to continue.  Authorization in :mod:`repoze.bfg` is performed via
+    its :term:`security policy`.
   Principal
     A *principal* is a string or unicode object representing a user or
     a user's membership in a group.  It is provided by the
@@ -155,13 +157,13 @@ Glossary
     indictate that Bob was represented by three principals: "bob",
     "group foo" and "group bar".
   Security Policy
-    A security policy in bfg terms is a bit of code which accepts a
-    request, the :term:`ACL` associated with a context, and the
-    :term:`permission` associated with a particular view, and
-    subsequently determines whether or not the principals associated
-    with the request can perform the action associated with the
-    permission based on the ACL found on the :term:`context` (or any
-    of its parents).
+    A security policy in :mod:`repoze.bfg` terms is a bit of code
+    which accepts a request, the :term:`ACL` associated with a
+    context, and the :term:`permission` associated with a particular
+    view, and subsequently determines whether or not the principals
+    associated with the request can perform the action associated with
+    the permission based on the ACL found on the :term:`context` (or
+    any of its parents).
   WSGI
     `Web Server Gateway Interface <http://wsgi.org/>`_.  This is a
     Python standard for connecting web applications to web servers,
@@ -204,15 +206,15 @@ Glossary
     :term:`WSGI` components together declaratively within an ``.ini``
     file.  It was developed by Ian Bicking as part of :term:`Paste`.
   Chameleon
-    `chameleon <http://pypi.python.org/pypi/chameleon.core>`_ is an
-    attribute language template compiler which supports both the
-    :term:`ZPT` and :term:`Genshi` templating specifications.  It is
-    written and maintained by Malthe Borch.  It has serveral
-    extensions, such as the ability to use bracketed (Genshi-style)
-    ``${name}`` syntax, even within ZPT.  It is also much faster than
-    the reference implementations of both ZPT and Genshi.
-    :mod:`repoze.bfg` offers Chameleon templating out of the box in
-    ZPT flavor and offers the Genshi flavor as an add on within the
+    `chameleon <http://chameleon.repoze.org>`_ is an attribute
+    language template compiler which supports both the :term:`ZPT` and
+    :term:`Genshi` templating specifications.  It is written and
+    maintained by Malthe Borch.  It has serveral extensions, such as
+    the ability to use bracketed (Genshi-style) ``${name}`` syntax,
+    even within ZPT.  It is also much faster than the reference
+    implementations of both ZPT and Genshi.  :mod:`repoze.bfg` offers
+    Chameleon templating out of the box in ZPT flavor and offers the
+    Genshi flavor as an add on within the
     :mod:`repoze.bfg.chameleon_genshi` package.
   chameleon.zpt
     ``chameleon.zpt`` is the package which provides :term:`ZPT`
@@ -255,10 +257,11 @@ Glossary
   ReStructuredText
     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
     that is the defacto standard for descriptive text shipped in
-    :term:`distribution` files, and Python docstrings.
+    :term:`distribution` files, and Python docstrings.  This
+    documentation is authored in ReStructuredText format.
   Root
     The object at which :term:`traversal` begins when
-    :mod:`repoze.bfg` searches for a context (for :term:`URL
+    :mod:`repoze.bfg` searches for a :term:`context` (for :term:`URL
     Dispatch`, the root is *always* the context).
   Subpath
     A list of element "left over" after the :term:`router` has
@@ -266,22 +269,23 @@ Glossary
     sequence of strings, e.g. ``['left', 'over', 'names']``.
   Interface
     A `Zope interface <http://pypi.python.org/pypi/zope.interface>`_
-    object.  In bfg, an interface may be attached to an model object
-    or a request object in order to identify that the object is "of a
-    type".  Interfaces are used internally by :mod:`repoze.bfg` to
-    perform view lookups and security policy lookups.  Interfaces are
-    exposed to application programmers by the ``view`` ZCML directive
-    or the corresponding ``bfg_view`` decorator in the form of both
-    the ``for`` attribute and the ``request_type`` attribute.  They
-    may be exposed to application developers when using the
-    :term:`event` system as well. Fundamentally, :mod:`repoze.bfg`
-    programmers can think of an interface as something that they can
-    attach to an object that stamps it with a "type" unrelated to its
-    underlying Python type.  Interfaces can also be used to describe
-    the behavior of an object (its methods and attributes), but unless
-    they choose to, :mod:`repoze.bfg` programmers do not need to
-    understand or use this feature of interfaces.  In other words, bfg
-    developers need to only understand "marker" interfaces.
+    object.  In :mod:`repoze.bfg`, an interface may be attached to an
+    model object or a request object in order to identify that the
+    object is "of a type".  Interfaces are used internally by
+    :mod:`repoze.bfg` to perform view lookups and security policy
+    lookups.  Interfaces are exposed to application programmers by the
+    ``view`` ZCML directive or the corresponding ``bfg_view``
+    decorator in the form of both the ``for`` attribute and the
+    ``request_type`` attribute.  They may be exposed to application
+    developers when using the :term:`event` system as
+    well. Fundamentally, :mod:`repoze.bfg` programmers can think of an
+    interface as something that they can attach to an object that
+    stamps it with a "type" unrelated to its underlying Python type.
+    Interfaces can also be used to describe the behavior of an object
+    (its methods and attributes), but unless they choose to,
+    :mod:`repoze.bfg` programmers do not need to understand or use
+    this feature of interfaces.  In other words, bfg developers need
+    to only understand "marker" interfaces.
   Event
     An object broadcast to zero or more :term:`subscriber` callables
     during normal system operations.  :mod:`repoze.bfg` emits events
@@ -292,7 +296,7 @@ Glossary
     Application-code generated events may be subscribed to in the same
     way as system-generated events.
   Subscriber
-    A callable which receives an event.  A callable becomes a
+    A callable which receives an :term:`event`.  A callable becomes a
     subscriber through an application registry registration.  See
     :ref:`events_chapter` for more information.
   Request type
@@ -313,20 +317,20 @@ Glossary
     ``repoze.bfg.interfaces.INewRequest`` event type.
   repoze.lemonade
     Zope2 CMF-like `data structures and helper facilities
-    <http://static.repoze.org/lemonadedocs>`_ for
-    CA-and-ZODB-based applications useful within bfg applications.
+    <http://docs.repoze.org/lemonade>`_ for CA-and-ZODB-based
+    applications useful within bfg applications.
   repoze.catalog
     An indexing and search facility (fielded and full-text) based on
-    `zope.index <http://pypi.python.org/pypi/zope.index>`_.  See
-    `the documentation <http://static.repoze.org/catalogdocs>`_ for more 
+    `zope.index <http://pypi.python.org/pypi/zope.index>`_.  See `the
+    documentation <http://docs.repoze.org/catalog>`_ for more
     information.
   repoze.who
-    `Authentication middleware <http://static.repoze.org/whodocs>`_
-    for :term:`WSGI` applications.  It can be used by
-    :mod:`repoze.bfg` to provide authentication information.
+    `Authentication middleware <http://docs.repoze.org/who>`_ for
+    :term:`WSGI` applications.  It can be used by :mod:`repoze.bfg` to
+    provide authentication information.
   repoze.workflow
     `Barebones workflow for Python apps
-    <http://static.repoze.org/workflowdocs>`_ .  It can be used by
+    <http://docs.repoze.org/workflow>`_ .  It can be used by
     :mod:`repoze.bfg` to form a workflow system.
   Virtual root
     A model object representing the "virtual" root of a request; this
