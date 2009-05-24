@@ -67,7 +67,8 @@ Glossary
   Traversal
     The act of descending "down" a graph of model objects from a root
     model in order to find a :term:`context`.  The :mod:`repoze.bfg`
-    :term:`router` performs traversal of model objects.  See the
+    :term:`router` performs traversal of model objects when a
+    :term:`root factory` is specified.  See the
     :ref:`traversal_chapter` chapter for more information.
   Router
     The :term:`WSGI` application created when you start a
