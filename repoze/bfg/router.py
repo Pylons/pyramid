@@ -17,7 +17,7 @@ from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import IUnauthorizedAppFactory
+from repoze.bfg.interfaces import IForbiddenAppFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 
@@ -50,22 +50,40 @@ class Router(object):
 
     def __init__(self, registry):
         self.registry = registry
+        self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
 
         self.request_factory = registry.queryUtility(IRequestFactory)
-        self.security_policy = registry.queryUtility(ISecurityPolicy)
-        self.notfound_app_factory = registry.queryUtility(
-            INotFoundAppFactory,
-            default=NotFound)
-        self.unauth_app_factory = registry.queryUtility(
-            IUnauthorizedAppFactory,
-            default=Unauthorized)
+        security_policy = registry.queryUtility(ISecurityPolicy)
 
+        self.forbidden_app_factory = registry.queryUtility(IForbiddenAppFactory)
+
+        if security_policy is not None:
+            if hasattr(security_policy, 'forbidden'):
+                security_policy_forbidden = security_policy.forbidden
+            else:
+                security_policy_forbidden = Unauthorized
+                warning = ('You are running with a security policy (%s) which '
+                           'does not have a "forbidden" method; in BFG 0.8.2+ '
+                           'the ISecurityPolicy interface in the '
+                           'repoze.bfg.interfaces module defines this method '
+                           'as required; your application will not work under '
+                           'a future release of BFG if you continue using a '
+                           'security policy without a "forbidden" method.' %
+                           security_policy)
+                self.logger and self.logger.warn(warning)
+            # allow a specifically-registered IForbiddenAppFactory to
+            # override the security policy's forbidden
+            self.forbidden_app_factory = (self.forbidden_app_factory or
+                                          security_policy_forbidden)
+
+        self.security_policy = security_policy
+        self.notfound_app_factory = registry.queryUtility(INotFoundAppFactory,
+                                                          default=NotFound)
         settings = registry.queryUtility(ISettings)
         if settings is not None:
             self.debug_authorization = settings.debug_authorization
             self.debug_notfound = settings.debug_notfound
             
-        self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
         self.root_factory = registry.getUtility(IRootFactory)
         self.root_policy = self.root_factory # b/w compat
         self.traverser_warned = {}
@@ -144,14 +162,16 @@ class Router(object):
                     'context %r): %s' % (
                     request.url, view_name, context, permitted)
                     )
+
             if not permitted:
                 if debug_authorization:
                     msg = str(permitted)
                 else:
                     msg = 'Unauthorized: failed security policy check'
-                environ['message'] = msg
-                unauth_app = self.unauth_app_factory()
-                return unauth_app(environ, start_response)
+
+                environ['repoze.bfg.message'] = msg
+
+                return self.forbidden_app_factory()(environ, start_response)
 
             response = registry.queryMultiAdapter(
                 (context, request), IView, name=view_name)
@@ -168,7 +188,7 @@ class Router(object):
                     logger and logger.debug(msg)
                 else:
                     msg = request.url
-                environ['message'] = msg
+                environ['repoze.bfg.message'] = msg
                 notfound_app = self.notfound_app_factory()
                 return notfound_app(environ, start_response)
 

@@ -131,6 +131,17 @@ class ISecurityPolicy(Interface):
         implementation, in which case, it should raise a
         ``NotImplementedError`` exception."""
 
+    def forbidden():
+        """ This method should return a WSGI application (a callable
+        accepting ``environ`` and ``start_response``).  This WSGI
+        application will be called by ``repoze.bfg`` when view
+        invocation is denied due to a security policy deny.  The WSGI
+        application should return a response appropriate when access
+        to a view resource was forbidden by the security policy.  Note
+        that the ``repoze.bfg.message`` key in the environ passed to
+        the WSGI app will contain the 'raw' reason that view
+        invocation was denied by repoze.bfg."""
+
 class IViewPermission(Interface):
     def __call__(security_policy):
         """ Return True if the permission allows, return False if it denies. """
@@ -197,7 +208,7 @@ class INotFoundAppFactory(Interface):
         a``message`` key in the WSGI environ provides information
         pertaining to the reason for the notfound."""
 
-class IUnauthorizedAppFactory(Interface):
+class IForbiddenAppFactory(Interface):
     """ A utility which returns an Unauthorized WSGI application
     factory"""
     def __call__():
@@ -205,6 +216,12 @@ class IUnauthorizedAppFactory(Interface):
         application.  When the WSGI application is invoked, a
         ``message`` key in the WSGI environ provides information
         pertaining to the reason for the unauthorized."""
+
+IUnauthorizedAppFactory = IForbiddenAppFactory
+deprecated('IUnauthorizedAppFactory',
+           '(repoze.bfg.interfaces.IUnauthorizedAppFactory should now be '
+           'imported as repoze.bfg.interfaces.IForbiddenAppFactory)',
+           )
 
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.

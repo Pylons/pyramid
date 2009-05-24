@@ -105,7 +105,7 @@ def wsgiapp2(wrapped):
 class HTTPException(object):
     def __call__(self, environ, start_response, exc_info=False):
         try:
-            msg = escape(environ['message'])
+            msg = escape(environ['repoze.bfg.message'])
         except KeyError:
             msg = ''
         html = """<body>

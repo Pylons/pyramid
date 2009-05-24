@@ -8,6 +8,8 @@ from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IViewPermissionFactory
 
+from repoze.bfg.wsgi import Unauthorized as UnauthorizedApp
+
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
 Allow = 'Allow'
@@ -145,6 +147,8 @@ class ACLSecurityPolicy(object):
 
         return []
 
+    forbidden = UnauthorizedApp
+
 class InheritingACLSecurityPolicy(object):
     """ A security policy which uses ACLs in the following ways:
 
@@ -267,6 +271,8 @@ class InheritingACLSecurityPolicy(object):
             allowed.update(allowed_here)
 
         return allowed
+
+    forbidden = UnauthorizedApp
 
 def get_remoteuser(request):
     user_id = request.environ.get('REMOTE_USER')
@@ -595,6 +601,3 @@ class ViewPermissionFactory(object):
 class Unauthorized(Exception):
     pass
 
-
-    
-    

@@ -88,7 +88,7 @@ an object that implements any particular interface; it simply needs
 have a ``status`` attribute, a ``headerlist`` attribute, and and
 ``app_iter`` attribute.
 
-Changing the NotFound application
+Changing the NotFound Application
 ---------------------------------
 
 When :mod:`repoze.bfg` can't map a URL to code, it creates and invokes
@@ -119,54 +119,54 @@ sample code that implements a minimal NotFound application factory:
 .. note:: When a NotFound application factory is invoked, it is passed
    the WSGI environ and the WSGI ``start_response`` handler by
    :mod:`repoze.bfg`.  Within the WSGI environ will be a key named
-   ``message`` that has a value explaining why the not found error was
-   raised.  This error will be different when the ``debug_notfound``
-   environment setting is true than it is when it is false.
+   ``repoze.bfg.message`` that has a value explaining why the not
+   found error was raised.  This error will be different when the
+   ``debug_notfound`` environment setting is true than it is when it
+   is false.
 
-Changing the Unauthorized application
--------------------------------------
+Changing the Forbidden Application
+----------------------------------
 
 When :mod:`repoze.bfg` can't authorize execution of a view based on
-the security policy in use, it creates and invokes an Unauthorized
-WSGI application. The application it invokes can be customized by
-placing something like the following ZCML in your ``configure.zcml``
-file.
+the security policy in use, it creates and invokes a Forbidden WSGI
+application. The application it invokes can be customized by placing
+something like the following ZCML in your ``configure.zcml`` file.
 
 .. code-block:: xml
    :linenos:
 
-   <utility provides="repoze.bfg.interfaces.IUnauthorizedAppFactory"
-            component="helloworld.factories.unauthorized_app_factory"/>
+   <utility provides="repoze.bfg.interfaces.IForbiddenAppFactory"
+            component="helloworld.factories.forbidden_app_factory"/>
 
-Replace ``helloworld.factories.unauthorized_app_factory`` with the
-Python dotted name to the request factory you want to use.  Here's
+Replace ``helloworld.factories.forbidden_app_factory`` with the Python
+dotted name to the WSGI application factory you want to use.  Here's
 some sample code that implements a minimal Unauthorized application
 factory:
 
 .. code-block:: python
 
-   from webob.exc import HTTPUnauthorized
+   from webob.exc import HTTPForbidden
 
-   class MyUnauthorized(HTTPUnauthorized):
+   class MyForbidden(HTTPForbidden):
        pass
 
-   def notfound_app_factory():
-       return MyUnauthorized
+   def forbidden_app_factory():
+       return MyForbidden
 
-.. note:: When an Unauthorized application factory is invoked, it is
+.. note:: When an Forbidden application factory is invoked, it is
    passed the WSGI environ and the WSGI ``start_response`` handler by
    :mod:`repoze.bfg`.  Within the WSGI environ will be a key named
-   ``message`` that has a value explaining why the action was not
-   authorized.  This error will be different when the
+   ``repoze.bfg.message`` that has a value explaining why the action
+   was forbidden.  This error will be different when the
    ``debug_authorization`` environment setting is true than it is when
    it is false.
 
-.. note:: You can influence the status code of Unauthorized responses
-   by using an alterate unauthorized application factory.  For
-   example, you may return an unauthorized application with a ``403
-   Forbidden`` status code, rather than use the default unauthorized
-   application factory, which sends a response with a ``401
-   Unauthorized`` status code.
+.. warning:: the default forbidden application factory sends a
+   response with a ``401 Unauthorized`` status code for backwards
+   compatibility reasons.  You can influence the status code of
+   Forbidden responses by using an alterate forbidden application
+   factory.  For example, it would make sense to return an forbidden
+   application with a ``403 Forbidden`` status code.
 
 Changing the Default Routes Context Factory
 -------------------------------------------
