@@ -33,7 +33,7 @@ Backwards Incompatibilities
 ---------------------------
 
 - Custom NotFound and Forbidden (nee' Unauthorized) WSGI applications
-  (registered a a utility for INotFoundAppFactory and
+  (registered as a utility for INotFoundAppFactory and
   IUnauthorizedAppFactory) could rely on an environment key named
   ``message`` describing the circumstance of the response.  This key
   has been renamed to ``repoze.bfg.message`` (as per the WSGI spec,
