@@ -4,7 +4,7 @@ Next release
 Features
 --------
 
-- It is now possible to write a custom security policy that returns a
+- It is now possible to register a security policy that returns a
   customized ``Forbidden`` WSGI application when BFG cannot authorize
   an invocation of a view.  To this end, ISecurityPolicy objects must
   now have a ``forbidden`` method.  This method should return a WSGI
