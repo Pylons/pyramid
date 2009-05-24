@@ -44,28 +44,24 @@ _marker = object()
 class Router(object):
     """ The main repoze.bfg WSGI application. """
     implements(IRouter)
-    
+
+    debug_authorization = False
+    debug_notfound = False
+
     def __init__(self, registry):
         self.registry = registry
 
         self.request_factory = registry.queryUtility(IRequestFactory)
         self.security_policy = registry.queryUtility(ISecurityPolicy)
-
-        notfound_app_factory = registry.queryUtility(INotFoundAppFactory)
-        if notfound_app_factory is None:
-            notfound_app_factory = NotFound
-        self.notfound_app_factory = notfound_app_factory
-
-        unauth_app_factory = registry.queryUtility(IUnauthorizedAppFactory)
-        if unauth_app_factory is None:
-            unauth_app_factory = Unauthorized
-        self.unauth_app_factory = unauth_app_factory
+        self.notfound_app_factory = registry.queryUtility(
+            INotFoundAppFactory,
+            default=NotFound)
+        self.unauth_app_factory = registry.queryUtility(
+            IUnauthorizedAppFactory,
+            default=Unauthorized)
 
         settings = registry.queryUtility(ISettings)
-        if settings is None:
-            self.debug_authorization = False
-            self.debug_notfound = False
-        else:
+        if settings is not None:
             self.debug_authorization = settings.debug_authorization
             self.debug_notfound = settings.debug_notfound
             
