@@ -245,14 +245,12 @@ class TestACLSecurityPolicy(unittest.TestCase):
 
     def test_forbidden(self):
         policy = self._makeOne(lambda *arg: None)
-        forbidden_app = policy.forbidden(None, None)
-        environ = {}
-        result = []
-        def start_response(status, headers):
-            result.append((status, headers))
-        response = forbidden_app(environ, start_response)
-        self.assertEqual(result[0][0], '401 Unauthorized')
-        self.failUnless(len(result[0][1]), 2) # headers
+        context = DummyContext()
+        request = DummyRequest({})
+        response = policy.forbidden(context, request)
+        self.failUnless('401 Unauthorized' in response.app_iter[0])
+        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertEqual(len(response.headerlist), 2)
         
 
 class TestInheritingACLSecurityPolicy(unittest.TestCase):
@@ -444,14 +442,12 @@ class TestInheritingACLSecurityPolicy(unittest.TestCase):
 
     def test_forbidden(self):
         policy = self._makeOne(lambda *arg: None)
-        forbidden_app = policy.forbidden(None, None)
-        environ = {}
-        result = []
-        def start_response(status, headers):
-            result.append((status, headers))
-        response = forbidden_app(environ, start_response)
-        self.assertEqual(result[0][0], '401 Unauthorized')
-        self.failUnless(len(result[0][1]), 2) # headers
+        context = DummyContext()
+        request = DummyRequest({})
+        response = policy.forbidden(context, request)
+        self.failUnless('401 Unauthorized' in response.app_iter[0])
+        self.assertEqual(response.status, '401 Unauthorized')
+        self.assertEqual(len(response.headerlist), 2)
 
 class TestAllPermissionsList(unittest.TestCase):
     def setUp(self):

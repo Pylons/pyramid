@@ -5,42 +5,44 @@ Features
 --------
 
 - It is now possible to register a custom
-  ``repoze.bfg.interfaces.IForbiddenAppFactory`` for a given
+  ``repoze.bfg.interfaces.IForbiddenResponseFactory`` for a given
   application.  This feature replaces the
   ``repoze.bfg.interfaces.IUnauthorizedAppFactory`` feature previously
-  described in the Hooks chapter.  The IForbiddenAppFactory will be
-  called when the framework detects an authorization failure; it
+  described in the Hooks chapter.  The IForbiddenResponseFactory will
+  be called when the framework detects an authorization failure; it
   should accept a context object and a request object; it should
-  return a WSGI application.  Read the below point for more info and
-  see the Hooks narrative chapter of the BFG docs for more info.
+  return an IResponse object (a webob response, basically).  Read the
+  below point for more info and see the Hooks narrative chapter of the
+  BFG docs for more info; this registration trumps the security policy
+  ``forbidden`` feature when it is registered.
 
 - It is now possible to register a security policy that returns a
-  customized ``Forbidden`` WSGI application when BFG cannot authorize
-  an invocation of a view.  To this end, ISecurityPolicy objects must
-  now have a ``forbidden`` method that accepts two arguments:
-  ``context`` and ``request``.  The ``context`` will be the context
-  found by the router, the ``request`` will be the current request.
-  This method should return a WSGI application.  The returned WSGI
-  application should generate a response which is appropriate when
-  access to a view resource was forbidden by the security policy
-  (e.g. perhaps a login page).  ``repoze.bfg`` is willing to operate
-  with a custom security policy that does not have a ``forbidden``
-  method, but it will issue a warning; eventually security policies
-  without a ``forbidden`` method will cease to work under
-  ``repoze.bfg``.
+  customized ``Forbidden`` response when BFG cannot authorize an
+  invocation of a view.  To this end, ISecurityPolicy objects must now
+  have a ``forbidden`` method that accepts two arguments: ``context``
+  and ``request``.  The ``context`` will be the context found by the
+  router, the ``request`` will be the current request.  This method
+  should return an IResponse (a webob response).  The returned
+  response application should be appropriate when access to a view
+  resource was forbidden by the security policy (e.g. perhaps a login
+  page or a general "forbidden" page).  ``repoze.bfg`` is willing to
+  operate with a custom security policy that does not have a
+  ``forbidden`` method, but it will issue a warning; eventually
+  security policies without a ``forbidden`` method will cease to work
+  under ``repoze.bfg``.
 
-  Note that the ``forbidden`` WSGI application returned by the
-  security policy is not used if a developer has registered an
-  IForbiddenAppFactory (see the "Hooks" narrative chapter); the
-  explicitly registered IForbiddenAppFactory will be preferred over
-  the (more general) security policy forbidden app factory.
+  Note that the ``forbidden`` method of a security policy is not used
+  if a developer has registered an IForbiddenResponseFactory (see the
+  "Hooks" narrative chapter); the explicitly registered
+  IForbiddenResponseFactory will be preferred over the (more general)
+  security policy forbidden method.
 
 - All default security policies now have a ``forbidden`` callable
-  attached to them.  This particular callable returns a WSGI
-  application which generates a ``401 Unauthorized`` response for
-  backwards compatibility (had backwards compatibility not been an
-  issue, this callable would have returned a WSGI app that generated a
-  ``403 Forbidden`` response).
+  attached to them.  This particular callable returns an IResponse (a
+  webob response) with a ``401 Unauthorized`` status for backwards
+  compatibility (had backwards compatibility not been an issue, this
+  callable would have returned a WSGI app that generated a ``403
+  Forbidden`` response).
 
 Backwards Incompatibilities
 ---------------------------
@@ -57,8 +59,7 @@ Deprecations
 
 - The ``repoze.bfg.interfaces.IUnauthorizedAppFactory`` interface has
   been deprecated in favor of using the new
-  ``repoze.bfg.interfaces.IForbiddenAppFactory`` mechanism.
-
+  ``repoze.bfg.interfaces.IForbiddenResponseFactory`` mechanism.
 
 0.8.1 (2009-05-21)
 ==================

@@ -78,8 +78,9 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IViewPermission
         self.registry.registerAdapter(permission, for_, IViewPermission, name)
 
-    def _registerSecurityPolicy(self):
-        secpol = DummySecurityPolicy()
+    def _registerSecurityPolicy(self, secpol=None):
+        if secpol is None:
+            secpol = DummySecurityPolicy()
         from repoze.bfg.interfaces import ISecurityPolicy
         self.registry.registerUtility(secpol, ISecurityPolicy)
         return secpol
@@ -130,8 +131,9 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         rootfactory = self._registerRootFactory(None)
         logger = self._registerLogger()
-        secpol = self._registerSecurityPolicy()
-        del secpol.forbidden
+        class Dummy:
+            pass
+        self._registerSecurityPolicy(Dummy())
         router = self._makeOne()
         self.assertEqual(len(logger.messages), 1)
         self.failUnless('which does not have a "forbidden" method'
@@ -150,8 +152,12 @@ class RouterTests(unittest.TestCase):
         self.registry.registerUtility(factory, IUnauthorizedAppFactory)
         router = self._makeOne()
         self.assertEqual(len(logger.messages), 1)
-        self.failUnless('IForbiddenAppFactory' in logger.messages[0])
-        self.assertEqual(router.forbidden_app_factory(None, None), 'yo')
+        self.failUnless('IForbiddenResponseFactory' in logger.messages[0])
+        class DummyRequest:
+            def get_response(self, app):
+                return app
+        req = DummyRequest()
+        self.assertEqual(router.forbidden_resp_factory(None, req), 'yo')
 
     def test_inotfound_appfactory_override(self):
         from repoze.bfg.interfaces import INotFoundAppFactory
@@ -162,31 +168,31 @@ class RouterTests(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.notfound_app_factory, app)
 
-    def test_iforbidden_appfactory_override_withsecpol(self):
-        from repoze.bfg.interfaces import IForbiddenAppFactory
+    def test_iforbidden_respfactory_override_withsecpol(self):
+        from repoze.bfg.interfaces import IForbiddenResponseFactory
         def app():
             """ """
-        self.registry.registerUtility(app, IForbiddenAppFactory)
+        self.registry.registerUtility(app, IForbiddenResponseFactory)
         self._registerSecurityPolicy()
         self._registerRootFactory(None)
         router = self._makeOne()
-        self.assertEqual(router.forbidden_app_factory, app)
+        self.assertEqual(router.forbidden_resp_factory, app)
 
-    def test_iforbidden_appfactory_override_nosecpol(self):
-        from repoze.bfg.interfaces import IForbiddenAppFactory
+    def test_iforbidden_responsefactory_override_nosecpol(self):
+        from repoze.bfg.interfaces import IForbiddenResponseFactory
         def app():
             """ """
-        self.registry.registerUtility(app, IForbiddenAppFactory)
+        self.registry.registerUtility(app, IForbiddenResponseFactory)
         self._registerRootFactory(None)
         router = self._makeOne()
-        self.assertEqual(router.forbidden_app_factory, app)
+        self.assertEqual(router.forbidden_resp_factory, app)
 
-    def test_iforbidden_appfactory_nooverride(self):
+    def test_iforbidden_responsefactory_nooverride(self):
         secpol = self._registerSecurityPolicy()
         context = DummyContext()
         self._registerRootFactory(None)
         router = self._makeOne()
-        self.assertEqual(router.forbidden_app_factory, secpol.forbidden)
+        self.assertEqual(router.forbidden_resp_factory, secpol.forbidden)
 
     def test_call_no_view_registered_no_isettings(self):
         environ = self._makeEnviron()
@@ -782,11 +788,11 @@ class DummyResponse:
     app_iter = ()
     
 class DummySecurityPolicy:
-    def __init__(self):
-        def wsgiapp(environ, start_response):
-            self.environ = environ
-            self.start_response = start_response
-            start_response('401 Unauthorized', [])
-            return 'Unauthorized'
-        self.forbidden = lambda *x: wsgiapp
+    def forbidden(self, context, request):
+        self.request = request
+        ob = DummyResponse()
+        ob.status = '401 Unauthorized'
+        ob.app_iter = ['Unauthorized']
+        ob.headerlist = ()
+        return ob
 

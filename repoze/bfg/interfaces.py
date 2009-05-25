@@ -132,14 +132,21 @@ class ISecurityPolicy(Interface):
         ``NotImplementedError`` exception."""
 
     def forbidden(context, request):
-        """ This method should return a WSGI application (a callable
-        accepting ``environ`` and ``start_response``).  This WSGI
-        application will be called by ``repoze.bfg`` when view
-        invocation is denied due to a security policy deny.  The WSGI
-        application should return a response appropriate when access
-        to a view resource was forbidden by the security policy.  Note
-        that the ``repoze.bfg.message`` key in the environ passed to
-        the WSGI app will contain the 'raw' reason that view
+        """ This method should return an IResponse object (an object
+        with the attributes ``status``, ``headerlist``, and
+        ``app_iter``) as a result of a view invocation denial.  The
+        ``forbidden`` method of a security policy will be called by
+        ``repoze.bfg`` when view invocation is denied (usually as a
+        result of the ``permit`` method of the same security policy
+        returning False to the Router).
+
+        The ``forbidden`` method of a security will not be called when
+        an ``IForbiddenResponseFactory`` utility is registered;
+        instead the ``IForbiddenResponseFactory`` utility will serve
+        the forbidden response.
+
+        Note that the ``repoze.bfg.message`` key in the environ passed
+        to the WSGI app will contain the 'raw' reason that view
         invocation was denied by repoze.bfg.  The ``context`` object
         passed in will be the context found by ``repoze.bfg`` when the
         denial was found and the ``request`` will be the request which
@@ -211,23 +218,25 @@ class INotFoundAppFactory(Interface):
         a``message`` key in the WSGI environ provides information
         pertaining to the reason for the notfound."""
 
-class IForbiddenAppFactory(Interface):
-    """ A utility which returns an Forbidden WSGI application
-    factory"""
+class IForbiddenResponseFactory(Interface):
+    """ A utility which returns an IResponse as the result of the
+    denial of a view invocation by a security policy."""
     def __call__(context, request):
-        """ Return a callable which returns an unauthorized WSGI
-        application.  When the WSGI application is invoked, a
-        ``message`` key in the WSGI environ provides information
-        pertaining to the reason for the unauthorized.  The
-        ``context`` passed to the forbidden app factory will be the
-        context found by the repoze.bfg router during traversal or url
-        dispatch.  The ``request`` will be the request object which
-        caused the deny. """
+        """ Return an object implementing IResponse (an object with
+        the status, headerlist, and app_iter attributes) as a result
+        of a view invocation denial by a security policy.
+        
+        Note that the ``message`` key in the WSGI environ
+        (request.environ) provides information pertaining to the
+        reason for the view invocation denial.  The ``context`` passed
+        to the forbidden app factory will be the context found by the
+        repoze.bfg router during traversal or url dispatch.  The
+        ``request`` will be the request object which caused the deny."""
 
 class IUnauthorizedAppFactory(Interface):
     """ A utility which returns an Unauthorized WSGI application
     factory (deprecated in repoze.bfg 0.8.2) in favor of
-    IForbiddenAppFactory """
+    IForbiddenResponseFactory """
     
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.
