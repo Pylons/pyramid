@@ -12,8 +12,6 @@ from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IViewPermissionFactory
 from repoze.bfg.interfaces import IResponseFactory
 
-from repoze.bfg.wsgi import Unauthorized as UnauthorizedApp
-
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
 Allow = 'Allow'
@@ -517,26 +515,6 @@ def WhoInheritingACLSecurityPolicy():
     """
     return InheritingACLSecurityPolicy(get_who_principals)
 
-## class StandaloneInheritingACLSecurityPolicy(InheritingACLSecurityPolicy):
-##     def __init__(self, get_principals, login_view_name='login_view',
-##                  forbidden_view_name='forbidden_view'):
-##         self.get_principals = get_principals
-##         self.login_view_name = login_view_name
-##         self.forbidden_view_name = forbidden_view_name
-
-##     def forbidden(self, context, request):
-##         from repoze.bfg.view import render_view_to_response
-##         from webob import Response
-
-##         userid = self.authenticated_userid(request)
-
-##         if userid is None:
-##             view_name = self.login_view_name
-##         else:
-##             view_name = self.forbidden_view_name
-
-##         return render_view_to_response(context, request, name=view_name,
-##                                        secure=False)
 
 class PermitsResult(int):
     def __new__(cls, s, *args):
