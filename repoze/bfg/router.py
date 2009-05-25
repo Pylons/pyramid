@@ -31,13 +31,15 @@ from repoze.bfg.registry import populateRegistry
 from repoze.bfg.request import HTTP_METHOD_FACTORIES
 from repoze.bfg.request import Request
 
+from repoze.bfg.security import _forbidden
+
 from repoze.bfg.settings import Settings
 
 from repoze.bfg.urldispatch import RoutesRootFactory
 
 from repoze.bfg.traversal import _traverse
 from repoze.bfg.view import _view_execution_permitted
-from repoze.bfg.wsgi import Unauthorized
+
 from repoze.bfg.wsgi import NotFound
 
 _marker = object()
@@ -55,6 +57,7 @@ class Router(object):
 
         self.request_factory = registry.queryUtility(IRequestFactory)
         security_policy = registry.queryUtility(ISecurityPolicy)
+        self.security_policy = security_policy
 
         unauthorized_app_factory = registry.queryUtility(
             IUnauthorizedAppFactory)
@@ -86,7 +89,7 @@ class Router(object):
             if hasattr(security_policy, 'forbidden'):
                 security_policy_forbidden = security_policy.forbidden
             else:
-                security_policy_forbidden = Unauthorized
+                security_policy_forbidden = _forbidden
                 warning = ('You are running with a security policy (%s) which '
                            'does not have a "forbidden" method; in BFG 0.8.2+ '
                            'the ISecurityPolicy interface in the '
@@ -101,9 +104,9 @@ class Router(object):
             self.forbidden_resp_factory = (self.forbidden_resp_factory or
                                            security_policy_forbidden)
 
-        self.security_policy = security_policy
         self.notfound_app_factory = registry.queryUtility(INotFoundAppFactory,
                                                           default=NotFound)
+        
         settings = registry.queryUtility(ISettings)
         if settings is not None:
             self.debug_authorization = settings.debug_authorization

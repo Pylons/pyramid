@@ -138,6 +138,11 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(len(logger.messages), 1)
         self.failUnless('which does not have a "forbidden" method'
                         in logger.messages[0])
+        class DummyRequest:
+            environ = {}
+        req = DummyRequest()
+        resp = router.forbidden_resp_factory(None, req)
+        self.assertEqual(resp.status, '401 Unauthorized')
 
     def test_secpol_with_iunauthorized_appfactory(self):
         from repoze.bfg.interfaces import IUnauthorizedAppFactory

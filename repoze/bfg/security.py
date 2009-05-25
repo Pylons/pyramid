@@ -1,5 +1,5 @@
-from webob import Response
 from cgi import escape
+from webob import Response
 
 from zope.component import queryUtility
 from zope.deprecation import deprecated
@@ -80,10 +80,30 @@ def principals_allowed_by_permission(context, permission):
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
 
+def _forbidden(context, request):
+    status = '401 Unauthorized'
+    try:
+        msg = escape(request.environ['repoze.bfg.message'])
+    except KeyError:
+        msg = ''
+    html = """
+    <html>
+    <title>%s</title>
+    <body>
+    <h1>%s</h1>
+    <code>%s</code>
+    </body>
+    </html>
+    """ % (status, status, msg)
+    headers = [('Content-Length', str(len(html))),
+               ('Content-Type', 'text/html')]
+    response_factory = queryUtility(IResponseFactory, default=Response)
+    return response_factory(status = status,
+                            headerlist = headers,
+                            app_iter = [html])
+
 class ACLSecurityPolicy(object):
     implements(ISecurityPolicy)
-
-    forbidden_status = '401 Unauthorized' # b/c, should be 403
 
     def __init__(self, get_principals):
         self.get_principals = get_principals
@@ -154,11 +174,7 @@ class ACLSecurityPolicy(object):
         return []
 
     def forbidden(self, context, request):
-        body, headerlist = _forbidden_html(request, self.forbidden_status)
-        response_factory = queryUtility(IResponseFactory, default=Response)
-        return response_factory(status = self.forbidden_status,
-                                headerlist = headerlist,
-                                app_iter = body)
+        return _forbidden(context, request)
 
 class InheritingACLSecurityPolicy(object):
     """ A security policy which uses ACLs in the following ways:
@@ -204,8 +220,6 @@ class InheritingACLSecurityPolicy(object):
       ``authenticated_userid``).
     """
     implements(ISecurityPolicy)
-
-    forbidden_status = '401 Unauthorized' # b/c, should be 403
 
     def __init__(self, get_principals):
         self.get_principals = get_principals
@@ -286,11 +300,7 @@ class InheritingACLSecurityPolicy(object):
         return allowed
 
     def forbidden(self, context, request):
-        body, headerlist = _forbidden_html(request, self.forbidden_status)
-        response_factory = queryUtility(IResponseFactory, default=Response)
-        return response_factory(status = self.forbidden_status,
-                                headerlist = headerlist,
-                                app_iter = body)
+        return _forbidden(context, request)
 
 def get_remoteuser(request):
     user_id = request.environ.get('REMOTE_USER')
@@ -507,6 +517,27 @@ def WhoInheritingACLSecurityPolicy():
     """
     return InheritingACLSecurityPolicy(get_who_principals)
 
+## class StandaloneInheritingACLSecurityPolicy(InheritingACLSecurityPolicy):
+##     def __init__(self, get_principals, login_view_name='login_view',
+##                  forbidden_view_name='forbidden_view'):
+##         self.get_principals = get_principals
+##         self.login_view_name = login_view_name
+##         self.forbidden_view_name = forbidden_view_name
+
+##     def forbidden(self, context, request):
+##         from repoze.bfg.view import render_view_to_response
+##         from webob import Response
+
+##         userid = self.authenticated_userid(request)
+
+##         if userid is None:
+##             view_name = self.login_view_name
+##         else:
+##             view_name = self.forbidden_view_name
+
+##         return render_view_to_response(context, request, name=view_name,
+##                                        secure=False)
+
 class PermitsResult(int):
     def __new__(cls, s, *args):
         inst = int.__new__(cls, cls.boolval)
@@ -618,22 +649,4 @@ class ViewPermissionFactory(object):
 
 class Unauthorized(Exception):
     pass
-
-def _forbidden_html(request, status):
-    try:
-        msg = escape(request.environ['repoze.bfg.message'])
-    except KeyError:
-        msg = ''
-    html = """
-    <html>
-    <title>%s</title>
-    <body>
-    <h1>%s</h1>
-    <code>%s</code>
-    </body>
-    </html>
-    """ % (status, status, msg)
-    headers = [('Content-Length', str(len(html))),
-               ('Content-Type', 'text/html')]
-    return [html], headers
 
