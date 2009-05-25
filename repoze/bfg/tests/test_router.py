@@ -137,6 +137,22 @@ class RouterTests(unittest.TestCase):
         self.failUnless('which does not have a "forbidden" method'
                         in logger.messages[0])
 
+    def test_secpol_with_iunauthorized_appfactory(self):
+        from repoze.bfg.interfaces import IUnauthorizedAppFactory
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        rootfactory = self._registerRootFactory(None)
+        logger = self._registerLogger()
+        secpol = self._registerSecurityPolicy()
+        def factory():
+            return 'yo'
+        self.registry.registerUtility(factory, IUnauthorizedAppFactory)
+        router = self._makeOne()
+        self.assertEqual(len(logger.messages), 1)
+        self.failUnless('IForbiddenAppFactory' in logger.messages[0])
+        self.assertEqual(router.forbidden_app_factory(None, None), 'yo')
+
     def test_inotfound_appfactory_override(self):
         from repoze.bfg.interfaces import INotFoundAppFactory
         def app():

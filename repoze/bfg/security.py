@@ -147,7 +147,8 @@ class ACLSecurityPolicy(object):
 
         return []
 
-    forbidden = UnauthorizedApp
+    def forbidden(self, context, request):
+        return UnauthorizedApp()
 
 class InheritingACLSecurityPolicy(object):
     """ A security policy which uses ACLs in the following ways:
@@ -272,7 +273,8 @@ class InheritingACLSecurityPolicy(object):
 
         return allowed
 
-    forbidden = UnauthorizedApp
+    def forbidden(self, context, request):
+        return UnauthorizedApp()
 
 def get_remoteuser(request):
     user_id = request.environ.get('REMOTE_USER')

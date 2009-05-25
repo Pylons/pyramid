@@ -131,7 +131,7 @@ class ISecurityPolicy(Interface):
         implementation, in which case, it should raise a
         ``NotImplementedError`` exception."""
 
-    def forbidden():
+    def forbidden(context, request):
         """ This method should return a WSGI application (a callable
         accepting ``environ`` and ``start_response``).  This WSGI
         application will be called by ``repoze.bfg`` when view
@@ -140,7 +140,10 @@ class ISecurityPolicy(Interface):
         to a view resource was forbidden by the security policy.  Note
         that the ``repoze.bfg.message`` key in the environ passed to
         the WSGI app will contain the 'raw' reason that view
-        invocation was denied by repoze.bfg."""
+        invocation was denied by repoze.bfg.  The ``context`` object
+        passed in will be the context found by ``repoze.bfg`` when the
+        denial was found and the ``request`` will be the request which
+        caused the denial."""
 
 class IViewPermission(Interface):
     def __call__(security_policy):
@@ -209,20 +212,23 @@ class INotFoundAppFactory(Interface):
         pertaining to the reason for the notfound."""
 
 class IForbiddenAppFactory(Interface):
-    """ A utility which returns an Unauthorized WSGI application
+    """ A utility which returns an Forbidden WSGI application
     factory"""
-    def __call__():
+    def __call__(context, request):
         """ Return a callable which returns an unauthorized WSGI
         application.  When the WSGI application is invoked, a
         ``message`` key in the WSGI environ provides information
-        pertaining to the reason for the unauthorized."""
+        pertaining to the reason for the unauthorized.  The
+        ``context`` passed to the forbidden app factory will be the
+        context found by the repoze.bfg router during traversal or url
+        dispatch.  The ``request`` will be the request object which
+        caused the deny. """
 
-IUnauthorizedAppFactory = IForbiddenAppFactory
-deprecated('IUnauthorizedAppFactory',
-           '(repoze.bfg.interfaces.IUnauthorizedAppFactory should now be '
-           'imported as repoze.bfg.interfaces.IForbiddenAppFactory)',
-           )
-
+class IUnauthorizedAppFactory(Interface):
+    """ A utility which returns an Unauthorized WSGI application
+    factory (deprecated in repoze.bfg 0.8.2) in favor of
+    IForbiddenAppFactory """
+    
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.
     """

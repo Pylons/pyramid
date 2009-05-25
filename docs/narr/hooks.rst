@@ -145,13 +145,10 @@ factory:
 
 .. code-block:: python
 
-   from webob.exc import HTTPForbidden
+   from repoze.bfg.chameleon_zpt import render_template_to_response
 
-   class MyForbidden(HTTPForbidden):
-       pass
-
-   def forbidden_app_factory():
-       return MyForbidden
+   def forbidden_app_factory(context, request):
+       return render_template_to_response('templates/login_form.pt')
 
 .. note:: When an Forbidden application factory is invoked, it is
    passed the WSGI environ and the WSGI ``start_response`` handler by
@@ -159,7 +156,8 @@ factory:
    ``repoze.bfg.message`` that has a value explaining why the action
    was forbidden.  This error will be different when the
    ``debug_authorization`` environment setting is true than it is when
-   it is false.
+   it is false.  A WebOb ``Response`` object is a valid WSGI
+   application, by the way.
 
 .. warning:: the default forbidden application factory sends a
    response with a ``401 Unauthorized`` status code for backwards

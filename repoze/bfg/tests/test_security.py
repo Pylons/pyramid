@@ -245,7 +245,7 @@ class TestACLSecurityPolicy(unittest.TestCase):
 
     def test_forbidden(self):
         policy = self._makeOne(lambda *arg: None)
-        forbidden_app = policy.forbidden()
+        forbidden_app = policy.forbidden(None, None)
         environ = {}
         result = []
         def start_response(status, headers):
@@ -444,7 +444,7 @@ class TestInheritingACLSecurityPolicy(unittest.TestCase):
 
     def test_forbidden(self):
         policy = self._makeOne(lambda *arg: None)
-        forbidden_app = policy.forbidden()
+        forbidden_app = policy.forbidden(None, None)
         environ = {}
         result = []
         def start_response(status, headers):
