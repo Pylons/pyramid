@@ -243,16 +243,6 @@ class TestACLSecurityPolicy(unittest.TestCase):
         result = policy.principals_allowed_by_permission(None, 'read')
         self.assertEqual(result, [])
 
-    def test_forbidden(self):
-        policy = self._makeOne(lambda *arg: None)
-        context = DummyContext()
-        request = DummyRequest({})
-        response = policy.forbidden(context, request)
-        self.failUnless('401 Unauthorized' in response.app_iter[0])
-        self.assertEqual(response.status, '401 Unauthorized')
-        self.assertEqual(len(response.headerlist), 2)
-        
-
 class TestInheritingACLSecurityPolicy(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -439,15 +429,6 @@ class TestInheritingACLSecurityPolicy(unittest.TestCase):
         policy = self._makeOne(lambda request: request.principals)
         result = policy.authenticated_userid(request)
         self.assertEqual(result, None)
-
-    def test_forbidden(self):
-        policy = self._makeOne(lambda *arg: None)
-        context = DummyContext()
-        request = DummyRequest({})
-        response = policy.forbidden(context, request)
-        self.failUnless('401 Unauthorized' in response.app_iter[0])
-        self.assertEqual(response.status, '401 Unauthorized')
-        self.assertEqual(len(response.headerlist), 2)
 
 class TestAllPermissionsList(unittest.TestCase):
     def setUp(self):

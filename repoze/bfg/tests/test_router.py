@@ -78,12 +78,9 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IViewPermission
         self.registry.registerAdapter(permission, for_, IViewPermission, name)
 
-    def _registerSecurityPolicy(self, secpol=None):
-        if secpol is None:
-            secpol = DummySecurityPolicy()
+    def _registerSecurityPolicy(self, secpol):
         from repoze.bfg.interfaces import ISecurityPolicy
         self.registry.registerUtility(secpol, ISecurityPolicy)
-        return secpol
 
     def _registerEventListener(self, iface):
         L = []
@@ -92,11 +89,9 @@ class RouterTests(unittest.TestCase):
         self.registry.registerHandler(listener, (iface,))
         return L
 
-    def _registerRootFactory(self, val):
-        rootfactory = make_rootfactory(val)
+    def _registerRootFactory(self, root_factory):
         from repoze.bfg.interfaces import IRootFactory
-        self.registry.registerUtility(rootfactory, IRootFactory)
-        return rootfactory
+        self.registry.registerUtility(root_factory, IRootFactory)
 
     def _getTargetClass(self):
         from repoze.bfg.router import Router
@@ -118,93 +113,21 @@ class RouterTests(unittest.TestCase):
         return environ
 
     def test_root_policy(self):
+        rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
-        rootfactory = self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         self.assertEqual(router.root_policy, rootfactory)
 
-    def test_secpol_no_forbidden(self):
-        environ = self._makeEnviron()
-        context = DummyContext()
-        self._registerTraverserFactory(context)
-        rootfactory = self._registerRootFactory(None)
-        logger = self._registerLogger()
-        class Dummy:
-            pass
-        self._registerSecurityPolicy(Dummy())
-        router = self._makeOne()
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('which does not have a "forbidden" method'
-                        in logger.messages[0])
-        class DummyRequest:
-            environ = {}
-        req = DummyRequest()
-        resp = router.forbidden_resp_factory(None, req)
-        self.assertEqual(resp.status, '401 Unauthorized')
-
-    def test_secpol_with_iunauthorized_appfactory(self):
-        from repoze.bfg.interfaces import IUnauthorizedAppFactory
-        environ = self._makeEnviron()
-        context = DummyContext()
-        self._registerTraverserFactory(context)
-        rootfactory = self._registerRootFactory(None)
-        logger = self._registerLogger()
-        secpol = self._registerSecurityPolicy()
-        def factory():
-            return 'yo'
-        self.registry.registerUtility(factory, IUnauthorizedAppFactory)
-        router = self._makeOne()
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('IForbiddenResponseFactory' in logger.messages[0])
-        class DummyRequest:
-            def get_response(self, app):
-                return app
-        req = DummyRequest()
-        self.assertEqual(router.forbidden_resp_factory(None, req), 'yo')
-
-    def test_inotfound_appfactory_override(self):
-        from repoze.bfg.interfaces import INotFoundAppFactory
-        def app():
-            """ """
-        self.registry.registerUtility(app, INotFoundAppFactory)
-        self._registerRootFactory(None)
-        router = self._makeOne()
-        self.assertEqual(router.notfound_app_factory, app)
-
-    def test_iforbidden_respfactory_override_withsecpol(self):
-        from repoze.bfg.interfaces import IForbiddenResponseFactory
-        def app():
-            """ """
-        self.registry.registerUtility(app, IForbiddenResponseFactory)
-        self._registerSecurityPolicy()
-        self._registerRootFactory(None)
-        router = self._makeOne()
-        self.assertEqual(router.forbidden_resp_factory, app)
-
-    def test_iforbidden_responsefactory_override_nosecpol(self):
-        from repoze.bfg.interfaces import IForbiddenResponseFactory
-        def app():
-            """ """
-        self.registry.registerUtility(app, IForbiddenResponseFactory)
-        self._registerRootFactory(None)
-        router = self._makeOne()
-        self.assertEqual(router.forbidden_resp_factory, app)
-
-    def test_iforbidden_responsefactory_nooverride(self):
-        secpol = self._registerSecurityPolicy()
-        context = DummyContext()
-        self._registerRootFactory(None)
-        router = self._makeOne()
-        self.assertEqual(router.forbidden_resp_factory, secpol.forbidden)
-
     def test_call_no_view_registered_no_isettings(self):
+        rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
         logger = self._registerLogger()
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -225,7 +148,8 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
         start_response = DummyStartResponse()
-        self._registerRootFactory(NotFound())
+        rootfactory = make_rootfactory(NotFound())
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         result = router(environ, start_response)
         status = start_response.status
@@ -233,12 +157,13 @@ class RouterTests(unittest.TestCase):
         self.failUnless('http://localhost:8080' in result[0], result)
 
     def test_call_no_view_registered_debug_notfound_false(self):
+        rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
         logger = self._registerLogger()
         self._registerSettings(debug_notfound=False)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -251,12 +176,13 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_true(self):
+        rootfactory = make_rootfactory(None)
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
         self._registerSettings(debug_notfound=True)
         logger = self._registerLogger()
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -279,17 +205,19 @@ class RouterTests(unittest.TestCase):
         self.failUnless("subpath: []" in message)
 
     def test_call_view_returns_nonresponse(self):
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
         view = make_view('abc')
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(ValueError, router, environ, start_response)
 
     def test_call_view_registered_nonspecific_default_path(self):
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -297,7 +225,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -310,6 +238,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
 
     def test_call_deprecation_warning(self):
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context, _deprecation_warning='abc')
         response = DummyResponse()
@@ -317,7 +246,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         logger = self._registerLogger()
         router.logger = logger
@@ -327,6 +256,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(logger.messages[0], 'abc')
 
     def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context, view_name='foo',
                                        subpath=['bar'],
@@ -336,7 +266,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, 'foo', None, None)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -349,6 +279,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
 
     def test_call_view_registered_specific_success(self):
+        rootfactory = make_rootfactory(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
         class IContext(Interface):
@@ -362,7 +293,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -375,6 +306,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
 
     def test_call_view_registered_specific_fail(self):
+        rootfactory = make_rootfactory(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
         class IContext(Interface):
@@ -389,7 +321,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -397,6 +329,7 @@ class RouterTests(unittest.TestCase):
         self.failUnless('404' in result[0])
 
     def test_call_view_registered_security_policy_permission_none(self):
+        rootfactory = make_rootfactory(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
         class IContext(Interface):
@@ -409,14 +342,16 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerSecurityPolicy()
-        self._registerRootFactory(None)
+        secpol = DummySecurityPolicy()
+        self._registerSecurityPolicy(secpol)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(start_response.status, '200 OK')
 
     def test_call_view_registered_security_policy_permission_succeeds(self):
+        rootfactory = make_rootfactory(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
         class IContext(Interface):
@@ -427,12 +362,13 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
+        secpol = DummySecurityPolicy()
         permissionfactory = make_permission_factory(True)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        secpol = self._registerSecurityPolicy()
+        self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -440,6 +376,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(permissionfactory.checked_with, secpol)
 
     def test_call_view_permission_fails_nosettings(self):
+        rootfactory = make_rootfactory(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
         class IContext(Interface):
@@ -450,24 +387,26 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
+        secpol = DummySecurityPolicy()
         from repoze.bfg.security import ACLDenied
         permissionfactory = make_permission_factory(
             ACLDenied('ace', 'acl', 'permission', ['principals'], context)
             )
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        secpol = self._registerSecurityPolicy()
+        self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(start_response.status, '401 Unauthorized')
-        message = environ['repoze.bfg.message']
-        self.assertEqual(message, 'Unauthorized: failed security policy check')
+        message = result[0]
+        self.failUnless('failed security policy check' in message)
         self.assertEqual(permissionfactory.checked_with, secpol)
 
     def test_call_view_permission_fails_no_debug_auth(self):
+        rootfactory = make_rootfactory(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
         class IContext(Interface):
@@ -478,25 +417,27 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
+        secpol = DummySecurityPolicy()
         from repoze.bfg.security import ACLDenied
         permissionfactory = make_permission_factory(
             ACLDenied('ace', 'acl', 'permission', ['principals'], context)
             )
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        secpol = self._registerSecurityPolicy()
+        self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
         self._registerSettings(debug_authorization=False)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(start_response.status, '401 Unauthorized')
-        message = environ['repoze.bfg.message']
+        message = result[0]
         self.failUnless('failed security policy check' in message)
         self.assertEqual(permissionfactory.checked_with, secpol)
 
     def test_call_view_permission_fails_with_debug_auth(self):
+        rootfactory = make_rootfactory(None)
         from zope.interface import Interface
         from zope.interface import directlyProvides
         class IContext(Interface):
@@ -507,22 +448,23 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
         view = make_view(response)
+        secpol = DummySecurityPolicy()
         from repoze.bfg.security import ACLDenied
         permissionfactory = make_permission_factory(
             ACLDenied('ace', 'acl', 'permission', ['principals'], context)
             )
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        secpol = self._registerSecurityPolicy()
+        self._registerSecurityPolicy(secpol)
         self._registerPermission(permissionfactory, '', IContext, IRequest)
         self._registerSettings(debug_authorization=True)
         logger = self._registerLogger()
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(start_response.status, '401 Unauthorized')
-        message = environ['repoze.bfg.message']
+        message = result[0]
         self.failUnless(
             "ACLDenied permission 'permission' via ACE 'ace' in ACL 'acl' "
             "on context" in message)
@@ -540,6 +482,7 @@ class RouterTests(unittest.TestCase):
             "for principals ['principals']" in logged)
 
     def test_call_eventsends(self):
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -551,7 +494,7 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import INewResponse
         request_events = self._registerEventListener(INewRequest)
         response_events = self._registerEventListener(INewResponse)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -565,6 +508,7 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IPOSTRequest
         from repoze.bfg.interfaces import IPUTRequest
         from repoze.bfg.interfaces import IRequest
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -572,7 +516,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='POST')
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         request_events = self._registerEventListener(INewRequest)
@@ -587,6 +531,7 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IPUTRequest
         from repoze.bfg.interfaces import IPOSTRequest
         from repoze.bfg.interfaces import IRequest
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -594,7 +539,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='PUT')
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         request_events = self._registerEventListener(INewRequest)
@@ -607,6 +552,7 @@ class RouterTests(unittest.TestCase):
     def test_call_unknown_method(self):
         from repoze.bfg.interfaces import INewRequest
         from repoze.bfg.interfaces import IRequest
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -614,7 +560,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='UNKNOWN')
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         request_events = self._registerEventListener(INewRequest)
@@ -627,6 +573,7 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequestFactory
         from repoze.bfg.testing import DummyRequest
         self.registry.registerUtility(DummyRequest, IRequestFactory)
+        rootfactory = make_rootfactory(None)
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -634,7 +581,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
+        self._registerRootFactory(rootfactory)
         router = self._makeOne()
         start_response = DummyStartResponse()
         request_events = self._registerEventListener(INewRequest)
@@ -645,6 +592,40 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(request.context, context)
         self.assertEqual(request.view_name, '')
         self.assertEqual(request.subpath, [])
+
+    def test_call_inotfound_appfactory_override(self):
+        from repoze.bfg.interfaces import INotFoundAppFactory
+        def app():
+            """ """
+        self.registry.registerUtility(app, INotFoundAppFactory)
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron()
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne()
+        self.assertEqual(router.notfound_app_factory, app)
+
+    def test_call_iunauth_appfactory_override(self):
+        from repoze.bfg.interfaces import IUnauthorizedAppFactory
+        def app():
+            """ """
+        self.registry.registerUtility(app, IUnauthorizedAppFactory)
+        rootfactory = make_rootfactory(None)
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = make_view(response)
+        environ = self._makeEnviron()
+        self._registerView(view, '', None, None)
+        self._registerRootFactory(rootfactory)
+        router = self._makeOne()
+        self.assertEqual(router.unauth_app_factory, app)
 
 class MakeAppTests(unittest.TestCase):
     def setUp(self):
@@ -793,11 +774,5 @@ class DummyResponse:
     app_iter = ()
     
 class DummySecurityPolicy:
-    def forbidden(self, context, request):
-        self.request = request
-        ob = DummyResponse()
-        ob.status = '401 Unauthorized'
-        ob.app_iter = ['Unauthorized']
-        ob.headerlist = ()
-        return ob
+    pass
 

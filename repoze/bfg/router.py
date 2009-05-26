@@ -17,7 +17,6 @@ from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import IForbiddenResponseFactory
 from repoze.bfg.interfaces import IUnauthorizedAppFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
@@ -31,15 +30,13 @@ from repoze.bfg.registry import populateRegistry
 from repoze.bfg.request import HTTP_METHOD_FACTORIES
 from repoze.bfg.request import Request
 
-from repoze.bfg.security import _forbidden
-
 from repoze.bfg.settings import Settings
 
 from repoze.bfg.urldispatch import RoutesRootFactory
 
 from repoze.bfg.traversal import _traverse
 from repoze.bfg.view import _view_execution_permitted
-
+from repoze.bfg.wsgi import Unauthorized
 from repoze.bfg.wsgi import NotFound
 
 _marker = object()
@@ -53,65 +50,22 @@ class Router(object):
 
     def __init__(self, registry):
         self.registry = registry
-        self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
 
         self.request_factory = registry.queryUtility(IRequestFactory)
-        security_policy = registry.queryUtility(ISecurityPolicy)
-        self.security_policy = security_policy
+        self.security_policy = registry.queryUtility(ISecurityPolicy)
+        self.notfound_app_factory = registry.queryUtility(
+            INotFoundAppFactory,
+            default=NotFound)
+        self.unauth_app_factory = registry.queryUtility(
+            IUnauthorizedAppFactory,
+            default=Unauthorized)
 
-        unauthorized_app_factory = registry.queryUtility(
-            IUnauthorizedAppFactory)
-
-        forbidden = None
-
-        if unauthorized_app_factory is not None:
-            warning = (
-                'Instead of registering a utility against the '
-                'repoze.bfg.interfaces.IUnauthorizedAppFactory interface '
-                'to return a custom forbidden response, you should now '
-                'register a "repoze.interfaces.IForbiddenResponseFactory".  '
-                'The IUnauthorizedAppFactory interface was deprecated in '
-                'repoze.bfg 0.8.2 and will be removed in a subsequent version '
-                'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
-                'documentation for more information about '
-                'IForbiddenResponseFactory.')
-            self.logger and self.logger.warn(warning)
-            def forbidden(context, request):
-                app = unauthorized_app_factory()
-                response = request.get_response(app)
-                return response
-
-        self.forbidden_resp_factory = registry.queryUtility(
-            IForbiddenResponseFactory,
-            default=forbidden)
-
-        if security_policy is not None:
-            if hasattr(security_policy, 'forbidden'):
-                security_policy_forbidden = security_policy.forbidden
-            else:
-                security_policy_forbidden = _forbidden
-                warning = ('You are running with a security policy (%s) which '
-                           'does not have a "forbidden" method; in BFG 0.8.2+ '
-                           'the ISecurityPolicy interface in the '
-                           'repoze.bfg.interfaces module defines this method '
-                           'as required; your application will not work under '
-                           'a future release of BFG if you continue using a '
-                           'security policy without a "forbidden" method.' %
-                           security_policy)
-                self.logger and self.logger.warn(warning)
-            # allow a specifically-registered IForbiddenResponseFactory to
-            # override the security policy's forbidden
-            self.forbidden_resp_factory = (self.forbidden_resp_factory or
-                                           security_policy_forbidden)
-
-        self.notfound_app_factory = registry.queryUtility(INotFoundAppFactory,
-                                                          default=NotFound)
-        
         settings = registry.queryUtility(ISettings)
         if settings is not None:
             self.debug_authorization = settings.debug_authorization
             self.debug_notfound = settings.debug_notfound
             
+        self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
         self.root_factory = registry.getUtility(IRootFactory)
         self.root_policy = self.root_factory # b/w compat
         self.traverser_warned = {}
@@ -190,18 +144,14 @@ class Router(object):
                     'context %r): %s' % (
                     request.url, view_name, context, permitted)
                     )
-
             if not permitted:
                 if debug_authorization:
                     msg = str(permitted)
                 else:
                     msg = 'Unauthorized: failed security policy check'
-
-                environ['repoze.bfg.message'] = msg
-
-                response = self.forbidden_resp_factory(context, request)
-                start_response(response.status, response.headerlist)
-                return response.app_iter
+                environ['message'] = msg
+                unauth_app = self.unauth_app_factory()
+                return unauth_app(environ, start_response)
 
             response = registry.queryMultiAdapter(
                 (context, request), IView, name=view_name)
@@ -218,7 +168,7 @@ class Router(object):
                     logger and logger.debug(msg)
                 else:
                     msg = request.url
-                environ['repoze.bfg.message'] = msg
+                environ['message'] = msg
                 notfound_app = self.notfound_app_factory()
                 return notfound_app(environ, start_response)
 

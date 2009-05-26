@@ -1,6 +1,3 @@
-from cgi import escape
-from webob import Response
-
 from zope.component import queryUtility
 from zope.deprecation import deprecated
 from zope.interface import implements
@@ -10,7 +7,6 @@ from repoze.bfg.location import lineage
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IViewPermissionFactory
-from repoze.bfg.interfaces import IResponseFactory
 
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
@@ -78,31 +74,9 @@ def principals_allowed_by_permission(context, permission):
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
 
-def _forbidden(context, request):
-    status = '401 Unauthorized'
-    try:
-        msg = escape(request.environ['repoze.bfg.message'])
-    except KeyError:
-        msg = ''
-    html = """
-    <html>
-    <title>%s</title>
-    <body>
-    <h1>%s</h1>
-    <code>%s</code>
-    </body>
-    </html>
-    """ % (status, status, msg)
-    headers = [('Content-Length', str(len(html))),
-               ('Content-Type', 'text/html')]
-    response_factory = queryUtility(IResponseFactory, default=Response)
-    return response_factory(status = status,
-                            headerlist = headers,
-                            app_iter = [html])
-
 class ACLSecurityPolicy(object):
     implements(ISecurityPolicy)
-
+    
     def __init__(self, get_principals):
         self.get_principals = get_principals
 
@@ -171,9 +145,6 @@ class ACLSecurityPolicy(object):
 
         return []
 
-    def forbidden(self, context, request):
-        return _forbidden(context, request)
-
 class InheritingACLSecurityPolicy(object):
     """ A security policy which uses ACLs in the following ways:
 
@@ -218,7 +189,7 @@ class InheritingACLSecurityPolicy(object):
       ``authenticated_userid``).
     """
     implements(ISecurityPolicy)
-
+    
     def __init__(self, get_principals):
         self.get_principals = get_principals
 
@@ -296,9 +267,6 @@ class InheritingACLSecurityPolicy(object):
             allowed.update(allowed_here)
 
         return allowed
-
-    def forbidden(self, context, request):
-        return _forbidden(context, request)
 
 def get_remoteuser(request):
     user_id = request.environ.get('REMOTE_USER')
@@ -515,7 +483,6 @@ def WhoInheritingACLSecurityPolicy():
     """
     return InheritingACLSecurityPolicy(get_who_principals)
 
-
 class PermitsResult(int):
     def __new__(cls, s, *args):
         inst = int.__new__(cls, cls.boolval)
@@ -628,3 +595,6 @@ class ViewPermissionFactory(object):
 class Unauthorized(Exception):
     pass
 
+
+    
+    
