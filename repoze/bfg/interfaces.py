@@ -1,8 +1,6 @@
 from zope.interface import Attribute
 from zope.interface import Interface
 
-from zope.deprecation import deprecated
-
 from zope.component.interfaces import IObjectEvent
 
 class IRequestFactory(Interface):
@@ -51,12 +49,6 @@ class IRootFactory(Interface):
     def __call__(environ):
         """ Return a root object """
 
-IRootPolicy = IRootFactory
-deprecated('IRootPolicy',
-           '(repoze.bfg.interfaces.IRootPolicy should now be imported '
-           'as repoze.bfg.interfaces.IRootFactory)',
-           )
-
 class ITraverser(Interface):
     def __call__(environ):
         """ Return a dictionary with the keys ``root``, ``context``,
@@ -91,21 +83,9 @@ class ITemplateRenderer(Interface):
         passed in as arguments and return the result (a string or
         unicode object) """
 
-ITemplate = ITemplateRenderer
-deprecated('ITemplate',
-           '(repoze.bfg.interfaces.ITemplate should now be imported '
-           'as repoze.bfg.interfaces.ITemplateRenderer)',
-           )
-
 class ITemplateRendererFactory(Interface):
     def __call__(path, auto_reload=False):
         """ Return an object that implements ``ITemplateRenderer``  """
-
-ITemplateFactory = ITemplateRendererFactory
-deprecated('ITemplateFactory',
-           '(repoze.bfg.interfaces.ITemplateFactory should now be imported '
-           'as repoze.bfg.interfaces.ITemplateRendererFactory)',
-           )
 
 class ISecurityPolicy(Interface):
     """ A utility that provides a mechanism to check authorization

@@ -4,7 +4,6 @@ from zope.component import queryUtility
 
 from zope.interface import classProvides
 from zope.interface import implements
-from zope.deprecation import deprecated
 
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
@@ -26,11 +25,6 @@ class ZPTTemplateRenderer(object):
     
     def __call__(self, **kw):
         return self.template(**kw)
-
-ZPTTemplateFactory = ZPTTemplateRenderer
-deprecated('ZPTTemplateFactory',
-           ('repoze.bfg.chameleon_zpt.ZPTTemplateFactory should now be '
-            'imported as repoze.bfg.chameleon_zpt.ZPTTemplateRenderer'))
 
 def _auto_reload():
     settings = queryUtility(ISettings)

@@ -35,7 +35,7 @@ Deprecated Alias Removals
 -------------------------
 
 - Remove ``repoze.bfg.template`` module.  All imports from this
-  package have been deprecated since version 0.3.8.  Instead, import
+  package have been deprecated since 0.3.8.  Instead, import
   ``get_template``, ``render_template``, and
   ``render_template_to_response`` from the
   ``repoze.bfg.chameleon_zpt``module.
@@ -53,6 +53,25 @@ Deprecated Alias Removals
   ``repoze.bfg.router.get_options`` and ``repoze.bfg.router.Settings``
   (deprecated since 0.6.2).  These both must now be imported from
   ``repoze.bfg.settings``.
+
+- Removed backwards compatibility alias for
+  ``repoze.bfg.interfaces.IRootPolicy`` (deprecated since 0.6.2).  It
+  must be imported as ``repoze.bfg.interfaces.IRootFactory`` now.
+
+- Removed backwards compatibility alias for
+  ``repoze.bfg.interfaces.ITemplate`` (deprecated since 0.4.4).  It
+  must be imported as ``repoze.bfg.interfaces.ITemplateRenderer`` now.
+
+- Removed backwards compatibility alias for
+  ``repoze.bfg.interfaces.ITemplateFactory`` (deprecated since 0.4.4).
+  It must be imported as
+  ``repoze.bfg.interfaces.ITemplateRendererFactory`` now.
+
+- Removed backwards compatibility alias for
+  ``repoze.bfg.chameleon_zpt.ZPTTemplateFactory`` (deprecated since
+  0.4.4).  This must be imported as ``repoze.bfg.ZPTTemplateRenderer``
+  now.
+
 
 0.9a2 (2009-05-27)
 ==================
