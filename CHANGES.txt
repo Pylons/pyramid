@@ -64,7 +64,7 @@ Features
     ``ISecurityPolicy``.  This is because it's not uncommon to need to
     configure settings for concrete authorization or authentication
     policies using paste .ini parameters; the app entry point for your
-    applicatio is the natural place to do this.
+    application is the natural place to do this.
 
 - Two new abstractions have been added in the way of adapters used by
   the system: an ``IAuthorizationPolicy`` and an
