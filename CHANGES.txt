@@ -8,6 +8,14 @@ Documentation
   step-by-step how to create a traversal-based ZODB application with
   authentication.
 
+Deprecated Alias Removals
+-------------------------
+
+- Removed backwards compatibility aliases for
+  ``repoze.bfg.router.get_options`` and ``repoze.bfg.router.Settings``
+  (deprecated since 0.6.2).  These both must now be imported from
+  ``repoze.bfg.settings``.
+
 0.9a2 (2009-05-27)
 ==================
 

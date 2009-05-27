@@ -14,20 +14,6 @@ from repoze.bfg.threadlocal import manager
 
 from repoze.bfg.zcml import zcml_configure
 
-from repoze.bfg.settings import Settings  # alias for deprecation below
-
-deprecated('Settings',
-    "('from repoze.bfg.registry import Settings' is now "
-    "deprecated; instead use 'from repoze.bfg.settings import Settings')",
-    )
-
-from repoze.bfg.settings import get_options # alias for deprecation below
-
-deprecated('get_options',
-    "('from repoze.bfg.registry import get_options' is now "
-    "deprecated; instead use 'from repoze.bfg.settings import get_options')",
-    )
-
 class Registry(Components):
 
     # for optimization purposes, if no listeners are listening, don't try
