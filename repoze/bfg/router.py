@@ -325,18 +325,6 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     registry.registerUtility(settings, ISettings)
     mapper = RoutesRootFactory(root_factory)
     registry.registerUtility(mapper, IRoutesMapper)
-    populateRegistry(registry, filename, package)
-    if mapper.has_routes():
-        # if the user had any <route/> statements in his configuration,
-        # use the RoutesRootFactory as the root factory
-        root_factory = mapper
-    else:
-        # otherwise, use only the supplied root_factory (unless it's None)
-        if root_factory is None:
-            raise ValueError(
-                'root_factory (aka get_root) was None and no routes connected')
-
-    registry.registerUtility(root_factory, IRootFactory)
 
     if authentication_policy:
         registry.registerUtility(authentication_policy, IAuthenticationPolicy)
@@ -357,6 +345,19 @@ def make_app(root_factory, package=None, filename='configure.zcml',
                 'security policies will cease to work in a later BFG '
                 'release.')
             registerBBBAuthn(secpol, registry)
+
+    populateRegistry(registry, filename, package)
+    if mapper.has_routes():
+        # if the user had any <route/> statements in his configuration,
+        # use the RoutesRootFactory as the root factory
+        root_factory = mapper
+    else:
+        # otherwise, use only the supplied root_factory (unless it's None)
+        if root_factory is None:
+            raise ValueError(
+                'root_factory (aka get_root) was None and no routes connected')
+
+    registry.registerUtility(root_factory, IRootFactory)
 
     app = Router(registry)
 

@@ -1,6 +1,13 @@
 0.9dev (unreleased)
 ===================
 
+Features
+--------
+
+- Allow IAuthenticationPolicy and IAuthorizationPolicy to be
+  overridden via ZCML registrations (do ZCML parsing after
+  registering these in router.py).
+
 Documentation
 -------------
 
