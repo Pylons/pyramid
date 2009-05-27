@@ -185,22 +185,22 @@ traversing the follwing graph::
 
 Here's what happens:
 
-  - bfg traverses the root, and attempts to find foo, which it finds.
+- bfg traverses the root, and attempts to find foo, which it finds.
 
-  - bfg traverses foo, and attempts to find bar, which it finds.
+- bfg traverses foo, and attempts to find bar, which it finds.
 
-  - bfg traverses bar, and attempts to find baz, which it does not
-    find ('bar' raises a ``KeyError`` when asked for baz).
+- bfg traverses bar, and attempts to find baz, which it does not
+  find ('bar' raises a ``KeyError`` when asked for baz).
 
 The fact that it does not find "baz" at this point does not signify an
 error condition.  It signifies that:
 
-  - the "context" is bar (the context is the last item found during
-    traversal).
+- the "context" is bar (the context is the last item found during
+  traversal).
 
-  - the "view name" is ``baz``
+- the "view name" is ``baz``
 
-  - the "subpath" is ``['biz', 'buz.txt']``
+- the "subpath" is ``['biz', 'buz.txt']``
 
 Because it's the "context", bfg examimes "bar" to find out what "type"
 it is. Let's say it finds that the context is an ``IBar`` type
@@ -211,8 +211,8 @@ Using the "view name" ("baz") and the type, it asks the
 :term:`application registry` (configured separately, via
 ``configure.zcml``) this question:
 
-  - Please find me a :term:`view` with the name "baz" that can be used
-    for the type ``IBar``.
+- Please find me a :term:`view` with the name "baz" that can be used
+  for the type ``IBar``.
 
 Let's say it finds no matching view type.  It then returns a
 ``NotFound``.  The request ends.  Everyone is sad.
@@ -231,23 +231,23 @@ But!  For this graph::
 
 The user asks for ``http://example.com/foo/bar/baz/biz/buz.txt``
 
-  - bfg traverses foo, and attempts to find bar, which it finds.
+- bfg traverses foo, and attempts to find bar, which it finds.
 
-  - bfg traverses bar, and attempts to find baz, which it finds.
+- bfg traverses bar, and attempts to find baz, which it finds.
 
-  - bfg traverses baz, and attempts to find biz, which it finds.
+- bfg traverses baz, and attempts to find biz, which it finds.
 
-  - bfg traverses biz, and attemtps to find "buz.txt" which it does
-    not find.
+- bfg traverses biz, and attemtps to find "buz.txt" which it does
+  not find.
 
 The fact that it does not find "buz.txt" at this point does not
 signify an error condition.  It signifies that:
 
-  - the "context" is biz (the context is the last item found during traversal).
+- the "context" is biz (the context is the last item found during traversal).
 
-  - the "view name" is "buz.txt"
+- the "view name" is "buz.txt"
 
-  - the "subpath" is the empty list []
+- the "subpath" is the empty list []
 
 Because it's the "context", bfg examimes "biz" to find out what "type"
 it is. Let's say it finds that the context an ``IBiz`` type (because
@@ -257,8 +257,8 @@ indicates it's an ``IBiz``).
 Using the "view name" ("buz.txt") and the type, it asks the
 :term:`application registry` this question:
 
-  - Please find me a :term:`view` with the name "buz.txt" that can be
-    used for type ``IBiz``.
+- Please find me a :term:`view` with the name "buz.txt" that can be
+  used for type ``IBiz``.
 
 Let's say that question is answered "here you go, here'a a bit of code
 that is willing to deal with that case", and returns a :term:`view`.
