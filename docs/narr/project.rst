@@ -156,7 +156,50 @@ Here's sample output from a test run:
    OK
 
 The tests are found in the ``tests.py`` module in your ``paster
-create``-generated project.  Two sample tests exist.
+create`` -generated project.  Two sample tests exist.
+
+The Interactive Shell
+---------------------
+
+Once you've installed your program for development using ``setup.py
+develop``, you can use an interactive shell to examine your BFG
+application from a Python prompt.  To do so, use the ``paster``
+shell command with the ``bfgshell`` argument:
+
+The first argument to ``bfgshell`` is the path to your application's
+``.ini`` file.  The second is the section name inside the ``.ini``
+file which points to your application.
+
+
+.. code-block::  bash
+   :linenos:
+
+    [chrism@vitaminf bfgshellenv]$ ../bin/paster bfgshell MyProject.ini main
+
+    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
+    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
+    Type "help" for more information. "root" is the BFG app root object.
+    >>> root
+    <foo.models.MyModel object at 0x445270>
+
+If that command fails because ``paster`` claims it knows nothing about
+the "bfgshell" command (this happens under certain conditions that are
+not yet well-understood) try passing the flag ``--plugin=repoze.bfg``
+before the filename:
+
+.. code-block::  bash
+   :linenos:
+
+    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
+
+Press Ctrl-D to exit the interactive shell.
+
+You should always use a section name argument that refers to the
+actual ``app`` section within the config file that points at your BFG
+application *without any middleware wrapping*.  In particular, a
+section name is inappropriate as the second argument to "bfgshell" if
+the configuration section it names is a ``pipeline`` rather than an
+``app``.
 
 Runnning The Project Application
 --------------------------------
@@ -648,30 +691,3 @@ build your application.  You are not required to write tests to use
 :mod:`repoze.bfg`, this file is simply provided as convenience and
 example.
 
-The Interactive Shell
----------------------
-
-You can use an interactive shell to examine your BFG application from
-a Python prompt.  To do so, use the ``bfgshell`` paster command:
-
-.. code-block::  python
-   :linenos:
-
-    [chrism@vitaminf bfgshellenv]$ bin/paster bfgshell foo/foo.ini main
-
-    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
-    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
-    Type "help" for more information. "root" is the BFG app root object.
-    >>> root
-    <foo.models.MyModel object at 0x445270>
-
-The first argument is the path to your application's ``.ini`` file.
-The second is the section name inside the ``.ini`` file which points
-to your application.
-
-.. note:: You should use a ``section name`` argument that refers to
-          the actual ``app`` section within the config file that
-          points at your BFG app *without any middleware wrapping*, or
-          this command will almost certainly fail.  The section name
-          ``main`` is often inappropriate if the configuration does
-          any middleware wrapping.
