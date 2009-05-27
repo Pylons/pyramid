@@ -71,6 +71,14 @@ Tutorials
 Step-by-step tutorials which demonstrate how you might use and deploy
 :mod:`repoze.bfg`.
 
+"BFG Wiki" tutorial, demonstrating how to build a :term:`traversal`
+based application using :term:`ZODB` and :term:`authentication`.
+
+.. toctree::
+   :maxdepth: 3
+
+   tutorials/bfgwiki/index.rst
+
 :mod:`repoze.bfg` for Zope CMF Developers
 
 .. toctree::
@@ -89,7 +97,7 @@ Change History
 ==============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    changes
 
