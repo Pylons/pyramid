@@ -89,3 +89,32 @@ def getSiteManager(context=None):
         except TypeError, error:
             raise ComponentLookupError(*error.args)
 
+class FakeRegistryManager(object):
+    def push(self, registry):
+        return manager.push({'registry':registry, 'request':None})
+
+    set = push # b/c
+
+    def pop(self):
+        result = manager.pop()
+        if result:
+            return result['registry']
+
+    def get(self):
+        return manager.get()['registry']
+
+    def clear(self):
+        manager.clear()
+
+# for use in scripts for backwards compatibility *only*!
+registry_manager = FakeRegistryManager() 
+    
+deprecated('registry_manager',
+           'As of repoze.bfg 0.9, any import of registry_manager from'
+           '``repoze.bfg.registry`` is '
+           'deprecated.  Instead, if you are trying to push a BFG '
+           'application registry into a registry_manager within a "debug" '
+           'script, call ``app.get_root(environ)``, which has the side '
+           'effect of pushing the current registry into a thread local '
+           'stack.  ``registry_manager`` will disappear in a later '
+           'release of repoze.bfg')

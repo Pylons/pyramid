@@ -1,3 +1,29 @@
+0.9dev (unreleased)
+===================
+
+Features
+--------
+
+- A new API function has been added for scripts which need to obtain
+  the traversal root: ``repoze.bfg.scripting.get_root``.  Given a
+  ``repoze.bfg`` Router application instance as its ``router``
+  argument, this callable returns the traversal root of graph as
+  defined by the application's root factory.  It also has the effect
+  of pushing a new registry and request on to the internal thread
+  local stack managed by BFG so that registry lookups work properly.
+
+    .. warning:: This function should never be called from *within* a
+       BFG model or view, only from top-level scripts which wish to
+       get the root of a graph to do offline processing.
+
+Deprecations
+------------
+
+- The name ``repoze.bfg.registry.registry_manager`` was never an API,
+  but scripts in the wild were using it to set up an environment for
+  use under a debug shell.  A backwards compatibility shim has been
+  added for this purpose, but the feature is deprecated.
+
 0.9a1 (2009-5-27)
 =================
 
