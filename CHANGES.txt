@@ -1,3 +1,10 @@
+0.9dev (unreleased)
+===================
+
+- Added "BFG Wiki" tutorial to documentation; it describes
+  step-by-step how to create a traversal-based ZODB application with
+  authentication.
+
 0.9a2 (2009-05-27)
 ==================
 
