@@ -1,5 +1,5 @@
-Next release
-============
+0.9dev (unreleased)
+===================
 
 Features
 --------
@@ -18,7 +18,7 @@ Features
   implementation of an authentication policy (an object implementing
   the ``repoze.bfg.interfaces.IAuthenticationPolicy`` interface) and
   an implementation of an authorization policy (an object implementing
-  ``repoze.bfg.interfaces.IAuthorizationPolicy).  Concrete
+  ``repoze.bfg.interfaces.IAuthorizationPolicy)``.  Concrete
   implementations of authentication policies exist in
   ``repoze.bfg.authentication``.  Concrete implementations of
   authorization policies exist in ``repoze.bfg.authorization``.
@@ -110,6 +110,9 @@ Deprecations
   ``request``).  Calling them with a single argument is still
   supported but issues a deprecation warning.
 
+- Use of "old-style" security policies (those base on ISecurityPolicy)
+  is now deprecated.  See the "Security" chapter of the docs for info
+  about activating an authorization policy and an authentication poicy.
 
 0.8.1 (2009-05-21)
 ==================
