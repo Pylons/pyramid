@@ -211,8 +211,8 @@ Using the "view name" ("baz") and the type, it asks the
 :term:`application registry` (configured separately, via
 ``configure.zcml``) this question:
 
-  - Please find me a :term:`view` (aka *controller* in some religions)
-    with the name "baz" that can be used for the type ``IBar``.
+  - Please find me a :term:`view` with the name "baz" that can be used
+    for the type ``IBar``.
 
 Let's say it finds no matching view type.  It then returns a
 ``NotFound``.  The request ends.  Everyone is sad.
@@ -257,8 +257,8 @@ indicates it's an ``IBiz``).
 Using the "view name" ("buz.txt") and the type, it asks the
 :term:`application registry` this question:
 
-  - Please find me a :term:`view` (*controller* in some religions)
-    with the name "buz.txt" that can be used for type ``IBiz``.
+  - Please find me a :term:`view` with the name "buz.txt" that can be
+    used for type ``IBiz``.
 
 Let's say that question is answered "here you go, here'a a bit of code
 that is willing to deal with that case", and returns a :term:`view`.
