@@ -207,8 +207,8 @@ your authentication system provides group information and the
 effective :term:`authentication policy` policy is written to respect
 group information.  The ``RepozeWho1AuthenicationPolicy``
 authentication policy that comes with :mod:`repoze.bfg` respects group
-information (see the :mod:`repoze.bfg.security` API docs for more
-info on authentication policies).
+information (see the :mod:`repoze.bfg.authentication` API docs for
+more info on authentication policies).
 
 Each tuple within an ACL structure is known as a :term:`ACE`, which
 stands for "access control entry".  For example, in the above ACL,
