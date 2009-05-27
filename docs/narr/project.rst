@@ -648,3 +648,30 @@ build your application.  You are not required to write tests to use
 :mod:`repoze.bfg`, this file is simply provided as convenience and
 example.
 
+The Interactive Shell
+---------------------
+
+You can use an interactive shell to examine your BFG application from
+a Python prompt.  To do so, use the ``bfgshell`` paster command:
+
+.. code-block::  python
+   :linenos:
+
+    [chrism@vitaminf bfgshellenv]$ bin/paster bfgshell foo/foo.ini main
+
+    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
+    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
+    Type "help" for more information. "root" is the BFG app root object.
+    >>> root
+    <foo.models.MyModel object at 0x445270>
+
+The first argument is the path to your application's ``.ini`` file.
+The second is the section name inside the ``.ini`` file which points
+to your application.
+
+.. note:: You should use a ``section name`` argument that refers to
+          the actual ``app`` section within the config file that
+          points at your BFG app *without any middleware wrapping*, or
+          this command will almost certainly fail.  The section name
+          ``main`` is often inappropriate if the configuration does
+          any middleware wrapping.

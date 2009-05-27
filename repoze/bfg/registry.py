@@ -112,9 +112,7 @@ registry_manager = FakeRegistryManager()
 deprecated('registry_manager',
            'As of repoze.bfg 0.9, any import of registry_manager from'
            '``repoze.bfg.registry`` is '
-           'deprecated.  Instead, if you are trying to push a BFG '
-           'application registry into a registry_manager within a "debug" '
-           'script, call ``app.get_root(environ)``, which has the side '
-           'effect of pushing the current registry into a thread local '
-           'stack.  ``registry_manager`` will disappear in a later '
-           'release of repoze.bfg')
+           'deprecated.  If you are trying to use the registry manager '
+           'within a "debug" script of your own making, use the ``bfgshell`` '
+           'paster command instead ``registry_manager`` will disappear in '
+           'a later release of repoze.bfg')

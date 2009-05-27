@@ -4,17 +4,14 @@
 Features
 --------
 
-- A new API function has been added for scripts which need to obtain
-  the traversal root: ``repoze.bfg.scripting.get_root``.  Given a
-  ``repoze.bfg`` Router application instance as its ``router``
-  argument, this callable returns the traversal root of graph as
-  defined by the application's root factory.  It also has the effect
-  of pushing a new registry and request on to the internal thread
-  local stack managed by BFG so that registry lookups work properly.
+- A paster command has been added named "bfgshell".  This command can
+  be used to get an interactive prompt with your BFG root object in
+  the global namespace.  E.g.::
 
-    .. warning:: This function should never be called from *within* a
-       BFG model or view, only from top-level scripts which wish to
-       get the root of a graph to do offline processing.
+    bin/paster bfgshell /path/to/myapp.ini myapp
+
+  See the ``Project`` chapter in the BFG documentation for more
+  information.
 
 Deprecations
 ------------
