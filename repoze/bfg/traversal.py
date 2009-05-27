@@ -3,8 +3,6 @@ import urllib
 
 from zope.component import getMultiAdapter
 
-from zope.deprecation import deprecated
-
 from zope.interface import classProvides
 from zope.interface import implements
 
@@ -438,14 +436,6 @@ def traversal_path(path):
                                 'UTF-8 decoding scheme' % segment)
             clean.append(segment)
     return tuple(clean)
-
-# ``split_path`` wasn't actually ever an API but people were using it
-# anyway.  I turned it into the ``traversal_path`` API in 0.6.5, and
-# generate the below deprecation to give folks a heads up.
-deprecated('split_path',
-    "('from repoze.bfg.traversal import split_path' is now deprecated; "
-    "instead use 'from repoze.bfg.traversal import traversal_path')",
-    )
 
 _segment_cache = {}
 

@@ -12,7 +12,11 @@ Deprecated Alias Removals
 -------------------------
 
 - Remove backwards compatibility alias for
-  ``repoze.bfg.urldispatch.RoutesContext`` (deprecated since 0.6.3).
+  ``repoze.bfg.traversal.split_path`` (deprecated since 0.6.5).  This
+  must now be imported as ``repoze.bfg.traversal.traversal_path``).
+
+- Remove backwards compatibility alias for
+  ``repoze.bfg.urldispatch.RoutesContext`` (deprecated since 0.6.5).
   This must now be imported as
   ``repoze.bfg.urldispatch.DefaultRoutesContext``.
 
