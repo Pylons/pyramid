@@ -13,8 +13,6 @@
 
   .. autofunction:: is_response
 
-  .. autofunction:: view_execution_permitted
-
   .. autoclass:: bfg_view
      :members:
 

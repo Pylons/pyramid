@@ -8,13 +8,20 @@
 API Functions
 ~~~~~~~~~~~~~
 
-.. autofunction:: authenticated_userid
+.. autofunction:: authenticated_userid(context, request)
 
-.. autofunction:: effective_principals
+.. autofunction:: effective_principals(context, request)
 
 .. autofunction:: has_permission
 
 .. autofunction:: principals_allowed_by_permission
+
+.. autofunction:: forget
+
+.. autofunction:: remember
+
+.. autofunction:: view_execution_permitted
+
 
 Constants
 ~~~~~~~~~
@@ -29,8 +36,8 @@ Constants
 
     The special principal id named 'Authenticated'.  This principal id
     is granted to all requests which contain any other non-Everyone
-    principal id (according to the security policy).  Its actual value
-    is the string 'system.Authenticated'.
+    principal id (according to the :term:`authentication policy`).
+    Its actual value is the string 'system.Authenticated'.
 
 .. attribute:: ALL_PERMISSIONS
 
@@ -73,15 +80,3 @@ Return Values
 .. autoclass:: Allowed
    :members:
 
-.. _security_policies_api_section:
-
-Security Policies
-~~~~~~~~~~~~~~~~~
-
-.. autofunction:: WhoACLSecurityPolicy
-
-.. autofunction:: WhoInheritingACLSecurityPolicy
-
-.. autofunction:: RemoteUserACLSecurityPolicy
-
-.. autofunction:: RemoteUserInheritingACLSecurityPolicy

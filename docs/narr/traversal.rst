@@ -135,13 +135,13 @@ code to execute:
     for the name ``b``, the router deems that the context is "object
     ``a``", the view name is ``b`` and the subpath is ``['c']``.
 
-#.  If a :term:`security policy` is configured, the router performs a
-    permission lookup.  If a permission declaration is found for the
-    view name and context implied by the current request, the security
-    policy is consulted to see if the "current user" (also determined
-    by the security policy) can perform the action.  If he can,
-    processing continues.  If he cannot, an ``HTTPUnauthorized`` error
-    is raised.
+#.  If a :term:`authentication policy` is configured, the router
+    performs a permission lookup.  If a permission declaration is
+    found for the view name and context implied by the current
+    request, an :term:`authorization policy` is consulted to see if
+    the "current user" (al determined by the the authentication
+    policy) can perform the action.  If he can, processing continues.
+    If he cannot, an ``HTTPUnauthorized`` error is raised.
 
 #.  Armed with the context, the view name, and the subpath, the router
     performs a view lookup.  It attemtps to look up a view from the

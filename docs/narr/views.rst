@@ -546,12 +546,12 @@ will be called.
 View Security
 -------------
 
-If a :term:`security policy` is active, any :term:`permission`
-attached to a ``view`` declaration will be consulted to ensure
-that the currently authenticated user possesses that permission
-against the context before the view function is actually called.
-Here's an example of specifying a permission in a ``view``
-declaration:
+If a :term:`authentication policy` (and a :term:`authorization
+policy`) is active, any :term:`permission` attached to a ``view``
+declaration will be consulted to ensure that the currently
+authenticated user possesses that permission against the context
+before the view function is actually called.  Here's an example of
+specifying a permission in a ``view`` declaration:
 
 .. code-block:: xml
    :linenos:
@@ -563,16 +563,16 @@ declaration:
        permission="add"
        />
 
-When a security policy is enabled, this view will be protected with
-the ``add`` permission.  The view will *not be called* if the user
-does not possess the ``add`` permission relative to the current
-:term:`context` and a security policy is enabled.  Instead an HTTP
-``Unauthorized`` status will be returned to the client.
+When an authentication policy is enabled, this view will be protected
+with the ``add`` permission.  The view will *not be called* if the
+user does not possess the ``add`` permission relative to the current
+:term:`context` and an authorization policy is enabled.  Instead an
+HTTP ``Unauthorized`` status will be returned to the client.
 
 .. note::
 
    See the :ref:`security_chapter` chapter to find out how to turn on
-   a security policy.
+   an authentication policy.
 
 .. note::
 

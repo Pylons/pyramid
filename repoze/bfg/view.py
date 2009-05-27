@@ -2,60 +2,24 @@ import inspect
 
 from paste.urlparser import StaticURLParser
 from zope.component import queryMultiAdapter
-from zope.component import queryUtility
-
-from repoze.bfg.interfaces import ISecurityPolicy
-from repoze.bfg.interfaces import IViewPermission
-from repoze.bfg.interfaces import IView
-
-from repoze.bfg.path import caller_path
-from repoze.bfg.security import Unauthorized
-from repoze.bfg.security import Allowed
+from zope.deprecation import deprecated
 
 from zope.interface import Interface
 
+
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IView
+from repoze.bfg.path import caller_path
+from repoze.bfg.security import view_execution_permitted
+from repoze.bfg.security import Unauthorized
+
+deprecated('view_execution_permitted',
+    "('from repoze.bfg.view import view_execution_permitted' is now "
+    "deprecated; instead use 'from repoze.bfg.security import "
+    "view_execution_permitted')",
+    )
 
 _marker = object()
-
-def view_execution_permitted(context, request, name=''):
-    """ If the view specified by ``context`` and ``name`` is protected
-    by a permission, check the permission associated with the view
-    using the effective security policy and the ``request``.  Return a
-    boolean result.  If no security policy is in effect, or if the
-    view is not protected by a permission, return True."""
-    security_policy = queryUtility(ISecurityPolicy)
-    permission = queryMultiAdapter((context, request), IViewPermission,
-                                   name=name)
-    return _view_execution_permitted(context, request, name, security_policy,
-                                     permission, True)
-
-def _view_execution_permitted(context, request, view_name, security_policy,
-                              permission, debug_authorization):
-    """ Rawer (faster) form of view_execution_permitted which does not
-    need to do a CA lookup for the security policy or other values and
-    which returns plain booleans if debug_authorization is off instead
-    of constructing ``Allowed`` objects.  This function is used by
-    ``view_execution_permitted`` and the Router; it is not a public
-    API."""
-    if security_policy is None:
-        if debug_authorization:
-            return Allowed(
-                'Allowed: view name %r in context %r (no security policy in '
-                'use)', view_name, context)
-        else:
-            return True
-
-    elif permission is None:
-        if debug_authorization:
-            return Allowed(
-                'Allowed: view name %r in context %r (no permission '
-                'registered for name %r).', view_name, context, view_name)
-        else:
-            return True
-
-    else:
-        return permission(security_policy)
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified

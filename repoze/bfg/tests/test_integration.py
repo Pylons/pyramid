@@ -120,7 +120,7 @@ class TestFixtureApp(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def test_registry_actions_can_be_pickled_and_unpickled(self):
+    def test_execute_actions(self):
         import repoze.bfg.tests.fixtureapp as package
         from zope.configuration import config
         from zope.configuration import xmlconfig
@@ -129,11 +129,6 @@ class TestFixtureApp(unittest.TestCase):
         context.package = package
         xmlconfig.include(context, 'configure.zcml', package)
         context.execute_actions(clear=False)
-        actions = context.actions
-        import cPickle
-        dumped = cPickle.dumps(actions, -1)
-        new = cPickle.loads(dumped)
-        self.assertEqual(len(actions), len(new))
 
 class TestGrokkedApp(unittest.TestCase):
     def setUp(self):

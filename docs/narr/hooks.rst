@@ -88,7 +88,7 @@ an object that implements any particular interface; it simply needs
 have a ``status`` attribute, a ``headerlist`` attribute, and and
 ``app_iter`` attribute.
 
-Changing the NotFound application
+Changing the NotFound Application
 ---------------------------------
 
 When :mod:`repoze.bfg` can't map a URL to code, it creates and invokes
@@ -119,54 +119,55 @@ sample code that implements a minimal NotFound application factory:
 .. note:: When a NotFound application factory is invoked, it is passed
    the WSGI environ and the WSGI ``start_response`` handler by
    :mod:`repoze.bfg`.  Within the WSGI environ will be a key named
-   ``message`` that has a value explaining why the not found error was
-   raised.  This error will be different when the ``debug_notfound``
-   environment setting is true than it is when it is false.
+   ``repoze.bfg.message`` that has a value explaining why the not
+   found error was raised.  This error will be different when the
+   ``debug_notfound`` environment setting is true than it is when it
+   is false.
 
-Changing the Unauthorized application
--------------------------------------
+Changing the Forbidden Response
+-------------------------------
 
 When :mod:`repoze.bfg` can't authorize execution of a view based on
-the security policy in use, it creates and invokes an Unauthorized
-WSGI application. The application it invokes can be customized by
-placing something like the following ZCML in your ``configure.zcml``
-file.
+the authorization policy in use, it invokes a "forbidden response
+factory".  Usually this forbidden response factory is a default 401
+response, but it can be overridden as necessary by placing something
+like the following ZCML in your ``configure.zcml`` file.
 
 .. code-block:: xml
    :linenos:
 
-   <utility provides="repoze.bfg.interfaces.IUnauthorizedAppFactory"
-            component="helloworld.factories.unauthorized_app_factory"/>
+   <utility provides="repoze.bfg.interfaces.IForbiddenResponseFactory"
+            component="helloworld.factories.forbidden_response_factory"/>
 
-Replace ``helloworld.factories.unauthorized_app_factory`` with the
-Python dotted name to the request factory you want to use.  Here's
-some sample code that implements a minimal Unauthorized application
-factory:
+Replace ``helloworld.factories.forbidden_app_factory`` with the Python
+dotted name to the forbidden response factory you want to use.  The
+response factory must accept two parameters: ``context`` and
+``request``.  The ``context`` is the context found by the router when
+the view invocation was denied.  The ``request`` is the current
+:term:`request` representing the denied action.  Here's some sample
+code that implements a minimal forbidden response factory:
 
 .. code-block:: python
 
-   from webob.exc import HTTPUnauthorized
+   from repoze.bfg.chameleon_zpt import render_template_to_response
 
-   class MyUnauthorized(HTTPUnauthorized):
-       pass
+   def forbidden_response_factory(context, request):
+       return render_template_to_response('templates/login_form.pt')
 
-   def notfound_app_factory():
-       return MyUnauthorized
+.. note:: When an forbidden response factory is invoked, it is passed
+   the request as the second argument.  An attribute of the request is
+   ``environ``, which is the WSGI environment.  Within the WSGI
+   environ will be a key named ``repoze.bfg.message`` that has a value
+   explaining why the current view invocation was forbidden.  This
+   error will be different when the ``debug_authorization``
+   environment setting is true than it is when it is false.
 
-.. note:: When an Unauthorized application factory is invoked, it is
-   passed the WSGI environ and the WSGI ``start_response`` handler by
-   :mod:`repoze.bfg`.  Within the WSGI environ will be a key named
-   ``message`` that has a value explaining why the action was not
-   authorized.  This error will be different when the
-   ``debug_authorization`` environment setting is true than it is when
-   it is false.
-
-.. note:: You can influence the status code of Unauthorized responses
-   by using an alterate unauthorized application factory.  For
-   example, you may return an unauthorized application with a ``403
-   Forbidden`` status code, rather than use the default unauthorized
-   application factory, which sends a response with a ``401
-   Unauthorized`` status code.
+.. warning:: the default forbidden application factory sends a
+   response with a ``401 Unauthorized`` status code for backwards
+   compatibility reasons.  You can influence the status code of
+   Forbidden responses by using an alterate forbidden application
+   factory.  For example, it would make sense to return an forbidden
+   application with a ``403 Forbidden`` status code.
 
 Changing the Default Routes Context Factory
 -------------------------------------------

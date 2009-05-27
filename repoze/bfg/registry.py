@@ -10,6 +10,8 @@ from zope.component.registry import Components
 
 from zope.deprecation import deprecated
 
+from repoze.bfg.threadlocal import manager
+
 from repoze.bfg.zcml import zcml_configure
 
 from repoze.bfg.settings import Settings  # alias for deprecation below
@@ -48,35 +50,8 @@ class Registry(Components):
             for ignored in self.subscribers(events, None):
                 """ """
 
-class ThreadLocalRegistryManager(threading.local):
-    def __init__(self):
-        self.stack = []
-        
-    def push(self, registry):
-        self.stack.append(registry)
-
-    set = push # backwards compatibility
-
-    def pop(self):
-        if self.stack:
-            return self.stack.pop()
-
-    def get(self):
-        try:
-            return self.stack[-1]
-        except IndexError:
-            return getGlobalSiteManager()
-
-    def clear(self):
-        self.stack[:] = []
-
-registry_manager = ThreadLocalRegistryManager()
-
-def setRegistryManager(manager): # for unit tests
-    global registry_manager
-    old_registry_manager = registry_manager
-    registry_manager = manager
-    return old_registry_manager
+def get_registry():
+    return manager.get()['registry']
 
 def populateRegistry(registry, filename, package, lock=threading.Lock()):
 
@@ -95,19 +70,19 @@ def populateRegistry(registry, filename, package, lock=threading.Lock()):
     registry."""
     
     lock.acquire()
-    registry_manager.push(registry)
+    manager.push({'registry':registry, 'request':None})
     try:
         original_getSiteManager.sethook(getSiteManager)
-        zope.component.getGlobalSiteManager = registry_manager.get
+        zope.component.getGlobalSiteManager = get_registry
         zcml_configure(filename, package)
     finally:
         zope.component.getGlobalSiteManager = getGlobalSiteManager
         lock.release()
-        registry_manager.pop()
+        manager.pop()
 
 def getSiteManager(context=None):
     if context is None:
-        return registry_manager.get()
+        return get_registry()
     else:
         try:
             return IComponentLookup(context)

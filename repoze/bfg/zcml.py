@@ -37,14 +37,15 @@ class Uncacheable(object):
     """ Include in discriminators of actions which are not cacheable;
     this class only exists for backwards compatibility (<0.8.1)"""
 
-def view(_context,
-         permission=None,
-         for_=None,
-         view=None,
-         name="",
-         request_type=None,
-         cacheable=True, # not used, here for b/w compat < 0.8
-         ):
+def view(
+    _context,
+    permission=None,
+    for_=None,
+    view=None,
+    name="",
+    request_type=None,
+    cacheable=True, # not used, here for b/w compat < 0.8
+    ):
 
     if not view:
         raise ConfigurationError('"view" attribute was not specified')

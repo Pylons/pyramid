@@ -9,53 +9,64 @@ from being invoked when the user represented by credentials in the
 :term:`request` does not have an appropriate level of access in a
 specific context.
 
-Authorization is enabled by adding configuration to your
-``configure.zcml`` which specifies a :term:`security policy`.
+Authorization is enabled by modifying your application's invocation of
+``repoze.bfg.router.make_app``, often located in the ``run.py`` module
+of a :mod:`repoze.bfg` application.
 
-Enabling a Security Policy
---------------------------
+Enabling an Authorization Policy
+--------------------------------
 
-By default, :mod:`repoze.bfg` enables no security policy.  All views
-are accessible by completely anonymous users.
+By default, :mod:`repoze.bfg` enables no authorization policy.  All
+views are accessible by completely anonymous users.
 
-However, if you add the following bit of code to your application's
-``configure.zcml``, you will enable a security policy:
+However, if you change the call to ``repoze.bfg.router.make_app``
+(usually found within the ``run.py`` module in your application), you
+will enable an authorization policy.
 
-.. code-block:: xml
+You must enable a a :term:`authentication policy` in order to enable
+an authorization policy.
+
+For example, to enable a policy which compares the ``REMOTE_USER``
+variable passed in the request's environment (as the sole
+:term:`principal`) against the principals present in any :term:`ACL`
+found in model data when attempting to call some :term:`view`, modify
+your ``run.py`` to look something like this:
+
+.. code-block:: python
    :linenos:
 
-   <utility
-     provides="repoze.bfg.interfaces.ISecurityPolicy"
-     factory="repoze.bfg.security.RemoteUserInheritingACLSecurityPolicy"
-     />
+   from repoze.bfg.router import make_app
+   from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 
-The above inscrutable stanza enables the
-``RemoteUserInheritingACLSecurityPolicy`` to be in effect for every
-request to your application.  The
-``RemoteUserInheritingACLSecurityPolicy`` is a policy which compares
-the ``REMOTE_USER`` variable passed in the request's environment (as
-the sole :term:`principal`) against the principals present in any
-:term:`ACL` found in model data when attempting to call some
-:term:`view`.  The policy either allows the view that the permission
-was declared for to be called, or returns a ``401 Unathorized``
-response code to the upstream WSGI server.
+   def app(global_config, **kw):
+       """ This function returns a repoze.bfg.router.Router object.  It
+       is usually called by the PasteDeploy framework during ``paster
+       serve``"""
+       # paster app config callback
+       from myproject.models import get_root
+       import myproject
+       policy = RemoteUserAuthenticationPolicy()
+       return make_app(get_root, myproject, authentication_policy=policy,
+                       options=kw)
 
-.. note:: Another "inheriting" security policy also exists:
-   ``WhoInheritingACLSecurityPolicy``.  This policy uses principal
-   information found in the ``repoze.who.identity`` value set into the
-   WSGI environment by the :term:`repoze.who` middleware rather than
-   ``REMOTE_USER`` information. This policy only works properly when
-   :term:`repoze.who` middleware is present in the WSGI pipeline.
+This injects an instance of the
+``repoze.bfg.authentication.RemoteUserAuthenticationPolicy`` as the
+:term:`authentication policy`.  It is possible to use a different
+authentication policy.  :mod:`repoze.bfg` ships with a few prechewed
+authentication policies that should prove useful (see
+:ref:`authentication_policies_api_section`).  It is also possible to
+construct your own authentication policy.  Any instance which
+implements the interface defined in
+``repoze.bfg.interfaces.IAuthenticationPolicy`` can be used.
 
-.. note:: "non-inheriting" security policy variants of the
-   (``WhoACLSecurityPolicy`` and ``RemoteUserACLSecurityPolicy``) also
-   exist.  These policies use the *first* ACL found as the canonical
-   ACL; they do not continue searching up the context lineage to find
-   "inherited" ACLs.  It is recommended that you use the inheriting
-   variants unless you need this feature.
-
-.. note:: See :ref:`security_policies_api_section` for more
-   information about the features of the default security policies.
+It's common but it is also possible to change the default
+:term:`authorization policy` (to use some other persistent
+authorization mechanism other than ACLs).  To do so, pass an object
+which implements the ``repoze.bfg.interfaces.IAuthorizationPolicy``)
+to ``make_app`` as the ``authorization_policy`` value.
+:mod:`repoze.who` ships with only one.  See
+:ref:`authorization_policies_api_section` for the details of the ACL
+authorization policy which is the default
 
 Protecting Views with Permissions
 ---------------------------------
@@ -91,9 +102,9 @@ your project's package
        """ Add blog entry code goes here """
        pass
 
-If a security policy is in place when this view is found during normal
-application operations, the user will need to possess the ``add``
-permission against the context to be able to invoke the
+If an authorization policy is in place when this view is found during
+normal application operations, the user will need to possess the
+``add`` permission against the context to be able to invoke the
 ``blog_entry_add_view`` view.
 
 Permission names are just strings.  They hold no special significance
@@ -192,18 +203,18 @@ ACE, as below.
        ]
 
 A principal is usually a user id, however it also may be a group id if
-your authentication system provides group information and the security
-policy is written to respect them.  The
-``RemoteUserInheritingACLSecurityPolicy`` does not respect group
-information, but other security policies that come with
-:mod:`repoze.bfg` do (see the :mod:`repoze.bfg.security` API docs for
-more info).
+your authentication system provides group information and the
+effective :term:`authentication policy` policy is written to respect
+group information.  The ``RepozeWho1AuthenicationPolicy``
+authentication policy that comes with :mod:`repoze.bfg` respects group
+information (see the :mod:`repoze.bfg.security` API docs for more
+info on authentication policies).
 
 Each tuple within an ACL structure is known as a :term:`ACE`, which
 stands for "access control entry".  For example, in the above ACL,
 ``(Allow, Everyone, 'view')`` is an ACE.  Each ACE in an ACL is
-processed by a security policy *in the order dictated by the ACL*.  So
-if you have an ACL like this:
+processed by an authorization policy *in the order dictated by the
+ACL*.  So if you have an ACL like this:
 
 .. code-block:: python
    :linenos:
@@ -217,9 +228,9 @@ if you have an ACL like this:
        (Deny, Everyone, 'view'),
        ]
 
-The security policy will *allow* everyone the view permission, even
-though later in the ACL you have an ACE that denies everyone the view
-permission.  On the other hand, if you have an ACL like this:
+The authorization policy will *allow* everyone the view permission,
+even though later in the ACL you have an ACE that denies everyone the
+view permission.  On the other hand, if you have an ACL like this:
 
 .. code-block:: python
    :linenos:
@@ -233,7 +244,7 @@ permission.  On the other hand, if you have an ACL like this:
        (Allow, Everyone, 'view'),
        ]
 
-The security policy will deny Everyone the view permission, even
+The authorization policy will deny Everyone the view permission, even
 though later in the ACL is an ACE that allows everyone.
 
 Special Principal Names
@@ -271,8 +282,8 @@ module.  These can be imported for use in ACLs.
   ACL like so: ``(Allow, 'fred', ALL_PERMISSIONS)``.  The
   ``ALL_PERMISSIONS`` object is actually a standin object that has a
   ``__contains__`` method that always returns True, which, for all
-  known security policies, has the effect of indicating that a given
-  principal "has" any permission asked for by the system.
+  known authorization policies, has the effect of indicating that a
+  given principal "has" any permission asked for by the system.
 
 Special ACEs
 ------------
@@ -286,11 +297,11 @@ following:
    (Deny, Everyone, ALL_PERMISSIONS)
 
 This ACE is often used as the *last* ACE of an ACL to explicitly cause
-inheriting security policies to "stop looking up the traversal tree"
-(effectively breaking any inheritance).  For example, an ACL which
-allows *only* ``fred`` the view permission in a particular traversal
-context despite what inherited ACLs may say when an inheriting
-security policy is in effect might look like so:
+inheriting authorization policies to "stop looking up the traversal
+tree" (effectively breaking any inheritance).  For example, an ACL
+which allows *only* ``fred`` the view permission in a particular
+traversal context despite what inherited ACLs may say when the default
+authorization policy is in effect might look like so:
 
 .. code-block:: python
    :linenos:
@@ -304,39 +315,11 @@ security policy is in effect might look like so:
 ACL Inheritance
 ---------------
 
-While any security policy is in place, if a model object does not have
-an ACL when it is the context, its *parent* is consulted for an ACL.
-If that object does not have an ACL, *its* parent is consulted for an
-ACL, ad infinitum, until we've reached the root and there are no more
-parents left.
-
-With *non-inheriting* security policy variants
-(e.g. ``WhoACLSecurityPolicy`` and ``RemoteUserACLSecurityPolicy``),
-the *first* ACL found by the security policy will be used as the
-effective ACL.  No combination of ACLs found during traversal or
-backtracking is done.
-
-With *inheriting* security policy variants
-(e.g. ``WhoInheritingACLSecurityPolicy`` and
-``RemoteUserInheritingACLSecurityPolicy``), *all* ACLs in the
-context's :term:`lineage` are consulted when determining whether
-access is allowed or denied.
-
-:ref:`security_policies_api_section` for more information about the
-features of the default security policies and the difference between
-the inheriting and non-inheriting variants.
-
-.. note:: It is recommended that you use the inheriting variant of a
-   security policy.  Inheriting variants of security policies make it
-   possible for you to form a security strategy based on context ACL
-   "inheritance" rather than needing to keep all information about an
-   object's security state in a single ACL attached to that object.
-   It's much easier to code applications that dynamically change ACLs
-   if ACL inheritance is used.  In reality, the non-inheriting
-   security policy variants exist only for backwards compatibility
-   with applications that used them in versions of :mod:`repoze.bfg`
-   before 0.8.  If this backwards compatibility was not required, the
-   non-inheriting variants probably just wouldn't exist.
+While the default :term:`authorization policy` is in place, if a model
+object does not have an ACL when it is the context, its *parent* is
+consulted for an ACL.  If that object does not have an ACL, *its*
+parent is consulted for an ACL, ad infinitum, until we've reached the
+root and there are no more parents left.
 
 Location-Awareness
 ------------------

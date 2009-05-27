@@ -2,433 +2,6 @@ import unittest
 
 from repoze.bfg.testing import cleanUp
 
-class TestACLSecurityPolicy(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _getTargetClass(self):
-        from repoze.bfg.security import ACLSecurityPolicy
-        return ACLSecurityPolicy
-
-    def _makeOne(self, *arg, **kw):
-        klass = self._getTargetClass()
-        return klass(*arg, **kw)
-
-    def test_class_implements_ISecurityPolicy(self):
-        from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ISecurityPolicy
-        verifyClass(ISecurityPolicy, self._getTargetClass())
-
-    def test_instance_implements_ISecurityPolicy(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ISecurityPolicy
-        verifyObject(ISecurityPolicy, self._makeOne(lambda *arg: None))
-
-    def test_permits_no_principals_no_acl_info_on_context(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        policy = self._makeOne(lambda *arg: [])
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, False)
-        from repoze.bfg.security import Everyone
-        self.assertEqual(result.principals, set([Everyone]))
-        self.assertEqual(result.permission, 'view')
-        self.assertEqual(result.context, context)
-
-    def test_permits_no_principals_empty_acl_info_on_context(self):
-        context = DummyContext()
-        context.__acl__ = []
-        request = DummyRequest({})
-        policy = self._makeOne(lambda *arg: [])
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, False)
-        from repoze.bfg.security import Everyone
-        self.assertEqual(result.principals, set([Everyone]))
-        self.assertEqual(result.permission, 'view')
-        self.assertEqual(result.context, context)
-
-    def test_permits_no_principals_root_has_empty_acl_info(self):
-        context = DummyContext()
-        context.__name__ = None
-        context.__parent__ = None
-        context.__acl__ = []
-        context2 = DummyContext()
-        context2.__name__ = 'context2'
-        context2.__parent__ = context
-        request = DummyRequest({})
-        policy = self._makeOne(lambda *arg: [])
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, False)
-        from repoze.bfg.security import Everyone
-        self.assertEqual(result.principals, set([Everyone]))
-        self.assertEqual(result.permission, 'view')
-        self.assertEqual(result.context, context)
-
-    def test_permits_no_principals_root_allows_everyone(self):
-        context = DummyContext()
-        context.__name__ = None
-        context.__parent__ = None
-        from repoze.bfg.security import Allow, Everyone
-        context.__acl__ = [ (Allow, Everyone, 'view') ]
-        context2 = DummyContext()
-        context2.__name__ = 'context2'
-        context2.__parent__ = context
-        request = DummyRequest({})
-        policy = self._makeOne(lambda *arg: [])
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, True)
-        self.assertEqual(result.principals, set([Everyone]))
-        self.assertEqual(result.permission, 'view')
-        self.assertEqual(result.context, context)
-
-    def test_permits_deny_implicit(self):
-        from repoze.bfg.security import Allow, Authenticated, Everyone
-        context = DummyContext()
-        context.__acl__ =  [ (Allow, 'somebodyelse', 'read') ]
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context, request, 'read')
-        self.assertEqual(result, False)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'read')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, None)
-
-    def test_permits_deny_explicit(self):
-        from repoze.bfg.security import Deny, Authenticated, Everyone
-        context = DummyContext()
-        context.__acl__ =  [ (Deny, 'fred', 'read') ]
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context, request, 'read')
-        self.assertEqual(result, False)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'read')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, (Deny, 'fred', 'read'))
-
-    def test_permits_deny_twoacl_implicit(self):
-        from repoze.bfg.security import Allow, Authenticated, Everyone
-        context = DummyContext()
-        acl = [(Allow, 'somebody', 'view'), (Allow, 'somebody', 'write')]
-        context.__acl__ = acl
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context, request, 'read')
-        self.assertEqual(result, False)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'read')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, None)
-
-    def test_permits_allow_twoacl_multiperm(self):
-        from repoze.bfg.security import Allow, Deny, Authenticated, Everyone
-        context = DummyContext()
-        acl = [ (Allow, 'fred', ('write', 'view') ), (Deny, 'fred', 'view') ]
-        context.__acl__ = acl
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, True)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'view')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, (Allow, 'fred', ('write', 'view') ))
-
-    def test_permits_deny_twoacl_multiperm(self):
-        from repoze.bfg.security import Allow, Deny, Authenticated, Everyone
-        context = DummyContext()
-        acl = []
-        deny = (Deny, 'fred', ('view', 'read'))
-        allow = (Allow, 'fred', 'view')
-        context.__acl__ = [deny, allow]
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context, request, 'read')
-        self.assertEqual(result, False)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'read')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, deny)
-
-    def test_permits_allow_via_location_parent(self):
-        from repoze.bfg.security import Allow, Authenticated, Everyone
-        context = DummyContext()
-        context.__parent__ = None
-        context.__name__ = None
-        context.__acl__ = [ (Allow, 'fred', 'read') ]
-        context2 = DummyContext()
-        context2.__parent__ = context
-        context2.__name__ = 'myname'
-
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context2, request, 'read')
-        self.assertEqual(result, True)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'read')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, ('Allow', 'fred', 'read'))
-
-    def test_permits_deny_byorder(self):
-        from repoze.bfg.security import Allow, Deny, Authenticated, Everyone
-        context = DummyContext()
-        acl = []
-        deny = (Deny, 'fred', 'read')
-        allow = (Allow, 'fred', 'view')
-        context.__acl__ = [deny, allow]
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context, request, 'read')
-        self.assertEqual(result, False)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'read')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, deny)
-
-    def test_permits_allow_byorder(self):
-        from repoze.bfg.security import Allow, Deny, Authenticated, Everyone
-        context = DummyContext()
-        acl = []
-        deny = (Deny, 'fred', ('view', 'read'))
-        allow = (Allow, 'fred', 'view')
-        context.__acl__ = [allow, deny]
-        policy = self._makeOne(lambda *arg: ['fred'])
-        request = DummyRequest({})
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, True)
-        self.assertEqual(result.principals,
-                         set(['fred', Authenticated, Everyone]))
-        self.assertEqual(result.permission, 'view')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.ace, allow)
-
-    def test_principals_allowed_by_permission_direct(self):
-        from repoze.bfg.security import Allow
-        context = DummyContext()
-        acl = [ (Allow, 'chrism', ('read', 'write')),
-                (Allow, 'other', 'read') ]
-        context.__acl__ = acl
-        policy = self._makeOne(lambda *arg: None)
-        result = policy.principals_allowed_by_permission(context, 'read')
-        self.assertEqual(result, ['chrism', 'other'])
-
-    def test_principals_allowed_by_permission_acquired(self):
-        from repoze.bfg.security import Allow
-        context = DummyContext()
-        acl = [ (Allow, 'chrism', ('read', 'write')),
-                (Allow, 'other', ('read',)) ]
-        context.__acl__ = acl
-        context.__parent__ = None
-        context.__name__ = 'context'
-        inter = DummyContext()
-        inter.__name__ = None
-        inter.__parent__ = context
-        policy = self._makeOne(lambda *arg: None)
-        result = policy.principals_allowed_by_permission(inter, 'read')
-        self.assertEqual(result, ['chrism', 'other'])
-
-    def test_principals_allowed_by_permission_no_acls(self):
-        policy = self._makeOne(lambda *arg: None)
-        result = policy.principals_allowed_by_permission(None, 'read')
-        self.assertEqual(result, [])
-
-class TestInheritingACLSecurityPolicy(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _getTargetClass(self):
-        from repoze.bfg.security import InheritingACLSecurityPolicy
-        return InheritingACLSecurityPolicy
-
-    def _makeOne(self, *arg, **kw):
-        klass = self._getTargetClass()
-        return klass(*arg, **kw)
-
-    def test_class_implements_ISecurityPolicy(self):
-        from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ISecurityPolicy
-        verifyClass(ISecurityPolicy, self._getTargetClass())
-
-    def test_instance_implements_ISecurityPolicy(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ISecurityPolicy
-        verifyObject(ISecurityPolicy, self._makeOne(lambda *arg: None))
-
-    def test_permits(self):
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
-        from repoze.bfg.security import ALL_PERMISSIONS
-        from repoze.bfg.security import DENY_ALL
-        policy = self._makeOne(lambda *arg: [])
-        root = DummyContext()
-        community = DummyContext(__name__='community', __parent__=root)
-        blog = DummyContext(__name__='blog', __parent__=community)
-        root.__acl__ = [
-            (Allow, Authenticated, VIEW),
-            ]
-        community.__acl__ = [
-            (Allow, 'fred', ALL_PERMISSIONS),
-            (Allow, 'wilma', VIEW),
-            DENY_ALL,
-            ]
-        blog.__acl__ = [
-            (Allow, 'barney', MEMBER_PERMS),
-            (Allow, 'wilma', VIEW),
-            ]
-        policy = self._makeOne(lambda request: request.principals)
-        request = DummyRequest({})
-
-        request.principals = ['wilma']
-        result = policy.permits(blog, request, 'view')
-        self.assertEqual(result, True)
-        self.assertEqual(result.context, blog)
-        self.assertEqual(result.ace, (Allow, 'wilma', VIEW))
-        result = policy.permits(blog, request, 'delete')
-        self.assertEqual(result, False)
-        self.assertEqual(result.context, community)
-        self.assertEqual(result.ace, (Deny, Everyone, ALL_PERMISSIONS))
-
-        request.principals = ['fred']
-        result = policy.permits(blog, request, 'view')
-        self.assertEqual(result, True)
-        self.assertEqual(result.context, community)
-        self.assertEqual(result.ace, (Allow, 'fred', ALL_PERMISSIONS))
-        result = policy.permits(blog, request, 'doesntevenexistyet')
-        self.assertEqual(result, True)
-        self.assertEqual(result.context, community)
-        self.assertEqual(result.ace, (Allow, 'fred', ALL_PERMISSIONS))
-
-        request.principals = ['barney']
-        result = policy.permits(blog, request, 'view')
-        self.assertEqual(result, True)
-        self.assertEqual(result.context, blog)
-        self.assertEqual(result.ace, (Allow, 'barney', MEMBER_PERMS))
-        result = policy.permits(blog, request, 'administer')
-        self.assertEqual(result, False)
-        self.assertEqual(result.context, community)
-        self.assertEqual(result.ace, (Deny, Everyone, ALL_PERMISSIONS))
-        
-        request.principals = ['someguy']
-        result = policy.permits(root, request, 'view')
-        self.assertEqual(result, True)
-        self.assertEqual(result.context, root)
-        self.assertEqual(result.ace, (Allow, Authenticated, VIEW))
-        result = policy.permits(blog, request, 'view')
-        self.assertEqual(result, False)
-        self.assertEqual(result.context, community)
-        self.assertEqual(result.ace, (Deny, Everyone, ALL_PERMISSIONS))
-
-        request.principals = []
-        result = policy.permits(root, request, 'view')
-        self.assertEqual(result, False)
-        self.assertEqual(result.context, root)
-        self.assertEqual(result.ace, None)
-
-        request.principals = []
-        context = DummyContext()
-        result = policy.permits(context, request, 'view')
-        self.assertEqual(result, False)
-
-    def test_principals_allowed_by_permission_direct(self):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import DENY_ALL
-        context = DummyContext()
-        acl = [ (Allow, 'chrism', ('read', 'write')),
-                DENY_ALL,
-                (Allow, 'other', 'read') ]
-        context.__acl__ = acl
-        policy = self._makeOne(lambda *arg: None)
-        result = sorted(
-            policy.principals_allowed_by_permission(context, 'read'))
-        self.assertEqual(result, ['chrism'])
-
-    def test_principals_allowed_by_permission(self):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import DENY_ALL
-        from repoze.bfg.security import ALL_PERMISSIONS
-        root = DummyContext(__name__='', __parent__=None)
-        community = DummyContext(__name__='community', __parent__=root)
-        blog = DummyContext(__name__='blog', __parent__=community)
-        root.__acl__ = [ (Allow, 'chrism', ('read', 'write')),
-                         (Allow, 'other', ('read',)),
-                         (Allow, 'jim', ALL_PERMISSIONS)]
-        community.__acl__ = [  (Deny, 'flooz', 'read'),
-                               (Allow, 'flooz', 'read'),
-                               (Allow, 'mork', 'read'),
-                               (Deny, 'jim', 'read'),
-                               (Allow, 'someguy', 'manage')]
-        blog.__acl__ = [ (Allow, 'fred', 'read'),
-                         DENY_ALL]
-        
-        policy = self._makeOne(lambda *arg: None)
-        result = sorted(policy.principals_allowed_by_permission(blog, 'read'))
-        self.assertEqual(result, ['fred'])
-        result = sorted(policy.principals_allowed_by_permission(community,
-                                                                'read'))
-        self.assertEqual(result, ['chrism', 'mork', 'other'])
-        result = sorted(policy.principals_allowed_by_permission(community,
-                                                                'read'))
-        result = sorted(policy.principals_allowed_by_permission(root, 'read'))
-        self.assertEqual(result, ['chrism', 'jim', 'other'])
-
-    def test_principals_allowed_by_permission_no_acls(self):
-        policy = self._makeOne(lambda *arg: None)
-        context = DummyContext()
-        result = sorted(policy.principals_allowed_by_permission(context,'read'))
-        self.assertEqual(result, [])
-
-    def test_effective_principals(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        request.principals = ['fred']
-        policy = self._makeOne(lambda request: request.principals)
-        result = sorted(policy.effective_principals(request))
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
-        self.assertEqual(result,
-                         ['fred', Authenticated, Everyone])
-
-    def test_no_effective_principals(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        request.principals = []
-        policy = self._makeOne(lambda request: request.principals)
-        result = sorted(policy.effective_principals(request))
-        from repoze.bfg.security import Everyone
-        self.assertEqual(result, [Everyone])
-
-    def test_authenticated_userid(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        request.principals = ['fred']
-        policy = self._makeOne(lambda request: request.principals)
-        result = policy.authenticated_userid(request)
-        self.assertEqual(result, 'fred')
-
-    def test_no_authenticated_userid(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        request.principals = []
-        policy = self._makeOne(lambda request: request.principals)
-        result = policy.authenticated_userid(request)
-        self.assertEqual(result, None)
 
 class TestAllPermissionsList(unittest.TestCase):
     def setUp(self):
@@ -454,211 +27,13 @@ class TestAllPermissionsList(unittest.TestCase):
         from repoze.bfg.security import ALL_PERMISSIONS
         self.assertEqual(ALL_PERMISSIONS.__class__, self._getTargetClass())
 
-class TestRemoteUserACLSecurityPolicy(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _getTargetClass(self):
-        from repoze.bfg.security import RemoteUserACLSecurityPolicy
-        return RemoteUserACLSecurityPolicy
-
-    def _makeOne(self, *arg, **kw):
-        klass = self._getTargetClass()
-        return klass(*arg, **kw)
-
-    def test_instance_implements_ISecurityPolicy(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ISecurityPolicy
-        verifyObject(ISecurityPolicy, self._makeOne())
-
-    def test_authenticated_userid(self):
-        context = DummyContext()
-        request = DummyRequest({'REMOTE_USER':'fred'})
-        policy = self._makeOne()
-        result = policy.authenticated_userid(request)
-        self.assertEqual(result, 'fred')
-
-    def test_authenticated_userid_no_remote_user(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        policy = self._makeOne()
-        result = policy.authenticated_userid(request)
-        self.assertEqual(result, None)
-
-    def test_effective_principals(self):
-        context = DummyContext()
-        request = DummyRequest({'REMOTE_USER':'fred'})
-        policy = self._makeOne()
-        result = policy.effective_principals(request)
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
-        self.assertEqual(result, [Everyone, Authenticated, 'fred'])
-
-    def test_effective_principals_no_remote_user(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        policy = self._makeOne()
-        result = policy.effective_principals(request)
-        from repoze.bfg.security import Everyone
-        self.assertEqual(result, [Everyone])
-
-class TestRemoteUserInheritingACLSecurityPolicy(TestRemoteUserACLSecurityPolicy):
-    def _getTargetClass(self):
-        from repoze.bfg.security import RemoteUserInheritingACLSecurityPolicy
-        return RemoteUserInheritingACLSecurityPolicy
-
-class TestWhoACLSecurityPolicy(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _getTargetClass(self):
-        from repoze.bfg.security import WhoACLSecurityPolicy
-        return WhoACLSecurityPolicy
-
-    def _makeOne(self, *arg, **kw):
-        klass = self._getTargetClass()
-        return klass(*arg, **kw)
-
-    def test_instance_implements_ISecurityPolicy(self):
-        from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ISecurityPolicy
-        verifyObject(ISecurityPolicy, self._makeOne())
-
-    def test_authenticated_userid(self):
-        context = DummyContext()
-        identity = {'repoze.who.identity':{'repoze.who.userid':'fred'}}
-        request = DummyRequest(identity)
-        policy = self._makeOne()
-        result = policy.authenticated_userid(request)
-        self.assertEqual(result, 'fred')
-
-    def test_authenticated_userid_no_who_ident(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        policy = self._makeOne()
-        result = policy.authenticated_userid(request)
-        self.assertEqual(result, None)
-
-    def test_effective_principals(self):
-        context = DummyContext()
-        identity = {'repoze.who.identity':{'repoze.who.userid':'fred'}}
-        request = DummyRequest(identity)
-        policy = self._makeOne()
-        result = policy.effective_principals(request)
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
-        self.assertEqual(result, [Everyone, Authenticated, 'fred'])
-
-    def test_effective_principals_no_who_ident(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        policy = self._makeOne()
-        result = policy.effective_principals(request)
-        from repoze.bfg.security import Everyone
-        self.assertEqual(result, [Everyone])
-
-class TestWhoInheritingACLSecurityPolicy(TestWhoACLSecurityPolicy):
-    def _getTargetClass(self):
-        from repoze.bfg.security import WhoInheritingACLSecurityPolicy
-        return WhoInheritingACLSecurityPolicy
-
-class TestAPIFunctions(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-        
-    def tearDown(self):
-        cleanUp()
-
-    def _registerSecurityPolicy(self, secpol):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import ISecurityPolicy
-        gsm.registerUtility(secpol, ISecurityPolicy)
-
-    def test_has_permission_registered(self):
-        secpol = DummySecurityPolicy(False)
-        self._registerSecurityPolicy(secpol)
-        from repoze.bfg.security import has_permission
-        self.assertEqual(has_permission('view', None, None), False)
-        
-    def test_has_permission_not_registered(self):
-        from repoze.bfg.security import has_permission
-        result = has_permission('view', None, None)
-        self.assertEqual(result, True)
-        self.assertEqual(result.msg, 'No security policy in use.')
-
-    def test_authenticated_userid_registered(self):
-        secpol = DummySecurityPolicy(False)
-        self._registerSecurityPolicy(secpol)
-        from repoze.bfg.security import authenticated_userid
-        request = DummyRequest({})
-        self.assertEqual(authenticated_userid(request), 'fred')
-        
-    def test_authenticated_userid_not_registered(self):
-        from repoze.bfg.security import authenticated_userid
-        request = DummyRequest({})
-        self.assertEqual(authenticated_userid(request), None)
-
-    def test_effective_principals_registered(self):
-        secpol = DummySecurityPolicy(False)
-        self._registerSecurityPolicy(secpol)
-        from repoze.bfg.security import effective_principals
-        request = DummyRequest({})
-        self.assertEqual(effective_principals(request), ['fred', 'bob'])
-        
-    def test_effective_principals_not_registered(self):
-        from repoze.bfg.security import effective_principals
-        request = DummyRequest({})
-        self.assertEqual(effective_principals(request), [])
-
-    def test_principals_allowed_by_permission_not_registered(self):
-        from repoze.bfg.security import principals_allowed_by_permission
-        from repoze.bfg.security import Everyone
-        self.assertEqual(principals_allowed_by_permission(None, None),
-                         [Everyone])
-
-    def test_principals_allowed_by_permission_registered(self):
-        secpol = DummySecurityPolicy(False)
-        self._registerSecurityPolicy(secpol)
-        from repoze.bfg.security import principals_allowed_by_permission
-        self.assertEqual(principals_allowed_by_permission(None, None),
-                         ['fred', 'bob'])
-
-class TestViewPermission(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.security import ViewPermission
-        return ViewPermission
-    
-    def _makeOne(self, *arg, **kw):
-        klass = self._getTargetClass()
-        return klass(*arg, **kw)
-        
-    def test_call(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        secpol = DummySecurityPolicy(True)
-        permission = self._makeOne(context, request, 'repoze.view')
-        result = permission(secpol)
-        self.assertEqual(result, True)
-        self.assertEqual(secpol.checked, (context, request, 'repoze.view'))
-
-    def test_repr(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        request.view_name = 'viewname'
-        secpol = DummySecurityPolicy(True)
-        permission = self._makeOne(context, request, 'repoze.view')
-        result = repr(permission)
-        self.failUnless(result.startswith('<Permission at '))
-        self.failUnless(result.endswith(" named 'repoze.view' for 'viewname'>"))
-
 class TestViewPermissionFactory(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _getTargetClass(self):
         from repoze.bfg.security import ViewPermissionFactory
         return ViewPermissionFactory
@@ -671,10 +46,9 @@ class TestViewPermissionFactory(unittest.TestCase):
         context = DummyContext()
         request = DummyRequest({})
         factory = self._makeOne('repoze.view')
+        self.assertEqual(factory.permission_name, 'repoze.view')
         result = factory(context, request)
-        self.assertEqual(result.permission_name, 'repoze.view')
-        self.assertEqual(result.context, context)
-        self.assertEqual(result.request, request)
+        self.assertEqual(result, True)
 
 class TestAllowed(unittest.TestCase):
     def _getTargetClass(self):
@@ -752,6 +126,222 @@ class TestACLDenied(unittest.TestCase):
         self.failUnless('<ACLDenied instance at ' in repr(denied))
         self.failUnless("with msg %r>" % msg in repr(denied))
 
+class TestViewExecutionPermitted(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.security import view_execution_permitted
+        return view_execution_permitted(*arg, **kw)
+
+    def _registerViewPermission(self, view_name, allow=True):
+        import zope.component
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IViewPermission
+        class Checker(object):
+            def __call__(self, context, request):
+                self.context = context
+                self.request = request
+                return allow
+        checker = Checker()
+        gsm = zope.component.getGlobalSiteManager()
+        gsm.registerAdapter(checker, (Interface, Interface),
+                            IViewPermission,
+                            view_name)
+        return checker
+
+    def test_no_permission(self):
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        from repoze.bfg.interfaces import ISettings
+        settings = DummySettings(debug_authorization=True)
+        gsm.registerUtility(settings, ISettings)
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request, '')
+        msg = result.msg
+        self.failUnless("Allowed: view name '' in context" in msg)
+        self.failUnless('(no permission defined)' in msg)
+        self.assertEqual(result, True)
+
+    def test_with_permission(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import IRequest
+        class IContext(Interface):
+            pass
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        checker = self._registerViewPermission('', True)
+        request = DummyRequest({})
+        directlyProvides(request, IRequest)
+        result = self._callFUT(context, request, '')
+        self.failUnless(result is True)
+
+def _registerAuthenticationPolicy(result):
+    from repoze.bfg.interfaces import IAuthenticationPolicy
+    policy = DummyAuthenticationPolicy(result)
+    import zope.component
+    gsm = zope.component.getGlobalSiteManager()
+    gsm.registerUtility(policy, IAuthenticationPolicy)
+    return policy
+
+def _registerAuthorizationPolicy(result):
+    from repoze.bfg.interfaces import IAuthorizationPolicy
+    policy = DummyAuthorizationPolicy(result)
+    import zope.component
+    gsm = zope.component.getGlobalSiteManager()
+    gsm.registerUtility(policy, IAuthorizationPolicy)
+    return policy
+
+
+class TestHasPermission(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg):
+        from repoze.bfg.security import has_permission
+        return has_permission(*arg)
+
+    def test_no_authentication_policy(self):
+        result = self._callFUT('view', None, None)
+        self.assertEqual(result, True)
+        self.assertEqual(result.msg, 'No authentication policy in use.')
+        
+    def test_authentication_policy_no_authorization_policy(self):
+        _registerAuthenticationPolicy(None)
+        self.assertRaises(ValueError, self._callFUT, 'view', None, None)
+
+    def test_authn_and_authz_policies_registered(self):
+        _registerAuthenticationPolicy(None)
+        pol = _registerAuthorizationPolicy('yo')
+        self.assertEqual(self._callFUT('view', None, None), 'yo')
+
+class TestAuthenticatedUserId(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg):
+        from repoze.bfg.security import authenticated_userid
+        return authenticated_userid(*arg)
+
+    def test_no_authentication_policy(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request)
+        self.assertEqual(result, None)
+
+    def test_with_authentication_policy(self):
+        _registerAuthenticationPolicy('yo')
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request)
+        self.assertEqual(result, 'yo')
+
+class TestEffectivePrincipals(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg):
+        from repoze.bfg.security import effective_principals
+        return effective_principals(*arg)
+
+    def test_no_authentication_policy(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request)
+        self.assertEqual(result, [])
+
+    def test_with_authentication_policy(self):
+        _registerAuthenticationPolicy('yo')
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request)
+        self.assertEqual(result, 'yo')
+
+class TestPrincipalsAllowedByPermission(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg):
+        from repoze.bfg.security import principals_allowed_by_permission
+        return principals_allowed_by_permission(*arg)
+
+    def test_no_authorization_policy(self):
+        from repoze.bfg.security import Everyone
+        context = DummyContext()
+        result = self._callFUT(context, 'view')
+        self.assertEqual(result, [Everyone])
+
+    def test_with_authorization_policy(self):
+        _registerAuthorizationPolicy('yo')
+        context = DummyContext()
+        result = self._callFUT(context, 'view')
+        self.assertEqual(result, 'yo')
+
+class TestRemember(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg):
+        from repoze.bfg.security import remember
+        return remember(*arg)
+
+    def test_no_authentication_policy(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request, 'me')
+        self.assertEqual(result, [])
+
+    def test_with_authentication_policy(self):
+        _registerAuthenticationPolicy('yo')
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request, 'me')
+        self.assertEqual(result, 'yo')
+
+class TestForget(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg):
+        from repoze.bfg.security import forget
+        return forget(*arg)
+
+    def test_no_authentication_policy(self):
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request)
+        self.assertEqual(result, [])
+
+    def test_with_authentication_policy(self):
+        _registerAuthenticationPolicy('yo')
+        context = DummyContext()
+        request = DummyRequest({})
+        result = self._callFUT(context, request)
+        self.assertEqual(result, 'yo')
+
 class DummyContext:
     def __init__(self, *arg, **kw):
         self.__dict__.update(kw)
@@ -760,33 +350,33 @@ class DummyRequest:
     def __init__(self, environ):
         self.environ = environ
 
-class DummySecurityPolicy:
+class DummyAuthenticationPolicy:
     def __init__(self, result):
         self.result = result
 
-    def permits(self, *args):
-        self.checked = args
+    def effective_principals(self, context, request):
         return self.result
 
-    def authenticated_userid(self, request):
-        return 'fred'
+    def authenticated_userid(self, context, request):
+        return self.result
 
-    def effective_principals(self, request):
-        return ['fred', 'bob']
+    def remember(self, context, request, principal, **kw):
+        return self.result
+
+    def forget(self, context, request):
+        return self.result
+
+class DummyAuthorizationPolicy:
+    def __init__(self, result):
+        self.result = result
+
+    def permits(self, context, principals, permission):
+        return self.result
 
     def principals_allowed_by_permission(self, context, permission):
-        return ['fred', 'bob']
+        return self.result
 
-VIEW = 'view'
-EDIT = 'edit'
-CREATE = 'create'
-DELETE = 'delete'
-MODERATE = 'moderate'
-ADMINISTER = 'administer'
-COMMENT = 'comment'
-
-GUEST_PERMS = (VIEW, COMMENT)
-MEMBER_PERMS = GUEST_PERMS + (EDIT, CREATE, DELETE)
-MODERATOR_PERMS = MEMBER_PERMS + (MODERATE,)
-ADMINISTRATOR_PERMS = MODERATOR_PERMS + (ADMINISTER,)
+class DummySettings:
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
 

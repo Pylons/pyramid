@@ -197,15 +197,26 @@ class INotFoundAppFactory(Interface):
         a``message`` key in the WSGI environ provides information
         pertaining to the reason for the notfound."""
 
+class IForbiddenResponseFactory(Interface):
+    """ A utility which returns an IResponse as the result of the
+    denial of a view invocation by a security policy."""
+    def __call__(context, request):
+        """ Return an object implementing IResponse (an object with
+        the status, headerlist, and app_iter attributes) as a result
+        of a view invocation denial by a security policy.
+        
+        Note that the ``message`` key in the WSGI environ
+        (request.environ) provides information pertaining to the
+        reason for the view invocation denial.  The ``context`` passed
+        to the forbidden app factory will be the context found by the
+        repoze.bfg router during traversal or url dispatch.  The
+        ``request`` will be the request object which caused the deny."""
+
 class IUnauthorizedAppFactory(Interface):
     """ A utility which returns an Unauthorized WSGI application
-    factory"""
-    def __call__():
-        """ Return a callable which returns an unauthorized WSGI
-        application.  When the WSGI application is invoked, a
-        ``message`` key in the WSGI environ provides information
-        pertaining to the reason for the unauthorized."""
-
+    factory (deprecated in repoze.bfg 0.8.2) in favor of
+    IForbiddenResponseFactory """
+    
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.
     """
@@ -219,6 +230,37 @@ class IContextURL(Interface):
 class IRoutesContextFactory(Interface):
     """ A marker interface used to look up the default routes context factory
     """
+
+class IAuthenticationPolicy(Interface):
+    """ A multi-adapter on context and request """
+    def authenticated_userid(context, request):
+        """ Return the authenticated userid or ``None`` if no
+        authenticated userid can be found. """
+
+    def effective_principals(context, request):
+        """ Return a sequence representing the effective principals
+        including the userid and any groups belonged to by the current
+        user, including 'system' groups such as Everyone and
+        Authenticated. """
+
+    def remember(context, request, principal, **kw):
+        """ Return a set of headers suitable for 'remembering' the
+        principal named ``principal`` when set in a response.  An
+        individual authentication policy and its consumers can decide
+        on the composition and meaning of **kw. """
+    
+    def forget(context, request):
+        """ Return a set of headers suitable for 'forgetting' the
+        current user on subsequent requests. """
+
+class IAuthorizationPolicy(Interface):
+    """ A adapter on context """
+    def permits(context, principals, permission):
+        """ Return True if any of the principals is allowed the
+        permission in the current context, else return False """
+        
+    def principals_allowed_by_permission(context, permission):
+        """ Return a set of principal identifiers allowed by the permission """
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)

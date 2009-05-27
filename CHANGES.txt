@@ -1,3 +1,116 @@
+Next release
+============
+
+Features
+--------
+
+- New API functions named ``forget`` and ``remember`` are available in
+  the ``security`` module.  The ``forget`` function returns headers
+  which will cause the currently authenticated user to be logged out
+  when set in a response.  The ``remember`` function (when passed the
+  proper arguments) will return headers which will cause a principal
+  to be "logged in" when set in a response.  See the Security API
+  chapter of the docs for more info.
+
+- New keyword arguments to the ``repoze.bfg.router.make_app`` call
+  have been added: ``authentication_policy`` and
+  ``authorization_policy``.  These should, respectively, be an
+  implementation of an authentication policy (an object implementing
+  the ``repoze.bfg.interfaces.IAuthenticationPolicy`` interface) and
+  an implementation of an authorization policy (an object implementing
+  ``repoze.bfg.interfaces.IAuthorizationPolicy).  Concrete
+  implementations of authentication policies exist in
+  ``repoze.bfg.authentication``.  Concrete implementations of
+  authorization policies exist in ``repoze.bfg.authorization``.
+
+  Both ``authentication_policy`` and ``authorization_policy`` default
+  to ``None``.
+
+  If ``authentication_policy`` is ``None``, but
+  ``authorization_policy`` is *not* ``None``, then
+  ``authorization_policy`` is ignored (the ability to do authorization
+  depends on authentication).
+
+  If the ``authentication_policy`` argument is *not* ``None``, and the
+  ``authorization_policy`` argument *is* ``None``, the authorization
+  policy defaults to an authorization implementation that uses ACLs
+  (``repoze.bfg.authorization.ACLAuthorizationPolicy``).
+
+  .. note:: we no longer encourage configuration of "security
+    policies" using ZCML, as previously we did for
+    ``ISecurityPolicy``.  This is because it's not uncommon to need to
+    configure settings for concrete authorization or authentication
+    policies using paste .ini parameters; the app entry point for your
+    applicatio is the natural place to do this.
+
+- Two new abstractions have been added in the way of adapters used by
+  the system: an ``IAuthorizationPolicy`` and an
+  ``IAuthenticationPolicy``.  A combination of these (as registered by
+  the ``securitypolicy`` ZCML directive) take the place of the
+  ``ISecurityPolicy`` abstraction in previous releases of repoze.who.
+  The API functions in ``repoze.who.security`` (such as
+  ``authentication_userid``, ``effective_principals``,
+  ``has_permission``, and so on) have been changed to try to make use
+  of these new adapters.  If you're using an older ``ISecurityPolicy``
+  adapter, the system will still work, but it will print deprecation
+  warnings when such a policy is used.
+
+- The way the (internal) IViewPermission utilities registered via ZCML
+  are invoked has changed.  They are purely adapters now, returning a
+  boolean result, rather than returning a callable. You shouldn't have
+  been using these anyway. ;-)
+
+- New concrete implementations of IAuthenticationPolicy have been
+  added to the ``repoze.bfg.authentication`` module:
+  ``RepozeWho1AuthenticationPolicy`` which uses ``repoze.who``
+  identity to retrieve authentication data from and
+  ``RemoteUserAuthenticationPolicy``, which uses the ``REMOTE_USER``
+  value in the WSGI environment to retrieve authentication data.
+
+- A new concrete implementation of IAuthorizationPolicy has been added
+  to the ``repoze.bfg.authorization`` module:
+  ``ACLAuthorizationPolicy`` which uses ACL inheritance to do
+  authorization.
+
+- It is now possible to register a custom
+  ``repoze.bfg.interfaces.IForbiddenResponseFactory`` for a given
+  application.  This feature replaces the
+  ``repoze.bfg.interfaces.IUnauthorizedAppFactory`` feature previously
+  described in the Hooks chapter.  The IForbiddenResponseFactory will
+  be called when the framework detects an authorization failure; it
+  should accept a context object and a request object; it should
+  return an IResponse object (a webob response, basically).  Read the
+  below point for more info and see the Hooks narrative chapter of the
+  BFG docs for more info.
+
+Backwards Incompatibilities
+---------------------------
+
+- Custom NotFound and Forbidden (nee' Unauthorized) WSGI applications
+  (registered as a utility for INotFoundAppFactory and
+  IUnauthorizedAppFactory) could rely on an environment key named
+  ``message`` describing the circumstance of the response.  This key
+  has been renamed to ``repoze.bfg.message`` (as per the WSGI spec,
+  which requires environment extensions to contain dots).
+
+Deprecations
+------------
+
+- The ``repoze.bfg.interfaces.IUnauthorizedAppFactory`` interface has
+  been deprecated in favor of using the new
+  ``repoze.bfg.interfaces.IForbiddenResponseFactory`` mechanism.
+
+- The ``view_execution_permitted`` API should now be imported from the
+  ``repoze.bfg.security`` module instead of the ``repoze.bfg.view``
+  module.
+
+- The ``authenticated_userid`` and ``effective_principals`` APIs in
+  ``repoze.bfg.security`` used to only take a single argument
+  (request).  They now accept two arguments (``context`` and
+  ``request``).  Calling them with a single argument is still
+  supported but issues a deprecation warning.
+
+
 0.8.1 (2009-05-21)
 ==================
 

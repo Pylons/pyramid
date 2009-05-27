@@ -131,7 +131,7 @@ class TestNotFound(unittest.TestCase):
                                    ('Content-Type', 'text/html')])
         
     def test_with_message(self):
-        environ = {'message':'<hi!>'}
+        environ = {'repoze.bfg.message':'<hi!>'}
         L = []
         def start_response(status, headers):
             L.append((status, headers))
@@ -166,7 +166,7 @@ class TestUnauthorized(unittest.TestCase):
                                    ('Content-Type', 'text/html')])
         
     def test_with_message(self):
-        environ = {'message':'<hi!>'}
+        environ = {'repoze.bfg.message':'<hi!>'}
         L = []
         def start_response(status, headers):
             L.append((status, headers))

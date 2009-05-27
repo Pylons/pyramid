@@ -141,14 +141,16 @@ Glossary
     perfom authentication: it leaves it up to an upstream component
     such as :term:`repoze.who`.  :mod:`repoze.bfg` uses the
     :term:`authentication` data supplied by the upstream component as
-    one input during :term:`authorization`.
+    one input during :term:`authorization`.  Authentication in
+    :mod:`repoze.bfg` is performed via an :term:`authentication
+    policy`.
   Authorization
     The act of determining whether a user can perform a specific
     action.  In bfg terms, this means determining whether, for a given
     context, any :term:`principal` (or principals) associated with the
     request have the requisite :term:`permission` to allow the request
     to continue.  Authorization in :mod:`repoze.bfg` is performed via
-    its :term:`security policy`.
+    its :term:`authorization policy`.
   Principal
     A *principal* is a string or unicode object representing a user or
     a user's membership in a group.  It is provided by the
@@ -158,14 +160,16 @@ Glossary
     bar", the request might have information attached to it that would
     indictate that Bob was represented by three principals: "bob",
     "group foo" and "group bar".
-  Security Policy
-    A security policy in :mod:`repoze.bfg` terms is a bit of code
-    which accepts a request, the :term:`ACL` associated with a
-    context, and the :term:`permission` associated with a particular
-    view, and subsequently determines whether or not the principals
-    associated with the request can perform the action associated with
-    the permission based on the ACL found on the :term:`context` (or
-    any of its parents).
+  Authorization Policy
+    An authorization policy in :mod:`repoze.bfg` terms is a bit of
+    code which has an API which determines whether or not the
+    principals associated with the request can perform an action
+    associated with a permission, based on the information found on the
+    :term:`context`.
+  Authentication Policy
+    An authentication policy in :mod:`repoze.bfg` terms is a bit of
+    code which has an API which determines the current
+    :term:`principal` (or principals) associated with a request.
   WSGI
     `Web Server Gateway Interface <http://wsgi.org/>`_.  This is a
     Python standard for connecting web applications to web servers,
@@ -274,7 +278,7 @@ Glossary
     object.  In :mod:`repoze.bfg`, an interface may be attached to an
     model object or a request object in order to identify that the
     object is "of a type".  Interfaces are used internally by
-    :mod:`repoze.bfg` to perform view lookups and security policy
+    :mod:`repoze.bfg` to perform view lookups and other policy
     lookups.  Interfaces are exposed to application programmers by the
     ``view`` ZCML directive or the corresponding ``bfg_view``
     decorator in the form of both the ``for`` attribute and the

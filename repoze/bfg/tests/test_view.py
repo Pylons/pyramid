@@ -15,11 +15,21 @@ class BaseTest(object):
         from repoze.bfg.interfaces import IView
         gsm.registerAdapter(app, for_, IView, name)
 
-    def _registerPermission(self, permission, name, *for_):
+    def _registerViewPermission(self, view_name, allow=True):
         import zope.component
-        gsm = zope.component.getGlobalSiteManager()
+        from zope.interface import Interface
         from repoze.bfg.interfaces import IViewPermission
-        gsm.registerAdapter(permission, for_, IViewPermission, name)
+        class Checker(object):
+            def __call__(self, context, request):
+                self.context = context
+                self.request = request
+                return allow
+        checker = Checker()
+        gsm = zope.component.getGlobalSiteManager()
+        gsm.registerAdapter(checker, (Interface, Interface),
+                            IViewPermission,
+                            view_name)
+        return checker
 
     def _registerSecurityPolicy(self, secpol):
         import zope.component
@@ -61,12 +71,10 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(False)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', False)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -85,12 +93,10 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(True)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', True)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -109,12 +115,10 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(False)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', False)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -146,12 +150,10 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(False)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', False)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -170,12 +172,10 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(True)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', True)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -194,12 +194,10 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(False)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', False)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -231,12 +229,10 @@ class RenderViewTests(unittest.TestCase, BaseTest):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(False)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', False)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -255,12 +251,10 @@ class RenderViewTests(unittest.TestCase, BaseTest):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(True)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', True)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -278,12 +272,10 @@ class RenderViewTests(unittest.TestCase, BaseTest):
         directlyProvides(context, IContext)
         response = DummyResponse()
         secpol = DummySecurityPolicy()
-        permissionfactory = make_permission_factory(False)
         view = make_view(response)
         self._registerView(view, 'registered', IContext, IRequest)
         self._registerSecurityPolicy(secpol)
-        self._registerPermission(permissionfactory, 'registered', IContext,
-                                 IRequest)
+        self._registerViewPermission('registered', False)
         environ = self._makeEnviron()
         from webob import Request
         request = Request(environ)
@@ -313,67 +305,6 @@ class TestIsResponse(unittest.TestCase):
         response = DummyResponse()
         response.status = None
         self.assertEqual(self._callFUT(response), False)
-
-class TestViewExecutionPermitted(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, *arg, **kw):
-        from repoze.bfg.view import view_execution_permitted
-        return view_execution_permitted(*arg, **kw)
-
-    def _registerSecurityPolicy(self, secpol):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import ISecurityPolicy
-        gsm.registerUtility(secpol, ISecurityPolicy)
-
-    def _registerPermission(self, permission, name, *for_):
-        import zope.component
-        gsm = zope.component.getGlobalSiteManager()
-        from repoze.bfg.interfaces import IViewPermission
-        gsm.registerAdapter(permission, for_, IViewPermission, name)
-
-    def test_no_secpol(self):
-        context = DummyContext()
-        request = DummyRequest()
-        result = self._callFUT(context, request, '')
-        msg = result.msg
-        self.failUnless("Allowed: view name '' in context" in msg)
-        self.failUnless('(no security policy in use)' in msg)
-        self.assertEqual(result, True)
-
-    def test_secpol_no_permission(self):
-        secpol = DummySecurityPolicy()
-        self._registerSecurityPolicy(secpol)
-        context = DummyContext()
-        request = DummyRequest()
-        result = self._callFUT(context, request, '')
-        msg = result.msg
-        self.failUnless("Allowed: view name '' in context" in msg)
-        self.failUnless("(no permission registered for name '')" in msg)
-        self.assertEqual(result, True)
-
-    def test_secpol_and_permission(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import IRequest
-        class IContext(Interface):
-            pass
-        context = DummyContext()
-        directlyProvides(context, IContext)
-        permissionfactory = make_permission_factory(True)
-        self._registerPermission(permissionfactory, '', IContext,
-                                 IRequest)
-        secpol = DummySecurityPolicy()
-        self._registerSecurityPolicy(secpol)
-        request = DummyRequest()
-        directlyProvides(request, IRequest)
-        result = self._callFUT(context, request, '')
-        self.failUnless(result is True)
 
 class TestStaticView(unittest.TestCase, BaseTest):
     def setUp(self):
@@ -526,18 +457,6 @@ def make_view(response):
     def view(context, request):
         return response
     return view
-
-def make_permission_factory(result):
-    class DummyPermissionFactory:
-        def __init__(self, context, request):
-            self.context = context
-            self.request = request
-
-        def __call__(self, secpol):
-            self.__class__.checked_with = secpol
-            return result
-
-    return DummyPermissionFactory
 
 class DummyResponse:
     status = '200 OK'

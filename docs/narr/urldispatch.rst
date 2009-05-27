@@ -420,14 +420,14 @@ Using :mod:`repoze.bfg` Security With URL Dispatch
 --------------------------------------------------
 
 :mod:`repoze.bfg` provides its own security framework which consults a
-:term:`security policy` before allowing any application code to be
-called.  This framework operates in terms of ACLs (Access Control
+:term:`authorization policy` before allowing any application code to
+be called.  This framework operates in terms of ACLs (Access Control
 Lists, see :ref:`security_chapter` for more information about the
-:mod:`repoze.bfg` security subsystem).  A common thing to want to do
-is to attach an ``__acl__`` to the context object dynamically for
-declarative security purposes.  You can use the ``factory``
-argument that points at a context factory which attaches a custom
-``__acl__`` to an object at its creation time.
+:mod:`repoze.bfg` authorization subsystem).  A common thing to want to
+do is to attach an ``__acl__`` to the context object dynamically for
+declarative security purposes.  You can use the ``factory`` argument
+that points at a context factory which attaches a custom ``__acl__``
+to an object at its creation time.
 
 Such a ``factory`` might look like so:
 

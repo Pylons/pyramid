@@ -8,29 +8,20 @@ class TestTestingFunctions(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def test_registerDummySecurityPolicy_permissive(self):
-        from repoze.bfg import testing
-        testing.registerDummySecurityPolicy('user', ('group1', 'group2'),
-                                            permissive=True)
-        from repoze.bfg.interfaces import ISecurityPolicy
-        from zope.component import getUtility
-        ut = getUtility(ISecurityPolicy)
-        from repoze.bfg.testing import DummyAllowingSecurityPolicy
-        self.failUnless(isinstance(ut, DummyAllowingSecurityPolicy))
-        self.assertEqual(ut.userid, 'user')
-        self.assertEqual(ut.groupids, ('group1', 'group2'))
-        
-    def test_registerDummySecurityPolicy_nonpermissive(self):
+    def test_registerDummySecurityPolicy(self):
         from repoze.bfg import testing
         testing.registerDummySecurityPolicy('user', ('group1', 'group2'),
                                             permissive=False)
-        from repoze.bfg.interfaces import ISecurityPolicy
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.interfaces import IAuthorizationPolicy
         from zope.component import getUtility
-        ut = getUtility(ISecurityPolicy)
-        from repoze.bfg.testing import DummyDenyingSecurityPolicy
-        self.failUnless(isinstance(ut, DummyDenyingSecurityPolicy))
+        ut = getUtility(IAuthenticationPolicy)
+        from repoze.bfg.testing import DummySecurityPolicy
+        self.failUnless(isinstance(ut, DummySecurityPolicy))
+        ut = getUtility(IAuthorizationPolicy)
         self.assertEqual(ut.userid, 'user')
         self.assertEqual(ut.groupids, ('group1', 'group2'))
+        self.assertEqual(ut.permissive, False)
 
     def test_registerModels(self):
         ob1 = object()
@@ -153,36 +144,30 @@ class TestTestingFunctions(unittest.TestCase):
         self.assertEqual(response.body, '123')
 
     def test_registerViewPermission_defaults(self):
+        from repoze.bfg.security import view_execution_permitted
         from repoze.bfg import testing
         view = testing.registerViewPermission('moo.html')
-        from repoze.bfg.view import view_execution_permitted
         testing.registerDummySecurityPolicy()
         result = view_execution_permitted(None, None, 'moo.html')
         self.failUnless(result)
         self.assertEqual(result.msg, 'message')
         
     def test_registerViewPermission_denying(self):
+        from repoze.bfg.security import view_execution_permitted
         from repoze.bfg import testing
         view = testing.registerViewPermission('moo.html', result=False)
-        from repoze.bfg.view import view_execution_permitted
         testing.registerDummySecurityPolicy()
         result = view_execution_permitted(None, None, 'moo.html')
         self.failIf(result)
         self.assertEqual(result.msg, 'message')
 
     def test_registerViewPermission_custom(self):
-        class ViewPermission:
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
-
-            def __call__(self, secpol):
-                return True
-                
+        from repoze.bfg.security import view_execution_permitted
+        def viewperm(context, request):
+            return True
         from repoze.bfg import testing
         view = testing.registerViewPermission('moo.html',
-                                              viewpermission=ViewPermission)
-        from repoze.bfg.view import view_execution_permitted
+                                              viewpermission=viewperm)
         testing.registerDummySecurityPolicy()
         result = view_execution_permitted(None, None, 'moo.html')
         self.failUnless(result is True)
@@ -226,30 +211,30 @@ class TestTestingFunctions(unittest.TestCase):
         testing.registerUtility(utility, iface, name='mudge')
         self.assertEqual(getUtility(iface, name='mudge')(), 'foo')
 
-class TestDummyAllowingSecurityPolicy(unittest.TestCase):
+class TestDummySecurityPolicy(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.testing import DummyAllowingSecurityPolicy
-        return DummyAllowingSecurityPolicy
+        from repoze.bfg.testing import DummySecurityPolicy
+        return DummySecurityPolicy
 
-    def _makeOne(self, userid=None, groupids=()):
+    def _makeOne(self, userid=None, groupids=(), permissive=True):
         klass = self._getTargetClass()
-        return klass(userid, groupids)
+        return klass(userid, groupids, permissive)
 
     def test_authenticated_userid(self):
         policy = self._makeOne('user')
-        self.assertEqual(policy.authenticated_userid(None), 'user')
+        self.assertEqual(policy.authenticated_userid(None, None), 'user')
         
     def test_effective_principals_userid(self):
         policy = self._makeOne('user', ('group1',))
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
-        self.assertEqual(policy.effective_principals(None),
+        self.assertEqual(policy.effective_principals(None, None),
                          [Everyone, Authenticated, 'user', 'group1'])
 
     def test_effective_principals_nouserid(self):
         policy = self._makeOne()
         from repoze.bfg.security import Everyone
-        self.assertEqual(policy.effective_principals(None), [Everyone])
+        self.assertEqual(policy.effective_principals(None, None), [Everyone])
 
     def test_permits(self):
         policy = self._makeOne()
@@ -259,44 +244,19 @@ class TestDummyAllowingSecurityPolicy(unittest.TestCase):
         policy = self._makeOne('user', ('group1',))
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
-        self.assertEqual(policy.principals_allowed_by_permission(None, None),
-                         [Everyone, Authenticated, 'user', 'group1'])
-        
+        result = policy.principals_allowed_by_permission(None, None)
+        self.assertEqual(result, [Everyone, Authenticated, 'user', 'group1'])
 
-class TestDummyDenyingSecurityPolicy(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.testing import DummyDenyingSecurityPolicy
-        return DummyDenyingSecurityPolicy
-
-    def _makeOne(self, userid=None, groupids=()):
-        klass = self._getTargetClass()
-        return klass(userid, groupids)
-
-    def test_authenticated_userid(self):
-        policy = self._makeOne('user')
-        self.assertEqual(policy.authenticated_userid(None), 'user')
-        
-    def test_effective_principals_userid(self):
-        policy = self._makeOne('user', ('group1',))
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
-        self.assertEqual(policy.effective_principals(None),
-                         [Everyone, Authenticated, 'user', 'group1'])
-
-    def test_effective_principals_nouserid(self):
+    def test_forget(self):
         policy = self._makeOne()
-        from repoze.bfg.security import Everyone
-        self.assertEqual(policy.effective_principals(None), [Everyone])
-
-    def test_permits(self):
+        self.assertEqual(policy.forget(None, None), [])
+        
+    def test_remember(self):
         policy = self._makeOne()
-        self.assertEqual(policy.permits(None, None, None), False)
+        self.assertEqual(policy.remember(None, None, None), [])
         
-    def test_principals_allowed_by_permission(self):
-        policy = self._makeOne('user', ('group1',))
-        self.assertEqual(policy.principals_allowed_by_permission(None, None),
-                         [])
         
+
 class TestDummyModel(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.testing import DummyModel

@@ -50,15 +50,17 @@ Per-module :mod:`repoze.bfg` API documentation.
 .. toctree::
    :maxdepth: 2
 
+   api/authentication
+   api/authorization
    api/events
    api/interfaces
+   api/location
    api/push
    api/router
    api/security
    api/template
    api/testing
    api/traversal
-   api/location
    api/url
    api/view
    api/wsgi
