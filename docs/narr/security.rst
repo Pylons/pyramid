@@ -59,7 +59,7 @@ construct your own authentication policy.  Any instance which
 implements the interface defined in
 ``repoze.bfg.interfaces.IAuthenticationPolicy`` can be used.
 
-It's common but it is also possible to change the default
+It's not common, but it is also possible to change the default
 :term:`authorization policy` (to use some other persistent
 authorization mechanism other than ACLs).  To do so, pass an object
 which implements the ``repoze.bfg.interfaces.IAuthorizationPolicy``)
