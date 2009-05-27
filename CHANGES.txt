@@ -11,6 +11,11 @@ Documentation
 Deprecated Alias Removals
 -------------------------
 
+- Remove backwards compatibility alias for
+  ``repoze.bfg.urldispatch.RoutesContext`` (deprecated since 0.6.3).
+  This must now be imported as
+  ``repoze.bfg.urldispatch.DefaultRoutesContext``.
+
 - Removed backwards compatibility aliases for
   ``repoze.bfg.router.get_options`` and ``repoze.bfg.router.Settings``
   (deprecated since 0.6.2).  These both must now be imported from

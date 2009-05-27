@@ -2,8 +2,6 @@ import re
 
 from zope.component import queryUtility
 
-from zope.deprecation import deprecated 
-
 from zope.interface import implements
 from zope.interface import alsoProvides
 from zope.interface import classProvides
@@ -25,13 +23,6 @@ class DefaultRoutesContext(object):
     implements(IRoutesContext)
     def __init__(self, **kw):
         self.__dict__.update(kw)
-
-RoutesContext = DefaultRoutesContext
-deprecated('RoutesContext',
-           "('from repoze.bfg.urldispatch import RoutesContext' is now "
-           "deprecated; instead use 'from repoze.bfg.urldispatch import "
-           "DefaultRoutesContext')",
-           )
 
 class RoutesContextNotFound(object):
     implements(IContextNotFound)
