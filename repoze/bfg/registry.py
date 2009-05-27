@@ -114,5 +114,5 @@ deprecated('registry_manager',
            '``repoze.bfg.registry`` is '
            'deprecated.  If you are trying to use the registry manager '
            'within a "debug" script of your own making, use the ``bfgshell`` '
-           'paster command instead ``registry_manager`` will disappear in '
+           'paster command instead. ``registry_manager`` will disappear in '
            'a later release of repoze.bfg')
