@@ -81,10 +81,57 @@ class GetSiteManagerTests(unittest.TestCase):
     def test_with_context(self):
         from zope.component.interfaces import ComponentLookupError
         self.assertRaises(ComponentLookupError, self._callFUT, object)
+
+class TestFakeRegistry(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.registry import FakeRegistryManager
+        return FakeRegistryManager
+
+    def _makeOne(self):
+        manager = self._getTargetClass()()
+        manager.manager = DummyThreadLocalManager({'registry':None,
+                                                   'request':None})
+        return manager
+
+    def test_push(self):
+        manager = self._makeOne()
+        result = manager.push(1)
+        self.assertEqual(manager.manager.pushed, {'registry':1,
+                                                  'request':None})
+
+    def test_pop(self):
+        manager = self._makeOne()
+        result = manager.pop()
+        self.assertEqual(manager.manager.popped, True)
+        self.assertEqual(result, None)
+
+    def test_get(self):
+        manager = self._makeOne()
+        result = manager.get()
+        self.assertEqual(result, None)
+
+    def test_clear(self):
+        manager = self._makeOne()
+        manager.clear()
+        self.assertEqual(manager.manager.cleared, True)
+        
         
 class DummyThreadLocalManager:
     def __init__(self, data):
         self.data = data
+
+    def pop(self):
+        self.popped = True
+        return self.data
+
+    def push(self, data):
+        self.pushed = data
+
+    def get(self):
+        return self.data
+
+    def clear(self):
+        self.cleared = True
         
 class DummyLock:
     def acquire(self):

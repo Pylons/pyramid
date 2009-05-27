@@ -90,21 +90,22 @@ def getSiteManager(context=None):
             raise ComponentLookupError(*error.args)
 
 class FakeRegistryManager(object):
+    manager = manager # for unit tests
     def push(self, registry):
-        return manager.push({'registry':registry, 'request':None})
+        return self.manager.push({'registry':registry, 'request':None})
 
     set = push # b/c
 
     def pop(self):
-        result = manager.pop()
+        result = self.manager.pop()
         if result:
             return result['registry']
 
     def get(self):
-        return manager.get()['registry']
+        return self.manager.get()['registry']
 
     def clear(self):
-        manager.clear()
+        self.manager.clear()
 
 # for use in scripts for backwards compatibility *only*!
 registry_manager = FakeRegistryManager() 
