@@ -8,6 +8,22 @@ Documentation
   step-by-step how to create a traversal-based ZODB application with
   authentication.
 
+Deprecation Additions
+---------------------
+
+- Added deprecations for imports of ``ACLSecurityPolicy``,
+  ``InheritingACLSecurityPolicy``, ``RemoteUserACLSecurityPolicy``,
+  ``RemoteUserInheritingACLSecurityPolicy``, ``WhoACLSecurityPolicy``,
+  and ``WhoInheritingACLSecurityPolicy`` from the
+  ``repoze.bfg.security`` module; for the meantime (for backwards
+  compatibility purposes) these live in the ``repoze.bfg.secpols``
+  module.  Note however, that the entire concept of a "security
+  policy" is deprecated in BFG in favor of separate authentication and
+  authorization policies, so any use of a security policy will
+  generate additional deprecation warnings even if you do start using
+  ``repoze.bfg.secpols``.  ``repoze.bfg.secpols`` will disappear in a
+  future release of ``repoze.bfg``.
+
 Deprecated Alias Removals
 -------------------------
 

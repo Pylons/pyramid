@@ -2,6 +2,8 @@ import warnings
 
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
+from zope.deprecation import deprecated
+
 from zope.interface import implements
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
@@ -287,3 +289,17 @@ from repoze.bfg.secpols import WhoACLSecurityPolicy
 from repoze.bfg.secpols import WhoInheritingACLSecurityPolicy
 # /BBB imports
 
+for name in ('ACLSecurityPolicy',
+             'InheritingACLSecurityPolicy',
+             'RemoteUserACLSecurityPolicy',
+             'RemoteUserInheritingACLSecurityPolicy',
+             'WhoACLSecurityPolicy',
+             'WhoInheritingACLSecurityPolicy'):
+    deprecated(name,
+               ('repoze.bfg.security.%s should be imported from '
+                'repoze.bfg.secpols.%s as of BFG 0.9.  Please consider '
+                'disusing any security policy in favor of separate '
+                'authorization and authentication policies; security '
+                'policies themselves are deprecated as of BFG 0.9; see the '
+                'Security chapter of the BFG docs for the new spellings.'%
+                (name, name)))
