@@ -1,3 +1,12 @@
+0.9a4 (2009-05-27)
+==================
+
+Bug Fixes
+---------
+
+- Try checking for an "old style" security policy *after* we parse
+  ZCML (thinko).
+
 0.9a3 (2009-05-27)
 ==================
 

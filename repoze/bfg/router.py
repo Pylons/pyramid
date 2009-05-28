@@ -331,7 +331,10 @@ def make_app(root_factory, package=None, filename='configure.zcml',
         if authorization_policy is None:
             authorization_policy = ACLAuthorizationPolicy()
         registry.registerUtility(authorization_policy, IAuthorizationPolicy)
-    else:
+
+    populateRegistry(registry, filename, package)
+
+    if not authentication_policy:
         # deal with bw compat of <= 0.8 security policies (deprecated)
         secpol = registry.queryUtility(ISecurityPolicy)
         if secpol is not None:
@@ -345,8 +348,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
                 'security policies will cease to work in a later BFG '
                 'release.')
             registerBBBAuthn(secpol, registry)
-
-    populateRegistry(registry, filename, package)
+        
     if mapper.has_routes():
         # if the user had any <route/> statements in his configuration,
         # use the RoutesRootFactory as the root factory
