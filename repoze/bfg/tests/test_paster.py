@@ -28,6 +28,21 @@ class TestBFGShellCommand(unittest.TestCase):
         self.failUnless(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
+class TestGetApp(unittest.TestCase):
+    def _callFUT(self, config_file, section_name, loadapp):
+        from repoze.bfg.paster import get_app
+        return get_app(config_file, section_name, loadapp)
+
+    def test_it(self):
+        import os
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        result = self._callFUT('/foo/bar/myapp.ini', 'myapp', loadapp)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.assertEqual(loadapp.relative_to, os.getcwd())
+        self.assertEqual(result, app)
+
 class Dummy:
     pass
 

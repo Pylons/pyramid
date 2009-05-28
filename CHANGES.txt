@@ -1,3 +1,19 @@
+Next release
+============
+
+Features
+--------
+
+- Add a ``get_app`` API functions to the ``paster`` module.  This
+  obtains a WSGI application from a config file given a config file
+  name and a section name.  See the ``repoze.bfg.paster`` API docs for
+  more information.
+
+- Add a new module named ``scripting``.  It contains a ``get_root``
+  API function, which, provided a Router instance, returns a traversal
+  root object and a "closer".  See the ``repoze.bfg.scripting`` API
+  docs for more info.
+
 0.9a4 (2009-05-27)
 ==================
 

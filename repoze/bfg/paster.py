@@ -10,6 +10,8 @@ from paste.script.command import Command
 
 from paste.util.template import paste_script_template_renderer
 
+from repoze.bfg.scripting import get_root
+
 class StarterProjectTemplate(Template):
     _template_dir = 'paster_templates/starter'
     summary = 'repoze.bfg starter project'
@@ -29,6 +31,14 @@ class AlchemyProjectTemplate(Template):
     _template_dir = 'paster_templates/alchemy'
     summary = 'repoze.bfg SQLAlchemy project using traversal'
     template_renderer = staticmethod(paste_script_template_renderer)
+
+def get_app(config_file, name, loadapp=loadapp):
+    """ Return the WSGI application named ``name`` in the PasteDeploy
+    config file ``config_file``"""
+    config_name = 'config:%s' % config_file
+    here_dir = os.getcwd()
+    app = loadapp(config_name, name=name, relative_to=here_dir)
+    return app
 
 class BFGShellCommand(Command):
     """Open an interactive shell with a repoze.bfg app loaded.
@@ -59,31 +69,19 @@ class BFGShellCommand(Command):
     group_name = 'bfg'
 
     parser = Command.standard_parser(simulate=True)
-    environ = {}
     interact = (interact,) # for testing
     loadapp = (loadapp,) # for testing
     verbose = 3
-
-    def __init__(self, name):
-        Command.__init__(self, name)
 
     def command(self):
         cprt =('Type "help" for more information. "root" is the BFG app '
                'root object.')
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
-
         config_file, section_name = self.args
-        config_name = 'config:%s' % config_file
-        here_dir = os.getcwd()
-
-        app = self.loadapp[0](config_name,
-                              name=section_name, relative_to=here_dir)
-        registry = app.registry
-        threadlocals = {'registry':registry, 'request':None}
+        app = get_app(config_file, section_name, loadapp=self.loadapp[0])
+        root, closer = get_root(app)
         try:
-            app.threadlocal_manager.push(threadlocals)
-            root = app.root_factory(self.environ)
             self.interact[0](banner, local={'root':root})
         finally:
-            app.threadlocal_manager.pop()
+            closer()
             
