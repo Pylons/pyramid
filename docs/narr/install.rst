@@ -24,13 +24,14 @@ run under Python 3.X.
 BFG is known to run properly on all popular (and even some
 less-popular) Unix-like systems such as Linux, MacOS X, and FreeBSD.
 
-At the time of this writing, ``repoze.bfg`` will run on Windows
-systems.  None of its main developers use the Windows platform
-regularly, so it is not tested on Windows as well as it is on UNIX.
-Most of the platform-specific documentation (including this chapter)
-assumes you're installing it on a UNIX system.
+``repoze.bfg`` runs on Windows systems.  However, none of its main
+developers use the Windows platform.  Therefor, most of the
+platform-specific documentation (excepting this chapter) assumes
+you're using a UNIX system. If you're using a Windows system, you'll
+need to transliterate command lines in the documentation to their
+Windows equivalents.
 
-:mod:`repoze.bfg` is known to run on Google's App Engine.  See
+:mod:`repoze.bfg` is also known to run on Google's App Engine.  See
 :ref:`appengine_tutorial`.
 
 It is not known whether :mod:`repoze.bfg` will or will not run under
@@ -150,6 +151,50 @@ virtualenv (``bfgenv``) directory:
 
 This command will take longer than the previous ones to complete, as it
 downloads and installs a number of dependencies.
+
+Installing :mod:`repoze.bfg` on a Windows System
+-------------------------------------------------
+
+#. Install, or find `Python 2.5
+   <http://python.org/download/releases/2.5.4/>`_ for your system.
+
+#. Install latest `setuptools` into the Python you
+   obtained/installed/found in the step above: download `ez_setup.py
+   <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
+   the ``python`` interpreter of your Python 2.5 installation using a
+   command prompt:
+
+   .. code-block:: bash
+
+    c:\> c:\Python25\python ez_setup.py
+
+#. Use that Python's `bin/easy_install` to install `virtualenv`:
+
+   .. code-block:: bash
+
+    c:\> c:\Python25\Scripts\easy_install virtualenv
+
+#. Use that Python's virtualenv to make a workspace:
+
+   .. code-block:: bash
+
+     c:\> c:\Python25\Scripts\virtualenv --no-site-packages bfgenv
+
+#. Switch to the ``bfgenv`` directory:
+
+   .. code-block:: bash
+
+     c:\> cd bfgenv
+
+#. (Optional) Consider using ``bin\activate.bat`` to make your shell
+   environment wired to use the virtualenv.
+
+#. Use ``easy_install`` and point to the BFG "current index to get BFG
+   and its direct dependencies installed:
+
+   .. code-block:: bash
+
+     c:\bfgenv> Scripts/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
 
 What Gets Installed
 ~~~~~~~~~~~~~~~~~~~
