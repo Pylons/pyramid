@@ -1,5 +1,5 @@
-0.9dev (unreleased)
-===================
+0.9a3 (2009-05-27)
+==================
 
 Features
 --------
@@ -15,8 +15,8 @@ Documentation
   step-by-step how to create a traversal-based ZODB application with
   authentication.
 
-Deprecation Additions
----------------------
+Deprecations
+------------
 
 - Added deprecations for imports of ``ACLSecurityPolicy``,
   ``InheritingACLSecurityPolicy``, ``RemoteUserACLSecurityPolicy``,
