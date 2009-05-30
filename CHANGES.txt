@@ -1,5 +1,11 @@
-Next release
-============
+0.9a6 (2009-05-29)
+==================
+
+Documentation
+-------------
+
+- Changed "BFG Wiki" tutorial to use AuthTktAuthenticationPolicy
+  rather than repoze.who.
 
 Features
 --------

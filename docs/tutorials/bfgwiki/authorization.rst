@@ -54,8 +54,8 @@ to it.  This view will clear the credentials of the logged in user and
 redirect back to the front page.
 
 We'll add a different file (for presentation convenience) to add login
-and logout views.  Add a file to your application in the same
-directory as ``login.py`` with the following content:
+and logout views.  Add a file named ``login.py`` to your application
+(in the same directory as ``views.py``) with the following content:
 
 .. literalinclude:: src/authorization/tutorial/login.py
    :linenos:
@@ -65,8 +65,8 @@ Changing Existing Views
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Then we need to change each opf our ``view_page``, ``edit_page`` and
-``add_page`` views to pass a "logged in" parameter into its template.
-We'll add something like this to each view body:
+``add_page`` views in ``views.py`` to pass a "logged in" parameter
+into its template.  We'll add something like this to each view body:
 
 .. code-block:: python
    :linenos:
@@ -97,7 +97,7 @@ referred to within the login view we just added to ``login.py``.
    :language: xml
 
 Change ``view.pt`` and ``edit.pt``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We'll also need to change our ``edit.pt`` and ``view.pt`` templates to
 display a "Logout" link if someone is logged in.  This link will
@@ -112,7 +112,7 @@ class="main_content">`` div:
    <span tal:condition="logged_in"><a href="${request.application_url}/logout">Logout</a></span>
 
 Changing ``configure.zcml``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Change your application's ``configure.zcml`` to add a slightly
 inscrutable ``utility`` stanza.  This configures our login view to
