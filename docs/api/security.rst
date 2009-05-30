@@ -8,9 +8,9 @@
 API Functions
 ~~~~~~~~~~~~~
 
-.. autofunction:: authenticated_userid(context, request)
+.. autofunction:: authenticated_userid
 
-.. autofunction:: effective_principals(context, request)
+.. autofunction:: effective_principals
 
 .. autofunction:: has_permission
 
