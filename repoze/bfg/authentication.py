@@ -52,7 +52,6 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
     WSGI environment).
 
     Constructor Arguments
-    ---------------------
 
     ``identifier_name``
 
@@ -131,7 +130,6 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     REMOTE_USER WSGI envvar.
 
     Constructor Arguments
-    ---------------------
 
     ``environ_key``
 
@@ -165,7 +163,6 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     auth_tkt cookie.
 
     Constructor Arguments
-    ---------------------
 
     ``secret``
 

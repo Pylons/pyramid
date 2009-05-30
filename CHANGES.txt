@@ -80,7 +80,7 @@ Deprecated Import Alias Removals
   package have been deprecated since 0.3.8.  Instead, import
   ``get_template``, ``render_template``, and
   ``render_template_to_response`` from the
-  ``repoze.bfg.chameleon_zpt``module.
+  ``repoze.bfg.chameleon_zpt`` module. 
 
 - Remove backwards compatibility import alias for
   ``repoze.bfg.traversal.split_path`` (deprecated since 0.6.5).  This
