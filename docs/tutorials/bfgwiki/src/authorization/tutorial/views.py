@@ -4,6 +4,9 @@ import re
 from webob.exc import HTTPFound
 from repoze.bfg.url import model_url
 from repoze.bfg.chameleon_zpt import render_template_to_response
+
+from repoze.bfg.security import authenticated_userid
+
 from repoze.bfg.view import static
 from repoze.bfg.view import bfg_view
 
@@ -41,7 +44,7 @@ def view_page(context, request):
     content = wikiwords.sub(check, content)
     edit_url = model_url(context, request, 'edit_page')
 
-    logged_in = 'repoze.who.identity' in request.environ
+    logged_in = authenticated_userid(context, request)
 
     return render_template_to_response('templates/view.pt',
                                        request = request,
@@ -88,15 +91,4 @@ def edit_page(context, request):
                                        save_url = model_url(context, request,
                                                             'edit_page')
                                        )
-    
-    
-@bfg_view(for_=Wiki, name='logout')
-def logout(context, request):
-    identity = request.environ.get('repoze.who.identity')
-    headers = []
-    if identity is not None:
-        auth_tkt = request.environ['repoze.who.plugins']['auth_tkt']
-        headers = auth_tkt.forget(request.environ, identity)
-    return HTTPFound(location = model_url(context, request),
-                     headers = headers)
-    
+

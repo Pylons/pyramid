@@ -15,7 +15,6 @@ requires = [
     'ZODB3',
     'repoze.zodbconn',
     'repoze.tm',
-    'repoze.who',
     ]
 
 setup(name='tutorial',

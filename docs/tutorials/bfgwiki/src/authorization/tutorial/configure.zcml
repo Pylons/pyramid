@@ -5,4 +5,7 @@
 
   <scan package="."/>
 
+   <utility provides="repoze.bfg.interfaces.IForbiddenResponseFactory"
+            component=".login.login"/>
+
 </configure>
