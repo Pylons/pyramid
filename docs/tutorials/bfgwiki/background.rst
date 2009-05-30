@@ -11,6 +11,6 @@ that the tutorial is taught "live" under some circumstances.  When it
 mentions use of a CD, there are alternate instructions which follow
 for people who do not have the CD.
 
-This tutorial is known to work under :mod:`repoze.bfg` version 0.9a6.
+This tutorial is known to work under :mod:`repoze.bfg` version 0.9a7.
 
 Have fun!
