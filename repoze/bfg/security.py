@@ -1,5 +1,3 @@
-import warnings
-
 from zope.component import queryMultiAdapter
 from zope.component import queryUtility
 from zope.deprecation import deprecated
@@ -45,64 +43,30 @@ def has_permission(permission, context, request):
     if authz_policy is None:
         raise ValueError('Authentication policy registered without '
                          'authorization policy') # should never happen
-    principals = authn_policy.effective_principals(context, request)
+    principals = authn_policy.effective_principals(request)
     return authz_policy.permits(context, principals, permission)
 
-def authenticated_userid(*args):
+def authenticated_userid(request):
     """ Return the userid of the currently authenticated user or
     ``None`` if there is no authentication policy in effect or there
     is no currently authenticated user. """
 
-    largs = len(args)
-    if largs > 2:
-        raise TypeError(args)
-    if largs == 1:
-        request = args[0]
-        context = None
-        warnings.warn(
-            'As of BFG 0.9, the "repoze.bfg.security.authenticated_userid" '
-            'API now takes two arguments: "context" and "request". '
-            'It is being called it with a single argument'
-            '(assumed to be a request).   In a future version, the '
-            '"authenticated_userid API will stop accepting calls with a '
-            'single argument; please fix the calling code.',
-            stacklevel=2)
-    else:
-        context, request = args
-        
     policy = queryUtility(IAuthenticationPolicy)
     if policy is None:
         return None
-    return policy.authenticated_userid(context, request)
+    return policy.authenticated_userid(request)
 
-def effective_principals(*args):
+def effective_principals(request):
     """ Return the list of 'effective' principal identifiers for the
     request.  This will include the userid of the currently
     authenticated user if a user is currently authenticated. If no
     authentication policy is in effect, this will return an empty
     sequence."""
 
-    largs = len(args)
-    if largs > 2:
-        raise TypeError(args)
-    if largs == 1:
-        request = args[0]
-        context = None
-        warnings.warn(
-            'As of BFG 0.9, the "repoze.bfg.security.effective_principals " '
-            'API now takes two arguments: "context" and "request". '
-            'It is being called it with a single argument'
-            '(assumed to be a request).   In a future version, the '
-            '"effective_principals API will stop accepting calls with a '
-            'single argument; please fix the calling code.',
-            stacklevel=2)
-    else:
-        context, request = args
-        
     policy = queryUtility(IAuthenticationPolicy)
     if policy is None:
         return []
-    return policy.effective_principals(context, request)
+    return policy.effective_principals(request)
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a context (a model object), and a permission (a
@@ -138,7 +102,7 @@ def view_execution_permitted(context, request, name=''):
             (name, context))
     return result
 
-def remember(context, request, principal, **kw):
+def remember(request, principal, **kw):
     """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
     'foo=abc')]``) suitable for 'remembering' a set of credentials
     implied by the data passed as ``principal`` and ``*kw`` using the
@@ -160,9 +124,9 @@ def remember(context, request, principal, **kw):
     if policy is None:
         return []
     else:
-        return policy.remember(context, request, principal, **kw)
+        return policy.remember(request, principal, **kw)
 
-def forget(context, request):
+def forget(request):
     """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
     'foo=abc')]``) suitable for 'forgetting' the set of credentials
     possessed by the currently authenticated user.  A common usage
@@ -181,7 +145,7 @@ def forget(context, request):
     if policy is None:
         return []
     else:
-        return policy.forget(context, request)
+        return policy.forget(request)
     
 class PermitsResult(int):
     def __new__(cls, s, *args):

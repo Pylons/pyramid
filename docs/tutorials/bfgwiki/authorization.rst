@@ -71,7 +71,7 @@ into its template.  We'll add something like this to each view body:
 .. code-block:: python
    :linenos:
 
-   logged_in = authenticated_user(context, request)
+   logged_in = authenticated_user(request)
 
 We'll then change the return value of ``render_template_to_response``
 to pass the `resulting `logged_in`` value to the template, e.g.:

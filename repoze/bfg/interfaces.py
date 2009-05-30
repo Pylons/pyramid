@@ -213,23 +213,23 @@ class IRoutesContextFactory(Interface):
 
 class IAuthenticationPolicy(Interface):
     """ An object representing a BFG authentication policy. """
-    def authenticated_userid(context, request):
+    def authenticated_userid(request):
         """ Return the authenticated userid or ``None`` if no
         authenticated userid can be found. """
 
-    def effective_principals(context, request):
+    def effective_principals(request):
         """ Return a sequence representing the effective principals
         including the userid and any groups belonged to by the current
         user, including 'system' groups such as Everyone and
         Authenticated. """
 
-    def remember(context, request, principal, **kw):
+    def remember(request, principal, **kw):
         """ Return a set of headers suitable for 'remembering' the
         principal named ``principal`` when set in a response.  An
         individual authentication policy and its consumers can decide
         on the composition and meaning of **kw. """
     
-    def forget(context, request):
+    def forget(request):
         """ Return a set of headers suitable for 'forgetting' the
         current user on subsequent requests. """
 

@@ -230,21 +230,19 @@ class TestAuthenticatedUserId(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, *arg):
+    def _callFUT(self, request):
         from repoze.bfg.security import authenticated_userid
-        return authenticated_userid(*arg)
+        return authenticated_userid(request)
 
     def test_no_authentication_policy(self):
-        context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request)
+        result = self._callFUT(request)
         self.assertEqual(result, None)
 
     def test_with_authentication_policy(self):
         _registerAuthenticationPolicy('yo')
-        context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request)
+        result = self._callFUT(request)
         self.assertEqual(result, 'yo')
 
 class TestEffectivePrincipals(unittest.TestCase):
@@ -254,21 +252,19 @@ class TestEffectivePrincipals(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, *arg):
+    def _callFUT(self, request):
         from repoze.bfg.security import effective_principals
-        return effective_principals(*arg)
+        return effective_principals(request)
 
     def test_no_authentication_policy(self):
-        context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request)
+        result = self._callFUT(request)
         self.assertEqual(result, [])
 
     def test_with_authentication_policy(self):
         _registerAuthenticationPolicy('yo')
-        context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request)
+        result = self._callFUT(request)
         self.assertEqual(result, 'yo')
 
 class TestPrincipalsAllowedByPermission(unittest.TestCase):
@@ -308,14 +304,13 @@ class TestRemember(unittest.TestCase):
     def test_no_authentication_policy(self):
         context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request, 'me')
+        result = self._callFUT(request, 'me')
         self.assertEqual(result, [])
 
     def test_with_authentication_policy(self):
         _registerAuthenticationPolicy('yo')
-        context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request, 'me')
+        result = self._callFUT(request, 'me')
         self.assertEqual(result, 'yo')
 
 class TestForget(unittest.TestCase):
@@ -330,16 +325,14 @@ class TestForget(unittest.TestCase):
         return forget(*arg)
 
     def test_no_authentication_policy(self):
-        context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request)
+        result = self._callFUT(request)
         self.assertEqual(result, [])
 
     def test_with_authentication_policy(self):
         _registerAuthenticationPolicy('yo')
-        context = DummyContext()
         request = DummyRequest({})
-        result = self._callFUT(context, request)
+        result = self._callFUT(request)
         self.assertEqual(result, 'yo')
 
 class DummyContext:
@@ -354,16 +347,16 @@ class DummyAuthenticationPolicy:
     def __init__(self, result):
         self.result = result
 
-    def effective_principals(self, context, request):
+    def effective_principals(self, request):
         return self.result
 
-    def authenticated_userid(self, context, request):
+    def authenticated_userid(self, request):
         return self.result
 
-    def remember(self, context, request, principal, **kw):
+    def remember(self, request, principal, **kw):
         return self.result
 
-    def forget(self, context, request):
+    def forget(self, request):
         return self.result
 
 class DummyAuthorizationPolicy:

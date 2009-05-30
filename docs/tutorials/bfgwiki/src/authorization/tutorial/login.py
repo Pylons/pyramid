@@ -1,10 +1,11 @@
 from webob.exc import HTTPFound
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.security import remember
-from repoze.bfg.security import forget
 from repoze.bfg.view import bfg_view
 from repoze.bfg.url import model_url
+
+from repoze.bfg.security import remember
+from repoze.bfg.security import forget
 
 from tutorial.models import Wiki
 from tutorial.run import USERS
@@ -20,7 +21,7 @@ def login(context, request):
         login = request.params['login']
         password = request.params['password']
         if USERS.get(login) == password:
-            headers = remember(context, request, login)
+            headers = remember(request, login)
             return HTTPFound(location = came_from,
                              headers = headers)
         message = 'Failed login'
@@ -37,7 +38,7 @@ def login(context, request):
     
 @bfg_view(for_=Wiki, name='logout')
 def logout(context, request):
-    headers = forget(context, request)
+    headers = forget(request)
     return HTTPFound(location = model_url(context, request),
                      headers = headers)
     

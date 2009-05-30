@@ -446,16 +446,16 @@ class SecurityPolicyToAuthenticationPolicyAdapter(object):
     def __init__(self, secpol):
         self.secpol = secpol
         
-    def authenticated_userid(self, context, request):
+    def authenticated_userid(self, request):
         return self.secpol.authenticated_userid(request)
 
-    def effective_principals(self, context, request):
+    def effective_principals(self, request):
         return self.secpol.effective_principals(request)
 
-    def remember(self, context, request, principal, **kw):
+    def remember(self, request, principal, **kw):
         return []
     
-    def forget(self, context, request):
+    def forget(self, request):
         return []
 
 def registerBBBAuthn(secpol, registry):

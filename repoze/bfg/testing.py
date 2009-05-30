@@ -5,7 +5,7 @@ from zope.interface import implements
 
 from repoze.bfg.interfaces import IRequest
 
-_marker = []
+_marker = object()
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     """ Registers a dummy ``repoze.bfg`` security policy (actually, a
@@ -36,8 +36,19 @@ def registerModels(models):
     value will be returned to ``find_model`` (and thus to your code)
     when ``find_model`` is called with an equivalent path string or
     tuple."""
-    traverser = make_traverser_factory(models)
-    registerTraverserFactory(traverser)
+    class DummyTraverserFactory:
+        def __init__(self, context):
+            self.context = context
+
+        def __call__(self, environ):
+            path = environ['PATH_INFO']
+            ob = models[path]
+            from repoze.bfg.traversal import traversal_path
+            traversed = list(traversal_path(path))
+            return {'context':ob, 'view_name':'','subpath':[],
+                    'traversed':traversed, 'vroot':ob, 'vroot_path':[]}
+
+    registerTraverserFactory(DummyTraverserFactory)
     return models
 
 def registerEventListener(event_iface=Interface):
@@ -176,10 +187,10 @@ class DummySecurityPolicy:
         self.groupids = groupids
         self.permissive = permissive
 
-    def authenticated_userid(self, context, request):
+    def authenticated_userid(self, request):
         return self.userid
 
-    def effective_principals(self, context, request):
+    def effective_principals(self, request):
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
         effective_principals = [Everyone]
@@ -189,32 +200,17 @@ class DummySecurityPolicy:
             effective_principals.extend(self.groupids)
         return effective_principals
 
-    def remember(self, context, request, principal, **kw):
+    def remember(self, request, principal, **kw):
         return []
 
-    def forget(self, context, request):
+    def forget(self, request):
         return []
 
     def permits(self, context, principals, permission):
         return self.permissive
 
     def principals_allowed_by_permission(self, context, permission):
-        return self.effective_principals(None, None)
-
-def make_traverser_factory(root):
-    class DummyTraverserFactory:
-        def __init__(self, context):
-            self.context = context
-
-        def __call__(self, environ):
-            path = environ['PATH_INFO']
-            ob = root[path]
-            from repoze.bfg.traversal import traversal_path
-            traversed = list(traversal_path(path))
-            return {'context':ob, 'view_name':'','subpath':[],
-                    'traversed':traversed, 'vroot':ob, 'vroot_path':[]}
-
-    return DummyTraverserFactory
+        return self.effective_principals(None)
 
 class DummyTemplateRenderer:
     """

@@ -1,17 +1,9 @@
 from codecs import utf_8_decode
 from codecs import utf_8_encode
-import crypt
-import os
-import stat
-import StringIO
-import time
-import traceback
-
 from paste.request import get_cookies
 from paste.auth import auth_tkt
 
 from zope.interface import implements
-from zope.component import queryUtility
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.security import Everyone
@@ -19,7 +11,7 @@ from repoze.bfg.security import Authenticated
 
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """
-    def authenticated_userid(self, context, request):
+    def authenticated_userid(self, request):
         userid = self._get_userid(request)
         if userid is None:
             return None
@@ -28,7 +20,7 @@ class CallbackAuthenticationPolicy(object):
         if self.callback(userid) is not None: # is not None!
             return userid
 
-    def effective_principals(self, context, request):
+    def effective_principals(self, request):
         effective_principals = [Everyone]
         userid = self._get_userid(request)
         if userid is None:
@@ -83,7 +75,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         identifier = plugins[self.identifier_name]
         return identifier
 
-    def authenticated_userid(self, context, request):
+    def authenticated_userid(self, request):
         identity = self._get_identity(request)
         if identity is None:
             return None
@@ -92,7 +84,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         if self.callback(identity) is not None: # is not None!
             return identity['repoze.who.userid']
 
-    def effective_principals(self, context, request):
+    def effective_principals(self, request):
         effective_principals = [Everyone]
         identity = self._get_identity(request)
         if identity is None:
@@ -110,7 +102,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
         return effective_principals
 
-    def remember(self, context, request, principal, **kw):
+    def remember(self, request, principal, **kw):
         identifier = self._get_identifier(request)
         if identifier is None:
             return []
@@ -118,7 +110,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         identity = {'repoze.who.userid':principal}
         return identifier.remember(environ, identity)
 
-    def forget(self, context, request):
+    def forget(self, request):
         identifier = self._get_identifier(request)
         if identifier is None:
             return []
@@ -152,10 +144,10 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
     def _get_userid(self, request):
         return request.environ.get(self.environ_key)
 
-    def remember(self, context, request, principal, **kw):
+    def remember(self, request, principal, **kw):
         return []
 
-    def forget(self, context, request):
+    def forget(self, request):
         return []
 
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
@@ -212,10 +204,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         if result:
             return result['userid']
 
-    def remember(self, context, request, principal, **kw):
+    def remember(self, request, principal, **kw):
         return self.cookie.remember(request, principal)
 
-    def forget(self, context, request):
+    def forget(self, request):
         return self.cookie.forget(request)
         
 class AuthTktCookieHelper(object):

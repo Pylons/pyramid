@@ -222,19 +222,19 @@ class TestDummySecurityPolicy(unittest.TestCase):
 
     def test_authenticated_userid(self):
         policy = self._makeOne('user')
-        self.assertEqual(policy.authenticated_userid(None, None), 'user')
+        self.assertEqual(policy.authenticated_userid(None), 'user')
         
     def test_effective_principals_userid(self):
         policy = self._makeOne('user', ('group1',))
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
-        self.assertEqual(policy.effective_principals(None, None),
+        self.assertEqual(policy.effective_principals(None),
                          [Everyone, Authenticated, 'user', 'group1'])
 
     def test_effective_principals_nouserid(self):
         policy = self._makeOne()
         from repoze.bfg.security import Everyone
-        self.assertEqual(policy.effective_principals(None, None), [Everyone])
+        self.assertEqual(policy.effective_principals(None), [Everyone])
 
     def test_permits(self):
         policy = self._makeOne()
@@ -249,11 +249,11 @@ class TestDummySecurityPolicy(unittest.TestCase):
 
     def test_forget(self):
         policy = self._makeOne()
-        self.assertEqual(policy.forget(None, None), [])
+        self.assertEqual(policy.forget(None), [])
         
     def test_remember(self):
         policy = self._makeOne()
-        self.assertEqual(policy.remember(None, None, None), [])
+        self.assertEqual(policy.remember(None, None), [])
         
         
 

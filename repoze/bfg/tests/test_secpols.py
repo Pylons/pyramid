@@ -13,19 +13,6 @@ class TestAPIFunctionsSecpolBBB(unittest.TestCase):
         except KeyError:
             pass
 
-    def _testWithWarnings(self, f, *args, **kw):
-        messages = []
-        def showwarning(message, category, filename, lineno, file=None):
-            messages.append(message)
-        try:
-            import warnings
-            _old_showwarning = warnings.showwarning
-            warnings.showwarning = showwarning
-            result = f(*args, **kw)
-            return result, messages
-        finally:
-            warnings.showwarning = _old_showwarning
-
     def _registerSecurityPolicy(self, secpol):
         import zope.component
         from repoze.bfg.secpols import registerBBBAuthn
@@ -49,43 +36,28 @@ class TestAPIFunctionsSecpolBBB(unittest.TestCase):
         self._registerSecurityPolicy(secpol)
         from repoze.bfg.security import authenticated_userid
         request = DummyRequest({})
-        result, warnings = self._testWithWarnings(authenticated_userid,
-                                                  request)
+        result = authenticated_userid(request)
         self.assertEqual(result, 'fred')
-        self.assertEqual(len(warnings), 1)
         
     def test_authenticated_userid_not_registered(self):
         from repoze.bfg.security import authenticated_userid
         request = DummyRequest({})
-        result, warnings = self._testWithWarnings(authenticated_userid,
-                                                  request)
+        result = authenticated_userid(request)
         self.assertEqual(result, None)
-        self.assertEqual(len(warnings), 1)
-
-    def test_authenticated_userid_too_many_args(self):
-        from repoze.bfg.security import authenticated_userid
-        self.assertRaises(TypeError, authenticated_userid, None, None, None)
 
     def test_effective_principals_registered(self):
         secpol = DummySecurityPolicy(False)
         self._registerSecurityPolicy(secpol)
         from repoze.bfg.security import effective_principals
         request = DummyRequest({})
-        result, warnings = self._testWithWarnings(effective_principals, request)
+        result = effective_principals(request)
         self.assertEqual(result, ['fred', 'bob'])
-        self.assertEqual(len(warnings), 1)
         
     def test_effective_principals_not_registered(self):
         from repoze.bfg.security import effective_principals
         request = DummyRequest({})
-        result, warnings = self._testWithWarnings(effective_principals, request)
+        result  = effective_principals(request)
         self.assertEqual(result, [])
-        self.assertEqual(len(warnings), 1)
-
-    def test_effective_principals_too_many_args(self):
-        from repoze.bfg.security import effective_principals
-        self.assertRaises(TypeError, effective_principals, None, None, None)
-
 
     def test_principals_allowed_by_permission_not_registered(self):
         from repoze.bfg.security import principals_allowed_by_permission
@@ -665,25 +637,25 @@ class TestSecurityPolicyToAuthenticationPolicyAdapter(unittest.TestCase):
     def test_authenticated_userid(self):
         secpol = DummySecurityPolicy(None)
         adapter = self._makeOne(secpol)
-        result = adapter.authenticated_userid(None, None)
+        result = adapter.authenticated_userid(None)
         self.assertEqual(result, 'fred')
         
     def test_effective_principals(self):
         secpol = DummySecurityPolicy(None)
         adapter = self._makeOne(secpol)
-        result = adapter.effective_principals(None, None)
+        result = adapter.effective_principals(None)
         self.assertEqual(result, ['fred', 'bob'])
 
     def test_remember(self):
         secpol = DummySecurityPolicy(None)
         adapter = self._makeOne(secpol)
-        result = adapter.remember(None, None, None)
+        result = adapter.remember(None, None)
         self.assertEqual(result, [])
 
     def test_forget(self):
         secpol = DummySecurityPolicy(None)
         adapter = self._makeOne(secpol)
-        result = adapter.forget(None, None)
+        result = adapter.forget(None)
         self.assertEqual(result, [])
 
 class TestSecurityPolicyToAuthorizationPolicyAdapter(unittest.TestCase):

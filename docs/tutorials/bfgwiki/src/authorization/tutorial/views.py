@@ -44,7 +44,7 @@ def view_page(context, request):
     content = wikiwords.sub(check, content)
     edit_url = model_url(context, request, 'edit_page')
 
-    logged_in = authenticated_userid(context, request)
+    logged_in = authenticated_userid(request)
 
     return render_template_to_response('templates/view.pt',
                                        request = request,

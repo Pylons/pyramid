@@ -19,114 +19,100 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         verifyObject(IAuthenticationPolicy, self._makeOne())
 
     def test_authenticated_userid_None(self):
-        context = DummyContext()
         request = DummyRequest({})
         policy = self._makeOne()
-        self.assertEqual(policy.authenticated_userid(context, request), None)
+        self.assertEqual(policy.authenticated_userid(request), None)
         
     def test_authenticated_userid(self):
-        context = DummyContext()
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
         policy = self._makeOne()
-        self.assertEqual(policy.authenticated_userid(context, request), 'fred')
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_authenticated_userid_with_callback_returns_None(self):
-        context = DummyContext()
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
         def callback(identity):
             return None
         policy = self._makeOne(callback=callback)
-        self.assertEqual(policy.authenticated_userid(context, request), None)
+        self.assertEqual(policy.authenticated_userid(request), None)
 
     def test_authenticated_userid_with_callback_returns_something(self):
-        context = DummyContext()
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
         def callback(identity):
             return ['agroup']
         policy = self._makeOne(callback=callback)
-        self.assertEqual(policy.authenticated_userid(context, request), 'fred')
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_None(self):
         from repoze.bfg.security import Everyone
-        context = DummyContext()
         request = DummyRequest({})
         policy = self._makeOne()
-        self.assertEqual(policy.effective_principals(context, request),
-                         [Everyone])
+        self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_userid_only(self):
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
-        context = DummyContext()
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
         policy = self._makeOne()
-        self.assertEqual(policy.effective_principals(context, request),
+        self.assertEqual(policy.effective_principals(request),
                          [Everyone, Authenticated, 'fred'])
 
     def test_effective_principals_userid_and_groups(self):
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
-        context = DummyContext()
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred',
                                     'groups':['quux', 'biz']}})
         def callback(identity):
             return identity['groups']
         policy = self._makeOne(callback=callback)
-        self.assertEqual(policy.effective_principals(context, request),
+        self.assertEqual(policy.effective_principals(request),
                          [Everyone, Authenticated, 'fred', 'quux', 'biz'])
 
     def test_effective_principals_userid_callback_returns_None(self):
         from repoze.bfg.security import Everyone
-        context = DummyContext()
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred',
                                     'groups':['quux', 'biz']}})
         def callback(identity):
             return None
         policy = self._makeOne(callback=callback)
-        self.assertEqual(policy.effective_principals(context, request),
-                         [Everyone])
+        self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_remember_no_plugins(self):
-        context = DummyContext()
         authtkt = DummyWhoPlugin()
         request = DummyRequest({})
         policy = self._makeOne()
-        result = policy.remember(context, request, 'fred')
+        result = policy.remember(request, 'fred')
         self.assertEqual(result, [])
 
     def test_remember(self):
-        context = DummyContext()
         authtkt = DummyWhoPlugin()
         request = DummyRequest(
             {'repoze.who.plugins':{'auth_tkt':authtkt}})
         policy = self._makeOne()
-        result = policy.remember(context, request, 'fred')
+        result = policy.remember(request, 'fred')
         self.assertEqual(result[0], request.environ)
         self.assertEqual(result[1], {'repoze.who.userid':'fred'})
         
     def test_forget_no_plugins(self):
-        context = DummyContext()
         authtkt = DummyWhoPlugin()
         request = DummyRequest({})
         policy = self._makeOne()
-        result = policy.forget(context, request)
+        result = policy.forget(request)
         self.assertEqual(result, [])
 
     def test_forget(self):
-        context = DummyContext()
         authtkt = DummyWhoPlugin()
         request = DummyRequest(
             {'repoze.who.plugins':{'auth_tkt':authtkt},
              'repoze.who.identity':{'repoze.who.userid':'fred'},
              })
         policy = self._makeOne()
-        result = policy.forget(context, request)
+        result = policy.forget(request)
         self.assertEqual(result[0], request.environ)
         self.assertEqual(result[1], request.environ['repoze.who.identity'])
 
@@ -149,48 +135,41 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         verifyObject(IAuthenticationPolicy, self._makeOne())
 
     def test_authenticated_userid_None(self):
-        context = DummyContext()
         request = DummyRequest({})
         policy = self._makeOne()
-        self.assertEqual(policy.authenticated_userid(context, request), None)
+        self.assertEqual(policy.authenticated_userid(request), None)
         
     def test_authenticated_userid(self):
-        context = DummyContext()
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
-        self.assertEqual(policy.authenticated_userid(context, request), 'fred')
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_None(self):
         from repoze.bfg.security import Everyone
-        context = DummyContext()
         request = DummyRequest({})
         policy = self._makeOne()
-        self.assertEqual(policy.effective_principals(context, request),
-                         [Everyone])
+        self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
-        context = DummyContext()
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
-        self.assertEqual(policy.effective_principals(context, request),
+        self.assertEqual(policy.effective_principals(request),
                          [Everyone, Authenticated, 'fred'])
 
     def test_remember(self):
-        context = DummyContext()
         authtkt = DummyWhoPlugin()
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
-        result = policy.remember(context, request, 'fred')
+        result = policy.remember(request, 'fred')
         self.assertEqual(result, [])
         
     def test_forget(self):
-        context = DummyContext()
         authtkt = DummyWhoPlugin()
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
-        result = policy.forget(context, request)
+        result = policy.forget(request)
         self.assertEqual(result, [])
 
 class TestAutkTktAuthenticationPolicy(unittest.TestCase):
@@ -214,68 +193,58 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
 
     def test_authenticated_userid_no_cookie_identity(self):
-        context = DummyContext()
         request = DummyRequest({})
         policy = self._makeOne(None, None)
-        self.assertEqual(policy.authenticated_userid(context, request), None)
+        self.assertEqual(policy.authenticated_userid(request), None)
         
     def test_authenticated_userid_callback_returns_None(self):
-        context = DummyContext()
         request = DummyRequest({})
         def callback(userid):
             return None
         policy = self._makeOne(callback, {'userid':'fred'})
-        self.assertEqual(policy.authenticated_userid(context, request), None)
+        self.assertEqual(policy.authenticated_userid(request), None)
 
     def test_authenticated_userid(self):
-        context = DummyContext()
         request = DummyRequest({})
         def callback(userid):
             return True
         policy = self._makeOne(callback, {'userid':'fred'})
-        self.assertEqual(policy.authenticated_userid(context, request), 'fred')
+        self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_no_cookie_identity(self):
         from repoze.bfg.security import Everyone
-        context = DummyContext()
         request = DummyRequest({})
         policy = self._makeOne(None, None)
-        self.assertEqual(policy.effective_principals(context, request),
-                         [Everyone])
+        self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_callback_returns_None(self):
         from repoze.bfg.security import Everyone
-        context = DummyContext()
         request = DummyRequest({})
         def callback(userid):
             return None
         policy = self._makeOne(callback, {'userid':'fred'})
-        self.assertEqual(policy.effective_principals(context, request),
-                         [Everyone])
+        self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
-        context = DummyContext()
         request = DummyRequest({})
         def callback(userid):
             return ['group.foo']
         policy = self._makeOne(callback, {'userid':'fred'})
-        self.assertEqual(policy.effective_principals(context, request),
+        self.assertEqual(policy.effective_principals(request),
                              [Everyone, Authenticated, 'fred', 'group.foo'])
 
     def test_remember(self):
-        context = DummyContext()
         request = DummyRequest({})
         policy = self._makeOne(None, None)
-        result = policy.remember(context, request, 'fred')
+        result = policy.remember(request, 'fred')
         self.assertEqual(result, [])
         
     def test_forget(self):
-        context = DummyContext()
         request = DummyRequest({})
         policy = self._makeOne(None, None)
-        result = policy.forget(context, request)
+        result = policy.forget(request)
         self.assertEqual(result, [])
 
 class TestAuthTktCookieHelper(unittest.TestCase):
