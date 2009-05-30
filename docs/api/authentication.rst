@@ -8,7 +8,9 @@
 Authentication Policies
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: RepozeWho1AuthenticationPolicy
+.. autoclass:: AuthTktAuthenticationPolicy
 
 .. autoclass:: RemoteUserAuthenticationPolicy
+
+.. autoclass:: RepozeWho1AuthenticationPolicy
 

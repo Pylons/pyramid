@@ -1,3 +1,20 @@
+Next release
+============
+
+Features
+--------
+
+- Add an AuthTktAuthenticationPolicy.  This policy retrieves
+  credentials from an auth_tkt cookie managed by the application
+  itself (instead of relying on an upstream data source for
+  authentication data).  See the Security API chapter of the
+  documentation for more info.
+
+- Allow RemoteUserAuthenticationPolicy and
+  RepozeWho1AuthenticationPolicy to accept various constructor
+  arguments.  See the Security API chapter of the documentation for
+  more info.
+
 0.9a5 (2009-05-28)
 ==================
 

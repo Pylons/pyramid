@@ -212,7 +212,7 @@ class IRoutesContextFactory(Interface):
     """
 
 class IAuthenticationPolicy(Interface):
-    """ A multi-adapter on context and request """
+    """ An object representing a BFG authentication policy. """
     def authenticated_userid(context, request):
         """ Return the authenticated userid or ``None`` if no
         authenticated userid can be found. """
