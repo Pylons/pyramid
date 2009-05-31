@@ -415,6 +415,34 @@ class TestConnectRouteFunction(unittest.TestCase):
                           'conditions':{'method':'GET'}
                           })
 
+    def test_request_type(self):
+        mapper = self._registerRoutesMapper()
+        directive = DummyRouteDirective(static=True, explicit=True,
+                                        request_type='GET')
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][1],
+                         {'requirements': {},
+                          '_static':True,
+                          '_explicit':True,
+                          'conditions':{'method':'GET'}
+                          })
+
+    def test_condition_method_and_request_type(self):
+        mapper = self._registerRoutesMapper()
+        directive = DummyRouteDirective(static=True, explicit=True,
+                                        request_type='GET',
+                                        condition_method='POST')
+        self._callFUT(directive)
+        self.assertEqual(len(mapper.connections), 1)
+        self.assertEqual(mapper.connections[0][1],
+                         {'requirements': {},
+                          '_static':True,
+                          '_explicit':True,
+                          'conditions':{'method':'POST'}
+                          })
+
+
     def test_subdomains(self):
         mapper = self._registerRoutesMapper()
         directive = DummyRouteDirective(name='name',
@@ -693,6 +721,7 @@ class DummyRouteDirective:
     parent_member_name = None
     parent_collection_name = None
     condition_method = None
+    request_type = None
     condition_subdomain = None
     condition_function = None
     subdomains = None

@@ -10,6 +10,10 @@ Features
   the respective interface type imported from
   ``repoze.bfg.interfaces``.
 
+- The ``route`` ZCML directive now accepts ``request_type`` as an
+  alias for its ``condition_method`` argument for symmetry with the
+  ``view`` directive.
+
 Removals
 --------
 

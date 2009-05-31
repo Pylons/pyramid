@@ -122,10 +122,17 @@ filter
   A Python dotted-path name to a Routes `filter function
   <http://routes.groovie.org/manual.html#filter-functions>`_.
 
-condition_method
+request_type
 
   The name of the HTTP method used as the Routes `condition method
-  <http://routes.groovie.org/manual.html#conditions>`_.
+  <http://routes.groovie.org/manual.html#conditions>`_.  A string,
+  e.g. ``GET`` or ``POST``.  Note that :term:`interface` references
+  don't work here as they do in the ``view`` decorator or ``bfg_view``
+  ZCML directive.  Only strings representing an HTTP method will work.
+
+condition_method
+
+  An alias for the ``request_type`` attribute.
 
 condition_subdomain
 

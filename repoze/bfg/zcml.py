@@ -219,6 +219,7 @@ class IRouteDirective(Interface):
     absolute = Bool(title=u'absolute', required=False)
     member_name = TextLine(title=u'member_name', required=False)
     collection_name = TextLine(title=u'collection_name', required=False)
+    request_type = TextLine(title=u'request_type', required=False)
     condition_method = TextLine(title=u'condition_method', required=False)
     condition_subdomain = TextLine(title=u'condition_subdomain', required=False)
     condition_function = GlobalObject(title=u'condition_function',
@@ -258,6 +259,11 @@ def connect_route(directive):
                 'collection_name':directive.parent_collection_name,
                 }
     conditions = {}
+
+    # request_type and condition_method are aliases; condition_method
+    # "wins"
+    if directive.request_type:
+        conditions['method'] = directive.request_type
     if directive.condition_method:
         conditions['method'] = directive.condition_method
     if directive.condition_subdomain:
@@ -288,6 +294,7 @@ class Route(zope.configuration.config.GroupingContextDecorator):
     member_name = None
     collection_name = None
     condition_method = None
+    request_type = None
     condition_subdomain = None
     condition_function = None
     parent_member_name = None
@@ -320,9 +327,11 @@ class Route(zope.configuration.config.GroupingContextDecorator):
         view(self.context, self.permission, IRoutesContext, self.view,
              self.name, None)
 
+        method = self.condition_method or self.request_type
+
         self.context.action(
             discriminator = ('route', self.path, repr(self.requirements),
-                             self.condition_method, self.condition_subdomain,
+                             method, self.condition_subdomain,
                              self.condition_function, self.subdomains),
             callable = connect_route,
             args = (self,),
