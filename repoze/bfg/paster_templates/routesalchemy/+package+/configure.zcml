@@ -9,7 +9,6 @@
   <route path=""
     name="home"
     view=".views.my_view"
-    factory=".models.get_root_model"
     />
 
   <route path="static/*subpath"

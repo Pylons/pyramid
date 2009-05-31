@@ -19,11 +19,6 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
 metadata = MetaData()
 
-def get_root_model(**kw):
-    session = DBSession()
-    root = session.query(Model).filter(Model.name==u'root').first()
-    return root
-
 class Model(object):
     def __init__(self, name=''):
         self.name = name
