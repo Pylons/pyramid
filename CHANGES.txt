@@ -18,9 +18,9 @@ Features
 Deprecations
 ------------
 
-- The ``repoze.bfg.interfaces.IUnauthorizedAppFactory`` interface has
-  been deprecated in favor of using the new
-  ``repoze.bfg.interfaces.IForbiddenResponseFactory`` mechanism.
+- The ``repoze.bfg.interfaces.INotFoundAppFactory`` interface has been
+  deprecated in favor of using the new
+  ``repoze.bfg.interfaces.INotFoundView`` mechanism.
 
 Renames
 -------
