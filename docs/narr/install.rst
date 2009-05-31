@@ -29,10 +29,8 @@ developers use the Windows platform.  Therefor, most of the
 platform-specific documentation (excepting this chapter) assumes
 you're using a UNIX system. If you're using a Windows system, you'll
 need to transliterate command lines in the documentation to their
-Windows equivalents.
-
-:mod:`repoze.bfg` is also known to run on Google's App Engine.  See
-:ref:`appengine_tutorial`.
+Windows equivalents.  :mod:`repoze.bfg` is also known to run on
+Google's App Engine.
 
 It is not known whether :mod:`repoze.bfg` will or will not run under
 Jython or IronPython.
@@ -195,6 +193,12 @@ Installing :mod:`repoze.bfg` on a Windows System
    .. code-block:: bash
 
      c:\bfgenv> Scripts/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
+
+Installing :mod:`repoze.bfg` on Google App Engine
+-------------------------------------------------
+
+:ref:`appengine_tutorial` documents the steps required to install a
+:mod:`repoze.bfg` application on Google App Engine.
 
 What Gets Installed
 ~~~~~~~~~~~~~~~~~~~
