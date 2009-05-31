@@ -1,3 +1,9 @@
+Next release
+============
+
+- Renamed ``repoze.bfg.interfaces.IForbiddenResponseFactory`` to
+  ``repoze.bfg.interfaces.IForbiddenView``.
+
 0.9a7 (2009-05-30)
 ==================
 

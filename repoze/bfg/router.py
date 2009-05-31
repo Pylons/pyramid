@@ -23,7 +23,7 @@ from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import IForbiddenResponseFactory
+from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import IUnauthorizedAppFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
@@ -78,20 +78,19 @@ class Router(object):
                 'Instead of registering a utility against the '
                 'repoze.bfg.interfaces.IUnauthorizedAppFactory interface '
                 'to return a custom forbidden response, you should now '
-                'register a "repoze.interfaces.IForbiddenResponseFactory".  '
+                'register a "repoze.interfaces.IForbiddenView".  '
                 'The IUnauthorizedAppFactory interface was deprecated in '
                 'repoze.bfg 0.9 and will be removed in a subsequent version '
                 'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
                 'documentation for more information about '
-                'IForbiddenResponseFactory.')
+                'IForbiddenView.')
             self.logger and self.logger.warn(warning)
             def forbidden(context, request):
                 app = unauthorized_app_factory()
                 response = request.get_response(app)
                 return response
 
-        forbidden = registry.queryUtility(IForbiddenResponseFactory,
-                                          default=forbidden)
+        forbidden = registry.queryUtility(IForbiddenView, default=forbidden)
 
         self.forbidden_resp_factory = forbidden or default_forbidden_view
 

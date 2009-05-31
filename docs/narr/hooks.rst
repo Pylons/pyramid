@@ -124,28 +124,28 @@ sample code that implements a minimal NotFound application factory:
    ``debug_notfound`` environment setting is true than it is when it
    is false.
 
-Changing the Forbidden Response
--------------------------------
+Changing the Forbidden View
+---------------------------
 
 When :mod:`repoze.bfg` can't authorize execution of a view based on
-the authorization policy in use, it invokes a "forbidden response
-factory".  Usually this forbidden response factory is a default 401
-response, but it can be overridden as necessary by placing something
-like the following ZCML in your ``configure.zcml`` file.
+the authorization policy in use, it invokes a "forbidden view".  The
+default forbidden response has a 401 status code and is very plain,
+but it can be overridden as necessary by placing something like the
+following ZCML in your ``configure.zcml`` file.
 
 .. code-block:: xml
    :linenos:
 
-   <utility provides="repoze.bfg.interfaces.IForbiddenResponseFactory"
-            component="helloworld.factories.forbidden_response_factory"/>
+   <utility provides="repoze.bfg.interfaces.IForbiddenView"
+            component="helloworld.views.forbidden_view"/>
 
 Replace ``helloworld.factories.forbidden_app_factory`` with the Python
-dotted name to the forbidden response factory you want to use.  The
-response factory must accept two parameters: ``context`` and
-``request``.  The ``context`` is the context found by the router when
+dotted name to the forbidden view you want to use.  Like any other
+view, the forbidden view must accept two parameters: ``context`` and
+``request`` .  The ``context`` is the context found by the router when
 the view invocation was denied.  The ``request`` is the current
 :term:`request` representing the denied action.  Here's some sample
-code that implements a minimal forbidden response factory:
+code that implements a minimal forbidden view:
 
 .. code-block:: python
 
@@ -154,7 +154,7 @@ code that implements a minimal forbidden response factory:
    def forbidden_response_factory(context, request):
        return render_template_to_response('templates/login_form.pt')
 
-.. note:: When an forbidden response factory is invoked, it is passed
+.. note:: When an forbidden view is invoked, it is passed
    the request as the second argument.  An attribute of the request is
    ``environ``, which is the WSGI environment.  Within the WSGI
    environ will be a key named ``repoze.bfg.message`` that has a value
@@ -162,12 +162,11 @@ code that implements a minimal forbidden response factory:
    error will be different when the ``debug_authorization``
    environment setting is true than it is when it is false.
 
-.. warning:: the default forbidden application factory sends a
-   response with a ``401 Unauthorized`` status code for backwards
-   compatibility reasons.  You can influence the status code of
-   Forbidden responses by using an alterate forbidden application
-   factory.  For example, it would make sense to return an forbidden
-   application with a ``403 Forbidden`` status code.
+.. warning:: the default forbidden view sends a response with a ``401
+   Unauthorized`` status code for backwards compatibility reasons.
+   You can influence the status code of Forbidden responses by using
+   an alterate forbidden view.  For example, it would make sense to
+   return a response with a ``403 Forbidden`` status code.
 
 Changing the Default Routes Context Factory
 -------------------------------------------

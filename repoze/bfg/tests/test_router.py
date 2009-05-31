@@ -137,10 +137,10 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(router.notfound_app_factory, app)
 
     def test_iforbidden_responsefactory_override(self):
-        from repoze.bfg.interfaces import IForbiddenResponseFactory
+        from repoze.bfg.interfaces import IForbiddenView
         def app():
             """ """
-        self.registry.registerUtility(app, IForbiddenResponseFactory)
+        self.registry.registerUtility(app, IForbiddenView)
         self._registerRootFactory(None)
         router = self._makeOne()
         self.assertEqual(router.forbidden_resp_factory, app)
@@ -164,7 +164,7 @@ class RouterTests(unittest.TestCase):
         self.registry.registerUtility(factory, IUnauthorizedAppFactory)
         router = self._makeOne()
         self.assertEqual(len(logger.messages), 1)
-        self.failUnless('IForbiddenResponseFactory' in logger.messages[0])
+        self.failUnless('IForbiddenView' in logger.messages[0])
         class DummyRequest:
             def get_response(self, app):
                 return app
