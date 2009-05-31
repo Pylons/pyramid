@@ -4,5 +4,3 @@
 
 - SQLAlchemy + Routes tutorial (convert repoze.wiki)
 
-- Alias 'condition_method' in route delcaration to request_type.
-
