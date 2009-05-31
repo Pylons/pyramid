@@ -10,7 +10,7 @@ Features
   ``repoze.bfg.interfaces.INotFoundAppFactory`` feature previously
   described in the Hooks chapter.  The INotFoundView will be called
   when the framework detects that a view lookup done as a result of a
-  reqest fails; it should accept a context object and a request
+  request fails; it should accept a context object and a request
   object; it should return an IResponse object (a webob response,
   basically).  See the Hooks narrative chapter of the BFG docs for
   more info.
