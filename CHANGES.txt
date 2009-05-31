@@ -27,6 +27,10 @@ Documentation
 - Add description to narrative templating chapter about how to use
   Chameleon text templates.
 
+- Changed Views narrative chapter to use method strings rather than
+  interface types, and moved advanced interface type usage to Events
+  narrative chapter.
+
 0.9a8 (2009-05-31)
 ==================
 
