@@ -1,0 +1,6 @@
+[nosetests]
+match=^test
+nocapture=1
+cover-package={{package}}
+with-coverage=1
+cover-erase=1
