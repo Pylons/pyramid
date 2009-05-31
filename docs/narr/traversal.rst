@@ -5,12 +5,12 @@ Traversal
 
 When :term:`traversal` is used, the :mod:`repoze.bfg` *Router* parses
 the URL associated with the request and splits the URL into path
-segments.  Based on these path segments, :mod:`repoze.bfg` traverses
-a *model graph* in order to find a :term:`context`.  It then
-attempts to find a :term:`view` based on the *type* of the context
-(specified by an :term:`interface`).  If :mod:`repoze.bfg` finds a
-:term:`view` for the context, it calls it and returns a response to
-the user.
+segments.  Based on these path segments, :mod:`repoze.bfg` traverses a
+*model graph* in order to find a :term:`context`.  It then attempts to
+find a :term:`view` based on the *type* of the context (specified by
+its Python class type or any :term:`interface` attached to it).  If
+:mod:`repoze.bfg` finds a :term:`view` for the context, it calls it
+and returns a response to the user.
 
 The Model Graph
 ---------------

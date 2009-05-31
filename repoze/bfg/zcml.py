@@ -25,6 +25,8 @@ from repoze.bfg.interfaces import IRoutesContext
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
 
+from repoze.bfg.request import HTTP_METHOD_INTERFACES
+
 from repoze.bfg.security import ViewPermissionFactory
 
 import martian
@@ -68,6 +70,15 @@ def view(
             # the view specification; we ignore it.
             pass
 
+    if request_type is None:
+        request_type = IRequest
+
+    elif isinstance(request_type, basestring):
+        if request_type in HTTP_METHOD_INTERFACES:
+            request_type = HTTP_METHOD_INTERFACES[request_type]
+        else:
+            request_type = _context.resolve(request_type)
+
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
         # function that operates like a Zope view (when it's invoked,
@@ -83,9 +94,6 @@ def view(
         _bfg_class_view.__name__ = view.__name__
         _bfg_class_view.__doc__ = view.__doc__
         view = _bfg_class_view
-
-    if request_type is None:
-        request_type = IRequest
 
     if permission:
         pfactory = ViewPermissionFactory(permission)
@@ -132,8 +140,8 @@ class IViewDirective(Interface):
         required=False,
         )
 
-    request_type = GlobalObject(
-        title=u"""The request type interface for the view""",
+    request_type = TextLine(
+        title=u"The request type string or dotted name interface for the view",
         description=(u"The view will be called if the interface represented by "
                      u"'request_type' is implemented by the request.  The "
                      u"default request type is repoze.bfg.interfaces.IRequest"),

@@ -102,6 +102,8 @@ function.
 
 The return value of a subscriber function is ignored.
 
+.. _using_an_event_to_vary_the_request_type:
+
 Using An Event to Vary the Request Type
 ---------------------------------------
 
@@ -176,4 +178,31 @@ might also choose to use hostname
 request.environ['SERVER_NAME'])``) in order to "skin" your application
 differently based on whether the user should see the "management"
 (e.g. "manage.myapp.com") presentation of the application or the
-"retail" presentation (e.g. "www.myapp.com").
+"retail" presentation (e.g. "www.myapp.com").  By attaching to the
+request an arbitrary interface after examining the hostname or any
+other information available in the request within an ``INewRequest``
+event subscriber, you can control view lookup precisely.  For example,
+if you wanted to have two slightly different views for requests to two
+different hostnames, you might register one view with a
+``request_type`` of ``.interfaces.IHostnameFoo`` and another with a
+``request_type`` of ``.interfaces.IHostnameBar`` and then arrange for
+an event subscriber to attach ``.interfaces.IHostnameFoo`` to the
+request when the HTTP_HOST is ``foo`` and ``.interfaces.IHostnameBar``
+to the request when the HTTP_HOST is ``bar``.  The appropriate view
+will be called.
+
+You can also form an inheritance hierarchy out of ``request_type``
+interfaces.  When :mod:`repoze.bfg` looks up a view, the most specific
+view for the interface(s) found on the request based on standard
+Python method resolution order through the interface class hierarchy
+will be called.
+
+:mod:`repoze.bfg` also makes available as interfaces standard request
+type interfaces matching HTTP verbs.  When these are specified as a
+``request_type`` for a view, the view will be called only when the
+request has an HTTP verb (aka HTTP method) matching the request type.
+For example, using the string ``repoze.bfg.interfaces.IPOST`` or the
+imported interface definition itself matching that Python dotted name
+as the request_type argument to a view definition is equivalent to
+using the string ``POST``.  See :ref:`interfaces_module` for more
+information about available request types.

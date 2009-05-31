@@ -109,7 +109,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
 
-    def test_request_type(self):
+    def test_request_type_asinterface(self):
         context = DummyContext()
         class IFoo:
             pass
@@ -147,6 +147,42 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
+
+    def test_request_type_ashttpmethod(self):
+        context = DummyContext()
+        class IFoo:
+            pass
+        view = lambda *arg: None
+        self._callFUT(context, 'repoze.view', IFoo, view=view,
+                      request_type='GET')
+        actions = context.actions
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IGETRequest
+
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        self.assertEqual(permission['args'][2], (IFoo, IGETRequest))
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IDummy, IView)
+        self.assertEqual(regadapt['args'][2], (IFoo, IGETRequest))
+
+    def test_request_type_asinterfacestring(self):
+        context = DummyContext()
+        class IFoo:
+            pass
+        view = lambda *arg: None
+        self._callFUT(context, 'repoze.view', IFoo, view=view,
+                      request_type='whatever')
+        actions = context.actions
+        from repoze.bfg.interfaces import IView
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        self.assertEqual(permission['args'][2], (IFoo, IDummy))
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IDummy, IView)
+        self.assertEqual(regadapt['args'][2], (IFoo, IDummy))
 
     def test_adapted_class(self):
         from zope.interface import Interface
@@ -632,6 +668,9 @@ class DummyContext:
              'callable':callable,
              'args':args}
             )
+
+    def resolve(self, dottedname):
+        return IDummy
 
 class Dummy:
     pass

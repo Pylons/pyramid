@@ -320,7 +320,12 @@ Glossary
     that particular interface.  Application code can cause requests to
     possess a different interface by adding the interface to the
     request object within a :term:`subscriber` to the
-    ``repoze.bfg.interfaces.INewRequest`` event type.
+    ``repoze.bfg.interfaces.INewRequest`` event type.  String aliases
+    such as ``GET``, ``POST``, etc. representing HTTP method names may
+    be used in place of an interface specification in the
+    ``request_type`` argument passed to view declarations.  ``GET`` is
+    aliased to ``repoze.bfg.interfaces.IGETRequest``, ``POST`` is
+    aliased to ``repoze.bfg.interfaces.IPOSTRequest``, and so on.
   repoze.lemonade
     Zope2 CMF-like `data structures and helper facilities
     <http://docs.repoze.org/lemonade>`_ for CA-and-ZODB-based

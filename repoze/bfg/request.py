@@ -21,8 +21,8 @@ class Request(WebobRequest):
 # an optimization (e.g. preventing calls to ``alsoProvides`` means the
 # difference between 590 r/s and 690 r/s on a MacBook 2GHz).  These
 # classes are *not* APIs.  None of these classes, nor the
-# ``HTTP_METHOD_FACTORIES`` lookup dict should be imported directly by
-# user code.
+# ``HTTP_METHOD_FACTORIES`` or ``HTTP_METHOD_INTERFACES`` lookup dicts
+# should be imported directly by user code.
 
 class GETRequest(WebobRequest):
     implements(repoze.bfg.interfaces.IGETRequest)
@@ -52,3 +52,11 @@ HTTP_METHOD_FACTORIES = {
     'HEAD':HEADRequest,
     }
 
+HTTP_METHOD_INTERFACES = {
+    'GET':repoze.bfg.interfaces.IGETRequest,
+    'POST':repoze.bfg.interfaces.IPOSTRequest,
+    'PUT':repoze.bfg.interfaces.IPUTRequest,
+    'DELETE':repoze.bfg.interfaces.IDELETERequest,
+    'HEAD':repoze.bfg.interfaces.IHEADRequest,
+    }
+    

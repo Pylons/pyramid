@@ -208,10 +208,12 @@ permission
 
 request_type
 
-  A Python dotted-path name representing the :term:`interface` that
+  This value can either be one of the strings 'GET', 'POST', 'PUT',
+  'DELETE', or 'HEAD' representing an HTTP method, *or* it may be
+  Python dotted-path string representing the :term:`interface` that
   the :term:`request` must have in order for this view to be found and
-  called.  See :ref:`view_request_types_section` for more
-  information about request types.
+  called.  See :ref:`view_request_types_section` for more information
+  about request types.
 
 .. _mapping_views_to_urls_using_a_decorator_section:
 
@@ -256,11 +258,10 @@ An example might reside in a bfg application module ``views.py``:
    :linenos:
 
    from models import MyModel
-   from repoze.bfg.interfaces import IPOSTRequest
    from repoze.bfg.view import bfg_view
    from repoze.bfg.chameleon_zpt import render_template_to_response
 
-   @bfg_view(name='my_view', request_type=IPOSTRequest, for_=MyModel,
+   @bfg_view(name='my_view', request_type='POST', for_=MyModel,
              permission='read')
    def my_view(context, request):
        return render_template_to_response('templates/my.pt')
@@ -276,7 +277,7 @@ your application registry:
     view=".views.my_view"
     name="my_view"
     permission="read"
-    request_type="repoze.bfg.interfaces.IPOSTRequest"
+    request_type="POST"
     />
 
 All arguments to ``bfg_view`` are optional.
@@ -284,8 +285,8 @@ All arguments to ``bfg_view`` are optional.
 If ``name`` is not supplied, the empty string is used (implying
 the default view).
 
-If ``request_type`` is not supplied, the interface
-``repoze.bfg.interfaces.IRequest`` is used.
+If ``request_type`` is not supplied, the interface ``None`` is used,
+implying any request type.
 
 If ``for_`` is not supplied, the interface
 ``zope.interface.Interface`` (which matches any model) is used.
@@ -307,10 +308,9 @@ All arguments may be omitted.  For example:
        return Response()
 
 Such a registration as the one directly above implies that the view
-name will be ``my_view``, registered for models with the
-``zope.interface.Interface`` interface (which matches anything), using
-no permission, registered against requests which implement the default
-``IRequest`` interface.
+name will be ``my_view``, registered ``for_`` any model type, using no
+permission, registered against requests which implement any request
+method or interface.
 
 If your view callable is a class, the ``bfg_view`` decorator can also
 be used as a class decorator in Python 2.6 and better (Python 2.5 and
@@ -442,16 +442,22 @@ interfaces.
 
 .. _view_request_types_section:
 
-View Request Types
-------------------
+Standard View Request Types
+---------------------------
 
 You can optionally add a *request_type* attribute to your ``view``
-declaration, which indicates what "kind" of request the view should be
-used for.  If the request type for a request doesn't match the request
-type that a view defines as its ``request_type`` argument, that view
-won't be called.
+declaration or ``bfg_view`` decorator, which indicates what "kind" of
+request the view should be used for.  If the request type for a
+request doesn't match the request type that a view defines as its
+``request_type`` argument, that view won't be called.
 
-For example:
+The request type can be one of the strings 'GET', 'POST', 'PUT',
+'DELETE', or 'HEAD'.  When the request type is one of these strings,
+the view will only be called when the HTTP method of a request matches
+this type.
+
+For example, the following bit of ZCML will match an HTTP POST
+request:
 
 .. code-block:: xml
    :linenos:
@@ -460,86 +466,45 @@ For example:
        for=".models.Hello"
        view=".views.handle_post"
        name="handle_post"
-       request_type="repoze.bfg.interfaces.IPOSTRequest"
+       request_type="POST"
        />
 
-The above example registers a view for the ``IPOSTRequest`` type, so
-it will only be called if the request is a POST request.  Even if all
-the other specifiers match (e.g. the model type is the class
+A ``bfg_view`` decorator that does the same as the above ZCML ``view``
+declaration which matches only on HTTP POST might look something like:
+
+.. code-block:: python
+   :linenos:
+
+   from myproject.models import Hello
+   from webob import Response
+
+   @bfg_view(for=Hello, request_type='POST')
+   def handle_post(context, request):
+       return Response('hello'
+
+The above examples register views for the POST request type, so it
+will only be called if the request's HTTP method is ``POST``.  Even if
+all the other specifiers match (e.g. the model type is the class
 ``.models.Hello``, and the view_name is ``handle_post``), if the
 request verb is not POST, it will not be invoked.  This provides a way
 to ensure that views you write are only called via specific HTTP
 verbs.
 
-The least specific request type is ``repoze.bfg.interfaces.IRequest``.
-All requests are guaranteed to implement this request type.  It is
-also the default request type for views that omit a ``request_type``
-argument.
-
-:mod:`repoze.bfg` also makes available more specific request types
-matching HTTP verbs.  When these are specified as a ``request_type``
-for a view, the view will be called only when the request has an HTTP
-verb (aka HTTP method) matching the request type.  See
-:ref:`interfaces_module` for more information about available request
-types.
+The least specific request type is ``None``.  All requests are
+guaranteed to implement this request type.  It is also the default
+request type for views that omit a ``request_type`` argument.
 
 Custom View Request Types
 -------------------------
 
-You can make use of *custom* view request types.  For example:
+You can make use of *custom* view request types by attaching an
+:term:`interface` to the request and specifying this interface in the
+``request_type`` parameter.  For example, you might want to make use
+of simple "content negotiation", only invoking a particular view if
+the request has a content-type of 'application/json'.
 
-.. code-block:: xml
-   :linenos:
-
-   <view
-       for=".models.Hello"
-       view=".views.hello_json"
-       name="hello.json"
-       request_type=".interfaces.IJSONRequest"
-       />
-
-Where the code behind ``.interfaces.IJSONRequest`` might look like:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.interfaces import IRequest
-
-   class IJSONRequest(IRequest):
-      """ An marker interface for representing a JSON request """
-
-This is an example of simple "content negotiation", using JSON as an
-example.  To make sure that this view will be called when the request
-comes from a JSON client, you can use an ``INewRequest`` event
-subscriber to attach the ``IJSONRequest`` interface to the request if
-and only if the request headers indicate that the request has come
-from a JSON client.  Since we've indicated that the ``request_type``
-in our ZCML for this particular view is ``.interfaces.IJSONRequest``,
-the view will only be called if the request provides this interface.
-
-You can also use this facility for "skinning" a by using request
-parameters to vary the interface(s) that a request provides.  By
-attaching to the request an arbitrary interface after examining the
-hostname or any other information available in the request within an
-``INewRequest`` event subscriber, you can control view lookup
-precisely.  For example, if you wanted to have two slightly different
-views for requests to two different hostnames, you might register one
-view with a ``request_type`` of ``.interfaces.IHostnameFoo`` and
-another with a ``request_type`` of ``.interfaces.IHostnameBar`` and
-then arrange for an event subscriber to attach
-``.interfaces.IHostnameFoo`` to the request when the HTTP_HOST is
-``foo`` and ``.interfaces.IHostnameBar`` to the request when the
-HTTP_HOST is ``bar``.  The appropriate view will be called.
-
-You can also form an inheritance hierarchy out of ``request_type``
-interfaces.  When :mod:`repoze.bfg` looks up a view, the most specific
-view for the interface(s) found on the request based on standard
-Python method resolution order through the interface class hierarchy
-will be called.
-
-.. note:: see :ref:`events_chapter` for more information about event
-   subscribers, and how to provide requests with differing request
-   types.
+For information about using interface to specify a request type, see
+:ref:`using_an_event_to_vary_the_request_type`.
 
 .. _view_security_section:
 

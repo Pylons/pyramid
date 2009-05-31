@@ -1,6 +1,15 @@
 Next Release
 ============
 
+Features
+--------
+
+- The ``request_type`` argument of ZCML ``view`` declarations and
+  ``bfg_view`` decorators can now be one of the strings ``GET``,
+  ``POST``, ``PUT``, ``DELETE``, or ``HEAD`` instead of a reference to
+  the respective interface type imported from
+  ``repoze.bfg.interfaces``.
+
 Removals
 --------
 
