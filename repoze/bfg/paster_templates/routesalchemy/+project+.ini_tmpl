@@ -1,12 +1,17 @@
 [DEFAULT]
 debug = true
 
-[app:main]
-use = egg:{{project}}#app
+[app:sql]
+use = egg:{{package}}#app
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
 db_string = sqlite:///%(here)s/{{package}}.db
+
+[pipeline:main]
+pipeline =
+    egg:repoze.tm2#tm
+    sql
 
 [server:main]
 use = egg:Paste#http

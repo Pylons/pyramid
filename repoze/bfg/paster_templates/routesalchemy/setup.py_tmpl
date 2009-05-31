@@ -14,6 +14,7 @@ requires = [
     'repoze.bfg',
     'SQLAlchemy',
     'transaction',
+    'repoze.tm2',
     'zope.sqlalchemy',
     ]
 
@@ -40,6 +41,7 @@ setup(name='{{project}}',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
+      test_suite='{{package}}',
       install_requires = requires,
       entry_points = """\
       [paste.app_factory]
