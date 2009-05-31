@@ -1,8 +1,33 @@
 Next release
 ============
 
+Features
+--------
+
+- It is now possible to register a custom
+  ``repoze.bfg.interfaces.INotFoundView`` for a given application.
+  This feature replaces the
+  ``repoze.bfg.interfaces.INotFoundAppFactory`` feature previously
+  described in the Hooks chapter.  The INotFoundView will be called
+  when the framework detects that a view lookup done as a result of a
+  reqest fails; it should accept a context object and a request
+  object; it should return an IResponse object (a webob response,
+  basically).  See the Hooks narrative chapter of the BFG docs for
+  more info.
+
+Deprecations
+------------
+
+- The ``repoze.bfg.interfaces.IUnauthorizedAppFactory`` interface has
+  been deprecated in favor of using the new
+  ``repoze.bfg.interfaces.IForbiddenResponseFactory`` mechanism.
+
+Renames
+-------
+
 - Renamed ``repoze.bfg.interfaces.IForbiddenResponseFactory`` to
   ``repoze.bfg.interfaces.IForbiddenView``.
+
 
 0.9a7 (2009-05-30)
 ==================

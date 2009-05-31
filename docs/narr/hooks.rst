@@ -88,41 +88,37 @@ an object that implements any particular interface; it simply needs
 have a ``status`` attribute, a ``headerlist`` attribute, and and
 ``app_iter`` attribute.
 
-Changing the NotFound Application
----------------------------------
+Changing the Not Found View
+---------------------------
 
-When :mod:`repoze.bfg` can't map a URL to code, it creates and invokes
-a NotFound WSGI application. The application it invokes can be
-customized by placing something like the following ZCML in your
-``configure.zcml`` file.
+When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
+notfound :term:`view`. The view it invokes can be customized by
+placing something like the following ZCML in your ``configure.zcml``
+file.
 
 .. code-block:: xml
    :linenos:
 
-   <utility provides="repoze.bfg.interfaces.INotFoundAppFactory"
-            component="helloworld.factories.notfound_app_factory"/>
+   <utility provides="repoze.bfg.interfaces.INotFoundView"
+            component="helloworld.views.notfound_view"/>
 
-Replace ``helloworld.factories.notfound_app_factory`` with the Python
-dotted name to the request factory you want to use.  Here's some
-sample code that implements a minimal NotFound application factory:
+Replace ``helloworld.views.notfound_view`` with the Python dotted name
+to the notfound view you want to use.  Here's some sample code that
+implements a minimal NotFound view:
 
 .. code-block:: python
 
    from webob.exc import HTTPNotFound
 
-   class MyNotFound(HTTPNotFound):
-       pass
+   def notfound_view(context, request):
+       return HTTPNotFound()
 
-   def notfound_app_factory():
-       return MyNotFound
-
-.. note:: When a NotFound application factory is invoked, it is passed
-   the WSGI environ and the WSGI ``start_response`` handler by
-   :mod:`repoze.bfg`.  Within the WSGI environ will be a key named
-   ``repoze.bfg.message`` that has a value explaining why the not
-   found error was raised.  This error will be different when the
-   ``debug_notfound`` environment setting is true than it is when it
-   is false.
+.. note:: When a NotFound view is invoked, it is passed a request.
+   The ``environ`` attribute of the request is the WSGI environment.
+   Within the WSGI environ will be a key named ``repoze.bfg.message``
+   that has a value explaining why the not found error was raised.
+   This error will be different when the ``debug_notfound``
+   environment setting is true than it is when it is false.
 
 Changing the Forbidden View
 ---------------------------

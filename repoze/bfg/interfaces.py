@@ -184,18 +184,21 @@ class IForbiddenView(Interface):
         repoze.bfg router during traversal or url dispatch.  The
         ``request`` will be the request object which caused the deny."""
 
-class INotFoundAppFactory(Interface):
-    """ A utility which returns a NotFound WSGI application factory """
-    def __call__():
-        """ Return a callable which returns a notfound WSGI
-        application.  When the WSGI application is invoked,
+class INotFoundView(Interface):
+    """ A utility which returns a NotFound response (an IResponse)
+    when a view cannot be located for a particular URL"""
+    def __call__(context, request):
+        """ Return a NotFound response.  When the view is rendered,
         a``message`` key in the WSGI environ provides information
-        pertaining to the reason for the notfound."""
+        pertaining to the reason for the notfound error."""
+
+class INotFoundAppFactory(Interface):
+    """ A utility which returns a NotFound WSGI application factory.
+    Deprecated in repoze.bfg 0.9 in favor of INotFoundView"""
 
 class IUnauthorizedAppFactory(Interface):
     """ A utility which returns an Unauthorized WSGI application
-    factory (deprecated in repoze.bfg 0.8.2) in favor of
-    IForbiddenResponseFactory """
+    factory.  Deprecated in repoze.bfg 0.9 in favor of IForbiddenView"""
     
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.

@@ -127,14 +127,24 @@ class RouterTests(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.root_policy, rootfactory)
 
-    def test_inotfound_appfactory_override(self):
+    def test_secpol_with_inotfound_appfactory_BBB(self):
         from repoze.bfg.interfaces import INotFoundAppFactory
-        def app():
-            """ """
-        self.registry.registerUtility(app, INotFoundAppFactory)
-        self._registerRootFactory(None)
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        rootfactory = self._registerRootFactory(None)
+        logger = self._registerLogger()
+        def factory():
+            return 'yo'
+        self.registry.registerUtility(factory, INotFoundAppFactory)
         router = self._makeOne()
-        self.assertEqual(router.notfound_app_factory, app)
+        self.assertEqual(len(logger.messages), 1)
+        self.failUnless('INotFoundView' in logger.messages[0])
+        class DummyRequest:
+            def get_response(self, app):
+                return app
+        req = DummyRequest()
+        self.assertEqual(router.notfound_view(None, req), 'yo')
 
     def test_iforbidden_responsefactory_override(self):
         from repoze.bfg.interfaces import IForbiddenView
@@ -143,16 +153,16 @@ class RouterTests(unittest.TestCase):
         self.registry.registerUtility(app, IForbiddenView)
         self._registerRootFactory(None)
         router = self._makeOne()
-        self.assertEqual(router.forbidden_resp_factory, app)
+        self.assertEqual(router.forbidden_view, app)
 
     def test_iforbidden_responsefactory_nooverride(self):
         context = DummyContext()
         self._registerRootFactory(None)
         router = self._makeOne()
         from repoze.bfg.router import default_forbidden_view
-        self.assertEqual(router.forbidden_resp_factory, default_forbidden_view)
+        self.assertEqual(router.forbidden_view, default_forbidden_view)
 
-    def test_secpol_with_iunauthorized_appfactory(self):
+    def test_secpol_with_iunauthorized_appfactory_BBB(self):
         from repoze.bfg.interfaces import IUnauthorizedAppFactory
         environ = self._makeEnviron()
         context = DummyContext()
@@ -169,7 +179,7 @@ class RouterTests(unittest.TestCase):
             def get_response(self, app):
                 return app
         req = DummyRequest()
-        self.assertEqual(router.forbidden_resp_factory(None, req), 'yo')
+        self.assertEqual(router.forbidden_view(None, req), 'yo')
 
     def test_call_no_view_registered_no_isettings(self):
         environ = self._makeEnviron()

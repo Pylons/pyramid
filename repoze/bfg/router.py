@@ -50,8 +50,6 @@ from repoze.bfg.traversal import _traverse
 
 from repoze.bfg.urldispatch import RoutesRootFactory
 
-from repoze.bfg.wsgi import NotFound
-
 _marker = object()
 
 class Router(object):
@@ -68,17 +66,17 @@ class Router(object):
 
         self.request_factory = registry.queryUtility(IRequestFactory)
 
+        forbidden = None
+
         unauthorized_app_factory = registry.queryUtility(
             IUnauthorizedAppFactory)
-
-        forbidden = None
 
         if unauthorized_app_factory is not None:
             warning = (
                 'Instead of registering a utility against the '
                 'repoze.bfg.interfaces.IUnauthorizedAppFactory interface '
                 'to return a custom forbidden response, you should now '
-                'register a "repoze.interfaces.IForbiddenView".  '
+                'register a repoze.interfaces.IForbiddenView.'
                 'The IUnauthorizedAppFactory interface was deprecated in '
                 'repoze.bfg 0.9 and will be removed in a subsequent version '
                 'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
@@ -92,10 +90,30 @@ class Router(object):
 
         forbidden = registry.queryUtility(IForbiddenView, default=forbidden)
 
-        self.forbidden_resp_factory = forbidden or default_forbidden_view
+        self.forbidden_view = forbidden or default_forbidden_view
 
-        self.notfound_app_factory = registry.queryUtility(INotFoundAppFactory,
-                                                          default=NotFound)
+        notfound = None
+
+        notfound_app_factory = registry.queryUtility(INotFoundAppFactory)
+
+        if notfound_app_factory is not None:
+            warning = (
+                'Instead of registering a utility against the '
+                'repoze.bfg.interfaces.INotFoundAppFactory interface '
+                'to return a custom notfound response, you should register '
+                'a repoze.bfg.interfaces.INotFoundView.  The '
+                'INotFoundAppFactory interface was deprecated in'
+                'repoze.bfg 0.9 and will be removed in a subsequent version '
+                'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
+                'documentation for more information about '
+                'INotFoundView.')
+            self.logger and self.logger.warn(warning)
+            def notfound(context, request):
+                app = notfound_app_factory()
+                response = request.get_response(app)
+                return response
+                
+        self.notfound_view = notfound or default_notfound_view
         
         settings = registry.queryUtility(ISettings)
         if settings is not None:
@@ -203,7 +221,7 @@ class Router(object):
 
                 environ['repoze.bfg.message'] = msg
 
-                response = self.forbidden_resp_factory(context, request)
+                response = self.forbidden_view(context, request)
                 start_response(response.status, response.headerlist)
                 return response.app_iter
 
@@ -223,8 +241,9 @@ class Router(object):
                 else:
                     msg = request.url
                 environ['repoze.bfg.message'] = msg
-                notfound_app = self.notfound_app_factory()
-                return notfound_app(environ, start_response)
+                response = self.notfound_view(context, request)
+                start_response(response.status, response.headerlist)
+                return response.app_iter
 
             registry.has_listeners and registry.notify(NewResponse(response))
 
@@ -238,8 +257,7 @@ class Router(object):
         finally:
             self.threadlocal_manager.pop()
 
-def default_forbidden_view(context, request):
-    status = '401 Unauthorized'
+def default_view(context, request, status):
     try:
         msg = escape(request.environ['repoze.bfg.message'])
     except KeyError:
@@ -259,6 +277,12 @@ def default_forbidden_view(context, request):
     return response_factory(status = status,
                             headerlist = headers,
                             app_iter = [html])
+
+def default_forbidden_view(context, request):
+    return default_view(context, request, '401 Unauthorized')
+
+def default_notfound_view(context, request):
+    return default_view(context, request, '404 Not Found')
 
 def make_app(root_factory, package=None, filename='configure.zcml',
              authentication_policy=None, authorization_policy=None,
