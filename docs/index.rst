@@ -106,12 +106,11 @@ Change History
 Sample Applications
 ===================
 
-`repoze.wiki <http://svn.repoze.org/repoze.wiki/trunk/>`_ is a port of
-the `TurboGears 20-Minute Wiki
-<http://turbogears.org/2.0/docs/main/Wiki20/wiki20.html>`_.  It
-demonstrates integration with `SQLAlchemy
-<http://www.sqlalchemy.org/>`_, customized traversal, and form
-processing.  Check this application out of Subversion via::
+`repoze.wiki <http://svn.repoze.org/repoze.wiki/trunk/>`_ is a variant
+of the application created during :ref:`bfg_wiki_tutorial` which uses
+`SQLAlchemy <http://www.sqlalchemy.org/>`_ instead of :term:`ZODB` and
+:term:`url dispatch` instead of :term:`traversal`.  Check this
+application out of Subversion via::
 
   svn co http://svn.repoze.org/repoze.wiki/trunk repoze.wiki
 
@@ -136,9 +135,9 @@ Subversion via::
 
 `repoze.shootout <http://svn.repoze.org/repoze.shootout/trunk/>`_ is
 an example "idea competition" application by Carlos de la Guardia.  It
-demonstrates :term:`URL dispatch` and integration with `SQLAlchemy
-<http://www.sqlalchemy.org/>`_ and :term:`repoze.who`.  Check this
-application out of Subversion via::
+demonstrates a hybrid of :term:`URL dispatch` and :term:`traversal`
+and integration with `SQLAlchemy <http://www.sqlalchemy.org/>`_ and
+:term:`repoze.who`.  Check this application out of Subversion via::
 
   svn co http://svn.repoze.org/repoze.shootout/trunk repoze.shootout
 

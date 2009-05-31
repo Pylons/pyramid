@@ -1,5 +1,7 @@
-BFG Tutorial: BFG Wiki
-======================
+.. _bfg_wiki_tutorial:
+
+BFG Wiki Tutorial
+=================
 
 This tutorial introduces a :term:`traversal` -based BFG application to
 a developer with at least passing familiarity to Python.  When we're
