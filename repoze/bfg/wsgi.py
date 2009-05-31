@@ -1,5 +1,3 @@
-from cgi import escape
-
 try:
     from functools import wraps
 except ImportError:                         #pragma NO COVERAGE
@@ -102,25 +100,3 @@ def wsgiapp2(wrapped):
         return request.get_response(wrapped)
     return wraps(wrapped)(decorator) # grokkability
 
-class HTTPException(object):
-    def __call__(self, environ, start_response, exc_info=False):
-        try:
-            msg = escape(environ['repoze.bfg.message'])
-        except KeyError:
-            msg = ''
-        html = """<body>
-        <html><title>%s</title><body><h1>%s</h1>
-        <code>%s</code>
-        """ % (self.status, self.status, msg)
-        headers = [('Content-Length', str(len(html))),
-                   ('Content-Type', 'text/html')]
-        start_response(self.status, headers)
-        return [html]
-
-class NotFound(HTTPException):
-    """ The default NotFound WSGI application """
-    status = '404 Not Found'
-
-class Unauthorized(HTTPException):
-    """ The default Unauthorized WSGI application """
-    status = '401 Unauthorized'

@@ -31,4 +31,3 @@ def defaults():
     return defaults
 
 manager = ThreadLocalManager(defaults)
-
