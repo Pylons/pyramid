@@ -12,7 +12,10 @@ from tutorial.run import USERS
 
 @bfg_view(for_=Wiki, name='login')
 def login(context, request):
+    login_url = model_url(context, request, 'login')
     referrer = request.environ.get('HTTP_REFERER', '/')
+    if referrer == login_url:
+        referrer = '/' # never use the login form itself as came_from
     came_from = request.params.get('came_from', referrer)
     message = ''
     login = ''
