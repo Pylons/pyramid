@@ -1,6 +1,12 @@
 Next Release
 ============
 
+Removals
+--------
+
+- Remove ``repoze.bfg.threadlocal.setManager``.  It was only used in
+  unit tests.
+
 Documentation
 -------------
 

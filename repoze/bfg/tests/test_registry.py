@@ -56,7 +56,8 @@ class TestPopulateRegistry(unittest.TestCase):
         dummyregmgr = DummyThreadLocalManager({'registry':None})
         import repoze.bfg.threadlocal
         try:
-            old = repoze.bfg.threadlocal.setManager(dummyregmgr)
+            old = repoze.bfg.threadlocal.manager
+            repoze.bfg.threadlocal.manager = dummyregmgr
             from zope.component.registry import Components
             registry = Components('hello')
             self._callFUT(registry,
@@ -67,7 +68,7 @@ class TestPopulateRegistry(unittest.TestCase):
             self.assertEqual(dummylock.released, True)
             self.assertEqual(dummyregmgr.data['registry'], None)
         finally:
-            repoze.bfg.threadlocal.setManager(old)
+            repoze.bfg.threadlocal.manager = old
 
 class GetSiteManagerTests(unittest.TestCase):
     def _callFUT(self, context=None):

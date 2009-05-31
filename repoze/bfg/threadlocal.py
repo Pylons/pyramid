@@ -32,8 +32,3 @@ def defaults():
 
 manager = ThreadLocalManager(defaults)
 
-def setManager(new_manager): # for unit tests
-    global manager
-    old_manager = manager
-    manager = new_manager
-    return old_manager
