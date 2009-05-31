@@ -1,0 +1,8 @@
+- path module: use pkg_resources (if feasible, given ZCML)
+
+- audit use of "functools.wraps" (pickling no longer required)
+
+- accept "GET", "HEAD", "POST", etc as strings in request_type arg to
+  view decorators and ZCML registrations.
+
+- SQLAlchemy + Routes tutorial.
