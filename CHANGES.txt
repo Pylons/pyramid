@@ -1,3 +1,12 @@
+Next Release
+============
+
+Documentation
+-------------
+
+- Add description to narrative templating chapter about how to use
+  Chameleon text templates.
+
 0.9a8 (2009-05-31)
 ==================
 

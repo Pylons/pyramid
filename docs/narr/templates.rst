@@ -7,8 +7,8 @@ information.  :mod:`repoze.bfg` offers a number of ways to perform
 templating tasks "out of the box", and provides alternative templating
 language support via add-on "bindings" packages.
 
-Templating With :term:`Chameleon` (:term:`chameleon.zpt`) Page Templates
-------------------------------------------------------------------------
+Templating With :term:`Chameleon` ZPT Page Templates
+----------------------------------------------------
 
 Like :term:`Zope`, :mod:`repoze.bfg` uses Zope Page Templates
 (:term:`ZPT`) as its default and best-supported templating
@@ -180,6 +180,35 @@ And ``templates/mytemplate.pt`` might look like so:
       </span>
     </html>
 
+Templating with :term:`Chameleon` Text Templates
+------------------------------------------------
+
+:mod:`repoze.bfg` also allows for the use of templates which are
+composed entirely of non-XML text via :term:`Chameleon`.  To do so,
+you can create templates that are entirely composed of text except for
+``${name}`` -style substitution points.
+
+Here's an example usage of a Chameleon text template.  Create a file
+on disk named ``text.txt`` in your project's ``templates`` directory
+with the following contents::
+
+   Hello, ${name}!
+
+Then in your project's ``views.py`` module, you can create a view
+which renders this template:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.chameleon_text import render_template_to_response
+
+   def text_view(context, request):
+       return render_template_to_response('templates/text.txt', name='World')
+
+The Chameleon text rendering API is a wholesale mirror of the
+Chameleon text ZPT rendering API, it's just imported from another
+place; see :ref:`template_module` for the API description.
+
 Side Effects of Rendering a Chameleon Template
 ----------------------------------------------
 
@@ -235,15 +264,6 @@ application's configuration section, e.g.::
   use = egg:MyProject#app
   reload_templates = true
 
-Using Text Templates
---------------------
-
-:mod:`repoze.bfg` also allows for the use of templates which are
-composed entirely of non-XML text via :term:`Chameleon`.  To do so,
-you can create templates that are entirely composed of text except for
-``${name}`` -style substitution points.  The rendering API is a mirror
-of the ZPT rendering facility, it's just imported from another place;
-see :ref:`template_module` for more information.
 
 Templating with other Templating Languages
 ------------------------------------------
