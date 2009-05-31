@@ -180,6 +180,29 @@ And ``templates/mytemplate.pt`` might look like so:
       </span>
     </html>
 
+Side Effects of Rendering a Chameleon Template
+----------------------------------------------
+
+When a Chameleon template is rendered from a file, the templating
+engine writes a file in the same directory as the template file itself
+as a kind of cache, in order to do less work the next time the
+template needs to be read from disk.  When using ``chameleon.core``
+version 1.0b32 and lower, this filename is ``<template_name>.cache``.
+When using ``chameleon.core`` version 1.0b33 and higher, this filename
+is ``<template_name>.py``.  If you see "strange" ``.py`` or ``.cache``
+files showing up in your ``templates`` directory, it is due to this
+feature.  If you're using a version control system such as Subversion,
+you should cause it to ignore these files.  Here's the contents of my
+``svn propedit svn:ignore .`` in each of my ``templates`` directories.
+(Note that I always name my Chameleon ZPT template files with a
+``.pt`` extension, so that this pattern works):
+
+.. code-block:: bash
+   :linenos:
+
+   *.cache
+   *.pt.py
+
 .. _reload_templates_section:
 
 Automatically Reloading Templates
