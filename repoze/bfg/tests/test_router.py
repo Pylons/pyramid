@@ -127,26 +127,7 @@ class RouterTests(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.root_policy, rootfactory)
 
-    def test_secpol_with_inotfound_appfactory_BBB(self):
-        from repoze.bfg.interfaces import INotFoundAppFactory
-        environ = self._makeEnviron()
-        context = DummyContext()
-        self._registerTraverserFactory(context)
-        rootfactory = self._registerRootFactory(None)
-        logger = self._registerLogger()
-        def factory():
-            return 'yo'
-        self.registry.registerUtility(factory, INotFoundAppFactory)
-        router = self._makeOne()
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('INotFoundView' in logger.messages[0])
-        class DummyRequest:
-            def get_response(self, app):
-                return app
-        req = DummyRequest()
-        self.assertEqual(router.notfound_view(None, req), 'yo')
-
-    def test_iforbidden_responsefactory_override(self):
+    def test_iforbiddenview_override(self):
         from repoze.bfg.interfaces import IForbiddenView
         def app():
             """ """
@@ -155,14 +136,30 @@ class RouterTests(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.forbidden_view, app)
 
-    def test_iforbidden_responsefactory_nooverride(self):
+    def test_iforbiddenview_nooverride(self):
         context = DummyContext()
         self._registerRootFactory(None)
         router = self._makeOne()
         from repoze.bfg.router import default_forbidden_view
         self.assertEqual(router.forbidden_view, default_forbidden_view)
 
-    def test_secpol_with_iunauthorized_appfactory_BBB(self):
+    def test_inotfoundview_override(self):
+        from repoze.bfg.interfaces import INotFoundView
+        def app():
+            """ """
+        self.registry.registerUtility(app, INotFoundView)
+        self._registerRootFactory(None)
+        router = self._makeOne()
+        self.assertEqual(router.notfound_view, app)
+
+    def test_inotfoundview_nooverride(self):
+        context = DummyContext()
+        self._registerRootFactory(None)
+        router = self._makeOne()
+        from repoze.bfg.router import default_notfound_view
+        self.assertEqual(router.notfound_view, default_notfound_view)
+
+    def test_iunauthorized_appfactory_BBB(self):
         from repoze.bfg.interfaces import IUnauthorizedAppFactory
         environ = self._makeEnviron()
         context = DummyContext()
@@ -180,6 +177,25 @@ class RouterTests(unittest.TestCase):
                 return app
         req = DummyRequest()
         self.assertEqual(router.forbidden_view(None, req), 'yo')
+
+    def test_inotfound_appfactory_BBB(self):
+        from repoze.bfg.interfaces import INotFoundAppFactory
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        rootfactory = self._registerRootFactory(None)
+        logger = self._registerLogger()
+        def factory():
+            return 'yo'
+        self.registry.registerUtility(factory, INotFoundAppFactory)
+        router = self._makeOne()
+        self.assertEqual(len(logger.messages), 1)
+        self.failUnless('INotFoundView' in logger.messages[0])
+        class DummyRequest:
+            def get_response(self, app):
+                return app
+        req = DummyRequest()
+        self.assertEqual(router.notfound_view(None, req), 'yo')
 
     def test_call_no_view_registered_no_isettings(self):
         environ = self._makeEnviron()
@@ -267,6 +283,45 @@ class RouterTests(unittest.TestCase):
         view = make_view('abc')
         self._registerView(view, '', None, None)
         self._registerRootFactory(None)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(ValueError, router, environ, start_response)
+
+    def test_inotfoundview_returns_nonresponse(self):
+        from repoze.bfg.interfaces import INotFoundView
+        context = DummyContext()
+        environ = self._makeEnviron()
+        self._registerTraverserFactory(context)
+        self._registerRootFactory(None)
+        def app(context, request):
+            """ """
+        self.registry.registerUtility(app, INotFoundView)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(ValueError, router, environ, start_response)
+
+    def test_iforbiddenview_returns_nonresponse(self):
+        from repoze.bfg.interfaces import IForbiddenView
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context)
+        self._registerAuthenticationPolicy()
+        response = DummyResponse()
+        view = make_view(response)
+        from repoze.bfg.security import ACLDenied
+        denied = ACLDenied('ace', 'acl', 'permission', ['principals'], context)
+        environ = self._makeEnviron()
+        self._registerView(view, '', IContext, IRequest)
+        checker = self._registerViewPermission('', denied)
+        self._registerRootFactory(None)
+        def app(context, request):
+            """ """
+        self.registry.registerUtility(app, IForbiddenView)
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(ValueError, router, environ, start_response)

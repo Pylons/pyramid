@@ -16,7 +16,6 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import ISecurityPolicy
-from repoze.bfg.interfaces import INotFoundAppFactory
 from repoze.bfg.interfaces import IRequestFactory
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRootFactory
@@ -24,7 +23,9 @@ from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import IForbiddenView
+from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IUnauthorizedAppFactory
+from repoze.bfg.interfaces import INotFoundAppFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -112,6 +113,9 @@ class Router(object):
                 app = notfound_app_factory()
                 response = request.get_response(app)
                 return response
+
+        notfound = registry.queryUtility(INotFoundView,
+                                         default=notfound)
                 
         self.notfound_view = notfound or default_notfound_view
         
@@ -134,11 +138,20 @@ class Router(object):
         iterable.
         """
         registry = self.registry
+        logger = self.logger
+
         threadlocals = {'registry':registry, 'request':None}
         self.threadlocal_manager.push(threadlocals)
 
-        logger = self.logger
-        request = None
+        def respond(response, view_name):
+            registry.has_listeners and registry.notify(NewResponse(response))
+            try:
+                start_response(response.status, response.headerlist)
+                return response.app_iter
+            except AttributeError:
+                raise ValueError(
+                    'Non-response object returned from view %s: %r' %
+                    (view_name, response))
 
         try:
             if self.request_factory is None:
@@ -221,9 +234,8 @@ class Router(object):
 
                 environ['repoze.bfg.message'] = msg
 
-                response = self.forbidden_view(context, request)
-                start_response(response.status, response.headerlist)
-                return response.app_iter
+                return respond(self.forbidden_view(context, request),
+                               '<IForbiddenView>')
 
             response = registry.queryMultiAdapter(
                 (context, request), IView, name=view_name)
@@ -241,18 +253,10 @@ class Router(object):
                 else:
                     msg = request.url
                 environ['repoze.bfg.message'] = msg
-                response = self.notfound_view(context, request)
-                start_response(response.status, response.headerlist)
-                return response.app_iter
+                return respond(self.notfound_view(context, request),
+                               '<INotFoundView>')
 
-            registry.has_listeners and registry.notify(NewResponse(response))
-
-            try:
-                start_response(response.status, response.headerlist)
-                return response.app_iter
-            except AttributeError:
-                raise ValueError(
-                    'Non-response object returned from view: %r' % response)
+            return respond(response, view_name)
 
         finally:
             self.threadlocal_manager.pop()

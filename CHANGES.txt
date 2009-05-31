@@ -15,6 +15,15 @@ Features
   basically).  See the Hooks narrative chapter of the BFG docs for
   more info.
 
+- The error presented when a view invoked by the router returns a
+  non-response object now includes the view's name for troubleshooting
+  purposes.
+
+Bug Fixes
+---------
+
+- A "new response" event is emitted for forbiden and notfound views.
+
 Deprecations
 ------------
 
@@ -27,7 +36,6 @@ Renames
 
 - Renamed ``repoze.bfg.interfaces.IForbiddenResponseFactory`` to
   ``repoze.bfg.interfaces.IForbiddenView``.
-
 
 0.9a7 (2009-05-30)
 ==================
