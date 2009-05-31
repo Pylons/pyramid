@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+    xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <title>${page.__name__} - bfg tutorial wiki (based on TurboGears 20-Minute Wiki)</title>
+        <link rel="stylesheet" type="text/css"
+          href="${request.application_url}/static/style.css" />
+</head>
+
+<body>
+
+<div class="main_content">
+<div style="float:right; width: 10em;"> Viewing
+<span tal:replace="page.__name__">Page Name Goes Here</span> <br/>
+You can return to the <a href="${request.application_url}">FrontPage</a>.
+</div>
+
+<div tal:replace="structure content">Page text goes here.</div>
+<p><a tal:attributes="href edit_url" href="">Edit this page</a></p>
+</div>
+
+</body></html>

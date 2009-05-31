@@ -1,0 +1,34 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <!-- this must be included for the view declarations to work -->
+  <include package="repoze.bfg.includes" />
+
+  <view
+     for=".models.Wiki"
+     view=".views.static_view"
+     name="static"
+     />
+
+  <view
+     for=".models.Wiki"
+     view=".views.view_wiki"
+     />
+
+  <view
+     for=".models.Wiki"
+     name="add_page"
+     view=".views.add_page"
+     />
+
+  <view
+     for=".models.Page"
+     view=".views.view_page"
+     />
+
+  <view
+     for=".models.Page"
+     name="edit_page"
+     view=".views.edit_page"
+     />
+
+</configure>
