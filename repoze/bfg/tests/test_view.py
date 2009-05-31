@@ -361,12 +361,10 @@ class TestBFGViewDecorator(unittest.TestCase):
         return self._getTargetClass()(*arg, **kw)
 
     def test_create_defaults(self):
-        from repoze.bfg.interfaces import IRequest
-        from zope.interface import Interface
         decorator = self._makeOne()
         self.assertEqual(decorator.name, '')
-        self.assertEqual(decorator.request_type, IRequest)
-        self.assertEqual(decorator.for_, Interface)
+        self.assertEqual(decorator.request_type, None)
+        self.assertEqual(decorator.for_, None)
         self.assertEqual(decorator.permission, None)
         
     def test_create_nondefaults(self):
@@ -378,8 +376,6 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.assertEqual(decorator.permission, 'foo')
         
     def test_call_function(self):
-        from repoze.bfg.interfaces import IRequest
-        from zope.interface import Interface
         decorator = self._makeOne()
         def foo():
             """ docstring """
@@ -387,13 +383,11 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.failUnless(wrapped is foo)
         self.assertEqual(wrapped.__is_bfg_view__, True)
         self.assertEqual(wrapped.__permission__, None)
-        self.assertEqual(wrapped.__for__, Interface)
-        self.assertEqual(wrapped.__request_type__, IRequest)
+        self.assertEqual(wrapped.__for__, None)
+        self.assertEqual(wrapped.__request_type__, None)
 
     def test_call_oldstyle_class(self):
         import inspect
-        from repoze.bfg.interfaces import IRequest
-        from zope.interface import Interface
         decorator = self._makeOne()
         class foo:
             """ docstring """
@@ -407,8 +401,8 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.failUnless(inspect.isfunction(wrapped))
         self.assertEqual(wrapped.__is_bfg_view__, True)
         self.assertEqual(wrapped.__permission__, None)
-        self.assertEqual(wrapped.__for__, Interface)
-        self.assertEqual(wrapped.__request_type__, IRequest)
+        self.assertEqual(wrapped.__for__, None)
+        self.assertEqual(wrapped.__request_type__, None)
         self.assertEqual(wrapped.__module__, foo.__module__)
         self.assertEqual(wrapped.__name__, foo.__name__)
         self.assertEqual(wrapped.__doc__, foo.__doc__)
@@ -418,8 +412,6 @@ class TestBFGViewDecorator(unittest.TestCase):
 
     def test_call_newstyle_class(self):
         import inspect
-        from repoze.bfg.interfaces import IRequest
-        from zope.interface import Interface
         decorator = self._makeOne()
         class foo(object):
             """ docstring """
@@ -433,8 +425,8 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.failUnless(inspect.isfunction(wrapped))
         self.assertEqual(wrapped.__is_bfg_view__, True)
         self.assertEqual(wrapped.__permission__, None)
-        self.assertEqual(wrapped.__for__, Interface)
-        self.assertEqual(wrapped.__request_type__, IRequest)
+        self.assertEqual(wrapped.__for__, None)
+        self.assertEqual(wrapped.__request_type__, None)
         self.assertEqual(wrapped.__module__, foo.__module__)
         self.assertEqual(wrapped.__name__, foo.__name__)
         self.assertEqual(wrapped.__doc__, foo.__doc__)

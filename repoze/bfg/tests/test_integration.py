@@ -1,5 +1,4 @@
 import os
-import sys
 import unittest
 
 from repoze.bfg.push import pushpage
@@ -139,6 +138,9 @@ class TestGrokkedApp(unittest.TestCase):
 
     def test_it(self):
         import inspect
+        from repoze.bfg.interfaces import IPOSTRequest
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
         import repoze.bfg.tests.grokkedapp as package
         from zope.configuration import config
         from zope.configuration import xmlconfig
@@ -147,14 +149,35 @@ class TestGrokkedApp(unittest.TestCase):
         context.package = package
         xmlconfig.include(context, 'configure.zcml', package)
         actions = context.actions
-        klassview = actions[-1]
+
+        postview = actions[-1]
+        self.assertEqual(postview[0][1], None)
+        self.assertEqual(postview[0][2], '')
+        self.assertEqual(postview[0][3], IPOSTRequest)
+        self.assertEqual(postview[0][4], IView)
+        self.assertEqual(postview[2][1], package.grokked_post)
+        self.assertEqual(postview[2][2], (None, IPOSTRequest))
+        self.assertEqual(postview[2][3], IView)
+        
+        klassview = actions[-2]
+        self.assertEqual(klassview[0][1], None)
         self.assertEqual(klassview[0][2], 'grokked_klass')
+        self.assertEqual(klassview[0][3], IRequest)
+        self.assertEqual(klassview[0][4], IView)
         self.assertEqual(klassview[2][1], package.grokked_klass)
+        self.assertEqual(klassview[2][2], (None, IRequest))
+        self.assertEqual(klassview[2][3], IView)
         self.failUnless(inspect.isfunction(package.grokked_klass))
         self.assertEqual(package.grokked_klass(None, None), None)
-        funcview = actions[-2]
+
+        funcview = actions[-3]
+        self.assertEqual(funcview[0][1], None)
         self.assertEqual(funcview[0][2], '')
+        self.assertEqual(funcview[0][3], IRequest)
+        self.assertEqual(funcview[0][4], IView)
         self.assertEqual(funcview[2][1], package.grokked)
+        self.assertEqual(funcview[2][2], (None, IRequest))
+        self.assertEqual(funcview[2][3], IView)
 
 class DummyContext:
     pass

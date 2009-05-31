@@ -4,10 +4,6 @@ from paste.urlparser import StaticURLParser
 from zope.component import queryMultiAdapter
 from zope.deprecation import deprecated
 
-from zope.interface import Interface
-
-
-from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IView
 from repoze.bfg.path import caller_path
 from repoze.bfg.security import view_execution_permitted
@@ -221,8 +217,7 @@ class bfg_view(object):
     
       <scan package="."/>
     """
-    def __init__(self, name='', request_type=IRequest, for_=Interface,
-               permission=None):
+    def __init__(self, name='', request_type=None, for_=None, permission=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_

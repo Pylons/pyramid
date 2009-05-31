@@ -1,11 +1,11 @@
 from repoze.bfg.view import bfg_view
-from zope.interface import Interface
 
-class INothing(Interface):
-    pass
-    
-@bfg_view(for_=INothing)
+@bfg_view()
 def grokked(context, request):
+    """ """
+
+@bfg_view(request_type='POST')
+def grokked_post(context, request):
     """ """
     
 class grokked_klass(object):
@@ -23,4 +23,4 @@ class grokked_klass(object):
 # class grokked_class(object):
 #     ....
 #
-grokked_klass = bfg_view(for_=INothing, name='grokked_klass')(grokked_klass)
+grokked_klass = bfg_view(name='grokked_klass')(grokked_klass)
