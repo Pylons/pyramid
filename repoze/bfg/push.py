@@ -22,7 +22,7 @@ class pushpage(object):
 
     Equates to::
 
-      from repoze.bfg.chameleon import render_template_to_response
+      from repoze.bfg.chameleon_zpt import render_template_to_response
       def my_view(context, request):
           return render_template_to_response('www/my_template.pt', a=1, b=())
         

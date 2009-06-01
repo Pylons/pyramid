@@ -9,15 +9,20 @@ from repoze.bfg.security import ACLDenied
 from repoze.bfg.security import Everyone
 
 class ACLAuthorizationPolicy(object):
-    """ An authorization policy which uses ACLs in the following ways:
+    """ An :term:`authorization policy` which consults an :term:`ACL`
+    object attached to a :term:`context` to determine authorization
+    information about a a :term:`principal` or multiple principals.  If
+    the context is part of a :term:`lineage`, the context's parents are
+    consulted for ACL information too.  The following is true about this
+    security policy.
 
-    - When checking whether a user is permitted (via the ``permits``
-      method), the security policy consults the ``context`` for an ACL
-      first.  If no ACL exists on the context, or one does exist but
-      the ACL does not explicitly allow or deny access for any of the
-      effective principals, consult the context's parent ACL, and so
-      on, until the lineage is exhausted or we determine that the
-      policy permits or denies.
+    - When checking whether the 'current' user is permitted (via the
+      ``permits`` method), the security policy consults the
+      ``context`` for an ACL first.  If no ACL exists on the context,
+      or one does exist but the ACL does not explicitly allow or deny
+      access for any of the effective principals, consult the
+      context's parent ACL, and so on, until the lineage is exhausted
+      or we determine that the policy permits or denies.
 
       During this processing, if any ``Deny`` ACE is found matching
       any principal in ``principals``, stop processing by returning an
@@ -38,13 +43,13 @@ class ACLAuthorizationPolicy(object):
       process, if we find an explicit ``Allow`` ACE for a principal
       that matches the ``permission``, the principal is included in
       the allow list.  However, if later in the walking process that
-      user is mentioned in any ``Deny`` ACE for the permission, the
-      user is removed from the allow list.  If a ``Deny`` to the
-      principal ``Everyone`` is encountered during the walking process
-      that matches the ``permission``, the allow list is cleared for
-      all principals encountered in previous ACLs.  The walking
-      process ends after we've processed the any ACL directly attached
-      to ``context``; a set of principals is returned.
+      principal is mentioned in any ``Deny`` ACE for the permission,
+      the principal is removed from the allow list.  If a ``Deny`` to
+      the principal ``Everyone`` is encountered during the walking
+      process that matches the ``permission``, the allow list is
+      cleared for all principals encountered in previous ACLs.  The
+      walking process ends after we've processed the any ACL directly
+      attached to ``context``; a set of principals is returned.
     """
 
     implements(IAuthorizationPolicy)
