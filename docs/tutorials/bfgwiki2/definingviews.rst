@@ -117,7 +117,7 @@ construct URLs and find model objects.
 
 The context object will have a ``pagename`` attribute that matches the
 name of the page we'd like to add.  If our add view is invoked via,
-e.g. ``http://localhost:6543/add_page/SomeName``, the :term:`pagename`
+e.g. ``http://localhost:6543/add_page/SomeName``, the ``pagename``
 attribute of the context will be ``SomeName``.
 
 If the view rendering is *not* a result of a form submission (if the
