@@ -2,5 +2,3 @@
 
 - audit use of "functools.wraps" (pickling no longer required)
 
-- SQLAlchemy + Routes tutorial (convert repoze.wiki)
-
