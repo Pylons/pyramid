@@ -14,6 +14,9 @@ Features
   alias for its ``condition_method`` argument for symmetry with the
   ``view`` directive.
 
+- The ``bfg_routesalchemy`` paster template now provides a unit test
+  and actually uses the database during a view rendering.
+
 Removals
 --------
 
