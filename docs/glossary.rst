@@ -364,3 +364,6 @@ Glossary
     factory may be passed to ``make_app`` as ``None``, in which case
     the application performs no graph traversal and uses :term:`URL
     dispatch` for all URL-to-view code mappings.
+  SQLAlchemy
+    `SQLAlchemy' <http://www.sqlalchemy.org/>`_ is an object
+    relational mapper used in tutorials within this documentation.

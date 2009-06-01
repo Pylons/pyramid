@@ -73,13 +73,25 @@ Tutorials
 Step-by-step tutorials which demonstrate how you might use and deploy
 :mod:`repoze.bfg`.
 
-"BFG Wiki" tutorial, demonstrating how to build a :term:`traversal`
-based application using :term:`ZODB` and :term:`authentication`.
+ZODB + traversal BFG Wiki tutorial, demonstrating how to build a
+:term:`traversal` based application using :term:`ZODB` and
+:term:`authentication`.  Good for people with prior Zope experience
+(or no experience at all).
 
 .. toctree::
    :maxdepth: 3
 
    tutorials/bfgwiki/index.rst
+
+SQLAlchemy + url dispatch BFG Wiki tutorial, demonstrating how to
+build a :term:`url dispatch` based application using
+:term:`SQLAlchemy` and :term:`authentication`.  Good for people with
+prior Pylons experience (or no experience at all).
+
+.. toctree::
+   :maxdepth: 3
+
+   tutorials/bfgwiki2/index.rst
 
 :mod:`repoze.bfg` for Zope CMF Developers
 
@@ -108,9 +120,9 @@ Sample Applications
 
 `repoze.wiki <http://svn.repoze.org/repoze.wiki/trunk/>`_ is a variant
 of the application created during :ref:`bfg_wiki_tutorial` which uses
-`SQLAlchemy <http://www.sqlalchemy.org/>`_ instead of :term:`ZODB` and
-:term:`url dispatch` instead of :term:`traversal`.  Check this
-application out of Subversion via::
+:term:`SQLAlchemy` instead of :term:`ZODB` and uses :term:`url
+dispatch` instead of :term:`traversal`.  Check this application out of
+Subversion via::
 
   svn co http://svn.repoze.org/repoze.wiki/trunk repoze.wiki
 

@@ -17,9 +17,4 @@ Contents:
    background
    installation
    basiclayout
-   definingmodels
-   definingviews
-   viewdecorators
-   authorization
-   distributing
 
