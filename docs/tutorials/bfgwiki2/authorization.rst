@@ -26,7 +26,7 @@ BFG documentation section named
 in a new module we create named ``utilities.py``.
 
 Add the following section to your application's
-``configure.zcml``file:
+``configure.zcml`` file:
 
 .. code-block:: xml
    :linenos:
