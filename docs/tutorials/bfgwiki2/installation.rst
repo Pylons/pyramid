@@ -114,7 +114,7 @@ Preparation, Windows
      c:\bigfntut> Scripts\easy_install -i docutils nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
 
 
-.. _making_a_project:
+.. _sql_making_a_project:
 
 Making a Project
 ================
@@ -147,7 +147,7 @@ Installing the Project in "Development Mode"
 In order to do development on the project easily, you must "register"
 the project as a development egg in your workspace using the
 ``setup.py develop`` command.  In order to do so, cd to the "tutorial"
-directory you created in :ref:`making_a_project`, and run the
+directory you created in :ref:`sql_making_a_project`, and run the
 "setup.py develop" command using virtualenv Python interpreter.
 
 On UNIX:
@@ -164,7 +164,7 @@ On Windows:
   C:\bigfntut> cd tutorial
   C:\bigfntut\tutorial> ..\Scripts\python setup.py develop
 
-.. _running_tests:
+.. _sql_running_tests:
 
 Running the Tests
 =================
