@@ -122,10 +122,10 @@ and its ``app`` function:
 
 #. Line *26*.  We use the ``repoze.bfg.router.make_app`` to return a
    :term:`WSGI` application.  The ``make_app`` function's first
-   parameter is the "root factory".  Since this is a URL dispatch
-   application, the root factory is ``None`` (we don't do any
-   :term:`traversal` in this app.  The second argument is the
-   *package* representing our application, and the third argument,
+   parameter is the "root factory", which is used by the BFG
+   :term:`traversal` mechanism.  Since this is a URL dispatch
+   application, the root factory is ``None``.  The second argument is
+   the *package* representing our application, and the third argument,
    ``options`` is passed as a keyword argument.  It contains a
    dictionary of options parsed by PasteDeploy.
 
