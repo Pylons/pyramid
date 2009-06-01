@@ -12,7 +12,7 @@ class Cleanup:
 
 def handle_teardown(event):
     environ = event.request.environ
-    environ['usermanager.sasession'] = Cleanup(DBSession.remove)
+    environ['{{package}}.sasession'] = Cleanup(DBSession.remove)
 
 def app(global_config, **kw):
     """ This function returns a repoze.bfg.router.Router object.
