@@ -1,0 +1,58 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <!-- this must be included for the view declarations to work -->
+  <include package="repoze.bfg.includes" />
+
+  <subscriber for="repoze.bfg.interfaces.INewRequest"
+    handler=".run.handle_teardown"/>
+
+  <route
+     path="login"
+     name="login"
+     view=".login.login"
+     />
+
+  <route
+     path="logout"
+     name="logout"
+     view=".login.logout"
+     />
+
+  <route path="static/*subpath"
+    name="static"
+    view=".views.static_view"
+    />
+
+  <route
+    path=""
+    name="view_wiki"
+    view=".views.view_wiki"
+    />
+    
+  <route
+     path=":pagename"
+     name="view_page"
+     view=".views.view_page"
+     />
+
+  <route
+     path=":pagename/edit_page"
+     name="edit_page"
+     view=".views.edit_page"
+     permission="edit"
+     />
+
+  <route
+     path="add_page/:pagename"
+     name="add_page"
+     view=".views.add_page"
+     permission="edit"
+     />
+
+   <utility provides="repoze.bfg.interfaces.IRoutesContextFactory"
+            component=".utilities.RoutesContextFactory"/>
+
+   <utility provides="repoze.bfg.interfaces.IForbiddenView"
+            component=".login.login"/>
+
+</configure>
