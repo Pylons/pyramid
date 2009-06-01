@@ -18,7 +18,7 @@ wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 static_view = static('templates/static')
 
 def view_wiki(context, request):
-    return HTTPFound(location = url_for('view_page', page_name='FrontPage'))
+    return HTTPFound(location = url_for('view_page', pagename='FrontPage'))
 
 def view_page(context, request):
     session = DBSession()
