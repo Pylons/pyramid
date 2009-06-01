@@ -110,6 +110,8 @@ normal application operations, the user will need to possess the
 Permission names are just strings.  They hold no special significance
 to the system.  You can name permissions whatever you like.
 
+.. _assigning_acls:
+
 Assigning ACLs to your Model Objects
 ------------------------------------
 

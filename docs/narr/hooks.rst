@@ -164,6 +164,8 @@ code that implements a minimal forbidden view:
    an alterate forbidden view.  For example, it would make sense to
    return a response with a ``403 Forbidden`` status code.
 
+.. _changing_routes_context_factory:
+
 Changing the Default Routes Context Factory
 -------------------------------------------
 
@@ -184,6 +186,7 @@ Python dotted name to the context factory you want to use.  Here's
 some sample code that implements a minimal context factory:
 
 .. code-block:: python
+   :linenos:
 
    class RoutesContextFactory(object):
        def __init__(self, **kw):

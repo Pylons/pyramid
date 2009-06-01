@@ -69,6 +69,8 @@ NotFound error to the user's browser when no routes match.
 .. note:: See :ref:`modelspy_project_section` for an example of a
           simple root factory callable that will use traversal.
 
+.. _route_zcml_directive:
+
 The ``route`` ZCML Directive
 ----------------------------
 
