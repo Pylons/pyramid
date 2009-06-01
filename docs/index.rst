@@ -118,14 +118,6 @@ Change History
 Sample Applications
 ===================
 
-`repoze.wiki <http://svn.repoze.org/repoze.wiki/trunk/>`_ is a variant
-of the application created during :ref:`bfg_wiki_tutorial` which uses
-:term:`SQLAlchemy` instead of :term:`ZODB` and uses :term:`url
-dispatch` instead of :term:`traversal`.  Check this application out of
-Subversion via::
-
-  svn co http://svn.repoze.org/repoze.wiki/trunk repoze.wiki
-
 `repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is a
 simple pastebin application based on Rocky Burt's `ClueBin
 <http://pypi.python.org/pypi/ClueBin/0.2.3>`_.  It demonstrates form
