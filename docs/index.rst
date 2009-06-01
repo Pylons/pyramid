@@ -79,7 +79,7 @@ ZODB + traversal BFG Wiki tutorial, demonstrating how to build a
 (or no experience at all).
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    tutorials/bfgwiki/index.rst
 
@@ -89,21 +89,21 @@ build a :term:`url dispatch` based application using
 prior Pylons experience (or no experience at all).
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    tutorials/bfgwiki2/index.rst
 
 :mod:`repoze.bfg` for Zope CMF Developers
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    tutorials/cmf/index.rst
 
 :mod:`repoze.bfg` on Google's App Engine
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    tutorials/gae/index.rst
 
