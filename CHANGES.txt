@@ -38,6 +38,8 @@ Documentation
   interface types, and moved advanced interface type usage to Events
   narrative chapter.
 
+- Added a Routes+SQLAlchemy wiki tutorial.
+
 0.9a8 (2009-05-31)
 ==================
 
