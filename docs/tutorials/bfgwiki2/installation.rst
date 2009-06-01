@@ -64,8 +64,8 @@ Preparation, UNIX
 
      $ bin/easy_install docutils nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
 
-Preparation (without CD), Windows
----------------------------------
+Preparation, Windows
+--------------------
 
 #. Install, or find `Python 2.5
    <http://python.org/download/releases/2.5.4/>`_ for your system.
