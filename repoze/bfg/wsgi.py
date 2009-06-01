@@ -48,7 +48,7 @@ def wsgiapp2(wrapped):
 
     E.g.::
 
-      @wsgiapp
+      @wsgiapp2
       def hello_world(environ, start_response):
           body = 'Hello world'
           start_response('200 OK', [ ('Content-Type', 'text/plain'),
