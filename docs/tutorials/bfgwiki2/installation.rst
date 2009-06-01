@@ -4,9 +4,8 @@ Installation
 
 For the most part, the installation process for this tutorial follows
 the `Installing repoze.bfg
-<http://docs.repoze.org/bfg/narr/install.html>`_ and `Creating a
-repoze.bfg Project <http://docs.repoze.org/bfg/narr/project.html>`_
-pages.
+<http://docs.repoze.org/bfg/narr/install.html>`_.  We install
+additional libraries for tutorial purposes.
 
 Preparation
 ===========
