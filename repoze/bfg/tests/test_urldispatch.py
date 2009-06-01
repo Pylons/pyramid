@@ -22,31 +22,17 @@ class RoutesRootFactoryTests(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(get_root)
 
-    def test_init_custom_default_context_factory_dont_decorate(self):
+    def test_init_default_context_factory(self):
         from zope.component import getGlobalSiteManager
         from repoze.bfg.interfaces import IRoutesContextFactory
+        from repoze.bfg.urldispatch import DefaultRoutesContext
         class Dummy(object):
             pass
         gsm = getGlobalSiteManager()
         gsm.registerUtility(Dummy, IRoutesContextFactory)
         mapper = self._makeOne(None)
-        self.assertEqual(mapper.default_context_factory,
-                         Dummy)
+        self.assertEqual(mapper.default_context_factory, DefaultRoutesContext)
         self.assertEqual(mapper.decorate_context, True)
-
-    def test_init_custom_default_context_factory_decorate(self):
-        from zope.component import getGlobalSiteManager
-        from repoze.bfg.interfaces import IRoutesContextFactory
-        from repoze.bfg.interfaces import IRoutesContext
-        from zope.interface import implements
-        class Dummy(object):
-            implements(IRoutesContext)
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(Dummy, IRoutesContextFactory)
-        mapper = self._makeOne(None)
-        self.assertEqual(mapper.default_context_factory,
-                         Dummy)
-        self.assertEqual(mapper.decorate_context, False)
 
     def test_no_route_matches(self):
         marker = ()

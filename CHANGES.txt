@@ -1,6 +1,13 @@
 Next Release
 ============
 
+Bug Fixes
+---------
+
+- It was not possible to register a custom ``IRoutesContextFactory``
+  for use as a default context factory as documented in the "Hooks"
+  chapter.
+
 Features
 --------
 

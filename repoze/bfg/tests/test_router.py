@@ -911,6 +911,38 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(len(logger.messages), 1)
         self.failUnless('ISecurityPolicy' in logger.messages[0])
 
+    def test_custom_default_context_factory_nodecorate(self):
+        from repoze.bfg.tests import routesapp
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import IRoutesContextFactory
+        from repoze.bfg.interfaces import IRoutesMapper
+        class Dummy(object):
+            pass
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(Dummy, IRoutesContextFactory)
+        app = self._callFUT(None, routesapp, registry=gsm)
+        mapper = gsm.getUtility(IRoutesMapper)
+        self.assertEqual(mapper.default_context_factory,
+                         Dummy)
+        self.assertEqual(mapper.decorate_context, True)
+
+    def test_custom_default_context_factory_decorate(self):
+        from repoze.bfg.tests import routesapp
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import IRoutesContextFactory
+        from repoze.bfg.interfaces import IRoutesMapper
+        from repoze.bfg.interfaces import IRoutesContext
+        from zope.interface import implements
+        class Dummy(object):
+            implements(IRoutesContext)
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(Dummy, IRoutesContextFactory)
+        app = self._callFUT(None, routesapp, registry=gsm)
+        mapper = gsm.getUtility(IRoutesMapper)
+        self.assertEqual(mapper.default_context_factory,
+                         Dummy)
+        self.assertEqual(mapper.decorate_context, False)
+
 class TestDefaultForbiddenView(unittest.TestCase):
     def _callFUT(self, context, request):
         from repoze.bfg.router import default_forbidden_view

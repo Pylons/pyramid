@@ -30,6 +30,8 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IAuthenticationPolicy
+from repoze.bfg.interfaces import IRoutesContext
+from repoze.bfg.interfaces import IRoutesContextFactory
 
 from repoze.bfg.log import make_stream_logger
 
@@ -350,8 +352,6 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
     settings = Settings(options)
     registry.registerUtility(settings, ISettings)
-    mapper = RoutesRootFactory(root_factory)
-    registry.registerUtility(mapper, IRoutesMapper)
 
     if authentication_policy:
         registry.registerUtility(authentication_policy, IAuthenticationPolicy)
@@ -359,7 +359,18 @@ def make_app(root_factory, package=None, filename='configure.zcml',
             authorization_policy = ACLAuthorizationPolicy()
         registry.registerUtility(authorization_policy, IAuthorizationPolicy)
 
+    mapper = RoutesRootFactory(root_factory)
+    registry.registerUtility(mapper, IRoutesMapper)
+
     populateRegistry(registry, filename, package)
+
+    context_factory = registry.queryUtility(
+        IRoutesContextFactory,
+        default=mapper.default_context_factory)
+
+    if IRoutesContext.implementedBy(context_factory):
+        mapper.decorate_context = False
+    mapper.default_context_factory = context_factory
 
     if not authentication_policy:
         # deal with bw compat of <= 0.8 security policies (deprecated)

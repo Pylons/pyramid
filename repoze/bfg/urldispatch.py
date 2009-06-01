@@ -55,11 +55,7 @@ class RoutesRootFactory(Mapper):
         kw['explicit'] = True
         Mapper.__init__(self, **kw)
         self._regs_created = False
-        context_factory = queryUtility(IRoutesContextFactory,
-                                       default=DefaultRoutesContext)
-        if IRoutesContext.implementedBy(context_factory):
-            self.decorate_context = False
-        self.default_context_factory = context_factory
+        self.default_context_factory = DefaultRoutesContext
 
     def has_routes(self):
         return bool(self.matchlist)
