@@ -5,7 +5,7 @@ repoze.bfg
 ===========
 
 :mod:`repoze.bfg` is a Python web application framework.  It is
-inspired by :term:`Zope`, :term:`Pylons`, and :term:`Django`, and uses
+inspired by :term:`Zope`, :term:`Pylons`, and :term:`Django`.  It uses
 various Zope-related and Pylons-related libraries internally to do
 much of its work.  :mod:`repoze.bfg` uses the WSGI protocol to handle
 request and responses.
