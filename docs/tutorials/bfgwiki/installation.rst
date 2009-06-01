@@ -85,25 +85,25 @@ Preparation (without CD), Windows
    the ``python`` interpreter of your Python 2.5 installation using a
    command prompt:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
     c:\> c:\Python25\python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
     c:\> c:\Python25\Scripts\easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
      c:\> c:\Python25\Scripts\virtualenv --no-site-packages bigfntut
 
 #. Switch to the ``bigfntut`` directory:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
      c:\> cd bigfntut
 
@@ -113,7 +113,7 @@ Preparation (without CD), Windows
 #. Use ``easy_install`` and point to the BFG "current index to get BFG
    and its direct dependencies installed:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
      c:\bigfntut> Scripts/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
 
@@ -121,7 +121,7 @@ Preparation (without CD), Windows
    ``repoze.zodbconn``, ``repoze.who``, ``nose`` and ``coverage`` from
    a *different* index (the "lemonade" index).
 
-   .. code-block:: bash
+   .. code-block:: bat
 
      c:\bigfntut> Scripts\easy_install -i http://dist.repoze.org/lemonade/dev/simple docutils repoze.tm repoze.zodbconn repoze.who nose coverage
 
@@ -148,7 +148,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: bash
+.. code-block:: bat
 
    c:\bigfntut> Scripts\paster create -t bfg_zodb tutorial
 
@@ -170,7 +170,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: bash
+.. code-block:: bat
 
   C:\bigfntut> cd tutorial
   C:\bigfntut\tutorial> ..\Scripts\python setup.py develop
@@ -191,7 +191,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: bash
+.. code-block:: bat
 
   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
 
@@ -208,7 +208,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: bash
+.. code-block:: bat
 
   c:\bifgfntut\tutorial> ..\Scripts\paster serve tutorial.ini --reload
 
@@ -229,7 +229,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: bash
+.. code-block:: bat
 
   c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial --cover-erase --with-coverage
 
