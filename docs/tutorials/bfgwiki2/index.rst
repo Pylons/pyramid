@@ -1,12 +1,13 @@
-.. _bfg_wiki_tutorial:
+.. _bfg_sql_wiki_tutorial:
 
-BFG Wiki Tutorial
-=================
+BFG URL Dispatch + SQLAlchemy Wiki Tutorial
+===========================================
 
-This tutorial introduces a :term:`traversal` -based BFG application to
-a developer with at least passing familiarity to Python.  When we're
-done with the tutorial, the developer will have created a basic Wiki
-application with authentication.
+This tutorial introduces a :term:`url dispatch` and :term:`SQLAlchemy`
+-based BFG application to a developer with at least passing
+familiarity to Python.  When we're done with the tutorial, the
+developer will have created a basic Wiki application with
+authentication.
 
 Contents:
 
