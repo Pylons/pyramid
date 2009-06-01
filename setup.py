@@ -71,6 +71,7 @@ setup(name='repoze.bfg',
         bfg_starter=repoze.bfg.paster:StarterProjectTemplate
         bfg_zodb=repoze.bfg.paster:ZODBProjectTemplate
         bfg_routesalchemy=repoze.bfg.paster:RoutesAlchemyProjectTemplate
+        bfg_alchemy=repoze.bfg.paster:AlchemyProjectTemplate
         [paste.paster_command]
         bfgshell=repoze.bfg.paster:BFGShellCommand
       """
