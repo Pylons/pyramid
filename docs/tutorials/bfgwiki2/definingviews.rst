@@ -237,6 +237,9 @@ Mapping Views to URLs in ``configure.zcml``
 The ``configure.zcml`` file contains ``route`` declarations which
 serve to map URLs (via :term:`url dispatch`) to view functions.
 You'll need to add five ``view`` declarations to ``configure.zcml``.
+Note that the *ordering* of these declarations is very important.
+``route`` declarations are matched in the order they're found in the
+``configure.zcml`` file.
 
 #. Add a declaration which maps the empty path (signifying the root
    URL) to the view named ``view_wiki`` in our ``views.py`` file with

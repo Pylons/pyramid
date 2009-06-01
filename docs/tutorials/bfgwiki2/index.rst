@@ -17,4 +17,9 @@ Contents:
    background
    installation
    basiclayout
+   definingmodels
+   definingviews
+   authorization
+   distributing
+
 
