@@ -118,7 +118,7 @@ and logout views.  Add a file named ``login.py`` to your application
 Changing Existing Views
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Then we need to change each opf our ``view_page``, ``edit_page`` and
+Then we need to change each of our ``view_page``, ``edit_page`` and
 ``add_page`` views in ``views.py`` to pass a "logged in" parameter
 into its template.  We'll add something like this to each view body:
 
