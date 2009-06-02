@@ -2,3 +2,7 @@
 
 - audit use of "functools.wraps" (pickling no longer required)
 
+- Docs: add interface docs for IAuthenticationPolicy and
+  IAuthorizationPolicy, so people who care might be able to write
+  their own.
+
