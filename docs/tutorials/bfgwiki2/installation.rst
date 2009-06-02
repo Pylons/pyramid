@@ -119,12 +119,9 @@ Preparation, Windows
 Making a Project
 ================
 
-Whether you arrived at this point by installing your own environment
-using the steps above, or you used the instructions in the tutorial
-disc, your next steps are to create a project.
-
-BFG supplies a variety of templates to generate sample projects.  We
-will use the :term:`SQLAlchemy` + :term:`Routes` -oriented template.
+Your next step is to create a project.  BFG supplies a variety of
+templates to generate sample projects.  We will use the
+:term:`SQLAlchemy` + :term:`Routes` -oriented template.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "bigfntut".
