@@ -798,6 +798,17 @@ class MakeAppTests(unittest.TestCase):
         app = self._callFUT(rootpolicy, fixtureapp)
         assert app.created is True
 
+    def test_custom_settings(self):
+        options= {'mysetting':True}
+        from repoze.bfg.tests import fixtureapp
+        rootpolicy = make_rootfactory(None)
+        app = self._callFUT(rootpolicy, fixtureapp, options=options)
+        from repoze.bfg.interfaces import ISettings
+        settings = app.registry.getUtility(ISettings)
+        self.assertEqual(settings.reload_templates, False)
+        self.assertEqual(settings.debug_authorization, False)
+        self.assertEqual(settings.mysetting, True)
+
     def test_registrations(self):
         options= {'reload_templates':True,
                   'debug_authorization':True}

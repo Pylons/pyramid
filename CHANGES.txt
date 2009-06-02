@@ -1,6 +1,15 @@
 Next release
 ============
 
+Features
+--------
+
+- Add API named ``repoze.bfg.settings.get_settings`` which retrieves a
+  derivation of values passed as the ``options`` value of
+  ``repoze.bfg.router.make_app``.  This API should be preferred
+  instead of using getUtility(ISettings).  I added a new
+  ``repoze.bfg.settings`` API document as well.
+
 Bug Fixes
 ---------
 

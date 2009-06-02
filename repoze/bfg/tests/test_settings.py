@@ -1,4 +1,5 @@
 import unittest
+from repoze.bfg.testing import cleanUp
 
 class TestSettings(unittest.TestCase):
     def _getTargetClass(self):
@@ -9,17 +10,36 @@ class TestSettings(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(options)
 
-    def test_no_options(self):
-        settings = self._makeOne()
+    def test_getattr(self):
+        settings = self._makeOne(reload_templates=False)
         self.assertEqual(settings.reload_templates, False)
-        self.assertEqual(settings.debug_notfound, False)
-        self.assertEqual(settings.debug_authorization, False)
 
-    def test_with_option(self):
-        settings = self._makeOne(reload_templates=True)
-        self.assertEqual(settings.reload_templates, True)
-        self.assertEqual(settings.debug_notfound, False)
-        self.assertEqual(settings.debug_authorization, False)
+    def test_getattr_raises_attribute_error(self):
+        settings = self._makeOne()
+        self.assertRaises(AttributeError, settings.__getattr__,
+                          'reload_templates'
+                          )
+
+class TestGetSettings(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self):
+        from repoze.bfg.settings import get_settings
+        return get_settings()
+
+    def test_it_nosettings(self):
+        self.assertEqual(self._callFUT(), None)
+
+    def test_it_withsettings(self):
+        from repoze.bfg.interfaces import ISettings
+        from zope.component import provideUtility
+        settings = {'a':1}
+        provideUtility(settings, ISettings)
+        self.assertEqual(self._callFUT(), settings)
 
 class TestGetOptions(unittest.TestCase):
     def _callFUT(self, *arg, **kw):

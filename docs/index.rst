@@ -60,6 +60,7 @@ Per-module :mod:`repoze.bfg` API documentation.
    api/router
    api/scripting
    api/security
+   api/settings
    api/template
    api/testing
    api/traversal

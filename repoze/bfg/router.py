@@ -46,6 +46,7 @@ from repoze.bfg.secpols import registerBBBAuthn
 from repoze.bfg.security import Allowed
 
 from repoze.bfg.settings import Settings
+from repoze.bfg.settings import get_options
 
 from repoze.bfg.threadlocal import manager
 
@@ -350,7 +351,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     if debug_logger is None:
         debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
     registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
-    settings = Settings(options)
+    settings = Settings(get_options(options))
     registry.registerUtility(settings, ISettings)
 
     if authentication_policy:

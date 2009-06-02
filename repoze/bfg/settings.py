@@ -1,14 +1,30 @@
 import os
 
+from zope.component import queryUtility
 from zope.interface import implements
 
 from repoze.bfg.interfaces import ISettings
 
-class Settings(object):
+class Settings(dict):
     implements(ISettings)
-    def __init__(self, options):
-        options = get_options(options)
-        self.__dict__.update(options)
+    def __getattr__(self, name):
+        # backwards compatibility
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
+
+def get_settings():
+    """
+    Return a 'settings' object for the current application.  A
+    'settings' object is a dictionary-like object that contains
+    key/value pairs based on the dictionary passed as the ``options``
+    argument to the ``repoze.bfg.router.make_app`` API.
+
+    For backwards compatibility, dictionary keys can also be looked up
+    as attributes of the settings object.
+    """
+    return queryUtility(ISettings)
 
 def asbool(s):
     s = str(s).strip()
