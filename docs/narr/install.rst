@@ -162,25 +162,25 @@ Installing :mod:`repoze.bfg` on a Windows System
    the ``python`` interpreter of your Python 2.5 installation using a
    command prompt:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
     c:\> c:\Python25\python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
     c:\> c:\Python25\Scripts\easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
      c:\> c:\Python25\Scripts\virtualenv --no-site-packages bfgenv
 
 #. Switch to the ``bfgenv`` directory:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
      c:\> cd bfgenv
 
@@ -190,7 +190,7 @@ Installing :mod:`repoze.bfg` on a Windows System
 #. Use ``easy_install`` and point to the BFG "current index to get BFG
    and its direct dependencies installed:
 
-   .. code-block:: bash
+   .. code-block:: bat
 
      c:\bfgenv> Scripts/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
 
