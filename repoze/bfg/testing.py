@@ -233,7 +233,7 @@ class DummyTemplateRenderer:
         return self.string_response
 
     def __getattr__(self, k):
-        """ Backwards compatibiity """
+        """ Backwards compatibility """
         val = self._received.get(k, _marker)
         if val is _marker:
             raise AttributeError(k)
