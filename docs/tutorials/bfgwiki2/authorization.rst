@@ -195,23 +195,23 @@ our application in a browser.  The views we'll try are as follows:
 
 - Visiting `http://localhost:6543/FrontPage/
   <http://localhost:6543/FrontPage/>`_ in a browser invokes the
-  ``view_page`` view of the front page page object.
+  ``view_page`` view of the FrontPage page object.
 
 - Visiting `http://localhost:6543/FrontPage/edit_page
   <http://localhost:6543/FrontPage/edit_page>`_ in a browser invokes
-  the edit view for the front page object.  It is executable by only
+  the edit view for the FrontPage object.  It is executable by only
   the ``editor`` user.  If a different user (or the anonymous user)
   invokes it, a login form will be displayed.  Supplying the
   credentials with the username ``editor``, password ``editor`` will
-  show the edit page form being displayed.
+  display the edit page form.
 
 - Visiting `http://localhost:6543/add_page/SomePageName
   <http://localhost:6543/add_page/SomePageName>`_ in a browser invokes
   the add view for a page.  It is executable by only the ``editor``
   user.  If a different user (or the anonymous user) invokes it, a
   login form will be displayed.  Supplying the credentials with the
-  username ``editor``, password ``editor`` will show the edit page
-  form being displayed.
+  username ``editor``, password ``editor`` will display the edit page
+  form.
 
 Seeing Our Changes To ``views.py`` and our Templates
 ----------------------------------------------------
