@@ -63,7 +63,7 @@ def wsgiapp2(wrapped):
           context="*"
         />
 
-    The wsgiapp decorator will convert the result of the WSGI
+    The wsgiapp2 decorator will convert the result of the WSGI
     application to a Response and return it to repoze.bfg as if the
     WSGI app were a repoze.bfg view.  The ``SCRIPT_NAME`` and
     ``PATH_INFO`` values present in the WSGI environment are fixed up
