@@ -9,6 +9,4 @@
 
   .. autofunction:: inside
 
-  .. autofunction:: locate
-
 

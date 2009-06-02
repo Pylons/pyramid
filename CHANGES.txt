@@ -13,6 +13,12 @@ Documentation
 - Fix a reference to ``wsgiapp`` in the ``wsgiapp2`` API documentation
   within the ``repoze.bfg.wsgi`` module.
 
+API Removals
+------------
+
+- The ``repoze.bfg.location.locate`` API was removed: it didn't do
+  enough to be very helpful and had a misleading name.
+
 0.9 (2009-06-01)
 ================
 

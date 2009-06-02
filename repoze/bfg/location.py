@@ -32,16 +32,6 @@ def inside(model1, model2):
 
     return False
 
-def locate(model, parent, name=None):
-    """
-    Directly set ``model`` 's ``__parent__`` attribute to the
-    ``parent`` object (also a model), and its ``__name__`` to the
-    supplied ``name`` argument, and return the model.
-    """
-    model.__parent__ = parent
-    model.__name__ = name
-    return model
-
 def lineage(model):
     """
     Return a generator representing the model lineage.  The generator
