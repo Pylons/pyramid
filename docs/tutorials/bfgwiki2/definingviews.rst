@@ -112,7 +112,7 @@ The ``add_page`` function will be invoked when a user clicks on a
 ``check`` function within the ``view_page`` view generates URLs to
 this view.  It also acts as a handler for the form that is generated
 when we want to add a page object.  The ``context`` of the
-``add_page`` view is will always have the attributes we need to
+``add_page`` view will always have the attributes we need to
 construct URLs and find model objects.
 
 The context object will have a ``pagename`` attribute that matches the
