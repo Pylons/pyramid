@@ -16,7 +16,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: bash
+.. code-block:: bat
 
    c:\bigfntut> ..\Scripts\python setup.py sdist
 
