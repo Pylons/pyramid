@@ -7,7 +7,8 @@ from repoze.bfg.threadlocal import manager
 
 def current_request():
     """Return the currently active request or ``None`` if no request
-    is currently active.
+    is currently active.  This is *not* an official API, but it's
+    going to live here 'forever' and so can be relied on to exist.
 
     **This function should be used extremely sparingly** (read: almost
     never), because its usage makes it possible to write code that can
