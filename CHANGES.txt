@@ -1,10 +1,19 @@
 Next release
 ============
 
+Features
+--------
+
+- Add ``repoze.bfg.request.current_request`` function.  This function
+  should be used (**very sparingly**) to retrieve the "current"
+  request.  See the ``repoze.bfg.request`` API documentation for more
+  information.
+
 Bug Fixes
 ---------
 
-- Restored missing entry point declaration for bfg_alchemy paster template, which was accidentally removed in 0.9.
+- Restored missing entry point declaration for bfg_alchemy paster
+  template, which was accidentally removed in 0.9.
 
 Documentation
 -------------
