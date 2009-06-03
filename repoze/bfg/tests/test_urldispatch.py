@@ -1,22 +1,6 @@
 import unittest
 from repoze.bfg.testing import cleanUp
 
-class TestDefaultRoutesContextFactory(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.urldispatch import DefaultRoutesContext
-        return DefaultRoutesContext
-
-    def _makeOne(self, **kw):
-        return self._getTargetClass()(kw)
-    
-    def test_getattr(self):
-        inst = self._makeOne(a=1)
-        self.assertEqual(inst.a, 1)
-
-    def test_getattr_raises(self):
-        inst = self._makeOne(a=1)
-        self.assertRaises(AttributeError, inst.__getattr__, 'b')
-
 class RoutesRootFactoryTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
