@@ -218,7 +218,8 @@ The ``mypackage.views`` module referred to above might look like so:
 In this case the context object passed to the view will be an instance
 of the ``repoze.bfg.urldispatch.DefaultRoutesContext``.  This is the
 type of obejct created for a context when there is no "factory"
-specified in the ``route`` declaration.
+specified in the ``route`` declaration.  It is a mapping object, a lot
+like a dictionary.
 
 Example 2
 ---------
@@ -337,9 +338,9 @@ The ``.models`` module referred to above might look like so:
 .. code-block:: python
    :linenos:
 
-   class Article(object):
-       def __init__(self, **kw):
-           self.__dict__.update(kw)
+   class Article(dict):
+       def is_root(self):
+           return self['article'] == 'root'
 
 The ``.views`` module referred to above might look like so:
 
@@ -349,15 +350,18 @@ The ``.views`` module referred to above might look like so:
    from webob import Response
 
    def article_view(context, request):
-       return Response('Article with name' % context.article)
+       if context.is_root():
+          return Response('Root article')
+       else:
+          return Response('Article with name %s' % context.article)
 
 The effect of this configuration: when this :mod:`repoze.bfg`
 application runs, if any URL matches the pattern
 ``archives/:article``, the ``.views.articles_view`` view will be
 called with its :term:`context` as a instance of the ``Article``
-class.  The ``Article`` instance will have attributes matching the
-keys and values in the Routes routing dictionary associated with the
-request.
+class.  The ``Article`` instance will have keys and values matching
+the keys and values in the Routes routing dictionary associated with
+the request.
 
 In this case in particular, when a user visits
 ``/archives/something``, the context will be an instance of the
@@ -443,9 +447,8 @@ Such a ``factory`` might look like so:
 .. code-block:: python
    :linenos:
 
-   class Article(object):
-       def __init__(self, **kw):
-           self.__dict__.update(kw)
+   class Article(dict):
+       pass
 
    def article_factory(**kw):
        model = Article(**kw)
