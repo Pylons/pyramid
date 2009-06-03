@@ -1,7 +1,5 @@
 import re
 
-from zope.component import queryUtility
-
 from zope.interface import implements
 from zope.interface import alsoProvides
 from zope.interface import classProvides
@@ -13,16 +11,18 @@ from routes import url_for
 from repoze.bfg.interfaces import IContextNotFound
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import IRoutesContext
-from repoze.bfg.interfaces import IRoutesContextFactory
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import ITraverserFactory
 
 _marker = ()
 
-class DefaultRoutesContext(object):
+class DefaultRoutesContext(dict):
     implements(IRoutesContext)
-    def __init__(self, **kw):
-        self.__dict__.update(kw)
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
 
 class RoutesContextNotFound(object):
     implements(IContextNotFound)
