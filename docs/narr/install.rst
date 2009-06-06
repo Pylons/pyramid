@@ -192,7 +192,7 @@ Installing :mod:`repoze.bfg` on a Windows System
 
    .. code-block:: bat
 
-     c:\bfgenv> Scripts/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
+     c:\bfgenv> Scripts\easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
 
 Installing :mod:`repoze.bfg` on Google App Engine
 -------------------------------------------------
