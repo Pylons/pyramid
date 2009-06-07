@@ -158,6 +158,8 @@ Installing :mod:`repoze.bfg` on a Windows System
 
 #. Install the `Python for Windows extensions
    <http://www.sourceforge.net/project/showfiles.php?group_id=78018>`_.
+   Make sure to pick the right download for Python 2.5 and install it
+   using the same Python installation from the previous step.
 
 #. Install latest `setuptools` into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
