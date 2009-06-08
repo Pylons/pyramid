@@ -1,3 +1,12 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- The ``bfg_alchemy`` Paster template named "repoze.tm" in its
+  pipeline rather than "repoze.tm2", causing the startup to fail.
+
 0.9.1 (2009-06-02)
 ==================
 

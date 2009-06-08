@@ -11,7 +11,7 @@ db_echo = false
 
 [pipeline:main]
 pipeline =
-    egg:repoze.tm#tm
+    egg:repoze.tm2#tm
     alchemy
 
 [server:main]
