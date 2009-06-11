@@ -83,6 +83,25 @@ class GetSiteManagerTests(unittest.TestCase):
         from zope.component.interfaces import ComponentLookupError
         self.assertRaises(ComponentLookupError, self._callFUT, object)
 
+class GetRegistryTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self):
+        from repoze.bfg.registry import get_registry
+        return get_registry()
+
+    def test_it(self):
+        from repoze.bfg.threadlocal import manager
+        try:
+            manager.push({'registry':123})
+            self.assertEqual(self._callFUT(), 123)
+        finally:
+            manager.pop()
+    
 class TestFakeRegistry(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.registry import FakeRegistryManager

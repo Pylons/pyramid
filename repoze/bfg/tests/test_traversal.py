@@ -830,9 +830,9 @@ class UnderTraverseTests(unittest.TestCase):
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, context, environ):
+    def _callFUT(self, context, environ, registry=None):
         from repoze.bfg.traversal import _traverse
-        return _traverse(context, environ)
+        return _traverse(context, environ, registry)
 
     def _registerTraverserFactory(self, traverser):
         import zope.component
@@ -846,6 +846,15 @@ class UnderTraverseTests(unittest.TestCase):
         self._registerTraverserFactory(traverser)
         context = DummyContext()
         result = self._callFUT(context, None)
+        self.assertEqual(result, {})
+
+    def test_withregistry(self):
+        from zope.component import getSiteManager
+        registry = getSiteManager()
+        traverser = make_traverser({})
+        self._registerTraverserFactory(traverser)
+        context = DummyContext()
+        result = self._callFUT(context, None, registry)
         self.assertEqual(result, {})
 
     def test_issixtuple(self):

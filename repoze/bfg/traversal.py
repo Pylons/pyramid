@@ -262,11 +262,15 @@ def traverse(model, path):
 
     return _traverse(model, {'PATH_INFO':path})
 
-def _traverse(model, environ):
-    traverser = ITraverserFactory(model)
+def _traverse(model, environ, registry=None):
+    if registry is None:
+        traverser = ITraverserFactory(model)
+    else:
+        # for speed
+        traverser = registry.getAdapter(model, ITraverserFactory)
     result = traverser(environ)
     deprecation_warning = None
-    if not isinstance(result, dict):
+    if result.__class__ is not dict: # isinstance slightly slower
         try:
             # b/w compat for 6-arg returning ITraversers (0.7.1 til 0.8a7)
             ctx, view_name, subpath, traversed, vroot, vroot_path = result

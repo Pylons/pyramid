@@ -68,7 +68,7 @@ def populateRegistry(registry, filename, package, lock=threading.Lock()):
 
 def getSiteManager(context=None):
     if context is None:
-        return get_registry()
+        return manager.get()['registry']
     else:
         try:
             return IComponentLookup(context)

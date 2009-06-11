@@ -147,7 +147,7 @@ class Router(object):
             threadlocals['request'] = request
             registry.has_listeners and registry.notify(NewRequest(request))
 
-            tdict = _traverse(root, environ)
+            tdict = _traverse(root, environ, registry)
             if '_deprecation_warning' in tdict:
                 warning = tdict.pop('_deprecation_warning')
                 if not warning in self.traverser_warned:
