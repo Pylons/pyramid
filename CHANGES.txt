@@ -57,20 +57,13 @@ Backwards Incompatibilities
 - The ``repoze.bfg.IRequestFactory`` interface was removed.  See the
   bullet above for why.
 
-- View code that used urldispatch which expected the default routes
-  context factory to stash the routes matchdict arguments on the
-  context will not work properly without passing a default "root
-  factory" to ``repoze.bfg.router.make_app`` that performs this magic.
-  The "magic" is retrieving the matchdict from the environ and
-  constructing a root object that has this set of key/value pairs as
-  instance __dict__ values.
-
 - Routes "context factories" (spelled as the factory argument to a
   route statement in ZCML) must now expect the WSGI environ as a
   single argument rather than a set of keyword arguments.  They can
   obtain the match dictionary by asking for
   environ['bfg.routes.matchdict'].  This is the same set of keywords
-  that used to be passed to context factories.
+  that used to be passed to urldispatch "context factories" in BFG 0.9
+  and below.
 
 - Using the ``@zope.component.adapter`` decorator on a bfg view
   function no longer works.  Use the ``@repoze.bfg.view.bfg_view``
