@@ -1,6 +1,5 @@
 from cgi import escape
 import sys
-from webob import Request as WebObRequest
 from webob import Response
 
 from zope.component.event import dispatch
@@ -158,21 +157,12 @@ class Router(object):
                 tdict['traversed'], tdict['virtual_root'],
                 tdict['virtual_root_path'])
 
-            if isinstance(request, WebObRequest):
-                # webob.Request's __setattr__ (as of 0.9.5 and lower)
-                # is a bottleneck; if we're sure we're using a
-                # webob.Request, go around its back and set stuff into
-                # the environ directly
-                attrs = environ.setdefault('webob.adhoc_attrs', {})
-                attrs.update(tdict)
-            else:
-                request.root = root
-                request.context = context
-                request.view_name = view_name
-                request.subpath = subpath
-                request.traversed = traversed
-                request.virtual_root = vroot
-                request.virtual_root_path = vroot_path
+            # webob.Request's __setattr__ (as of 0.9.5 and lower) is a
+            # bottleneck; since we're sure we're using a
+            # webob.Request, we can go around its back and set stuff
+            # into the environ directly
+            attrs = environ.setdefault('webob.adhoc_attrs', {})
+            attrs.update(tdict)
 
             def respond(response, view_name):
                 registry.has_listeners and registry.notify(
