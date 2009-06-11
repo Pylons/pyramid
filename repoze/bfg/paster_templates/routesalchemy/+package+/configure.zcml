@@ -6,12 +6,13 @@
   <subscriber for="repoze.bfg.interfaces.INewRequest"
     handler=".run.handle_teardown"/>
 
-  <route path=""
+  <route 
+    path=""
     name="home"
     view=".views.my_view"
     />
 
-  <route path="static/*subpath"
+  <view 
     name="static"
     view=".views.static_view"
     />
