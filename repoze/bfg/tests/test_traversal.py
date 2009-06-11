@@ -189,6 +189,67 @@ class ModelGraphTraverserTests(unittest.TestCase):
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
         self.assertRaises(TypeError, policy, environ)
 
+    def test_withroute_nothingfancy(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        routing_args = ((), {})
+        environ = {'bfg.routes.matchdict': {}}
+        result = traverser(environ)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], [])
+
+    def test_withroute_with_subpath(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        environ = {'bfg.routes.matchdict': {'subpath':'/a/b/c'}}
+        result = traverser(environ)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ['a', 'b','c'])
+        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], [])
+
+    def test_withroute_with_path_info(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        environ = {'bfg.routes.matchdict': {'path_info':'foo/bar'},
+                   'PATH_INFO':'/a/b/foo/bar', 'SCRIPT_NAME':''}
+        result = traverser(environ)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], [])
+        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(environ['PATH_INFO'], '/foo/bar')
+        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
+
+    def test_withroute_with_path_info_PATH_INFO_w_extra_slash(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        environ = {'bfg.routes.matchdict':{'path_info':'foo/bar'},
+                   'PATH_INFO':'/a/b//foo/bar', 'SCRIPT_NAME':''}
+        traverser(environ)
+        self.assertEqual(environ['PATH_INFO'], '/foo/bar')
+        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
+
+    def test_withroute_and_traverse(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        environ = {'bfg.routes.matchdict': {'traverse':'foo/bar'}}
+        result = traverser(environ)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], 'foo')
+        self.assertEqual(result['subpath'], ['bar'])
+        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], [])
+
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
         from repoze.bfg.traversal import find_interface
@@ -637,7 +698,21 @@ class TraversalContextURLTests(unittest.TestCase):
         context_url = self._makeOne(bar, request)
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432//bar/')
-        
+
+    def test_with_route(self):
+        root = DummyContext()
+        root.__name__ = None
+        root.__parent__ = None
+        one = DummyContext()
+        one.__name__ = 'one'
+        one.__parent__ = root
+        route = DummyRoute()
+        request = DummyRequest({'bfg.routes.route':route,
+                                'bfg.routes.matchdict':{'a':1}})
+        context_url = self._makeOne(one, request)
+        result = context_url()
+        self.assertEqual(result, 'http://example.com/one/')
+        self.assertEqual(route.generate_kw, {'a':1, 'traverse':'/one/'})
 
 class TestVirtualRoot(unittest.TestCase):
     def setUp(self):
@@ -839,3 +914,8 @@ class DummyContextURL:
 
     def virtual_root(self):
         return '123'
+
+class DummyRoute:
+    def generate(self, **kw):
+        self.generate_kw = kw
+        return 'http://example.com'

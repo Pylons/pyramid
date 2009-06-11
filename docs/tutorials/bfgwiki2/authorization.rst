@@ -11,54 +11,39 @@ allowing anyone with access to the server to view pages.
 *authentication*.  We'll make use of both features to provide security
 to our application.
 
-Adding A Context Factory
-------------------------
+Adding A Root Factory
+---------------------
 
-We're going to start to use a custom *context factory* within our
-``configure.zcml`` file in order to be able to attach security
-declarations to our :term:`context` object.  When we do this, we can
-begin to make use of the declarative security features of
-:mod:`repoze.bfg`.
+We're going to start to use a custom *root factory* within our
+``run.py`` file in order to be able to attach security declarations to
+our :term:`context` object.  When we do this, we can begin to make use
+of the declarative security features of :mod:`repoze.bfg`.
 
-Let's modify our ``configure.zcml``, following the instructions in the
-BFG documentation section named
-:ref:`changing_routes_context_factory`.  We'll point it at a function
-in a new module we create named ``utilities.py``.
+Let's modify our ``run.py``, passing in a :term:`root factory` as the
+first argument to ``repoze.bfg.router.make_app``.  We'll point it at a
+new class we create inside our ``models.py`` file.  Add the following
+statements to your ``models.py`` file:
 
-Add the following section to your application's
-``configure.zcml`` file:
+.. code-block:: python
 
-.. code-block:: xml
-   :linenos:
+   from repoze.bfg.security import Allow
+   from repoze.bfg.security import Everyone
 
-   <utility provides="repoze.bfg.interfaces.IRoutesContextFactory"
-            component=".utilities.RoutesContextFactory"/>
+   class RootFactory(object):
+    __acl__ = [ (Allow, Everyone, 'view'), (Allow, 'editor', 'edit') ]
+    def __init__(self, environ):
+        self.__dict__.update(environ['bfg.routes.matchdict'])
 
-As a result, our ``configure.zcml`` file will now look like so:
-
-.. literalinclude:: src/authorization/tutorial/configure.zcml
-   :linenos:
-   :language: xml
-
-Once ``configure.zcml`` has been modified, create a file named
-``utilities.py`` and give it the following contents:
-
-.. literalinclude:: src/authorization/tutorial/utilities.py
-   :linenos:
-   :language: python
-
-The result of our changing of the default routes context factory in
-``configure.zcml`` and our addition of a new ``RoutesContextFactory``
-class to ``utilities.py`` allows us to use declarative security
-features of :mod:`repoze.bfg`.  The ``RoutesContextFactory`` class we
-added will be used to construct each of the ``context`` objects passed
-to our views.  All of our ``context`` objects will possess an
-``__acl__`` attribute that allows "Everyone" (a special principal) to
-view all request, while allowing only a user named ``editor`` to edit
-and add pages.  The ``__acl__`` attribute attached to a context is
-interpreted specially by :mod:`repoze.bfg` as an access control list
-during view execution.  See :ref:`assigning_acls` for more information
-about what an :term:`ACL` represents.
+Defining a root factory allows us to use declarative security features
+of :mod:`repoze.bfg`.  The ``RootFactory`` class we added will be used
+to construct each of the ``context`` objects passed to our views.  All
+of our ``context`` objects will possess an ``__acl__`` attribute that
+allows "Everyone" (a special principal) to view all request, while
+allowing only a user named ``editor`` to edit and add pages.  The
+``__acl__`` attribute attached to a context is interpreted specially
+by :mod:`repoze.bfg` as an access control list during view execution.
+See :ref:`assigning_acls` for more information about what an
+:term:`ACL` represents.
 
 .. note: Although we don't use the functionality here, the ``factory``
    used to create route contexts may differ per-route instead of
@@ -87,8 +72,11 @@ accepts a userid.  If the userid exists in the system, the callback
 should return a sequence of group identifiers (or an empty sequence if
 the user isn't a member of any groups).  If the userid *does not*
 exist in the system, the callback should return ``None``.  We'll use
-"dummy" data to represent user and groups sources.  When we're done,
-your application's ``run.py`` will look like this.
+"dummy" data to represent user and groups sources.
+
+We'll also use the opportunity to pass our ``RootFactory`` in as the
+first argument to ``make_app``.  When we're done, your application's
+``run.py`` will look like this.
 
 .. literalinclude:: src/authorization/tutorial/run.py
    :linenos:

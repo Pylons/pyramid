@@ -19,6 +19,10 @@ def wsgiapptest(environ, start_response):
     """ """
     return '123'
 
+def _getRequestInterface(name_or_iface=None):
+    from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+    return DEFAULT_REQUEST_FACTORIES[name_or_iface]['interface']
+
 class WGSIAppPlusBFGViewTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -36,7 +40,7 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         self.assertEqual(result, '123')
 
     def test_scanned(self):
-        from repoze.bfg.interfaces import IRequest
+        IRequest = _getRequestInterface()
         from repoze.bfg.interfaces import IView
         from repoze.bfg.zcml import scan
         context = DummyContext()
@@ -76,7 +80,6 @@ class PushPagePlusBFGViewTests(unittest.TestCase):
         self.assertEqual(result.status, '200 OK')
 
     def test_scanned(self):
-        from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.zcml import scan
         context = DummyContext()
@@ -85,6 +88,7 @@ class PushPagePlusBFGViewTests(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 2)
         action = actions[0]
+        IRequest = _getRequestInterface()
         self.assertEqual(action['args'],
                          ('registerAdapter',
                           pushtest, (INothing, IRequest), IView, '', None))
@@ -139,7 +143,6 @@ class TestGrokkedApp(unittest.TestCase):
     def test_it(self):
         import inspect
         from repoze.bfg.interfaces import IPOSTRequest
-        from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         import repoze.bfg.tests.grokkedapp as package
         from zope.configuration import config
@@ -150,22 +153,25 @@ class TestGrokkedApp(unittest.TestCase):
         xmlconfig.include(context, 'configure.zcml', package)
         actions = context.actions
 
+        post_iface = _getRequestInterface(IPOSTRequest)
+        request_iface = _getRequestInterface()
+
         postview = actions[-1]
         self.assertEqual(postview[0][1], None)
         self.assertEqual(postview[0][2], '')
-        self.assertEqual(postview[0][3], IPOSTRequest)
+        self.assertEqual(postview[0][3], post_iface)
         self.assertEqual(postview[0][4], IView)
         self.assertEqual(postview[2][1], package.grokked_post)
-        self.assertEqual(postview[2][2], (None, IPOSTRequest))
+        self.assertEqual(postview[2][2], (None, post_iface))
         self.assertEqual(postview[2][3], IView)
         
         klassview = actions[-2]
         self.assertEqual(klassview[0][1], None)
         self.assertEqual(klassview[0][2], 'grokked_klass')
-        self.assertEqual(klassview[0][3], IRequest)
+        self.assertEqual(klassview[0][3], request_iface)
         self.assertEqual(klassview[0][4], IView)
         self.assertEqual(klassview[2][1], package.grokked_klass)
-        self.assertEqual(klassview[2][2], (None, IRequest))
+        self.assertEqual(klassview[2][2], (None, request_iface))
         self.assertEqual(klassview[2][3], IView)
         self.failUnless(inspect.isfunction(package.grokked_klass))
         self.assertEqual(package.grokked_klass(None, None), None)
@@ -173,10 +179,10 @@ class TestGrokkedApp(unittest.TestCase):
         funcview = actions[-3]
         self.assertEqual(funcview[0][1], None)
         self.assertEqual(funcview[0][2], '')
-        self.assertEqual(funcview[0][3], IRequest)
+        self.assertEqual(funcview[0][3], request_iface)
         self.assertEqual(funcview[0][4], IView)
         self.assertEqual(funcview[2][1], package.grokked)
-        self.assertEqual(funcview[2][2], (None, IRequest))
+        self.assertEqual(funcview[2][2], (None, request_iface))
         self.assertEqual(funcview[2][3], IView)
 
 class DummyContext:

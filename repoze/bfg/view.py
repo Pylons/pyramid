@@ -146,7 +146,7 @@ class bfg_view(object):
       from repoze.bfg.interfaces import IRequest
 
       @bfg_view(name='my_view', request_type=IRequest, for_=IMyModel,
-                permission='read'))
+                permission='read', route_name='site1'))
       def my_view(context, request):
           return render_template_to_response('templates/my.pt')
 
@@ -157,6 +157,7 @@ class bfg_view(object):
        view='.views.my_view'
        name='my_view'
        permission='read'
+       route_name='site1'
        />
 
     If ``name`` is not supplied, the empty string is used (implying
@@ -170,6 +171,10 @@ class bfg_view(object):
 
     If ``permission`` is not supplied, no permission is registered for
     this view (it's accessible by any caller).
+
+    If ``route_name`` is not supplied, the view declaration is considered
+    to be made against the 'default' route (the route which matches when
+    no ZCML-defined route matches the request).
 
     Any individual or all parameters can be omitted.  The simplest
     bfg_view declaration then becomes::
@@ -217,11 +222,13 @@ class bfg_view(object):
     
       <scan package="."/>
     """
-    def __init__(self, name='', request_type=None, for_=None, permission=None):
+    def __init__(self, name='', request_type=None, for_=None, permission=None,
+                 route_name=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
         self.permission = permission
+        self.route_name = route_name
 
     def __call__(self, wrapped):
         _bfg_view = wrapped
@@ -244,5 +251,6 @@ class bfg_view(object):
         _bfg_view.__for__ = self.for_
         _bfg_view.__view_name__ = self.name
         _bfg_view.__request_type__ = self.request_type
+        _bfg_view.__route_name__ = self.route_name
         return _bfg_view
 

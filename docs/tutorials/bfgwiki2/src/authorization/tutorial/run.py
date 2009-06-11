@@ -4,6 +4,7 @@ from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 import tutorial
 from tutorial.models import DBSession
 from tutorial.models import initialize_sql
+from tutorial.models import RootFactory
 
 class Cleanup:
     def __init__(self, cleaner):
@@ -27,7 +28,7 @@ def app(global_config, **kw):
 
     authpolicy = AuthTktAuthenticationPolicy('seekr!t', callback=groupfinder)
 
-    return make_app(None, tutorial,  authentication_policy=authpolicy,
+    return make_app(RootFactory, tutorial,  authentication_policy=authpolicy,
                     options=kw)
 
 USERS = {'editor':'editor',

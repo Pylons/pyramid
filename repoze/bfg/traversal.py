@@ -489,10 +489,31 @@ class ModelGraphTraverser(object):
         self.root = root
 
     def __call__(self, environ, _marker=_marker):
-        try:
-            path = environ['PATH_INFO']
-        except KeyError:
-            path = '/'
+        if 'bfg.routes.matchdict' in environ:
+            # this request matched a Routes route
+            matchdict = environ['bfg.routes.matchdict']
+            if 'path_info' in matchdict:
+                # this is stolen from routes.middleware; if the route map
+                # has a *path_info capture, use it to influence the path
+                # info and script_name of the generated environment
+                oldpath = environ['PATH_INFO']
+                newpath = matchdict['path_info'] or ''
+                environ['PATH_INFO'] = newpath
+                if not environ['PATH_INFO'].startswith('/'):
+                    environ['PATH_INFO'] = '/' + environ['PATH_INFO']
+                pattern = r'^(.*?)/' + re.escape(newpath) + '$'
+                environ['SCRIPT_NAME'] += re.sub(pattern, r'\1', oldpath)
+                if environ['SCRIPT_NAME'].endswith('/'):
+                    environ['SCRIPT_NAME'] = environ['SCRIPT_NAME'][:-1]
+            path = matchdict.get('traverse', '/')
+            subpath = filter(None, matchdict.get('subpath', '').split('/'))
+        else:
+            # this request did not match a Routes route
+            subpath = []
+            try:
+                path = environ['PATH_INFO']
+            except KeyError:
+                path = '/'
         try:
             vroot_path_string = environ[VH_ROOT_KEY]
         except KeyError:
@@ -535,8 +556,9 @@ class ModelGraphTraverser(object):
             ob = next
             i += 1
 
-        return dict(context=ob, view_name=u'', subpath=[], traversed=traversed,
-                    virtual_root=vroot, virtual_root_path=vroot_path,
+        return dict(context=ob, view_name=u'', subpath=subpath,
+                    traversed=traversed, virtual_root=vroot,
+                    virtual_root_path=vroot_path,
                     root=self.root)
 
 class TraversalContextURL(object):
@@ -584,8 +606,16 @@ class TraversalContextURL(object):
         else:
             if path.startswith(vroot_path):
                 path = path[len(vroot_path):]
-                
-        app_url = request.application_url # never ends in a slash
+
+        environ = request.environ
+        if 'bfg.routes.route' in environ:
+            matchdict = environ['bfg.routes.matchdict'].copy()
+            matchdict['traverse'] = path
+            route = environ['bfg.routes.route']
+            app_url = route.generate(**matchdict)
+        else:
+            app_url = request.application_url # never ends in a slash
+
         return app_url + path
 
 always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'

@@ -184,111 +184,54 @@ class TestViewDirective(unittest.TestCase):
         regadapt_discriminator = ('view', IFoo, '', IDummy, IView)
         self.assertEqual(regadapt['args'][2], (IFoo, IDummy))
 
-    def test_adapted_class(self):
-        from zope.interface import Interface
-        import zope.component
-
-        class IFoo(Interface):
+    def test_with_route_name(self):
+        class IFoo:
             pass
-        class IBar(Interface):
+        class IDummyRequest:
             pass
-
-        class AView(object):
-            zope.component.adapts(IFoo, IBar)
-
-        aview = AView()
-
         context = DummyContext()
-        self._callFUT(context, view=aview)
-
+        context.request_factories = {'foo':{None:{'interface':IDummyRequest}}}
+        view = lambda *arg: None
+        self._callFUT(context, 'repoze.view', IFoo, view=view, route_name='foo')
         actions = context.actions
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
         from repoze.bfg.zcml import handler
 
-        self.assertEqual(len(actions), 1)
+        self.assertEqual(len(actions), 2)
 
-        regadapt = actions[0]
-        regadapt_discriminator = ('view', IFoo, '', IBar, IView)
-
+        permission = actions[0]
+        permission_discriminator = ('permission', IFoo, '', IDummyRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IDummyRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+        
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IDummyRequest, IView)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], aview)
-        self.assertEqual(regadapt['args'][2], (IFoo, IBar))
+        self.assertEqual(regadapt['args'][1], view)
+        self.assertEqual(regadapt['args'][2], (IFoo, IDummyRequest))
         self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
 
-    def test_adapted_function(self):
-        from zope.interface import Interface
-        import zope.component
-
-        class IFoo(Interface):
-            pass
-        class IBar(Interface):
-            pass
-
-        @zope.component.adapter(IFoo, IBar)
-        def aview(context, request):
-            pass
-        aview(None, None) # dead chicken for test coverage
-
+    def test_with_route_name_bad_order(self):
         context = DummyContext()
-        self._callFUT(context, view=aview)
-
-        actions = context.actions
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.zcml import handler
-
-        self.assertEqual(len(actions), 1)
-
-        regadapt = actions[0]
-        regadapt_discriminator = ('view', IFoo, '', IBar, IView)
-
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], aview)
-        self.assertEqual(regadapt['args'][2], (IFoo, IBar))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
-
-    def test_adapted_nonsense(self):
-        from repoze.bfg.interfaces import IRequest
-        from zope.interface import Interface
-        import zope.component
-
-        class IFoo(Interface):
-            pass
-        class IBar(Interface):
-            pass
-
-        @zope.component.adapter(IFoo) # too few arguments
-        def aview(context, request):
-            pass
-        aview(None, None) # dead chicken for test coverage
-
-        context = DummyContext()
-        self._callFUT(context, view=aview)
-
-        actions = context.actions
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.zcml import handler
-
-        self.assertEqual(len(actions), 1)
-
-        regadapt = actions[0]
-        regadapt_discriminator = ('view', None, '', IRequest, IView)
-
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], aview)
-        self.assertEqual(regadapt['args'][2], (None, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
+        context.request_factories = {}
+        view = lambda *arg: None
+        from zope.configuration.exceptions import ConfigurationError
+        self.assertRaises(ConfigurationError, self._callFUT, context,
+                          'repoze.view', None, view, '', None, 'foo')
 
 class TestRouteRequirementFunction(unittest.TestCase):
     def _callFUT(self, context, attr, expr):
@@ -372,7 +315,11 @@ class TestConnectRouteFunction(unittest.TestCase):
         self.assertEqual(D['_collection_name'], 'c')
         self.assertEqual(D['_parent_resource'], pr)
         self.assertEqual(D['conditions'], c)
-        self.assertEqual(D['_factory'], foo)
+        route = mapper.matchlist[-1]
+        self.assertEqual(route._factory, foo)
+        self.assertEqual(route.request_factories,
+                         directive.context.request_factories['thename'])
+        
 
     def test_condition_subdomain_true(self):
         mapper = self._registerRoutesMapper()
@@ -469,48 +416,44 @@ class TestRoute(unittest.TestCase):
         from repoze.bfg.zcml import Route
         return Route
 
-    def _makeOne(self, context, path, name, view, **kw):
-        return self._getTargetClass()(context, path, name, view, **kw)
+    def _makeOne(self, context, path, name, **kw):
+        return self._getTargetClass()(context, path, name, **kw)
 
     def test_defaults(self):
         context = DummyContext()
-        view = Dummy()
-        route = self._makeOne(context, 'path', 'name', view)
+        route = self._makeOne(context, 'path', 'name')
         self.assertEqual(route.path, 'path')
         self.assertEqual(route.name, 'name')
-        self.assertEqual(route.view, view)
         self.assertEqual(route.requirements, {})
 
     def test_parent_collection_name_missing(self):
         context = DummyContext()
-        view = Dummy()
         from zope.configuration.exceptions import ConfigurationError
         self.assertRaises(ConfigurationError, self._makeOne, context,
-                          'path', 'name', view,
-                          parent_member_name='a')
+                          'path', 'name', parent_member_name='a')
         
     def test_parent_collection_name_present(self):
         context = DummyContext()
-        view = Dummy()
-        route = self._makeOne(context, 'path', 'name', view,
+        route = self._makeOne(context, 'path', 'name',
                               parent_member_name='a',
                               parent_collection_name='p')
         self.assertEqual(route.parent_member_name, 'a')
         self.assertEqual(route.parent_collection_name, 'p')
 
-    def test_after(self):
+    def test_after_with_view(self):
         from repoze.bfg.zcml import handler
         from repoze.bfg.zcml import connect_route
-        from repoze.bfg.interfaces import IRoutesContext
-        from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         
         context = DummyContext()
         view = Dummy()
-        route = self._makeOne(context, 'path', 'name', view)
+        route = self._makeOne(context, 'path', 'name', view=view)
         route.after()
         actions = context.actions
         self.assertEqual(len(actions), 2)
+
+        factories = context.request_factories
+        request_iface = factories['name'][None]['interface']
 
         view_action = actions[0]
         view_callable = view_action['callable']
@@ -519,13 +462,13 @@ class TestRoute(unittest.TestCase):
         self.assertEqual(view_callable, handler)
         self.assertEqual(len(view_discriminator), 5)
         self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], IRoutesContext)
-        self.assertEqual(view_discriminator[2],'name')
-        self.assertEqual(view_discriminator[3], IRequest)
+        self.assertEqual(view_discriminator[1], None)
+        self.assertEqual(view_discriminator[2],'')
+        self.assertEqual(view_discriminator[3], request_iface)
         self.assertEqual(view_discriminator[4], IView)
         self.assertEqual(view_args, ('registerAdapter', view,
-                                     (IRoutesContext, IRequest), IView,
-                                     'name', None))
+                                     (None, request_iface), IView,
+                                     '', None))
         
         route_action = actions[1]
         route_callable = route_action['callable']
@@ -534,7 +477,32 @@ class TestRoute(unittest.TestCase):
         self.assertEqual(route_callable, connect_route)
         self.assertEqual(len(route_discriminator), 7)
         self.assertEqual(route_discriminator[0], 'route')
-        self.assertEqual(route_discriminator[1], 'path')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_discriminator[2],'{}')
+        self.assertEqual(route_discriminator[3], None)
+        self.assertEqual(route_discriminator[4], None)
+        self.assertEqual(route_discriminator[5], None)
+        self.assertEqual(route_discriminator[6], None)
+        self.assertEqual(route_args, (route,))
+
+    def test_after_without_view(self):
+        from repoze.bfg.zcml import connect_route
+        
+        context = DummyContext()
+        view = Dummy()
+        route = self._makeOne(context, 'path', 'name')
+        route.after()
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        route_action = actions[0]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 7)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
         self.assertEqual(route_discriminator[2],'{}')
         self.assertEqual(route_discriminator[3], None)
         self.assertEqual(route_discriminator[4], None)
@@ -611,6 +579,7 @@ class TestBFGViewFunctionGrokker(unittest.TestCase):
         obj.__for__ = Interface
         obj.__view_name__ = 'foo.html'
         obj.__request_type__ = IRequest
+        obj.__route_name__ = None
         context = DummyContext()
         result = grokker.grok('name', obj, context=context)
         self.assertEqual(result, True)
@@ -729,13 +698,20 @@ class DummyRouteDirective:
         if not 'requirements' in kw:
             kw['requirements'] = {}
         self.__dict__.update(kw)
+        self.context = DummyContext()
+        self.context.request_factories = {self.name:{}}
 
 class DummyMapper:
     def __init__(self):
         self.connections = []
+        self.matchlist = []
 
     def connect(self, *arg, **kw):
         self.connections.append((arg, kw))
+        self.matchlist.append(DummyRoute())
+
+class DummyRoute:
+    pass
 
 from zope.interface import Interface
 class IDummy(Interface):

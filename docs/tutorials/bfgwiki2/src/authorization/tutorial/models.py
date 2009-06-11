@@ -14,6 +14,9 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
+from repoze.bfg.security import Allow
+from repoze.bfg.security import Everyone
+
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
@@ -27,6 +30,11 @@ class Page(Base):
     def __init__(self, name, data):
        self.name = name
        self.data = data
+
+class RootFactory(object):
+    __acl__ = [ (Allow, Everyone, 'view'), (Allow, 'editor', 'edit') ]
+    def __init__(self, environ):
+        self.__dict__.update(environ['bfg.routes.matchdict'])
 
 def initialize_sql(db, echo=False):
     engine = create_engine(db, echo=echo)

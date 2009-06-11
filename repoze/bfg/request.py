@@ -1,7 +1,14 @@
 from zope.interface import implements
 from webob import Request as WebobRequest
 
-import repoze.bfg.interfaces
+from zope.interface.interface import InterfaceClass
+
+from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IGETRequest
+from repoze.bfg.interfaces import IPOSTRequest
+from repoze.bfg.interfaces import IPUTRequest
+from repoze.bfg.interfaces import IDELETERequest
+from repoze.bfg.interfaces import IHEADRequest
 
 from repoze.bfg.threadlocal import manager
 
@@ -73,6 +80,25 @@ def current_request():
     """
     return manager.get()['request']
 
+def request_factory(environ):
+    try:
+        method = environ['REQUEST_METHOD']
+    except KeyError:
+        method = None
+
+    if 'bfg.routes.route' in environ:
+        route = environ['bfg.routes.route']
+        request_factories = route.request_factories
+    else:
+        request_factories = DEFAULT_REQUEST_FACTORIES
+
+    try:
+        request_factory = request_factories[method]['factory']
+    except KeyError:
+        request_factory = request_factories[None]['factory']
+
+    return request_factory(environ)
+
 def make_request_ascii(event):
     """ An event handler that causes the request charset to be ASCII;
     used as an INewRequest subscriber so code written before 0.7.0 can
@@ -80,53 +106,71 @@ def make_request_ascii(event):
     request = event.request
     request.charset = None
 
-class Request(WebobRequest):
-    implements(repoze.bfg.interfaces.IRequest)
-    charset = 'utf-8'
+def named_request_factories(name=None):
+    # We use 'precooked' Request subclasses that correspond to HTTP
+    # request methods when returning a request object from
+    # ``request_factory`` rather than using ``alsoProvides`` to attach
+    # the proper interface to an unsubclassed webob.Request.  This
+    # pattern is purely an optimization (e.g. preventing calls to
+    # ``alsoProvides`` means the difference between 590 r/s and 690
+    # r/s on a MacBook 2GHz).  This method should be never imported
+    # directly by user code; it is *not* an API.
+    if name is None:
+        default_iface = IRequest
+        get_iface = IGETRequest
+        post_iface = IPOSTRequest
+        put_iface = IPUTRequest
+        delete_iface = IDELETERequest
+        head_iface = IHEADRequest
+    else:
+        default_iface = InterfaceClass('%s_IRequest' % name)
+        get_iface = InterfaceClass('%s_IGETRequest' % name, (default_iface,))
+        post_iface = InterfaceClass('%s_IPOSTRequest' % name, (default_iface,))
+        put_iface = InterfaceClass('%s_IPUTRequest' % name, (default_iface,))
+        delete_iface = InterfaceClass('%s_IDELETERequest' % name,
+                                      (default_iface,))
+        head_iface = InterfaceClass('%s_IHEADRequest' % name, (default_iface))
+        
+    class Request(WebobRequest):
+        implements(default_iface)
+        charset = 'utf-8'
 
-# We use 'precooked' Request subclasses that correspond to HTTP
-# request methods within ``router.py`` when constructing a request
-# object rather than using ``alsoProvides`` to attach the proper
-# interface to an unsubclassed webob.Request.  This pattern is purely
-# an optimization (e.g. preventing calls to ``alsoProvides`` means the
-# difference between 590 r/s and 690 r/s on a MacBook 2GHz).  These
-# classes are *not* APIs.  None of these classes, nor the
-# ``HTTP_METHOD_FACTORIES`` or ``HTTP_METHOD_INTERFACES`` lookup dicts
-# should be imported directly by user code.
+    class GETRequest(WebobRequest):
+        implements(get_iface)
+        charset = 'utf-8'
 
-class GETRequest(WebobRequest):
-    implements(repoze.bfg.interfaces.IGETRequest)
-    charset = 'utf-8'
-
-class POSTRequest(WebobRequest):
-    implements(repoze.bfg.interfaces.IPOSTRequest)
-    charset = 'utf-8'
-
-class PUTRequest(WebobRequest):
-    implements(repoze.bfg.interfaces.IPUTRequest)
-    charset = 'utf-8'
-
-class DELETERequest(WebobRequest):
-    implements(repoze.bfg.interfaces.IDELETERequest)
-    charset = 'utf-8'
-
-class HEADRequest(WebobRequest):
-    implements(repoze.bfg.interfaces.IHEADRequest)
-    charset = 'utf-8'
-
-HTTP_METHOD_FACTORIES = {
-    'GET':GETRequest,
-    'POST':POSTRequest,
-    'PUT':PUTRequest,
-    'DELETE':DELETERequest,
-    'HEAD':HEADRequest,
-    }
-
-HTTP_METHOD_INTERFACES = {
-    'GET':repoze.bfg.interfaces.IGETRequest,
-    'POST':repoze.bfg.interfaces.IPOSTRequest,
-    'PUT':repoze.bfg.interfaces.IPUTRequest,
-    'DELETE':repoze.bfg.interfaces.IDELETERequest,
-    'HEAD':repoze.bfg.interfaces.IHEADRequest,
-    }
+    class POSTRequest(WebobRequest):
+        implements(post_iface)
+        charset = 'utf-8'
     
+    class PUTRequest(WebobRequest):
+        implements(put_iface)
+        charset = 'utf-8'
+
+    class DELETERequest(WebobRequest):
+        implements(delete_iface)
+        charset = 'utf-8'
+
+    class HEADRequest(WebobRequest):
+        implements(head_iface)
+        charset = 'utf-8'
+
+    factories = {
+        IRequest:{'interface':default_iface, 'factory':Request},
+        IGETRequest:{'interface':get_iface, 'factory':GETRequest},
+        IPOSTRequest:{'interface':post_iface, 'factory':POSTRequest},
+        IPUTRequest:{'interface':put_iface, 'factory':PUTRequest},
+        IDELETERequest:{'interface':delete_iface, 'factory':DELETERequest},
+        IHEADRequest:{'interface':head_iface, 'factory':HEADRequest},
+        None:{'interface':default_iface, 'factory':Request},
+        'GET':{'interface':get_iface, 'factory':GETRequest},
+        'POST':{'interface':post_iface, 'factory':POSTRequest},
+        'PUT':{'interface':put_iface, 'factory':PUTRequest},
+        'DELETE':{'interface':delete_iface, 'factory':DELETERequest},
+        'HEAD':{'interface':head_iface, 'factory':HEADRequest},
+        }
+
+    return factories
+
+DEFAULT_REQUEST_FACTORIES = named_request_factories()
+

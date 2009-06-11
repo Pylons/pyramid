@@ -16,20 +16,6 @@
       for="* repoze.bfg.interfaces.IRequest"
   />
 
-  <!-- URL dispatch adapters -->
-
-  <adapter
-      factory="repoze.bfg.urldispatch.RoutesModelTraverser"
-      provides="repoze.bfg.interfaces.ITraverserFactory"
-      for="repoze.bfg.interfaces.IRoutesContext"
-  />
-
-  <adapter
-      factory="repoze.bfg.urldispatch.RoutesContextURL"
-      provides="repoze.bfg.interfaces.IContextURL"
-      for="repoze.bfg.interfaces.IRoutesContext repoze.bfg.interfaces.IRequest"
-  />
-
   <include file="meta.zcml" />
 
 </configure>

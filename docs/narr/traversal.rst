@@ -29,15 +29,18 @@ root object is usually a *mapping* object (such as a Python
 dictionary).
 
 .. note:: If a :term:`root factory` is passed to the :mod:`repoze.bfg`
-   "make_app" function as the value ``None``, no traversal is
-   performed.  Instead, it's assumed that all URLs will be mapped to
-   code via :term:`URL dispatch`.  No root factory, no traversal.  It
-   is also possible to mix-and-match traversal with URL dispatch.
-   When both a root factory (and therefore traversal) *and* "routes"
-   declarations (and therefore url dispatch) are used, the url
-   dispatch routes are checked first, and if none match,
-   :mod:`repoze.bfg` will fall back to using traversal to attempt to
-   map the request to a view.
+   "make_app" function as the value ``None``, a default root factory
+   is used.  This is most useful when you're using :term:`URL
+   dispatch` and you don't care very much about traversing any
+   particular graph to resolve URLs to code.  It is also possible to
+   use traversal and URL dispatch together.  When both a root factory
+   (and therefore traversal) *and* "routes" declarations (and
+   therefore url dispatch) are used, the url dispatch routes are
+   checked first, and if none match, :mod:`repoze.bfg` will fall back
+   to using traversal to attempt to map the request to a view.  If the
+   name ``*traverse`` is in a route's ``path`` pattern, when it is
+   matched, it is also possible to do traversal *after* a route has
+   been matched.  See :ref:`urldispatch_chapter` for more information.
 
 Items contained within the object graph are analogous to the concept
 of :term:`model` objects used by many other frameworks (and

@@ -90,10 +90,3 @@ URL-based dispatch.
 :mod:`repoze.bfg` provides support for both approaches.  You can use
 either as you see fit.
 
-.. note::
-
-  Most existng :mod:`repoze.bfg` applications use :term:`traversal` to
-  map URLs to code.  This is mostly due to the :term:`Zope` heritage
-  of :mod:`repoze.bfg` and because it aids applications that require
-  highly granular declarative security assertions.
-

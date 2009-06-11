@@ -1,11 +1,104 @@
 Next release
 ============
 
+Features
+--------
+
+- The concepts of traversal and URL dispatch have been unified.  It is
+  now possible to use the same sort of factory as both a traversal
+  "root factory" and what used to be referred to as a urldispatch
+  "context factory".
+
+- When the root factory argument (as a first argument) passed to
+  ``repoze.bfg.router.make_app`` is ``None``, a *default* root factory
+  is used.  This is in support of using routes as "root finders"; it
+  supplants the idea that there is a default
+  ``IRoutesContextFactory``.
+
+- The `view`` ZCML statement and the ``repoze.bfg.view.bfg_view``
+  decorator now accept an extra argument: ``route_name``.  If a
+  ``route_name`` is specified, it must match the name of a previously
+  defined ``route`` statement.  When it is specified, the view will
+  only be called when that route matches during a request.
+
+- It is now possible to perfom traversal *after* a route has matched.
+  Use the pattern ``*traverse`` in a ``<route>`` ``path`` attribute
+  within ZCML, and the path remainder which it matches will be used as
+  a traversal path.
+
+- When any route defined matches, the WSGI environment will now
+  contain a key ``bfg.routes.route`` (the Route object which matched),
+  and a key ``bfg.routes.matchdict`` (the result of calling route.match).
+
+Removals
+--------
+
+- The ``IRoutesContext``, ``IRoutesContextFactory``, and
+  ``IContextNotFound`` interfaces were removed from
+  ``repoze.bfg.interfaces``.  These were never APIs.
+
+- The ``repoze.bfg.urldispatch.RoutesContextNotFound``,
+  ``repoze.bfg.urldispatch.RoutesModelTraverser`` and
+  ``repoze.bfg.urldispatch.RoutesContextURL`` classes were removed.
+  These were also never APIs.
+
+Backwards Incompatibilities
+---------------------------
+
+- Changing the default request factory via an IRequestFactory utility
+  registration (as used to be documented in the "Hooks" chapter's
+  "Changing the request factory" section) is no longer supported.  The
+  dance to manufacture a request is complicated as a result of
+  unifying traversal and url dispatch, making it highly unlikely for
+  anyone to be able to override it properly.  For those who just want
+  to decorate or modify a request, use a NewRequestEvent subscriber
+  (see the Events chapter in the documentation).
+
+- The ``repoze.bfg.IRequestFactory`` interface was removed.  See the
+  bullet above for why.
+
+- View code that used urldispatch which expected the default routes
+  context factory to stash the routes matchdict arguments on the
+  context will not work properly without passing a default "root
+  factory" to ``repoze.bfg.router.make_app`` that performs this magic.
+  The "magic" is retrieving the matchdict from the environ and
+  constructing a root object that has this set of key/value pairs as
+  instance __dict__ values.
+
+- Routes "context factories" (spelled as the factory argument to a
+  route statement in ZCML) must now expect the WSGI environ as a
+  single argument rather than a set of keyword arguments.  They can
+  obtain the match dictionary by asking for
+  environ['bfg.routes.matchdict'].  This is the same set of keywords
+  that used to be passed to context factories.
+
+- Using the ``@zope.component.adapter`` decorator on a bfg view
+  function no longer works.  Use the ``@repoze.bfg.view.bfg_view``
+  decorator instead to mark a function (or a class) as a view.
+
+- The name under which the matching route object is found in the
+  environ was changed from ``bfg.route`` to ``bfg.routes.route``.
+
+- Finding the root is now done *before* manufacturing a request object
+  (and sending a new request event) within the router (it used to be
+  performed afterwards).
+
 Bug Fixes
 ---------
 
 - The ``bfg_alchemy`` Paster template named "repoze.tm" in its
   pipeline rather than "repoze.tm2", causing the startup to fail.
+
+Documentation
+-------------
+
+- Replaced all mentions and explanations of a routes "context factory"
+  with equivalent explanations of a "root factory" (context factories
+  have been disused).
+
+- Updated Routes bfgwiki2 tutorial to reflect the fact that context
+  factories are now no longer used.
+
 
 0.9.1 (2009-06-02)
 ==================

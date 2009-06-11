@@ -7,51 +7,6 @@ ZCML "hooks" can be used to influence the behavior of the
 :mod:`repoze.bfg` framework in various ways.  This is an advanced
 topic; not many people will want or need to do any of these things.
 
-Changing the request factory
-----------------------------
-
-You may change the class used as the "request factory" from within the
-:mod:`repoze.bfg` ``Router`` class (the ``Router`` class turns the
-WSGI environment into a "request" object which is used ubiquitously
-throughout :mod:`repoze.bfg`).  The default "request factory" is the
-class ``webob.Request``.  You may change it by placing the following
-ZCML in your ``configure.zcml`` file.
-
-.. code-block:: xml
-   :linenos:
-
-   <utility provides="repoze.bfg.interfaces.IRequestFactory"
-            component="helloworld.factories.request_factory"/>
-
-Replace ``helloworld.factories.request_factory`` with the Python
-dotted name to the request factory you want to use.  Here's some
-sample code that implements a minimal request factory:
-
-.. code-block:: python
-
-   from webob import Request
-   from repoze.bfg.interfaces import IRequest
-
-   class MyRequest(Request):
-       implements(IRequest)
-
-   def request_factory():
-       return MyRequest
-
-.. warning:: If you register an ``IRequestFactory`` utility in this
-   way, you *must* be sure that the factory returns an object that
-   implements *at least* the ``repoze.bfg.interfaces.IRequest``
-   interface.  Otherwise all application view lookups will fail (they
-   will all return a 404 response code).  Likewise, if you want to be
-   able to use method-related interfaces such as ``IGETRequest``,
-   ``IPOSTRequest``, etc. in your view declarations, the callable
-   returned by the factory must also do the same introspection of the
-   environ that the default request factory does and decorate the
-   returned object to implement one of these interfaces based on the
-   ``HTTP_METHOD`` present in the environ.  Note that the above
-   example does not do this, so lookups for method-related interfaces
-   will fail.
-
 Changing the response factory
 -----------------------------
 
@@ -163,32 +118,4 @@ code that implements a minimal forbidden view:
    You can influence the status code of Forbidden responses by using
    an alterate forbidden view.  For example, it would make sense to
    return a response with a ``403 Forbidden`` status code.
-
-.. _changing_routes_context_factory:
-
-Changing the Default Routes Context Factory
--------------------------------------------
-
-The default Routes "context factory" (the object used to create
-context objects when you use ``<route..>`` statements in your ZCML) is
-``repoze.bfg.urldispatch.DefaultRoutesContext``.  You may change the
-class used as the Routes "context factory" by placing the following
-ZCML in your ``configure.zcml`` file.
-
-.. code-block:: xml
-   :linenos:
-
-   <utility provides="repoze.bfg.interfaces.IRoutesContextFactory"
-            component="helloworld.factories.routes_context_factory"/>
-
-Replace ``helloworld.factories.routes_context_factory`` with the
-Python dotted name to the context factory you want to use.  Here's
-some sample code that implements a minimal context factory:
-
-.. code-block:: python
-   :linenos:
-
-   class RoutesContextFactory(object):
-       def __init__(self, **kw):
-           self.__dict__.update(kw)
 

@@ -49,9 +49,6 @@
      permission="edit"
      />
 
-   <utility provides="repoze.bfg.interfaces.IRoutesContextFactory"
-            component=".utilities.RoutesContextFactory"/>
-
    <utility provides="repoze.bfg.interfaces.IForbiddenView"
             component=".login.login"/>
 

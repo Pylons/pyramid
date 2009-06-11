@@ -123,7 +123,7 @@ class RouterTests(unittest.TestCase):
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
-        rootfactory = self._registerRootFactory(None)
+        rootfactory = self._registerRootFactory('abc')
         router = self._makeOne()
         self.assertEqual(router.root_policy, rootfactory)
 
@@ -132,13 +132,11 @@ class RouterTests(unittest.TestCase):
         def app():
             """ """
         self.registry.registerUtility(app, IForbiddenView)
-        self._registerRootFactory(None)
         router = self._makeOne()
         self.assertEqual(router.forbidden_view, app)
 
     def test_iforbiddenview_nooverride(self):
         context = DummyContext()
-        self._registerRootFactory(None)
         router = self._makeOne()
         from repoze.bfg.router import default_forbidden_view
         self.assertEqual(router.forbidden_view, default_forbidden_view)
@@ -148,13 +146,11 @@ class RouterTests(unittest.TestCase):
         def app():
             """ """
         self.registry.registerUtility(app, INotFoundView)
-        self._registerRootFactory(None)
         router = self._makeOne()
         self.assertEqual(router.notfound_view, app)
 
     def test_inotfoundview_nooverride(self):
         context = DummyContext()
-        self._registerRootFactory(None)
         router = self._makeOne()
         from repoze.bfg.router import default_notfound_view
         self.assertEqual(router.notfound_view, default_notfound_view)
@@ -164,7 +160,6 @@ class RouterTests(unittest.TestCase):
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
-        rootfactory = self._registerRootFactory(None)
         logger = self._registerLogger()
         def factory():
             return 'yo'
@@ -183,7 +178,6 @@ class RouterTests(unittest.TestCase):
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
-        rootfactory = self._registerRootFactory(None)
         logger = self._registerLogger()
         def factory():
             return 'yo'
@@ -202,7 +196,6 @@ class RouterTests(unittest.TestCase):
         context = DummyContext()
         self._registerTraverserFactory(context)
         logger = self._registerLogger()
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -214,29 +207,12 @@ class RouterTests(unittest.TestCase):
         self.failIf('debug_notfound' in result[0])
         self.assertEqual(len(logger.messages), 0)
 
-    def test_call_root_is_icontextnotfound(self):
-        from zope.interface import implements
-        from repoze.bfg.interfaces import IContextNotFound
-        class NotFound(object):
-            implements(IContextNotFound)
-        context = NotFound()
-        self._registerTraverserFactory(context)
-        environ = self._makeEnviron()
-        start_response = DummyStartResponse()
-        self._registerRootFactory(NotFound())
-        router = self._makeOne()
-        result = router(environ, start_response)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
-        self.failUnless('http://localhost:8080' in result[0], result)
-
     def test_call_no_view_registered_debug_notfound_false(self):
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
         logger = self._registerLogger()
         self._registerSettings(debug_notfound=False)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -254,7 +230,6 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         self._registerSettings(debug_notfound=True)
         logger = self._registerLogger()
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -282,7 +257,6 @@ class RouterTests(unittest.TestCase):
         environ = self._makeEnviron()
         view = make_view('abc')
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(ValueError, router, environ, start_response)
@@ -292,7 +266,6 @@ class RouterTests(unittest.TestCase):
         context = DummyContext()
         environ = self._makeEnviron()
         self._registerTraverserFactory(context)
-        self._registerRootFactory(None)
         def app(context, request):
             """ """
         self.registry.registerUtility(app, INotFoundView)
@@ -318,7 +291,6 @@ class RouterTests(unittest.TestCase):
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         checker = self._registerViewPermission('', denied)
-        self._registerRootFactory(None)
         def app(context, request):
             """ """
         self.registry.registerUtility(app, IForbiddenView)
@@ -334,7 +306,7 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
+        rootfactory = self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -344,7 +316,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(environ['webob.adhoc_attrs']['view_name'], '')
         self.assertEqual(environ['webob.adhoc_attrs']['subpath'], [])
         self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
-        self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
+        self.assertEqual(environ['webob.adhoc_attrs']['root'], context)
 
     def test_call_deprecation_warning(self):
         context = DummyContext()
@@ -354,7 +326,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
         router = self._makeOne()
         logger = self._registerLogger()
         router.logger = logger
@@ -368,12 +339,12 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, view_name='foo',
                                        subpath=['bar'],
                                        traversed=['context'])
+        rootfactory = self._registerRootFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, 'foo', None, None)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -383,7 +354,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(environ['webob.adhoc_attrs']['view_name'], 'foo')
         self.assertEqual(environ['webob.adhoc_attrs']['subpath'], ['bar'])
         self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
-        self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
+        self.assertEqual(environ['webob.adhoc_attrs']['root'], context)
 
     def test_call_view_registered_specific_success(self):
         from zope.interface import Interface
@@ -394,12 +365,12 @@ class RouterTests(unittest.TestCase):
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context)
+        rootfactory = self._registerRootFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -409,7 +380,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(environ['webob.adhoc_attrs']['view_name'], '')
         self.assertEqual(environ['webob.adhoc_attrs']['subpath'], [])
         self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
-        self.assertEqual(environ['webob.adhoc_attrs']['root'], None)
+        self.assertEqual(environ['webob.adhoc_attrs']['root'], context)
 
     def test_call_view_registered_specific_fail(self):
         from zope.interface import Interface
@@ -426,7 +397,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -446,7 +416,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -466,7 +435,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerRootFactory(None)
         router = self._makeOne()
         router.debug_authorization = True
         start_response = DummyStartResponse()
@@ -490,7 +458,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerRootFactory(None)
         router = self._makeOne()
         router.debug_authorization = True
         start_response = DummyStartResponse()
@@ -514,7 +481,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
-        self._registerRootFactory(None)
         router = self._makeOne()
         router.debug_authorization = False
         start_response = DummyStartResponse()
@@ -537,7 +503,6 @@ class RouterTests(unittest.TestCase):
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         checker = self._registerViewPermission('', True)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -561,7 +526,6 @@ class RouterTests(unittest.TestCase):
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         checker = self._registerViewPermission('', denied)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -588,7 +552,6 @@ class RouterTests(unittest.TestCase):
         self._registerView(view, '', IContext, IRequest)
         checker = self._registerViewPermission('', denied)
         self._registerSettings(debug_authorization=False)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -616,7 +579,6 @@ class RouterTests(unittest.TestCase):
         checker = self._registerViewPermission('', allowed)
         self._registerSettings(debug_authorization=True)
         logger = self._registerLogger()
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -650,7 +612,6 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.interfaces import INewResponse
         request_events = self._registerEventListener(INewRequest)
         response_events = self._registerEventListener(INewResponse)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -667,7 +628,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         router.threadlocal_manager = DummyThreadLocalManager()
@@ -687,7 +647,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='POST')
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         request_events = self._registerEventListener(INewRequest)
@@ -709,7 +668,6 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='PUT')
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         request_events = self._registerEventListener(INewRequest)
@@ -729,37 +687,12 @@ class RouterTests(unittest.TestCase):
         view = make_view(response)
         environ = self._makeEnviron(REQUEST_METHOD='UNKNOWN')
         self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         request_events = self._registerEventListener(INewRequest)
         result = router(environ, start_response)
         request = request_events[0].request
         self.failUnless(IRequest.providedBy(request))
-
-    def test_call_irequestfactory_override(self):
-        from repoze.bfg.interfaces import INewRequest
-        from repoze.bfg.interfaces import IRequestFactory
-        from repoze.bfg.testing import DummyRequest
-        self.registry.registerUtility(DummyRequest, IRequestFactory)
-        context = DummyContext()
-        self._registerTraverserFactory(context)
-        response = DummyResponse()
-        response.app_iter = ['Hello world']
-        view = make_view(response)
-        environ = self._makeEnviron()
-        self._registerView(view, '', None, None)
-        self._registerRootFactory(None)
-        router = self._makeOne()
-        start_response = DummyStartResponse()
-        request_events = self._registerEventListener(INewRequest)
-        result = router(environ, start_response)
-        request = request_events[0].request
-        self.failUnless(isinstance(request, DummyRequest))
-        self.assertEqual(request.root, None)
-        self.assertEqual(request.context, context)
-        self.assertEqual(request.view_name, '')
-        self.assertEqual(request.subpath, [])
 
 class MakeAppTests(unittest.TestCase):
     def setUp(self):
@@ -844,13 +777,14 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(settings.reload_templates, True)
         self.assertEqual(settings.debug_authorization, True)
         self.failUnless(isinstance(rootfactory, RoutesRootFactory))
-        self.assertEqual(rootfactory.get_root, rootpolicy)
+        self.assertEqual(rootfactory.default_root_factory, rootpolicy)
         self.failUnless(self.regmgr.pushed and self.regmgr.popped)
 
     def test_routes_in_config_no_rootpolicy(self):
         options= {'reload_templates':True,
                   'debug_authorization':True}
         from repoze.bfg.urldispatch import RoutesRootFactory
+        from repoze.bfg.router import DefaultRootFactory
         from repoze.bfg.tests import routesapp
         app = self._callFUT(None, routesapp, options=options)
         from repoze.bfg.interfaces import ISettings
@@ -863,15 +797,18 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(settings.reload_templates, True)
         self.assertEqual(settings.debug_authorization, True)
         self.failUnless(isinstance(rootfactory, RoutesRootFactory))
-        self.assertEqual(rootfactory.get_root, None)
+        self.assertEqual(rootfactory.default_root_factory, DefaultRootFactory)
         self.failUnless(self.regmgr.pushed and self.regmgr.popped)
         
     def test_no_routes_in_config_no_rootpolicy(self):
+        from repoze.bfg.router import DefaultRootFactory
+        from repoze.bfg.interfaces import IRootFactory
         options= {'reload_templates':True,
                   'debug_authorization':True}
         from repoze.bfg.tests import fixtureapp
-        self.assertRaises(ValueError, self._callFUT, None, fixtureapp,
-                          options=options)
+        app = self._callFUT(None, fixtureapp, options=options)
+        rootfactory = app.registry.getUtility(IRootFactory)
+        self.assertEqual(rootfactory, DefaultRootFactory)
 
     def test_authorization_policy_no_authentication_policy(self):
         from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -921,38 +858,6 @@ class MakeAppTests(unittest.TestCase):
         self.failUnless(app.registry.queryUtility(IAuthorizationPolicy))
         self.assertEqual(len(logger.messages), 1)
         self.failUnless('ISecurityPolicy' in logger.messages[0])
-
-    def test_custom_default_context_factory_nodecorate(self):
-        from repoze.bfg.tests import routesapp
-        from zope.component import getGlobalSiteManager
-        from repoze.bfg.interfaces import IRoutesContextFactory
-        from repoze.bfg.interfaces import IRoutesMapper
-        class Dummy(object):
-            pass
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(Dummy, IRoutesContextFactory)
-        app = self._callFUT(None, routesapp, registry=gsm)
-        mapper = gsm.getUtility(IRoutesMapper)
-        self.assertEqual(mapper.default_context_factory,
-                         Dummy)
-        self.assertEqual(mapper.decorate_context, True)
-
-    def test_custom_default_context_factory_decorate(self):
-        from repoze.bfg.tests import routesapp
-        from zope.component import getGlobalSiteManager
-        from repoze.bfg.interfaces import IRoutesContextFactory
-        from repoze.bfg.interfaces import IRoutesMapper
-        from repoze.bfg.interfaces import IRoutesContext
-        from zope.interface import implements
-        class Dummy(object):
-            implements(IRoutesContext)
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(Dummy, IRoutesContextFactory)
-        app = self._callFUT(None, routesapp, registry=gsm)
-        mapper = gsm.getUtility(IRoutesMapper)
-        self.assertEqual(mapper.default_context_factory,
-                         Dummy)
-        self.assertEqual(mapper.decorate_context, False)
 
 class TestDefaultForbiddenView(unittest.TestCase):
     def _callFUT(self, context, request):

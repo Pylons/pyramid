@@ -16,7 +16,6 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import ISecurityPolicy
-from repoze.bfg.interfaces import IRequestFactory
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
@@ -30,16 +29,14 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IRoutesContext
-from repoze.bfg.interfaces import IRoutesContextFactory
+from repoze.bfg.interfaces import IDefaultRootFactory
 
 from repoze.bfg.log import make_stream_logger
 
 from repoze.bfg.registry import Registry
 from repoze.bfg.registry import populateRegistry
 
-from repoze.bfg.request import HTTP_METHOD_FACTORIES
-from repoze.bfg.request import Request
+from repoze.bfg.request import request_factory
 
 from repoze.bfg.secpols import registerBBBAuthn
 
@@ -67,8 +64,6 @@ class Router(object):
     def __init__(self, registry):
         self.registry = registry
         self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
-
-        self.request_factory = registry.queryUtility(IRequestFactory)
 
         forbidden = None
 
@@ -129,7 +124,8 @@ class Router(object):
 
         self.secured = not not registry.queryUtility(IAuthenticationPolicy)
             
-        self.root_factory = registry.getUtility(IRootFactory)
+        self.root_factory = registry.queryUtility(IRootFactory,
+                                                  default=DefaultRootFactory)
         self.root_policy = self.root_factory # b/w compat
         self.traverser_warned = {}
 
@@ -145,33 +141,13 @@ class Router(object):
 
         threadlocals = {'registry':registry, 'request':None}
         self.threadlocal_manager.push(threadlocals)
-
-        def respond(response, view_name):
-            registry.has_listeners and registry.notify(NewResponse(response))
-            try:
-                start_response(response.status, response.headerlist)
-                return response.app_iter
-            except AttributeError:
-                raise ValueError(
-                    'Non-response object returned from view %s: %r' %
-                    (view_name, response))
-
+ 
         try:
-            if self.request_factory is None:
-                method = environ['REQUEST_METHOD']
-                try:
-                    # for speed we disuse HTTP_METHOD_FACTORIES.get
-                    request_factory = HTTP_METHOD_FACTORIES[method]
-                except KeyError:
-                    request_factory = Request
-            else:
-                request_factory = self.request_factory
-
+            root = self.root_factory(environ)
             request = request_factory(environ)
             threadlocals['request'] = request
-            
             registry.has_listeners and registry.notify(NewRequest(request))
-            root = self.root_factory(environ)
+
             tdict = _traverse(root, environ)
             if '_deprecation_warning' in tdict:
                 warning = tdict.pop('_deprecation_warning')
@@ -197,6 +173,17 @@ class Router(object):
                 request.traversed = traversed
                 request.virtual_root = vroot
                 request.virtual_root_path = vroot_path
+
+            def respond(response, view_name):
+                registry.has_listeners and registry.notify(
+                    NewResponse(response))
+                try:
+                    start_response(response.status, response.headerlist)
+                    return response.app_iter
+                except AttributeError:
+                    raise ValueError(
+                        'Non-response object returned from view %s: %r' %
+                        (view_name, response))
 
             if self.secured:
 
@@ -299,10 +286,11 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     ``repoze.bfg`` WSGI application.
 
     ``root_factory`` must be a callable that accepts a WSGI
-    environment and returns a traversal root object.  It may be
-    ``None``, in which case traversal is not performed at all.
-    Instead, all URL-to-code mapping is done via URL dispatch (aka
-    Routes).
+    environment and returns a traversal root object.  The traversal
+    root returned by the root factory is the *default* traversal root;
+    it can be overridden on a per-view basis.  ``root_factory`` may be
+    ``None``, in which case a 'default default' traversal root is
+    used.
 
     ``package`` is a Python module representing the application's
     package.  It is optional, defaulting to ``None``.  If ``package``
@@ -360,18 +348,16 @@ def make_app(root_factory, package=None, filename='configure.zcml',
             authorization_policy = ACLAuthorizationPolicy()
         registry.registerUtility(authorization_policy, IAuthorizationPolicy)
 
+    if root_factory is None:
+        root_factory = DefaultRootFactory
+
+    # register the *default* root factory so we can find it later
+    registry.registerUtility(root_factory, IDefaultRootFactory)
+
     mapper = RoutesRootFactory(root_factory)
     registry.registerUtility(mapper, IRoutesMapper)
 
     populateRegistry(registry, filename, package)
-
-    context_factory = registry.queryUtility(
-        IRoutesContextFactory,
-        default=mapper.default_context_factory)
-
-    if IRoutesContext.implementedBy(context_factory):
-        mapper.decorate_context = False
-    mapper.default_context_factory = context_factory
 
     if not authentication_policy:
         # deal with bw compat of <= 0.8 security policies (deprecated)
@@ -390,13 +376,10 @@ def make_app(root_factory, package=None, filename='configure.zcml',
         
     if mapper.has_routes():
         # if the user had any <route/> statements in his configuration,
-        # use the RoutesRootFactory as the root factory
+        # use the RoutesRootFactory as the IRootFactory; otherwise use the
+        # default root factory (optimization; we don't want to go through
+        # the Routes logic if we know there are no routes to match)
         root_factory = mapper
-    else:
-        # otherwise, use only the supplied root_factory (unless it's None)
-        if root_factory is None:
-            raise ValueError(
-                'root_factory (aka get_root) was None and no routes connected')
 
     registry.registerUtility(root_factory, IRootFactory)
 
@@ -415,3 +398,8 @@ def make_app(root_factory, package=None, filename='configure.zcml',
 
     return app
 
+class DefaultRootFactory:
+    __parent__ = None
+    __name__ = None
+    def __init__(self, environ):
+        pass

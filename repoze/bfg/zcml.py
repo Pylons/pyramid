@@ -3,7 +3,6 @@ import types
 
 from zope.configuration import xmlconfig
 
-from zope.component import adaptedBy
 from zope.component import getSiteManager
 from zope.component import queryUtility
 
@@ -19,13 +18,12 @@ from zope.interface import implements
 from zope.schema import Bool
 from zope.schema import TextLine
 
-from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import IRoutesContext
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IView
 
-from repoze.bfg.request import HTTP_METHOD_INTERFACES
+from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+from repoze.bfg.request import named_request_factories
 
 from repoze.bfg.security import ViewPermissionFactory
 
@@ -35,10 +33,6 @@ def handler(methodName, *args, **kwargs):
     method = getattr(getSiteManager(), methodName)
     method(*args, **kwargs)
 
-class Uncacheable(object):
-    """ Include in discriminators of actions which are not cacheable;
-    this class only exists for backwards compatibility (<0.8.1)"""
-
 def view(
     _context,
     permission=None,
@@ -46,38 +40,29 @@ def view(
     view=None,
     name="",
     request_type=None,
+    route_name=None,
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
     if not view:
         raise ConfigurationError('"view" attribute was not specified')
 
-    # adapts() decorations may be used against either functions or
-    # class instances
-    if inspect.isfunction(view):
-        adapted_by = adaptedBy(view)
+    if route_name is None:
+        request_factories = DEFAULT_REQUEST_FACTORIES
     else:
-        adapted_by = adaptedBy(type(view))
-
-    if adapted_by is not None:
         try:
-            if for_ is None:
-                for_, _ = adapted_by
-            if request_type is None:
-                _, request_type = adapted_by
-        except ValueError:
-            # the component adaptation annotation does not conform to
-            # the view specification; we ignore it.
-            pass
-
-    if request_type is None:
-        request_type = IRequest
-
-    elif isinstance(request_type, basestring):
-        if request_type in HTTP_METHOD_INTERFACES:
-            request_type = HTTP_METHOD_INTERFACES[request_type]
-        else:
-            request_type = _context.resolve(request_type)
+            request_factories = _context.request_factories[route_name]
+        except KeyError:
+            raise ConfigurationError(
+                'Unknown route_name "%s".  <route> definitions must be ordered '
+                'before the view definition which mentions the route\'s name '
+                'within ZCML (or before the "scan" directive is invoked '
+                'within a bfg_view decorator).' % route_name)
+        
+    if request_type in request_factories:
+        request_type = request_factories[request_type]['interface']
+    else:
+        request_type = _context.resolve(request_type)
 
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
@@ -110,8 +95,7 @@ def view(
         discriminator = ('view', for_, name, request_type, IView),
         callable = handler,
         args = ('registerAdapter',
-                view, (for_, request_type), IView, name,
-                _context.info),
+                view, (for_, request_type), IView, name, _context.info),
         )
 
 class IViewDirective(Interface):
@@ -148,7 +132,10 @@ class IViewDirective(Interface):
         required=False
         )
 
-PVERSION = 1
+    route_name = TextLine(
+        title = u'The route that must match for this view to be used',
+        required = False)
+
 
 def zcml_configure(name, package):
     context = zope.configuration.config.ConfigurationMachine()
@@ -187,9 +174,11 @@ class BFGViewFunctionGrokker(martian.InstanceGrokker):
             for_ = obj.__for__
             name = obj.__view_name__
             request_type = obj.__request_type__
+            route_name = obj.__route_name__
             context = kw['context']
             view(context, permission=permission, for_=for_,
-                 view=obj, name=name, request_type=request_type)
+                 view=obj, name=name, request_type=request_type,
+                 route_name=route_name)
             return True
         return False
 
@@ -209,7 +198,7 @@ class IRouteDirective(Interface):
     """
     name = TextLine(title=u'name', required=True)
     path = TextLine(title=u'path', required=True)
-    view = GlobalObject(title=u'view', required=True)
+    view = GlobalObject(title=u'view', required=False)
     permission = TextLine(title=u'permission', required=False)
     factory = GlobalObject(title=u'context factory', required=False)
     minimize = Bool(title=u'minimize', required=False)
@@ -275,10 +264,12 @@ def connect_route(directive):
     if conditions:
         kw['conditions'] = conditions
 
-    if directive.factory:
-        kw['_factory'] = directive.factory
-
-    return mapper.connect(*args, **kw)
+    result = mapper.connect(*args, **kw)
+    route = mapper.matchlist[-1]
+    route._factory = directive.factory
+    context = directive.context
+    route.request_factories = context.request_factories[directive.name]
+    return result
 
 class Route(zope.configuration.config.GroupingContextDecorator):
     """ Handle ``route`` ZCML directives
@@ -305,13 +296,12 @@ class Route(zope.configuration.config.GroupingContextDecorator):
     implements(zope.configuration.config.IConfigurationContext,
                IRouteDirective)
 
-    def __init__(self, context, path, name, view, **kw):
+    def __init__(self, context, path, name, **kw):
         self.validate(**kw)
         self.requirements = {} # mutated by subdirectives
         self.context = context
         self.path = path
         self.name = name
-        self.view = view
         self.__dict__.update(**kw)
 
     def validate(self, **kw):
@@ -324,16 +314,27 @@ class Route(zope.configuration.config.GroupingContextDecorator):
                     'specified together')
 
     def after(self):
-        view(self.context, self.permission, IRoutesContext, self.view,
-             self.name, None)
+        context = self.context
+        name = self.name
+        if not hasattr(context, 'request_factories'):
+            context.request_factories = {}
+        context.request_factories[name] = named_request_factories(name)
+
+        if self.view:
+            view(context, self.permission, None, self.view, '',
+                 self.request_type, name)
 
         method = self.condition_method or self.request_type
 
         self.context.action(
-            discriminator = ('route', self.path, repr(self.requirements),
+            discriminator = ('route', self.name, repr(self.requirements),
                              method, self.condition_subdomain,
                              self.condition_function, self.subdomains),
             callable = connect_route,
             args = (self,),
             )
+
+class Uncacheable(object):
+    """ Include in discriminators of actions which are not cacheable;
+    this class only exists for backwards compatibility (<0.8.1)"""
 

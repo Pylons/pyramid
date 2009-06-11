@@ -16,8 +16,8 @@ which allows you to declaratively map URLs to code.
           neither concept (controller nor action) exists within
           :mod:`repoze.bfg`.  Instead, when you map a URL pattern to
           code in bfg, you will map the URL patterm to a :term:`view`.
-          Once the context and view name are found, the view will be
-          called with a :term:`context` and a :term:`request`.
+          Once the context and view are found, the view will be called
+          with a :term:`context` and a :term:`request`.
 
 It often makes a lot of sense to use :term:`URL dispatch` instead of
 :term:`traversal` in an application that has no natural hierarchy.
@@ -54,17 +54,15 @@ acts as a root factory, it is willing to check the requested URL
 against a *routes map* to find a :term:`context` and a :term:`view`
 before traversal has a chance to find it first.  If a route matches, a
 :term:`context` is generated and :mod:`repoze.bfg` will call the
-:term:`view` specified with the context and the request.
-
-If no route matches, :mod:`repoze.bfg` will fail over to calling the
-root factory callable passed to the application in it's ``make_app``
-function (usually a traversal function).  By configuring your ZCML
-``route`` statements appropriately, you can mix and match URL dispatch
-and traversal in this way.
+:term:`view` specified with the context and the request.  If no route
+matches, :mod:`repoze.bfg` will fail over to calling the :term:`root
+factory` callable passed to the application in it's ``make_app``
+function (usually a traversal function).
 
 A root factory is not required for purely URL-dispatch-based apps: if
-the root factory callable is ``None``, :mod:`repoze.bfg` will return a
-NotFound error to the user's browser when no routes match.
+the root factory callable is passed as ``None`` to the ``make_app``
+function, :mod:`repoze.bfg` will return a NotFound error to the user's
+browser when no routes match.
 
 .. note:: See :ref:`modelspy_project_section` for an example of a
           simple root factory callable that will use traversal.
@@ -105,9 +103,8 @@ factory
 
   The Python dotted-path name to a function that will generate a
   :mod:`repoze.bfg` context object when this route matches.
-  e.g. ``mypackage.models.MyFactoryClass``.  By default, a
-  ``repoze.bfg.urldispatch.DefaultRoutesContext`` object will be
-  constructed if a factory is not provided.
+  e.g. ``mypackage.models.MyFactoryClass``.  If this argument is not
+  specified, a default root factory will be used.
 
 encoding
 
@@ -267,12 +264,12 @@ Example 3
 ---------
 
 The context object passed to a view found as the result of URL
-dispatch will by default be an instance of the
-``repoze.bfg.urldispatch.DefaultRoutesContext`` object.  You can
-override this behavior by passing in a ``factory`` argument to the
-ZCML directive for a particular route.  The ``factory`` should be a
-callable that accepts arbitrary keyword arguments and returns an
-instance of a class that will be the context used by the view.
+dispatch will by default be an instance of the object returned by the
+default :term:`root factory`.  You can override this behavior by
+passing in a ``factory`` argument to the ZCML directive for a
+particular route.  The ``factory`` should be a callable that accepts a
+WSGI environment and returns an instance of a class that will be the
+context used by the view.
 
 An example of using a route with a factory:
 
@@ -288,13 +285,13 @@ An example of using a route with a factory:
 
 The above route will manufacture an ``Idea`` model as a context,
 assuming that ``mypackage.models.Idea`` resolves to a class that
-accepts arbitrary key/value pair arguments.
+accepts a WSGI environment in its ``__init__``.
 
 .. note:: Values prefixed with a period (``.``) for the ``factory``
-   and ``provides`` attributes of a ``route`` (such as
-   ``.models.Idea`` and ``.views.idea_view``) above) mean "relative to
-   the Python package directory in which this :term:`ZCML` file is
-   stored".  So if the above ``route`` declaration was made inside a
+   and ``view`` attributes of a ``route`` (such as ``.models.Idea``
+   and ``.views.idea_view``) above) mean "relative to the Python
+   package directory in which this :term:`ZCML` file is stored".  So
+   if the above ``route`` declaration was made inside a
    ``configure.zcml`` file that lived in the ``hello`` package, you
    could replace the relative ``.models.Idea`` with the absolute
    ``hello.models.Idea`` Either the relative or absolute form is
@@ -302,14 +299,10 @@ accepts arbitrary key/value pair arguments.
    form, in case your package's name changes.  It's also shorter to
    type.
 
-All context objects manufactured via URL dispatch will be decorated by
-default with the ``repoze.bfg.interfaces.IRoutesContext``
-:term:`interface`.
-
 If no route matches in the above configuration, :mod:`repoze.bfg` will
-call the "fallback" ``get_root`` callable provided to it during
-``make_app`.  If the "fallback" ``get_root`` is None, a ``NotFound``
-error will be raised when no route matches.
+call the "fallback" :term:`root factory` callable provided to it
+during ``make_app`.  If the "fallback" root factory is None, a
+``NotFound`` error will be raised when no route matches.
 
 .. note:: See :ref:`using_model_interfaces` for more information about
           how views are found when interfaces are attached to a
@@ -338,7 +331,10 @@ The ``.models`` module referred to above might look like so:
 .. code-block:: python
    :linenos:
 
-   class Article(dict):
+   class Article(object):
+       def __init__(self, environ):
+           self.__dict__.update(environ['repoze.bfg.matchdict'])
+
        def is_root(self):
            return self['article'] == 'root'
 
@@ -393,8 +389,8 @@ request when a database connection is involved.  When
 of the traversal :term:`root factory`.  Often the root factory will
 insert an object into the WSGI environment that performs some cleanup
 when its ``__del__`` method is called.  When URL dispatch is used,
-however, no root factory is required, so sometimes that option is not
-open to you.
+however, no special root factory is required, so sometimes that option
+is not open to you.
 
 Instead of putting this cleanup logic in the root factory, however,
 you can cause a subscriber to be fired when a new request is detected;
@@ -439,32 +435,28 @@ Lists, see :ref:`security_chapter` for more information about the
 :mod:`repoze.bfg` authorization subsystem).  A common thing to want to
 do is to attach an ``__acl__`` to the context object dynamically for
 declarative security purposes.  You can use the ``factory`` argument
-that points at a context factory which attaches a custom ``__acl__``
-to an object at its creation time.
+that points at a factory which attaches a custom ``__acl__`` to an
+object at its creation time.
 
 Such a ``factory`` might look like so:
 
 .. code-block:: python
    :linenos:
 
-   class Article(dict):
-       pass
-
-   def article_factory(**kw):
-       model = Article(**kw)
-       article = kw.get('article', None)
-       if article == '1':
-           model.__acl__ = [ (Allow, 'editor', 'view') ]
-       return model
+   class Article(object):
+       def __init__(self, environ):
+          matchdict = environ['bfg.routes.matchdict']
+          article = matchdict.get('article', None)
+          if article == '1':
+              self.__acl__ = [ (Allow, 'editor', 'view') ]
 
 If the route ``archives/:article`` is matched, and the article number
 is ``1``, :mod:`repoze.bfg` will generate an ``Article``
 :term:`context` with an ACL on it that allows the ``editor`` principal
 the ``view`` permission.  Obviously you can do more generic things
 that inspect the routes match dict to see if the ``article`` argument
-matches a particular string; our sample ``article_factory`` function
-is not very ambitious.  Its job could have just as well been done in
-the ``Article`` class' constructor, too.
+matches a particular string; our sample ``Article`` factory class is
+not very ambitious.
 
 .. note:: See :ref:`security_chapter` for more information about
    :mod:`repoze.bfg` security and ACLs.
