@@ -215,6 +215,20 @@ request_type
   called.  See :ref:`view_request_types_section` for more information
   about request types.
 
+route_name
+
+  *This attribute services an advanced feature that isn't often used
+  unless you want to perform traversal *after* a route has matched.*
+  This value must match the ``name`` of a ``<route>`` declaration (see
+  :ref:`urldispatch_chapter`) that must match before this view will be
+  called.  The ``<route>`` declaration specifed by ``route_name`` must
+  exist in ZCML before the view that names the route
+  (XML-ordering-wise) .  Note that the ``<route>`` declaration
+  referred to by ``route_name`` usually has a ``*traverse`` token in
+  the value of its ``path`` attribute, representing a part of the path
+  that will be used by traversal against the result of the route's
+  :term:`root factory`.
+
 .. _mapping_views_to_urls_using_a_decorator_section:
 
 Mapping Views to URLs Using a Decorator
@@ -294,6 +308,10 @@ If ``for_`` is not supplied, the interface
 
 If ``permission`` is not supplied, no permission is registered for
 this view (it's accessible by any caller).
+
+If ``route_name`` is supplied, the view will be invoked only if the
+named route matches.  *This is an advanced feature, not often used by
+"civilians"*.
 
 All arguments may be omitted.  For example:
 
