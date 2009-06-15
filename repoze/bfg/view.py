@@ -152,7 +152,7 @@ class bfg_view(object):
 
     Equates to the ZCML::
 
-      <bfg:view
+      <view
        for='.models.IMyModel'
        view='.views.my_view'
        name='my_view'
@@ -172,9 +172,10 @@ class bfg_view(object):
     If ``permission`` is not supplied, no permission is registered for
     this view (it's accessible by any caller).
 
-    If ``route_name`` is not supplied, the view declaration is considered
-    to be made against the 'default' route (the route which matches when
-    no ZCML-defined route matches the request).
+    If ``route_name`` is not supplied, the view declaration is
+    considered to be made against a URL that doesn't match any defined
+    :term:`route`.  The use of a ``route_name`` is an advanced
+    feature, useful only if you're using :term:`url dispatch`.
 
     Any individual or all parameters can be omitted.  The simplest
     bfg_view declaration then becomes::
@@ -187,7 +188,7 @@ class bfg_view(object):
     ``my_view``, registered for models with the
     ``zope.interface.Interface`` interface, using no permission,
     registered against requests which implement the default IRequest
-    interface.
+    interface when no urldispatch route matches.
 
     The ``bfg_view`` decorator can also be used as a class decorator
     in Python 2.6 and better (Python 2.5 and below do not support
@@ -204,18 +205,27 @@ class bfg_view(object):
             def __call__(self):
                 return Response('hello from %s!' % self.context)
 
-    .. warning:: This feature is new in 0.8.1.
+    In Python 2.5 and below, the bfg_view decorator can still be used
+    against a class, although not in decorator form::
+
+        from webob import Response
+        from repoze.bfg.view import bfg_view
+
+        class MyView(object):
+            def __init__(self, context, request):
+                self.context = context
+                self.request = request
+            def __call__(self):
+                return Response('hello from %s!' % self.context)
+
+        MyView = bfg_view()(MyView)
 
     .. note:: When a view is a class, the calling semantics are
               different than when it is a function or another
-              non-class callable.  When a view is a class, the class'
-              ``__init__`` is called with the context and the request
-              parameters, creating an instance.  Subsequently that
-              instance's ``__call__`` method is invoked with no
-              parameters.  The class' ``__call__`` method must return a
-              response.  This provides behavior similar to a Zope
-              'browser view' (Zope 'browser views' are typically classes
-              instead of simple callables).
+              non-class callable.  See :ref:`class_as_view` for more
+              information.
+
+    .. warning:: Using a class as a view is a new feature in 0.8.1+.
 
     To make use of any bfg_view declaration, you *must* insert the
     following boilerplate into your application registry's ZCML::
