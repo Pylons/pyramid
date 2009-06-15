@@ -4,6 +4,9 @@ Next release
 Features
 --------
 
+- Move LRU cache implementation into a separate package
+  (``repoze.lru``).
+
 - The concepts of traversal and URL dispatch have been unified.  It is
   now possible to use the same sort of factory as both a traversal
   "root factory" and what used to be referred to as a urldispatch

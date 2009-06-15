@@ -6,9 +6,9 @@ from zope.component import getMultiAdapter
 from zope.interface import classProvides
 from zope.interface import implements
 
-from repoze.bfg.location import lineage
+from repoze.lru import lru_cache
 
-from repoze.bfg.lru import lru_cache
+from repoze.bfg.location import lineage
 
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import ITraverser

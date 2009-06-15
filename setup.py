@@ -39,6 +39,7 @@ install_requires=[
     'zope.component >= 3.6.0', # independent of zope.hookable
     'zope.deprecation',
     'repoze.zcml',
+    'repoze.lru',
     'martian',
     ]
 
