@@ -4,6 +4,10 @@ Next release
 Features
 --------
 
+- Make 404 responses slightly cheaper by showing
+  ``environ["PATH_INFO"]`` on the notfound result page rather than the
+  fullly computed URL.
+
 - Move LRU cache implementation into a separate package
   (``repoze.lru``).
 

@@ -231,7 +231,7 @@ class Router(object):
                         )
                     logger and logger.debug(msg)
                 else:
-                    msg = request.url
+                    msg = request.path_info
                 environ['repoze.bfg.message'] = msg
                 return respond(self.notfound_view(context, request),
                                '<INotFoundView>')

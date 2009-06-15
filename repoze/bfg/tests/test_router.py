@@ -203,7 +203,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(len(headers), 2)
         status = start_response.status
         self.assertEqual(status, '404 Not Found')
-        self.failUnless('http://localhost:8080' in result[0], result)
+        self.failUnless('<code>/</code>' in result[0], result)
         self.failIf('debug_notfound' in result[0])
         self.assertEqual(len(logger.messages), 0)
 
@@ -220,7 +220,7 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(len(headers), 2)
         status = start_response.status
         self.assertEqual(status, '404 Not Found')
-        self.failUnless('http://localhost:8080' in result[0], result)
+        self.failUnless('<code>/</code>' in result[0], result)
         self.failIf('debug_notfound' in result[0])
         self.assertEqual(len(logger.messages), 0)
 
