@@ -958,7 +958,13 @@ class TestRequestOnly(unittest.TestCase):
         class foo(object):
             def __init__(self, request, foo=1, bar=2):
                 """ """
-        self.assertTrue(self._callFUT(foo), True)
+        self.assertTrue(self._callFUT(foo))
+
+    def test_newstyle_class_init_noargs(self):
+        class foo(object):
+            def __init__():
+                """ """
+        self.assertFalse(self._callFUT(foo))
 
     def test_oldstyle_class_no_init(self):
         class foo:
@@ -994,6 +1000,12 @@ class TestRequestOnly(unittest.TestCase):
             def __init__(self, request, foo=1, bar=2):
                 """ """
         self.assertTrue(self._callFUT(foo), True)
+
+    def test_oldstyle_class_init_noargs(self):
+        class foo:
+            def __init__():
+                """ """
+        self.assertFalse(self._callFUT(foo))
 
     def test_function_toomanyargs(self):
         def foo(context, request):
