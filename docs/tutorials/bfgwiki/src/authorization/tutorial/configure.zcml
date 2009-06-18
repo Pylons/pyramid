@@ -5,7 +5,7 @@
 
   <scan package="."/>
 
-   <utility provides="repoze.bfg.interfaces.IForbiddenView"
-            component=".login.login"/>
+  <forbidden
+    view=".login.login"/>
 
 </configure>

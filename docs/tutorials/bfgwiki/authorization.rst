@@ -114,10 +114,10 @@ class="main_content">`` div:
 Changing ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Change your application's ``configure.zcml`` to add a slightly
-inscrutable ``utility`` stanza.  This configures our login view to
-show up when BFG detects that a view invocation can not be authorized.
-When you're done, your ``configure.zcml`` will look like so:
+Change your application's ``configure.zcml`` to add a ``forbidden``
+stanza.  This configures our login view to show up when BFG detects
+that a view invocation can not be authorized.  When you're done, your
+``configure.zcml`` will look like so:
 
 .. literalinclude:: src/authorization/tutorial/configure.zcml
    :linenos:

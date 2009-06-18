@@ -4,8 +4,83 @@ Using ZCML Hooks
 ================
 
 ZCML "hooks" can be used to influence the behavior of the
-:mod:`repoze.bfg` framework in various ways.  This is an advanced
-topic; not many people will want or need to do any of these things.
+:mod:`repoze.bfg` framework in various ways.
+
+Changing the Not Found View
+---------------------------
+
+When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
+notfound :term:`view`. The view it invokes can be customized by
+placing something like the following ZCML in your ``configure.zcml``
+file.
+
+.. code-block:: xml
+   :linenos:
+
+   <notfound 
+       view="helloworld.views.notfound_view"/>
+
+Replace ``helloworld.views.notfound_view`` with the Python dotted name
+to the notfound view you want to use.  Here's some sample code that
+implements a minimal NotFound view:
+
+.. code-block:: python
+
+   from webob.exc import HTTPNotFound
+
+   def notfound_view(context, request):
+       return HTTPNotFound()
+
+.. note:: When a NotFound view is invoked, it is passed a request.
+   The ``environ`` attribute of the request is the WSGI environment.
+   Within the WSGI environ will be a key named ``repoze.bfg.message``
+   that has a value explaining why the not found error was raised.
+   This error will be different when the ``debug_notfound``
+   environment setting is true than it is when it is false.
+
+Changing the Forbidden View
+---------------------------
+
+When :mod:`repoze.bfg` can't authorize execution of a view based on
+the authorization policy in use, it invokes a "forbidden view".  The
+default forbidden response has a 401 status code and is very plain,
+but it can be overridden as necessary by placing something like the
+following ZCML in your ``configure.zcml`` file.
+
+.. code-block:: xml
+   :linenos:
+
+   <forbidden
+       view="helloworld.views.forbidden_view"/>
+
+Replace ``helloworld.views.forbidden_view`` with the Python
+dotted name to the forbidden view you want to use.  Like any other
+view, the forbidden view must accept two parameters: ``context`` and
+``request`` .  The ``context`` is the context found by the router when
+the view invocation was denied.  The ``request`` is the current
+:term:`request` representing the denied action.  Here's some sample
+code that implements a minimal forbidden view:
+
+.. code-block:: python
+
+   from repoze.bfg.chameleon_zpt import render_template_to_response
+
+   def forbidden_view(context, request):
+       return render_template_to_response('templates/login_form.pt')
+
+.. note:: When an forbidden view is invoked, it is passed
+   the request as the second argument.  An attribute of the request is
+   ``environ``, which is the WSGI environment.  Within the WSGI
+   environ will be a key named ``repoze.bfg.message`` that has a value
+   explaining why the current view invocation was forbidden.  This
+   error will be different when the ``debug_authorization``
+   environment setting is true than it is when it is false.
+
+.. warning:: the default forbidden view sends a response with a ``401
+   Unauthorized`` status code for backwards compatibility reasons.
+   You can influence the status code of Forbidden responses by using
+   an alterate forbidden view.  For example, it would make sense to
+   return a response with a ``403 Forbidden`` status code.
 
 Changing the response factory
 -----------------------------
@@ -42,80 +117,4 @@ Unlike a request factory, a response factory does not need to return
 an object that implements any particular interface; it simply needs
 have a ``status`` attribute, a ``headerlist`` attribute, and and
 ``app_iter`` attribute.
-
-Changing the Not Found View
----------------------------
-
-When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
-notfound :term:`view`. The view it invokes can be customized by
-placing something like the following ZCML in your ``configure.zcml``
-file.
-
-.. code-block:: xml
-   :linenos:
-
-   <utility provides="repoze.bfg.interfaces.INotFoundView"
-            component="helloworld.views.notfound_view"/>
-
-Replace ``helloworld.views.notfound_view`` with the Python dotted name
-to the notfound view you want to use.  Here's some sample code that
-implements a minimal NotFound view:
-
-.. code-block:: python
-
-   from webob.exc import HTTPNotFound
-
-   def notfound_view(context, request):
-       return HTTPNotFound()
-
-.. note:: When a NotFound view is invoked, it is passed a request.
-   The ``environ`` attribute of the request is the WSGI environment.
-   Within the WSGI environ will be a key named ``repoze.bfg.message``
-   that has a value explaining why the not found error was raised.
-   This error will be different when the ``debug_notfound``
-   environment setting is true than it is when it is false.
-
-Changing the Forbidden View
----------------------------
-
-When :mod:`repoze.bfg` can't authorize execution of a view based on
-the authorization policy in use, it invokes a "forbidden view".  The
-default forbidden response has a 401 status code and is very plain,
-but it can be overridden as necessary by placing something like the
-following ZCML in your ``configure.zcml`` file.
-
-.. code-block:: xml
-   :linenos:
-
-   <utility provides="repoze.bfg.interfaces.IForbiddenView"
-            component="helloworld.views.forbidden_view"/>
-
-Replace ``helloworld.factories.forbidden_app_factory`` with the Python
-dotted name to the forbidden view you want to use.  Like any other
-view, the forbidden view must accept two parameters: ``context`` and
-``request`` .  The ``context`` is the context found by the router when
-the view invocation was denied.  The ``request`` is the current
-:term:`request` representing the denied action.  Here's some sample
-code that implements a minimal forbidden view:
-
-.. code-block:: python
-
-   from repoze.bfg.chameleon_zpt import render_template_to_response
-
-   def forbidden_response_factory(context, request):
-       return render_template_to_response('templates/login_form.pt')
-
-.. note:: When an forbidden view is invoked, it is passed
-   the request as the second argument.  An attribute of the request is
-   ``environ``, which is the WSGI environment.  Within the WSGI
-   environ will be a key named ``repoze.bfg.message`` that has a value
-   explaining why the current view invocation was forbidden.  This
-   error will be different when the ``debug_authorization``
-   environment setting is true than it is when it is false.
-
-.. warning:: the default forbidden view sends a response with a ``401
-   Unauthorized`` status code for backwards compatibility reasons.
-   You can influence the status code of Forbidden responses by using
-   an alterate forbidden view.  For example, it would make sense to
-   return a response with a ``403 Forbidden`` status code.
 
