@@ -111,8 +111,7 @@ class Router(object):
                 response = request.get_response(app)
                 return response
 
-        notfound = registry.queryUtility(INotFoundView,
-                                         default=notfound)
+        notfound = registry.queryUtility(INotFoundView, default=notfound)
                 
         self.notfound_view = notfound or default_notfound_view
         
@@ -176,25 +175,21 @@ class Router(object):
                         (view_name, response))
 
             if self.secured:
-
                 permitted = registry.queryMultiAdapter((context, request),
                                                        IViewPermission,
                                                        name=view_name)
-
                 if permitted is None:
                     if self.debug_authorization:
                         permitted =  Allowed(
-                            'Allowed: view name %r in context %r (no '
-                            'permission registered).' %
-                            (view_name, context))
+                            'Allowed: view name %r against context %r (no '
+                            'permission registered).' % (view_name, context))
                     else:
                         permitted = True
-
                 
             else:
                 if self.debug_authorization:
                     permitted =  Allowed(
-                        'Allowed: view name %r in context %r (no '
+                        'Allowed: view name %r against context %r (no '
                         'authentication policy in use).' % (view_name, context))
                 else:
                     permitted = True
@@ -202,9 +197,8 @@ class Router(object):
             if self.debug_authorization:
                 logger and logger.debug(
                     'debug_authorization of url %s (view name %r against '
-                    'context %r): %s' % (
-                    request.url, view_name, context, permitted)
-                    )
+                    'context %r): %s' % (request.url, view_name, context,
+                                         permitted))
 
             if not permitted:
                 if self.debug_authorization:
@@ -319,16 +313,16 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     if options is None:
         options = {}
 
-    regname = filename
-
-    if package:
-        regname = package.__name__
     if registry is None:
+        regname = filename
+        if package:
+            regname = package.__name__
         registry = Registry(regname)
 
     if debug_logger is None:
         debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
     registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
+
     settings = Settings(get_options(options))
     registry.registerUtility(settings, ISettings)
 
@@ -341,7 +335,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     if root_factory is None:
         root_factory = DefaultRootFactory
 
-    # register the *default* root factory so we can find it later
+    # register the *default* root factory so apps can find it later
     registry.registerUtility(root_factory, IDefaultRootFactory)
 
     mapper = RoutesRootFactory(root_factory)
@@ -398,4 +392,3 @@ class DefaultRootFactory:
             # factory") in BFG 0.9.X and before
             self.__dict__.update(environ['bfg.routes.matchdict'])
 
-            
