@@ -9,7 +9,7 @@ from repoze.bfg.security import forget
 
 from tutorial.run import USERS
 
-def login(context, request):
+def login(request):
     login_url = url_for('login')
     referrer = request.environ.get('HTTP_REFERER', '/')
     if referrer == login_url:
@@ -37,7 +37,7 @@ def login(context, request):
         request  =request,
         )
     
-def logout(context, request):
+def logout(request):
     headers = forget(request)
     return HTTPFound(location = url_for('view_wiki'),
                      headers = headers)

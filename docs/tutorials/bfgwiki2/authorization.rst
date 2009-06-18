@@ -18,7 +18,7 @@ Adding A Root Factory
 
 We're going to start to use a custom *root factory* within our
 ``run.py`` file in order to be able to attach security declarations to
-our :term:`context` object.  When we do this, we can begin to make use
+a :term:`context` object.  When we do this, we can begin to make use
 of the declarative security features of :mod:`repoze.bfg`.
 
 Let's modify our ``run.py``, passing in a :term:`root factory` as the
@@ -38,14 +38,15 @@ statements to your ``models.py`` file:
 
 Defining a root factory allows us to use declarative security features
 of :mod:`repoze.bfg`.  The ``RootFactory`` class we added will be used
-to construct each of the ``context`` objects passed to our views.  All
-of our ``context`` objects will possess an ``__acl__`` attribute that
-allows "Everyone" (a special principal) to view all request, while
-allowing only a user named ``editor`` to edit and add pages.  The
-``__acl__`` attribute attached to a context is interpreted specially
-by :mod:`repoze.bfg` as an access control list during view execution.
-See :ref:`assigning_acls` for more information about what an
-:term:`ACL` represents.
+to construct each of the ``context`` objects.  The context is attached
+to our request as the ``context`` attribute.  All of our ``context``
+objects will possess an ``__acl__`` attribute that allows "Everyone"
+(a special principal) to view all pages, while allowing only a user
+named ``editor`` to edit and add pages.  The ``__acl__`` attribute
+attached to a context is interpreted specially by :mod:`repoze.bfg` as
+an access control list during view execution.  See
+:ref:`assigning_acls` for more information about what an :term:`ACL`
+represents.
 
 .. note: Although we don't use the functionality here, the ``factory``
    used to create route contexts may differ per-route instead of
@@ -125,7 +126,7 @@ to pass the `resulting `logged_in`` value to the template, e.g.:
 
    return render_template_to_response('templates/view.pt',
                                       request = request,
-                                      page = context,
+                                      page = page,
                                       content = content,
                                       logged_in = logged_in,
                                       edit_url = edit_url)
