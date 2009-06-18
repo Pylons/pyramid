@@ -2,6 +2,7 @@ from cgi import escape
 import sys
 from webob import Response
 
+from zope.interface import providedBy
 from zope.component.event import dispatch
 from zope.component import queryUtility
 
@@ -205,16 +206,15 @@ class Router(object):
                     msg = str(permitted)
                 else:
                     msg = 'Unauthorized: failed security policy check'
-
                 environ['repoze.bfg.message'] = msg
-
                 return respond(self.forbidden_view(context, request),
                                '<IForbiddenView>')
 
-            response = registry.queryMultiAdapter(
-                (context, request), IView, name=view_name)
+            view_callable = registry.adapters.lookup(
+                map(providedBy, (context, request)), IView, name=view_name,
+                default=None)
 
-            if response is None:
+            if view_callable is None:
                 if self.debug_notfound:
                     msg = (
                         'debug_notfound of url %s; path_info: %r, context: %r, '
@@ -230,6 +230,7 @@ class Router(object):
                 return respond(self.notfound_view(context, request),
                                '<INotFoundView>')
 
+            response = view_callable(context, request)
             return respond(response, view_name)
 
         finally:

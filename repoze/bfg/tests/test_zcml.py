@@ -58,6 +58,144 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
 
+    def test_view_as_function_requestonly(self):
+        context = DummyContext()
+
+        def view(request):
+            return 'OK'
+        class IFoo:
+            pass
+        
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
+        actions = context.actions
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+        
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        wrapper = regadapt['args'][1]
+        self.failIfEqual(wrapper, view)
+        self.assertEqual(wrapper.__module__, view.__module__)
+        self.assertEqual(wrapper.__name__, view.__name__)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result, 'OK')
+        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
+    def test_view_as_instance(self):
+        context = DummyContext()
+        class AView:
+            def __call__(self, context, request):
+                """ """
+        view = AView()
+        class IFoo:
+            pass
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
+        actions = context.actions
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+        
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        self.assertEqual(regadapt['args'][1], view)
+        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
+    def test_view_as_instance_requestonly(self):
+        context = DummyContext()
+        class AView:
+            def __call__(self, request):
+                return 'OK'
+        view = AView()
+        class IFoo:
+            pass
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
+        actions = context.actions
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+        
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        wrapper = regadapt['args'][1]
+        self.failIfEqual(wrapper, view)
+        self.assertEqual(wrapper.__module__, view.__module__)
+        self.failUnless('instance' in wrapper.__name__)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result, 'OK')
+        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
     def test_view_as_oldstyle_class(self):
         context = DummyContext()
         class IFoo:
@@ -103,6 +241,155 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result.context, None)
+        self.assertEqual(result.request, None)
+        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
+    def test_view_as_oldstyle_class_requestonly(self):
+        context = DummyContext()
+        class IFoo:
+            pass
+        class view:
+            def __init__(self, request):
+                self.request = request
+
+            def __call__(self):
+                return self
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
+        actions = context.actions
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+        
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        wrapper = regadapt['args'][1]
+        self.assertEqual(wrapper.__module__, view.__module__)
+        self.assertEqual(wrapper.__name__, view.__name__)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result.request, None)
+        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
+    def test_view_as_newstyle_class(self):
+        context = DummyContext()
+        class IFoo:
+            pass
+        class view(object):
+            def __init__(self, context, request):
+                self.context = context
+                self.request = request
+
+            def __call__(self):
+                return self
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
+        actions = context.actions
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+        
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        wrapper = regadapt['args'][1]
+        self.assertEqual(wrapper.__module__, view.__module__)
+        self.assertEqual(wrapper.__name__, view.__name__)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result.context, None)
+        self.assertEqual(result.request, None)
+        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
+        self.assertEqual(regadapt['args'][3], IView)
+        self.assertEqual(regadapt['args'][4], '')
+        self.assertEqual(regadapt['args'][5], None)
+
+    def test_view_as_newstyle_class_requestonly(self):
+        context = DummyContext()
+        class IFoo:
+            pass
+        class view(object):
+            def __init__(self, request):
+                self.request = request
+
+            def __call__(self):
+                return self
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
+        actions = context.actions
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.security import ViewPermissionFactory
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 2)
+
+        permission = actions[0]
+        permission_discriminator = ('permission', IFoo, '', IRequest,
+                                    IViewPermission)
+        self.assertEqual(permission['discriminator'], permission_discriminator)
+        self.assertEqual(permission['callable'], handler)
+        self.assertEqual(permission['args'][0], 'registerAdapter')
+        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
+        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
+        self.assertEqual(permission['args'][2], (IFoo, IRequest))
+        self.assertEqual(permission['args'][3], IViewPermission)
+        self.assertEqual(permission['args'][4], '')
+        self.assertEqual(permission['args'][5], None)
+        
+        regadapt = actions[1]
+        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerAdapter')
+        wrapper = regadapt['args'][1]
+        self.assertEqual(wrapper.__module__, view.__module__)
+        self.assertEqual(wrapper.__name__, view.__name__)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
         self.assertEqual(result.request, None)
         self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
         self.assertEqual(regadapt['args'][3], IView)
@@ -632,7 +919,142 @@ class TestExcludeFunction(unittest.TestCase):
     def test_it(self):
         self.assertEqual(self._callFUT('.foo'), True)
         self.assertEqual(self._callFUT('foo'), False)
+
+class TestRequestOnly(unittest.TestCase):
+    def _callFUT(self, arg):
+        from repoze.bfg.zcml import requestonly
+        return requestonly(arg)
     
+    def test_newstyle_class_no_init(self):
+        class foo(object):
+            """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_newstyle_class_init_toomanyargs(self):
+        class foo(object):
+            def __init__(self, context, request):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+        
+    def test_newstyle_class_init_onearg_named_request(self):
+        class foo(object):
+            def __init__(self, request):
+                """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_newstyle_class_init_onearg_named_somethingelse(self):
+        class foo(object):
+            def __init__(self, req):
+                """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_newstyle_class_init_defaultargs_firstname_not_request(self):
+        class foo(object):
+            def __init__(self, context, request=None):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_newstyle_class_init_defaultargs_firstname_request(self):
+        class foo(object):
+            def __init__(self, request, foo=1, bar=2):
+                """ """
+        self.assertTrue(self._callFUT(foo), True)
+
+    def test_oldstyle_class_no_init(self):
+        class foo:
+            """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_oldstyle_class_init_toomanyargs(self):
+        class foo:
+            def __init__(self, context, request):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+        
+    def test_oldstyle_class_init_onearg_named_request(self):
+        class foo:
+            def __init__(self, request):
+                """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_oldstyle_class_init_onearg_named_somethingelse(self):
+        class foo:
+            def __init__(self, req):
+                """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_oldstyle_class_init_defaultargs_firstname_not_request(self):
+        class foo:
+            def __init__(self, context, request=None):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_oldstyle_class_init_defaultargs_firstname_request(self):
+        class foo:
+            def __init__(self, request, foo=1, bar=2):
+                """ """
+        self.assertTrue(self._callFUT(foo), True)
+
+    def test_function_toomanyargs(self):
+        def foo(context, request):
+            """ """
+        self.assertFalse(self._callFUT(foo))
+        
+    def test_function_onearg_named_request(self):
+        def foo(request):
+            """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_function_onearg_named_somethingelse(self):
+        def foo(req):
+            """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_function_defaultargs_firstname_not_request(self):
+        def foo(context, request=None):
+            """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_function_defaultargs_firstname_request(self):
+        def foo(request, foo=1, bar=2):
+            """ """
+        self.assertTrue(self._callFUT(foo), True)
+
+    def test_instance_toomanyargs(self):
+        class Foo:
+            def __call__(self, context, request):
+                """ """
+        foo = Foo()
+        self.assertFalse(self._callFUT(foo))
+        
+    def test_instance_defaultargs_onearg_named_request(self):
+        class Foo:
+            def __call__(self, request):
+                """ """
+        foo = Foo()
+        self.assertTrue(self._callFUT(foo))
+
+    def test_instance_defaultargs_onearg_named_somethingelse(self):
+        class Foo:
+            def __call__(self, req):
+                """ """
+        foo = Foo()
+        self.assertTrue(self._callFUT(foo))
+
+    def test_instance_defaultargs_firstname_not_request(self):
+        class Foo:
+            def __call__(self, context, request=None):
+                """ """
+        foo = Foo()
+        self.assertFalse(self._callFUT(foo))
+
+    def test_instance_defaultargs_firstname_request(self):
+        class Foo:
+            def __call__(self, request, foo=1, bar=2):
+                """ """
+        foo = Foo()
+        self.assertTrue(self._callFUT(foo), True)
+
 class DummyModule:
     __name__ = 'dummy'
 

@@ -4,6 +4,36 @@ Next release
 Features
 --------
 
+- Allow views to be *optionally* defined as callables that accept only
+  a request object, instead of both a context and a request (which
+  still works, and always will).  The following types work as views in
+  this style:
+
+  - functions that accept a single argument ``request``, e.g.::
+
+      def aview(request):
+          pass
+
+  - new and old-style classes that have an ``__init__`` method that
+    accepts ``self, request``, e.g.::
+
+      def View(object):
+          __init__(self, request):
+             pass
+
+  - Arbitrary callables that have a ``__call__`` method that accepts
+    ``self, request``, e.g.::
+
+      def AView(object):
+          def __call__(self, request):
+             pass
+      view = AView()
+
+  This likely should have been the calling convention all along, as
+  the request has ``context`` as an attribute already, and with views
+  called as a result of URL dispatch, having the context in the
+  arguments is not very useful.  C'est la vie.
+
 - Cache the absolute path in the caller's package globals within
   ``repoze.bfg.path`` to get rid of repeated (expensive) calls to
   os.path.abspath.

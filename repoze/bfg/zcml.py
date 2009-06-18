@@ -64,6 +64,8 @@ def view(
     else:
         request_type = _context.resolve(request_type)
 
+    derived_view = view
+
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
         # function that operates like a Zope view (when it's invoked,
@@ -71,14 +73,29 @@ def view(
         # position arguments, then immediately invoke the __call__
         # method of the instance with no arguments; __call__ should
         # return an IResponse).
-        _view = view
-        def _bfg_class_view(context, request):
-            inst = _view(context, request)
-            return inst()
-        _bfg_class_view.__module__ = view.__module__
-        _bfg_class_view.__name__ = view.__name__
-        _bfg_class_view.__doc__ = view.__doc__
-        view = _bfg_class_view
+        if requestonly(view):
+            def _bfg_class_requestonly_view(context, request):
+                inst = view(request)
+                return inst()
+            derived_view = _bfg_class_requestonly_view
+        else:
+            def _bfg_class_view(context, request):
+                inst = view(context, request)
+                return inst()
+            derived_view = _bfg_class_view
+
+    elif requestonly(view):
+        def _bfg_requestonly_view(context, request):
+            return view(request)
+        derived_view = _bfg_requestonly_view
+
+    if derived_view is not view:
+        derived_view.__module__ = view.__module__
+        derived_view.__doc__ = view.__doc__
+        try:
+            derived_view.__name__ = view.__name__
+        except AttributeError:
+            derived_view.__name__ = repr(view)
 
     if permission:
         pfactory = ViewPermissionFactory(permission)
@@ -95,7 +112,7 @@ def view(
         discriminator = ('view', for_, name, request_type, IView),
         callable = handler,
         args = ('registerAdapter',
-                view, (for_, request_type), IView, name, _context.info),
+                derived_view, (for_, request_type), IView, name, _context.info),
         )
 
 class IViewDirective(Interface):
@@ -338,3 +355,43 @@ class Uncacheable(object):
     """ Include in discriminators of actions which are not cacheable;
     this class only exists for backwards compatibility (<0.8.1)"""
 
+def requestonly(class_or_callable):
+    """ Return true of the class or callable accepts only a request argument,
+    as opposed to something that accepts context, request """
+    if inspect.isfunction(class_or_callable):
+        fn = class_or_callable
+    elif inspect.isclass(class_or_callable):
+        try:
+            fn = class_or_callable.__init__
+        except AttributeError:
+            return False
+    else:
+        try:
+            fn = class_or_callable.__call__
+        except AttributeError:
+            return False
+
+    try:
+        argspec = inspect.getargspec(fn)
+    except TypeError:
+        return False
+
+    args = argspec[0]
+    defaults = argspec[3]
+
+    if hasattr(fn, 'im_func'):
+        # it's an instance method
+        if not args:
+            return False
+        args = args[1:]
+    if not args:
+        return False
+
+    if len(args) == 1:
+        return True
+
+    elif args[0] == 'request':
+        if len(args) - len(defaults) == 1:
+            return True
+
+    return False
