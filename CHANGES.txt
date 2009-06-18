@@ -4,6 +4,11 @@ Next release
 Features
 --------
 
+- Add ``reissue_time`` and ``timeout`` parameters to
+  ``repoze.bfg.authentication.AuthTktAuthenticationPolicy``
+  constructor.  If these are passed, cookies will be reset every so
+  often (cadged from the same change to repoze.who lately).
+
 - The matchdict related to the matching of a Routes route is available
   on the request as the ``matchdict`` attribute:
   ``request.matchdict``.  If no route matched, this attribute will be

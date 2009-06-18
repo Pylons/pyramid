@@ -177,10 +177,18 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         from repoze.bfg.authentication import AuthTktAuthenticationPolicy
         return AuthTktAuthenticationPolicy
 
-    def _makeOne(self, callback, cookieidentity):
-        inst = self._getTargetClass()('secret', callback)
+    def _makeOne(self, callback, cookieidentity, **kw):
+        inst = self._getTargetClass()('secret', callback, **kw)
         inst.cookie = DummyCookieHelper(cookieidentity)
         return inst
+
+    def test_allargs(self):
+        # pass all known args
+        inst = self._getTargetClass()(
+            'secret', callback=None, cookie_name=None, secure=False,
+            include_ip=False, timeout=None, reissue_time=None,
+            )
+        self.assertEqual(inst.callback, None)
 
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
@@ -266,7 +274,8 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
     def _makeTicket(self, userid='userid', remote_addr='0.0.0.0',
                     tokens = [], userdata='userdata',
-                    cookie_name='auth_tkt', secure=False):
+                    cookie_name='auth_tkt', secure=False,
+                    time=None):
         from paste.auth import auth_tkt
         ticket = auth_tkt.AuthTicket(
             'secret',
@@ -274,6 +283,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
             remote_addr,
             tokens=tokens,
             user_data=userdata,
+            time=time,
             cookie_name=cookie_name,
             secure=secure)
         return ticket.cookie_value()
@@ -499,6 +509,20 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(name, 'Set-Cookie')
         self.assertEqual(value, 'auth_tkt=""""; Path=/; Domain=.localhost')
 
+    def test_timeout_no_reissue(self):
+        self.assertRaises(ValueError, self._makeOne, 'userid', timeout=1)
+
+    def test_timeout_lower_than_reissue(self):
+        self.assertRaises(ValueError, self._makeOne, 'userid', timeout=1,
+                          reissue_time=2)
+
+    def test_identify_bad_cookie_expired(self):
+        import time
+        helper = self._makeOne('secret', timeout=2, reissue_time=1)
+        val = self._makeTicket(userid='userid', time=time.time()-3)
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % val})
+        result = helper.identify(request)
+        self.assertEqual(result, None)
 
 class DummyContext:
     pass

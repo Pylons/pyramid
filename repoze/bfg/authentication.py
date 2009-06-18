@@ -1,3 +1,5 @@
+import time
+
 from codecs import utf_8_decode
 from codecs import utf_8_encode
 from paste.request import get_cookies
@@ -183,6 +185,18 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        Default: ``False``.  Make the requesting IP address part of
        the authentication data in the cookie.  Optional.
 
+    ``timeout``
+
+       Default: ``None``.  Maximum age in seconds allowed for a cookie
+       to live.  If ``timeout`` is specified, you must also set
+       ``reissue_time`` to a lower value.
+
+    ``reissue_time``
+
+       Default: ``None``.  If ``reissue_time`` is specified, when we
+       encounter a cookie that is older than the reissue time (in
+       seconds), but younger that the ``timeout``, a new cookie will
+       be issued.
     """
     implements(IAuthenticationPolicy)
     def __init__(self,
@@ -190,12 +204,16 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  callback=None,
                  cookie_name='repoze.bfg.auth_tkt',
                  secure=False,
-                 include_ip=False):
+                 include_ip=False,
+                 timeout=None,
+                 reissue_time=None):
         self.cookie = AuthTktCookieHelper(
             secret,
             cookie_name=cookie_name,
             secure=secure,
             include_ip=include_ip,
+            timeout=timeout,
+            reissue_time=reissue_time,
             )
         self.callback = callback
 
@@ -223,11 +241,16 @@ class AuthTktCookieHelper(object):
         }
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
-                 include_ip=False):
+                 include_ip=False, timeout=None, reissue_time=None):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
         self.secure = secure
+        if timeout and ( (not reissue_time) or (reissue_time > timeout) ):
+            raise ValueError('When timeout is specified, reissue_time must '
+                             'be set to a lower value')
+        self.timeout = timeout
+        self.reissue_time = reissue_time
 
     # IIdentifier
     def identify(self, request):
@@ -247,6 +270,9 @@ class AuthTktCookieHelper(object):
             timestamp, userid, tokens, user_data = auth_tkt.parse_ticket(
                 self.secret, cookie.value, remote_addr)
         except auth_tkt.BadTicket:
+            return None
+
+        if self.timeout and ( (timestamp + self.timeout) < time.time() ):
             return None
 
         userid_typename = 'userid_type:'
