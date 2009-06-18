@@ -4,6 +4,11 @@ Next release
 Features
 --------
 
+- The matchdict related to the matching of a Routes route is available
+  on the request as the ``matchdict`` attribute:
+  ``request.matchdict``.  If no route matched, this attribute will be
+  None.
+
 - Make 404 responses slightly cheaper by showing
   ``environ["PATH_INFO"]`` on the notfound result page rather than the
   fullly computed URL.

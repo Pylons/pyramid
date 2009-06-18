@@ -6,7 +6,7 @@
   <subscriber for="repoze.bfg.interfaces.INewRequest"
     handler=".run.handle_teardown"/>
 
-  <route path="static/*subpath"
+  <view 
     name="static"
     view=".views.static_view"
     />

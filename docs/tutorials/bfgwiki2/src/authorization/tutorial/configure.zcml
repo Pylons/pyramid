@@ -6,6 +6,11 @@
   <subscriber for="repoze.bfg.interfaces.INewRequest"
     handler=".run.handle_teardown"/>
 
+  <view 
+    name="static"
+    view=".views.static_view"
+    />
+
   <route
      path="login"
      name="login"
@@ -17,11 +22,6 @@
      name="logout"
      view=".login.logout"
      />
-
-  <route path="static/*subpath"
-    name="static"
-    view=".views.static_view"
-    />
 
   <route
     path=""

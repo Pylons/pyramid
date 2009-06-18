@@ -90,6 +90,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [])
         self.assertEqual(result['virtual_root'], policy.root)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], None)
 
     def test_call_pathel_with_no_getitem(self):
         policy = self._makeOne(None)
@@ -101,6 +102,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [])
         self.assertEqual(result['virtual_root'], policy.root)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], None)
 
     def test_call_withconn_getitem_emptypath_nosubpath(self):
         root = DummyContext()
@@ -113,6 +115,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [])
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], None)
 
     def test_call_withconn_getitem_withpath_nosubpath(self):
         foo = DummyContext()
@@ -126,6 +129,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [u'foo'])
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], None)
 
     def test_call_withconn_getitem_withpath_withsubpath(self):
         foo = DummyContext()
@@ -139,6 +143,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [u'foo'])
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], None)
 
     def test_call_with_explicit_viewname(self):
         foo = DummyContext()
@@ -152,6 +157,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [])
         self.assertEqual(result['virtual_root'], root)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], None)
 
     def test_call_with_vh_root(self):
         environ = self._getEnviron(PATH_INFO='/baz',
@@ -172,6 +178,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [u'foo', u'bar', u'baz'])
         self.assertEqual(result['virtual_root'], bar)
         self.assertEqual(result['virtual_root_path'], [u'foo', u'bar'])
+        self.assertEqual(result['matchdict'], None)
 
     def test_non_utf8_path_segment_unicode_path_segments_fails(self):
         foo = DummyContext()
@@ -201,6 +208,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [])
         self.assertEqual(result['virtual_root'], model)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], {})
 
     def test_withroute_with_subpath(self):
         model = DummyContext()
@@ -213,6 +221,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [])
         self.assertEqual(result['virtual_root'], model)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], {'subpath':'/a/b/c'})
 
     def test_withroute_with_path_info(self):
         model = DummyContext()
@@ -228,6 +237,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root_path'], [])
         self.assertEqual(environ['PATH_INFO'], '/foo/bar')
         self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
+        self.assertEqual(result['matchdict'], {'path_info':'foo/bar'})
 
     def test_withroute_with_path_info_PATH_INFO_w_extra_slash(self):
         model = DummyContext()
@@ -249,6 +259,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['traversed'], [])
         self.assertEqual(result['virtual_root'], model)
         self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['matchdict'], {'traverse':'foo/bar'})
 
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):

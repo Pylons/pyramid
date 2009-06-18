@@ -1,3 +1,5 @@
+.. _wiki2_adding_authorization:
+
 ====================
 Adding Authorization
 ====================

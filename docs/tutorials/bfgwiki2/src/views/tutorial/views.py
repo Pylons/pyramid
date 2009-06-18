@@ -21,8 +21,9 @@ def view_wiki(context, request):
     return HTTPFound(location = url_for('view_page', pagename='FrontPage'))
 
 def view_page(context, request):
+    matchdict = request.matchdict
     session = DBSession()
-    page = session.query(Page).filter_by(name=context.pagename).one()
+    page = session.query(Page).filter_by(name=matchdict['pagename']).one()
 
     def check(match):
         word = match.group(1)
@@ -36,7 +37,7 @@ def view_page(context, request):
 
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
-    edit_url = url_for('edit_page', pagename=context.pagename)
+    edit_url = url_for('edit_page', pagename=matchdict['pagename'])
     return render_template_to_response('templates/view.pt',
                                        request = request,
                                        page = page,
@@ -44,7 +45,7 @@ def view_page(context, request):
                                        edit_url = edit_url)
 
 def add_page(context, request):
-    name = context.pagename
+    name = request.matchdict['pagename']
     if 'form.submitted' in request.params:
         session = DBSession()
         body = request.params['body']
@@ -59,7 +60,7 @@ def add_page(context, request):
                                        save_url = save_url)
     
 def edit_page(context, request):
-    name = context.pagename
+    name = request.matchdict['pagename']
     session = DBSession()
     page = session.query(Page).filter_by(name=name).one()
     if 'form.submitted' in request.params:
