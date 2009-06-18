@@ -37,25 +37,6 @@ class TestSubclassedRequest(unittest.TestCase):
         request.charset = None
         self.assertEqual(request.GET['la'], 'La Pe\xc3\xb1a')
 
-class TestCurrentRequest(unittest.TestCase):
-    def _callFUT(self):
-        from repoze.bfg.request import current_request
-        return current_request()
-
-    def test_it_None(self):
-        request = self._callFUT()
-        self.assertEqual(request, None)
-
-    def test_it(self):
-        from repoze.bfg.threadlocal import manager
-        request = DummyRequest()
-        try:
-            manager.push({'request':request})
-            self.assertEqual(self._callFUT(), request)
-        finally:
-            manager.pop()
-        self.assertEqual(self._callFUT(), None)
-
 class TestRequestFactory(unittest.TestCase):
     def _callFUT(self, environ):
         from repoze.bfg.request import request_factory

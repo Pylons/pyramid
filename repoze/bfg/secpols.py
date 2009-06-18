@@ -6,7 +6,7 @@ from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IAuthenticationPolicy
 
 from repoze.bfg.location import lineage
-from repoze.bfg.request import current_request
+from repoze.bfg.threadlocal import get_current_request
 
 from repoze.bfg.security import Allow
 from repoze.bfg.security import Deny
@@ -434,7 +434,7 @@ class SecurityPolicyToAuthorizationPolicyAdapter(object):
         self.secpol = secpol
 
     def permits(self, context, principals, permission):
-        request = current_request()
+        request = get_current_request()
         return self.secpol.permits(context, request, permission)
 
     def principals_allowed_by_permission(self, context, permission):

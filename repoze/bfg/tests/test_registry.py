@@ -54,54 +54,17 @@ class TestPopulateRegistry(unittest.TestCase):
         from repoze.bfg.tests import fixtureapp
         dummylock = DummyLock()
         dummyregmgr = DummyThreadLocalManager({'registry':None})
-        import repoze.bfg.threadlocal
-        try:
-            old = repoze.bfg.threadlocal.manager
-            repoze.bfg.threadlocal.manager = dummyregmgr
-            from zope.component.registry import Components
-            registry = Components('hello')
-            self._callFUT(registry,
-                          'configure.zcml',
-                          fixtureapp,
-                          lock=dummylock)
-            self.assertEqual(dummylock.acquired, True)
-            self.assertEqual(dummylock.released, True)
-            self.assertEqual(dummyregmgr.data['registry'], None)
-        finally:
-            repoze.bfg.threadlocal.manager = old
+        from zope.component.registry import Components
+        registry = Components('hello')
+        self._callFUT(registry,
+                      'configure.zcml',
+                      fixtureapp,
+                      lock=dummylock,
+                      manager=dummyregmgr)
+        self.assertEqual(dummylock.acquired, True)
+        self.assertEqual(dummylock.released, True)
+        self.assertEqual(dummyregmgr.data['registry'], None)
 
-class GetSiteManagerTests(unittest.TestCase):
-    def _callFUT(self, context=None):
-        from repoze.bfg.registry import getSiteManager
-        return getSiteManager(context)
-
-    def test_no_context(self):
-        from zope.component import getGlobalSiteManager
-        self.assertEqual(self._callFUT(), getGlobalSiteManager())
-    
-    def test_with_context(self):
-        from zope.component.interfaces import ComponentLookupError
-        self.assertRaises(ComponentLookupError, self._callFUT, object)
-
-class GetRegistryTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-        
-    def _callFUT(self):
-        from repoze.bfg.registry import get_registry
-        return get_registry()
-
-    def test_it(self):
-        from repoze.bfg.threadlocal import manager
-        try:
-            manager.push({'registry':123})
-            self.assertEqual(self._callFUT(), 123)
-        finally:
-            manager.pop()
-    
 class TestFakeRegistry(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.registry import FakeRegistryManager

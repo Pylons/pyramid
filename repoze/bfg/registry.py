@@ -4,13 +4,12 @@ import zope.component
 
 from zope.component import getGlobalSiteManager
 from zope.component import getSiteManager as original_getSiteManager
-from zope.component.interfaces import ComponentLookupError
-from zope.component.interfaces import IComponentLookup
 from zope.component.registry import Components
 
 from zope.deprecation import deprecated
 
 from repoze.bfg.threadlocal import manager
+from repoze.bfg.threadlocal import get_current_registry
 
 from repoze.bfg.zcml import zcml_configure
 
@@ -36,10 +35,8 @@ class Registry(Components):
             for ignored in self.subscribers(events, None):
                 """ """
 
-def get_registry():
-    return manager.get()['registry']
-
-def populateRegistry(registry, filename, package, lock=threading.Lock()):
+def populateRegistry(registry, filename, package, lock=threading.Lock(),
+                     manager=manager): # lock and manager for testing
 
     """ We push our ZCML-defined configuration into an app-local
     component registry in order to allow more than one bfg app to live
@@ -58,22 +55,13 @@ def populateRegistry(registry, filename, package, lock=threading.Lock()):
     lock.acquire()
     manager.push({'registry':registry, 'request':None})
     try:
-        original_getSiteManager.sethook(getSiteManager)
-        zope.component.getGlobalSiteManager = get_registry
+        original_getSiteManager.sethook(get_current_registry)
+        zope.component.getGlobalSiteManager = get_current_registry
         zcml_configure(filename, package)
     finally:
         zope.component.getGlobalSiteManager = getGlobalSiteManager
         lock.release()
         manager.pop()
-
-def getSiteManager(context=None):
-    if context is None:
-        return manager.get()['registry']
-    else:
-        try:
-            return IComponentLookup(context)
-        except TypeError, error:
-            raise ComponentLookupError(*error.args)
 
 class FakeRegistryManager(object):
     manager = manager # for unit tests
@@ -103,3 +91,19 @@ deprecated('registry_manager',
            'within a "debug" script of your own making, use the ``bfgshell`` '
            'paster command instead. ``registry_manager`` will disappear in '
            'a later release of repoze.bfg')
+
+getSiteManager = get_current_registry # b/c
+
+deprecated('getSiteManager',
+           'As of repoze.bfg 1.0, any import of getSiteManager from'
+           '``repoze.bfg.registry`` is '
+           'deprecated.  Use ``from zope.compponent import getSiteManager '
+           'instead.')
+
+get_registry = get_current_registry # b/c
+
+deprecated('get_registry',
+           'As of repoze.bfg 1.0, any import of get_registry from'
+           '``repoze.bfg.registry`` is '
+           'deprecated.  Use ``from repoze.bfg.threadlocal import '
+           'get_current_registry instead.')
