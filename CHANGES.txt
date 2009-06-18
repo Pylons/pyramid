@@ -4,6 +4,10 @@ Next release
 Features
 --------
 
+- Cache the absolute path in the caller's package globals within
+  ``repoze.bfg.path`` to get rid of repeated (expensive) calls to
+  os.path.abspath.
+
 - Add ``reissue_time`` and ``timeout`` parameters to
   ``repoze.bfg.authentication.AuthTktAuthenticationPolicy``
   constructor.  If these are passed, cookies will be reset every so
@@ -108,7 +112,6 @@ Documentation
 
 - Updated Routes bfgwiki2 tutorial to reflect the fact that context
   factories are now no longer used.
-
 
 0.9.1 (2009-06-02)
 ==================
