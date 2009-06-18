@@ -30,8 +30,9 @@ function can be defined as follows:
 
 context
 
-  An instance of a model found via graph :term:`traversal` or
-  :term:`URL dispatch`.
+  An instance of a :term:`context` found via graph :term:`traversal`
+  or :term:`URL dispatch`.  If the context is found via traversal, it
+  will be a :term:`model` object.
 
 request
 
@@ -77,6 +78,45 @@ For example:
 
 The context and request objects passed to ``__init__`` are the same
 types of objects as described in :ref:`function_as_view`.
+
+Alternate "Request-Only" View Argument Convention
+-------------------------------------------------
+
+Views may alternately be defined as callables that accept only a
+request object, instead of both a context and a request.  The
+following types work as views in this style:
+
+#. Functions that accept a single argument ``request``, e.g.::
+
+      from webob import Response
+
+      def aview(request):
+          return Response('OK')
+
+#. New and old-style classes that have an ``__init__`` method that
+   accepts ``self, request``, e.g.::
+
+      from webob import Response
+
+      def View(object):
+          __init__(self, request):
+          return Response('OK')
+
+#. Arbitrary callables that have a ``__call__`` method that accepts
+  ``self, request``, e.g.::
+
+      from webob import Response
+
+      def AView(object):
+          def __call__(self, request):
+              return Response('OK')
+      view = AView()
+
+This style of calling convention is useful for :term:`url dispatch`
+based applications, where the context is seldom used within the view
+code itself.  The view always has access to the context via
+``request.context`` in any case, so it's still available even if you
+use the request-only calling convention.
 
 The Response
 ------------
