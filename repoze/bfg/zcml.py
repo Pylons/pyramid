@@ -64,38 +64,7 @@ def view(
     else:
         request_type = _context.resolve(request_type)
 
-    derived_view = view
-
-    if inspect.isclass(view):
-        # If the object we've located is a class, turn it into a
-        # function that operates like a Zope view (when it's invoked,
-        # construct an instance using 'context' and 'request' as
-        # position arguments, then immediately invoke the __call__
-        # method of the instance with no arguments; __call__ should
-        # return an IResponse).
-        if requestonly(view):
-            def _bfg_class_requestonly_view(context, request):
-                inst = view(request)
-                return inst()
-            derived_view = _bfg_class_requestonly_view
-        else:
-            def _bfg_class_view(context, request):
-                inst = view(context, request)
-                return inst()
-            derived_view = _bfg_class_view
-
-    elif requestonly(view):
-        def _bfg_requestonly_view(context, request):
-            return view(request)
-        derived_view = _bfg_requestonly_view
-
-    if derived_view is not view:
-        derived_view.__module__ = view.__module__
-        derived_view.__doc__ = view.__doc__
-        try:
-            derived_view.__name__ = view.__name__
-        except AttributeError:
-            derived_view.__name__ = repr(view)
+    derived_view = derive_view(view)
 
     if permission:
         pfactory = ViewPermissionFactory(permission)
@@ -115,100 +84,52 @@ def view(
                 derived_view, (for_, request_type), IView, name, _context.info),
         )
 
-class IViewDirective(Interface):
-    for_ = GlobalObject(
-        title=u"The interface or class this view is for.",
-        required=False
-        )
+def derive_view(view):
+    derived_view = view
+    if inspect.isclass(view):
+        # If the object we've located is a class, turn it into a
+        # function that operates like a Zope view (when it's invoked,
+        # construct an instance using 'context' and 'request' as
+        # position arguments, then immediately invoke the __call__
+        # method of the instance with no arguments; __call__ should
+        # return an IResponse).
+        if requestonly(view):
+            # its __init__ accepts only a single request argument,
+            # instead of both context and request
+            def _bfg_class_requestonly_view(context, request):
+                inst = view(request)
+                return inst()
+            derived_view = _bfg_class_requestonly_view
+        else:
+            # its __init__ accepts both context and request
+            def _bfg_class_view(context, request):
+                inst = view(context, request)
+                return inst()
+            derived_view = _bfg_class_view
 
-    permission = TextLine(
-        title=u"Permission",
-        description=u"The permission needed to use the view.",
-        required=False
-        )
+    elif requestonly(view):
+        # its __call__ accepts only a single request argument,
+        # instead of both context and request
+        def _bfg_requestonly_view(context, request):
+            return view(request)
+        derived_view = _bfg_requestonly_view
 
-    view = GlobalObject(
-        title=u"",
-        description=u"The view function",
-        required=False,
-        )
+    if derived_view is not view:
+        derived_view.__module__ = view.__module__
+        derived_view.__doc__ = view.__doc__
+        try:
+            derived_view.__name__ = view.__name__
+        except AttributeError:
+            derived_view.__name__ = repr(view)
 
-    name = TextLine(
-        title=u"The name of the view",
-        description=u"""
-        The name shows up in URLs/paths. For example 'foo' or
-        'foo.html'.""",
-        required=False,
-        )
-
-    request_type = TextLine(
-        title=u"The request type string or dotted name interface for the view",
-        description=(u"The view will be called if the interface represented by "
-                     u"'request_type' is implemented by the request.  The "
-                     u"default request type is repoze.bfg.interfaces.IRequest"),
-        required=False
-        )
-
-    route_name = TextLine(
-        title = u'The route that must match for this view to be used',
-        required = False)
-
-
-def zcml_configure(name, package):
-    context = zope.configuration.config.ConfigurationMachine()
-    xmlconfig.registerCommonDirectives(context)
-    context.package = package
-    xmlconfig.include(context, name, package)
-    context.execute_actions(clear=False)
-    return context.actions
-
-file_configure = zcml_configure # backwards compat (>0.8.1)
-
-def exclude(name):
-    if name.startswith('.'):
-        return True
-    return False
-
+    return derived_view
+    
 def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
     module_grokker = martian.ModuleGrokker()
     module_grokker.register(BFGViewFunctionGrokker())
     martian.grok_dotted_name(package.__name__, grokker=module_grokker,
                              context=_context, exclude_filter=exclude)
-
-class IScanDirective(Interface):
-    package = GlobalObject(
-        title=u"The package we'd like to scan.",
-        required=True,
-        )
-
-class BFGViewFunctionGrokker(martian.InstanceGrokker):
-    martian.component(types.FunctionType)
-
-    def grok(self, name, obj, **kw):
-        if hasattr(obj, '__is_bfg_view__'):
-            permission = obj.__permission__
-            for_ = obj.__for__
-            name = obj.__view_name__
-            request_type = obj.__request_type__
-            route_name = obj.__route_name__
-            context = kw['context']
-            view(context, permission=permission, for_=for_,
-                 view=obj, name=name, request_type=request_type,
-                 route_name=route_name)
-            return True
-        return False
-
-class IRouteRequirementDirective(Interface):
-    """ The interface for the ``requirement`` route subdirective """
-    attr = TextLine(title=u'attr', required=True)
-    expr = TextLine(title=u'expression', required=True)
-
-def route_requirement(context, attr, expr):
-    route = context.context
-    if attr in route.requirements:
-        raise ValueError('Duplicate requirement', attr)
-    route.requirements[attr] = expr
 
 class IRouteDirective(Interface):
     """ The interface for the ``route`` ZCML directive
@@ -236,57 +157,6 @@ class IRouteDirective(Interface):
     explicit = Bool(title=u'explicit', required=False)
     subdomains = Tokens(title=u'subdomains', required=False,
                         value_type=TextLine())
-
-def connect_route(directive):
-    mapper = queryUtility(IRoutesMapper)
-    if mapper is None:
-        return
-    args = [directive.name, directive.path]
-    kw = dict(requirements=directive.requirements)
-    if directive.minimize:
-        kw['_minimize'] = True
-    if directive.explicit:
-        kw['_explicit'] = True
-    if directive.encoding:
-        kw['_encoding'] = directive.encoding
-    if directive.static:
-        kw['_static'] = True
-    if directive.filter:
-        kw['_filter'] = directive.filter
-    if directive.absolute:
-        kw['_absolute'] = True
-    if directive.member_name:
-        kw['_member_name'] = directive.member_name
-    if directive.collection_name:
-        kw['_collection_name'] = directive.collection_name
-    if directive.parent_member_name and directive.parent_collection_name:
-            kw['_parent_resource'] = {
-                'member_name':directive.parent_member_name,
-                'collection_name':directive.parent_collection_name,
-                }
-    conditions = {}
-
-    # request_type and condition_method are aliases; condition_method
-    # "wins"
-    if directive.request_type:
-        conditions['method'] = directive.request_type
-    if directive.condition_method:
-        conditions['method'] = directive.condition_method
-    if directive.condition_subdomain:
-        conditions['sub_domain'] = directive.condition_subdomain
-    if directive.condition_function:
-        conditions['function'] = directive.condition_function
-    if directive.subdomains:
-        conditions['sub_domain'] = directive.subdomains
-    if conditions:
-        kw['conditions'] = conditions
-
-    result = mapper.connect(*args, **kw)
-    route = mapper.matchlist[-1]
-    route._factory = directive.factory
-    context = directive.context
-    route.request_factories = context.request_factories[directive.name]
-    return result
 
 class Route(zope.configuration.config.GroupingContextDecorator):
     """ Handle ``route`` ZCML directives
@@ -351,9 +221,143 @@ class Route(zope.configuration.config.GroupingContextDecorator):
             args = (self,),
             )
 
-class Uncacheable(object):
-    """ Include in discriminators of actions which are not cacheable;
-    this class only exists for backwards compatibility (<0.8.1)"""
+def route_requirement(context, attr, expr):
+    route = context.context
+    if attr in route.requirements:
+        raise ValueError('Duplicate requirement', attr)
+    route.requirements[attr] = expr
+
+def connect_route(directive):
+    mapper = queryUtility(IRoutesMapper)
+    if mapper is None:
+        return
+    args = [directive.name, directive.path]
+    kw = dict(requirements=directive.requirements)
+    if directive.minimize:
+        kw['_minimize'] = True
+    if directive.explicit:
+        kw['_explicit'] = True
+    if directive.encoding:
+        kw['_encoding'] = directive.encoding
+    if directive.static:
+        kw['_static'] = True
+    if directive.filter:
+        kw['_filter'] = directive.filter
+    if directive.absolute:
+        kw['_absolute'] = True
+    if directive.member_name:
+        kw['_member_name'] = directive.member_name
+    if directive.collection_name:
+        kw['_collection_name'] = directive.collection_name
+    if directive.parent_member_name and directive.parent_collection_name:
+            kw['_parent_resource'] = {
+                'member_name':directive.parent_member_name,
+                'collection_name':directive.parent_collection_name,
+                }
+    conditions = {}
+
+    # request_type and condition_method are aliases; condition_method
+    # "wins"
+    if directive.request_type:
+        conditions['method'] = directive.request_type
+    if directive.condition_method:
+        conditions['method'] = directive.condition_method
+    if directive.condition_subdomain:
+        conditions['sub_domain'] = directive.condition_subdomain
+    if directive.condition_function:
+        conditions['function'] = directive.condition_function
+    if directive.subdomains:
+        conditions['sub_domain'] = directive.subdomains
+    if conditions:
+        kw['conditions'] = conditions
+
+    result = mapper.connect(*args, **kw)
+    route = mapper.matchlist[-1]
+    route._factory = directive.factory
+    context = directive.context
+    route.request_factories = context.request_factories[directive.name]
+    return result
+
+class IViewDirective(Interface):
+    for_ = GlobalObject(
+        title=u"The interface or class this view is for.",
+        required=False
+        )
+
+    permission = TextLine(
+        title=u"Permission",
+        description=u"The permission needed to use the view.",
+        required=False
+        )
+
+    view = GlobalObject(
+        title=u"",
+        description=u"The view function",
+        required=False,
+        )
+
+    name = TextLine(
+        title=u"The name of the view",
+        description=u"""
+        The name shows up in URLs/paths. For example 'foo' or
+        'foo.html'.""",
+        required=False,
+        )
+
+    request_type = TextLine(
+        title=u"The request type string or dotted name interface for the view",
+        description=(u"The view will be called if the interface represented by "
+                     u"'request_type' is implemented by the request.  The "
+                     u"default request type is repoze.bfg.interfaces.IRequest"),
+        required=False
+        )
+
+    route_name = TextLine(
+        title = u'The route that must match for this view to be used',
+        required = False)
+
+class IRouteRequirementDirective(Interface):
+    """ The interface for the ``requirement`` route subdirective """
+    attr = TextLine(title=u'attr', required=True)
+    expr = TextLine(title=u'expression', required=True)
+
+class IScanDirective(Interface):
+    package = GlobalObject(
+        title=u"The package we'd like to scan.",
+        required=True,
+        )
+
+def zcml_configure(name, package):
+    context = zope.configuration.config.ConfigurationMachine()
+    xmlconfig.registerCommonDirectives(context)
+    context.package = package
+    xmlconfig.include(context, name, package)
+    context.execute_actions(clear=False)
+    return context.actions
+
+file_configure = zcml_configure # backwards compat (>0.8.1)
+
+class BFGViewFunctionGrokker(martian.InstanceGrokker):
+    martian.component(types.FunctionType)
+
+    def grok(self, name, obj, **kw):
+        if hasattr(obj, '__is_bfg_view__'):
+            permission = obj.__permission__
+            for_ = obj.__for__
+            name = obj.__view_name__
+            request_type = obj.__request_type__
+            route_name = obj.__route_name__
+            context = kw['context']
+            view(context, permission=permission, for_=for_,
+                 view=obj, name=name, request_type=request_type,
+                 route_name=route_name)
+            return True
+        return False
+
+def exclude(name):
+    if name.startswith('.'):
+        return True
+    return False
 
 def requestonly(class_or_callable):
     """ Return true of the class or callable accepts only a request argument,
@@ -395,3 +399,8 @@ def requestonly(class_or_callable):
             return True
 
     return False
+
+class Uncacheable(object):
+    """ Include in discriminators of actions which are not cacheable;
+    this class only exists for backwards compatibility (<0.8.1)"""
+

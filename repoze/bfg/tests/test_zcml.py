@@ -520,6 +520,101 @@ class TestViewDirective(unittest.TestCase):
         self.assertRaises(ConfigurationError, self._callFUT, context,
                           'repoze.view', None, view, '', None, 'foo')
 
+class TestDeriveView(unittest.TestCase):
+    def _callFUT(self, view):
+        from repoze.bfg.zcml import derive_view
+        return derive_view(view)
+    
+    def test_view_as_function_context_and_request(self):
+        def view(context, request):
+            return 'OK'
+        result = self._callFUT(view)
+        self.failUnless(result is view)
+        self.assertEqual(view(None, None), 'OK')
+        
+    def test_view_as_function_requestonly(self):
+        def view(request):
+            return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_view_as_newstyle_class_context_and_request(self):
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+        
+    def test_view_as_newstyle_class_requestonly(self):
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_view_as_oldstyle_class_context_and_request(self):
+        class view:
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+        
+    def test_view_as_oldstyle_class_requestonly(self):
+        class view:
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_view_as_instance_context_and_request(self):
+        class View:
+            def __call__(self, context, request):
+                return 'OK'
+        view = View()
+        result = self._callFUT(view)
+        self.failUnless(result is view)
+        self.assertEqual(result(None, None), 'OK')
+        
+    def test_view_as_instance_requestonly(self):
+        class View:
+            def __call__(self, request):
+                return 'OK'
+        view = View()
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.failUnless('instance' in result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
 class TestRouteRequirementFunction(unittest.TestCase):
     def _callFUT(self, context, attr, expr):
         from repoze.bfg.zcml import route_requirement
