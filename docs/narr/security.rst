@@ -388,3 +388,68 @@ these objects will have a ``msg`` attribute, which is a string
 indicating why permission was denied or allowed.  Introspecting this
 information in the debugger or via print statements when a
 ``has_permission`` fails is often useful.
+
+Creating Your Own Authentication Policy
+---------------------------------------
+
+:mod:`repoze.bfg` ships with a number of useful out-of-the-box
+security policies (see :ref:`authentication_policies_api_section`).
+However, creating your own authentication policy is often necessary
+when you want to control the "horizontal and vertical" of how your
+users authenticate.  Doing so is matter of creating an instance of
+something that implements the following interface:
+
+.. code-block:: python
+
+   class AuthenticationPolicy(object):
+       """ An object representing a BFG authentication policy. """
+       def authenticated_userid(self, request):
+           """ Return the authenticated userid or ``None`` if no
+           authenticated userid can be found. """
+
+       def effective_principals(self, request):
+           """ Return a sequence representing the effective principals
+           including the userid and any groups belonged to by the current
+           user, including 'system' groups such as Everyone and
+           Authenticated. """
+
+       def remember(self, request, principal, **kw):
+           """ Return a set of headers suitable for 'remembering' the
+           principal named ``principal`` when set in a response.  An
+           individual authentication policy and its consumers can decide
+           on the composition and meaning of **kw. """
+       
+       def forget(self, request):
+           """ Return a set of headers suitable for 'forgetting' the
+           current user on subsequent requests. """
+
+Pass the object you create into the ``repoze.bfg.router.make_app``
+function as the ``authentication_policy`` argument at application
+startup time (usually within a ``run.py`` module).
+
+Creating Your Own Authorization Policy
+--------------------------------------
+
+An authentiction policy the policy that allows or denies access after
+a user is authenticated.  By default, :mod:`repoze.bfg` will use the
+``repoze.bfg.authorization.ACLAuthorizationPolicy`` if an
+authentication policy is activated.  Creating and using your own
+authorization policy is a matter of creating an instance of an object
+that implements the following interface:
+
+.. code-block:: python
+
+    class IAuthorizationPolicy(object):
+        """ A adapter on context """
+        def permits(self, context, principals, permission):
+            """ Return True if any of the principals is allowed the
+            permission in the current context, else return False """
+            
+        def principals_allowed_by_permission(self, context, permission):
+            """ Return a set of principal identifiers allowed by the 
+                permission """
+
+Pass the object you create into the ``repoze.bfg.router.make_app``
+function as the ``authorization_policy`` argument at application
+startup time (usually within a ``run.py`` module).  You must also pass
+an ``authentication_policy`` if you pass an ``authorization_policy``.

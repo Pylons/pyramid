@@ -172,6 +172,9 @@ Bug Fixes
 Documentation
 -------------
 
+- Add interface docs related to how to create authentication policies
+  and authorization policies to the "Security" narrative chapter.
+
 - Added a (fairly sad) "Combining Traversal and URL Dispatch" chapter
   to the narrative documentation.
 
