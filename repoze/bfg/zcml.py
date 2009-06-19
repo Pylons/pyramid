@@ -20,6 +20,8 @@ from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IViewPermission
+from repoze.bfg.interfaces import INotFoundView
+from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
@@ -83,6 +85,20 @@ def view(
         args = ('registerAdapter',
                 derived_view, (for_, request_type), IView, name, _context.info),
         )
+
+def view_utility(_context, view, iface):
+    derived_view = derive_view(view)
+    _context.action(
+        discriminator = ('notfound_view',),
+        callable = handler,
+        args = ('registerUtility', derived_view, iface, '', _context.info),
+        )
+
+def notfound(_context, view):
+    view_utility(_context, view, INotFoundView)
+
+def forbidden(_context, view):
+    view_utility(_context, view, IForbiddenView)
 
 def derive_view(view):
     derived_view = view
@@ -315,6 +331,20 @@ class IViewDirective(Interface):
     route_name = TextLine(
         title = u'The route that must match for this view to be used',
         required = False)
+
+class INotFoundViewDirective(Interface):
+    view = GlobalObject(
+        title=u"",
+        description=u"The notfound view callable",
+        required=True,
+        )
+
+class IForbiddenViewDirective(Interface):
+    view = GlobalObject(
+        title=u"",
+        description=u"The forbidden view callable",
+        required=True,
+        )
 
 class IRouteRequirementDirective(Interface):
     """ The interface for the ``requirement`` route subdirective """

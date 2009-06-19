@@ -520,6 +520,62 @@ class TestViewDirective(unittest.TestCase):
         self.assertRaises(ConfigurationError, self._callFUT, context,
                           'repoze.view', None, view, '', None, 'foo')
 
+class TestNotFoundDirective(unittest.TestCase):
+    def _callFUT(self, context, view):
+        from repoze.bfg.zcml import notfound
+        return notfound(context, view)
+    
+    def test_it(self):
+        context = DummyContext()
+        def view(request):
+            return 'OK'
+        self._callFUT(context, view)
+        actions = context.actions
+        from repoze.bfg.interfaces import INotFoundView
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 1)
+
+        regadapt = actions[0]
+        regadapt_discriminator = ('notfound_view',)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerUtility')
+        derived_view = regadapt['args'][1]
+        self.assertEqual(derived_view(None, None), 'OK')
+        self.assertEqual(derived_view.__name__, view.__name__)
+        self.assertEqual(regadapt['args'][2], INotFoundView)
+        self.assertEqual(regadapt['args'][3], '')
+        self.assertEqual(regadapt['args'][4], None)
+
+class TestForbiddenDirective(unittest.TestCase):
+    def _callFUT(self, context, view):
+        from repoze.bfg.zcml import forbidden
+        return forbidden(context, view)
+    
+    def test_it(self):
+        context = DummyContext()
+        def view(request):
+            return 'OK'
+        self._callFUT(context, view)
+        actions = context.actions
+        from repoze.bfg.interfaces import IForbiddenView
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 1)
+
+        regadapt = actions[0]
+        regadapt_discriminator = ('notfound_view',)
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerUtility')
+        derived_view = regadapt['args'][1]
+        self.assertEqual(derived_view(None, None), 'OK')
+        self.assertEqual(derived_view.__name__, view.__name__)
+        self.assertEqual(regadapt['args'][2], IForbiddenView)
+        self.assertEqual(regadapt['args'][3], '')
+        self.assertEqual(regadapt['args'][4], None)
+        
 class TestDeriveView(unittest.TestCase):
     def _callFUT(self, view):
         from repoze.bfg.zcml import derive_view
@@ -787,7 +843,7 @@ class TestConnectRouteFunction(unittest.TestCase):
                           'conditions':{'sub_domain':['a', 'b']}
                           })
 
-class TestRoute(unittest.TestCase):
+class TestRouteDirective(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -978,7 +1034,7 @@ class TestBFGViewFunctionGrokker(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 0)
 
-class TestZCMLScanFunction(unittest.TestCase):
+class TestZCMLScanDirective(unittest.TestCase):
     def setUp(self):
         cleanUp()
 

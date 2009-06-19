@@ -184,7 +184,7 @@ class RouterTests(unittest.TestCase):
         self.registry.registerUtility(factory, INotFoundAppFactory)
         router = self._makeOne()
         self.assertEqual(len(logger.messages), 1)
-        self.failUnless('INotFoundView' in logger.messages[0])
+        self.failUnless('notfound_view' in logger.messages[0])
         class DummyRequest:
             def get_response(self, app):
                 return app

@@ -99,13 +99,13 @@ class Router(object):
             warning = (
                 'Instead of registering a utility against the '
                 'repoze.bfg.interfaces.INotFoundAppFactory interface '
-                'to return a custom notfound response, you should register '
-                'a repoze.bfg.interfaces.INotFoundView.  The '
+                'to return a custom notfound response, you should use the '
+                '"notfound_view" ZCML directive. The '
                 'INotFoundAppFactory interface was deprecated in'
                 'repoze.bfg 0.9 and will be removed in a subsequent version '
                 'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
                 'documentation for more information about '
-                'INotFoundView.')
+                'the "notfound_view" directive.')
             self.logger and self.logger.warn(warning)
             def notfound(context, request):
                 app = notfound_app_factory()

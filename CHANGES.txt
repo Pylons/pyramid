@@ -4,6 +4,21 @@ Next release
 Features
 --------
 
+- A new ZCML directive was added named ``notfound``.  This ZCML
+  directive can be used to name a view that should be invoked when the
+  request can't otherwise be resolved to a view callable.  For example::
+
+    <notfound 
+        view="helloworld.views.notfound_view"/>
+
+- A new ZCML directive was added named ``forbidden``.  This ZCML
+  directive can be used to name a view that should be invoked when a
+  view callable for a request is found, but cannot be invoked due to
+  an authorization failure.  For example::
+
+   <forbidden
+       view="helloworld.views.forbidden_view"/>
+
 - Allow views to be *optionally* defined as callables that accept only
   a request object, instead of both a context and a request (which
   still works, and always will).  The following types work as views in
@@ -81,6 +96,19 @@ Features
   contain a key ``bfg.routes.route`` (the Route object which matched),
   and a key ``bfg.routes.matchdict`` (the result of calling route.match).
 
+Deprecations
+------------
+
+- Utility registrations against
+  ``repoze.bfg.interfaces.INotFoundView`` and
+  ``repoze.bfg.interfaces.IForbiddenView`` are now deprecated.  Use
+  the ``notfound`` and ``forbidden`` ZCML directives instead (see the
+  "Hooks" chapter for more information).  Such registrations will
+  continue to work, but the notfound and forbidden directives do
+  "extra work" to ensure that the callable named by the directive can
+  be called by the router even if it's a class or
+  request-argument-only view.
+
 Removals
 --------
 
@@ -135,6 +163,9 @@ Bug Fixes
 
 Documentation
 -------------
+
+- A "router" chapter explaining the request/response lifecycle at a
+  high level was added.
 
 - Replaced all mentions and explanations of a routes "context factory"
   with equivalent explanations of a "root factory" (context factories

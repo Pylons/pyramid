@@ -16,6 +16,18 @@
         handler="repoze.bfg.zcml.scan"
         />
 
+    <meta:directive
+        name="notfound"
+        schema="repoze.bfg.zcml.INotFoundViewDirective"
+        handler="repoze.bfg.zcml.notfound"
+        />
+
+    <meta:directive
+        name="forbidden"
+        schema="repoze.bfg.zcml.IForbiddenViewDirective"
+        handler="repoze.bfg.zcml.forbidden"
+        />
+
   </meta:directives>
 
   <meta:groupingDirective
