@@ -1,7 +1,6 @@
 import os
 import unittest
 
-from repoze.bfg.push import pushpage
 from repoze.bfg.wsgi import wsgiapp
 from repoze.bfg.view import bfg_view
 from repoze.bfg.view import static
@@ -52,46 +51,6 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         self.assertEqual(action['args'],
                          ('registerAdapter',
                           wsgiapptest, (INothing, IRequest), IView, '', None))
-
-@bfg_view(for_=INothing)
-@pushpage('fake.pt')
-def pushtest(context, request):
-    """ """
-    return {'a':1}
-
-class PushPagePlusBFGViewTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def test_it(self):
-        import types
-        import os
-        from repoze.bfg.testing import registerDummyRenderer
-        path = os.path.join(os.path.dirname(__file__), 'fake.pt')
-        renderer = registerDummyRenderer(path)
-        self.assertEqual(pushtest.__is_bfg_view__, True)
-        self.failUnless(type(pushtest) is types.FunctionType)
-        context = DummyContext()
-        request = DummyRequest()
-        result = pushtest(context, request)
-        self.assertEqual(result.status, '200 OK')
-
-    def test_scanned(self):
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.zcml import scan
-        context = DummyContext()
-        from repoze.bfg.tests import test_integration
-        scan(context, test_integration)
-        actions = context.actions
-        self.assertEqual(len(actions), 2)
-        action = actions[0]
-        IRequest = _getRequestInterface()
-        self.assertEqual(action['args'],
-                         ('registerAdapter',
-                          pushtest, (INothing, IRequest), IView, '', None))
 
 here = os.path.dirname(__file__)
 staticapp = static(os.path.join(here, 'fixtures'))

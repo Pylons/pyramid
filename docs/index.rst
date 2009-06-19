@@ -58,7 +58,6 @@ Per-module :mod:`repoze.bfg` API documentation.
    api/interfaces
    api/location
    api/paster
-   api/push
    api/router
    api/scripting
    api/security

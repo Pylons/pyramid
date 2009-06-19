@@ -124,6 +124,11 @@ Removals
 Backwards Incompatibilities
 ---------------------------
 
+- Moved the ``repoze.bfg.push`` module, which implemented the ``pushpage``
+  decorator, into a separate distribution, ``repoze.bfg.pushpage``.
+  Applications which used this decorator should continue to work after
+  adding that distribution to their installation requirements.
+
 - Changing the default request factory via an IRequestFactory utility
   registration (as used to be documented in the "Hooks" chapter's
   "Changing the request factory" section) is no longer supported.  The
