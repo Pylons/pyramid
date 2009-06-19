@@ -46,8 +46,8 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         from repoze.bfg.tests import test_integration
         scan(context, test_integration)
         actions = context.actions
-        self.assertEqual(len(actions), 2)
-        action = actions[1]
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
         self.assertEqual(action['args'],
                          ('registerAdapter',
                           wsgiapptest, (INothing, IRequest), IView, '', None))
