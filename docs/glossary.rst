@@ -45,10 +45,12 @@ Glossary
     used; in its place is a dot.
   View
     A "view" is a callable which returns a response object.  It should
-    accept two values: :term:`context` and :term:`request`.  A view is
-    the primary mechanism by which a developer writes user interface
-    code within :mod:`repoze.bfg`.  See :ref:`views_chapter` for more
-    information about :mod:`repoze.bfg` views.
+    accept two values: :term:`context` and :term:`request`.  An
+    alternate calling convention allows a view to be defined as a a
+    callable which only accepts a single ``request`` argument.  A view
+    is the primary mechanism by which a developer writes user
+    interface code within :mod:`repoze.bfg`.  See :ref:`views_chapter`
+    for more information about :mod:`repoze.bfg` views.
   View name
     The "URL name" of a view, e.g ``index.html``.  If a view is
     configured without a name, its name is considered to be the empty
@@ -61,9 +63,11 @@ Glossary
   Model
     An object representing data in the system.  If :mod:`traversal` is
     used, a model is a node in the object graph traversed by the
-    system.  If :mod:`url dispatch` is used, a model is generated for
-    each request.  A model instance becomes the :term:`context` of a
-    :term:`view`.
+    system.  When traversal is used, a model instance becomes the
+    :term:`context` of a :term:`view`.  If :mod:`url dispatch` is
+    used, a single :term:`context` (which isn't really a model,
+    because it contains no data except security elements) is generated
+    for each request and is used as the context of a view.
   Traversal
     The act of descending "down" a graph of model objects from a root
     model in order to find a :term:`context`.  The :mod:`repoze.bfg`
@@ -87,7 +91,7 @@ Glossary
     :term:`URL dispatch` based on URL data; if it's found via
     traversal, it's usually a :term:`model` object that is part of an
     object graph; if it's found via :term:`URL dispatch`, it's a
-    manufactured context object that contains routing information.  A
+    manufactured context object that contains security information.  A
     context becomes the subject of a :term:`view`, and typically has
     security information attached to it.  See the
     :ref:`traversal_chapter` chapter and the
@@ -248,6 +252,10 @@ Glossary
     graph traversal when deciding which *view* should be called.  See
     :ref:`urldispatch_chapter` for more information about Routes integration 
     in bfg.
+  Route
+    A single pattern matched by the :term:`Routes` subsystem, which
+    generally resolves to a :term:`root factory` (and then ultimately
+    a :term:`view`).  See also :term:`url dispatch`.
   ZCML
     `Zope Configuration Markup Language
     <http://www.muthukadan.net/docs/zca.html#zcml>`_, the XML dialect
@@ -362,8 +370,9 @@ Glossary
     root factory to :mod:`repoze.bfg` within a call to
     ``repoze.bfg.router.make_app``; however, an application's root
     factory may be passed to ``make_app`` as ``None``, in which case
-    the application performs no graph traversal and uses :term:`URL
-    dispatch` for all URL-to-view code mappings.
+    the application uses a default root object (this pattern is often
+    used in application which use :term:`URL dispatch` for all
+    URL-to-view code mappings).
   SQLAlchemy
     `SQLAlchemy' <http://www.sqlalchemy.org/>`_ is an object
     relational mapper used in tutorials within this documentation.

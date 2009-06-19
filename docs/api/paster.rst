@@ -3,6 +3,11 @@
 :mod:`repoze.bfg.paster`
 ---------------------------
 
-.. automodule:: repoze.bfg.paster
+.. module:: repoze.bfg.paster
 
-  .. autofunction:: get_app(config_file, name)
+.. function:: get_app(config_file, name)
+
+    Return the WSGI application named ``name`` in the PasteDeploy
+    config file ``config_file``.
+
+     

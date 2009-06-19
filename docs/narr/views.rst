@@ -103,7 +103,7 @@ following types work as views in this style:
           return Response('OK')
 
 #. Arbitrary callables that have a ``__call__`` method that accepts
-  ``self, request``, e.g.::
+   ``self, request``, e.g.::
 
       from webob import Response
 

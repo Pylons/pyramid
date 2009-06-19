@@ -55,6 +55,3 @@ statement, e.g.:
 
   .. autofunction:: render_template_to_response
 
-.. note:: For backwards compatibility purposes, these functions may
-          also be imported from ``repoze.bfg.template``.
-
