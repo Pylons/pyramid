@@ -15,9 +15,11 @@ class RouterTests(unittest.TestCase):
         cleanUp()
 
     def _registerLogger(self):
+        from zope.component import getSiteManager
+        gsm = getSiteManager()
         from repoze.bfg.interfaces import ILogger
         logger = DummyLogger()
-        self.registry.registerUtility(logger, ILogger, name='repoze.bfg.debug')
+        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
         return logger
 
     def _registerSettings(self, **kw):
@@ -154,42 +156,6 @@ class RouterTests(unittest.TestCase):
         router = self._makeOne()
         from repoze.bfg.router import default_notfound_view
         self.assertEqual(router.notfound_view, default_notfound_view)
-
-    def test_iunauthorized_appfactory_BBB(self):
-        from repoze.bfg.interfaces import IUnauthorizedAppFactory
-        environ = self._makeEnviron()
-        context = DummyContext()
-        self._registerTraverserFactory(context)
-        logger = self._registerLogger()
-        def factory():
-            return 'yo'
-        self.registry.registerUtility(factory, IUnauthorizedAppFactory)
-        router = self._makeOne()
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('IForbiddenView' in logger.messages[0])
-        class DummyRequest:
-            def get_response(self, app):
-                return app
-        req = DummyRequest()
-        self.assertEqual(router.forbidden_view(None, req), 'yo')
-
-    def test_inotfound_appfactory_BBB(self):
-        from repoze.bfg.interfaces import INotFoundAppFactory
-        environ = self._makeEnviron()
-        context = DummyContext()
-        self._registerTraverserFactory(context)
-        logger = self._registerLogger()
-        def factory():
-            return 'yo'
-        self.registry.registerUtility(factory, INotFoundAppFactory)
-        router = self._makeOne()
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('notfound_view' in logger.messages[0])
-        class DummyRequest:
-            def get_response(self, app):
-                return app
-        req = DummyRequest()
-        self.assertEqual(router.notfound_view(None, req), 'yo')
 
     def test_call_no_view_registered_no_isettings(self):
         environ = self._makeEnviron()
@@ -843,22 +809,6 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(app.registry.getUtility(IAuthorizationPolicy),
                          authzpolicy)
 
-    def test_secpol_BBB_registrations(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.interfaces import ISecurityPolicy
-        secpol = DummySecurityPolicy()
-        from zope.component import getGlobalSiteManager
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(secpol, ISecurityPolicy)
-        from repoze.bfg.tests import routesapp
-        logger = DummyLogger()
-        app = self._callFUT(None, routesapp, registry=gsm, debug_logger=logger)
-        self.failUnless(app.registry.queryUtility(IAuthenticationPolicy))
-        self.failUnless(app.registry.queryUtility(IAuthorizationPolicy))
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('ISecurityPolicy' in logger.messages[0])
-
 class TestDefaultForbiddenView(unittest.TestCase):
     def _callFUT(self, context, request):
         from repoze.bfg.router import default_forbidden_view
@@ -929,21 +879,10 @@ class DummyResponse:
     headerlist = ()
     app_iter = ()
     
-class DummySecurityPolicy:
-    pass
-
 class DummyRequest:
     def __init__(self, environ):
         self.environ = environ
         
-
-class DummyLogger:
-    def __init__(self):
-        self.messages = []
-    def info(self, msg):
-        self.messages.append(msg)
-    warn = info
-    debug = info
 
 class DummyThreadLocalManager:
     def __init__(self):
@@ -958,3 +897,12 @@ class DummyThreadLocalManager:
     
 class DummyAuthenticationPolicy:
     pass
+
+class DummyLogger:
+    def __init__(self):
+        self.messages = []
+    def info(self, msg):
+        self.messages.append(msg)
+    warn = info
+    debug = info
+

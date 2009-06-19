@@ -950,6 +950,10 @@ class TestRouteDirective(unittest.TestCase):
 
 class TestZCMLConfigure(unittest.TestCase):
     i = 0
+    def _callFUT(self, path, package):
+        from repoze.bfg.zcml import zcml_configure
+        return zcml_configure(path, package)
+    
     def setUp(self):
         cleanUp()
         self.tempdir = None
@@ -979,18 +983,71 @@ class TestZCMLConfigure(unittest.TestCase):
             sys.path.pop(0)
             shutil.rmtree(self.tempdir)
 
-    def test_file_configure(self):
-        from repoze.bfg.zcml import file_configure
-        actions = file_configure('configure.zcml', self.module)
+    def test_zcml_configure(self):
+        actions = self._callFUT('configure.zcml', self.module)
         self.failUnless(actions)
         self.failUnless(isinstance(actions, list))
 
-    def test_file_configure_nonexistent_configure_dot_zcml(self):
+    def test_zcml_configure_nonexistent_configure_dot_zcml(self):
         import os
-        from repoze.bfg.zcml import file_configure
         os.remove(os.path.join(self.packagepath, 'configure.zcml'))
-        self.assertRaises(IOError, file_configure, 'configure.zcml',
+        self.assertRaises(IOError, self._callFUT, 'configure.zcml',
                           self.module)
+
+    def test_secpol_BBB(self):
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.interfaces import ISecurityPolicy
+        from repoze.bfg.interfaces import ILogger
+        secpol = DummySecurityPolicy()
+        from zope.component import getGlobalSiteManager
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(secpol, ISecurityPolicy)
+        logger = DummyLogger()
+        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
+        self._callFUT('configure.zcml', self.module)
+        self.failUnless(gsm.queryUtility(IAuthenticationPolicy))
+        self.failUnless(gsm.queryUtility(IAuthorizationPolicy))
+        self.assertEqual(len(logger.messages), 1)
+        self.failUnless('ISecurityPolicy' in logger.messages[0])
+
+    def test_iunauthorized_appfactory_BBB(self):
+        from repoze.bfg.interfaces import IUnauthorizedAppFactory
+        from repoze.bfg.interfaces import IForbiddenView
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import ILogger
+        context = DummyContext()
+        def factory():
+            return 'yo'
+        logger = DummyLogger()
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(factory, IUnauthorizedAppFactory)
+        logger = DummyLogger()
+        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
+        self._callFUT('configure.zcml', self.module)
+        self.assertEqual(len(logger.messages), 1)
+        self.failUnless('forbidden' in logger.messages[0])
+        forbidden = gsm.getUtility(IForbiddenView)
+        self.assertEqual(forbidden(None, DummyRequest()), 'yo')
+
+    def test_inotfound_appfactory_BBB(self):
+        from repoze.bfg.interfaces import INotFoundAppFactory
+        from repoze.bfg.interfaces import INotFoundView
+        from zope.component import getGlobalSiteManager
+        from repoze.bfg.interfaces import ILogger
+        context = DummyContext()
+        def factory():
+            return 'yo'
+        logger = DummyLogger()
+        gsm = getGlobalSiteManager()
+        gsm.registerUtility(factory, INotFoundAppFactory)
+        logger = DummyLogger()
+        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
+        self._callFUT('configure.zcml', self.module)
+        self.assertEqual(len(logger.messages), 1)
+        self.failUnless('notfound' in logger.messages[0])
+        notfound = gsm.getUtility(INotFoundView)
+        self.assertEqual(notfound(None,DummyRequest()), 'yo')
 
 class TestBFGViewFunctionGrokker(unittest.TestCase):
     def setUp(self):
@@ -1302,3 +1359,18 @@ from zope.interface import Interface
 class IDummy(Interface):
     pass
 
+class DummySecurityPolicy:
+    pass
+
+class DummyLogger:
+    def __init__(self):
+        self.messages = []
+    def info(self, msg):
+        self.messages.append(msg)
+    warn = info
+    debug = info
+
+class DummyRequest:
+    def get_response(self, app):
+        return app
+    

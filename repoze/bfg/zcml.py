@@ -20,14 +20,22 @@ from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IViewPermission
+from repoze.bfg.interfaces import INotFoundAppFactory
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IForbiddenView
+from repoze.bfg.interfaces import IAuthenticationPolicy
+from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IUnauthorizedAppFactory
+from repoze.bfg.interfaces import ILogger
 
 from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
 from repoze.bfg.request import named_request_factories
 
 from repoze.bfg.security import ViewPermissionFactory
+
+from repoze.bfg.secpols import registerBBBAuthn
+
 
 import martian
 
@@ -363,6 +371,73 @@ def zcml_configure(name, package):
     context.package = package
     xmlconfig.include(context, name, package)
     context.execute_actions(clear=False)
+
+    logger = queryUtility(ILogger, name='repoze.bfg.debug')
+    registry = getSiteManager()
+
+    # persistence means always having to say you're sorry
+    
+    authentication_policy = registry.queryUtility(IAuthenticationPolicy)
+
+    if not authentication_policy:
+        # deal with bw compat of <= 0.8 security policies (deprecated)
+        secpol = registry.queryUtility(ISecurityPolicy)
+        if secpol is not None:
+            logger and logger.warn(
+                'Your application is using a repoze.bfg ``ISecurityPolicy`` '
+                '(probably registered via ZCML).  This form of security policy '
+                'has been deprecated in BFG 0.9.  See the "Security" chapter '
+                'of the repoze.bfg documentation to see how to register a more '
+                'up to date set of security policies (an authentication '
+                'policy and an authorization policy).  ISecurityPolicy-based '
+                'security policies will cease to work in a later BFG '
+                'release.')
+            registerBBBAuthn(secpol, registry)
+
+    forbidden_view = registry.queryUtility(IForbiddenView)
+    unauthorized_app_factory = registry.queryUtility(IUnauthorizedAppFactory)
+
+    if unauthorized_app_factory is not None:
+        if forbidden_view is None:
+            warning = (
+                'Instead of registering a utility against the '
+                'repoze.bfg.interfaces.IUnauthorizedAppFactory interface '
+                'to return a custom forbidden response, you should now '
+                'use the "forbidden" ZCML directive.'
+                'The IUnauthorizedAppFactory interface was deprecated in '
+                'repoze.bfg 0.9 and will be removed in a subsequent version '
+                'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
+                'documentation for more information about '
+                'the forbidden directive.')
+            logger and logger.warn(warning)
+            def forbidden(context, request):
+                app = unauthorized_app_factory()
+                response = request.get_response(app)
+                return response
+            registry.registerUtility(forbidden, IForbiddenView)
+
+    notfound_view = registry.queryUtility(INotFoundView)
+    notfound_app_factory = registry.queryUtility(INotFoundAppFactory)
+
+    if notfound_app_factory is not None:
+        if notfound_view is None:
+            warning = (
+                'Instead of registering a utility against the '
+                'repoze.bfg.interfaces.INotFoundAppFactory interface '
+                'to return a custom notfound response, you should use the '
+                '"notfound" ZCML directive. The '
+                'INotFoundAppFactory interface was deprecated in'
+                'repoze.bfg 0.9 and will be removed in a subsequent version '
+                'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
+                'documentation for more information about '
+                'the "notfound" directive.')
+            logger and logger.warn(warning)
+            def notfound(context, request):
+                app = notfound_app_factory()
+                response = request.get_response(app)
+                return response
+            registry.registerUtility(notfound, INotFoundView)
+
     return context.actions
 
 file_configure = zcml_configure # backwards compat (>0.8.1)

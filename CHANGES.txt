@@ -161,6 +161,14 @@ Bug Fixes
 - The ``bfg_alchemy`` Paster template named "repoze.tm" in its
   pipeline rather than "repoze.tm2", causing the startup to fail.
 
+- Move BBB logic for registering an
+  IAuthenticationPolicy/IForbiddenView/INotFoundView based on older
+  concepts from the router module's ``make_app`` function into the
+  ``repoze.bfg.zcml.zcml_configure`` callable, to service
+  compatibility with scripts that use "zope.configuration.xmlconfig"
+  (replace with ``repoze.bfg.zml.zcml_configure`` as necessary to get
+  BBB logic)
+
 Documentation
 -------------
 

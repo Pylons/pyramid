@@ -15,7 +15,6 @@ from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ILogger
-from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
@@ -23,8 +22,6 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import INotFoundView
-from repoze.bfg.interfaces import IUnauthorizedAppFactory
-from repoze.bfg.interfaces import INotFoundAppFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -37,8 +34,6 @@ from repoze.bfg.registry import Registry
 from repoze.bfg.registry import populateRegistry
 
 from repoze.bfg.request import request_factory
-
-from repoze.bfg.secpols import registerBBBAuthn
 
 from repoze.bfg.security import Allowed
 
@@ -64,65 +59,15 @@ class Router(object):
     def __init__(self, registry):
         self.registry = registry
         self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
-
-        forbidden = None
-
-        unauthorized_app_factory = registry.queryUtility(
-            IUnauthorizedAppFactory)
-
-        if unauthorized_app_factory is not None:
-            warning = (
-                'Instead of registering a utility against the '
-                'repoze.bfg.interfaces.IUnauthorizedAppFactory interface '
-                'to return a custom forbidden response, you should now '
-                'register a repoze.interfaces.IForbiddenView.'
-                'The IUnauthorizedAppFactory interface was deprecated in '
-                'repoze.bfg 0.9 and will be removed in a subsequent version '
-                'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
-                'documentation for more information about '
-                'IForbiddenView.')
-            self.logger and self.logger.warn(warning)
-            def forbidden(context, request):
-                app = unauthorized_app_factory()
-                response = request.get_response(app)
-                return response
-
-        forbidden = registry.queryUtility(IForbiddenView, default=forbidden)
-
-        self.forbidden_view = forbidden or default_forbidden_view
-
-        notfound = None
-
-        notfound_app_factory = registry.queryUtility(INotFoundAppFactory)
-
-        if notfound_app_factory is not None:
-            warning = (
-                'Instead of registering a utility against the '
-                'repoze.bfg.interfaces.INotFoundAppFactory interface '
-                'to return a custom notfound response, you should use the '
-                '"notfound_view" ZCML directive. The '
-                'INotFoundAppFactory interface was deprecated in'
-                'repoze.bfg 0.9 and will be removed in a subsequent version '
-                'of repoze.bfg.  See the "Hooks" chapter of the repoze.bfg '
-                'documentation for more information about '
-                'the "notfound_view" directive.')
-            self.logger and self.logger.warn(warning)
-            def notfound(context, request):
-                app = notfound_app_factory()
-                response = request.get_response(app)
-                return response
-
-        notfound = registry.queryUtility(INotFoundView, default=notfound)
-                
-        self.notfound_view = notfound or default_notfound_view
-        
+        self.forbidden_view = registry.queryUtility(
+            IForbiddenView, default=default_forbidden_view)
+        self.notfound_view = registry.queryUtility(
+            INotFoundView, default=default_notfound_view)
         settings = registry.queryUtility(ISettings)
         if settings is not None:
             self.debug_authorization = settings.debug_authorization
             self.debug_notfound = settings.debug_notfound
-
         self.secured = not not registry.queryUtility(IAuthenticationPolicy)
-            
         self.root_factory = registry.queryUtility(IRootFactory,
                                                   default=DefaultRootFactory)
         self.root_policy = self.root_factory # b/w compat
@@ -344,21 +289,6 @@ def make_app(root_factory, package=None, filename='configure.zcml',
 
     populateRegistry(registry, filename, package)
 
-    if not authentication_policy:
-        # deal with bw compat of <= 0.8 security policies (deprecated)
-        secpol = registry.queryUtility(ISecurityPolicy)
-        if secpol is not None:
-            debug_logger.warn(
-                'Your application is using a repoze.bfg ``ISecurityPolicy`` '
-                '(probably registered via ZCML).  This form of security policy '
-                'has been deprecated in BFG 0.9.  See the "Security" chapter '
-                'of the repoze.bfg documentation to see how to register a more '
-                'up to date set of security policies (an authentication '
-                'policy and an authorization policy).  ISecurityPolicy-based '
-                'security policies will cease to work in a later BFG '
-                'release.')
-            registerBBBAuthn(secpol, registry)
-        
     if mapper.has_routes():
         # if the user had any <route/> statements in his configuration,
         # use the RoutesRootFactory as the IRootFactory; otherwise use the
