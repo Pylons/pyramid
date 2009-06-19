@@ -1,4 +1,4 @@
-.. _startup_chapter:
+.. _router_chapter:
 
 How :mod:`repoze.bfg` Processes A Request
 =========================================

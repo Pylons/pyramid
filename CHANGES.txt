@@ -164,6 +164,9 @@ Bug Fixes
 Documentation
 -------------
 
+- Added a (fairly sad) "Combining Traversal and URL Dispatch" chapter
+  to the narrative documentation.
+
 - A "router" chapter explaining the request/response lifecycle at a
   high level was added.
 
