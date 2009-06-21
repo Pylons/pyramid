@@ -11,11 +11,7 @@ class TestMakeRequestASCII(unittest.TestCase):
         self._callFUT(event)
         self.assertEqual(request.charset, None)
 
-class TestSubclassedRequest(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
-        return DEFAULT_REQUEST_FACTORIES[None]['factory']
-    
+class TestRequestSubclass(object):
     def _makeOne(self, environ):
         request = self._getTargetClass()(environ)
         return request
@@ -36,6 +32,75 @@ class TestSubclassedRequest(unittest.TestCase):
         request = self._makeOne(environ)
         request.charset = None
         self.assertEqual(request.GET['la'], 'La Pe\xc3\xb1a')
+
+    def test_class_implements(self):
+        from repoze.bfg.interfaces import IRequest
+        klass = self._getTargetClass()
+        iface = self._getInterface()
+        self.assertTrue(iface.implementedBy(klass))
+        self.assertTrue(IRequest.implementedBy(klass))
+
+    def test_instance_provides(self):
+        from repoze.bfg.interfaces import IRequest
+        inst = self._makeOne({})
+        iface = self._getInterface()
+        self.assertTrue(iface.providedBy(inst))
+        self.assertTrue(IRequest.providedBy(inst))
+
+
+class Test_Request(TestRequestSubclass, unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES[None]['factory']
+
+    def _getInterface(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES[None]['interface']
+
+class Test_GETRequest(TestRequestSubclass, unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['GET']['factory']
+
+    def _getInterface(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['GET']['interface']
+
+class Test_POSTRequest(TestRequestSubclass, unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['POST']['factory']
+
+    def _getInterface(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['POST']['interface']
+
+class Test_PUTRequest(TestRequestSubclass, unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['PUT']['factory']
+
+    def _getInterface(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['PUT']['interface']
+
+class Test_DELETERequest(TestRequestSubclass, unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['DELETE']['factory']
+
+    def _getInterface(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['DELETE']['interface']
+
+class Test_HEADRequest(TestRequestSubclass, unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['HEAD']['factory']
+
+    def _getInterface(self):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES['HEAD']['interface']
 
 class TestRequestFactory(unittest.TestCase):
     def _callFUT(self, environ):
@@ -142,14 +207,15 @@ class TestNamedRequestFactories(unittest.TestCase):
             self.assertEqual(factories[alias], factories[iface])
             named_iface = factories[alias]['interface']
             named_factory = factories[alias]['factory']
-            self.failUnless(named_iface.implementedBy(named_factory))
             self.assertEqual(factories[alias]['interface'], iface)
             self.assertEqual(factories[iface]['interface'], iface)
             self.assertEqual(factories[alias]['factory'].charset, 'utf-8')
+            self.failUnless(named_iface.implementedBy(named_factory))
+            self.failUnless(iface.implementedBy(named_factory))
+            self.failUnless(IRequest.implementedBy(named_factory))
 
     def test_it_named(self):
         factories = self._callFUT('name')
-        from zope.interface.interface import InterfaceClass
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IGETRequest
         from repoze.bfg.interfaces import IPOSTRequest
@@ -171,6 +237,8 @@ class TestNamedRequestFactories(unittest.TestCase):
             named_iface = factories[alias]['interface']
             named_factory = factories[alias]['factory']
             self.failUnless(named_iface.implementedBy(named_factory))
+            self.failUnless(iface.implementedBy(named_factory))
+            self.failUnless(IRequest.implementedBy(named_factory))
 
 class TestDefaultRequestFactories(unittest.TestCase):
     def test_it(self):
