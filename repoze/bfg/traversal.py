@@ -493,7 +493,6 @@ class ModelGraphTraverser(object):
         self.root = root
 
     def __call__(self, environ, _marker=_marker):
-        matchdict = None
         if 'bfg.routes.matchdict' in environ:
             matchdict = environ['bfg.routes.matchdict']
             path = matchdict.get('traverse', '/')
@@ -528,22 +527,19 @@ class ModelGraphTraverser(object):
             if segment[:2] =='@@':
                 return dict(context=ob, view_name=segment[2:], subpath=path[i:],
                             traversed=traversed, virtual_root=vroot,
-                            virtual_root_path=vroot_path, root=self.root,
-                            matchdict=matchdict)
+                            virtual_root_path=vroot_path, root=self.root)
             try:
                 getitem = ob.__getitem__
             except AttributeError:
                 return dict(context=ob, view_name=segment, subpath=path[i:],
                             traversed=traversed, virtual_root=vroot,
-                            virtual_root_path=vroot_path, root=self.root,
-                            matchdict=matchdict)
+                            virtual_root_path=vroot_path, root=self.root)
             try:
                 next = getitem(segment)
             except KeyError:
                 return dict(context=ob, view_name=segment, subpath=path[i:],
                             traversed=traversed, virtual_root=vroot,
-                            virtual_root_path=vroot_path, root=self.root,
-                            matchdict=matchdict)
+                            virtual_root_path=vroot_path, root=self.root)
             if vroot_idx == i-1:
                 vroot = ob
             traversed.append(segment)
@@ -553,7 +549,7 @@ class ModelGraphTraverser(object):
         return dict(context=ob, view_name=u'', subpath=subpath,
                     traversed=traversed, virtual_root=vroot,
                     virtual_root_path=vroot_path,
-                    root=self.root, matchdict=matchdict)
+                    root=self.root)
 
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context

@@ -37,7 +37,6 @@ class RoutesRootFactory(Mapper):
             args = None
         if isinstance(args, dict): # might be an empty dict
             args = args.copy()
-            routepath = route.routepath
             config = request_config()
             config.mapper = self
             config.mapper_dict = args
@@ -47,6 +46,8 @@ class RoutesRootFactory(Mapper):
             environ['wsgiorg.routing_args'] = ((), args)
             environ['bfg.routes.route'] = route
             environ['bfg.routes.matchdict'] = args
+            adhoc_attrs = environ.setdefault('webob.adhoc_attrs', {})
+            adhoc_attrs['matchdict'] = args
             # this is stolen from routes.middleware; if the route map
             # has a *path_info capture, use it to influence the path
             # info and script_name of the generated environment
