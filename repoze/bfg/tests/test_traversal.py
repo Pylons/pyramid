@@ -223,31 +223,6 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root_path'], [])
         self.assertEqual(result['matchdict'], {'subpath':'/a/b/c'})
 
-    def test_withroute_with_path_info(self):
-        model = DummyContext()
-        traverser = self._makeOne(model)
-        environ = {'bfg.routes.matchdict': {'path_info':'foo/bar'},
-                   'PATH_INFO':'/a/b/foo/bar', 'SCRIPT_NAME':''}
-        result = traverser(environ)
-        self.assertEqual(result['context'], model)
-        self.assertEqual(result['view_name'], '')
-        self.assertEqual(result['subpath'], [])
-        self.assertEqual(result['traversed'], [])
-        self.assertEqual(result['virtual_root'], model)
-        self.assertEqual(result['virtual_root_path'], [])
-        self.assertEqual(environ['PATH_INFO'], '/foo/bar')
-        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
-        self.assertEqual(result['matchdict'], {'path_info':'foo/bar'})
-
-    def test_withroute_with_path_info_PATH_INFO_w_extra_slash(self):
-        model = DummyContext()
-        traverser = self._makeOne(model)
-        environ = {'bfg.routes.matchdict':{'path_info':'foo/bar'},
-                   'PATH_INFO':'/a/b//foo/bar', 'SCRIPT_NAME':''}
-        traverser(environ)
-        self.assertEqual(environ['PATH_INFO'], '/foo/bar')
-        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
-
     def test_withroute_and_traverse(self):
         model = DummyContext()
         traverser = self._makeOne(model)

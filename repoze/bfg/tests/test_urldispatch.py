@@ -70,6 +70,54 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(environ['bfg.routes.matchdict'], {})
         self.assertEqual(environ['wsgiorg.routing_args'], ((), {}))
 
+    def test_matches_with_path_info_no_scriptname(self):
+        root_factory = make_get_root(123)
+        mapper = self._makeOne(root_factory)
+        mapper.connect('root', '/a/b/*path_info')
+        environ = self._getEnviron(PATH_INFO='/a/b/c/d')
+        result = mapper(environ)
+        self.assertEqual(result, 123)
+        self.assertEqual(environ['bfg.routes.route'].name, 'root')
+        self.assertEqual(environ['bfg.routes.matchdict'], {'path_info':'c/d'})
+        self.assertEqual(environ['PATH_INFO'], '/c/d')
+        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
+
+    def test_matches_with_path_info_with_scriptname(self):
+        root_factory = make_get_root(123)
+        mapper = self._makeOne(root_factory)
+        mapper.connect('root', '/a/b/*path_info')
+        environ = self._getEnviron(PATH_INFO='/a/b/c/d', SCRIPT_NAME='z')
+        result = mapper(environ)
+        self.assertEqual(result, 123)
+        self.assertEqual(environ['bfg.routes.route'].name, 'root')
+        self.assertEqual(environ['bfg.routes.matchdict'], {'path_info':'c/d'})
+        self.assertEqual(environ['PATH_INFO'], '/c/d')
+        self.assertEqual(environ['SCRIPT_NAME'], 'z/a/b')
+
+    def test_matches_PATH_INFO_w_extra_slash(self):
+        root_factory = make_get_root(123)
+        mapper = self._makeOne(root_factory)
+        mapper.connect('root', '/a/b/*path_info')
+        environ = self._getEnviron(PATH_INFO='/a/b//c/d', SCRIPT_NAME='')
+        result = mapper(environ)
+        self.assertEqual(result, 123)
+        self.assertEqual(environ['bfg.routes.route'].name, 'root')
+        self.assertEqual(environ['bfg.routes.matchdict'], {'path_info':'/c/d'})
+        self.assertEqual(environ['PATH_INFO'], '/c/d')
+        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
+
+    def test_matches_SCRIPT_NAME_endswith_slash(self):
+        root_factory = make_get_root(123)
+        mapper = self._makeOne(root_factory)
+        mapper.connect('root', '/a/b//*path_info')
+        environ = self._getEnviron(PATH_INFO='/a/b//c/d', SCRIPT_NAME='')
+        result = mapper(environ)
+        self.assertEqual(result, 123)
+        self.assertEqual(environ['bfg.routes.route'].name, 'root')
+        self.assertEqual(environ['bfg.routes.matchdict'], {'path_info':'c/d'})
+        self.assertEqual(environ['PATH_INFO'], '/c/d')
+        self.assertEqual(environ['SCRIPT_NAME'], '/a/b')
+
     def test_unicode_in_route_default(self):
         root_factory = make_get_root(123)
         mapper = self._makeOne(root_factory)

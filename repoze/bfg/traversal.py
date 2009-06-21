@@ -495,21 +495,7 @@ class ModelGraphTraverser(object):
     def __call__(self, environ, _marker=_marker):
         matchdict = None
         if 'bfg.routes.matchdict' in environ:
-            # this request matched a Routes route
             matchdict = environ['bfg.routes.matchdict']
-            if 'path_info' in matchdict:
-                # this is stolen from routes.middleware; if the route map
-                # has a *path_info capture, use it to influence the path
-                # info and script_name of the generated environment
-                oldpath = environ['PATH_INFO']
-                newpath = matchdict['path_info'] or ''
-                environ['PATH_INFO'] = newpath
-                if not environ['PATH_INFO'].startswith('/'):
-                    environ['PATH_INFO'] = '/' + environ['PATH_INFO']
-                pattern = r'^(.*?)/' + re.escape(newpath) + '$'
-                environ['SCRIPT_NAME'] += re.sub(pattern, r'\1', oldpath)
-                if environ['SCRIPT_NAME'].endswith('/'):
-                    environ['SCRIPT_NAME'] = environ['SCRIPT_NAME'][:-1]
             path = matchdict.get('traverse', '/')
             subpath = filter(None, matchdict.get('subpath', '').split('/'))
         else:
