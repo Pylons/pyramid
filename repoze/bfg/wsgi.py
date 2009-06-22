@@ -71,32 +71,21 @@ def wsgiapp2(wrapped):
     """
     def decorator(context, request):
         traversed = request.traversed
-        if traversed is not None:
-            # We need to fix up PATH_INFO and SCRIPT_NAME to give the
-            # subapplication the right information, sans the info it
-            # took to traverse here.  If ``traversed`` is None here,
-            # it means that no traversal was done.  For example, it
-            # will be None in the case that the context is one
-            # obtained via a Routes match (Routes 'traversal' doesn't
-            # actually traverse).  If this view is invoked on a Routes
-            # context, this fixup is not invoked.  Instead, the route
-            # used to reach it should use *path_info in the actual
-            # route pattern to get a similar fix-up done.
-            vroot_path = request.virtual_root_path or []
-            view_name = request.view_name
-            subpath = request.subpath or []
-            script_list = traversed[len(vroot_path):]
-            script_list = [ quote_path_segment(name) for name in script_list ]
-            if view_name:
-                script_list.append(quote_path_segment(view_name))
-            script_name =  '/' + '/'.join(script_list)
-            path_list = [ quote_path_segment(name) for name in subpath ]
-            path_info = '/' + '/'.join(path_list)
-            request.environ['PATH_INFO'] = path_info
-            script_name = request.environ['SCRIPT_NAME'] + script_name
-            if script_name.endswith('/'):
-                script_name = script_name[:-1]
-            request.environ['SCRIPT_NAME'] = script_name
+        vroot_path = request.virtual_root_path or []
+        view_name = request.view_name
+        subpath = request.subpath or ()
+        script_list = traversed[len(vroot_path):]
+        script_list = [ quote_path_segment(name) for name in script_list ]
+        if view_name:
+            script_list.append(quote_path_segment(view_name))
+        script_name =  '/' + '/'.join(script_list)
+        path_list = [ quote_path_segment(name) for name in subpath ]
+        path_info = '/' + '/'.join(path_list)
+        request.environ['PATH_INFO'] = path_info
+        script_name = request.environ['SCRIPT_NAME'] + script_name
+        if script_name.endswith('/'):
+            script_name = script_name[:-1]
+        request.environ['SCRIPT_NAME'] = script_name
         return request.get_response(wrapped)
     return wraps(wrapped)(decorator) # grokkability
 

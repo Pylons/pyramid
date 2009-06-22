@@ -207,12 +207,14 @@ class TestNamedRequestFactories(unittest.TestCase):
             self.assertEqual(factories[alias], factories[iface])
             named_iface = factories[alias]['interface']
             named_factory = factories[alias]['factory']
+            default_iface = factories[None]['interface']
             self.assertEqual(factories[alias]['interface'], iface)
             self.assertEqual(factories[iface]['interface'], iface)
             self.assertEqual(factories[alias]['factory'].charset, 'utf-8')
             self.failUnless(named_iface.implementedBy(named_factory))
             self.failUnless(iface.implementedBy(named_factory))
             self.failUnless(IRequest.implementedBy(named_factory))
+            self.failUnless(default_iface.implementedBy(named_factory))
 
     def test_it_named(self):
         factories = self._callFUT('name')
@@ -236,9 +238,11 @@ class TestNamedRequestFactories(unittest.TestCase):
             self.assertEqual(factories[alias]['factory'].charset, 'utf-8')
             named_iface = factories[alias]['interface']
             named_factory = factories[alias]['factory']
+            default_iface = factories[None]['interface']
             self.failUnless(named_iface.implementedBy(named_factory))
             self.failUnless(iface.implementedBy(named_factory))
             self.failUnless(IRequest.implementedBy(named_factory))
+            self.failUnless(default_iface.implementedBy(named_factory))
 
 class TestDefaultRequestFactories(unittest.TestCase):
     def test_it(self):

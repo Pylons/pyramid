@@ -17,15 +17,7 @@ class WSGIApp2Tests(unittest.TestCase):
         from repoze.bfg.wsgi import wsgiapp2
         return wsgiapp2(app)
 
-    def test_decorator_traversed_is_None(self):
-        context = DummyContext()
-        request = DummyRequest()
-        request.traversed = None
-        decorator = self._callFUT(dummyapp)
-        response = decorator(context, request)
-        self.assertEqual(response, dummyapp)
-
-    def test_decorator_traversed_not_None_with_subpath_and_view_name(self):
+    def test_decorator_with_subpath_and_view_name(self):
         context = DummyContext()
         request = DummyRequest()
         request.traversed = ['a', 'b']
@@ -39,7 +31,7 @@ class WSGIApp2Tests(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/subpath')
         self.assertEqual(request.environ['SCRIPT_NAME'], '/foo/b/view_name')
         
-    def test_decorator_traversed_not_None_with_subpath_no_view_name(self):
+    def test_decorator_with_subpath_no_view_name(self):
         context = DummyContext()
         request = DummyRequest()
         request.traversed = ['a', 'b']
@@ -53,7 +45,7 @@ class WSGIApp2Tests(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/subpath')
         self.assertEqual(request.environ['SCRIPT_NAME'], '/foo/b')
 
-    def test_decorator_traversed_not_None_no_subpath_with_view_name(self):
+    def test_decorator_no_subpath_with_view_name(self):
         context = DummyContext()
         request = DummyRequest()
         request.traversed = ['a', 'b']

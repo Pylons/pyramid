@@ -48,21 +48,6 @@ class RoutesRootFactory(Mapper):
             environ['bfg.routes.matchdict'] = args
             adhoc_attrs = environ.setdefault('webob.adhoc_attrs', {})
             adhoc_attrs['matchdict'] = args
-            # this is stolen from routes.middleware; if the route map
-            # has a *path_info capture, use it to influence the path
-            # info and script_name of the generated environment
-            if 'path_info' in args:
-                if not 'SCRIPT_NAME' in environ:
-                    environ['SCRIPT_NAME'] = ''
-                oldpath = environ['PATH_INFO']
-                newpath = args['path_info'] or ''
-                environ['PATH_INFO'] = newpath
-                if not environ['PATH_INFO'].startswith('/'):
-                    environ['PATH_INFO'] = '/' + environ['PATH_INFO']
-                pattern = r'^(.*?)/' + re.escape(newpath) + '$'
-                environ['SCRIPT_NAME'] += re.sub(pattern, r'\1', oldpath)
-                if environ['SCRIPT_NAME'].endswith('/'):
-                    environ['SCRIPT_NAME'] = environ['SCRIPT_NAME'][:-1]
             factory = route._factory or self.default_root_factory
             return factory(environ)
 

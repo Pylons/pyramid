@@ -160,6 +160,11 @@ Backwards Incompatibilities
   (and sending a new request event) within the router (it used to be
   performed afterwards).
 
+- Adding ``*path_info`` to a route no longer changes the PATH_INFO for
+  a request that matches using URL dispatch.  This feature was only
+  there to service the ``repoze.bfg.wsgi.wsgiapp2`` decorator and it
+  did it wrong; use ``*subpath`` instead now.
+
 Bug Fixes
 ---------
 
@@ -192,13 +197,6 @@ Documentation
 
 - Updated Routes bfgwiki2 tutorial to reflect the fact that context
   factories are now no longer used.
-
-Internal
---------
-
-- Make Routes mapper responsible for doing magic to fix up PATH_INFO
-  and SCRIPT_NAME when a ``path_info`` key exists in the matchdict.
-  This used to be done in the traverser, which made no sense.
 
 0.9.1 (2009-06-02)
 ==================

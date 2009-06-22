@@ -56,11 +56,13 @@ def named_request_factories(name=None):
     else:
         IC = InterfaceClass
         default_iface = IC('%s_IRequest' % name, (IRequest,))
-        get_iface = IC('%s_IGETRequest' % name, (IGETRequest,))
-        post_iface = IC('%s_IPOSTRequest' % name, (IPOSTRequest,))
-        put_iface = IC('%s_IPUTRequest' % name, (IPUTRequest,))
-        delete_iface = IC('%s_IDELETERequest' % name, (IDELETERequest,))
-        head_iface = IC('%s_IHEADRequest' % name, (IHEADRequest,))
+        get_iface = IC('%s_IGETRequest' % name, (default_iface, IGETRequest))
+        post_iface = IC('%s_IPOSTRequest' % name, (default_iface, IPOSTRequest))
+        put_iface = IC('%s_IPUTRequest' % name, (default_iface, IPUTRequest))
+        delete_iface = IC('%s_IDELETERequest' % name, (default_iface,
+                                                       IDELETERequest))
+        head_iface = IC('%s_IHEADRequest' % name, (default_iface,
+                                                   IHEADRequest,))
         
     class Request(WebobRequest):
         implements(default_iface)

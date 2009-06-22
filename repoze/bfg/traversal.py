@@ -496,10 +496,11 @@ class ModelGraphTraverser(object):
         if 'bfg.routes.matchdict' in environ:
             matchdict = environ['bfg.routes.matchdict']
             path = matchdict.get('traverse', '/')
-            subpath = filter(None, matchdict.get('subpath', '').split('/'))
+            subpath = matchdict.get('subpath', '')
+            subpath = tuple(filter(None, subpath.split('/')))
         else:
             # this request did not match a Routes route
-            subpath = []
+            subpath = ()
             try:
                 path = environ['PATH_INFO']
             except KeyError:
@@ -514,7 +515,7 @@ class ModelGraphTraverser(object):
             vroot_idx = len(vroot_path)
             path = vroot_path_string + path
 
-        path = list(traversal_path(path))
+        path = traversal_path(path)
 
         traversed = []
 
