@@ -61,3 +61,7 @@ something like this:
    :linenos:
    :language: python
 
+At this point, our system is in a "non-runnable" state; we'll need to
+change the "views" (and associated files) in the next chapter to be
+able to start and run the application successfully.
+
