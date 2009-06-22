@@ -161,6 +161,7 @@ class IRouteDirective(Interface):
     name = TextLine(title=u'name', required=True)
     path = TextLine(title=u'path', required=True)
     view = GlobalObject(title=u'view', required=False)
+    view_for = GlobalObject(title=u'view_for', required=False)
     permission = TextLine(title=u'permission', required=False)
     factory = GlobalObject(title=u'context factory', required=False)
     minimize = Bool(title=u'minimize', required=False)
@@ -186,6 +187,7 @@ class Route(zope.configuration.config.GroupingContextDecorator):
     """ Handle ``route`` ZCML directives
     """
     view = None
+    view_for = None
     permission = None
     factory = None
     minimize = True
@@ -232,7 +234,7 @@ class Route(zope.configuration.config.GroupingContextDecorator):
         context.request_factories[name] = named_request_factories(name)
 
         if self.view:
-            view(context, self.permission, None, self.view, '',
+            view(context, self.permission, self.view_for, self.view, '',
                  self.request_type, name)
 
         method = self.condition_method or self.request_type

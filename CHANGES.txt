@@ -1,7 +1,12 @@
 Next release
 ============
 
-- ...
+Features
+--------
+
+- Add a ``view_for`` attribute to the ``route`` ZCML directive.  This
+  attribute should refer to an interface or a class (ala the ``for``
+  attribute of the ``view`` ZCML directive).
 
 1.0a1 (2009-06-22)
 ==================

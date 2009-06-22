@@ -923,6 +923,52 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_discriminator[6], None)
         self.assertEqual(route_args, (route,))
 
+    def test_after_with_view_and_view_for(self):
+        from repoze.bfg.zcml import handler
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        
+        context = DummyContext()
+        view = Dummy()
+        route = self._makeOne(context, 'path', 'name', view=view,
+                              view_for=IDummy)
+        route.after()
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        factories = context.request_factories
+        request_iface = factories['name'][None]['interface']
+
+        view_action = actions[0]
+        view_callable = view_action['callable']
+        view_discriminator = view_action['discriminator']
+        view_args = view_action['args']
+        self.assertEqual(view_callable, handler)
+        self.assertEqual(len(view_discriminator), 5)
+        self.assertEqual(view_discriminator[0], 'view')
+        self.assertEqual(view_discriminator[1], IDummy)
+        self.assertEqual(view_discriminator[2],'')
+        self.assertEqual(view_discriminator[3], request_iface)
+        self.assertEqual(view_discriminator[4], IView)
+        self.assertEqual(view_args, ('registerAdapter', view,
+                                     (IDummy, request_iface), IView,
+                                     '', None))
+        
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 7)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_discriminator[2],'{}')
+        self.assertEqual(route_discriminator[3], None)
+        self.assertEqual(route_discriminator[4], None)
+        self.assertEqual(route_discriminator[5], None)
+        self.assertEqual(route_discriminator[6], None)
+        self.assertEqual(route_args, (route,))
+
     def test_after_without_view(self):
         from repoze.bfg.zcml import connect_route
         

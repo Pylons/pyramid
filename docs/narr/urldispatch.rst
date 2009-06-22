@@ -91,7 +91,15 @@ view
 
   The Python dotted-path name to a function that will be used as a
   view callable when this route matches.
-  e.g. ``mypackage.views.my_view``.  This attribute is required.
+  e.g. ``mypackage.views.my_view``.
+
+view_for
+
+  The Python dotted-path name to a class or an interface that the
+  :term:`context` of the view should match for the view named by the
+  route to be used.  This attribute is only useful if the ``view``
+  attribute is used.  If this attribute is not specified, the default
+  (``None``) will be used.
 
 permission
 
