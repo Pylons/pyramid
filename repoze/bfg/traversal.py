@@ -481,8 +481,6 @@ def quote_path_segment(segment):
         _segment_cache[segment] = result
         return result
 
-_marker = object()
-
 class ModelGraphTraverser(object):
     """ A model graph traverser that should be used (for speed) when
     every object in the graph supplies a ``__name__`` and
@@ -492,7 +490,7 @@ class ModelGraphTraverser(object):
     def __init__(self, root):
         self.root = root
 
-    def __call__(self, environ, _marker=_marker):
+    def __call__(self, environ):
         if 'bfg.routes.matchdict' in environ:
             matchdict = environ['bfg.routes.matchdict']
             path = matchdict.get('traverse', '/')
