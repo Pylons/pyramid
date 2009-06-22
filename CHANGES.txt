@@ -1,6 +1,12 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- The ``bfg_routesalchemy`` paster template app tests failed due to a
+  mismatch between test and view signatures.
+
 Features
 --------
 
