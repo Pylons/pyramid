@@ -71,11 +71,11 @@ def wsgiapp2(wrapped):
     """
     def decorator(context, request):
         traversed = request.traversed
-        vroot_path = request.virtual_root_path or []
+        vroot_path = request.virtual_root_path or ()
         view_name = request.view_name
         subpath = request.subpath or ()
-        script_list = traversed[len(vroot_path):]
-        script_list = [ quote_path_segment(name) for name in script_list ]
+        script_tuple = traversed[len(vroot_path):]
+        script_list = [ quote_path_segment(name) for name in script_tuple ]
         if view_name:
             script_list.append(quote_path_segment(view_name))
         script_name =  '/' + '/'.join(script_list)

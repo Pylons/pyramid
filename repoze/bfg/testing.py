@@ -383,11 +383,12 @@ class DummyRequest:
         self.path_qs = ''
         self.body = ''
         self.view_name = ''
-        self.subpath = []
-        self.traversed = None
-        self.virtual_root = None
-        self.virtual_root_path = None
+        self.subpath = ()
+        self.traversed = ()
+        self.virtual_root_path = ()
         self.context = None
+        self.root = None
+        self.virtual_root = None
         self.marshalled = params # repoze.monty
         self.__dict__.update(kw)
 

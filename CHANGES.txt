@@ -165,6 +165,10 @@ Backwards Incompatibilities
   there to service the ``repoze.bfg.wsgi.wsgiapp2`` decorator and it
   did it wrong; use ``*subpath`` instead now.
 
+- The values of ``subpath``, ``traversed``, and ``virtual_root_path``
+  attached to the request object are always now tuples instead of
+  lists (performance).
+
 Bug Fixes
 ---------
 

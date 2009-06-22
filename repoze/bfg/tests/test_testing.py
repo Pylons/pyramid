@@ -349,8 +349,11 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.script_name, '')
         self.assertEqual(request.path_qs, '')
         self.assertEqual(request.view_name, '')
-        self.assertEqual(request.subpath, [])
+        self.assertEqual(request.subpath, ())
         self.assertEqual(request.context, None)
+        self.assertEqual(request.root, None)
+        self.assertEqual(request.virtual_root, None)
+        self.assertEqual(request.virtual_root_path, ())
 
     def test_params_explicit(self):
         request = self._makeOne(params = {'foo':'bar'})

@@ -505,52 +505,60 @@ class ModelGraphTraverser(object):
                 path = environ['PATH_INFO']
             except KeyError:
                 path = '/'
+
         try:
             vroot_path_string = environ[VH_ROOT_KEY]
         except KeyError:
-            vroot_path = []
+            vroot_path = ()
             vroot_idx = 0
         else:
-            vroot_path = list(traversal_path(vroot_path_string))
+            vroot_path = traversal_path(vroot_path_string)
             vroot_idx = len(vroot_path)
             path = vroot_path_string + path
 
         path = traversal_path(path)
-
-        traversed = []
-
         ob = vroot = self.root
-        name = ''
+
+        # in case you're wondering, we do dead reckoning here instead
+        # of pushing and popping temporary lists for speed purposes
 
         i = 1
+        j = vroot_idx
 
         for segment in path:
             if segment[:2] =='@@':
-                return dict(context=ob, view_name=segment[2:], subpath=path[i:],
-                            traversed=traversed, virtual_root=vroot,
-                            virtual_root_path=vroot_path, root=self.root)
+                return dict(context=ob, view_name=segment[2:],
+                            subpath=path[i:], traversed=path[:j],
+                            virtual_root=vroot,
+                            virtual_root_path=vroot_path,
+                            root=self.root)
             try:
                 getitem = ob.__getitem__
             except AttributeError:
-                return dict(context=ob, view_name=segment, subpath=path[i:],
-                            traversed=traversed, virtual_root=vroot,
-                            virtual_root_path=vroot_path, root=self.root)
+                return dict(context=ob, view_name=segment,
+                            subpath=path[i:], traversed=path[:j],
+                            virtual_root=vroot,
+                            virtual_root_path=vroot_path,
+                            root=self.root)
+
             try:
                 next = getitem(segment)
             except KeyError:
-                return dict(context=ob, view_name=segment, subpath=path[i:],
-                            traversed=traversed, virtual_root=vroot,
-                            virtual_root_path=vroot_path, root=self.root)
+                return dict(context=ob, view_name=segment,
+                            subpath=path[i:], traversed=path[:j],
+                            virtual_root=vroot,
+                            virtual_root_path=vroot_path,
+                            root=self.root)
+
             if vroot_idx == i-1:
                 vroot = ob
-            traversed.append(segment)
             ob = next
             i += 1
+            j += 1
 
         return dict(context=ob, view_name=u'', subpath=subpath,
-                    traversed=traversed, virtual_root=vroot,
-                    virtual_root_path=vroot_path,
-                    root=self.root)
+                    traversed=path, virtual_root=vroot,
+                    virtual_root_path=vroot_path, root=self.root)
 
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context

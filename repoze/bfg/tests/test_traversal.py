@@ -87,9 +87,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['traversed'], ())
         self.assertEqual(result['virtual_root'], policy.root)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_pathel_with_no_getitem(self):
         policy = self._makeOne(None)
@@ -98,9 +98,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], None)
         self.assertEqual(result['view_name'], 'foo')
         self.assertEqual(result['subpath'], ('bar',))
-        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['traversed'], ())
         self.assertEqual(result['virtual_root'], policy.root)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_withconn_getitem_emptypath_nosubpath(self):
         root = DummyContext()
@@ -110,9 +110,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], root)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['traversed'], ())
         self.assertEqual(result['virtual_root'], root)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_withconn_getitem_withpath_nosubpath(self):
         foo = DummyContext()
@@ -123,9 +123,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], foo)
         self.assertEqual(result['view_name'], 'bar')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], [u'foo'])
+        self.assertEqual(result['traversed'], (u'foo',))
         self.assertEqual(result['virtual_root'], root)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_withconn_getitem_withpath_withsubpath(self):
         foo = DummyContext()
@@ -136,9 +136,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], foo)
         self.assertEqual(result['view_name'], 'bar')
         self.assertEqual(result['subpath'], ('baz', 'buz'))
-        self.assertEqual(result['traversed'], [u'foo'])
+        self.assertEqual(result['traversed'], (u'foo',))
         self.assertEqual(result['virtual_root'], root)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_with_explicit_viewname(self):
         foo = DummyContext()
@@ -149,29 +149,69 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], root)
         self.assertEqual(result['view_name'], 'foo')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['traversed'], ())
         self.assertEqual(result['virtual_root'], root)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_call_with_vh_root(self):
         environ = self._getEnviron(PATH_INFO='/baz',
                                    HTTP_X_VHM_ROOT='/foo/bar')
         baz = DummyContext()
-        baz.name = 'baz'
         bar = DummyContext(baz)
-        bar.name = 'bar'
         foo = DummyContext(bar)
-        foo.name = 'foo'
         root = DummyContext(foo)
-        root.name = 'root'
         policy = self._makeOne(root)
         result = policy(environ)
         self.assertEqual(result['context'], baz)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], [u'foo', u'bar', u'baz'])
+        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
         self.assertEqual(result['virtual_root'], bar)
-        self.assertEqual(result['virtual_root_path'], [u'foo', u'bar'])
+        self.assertEqual(result['virtual_root_path'], (u'foo', u'bar'))
+
+    def test_call_with_vh_root2(self):
+        environ = self._getEnviron(PATH_INFO='/bar/baz',
+                                   HTTP_X_VHM_ROOT='/foo')
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        policy = self._makeOne(root)
+        result = policy(environ)
+        self.assertEqual(result['context'], baz)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['virtual_root'], foo)
+        self.assertEqual(result['virtual_root_path'], (u'foo',))
+
+    def test_call_with_vh_root3(self):
+        environ = self._getEnviron(PATH_INFO='/foo/bar/baz',
+                                   HTTP_X_VHM_ROOT='/')
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyContext(foo)
+        policy = self._makeOne(root)
+        result = policy(environ)
+        self.assertEqual(result['context'], baz)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], (u'foo', u'bar', u'baz'))
+        self.assertEqual(result['virtual_root'], root)
+        self.assertEqual(result['virtual_root_path'], ())
+
+    def test_call_with_vh_root_path_root(self):
+        policy = self._makeOne(None)
+        environ = self._getEnviron(HTTP_X_VHM_ROOT='/',
+                                   PATH_INFO='/')
+        result = policy(environ)
+        self.assertEqual(result['context'], None)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], ())
+        self.assertEqual(result['virtual_root'], policy.root)
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_non_utf8_path_segment_unicode_path_segments_fails(self):
         foo = DummyContext()
@@ -198,9 +238,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], model)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
-        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['traversed'], ())
         self.assertEqual(result['virtual_root'], model)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_withroute_with_subpath(self):
         model = DummyContext()
@@ -210,9 +250,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], model)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ('a', 'b','c'))
-        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['traversed'], ())
         self.assertEqual(result['virtual_root'], model)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
     def test_withroute_and_traverse(self):
         model = DummyContext()
@@ -222,9 +262,9 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['context'], model)
         self.assertEqual(result['view_name'], 'foo')
         self.assertEqual(result['subpath'], ('bar',))
-        self.assertEqual(result['traversed'], [])
+        self.assertEqual(result['traversed'], ())
         self.assertEqual(result['virtual_root'], model)
-        self.assertEqual(result['virtual_root_path'], [])
+        self.assertEqual(result['virtual_root_path'], ())
 
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
