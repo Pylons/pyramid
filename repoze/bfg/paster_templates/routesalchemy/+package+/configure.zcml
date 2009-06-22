@@ -12,7 +12,8 @@
     view=".views.my_view"
     />
 
-  <view 
+  <route
+    path="/static/*subpath"
     name="static"
     view=".views.static_view"
     />

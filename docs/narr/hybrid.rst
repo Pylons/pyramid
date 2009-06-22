@@ -215,6 +215,32 @@ In this way, each route can use a different factory, making it
 possible to traverse different graphs based on some routing parameter
 within the same application.
 
+Using ``*subpath`` in a Route Path
+----------------------------------
+
+There are certain (extremely rare) cases when you'd like to influence
+the traversal :term:`subpath` when a route matches without atually
+performing traversal.  For instance, the ``repoze.bfg.wsgi.wsgiapp2``
+decorator and the ``repoze.bfg.view.static`` helper attempt to compute
+``PATH_INFO`` from the request's subpath, so it's useful to be able to
+influence this value.  When ``*subpath`` exists in a path pattern, no
+path is actually traversed, but the traversal algorithm will return a
+:term:`subpath` list implied by the capture value of ``*subpath``.
+You'll see this pattern most commonly in route declarations that look
+like this:
+
+.. code-block:: xml
+
+   <route
+    path="/static/*subpath"
+    name="static"
+    view=".views.static_view"
+    />
+
+Where ``.views.static_view`` is an instance of
+``repoze.bfg.view.static``.  This effectively tells the static helper
+to traverse everything in the subpath as a filename.
+
 Corner Cases
 ------------
 

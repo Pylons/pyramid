@@ -186,7 +186,8 @@ Documentation
   and authorization policies to the "Security" narrative chapter.
 
 - Added a (fairly sad) "Combining Traversal and URL Dispatch" chapter
-  to the narrative documentation.
+  to the narrative documentation.  This explains the usage of
+  ``*traverse`` and ``*subpath`` in routes URL patters.
 
 - A "router" chapter explaining the request/response lifecycle at a
   high level was added.
