@@ -56,7 +56,7 @@ Virtual root support is useful when you'd like to host some model in a
 :mod:`repoze.bfg` model graph as an application under a URL pathname
 that does not include the model path itself.  For example, you might
 want to serve the object at the traversal path ``/cms`` as an
-application on reachable via ``http://example.com/`` (as opposed to
+application reachable via ``http://example.com/`` (as opposed to
 ``http://example.com/cms``). To specify a virtual root, cause an
 environment variable to be inserted into the WSGI environ named
 ``HTTP_X_VHM_ROOT`` with a value that is the absolute pathname to the
