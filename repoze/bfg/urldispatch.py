@@ -1,5 +1,3 @@
-import re
-
 from routes import Mapper
 from routes import request_config
 
