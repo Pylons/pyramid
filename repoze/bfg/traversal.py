@@ -516,45 +516,51 @@ class ModelGraphTraverser(object):
             vroot_idx = len(vroot_path)
             path = vroot_path_string + path
 
-        path = traversal_path(path)
         ob = vroot = self.root
 
-        # in case you're wondering, we do dead reckoning here instead
-        # of pushing and popping temporary lists for speed purposes
+        if (not path) or path == '/':
+            # save a call to traversal_path if we know it's going to return
+            # the empty tuple
+            path = ()
+        else:
+            path = traversal_path(path)
 
-        i = 1
-        j = vroot_idx
+            # in case you're wondering, we do dead reckoning here instead
+            # of pushing and popping temporary lists for speed purposes
 
-        for segment in path:
-            if segment[:2] =='@@':
-                return dict(context=ob, view_name=segment[2:],
-                            subpath=path[i:], traversed=path[:j],
-                            virtual_root=vroot,
-                            virtual_root_path=vroot_path,
-                            root=self.root)
-            try:
-                getitem = ob.__getitem__
-            except AttributeError:
-                return dict(context=ob, view_name=segment,
-                            subpath=path[i:], traversed=path[:j],
-                            virtual_root=vroot,
-                            virtual_root_path=vroot_path,
-                            root=self.root)
+            i = 1
+            j = vroot_idx
 
-            try:
-                next = getitem(segment)
-            except KeyError:
-                return dict(context=ob, view_name=segment,
-                            subpath=path[i:], traversed=path[:j],
-                            virtual_root=vroot,
-                            virtual_root_path=vroot_path,
-                            root=self.root)
+            for segment in path:
+                if segment[:2] =='@@':
+                    return dict(context=ob, view_name=segment[2:],
+                                subpath=path[i:], traversed=path[:j],
+                                virtual_root=vroot,
+                                virtual_root_path=vroot_path,
+                                root=self.root)
+                try:
+                    getitem = ob.__getitem__
+                except AttributeError:
+                    return dict(context=ob, view_name=segment,
+                                subpath=path[i:], traversed=path[:j],
+                                virtual_root=vroot,
+                                virtual_root_path=vroot_path,
+                                root=self.root)
 
-            if vroot_idx == i-1:
-                vroot = ob
-            ob = next
-            i += 1
-            j += 1
+                try:
+                    next = getitem(segment)
+                except KeyError:
+                    return dict(context=ob, view_name=segment,
+                                subpath=path[i:], traversed=path[:j],
+                                virtual_root=vroot,
+                                virtual_root_path=vroot_path,
+                                root=self.root)
+
+                if vroot_idx == i-1:
+                    vroot = ob
+                ob = next
+                i += 1
+                j += 1
 
         return dict(context=ob, view_name=u'', subpath=subpath,
                     traversed=path, virtual_root=vroot,

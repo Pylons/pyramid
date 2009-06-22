@@ -44,9 +44,10 @@ def registerModels(models):
             path = environ['PATH_INFO']
             ob = models[path]
             from repoze.bfg.traversal import traversal_path
-            traversed = list(traversal_path(path))
-            return {'context':ob, 'view_name':'','subpath':[],
-                    'traversed':traversed, 'vroot':ob, 'vroot_path':[]}
+            traversed = traversal_path(path)
+            return {'context':ob, 'view_name':'','subpath':(),
+                    'traversed':traversed, 'virtual_root':ob,
+                    'virtual_root_path':(), 'root':ob}
 
     registerTraverserFactory(DummyTraverserFactory)
     return models
