@@ -215,6 +215,8 @@ In this way, each route can use a different factory, making it
 possible to traverse different graphs based on some routing parameter
 within the same application.
 
+.. _star_subpath:
+
 Using ``*subpath`` in a Route Path
 ----------------------------------
 

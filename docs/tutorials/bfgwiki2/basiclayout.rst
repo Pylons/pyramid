@@ -50,7 +50,7 @@ XML namespace.  Our sample ZCML file looks like the following:
    declaration, we're saying that any URL that starts with ``/static``
    should go to the static view; any remainder of its path (e.g. the
    ``/foo`` in ``/static/foo``) will be used to compose a path to a
-   static file resource (CSS and such).
+   static file resource (CSS and such).  
 
 Content Models with ``models.py``
 ---------------------------------

@@ -73,7 +73,10 @@ Glossary
     model in order to find a :term:`context`.  The :mod:`repoze.bfg`
     :term:`router` performs traversal of model objects when a
     :term:`root factory` is specified.  See the
-    :ref:`traversal_chapter` chapter for more information.
+    :ref:`traversal_chapter` chapter for more information.  Traversal
+    can be performed *instead* of :term:`URL dispatch` or can be
+    combined *with* URL dispatch.  See :ref:`hybrid_chapter` for more
+    information about combining traversal and URL dispatch (advanced).
   Router
     The :term:`WSGI` application created when you start a
     :mod:`repoze.bfg` application.  The router intercepts requests,
@@ -280,7 +283,10 @@ Glossary
   Subpath
     A list of element "left over" after the :term:`router` has
     performed a successful traversal to a view.  The subpath is a
-    sequence of strings, e.g. ``['left', 'over', 'names']``.
+    sequence of strings, e.g. ``['left', 'over', 'names']``.  Within
+    BFG applications that use URL dispatch rather than traversal, you
+    can use ``*subpath`` in the route pattern to influence the
+    subpath.  See :ref:`star_subpath` for more information.
   Interface
     A `Zope interface <http://pypi.python.org/pypi/zope.interface>`_
     object.  In :mod:`repoze.bfg`, an interface may be attached to an
