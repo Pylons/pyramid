@@ -40,12 +40,13 @@ XML namespace.  Our sample ZCML file looks like the following:
    response.  You will use mostly ``<route>`` statements in a
    :term:`URL dispatch` based application to map URLs to code.
 
-#. *Lines 14-17*.  Register a ``<view>`` with a path that starts with
-   ``/static``.  This points at a bit of code (``.views.static_view``)
-   that will serve up static resources for us, in this case, at
-   ``http://localhost:6543/static/`` and below.  ``<view>``
-   declarations also map code to URLs like ``route`` statements,
-   except they match URLs based on :term:`traversal`.  With this view
+#. *Lines 14-17*.  Register a ``<route>`` that will match with a path
+   that starts with ``/static/``.  This points at a bit of code
+   (``.views.static_view``) that will serve up static resources for
+   us, in this case, at ``http://localhost:6543/static/`` and below.
+   The ``*subpath`` token captures the remainder of the path and sets
+   the request :term:`subpath` to a derivation of the remainder of the
+   path, which is relied on by the view it mentions.  With this view
    declaration, we're saying that any URL that starts with ``/static``
    should go to the static view; any remainder of its path (e.g. the
    ``/foo`` in ``/static/foo``) will be used to compose a path to a
