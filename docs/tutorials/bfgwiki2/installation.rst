@@ -208,6 +208,24 @@ test`` does but provides additional "coverage" information, exposing
 which lines of your project are "covered" (or not covered) by the
 tests.
 
+To get this functionality working, we'll need to install a couple of
+other packages into our ``virtualenv``: ``nose`` and ``coverage``:
+
+On UNIX:
+
+.. code-block:: bash
+
+  $ ../bin/easy_install nose coverage
+
+On Windows:
+
+.. code-block:: bat
+
+  c:\bfgfntut\tutorial> ..\Scripts\easy_install nose coverage
+
+Once ``nose`` and ``coverage`` are installed, we can actually run the
+coverage tests.
+
 On UNIX:
 
 .. code-block:: bash
