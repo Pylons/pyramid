@@ -130,7 +130,7 @@ looks like so:
        def __getitem__(self, name):
           return self.subobjects[name]
 
-   root = Traversable(None, None, 
+   root = Traversable(
            {'a':Traversable({'b':Traversable({'c':Traversable({})})})})
 
    def root_factory(environ):

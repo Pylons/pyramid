@@ -254,7 +254,7 @@ Glossary
     mappings. In terms of :mod:`repoze.bfg`, a Route can supplant
     graph traversal when deciding which *view* should be called.  See
     :ref:`urldispatch_chapter` for more information about Routes integration 
-    in bfg.
+    in :mod:`repoze.bfg`.
   Route
     A single pattern matched by the :term:`Routes` subsystem, which
     generally resolves to a :term:`root factory` (and then ultimately
