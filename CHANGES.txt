@@ -8,6 +8,12 @@ Features
   attribute should refer to an interface or a class (ala the ``for``
   attribute of the ``view`` ZCML directive).
 
+Documentation
+-------------
+
+- Conditional documentation in installation section ("how to install a
+  Python interpreter").
+
 1.0a1 (2009-06-22)
 ==================
 

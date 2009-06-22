@@ -17,7 +17,8 @@ Windows.
 Preparation, UNIX
 -----------------
 
-#. Obtain, install, or find `Python 2.5
+#. If you don't already have a Python 2.5 interpreter installed on
+   your system, obtain, install, or find `Python 2.5
    <http://python.org/download/releases/2.5.4/>`_ for your system.
 
 #. Install latest `setuptools` into the Python you
