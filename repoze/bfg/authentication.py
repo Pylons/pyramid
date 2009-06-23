@@ -19,7 +19,7 @@ class CallbackAuthenticationPolicy(object):
             return None
         if self.callback is None:
             return userid
-        if self.callback(userid) is not None: # is not None!
+        if self.callback(userid, request) is not None: # is not None!
             return userid
 
     def effective_principals(self, request):
@@ -30,7 +30,7 @@ class CallbackAuthenticationPolicy(object):
         if self.callback is None:
             groups = []
         else:
-            groups = self.callback(userid)
+            groups = self.callback(userid, request)
         if groups is None: # is None!
             return effective_principals
         effective_principals.append(Authenticated)
@@ -54,11 +54,12 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``callback``
 
-        Default: ``None``.  A callback passed the repoze.who identity,
-        expected to return None if the user represented by the
-        identity doesn't exist or a sequence of group identifiers
-        (possibly empty) if the user does exist.  If ``callback`` is
-        None, the userid will be assumed to exist with no groups.
+        Default: ``None``.  A callback passed the repoze.who identity
+        and the request, expected to return None if the user
+        represented by the identity doesn't exist or a sequence of
+        group identifiers (possibly empty) if the user does exist.  If
+        ``callback`` is None, the userid will be assumed to exist with
+        no groups.
 
     """
     implements(IAuthenticationPolicy)
@@ -83,7 +84,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
             return None
         if self.callback is None:
             return identity['repoze.who.userid']
-        if self.callback(identity) is not None: # is not None!
+        if self.callback(identity, request) is not None: # is not None!
             return identity['repoze.who.userid']
 
     def effective_principals(self, request):
@@ -94,7 +95,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         if self.callback is None:
             groups = []
         else:
-            groups = self.callback(identity)
+            groups = self.callback(identity, request)
         if groups is None: # is None!
             return effective_principals
         userid = identity['repoze.who.userid']
@@ -132,10 +133,11 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``callback``
 
-        Default: ``None``.  A callback passed the userid, expected to return
-        None if the userid doesn't exist or a sequence of group identifiers
-        (possibly empty) if the user does exist.  If ``callback`` is None,
-        the userid will be assumed to exist with no groups.
+        Default: ``None``.  A callback passed the userid and the request,
+        expected to return None if the userid doesn't exist or a sequence
+        of group identifiers (possibly empty) if the user does exist.
+        If ``callback`` is None, the userid will be assumed to exist with no
+        groups.
     """
     implements(IAuthenticationPolicy)
 

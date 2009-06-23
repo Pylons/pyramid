@@ -32,7 +32,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     def test_authenticated_userid_with_callback_returns_None(self):
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
-        def callback(identity):
+        def callback(identity, request):
             return None
         policy = self._makeOne(callback=callback)
         self.assertEqual(policy.authenticated_userid(request), None)
@@ -40,7 +40,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     def test_authenticated_userid_with_callback_returns_something(self):
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
-        def callback(identity):
+        def callback(identity, request):
             return ['agroup']
         policy = self._makeOne(callback=callback)
         self.assertEqual(policy.authenticated_userid(request), 'fred')
@@ -66,7 +66,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred',
                                     'groups':['quux', 'biz']}})
-        def callback(identity):
+        def callback(identity, request):
             return identity['groups']
         policy = self._makeOne(callback=callback)
         self.assertEqual(policy.effective_principals(request),
@@ -77,7 +77,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred',
                                     'groups':['quux', 'biz']}})
-        def callback(identity):
+        def callback(identity, request):
             return None
         policy = self._makeOne(callback=callback)
         self.assertEqual(policy.effective_principals(request), [Everyone])
@@ -207,14 +207,14 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         
     def test_authenticated_userid_callback_returns_None(self):
         request = DummyRequest({})
-        def callback(userid):
+        def callback(userid, request):
             return None
         policy = self._makeOne(callback, {'userid':'fred'})
         self.assertEqual(policy.authenticated_userid(request), None)
 
     def test_authenticated_userid(self):
         request = DummyRequest({})
-        def callback(userid):
+        def callback(userid, request):
             return True
         policy = self._makeOne(callback, {'userid':'fred'})
         self.assertEqual(policy.authenticated_userid(request), 'fred')
@@ -228,7 +228,7 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
     def test_effective_principals_callback_returns_None(self):
         from repoze.bfg.security import Everyone
         request = DummyRequest({})
-        def callback(userid):
+        def callback(userid, request):
             return None
         policy = self._makeOne(callback, {'userid':'fred'})
         self.assertEqual(policy.effective_principals(request), [Everyone])
@@ -237,7 +237,7 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         from repoze.bfg.security import Everyone
         from repoze.bfg.security import Authenticated
         request = DummyRequest({})
-        def callback(userid):
+        def callback(userid, request):
             return ['group.foo']
         policy = self._makeOne(callback, {'userid':'fred'})
         self.assertEqual(policy.effective_principals(request),

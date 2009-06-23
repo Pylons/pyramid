@@ -20,6 +20,18 @@ Documentation
 - Conditional documentation in installation section ("how to install a
   Python interpreter").
 
+Backwards Incompatibilities
+---------------------------
+
+- The ``callback`` argument of the ``repoze.bfg.authentication``
+  authentication policies named ``RepozeWho1AuthenticationPolicy``,
+  ``RemoteUserAuthenticationPolicy``, and
+  ``AuthTktAuthenticationPolicy`` now must accept two positional
+  arguments: the orginal argument accepted by each (userid or
+  identity) plus a second argument, which will be the current request.
+  Apologies, this is required to service finding groups when there is
+  no "global" database connection.
+
 1.0a1 (2009-06-22)
 ==================
 
