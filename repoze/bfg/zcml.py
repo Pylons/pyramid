@@ -62,7 +62,7 @@ def view(
     else:
         try:
             request_factories = _context.request_factories[route_name]
-        except KeyError:
+        except (KeyError, AttributeError):
             raise ConfigurationError(
                 'Unknown route_name "%s".  <route> definitions must be ordered '
                 'before the view definition which mentions the route\'s name '
