@@ -75,13 +75,13 @@ the policy, and pass it as the ``authentication_policy`` argument to
 the ``make_app`` function.  The first positional argument of an
 ``AuthTktAuthenticationPolicy`` is a secret used to encrypt cookie
 data.  Its second argument ("callback") should be a callable that
-accepts a userid (usually a string).  If the userid exists in the
-system, the callback should return a sequence of group identifiers (or
-an empty sequence if the user isn't a member of any groups).  If the
-userid *does not* exist in the system, the callback should return
-``None``.  We'll use "dummy" data to represent user and groups sources
-within ``run.py``.  In a "real" application this information would
-almost certainly come from some database.
+accepts a userid (usually a string) and a request object.  If the
+userid exists in the system, the callback should return a sequence of
+group identifiers (or an empty sequence if the user isn't a member of
+any groups).  If the userid *does not* exist in the system, the
+callback should return ``None``.  We'll use "dummy" data to represent
+user and groups sources within ``run.py``.  In a "real" application
+this information would almost certainly come from some database.
 
 We'll also use the opportunity to pass the ``RootFactory`` we created
 in the step above in as the first argument to ``make_app``.  When
