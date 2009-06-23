@@ -75,8 +75,7 @@ Source Compile Method
 It's useful to use a Python that *isn't* the "system" Python to
 develop your software (the authors of BFG never use the system Python
 to run BFG; always a self-compiled one).  Often the "system" Python is
-compiled with options that aren't optimal for web development, or they
-have
+compiled with options that aren't optimal for web development.
 
 To compile software on your UNIX system, typically you need
 development tools.  Often these can be installed via the package
