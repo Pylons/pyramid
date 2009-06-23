@@ -1,9 +1,9 @@
 .. _bfg_sql_wiki_tutorial:
 
-BFG URL Dispatch + SQLAlchemy Wiki Tutorial
+SQLAlchemy + BFG URL Dispatch Wiki Tutorial
 ===========================================
 
-This tutorial introduces a :term:`url dispatch` and :term:`SQLAlchemy`
+This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch`
 -based BFG application to a developer with at least passing
 familiarity to Python.  When we're done with the tutorial, the
 developer will have created a basic Wiki application with
