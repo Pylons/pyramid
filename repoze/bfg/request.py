@@ -1,3 +1,4 @@
+from zope.component import getUtility
 from zope.interface import implements
 from webob import Request as WebobRequest
 
@@ -10,6 +11,7 @@ from repoze.bfg.interfaces import IPOSTRequest
 from repoze.bfg.interfaces import IPUTRequest
 from repoze.bfg.interfaces import IDELETERequest
 from repoze.bfg.interfaces import IHEADRequest
+from repoze.bfg.interfaces import IRequestFactories
 
 def request_factory(environ):
     try:
@@ -19,7 +21,7 @@ def request_factory(environ):
 
     if 'bfg.routes.route' in environ:
         route = environ['bfg.routes.route']
-        request_factories = route.request_factories
+        request_factories = getUtility(IRequestFactories, name=route.name or '')
     else:
         request_factories = DEFAULT_REQUEST_FACTORIES
 

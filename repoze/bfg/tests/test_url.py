@@ -168,31 +168,40 @@ class TestRouteUrl(unittest.TestCase):
         from repoze.bfg.url import route_url
         return route_url(*arg, **kw)
 
-    def test_it(self):
+    def test_with_elements(self):
         from repoze.bfg.interfaces import IRoutesMapper
-        mapper = DummyRoutesMapper({'flub':DummyRoute({})})
+        mapper = DummyRoutesMapper(result='/1/2/3')
         from zope.component import getSiteManager
         sm = getSiteManager()
         sm.registerUtility(mapper, IRoutesMapper)
-        args = {'a':'1', 'b':'2', 'c':'3'}
-        environ = {'SERVER_NAME':'example.com', 'wsgi.url_scheme':'http',
-                   'SERVER_PORT':'80', 'wsgiorg.routing_args':((), args)}
-        request = DummyRequest(environ)
-        result = self._callFUT(request, 'flub', a=1, b=2, c=3)
-        self.assertEqual(result, 'http://example.com/1/2/3')
+        request = DummyRequest()
+        result = self._callFUT('flub', request, 'extra1', 'extra2',
+                               a=1, b=2, c=3, _query={'a':1},
+                               _anchor=u"foo")
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
+
+    def test_no_elements(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        mapper = DummyRoutesMapper(result='/1/2/3')
+        from zope.component import getSiteManager
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
+        request = DummyRequest()
+        result = self._callFUT('flub', request, a=1, b=2, c=3, _query={'a':1},
+                               _anchor=u"foo")
+        self.assertEqual(result,
+                         'http://example.com:5432/1/2/3?a=1#foo')
 
     def test_it_generation_error(self):
         from repoze.bfg.interfaces import IRoutesMapper
-        mapper = DummyRoutesMapper({'flub':DummyRoute({})})
+        mapper = DummyRoutesMapper(raise_exc=KeyError)
         from zope.component import getSiteManager
         sm = getSiteManager()
         sm.registerUtility(mapper, IRoutesMapper)
-        args = {'a':'1', 'b':'2', 'c':'3'}
-        mapper.raise_exc = True
-        environ = {'SERVER_NAME':'example.com', 'wsgi.url_scheme':'http',
-                   'SERVER_PORT':'80', 'wsgiorg.routing_args':((), args)}
-        request = DummyRequest(environ)
-        self.assertRaises(ValueError, self._callFUT, request, 'flub', a=1)
+        mapper.raise_exc = KeyError
+        request = DummyRequest()
+        self.assertRaises(KeyError, self._callFUT, 'flub', request, a=1)
         
 class DummyContext(object):
     def __init__(self, next=None):
@@ -206,24 +215,12 @@ class DummyRequest:
         self.environ = environ
 
 class DummyRoutesMapper:
-    encoding = 'utf-8'
-    hardcode_names = False
-    sub_domains = []
-    raise_exc = False
-    def __init__(self, routes, generate_result='/1/2/3', raise_exc=False):
-        self._routenames = routes
-        self.generate_result = generate_result
+    raise_exc = None
+    def __init__(self, result='/1/2/3', raise_exc=False):
+        self.result = result
         
     def generate(self, *route_args, **newargs):
         if self.raise_exc:
-            from routes.util import GenerationException
-            raise GenerationException
-        return self.generate_result
+            raise self.raise_exc
+        return self.result
     
-class DummyRoute:
-    filter = None
-    static = False
-    def __init__(self, defaults):
-        self.defaults = defaults
-        
-        

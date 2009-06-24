@@ -472,12 +472,16 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regadapt['args'][2], (IFoo, IDummy))
 
     def test_with_route_name(self):
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequestFactories
         class IFoo:
             pass
         class IDummyRequest:
             pass
         context = DummyContext()
-        context.request_factories = {'foo':{None:{'interface':IDummyRequest}}}
+        factories = {None:{'interface':IDummyRequest}}
+        sm = getSiteManager()
+        sm.registerUtility(factories, IRequestFactories, name='foo')
         view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IFoo, view=view, route_name='foo')
         actions = context.actions
@@ -671,19 +675,6 @@ class TestDeriveView(unittest.TestCase):
         self.failUnless('instance' in result.__name__)
         self.assertEqual(result(None, None), 'OK')
 
-class TestRouteRequirementFunction(unittest.TestCase):
-    def _callFUT(self, context, attr, expr):
-        from repoze.bfg.zcml import route_requirement
-        return route_requirement(context, attr, expr)
-
-    def test_it(self):
-        context = DummyContext()
-        context.context = DummyContext()
-        context.context.requirements = {}
-        self._callFUT(context, 'a', 'b')
-        self.assertEqual(context.context.requirements['a'], 'b')
-        self.assertRaises(ValueError, self._callFUT, context, 'a', 'b')
-
 class TestConnectRouteFunction(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -691,9 +682,9 @@ class TestConnectRouteFunction(unittest.TestCase):
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, directive):
+    def _callFUT(self, name, path, factory):
         from repoze.bfg.zcml import connect_route
-        return connect_route(directive)
+        return connect_route(name, path, factory)
 
     def _registerRoutesMapper(self):
         from zope.component import getGlobalSiteManager
@@ -703,145 +694,10 @@ class TestConnectRouteFunction(unittest.TestCase):
         gsm.registerUtility(mapper, IRoutesMapper)
         return mapper
 
-    def test_no_mapper(self):
-        directive = DummyRouteDirective()
-        self._callFUT(directive) # doesn't blow up when no routes mapper reg'd
-
     def test_defaults(self):
         mapper = self._registerRoutesMapper()
-        directive = DummyRouteDirective()
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][0], ('name', 'path'))
-        self.assertEqual(mapper.connections[0][1], {'requirements': {}})
-
-    def test_name_and_path(self):
-        mapper = self._registerRoutesMapper()
-        directive = DummyRouteDirective(name='abc', path='thepath')
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][0], ('abc', 'thepath',))
-        self.assertEqual(mapper.connections[0][1], {'requirements': {}})
-
-    def test_all_directives(self):
-        mapper = self._registerRoutesMapper()
-        def foo():
-            """ """
-        directive = DummyRouteDirective(
-            minimize=False, explicit=True, encoding='utf-8', static=True,
-            filter=foo, absolute=True, member_name='m', collection_name='c',
-            parent_member_name='p', parent_collection_name='c',
-            condition_method='GET', condition_subdomain=True,
-            condition_function=foo, subdomains=['a'],
-            name='thename', path='thepath',
-            factory=foo, view='view', permission='permission')
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][0], ('thename', 'thepath'))
-        pr = {'member_name':'p', 'collection_name':'c'}
-        c = {'method':'GET', 'sub_domain':['a'], 'function':foo}
-        D = mapper.connections[0][1]
-        
-        self.assertEqual(D['requirements'], {})
-        self.assertEqual(D['_minimize'],False)
-        self.assertEqual(D['_explicit'],True)
-        self.assertEqual(D['_encoding'],'utf-8')
-        self.assertEqual(D['_static'],True)
-        self.assertEqual(D['_filter'],foo)
-        self.assertEqual(D['_absolute'],True)
-        self.assertEqual(D['_member_name'], 'm')
-        self.assertEqual(D['_collection_name'], 'c')
-        self.assertEqual(D['_parent_resource'], pr)
-        self.assertEqual(D['conditions'], c)
-        route = mapper.matchlist[-1]
-        self.assertEqual(route._factory, foo)
-        self.assertEqual(route.request_factories,
-                         directive.context.request_factories['thename'])
-        
-
-    def test_condition_subdomain_true(self):
-        mapper = self._registerRoutesMapper()
-        directive = DummyRouteDirective(static=True, explicit=True,
-                                        condition_subdomain=True)
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][1],
-                         {'requirements': {},
-                          '_static':True,
-                          '_explicit':True,
-                          'conditions':{'sub_domain':True}
-                          })
-
-    def test_condition_function(self):
-        mapper = self._registerRoutesMapper()
-        def foo(e, r):
-            """ """
-        directive = DummyRouteDirective(static=True, explicit=True,
-                                        condition_function=foo)
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][1],
-                         {'requirements': {},
-                          '_static':True,
-                          '_explicit':True,
-                          'conditions':{'function':foo}
-                          })
-
-    def test_condition_method(self):
-        mapper = self._registerRoutesMapper()
-        directive = DummyRouteDirective(static=True, explicit=True,
-                                        condition_method='GET')
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][1],
-                         {'requirements': {},
-                          '_static':True,
-                          '_explicit':True,
-                          'conditions':{'method':'GET'}
-                          })
-
-    def test_request_type(self):
-        mapper = self._registerRoutesMapper()
-        directive = DummyRouteDirective(static=True, explicit=True,
-                                        request_type='GET')
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][1],
-                         {'requirements': {},
-                          '_static':True,
-                          '_explicit':True,
-                          'conditions':{'method':'GET'}
-                          })
-
-    def test_condition_method_and_request_type(self):
-        mapper = self._registerRoutesMapper()
-        directive = DummyRouteDirective(static=True, explicit=True,
-                                        request_type='GET',
-                                        condition_method='POST')
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][1],
-                         {'requirements': {},
-                          '_static':True,
-                          '_explicit':True,
-                          'conditions':{'method':'POST'}
-                          })
-
-
-    def test_subdomains(self):
-        mapper = self._registerRoutesMapper()
-        directive = DummyRouteDirective(name='name',
-                                        static=True, explicit=True,
-                                        subdomains=['a', 'b'])
-        self._callFUT(directive)
-        self.assertEqual(len(mapper.connections), 1)
-        self.assertEqual(mapper.connections[0][0], ('name', 'path'))
-        self.assertEqual(mapper.connections[0][1],
-                         {'requirements': {},
-                          '_static':True,
-                          '_explicit':True,
-                          'conditions':{'sub_domain':['a', 'b']}
-                          })
+        self._callFUT('name', 'path', 'factory')
+        self.assertEqual(mapper.connections, [('name', 'path', 'factory')])
 
 class TestRouteDirective(unittest.TestCase):
     def setUp(self):
@@ -850,48 +706,32 @@ class TestRouteDirective(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _getTargetClass(self):
-        from repoze.bfg.zcml import Route
-        return Route
-
-    def _makeOne(self, context, path, name, **kw):
-        return self._getTargetClass()(context, path, name, **kw)
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import route
+        return route(*arg, **kw)
 
     def test_defaults(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IRequestFactories
         context = DummyContext()
-        route = self._makeOne(context, 'path', 'name')
-        self.assertEqual(route.path, 'path')
-        self.assertEqual(route.name, 'name')
-        self.assertEqual(route.requirements, {})
+        self._callFUT(context, 'name', 'path')
+        self.failUnless(getUtility(IRequestFactories, name='name'))
 
-    def test_parent_collection_name_missing(self):
-        context = DummyContext()
-        from zope.configuration.exceptions import ConfigurationError
-        self.assertRaises(ConfigurationError, self._makeOne, context,
-                          'path', 'name', parent_member_name='a')
-        
-    def test_parent_collection_name_present(self):
-        context = DummyContext()
-        route = self._makeOne(context, 'path', 'name',
-                              parent_member_name='a',
-                              parent_collection_name='p')
-        self.assertEqual(route.parent_member_name, 'a')
-        self.assertEqual(route.parent_collection_name, 'p')
-
-    def test_after_with_view(self):
+    def test_with_view(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IRequestFactories
         from repoze.bfg.zcml import handler
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         
         context = DummyContext()
         view = Dummy()
-        route = self._makeOne(context, 'path', 'name', view=view)
-        route.after()
+        self._callFUT(context, 'name', 'path', view=view)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
-        factories = context.request_factories
-        request_iface = factories['name'][None]['interface']
+        factories = getUtility(IRequestFactories, name='name')
+        request_iface = factories[None]['interface']
 
         view_action = actions[0]
         view_callable = view_action['callable']
@@ -913,31 +753,28 @@ class TestRouteDirective(unittest.TestCase):
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
         self.assertEqual(route_callable, connect_route)
-        self.assertEqual(len(route_discriminator), 7)
+        self.assertEqual(len(route_discriminator), 4)
         self.assertEqual(route_discriminator[0], 'route')
         self.assertEqual(route_discriminator[1], 'name')
-        self.assertEqual(route_discriminator[2],'{}')
+        self.assertEqual(route_discriminator[2], None)
         self.assertEqual(route_discriminator[3], None)
-        self.assertEqual(route_discriminator[4], None)
-        self.assertEqual(route_discriminator[5], None)
-        self.assertEqual(route_discriminator[6], None)
-        self.assertEqual(route_args, (route,))
+        self.assertEqual(route_args, ('name', 'path', None))
 
-    def test_after_with_view_and_view_for(self):
+    def test_with_view_and_view_for(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IRequestFactories
         from repoze.bfg.zcml import handler
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         
         context = DummyContext()
         view = Dummy()
-        route = self._makeOne(context, 'path', 'name', view=view,
-                              view_for=IDummy)
-        route.after()
+        self._callFUT(context, 'name', 'path', view=view, view_for=IDummy)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
-        factories = context.request_factories
-        request_iface = factories['name'][None]['interface']
+        factories = getUtility(IRequestFactories, 'name')
+        request_iface = factories[None]['interface']
 
         view_action = actions[0]
         view_callable = view_action['callable']
@@ -959,23 +796,21 @@ class TestRouteDirective(unittest.TestCase):
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
         self.assertEqual(route_callable, connect_route)
-        self.assertEqual(len(route_discriminator), 7)
+        self.assertEqual(len(route_discriminator), 4)
         self.assertEqual(route_discriminator[0], 'route')
         self.assertEqual(route_discriminator[1], 'name')
-        self.assertEqual(route_discriminator[2],'{}')
+        self.assertEqual(route_discriminator[2], IDummy)
         self.assertEqual(route_discriminator[3], None)
-        self.assertEqual(route_discriminator[4], None)
-        self.assertEqual(route_discriminator[5], None)
-        self.assertEqual(route_discriminator[6], None)
-        self.assertEqual(route_args, (route,))
+        self.assertEqual(route_args, ('name', 'path', None,))
 
-    def test_after_without_view(self):
+    def test_without_view(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IRequestFactories
         from repoze.bfg.zcml import connect_route
         
         context = DummyContext()
         view = Dummy()
-        route = self._makeOne(context, 'path', 'name')
-        route.after()
+        self._callFUT(context, 'name', 'path')
         actions = context.actions
         self.assertEqual(len(actions), 1)
 
@@ -984,15 +819,35 @@ class TestRouteDirective(unittest.TestCase):
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
         self.assertEqual(route_callable, connect_route)
-        self.assertEqual(len(route_discriminator), 7)
+        self.assertEqual(len(route_discriminator), 4)
         self.assertEqual(route_discriminator[0], 'route')
         self.assertEqual(route_discriminator[1], 'name')
-        self.assertEqual(route_discriminator[2],'{}')
+        self.assertEqual(route_discriminator[2], None)
         self.assertEqual(route_discriminator[3], None)
-        self.assertEqual(route_discriminator[4], None)
-        self.assertEqual(route_discriminator[5], None)
-        self.assertEqual(route_discriminator[6], None)
-        self.assertEqual(route_args, (route,))
+        self.assertEqual(route_args, ('name','path', None))
+
+    def test_with_request_type(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IRequestFactories
+        from repoze.bfg.zcml import connect_route
+        
+        context = DummyContext()
+        view = Dummy()
+        self._callFUT(context, 'name', 'path', request_type="GET")
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        route_action = actions[0]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 4)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_discriminator[2], None)
+        self.assertEqual(route_discriminator[3], 'GET')
+        self.assertEqual(route_args, ('name','path', None))
 
 class TestZCMLConfigure(unittest.TestCase):
     i = 0
@@ -1360,44 +1215,12 @@ class DummyContext:
 class Dummy:
     pass
 
-class DummyRouteDirective:
-    path = 'path'
-    name = 'name'
-    view = None
-    view_for = None
-    permission = None
-    factory = None
-    minimize = True
-    encoding = None
-    static = False
-    filter = None
-    absolute = False
-    member_name = None
-    collection_name = None
-    condition_method = None
-    request_type = None
-    condition_subdomain = None
-    condition_function = None
-    parent_member_name = None
-    parent_collection_name = None
-    subdomains = None
-    explicit = False
-
-    def __init__(self, **kw):
-        if not 'requirements' in kw:
-            kw['requirements'] = {}
-        self.__dict__.update(kw)
-        self.context = DummyContext()
-        self.context.request_factories = {self.name:{}}
-
 class DummyMapper:
     def __init__(self):
         self.connections = []
-        self.matchlist = []
 
-    def connect(self, *arg, **kw):
-        self.connections.append((arg, kw))
-        self.matchlist.append(DummyRoute())
+    def connect(self, *args):
+        self.connections.append(args)
 
 class DummyRoute:
     pass

@@ -614,20 +614,14 @@ class TraversalContextURL(object):
             route = environ['bfg.routes.route']
             matchdict = environ['bfg.routes.matchdict'].copy()
             matchdict['traverse'] = path
-            # we can't use route.generate here because our matchdict
-            # keys are Unicode
-            if route.minimization:
-                segments = route.generate_minimized(matchdict)
-            else:
-                segments = route.generate_non_minimized(matchdict)
-            if segments is False:
-                raise ValueError(
-                    "Couldn't generate URL for matchdict %r" % matchdict)
+            try:
+                segments = route.generate(matchdict)
+            except KeyError, why:
+                raise KeyError(
+                    "Couldn't generate URL for matchdict %r: %s" %
+                    (matchdict, str(why)))
             app_url = request.application_url
-            if segments.startswith('/'):
-                return app_url + segments
-            else:
-                return app_url + '/' + segments
+            return app_url + segments
         else:
             app_url = request.application_url # never ends in a slash
             return app_url + path

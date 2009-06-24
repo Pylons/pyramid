@@ -28,21 +28,12 @@
         handler="repoze.bfg.zcml.forbidden"
         />
 
-  </meta:directives>
-
-  <meta:groupingDirective
-      namespace="http://namespaces.repoze.org/bfg"
+  <meta:directive
       name="route"
       schema="repoze.bfg.zcml.IRouteDirective"
-      handler="repoze.bfg.zcml.Route"
+      handler="repoze.bfg.zcml.route"
       />
 
-  <meta:directive
-      name="requirement"
-      namespace="http://namespaces.repoze.org/bfg"
-      usedIn="repoze.bfg.zcml.IRouteDirective"
-      schema="repoze.bfg.zcml.IRouteRequirementDirective"
-      handler="repoze.bfg.zcml.route_requirement"
-      />
+  </meta:directives>
 
 </configure>

@@ -4,18 +4,16 @@ import types
 from zope.configuration import xmlconfig
 
 from zope.component import getSiteManager
+from zope.component import getUtility
 from zope.component import queryUtility
 
 import zope.configuration.config
 
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
-from zope.configuration.fields import Tokens
 
 from zope.interface import Interface
-from zope.interface import implements
 
-from zope.schema import Bool
 from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IRoutesMapper
@@ -28,6 +26,7 @@ from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IUnauthorizedAppFactory
 from repoze.bfg.interfaces import ILogger
+from repoze.bfg.interfaces import IRequestFactories
 
 from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
 from repoze.bfg.request import named_request_factories
@@ -60,9 +59,8 @@ def view(
     if route_name is None:
         request_factories = DEFAULT_REQUEST_FACTORIES
     else:
-        try:
-            request_factories = _context.request_factories[route_name]
-        except (KeyError, AttributeError):
+        request_factories = queryUtility(IRequestFactories, name=route_name)
+        if request_factories is None:
             raise ConfigurationError(
                 'Unknown route_name "%s".  <route> definitions must be ordered '
                 'before the view definition which mentions the route\'s name '
@@ -93,6 +91,8 @@ def view(
         args = ('registerAdapter',
                 derived_view, (for_, request_type), IView, name, _context.info),
         )
+
+_view = view # for directives that take a view arg
 
 def view_utility(_context, view, iface):
     derived_view = derive_view(view)
@@ -164,145 +164,28 @@ class IRouteDirective(Interface):
     view_for = GlobalObject(title=u'view_for', required=False)
     permission = TextLine(title=u'permission', required=False)
     factory = GlobalObject(title=u'context factory', required=False)
-    minimize = Bool(title=u'minimize', required=False)
-    encoding = TextLine(title=u'encoding', required=False)
-    static = Bool(title=u'static', required=False)
-    filter = GlobalObject(title=u'filter', required=False)
-    absolute = Bool(title=u'absolute', required=False)
-    member_name = TextLine(title=u'member_name', required=False)
-    collection_name = TextLine(title=u'collection_name', required=False)
     request_type = TextLine(title=u'request_type', required=False)
-    condition_method = TextLine(title=u'condition_method', required=False)
-    condition_subdomain = TextLine(title=u'condition_subdomain', required=False)
-    condition_function = GlobalObject(title=u'condition_function',
-                                      required=False)
-    parent_member_name = TextLine(title=u'parent member_name', required=False)
-    parent_collection_name = TextLine(title=u'parent collection_name',
-                                      required=False)
-    explicit = Bool(title=u'explicit', required=False)
-    subdomains = Tokens(title=u'subdomains', required=False,
-                        value_type=TextLine())
 
-class Route(zope.configuration.config.GroupingContextDecorator):
+def route(_context, name, path, view=None, view_for=None, permission=None,
+          factory=None, request_type=None):
     """ Handle ``route`` ZCML directives
     """
-    view = None
-    view_for = None
-    permission = None
-    factory = None
-    minimize = True
-    encoding = None
-    static = False
-    filter = None
-    absolute = False
-    member_name = None
-    collection_name = None
-    condition_method = None
-    request_type = None
-    condition_subdomain = None
-    condition_function = None
-    parent_member_name = None
-    parent_collection_name = None
-    subdomains = None
-    explicit = False
+    sm = getSiteManager()
+    request_factories = named_request_factories(name)
+    sm.registerUtility(request_factories, IRequestFactories, name=name)
 
-    implements(zope.configuration.config.IConfigurationContext,
-               IRouteDirective)
+    if view:
+        _view(_context, permission, view_for, view, '', request_type, name)
 
-    def __init__(self, context, path, name, **kw):
-        self.validate(**kw)
-        self.requirements = {} # mutated by subdirectives
-        self.context = context
-        self.path = path
-        self.name = name
-        self.__dict__.update(**kw)
+    _context.action(
+        discriminator = ('route', name, view_for, request_type),
+        callable = connect_route,
+        args = (name, path, factory),
+        )
 
-    def validate(self, **kw):
-        parent_member_name = kw.get('parent_member_name')
-        parent_collection_name = kw.get('parent_collection_name')
-        if parent_member_name or parent_collection_name:
-            if not (parent_member_name and parent_collection_name):
-                raise ConfigurationError(
-                    'parent_member_name and parent_collection_name must be '
-                    'specified together')
-
-    def after(self):
-        context = self.context
-        name = self.name
-        if not hasattr(context, 'request_factories'):
-            context.request_factories = {}
-        context.request_factories[name] = named_request_factories(name)
-
-        if self.view:
-            view(context, self.permission, self.view_for, self.view, '',
-                 self.request_type, name)
-
-        method = self.condition_method or self.request_type
-
-        self.context.action(
-            discriminator = ('route', self.name, repr(self.requirements),
-                             method, self.condition_subdomain,
-                             self.condition_function, self.subdomains),
-            callable = connect_route,
-            args = (self,),
-            )
-
-def route_requirement(context, attr, expr):
-    route = context.context
-    if attr in route.requirements:
-        raise ValueError('Duplicate requirement', attr)
-    route.requirements[attr] = expr
-
-def connect_route(directive):
-    mapper = queryUtility(IRoutesMapper)
-    if mapper is None:
-        return
-    args = [directive.name, directive.path]
-    kw = dict(requirements=directive.requirements)
-    if not directive.minimize:
-        kw['_minimize'] = False
-    if directive.explicit:
-        kw['_explicit'] = True
-    if directive.encoding:
-        kw['_encoding'] = directive.encoding
-    if directive.static:
-        kw['_static'] = True
-    if directive.filter:
-        kw['_filter'] = directive.filter
-    if directive.absolute:
-        kw['_absolute'] = True
-    if directive.member_name:
-        kw['_member_name'] = directive.member_name
-    if directive.collection_name:
-        kw['_collection_name'] = directive.collection_name
-    if directive.parent_member_name and directive.parent_collection_name:
-            kw['_parent_resource'] = {
-                'member_name':directive.parent_member_name,
-                'collection_name':directive.parent_collection_name,
-                }
-    conditions = {}
-
-    # request_type and condition_method are aliases; condition_method
-    # "wins"
-    if directive.request_type:
-        conditions['method'] = directive.request_type
-    if directive.condition_method:
-        conditions['method'] = directive.condition_method
-    if directive.condition_subdomain:
-        conditions['sub_domain'] = directive.condition_subdomain
-    if directive.condition_function:
-        conditions['function'] = directive.condition_function
-    if directive.subdomains:
-        conditions['sub_domain'] = directive.subdomains
-    if conditions:
-        kw['conditions'] = conditions
-
-    result = mapper.connect(*args, **kw)
-    route = mapper.matchlist[-1]
-    route._factory = directive.factory
-    context = directive.context
-    route.request_factories = context.request_factories[directive.name]
-    return result
+def connect_route(name, path, factory):
+    mapper = getUtility(IRoutesMapper)
+    mapper.connect(name, path, factory)
 
 class IViewDirective(Interface):
     for_ = GlobalObject(

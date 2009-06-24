@@ -785,11 +785,11 @@ class TraversalContextURLTests(unittest.TestCase):
         one.__name__ = 'one'
         one.__parent__ = root
         route = DummyRoute()
-        route.non_minimized_result = False
+        route.raise_exc = KeyError
         request = DummyRequest({'bfg.routes.route':route,
                                 'bfg.routes.matchdict':{'a':1}})
         context_url = self._makeOne(one, request)
-        self.assertRaises(ValueError, context_url)
+        self.assertRaises(KeyError, context_url)
 
 class TestVirtualRoot(unittest.TestCase):
     def setUp(self):
@@ -1005,15 +1005,10 @@ class DummyContextURL:
         return '123'
 
 class DummyRoute:
-    minimization = False
-
-    minimized_result = 'example/'
-    non_minimized_result = '/example/'
-
-    def generate_minimized(self, kw):
+    result = '/example/'
+    raise_exc = None
+    def generate(self, kw):
         self.generate_kw = kw
-        return self.minimized_result
-
-    def generate_non_minimized(self, kw):
-        self.generate_kw = kw
-        return self.non_minimized_result
+        if self.raise_exc:
+            raise self.raise_exc
+        return self.result

@@ -230,6 +230,9 @@ class IAuthorizationPolicy(Interface):
     def principals_allowed_by_permission(context, permission):
         """ Return a set of principal identifiers allowed by the permission """
 
+class IRequestFactories(Interface):
+    """ Marker interface for utilities representing request factories """
+
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)
 VH_ROOT_KEY = 'HTTP_X_VHM_ROOT' 

@@ -1,4 +1,5 @@
 import unittest
+from repoze.bfg.testing import cleanUp
 
 class TestMakeRequestASCII(unittest.TestCase):
     def _callFUT(self, event):
@@ -103,22 +104,35 @@ class Test_HEADRequest(TestRequestSubclass, unittest.TestCase):
         return DEFAULT_REQUEST_FACTORIES['HEAD']['interface']
 
 class TestRequestFactory(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, environ):
         from repoze.bfg.request import request_factory
         return request_factory(environ)
 
-    def _getRequestFactory(self, name_or_iface=None):
-        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
-        return DEFAULT_REQUEST_FACTORIES[name_or_iface]['factory']
-
-    def _makeRoute(self):
-        route = DummyRoute()
+    def _registerRequestFactories(self, name=''):
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequestFactories
         factories = {}
         def factory(environ):
             return environ
         for name in (None, 'GET', 'POST', 'PUT', 'DELETE', 'HEAD'):
             factories[name] = {'factory':factory}
-        route.request_factories = factories
+        sm = getSiteManager()
+        sm.registerUtility(factories, IRequestFactories, name=name)
+        if name:
+            sm.registerUtility(factories, IRequestFactories, name='')
+
+    def _getRequestFactory(self, name_or_iface=None):
+        from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
+        return DEFAULT_REQUEST_FACTORIES[name_or_iface]['factory']
+
+    def _makeRoute(self, name=None):
+        route = DummyRoute(name)
         return route
 
     def test_no_route_no_request_method(self):
@@ -164,18 +178,21 @@ class TestRequestFactory(unittest.TestCase):
         self.failUnless(IHEADRequest.providedBy(result))
 
     def test_route_no_request_method(self):
+        self._registerRequestFactories()
         route = self._makeRoute()
         environ = {'bfg.routes.route':route}
         result = self._callFUT(environ)
         self.assertEqual(result, environ)
 
     def test_route_unknown(self):
+        self._registerRequestFactories()
         route = self._makeRoute()
         environ = {'bfg.routes.route':route, 'REQUEST_METHOD':'UNKNOWN'}
         result = self._callFUT(environ)
         self.assertEqual(result, environ)
 
     def test_route_known(self):
+        self._registerRequestFactories()
         route = self._makeRoute()
         environ = {'bfg.routes.route':route, 'REQUEST_METHOD':'GET'}
         result = self._callFUT(environ)
@@ -273,7 +290,8 @@ class TestDefaultRequestFactories(unittest.TestCase):
 
 
 class DummyRoute:
-    pass
+    def __init__(self, name):
+        self.name=name
 
 class DummyRequest:
     pass

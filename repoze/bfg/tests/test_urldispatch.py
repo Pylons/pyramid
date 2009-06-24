@@ -1,6 +1,33 @@
 import unittest
 from repoze.bfg.testing import cleanUp
 
+class TestRoute(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.urldispatch import Route
+        return Route
+
+    def _makeOne(self, *arg):
+        return self._getTargetClass()(*arg)
+
+    def test_ctor(self):
+        route = self._makeOne('name', 'matcher', 'generator', 'factory')
+        self.assertEqual(route.name, 'name')
+        self.assertEqual(route.matcher, 'matcher')
+        self.assertEqual(route.generator, 'generator')
+        self.assertEqual(route.factory, 'factory')
+
+    def test_match(self):
+        def matcher(path):
+            return 123
+        route = self._makeOne('name', matcher, 'generator', 'factory')
+        self.assertEqual(route.match('whatever'), 123)
+        
+    def test_generate(self):
+        def generator(path):
+            return 123
+        route = self._makeOne('name', 'matcher', generator, 'factory')
+        self.assertEqual(route.generate({}), 123)
+
 class RoutesRootFactoryTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -27,40 +54,27 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(mapper.default_root_factory, None)
 
     def test_no_route_matches(self):
-        get_root = make_get_root(123)
+        get_root = DummyRootFactory(123)
         mapper = self._makeOne(get_root)
         environ = self._getEnviron(PATH_INFO='/')
         result = mapper(environ)
         self.assertEqual(result, 123)
-        self.assertEqual(mapper.environ, environ)
 
     def test_route_matches(self):
-        get_root = make_get_root(123)
+        get_root = DummyRootFactory(123)
         mapper = self._makeOne(get_root)
-        mapper.connect('foo', 'archives/:action/:article', foo='foo')
+        mapper.connect('foo', 'archives/:action/:article')
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
         self.assertEqual(result, 123)
         routing_args = environ['wsgiorg.routing_args'][1]
-        self.assertEqual(routing_args['foo'], 'foo')
         self.assertEqual(routing_args['action'], 'action1')
         self.assertEqual(routing_args['article'], 'article1')
         self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
         self.assertEqual(environ['bfg.routes.route'].name, 'foo')
 
-    def test_unnamed_root_route_matches(self):
-        root_factory = make_get_root(123)
-        mapper = self._makeOne(root_factory)
-        mapper.connect('')
-        environ = self._getEnviron(PATH_INFO='/')
-        result = mapper(environ)
-        self.assertEqual(result, 123)
-        self.assertEqual(environ['bfg.routes.route'].name, None)
-        self.assertEqual(environ['bfg.routes.matchdict'], {})
-        self.assertEqual(environ['wsgiorg.routing_args'], ((), {}))
-
-    def test_named_root_route_matches(self):
-        root_factory = make_get_root(123)
+    def test_root_route_matches(self):
+        root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)
         mapper.connect('root', '')
         environ = self._getEnviron(PATH_INFO='/')
@@ -70,25 +84,19 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(environ['bfg.routes.matchdict'], {})
         self.assertEqual(environ['wsgiorg.routing_args'], ((), {}))
 
-    def test_unicode_in_route_default(self):
-        root_factory = make_get_root(123)
+    def test_root_route_matches2(self):
+        root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)
-        class DummyRoute:
-            routepath = ':id'
-            _factory = None
-        la = unicode('\xc3\xb1a', 'utf-8')
-        mapper.routematch = lambda *arg: ({la:'id'}, DummyRoute)
-        mapper.connect('whatever', ':la')
-        environ = self._getEnviron(PATH_INFO='/foo')
+        mapper.connect('root', '/')
+        environ = self._getEnviron(PATH_INFO='/')
         result = mapper(environ)
         self.assertEqual(result, 123)
-        self.assertEqual(environ['bfg.routes.route'], DummyRoute)
-        self.assertEqual(environ['bfg.routes.matchdict'], {u'\xf1a': 'id'})
-        routing_args = environ['wsgiorg.routing_args'][1]
-        self.assertEqual(routing_args[la], 'id')
+        self.assertEqual(environ['bfg.routes.route'].name, 'root')
+        self.assertEqual(environ['bfg.routes.matchdict'], {})
+        self.assertEqual(environ['wsgiorg.routing_args'], ((), {}))
 
     def test_fallback_to_default_root_factory(self):
-        root_factory = make_get_root(123)
+        root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)
         mapper.connect('wont', 'wont/:be/:found')
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
@@ -101,20 +109,50 @@ class RoutesRootFactoryTests(unittest.TestCase):
         mapper.connect('whatever', 'archives/:action/:article')
         self.assertEqual(mapper.has_routes(), True)
 
-    def test_url_for(self):
-        root_factory = make_get_root(None)
-        mapper = self._makeOne(root_factory)
-        mapper.connect('whatever', 'archives/:action/:article')
-        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
-        result = mapper(environ)
-        from routes import url_for
-        result = url_for(action='action2', article='article2')
-        self.assertEqual(result, '/archives/action2/article2')
+    def test_generate(self):
+        mapper = self._makeOne(None)
+        def generator(kw):
+            return 123
+        route = DummyRoute(generator)
+        mapper.routes['abc'] =  route
+        self.assertEqual(mapper.generate('abc', {}), 123)
 
-def make_get_root(result):
-    def dummy_get_root(environ):
-        return result
-    return dummy_get_root
+class TestCompileRoute(unittest.TestCase):
+    def _callFUT(self, path):
+        from repoze.bfg.urldispatch import _compile_route
+        return _compile_route(path)
+
+    def test_no_star(self):
+        matcher, generator = self._callFUT('/foo/:baz/biz/:buz/bar')
+        self.assertEqual(matcher('/foo/baz/biz/buz/bar'),
+                         {'baz':'baz', 'buz':'buz'})
+        self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
+        self.assertEqual(generator({'baz':1, 'buz':2}), '/foo/1/biz/2/bar')
+
+    def test_with_star(self):
+        matcher, generator = self._callFUT('/foo/:baz/biz/:buz/bar*traverse')
+        self.assertEqual(matcher('/foo/baz/biz/buz/bar'),
+                         {'baz':'baz', 'buz':'buz', 'traverse':''})
+        self.assertEqual(matcher('/foo/baz/biz/buz/bar/everything/else/here'),
+                         {'baz':'baz', 'buz':'buz',
+                          'traverse':'/everything/else/here'})
+        self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
+        self.assertEqual(generator(
+            {'baz':1, 'buz':2, 'traverse':u'/a/b'}), '/foo/1/biz/2/bar/a/b')
+
+    def test_no_beginning_slash(self):
+        matcher, generator = self._callFUT('foo/:baz/biz/:buz/bar')
+        self.assertEqual(matcher('/foo/baz/biz/buz/bar'),
+                         {'baz':'baz', 'buz':'buz'})
+        self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
+        self.assertEqual(generator({'baz':1, 'buz':2}), '/foo/1/biz/2/bar')
+
+
+class DummyRootFactory(object):
+    def __init__(self, result):
+        self.result = result
+    def __call__(self, environ):
+        return self.result
 
 class DummyContext(object):
     """ """
@@ -122,3 +160,7 @@ class DummyContext(object):
 class DummyRequest(object):
     """ """
     
+class DummyRoute(object):
+    def __init__(self, generator):
+        self.generate = generator
+        

@@ -10,43 +10,88 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.traversal import TraversalContextURL
 from repoze.bfg.traversal import quote_path_segment
 
-from routes import URLGenerator
-from routes.util import GenerationException
-
-def route_url(request, route_name, **kw):
+def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named BFG route.
     
     Use the request object as the first positional argument.  Use the
-    route's ``name`` as the second positional argument.  Use keyword
-    arguments to supply values which match any dynamic path elements
-    in the route definition.  Raises a ValueError exception if the URL
-    cannot be generated when the
+    route's ``name`` as the second positional argument.  Additional
+    keyword elements are appended to the URL as path segments after it
+    is generated.
+    
+    Use keyword arguments to supply values which match any dynamic
+    path elements in the route definition.  Raises a KeyError
+    exception if the URL cannot be generated for any reason (not
+    enough arguments, for example).
 
     For example, if you've defined a route named "foobar" with the path
     ``:foo/:bar/*traverse``::
 
-        route_url(request, 'foobar', foo='1')          => <ValueError exception>
-        route_url(request, 'foobar', foo='1', bar='2') => <ValueError exception>
-        route_url('foobar', foo='1', bar='2',
+        route_url('foobar', request, foo='1')          => <KeyError exception>
+        route_url('foobar', request, foo='1', bar='2') => <KeyError exception>
+        route_url('foobar', request, foo='1', bar='2',
                    'traverse='a/b)                     =>  http://e.com/1/2/a/b
 
-    All keys given to ``route_url`` are sent to the BFG Routes "mapper"
-    instance for generation except for::
-        
-        anchor          specifies the anchor name to be appened to the path
-        host            overrides the default host if provided
-        protocol        overrides the default (current) protocol if provided
-        qualified       return a fully qualified URL (default True)
+    If a keyword argument ``_query`` is present, it will used to
+    compose a query string that will be tacked on to the end of the
+    URL.  The value of ``query`` must be a sequence of two-tuples *or*
+    a data structure with an ``.items()`` method that returns a
+    sequence of two-tuples (presumably a dictionary).  This data
+    structure will be turned into a query string per the documentation
+    of ``repoze.url.urlencode`` function.  After the query data is
+    turned into a query string, a leading ``?`` is prepended, and the
+    the resulting string is appended to the generated URL.
 
+    .. note:: Python data structures that are passed as ``_query``
+              which are sequences or dictionaries are turned into a
+              string under the same rules as when run through
+              urllib.urlencode with the ``doseq`` argument equal to
+              ``True``.  This means that sequences can be passed as
+              values, and a k=v pair will be placed into the query
+              string for each value.
+
+    If a keyword argument ``_anchor`` is present, its string
+    representation will be used as a named anchor in the generated URL
+    (e.g. if ``anchor`` is passed as ``foo`` and the model URL is
+    ``http://example.com/model/url``, the resulting generated URL will
+    be ``http://example.com/model/url#foo``).
+
+    .. note:: If ``_anchor`` is passed as a string, it should be UTF-8
+              encoded. If ``anchor`` is passed as a Unicode object, it
+              will be converted to UTF-8 before being appended to the
+              URL.  The anchor value is not quoted in any way before
+              being appended to the generated URL.
+
+    If both ``anchor`` and ``query`` are specified, the anchor element
+    will always follow the query element,
+    e.g. ``http://example.com?foo=1#bar``.
+
+    This function raises a ``KeyError`` if the route cannot be
+    generated due to missing replacement names.  Extra replacement
+    names are ignored.
     """
-    if not 'qualified' in kw:
-        kw['qualified'] = True
-    try:
-        mapper = getUtility(IRoutesMapper)
-        generator = URLGenerator(mapper, request.environ)
-        return generator(route_name, **kw)
-    except GenerationException, why:
-        raise ValueError(str(why))
+    mapper = getUtility(IRoutesMapper)
+    path = mapper.generate(route_name, kw) # raises KeyError if generate fails
+
+    anchor = ''
+    qs = ''
+
+    if '_query' in kw:
+        qs = '?' + urlencode(kw['_query'], doseq=True)
+
+    if '_anchor' in kw:
+        anchor = kw['_anchor']
+        if isinstance(anchor, unicode):
+            anchor = anchor.encode('utf-8')
+        anchor = '#' + anchor
+
+    if elements:
+        suffix = '/'.join([quote_path_segment(s) for s in elements])
+        if not path.endswith('/'):
+            suffix = '/' + suffix
+    else:
+        suffix = ''
+
+    return request.application_url + path + suffix + qs + anchor
 
 def model_url(model, request, *elements, **kw):
     """
