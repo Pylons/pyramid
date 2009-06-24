@@ -271,6 +271,13 @@ Glossary
     registry`.  You can also use decorators to configure views in
     :mod:`repoze.bfg`; see
     :ref:`mapping_views_to_urls_using_a_decorator_section`.
+  Zope Component Architecture
+    The `Zope Component Architecture
+    <http://www.muthukadan.net/docs/zca.html>`_ (aka ZCA) is a system
+    which allows for application pluggability and complex dispatching
+    based on objects which implement an :term:`interface`.
+    :mod:`repoze.bfg` uses the ZCA "under the hood" to perform view
+    dispatching and other application configuration tasks.
   ReStructuredText
     A `plain text format <http://docutils.sourceforge.net/rst.html>`_
     that is the defacto standard for descriptive text shipped in

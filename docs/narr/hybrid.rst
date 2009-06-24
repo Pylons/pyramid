@@ -22,7 +22,10 @@ matching, 2) root factories and 3) the traversal algorithm, and the
 interactions between all of them.  Therefore, use of this pattern is
 not recommended unless you *really* need to use it.
 
-It's useful to read :ref:`router_chapter` to get a more holistic
+This is a advanced topic that has non-trivial corner cases; you may
+need to understand more deeply how :mod:`repoze.bfg` works to
+understand the concepts discussed in this chapter.  To that end, it's
+useful to read :ref:`router_chapter` to get a more holistic
 understanding of what's happening "under the hood" to use this
 feature.
 
@@ -249,6 +252,113 @@ Corner Cases
 A number of corner case "gotchas" exist when using a hybrid
 application.  Let's see what they are.
 
+.. _globalviews_corner_case:
+
+"Global" Views Match Any Route When A More Specific View Doesn't
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that views that *don't* mention a ``route_name`` will *also*
+match when *any* route matches.  For example, the "bazbuz" view below
+will be found if the route named "abc" below is matched.
+
+.. code-block:: xml
+
+   <route
+     path="/abc/*traverse"
+     name="abc"
+     view=".views.abc"
+     />
+
+   <view
+     name="bazbuz"
+     view=".views.bazbuz"
+     />
+
+To override the behavior of the "bazbuz" view when this route matches,
+use an additional view that mentions the route name explicitly.
+
+.. code-block:: xml
+
+   <route
+     path="/abc/*traverse"
+     name="abc"
+     view=".views.abc"
+     />
+
+   <view
+     name="bazbuz"
+     view=".views.bazbuz"
+     />
+
+   <view
+     name="bazbuz"
+     route_name="abc"
+     view=".views.bazbuz2"
+     />
+
+In the above setup, when no route matches, and traversal finds the
+view name to be "bazbuz", the ``.views.bazbuz`` view will be used.
+However, if the "abc" route matches, and traversal finds the view name
+to be "bazbuz", the ``.views.bazbuz2`` view will be used.
+
+``context`` Type (aka "for") Registrations Bind More Tightly Than ``request``  Type Registrations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This corner case is only interesting if you are using a hybrid
+application and you believe the "wrong" view is being called for a
+given request.
+
+This explanation requires a little "inside baseball" knowledge of how
+:mod:`repoze.bfg` works.  :mod:`repoze.bfg` uses the :term:`Zope
+Component Architecture` under the hood to dispatch a request to a
+:term:`view`.  In Zope Component Architecture-speak, a view is an
+"multi adapter" registered for a :term:`context` type and a
+:term:`request` type as well as a particular :term:`view name`.  When
+a request is generated and a context is found by the :mod:`repoze.bfg`
+:term:`router`, it uses these two values, along with the :term:`view
+name` to try to locate a view callable.
+
+A view is registered for a ``route`` either as its default view via
+the ``view=`` attribute of a ``route`` declaration in ZCML *or* as a
+standalone ``<view>`` declaration (or via the ``@bfg_route``
+decorator) which has a ``route_name`` that matches the route's name).
+At startup time, when such a registration is encountered, the view is
+registered for the ``context`` type ``None`` (meaning *any* context)
+and a *special* request type which is dynamically generated.  This
+request type also derives from a "base" request type, which is what
+allows it to match against views defined without a route name (see
+:ref:`globalviews_corner_case`).
+
+When a request URL matches a ``<route>`` path, the special request
+type interface mentioned in the previous paragraph is attached to the
+``request`` object as it is created.  The *root* found by the router
+is based on either the route's ``factory`` (or the default root
+factory if no ``factory`` is mentioned in the ``<route>``
+declaration).  This root is eventually resolved to a ``context`` via
+:term:`traversal`.  This ``context`` will either have some particular
+interface, or it won't, depending on the result of traversal.
+
+Given how view dispatch works, since the registration made "under the
+hood" for views that match a route use the (very weakly binding)
+``None`` value as the context value's interface, if the context that
+is found has a specific interface, and a global view statement is
+registered against this interface as its context interface, it's
+likely that the *global* view will match *before* the view that is
+attached to the route unless the ``view_for`` attribute is used on the
+``route`` registration to match the "correct" interface first (because
+then both the request type and the context type are "more specific"
+for the view registration).
+
+What it all boils down to is: if a request that matches a route
+resolves to a view you don't expect it to, use the ``view_for``
+attribute of the ``route`` statement (*or* the ``for`` attribute of
+the ZCML statement that also has a ``route_name`` *or* the equivalent
+``for_`` parameter to the ``@bfg_view`` decorator that also has a
+``route_name`` parameter) to name the specific context interface you
+want the route-related view to match.
+
+Yes, that was as painful for me to write as it was for you to read.
+
 Registering a Default View for a Route That has a ``view`` attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -341,53 +451,6 @@ you must the special ``*traverse`` token to the route's "path"., e.g.:
      view=".views.bazbuz"
      route_name="abc"
      />
-
-"Global" Views Match Any Route When A More Specific View Doesn't
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Note that views that *don't* mention a ``route_name`` will *also*
-match when *any* route matches.  For example, the "bazbuz" view below
-will be found if the route named "abc" below is matched.
-
-.. code-block:: xml
-
-   <route
-     path="/abc/*traverse"
-     name="abc"
-     view=".views.abc"
-     />
-
-   <view
-     name="bazbuz"
-     view=".views.bazbuz"
-     />
-
-To override the behavior of the "bazbuz" view when this route matches,
-use an additional view that mentions the route name explicitly.
-
-.. code-block:: xml
-
-   <route
-     path="/abc/*traverse"
-     name="abc"
-     view=".views.abc"
-     />
-
-   <view
-     name="bazbuz"
-     view=".views.bazbuz"
-     />
-
-   <view
-     name="bazbuz"
-     route_name="abc"
-     view=".views.bazbuz2"
-     />
-
-In the above setup, when no route matches, and traversal finds the
-view name to be "bazbuz", the ``.views.bazbuz`` view will be used.
-However, if the "abc" route matches, and traversal finds the view name
-to be "bazbuz", the ``.views.bazbuz2`` view will be used.
 
 Route Ordering
 ~~~~~~~~~~~~~~
