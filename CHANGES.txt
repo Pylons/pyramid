@@ -13,6 +13,9 @@ Documentation
 - Added a "corner case" explanation to the "Hybrid Apps" chapter
   explaining what to do when "the wrong" view is matched.
 
+- Use ``repoze.bfg.url.route_url`` API in tutorials rather than Routes
+  ``url_for`` API.
+
 Features
 --------
 

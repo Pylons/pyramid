@@ -4,11 +4,10 @@ from docutils.core import publish_parts
 
 from webob.exc import HTTPFound
 
-from routes import url_for
-
 from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.view import static
 from repoze.bfg.security import authenticated_userid
+from repoze.bfg.url import route_url
 
 from tutorial.models import DBSession
 from tutorial.models import Page
@@ -19,7 +18,7 @@ wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 static_view = static('templates/static')
 
 def view_wiki(request):
-    return HTTPFound(location = url_for('view_page', pagename='FrontPage'))
+    return HTTPFound(location = route_url('view_page', pagename='FrontPage'))
 
 def view_page(request):
     pagename = request.matchdict['pagename']
@@ -30,15 +29,15 @@ def view_page(request):
         word = match.group(1)
         exists = session.query(Page).filter_by(name=word).all()
         if exists:
-            view_url = url_for('view_page', pagename=word)
+            view_url = route_url('view_page', pagename=word)
             return '<a href="%s">%s</a>' % (view_url, word)
         else:
-            add_url = url_for('add_page', pagename=word)
+            add_url = route_url('add_page', pagename=word)
             return '<a href="%s">%s</a>' % (add_url, word)
 
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
-    edit_url = url_for('edit_page', pagename=pagename)
+    edit_url = route_url('edit_page', pagename=pagename)
     logged_in = authenticated_userid(request)
     return render_template_to_response('templates/view.pt',
                                        request = request,
@@ -54,8 +53,8 @@ def add_page(request):
         body = request.params['body']
         page = Page(name, body)
         session.add(page)
-        return HTTPFound(location = url_for('view_page', pagename=name))
-    save_url = url_for('add_page', pagename=name)
+        return HTTPFound(location = route_url('view_page', pagename=name))
+    save_url = route_url('add_page', pagename=name)
     page = Page('', '')
     logged_in = authenticated_userid(request)
     return render_template_to_response('templates/edit.pt',
@@ -71,7 +70,7 @@ def edit_page(request):
     if 'form.submitted' in request.params:
         page.data = request.params['body']
         session.add(page)
-        return HTTPFound(location = url_for('view_page',
+        return HTTPFound(location = route_url('view_page',
                                             pagename=name))
 
     logged_in = authenticated_userid(request)
@@ -79,6 +78,6 @@ def edit_page(request):
                                        request = request,
                                        page = page,
                                        logged_in = logged_in,
-                                       save_url = url_for('edit_page',
+                                       save_url = route_url('edit_page',
                                                           pagename=name),
                                        )

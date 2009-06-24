@@ -1,16 +1,14 @@
 from webob.exc import HTTPFound
 
-from routes import url_for
-
 from repoze.bfg.chameleon_zpt import render_template_to_response
-
 from repoze.bfg.security import remember
 from repoze.bfg.security import forget
+from repoze.bfg.url import route_url
 
 from tutorial.run import USERS
 
 def login(request):
-    login_url = url_for('login')
+    login_url = route_url('login')
     referrer = request.environ.get('HTTP_REFERER', '/')
     if referrer == login_url:
         referrer = '/' # never use the login form itself as came_from
@@ -39,6 +37,6 @@ def login(request):
     
 def logout(request):
     headers = forget(request)
-    return HTTPFound(location = url_for('view_wiki'),
+    return HTTPFound(location = route_url('view_wiki'),
                      headers = headers)
     

@@ -71,10 +71,11 @@ The ``view_wiki`` function will respond as the default view of a
 ``Wiki`` model object.  It always redirects to a URL which represents
 the path to our "FrontPage".  It returns an instance of the
 ``webob.exc.HTTPFound`` class (instances of which implement the WebOb
-:term:`response` interface), It will use the the ``routes.url_for``
-API to construct a URL to the ``FrontPage`` page
-(e.g. ``http://localhost:6543/FrontPage``), and will use it as the
-"location" of the HTTPFound response, forming an HTTP redirect.
+:term:`response` interface), It will use the the
+``repoze.bfg.url.route_url`` API to construct a URL to the
+``FrontPage`` page (e.g. ``http://localhost:6543/FrontPage``), and
+will use it as the "location" of the HTTPFound response, forming an
+HTTP redirect.
 
 The ``view_page`` view function
 -------------------------------
