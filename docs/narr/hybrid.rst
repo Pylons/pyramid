@@ -461,8 +461,8 @@ statement ordering is very important, because routes are evaluated in
 a specific order, unlike traversal, which depends on emergent behavior
 rather than an ordered list of directives.
 
-A ``<route>`` Statement *Must* Precede Any ``<view>>`` Statement Which Mentions It
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A ``<route>`` Statement *Must* Precede Any ``<view>`` Statement Which Mentions It
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A ``<route>`` declaration *must* precede (in XML order) any ``<view>``
 declaration which names it as a ``route_name``.  If it does not, at
