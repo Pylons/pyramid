@@ -20,23 +20,23 @@ processing?
    :mod:`repoze.bfg` :term:`router` object.
 
 #. To service :term:`url dispatch`, the :mod:`repoze.bfg`
-   :term:`router` calls a :term:`Routes` "mapper" callable, which acts
-   as a :term:`root factory`.  The job of the mapper is to examine the
-   ``PATH_INFO`` and other various keys in the environment to
-   determine whether any user-defined :term:`route` matches the
-   current WSGI environment.  The :term:`router` passes the WSGI
-   environment as an argument to the mapper.
+   :term:`router` calls a :term:`URL dispatch` "root factory wrapper"
+   callable, which acts as a :term:`root factory`.  The job of the
+   mapper is to examine the ``PATH_INFO`` and other various keys in
+   the environment to determine whether any user-defined :term:`route`
+   matches the current WSGI environment.  The :term:`router` passes
+   the WSGI environment as an argument to the mapper.
 
 #. If any route matches, the WSGI environment is mutated; a
    ``bfg.routes.route`` key and a ``bfg.routes.matchdict`` are added
    to the WSGI environment.  If a route *doesn't* match, neither of
    these keys is added to the WSGI environment.
 
-#. Regardless of whether any route matched or not, the Routes mapper
-   returns a root object.  If a particular :term:`route` named a
-   ``factory`` argument, this factory is used to generate the root
-   object, otherwise a default :term:`root factory` is used.  If a
-   root factory argument was passed to the
+#. Regardless of whether any route matched or not, the :term:`URL
+   dispatch` mapper returns a root object.  If a particular
+   :term:`route` named a ``factory`` argument, this factory is used to
+   generate the root object, otherwise a default :term:`root factory`
+   is used.  If a root factory argument was passed to the
    ``repoze.bfg.router.make_app``, that callable is used to generate
    the root object.  If the root factory argument passed to
    ``make_app`` is ``None``, a default root factory is used to

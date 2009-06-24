@@ -13,11 +13,12 @@ components.  Examples: `Django's URL dispatcher
 <http://www.djangoproject.com/documentation/url_dispatch/>`_ and the
 :term:`Routes` URL mapping system.
 
-:mod:`repoze.bfg` supports :term:`URL dispatch` via :term:`Routes`.
-:term:`URL dispatch` is convenient and straightforward.  When you
-limit your application to using URL dispatch, you know every URL that
-your application might generate or respond to, and all the URL
-matching elements are listed in a single place.
+:mod:`repoze.bfg` supports :term:`URL dispatch` via a subsystem that
+was inpsired by :term:`Routes`.  :term:`URL dispatch` is convenient
+and straightforward.  When you limit your application to using URL
+dispatch, you know every URL that your application might generate or
+respond to, and all the URL matching elements are listed in a single
+place.
 
 Like :term:`Zope`, :mod:`repoze.bfg`, in contrast to URL dispatch, can
 also map URLs to code slightly differently, by using using object
@@ -35,8 +36,8 @@ Differences Between Traversal and URL Dispatch
 item "below" ``members`` in the URL represents a member in the system.
 You just match everything "below" ``members`` to a particular view.
 
-For example, you might configure a :term:`Routes` URL map to match
-against the following URL patterns::
+For example, you might configure a :term:`route` to match against the
+following URL patterns::
 
   archives/:year/:month/:day
   members/:membername

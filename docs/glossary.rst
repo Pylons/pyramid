@@ -84,11 +84,13 @@ Glossary
     returns responses to the WSGI server on behalf of your
     :mod:`repoze.bfg` application.
   URL dispatch
+
     An alternative to graph traversal as a mechanism for locating a
-    :term:`context` for a :term:`view`.  When you use :term:`Routes`
+    :term:`context` for a :term:`view`.  When you use a :term:`route`
     in your :mod:`repoze.bfg` application via a ``<route>``
     declaration in ZCML, you are using URL dispatch. See the
     :ref:`urldispatch_chapter` for more information.
+
   Context
     An object in the system that is found during :term:`traversal` or
     :term:`URL dispatch` based on URL data; if it's found via
@@ -251,14 +253,13 @@ Glossary
   Routes
     A `system by Ben Bangert <http://routes.groovie.org/>`_ which
     parses URLs and compares them against a number of user defined
-    mappings. In terms of :mod:`repoze.bfg`, a Route can supplant
-    graph traversal when deciding which *view* should be called.  See
-    :ref:`urldispatch_chapter` for more information about Routes integration 
-    in :mod:`repoze.bfg`.
+    mappings. The URL pattern matching syntax in :mod:`repoze.bfg` is
+    inspired by the Routes syntax (which was inspired by Ruby On
+    Rails pattern syntax).
   Route
-    A single pattern matched by the :term:`Routes` subsystem, which
-    generally resolves to a :term:`root factory` (and then ultimately
-    a :term:`view`).  See also :term:`url dispatch`.
+    A single pattern matched by the :term:`url dispatch` subsystem,
+    which generally resolves to a :term:`root factory` (and then
+    ultimately a :term:`view`).  See also :term:`url dispatch`.
   ZCML
     `Zope Configuration Markup Language
     <http://www.muthukadan.net/docs/zca.html#zcml>`_, the XML dialect

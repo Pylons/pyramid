@@ -5,19 +5,11 @@ URL Dispatch
 
 It is common for :mod:`repoze.bfg` developers to rely on
 :term:`traversal` to map URLs to code.  However, :mod:`repoze.bfg` can
-also map URLs to code via :term:`URL dispatch` using the
-:term:`Routes` framework.  The :term:`Routes` framework is a Python
-reimplementation of the `Rails routes system
-<http://manuals.rubyonrails.com/read/chapter/65>`_.  It is a mechanism
-which allows you to declaratively map URLs to code.  
-
-.. note:: In common :term:`Routes` lingo, the code that it maps URLs
-          to is defined by a *controller* and an *action*.  However,
-          neither concept (controller nor action) exists within
-          :mod:`repoze.bfg`.  Instead, when you map a URL pattern to
-          code in bfg, you will map the URL patterm to a :term:`view`.
-          Once the context and view are found, the view will be called
-          with a :term:`context` and a :term:`request`.
+also map URLs to code via :term:`URL dispatch`.  The presence of
+``<route>`` statements in ZCML are a sign that you're using URL
+dispatch.  Using ``<route>`` statements in ZCML allows you to
+declaratively map URLs to code.  The syntax of the pattern matching
+language used by :mod:`repoze.bfg` is close to that of :term:`Routes`.
 
 It often makes a lot of sense to use :term:`URL dispatch` instead of
 :term:`traversal` in an application that has no natural hierarchy.
@@ -38,13 +30,6 @@ given URL to :term:`context` and :term:`view name`.
 To allow for URL dispatch to be used, the :mod:`repoze.bfg` framework
 allows you to inject ``route`` ZCML directives into your application's
 ``configure.zcml`` file.
-
-.. note:: Each ZCML ``route`` statement equates to a call to the
-          :term:`Routes` ``Mapper`` object's ``connect`` method.  See
-          `Setting up routes
-          <http://routes.groovie.org/manual.html#setting-up-routes>`_
-          for examples of using a Routes ``Mapper`` object outside of
-          :mod:`repoze.bfg`.
 
 When any ``route`` ZCML directive is present in an application's
 ``configure.zcml``, "under the hood" :mod:`repoze.bfg` wraps the
@@ -114,82 +99,10 @@ factory
   e.g. ``mypackage.models.MyFactoryClass``.  If this argument is not
   specified, a default root factory will be used.
 
-encoding
-
-  The `URL encoding <http://routes.groovie.org/manual.html#unicode>`_
-  for a match returned by this route.
-
-static
-
-  A boolean (true/false) indicating whether this route is `static
-  <http://routes.groovie.org/manual.html#static-named-routes>`_.
-
-filter
-
-  A Python dotted-path name to a Routes `filter function
-  <http://routes.groovie.org/manual.html#filter-functions>`_.
-
 request_type
 
-  The name of the HTTP method used as the Routes `condition method
-  <http://routes.groovie.org/manual.html#conditions>`_.  A string,
-  e.g. ``GET`` or ``POST``.  Note that :term:`interface` references
-  don't work here as they do in the ``view`` decorator or ``bfg_view``
-  ZCML directive.  Only strings representing an HTTP method will work.
-
-condition_method
-
-  An alias for the ``request_type`` attribute.
-
-condition_subdomain
-
-  A field that contain a Routes `condition subdomain
-  <http://routes.groovie.org/manual.html#conditions>`_.
-
-condition_function
-
-  A python-dotted path name to a Routes `condition function
-  <http://routes.groovie.org/manual.html#conditions>`_.
-
-explicit
-
-  A boolean (true/false) indicating whether this route is `explicit
-  <http://routes.groovie.org/manual.html#overriding-route-memory>`_.
-
-subdomains
-
-  A field that contain one or more Routes `condition subdomains
-  <http://routes.groovie.org/manual.html#conditions>`_.  If this field
-  is used, the ``condition_subdomain`` attribute is ignored.
-
-Using the ``requirement`` Subdirective
---------------------------------------
-
-The ``route`` directive supports a subdirective named ``requirement``
-that allows you to specify Routes `requirement
-<http://routes.groovie.org/manual.html#requirements>`_ expressions.
-
-For example:
-
-.. code-block:: xml
-   :linenos:
-
-   <route 
-     name="archive"
-     path="archives/:year/:month"
-     view=".views.archive_view">
-
-   <requirement
-      attr="year"
-      expr="d{2,4}"
-      />
-
-   <requirement
-      attr="month"
-      expr="d{1,2}"
-      />
-
-   </route>
+  A string representing an HTTP method name, e.g. ``GET`` or ``POST``
+  or an interface representing a :term:`request type`.
 
 Example 1
 ---------
@@ -321,8 +234,8 @@ Example 4
 ---------
 
 An example of configuring a ``view`` declaration in ``configure.zcml``
-that maps a context found via :term:`Routes` URL dispatch to a view
-function is as follows:
+that maps a context found via URL dispatch to a view function is as
+follows:
 
 .. code-block:: xml
    :linenos:
@@ -364,8 +277,8 @@ application runs, if any URL matches the pattern
 ``archives/:article``, the ``.views.articles_view`` view will be
 called with its :term:`context` as a instance of the ``Article``
 class.  The ``Article`` instance will have keys and values matching
-the keys and values in the Routes routing dictionary associated with
-the request.
+the keys and values in the routing dictionary associated with the
+request.
 
 In this case in particular, when a user visits
 ``/archives/something``, the context will be an instance of the
@@ -399,11 +312,13 @@ this.
 .. code-block:: python
 
    from repoze.bfg.url import route_url
-   url = route_url(request, 'foo', a='1', b='2', c='3')
+   url = route_url('foo', request, a='1', b='2', c='3')
 
 This would return something like the string
 ``http://example.com/1/2/3`` (at least if the current protocol and
-hostname implied ``http:/example.com``).
+hostname implied ``http:/example.com``).  See the
+:mod:`repoze.bfg.url.route_url` API documentation for more
+information.
 
 Cleaning Up After a Request
 ---------------------------

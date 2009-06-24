@@ -92,10 +92,10 @@ application's Python code and templates.
    <http://www.sqlalchemy.org/>`_ also exist.  Use ``paster create -t
    bfg_zodb`` to create a project that depends on ZODB.  Use ``paster
    create -t bfg_routesalchemy`` to create a project that depends on
-   SQLAlchemy and Routes (uses only :term:`URL dispatch` and no
-   :term:`traversal`).  Use ``paster create -t bfg_alchemy`` to create
-   a project that depends on SQLAlchemy but *not* Routes (uses
-   only :term:`traversal` and no :term:`URL dispatch`).
+   SQLAlchemy and :term:`URL dispatch` (no :term:`traversal`).  Use
+   ``paster create -t bfg_alchemy`` to create a project that depends
+   on SQLAlchemy but *not* :term:`URL dispatch` (uses only
+   :term:`traversal`).
 
 Installing your Newly Created Project for Development
 -----------------------------------------------------
