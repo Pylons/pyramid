@@ -16,11 +16,11 @@ wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
 static_view = static('templates/static')
 
-def view_wiki(context, request):
+def view_wiki(request):
     return HTTPFound(location = route_url('view_page', request,
                                           pagename='FrontPage'))
 
-def view_page(context, request):
+def view_page(request):
     matchdict = request.matchdict
     session = DBSession()
     page = session.query(Page).filter_by(name=matchdict['pagename']).one()
@@ -44,7 +44,7 @@ def view_page(context, request):
                                        content = content,
                                        edit_url = edit_url)
 
-def add_page(context, request):
+def add_page(request):
     name = request.matchdict['pagename']
     if 'form.submitted' in request.params:
         session = DBSession()
@@ -60,7 +60,7 @@ def add_page(context, request):
                                        page = page,
                                        save_url = save_url)
     
-def edit_page(context, request):
+def edit_page(request):
     name = request.matchdict['pagename']
     session = DBSession()
     page = session.query(Page).filter_by(name=name).one()
