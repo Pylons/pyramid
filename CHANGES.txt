@@ -34,10 +34,10 @@ Documentation
 Features
 --------
 
-- Added the ``repoze.bfg.url.route_url`` API.  This is meant to
-  "front" for the Routes ``url_for`` API.  See the URL Dispatch
-  narrative chapter and the "repoze.bfg.url" module API documentation
-  for more information.
+- Added the ``repoze.bfg.url.route_url`` API.  This API allows you to
+  generate URLs based on ``<route>`` declarations.  See the URL
+  Dispatch narrative chapter and the "repoze.bfg.url" module API
+  documentation for more information.
 
 Backwards Incompatibilities
 ---------------------------
