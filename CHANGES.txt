@@ -7,6 +7,11 @@ Bug Fixes
 - ``model_url`` when passed a request that was generated as a result
   of a route match would fail in a call to ``route.generate``.
 
+- BFG-on-GAE didn't work due to a corner case bug in the fallback
+  Python implementation of ``threading.local`` (symptom:
+  "Initialization arguments are not supported").  Thanks to Michael
+  Bernstein for the bug report.
+
 Documentation
 -------------
 
