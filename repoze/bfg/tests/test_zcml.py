@@ -728,7 +728,7 @@ class TestConnectRouteFunction(unittest.TestCase):
         def foo():
             """ """
         directive = DummyRouteDirective(
-            minimize=True, explicit=True, encoding='utf-8', static=True,
+            minimize=False, explicit=True, encoding='utf-8', static=True,
             filter=foo, absolute=True, member_name='m', collection_name='c',
             parent_member_name='p', parent_collection_name='c',
             condition_method='GET', condition_subdomain=True,
@@ -743,7 +743,7 @@ class TestConnectRouteFunction(unittest.TestCase):
         D = mapper.connections[0][1]
         
         self.assertEqual(D['requirements'], {})
-        self.assertEqual(D['_minimize'],True)
+        self.assertEqual(D['_minimize'],False)
         self.assertEqual(D['_explicit'],True)
         self.assertEqual(D['_encoding'],'utf-8')
         self.assertEqual(D['_static'],True)
@@ -1364,24 +1364,25 @@ class DummyRouteDirective:
     path = 'path'
     name = 'name'
     view = None
-    factory = None
+    view_for = None
     permission = None
+    factory = None
+    minimize = True
     encoding = None
-    static = False
-    minimize = False
-    explicit = False
     static = False
     filter = None
     absolute = False
-    member_name = False
+    member_name = None
     collection_name = None
-    parent_member_name = None
-    parent_collection_name = None
     condition_method = None
     request_type = None
     condition_subdomain = None
     condition_function = None
+    parent_member_name = None
+    parent_collection_name = None
     subdomains = None
+    explicit = False
+
     def __init__(self, **kw):
         if not 'requirements' in kw:
             kw['requirements'] = {}

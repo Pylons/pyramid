@@ -1,7 +1,11 @@
 Next release
 ============
 
-- ...
+Bug Fixes
+---------
+
+- ``model_url`` when passed a request that was generated as a result
+  of a route match would fail in a call to ``route.generate``.
 
 1.0a2 (2009-06-23)
 ==================

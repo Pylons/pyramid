@@ -259,8 +259,8 @@ def connect_route(directive):
         return
     args = [directive.name, directive.path]
     kw = dict(requirements=directive.requirements)
-    if directive.minimize:
-        kw['_minimize'] = True
+    if not directive.minimize:
+        kw['_minimize'] = False
     if directive.explicit:
         kw['_explicit'] = True
     if directive.encoding:
