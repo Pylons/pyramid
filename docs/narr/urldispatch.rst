@@ -104,6 +104,65 @@ request_type
   A string representing an HTTP method name, e.g. ``GET`` or ``POST``
   or an interface representing a :term:`request type`.
 
+The Matchdict
+-------------
+
+The main purpose of a route is to match (nor not match) the
+``PATH_INFO`` provided during a request against a URL path pattern.
+When this URL path pattern is matched, a dictionary is placed on the
+request named ``matchdict`` with the values that match patterns in the
+``path`` element.  If the URL pattern does not match, no matchdict is
+generated.
+
+Path Pattern Syntax
+--------------------
+
+The path pattern syntax is simple.
+
+The path may start with a slash character.  If the path does not start
+with a slash character, an implicit slash will be prepended to it at
+matching time.  For example, the following paths are equivalent::
+
+    :foo/bar/baz
+
+and::
+
+     /:foo/bar/baz
+
+A path segments (an individual item between ``/`` characters in the
+path) may either be a literal string (e.g. ``foo``) *or* it may
+segment replacement marker (e.g. ``:foo``).  A segment replacement
+marker is in the format ``:name``, where this means "accept any
+characters up to the next slash and use this as the ``name`` matchdict
+value."  For example, the following pattern defines one literal
+segment ("foo") and two dynamic segments ("baz", and "bar")::
+
+    foo/:baz/:bar
+
+The above pattern will match these URLs, generating the followng
+matchdicts::
+
+   foo/1/2        -> {'baz':1, 'bar':2}
+   foo/abc/def    -> {'baz':abc, 'bar':2}
+
+It will not match the following patterns however:
+
+   foo/1/2/        -> No match (trailing slash)
+   bar/abc/def     -> First segment literal mismatch
+
+If the pattern has a ``*`` in it, the name which follows it is
+considered a "remainder match".  A remainder match must come at the
+end of the path pattern.  Unlike segment replacement markers, it does
+not need to be preceded by a slash.  For example::
+
+    foo/:baz/:bar*traverse
+
+The above pattern will match these URLs, generating the followng
+matchdicts::
+
+   foo/1/2/               -> {'baz':1, 'bar':2, 'traverse':'/'}
+   foo/abc/def/a/b/c/d    -> {'baz':abc, 'bar':2, 'traverse':'/a/b/c/d'}
+
 Example 1
 ---------
 

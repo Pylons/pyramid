@@ -1,7 +1,11 @@
 Next release
 ============
 
-- ....
+Documentation
+-------------
+
+- Add information to the URL Dispatch narrative documentation about
+  path pattern matching syntax.
 
 1.0a3 (2009-06-24)
 ==================
