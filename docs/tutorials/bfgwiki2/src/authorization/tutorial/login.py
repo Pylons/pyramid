@@ -8,7 +8,7 @@ from repoze.bfg.url import route_url
 from tutorial.run import USERS
 
 def login(request):
-    login_url = route_url('login')
+    login_url = route_url(request, 'login')
     referrer = request.environ.get('HTTP_REFERER', '/')
     if referrer == login_url:
         referrer = '/' # never use the login form itself as came_from
@@ -37,6 +37,6 @@ def login(request):
     
 def logout(request):
     headers = forget(request)
-    return HTTPFound(location = route_url('view_wiki'),
+    return HTTPFound(location = route_url(request, 'view_wiki'),
                      headers = headers)
     

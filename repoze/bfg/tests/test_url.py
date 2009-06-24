@@ -158,48 +158,41 @@ class UrlEncodeTests(unittest.TestCase):
         self.assertEqual(result, 'a=1')
 
 class TestRouteUrl(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.url import route_url
         return route_url(*arg, **kw)
 
     def test_it(self):
-        from routes import Mapper
-        mapper = Mapper(controller_scan=None, directory=None,
-                        explicit=True, always_scan=False)
+        from repoze.bfg.interfaces import IRoutesMapper
+        mapper = DummyRoutesMapper({'flub':DummyRoute({})})
+        from zope.component import getSiteManager
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
         args = {'a':'1', 'b':'2', 'c':'3'}
-        mapper.connect('flub', ':a/:b/:c')
-        mapper.create_regs([])
         environ = {'SERVER_NAME':'example.com', 'wsgi.url_scheme':'http',
                    'SERVER_PORT':'80', 'wsgiorg.routing_args':((), args)}
-        mapper.environ = environ
-        from routes import request_config
-        config = request_config()
-        config.environ = environ
-        config.mapper = mapper
-        config.redirect = None
-        request = DummyRequest()
-        request.environ = environ
-        result = self._callFUT('flub', a=1, b=2, c=3)
+        request = DummyRequest(environ)
+        result = self._callFUT(request, 'flub', a=1, b=2, c=3)
         self.assertEqual(result, 'http://example.com/1/2/3')
 
     def test_it_generation_error(self):
-        from routes import Mapper
-        mapper = Mapper(controller_scan=None, directory=None,
-                        explicit=True, always_scan=False)
+        from repoze.bfg.interfaces import IRoutesMapper
+        mapper = DummyRoutesMapper({'flub':DummyRoute({})})
+        from zope.component import getSiteManager
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
         args = {'a':'1', 'b':'2', 'c':'3'}
-        mapper.connect('flub', ':a/:b/:c')
-        mapper.create_regs([])
+        mapper.raise_exc = True
         environ = {'SERVER_NAME':'example.com', 'wsgi.url_scheme':'http',
                    'SERVER_PORT':'80', 'wsgiorg.routing_args':((), args)}
-        mapper.environ = environ
-        from routes import request_config
-        config = request_config()
-        config.environ = environ
-        config.mapper = mapper
-        config.redirect = None
-        request = DummyRequest()
-        request.environ = environ
-        self.assertRaises(ValueError, self._callFUT, 'flub', a=1)
+        request = DummyRequest(environ)
+        self.assertRaises(ValueError, self._callFUT, request, 'flub', a=1)
         
 class DummyContext(object):
     def __init__(self, next=None):
@@ -207,4 +200,30 @@ class DummyContext(object):
         
 class DummyRequest:
     application_url = 'http://example.com:5432' # app_url never ends with slash
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
+        self.environ = environ
 
+class DummyRoutesMapper:
+    encoding = 'utf-8'
+    hardcode_names = False
+    sub_domains = []
+    raise_exc = False
+    def __init__(self, routes, generate_result='/1/2/3', raise_exc=False):
+        self._routenames = routes
+        self.generate_result = generate_result
+        
+    def generate(self, *route_args, **newargs):
+        if self.raise_exc:
+            from routes.util import GenerationException
+            raise GenerationException
+        return self.generate_result
+    
+class DummyRoute:
+    filter = None
+    static = False
+    def __init__(self, defaults):
+        self.defaults = defaults
+        
+        

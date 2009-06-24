@@ -399,10 +399,11 @@ this.
 .. code-block:: python
 
    from repoze.bfg.url import route_url
-   url = route_url('foo', a='1', b='2', c='3')
+   url = route_url(request, 'foo', a='1', b='2', c='3')
 
 This would return something like the string
-``http://example.com/1/2/3``.
+``http://example.com/1/2/3`` (at least if the current protocol and
+hostname implied ``http:/example.com``).
 
 Cleaning Up After a Request
 ---------------------------

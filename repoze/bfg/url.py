@@ -3,28 +3,32 @@
 import urllib
 
 from zope.component import queryMultiAdapter
+from zope.component import getUtility
 from repoze.bfg.interfaces import IContextURL
+from repoze.bfg.interfaces import IRoutesMapper
 
 from repoze.bfg.traversal import TraversalContextURL
 from repoze.bfg.traversal import quote_path_segment
 
-from routes import url_for
+from routes import URLGenerator
 from routes.util import GenerationException
 
-def route_url(*arg, **kw):
+def route_url(request, route_name, **kw):
     """Generates a fully qualified URL for a named BFG route.
     
-    Use the route's ``name`` as the first positional argument.  Use
-    keyword arguments to supply values which match any dynamic path
-    elements in the route definition.  Raises a ValueError exception
-    if the URL cannot be generated when the
+    Use the request object as the first positional argument.  Use the
+    route's ``name`` as the second positional argument.  Use keyword
+    arguments to supply values which match any dynamic path elements
+    in the route definition.  Raises a ValueError exception if the URL
+    cannot be generated when the
 
-    For example, if you've defined a route named"foobar" with the path
+    For example, if you've defined a route named "foobar" with the path
     ``:foo/:bar/*traverse``::
 
-        route_url(foo='1')                           =>  <ValueError exception>
-        route_url(foo='1', bar='2')                  =>  <ValueError exception>
-        route_url(foo='1', bar='2',traverse='a/b)    =>  http://e.com/1/2/a/b
+        route_url(request, 'foobar', foo='1')          => <ValueError exception>
+        route_url(request, 'foobar', foo='1', bar='2') => <ValueError exception>
+        route_url('foobar', foo='1', bar='2',
+                   'traverse='a/b)                     =>  http://e.com/1/2/a/b
 
     All keys given to ``route_url`` are sent to the BFG Routes "mapper"
     instance for generation except for::
@@ -38,7 +42,9 @@ def route_url(*arg, **kw):
     if not 'qualified' in kw:
         kw['qualified'] = True
     try:
-        return url_for(*arg, **kw)
+        mapper = getUtility(IRoutesMapper)
+        generator = URLGenerator(mapper, request.environ)
+        return generator(route_name, **kw)
     except GenerationException, why:
         raise ValueError(str(why))
 
