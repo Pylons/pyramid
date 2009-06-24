@@ -5,7 +5,9 @@ Implementation Changes
 ----------------------
 
 - ``repoze.bfg`` no longer relies on the Routes package to interpret
-  URL paths.
+  URL paths.  All known existing ``path`` patterns will continue to
+  work with the reimplemented logic, which lives in
+  ``repoze.bfg.urldispatch``.
 
 Bug Fixes
 ---------
