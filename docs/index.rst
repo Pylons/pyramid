@@ -28,7 +28,6 @@ Narrative documentation in chapter form explaining how to use
    narr/install
    narr/project
    narr/startup
-   narr/router
    narr/urlmapping
    narr/traversal
    narr/urldispatch
@@ -42,6 +41,7 @@ Narrative documentation in chapter form explaining how to use
    narr/environment
    narr/unittesting
    narr/hooks
+   narr/router
    glossary
 
 API documentation
