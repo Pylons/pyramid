@@ -84,13 +84,11 @@ Glossary
     returns responses to the WSGI server on behalf of your
     :mod:`repoze.bfg` application.
   URL dispatch
-
     An alternative to graph traversal as a mechanism for locating a
     :term:`context` for a :term:`view`.  When you use a :term:`route`
     in your :mod:`repoze.bfg` application via a ``<route>``
     declaration in ZCML, you are using URL dispatch. See the
     :ref:`urldispatch_chapter` for more information.
-
   Context
     An object in the system that is found during :term:`traversal` or
     :term:`URL dispatch` based on URL data; if it's found via
