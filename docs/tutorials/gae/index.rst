@@ -63,6 +63,7 @@ system.
 
    .. code-block:: bash
 
+      $ cd app
       $ rm -rf bfgapp
       $ bin/paster create -t bfg_jinja2_starter bfgapp
       $ mv bfgapp aside
