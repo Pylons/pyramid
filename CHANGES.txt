@@ -7,6 +7,12 @@ Bug Fixes
 - ``model_url`` when passed a request that was generated as a result
   of a route match would fail in a call to ``route.generate``.
 
+Documentation
+-------------
+
+- Added a "corner case" explanation to the "Hybrid Apps" chapter
+  explaining what to do when "the wrong" view is matched.
+
 1.0a2 (2009-06-23)
 ==================
 
