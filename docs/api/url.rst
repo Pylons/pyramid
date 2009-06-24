@@ -7,5 +7,7 @@
 
   .. autofunction:: model_url
 
+  .. autofunction:: route_url
+
   .. autofunction:: urlencode
 

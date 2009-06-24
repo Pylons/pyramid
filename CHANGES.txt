@@ -13,6 +13,14 @@ Documentation
 - Added a "corner case" explanation to the "Hybrid Apps" chapter
   explaining what to do when "the wrong" view is matched.
 
+Features
+--------
+
+- Added the ``repoze.bfg.url.route_url`` API.  This is meant to
+  "front" for the Routes ``url_for`` API.  See the URL Dispatch
+  narrative chapter and the "repoze.bfg.url" module API documentation
+  for more information.
+
 1.0a2 (2009-06-23)
 ==================
 

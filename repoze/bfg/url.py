@@ -8,6 +8,40 @@ from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.traversal import TraversalContextURL
 from repoze.bfg.traversal import quote_path_segment
 
+from routes import url_for
+from routes.util import GenerationException
+
+def route_url(*arg, **kw):
+    """Generates a fully qualified URL for a named BFG route.
+    
+    Use the route's ``name`` as the first positional argument.  Use
+    keyword arguments to supply values which match any dynamic path
+    elements in the route definition.  Raises a ValueError exception
+    if the URL cannot be generated when the
+
+    For example, if you've defined a route named"foobar" with the path
+    ``:foo/:bar/*traverse``::
+
+        route_url(foo='1')                           =>  <ValueError exception>
+        route_url(foo='1', bar='2')                  =>  <ValueError exception>
+        route_url(foo='1', bar='2',traverse='a/b)    =>  http://e.com/1/2/a/b
+
+    All keys given to ``route_url`` are sent to the BFG Routes "mapper"
+    instance for generation except for::
+        
+        anchor          specifies the anchor name to be appened to the path
+        host            overrides the default host if provided
+        protocol        overrides the default (current) protocol if provided
+        qualified       return a fully qualified URL (default True)
+
+    """
+    if not 'qualified' in kw:
+        kw['qualified'] = True
+    try:
+        return url_for(*arg, **kw)
+    except GenerationException, why:
+        raise ValueError(str(why))
+
 def model_url(model, request, *elements, **kw):
     """
     Generate a string representing the absolute URL of the model (or

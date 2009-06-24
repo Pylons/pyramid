@@ -156,6 +156,50 @@ class UrlEncodeTests(unittest.TestCase):
     def test_dict(self):
         result = self._callFUT({'a':1})
         self.assertEqual(result, 'a=1')
+
+class TestRouteUrl(unittest.TestCase):
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.url import route_url
+        return route_url(*arg, **kw)
+
+    def test_it(self):
+        from routes import Mapper
+        mapper = Mapper(controller_scan=None, directory=None,
+                        explicit=True, always_scan=False)
+        args = {'a':'1', 'b':'2', 'c':'3'}
+        mapper.connect('flub', ':a/:b/:c')
+        mapper.create_regs([])
+        environ = {'SERVER_NAME':'example.com', 'wsgi.url_scheme':'http',
+                   'SERVER_PORT':'80', 'wsgiorg.routing_args':((), args)}
+        mapper.environ = environ
+        from routes import request_config
+        config = request_config()
+        config.environ = environ
+        config.mapper = mapper
+        config.redirect = None
+        request = DummyRequest()
+        request.environ = environ
+        result = self._callFUT('flub', a=1, b=2, c=3)
+        self.assertEqual(result, 'http://example.com/1/2/3')
+
+    def test_it_generation_error(self):
+        from routes import Mapper
+        mapper = Mapper(controller_scan=None, directory=None,
+                        explicit=True, always_scan=False)
+        args = {'a':'1', 'b':'2', 'c':'3'}
+        mapper.connect('flub', ':a/:b/:c')
+        mapper.create_regs([])
+        environ = {'SERVER_NAME':'example.com', 'wsgi.url_scheme':'http',
+                   'SERVER_PORT':'80', 'wsgiorg.routing_args':((), args)}
+        mapper.environ = environ
+        from routes import request_config
+        config = request_config()
+        config.environ = environ
+        config.mapper = mapper
+        config.redirect = None
+        request = DummyRequest()
+        request.environ = environ
+        self.assertRaises(ValueError, self._callFUT, 'flub', a=1)
         
 class DummyContext(object):
     def __init__(self, next=None):

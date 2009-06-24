@@ -388,6 +388,22 @@ declaration:
        view=".views.root_view"
        />
 
+Generating Route URLs
+---------------------
+
+Use the :mod:`repoze.bfg.url.route_url` function to generate URLs
+based on route paths.  For example, if you've configured a route in
+ZCML with the ``name`` "foo" and the ``path`` ":a/:b/:c", you might do
+this.
+
+.. code-block:: python
+
+   from repoze.bfg.url import route_url
+   url = route_url('foo', a='1', b='2', c='3')
+
+This would return something like the string
+``http://example.com/1/2/3``.
+
 Cleaning Up After a Request
 ---------------------------
 
