@@ -2,7 +2,12 @@ import threading
 from zope.component import getGlobalSiteManager
 
 class ThreadLocalManager(threading.local):
-    def __init__(self, default):
+    def __init__(self, default=None):
+        # http://code.google.com/p/google-app-engine-django/issues/detail?id=119
+        # we *must* use a keword argument for ``default`` here instead
+        # of a positional argument to work around a bug in the
+        # implementation of _threading_local.local in Python, which is
+        # used by GAE instead of _thread.local
         self.stack = []
         self.default = default
         
@@ -30,7 +35,7 @@ def defaults():
     defaults['registry'] = gsm
     return defaults
 
-manager = ThreadLocalManager(defaults)
+manager = ThreadLocalManager(default=defaults)
 
 ## **The below function ``get_current*`` functions are special.  They
 ## are not part of the official BFG API, however, they're guaranteed
