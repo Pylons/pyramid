@@ -1,5 +1,5 @@
-Next release
-============
+1.0a3 (2009-06-24)
+==================
 
 Implementation Changes
 ----------------------
@@ -7,7 +7,9 @@ Implementation Changes
 - ``repoze.bfg`` no longer relies on the Routes package to interpret
   URL paths.  All known existing ``path`` patterns will continue to
   work with the reimplemented logic, which lives in
-  ``repoze.bfg.urldispatch``.
+  ``repoze.bfg.urldispatch``.  ``<route>`` ZCML directives which use
+  certain attributes (uncommon ones) may not work (see "Backwards
+  Incompatibilities" below).
 
 Bug Fixes
 ---------
@@ -42,15 +44,16 @@ Backwards Incompatibilities
 
 - As a result of disusing Routes, using the Routes ``url_for`` API
   inside a BFG application (as was suggested by previous iterations of
-  tutorials) will no longer work.
+  tutorials) will no longer work.  Use the
+  ``repoze.bfg.url.route_url`` method instead.
 
 - The following attributes on the ``<route>`` ZCML directive no longer
   work: ``encoding``, ``static``, ``filter``, ``condition_method``,
-  ``condition_subdomain``, ``condition_function``, ``explicit``,
-  ``subdomains``.
+  ``condition_subdomain``, ``condition_function``, ``explicit``, or
+  ``subdomains``.  These were all Routes features.
 
 - The ``<route>`` ZCML directive no longer supports the
-  ``<requirement>`` subdirective.
+  ``<requirement>`` subdirective.  This was a Routes feature.
 
 1.0a2 (2009-06-23)
 ==================
