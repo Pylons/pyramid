@@ -2,8 +2,7 @@
 ==============================
 
 :mod:`repoze.bfg` is a Python web application framework.  It is
-inspired by Zope, and uses :term:`Zope` libraries to do much of its
-work.  However, it is simpler than any released version of Zope.
+inspired by :term:`Zope`, :term:`Pylons`, and :term:`Django`.
 :mod:`repoze.bfg` uses the :term:`WSGI` protocol to handle requests
 and responses.
 
