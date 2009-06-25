@@ -29,9 +29,11 @@ with a convention for calling those views.  You are free to use
 third-party components in your application that fit your needs.  Also
 like Pylons, :mod:`repoze.bfg` is heavily dependent on WSGI.
 
-The "Django docs state that Django is an "MTV" framework in their `FAQ
-<http://www.djangoproject.com/documentation/faq/>`_.  This also
-happens to be true for :mod:`repoze.bfg`::
+The Django docs state that Django is *not* an "MVC"
+(model/view/controller) framework in their `FAQ
+<http://www.djangoproject.com/documentation/faq/>`_.  Django's
+documentation does a good job of why explaining why they don't use
+"MVC" acronym:
 
   Django appears to be a MVC framework, but you call the Controller
   the "view", and the View the "template". How come you don't use the
@@ -57,9 +59,8 @@ happens to be true for :mod:`repoze.bfg`::
   probably the framework itself: the machinery that sends a request to
   the appropriate view, according to the Django URL configuration.
 
-  If you're hungry for acronyms, you might say that Django is a "MTV"
-  framework - that is, "model", "template", and "view." That breakdown
-  makes much more sense.
+:mod:`repoze.bfg` uses the same non-MVC terminology as Django (as
+opposed to Rails or Pylons) in this respect.
 
 The skeleton code generator of :mod:`repoze.bfg` generates a directory
 layout very simliar to the directory layout suggested by the `Django
@@ -116,23 +117,23 @@ framework is a canonization of practices that "fit our brains".
 
 *Simplicity*: :mod:`repoze.bfg` attempts to be a *"pay only for what
 you eat"* framework in which you can be productive quickly with
-partial knowledge, in contrast to *"pay up front for what anyone might
-eventually want to eat"* frameworks, which tend to expect you to
-understand a great many concepts and technologies fully before you can
-be truly productive.  :mod:`repoze.bfg` doesn't force you to use any
-particular technology to get your application written, and we try to
-keep the core set of concepts you need to understand to a minimum.
-We've thrown out all the cruft.
+partial knowledge.  We contrast this with *"pay up front for what
+anyone might eventually want to eat"* frameworks, which tend to expect
+you to understand a great many concepts and technologies fully before
+you can be truly productive.  :mod:`repoze.bfg` doesn't force you to
+use any particular technology to get your application written, and we
+try to keep the core set of concepts you need to understand to a
+minimum.
 
 *Minimalism*: :mod:`repoze.bfg` provides only the very basics: *URL to
 code mapping*, *templating*, and *security*.  There is not much more
 to the framework than these pieces: you are expected to provide the
 rest.
 
-*Documentation*: Because :mod:`repoze.bfg` is so minimal, it's
-relatively easy to keep its documentation up-to-date, which is helpful
-to bring new developers up to speed.  It's our goal that nothing
-remain undocumented about :mod:`repoze.bfg`.
+*Documentation*: Because :mod:`repoze.bfg` is minimal, it's relatively
+easy to keep its documentation up-to-date, which is helpful to bring
+new developers up to speed.  It's our goal that nothing remain
+undocumented about :mod:`repoze.bfg`.
 
 *Speed*: :mod:`repoze.bfg` is meant to be fast, capable of serving on
 the order of 100-1000 requests per second on today's commodity
