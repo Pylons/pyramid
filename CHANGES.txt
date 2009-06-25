@@ -7,6 +7,12 @@ Documentation
 - Add information to the URL Dispatch narrative documentation about
   path pattern matching syntax.
 
+Bug Fixes
+---------
+
+- Make ``route_url`` URL-quote segment replacements during generation.
+  Remainder segments are not quoted.
+
 1.0a3 (2009-06-24)
 ==================
 

@@ -147,6 +147,47 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
         self.assertEqual(generator({'baz':1, 'buz':2}), '/foo/1/biz/2/bar')
 
+class TestCompileRouteMatchFunctional(unittest.TestCase):
+    def matches(self, pattern, path, result):
+        from repoze.bfg.urldispatch import _compile_route
+        self.assertEqual(_compile_route(pattern)[0](path), result)
+
+    def generates(self, pattern, dict, result):
+        from repoze.bfg.urldispatch import _compile_route
+        self.assertEqual(_compile_route(pattern)[1](dict), result)
+
+    def test_matcher_functional(self):
+        self.matches('/', '', None)
+        self.matches('', '', None)
+        self.matches('/', '/foo', None)
+        self.matches('/foo/', '/foo', None)
+        self.matches('/:x', '', None)
+        self.matches('', '/', {})
+        self.matches('/', '/', {})
+        self.matches('/:x', '/', {'x':''})
+        self.matches('/:x', '/a', {'x':'a'})
+        self.matches('zzz/:x', '/zzz/abc', {'x':'abc'})
+        self.matches('zzz/:x*traverse', '/zzz/abc', {'x':'abc', 'traverse':''})
+        self.matches('zzz/:x*traverse', '/zzz/abc/def/g', {'x':'abc',
+                                                         'traverse':'/def/g'})
+        
+    def test_generator_functional(self):
+        self.generates('', {}, '/')
+        self.generates('/', {}, '/')
+        self.generates('/:x', {'x':''}, '/')
+        self.generates('/:x', {'x':'a'}, '/a')
+        self.generates('zzz/:x', {'x':'abc'}, '/zzz/abc')
+        self.generates('zzz/:x*traverse', {'x':'abc', 'traverse':''},
+                       '/zzz/abc')
+        self.generates('zzz/:x*traverse', {'x':'abc', 'traverse':'/def/g'},
+                       '/zzz/abc/def/g')
+        self.generates('/:x', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8')},
+                       '/%2FLa%20Pe%C3%B1a')
+        self.generates('/:x*y', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8'),
+                                 'y':'/rest/of/path'},
+                       '/%2FLa%20Pe%C3%B1a/rest/of/path')
+                       
+
 
 class DummyRootFactory(object):
     def __init__(self, result):

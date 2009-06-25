@@ -1,5 +1,7 @@
 import re
 
+from repoze.bfg.traversal import _url_quote
+
 _marker = object()
 
 class Route(object):
@@ -96,6 +98,11 @@ def _compile_route(route):
         for k, v in dict.items():
             if isinstance(v, unicode):
                 v = v.encode('utf-8')
+            if (k!=star):
+                try:
+                    v = _url_quote(v)
+                except TypeError:
+                    pass
             newdict[k] = v
         return gen % newdict
 
