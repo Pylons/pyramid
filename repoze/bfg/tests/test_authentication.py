@@ -248,6 +248,13 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         policy = self._makeOne(None, None)
         result = policy.remember(request, 'fred')
         self.assertEqual(result, [])
+
+    def test_remember_with_extra_kargs(self):
+        request = DummyRequest({})
+        policy = self._makeOne(None, None)
+        result = policy.remember(request, 'fred', a=1, b=2)
+        self.assertEqual(policy.cookie.kw, {'a':1, 'b':2})
+        self.assertEqual(result, [])
         
     def test_forget(self):
         request = DummyRequest({})
@@ -491,6 +498,36 @@ class TestAuthTktCookieHelper(unittest.TestCase):
                          ('Set-Cookie',
                           'auth_tkt="%s"; Path=/' % new_val))
 
+    def test_remember_max_age(self):
+        plugin = self._makeOne('secret')
+        environ = {'HTTP_HOST':'example.com'}
+        tkt = self._makeTicket(userid='chris', userdata='')
+        request = self._makeRequest(environ)
+        result = plugin.remember(request, 'chris', max_age='500')
+        
+        name,value = result.pop(0)
+        self.assertEqual('Set-Cookie', name)
+        self.failUnless(
+            value.startswith('auth_tkt="%s"; Path=/; Max-Age=500' % tkt),
+            value)
+        self.failUnless('; Expires=' in value)
+        
+        name,value = result.pop(0)
+        self.assertEqual('Set-Cookie', name)
+        self.failUnless(
+            value.startswith(
+            'auth_tkt="%s"; Path=/; Domain=example.com; Max-Age=500'
+            % tkt), value)
+        self.failUnless('; Expires=' in value)
+
+        name,value = result.pop(0)
+        self.assertEqual('Set-Cookie', name)
+        self.failUnless(
+            value.startswith(
+            'auth_tkt="%s"; Path=/; Domain=.example.com; Max-Age=500' % tkt),
+            value)
+        self.failUnless('; Expires=' in value)
+
     def test_forget(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
@@ -546,6 +583,7 @@ class DummyCookieHelper:
         return self.result
 
     def remember(self, *arg, **kw):
+        self.kw = kw
         return []
 
     def forget(self, *arg):

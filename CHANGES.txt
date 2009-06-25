@@ -1,6 +1,14 @@
 Next release
 ============
 
+Features
+--------
+
+- Add optional ``max_age`` keyword value to the ``remember`` method of
+  ``repoze.bfg.authentication.AuthTktAuthenticationPolicy``; if this
+  value is passed to ``remember``, the generated cookie will have a
+  corresponding Max-Age value.
+
 Documentation
 -------------
 

@@ -1,3 +1,4 @@
+import datetime
 import time
 
 from codecs import utf_8_decode
@@ -226,7 +227,9 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             return result['userid']
 
     def remember(self, request, principal, **kw):
-        return self.cookie.remember(request, principal)
+        """ Accepts the following kw args: ``tokens``, ``userdata``,
+        ``max_age``."""
+        return self.cookie.remember(request, principal, **kw)
 
     def forget(self, request):
         return self.cookie.forget(request)
@@ -298,16 +301,27 @@ class AuthTktCookieHelper(object):
         identity['userdata'] = user_data
         return identity
 
-    def _get_cookies(self, environ, value):
+    def _get_cookies(self, environ, value, max_age=None):
+        if max_age is not None:
+            later = datetime.datetime.now() + datetime.timedelta(
+                seconds=int(max_age))
+            # Wdy, DD-Mon-YY HH:MM:SS GMT
+            expires = later.strftime('%a, %d %b %Y %H:%M:%S')
+            # the Expires header is *required* at least for IE7 (IE7 does
+            # not respect Max-Age)
+            max_age = "; Max-Age=%s; Expires=%s" % (max_age, expires)
+        else:
+            max_age = ''
+
         cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
         wild_domain = '.' + cur_domain
         cookies = [
-            ('Set-Cookie', '%s="%s"; Path=/' % (
-            self.cookie_name, value)),
-            ('Set-Cookie', '%s="%s"; Path=/; Domain=%s' % (
-            self.cookie_name, value, cur_domain)),
-            ('Set-Cookie', '%s="%s"; Path=/; Domain=%s' % (
-            self.cookie_name, value, wild_domain))
+            ('Set-Cookie', '%s="%s"; Path=/%s' % (
+            self.cookie_name, value, max_age)),
+            ('Set-Cookie', '%s="%s"; Path=/; Domain=%s%s' % (
+            self.cookie_name, value, cur_domain, max_age)),
+            ('Set-Cookie', '%s="%s"; Path=/; Domain=%s%s' % (
+            self.cookie_name, value, wild_domain, max_age))
             ]
         return cookies
 
@@ -318,7 +332,7 @@ class AuthTktCookieHelper(object):
         return self._get_cookies(environ, '""')
     
     # IIdentifier
-    def remember(self, request, userid, tokens='', userdata=''):
+    def remember(self, request, userid, tokens='', userdata='', max_age=None):
         environ = request.environ
         if self.include_ip:
             remote_addr = environ['REMOTE_ADDR']
@@ -368,5 +382,5 @@ class AuthTktCookieHelper(object):
             wild_domain = '.' + cur_domain
             if old_cookie_value != new_cookie_value:
                 # return a set of Set-Cookie headers
-                return self._get_cookies(environ, new_cookie_value)
+                return self._get_cookies(environ, new_cookie_value, max_age)
     
