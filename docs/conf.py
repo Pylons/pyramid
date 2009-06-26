@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'repoze.bfg'
-copyright = '2008, Agendaless Consulting'
+copyright = '2008-2009, Agendaless Consulting'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
