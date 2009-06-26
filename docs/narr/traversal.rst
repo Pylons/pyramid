@@ -40,7 +40,7 @@ dictionary).
    to using traversal to attempt to map the request to a view.  If the
    name ``*traverse`` is in a route's ``path`` pattern, when it is
    matched, it is also possible to do traversal *after* a route has
-   been matched.  See :ref:`urldispatch_chapter` for more information.
+   been matched.  See :ref:`hybrid_chapter` for more information.
 
 Items contained within the object graph are analogous to the concept
 of :term:`model` objects used by many other frameworks (and
