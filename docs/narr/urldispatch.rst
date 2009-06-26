@@ -129,7 +129,7 @@ and::
 
      /:foo/bar/baz
 
-A path segments (an individual item between ``/`` characters in the
+A path segment (an individual item between ``/`` characters in the
 path) may either be a literal string (e.g. ``foo``) *or* it may
 segment replacement marker (e.g. ``:foo``).  A segment replacement
 marker is in the format ``:name``, where this means "accept any
