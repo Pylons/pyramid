@@ -194,6 +194,7 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
                        '/%2FLa%20Pe%C3%B1a/rest/of/path')
         self.generates('*traverse', {'traverse':('a', u'La Pe\xf1a')},
                        '/a/La%20Pe%C3%B1a')
+        self.generates('/foo/:id.html', {'id':'bar'}, '/foo/bar.html')
 
 class DummyRootFactory(object):
     def __init__(self, result):
