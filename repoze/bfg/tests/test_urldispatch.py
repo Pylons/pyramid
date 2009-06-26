@@ -175,6 +175,7 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.matches(':x', '/La%20Pe%C3%B1a', {'x':u'La Pe\xf1a'})
         self.matches('*traverse', '/La%20Pe%C3%B1a/x',
                      {'traverse':(u'La Pe\xf1a', 'x')})
+        self.matches('/foo/:id.html', '/foo/bar.html', {'id':'bar'})
         
     def test_generator_functional(self):
         self.generates('', {}, '/')
