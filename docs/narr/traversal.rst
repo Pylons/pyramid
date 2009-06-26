@@ -127,16 +127,17 @@ code to execute:
     view name.
 
     Any subseqent path elements after the view name are deemed the
-    :term:`subpath`.  The subpath is always a sequence of strings that
-    come from ``PATH_INFO`` that are "left over" after traversal has
-    completed. For instance, if ``PATH_INFO`` was ``/a/b`` and the
-    root returned an "object ``a``", and "object ``a``" subsequently
-    returned an "object ``b``", the router deems that the context is
-    "object ``b``", the view name is the empty string, and the subpath
-    is the empty sequence.  On the other hand, if ``PATH_INFO`` was
-    ``/a/b/c`` and "object ``a``" was found but raised a ``KeyError``
-    for the name ``b``, the router deems that the context is "object
-    ``a``", the view name is ``b`` and the subpath is ``['c']``.
+    :term:`subpath`.  The subpath is always a sequence of path
+    segments that come from ``PATH_INFO`` that are "left over" after
+    traversal has completed. For instance, if ``PATH_INFO`` was
+    ``/a/b`` and the root returned an "object ``a``", and "object
+    ``a``" subsequently returned an "object ``b``", the router deems
+    that the context is "object ``b``", the view name is the empty
+    string, and the subpath is the empty sequence.  On the other hand,
+    if ``PATH_INFO`` was ``/a/b/c`` and "object ``a``" was found but
+    raised a ``KeyError`` for the name ``b``, the router deems that
+    the context is "object ``a``", the view name is ``b`` and the
+    subpath is ``('c',)``.
 
 #.  If a :term:`authentication policy` is configured, the router
     performs a permission lookup.  If a permission declaration is
@@ -203,7 +204,7 @@ error condition.  It signifies that:
 
 - the "view name" is ``baz``
 
-- the "subpath" is ``['biz', 'buz.txt']``
+- the "subpath" is ``('biz', 'buz.txt')``
 
 Because it's the "context", bfg examimes "bar" to find out what "type"
 it is. Let's say it finds that the context is an ``IBar`` type
@@ -250,7 +251,7 @@ signify an error condition.  It signifies that:
 
 - the "view name" is "buz.txt"
 
-- the "subpath" is the empty list []
+- the "subpath" is an empty sequence ( ``()`` ).
 
 Because it's the "context", bfg examimes "biz" to find out what "type"
 it is. Let's say it finds that the context an ``IBiz`` type (because
@@ -288,7 +289,8 @@ Traversal-Related Side Effects
 
 The :term:`subpath` will always be available to a view as a the
 ``subpath`` attribute of the :term:`request` object.  It will be a
-list containing zero or more elements (which will be strings).
+sequence containing zero or more elements (which will be Unicode
+objects).
 
 The :term:`view name` will always be available to a view as the
 ``view_name`` attribute of the :term:`request` object.  It will be a
