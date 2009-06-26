@@ -193,7 +193,7 @@ When matching the following path::
 
 Will generate the following matchdict::
 
-  {'traverse':(u'foo', u'La Pe\xf1a', u'a', u'b', u'c')}
+  {'traverse':(u'La Pe\xf1a', u'a', u'b', u'c')}
 
 Example 1
 ---------
