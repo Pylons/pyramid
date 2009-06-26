@@ -4,10 +4,9 @@ Security
 ========
 
 :mod:`repoze.bfg` provides an optional declarative authorization
-system that prevents views that are protected by a :term:`permission`
-from being invoked when the user represented by credentials in the
-:term:`request` does not have an appropriate level of access in a
-specific context.
+system that prevents a :term:`view` from being invoked when the user
+represented by credentials in the :term:`request` does not have an
+appropriate level of access in a specific context.
 
 Authorization is enabled by modifying your application's invocation of
 ``repoze.bfg.router.make_app``, often located in the ``run.py`` module
@@ -19,12 +18,13 @@ Enabling an Authorization Policy
 By default, :mod:`repoze.bfg` enables no authorization policy.  All
 views are accessible by completely anonymous users.
 
-However, if you change the call to ``repoze.bfg.router.make_app``
-(usually found within the ``run.py`` module in your application), you
-will enable an authorization policy.
+However, if you modify how your application calls to
+``repoze.bfg.router.make_app`` (usually found within the ``run.py``
+module in your application), you can enable an authorization policy.
 
 You must enable a a :term:`authentication policy` in order to enable
-an authorization policy.
+the default authorization policy (this is because authorization, in
+general, depends upon authentication).
 
 For example, to enable a policy which compares the ``REMOTE_USER``
 variable passed in the request's environment (as the sole
@@ -51,22 +51,25 @@ your ``run.py`` to look something like this:
 
 This injects an instance of the
 ``repoze.bfg.authentication.RemoteUserAuthenticationPolicy`` as the
-:term:`authentication policy`.  It is possible to use a different
-authentication policy.  :mod:`repoze.bfg` ships with a few prechewed
-authentication policies that should prove useful (see
-:ref:`authentication_policies_api_section`).  It is also possible to
-construct your own authentication policy.  Any instance which
-implements the interface defined in
-``repoze.bfg.interfaces.IAuthenticationPolicy`` can be used.
+:term:`authentication policy` used by this application.  It is
+possible to use a different authentication policy.  :mod:`repoze.bfg`
+ships with a few prechewed authentication policies that should prove
+useful (see :ref:`authentication_policies_api_section`).  It is also
+possible to construct your own authentication policy: see
+:ref:`creating_an_authentication_policy`.
 
-It's not common, but it is also possible to change the default
-:term:`authorization policy` (to use some other persistent
-authorization mechanism other than ACLs).  To do so, pass an object
-which implements the ``repoze.bfg.interfaces.IAuthorizationPolicy``)
-to ``make_app`` as the ``authorization_policy`` value.
-:mod:`repoze.who` ships with only one.  See
-:ref:`authorization_policies_api_section` for the details of the ACL
-authorization policy which is the default
+When you pass any ``authentication_policy`` argument to the
+``make_app`` function, and you don't also pass an
+``authorization_policy`` argument you are instructing BFG to use the
+*default* :term:`authorization policy`.  The default authorization
+policy compares :term:`ACL` information attached to :term:`context`
+objects against the information rovided by the authentication policy.
+See :ref:`authorization_policies_api_section` for the details of the
+default authorization policy.
+
+.. note:: It's not common, but it is also possible for a developer to
+   change the :term:`authorization policy` used by a :mod:`repoze.bfg`
+   application.  See :ref:`creating_an_authorization_policy`.
 
 Protecting Views with Permissions
 ---------------------------------
@@ -311,8 +314,7 @@ authorization policy is in effect might look like so:
    from repoze.bfg.security import Allow
    from repoze.bfg.security import DENY_ALL
 
-   __acl__ = [ (Allow, 'fred', 'view'),
-               DENY_ALL ]
+   __acl__ = [ (Allow, 'fred', 'view'), DENY_ALL ]
 
 ACL Inheritance
 ---------------
@@ -389,6 +391,8 @@ indicating why permission was denied or allowed.  Introspecting this
 information in the debugger or via print statements when a
 ``has_permission`` fails is often useful.
 
+.. _creating_an_authentication_policy:
+
 Creating Your Own Authentication Policy
 ---------------------------------------
 
@@ -427,13 +431,25 @@ Pass the object you create into the ``repoze.bfg.router.make_app``
 function as the ``authentication_policy`` argument at application
 startup time (usually within a ``run.py`` module).
 
+.. _creating_an_authorization_policy:
+
 Creating Your Own Authorization Policy
 --------------------------------------
 
 An authentiction policy the policy that allows or denies access after
-a user is authenticated.  By default, :mod:`repoze.bfg` will use the
-``repoze.bfg.authorization.ACLAuthorizationPolicy`` if an
-authentication policy is activated.  Creating and using your own
+a user has been authenticated.  By default, :mod:`repoze.bfg` will use
+the ``repoze.bfg.authorization.ACLAuthorizationPolicy`` if an
+authentication policy is activated and an authorization policy isn't
+otherwise specificed.  In some cases, it's useful to be able to use a
+different authentication policy than the
+``repoze.bfg.authorization.ACLAuthorizationPolicy``.  For example, it
+might be desirable to construct an alternate authorization policy
+which allows the application to use an authorization mechanism that
+does not involve :term:`ACL` objects.
+
+:mod:`repoze.bfg` ships with only its single default
+``ACLAuthorizationPolicy``, so you'll need to create your own if you'd
+like to use a different one.  Creating and using your own
 authorization policy is a matter of creating an instance of an object
 that implements the following interface:
 
@@ -453,3 +469,5 @@ Pass the object you create into the ``repoze.bfg.router.make_app``
 function as the ``authorization_policy`` argument at application
 startup time (usually within a ``run.py`` module).  You must also pass
 an ``authentication_policy`` if you pass an ``authorization_policy``.
+If you pass only an ``authorization_policy`` argument, an error will
+be raised at startup time.
