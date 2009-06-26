@@ -29,7 +29,21 @@ def route_url(route_name, request, *elements, **kw):
         route_url('foobar', request, foo='1')          => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2') => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2',
-                   'traverse='a/b')                    =>  http://e.com/1/2/a/b
+                   'traverse=('a','b')                 =>  http://e.com/1/2/a/b
+        route_url('foobar', request, foo='1', bar='2',
+                   'traverse=('/a/b')                 =>  http://e.com/1/2/a/b
+
+    Values replacing ``:segment`` arguments can be passed as strings
+    or Unicode objects.  They will be encoded to UTF-8 and URL-quoted
+    before being placed into the generated URL.
+
+    Values replacing ``*remainder`` arguments can be passed as strings
+    *or* tuples of Unicode/string values.  If a tuple is passed as a
+    ``*remainder`` replacement value, its values are URL-quoted and
+    encoded to UTF-8.  The resulting strings are joined with slashes
+    and rendered into the URL.  If a string is passed as a
+    ``*remainder`` replacement value, it is tacked on to the URL
+    untouched.
 
     If a keyword argument ``_query`` is present, it will used to
     compose a query string that will be tacked on to the end of the
