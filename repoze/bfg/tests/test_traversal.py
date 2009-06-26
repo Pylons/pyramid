@@ -270,7 +270,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root'], model)
         self.assertEqual(result['virtual_root_path'], ())
 
-    def test_withroute_with_subpath(self):
+    def test_withroute_with_subpath_string(self):
         model = DummyContext()
         traverser = self._makeOne(model)
         environ = {'bfg.routes.matchdict': {'subpath':'/a/b/c'}}
@@ -283,10 +283,36 @@ class ModelGraphTraverserTests(unittest.TestCase):
         self.assertEqual(result['virtual_root'], model)
         self.assertEqual(result['virtual_root_path'], ())
 
-    def test_withroute_and_traverse(self):
+    def test_withroute_with_subpath_tuple(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        environ = {'bfg.routes.matchdict': {'subpath':('a', 'b', 'c')}}
+        result = traverser(environ)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ('a', 'b','c'))
+        self.assertEqual(result['traversed'], ())
+        self.assertEqual(result['root'], model)
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], ())
+
+    def test_withroute_and_traverse_string(self):
         model = DummyContext()
         traverser = self._makeOne(model)
         environ = {'bfg.routes.matchdict': {'traverse':'foo/bar'}}
+        result = traverser(environ)
+        self.assertEqual(result['context'], model)
+        self.assertEqual(result['view_name'], 'foo')
+        self.assertEqual(result['subpath'], ('bar',))
+        self.assertEqual(result['traversed'], ())
+        self.assertEqual(result['root'], model)
+        self.assertEqual(result['virtual_root'], model)
+        self.assertEqual(result['virtual_root_path'], ())
+
+    def test_withroute_and_traverse_tuple(self):
+        model = DummyContext()
+        traverser = self._makeOne(model)
+        environ = {'bfg.routes.matchdict': {'traverse':('foo', 'bar')}}
         result = traverser(environ)
         self.assertEqual(result['context'], model)
         self.assertEqual(result['view_name'], 'foo')

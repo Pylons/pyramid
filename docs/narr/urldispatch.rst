@@ -142,16 +142,32 @@ segment ("foo") and two dynamic segments ("baz", and "bar")::
 The above pattern will match these URLs, generating the followng
 matchdicts::
 
-   foo/1/2        -> {'baz':1, 'bar':2}
-   foo/abc/def    -> {'baz':abc, 'bar':2}
+   foo/1/2        -> {'baz':u'1', 'bar':u'2'}
+   foo/abc/def    -> {'baz':u'abc', 'bar':u'2'}
 
 It will not match the following patterns however:
 
    foo/1/2/        -> No match (trailing slash)
    bar/abc/def     -> First segment literal mismatch
 
+Note that values representing path segments matched with a
+``:segment`` match will be url-unquoted and decoded from UTF-8 into
+Unicode within the matchdict.  So for instance, the following
+pattern::
+
+    foo/:bar
+
+When matching the following URL::
+
+    foo/La%20Pe%C3%B1a
+
+The matchdict will look like so (the value is URL-decoded / UTF-8
+decoded)::
+
+  {'bar':u'La Pe\xf1a'}
+
 If the pattern has a ``*`` in it, the name which follows it is
-considered a "remainder match".  A remainder match must come at the
+considered a "remainder match".  A remainder match *must* come at the
 end of the path pattern.  Unlike segment replacement markers, it does
 not need to be preceded by a slash.  For example::
 
@@ -160,8 +176,24 @@ not need to be preceded by a slash.  For example::
 The above pattern will match these URLs, generating the followng
 matchdicts::
 
-   foo/1/2/               -> {'baz':1, 'bar':2, 'traverse':'/'}
-   foo/abc/def/a/b/c/d    -> {'baz':abc, 'bar':2, 'traverse':'/a/b/c/d'}
+   foo/1/2/               -> {'baz':1, 'bar':2, 'traverse':()}
+   foo/abc/def/a/b/c      -> {'baz':abc, 'bar':2, 'traverse':('a', 'b', 'c')}
+
+Note that when a ``*stararg`` remainder match is matched, the value
+put into the matchdict is turned into a tuple of path segments
+representing the remainder of the path.  These path segments are
+url-unquoted and decoded from UTF-8 into Unicode.  For example, for
+the following pattern::
+
+    foo/*traverse
+
+When matching the following path::
+
+    /foo/La%20Pe%C3%B1a/a/b/c
+
+Will generate the following matchdict::
+
+  {'traverse':(u'foo', u'La Pe\xf1a', u'a', u'b', u'c')}
 
 Example 1
 ---------

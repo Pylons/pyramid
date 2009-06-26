@@ -1,6 +1,9 @@
 import re
+from urllib import unquote
 
 from repoze.bfg.traversal import _url_quote
+from repoze.bfg.traversal import traversal_path
+from repoze.bfg.traversal import quote_path_segment
 
 _marker = object()
 
@@ -89,8 +92,15 @@ def _compile_route(route):
         m = match(path)
         if m is None:
             return m
-        return dict(item for item in m.groupdict().iteritems()
-                    if item[1] is not None)
+        d = {}
+        for k,v in m.groupdict().iteritems():
+            if k is not None:
+                if k == star:
+                    d[k] = traversal_path(v)
+                else:
+                    d[k] = unquote(v).decode('utf-8')
+        return d
+                    
 
     gen = ''.join(gen)
     def generator(dict):
@@ -98,7 +108,9 @@ def _compile_route(route):
         for k, v in dict.items():
             if isinstance(v, unicode):
                 v = v.encode('utf-8')
-            if (k!=star):
+            if k == star and hasattr(v, '__iter__'):
+                v = '/'.join([quote_path_segment(x) for x in v])
+            elif k != star:
                 try:
                     v = _url_quote(v)
                 except TypeError:

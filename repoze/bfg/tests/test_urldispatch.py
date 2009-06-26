@@ -132,10 +132,10 @@ class TestCompileRoute(unittest.TestCase):
     def test_with_star(self):
         matcher, generator = self._callFUT('/foo/:baz/biz/:buz/bar*traverse')
         self.assertEqual(matcher('/foo/baz/biz/buz/bar'),
-                         {'baz':'baz', 'buz':'buz', 'traverse':''})
+                         {'baz':'baz', 'buz':'buz', 'traverse':()})
         self.assertEqual(matcher('/foo/baz/biz/buz/bar/everything/else/here'),
                          {'baz':'baz', 'buz':'buz',
-                          'traverse':'/everything/else/here'})
+                          'traverse':('everything', 'else', 'here')})
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
         self.assertEqual(generator(
             {'baz':1, 'buz':2, 'traverse':u'/a/b'}), '/foo/1/biz/2/bar/a/b')
@@ -167,9 +167,14 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.matches('/:x', '/', {'x':''})
         self.matches('/:x', '/a', {'x':'a'})
         self.matches('zzz/:x', '/zzz/abc', {'x':'abc'})
-        self.matches('zzz/:x*traverse', '/zzz/abc', {'x':'abc', 'traverse':''})
-        self.matches('zzz/:x*traverse', '/zzz/abc/def/g', {'x':'abc',
-                                                         'traverse':'/def/g'})
+        self.matches('zzz/:x*traverse', '/zzz/abc', {'x':'abc', 'traverse':()})
+        self.matches('zzz/:x*traverse', '/zzz/abc/def/g',
+                     {'x':'abc', 'traverse':('def', 'g')})
+        self.matches('*traverse', '/zzz/abc', {'traverse':('zzz', 'abc')})
+        self.matches('*traverse', '/zzz/%20abc', {'traverse':('zzz', ' abc')})
+        self.matches(':x', '/La%20Pe%C3%B1a', {'x':u'La Pe\xf1a'})
+        self.matches('*traverse', '/La%20Pe%C3%B1a/x',
+                     {'traverse':(u'La Pe\xf1a', 'x')})
         
     def test_generator_functional(self):
         self.generates('', {}, '/')
@@ -186,8 +191,8 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.generates('/:x*y', {'x':unicode('/La Pe\xc3\xb1a', 'utf-8'),
                                  'y':'/rest/of/path'},
                        '/%2FLa%20Pe%C3%B1a/rest/of/path')
-                       
-
+        self.generates('*traverse', {'traverse':('a', u'La Pe\xf1a')},
+                       '/a/La%20Pe%C3%B1a')
 
 class DummyRootFactory(object):
     def __init__(self, result):

@@ -4,6 +4,17 @@ Next release
 Features
 --------
 
+- Cause ``:segment`` matches in route paths to put a Unicode-decoded
+  and URL-dequoted value in the matchdict for the value matched.
+  Previously a non-decoded non-URL-dequoted string was placed in the
+  matchdict as the value.
+
+- Cause ``*remainder`` matches in route paths to put a *tuple* in the
+  matchdict dictionary in order to be able to present Unicode-decoded
+  and URL-dequoted values for the traversal path.  Previously a
+  non-decoded non-URL-dequoted string was placed in the matchdict as
+  the value.
+
 - Add optional ``max_age`` keyword value to the ``remember`` method of
   ``repoze.bfg.authentication.AuthTktAuthenticationPolicy``; if this
   value is passed to ``remember``, the generated cookie will have a

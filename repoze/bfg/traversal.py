@@ -368,7 +368,7 @@ def virtual_root(model, request):
     urlgenerator = getMultiAdapter((model, request), IContextURL)
     return urlgenerator.virtual_root()
 
-@lru_cache(500)
+@lru_cache(1000)
 def traversal_path(path):
     """ Given a ``PATH_INFO`` string (slash-separated path segments),
     return a tuple representing that path which can be used to
@@ -493,9 +493,17 @@ class ModelGraphTraverser(object):
     def __call__(self, environ):
         if 'bfg.routes.matchdict' in environ:
             matchdict = environ['bfg.routes.matchdict']
+
             path = matchdict.get('traverse', '/')
-            subpath = matchdict.get('subpath', '')
-            subpath = tuple(filter(None, subpath.split('/')))
+            if hasattr(path, '__iter__'):
+                # this is a *traverse stararg (not a :traverse)
+                path = '/'.join([quote_path_segment(x) for x in path]) or '/'
+
+            subpath = matchdict.get('subpath', ())
+            if not hasattr(subpath, '__iter__'):
+                # this is not a *subpath stararg (just a :subpath)
+                subpath = traversal_path(subpath)
+            
         else:
             # this request did not match a Routes route
             subpath = ()

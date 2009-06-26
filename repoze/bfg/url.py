@@ -29,7 +29,7 @@ def route_url(route_name, request, *elements, **kw):
         route_url('foobar', request, foo='1')          => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2') => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2',
-                   'traverse='a/b)                     =>  http://e.com/1/2/a/b
+                   'traverse='a/b')                    =>  http://e.com/1/2/a/b
 
     If a keyword argument ``_query`` is present, it will used to
     compose a query string that will be tacked on to the end of the
