@@ -145,7 +145,7 @@ matchdicts::
    foo/1/2        -> {'baz':u'1', 'bar':u'2'}
    foo/abc/def    -> {'baz':u'abc', 'bar':u'2'}
 
-It will not match the following patterns however:
+It will not match the following patterns however::
 
    foo/1/2/        -> No match (trailing slash)
    bar/abc/def     -> First segment literal mismatch
