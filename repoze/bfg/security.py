@@ -3,6 +3,7 @@ from zope.component import queryUtility
 from zope.deprecation import deprecated
 
 from zope.interface import implements
+from zope.interface import classProvides
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -232,7 +233,8 @@ class ACLAllowed(ACLPermitsResult):
     boolval = 1
 
 class ViewPermissionFactory(object):
-    implements(IViewPermissionFactory)
+    classProvides(IViewPermissionFactory)
+    implements(IViewPermission)
 
     def __init__(self, permission_name):
         self.permission_name = permission_name
