@@ -444,7 +444,7 @@ Features
 Bug Fixes
 ---------
 
-- A "new response" event is emitted for forbiden and notfound views.
+- A "new response" event is emitted for forbidden and notfound views.
 
 Deprecations
 ------------
