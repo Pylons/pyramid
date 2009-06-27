@@ -1,51 +1,106 @@
 import unittest
 
 class TestCallerPath(unittest.TestCase):
-    def _callFUT(self, path, level=2, package_globals=None):
+    def tearDown(self):
+        from repoze.bfg.tests import test_path
+        if hasattr(test_path, '__bfg_abspath__'):
+            del test_path.__bfg_abspath__
+
+    def _callFUT(self, path, level=2):
         from repoze.bfg.path import caller_path
-        return caller_path(path, level, package_globals)
+        return caller_path(path, level)
 
     def test_isabs(self):
-        self.assertEqual(self._callFUT('/a/b/c'), '/a/b/c')
+        result = self._callFUT('/a/b/c')
+        self.assertEqual(result, '/a/b/c')
 
     def test_pkgrelative(self):
         import os
         here = os.path.abspath(os.path.dirname(__file__))
-        self.assertEqual(self._callFUT('a/b/c'), os.path.join(here, 'a/b/c'))
+        result = self._callFUT('a/b/c')
+        self.assertEqual(result, os.path.join(here, 'a/b/c'))
 
     def test_memoization_has_bfg_abspath(self):
         import os
+        from repoze.bfg.tests import test_path
+        test_path.__bfg_abspath__ = '/foo/bar'
         here = os.path.abspath(os.path.dirname(__file__))
-        package_globals =  {'__bfg_abspath__':'/foo/bar'}
-        self.assertEqual(
-            self._callFUT('a/b/c',
-                          package_globals=package_globals),
-            os.path.join('/foo/bar', 'a/b/c'))
+        result = self._callFUT('a/b/c')
+        self.assertEqual(result, os.path.join('/foo/bar', 'a/b/c'))
 
     def test_memoization_success(self):
         import os
         here = os.path.abspath(os.path.dirname(__file__))
-        package_globals = {'__name__':'repoze.bfg.tests.test_path'}
-        self.assertEqual(
-            self._callFUT('a/b/c',
-                          package_globals=package_globals),
-            os.path.join(here, 'a/b/c'))
-        self.assertEqual(package_globals['__bfg_abspath__'], here)
+        from repoze.bfg.tests import test_path
+        result = self._callFUT('a/b/c')
+        self.assertEqual(result, os.path.join(here, 'a/b/c'))
+        self.assertEqual(test_path.__bfg_abspath__, here)
+
+class TestCallerModule(unittest.TestCase):
+    def _callFUT(self, level=2):
+        from repoze.bfg.path import caller_module
+        return caller_module(level)
+
+    def test_it_level_1(self):
+        from repoze.bfg.tests import test_path
+        result = self._callFUT(1)
+        self.assertEqual(result, test_path)
+
+    def test_it_level_2(self):
+        from repoze.bfg.tests import test_path
+        result = self._callFUT(2)
+        self.assertEqual(result, test_path)
+
+    def test_it_level_3(self):
+        import unittest
+        result = self._callFUT(3)
+        self.assertEqual(result, unittest)
+        
+class TestPackagePath(unittest.TestCase):
+    def _callFUT(self, package):
+        from repoze.bfg.path import package_path
+        return package_path(package)
+
+    def test_it_package(self):
+        from repoze.bfg import tests
+        package = DummyPackageOrModule(tests)
+        result = self._callFUT(package)
+        self.assertEqual(result, package.package_path)
+        
+    def test_it_module(self):
+        from repoze.bfg.tests import test_path
+        module = DummyPackageOrModule(test_path)
+        result = self._callFUT(module)
+        self.assertEqual(result, module.package_path)
+
+    def test_memoization_success(self):
+        from repoze.bfg.tests import test_path
+        module = DummyPackageOrModule(test_path)
+        result = self._callFUT(module)
+        self.assertEqual(module.__bfg_abspath__, module.package_path)
         
     def test_memoization_fail(self):
+        from repoze.bfg.tests import test_path
+        module = DummyPackageOrModule(test_path, raise_exc=TypeError)
+        result = self._callFUT(module)
+        self.failIf(hasattr(module, '__bfg_abspath__'))
+        self.assertEqual(result, module.package_path)
+    
+class DummyPackageOrModule:
+    def __init__(self, real_package_or_module, raise_exc=None):
+        self.__dict__['raise_exc'] = raise_exc
+        self.__dict__['__name__'] = real_package_or_module.__name__
         import os
-        here = os.path.abspath(os.path.dirname(__file__))
-        class faildict(dict):
-            def __setitem__(self, *arg):
-                raise KeyError('name')
-        package_globals = faildict({'__name__':'repoze.bfg.tests.test_path'})
-        self.assertEqual(
-            self._callFUT('a/b/c',
-                          package_globals=package_globals),
-            os.path.join(here, 'a/b/c'))
-        self.failIf('__bfg_abspath__' in package_globals)
+        self.__dict__['package_path'] = os.path.dirname(
+            os.path.abspath(real_package_or_module.__file__))
+
+    def __setattr__(self, key, val):
+        if self.raise_exc is not None:
+            raise self.raise_exc
+        self.__dict__[key] = val
         
         
+    
         
 
     
