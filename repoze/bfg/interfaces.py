@@ -49,20 +49,19 @@ class IDefaultRootFactory(Interface):
 class ITraverser(Interface):
     def __call__(environ):
         """ Return a dictionary with the keys ``root``, ``context``,
-        ``view_name``, ``subpath``, ``traversed``, ``vroot``, and
-        ``vroot_path``.  These values are typically the result of an
-        object graph traversal.  ``root`` is the physical root object,
-        ``context`` will be a model object, ``view_name`` will be the
-        view name used (a Unicode name), ``subpath`` will be a
-        sequence of Unicode names that followed the view name but were
-        not traversed, ``traversed`` will be a sequence of Unicode
-        names that were traversed (including the virtual root path, if
-        any) or ``None`` if no traversal was performed,
-        ``virtual_root`` will be a model object representing the
-        virtual root (or the physical root if traversal was not
-        performed), and ``virtual_root_path`` will be a sequence
-        representing the virtual root path (a sequence of Unicode
-        names) or None if traversal was not performed."""
+        ``view_name``, ``subpath``, ``traversed``, ``virtual_root``,
+        and ``virtual_root_path``.  These values are typically the
+        result of an object graph traversal.  ``root`` is the physical
+        root object, ``context`` will be a model object, ``view_name``
+        will be the view name used (a Unicode name), ``subpath`` will
+        be a sequence of Unicode names that followed the view name but
+        were not traversed, ``traversed`` will be a sequence of
+        Unicode names that were traversed (including the virtual root
+        path, if any) ``virtual_root`` will be a model object
+        representing the virtual root (or the physical root if
+        traversal was not performed), and ``virtual_root_path`` will
+        be a sequence representing the virtual root path (a sequence
+        of Unicode names) or None if traversal was not performed."""
 
 class ITraverserFactory(Interface):
     def __call__(context):
@@ -86,11 +85,13 @@ class ITemplateRendererFactory(Interface):
 
 class ISecurityPolicy(Interface):
     """ A utility that provides a mechanism to check authorization
-       using authentication data """
+       using authentication data.  This interface was deprecated in
+       BFG 0.9; use the combination of IAuthenticationPolicy and
+       IAuthorization Policy instead"""
     def permits(context, request, permission):
         """ Returns True if the combination of the authorization
-        information in the context and the authentication data in
-        the request allow the action implied by the permission """
+        information in the context and the authentication data in the
+        request allow the action implied by the permission"""
 
     def authenticated_userid(request):
         """ Return the userid of the currently authenticated user or
@@ -109,17 +110,16 @@ class ISecurityPolicy(Interface):
         ``NotImplementedError`` exception."""
 
 class IViewPermission(Interface):
-    def __call__(security_policy):
+    def __call__(context, request):
         """ Return True if the permission allows, return False if it denies. """
 
 class IViewPermissionFactory(Interface):
-    def __call__(context, request):
-        """ Return an IViewPermission """
+    def __call__(permission_name):
+        """ Returns an IViewPermission """
 
 class IRouter(Interface):
     """WSGI application which routes requests to 'view' code based on
     a view registry."""
-
     registry = Attribute(
         """Component architecture registry local to this application.""")
     
@@ -134,22 +134,19 @@ class INewResponse(Interface):
     response = Attribute('The response object')
 
 class ISettings(Interface):
-    """ Runtime settings for repoze.bfg """
-    reload_templates = Attribute('Reload templates when they change')
+    """ Runtime settings utility for repoze.bfg; represents the
+    deployment settings for the application"""
     
 class IWSGIApplicationCreatedEvent(IObjectEvent):
     """ Event issued after the application has been created and
     configured."""
-    
     app = Attribute(u"Published application")
 
 # this interface, even if it becomes unused within BFG, is imported by
 # other packages (such as repoze.bfg.traversalwrapper)
 class ILocation(Interface):
     """Objects that have a structural location"""
-
     __parent__ = Attribute("The parent in the location hierarchy")
-
     __name__ = Attribute("The name within the parent")
 
 class ILogger(Interface):
@@ -231,7 +228,8 @@ class IAuthorizationPolicy(Interface):
         """ Return a set of principal identifiers allowed by the permission """
 
 class IRequestFactories(Interface):
-    """ Marker interface for utilities representing request factories """
+    """ Marker utility interface representing a dictionary of request
+    factory descriptions"""
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)
