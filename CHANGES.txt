@@ -7,6 +7,10 @@ Features
 - Use the ``pkg_resources`` API to locate template filenames instead
   of dead-reckoning using the ``os.path`` module.
 
+- The ``repoze.bfg.templating`` module now uses ``pkg_resources`` to
+  locate and register template files instead of using an absolute
+  path name.
+
 1.0a4 (2009-06-25)
 ==================
 
