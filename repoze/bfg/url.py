@@ -15,8 +15,8 @@ def route_url(route_name, request, *elements, **kw):
     
     Use the request object as the first positional argument.  Use the
     route's ``name`` as the second positional argument.  Additional
-    keyword elements are appended to the URL as path segments after it
-    is generated.
+    positional arguments are appended to the URL as path segments
+    after it is generated.
     
     Use keyword arguments to supply values which match any dynamic
     path elements in the route definition.  Raises a KeyError
@@ -79,9 +79,9 @@ def route_url(route_name, request, *elements, **kw):
     will always follow the query element,
     e.g. ``http://example.com?foo=1#bar``.
 
-    This function raises a ``KeyError`` if the route cannot be
-    generated due to missing replacement names.  Extra replacement
-    names are ignored.
+    This function raises a ``KeyError`` if the URL cannot be generated
+    due to missing replacement names.  Extra replacement names are
+    ignored.
     """
     mapper = getUtility(IRoutesMapper)
     path = mapper.generate(route_name, kw) # raises KeyError if generate fails
