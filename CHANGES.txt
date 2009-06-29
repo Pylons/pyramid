@@ -1,5 +1,5 @@
-Next release
-============
+1.0a5 (2009-06-28)
+==================
 
 Features
 --------
@@ -58,7 +58,7 @@ Features
 
   The package name in a specification may start with a dot, meaning
   that the package is relative to the package in which the ZCML file
-  resides.  For example:
+  resides.  For example::
 
     <resource
       to_override=".subpackage:templates/"
