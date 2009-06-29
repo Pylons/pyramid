@@ -156,7 +156,7 @@ buildout for this application out of Subversion via::
   svn co http://svn.repoze.org/buildouts/bfgsite/ bfgsite_buildout
 
 `KARL <http://karlproject.org>`_ is a moderately-sized application
-(roughly 40K lines of Python code) built on top of :mod:`repoze.bfg`
+(roughly 70K lines of Python code) built on top of :mod:`repoze.bfg`
 and other Repoze software.  It is an open source web system for
 collaboration, organizational intranets, and knowledge management, It
 provides facilities for wikis, calendars, manuals, searching, tagging,
