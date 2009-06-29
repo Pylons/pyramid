@@ -147,7 +147,7 @@ It's Tested
 *If it ain't tested, it's broke.* We strive to test :mod:`repoze.bfg`
 completely.  Below a run of the ``nosetests`` command configured to
 show code coverage information (run against the :mod:`repoze.bfg`
-trunk as of the 1.0a1 release).
+trunk as of the 1.0a6 release).
 
 .. code-block:: bash
 
@@ -169,30 +169,32 @@ trunk as of the 1.0a1 release).
     ...........................................................................
     ...........................................................................
     ...........................................................................
-    ...............................
+    ...........................................................................
+    ....
     Name                                   Stmts   Exec  Cover   Missing
     --------------------------------------------------------------------
     repoze.bfg                                 0      0   100%   
-    repoze.bfg.authentication                190    190   100%   
+    repoze.bfg.authentication                196    196   100%   
     repoze.bfg.authorization                  50     50   100%   
     repoze.bfg.chameleon_text                 48     48   100%   
     repoze.bfg.chameleon_zpt                  41     41   100%   
     repoze.bfg.events                         18     18   100%   
     repoze.bfg.functional                     14     14   100%   
     repoze.bfg.includes                        0      0   100%   
-    repoze.bfg.interfaces                     72     72   100%   
+    repoze.bfg.interfaces                     73     73   100%   
     repoze.bfg.location                       10     10   100%   
     repoze.bfg.log                             9      9   100%   
     repoze.bfg.paster                         48     48   100%   
-    repoze.bfg.path                           18     18   100%   
+    repoze.bfg.path                           28     28   100%   
     repoze.bfg.registry                       51     51   100%   
-    repoze.bfg.request                        65     65   100%   
+    repoze.bfg.request                        67     67   100%   
+    repoze.bfg.resource                       79     79   100%   
     repoze.bfg.router                        158    158   100%   
     repoze.bfg.scripting                      10     10   100%   
     repoze.bfg.secpols                       166    166   100%   
-    repoze.bfg.security                      112    112   100%   
+    repoze.bfg.security                      114    114   100%   
     repoze.bfg.settings                       29     29   100%   
-    repoze.bfg.templating                     17     17   100%   
+    repoze.bfg.templating                     29     29   100%   
     repoze.bfg.testing                       216    216   100%   
     repoze.bfg.tests                           0      0   100%   
     repoze.bfg.tests.fixtureapp                0      0   100%   
@@ -201,7 +203,7 @@ trunk as of the 1.0a1 release).
     repoze.bfg.tests.grokkedapp                9      9   100%   
     repoze.bfg.tests.routesapp                 0      0   100%   
     repoze.bfg.tests.routesapp.views           4      4   100%   
-    repoze.bfg.tests.test_authentication     408    408   100%   
+    repoze.bfg.tests.test_authentication     433    433   100%   
     repoze.bfg.tests.test_authorization      124    124   100%   
     repoze.bfg.tests.test_chameleon_text     172    172   100%   
     repoze.bfg.tests.test_chameleon_zpt      161    161   100%   
@@ -210,33 +212,34 @@ trunk as of the 1.0a1 release).
     repoze.bfg.tests.test_location            34     34   100%   
     repoze.bfg.tests.test_log                 11     11   100%   
     repoze.bfg.tests.test_paster              69     69   100%   
-    repoze.bfg.tests.test_path                31     31   100%   
+    repoze.bfg.tests.test_path               104    104   100%   
     repoze.bfg.tests.test_registry            95     95   100%   
-    repoze.bfg.tests.test_request            215    215   100%   
+    repoze.bfg.tests.test_request            230    230   100%   
+    repoze.bfg.tests.test_resource           192    192   100%   
     repoze.bfg.tests.test_router             778    778   100%   
     repoze.bfg.tests.test_scripting           44     44   100%   
     repoze.bfg.tests.test_secpols            598    598   100%   
     repoze.bfg.tests.test_security           294    294   100%   
     repoze.bfg.tests.test_settings            96     96   100%   
-    repoze.bfg.tests.test_templating          45     45   100%   
+    repoze.bfg.tests.test_templating          74     74   100%   
     repoze.bfg.tests.test_testing            394    394   100%   
     repoze.bfg.tests.test_threadlocal         69     69   100%   
-    repoze.bfg.tests.test_traversal          851    851   100%   
-    repoze.bfg.tests.test_url                126    126   100%   
-    repoze.bfg.tests.test_urldispatch        103    103   100%   
+    repoze.bfg.tests.test_traversal          906    906   100%   
+    repoze.bfg.tests.test_url                173    173   100%   
+    repoze.bfg.tests.test_urldispatch        166    166   100%   
     repoze.bfg.tests.test_view               392    392   100%   
     repoze.bfg.tests.test_wsgi                99     99   100%   
-    repoze.bfg.tests.test_zcml              1105   1105   100%   
+    repoze.bfg.tests.test_zcml              1142   1142   100%   
     repoze.bfg.threadlocal                    29     29   100%   
-    repoze.bfg.traversal                     193    193   100%   
-    repoze.bfg.url                            43     43   100%   
-    repoze.bfg.urldispatch                    45     45   100%   
+    repoze.bfg.traversal                     200    200   100%   
+    repoze.bfg.url                            63     63   100%   
+    repoze.bfg.urldispatch                   101    101   100%   
     repoze.bfg.view                           65     65   100%   
     repoze.bfg.wsgi                           27     27   100%   
-    repoze.bfg.zcml                          297    297   100%   
+    repoze.bfg.zcml                          237    237   100%   
     --------------------------------------------------------------------
-    TOTAL                                   8557   8557   100%   
+    TOTAL                                   9228   9228   100%   
     ----------------------------------------------------------------------
-    Ran 556 tests in 22.183s
-    
+    Ran 604 tests in 21.224s
+
     OK
