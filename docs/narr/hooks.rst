@@ -174,7 +174,7 @@ will need to register two overrides.
 
 The package name in a specification may start with a dot, meaning that
 the package is relative to the package in which the ZCML file resides.
-For example:
+For example::
 
     <resource
       to_override=".subpackage:templates/"
