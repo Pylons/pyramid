@@ -864,12 +864,14 @@ class TestResourceDirective(unittest.TestCase):
     def test_override_directory_with_file(self):
         from zope.configuration.exceptions import ConfigurationError
         context = DummyContext()
-        self.assertRaises(ConfigurationError, self._callFUT, context, 'a/', 'a')
+        self.assertRaises(ConfigurationError, self._callFUT, context,
+                          'a:foo/', 'a:foo.pt')
 
     def test_override_file_with_directory(self):
         from zope.configuration.exceptions import ConfigurationError
         context = DummyContext()
-        self.assertRaises(ConfigurationError, self._callFUT, context, 'a', 'a/')
+        self.assertRaises(ConfigurationError, self._callFUT, context,
+                          'a:foo.pt', 'a:foo/')
 
     def test_no_colons(self):
         from repoze.bfg.zcml import _override

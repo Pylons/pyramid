@@ -192,18 +192,6 @@ def resource(context, to_override, override_with):
     if to_override == override_with:
         raise ConfigurationError('You cannot override a resource with itself')
 
-    if to_override.endswith('/'):
-        if not override_with.endswith('/'):
-            raise ConfigurationError(
-                'A directory cannot be overridden with a file (put a slash '
-                'at the end of override_with if necessary)')
-
-    if override_with.endswith('/'):
-        if not to_override.endswith('/'):
-            raise ConfigurationError(
-                'A file cannot be overridden with a directory (put a slash '
-                'at the end of to_override if necessary)')
-
     package = to_override
     path = ''
     if ':' in to_override:
@@ -213,6 +201,18 @@ def resource(context, to_override, override_with):
     override_prefix = ''
     if ':' in override_with:
         override_package, override_prefix = override_with.split(':', 1)
+
+    if path.endswith('/'):
+        if not override_prefix.endswith('/'):
+            raise ConfigurationError(
+                'A directory cannot be overridden with a file (put a slash '
+                'at the end of override_with if necessary)')
+
+    if override_prefix.endswith('/'):
+        if not path.endswith('/'):
+            raise ConfigurationError(
+                'A file cannot be overridden with a directory (put a slash '
+                'at the end of to_override if necessary)')
 
     package = context.resolve(package).__name__
     override_package = context.resolve(package).__name__

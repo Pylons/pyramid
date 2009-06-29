@@ -4,6 +4,80 @@ Next release
 Features
 --------
 
+- A new ZCML directive exists named "resource".  This ZCML directive
+  allows you to override Chameleon templates within a package (both
+  directories full of templates and individual template files) with
+  other templates in the same package or within another package.  This
+  allows you to "fake out" a view's use of a template, causing it to
+  retrieve a different template than the one actually named by a
+  relative path to a call like
+  ``render_template_to_response('templates/mytemplate.pt')``.  For
+  example, you can override a template file by doing::
+
+    <resource
+      to_override="some.package:templates/mytemplate.pt"
+      override_with="another.package:othertemplates/anothertemplate.pt"
+     />
+
+  The string passed to "to_override" and "override_with" is named a
+  "specification".  The colon separator in a specification separates
+  the package name from a package-relative directory name.  The colon
+  and the following relative path are optional.  If they are not
+  specified, the override attempts to resolve every lookup into a
+  package from the directory of another package.  For example::
+
+    <resource
+      to_override="some.package"
+      override_with="another.package"
+     />
+
+
+  Individual subdirectories within a package can also be overridden::
+
+    <resource
+      to_override="some.package:templates/"
+      override_with="another.package:othertemplates/"
+     />
+
+  If you wish to override a directory with another directory, you must
+  make sure to attach the slash to the end of both the ``to_override``
+  specification and the ``override_with`` specification.  If you fail
+  to attach a slash to the end of a specification that points a
+  directory, you will get unexpected results.  You cannot override a
+  directory specification with a file specification, and vice versa (a
+  startup error will occur if you try).
+
+  You cannot override a resource with itself (a startup error will
+  occur if you try).
+
+  Only individual *package* resources may be overridden.  Overrides
+  will not traverse through subpackages within an overridden package.
+  This means that if you want to override resources for both
+  ``some.package:templates``, and ``some.package.views:templates``,
+  you will need to register two overrides.
+
+  The package name in a specification may start with a dot, meaning
+  that the package is relative to the package in which the ZCML file
+  resides.  For example:
+
+    <resource
+      to_override=".subpackage:templates/"
+      override_with="another.package:templates/"
+     />
+
+  Overrides for the same ``to_overrides`` specification can be named
+  multiple times within ZCML.  Each ``override_with`` path will be
+  consulted in the order defined within ZCML, forming an override
+  search path.
+
+  Resource overrides can actually override resources other than
+  templates.  Any software which uses the ``pkg_resources``
+  ``get_resource_filename``, ``get_resource_stream`` or
+  ``get_resource_string`` APIs will obtain an overridden file when an
+  override is used.  However, the only built-in facility which uses
+  the ``pkg_resources`` API within BFG is the templating stuff, so we
+  only call out template overrides here.
+
 - Use the ``pkg_resources`` API to locate template filenames instead
   of dead-reckoning using the ``os.path`` module.
 
