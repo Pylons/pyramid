@@ -77,10 +77,10 @@ Differences from Other Frameworks
 Like :term:`Zope`, the :mod:`repoze.bfg` framework imposes slightly
 more `control inversion <http://plope.com/control_inversion>`_ upon
 application developers than other Python frameworks such as
-:term:`Pylons`.  For example :mod:`repoze.bfg` assumes that you're
-wiling to resolve a URL to a :term:`context` object before passing it
-to a :term:`view`.  Pylons and other Python "MVC" frameworks have no
-such intermediate step; they resolve a URL directly to a controller.
+:term:`Pylons`.  For example :mod:`repoze.bfg` allows you to
+explicitly resolve a URL to a :term:`context` object before invoking a
+:term:`view`.  Pylons and other Python "MVC" frameworks have no such
+intermediate step; they resolve a URL directly to a controller.
 Another example: using the :mod:`repoze.bfg` security subsystem
 assumes that you're willing to attach an :term:`ACL` to a
 :term:`context` object; the ACL is checked by the framework itself
