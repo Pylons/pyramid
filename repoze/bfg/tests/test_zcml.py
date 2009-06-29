@@ -897,6 +897,42 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['args'],
                          ('IDummy', 'foo.pt', 'IDummy', 'foo.pt'))
 
+    def test_override_module_with_directory(self):
+        from repoze.bfg.zcml import _override
+        context = DummyContext()
+        self._callFUT(context, 'a', 'b:foo/')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action['callable'], _override)
+        self.assertEqual(action['discriminator'], None)
+        self.assertEqual(action['args'],
+                         ('IDummy', '', 'IDummy', 'foo/'))
+
+    def test_override_directory_with_module(self):
+        from repoze.bfg.zcml import _override
+        context = DummyContext()
+        self._callFUT(context, 'a:foo/', 'b')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action['callable'], _override)
+        self.assertEqual(action['discriminator'], None)
+        self.assertEqual(action['args'],
+                         ('IDummy', 'foo/', 'IDummy', ''))
+
+    def test_override_module_with_module(self):
+        from repoze.bfg.zcml import _override
+        context = DummyContext()
+        self._callFUT(context, 'a', 'b')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action['callable'], _override)
+        self.assertEqual(action['discriminator'], None)
+        self.assertEqual(action['args'],
+                         ('IDummy', '', 'IDummy', ''))
+
 class Test_OverrideFunction(unittest.TestCase):
     def setUp(self):
         cleanUp()

@@ -54,8 +54,8 @@ class TestRendererFromCache(unittest.TestCase):
 
     def test_relpath_alreadyregistered(self):
         from repoze.bfg.interfaces import ITemplateRenderer
-        from repoze.bfg.tests import test_templating
-        module_name = test_templating.__name__
+        from repoze.bfg import tests
+        module_name = tests.__name__
         relpath = 'test_templating.py'
         spec = '%s\t%s' % (module_name, relpath)
         renderer = {}
@@ -64,7 +64,6 @@ class TestRendererFromCache(unittest.TestCase):
         self.failUnless(result is renderer)
 
     def test_relpath_notyetregistered(self):
-        from repoze.bfg import resource
         import os
         from repoze.bfg.tests import test_templating
         module_name = test_templating.__name__

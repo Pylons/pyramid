@@ -2,7 +2,7 @@ import pkg_resources
 from zope.component import queryUtility
 from repoze.bfg.interfaces import ITemplateRenderer
 from zope.component import getSiteManager
-from repoze.bfg.path import caller_module
+from repoze.bfg.path import caller_package
 import os
 
 def renderer_from_cache(path, factory, level=3, **kw):
@@ -19,8 +19,8 @@ def renderer_from_cache(path, factory, level=3, **kw):
 
     else:
         # 'path' is a relative filename
-        module = caller_module(level=level)
-        spec = (module.__name__, path) 
+        package = caller_package(level=level)
+        spec = (package.__name__, path) 
         utility_name = '%s\t%s' % spec # utility name must be a string :-(
         renderer = queryUtility(ITemplateRenderer, name=utility_name)
         if renderer is None:

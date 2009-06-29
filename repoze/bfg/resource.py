@@ -53,7 +53,7 @@ class PackageOverrides:
         self.overridden_package = overridden_package
 
     def insert(self, path, package, prefix):
-        if path.endswith('/'):
+        if not path or path.endswith('/'):
             override = DirectoryOverride(path, package, prefix)
         else:
             override = FileOverride(path, package, prefix)

@@ -55,6 +55,33 @@ class TestCallerModule(unittest.TestCase):
         import unittest
         result = self._callFUT(3)
         self.assertEqual(result, unittest)
+
+class TestCallerPackage(unittest.TestCase):
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.path import caller_package
+        return caller_package(*arg, **kw)
+
+    def test_it_level_1(self):
+        from repoze.bfg import tests
+        result = self._callFUT(1)
+        self.assertEqual(result, tests)
+
+    def test_it_level_2(self):
+        from repoze.bfg import tests
+        result = self._callFUT(2)
+        self.assertEqual(result, tests)
+
+    def test_it_level_3(self):
+        import unittest
+        result = self._callFUT(3)
+        self.assertEqual(result, unittest)
+
+    def test_it_package(self):
+        import repoze.bfg.tests
+        def dummy_caller_module(*arg):
+            return repoze.bfg.tests
+        result = self._callFUT(1, caller_module=dummy_caller_module)
+        self.assertEqual(result, repoze.bfg.tests)
         
 class TestPackagePath(unittest.TestCase):
     def _callFUT(self, package):

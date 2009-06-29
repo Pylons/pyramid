@@ -1,3 +1,18 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- Use ``caller_package`` function instead of ``caller_module``
+  function within ``templating`` to avoid needing to name the caller
+  module in resource overrides (actually match docs).
+
+- Make it possible to override templates stored directly in a module
+  with templates in a subdirectory of the same module, stored directly
+  within another module, or stored in a subdirectory of another module
+  (actually match docs).
+
 1.0a5 (2009-06-28)
 ==================
 

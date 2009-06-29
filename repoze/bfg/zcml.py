@@ -202,14 +202,14 @@ def resource(context, to_override, override_with):
     if ':' in override_with:
         override_package, override_prefix = override_with.split(':', 1)
 
-    if path.endswith('/'):
-        if not override_prefix.endswith('/'):
+    if path and path.endswith('/'):
+        if override_prefix and (not override_prefix.endswith('/')):
             raise ConfigurationError(
                 'A directory cannot be overridden with a file (put a slash '
                 'at the end of override_with if necessary)')
 
-    if override_prefix.endswith('/'):
-        if not path.endswith('/'):
+    if override_prefix and override_prefix.endswith('/'):
+        if path and (not path.endswith('/')):
             raise ConfigurationError(
                 'A file cannot be overridden with a directory (put a slash '
                 'at the end of to_override if necessary)')

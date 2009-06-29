@@ -16,6 +16,16 @@ def caller_module(level=2):
     module = sys.modules[module_name]
     return module
 
+def caller_package(level=2, caller_module=caller_module):
+    # caller_module in arglist for tests
+    module = caller_module(level+1)
+    if '__init__.py' in module.__file__:
+        # Module is a package
+        return module
+    # Go up one level to get package
+    package_name = module.__name__.rsplit('.', 1)[0]
+    return sys.modules[package_name]
+
 def package_path(package):
     # computing the abspath is actually kinda expensive so we memoize
     # the result
