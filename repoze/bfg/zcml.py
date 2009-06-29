@@ -1,5 +1,6 @@
 import inspect
 import types
+import pkg_resources
 
 from zope.configuration import xmlconfig
 
@@ -27,6 +28,10 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IUnauthorizedAppFactory
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IRequestFactories
+from repoze.bfg.interfaces import IPackageOverrides
+
+from repoze.bfg.resource import OverrideProvider
+from repoze.bfg.resource import PackageOverrides
 
 from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
 from repoze.bfg.request import named_request_factories
@@ -154,6 +159,69 @@ def scan(_context, package, martian=martian):
     module_grokker.register(BFGViewFunctionGrokker())
     martian.grok_dotted_name(package.__name__, grokker=module_grokker,
                              context=_context, exclude_filter=exclude)
+
+class IResourceDirective(Interface):
+    """
+    Directive for specifying that one package may override resources from
+    another package.
+    """
+    to_override = TextLine(
+        title=u"Override spec",
+        description=u'The spec of the resource to override.',
+        required=True)
+    override_with = TextLine(
+        title=u"With spec",
+        description=u"The spec of the resource providing the override.",
+        required=True)
+
+def _override(package, path, override_package, override_prefix,
+              PackageOverrides=PackageOverrides, pkg_resources=pkg_resources):
+    # PackageOverrides and pkg_resources kw args for tests
+    sm = getSiteManager()
+    override = queryUtility(IPackageOverrides, name=package)
+    if override is None:
+        override = PackageOverrides(package)
+        sm.registerUtility(override, IPackageOverrides, name=package)
+        # register_loader_type will be called too many times if there
+        # is more than one overridden package; that's OK, as our
+        # mutation is idempotent
+        pkg_resources.register_loader_type(type(None), OverrideProvider)
+    override.insert(path, override_package, override_prefix)
+
+def resource(context, to_override, override_with):
+    if to_override == override_with:
+        raise ConfigurationError('You cannot override a resource with itself')
+
+    if to_override.endswith('/'):
+        if not override_with.endswith('/'):
+            raise ConfigurationError(
+                'A directory cannot be overridden with a file (put a slash '
+                'at the end of override_with if necessary)')
+
+    if override_with.endswith('/'):
+        if not to_override.endswith('/'):
+            raise ConfigurationError(
+                'A file cannot be overridden with a directory (put a slash '
+                'at the end of to_override if necessary)')
+
+    package = to_override
+    path = ''
+    if ':' in to_override:
+        package, path = to_override.split(':', 1)
+
+    override_package = override_with
+    override_prefix = ''
+    if ':' in override_with:
+        override_package, override_prefix = override_with.split(':', 1)
+
+    package = context.resolve(package).__name__
+    override_package = context.resolve(package).__name__
+
+    context.action(
+        discriminator = None,
+        callable = _override,
+        args = (package, path, override_package, override_prefix),
+        )
 
 class IRouteDirective(Interface):
     """ The interface for the ``route`` ZCML directive

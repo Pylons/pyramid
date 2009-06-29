@@ -34,6 +34,12 @@
       handler="repoze.bfg.zcml.route"
       />
 
+  <meta:directive
+      name="resource"
+      schema="repoze.bfg.zcml.IResourceDirective"
+      handler="repoze.bfg.zcml.resource"
+      />
+
   </meta:directives>
 
 </configure>

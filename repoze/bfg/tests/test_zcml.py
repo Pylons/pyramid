@@ -804,8 +804,6 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_args, ('name', 'path', None,))
 
     def test_without_view(self):
-        from zope.component import getUtility
-        from repoze.bfg.interfaces import IRequestFactories
         from repoze.bfg.zcml import connect_route
         
         context = DummyContext()
@@ -827,8 +825,6 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_args, ('name','path', None))
 
     def test_with_request_type(self):
-        from zope.component import getUtility
-        from repoze.bfg.interfaces import IRequestFactories
         from repoze.bfg.zcml import connect_route
         
         context = DummyContext()
@@ -848,6 +844,94 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_discriminator[2], None)
         self.assertEqual(route_discriminator[3], 'GET')
         self.assertEqual(route_args, ('name','path', None))
+
+class TestResourceDirective(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import resource
+        return resource(*arg, **kw)
+
+    def test_samename(self):
+        from zope.configuration.exceptions import ConfigurationError
+        context = DummyContext()
+        self.assertRaises(ConfigurationError, self._callFUT, context, 'a', 'a')
+
+    def test_override_directory_with_file(self):
+        from zope.configuration.exceptions import ConfigurationError
+        context = DummyContext()
+        self.assertRaises(ConfigurationError, self._callFUT, context, 'a/', 'a')
+
+    def test_override_file_with_directory(self):
+        from zope.configuration.exceptions import ConfigurationError
+        context = DummyContext()
+        self.assertRaises(ConfigurationError, self._callFUT, context, 'a', 'a/')
+
+    def test_no_colons(self):
+        from repoze.bfg.zcml import _override
+        context = DummyContext()
+        self._callFUT(context, 'a', 'b')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action['callable'], _override)
+        self.assertEqual(action['discriminator'], None)
+        self.assertEqual(action['args'],
+                         ('IDummy', '', 'IDummy', ''))
+
+    def test_with_colons(self):
+        from repoze.bfg.zcml import _override
+        context = DummyContext()
+        self._callFUT(context, 'a:foo.pt', 'b:foo.pt')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action['callable'], _override)
+        self.assertEqual(action['discriminator'], None)
+        self.assertEqual(action['args'],
+                         ('IDummy', 'foo.pt', 'IDummy', 'foo.pt'))
+
+class Test_OverrideFunction(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import _override
+        return _override(*arg, **kw)
+
+    def _registerOverrides(self, overrides, package_name):
+        from repoze.bfg.interfaces import IPackageOverrides
+        from zope.component import getSiteManager
+        sm = getSiteManager()
+        sm.registerUtility(overrides, IPackageOverrides, name=package_name)
+
+    def test_overrides_not_yet_registered(self):
+        from repoze.bfg.resource import OverrideProvider
+        from zope.component import queryUtility
+        from repoze.bfg.interfaces import IPackageOverrides
+        resources = DummyPackageResources()
+        self._callFUT('package', 'path', 'opackage', 'oprefix',
+                      PackageOverrides=DummyOverrides, pkg_resources=resources)
+        overrides = queryUtility(IPackageOverrides, name='package')
+        self.assertEqual(overrides.package, 'package')
+        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
+        self.assertEqual(len(resources.registered), 1)
+        resource = resources.registered[0]
+        self.assertEqual(resource[0], type(None))
+        self.assertEqual(resource[1], OverrideProvider)
+
+    def test_overrides_already_registered(self):
+        overrides = DummyOverrides('package')
+        self._registerOverrides(overrides, 'package')
+        self._callFUT('package', 'path', 'opackage', 'oprefix')
+        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
 
 class TestZCMLConfigure(unittest.TestCase):
     i = 0
@@ -1244,3 +1328,18 @@ class DummyRequest:
     def get_response(self, app):
         return app
     
+class DummyOverrides:
+    def __init__(self, package):
+        self.package = package
+        self.inserted = []
+
+    def insert(self, path, package, prefix):
+        self.inserted.append((path, package, prefix))
+        
+class DummyPackageResources:
+    def __init__(self):
+        self.registered  = []
+
+    def register_loader_type(self, typ, provider):
+        self.registered.append((typ, provider))
+        

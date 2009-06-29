@@ -231,6 +231,9 @@ class IRequestFactories(Interface):
     """ Marker utility interface representing a dictionary of request
     factory descriptions"""
 
+class IPackageOverrides(Interface):
+    """ Utility for pkg_resources overrides """
+
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)
 VH_ROOT_KEY = 'HTTP_X_VHM_ROOT' 
