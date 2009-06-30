@@ -1,6 +1,5 @@
 import inspect
 import types
-import pkg_resources
 
 from zope.configuration import xmlconfig
 
@@ -30,7 +29,6 @@ from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IRequestFactories
 from repoze.bfg.interfaces import IPackageOverrides
 
-from repoze.bfg.resource import OverrideProvider
 from repoze.bfg.resource import PackageOverrides
 
 from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
