@@ -1,7 +1,15 @@
 Next release
 ============
 
-- ...
+- Bug fix: when a ``repoze.bfg.resource.PackageOverrides`` class was
+  instantiated, and the package it was overriding already had a
+  ``__loader__`` attribute, it would fail at startup time, even if the
+  ``__loader__`` attribute was another PackageOverrides instance.  We
+  now replace any ``__loader__`` that is also a PackageOverrides
+  instance.  Symptom: ``ConfigurationExecutionError: <type
+  'exceptions.TypeError'>: Package <module 'karl.views' from
+  '/Users/chrism/projects/osi/bfgenv/src/karl/karl/views/__init__.pyc'>
+  already has a __loader__ (probably a module in a zipped egg)``.
 
 1.0a7 (2009-06-30)
 ==================

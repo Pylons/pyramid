@@ -50,9 +50,11 @@ class PackageOverrides:
     implements(IPackageOverrides)
     # pkg_resources arg in kw args below for testing
     def __init__(self, package, pkg_resources=pkg_resources):
-        if hasattr(package, '__loader__'):
-            raise TypeError('Package %s already has a __loader__ '
-                            '(probably a module in a zipped egg)' % package)
+        if hasattr(package, '__loader__') and not isinstance(package.__loader__,
+                                                             self.__class__):
+            raise TypeError('Package %s already has a non-%s __loader__ '
+                            '(probably a module in a zipped egg)' %
+                            (package, self.__class__))
         # We register ourselves as a __loader__ *only* to support the
         # setuptools _find_adapter adapter lookup; this class doesn't
         # actually support the PEP 302 loader "API".  This is

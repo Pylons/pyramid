@@ -123,10 +123,17 @@ class TestPackageOverrides(unittest.TestCase):
             pkg_resources = DummyPkgResources()
         return klass(package, pkg_resources=pkg_resources)
 
-    def test_ctor_package_already_has_loader(self):
+    def test_ctor_package_already_has_loader_of_different_type(self):
         package = DummyPackage('package')
         package.__loader__ = True
         self.assertRaises(TypeError, self._makeOne, package)
+
+    def test_ctor_package_already_has_loader_of_same_type(self):
+        dummy_pkg_resources = DummyPkgResources()
+        package = DummyPackage('package')
+        package.__loader__ = self._makeOne(package)
+        po = self._makeOne(package)
+        self.assertEqual(package.__loader__, po)
 
     def test_ctor_sets_loader(self):
         package = DummyPackage('package')
