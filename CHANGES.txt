@@ -1,5 +1,5 @@
-Next release
-============
+1.0a7 (2009-06-30)
+==================
 
 - Add a ``reload_resources`` configuration file setting (aka the
   ``BFG_RELOAD_RESOURCES`` environment variable).  When this is set to
