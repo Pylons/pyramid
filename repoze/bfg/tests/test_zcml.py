@@ -883,7 +883,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         ('IDummy', '', 'IDummy', ''))
+                         (IDummy, '', IDummy, ''))
 
     def test_with_colons(self):
         from repoze.bfg.zcml import _override
@@ -895,7 +895,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         ('IDummy', 'foo.pt', 'IDummy', 'foo.pt'))
+                         (IDummy, 'foo.pt', IDummy, 'foo.pt'))
 
     def test_override_module_with_directory(self):
         from repoze.bfg.zcml import _override
@@ -907,7 +907,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         ('IDummy', '', 'IDummy', 'foo/'))
+                         (IDummy, '', IDummy, 'foo/'))
 
     def test_override_directory_with_module(self):
         from repoze.bfg.zcml import _override
@@ -919,7 +919,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         ('IDummy', 'foo/', 'IDummy', ''))
+                         (IDummy, 'foo/', IDummy, ''))
 
     def test_override_module_with_module(self):
         from repoze.bfg.zcml import _override
@@ -931,7 +931,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         ('IDummy', '', 'IDummy', ''))
+                         (IDummy, '', IDummy, ''))
 
 class Test_OverrideFunction(unittest.TestCase):
     def setUp(self):
@@ -951,24 +951,22 @@ class Test_OverrideFunction(unittest.TestCase):
         sm.registerUtility(overrides, IPackageOverrides, name=package_name)
 
     def test_overrides_not_yet_registered(self):
-        from repoze.bfg.resource import OverrideProvider
         from zope.component import queryUtility
         from repoze.bfg.interfaces import IPackageOverrides
-        resources = DummyPackageResources()
-        self._callFUT('package', 'path', 'opackage', 'oprefix',
-                      PackageOverrides=DummyOverrides, pkg_resources=resources)
+        package = DummyPackage('package')
+        opackage = DummyPackage('opackage')
+        self._callFUT(package, 'path', opackage, 'oprefix',
+                      PackageOverrides=DummyOverrides)
         overrides = queryUtility(IPackageOverrides, name='package')
-        self.assertEqual(overrides.package, 'package')
+        self.assertEqual(overrides.package, package)
         self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
-        self.assertEqual(len(resources.registered), 1)
-        resource = resources.registered[0]
-        self.assertEqual(resource[0], type(None))
-        self.assertEqual(resource[1], OverrideProvider)
 
     def test_overrides_already_registered(self):
-        overrides = DummyOverrides('package')
+        package = DummyPackage('package')
+        opackage = DummyPackage('opackage')
+        overrides = DummyOverrides(package)
         self._registerOverrides(overrides, 'package')
-        self._callFUT('package', 'path', 'opackage', 'oprefix')
+        self._callFUT(package, 'path', opackage, 'oprefix')
         self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
 
 class TestZCMLConfigure(unittest.TestCase):
@@ -1374,10 +1372,7 @@ class DummyOverrides:
     def insert(self, path, package, prefix):
         self.inserted.append((path, package, prefix))
         
-class DummyPackageResources:
-    def __init__(self):
-        self.registered  = []
-
-    def register_loader_type(self, typ, provider):
-        self.registered.append((typ, provider))
+class DummyPackage:
+    def __init__(self, name):
+        self.__name__ = name
         

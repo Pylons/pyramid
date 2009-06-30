@@ -175,18 +175,16 @@ class IResourceDirective(Interface):
         required=True)
 
 def _override(package, path, override_package, override_prefix,
-              PackageOverrides=PackageOverrides, pkg_resources=pkg_resources):
-    # PackageOverrides and pkg_resources kw args for tests
+              PackageOverrides=PackageOverrides):
+    # PackageOverrides kw arg for tests
     sm = getSiteManager()
-    override = queryUtility(IPackageOverrides, name=package)
+    package_name = package.__name__
+    override_package_name = override_package.__name__
+    override = queryUtility(IPackageOverrides, name=package_name)
     if override is None:
         override = PackageOverrides(package)
-        sm.registerUtility(override, IPackageOverrides, name=package)
-        # register_loader_type will be called too many times if there
-        # is more than one overridden package; that's OK, as our
-        # mutation is idempotent
-        pkg_resources.register_loader_type(type(None), OverrideProvider)
-    override.insert(path, override_package, override_prefix)
+        sm.registerUtility(override, IPackageOverrides, name=package_name)
+    override.insert(path, override_package_name, override_prefix)
 
 def resource(context, to_override, override_with):
     if to_override == override_with:
@@ -214,8 +212,8 @@ def resource(context, to_override, override_with):
                 'A file cannot be overridden with a directory (put a slash '
                 'at the end of to_override if necessary)')
 
-    package = context.resolve(package).__name__
-    override_package = context.resolve(package).__name__
+    package = context.resolve(package)
+    override_package = context.resolve(override_package)
 
     context.action(
         discriminator = None,

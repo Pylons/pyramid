@@ -117,13 +117,40 @@ class TestPackageOverrides(unittest.TestCase):
         from repoze.bfg.resource import PackageOverrides
         return PackageOverrides
 
-    def _makeOne(self, package):
+    def _makeOne(self, package, pkg_resources=None):
         klass = self._getTargetClass()
-        return klass(package)
+        if pkg_resources is None:
+            pkg_resources = DummyPkgResources()
+        return klass(package, pkg_resources=pkg_resources)
+
+    def test_ctor_package_already_has_loader(self):
+        package = DummyPackage('package')
+        package.__loader__ = True
+        self.assertRaises(TypeError, self._makeOne, package)
+
+    def test_ctor_sets_loader(self):
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        self.assertEqual(package.__loader__, po)
+
+    def test_ctor_registers_loader_type(self):
+        from repoze.bfg.resource import OverrideProvider
+        dummy_pkg_resources = DummyPkgResources()
+        package = DummyPackage('package')
+        po = self._makeOne(package, dummy_pkg_resources)
+        self.assertEqual(dummy_pkg_resources.registered, [(po.__class__,
+                         OverrideProvider)])
+
+    def test_ctor_sets_local_state(self):
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        self.assertEqual(po.overrides, [])
+        self.assertEqual(po.overridden_package_name, 'package')
 
     def test_insert_directory(self):
         from repoze.bfg.resource import DirectoryOverride
-        po = self._makeOne('package')
+        package = DummyPackage('package')
+        po = self._makeOne(package)
         po.overrides= [None]
         po.insert('foo/', 'package', 'bar/')
         self.assertEqual(len(po.overrides), 2)
@@ -132,7 +159,8 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_insert_file(self):
         from repoze.bfg.resource import FileOverride
-        po = self._makeOne('package')
+        package = DummyPackage('package')
+        po = self._makeOne(package)
         po.overrides= [None]
         po.insert('foo.pt', 'package', 'bar.pt')
         self.assertEqual(len(po.overrides), 2)
@@ -141,7 +169,8 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_search_path(self):
         overrides = [ DummyOverride(None), DummyOverride(('package', 'name'))]
-        po = self._makeOne('package')
+        package = DummyPackage('package')
+        po = self._makeOne(package)
         po.overrides= overrides
         self.assertEqual(list(po.search_path('whatever')),
                          [('package', 'name')])
@@ -150,7 +179,8 @@ class TestPackageOverrides(unittest.TestCase):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
             ('repoze.bfg.tests', 'test_resource.py'))]
-        po = self._makeOne('package')
+        package = DummyPackage('package')
+        po = self._makeOne(package)
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
         expected = os.path.join(here, 'test_resource.py')
@@ -160,7 +190,8 @@ class TestPackageOverrides(unittest.TestCase):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
             ('repoze.bfg.tests', 'test_resource.py'))]
-        po = self._makeOne('package')
+        package = DummyPackage('package')
+        po = self._makeOne(package)
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, 'test_resource.py')).read()
@@ -170,7 +201,8 @@ class TestPackageOverrides(unittest.TestCase):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
             ('repoze.bfg.tests', 'test_resource.py'))]
-        po = self._makeOne('package')
+        package = DummyPackage('package')
+        po = self._makeOne(package)
         po.overrides= overrides
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, 'test_resource.py')).read()
@@ -216,15 +248,12 @@ class TestFileOverride(unittest.TestCase):
         result = o('notfound.pt')
         self.assertEqual(result, None)
         
-    
-
 class DummyOverride:
     def __init__(self, result):
         self.result = result
 
     def __call__(self, resource_name):
         return self.result
-    
 
 class DummyOverrides:
     def __init__(self, result):
@@ -234,4 +263,15 @@ class DummyOverrides:
         return self.result
 
     get_stream = get_string = get_filename
+    
+class DummyPkgResources:
+    def __init__(self):
+        self.registered = []
+
+    def register_loader_type(self, typ, inst):
+        self.registered.append((typ, inst))
+        
+class DummyPackage:
+    def __init__(self, name):
+        self.__name__ = name
     

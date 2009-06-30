@@ -1,7 +1,10 @@
 Next release
 ============
 
-- ...
+- Register a ``repoze.bfg.resource.OverrideProvider`` as a
+  pkg_resources provider only for modules which are known to have
+  overrides, instead of globally, when a <resource> directive is used
+  (performance).
 
 1.0a6 (2009-06-29)
 ==================
