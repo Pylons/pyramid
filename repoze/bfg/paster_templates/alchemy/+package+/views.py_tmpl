@@ -3,8 +3,14 @@ from repoze.bfg.view import static
 
 static_view = static('templates/static')
 
-def my_view(context, request):
-    return render_template_to_response('templates/mytemplate.pt',
+def view_root(context, request):
+    return render_template_to_response('templates/root.pt',
                                        request = request,
-                                       item = context[u'test name'],
+                                       items = list(context),
+                                       project = '{{project}}')
+
+def view_model(context, request):
+    return render_template_to_response('templates/model.pt',
+                                       request = request,
+                                       item = context,
                                        project = '{{project}}')

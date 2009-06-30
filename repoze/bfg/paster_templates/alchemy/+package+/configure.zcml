@@ -5,13 +5,18 @@
 
   <view
      for=".models.MyApp"
-     view=".views.my_view"
+     view=".views.view_root"
      />
 
   <view
      for=".models.MyApp"
      view=".views.static_view"
      name="static"
+     />
+
+  <view
+     for=".models.MyModel"
+     view=".views.view_model"
      />
 
   <subscriber for="repoze.bfg.interfaces.INewRequest"

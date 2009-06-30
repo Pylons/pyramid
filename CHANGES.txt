@@ -1,6 +1,10 @@
 Next release
 ============
 
+- Updated the ``bfg_alchemy`` paster template to include two views:
+  the view on the root shows a list of links to records;  the view on
+  a record shows the details for that object.
+
 - Register a ``repoze.bfg.resource.OverrideProvider`` as a
   pkg_resources provider only for modules which are known to have
   overrides, instead of globally, when a <resource> directive is used

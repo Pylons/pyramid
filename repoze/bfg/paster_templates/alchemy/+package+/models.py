@@ -40,7 +40,11 @@ class MyApp(object):
 
     def __getitem__(self, key):
         session= DBSession()
-        query = session.query(MyModel).filter_by(name=key)
+        try:
+            key = int(key)
+        except (ValueError, TypeError):
+            raise KeyError(key)
+        query = session.query(MyModel).filter_by(id=key)
         try:
             item = query.one()
             item.__parent__ = self
@@ -55,6 +59,11 @@ class MyApp(object):
         except KeyError:
             item = default
         return item
+
+    def __iter__(self):
+        session= DBSession()
+        query = session.query(MyModel)
+        return iter(query)
 
 root = MyApp()
 
