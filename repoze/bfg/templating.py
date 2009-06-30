@@ -1,9 +1,12 @@
-import pkg_resources
-from zope.component import queryUtility
-from repoze.bfg.interfaces import ITemplateRenderer
-from zope.component import getSiteManager
-from repoze.bfg.path import caller_package
 import os
+import pkg_resources
+
+from zope.component import queryUtility
+from zope.component import getSiteManager
+
+from repoze.bfg.interfaces import ITemplateRenderer
+from repoze.bfg.path import caller_package
+from repoze.bfg.settings import get_settings
 
 def renderer_from_cache(path, factory, level=3, **kw):
     if os.path.isabs(path):
@@ -21,7 +24,7 @@ def renderer_from_cache(path, factory, level=3, **kw):
         # 'path' is a relative filename
         package = caller_package(level=level)
         spec = (package.__name__, path) 
-        utility_name = '%s\t%s' % spec # utility name must be a string :-(
+        utility_name = '%s:%s' % spec # utility name must be a string
         renderer = queryUtility(ITemplateRenderer, name=utility_name)
         if renderer is None:
             # service unit tests here by trying the relative path
@@ -29,11 +32,15 @@ def renderer_from_cache(path, factory, level=3, **kw):
             renderer = queryUtility(ITemplateRenderer, name=path)
         if renderer is None:
             if not pkg_resources.resource_exists(*spec):
-                raise ValueError('Missing template resource: %s:%s' % spec)
+                raise ValueError('Missing template resource: %s' % utility_name)
             abspath = pkg_resources.resource_filename(*spec)
             renderer = factory(abspath, **kw)
-            sm = getSiteManager()
-            sm.registerUtility(renderer, ITemplateRenderer, name=utility_name)
+            settings = get_settings()
+            if (not settings) or (not settings.get('reload_resources')):
+                # cache the template
+                sm = getSiteManager()
+                sm.registerUtility(renderer, ITemplateRenderer,
+                                   name=utility_name)
         
     return renderer
 

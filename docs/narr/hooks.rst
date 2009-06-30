@@ -118,6 +118,8 @@ an object that implements any particular interface; it simply needs
 have a ``status`` attribute, a ``headerlist`` attribute, and and
 ``app_iter`` attribute.
 
+.. _overriding_resources_section:
+
 Overriding Resources
 --------------------
 

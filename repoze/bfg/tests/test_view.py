@@ -317,8 +317,8 @@ class TestStaticView(unittest.TestCase, BaseTest):
         from repoze.bfg.view import static
         return static
 
-    def _makeOne(self, path):
-        return self._getTargetClass()(path)
+    def _makeOne(self, path, package_name=None):
+        return self._getTargetClass()(path, package_name=package_name)
         
     def test_abspath(self):
         import os
@@ -343,8 +343,26 @@ class TestStaticView(unittest.TestCase, BaseTest):
         response = view(context, request)
         self.assertEqual(request.copied, True)
         here = os.path.abspath(os.path.dirname(__file__))
-        abspath = os.path.join(here, 'fixtures')
-        self.assertEqual(response.directory, abspath)
+        self.assertEqual(response.root_resource, 'fixtures')
+        self.assertEqual(response.resource_name, 'fixtures')
+        self.assertEqual(response.package_name, 'repoze.bfg.tests')
+        self.assertEqual(response.cache_max_age, 3600)
+
+    def test_relpath_withpackage(self):
+        import os
+        path = 'fixtures'
+        view = self._makeOne(path, package_name='another')
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertEqual(request.copied, True)
+        here = os.path.abspath(os.path.dirname(__file__))
+        self.assertEqual(response.root_resource, 'fixtures')
+        self.assertEqual(response.resource_name, 'fixtures')
+        self.assertEqual(response.package_name, 'another')
+        self.assertEqual(response.cache_max_age, 3600)
 
 class TestBFGViewDecorator(unittest.TestCase):
     def setUp(self):

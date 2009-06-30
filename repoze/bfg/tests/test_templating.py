@@ -57,7 +57,7 @@ class TestRendererFromCache(unittest.TestCase):
         from repoze.bfg import tests
         module_name = tests.__name__
         relpath = 'test_templating.py'
-        spec = '%s\t%s' % (module_name, relpath)
+        spec = '%s:%s' % (module_name, relpath)
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=spec)
         result = self._callFUT('test_templating.py', None)
@@ -68,7 +68,6 @@ class TestRendererFromCache(unittest.TestCase):
         from repoze.bfg.tests import test_templating
         module_name = test_templating.__name__
         relpath = 'test_templating.py'
-        spec = '%s\t%s' % (module_name, relpath)
         renderer = {}
         factory = DummyFactory(renderer)
         result = self._callFUT('test_templating.py', factory)
@@ -78,6 +77,34 @@ class TestRendererFromCache(unittest.TestCase):
             path = path[:-1]
         self.assertEqual(factory.path, path)
         self.assertEqual(factory.kw, {})
+
+    def test_relpath_notyetregistered_reload_resources_true(self):
+        from zope.component import queryUtility
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.interfaces import ITemplateRenderer
+        settings = {'reload_resources':True}
+        testing.registerUtility(settings, ISettings)
+        renderer = {}
+        factory = DummyFactory(renderer)
+        result = self._callFUT('test_templating.py', factory)
+        self.failUnless(result is renderer)
+        spec = '%s:%s' % ('repoze.bfg.tests', 'test_templating.py')
+        self.assertEqual(queryUtility(ITemplateRenderer, name=spec),
+                         None)
+
+    def test_relpath_notyetregistered_reload_resources_false(self):
+        from zope.component import queryUtility
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.interfaces import ITemplateRenderer
+        settings = {'reload_resources':False}
+        testing.registerUtility(settings, ISettings)
+        renderer = {}
+        factory = DummyFactory(renderer)
+        result = self._callFUT('test_templating.py', factory)
+        self.failUnless(result is renderer)
+        spec = '%s:%s' % ('repoze.bfg.tests', 'test_templating.py')
+        self.assertNotEqual(queryUtility(ITemplateRenderer, name=spec),
+                            None)
 
 class DummyFactory:
     def __init__(self, renderer):

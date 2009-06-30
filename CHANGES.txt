@@ -1,6 +1,35 @@
 Next release
 ============
 
+- Add a ``reload_resources`` configuration file setting (aka the
+  ``BFG_RELOAD_RESOURCES`` environment variable).  When this is set to
+  true, the server never needs to be restarted when moving files
+  between directory resource overrides (esp. for templates currently).
+
+- Add a ``reload_all`` configuration file setting (aka the
+  ``BFG_RELOAD_ALL`` environment variable) that implies both
+  ``reload_resources`` and ``reload_templates``.
+
+- The ``static`` helper view class now uses a ``PackageURLParser`` in
+  order to allow for the overriding of static resources (CSS / logo
+  files, etc) using the ``resource`` ZCML directive.  The
+  ``PackageURLParser`` class was added to a (new) ``static`` module in
+  BFG; it is a subclass of the ``StaticURLParser`` class in
+  ``paste.urlparser``.
+
+- The ``repoze.bfg.templating.renderer_from_cache`` function now
+  checks for the ``reload_resources`` setting; if it's true, it does
+  not register a template renderer (it won't use the registry as a
+  template renderer cache).
+
+- Add ``pkg_resources`` to the glossary.
+
+- Update the "Environment" docs to note the existence of
+  ``reload_resources`` and ``reload_all``.
+
+- Use a colon instead of a tab as the separator between package name
+  and relpath to form the "spec" when register a ITemplateRenderer.
+
 - Updated the ``bfg_alchemy`` paster template to include two views:
   the view on the root shows a list of links to records;  the view on
   a record shows the details for that object.

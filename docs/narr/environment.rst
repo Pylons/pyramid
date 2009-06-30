@@ -27,6 +27,11 @@ application-specific configuration settings.
 |                                 |                             |  See also:                             |
 |                                 |                             |  :ref:`reload_templates_section`       |
 +---------------------------------+-----------------------------+----------------------------------------+
+| ``BFG_RELOAD_RESOURCES``        |  ``reload_resources``       |  Don't cache any resource file data    |
+|                                 |                             |  when true                             |
+|                                 |                             |  See also:                             |
+|                                 |                             |  :ref:`overriding_resources_section`   |
++---------------------------------+-----------------------------+----------------------------------------+
 | ``BFG_DEBUG_AUTHORIZATION``     |  ``debug_authorization``    |  Print view authorization failure &    |
 |                                 |                             |  success info to stderr when true      |
 |                                 |                             |  See also:                             |
@@ -38,6 +43,8 @@ application-specific configuration settings.
 |                                 |                             |  :ref:`debug_notfound_section`         |
 +---------------------------------+-----------------------------+----------------------------------------+
 | ``BFG_DEBUG_ALL``               |  ``debug_all``              |  Turns all debug_* settings on.        |
++---------------------------------+-----------------------------+----------------------------------------+
+| ``BFG_RELOAD_ALL``              |  ``reload_all``             |  Turns all reload_* settings on.       |
 +---------------------------------+-----------------------------+----------------------------------------+
 
 Examples
@@ -66,9 +73,52 @@ application would behave in the same manner as if you had placed the
 respective settings in the ``[app:main]`` section of your
 application's ``.ini`` file.
 
-If you want to turn all ``debug`` settings (every debug setting that
-starts with ``debug_``). on in one fell swoop, you can use
+If you want to turn all ``debug`` settings (every setting that starts
+with ``debug_``). on in one fell swoop, you can use
 ``BFG_DEBUG_ALL=1`` as an environment variable setting or you may use
 ``debug_all=true`` in the config file.  Note that this does not effect
 settings that do not start with ``debug_*`` such as
 ``reload_templates``.
+
+If you want to turn all ``reload`` settings (everysetting that starts
+with ``reload_``). on in one fell swoop, you can use
+``BFG_RELOAD_ALL=1`` as an environment variable setting or you may use
+``reload_all=true`` in the config file.  Note that this does not
+effect settings that do not start with ``reload_*`` such as
+``debug_notfound``.
+
+Understanding the Distinction Between ``reload_templates`` and ``reload_resources``
+-----------------------------------------------------------------------------------
+
+The difference between ``reload_resources`` and ``reload_templates``
+is a bit subtle.  Templates are themselves also treated by
+:mod:`repoze.bfg` as :term:`pkg_resources` resource files (along with
+static files and other resources), so the distinction can be
+confusing.  It's helpful to read :ref:`overriding_resources_section`
+for some context about resources in general.
+
+When ``reload_templates`` is true, :mod:`repoze.bfg`` takes advantage
+of the underlying templating systems' ability to check for file
+modifications to an individual template file.  When
+``reload_templates`` is true but ``reload_resources`` is *not* true,
+the template filename returned by pkg_resources is cached by
+:mod:`repoze.bfg` on the first request.  Subsequent requests for the
+same template file will return a cached template filename.  The
+underlying templating system checks for modifications to this
+particular file for every request.  Setting ``reload_templates`` to
+``True`` doesn't effect performance dramatically (although it should
+still not be used in production because it has some effect).
+
+However, when ``reload_resources`` is true, :mod:`repoze.bfg` will not
+cache the template filename, meaning you can see the effect of
+changing the content of an overridden resource directory for templates
+without restarting the server after every change.  Subsequent requests
+for the same template file may return different filenames based on the
+current state of overridden resource directories. Setting
+``reload_resources`` to ``True`` effects performance *dramatically*
+(slowing things down by an order of magnitude for each template
+rendering) but it's convenient when moving files around in overridden
+resource directories. ``reload_resources`` makes the system *very
+slow* when templates are in use.  Never set ``reload_resources`` to
+``True`` on a production system.
+

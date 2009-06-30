@@ -1,13 +1,17 @@
+import os
 import inspect
 
 from paste.urlparser import StaticURLParser
+
 from zope.component import queryMultiAdapter
 from zope.deprecation import deprecated
 
 from repoze.bfg.interfaces import IView
 from repoze.bfg.path import caller_path
+from repoze.bfg.path import caller_package
 from repoze.bfg.security import view_execution_permitted
 from repoze.bfg.security import Unauthorized
+from repoze.bfg.static import PackageURLParser
 
 deprecated('view_execution_permitted',
     "('from repoze.bfg.view import view_execution_permitted' is now "
@@ -106,25 +110,48 @@ def is_response(ob):
 class static(object):
     """ An instance of this class is a callable which can act as a BFG
     view; this view will serve static files from a directory on disk
-    based on the ``root_dir`` you provide to its constructor.  The
-    directory may contain subdirectories (recursively); the static
+    based on the ``root_dir`` you provide to its constructor.
+
+    The directory may contain subdirectories (recursively); the static
     view implementation will descend into these directories as
     necessary based on the components of the URL in order to resolve a
     path into a response.
 
     You may pass an absolute or relative filesystem path to the
     directory containing static files directory to the constructor as
-    the ``root_dir`` argument.  If the path is relative, it will be
-    considered relative to the directory in which the Python file
-    which calls ``static`` resides.  ``cache_max_age`` influences the
-    Expires and Max-Age response headers returned by the view (default
-    is 3600 seconds or five minutes).  ``level`` influences how
-    relative directories are resolved (the number of hops in the call
-    stack), not used very often.
+    the ``root_dir`` argument.
+
+    If the path is relative, and the ``package`` argument is ``None``,
+    it will be considered relative to the directory in which the
+    Python file which calls ``static`` resides.  If the ``package``
+    name argument is provided, and a relative ``root_dir`` is
+    provided, the ``root_dir`` will be considered relative to the
+    Python package specified by ``package_name`` (a dotted path to a
+    Python package).
+
+    ``cache_max_age`` influences the Expires and Max-Age response
+    headers returned by the view (default is 3600 seconds or five
+    minutes).  ``level`` influences how relative directories are
+    resolved (the number of hops in the call stack), not used very
+    often.
+
+    .. note:: If the ``root_dir`` is relative to a package, the BFG
+       ``resource`` ZCML directive can be used to override resources
+       within the named ``root_dir`` package-relative directory.
+       However, if the ``root_dir`` is absolute, the ``resource``
+       directive will not be able to override the resources it
+       contains.
     """
-    def __init__(self, root_dir, cache_max_age=3600, level=2):
-        root_dir = caller_path(root_dir, level=level)
-        self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
+    def __init__(self, root_dir, cache_max_age=3600, level=2,
+                 package_name=None):
+        if os.path.isabs(root_dir):
+            root_dir = caller_path(root_dir, level=level)
+            self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
+        else:
+            if package_name is None:
+                package_name = caller_package().__name__
+            self.app = PackageURLParser(package_name, root_dir,
+                                        cache_max_age=cache_max_age)
 
     def __call__(self, context, request):
         subpath = '/'.join(request.subpath)

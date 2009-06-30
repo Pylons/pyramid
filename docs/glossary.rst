@@ -17,6 +17,13 @@ Glossary
     `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
     builds on Python's ``distutils`` to provide easier building,
     distribution, and installation of libraries and applications.
+  pkg_resources
+    A module which ships with :term:`setuptools` that provides an API
+    for addressing "resource files" within Python packages.  Resource
+    files are static files, template files, etc; basically anything
+    non-Python-source that lives in a Python package can be considered
+    a resource file.  See also `PkgResources
+    <http://peak.telecommunity.com/DevCenter/PkgResources>`_
   Package
     A directory on disk which contains an ``__init__.py`` file, making
     it recognizable to Python as a location which can be ``import`` -ed.

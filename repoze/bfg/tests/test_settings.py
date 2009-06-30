@@ -61,6 +61,42 @@ class TestGetOptions(unittest.TestCase):
                              {'BFG_RELOAD_TEMPLATES':'1'})
         self.assertEqual(result['reload_templates'], True)
 
+    def test_reload_resources(self):
+        result = self._callFUT({})
+        self.assertEqual(result['reload_resources'], False)
+        result = self._callFUT({'reload_resources':'false'})
+        self.assertEqual(result['reload_resources'], False)
+        result = self._callFUT({'reload_resources':'t'})
+        self.assertEqual(result['reload_resources'], True)
+        result = self._callFUT({'reload_resources':'1'})
+        self.assertEqual(result['reload_resources'], True)
+        result = self._callFUT({}, {'BFG_RELOAD_RESOURCES':'1'})
+        self.assertEqual(result['reload_resources'], True)
+        result = self._callFUT({'reload_resources':'false'},
+                             {'BFG_RELOAD_RESOURCES':'1'})
+        self.assertEqual(result['reload_resources'], True)
+
+    def test_reload_all(self):
+        result = self._callFUT({})
+        self.assertEqual(result['reload_templates'], False)
+        self.assertEqual(result['reload_resources'], False)
+        result = self._callFUT({'reload_all':'false'})
+        self.assertEqual(result['reload_templates'], False)
+        self.assertEqual(result['reload_resources'], False)
+        result = self._callFUT({'reload_all':'t'})
+        self.assertEqual(result['reload_templates'], True)
+        self.assertEqual(result['reload_resources'], True)
+        result = self._callFUT({'reload_all':'1'})
+        self.assertEqual(result['reload_templates'], True)
+        self.assertEqual(result['reload_resources'], True)
+        result = self._callFUT({}, {'BFG_RELOAD_ALL':'1'})
+        self.assertEqual(result['reload_templates'], True)
+        self.assertEqual(result['reload_resources'], True)
+        result = self._callFUT({'reload_all':'false'},
+                             {'BFG_RELOAD_ALL':'1'})
+        self.assertEqual(result['reload_templates'], True)
+        self.assertEqual(result['reload_resources'], True)
+
     def test_debug_authorization(self):
         result = self._callFUT({})
         self.assertEqual(result['debug_authorization'], False)

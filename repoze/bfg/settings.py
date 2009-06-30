@@ -40,6 +40,9 @@ def get_options(kw, environ=os.environ):
     config_debug_all = kw.get('debug_all', '')
     effective_debug_all = asbool(eget('BFG_DEBUG_ALL',
                                       config_debug_all))
+    config_reload_all = kw.get('reload_all', '')
+    effective_reload_all = asbool(eget('BFG_RELOAD_ALL',
+                                      config_reload_all))
     config_debug_auth = kw.get('debug_authorization', '')
     effective_debug_auth = asbool(eget('BFG_DEBUG_AUTHORIZATION',
                                        config_debug_auth))
@@ -49,10 +52,14 @@ def get_options(kw, environ=os.environ):
     config_reload_templates = kw.get('reload_templates', '')
     effective_reload_templates = asbool(eget('BFG_RELOAD_TEMPLATES',
                                         config_reload_templates))
+    config_reload_resources = kw.get('reload_resources', '')
+    effective_reload_resources = asbool(eget('BFG_RELOAD_RESOURCES',
+                                             config_reload_resources))
     update = {
         'debug_authorization': effective_debug_all or effective_debug_auth,
         'debug_notfound': effective_debug_all or effective_debug_notfound,
-        'reload_templates': effective_reload_templates,
+        'reload_templates': effective_reload_all or effective_reload_templates,
+        'reload_resources':effective_reload_all or effective_reload_resources,
         }
 
     kw.update(update)
