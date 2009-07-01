@@ -1,6 +1,18 @@
 Next release
 ============
 
+- Add three new ZCML directives which configure authentication
+  policies:
+
+  - ``repozewho1authenticationpolicy``
+
+  - ``remoteuserauthenticationpolicy``
+
+  - ``authtktauthenticationpolicy``
+
+- Add a new ZCML directive which configures an ACL authorization
+  policy named ``aclauthorizationpolicy``.
+
 - Bug fix: when a ``repoze.bfg.resource.PackageOverrides`` class was
   instantiated, and the package it was overriding already had a
   ``__loader__`` attribute, it would fail at startup time, even if the

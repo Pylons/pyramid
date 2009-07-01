@@ -15,6 +15,13 @@ from zope.configuration.fields import GlobalObject
 from zope.interface import Interface
 
 from zope.schema import TextLine
+from zope.schema import Bool
+from zope.schema import Int
+
+from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
+from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
+from repoze.bfg.authentication import AuthTktAuthenticationPolicy
+from repoze.bfg.authorization import ACLAuthorizationPolicy
 
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IViewPermission
@@ -22,6 +29,7 @@ from repoze.bfg.interfaces import INotFoundAppFactory
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import IAuthenticationPolicy
+from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import ISecurityPolicy
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IUnauthorizedAppFactory
@@ -217,6 +225,84 @@ def resource(context, to_override, override_with):
         discriminator = None,
         callable = _override,
         args = (package, path, override_package, override_prefix),
+        )
+
+class IRepozeWho1AuthenticationPolicyDirective(Interface):
+    identifier_name = TextLine(title=u'identitfier_name', required=False,
+                               default=u'auth_tkt')
+    callback = GlobalObject(title=u'callback', required=False)
+
+def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
+                                   callback=None):
+    policy = RepozeWho1AuthenticationPolicy(identifier_name=identifier_name,
+                                            callback=callback)
+    _context.action(
+        discriminator = 'authentication_policy',
+        callable = handler,
+        args = ('registerUtility', policy, IAuthenticationPolicy, '',
+                _context.info),
+        )
+
+class IRemoteUserAuthenticationPolicyDirective(Interface):
+    environ_key = TextLine(title=u'environ_key', required=False,
+                           default=u'REMOTE_USER')
+    callback = GlobalObject(title=u'callback', required=False)
+
+def remoteuserauthenticationpolicy(_context, environ_key, callback=None):
+    policy = RemoteUserAuthenticationPolicy(environ_key=environ_key,
+                                            callback=callback)
+    _context.action(
+        discriminator = 'authentication_policy',
+        callable = handler,
+        args = ('registerUtility', policy, IAuthenticationPolicy, '',
+                _context.info),
+        )
+
+class IAuthTktAuthenticationPolicyDirective(Interface):
+    secret = TextLine(title=u'secret', required=True)
+    callback = GlobalObject(title=u'callback', required=False)
+    cookie_name = TextLine(title=u'cookie_name', required=False,
+                           default=u'repoze.bfg.auth_tkt')
+    secure = Bool(title=u"secure", required=False, default=False)
+    include_ip = Bool(title=u"include_ip", required=False, default=False)
+    timeout = Int(title=u"timeout", required=False, default=None)
+    reissue_time = Int(title=u"reissue_time", required=False, default=None)
+
+def authtktauthenticationpolicy(_context,
+                                secret,
+                                callback=None,
+                                cookie_name='repoze.bfg.auth_tkt',
+                                secure=False,
+                                include_ip=False,
+                                timeout=None,
+                                reissue_time=None):
+    try:
+        policy = AuthTktAuthenticationPolicy(secret,
+                                             callback=callback,
+                                             cookie_name=cookie_name,
+                                             secure=secure,
+                                             include_ip = include_ip,
+                                             timeout = timeout,
+                                             reissue_time = reissue_time)
+    except ValueError, why:
+        raise ConfigurationError(str(why))
+    _context.action(
+        discriminator = 'authentication_policy',
+        callable = handler,
+        args = ('registerUtility', policy, IAuthenticationPolicy, '',
+                _context.info),
+        )
+
+class IACLAuthorizationPolicyDirective(Interface):
+    pass
+
+def aclauthorizationpolicy(_context):
+    policy = ACLAuthorizationPolicy()
+    _context.action(
+        discriminator = 'authorization_policy',
+        callable = handler,
+        args = ('registerUtility', policy, IAuthorizationPolicy, '',
+                _context.info),
         )
 
 class IRouteDirective(Interface):

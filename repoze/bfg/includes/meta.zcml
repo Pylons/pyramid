@@ -28,17 +28,41 @@
         handler="repoze.bfg.zcml.forbidden"
         />
 
-  <meta:directive
-      name="route"
-      schema="repoze.bfg.zcml.IRouteDirective"
-      handler="repoze.bfg.zcml.route"
-      />
+    <meta:directive
+        name="route"
+        schema="repoze.bfg.zcml.IRouteDirective"
+        handler="repoze.bfg.zcml.route"
+        />
 
-  <meta:directive
-      name="resource"
-      schema="repoze.bfg.zcml.IResourceDirective"
-      handler="repoze.bfg.zcml.resource"
-      />
+    <meta:directive
+        name="resource"
+        schema="repoze.bfg.zcml.IResourceDirective"
+        handler="repoze.bfg.zcml.resource"
+        />
+
+    <meta:directive
+        name="repozewho1authenticationpolicy"
+        schema="repoze.bfg.zcml.IRepozeWho1AuthenticationPolicyDirective"
+        handler="repoze.bfg.zcml.repozewho1authenticationpolicy"
+        />
+
+    <meta:directive
+        name="remoteuserauthenticationpolicy"
+        schema="repoze.bfg.zcml.IRemoteUserAuthenticationPolicyDirective"
+        handler="repoze.bfg.zcml.remoteuserauthenticationpolicy"
+        />
+
+    <meta:directive
+        name="authtktauthenticationpolicy"
+        schema="repoze.bfg.zcml.IAuthTktAuthenticationPolicyDirective"
+        handler="repoze.bfg.zcml.authtktauthenticationpolicy"
+        />
+
+    <meta:directive
+        name="aclauthorizationpolicy"
+        schema="repoze.bfg.zcml.IACLAuthorizationPolicyDirective"
+        handler="repoze.bfg.zcml.aclauthorizationpolicy"
+        />
 
   </meta:directives>
 
