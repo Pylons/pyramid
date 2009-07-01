@@ -21,10 +21,16 @@ def renderer_from_cache(path, factory, level=3, **kw):
             sm.registerUtility(renderer, ITemplateRenderer, name=path)
 
     else:
-        # 'path' is a relative filename
-        package = caller_package(level=level)
-        spec = (package.__name__, path) 
-        utility_name = '%s:%s' % spec # utility name must be a string
+        # 'path' is a relative filename or a package:relpath spec
+        if ':' in path:
+            # it's a package:relpath spec
+            spec = path.split(':', 1)
+            utility_name = path
+        else:
+            # it's a relpath only
+            package = caller_package(level=level)
+            spec = (package.__name__, path) 
+            utility_name = '%s:%s' % spec # utility name must be a string
         renderer = queryUtility(ITemplateRenderer, name=utility_name)
         if renderer is None:
             # service unit tests here by trying the relative path

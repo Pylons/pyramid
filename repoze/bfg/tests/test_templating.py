@@ -45,12 +45,21 @@ class TestRendererFromCache(unittest.TestCase):
         result = self._callFUT('foo/bar', None)
         self.failUnless(renderer is result)
 
-    def test_relpath_notfound(self):
-        import os
-        here = os.path.dirname(__file__)
-        abspath = os.path.join(here, 'wont/exist')
+    def test_relpath_is_package_registered(self):
         renderer = {}
+        from repoze.bfg.interfaces import ITemplateRenderer
+        testing.registerUtility(renderer, ITemplateRenderer, name='foo:bar/baz')
+        result = self._callFUT('foo:bar/baz', None)
+        self.failUnless(renderer is result)
+
+    def test_relpath_notfound(self):
         self.assertRaises(ValueError, self._callFUT, 'wont/exist', None)
+
+    def test_relpath_is_package_notfound(self):
+        from repoze.bfg import tests
+        module_name = tests.__name__
+        self.assertRaises(ValueError, self._callFUT,
+                          '%s:wont/exist' % module_name, None)
 
     def test_relpath_alreadyregistered(self):
         from repoze.bfg.interfaces import ITemplateRenderer
@@ -61,6 +70,17 @@ class TestRendererFromCache(unittest.TestCase):
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=spec)
         result = self._callFUT('test_templating.py', None)
+        self.failUnless(result is renderer)
+
+    def test_relpath_is_package_alreadyregistered(self):
+        from repoze.bfg.interfaces import ITemplateRenderer
+        from repoze.bfg import tests
+        module_name = tests.__name__
+        relpath = 'test_templating.py'
+        spec = '%s:%s' % (module_name, relpath)
+        renderer = {}
+        testing.registerUtility(renderer, ITemplateRenderer, name=spec)
+        result = self._callFUT(spec, None)
         self.failUnless(result is renderer)
 
     def test_relpath_notyetregistered(self):
@@ -78,7 +98,23 @@ class TestRendererFromCache(unittest.TestCase):
         self.assertEqual(factory.path, path)
         self.assertEqual(factory.kw, {})
 
-    def test_relpath_notyetregistered_reload_resources_true(self):
+    def test_relpath_is_package_notyetregistered(self):
+        import os
+        from repoze.bfg import tests
+        module_name = tests.__name__
+        relpath = 'test_templating.py'
+        renderer = {}
+        factory = DummyFactory(renderer)
+        spec = '%s:%s' % (module_name, relpath)
+        result = self._callFUT(spec, factory)
+        self.failUnless(result is renderer)
+        path = os.path.abspath(__file__)
+        if path.endswith('pyc'): # pragma: no cover
+            path = path[:-1]
+        self.assertEqual(factory.path, path)
+        self.assertEqual(factory.kw, {})
+
+    def test_reload_resources_true(self):
         from zope.component import queryUtility
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ITemplateRenderer
@@ -92,7 +128,7 @@ class TestRendererFromCache(unittest.TestCase):
         self.assertEqual(queryUtility(ITemplateRenderer, name=spec),
                          None)
 
-    def test_relpath_notyetregistered_reload_resources_false(self):
+    def test_reload_resources_false(self):
         from zope.component import queryUtility
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ITemplateRenderer

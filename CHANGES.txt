@@ -1,3 +1,12 @@
+Next release
+============
+
+- Make it possible to pass strings in the form
+  "package_name:relative/path" to APIs like ``render_template``,
+  ``render_template_to_response``, and ``get_template``.  Sometimes
+  the package in which a caller lives is a direct namespace package,
+  so the module which is returned is semi-useless for navigating from.
+
 1.0a8 (2009-07-01)
 ==================
 
