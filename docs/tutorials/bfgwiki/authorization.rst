@@ -35,7 +35,7 @@ that a view invocation can not be authorized.  When you're done, your
 
 
 Adding ``security.py``
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 Add a ``security.py`` module within your package (in the same
 directory as "run.py", "views.py", etc) with the following content:
