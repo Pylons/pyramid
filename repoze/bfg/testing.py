@@ -395,12 +395,14 @@ class DummyRequest:
 
 _cleanups = []
 
-def addCleanUp(func, args=(), kw={}):
+def addCleanUp(func, args=(), kw=None):
     """Register a cleanup routines
 
     Pass a function to be called to cleanup global data.
     Optional argument tuple and keyword arguments may be passed.
     """
+    if kw is None:
+        kw = {}
     _cleanups.append((func, args, kw))
 
 def cleanUp():
