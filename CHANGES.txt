@@ -1,14 +1,22 @@
 Next release
 ============
 
+Features
+--------
+
 - Make it possible to pass strings in the form
   "package_name:relative/path" to APIs like ``render_template``,
   ``render_template_to_response``, and ``get_template``.  Sometimes
   the package in which a caller lives is a direct namespace package,
   so the module which is returned is semi-useless for navigating from.
+  In this way, the caller can control the horizontal and vertical of
+  where things get looked up from.
 
 1.0a8 (2009-07-01)
 ==================
+
+Deprecations
+------------
 
 - Deprecate the ``authentication_policy`` and ``authorization_policy``
   arguments to ``repoze.bfg.router.make_app``.  Instead, developers
@@ -18,6 +26,9 @@ Next release
   ``authtktauthenticationpolicy``) and the `aclauthorizationpolicy``
   authorization policy directive as described in the changes to the
   "Security" narrative documenation chapter and the wiki tutorials.
+
+Features
+--------
 
 - Add three new ZCML directives which configure authentication
   policies:
@@ -31,6 +42,9 @@ Next release
 - Add a new ZCML directive which configures an ACL authorization
   policy named ``aclauthorizationpolicy``.
 
+Bug Fixes
+---------
+
 - Bug fix: when a ``repoze.bfg.resource.PackageOverrides`` class was
   instantiated, and the package it was overriding already had a
   ``__loader__`` attribute, it would fail at startup time, even if the
@@ -43,6 +57,9 @@ Next release
 
 1.0a7 (2009-06-30)
 ==================
+
+Features
+--------
 
 - Add a ``reload_resources`` configuration file setting (aka the
   ``BFG_RELOAD_RESOURCES`` environment variable).  When this is set to
@@ -65,17 +82,23 @@ Next release
   not register a template renderer (it won't use the registry as a
   template renderer cache).
 
+Documentation
+-------------
+
 - Add ``pkg_resources`` to the glossary.
 
 - Update the "Environment" docs to note the existence of
   ``reload_resources`` and ``reload_all``.
 
-- Use a colon instead of a tab as the separator between package name
-  and relpath to form the "spec" when register a ITemplateRenderer.
-
 - Updated the ``bfg_alchemy`` paster template to include two views:
   the view on the root shows a list of links to records;  the view on
   a record shows the details for that object.
+
+Internal
+--------
+
+- Use a colon instead of a tab as the separator between package name
+  and relpath to form the "spec" when register a ITemplateRenderer.
 
 - Register a ``repoze.bfg.resource.OverrideProvider`` as a
   pkg_resources provider only for modules which are known to have
