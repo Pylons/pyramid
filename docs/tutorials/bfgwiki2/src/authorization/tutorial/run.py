@@ -1,5 +1,4 @@
 from repoze.bfg.router import make_app
-from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 
 import tutorial
 from tutorial.models import DBSession
@@ -26,16 +25,5 @@ def app(global_config, **kw):
         raise ValueError("No 'db_string' value in application configuration.")
     initialize_sql(db_string)
 
-    authpolicy = AuthTktAuthenticationPolicy('seekr!t', callback=groupfinder)
-
-    return make_app(RootFactory, tutorial,  authentication_policy=authpolicy,
-                    options=kw)
-
-USERS = {'editor':'editor',
-          'viewer':'viewer'}
-GROUPS = {'editor':['group.editors']}
-
-def groupfinder(userid, request):
-    if userid in USERS:
-        return GROUPS.get(userid, [])
+    return make_app(RootFactory, tutorial, options=kw)
 

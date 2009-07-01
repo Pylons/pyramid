@@ -8,9 +8,8 @@ system that prevents a :term:`view` from being invoked when the user
 represented by credentials in the :term:`request` does not have an
 appropriate level of access in a specific context.
 
-Authorization is enabled by modifying your application's invocation of
-``repoze.bfg.router.make_app``, often located in the ``run.py`` module
-of a :mod:`repoze.bfg` application.
+Authorization is enabled by modifying your :term:`application
+registry` (aka "configure.zcml").
 
 Enabling an Authorization Policy
 --------------------------------
@@ -18,58 +17,50 @@ Enabling an Authorization Policy
 By default, :mod:`repoze.bfg` enables no authorization policy.  All
 views are accessible by completely anonymous users.
 
-However, if you modify how your application calls to
-``repoze.bfg.router.make_app`` (usually found within the ``run.py``
-module in your application), you can enable an authorization policy.
+However, if you modify the :term:`application registry` file in your
+application's package (usually named ``configure.zcml``), you can
+enable an authorization policy.
 
-You must enable a a :term:`authentication policy` in order to enable
-the default authorization policy (this is because authorization, in
+You must also enable a a :term:`authentication policy` in order to
+enable the an authorization policy (this is because authorization, in
 general, depends upon authentication).
 
-For example, to enable a policy which compares the ``REMOTE_USER``
-variable passed in the request's environment (as the sole
-:term:`principal`) against the principals present in any :term:`ACL`
-found in model data when attempting to call some :term:`view`, modify
-your ``run.py`` to look something like this:
+For example, to enable a policy which compares the value of an "auth
+ticket" cookie passed in the request's environment which contains a
+reference to a single :term:`principal` against the principals present
+in any :term:`ACL` found in model data when attempting to call some
+:term:`view`, modify your ``configure.zcml`` to look something like
+this:
 
-.. code-block:: python
+.. code-block:: xml
    :linenos:
 
-   from repoze.bfg.router import make_app
-   from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
+   <configure xmlns="http://namespaces.repoze.org/bfg">
 
-   def app(global_config, **kw):
-       """ This function returns a repoze.bfg.router.Router object.  It
-       is usually called by the PasteDeploy framework during ``paster
-       serve``"""
-       # paster app config callback
-       from myproject.models import get_root
-       import myproject
-       policy = RemoteUserAuthenticationPolicy()
-       return make_app(get_root, myproject, authentication_policy=policy,
-                       options=kw)
+     <!-- views and other directives before this... -->
 
-This injects an instance of the
-``repoze.bfg.authentication.RemoteUserAuthenticationPolicy`` as the
-:term:`authentication policy` used by this application.  It is
-possible to use a different authentication policy.  :mod:`repoze.bfg`
-ships with a few prechewed authentication policies that should prove
-useful (see :ref:`authentication_policies_api_section`).  It is also
-possible to construct your own authentication policy: see
-:ref:`creating_an_authentication_policy`.
+     <authtktauthenticationpolicy
+          secret="iamsosecret"/>
 
-When you pass any ``authentication_policy`` argument to the
-``make_app`` function, and you don't also pass an
-``authorization_policy`` argument you are instructing BFG to use the
-*default* :term:`authorization policy`.  The default authorization
-policy compares :term:`ACL` information attached to :term:`context`
-objects against the information rovided by the authentication policy.
-See :ref:`authorization_policies_api_section` for the details of the
-default authorization policy.
+     <aclauthorizationpolicy/>
 
-.. note:: It's not common, but it is also possible for a developer to
-   change the :term:`authorization policy` used by a :mod:`repoze.bfg`
-   application.  See :ref:`creating_an_authorization_policy`.
+    </configure>
+
+"Under the hood", these statements cause an instance of the class
+``repoze.bfg.authentication.AuthTktAuthenticationPolicy`` to be
+injected as the :term:`authentication policy` used by this application
+and an instance of the class
+``repoze.bfg.authorization.ACLAuthorizationPolicy`` to be injected as
+the :term:`authorization policy` used by this application.
+
+:mod:`repoze.bfg` ships with a few prechewed authentication and
+authorization policies that should prove useful.  See
+:ref:`authentication_policies_directives_section` and
+:ref:`authorization_policies_directives_section` for more information.
+
+It is also possible to construct your own custom authentication policy
+or authorization policy: see :ref:`creating_an_authentication_policy`
+and :ref:`creating_an_authorization_policy`.
 
 Protecting Views with Permissions
 ---------------------------------
@@ -210,10 +201,11 @@ ACE, as below.
 A principal is usually a user id, however it also may be a group id if
 your authentication system provides group information and the
 effective :term:`authentication policy` policy is written to respect
-group information.  The ``RepozeWho1AuthenicationPolicy``
-authentication policy that comes with :mod:`repoze.bfg` respects group
-information (see the :mod:`repoze.bfg.authentication` API docs for
-more info on authentication policies).
+group information.  For example, the ``RepozeWho1AuthenicationPolicy``
+enabled by the ``repozewho1authenticationpolicy`` ZCML directive
+respects group information if you configure it with a ``callback``.
+See :ref:`authentication_policies_directives_section` for more
+information about the ``callback`` attribute.
 
 Each tuple within an ACL structure is known as a :term:`ACE`, which
 stands for "access control entry".  For example, in the above ACL,
@@ -391,17 +383,161 @@ indicating why permission was denied or allowed.  Introspecting this
 information in the debugger or via print statements when a
 ``has_permission`` fails is often useful.
 
+.. _authentication_policies_directives_section:
+
+Built-In Authentication Policy Directives
+-----------------------------------------
+
+:mod:`repoze.who` ships with a few "prechewed" authentication policy
+implementations that you can make use of within your application.
+
+``repozewho1authenticationpolicy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When this directive is used, authentication information is obtained
+from a ``repoze.who.identity`` key in the WSGI environment, assumed to
+be set by :term:`repoze.who` middleware.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <repozewho1authenticationpolicy
+    identifier_name="auth_tkt"
+    callback=".somemodule.somefunc"
+    />
+
+The ``identifier_name`` controls the name used to look up the
+:term:`repoze.who` "identifier" plugin within
+``environ['repoze.who.plugins']`` which is used by this policy to
+"remember" and "forget" credentials.  It defaults to ``auth_tkt``.
+
+The ``callback`` is a Python dotted name to a function passed the
+repoze.who identity and the request as positional arguments.  The
+callback is expected to return None if the user represented by the
+identity doesn't exist or a sequence of group identifiers (possibly
+empty) if the user does exist.  If ``callback`` is None, the userid
+will be assumed to exist with no groups.   It defaults to ``None``.
+
+``remoteuserauthenticationpolicy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When this directive is used, authentication information is obtained
+from a ``REMOTE_USER`` key in the WSGI environment, assumed to
+be set by a WSGI server or an upstream middleware component.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <remoteuserauthenticationpolicy
+    environ_key="REMOTE_USER"
+    callback=".somemodule.somefunc"
+    />
+
+The ``environ_key`` is the name that will be used to obtain the remote
+user value from the WSGI environment.  It defaults to ``REMOTE_USER``.
+
+The ``callback`` is a Python dotted name to a function passed the
+string representing the remote user and the request as positional
+arguments.  The callback is expected to return None if the user
+represented by the string doesn't exist or a sequence of group
+identifiers (possibly empty) if the user does exist.  If ``callback``
+is None, the userid will be assumed to exist with no groups.  It
+defaults to ``None``.
+
+``authtktauthenticationpolicy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When this directive is used, authentication information is obtained
+from an "auth ticket" cookie value, assumed to be set by a custom
+login form.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <authtktauthenticationpolicy
+    secret="goshiamsosecret"
+    callback=".somemodule.somefunc"
+    cookie_name="mycookiename"
+    secure="false"
+    include_ip="false"
+    timeout="86400"
+    reissue_time="600"
+    />
+
+The ``secret`` is a string that will be used to encrypt the data
+stored by the cookie.  It is required and has no default.
+
+The ``callback`` is a Python dotted name to a function passed the
+string representing the userid stored in the cookie and the request as
+positional arguments.  The callback is expected to return None if the
+user represented by the string doesn't exist or a sequence of group
+identifiers (possibly empty) if the user does exist.  If ``callback``
+is None, the userid will be assumed to exist with no groups.  It
+defaults to ``None``.
+
+The ``cookie_name`` is the name used for the cookie that contains the
+user information.  It defaults to ``repoze.bfg.auth_tkt``.
+
+``secure`` is a boolean value.  If it's set to "true", the cookie will
+only be sent back by the browser over a secure (HTTPS) connection.
+It defauls to "false".
+
+``include_ip`` is a boolean value.  If it's set to true, the
+requesting IP address is made part of the authentication data in the
+cookie; if the IP encoded in the cookie differs from the IP of the
+requesting user agent, the cookie is considered invalid.  It defaults
+to "false".
+
+``timeout`` is an integer value.  It represents the maximum age in
+seconds allowed for a cookie to live.  If ``timeout`` is specified,
+you must also set ``reissue_time`` to a lower value.  It defaults to
+``None``, meaning that the cookie will only live for the duration of
+the user's browser session.
+
+``reissue_time`` is an integer value.  If ``reissue_time`` is
+specified, when we encounter a cookie that is older than the reissue
+time (in seconds), but younger that the ``timeout``, a new cookie will
+be issued.  It defaults to ``None``, meaning that authentication
+cookies are never reissued.
+
+.. _authorization_policies_directives_section:
+
+Built-In Authorization Policy Directives
+----------------------------------------
+
+``aclauthorizationpolicy``
+
+When this directive is used, authorization information is obtained
+from :term:`ACL` objects attached to model instances.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <aclauthorizationpolicy/>
+
+In other words, it has no configuration attributes; its existence in a
+``configure.zcml`` file enables it.
+
 .. _creating_an_authentication_policy:
 
 Creating Your Own Authentication Policy
 ---------------------------------------
 
 :mod:`repoze.bfg` ships with a number of useful out-of-the-box
-security policies (see :ref:`authentication_policies_api_section`).
-However, creating your own authentication policy is often necessary
-when you want to control the "horizontal and vertical" of how your
-users authenticate.  Doing so is matter of creating an instance of
-something that implements the following interface:
+security policies (see
+:ref:`authentication_policies_directives_section`).  However, creating
+your own authentication policy is often necessary when you want to
+control the "horizontal and vertical" of how your users authenticate.
+Doing so is matter of creating an instance of something that
+implements the following interface:
 
 .. code-block:: python
 
@@ -427,9 +563,13 @@ something that implements the following interface:
            """ Return a set of headers suitable for 'forgetting' the
            current user on subsequent requests. """
 
-Pass the object you create into the ``repoze.bfg.router.make_app``
-function as the ``authentication_policy`` argument at application
-startup time (usually within a ``run.py`` module).
+You will then need to create a ZCML directive which allows you to use
+the authentication policy within a ZCML file.  See the
+``repoze.bfg.zcml`` module in the :mod:`repoze.bfg` source code for
+examples of how to create a directive.  Authorization policy ZCML
+directives should use the ZCML discriminator value
+"authentication_policy" in their actions to allow for conflict
+detection.
 
 .. _creating_an_authorization_policy:
 
@@ -465,9 +605,10 @@ that implements the following interface:
             """ Return a set of principal identifiers allowed by the 
                 permission """
 
-Pass the object you create into the ``repoze.bfg.router.make_app``
-function as the ``authorization_policy`` argument at application
-startup time (usually within a ``run.py`` module).  You must also pass
-an ``authentication_policy`` if you pass an ``authorization_policy``.
-If you pass only an ``authorization_policy`` argument, an error will
-be raised at startup time.
+You will then need to create a ZCML directive which allows you to use
+the authorization policy within a ZCML file.  See the
+``repoze.bfg.zcml`` module in the :mod:`repoze.bfg` source for
+examples of how to create a directive.  Authorization policy ZCML
+directives should use the ZCML discriminator value
+"authorization_policy" in their actions to allow for conflict
+detection.

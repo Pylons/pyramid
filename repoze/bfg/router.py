@@ -239,7 +239,10 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     authentication or authorization will be performed.  Instead, BFG
     will ignore any view permission assertions in your application and
     imperative security checks performed by your application will
-    always return ``True``.
+    always return ``True``.  This argument is deprecated in
+    :mod:`repoze.bfg` 1.0; use a ZCML directive such as
+    ``authtktauthenticationpolicy`` instead, as documented in the
+    Security chapter of the :mod:`repoze.bfg` documentation.
 
     ``authorization_policy`` is an object that implements the
     ``repoze.bfg.interfaces.IAuthorizationPoicy`` interface
@@ -249,7 +252,10 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     authenticate that user.  If the ``authentication_policy`` argument
     is *not* ``None``, and the ``authorization_policy`` argument *is*
     ``None``, the authorization policy defaults to an authorization
-    implementation that uses ACLs.
+    implementation that uses ACLs.  This argument is deprecated in
+    :mod:`repoze.bfg` 1.0; use a ZCML directive such as
+    ``aclauthorizationpolicy`` instead, as documented in the Security
+    chapter of the :mod:`repoze.bfg` documentation.
 
     ``options``, if used, should be a dictionary containing runtime
     options (e.g. the key/value pairs in an app section of a
@@ -272,12 +278,6 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     settings = Settings(get_options(options))
     registry.registerUtility(settings, ISettings)
 
-    if authentication_policy:
-        registry.registerUtility(authentication_policy, IAuthenticationPolicy)
-        if authorization_policy is None:
-            authorization_policy = ACLAuthorizationPolicy()
-        registry.registerUtility(authorization_policy, IAuthorizationPolicy)
-
     if root_factory is None:
         root_factory = DefaultRootFactory
 
@@ -286,6 +286,23 @@ def make_app(root_factory, package=None, filename='configure.zcml',
 
     mapper = RoutesRootFactory(root_factory)
     registry.registerUtility(mapper, IRoutesMapper)
+
+    if authentication_policy:
+        debug_logger.warn(
+            'The "authentication_policy" and "authorization_policy" '
+            'arguments to repoze.bfg.router.make_app have been deprecated '
+            'in repoze.bfg version 1.0.  Instead of using these arguments to '
+            'configure an authorization/authentication policy pair, use '
+            'a pair of ZCML directives (such as "authtktauthenticationpolicy" '
+            'and "aclauthorizationpolicy" documented within the Security '
+            'chapter in the BFG documentation.  If you need to use a custom '
+            'authentication or authorization policy, you should make a ZCML '
+            'directive for it and use that directive within your '
+            'application\'s ZCML')
+        registry.registerUtility(authentication_policy, IAuthenticationPolicy)
+        if authorization_policy is None:
+            authorization_policy = ACLAuthorizationPolicy()
+        registry.registerUtility(authorization_policy, IAuthorizationPolicy)
 
     populateRegistry(registry, filename, package)
 

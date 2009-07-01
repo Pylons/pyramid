@@ -780,8 +780,11 @@ class MakeAppTests(unittest.TestCase):
         from repoze.bfg.interfaces import IAuthorizationPolicy
         authzpolicy = DummyContext()
         from repoze.bfg.tests import routesapp
-        app = self._callFUT(None, routesapp, authorization_policy=authzpolicy)
+        logger = DummyLogger()
+        app = self._callFUT(None, routesapp, authorization_policy=authzpolicy,
+                            debug_logger=logger)
         self.failIf(app.registry.queryUtility(IAuthorizationPolicy))
+        self.assertEqual(logger.messages, [])
         
     def test_authentication_policy_no_authorization_policy(self):
         from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -789,12 +792,15 @@ class MakeAppTests(unittest.TestCase):
         from repoze.bfg.authorization import ACLAuthorizationPolicy
         authnpolicy = DummyContext()
         from repoze.bfg.tests import routesapp
-        app = self._callFUT(None, routesapp, authentication_policy=authnpolicy)
+        logger = DummyLogger()
+        app = self._callFUT(None, routesapp, authentication_policy=authnpolicy,
+                            debug_logger=logger)
         self.assertEqual(app.registry.getUtility(IAuthenticationPolicy),
                          authnpolicy)
         self.assertEqual(
             app.registry.getUtility(IAuthorizationPolicy).__class__,
             ACLAuthorizationPolicy)
+        self.assertEqual(len(logger.messages), 1) # deprecation warning
                         
     def test_authentication_policy_and_authorization_policy(self):
         from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -802,12 +808,15 @@ class MakeAppTests(unittest.TestCase):
         authnpolicy = DummyContext()
         authzpolicy = DummyContext()
         from repoze.bfg.tests import routesapp
+        logger = DummyLogger()
         app = self._callFUT(None, routesapp, authentication_policy=authnpolicy,
-                            authorization_policy = authzpolicy)
+                            authorization_policy = authzpolicy,
+                            debug_logger=logger)
         self.assertEqual(app.registry.getUtility(IAuthenticationPolicy),
                          authnpolicy)
         self.assertEqual(app.registry.getUtility(IAuthorizationPolicy),
                          authzpolicy)
+        self.assertEqual(len(logger.messages), 1) # deprecation warning
 
 class TestDefaultForbiddenView(unittest.TestCase):
     def _callFUT(self, context, request):

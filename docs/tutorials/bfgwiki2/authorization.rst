@@ -61,39 +61,52 @@ Configuring a ``repoze.bfg`` Authentication Policy
 --------------------------------------------------
 
 For any :mod:`repoze.bfg` application to perform authorization, we
-need to change our ``run.py`` module to add an :term:`authentication
-policy`.  Adding an authentication policy actually causes the system
-to begin to use :term:`authorization`.
+need to add a ``secrity.py`` module and we'll need to change our
+:term:`application registry` to add an :term:`authentication policy`
+and a :term:`authorization policy`.
 
 Changing ``run.py``
 ~~~~~~~~~~~~~~~~~~~
 
-Change your ``run.py`` module to import the
-``AuthTktAuthenticationPolicy`` from ``repoze.bfg.authentication``.
-Within the body of the ``make_app`` function, construct an instance of
-the policy, and pass it as the ``authentication_policy`` argument to
-the ``make_app`` function.  The first positional argument of an
-``AuthTktAuthenticationPolicy`` is a secret used to encrypt cookie
-data.  Its second argument ("callback") should be a callable that
-accepts a userid (usually a string) and a request object.  If the
-userid exists in the system, the callback should return a sequence of
-group identifiers (or an empty sequence if the user isn't a member of
-any groups).  If the userid *does not* exist in the system, the
-callback should return ``None``.  We'll use "dummy" data to represent
-user and groups sources within ``run.py``.  In a "real" application
-this information would almost certainly come from some database.
-
-We'll also use the opportunity to pass the ``RootFactory`` we created
-in the step above in as the first argument to ``make_app``.  When
-we're done, your application's ``run.py`` will look like this.
+We'll use the opportunity to pass the ``RootFactory`` we created in
+the step above in as the first argument to ``make_app``.  When we're
+done, your application's ``run.py`` will look like this.
 
 .. literalinclude:: src/authorization/tutorial/run.py
    :linenos:
    :language: python
 
-BFG's ``make_app`` callable also can accept an "authorization_policy"
-parameter.  We don't need to specify one, because we'll be using the
-default; it is the policy that scans the context for ACLs.
+Changing ``configure.zcml``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We'' change our ``configure.zcml`` file to enable an
+``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
+enable declarative security checking.  We'll also add a ``forbidden``
+stanza.  This configures our login view to show up when BFG detects
+that a view invocation can not be authorized.  When you're done, your
+``configure.zcml`` will look like so:
+
+.. literalinclude:: src/authorization/tutorial/configure.zcml
+   :linenos:
+   :language: xml
+
+Adding ``security.py``
+~~~~~~~~~~~~~~~~~~~~~
+
+Add a ``security.py`` module within your package (in the same
+directory as "run.py", "views.py", etc) with the following content:
+The groupfinder defined here is an authorization policy "callback"; it
+is a be a callable that accepts a userid ana a request.  If the userid
+exists in the system, the callback will return a sequence of group
+identifiers (or an empty sequence if the user isn't a member of any
+groups).  If the userid *does not* exist in the system, the callback
+will return ``None``.  We'll use "dummy" data to represent user and
+groups sources.  When we're done, your application's ``security.py``
+will look like this.
+
+.. literalinclude:: src/authorization/tutorial/security.py
+   :linenos:
+   :language: python
 
 Adding Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,15 +179,18 @@ class="main_content">`` div:
 Changing ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Change your application's ``configure.zcml`` to add a ``forbidden``
-stanza which points at our login view.  This configures our newly
-created login view to show up when BFG detects that a view invocation
-can not be authorized.  Also, add ``permission`` attributes with the
-value ``edit`` to the ``edit_page`` and ``add_page`` routes.  This
-indicates that the views which these routes reference cannot be
-invoked without the authenticated user possessing the ``edit``
-permission with respect to the current context.  When you're done,
-your ``configure.zcml`` will look like so:
+We'll change our ``configure.zcml`` file to enable an
+``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
+enable declarative security checking.  We'll also change
+``configure.zcml`` to add a ``forbidden`` stanza which points at our
+login view.  This configures our newly created login view to show up
+when BFG detects that a view invocation can not be authorized.  Also,
+add ``permission`` attributes with the value ``edit`` to the
+``edit_page`` and ``add_page`` routes.  This indicates that the views
+which these routes reference cannot be invoked without the
+authenticated user possessing the ``edit`` permission with respect to
+the current context.  When you're done, your ``configure.zcml`` will
+look like so:
 
 .. literalinclude:: src/authorization/tutorial/configure.zcml
    :linenos:

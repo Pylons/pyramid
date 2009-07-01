@@ -53,4 +53,10 @@
    <forbidden
       view=".login.login"/>
 
+  <authtktauthenticationpolicy
+    secret="sosecret"
+    />
+
+  <aclauthorizationpolicy/>
+
 </configure>

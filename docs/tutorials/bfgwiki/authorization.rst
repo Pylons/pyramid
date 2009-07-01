@@ -15,34 +15,42 @@ Configuring a ``repoze.bfg`` Authentication Policy
 --------------------------------------------------
 
 For any :mod:`repoze.bfg` application to perform authorization, we
-need to change our ``run.py`` module to add an :term:`authentication
-policy`.  Adding an authentication policy actually causes the system
-to begin to use :term:`authorization`.
+need to add a ``secrity.py`` module and we'll need to change our
+:term:`application registry` to add an :term:`authentication policy`
+and a :term:`authorization policy`.
 
-Changing ``run.py``
-~~~~~~~~~~~~~~~~~~~
+Changing ``configure.zcml``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Change your ``run.py`` module to import the
-``AuthTktAuthenticationPolicy`` from ``repoze.bfg.authentication``.
-Within the body of the ``make_app`` function, construct an instance of
-the policy, and pass it as the ``authentication_policy`` argument to
-the ``make_app`` function.  The first positional argument of an
-``AuthTktAuthenticationPolicy`` is a secret used to encrypt cookie
-data.  Its second argument ("callback") should be a callable that
-accepts a userid ana a request.  If the userid exists in the system,
-the callback should return a sequence of group identifiers (or an
-empty sequence if the user isn't a member of any groups).  If the
-userid *does not* exist in the system, the callback should return
-``None``.  We'll use "dummy" data to represent user and groups
-sources.  When we're done, your application's ``run.py`` will look
-like this.
+We'll change our ``configure.zcml`` file to enable an
+``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
+enable declarative security checking.  We'll also add a ``forbidden``
+stanza.  This configures our login view to show up when BFG detects
+that a view invocation can not be authorized.  When you're done, your
+``configure.zcml`` will look like so:
 
-.. literalinclude:: src/authorization/tutorial/run.py
+.. literalinclude:: src/authorization/tutorial/configure.zcml
+   :linenos:
+   :language: xml
+
+
+Adding ``security.py``
+~~~~~~~~~~~~~~~~~~~~~
+
+Add a ``security.py`` module within your package (in the same
+directory as "run.py", "views.py", etc) with the following content:
+The groupfinder defined here is an authorization policy "callback"; it
+is a be a callable that accepts a userid ana a request.  If the userid
+exists in the system, the callback will return a sequence of group
+identifiers (or an empty sequence if the user isn't a member of any
+groups).  If the userid *does not* exist in the system, the callback
+will return ``None``.  We'll use "dummy" data to represent user and
+groups sources.  When we're done, your application's ``security.py``
+will look like this.
+
+.. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
    :language: python
-
-BFG's ``make_app`` callable also can accept an authorization policy
-parameter.  We don't need to specify one, we'll use the default.
 
 Adding Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,18 +119,6 @@ class="main_content">`` div:
    :linenos:
 
    <span tal:condition="logged_in"><a href="${request.application_url}/logout">Logout</a></span>
-
-Changing ``configure.zcml``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Change your application's ``configure.zcml`` to add a ``forbidden``
-stanza.  This configures our login view to show up when BFG detects
-that a view invocation can not be authorized.  When you're done, your
-``configure.zcml`` will look like so:
-
-.. literalinclude:: src/authorization/tutorial/configure.zcml
-   :linenos:
-   :language: xml
 
 Giving Our Root Model Object an ACL
 -----------------------------------

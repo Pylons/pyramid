@@ -1,5 +1,4 @@
 from repoze.bfg.router import make_app
-from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 from repoze.zodbconn.finder import PersistentApplicationFinder
 
 
@@ -14,18 +13,6 @@ def app(global_config, **kw):
     zodb_uri = kw.get('zodb_uri')
     if zodb_uri is None:
         raise ValueError("No 'zodb_uri' in application configuration.")
-
-    authpolicy = AuthTktAuthenticationPolicy('seekr!t', callback=groupfinder)
-
     get_root = PersistentApplicationFinder(zodb_uri, appmaker)
-    return make_app(get_root, tutorial, authentication_policy=authpolicy,
-                    options=kw)
-
-USERS = {'editor':'editor',
-          'viewer':'viewer'}
-GROUPS = {'editor':['group.editors']}
-
-def groupfinder(userid, request):
-    if userid in USERS:
-        return GROUPS.get(userid, [])
+    return make_app(get_root, tutorial, options=kw)
 
