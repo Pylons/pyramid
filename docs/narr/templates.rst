@@ -53,9 +53,13 @@ a string body) is the template *path*.  In the example above, the path
 ``templates/foo.pt`` is *relative*.  Relative to what, you ask?
 Relative to the directory in which the ``views.py`` file which names
 it lives, which is usually the :mod:`repoze.bfg` application's
-:term:`package` directory.  A path passed to
-``render_template_to_response`` can also be absolute (starting with a
-slash on UNIX or a drive letter prefix on Windows).
+:term:`package` directory.
+
+A path passed to ``render_template_to_response`` can also be absolute
+(starting with a slash on UNIX or a drive letter prefix on Windows).
+It can also be a "specification" in the form
+``another.dotted.package_name:relative/path`` if the resources lives in
+another package.
 
 ``render_template_to_response`` always returns a Response object which
 has a *status code* of ``200 OK`` and a *content-type* of
