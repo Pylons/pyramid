@@ -1,5 +1,5 @@
-Next release
-============
+1.0a8 (2009-07-01)
+==================
 
 - Deprecate the ``authentication_policy`` and ``authorization_policy``
   arguments to ``repoze.bfg.router.make_app``.  Instead, developers
@@ -8,7 +8,7 @@ Next release
   ``remoteuserauthenticationpolicy`` and
   ``authtktauthenticationpolicy``) and the `aclauthorizationpolicy``
   authorization policy directive as described in the changes to the
-  "Security" narrative documentation chapter and the wiki tutorials.
+  "Security" narrative documenation chapter and the wiki tutorials.
 
 - Add three new ZCML directives which configure authentication
   policies:
