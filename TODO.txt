@@ -1,5 +1,0 @@
-- See if we can do something about always looking up ISettings when we
-  want to see if auto template reload is on (queryUility is a bit
-  expensive for this task).
-
-- Do we really need to adapt on the root to find an ITraverserFactory?
