@@ -5,11 +5,11 @@ from repoze.bfg.security import remember
 from repoze.bfg.security import forget
 from repoze.bfg.url import route_url
 
-from tutorial.run import USERS
+from tutorial.security import USERS
 
 def login(request):
     login_url = route_url('login', request)
-    referrer = request.environ.get('HTTP_REFERER', '/')
+    referrer = request.url
     if referrer == login_url:
         referrer = '/' # never use the login form itself as came_from
     came_from = request.params.get('came_from', referrer)
