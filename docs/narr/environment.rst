@@ -56,14 +56,15 @@ application-specific configuration settings.
 |                                 |                             |  ``package`` passed to ``make_app``    |
 |                                 |                             |  by the application.  It may also      |
 |                                 |                             |  take the form of a resource           |
-|                                 |                             | "specification" which names both the   |
+|                                 |                             |  "specification" which names both the  |
 |                                 |                             |  package name and a package-relative   |
 |                                 |                             |  filename, e.g.                        |
 |                                 |                             |  ``dotted.package.name:path/to.zcml``. |
 |                                 |                             |  If it is a resource specification,    |
 |                                 |                             |  both the  *package* and the           |
-|                                 |                             | *filename* passed  to ``make_app`` are |
-|                                 |                             |  overridden with the implied values.   |
+|                                 |                             |  *filename* passed  to ``make_app``    |
+|                                 |                             |  are overridden with the implied       |
+|                                 |                             |  values.                               |
 +---------------------------------+-----------------------------+----------------------------------------+
 
 Examples
