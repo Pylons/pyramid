@@ -24,6 +24,9 @@ Glossary
     non-Python-source that lives in a Python package can be considered
     a resource file.  See also `PkgResources
     <http://peak.telecommunity.com/DevCenter/PkgResources>`_
+  Resource
+    Any file contained within a Python :term:`package` which is *not*
+    a Python source code file.
   Package
     A directory on disk which contains an ``__init__.py`` file, making
     it recognizable to Python as a location which can be ``import`` -ed.

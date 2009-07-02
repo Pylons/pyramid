@@ -7,6 +7,8 @@ You can use :mod:`repoze.bfg` 's sample application generator to get
 started.  This generator uses :term:`Paste` templates to allow
 creation of a new project by answering a series of questions.
 
+.. _creating_a_project:
+
 Creating the Project
 --------------------
 

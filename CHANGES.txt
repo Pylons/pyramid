@@ -8,7 +8,14 @@ Features
   environment variable (``BFG_CONFIGURE_ZCML``) to name a ZCML file
   that will be used to bootstrap the application.  Previously, the
   integrator could not influence which ZCML file was used to do the
-  boostrapping (only the original application developer).
+  boostrapping (only the original application developer could do so).
+
+Documentation
+-------------
+
+- Added a "Resources" chapter to the narrative documentation which
+  explains how to override resources within one package from another
+  package.
 
 1.0a9 (2009-07-01)
 ==================
