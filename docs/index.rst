@@ -166,7 +166,10 @@ commenting, and file uploads.  See the `KARL site
 Support and Development
 =======================
 
-To report bugs, use the `Repoze bug tracker <http://bugs.repoze.org>`_.
+The `BFG web site <http://bfg.repoze.org>`_ is the main online source
+of BFG support and development information.
+
+To report bugs, use the `bug tracker <http://bfg.repoze.org/trac>`_.
 
 If you've got questions that aren't answered by this documentation,
 contact the `Repoze-dev maillist
