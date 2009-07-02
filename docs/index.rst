@@ -167,7 +167,7 @@ Support and Development
 =======================
 
 The `BFG web site <http://bfg.repoze.org>`_ is the main online source
-of BFG support and development information.
+of :mod:`repoze.bfg` support and development information.
 
 To report bugs, use the `bug tracker <http://bfg.repoze.org/trac>`_.
 
