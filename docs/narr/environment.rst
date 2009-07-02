@@ -46,6 +46,16 @@ application-specific configuration settings.
 +---------------------------------+-----------------------------+----------------------------------------+
 | ``BFG_RELOAD_ALL``              |  ``reload_all``             |  Turns all reload_* settings on.       |
 +---------------------------------+-----------------------------+----------------------------------------+
+| ``BFG_CONFIGURE_ZCML``          |  ``configure_zcml``         |  Use the specified filename to load    |
+|                                 |                             |  the :term:`application registry`      |
+|                                 |                             |  instead of the filename implied by    |
+|                                 |                             |  ``filename`` value passed to          |
+|                                 |                             |  ``repoze.bfg.router.make_app``.  If   |
+|                                 |                             |  this is a relative filename, it will  |
+|                                 |                             |  be considered relative to the         |
+|                                 |                             |  ``package`` passed to ``make_app``    |
+|                                 |                             |  by the application.                   |
++---------------------------------+-----------------------------+----------------------------------------+
 
 Examples
 --------
