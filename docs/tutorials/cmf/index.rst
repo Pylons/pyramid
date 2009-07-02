@@ -25,15 +25,6 @@ because CMF happens to provide other helpful services, such as types,
 skins, and workflow; this tutorial is for those sorts of developers
 and projects.
 
-XXX Missing:
-
-   templates.rst
-   forms.rst
-   membership.rst
-   discussions.rst
-   syndication.rst
-   dublincore.rst
-
 .. toctree::
    :maxdepth: 2
 
@@ -42,5 +33,7 @@ XXX Missing:
    skins.rst
    actions.rst
    workflow.rst
+   missing.rst
+
 
 
