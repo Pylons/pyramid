@@ -225,17 +225,21 @@ def make_app(root_factory, package=None, filename='configure.zcml',
 
     ``package`` is a Python module representing the application's
     package.  It is optional, defaulting to ``None``.  ``package`` may
-    be ``None``.  If ``package`` is ``None``, either the ``filename``
-    passed or the value in the ``options`` dictionary named
-    ``configure_zcml`` must be an absolute pathname to a ZCML file
-    that represents the application's configuration.
+    be ``None``.  If ``package`` is ``None``, the ``filename`` passed
+    or the value in the ``options`` dictionary named
+    ``configure_zcml`` must be a) absolute pathname to a ZCML file
+    that represents the application's configuration *or* b) a
+    'specification' in the form
+    ``dotted_package_name:relative/file/path.zcml``.
 
     ``filename`` is the filesystem path to a ZCML file (optionally
     relative to the package path) that should be parsed to create the
-    application registry.  It defaults to ``configure.zcml``.  Note
-    that if any value for ``configure_zcml`` is passed within the
-    ``options`` dictionary, the value passed as ``filename`` will be
-    ignored, replaced with the ``configure_zcml`` value.
+    application registry.  It defaults to ``configure.zcml``.  It can
+    also be a 'specification' in the form
+    ``dotted_package_name:relatve/file/path.zcml``. Note that if any
+    value for ``configure_zcml`` is passed within the ``options``
+    dictionary, the value passed as ``filename`` will be ignored,
+    replaced with the ``configure_zcml`` value.
 
     ``authentication_policy`` should be an object that implements the
     ``repoze.bfg.interfaces.IAuthenticationPolicy`` interface (e.g.
@@ -276,6 +280,11 @@ def make_app(root_factory, package=None, filename='configure.zcml',
 
     settings = Settings(get_options(options))
     filename = settings['configure_zcml']
+
+    if ':' in filename:
+        package, filename = filename.split(':', 1)
+        __import__(package)
+        package = sys.modules[package]
 
     if registry is None:
         regname = filename

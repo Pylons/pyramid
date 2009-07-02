@@ -703,6 +703,19 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failIf(app.registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_fixtureapp_explicit_specification_in_options(self):
+        manager = DummyRegistryManager()
+        rootpolicy = DummyRootFactory(None)
+        from repoze.bfg.tests import fixtureapp
+        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
+        app = self._callFUT(rootpolicy, fixtureapp, filename='configure.zcml',
+                            options={'configure_zcml':zcmlfile},
+                            manager=manager)
+        self.assertEqual(app.registry.__name__,
+                         'repoze.bfg.tests.fixtureapp.subpackage')
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failIf(app.registry.queryUtility(IFixture)) # only in c.zcml
         
     def test_event(self):
         manager = DummyRegistryManager()

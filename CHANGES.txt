@@ -6,9 +6,10 @@ Features
 
 - Allow a Paste config file (``configure_zcml``) value or an
   environment variable (``BFG_CONFIGURE_ZCML``) to name a ZCML file
-  that will be used to bootstrap the application.  Previously, the
-  integrator could not influence which ZCML file was used to do the
-  boostrapping (only the original application developer could do so).
+  (optionally package-relative) that will be used to bootstrap the
+  application.  Previously, the integrator could not influence which
+  ZCML file was used to do the boostrapping (only the original
+  application developer could do so).
 
 Documentation
 -------------

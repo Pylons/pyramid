@@ -54,7 +54,16 @@ application-specific configuration settings.
 |                                 |                             |  this is a relative filename, it will  |
 |                                 |                             |  be considered relative to the         |
 |                                 |                             |  ``package`` passed to ``make_app``    |
-|                                 |                             |  by the application.                   |
+|                                 |                             |  by the application.  It may also      |
+|                                 |                             |  take the form of a resource           |
+|                                 |                             | "specification" which names both the   |
+|                                 |                             |  package name and a package-relative   |
+|                                 |                             |  filename, e.g.                        |
+|                                 |                             |  ``dotted.package.name:path/to.zcml``. |
+|                                 |                             |  If it is a resource specification,    |
+|                                 |                             |  both the  *package* and the           |
+|                                 |                             | *filename* passed  to ``make_app`` are |
+|                                 |                             |  overridden with the implied values.   |
 +---------------------------------+-----------------------------+----------------------------------------+
 
 Examples
