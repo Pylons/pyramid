@@ -18,7 +18,9 @@ Architecture ("CA") internally, as do Zope 2, Zope 3, and
 :term:`Grok`.  Application :mod:`repoze.bfg` developers use either
 :term:`ZCML` (an XML dialect, used in Zope) or decorators to perform
 various configuration tasks.  The decorator support is provided by the
-:term:`Grok` project.
+:term:`Grok` project.  Like Zope, :mod:`repoze.bfg` allows you to
+create applications which do not need to be forked to be extended by a
+third party developer.
 
 Like :term:`Pylons`, :mod:`repoze.bfg` is mostly policy-free.  It
 makes no assertions about which database you should use, and its
@@ -88,6 +90,14 @@ instead of by user code, and access is permitted or denied by the
 framework itself rather than by user code.  Such a task would
 typically be performed by user-space decorators in other Python web
 frameworks.
+
+Like Zope, but unlike :term:`Pylons` or :term:`Django`, when you build
+a :mod:`repoze.bfg` application, if you obey certain constraints, the
+application you produce can be reused, modified, re-integrated, or
+extended by third-party developers without modification to the
+original application itself.  See :ref:`extending_chapter` for more
+information about extending or modifying an existing :mod:`repoze.bfg`
+application.
 
 Unlike application development using Zope, application developers
 don't interact with the Zope Component Architecture ("CA") very much

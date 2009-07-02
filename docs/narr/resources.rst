@@ -132,6 +132,13 @@ performing the following steps:
   package's ``configure.zcml`` file.  See :ref:`environment_chapter`
   for more information about this setting.
 
+Note that overriding resources is not the only way to extend or modify
+the behavior of an existing :mod:`repoze.bfg` application.  A "heavier
+hammer" way to do the same thing is explained in
+:ref:`extending_chapter`.  The heavier hammer way allows you to
+replace a :term:`view` wholesale rather than resources that might be
+used by a view.
+
 .. _resource_directive:
 
 The ``resource`` ZCML Directive

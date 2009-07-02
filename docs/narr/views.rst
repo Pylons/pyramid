@@ -298,7 +298,9 @@ decorator to do this work.
    to scan for view declarations.  Also, if you use decorators, it
    means that other people will not be able to override your view
    declarations externally using ZCML: this is a common requirement if
-   you're developing an exensible application (e.g. a framework).
+   you're developing an exensible application (e.g. a framework).  See
+   :ref:`extending_chapter` for more information about building
+   extensible applications.
 
 The ``bfg_view`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -35,13 +35,14 @@ Narrative documentation in chapter form explaining how to use
    narr/templates
    narr/models
    narr/security
-   narr/resources
    narr/hybrid
    narr/vhosting
    narr/events
    narr/environment
    narr/unittesting
    narr/hooks
+   narr/extending
+   narr/resources
    narr/router
    glossary
 

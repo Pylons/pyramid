@@ -17,6 +17,10 @@ Documentation
   explains how to override resources within one package from another
   package.
 
+- Added an "Extending" chapter to the narrative documentation which
+  explains how to extend or modify an existing BFG application using
+  another Python package and ZCML.
+
 1.0a9 (2009-07-01)
 ==================
 
