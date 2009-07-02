@@ -21,13 +21,6 @@ context.  Instead, you must use :term:`ZCML` for this
 purpose. :term:`ZCML` statements that belong to an application can be
 "overridden" by integrators as necessary, but decorators cannot.
 
-If you've inherited a :mod:`repoze.bfg` application that you'd like to
-extend, but which *does* use ``@bfg_view`` decorators, you'll (at
-least) need to change the source code of the original application,
-moving the view declarations out of the decorators and into
-:term:`ZCML`.  Once this is done, you should be able to extend or
-modify the application like any other.
-
 It's also often helpful for third party application "extenders" (aka
 "integrators") if you break your ZCML into separate files which do
 very specific things, and include them in the application's main
@@ -38,6 +31,13 @@ registrations he needs.
 
 Extending an Existing Application
 ---------------------------------
+
+If you've inherited a :mod:`repoze.bfg` application that you'd like to
+extend which uses ``@bfg_view`` decorators, you'll unfortunately need
+to change the source code of the original application, moving the view
+declarations out of the decorators and into :term:`ZCML`.  Once this
+is done, you should be able to extend or modify the application like
+any other.
 
 To extend or change the behavior of an existing application, the only
 hard-and-fast rule is that you need to write some :term:`ZCML`, and
