@@ -68,7 +68,7 @@ def add_page(context, request):
     page.__name__ = name
     page.__parent__ = context
 
-    logged_in = 'repoze.who.identity' in request.environ
+    logged_in = authenticated_userid(request)
 
     return render_template_to_response('templates/edit.pt',
                                        request = request,
@@ -82,7 +82,7 @@ def edit_page(context, request):
         context.data = request.params['body']
         return HTTPFound(location = model_url(context, request))
 
-    logged_in = 'repoze.who.identity' in request.environ
+    logged_in = authenticated_userid(request)
 
     return render_template_to_response('templates/edit.pt',
                                        request = request,
