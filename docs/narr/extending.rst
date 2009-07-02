@@ -55,9 +55,10 @@ The general pattern for extending an application looks something like this:
   original application (e.g. ``python setup.py develop`` or ``python
   setup.py install``).
 
-- Change the ``configure.zcml`` in the new package to the original
-  :mod:`repoze.bfg` application's ``configure.zcml`` via an include
-  statement, e.g.  ``<include package="theoriginalapplication"/>``.
+- Change the ``configure.zcml`` in the new package to include the
+  original :mod:`repoze.bfg` application's ``configure.zcml`` via an
+  include statement, e.g.  ``<include
+  package="theoriginalapplication"/>``.
 
 - On a line in the new package's ``configure.zcml`` file that falls
   after (XML-ordering-wise) the ``include`` of the original package,
