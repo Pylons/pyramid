@@ -75,7 +75,7 @@ Tutorials
 Step-by-step tutorials which demonstrate how you might use and deploy
 :mod:`repoze.bfg`.
 
-ZODB + traversal BFG Wiki tutorial, demonstrating how to build a
+ZODB + traversal Wiki tutorial, demonstrating how to build a
 :term:`traversal` based application using :term:`ZODB` and
 :term:`authentication`.  Good for people with prior Zope experience
 (or no experience at all).
@@ -85,10 +85,10 @@ ZODB + traversal BFG Wiki tutorial, demonstrating how to build a
 
    tutorials/bfgwiki/index.rst
 
-SQLAlchemy + url dispatch BFG Wiki tutorial, demonstrating how to
-build a :term:`url dispatch` based application using
-:term:`SQLAlchemy` and :term:`authentication`.  Good for people with
-prior Pylons experience (or no experience at all).
+SQLAlchemy + url dispatch Wiki tutorial, demonstrating how to build a
+:term:`url dispatch` based application using :term:`SQLAlchemy` and
+:term:`authentication`.  Good for people with prior Pylons experience
+(or no experience at all).
 
 .. toctree::
    :maxdepth: 2
