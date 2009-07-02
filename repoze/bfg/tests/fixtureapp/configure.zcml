@@ -16,6 +16,11 @@
       request_type=".views.IDummy"
       />
 
+   <utility
+      component=".models.fixture"
+      provides=".models.IFixture"
+    />
+
   <include file="another.zcml"/>
 
 </configure>

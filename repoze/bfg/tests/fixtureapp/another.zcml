@@ -1,5 +1,7 @@
 <configure xmlns="http://namespaces.repoze.org/bfg">
 
+  <include package="repoze.bfg.includes" />
+
   <view
       view=".views.fixture_view"
       for="*"

@@ -210,8 +210,9 @@ def default_notfound_view(context, request):
 
 def make_app(root_factory, package=None, filename='configure.zcml',
              authentication_policy=None, authorization_policy=None,
-             options=None, registry=None, debug_logger=None):
-    # registry and debug_logger *only* for unittests
+             options=None, registry=None, debug_logger=None,
+             manager=manager):
+    # registry, debug_logger and manager *only* for unittests
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
 
@@ -223,13 +224,18 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     used.
 
     ``package`` is a Python module representing the application's
-    package.  It is optional, defaulting to ``None``.  If ``package``
-    is ``None``, the ``filename`` passed must be an absolute pathname
-    to a ZCML file that represents the application's configuration.
+    package.  It is optional, defaulting to ``None``.  ``package`` may
+    be ``None``.  If ``package`` is ``None``, either the ``filename``
+    passed or the value in the ``options`` dictionary named
+    ``configure_zcml`` must be an absolute pathname to a ZCML file
+    that represents the application's configuration.
 
     ``filename`` is the filesystem path to a ZCML file (optionally
     relative to the package path) that should be parsed to create the
-    application registry.  It defaults to ``configure.zcml``.
+    application registry.  It defaults to ``configure.zcml``.  Note
+    that if any value for ``configure_zcml`` is passed within the
+    ``options`` dictionary, the value passed as ``filename`` will be
+    ignored, replaced with the ``configure_zcml`` value.
 
     ``authentication_policy`` should be an object that implements the
     ``repoze.bfg.interfaces.IAuthenticationPolicy`` interface (e.g.
@@ -265,18 +271,23 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     if options is None:
         options = {}
 
+    if not 'configure_zcml' in options:
+        options['configure_zcml'] = filename
+
+    settings = Settings(get_options(options))
+    filename = settings['configure_zcml']
+
     if registry is None:
         regname = filename
         if package:
             regname = package.__name__
         registry = Registry(regname)
 
+    registry.registerUtility(settings, ISettings)
+
     if debug_logger is None:
         debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
     registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
-
-    settings = Settings(get_options(options))
-    registry.registerUtility(settings, ISettings)
 
     if root_factory is None:
         root_factory = DefaultRootFactory

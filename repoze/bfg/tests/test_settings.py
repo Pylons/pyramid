@@ -148,6 +148,17 @@ class TestGetOptions(unittest.TestCase):
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_authorization'], True)
 
+    def test_configure_zcml(self):
+        result = self._callFUT({})
+        self.assertEqual(result['configure_zcml'], '')
+        result = self._callFUT({'configure_zcml':'abc'})
+        self.assertEqual(result['configure_zcml'], 'abc')
+        result = self._callFUT({}, {'BFG_CONFIGURE_ZCML':'abc'})
+        self.assertEqual(result['configure_zcml'], 'abc')
+        result = self._callFUT({'configure_zcml':'def'},
+                             {'BFG_CONFIGURE_ZCML':'abc'})
+        self.assertEqual(result['configure_zcml'], 'abc')
+
     def test_originals_kept(self):
         result = self._callFUT({'a':'i am so a'})
         self.assertEqual(result['a'], 'i am so a')

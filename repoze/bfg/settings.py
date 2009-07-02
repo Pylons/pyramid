@@ -55,11 +55,14 @@ def get_options(kw, environ=os.environ):
     config_reload_resources = kw.get('reload_resources', '')
     effective_reload_resources = asbool(eget('BFG_RELOAD_RESOURCES',
                                              config_reload_resources))
+    configure_zcml = kw.get('configure_zcml', '')
+    effective_configure_zcml = eget('BFG_CONFIGURE_ZCML', configure_zcml)
     update = {
         'debug_authorization': effective_debug_all or effective_debug_auth,
         'debug_notfound': effective_debug_all or effective_debug_notfound,
         'reload_templates': effective_reload_all or effective_reload_templates,
         'reload_resources':effective_reload_all or effective_reload_resources,
+        'configure_zcml':effective_configure_zcml,
         }
 
     kw.update(update)

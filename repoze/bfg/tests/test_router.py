@@ -97,7 +97,7 @@ class RouterTests(unittest.TestCase):
         return L
 
     def _registerRootFactory(self, val):
-        rootfactory = make_rootfactory(val)
+        rootfactory = DummyRootFactory(val)
         from repoze.bfg.interfaces import IRootFactory
         self.registry.registerUtility(rootfactory, IRootFactory)
         return rootfactory
@@ -221,7 +221,7 @@ class RouterTests(unittest.TestCase):
         context = DummyContext()
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
-        view = make_view('abc')
+        view = DummyView('abc')
         self._registerView(view, '', None, None)
         router = self._makeOne()
         start_response = DummyStartResponse()
@@ -251,7 +251,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         self._registerAuthenticationPolicy()
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         from repoze.bfg.security import ACLDenied
         denied = ACLDenied('ace', 'acl', 'permission', ['principals'], context)
         environ = self._makeEnviron()
@@ -269,7 +269,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
         rootfactory = self._registerRootFactory(context)
@@ -289,7 +289,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, _deprecation_warning='abc')
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
         router = self._makeOne()
@@ -308,7 +308,7 @@ class RouterTests(unittest.TestCase):
         rootfactory = self._registerRootFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, 'foo', None, None)
         router = self._makeOne()
@@ -334,7 +334,7 @@ class RouterTests(unittest.TestCase):
         rootfactory = self._registerRootFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         router = self._makeOne()
@@ -360,7 +360,7 @@ class RouterTests(unittest.TestCase):
         directlyProvides(context, INotContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         router = self._makeOne()
@@ -379,7 +379,7 @@ class RouterTests(unittest.TestCase):
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         router = self._makeOne()
@@ -398,7 +398,7 @@ class RouterTests(unittest.TestCase):
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         router = self._makeOne()
@@ -421,7 +421,7 @@ class RouterTests(unittest.TestCase):
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         router = self._makeOne()
@@ -444,7 +444,7 @@ class RouterTests(unittest.TestCase):
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         router = self._makeOne()
@@ -465,7 +465,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         self._registerAuthenticationPolicy()
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
         checker = self._registerViewPermission('', True)
@@ -486,7 +486,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         self._registerAuthenticationPolicy()
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         from repoze.bfg.security import ACLDenied
         denied = ACLDenied('ace', 'acl', 'permission', ['principals'], context)
         environ = self._makeEnviron()
@@ -511,7 +511,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         self._registerAuthenticationPolicy()
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         from repoze.bfg.security import ACLDenied
         denied = ACLDenied('ace', 'acl', 'permission', ['principals'], context)
         environ = self._makeEnviron()
@@ -537,7 +537,7 @@ class RouterTests(unittest.TestCase):
         self._registerAuthenticationPolicy()
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = make_view(response)
+        view = DummyView(response)
         from repoze.bfg.security import ACLDenied
         environ = self._makeEnviron()
         self._registerView(view, '', IContext, IRequest)
@@ -571,7 +571,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
         from repoze.bfg.interfaces import INewRequest
@@ -591,7 +591,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
         router = self._makeOne()
@@ -610,7 +610,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron(REQUEST_METHOD='POST')
         self._registerView(view, '', None, None)
         router = self._makeOne()
@@ -631,7 +631,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron(REQUEST_METHOD='PUT')
         self._registerView(view, '', None, None)
         router = self._makeOne()
@@ -650,7 +650,7 @@ class RouterTests(unittest.TestCase):
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
-        view = make_view(response)
+        view = DummyView(response)
         environ = self._makeEnviron(REQUEST_METHOD='UNKNOWN')
         self._registerView(view, '', None, None)
         router = self._makeOne()
@@ -663,27 +663,49 @@ class RouterTests(unittest.TestCase):
 class MakeAppTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        import repoze.bfg.router
-        self.old_tl_manager = repoze.bfg.router.manager
-        self.regmgr = DummyRegistryManager()
-        repoze.bfg.router.manager = self.regmgr
 
     def tearDown(self):
         cleanUp()
-        import repoze.bfg.router
-        repoze.bfg.router.threadlocal_manager = self.old_tl_manager
         
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.router import make_app
         return make_app(*arg, **kw)
 
-    def test_fixtureapp(self):
+    def test_fixtureapp_default_filename_withpackage(self):
+        manager = DummyRegistryManager()
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = make_rootfactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp)
+        rootpolicy = DummyRootFactory(None)
+        app = self._callFUT(rootpolicy, fixtureapp, manager=manager)
         self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failUnless(app.registry.queryUtility(IFixture)) # only in c.zcml
 
+    def test_fixtureapp_explicit_filename(self):
+        manager = DummyRegistryManager()
+        from repoze.bfg.tests import fixtureapp
+        rootpolicy = DummyRootFactory(None)
+        app = self._callFUT(rootpolicy, fixtureapp, filename='another.zcml',
+                            manager=manager)
+        self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failIf(app.registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_fixtureapp_explicit_filename_in_options(self):
+        import os
+        manager = DummyRegistryManager()
+        rootpolicy = DummyRootFactory(None)
+        from repoze.bfg.tests import fixtureapp
+        zcmlfile = os.path.join(os.path.dirname(fixtureapp.__file__),
+                                'another.zcml')
+        app = self._callFUT(rootpolicy, fixtureapp, filename='configure.zcml',
+                            options={'configure_zcml':zcmlfile},
+                            manager=manager)
+        self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failIf(app.registry.queryUtility(IFixture)) # only in c.zcml
+        
     def test_event(self):
+        manager = DummyRegistryManager()
         def subscriber(event):
             event.app.created = True        
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
@@ -693,15 +715,17 @@ class MakeAppTests(unittest.TestCase):
             (IWSGIApplicationCreatedEvent,)
             )
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = make_rootfactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp)
+        rootpolicy = DummyRootFactory(None)
+        app = self._callFUT(rootpolicy, fixtureapp, manager=manager)
         assert app.created is True
 
     def test_custom_settings(self):
+        manager = DummyRegistryManager()
         options= {'mysetting':True}
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = make_rootfactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp, options=options)
+        rootpolicy = DummyRootFactory(None)
+        app = self._callFUT(rootpolicy, fixtureapp, options=options,
+                            manager=manager)
         from repoze.bfg.interfaces import ISettings
         settings = app.registry.getUtility(ISettings)
         self.assertEqual(settings.reload_templates, False)
@@ -709,11 +733,13 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(settings.mysetting, True)
 
     def test_registrations(self):
+        manager = DummyRegistryManager()
         options= {'reload_templates':True,
                   'debug_authorization':True}
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = make_rootfactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp, options=options)
+        rootpolicy = DummyRootFactory(None)
+        app = self._callFUT(rootpolicy, fixtureapp, options=options,
+                            manager=manager)
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ILogger
         from repoze.bfg.interfaces import IRootFactory
@@ -724,15 +750,17 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(settings.reload_templates, True)
         self.assertEqual(settings.debug_authorization, True)
         self.assertEqual(rootfactory, rootpolicy)
-        self.failUnless(self.regmgr.pushed and self.regmgr.popped)
+        self.failUnless(manager.pushed and manager.popped)
 
     def test_routes_in_config_with_rootpolicy(self):
+        manager = DummyRegistryManager()
         options= {'reload_templates':True,
                   'debug_authorization':True}
         from repoze.bfg.urldispatch import RoutesRootFactory
         from repoze.bfg.tests import routesapp
-        rootpolicy = make_rootfactory(None)
-        app = self._callFUT(rootpolicy, routesapp, options=options)
+        rootpolicy = DummyRootFactory(None)
+        app = self._callFUT(rootpolicy, routesapp, options=options,
+                            manager=manager)
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ILogger
         from repoze.bfg.interfaces import IRootFactory
@@ -744,15 +772,17 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(settings.debug_authorization, True)
         self.failUnless(isinstance(rootfactory, RoutesRootFactory))
         self.assertEqual(rootfactory.default_root_factory, rootpolicy)
-        self.failUnless(self.regmgr.pushed and self.regmgr.popped)
+        self.failUnless(manager.pushed and manager.popped)
 
     def test_routes_in_config_no_rootpolicy(self):
+        manager = DummyRegistryManager()
         options= {'reload_templates':True,
                   'debug_authorization':True}
         from repoze.bfg.urldispatch import RoutesRootFactory
         from repoze.bfg.router import DefaultRootFactory
         from repoze.bfg.tests import routesapp
-        app = self._callFUT(None, routesapp, options=options)
+        app = self._callFUT(None, routesapp, options=options,
+                            manager=manager)
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ILogger
         from repoze.bfg.interfaces import IRootFactory
@@ -764,29 +794,33 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(settings.debug_authorization, True)
         self.failUnless(isinstance(rootfactory, RoutesRootFactory))
         self.assertEqual(rootfactory.default_root_factory, DefaultRootFactory)
-        self.failUnless(self.regmgr.pushed and self.regmgr.popped)
+        self.failUnless(manager.pushed and manager.popped)
         
     def test_no_routes_in_config_no_rootpolicy(self):
+        manager = DummyRegistryManager()
         from repoze.bfg.router import DefaultRootFactory
         from repoze.bfg.interfaces import IRootFactory
         options= {'reload_templates':True,
                   'debug_authorization':True}
         from repoze.bfg.tests import fixtureapp
-        app = self._callFUT(None, fixtureapp, options=options)
+        app = self._callFUT(None, fixtureapp, options=options,
+                            manager=manager)
         rootfactory = app.registry.getUtility(IRootFactory)
         self.assertEqual(rootfactory, DefaultRootFactory)
 
     def test_authorization_policy_no_authentication_policy(self):
+        manager = DummyRegistryManager()
         from repoze.bfg.interfaces import IAuthorizationPolicy
         authzpolicy = DummyContext()
         from repoze.bfg.tests import routesapp
         logger = DummyLogger()
         app = self._callFUT(None, routesapp, authorization_policy=authzpolicy,
-                            debug_logger=logger)
+                            debug_logger=logger, manager=manager)
         self.failIf(app.registry.queryUtility(IAuthorizationPolicy))
         self.assertEqual(logger.messages, [])
         
     def test_authentication_policy_no_authorization_policy(self):
+        manager = DummyRegistryManager()
         from repoze.bfg.interfaces import IAuthorizationPolicy
         from repoze.bfg.interfaces import IAuthenticationPolicy
         from repoze.bfg.authorization import ACLAuthorizationPolicy
@@ -794,7 +828,7 @@ class MakeAppTests(unittest.TestCase):
         from repoze.bfg.tests import routesapp
         logger = DummyLogger()
         app = self._callFUT(None, routesapp, authentication_policy=authnpolicy,
-                            debug_logger=logger)
+                            debug_logger=logger, manager=manager)
         self.assertEqual(app.registry.getUtility(IAuthenticationPolicy),
                          authnpolicy)
         self.assertEqual(
@@ -803,6 +837,7 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(len(logger.messages), 1) # deprecation warning
                         
     def test_authentication_policy_and_authorization_policy(self):
+        manager = DummyRegistryManager()
         from repoze.bfg.interfaces import IAuthorizationPolicy
         from repoze.bfg.interfaces import IAuthenticationPolicy
         authnpolicy = DummyContext()
@@ -811,7 +846,7 @@ class MakeAppTests(unittest.TestCase):
         logger = DummyLogger()
         app = self._callFUT(None, routesapp, authentication_policy=authnpolicy,
                             authorization_policy = authzpolicy,
-                            debug_logger=logger)
+                            debug_logger=logger, manager=manager)
         self.assertEqual(app.registry.getUtility(IAuthenticationPolicy),
                          authnpolicy)
         self.assertEqual(app.registry.getUtility(IAuthorizationPolicy),
@@ -866,15 +901,19 @@ class DummyRegistryManager:
 class DummyContext:
     pass
 
-def make_view(response):
-    def view(context, request):
-        return response
-    return view
+class DummyView:
+    def __init__(self, response):
+        self.response = response
 
-def make_rootfactory(root):
-    def rootpolicy(environ):
-        return root
-    return rootpolicy
+    def __call__(self, context, request):
+        return self.response
+
+class DummyRootFactory:
+    def __init__(self, root):
+        self.root = root
+
+    def __call__(self, environ):
+        return self.root
 
 class DummyStartResponse:
     status = ()
