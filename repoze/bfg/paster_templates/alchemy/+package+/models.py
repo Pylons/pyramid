@@ -9,15 +9,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 from sqlalchemy import create_engine
-from sqlalchemy import ForeignKey
-from sqlalchemy import UniqueConstraint
 from sqlalchemy import Integer
 from sqlalchemy import Unicode
-from sqlalchemy import String
 from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Boolean
-from sqlalchemy import Text
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
