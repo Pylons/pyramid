@@ -87,7 +87,8 @@ The general pattern for extending an application looks something like this:
      />
 
   Views which modify the behavior of an application will usually be
-  cutnpaste jobs from the original application with slight tweaks.
+  cut-n-paste copies of view callables from the original application
+  with slight tweaks.
 
   A similar pattern can be used to extend the application.  Just
   register a new view against some existing model type.
