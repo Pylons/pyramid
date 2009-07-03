@@ -152,6 +152,12 @@ On Windows:
 
    c:\bigfntut> Scripts\paster create -t bfg_zodb tutorial
 
+.. note:: If you are using Windows, the ``bfg_zodb`` Paster template
+   doesn't currently deal gracefully with installation into a location
+   that contains spaces in the path.  If you experience startup
+   problems, try putting both the virtualenv and the project into
+   directories that do not contain spaces in their paths.
+
 Installing the Project in "Development Mode"
 ============================================
 
