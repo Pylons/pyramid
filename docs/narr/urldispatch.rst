@@ -195,8 +195,14 @@ Will generate the following matchdict::
 
   {'traverse':(u'La Pe\xf1a', u'a', u'b', u'c')}
 
+``<route>`` Statement Examples
+------------------------------
+
+Let's check out some examples of how ``<route>`` statements might be
+commonly declared.
+
 Example 1
----------
+~~~~~~~~~
 
 The simplest route delcaration:
 
@@ -231,7 +237,7 @@ specified in the ``route`` declaration.  It is a mapping object, a lot
 like a dictionary.
 
 Example 2
----------
+~~~~~~~~~
 
 Below is an example of some more complicated route statements you
 might add to your ``configure.zcml``:
@@ -273,7 +279,7 @@ view available at the dotted Python pathname
 ``mypackage.views.idea_view``.  
 
 Example 3
----------
+~~~~~~~~~
 
 The context object passed to a view found as the result of URL
 dispatch will by default be an instance of the object returned by the
@@ -322,7 +328,7 @@ during ``make_app`.  If the "fallback" root factory is None, a
           not used then.
 
 Example 4
----------
+~~~~~~~~~
 
 An example of configuring a ``view`` declaration in ``configure.zcml``
 that maps a context found via URL dispatch to a view function is as
@@ -388,6 +394,17 @@ declaration:
 
    <route
        path=""
+       name="root"
+       view=".views.root_view"
+       />
+
+Or provide the literal string ``/`` as the path:
+
+.. code-block:: xml
+   :linenos:
+
+   <route
+       path="/"
        name="root"
        view=".views.root_view"
        />

@@ -3,8 +3,8 @@
 Startup
 =======
 
-When you cause :mod:`repoze.bfg` to start up in the foreground, you'll
-see something much like this show up on your console::
+When you cause :mod:`repoze.bfg` to start up in a console window,
+you'll see something much like this show up on the console::
 
   $ paster serve myproject/MyProject.ini
   Starting server in PID 16601.
@@ -12,8 +12,8 @@ see something much like this show up on your console::
 
 This chapter explains what happens between the time you press the
 "Return" key on your keyboard after typing ``paster serve
-myproject/MyProject.ini`` and the resulting output of the line
-``serving on 0.0.0:6543 ...`` to your console.
+myproject/MyProject.ini`` and the the time the line ``serving on
+0.0.0:6543 ...`` is output to your console.
 
 The Startup Process
 -------------------
@@ -99,15 +99,15 @@ press ``return`` after running ``paster serve MyProject.ini``.
    .. literalinclude:: MyProject/myproject/run.py
       :linenos:
 
-   Note that the app function imports the ``get_root`` root factory
-   function from the ``myproject.models`` Python module.  It then also
-   imports the "bare" ``myproject`` package, and passes ``get_root``,
-   ``myproject``, and the ``options`` keyword as the ``app``
-   function's extra keyword args to the ``make_app`` function of the
-   ``repoze.bfg.router`` module.  ``**kw`` here contains all the
-   options in the ``[app:main]`` section of our .ini file except the
-   "use" option (which is internal to paste).  In this case, ``**kw``
-   will be something like ``{'reload_templates':'true',
+   Note that the ``app`` function imports the ``get_root`` :term:`root
+   factory` function from the ``myproject.models`` Python module.  It
+   then also imports the "bare" ``myproject`` package, and passes
+   ``get_root``, ``myproject``, and the ``options`` keyword as the
+   ``app`` function's extra keyword args to the ``make_app`` function
+   of the ``repoze.bfg.router`` module.  ``**kw`` here contains all
+   the options in the ``[app:main]`` section of our .ini file except
+   the "use" option (which is internal to paste).  In this case,
+   ``**kw`` will be something like ``{'reload_templates':'true',
    'debug_authorization':'false', 'debug_notfound':'false'}``.
 
    ``get_root`` is the first argument to ``make_app``, and it is a
@@ -119,12 +119,13 @@ press ``return`` after running ``paster serve MyProject.ini``.
    callback knows where to look for the :term:`application registry`
    file (conventially named ``configure.zcml``).  ``make_app`` will
    use the package's path and look for ``configure.zcml`` within that
-   package's filesystem directory.  If you for some reason need or
-   want to load a different application registry filename for your
-   application, you can pass an optional ``filename=`` paramter to
-   make_app (e.g. ``make_app(get_root, myproject,
-   filename='meta.zcml', options=options``).  If the filename is
-   absolute, the ``package`` argument is ignored.
+   package's filesystem directory.
+
+   If you for some reason need or want to load a different application
+   registry filename for your application, you can pass an optional
+   ``filename=`` paramter to make_app (e.g. ``make_app(get_root,
+   myproject, filename='meta.zcml', options=options``).  If the
+   filename is absolute, the ``package`` argument is ignored.
 
 #. The ``make_app`` function does its work.  It finds and parses the
    ZCML represented by the application registry file.  If it fails to
@@ -140,10 +141,10 @@ press ``return`` after running ``paster serve MyProject.ini``.
 #. A ``WSGIApplicationCreatedEvent`` event is emitted (see
    :ref:`events_chapter` for more informations about events).
 
-#. Assuming there were no errors, our ``myproject`` ``app`` function
-   returns the router instance created by ``make_app`` back to
-   PasteDeploy.  As far as PasteDeploy is concerned, it is "just
-   another WSGI application".
+#. Assuming there were no errors, the ``app`` function in
+   ``myproject`` returns the router instance created by ``make_app``
+   back to PasteDeploy.  As far as PasteDeploy is concerned, it is
+   "just another WSGI application".
 
 #. PasteDeploy starts the WSGI *server* defined within the
    ``[server:main]`` section.  In our case, this is the ``Paste#http``

@@ -20,19 +20,20 @@ run under Python 3.X.
 .. note:: Installation of :mod:`repoze.bfg` does not require the
    compilation of any C code, so as long as you have a Python
    interpreter that meets the above requirements, you do not need to
-   have development tools installed on the target machine to run
+   have development tools installed on the target machine to install
    :mod:`repoze.bfg`.
 
-BFG is known to run properly on all popular (and even some
-less-popular) Unix-like systems such as Linux, MacOS X, and FreeBSD.
+BFG is known to run properly on all popular Unix-like systems such as
+Linux, MacOS X, and FreeBSD.
 
-:mod:`repoze.bfg` runs on Windows systems.  However, none of its main
-developers use the Windows platform.  Therefor, most of the
-platform-specific documentation (excepting this chapter) assumes
-you're using a UNIX system. If you're using a Windows system, you'll
-need to transliterate command lines in the documentation to their
-Windows equivalents.  :mod:`repoze.bfg` is also known to run on
-Google's App Engine.
+:mod:`repoze.bfg` does run on Windows systems.  However, none of its
+developers use Windows as a primary development platform.  Therefore,
+most of the platform-specific documentation (excepting this chapter)
+assumes you're using a UNIX system. If you're using a Windows system,
+you'll need to transliterate command lines in the documentation to
+their Windows equivalents.
+
+:mod:`repoze.bfg` is also known to run on Google's App Engine.
 
 It is not known whether :mod:`repoze.bfg` will or will not run under
 Jython or IronPython.
@@ -72,10 +73,12 @@ invokable via ``python2.5`` from a shell prompt.
 Source Compile Method
 +++++++++++++++++++++
 
-It's useful to use a Python that *isn't* the "system" Python to
-develop your software (the authors of BFG never use the system Python
-to run BFG; always a self-compiled one).  Often the "system" Python is
-compiled with options that aren't optimal for web development.
+It's useful to use a Python interpreter that *isn't* the "system"
+Python interpreter to develop your software.  The authors of
+:mod:`repoze.bfg` never use the system Python for development
+purposes; always a self-compiled one.  Compiling Python is easy, and
+often the "system" Python is compiled with options that aren't optimal
+for web development.
 
 To compile software on your UNIX system, typically you need
 development tools.  Often these can be installed via the package
@@ -117,6 +120,8 @@ interpreter executable from `<python.org
 http://python.org/download/>`_ (the files labeled "Windows
 Installer").  Once you've downloaded it, double click on the
 executable and accept the defaults during the installation process.
+You may also need to download and install the `Python for Windows
+extensions <http://sourceforge.net/projects/pywin32/files/>`_.
 
 Installing :mod:`repoze.bfg` on a UNIX System
 ---------------------------------------------
@@ -128,9 +133,9 @@ installed in your Python version (and likewise, to prevent
 are not compatible with your system Python).
 
 To set up a virtualenv to install :mod:`repoze.bfg` within, first
-ensure that setuptools is installed.  Invoke ``import setuptools``
-within the Python interpreter you'd like to run :mod:`repoze.bfg`
-with.
+ensure that :term:`setuptools` is installed.  Invoke ``import
+setuptools`` within the Python interpreter you'd like to run
+:mod:`repoze.bfg` under:
 
 .. code-block:: bash
 
@@ -143,9 +148,11 @@ with.
 If ``import setuptools`` does not raise an ``ImportError``, it means
 that setuptools is already installed into your Python interpreter.  If
 ``import setuptools`` fails, you will need to install setuptools
-manually.  If you are using a "system" Python (one installed by your
-OS distributor or a 3rd-party packager such as Fink or MacPorts), you
-can usually install a setuptools package using your system's package
+manually.
+
+If you are using a "system" Python (one installed by your OS
+distributor or a 3rd-party packager such as Fink or MacPorts), you can
+usually install a setuptools package using your system's package
 manager.  If you cannot do this, or if you're using a self-installed
 version of Python, you will need to install setuptools "by hand".
 Installing setuptools "by hand" is always a reasonable thing to do,
@@ -168,7 +175,6 @@ the script.  To remediate this, you may need to do:
 .. code-block:: bash
 
   $ sudo python ez_setup.py
-
 
 Installing the ``virtualenv`` Package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -247,9 +253,9 @@ Installing :mod:`repoze.bfg` on a Windows System
    <http://python.org/download/releases/2.5.4/>`_ for your system.
 
 #. Install the `Python for Windows extensions
-   <http://www.sourceforge.net/project/showfiles.php?group_id=78018>`_.
-   Make sure to pick the right download for Python 2.5 and install it
-   using the same Python installation from the previous step.
+   <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
+   pick the right download for Python 2.5 and install it using the
+   same Python installation from the previous step.
 
 #. Install latest `setuptools` into the Python you
    obtained/installed/found in the step above: download `ez_setup.py

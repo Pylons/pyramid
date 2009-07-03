@@ -3,12 +3,13 @@
 Traversal
 =========
 
-When :term:`traversal` is used, the :mod:`repoze.bfg` *Router* parses
-the URL associated with the request and splits the URL into path
-segments.  Based on these path segments, :mod:`repoze.bfg` traverses a
-*model graph* in order to find a :term:`context`.  It then attempts to
-find a :term:`view` based on the *type* of the context (specified by
-its Python class type or any :term:`interface` attached to it).  If
+When :term:`traversal` is used within a :mod:`repoze.bfg` application,
+the :mod:`repoze.bfg` *Router* parses the URL associated with the
+request.  It splits the URL into individual path segments.  Based on
+these path segments, :mod:`repoze.bfg` traverses a *model graph* in
+order to find a :term:`context`.  It then attempts to find a
+:term:`view` based on the *type* of the context (specified by its
+Python class type or any :term:`interface` attached to it).  If
 :mod:`repoze.bfg` finds a :term:`view` for the context, it calls it
 and returns a response to the user.
 
@@ -81,8 +82,8 @@ application, the system uses this algorithm to determine which Python
 code to execute:
 
 #.  The request for the page is presented to the :mod:`repoze.bfg`
-    "router" in terms of a standard :term:`WSGI` request, which is
-    represented by a WSGI environment and a ``start_response``
+    :term:`router` in terms of a standard :term:`WSGI` request, which
+    is represented by a WSGI environment and a ``start_response``
     callable.
 
 #.  The router creates a :term:`WebOb` request object based on the
@@ -145,15 +146,16 @@ code to execute:
     request, an :term:`authorization policy` is consulted to see if
     the "current user" (al determined by the the authentication
     policy) can perform the action.  If he can, processing continues.
-    If he cannot, an ``HTTPUnauthorized`` error is raised.
+    If he cannot, the ``forbidden`` view is called (see
+    :ref:`changing_the_forbidden_view`).
 
 #.  Armed with the context, the view name, and the subpath, the router
     performs a view lookup.  It attemtps to look up a view from the
     :mod:`repoze.bfg` :term:`application registry` using the view name
     and the context.  If a view function is found, it is called with
     the context and the request.  It returns a response, which is fed
-    back upstream.  If a view is not found, a generic WSGI
-    ``NotFound`` application is constructed and returned.
+    back upstream.  If a view is not found, the ``notfound`` view is
+    called (see :ref:`changing_the_notfound_view`).
 
 In either case, the result is returned upstream via the :term:`WSGI`
 protocol.
@@ -167,10 +169,10 @@ It's useful to be able to debug ``NotFound`` errors when they occur
 unexpectedly due to an application registry misconfiguration.  To
 debug these errors, use the ``BFG_DEBUG_NOTFOUND`` environment
 variable or the ``debug_notfound`` configuration file setting.
-Details of why a view was not found will be printed to stderr, and the
-browser representation of the error will include the same information.
-See :ref:`environment_chapter` for more information about how and
-where to set these values.
+Details of why a view was not found will be printed to ``stderr``, and
+the browser representation of the error will include the same
+information.  See :ref:`environment_chapter` for more information
+about how and where to set these values.
 
 A Traversal Example
 -------------------
@@ -189,27 +191,29 @@ traversing the follwing graph::
 
 Here's what happens:
 
-- bfg traverses the root, and attempts to find foo, which it finds.
+- :mod:`repoze.bfg` traverses the root, and attempts to find foo,
+  which it finds.
 
-- bfg traverses foo, and attempts to find bar, which it finds.
+- :mod:`repoze.bfg` traverses foo, and attempts to find bar, which it
+  finds.
 
-- bfg traverses bar, and attempts to find baz, which it does not
-  find ('bar' raises a ``KeyError`` when asked for baz).
+- :mod:`repoze.bfg` traverses bar, and attempts to find baz, which it
+  does not find ('bar' raises a ``KeyError`` when asked for baz).
 
 The fact that it does not find "baz" at this point does not signify an
 error condition.  It signifies that:
 
-- the "context" is bar (the context is the last item found during
-  traversal).
+- the :term:`context` is bar (the context is the last item found
+  during traversal).
 
-- the "view name" is ``baz``
+- the :term:`view name` is ``baz``
 
-- the "subpath" is ``('biz', 'buz.txt')``
+- the :term:`subpath` is ``('biz', 'buz.txt')``
 
-Because it's the "context", bfg examimes "bar" to find out what "type"
-it is. Let's say it finds that the context is an ``IBar`` type
-(because "bar" happens to have an attribute attached to it that
-indicates it's an ``IBar``).
+Because it's the "context", :mod:`repoze.bfg` examimes "bar" to find
+out what "type" it is. Let's say it finds that the context is an
+``IBar`` type (because "bar" happens to have an attribute attached to
+it that indicates it's an ``IBar``).
 
 Using the "view name" ("baz") and the type, it asks the
 :term:`application registry` (configured separately, via
@@ -218,8 +222,8 @@ Using the "view name" ("baz") and the type, it asks the
 - Please find me a :term:`view` with the name "baz" that can be used
   for the type ``IBar``.
 
-Let's say it finds no matching view type.  It then returns a
-``NotFound``.  The request ends.  Everyone is sad.
+Let's say it finds no matching view type.  It then returns the result
+of the ``notfound`` view.  The request ends.  Everyone is sad.
 
 But!  For this graph::
 
@@ -235,28 +239,32 @@ But!  For this graph::
 
 The user asks for ``http://example.com/foo/bar/baz/biz/buz.txt``
 
-- bfg traverses foo, and attempts to find bar, which it finds.
+- :mod:`repoze.bfg` traverses foo, and attempts to find bar, which it
+  finds.
 
-- bfg traverses bar, and attempts to find baz, which it finds.
+- :mod:`repoze.bfg` traverses bar, and attempts to find baz, which it
+  finds.
 
-- bfg traverses baz, and attempts to find biz, which it finds.
+- :mod:`repoze.bfg` traverses baz, and attempts to find biz, which it
+  finds.
 
-- bfg traverses biz, and attemtps to find "buz.txt" which it does
-  not find.
+- :mod:`repoze.bfg` traverses biz, and attemtps to find "buz.txt"
+  which it does not find.
 
 The fact that it does not find "buz.txt" at this point does not
 signify an error condition.  It signifies that:
 
-- the "context" is biz (the context is the last item found during traversal).
+- the :term:`context` is biz (the context is the last item found
+  during traversal).
 
-- the "view name" is "buz.txt"
+- the :term:`view name` is "buz.txt"
 
-- the "subpath" is an empty sequence ( ``()`` ).
+- the :term:`subpath` is an empty sequence ( ``()`` ).
 
-Because it's the "context", bfg examimes "biz" to find out what "type"
-it is. Let's say it finds that the context an ``IBiz`` type (because
-"biz" happens to have an attribute attached to it that happens
-indicates it's an ``IBiz``).
+Because it's the "context", :mod:`repoze.bfg` examimes "biz" to find
+out what "type" it is. Let's say it finds that the context an ``IBiz``
+type (because "biz" happens to have an attribute attached to it that
+happens indicates it's an ``IBiz``).
 
 Using the "view name" ("buz.txt") and the type, it asks the
 :term:`application registry` this question:
@@ -272,9 +280,9 @@ It is passed the "biz" object as the "context" and the current
 
 There are two special cases:
 
-- During traversal you will often end up with a "view name" that is
-  the empty string.  This indicates that :mod:`repoze.bfg` should look
-  up the *default view*.  The default view is a view that is
+- During traversal you will often end up with a :term:`view name` that
+  is the empty string.  This indicates that :mod:`repoze.bfg` should
+  look up the *default view*.  The default view is a view that is
   registered with no name or a view which is registered with a name
   that equals the empty string.
 
@@ -326,10 +334,13 @@ used to traverse to the virtual root object.  See
 Unicode and Traversal
 ---------------------
 
-The traversal machinery by default attempts to decode each path
-element in ``PATH_INFO`` from its natural byte string (``str`` type)
-representation into Unicode using the UTF-8 encoding before passing it
-to the ``__getitem__`` of a model object.  If any path segment in
-``PATH_INFO`` is not decodeable using the UTF-8 decoding, a TypeError
-is raised.
+The traversal machinery by default attempts to first URL-unquote and
+then Unicode-decode each path element in ``PATH_INFO`` from its
+natural byte string (``str`` type) representation.  URL unquoting is
+performed using the Python stdlib ``urllib.unquote`` function.
+Conversion from a URL-decoded string into Unicode is attempted using
+the UTF-8 encoding.  If any URL-unquoted path segment in ``PATH_INFO``
+is not decodeable using the UTF-8 decoding, a TypeError is raised.  A
+segment will be fully URL-unquoted and UTF8-decoded before it is
+passed it to the ``__getitem__`` of any model object during traversal.
 

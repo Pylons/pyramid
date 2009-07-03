@@ -13,14 +13,15 @@ However, for some problems, it's useful to use both traversal *and*
 URL dispatch within the same application.  :mod:`repoze.bfg` makes
 this possible.
 
-Reasoning about a "hybrid" URL dispatch + traversal model is difficult
-because the combination of the two concepts seems to break the law of
-`the magical number seven plus or minus 2
+Reasoning about a "hybrid" URL dispatch + traversal model can be
+difficult because the combination of the two concepts seems to fall
+outside the sweet spot of `the magical number seven plus or minus 2
 <http://en.wikipedia.org/wiki/The_Magical_Number_Seven,_Plus_or_Minus_Two>`_.
-This is because, as a user, you need to understand 1) URL pattern
-matching, 2) root factories and 3) the traversal algorithm, and the
-interactions between all of them.  Therefore, use of this pattern is
-not recommended unless you *really* need to use it.
+To reason successfully about using URL dispatch and traversal
+together, you need to understand 1) URL pattern matching, 2) root
+factories and 3) the traversal algorithm, and the interactions between
+all of them.  Therefore, use of this pattern is not recommended unless
+you *really* need to use it.
 
 This is a advanced topic that has non-trivial corner cases; you may
 need to understand more deeply how :mod:`repoze.bfg` works to

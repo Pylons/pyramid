@@ -9,18 +9,18 @@ and responses.
 Similarities to Other Frameworks
 --------------------------------
 
-:mod:`repoze.bfg` was inspired by :term:`Zope`, :term:`Django`, and
-:term:`Pylons`.
+:mod:`repoze.bfg` was inspired by :term:`Zope`, :term:`Pylons` and
+:term:`Django`.
 
 The :mod:`repoze.bfg` concept of traversal is inspired by
 :term:`Zope`.  Additionally, :mod:`repoze.bfg` uses the Zope Component
 Architecture ("CA") internally, as do Zope 2, Zope 3, and
-:term:`Grok`.  Application :mod:`repoze.bfg` developers use either
+:term:`Grok`.  :mod:`repoze.bfg` application developers may use either
 :term:`ZCML` (an XML dialect, used in Zope) or decorators to perform
-various configuration tasks.  The decorator support is provided by the
-:term:`Grok` project.  Like Zope, :mod:`repoze.bfg` allows you to
-create applications which do not need to be forked to be extended by a
-third party developer.
+various application configuration tasks.  The decorator support is
+provided by the :term:`Grok` project.  Like Zope, :mod:`repoze.bfg`
+allows you to create applications which do not need to be forked or
+otherwise modified to be extended by a third party developer.
 
 Like :term:`Pylons`, :mod:`repoze.bfg` is mostly policy-free.  It
 makes no assertions about which database you should use, and its
@@ -76,8 +76,8 @@ To learn more about the concepts used by :mod:`repoze.bfg`, visit the
 Differences from Other Frameworks
 ---------------------------------
 
-Like :term:`Zope`, the :mod:`repoze.bfg` framework imposes slightly
-more `control inversion <http://plope.com/control_inversion>`_ upon
+Like :term:`Zope`, the :mod:`repoze.bfg` framework imposes more
+`control inversion <http://plope.com/control_inversion>`_ upon
 application developers than other Python frameworks such as
 :term:`Pylons`.  For example :mod:`repoze.bfg` allows you to
 explicitly resolve a URL to a :term:`context` object before invoking a
@@ -107,7 +107,7 @@ CA behind special-purpose API functions.
 
 Also unlike :term:`Zope` and unlike other "full-featured" frameworks
 such as :term:`Django`, :mod:`repoze.bfg` makes no assumptions about
-what persistence mechanisms you want to use to build an application.
+which persistence mechanisms you should use to build an application.
 Zope applications are typically reliant on :term:`ZODB`;
 :mod:`repoze.bfg` allows you to build :term:`ZODB` applications, but
 it has no reliance on the ZODB package.  Likewise, :term:`Django`
@@ -121,8 +121,8 @@ Why?
 ----
 
 *Familiarity*: As web developers, we've become accustomed to working
-in very particular ways (primarily using Zope 2) over the years.  This
-framework is a canonization of practices that "fit our brains".
+in very particular ways over the years.  This framework is a
+canonization of practices that "fit our brains".
 
 *Simplicity*: :mod:`repoze.bfg` attempts to be a *"pay only for what
 you eat"* framework in which you can be productive quickly with
@@ -130,14 +130,13 @@ partial knowledge.  We contrast this with *"pay up front for what
 anyone might eventually want to eat"* frameworks, which tend to expect
 you to understand a great many concepts and technologies fully before
 you can be truly productive.  :mod:`repoze.bfg` doesn't force you to
-use any particular technology to get your application written, and we
-try to keep the core set of concepts you need to understand to a
-minimum.
+use any particular technology to produce an application, and we try to
+keep the core set of concepts you need to understand to a minimum.
 
 *Minimalism*: :mod:`repoze.bfg` provides only the very basics: *URL to
-code mapping*, *templating*, and *security*.  There is not much more
-to the framework than these pieces: you are expected to provide the
-rest.
+code mapping*, *templating*, *security*, and *resources*.  There is
+not much more to the framework than these pieces: you are expected to
+provide the rest.
 
 *Documentation*: Because :mod:`repoze.bfg` is minimal, it's relatively
 easy to keep its documentation up-to-date, which is helpful to bring

@@ -39,10 +39,10 @@ declarations out of the decorators and into :term:`ZCML`.  Once this
 is done, you should be able to extend or modify the application like
 any other.
 
-To extend or change the behavior of an existing application, the only
-hard-and-fast rule is that you need to write some :term:`ZCML`, and
-perhaps some implementations of the types of things you'd like to
-override (such as views), which is referred to within that ZCML.
+To extend or change the behavior of an existing application, you will
+need to write some :term:`ZCML`, and perhaps some implementations of
+the types of things you'd like to override (such as views), which are
+referred to within that ZCML.
 
 The general pattern for extending an application looks something like this:
 

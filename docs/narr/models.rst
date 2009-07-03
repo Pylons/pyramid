@@ -99,8 +99,9 @@ interface (as opposed to its class).  To do so, use the
    entry = BlogEntry()
    directlyProvides(IBlogEntry, entry)
 
-If a model object already has instance interface declarations that you
-don't want to disturb, use the ``zope.interface.alsoProvides`` API:
+If a model object already has instance-level interface declarations
+that you don't want to disturb, use the
+``zope.interface.alsoProvides`` API:
 
 .. code-block:: python
    :linenos:

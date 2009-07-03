@@ -1,11 +1,11 @@
 Templates
 =========
 
-A :term:`template` is a usually file on disk which can be used to
-render data provided by a :term:`view`, surrounded by more static
-information.  :mod:`repoze.bfg` offers a number of ways to perform
-templating tasks "out of the box", and provides alternative templating
-language support via add-on "bindings" packages.
+A :term:`template` is a file on disk which can be used to render
+dynamic data provided by a :term:`view`, usually surrounded by
+information that is static.  :mod:`repoze.bfg` offers a number of ways
+to perform templating tasks "out of the box", and provides alternative
+templating language support via add-on "bindings" packages.
 
 Templating With :term:`Chameleon` ZPT Page Templates
 ----------------------------------------------------
@@ -16,25 +16,14 @@ language. However, :mod:`repoze.bfg` uses a different implementation
 of the :term:`ZPT` specification than Zope does: the :term:`Chameleon`
 :term:`chameleon.zpt` templating engine. This templating engine
 complies largely with the `Zope Page Template
-<http://wiki.zope.org/ZPT/FrontPage>`_ template specification and is
-significantly faster.  
+<http://wiki.zope.org/ZPT/FrontPage>`_ template specification, however
+it is significantly faster.
 
 .. note:: The language definition documentation for Chameleon
    ZPT-style templates is available from `the Chameleon website
    <http://chameleon.repoze.org>`_.  See its `documentation
    <http://chameleon.repoze.org/docs/zpt/>`_ for the Chameleon ZPT
    language specification.
-
-.. note:: As of version 0.8.0, :mod:`repoze.bfg` no longer supports
-   XSL templates "out of the box".  The :mod:`repoze.bfg.xslt` package
-   is an add-on which provides XSL template bindings. See
-   :ref:`available_template_system_bindings`.
-
-.. note:: As of version 0.8.0, :mod:`repoze.bfg` no longer supports
-   Genshi-style Chameleon bindings "out of the box".  The
-   :mod:`repoze.bfg.chameleon_genshi` package is an add-on which
-   provides Chameleon Genshi-style template support. See
-   :ref:`available_template_system_bindings`.
 
 Given that there is a :term:`chameleon.zpt` template named ``foo.pt``
 in a directory in your application named ``templates``, you can render
@@ -55,11 +44,12 @@ Relative to the directory in which the ``views.py`` file which names
 it lives, which is usually the :mod:`repoze.bfg` application's
 :term:`package` directory.
 
-A path passed to ``render_template_to_response`` can also be absolute
-(starting with a slash on UNIX or a drive letter prefix on Windows).
-It can also be a "specification" in the form
-``another.dotted.package_name:relative/path`` if the resources lives in
-another package.
+Although a path is usually just a simple relative pathname, a path
+passed to ``render_template_to_response`` can be absolute, starting
+with a slash on UNIX or a drive letter prefix on Windows.  The path
+can alternately be a :term:`resource` "specification" in the form
+``some.dotted.package_name:relative/path``, making it possible to
+address template resources which live in another package.
 
 ``render_template_to_response`` always returns a Response object which
 has a *status code* of ``200 OK`` and a *content-type* of
@@ -248,8 +238,8 @@ environment so that a change to a template will be automatically
 detected, and the template will be reloaded on the next rendering.
 
 .. warning:: auto-template-reload behavior is not recommended for
-             production sites as it slows rendering; it's usually only
-             desirable during development.
+             production sites as it slows rendering slightly; it's
+             usually only desirable during development.
 
 In order to turn on automatic reloading of templates, you can use an
 environment variable setting or a configuration file setting.
@@ -268,6 +258,13 @@ application's configuration section, e.g.::
   use = egg:MyProject#app
   reload_templates = true
 
+:term:`Chameleon` Template Internationalization
+-----------------------------------------------
+
+See `the internationalization chapter
+<http://chameleon.repoze.org/docs/zpt/narr/i18n.html>`_ of the
+Chameleon documentation for information about supporting
+internationalized units of text within Chameleon templates.
 
 Templating with other Templating Languages
 ------------------------------------------
@@ -301,7 +298,9 @@ installed, here's an example of using Mako from within a
 
 Note that if you use third-party templating languages without
 cooperating BFG bindings, the auto-template-reload strategy explained
-in :ref:`reload_templates_section` will not be available.
+in :ref:`reload_templates_section` will not be available, nor will the
+template resource overriding capability explained in
+:ref:`overriding_resources_section` be available.
 
 .. _available_template_system_bindings:
 

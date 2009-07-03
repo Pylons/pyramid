@@ -3,9 +3,9 @@
 Creating a :mod:`repoze.bfg` Project
 ====================================
 
-You can use :mod:`repoze.bfg` 's sample application generator to get
-started.  This generator uses :term:`Paste` templates to allow
-creation of a new project by answering a series of questions.
+You can use the :mod:`repoze.bfg` sample application generator to get
+started.  This generator uses :term:`Paste` templates to aid in
+the creation of a new project.
 
 .. _creating_a_project:
 
@@ -69,15 +69,15 @@ project we name ``MyProject``:
      Copying setup.py_tmpl to ./MyProject/setup.py
    Running /Users/chrism/projects/repoze/bfg/bin/python setup.py egg_info
 
-As a result of the above, a project is created in a directory named
-``MyProject``.  That directory is a :term:`setuptools` :term:`project`
-directory from which a Python setuptools :term:`distribution` can be
-created.  The ``setup.py`` file in that directory can be used to
-distribute your application, or install your application for
-deployment or development. A sample :term:`PasteDeploy` ``.ini`` file
-named ``MyProject.ini`` will also be created in the project directory.
-You will use the ``paster serve`` command against this ``.ini`` file
-to run your application.
+As a result of invoking ``paster create``, a project is created in a
+directory named ``MyProject``.  That directory is a :term:`setuptools`
+:term:`project` directory from which a Python setuptools
+:term:`distribution` can be created.  The ``setup.py`` file in that
+directory can be used to distribute your application, or install your
+application for deployment or development. A sample
+:term:`PasteDeploy` ``.ini`` file named ``MyProject.ini`` will also be
+created in the project directory.  You will use the ``paster serve``
+command against this ``.ini`` file to run your application.
 
 The ``MyProject`` project directory contains an additional
 subdirectory named ``myproject`` (note the case difference)
@@ -164,14 +164,27 @@ The Interactive Shell
 ---------------------
 
 Once you've installed your program for development using ``setup.py
-develop``, you can use an interactive shell to examine your BFG
-application from a Python prompt.  To do so, use the ``paster``
-shell command with the ``bfgshell`` argument:
+develop``, you can use an interactive shell to examine your
+:mod:`repoze.bfg` application :term:`model` objects from a Python
+prompt.  To do so, use the ``paster`` shell command with the
+``bfgshell`` argument:
 
 The first argument to ``bfgshell`` is the path to your application's
 ``.ini`` file.  The second is the section name inside the ``.ini``
-file which points to your application.
+file which points to your *application* as opposed to any other
+section within the ``.ini`` file.  For example, if your application
+``.ini`` file might have a ``[app:main]`` section that looks like so:
 
+.. code-block: 
+
+   [app:main]
+   use = egg:MyProject#app
+   reload_templates = true
+   debug_authorization = false
+   debug_notfound = false
+
+If so, you can use the following command to invoke a debug shell using
+the name ``main`` as a section name:
 
 .. code-block::  bash
    :linenos:
@@ -194,7 +207,7 @@ before the filename:
 
     [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
 
-Press Ctrl-D to exit the interactive shell.
+Press "Ctrl-D" to exit the interactive shell.
 
 You should always use a section name argument that refers to the
 actual ``app`` section within the config file that points at your BFG
@@ -302,7 +315,7 @@ We won't describe the ``CHANGES.txt`` or ``README.txt`` files.
 ``ez_setup.py`` is a file only used by ``setup.py`` in case a user who
 wants to install your package does not have :term:`Setuptools` already
 installed.  It is only imported by and used by ``setup.py``, so we
-won't describe it here.
+won't describe it here either.
 
 .. _MyProject_ini:
 
@@ -388,8 +401,9 @@ not require an application restart to be detected.  See
    turned on.
 
 Various other settings may exist in this section having to do with
-debugging a :mod:`repoze.bfg` application.  See
-:ref:`environment_chapter` for more information about these settings.
+debugging or influencing runtime behavior of a :mod:`repoze.bfg`
+application.  See :ref:`environment_chapter` for more information
+about these settings.
 
 The ``[server:main]`` section of the configuration file configures a
 WSGI server which listens on port 6543.  It is configured to listen on
@@ -398,10 +412,10 @@ new thread for each request.
 
 .. note::
 
-  In general, ``repoze.bfg`` applications should be threading-aware.
-  It is not required that a ``repoze.bfg`` application be nonblocking
-  as all application code will run in its own thread, provided by the
-  server you're using.
+  In general, :mod:`repoze.bfg` applications should be
+  threading-aware.  It is not required that a :mod:`repoze.bfg`
+  application be nonblocking as all application code will run in its
+  own thread, provided by the server you're using.
 
 See the :term:`PasteDeploy` documentation for more information about
 other types of things you can put into this ``.ini`` file, such as
@@ -450,8 +464,8 @@ fields which probably don't need any description.  ``url`` is a field
 that should point at your application project's URL (if any).
 ``packages=find_packages()`` causes all packages within the project to
 be found when packaging the application.  ``include_package_data``
-will include non-Python files when the application is packaged (if
-those files are checked into version control).  ``zip_safe`` indicates
+will include non-Python files when the application is packaged if
+those files are checked into version control.  ``zip_safe`` indicates
 that this package is not safe to ship as a zipped egg (it will unpack
 as a directory, which is more convenient).  ``install_requires`` and
 ``tests_require`` indicate that this package depends on the
@@ -688,8 +702,8 @@ The ``tests.py`` module includes unit tests for your application.
 
 This sample ``tests.py`` file has a single unit test and a single
 integration test defined within it.  These two tests are executed when
-you run ``setup.py test -q``.  You may add more tests here as you
-build your application.  You are not required to write tests to use
-:mod:`repoze.bfg`, this file is simply provided as convenience and
+you run ``python setup.py test -q``.  You may add more tests here as
+you build your application.  You are not required to write tests to
+use :mod:`repoze.bfg`, this file is simply provided as convenience and
 example.
 

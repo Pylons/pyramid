@@ -6,10 +6,11 @@ Security
 :mod:`repoze.bfg` provides an optional declarative authorization
 system that prevents a :term:`view` from being invoked when the user
 represented by credentials in the :term:`request` does not have an
-appropriate level of access in a specific context.
+appropriate level of access with respect to a specific
+:term:`context`.
 
 Authorization is enabled by modifying your :term:`application
-registry` (aka "configure.zcml").
+registry` (aka ``configure.zcml``).
 
 Enabling an Authorization Policy
 --------------------------------
@@ -65,11 +66,10 @@ and :ref:`creating_an_authorization_policy`.
 Protecting Views with Permissions
 ---------------------------------
 
-You declaratively protected a particular view with a
-:term:`permission` via the ``configure.zcml`` application registry.
-For example, the following declaration protects the view named
-``add_entry.html`` when invoked against a ``Blog`` context with the
-``add`` permission:
+You declaratively protect a particular view using a :term:`permission`
+name via the ``configure.zcml`` application registry.  For example,
+the following declaration protects the view named ``add_entry.html``
+when invoked against a ``Blog`` context with the ``add`` permission:
 
 .. code-block:: xml
    :linenos:
@@ -81,9 +81,9 @@ For example, the following declaration protects the view named
        permission="add"
        />
 
-The equivalent view registration including the 'add' permission may be
-performed via the ``bfg_view`` decorator within the "views" module of
-your project's package
+The equivalent view registration including the 'add' permission name
+may be performed via the ``bfg_view`` decorator within the "views"
+module of your project's package
 
 .. code-block:: python
    :linenos:
@@ -101,21 +101,22 @@ normal application operations, the user will need to possess the
 ``add`` permission against the context to be able to invoke the
 ``blog_entry_add_view`` view.
 
-Permission names are just strings.  They hold no special significance
-to the system.  You can name permissions whatever you like.
+Permission names are usually just strings.  They hold no special
+significance to the system.  You can name permissions whatever you
+like.
 
 .. _assigning_acls:
 
 Assigning ACLs to your Model Objects
 ------------------------------------
 
-When :mod:`repoze.bfg` determines whether a user possesses a particular
-permission in a :term:`context`, it examines the :term:`ACL`
-associated with the context.  An ACL is associated with a context by
-virtue of the ``__acl__`` attribute of the model object representing
-the context.  This attribute can be defined on the model *instance*
-(if you need instance-level security), or it can be defined on the
-model *class* (if you just need type-level security).
+When :mod:`repoze.bfg` determines whether a user possesses a
+particular permission in a :term:`context`, it examines the
+:term:`ACL` associated with the context.  An ACL is associated with a
+context by virtue of the ``__acl__`` attribute of the model object
+representing the context.  This attribute can be defined on the model
+*instance* (if you need instance-level security), or it can be defined
+on the model *class* (if you just need type-level security).
 
 For example, an ACL might be attached to model for a blog via its
 class:
@@ -184,7 +185,7 @@ and edit the blog.
 The third argument in an ACE can also be a sequence of permission
 names instead of a single permission name.  So instead of creating
 multiple ACEs representing a number of different permission grants to
-a single ``group.editors`` group, we can collapse this into a single
+a single ``group:editors`` group, we can collapse this into a single
 ACE, as below.
 
 .. code-block:: python
@@ -339,6 +340,16 @@ root object's ``__parent__`` is ``None``.
 
 See :ref:`location_module` for documentations of functions which use
 location-awareness.  See also :ref:`location_aware`.
+
+Changing the Forbidden View
+---------------------------
+
+When :mod:`repoze.bfg` denies a view invocation due to an
+authorization denial, the special ``forbidden`` view is invoked.  "Out
+of the box", this forbidden view is very plain.  See
+:ref:`changing_the_forbidden_view` within :ref:`hooks_chapter` for
+instructions on how to create a custom forbidden view and arrange for
+it to be called when view authorization is denied.
 
 .. _debug_authorization_section:
 
@@ -612,3 +623,4 @@ examples of how to create a directive.  Authorization policy ZCML
 directives should use the ZCML discriminator value
 "authorization_policy" in their actions to allow for conflict
 detection.
+

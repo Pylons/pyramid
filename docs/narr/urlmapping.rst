@@ -4,12 +4,13 @@ Mapping URLs to Code
 ====================
 
 Many popular web frameworks today use :term:`URL dispatch` to
-associate a particular URL with a bit of code (known somewhat
-ambiguously as a "controller" or :term:`view` depending upon the
-particular vocabulary religion to which you subscribe).  These systems
-allow the developer to create "urlconfs" or "routes" to
-controller/view Python code using pattern matching against URL
-components.  Examples: `Django's URL dispatcher
+associate a particular URL with a bit of code.  In these systems, the
+bit of code associated with a URL is known somewhat ambiguously as a
+"controller" or :term:`view` depending upon the particular vocabulary
+religion to which you subscribe.  Such systems allow the developer to
+create "urlconfs" or "routes" to controller/view Python code using
+pattern matching against URL components.  Examples: `Django's URL
+dispatcher
 <http://www.djangoproject.com/documentation/url_dispatch/>`_ and the
 :term:`Routes` URL mapping system.
 
@@ -62,12 +63,13 @@ URL-dispatch based systems, and some assertions just aren't possible.
 For example, URL-dispatch based systems don't deal very well with URLs
 that represent arbitrary-depth hierarchies.
 
-Graph :term:`traversal` works well if you need to divine meaning out
-of these types of "ambiguous" URLs and URLs that represent
-arbitrary-depth hierarchies.  Each URL segment represents a single
-traversal through an edge of the graph.  So a URL like
-``http://example.com/a/b/c`` can be thought of as a graph traversal on
-the ``example.com`` site through the edges ``a``, ``b``, and ``c``.
+Graph :term:`traversal` works well if you need to divine meaning from
+of these types of "ambiguous" URLs and from URLs that represent
+arbitrary-depth hierarchies.  When traversal is used, each URL segment
+represents a single traversal step through an edge of a graph.  So a
+URL like ``http://example.com/a/b/c`` can be thought of as a graph
+traversal on the ``example.com`` site through the edges ``a``, ``b``,
+and ``c``.
 
 If you're willing to treat your application models as a graph that can
 be traversed, it also becomes easy to provide "row-level security" (in

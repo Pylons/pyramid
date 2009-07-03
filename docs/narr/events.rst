@@ -4,7 +4,7 @@ Using Events
 =============
 
 An *event* is an object broadcast by the :mod:`repoze.bfg` framework
-at particularly interesting points during the lifetime of your
+at particularly interesting points during the lifetime of an
 application.  You don't need to use, know about, or care about events
 in order to create most :mod:`repoze.bfg` applications, but they can
 be useful when you want to do slightly advanced operations, such as
@@ -12,7 +12,7 @@ be useful when you want to do slightly advanced operations, such as
 hostname used to reach the site.
 
 Events in :mod:`repoze.bfg` are always broadcast by the framework.
-They only become useful when you register a *subscriber*.  A
+However, they only become useful when you register a *subscriber*.  A
 subscriber is a function that accepts a single argument named `event`:
 
 .. code-block:: python
@@ -86,7 +86,8 @@ must.  Likewise, we know that ``INewResponse`` events have a
 ``response`` attribute, which is a response object constructed by your
 application, because the interface defined at
 ``repoze.bfg.interfaces.INewResponse`` says it must.  These particular
-interfaces are documented in the :ref:`events_module` API chapter.
+interfaces, along with others, are documented in the
+:ref:`events_module` API chapter.
 
 .. note::
 

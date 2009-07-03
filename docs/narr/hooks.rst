@@ -6,6 +6,8 @@ Using ZCML Hooks
 ZCML "hooks" can be used to influence the behavior of the
 :mod:`repoze.bfg` framework in various ways.
 
+.. _changing_the_notfound_view:
+
 Changing the Not Found View
 ---------------------------
 
@@ -37,6 +39,8 @@ implements a minimal NotFound view:
    that has a value explaining why the not found error was raised.
    This error will be different when the ``debug_notfound``
    environment setting is true than it is when it is false.
+
+.. _changing_the_forbidden_view:
 
 Changing the Forbidden View
 ---------------------------

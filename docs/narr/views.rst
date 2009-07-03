@@ -4,9 +4,10 @@ Views
 =====
 
 A :term:`view` is a callable which is invoked when a request enters
-your application.  :mod:`repoze.bfg's` primary job is to find and call
-a view when a :term:`request` reaches it.  The view's return value
-must implement the :term:`WebOb` ``Response`` object interface.
+your application.  The primary job of any :mod:`repoze.bfg`
+application is is to find and call a :term:`view` when a
+:term:`request` reaches it.  The value returned by a :term:`view` must
+implement the :term:`WebOb` ``Response`` object interface.
 
 .. _function_as_view:
 
@@ -267,7 +268,8 @@ route_name
   referred to by ``route_name`` usually has a ``*traverse`` token in
   the value of its ``path`` attribute, representing a part of the path
   that will be used by traversal against the result of the route's
-  :term:`root factory`.
+  :term:`root factory`.  See :ref:`hybrid_chapter` for more
+  information on using this advanced feature.
 
 .. _mapping_views_to_urls_using_a_decorator_section:
 
@@ -295,12 +297,12 @@ decorator to do this work.
 
 .. warning:: using this feature tends to slows down application
    startup slightly, as more work is performed at application startup
-   to scan for view declarations.  Also, if you use decorators, it
-   means that other people will not be able to override your view
-   declarations externally using ZCML: this is a common requirement if
-   you're developing an exensible application (e.g. a framework).  See
-   :ref:`extending_chapter` for more information about building
-   extensible applications.
+   to scan for view declarations.  Additionally, if you use
+   decorators, it means that other people will not be able to override
+   your view declarations externally using ZCML: this is a common
+   requirement if you're developing an exensible application (e.g. a
+   framework).  See :ref:`extending_chapter` for more information
+   about building extensible applications.
 
 The ``bfg_view`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -591,8 +593,9 @@ specifying a permission in a ``view`` declaration:
 When an authentication policy is enabled, this view will be protected
 with the ``add`` permission.  The view will *not be called* if the
 user does not possess the ``add`` permission relative to the current
-:term:`context` and an authorization policy is enabled.  Instead an
-HTTP ``Unauthorized`` status will be returned to the client.
+:term:`context` and an authorization policy is enabled.  Instead the
+``forbidden`` view result will be returned to the client (see
+:ref:`changing_the_forbidden_view`).
 
 .. note::
 
@@ -621,8 +624,8 @@ slightly different response.
        return HTTPFound(location='http://example.com')
 
 All exception types from the :mod:`webob.exc` module implement the
-``IResponse`` interface; any can be returned as the response from a
-view.  See :term:`WebOb` for the documentation for this module; it
+Webob ``Response`` interface; any can be returned as the response from
+a view.  See :term:`WebOb` for the documentation for this module; it
 includes other response types for Unauthorized, etc.
 
 .. _static_resources_section:
@@ -685,12 +688,6 @@ these will be resolved by the static view as you would expect.
    e.g. ``/@@static/foo.js``.  This is completely equivalent to
    ``/static/foo.js``.  See :ref:`traversal_chapter` for information
    about "goggles" (``@@``).
-
-.. note:: Under the hood, the ``repoze.bfg.view.static`` class employs
-   the ``urlparser.StaticURLParser`` WSGI application to serve static
-   files.  See `the Paste documentation for urlparser
-   <http://pythonpaste.org/modules/urlparser.html>`_ for more
-   information about ``urlparser.StaticURLParser``.
 
 Using Views to Handle Form Submissions (Unicode and Character Set Issues)
 -------------------------------------------------------------------------
