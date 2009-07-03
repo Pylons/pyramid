@@ -22,12 +22,15 @@ purpose. :term:`ZCML` statements that belong to an application can be
 "overridden" by integrators as necessary, but decorators cannot.
 
 It's also often helpful for third party application "extenders" (aka
-"integrators") if you break your ZCML into separate files which do
-very specific things, and include them in the application's main
-``configure.zcml`` via ``<include file="otherfile.zcml"/>``
-statements.  This way, an integrator can avoid including any ZCML he
+"integrators") if the ZCML that composes the configuration for an
+application is broken up into separate files which do very specific
+things.  These more specific ZCML files can be reintegrated within the
+application's main ``configure.zcml`` via ``<include
+file="otherfile.zcml"/>`` statements.  When ZCML files contain sets of
+specific statements, an integrator can avoid including any ZCML he
 does not want by including only the ZCML files which contain the
-registrations he needs.
+registrations he needs.  He is not forced to "accept everything" or
+"use nothing".
 
 Extending an Existing Application
 ---------------------------------
