@@ -6,16 +6,18 @@ Running :mod:`repoze.bfg` on Google's App Engine
 As of :mod:`repoze.bfg` version 0.8, it is possible to run a
 :mod:`repoze.bfg` application on Google's `App Engine
 <http://code.google.com/appengine/>`_.  Content from this tutorial was
-contributed by "YoungKing", based on the `"appengine-monkey" tutorial
+contributed by YoungKing, based on the `"appengine-monkey" tutorial
 for Pylons <http://code.google.com/p/appengine-monkey/wiki/Pylons>`_.
 This tutorial is written in terms of using the command line on a UNIX
 system; it should be possible to perform similar actions on a Windows
 system.
 
-.. note:: :term:`chameleon.zpt` cannot be used on Google App Engine
-   due to GAE environment limitations, so the tutorial is presented in
-   terms of using :term:`Jinja2` as the templating language in the
-   generated BFG application.
+.. note:: :term:`chameleon.zpt` cannot easily be used on Google App
+   Engine due to GAE environment limitations, so the tutorial is
+   presented in terms of using :term:`Jinja2` as the templating
+   language in the generated BFG application.  It is possible to *use*
+   Chameleon templates on GAE, it's just not possible to *compile*
+   them under GAE.
 
 #. Download Google's `App Engine SDK
    <http://code.google.com/appengine/downloads.html>`_ and install it
@@ -25,16 +27,18 @@ system.
    ``appengine-monkey``.
 
    .. code-block:: bash
+      :linenos:
 
       $ svn co http://appengine-monkey.googlecode.com/svn/trunk/ appengine-monkey
 
-#. Use ``appengine_homedir`` to create a :term:`virtualenv` for your
-   application.
+#. Use ``appengine_homedir.py`` script in ``appengine-monkey`` to
+   create a :term:`virtualenv` for your application.
 
    .. code-block:: bash
-   
+      :linenos:
+ 
       $ export GAE_PATH=/usr/local/google_appengine
-      $ python2.5 appengine-homedir.py --gae $GAE_PATH bfgapp
+      $ python2.5 /path/to/appengine-monkey/appengine-homedir.py --gae $GAE_PATH bfgapp
 
    Note that ``$GAE_PATH`` should be the path where you have unpacked
    the App Engine SDK.  (On Mac OS X at least,
@@ -49,9 +53,10 @@ system.
 #. Install :mod:`repoze.bfg.jinja2` into the virtualenv
 
    .. code-block:: bash
+      :linenos:
 
       $ cd bfgapp/
-      $ bin/easy_install -i http://dist.repoze.org/bfg/dev/simple/ repoze.bfg.jinja2
+      $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple/ repoze.bfg.jinja2
 
    This will install :mod:`repoze.bfg` in the environment.
 
@@ -59,9 +64,12 @@ system.
 
    We'll use the standard way to create a :mod:`repoze.bfg`
    application, but we'll have to move some files around when we are
-   done:
+   done.  The below commands assume your current working directory is
+   the ``bfgapp`` virtualenv director you created in the third step
+   above:
 
    .. code-block:: bash
+      :linenos:
 
       $ cd app
       $ rm -rf bfgapp
@@ -72,10 +80,23 @@ system.
 
 #. Edit ``config.py``
 
-   .. code-block:: python
+   Edit the ``APP_NAME`` and ``APP_ARGS`` settings within
+   ``config.py``.  The APP_NAME must be ``bfgapp.run:make_app``, and
+   the APP_ARGS must be ``({},)``.  Any other settings in
+   ``config.py`` should remain the same.
 
-    APP_NAME = 'bfgapp.run:app'
-    APP_ARGS = ({},)
+   .. code-block:: python
+      :linenos:
+
+      APP_NAME = 'bfgapp.run:app'
+      APP_ARGS = ({},)
+
+   .. warning:: It's very important that the ``APP_NAME`` is
+      ``bfgapp.run:app`` instead of ``bfgapp.run.make_app``.  If you
+      use the latter by mistake, you'll be confused for at least hour
+      when debugging an error like this: ``IOError: [Errno 2] No such
+      file or directory:
+      '/Users/chrism/projects/bfg_gae/bfgapp2/app/configure.zcml'``.
 
 #.  Edit ``runner.py``
 
@@ -83,12 +104,21 @@ system.
     ``import site`` in app/runner.py:
 
     .. code-block:: python
+       :linenos:
 
        import sys
-       sys.path = [path for path in sys.path if "site-packages" not in path]
+       sys.path = [path for path in sys.path if 'site-packages' not in path]
        import site
 
-    You will also need to comment the ``assert`` in the file.
+    You will also need to comment out the line that starts with
+    ``assert sys.path`` in the file.
+
+    .. code-block:: python
+       :linenos:
+
+       # comment the sys.path assertion out
+       # assert sys.path[:len(cur_sys_path)] == cur_sys_path, (
+       #   "addsitedir() caused entries to be prepended to sys.path")
 
 #. Run the application.  ``dev_appserver.py`` is typically installed
    by the SDK in the global path but you need to be sure to run it
@@ -110,8 +140,25 @@ system.
       WARNING  2009-05-03 22:23:14,045 dev_appserver.py:3240] Could not initialize images API; you are likely missing the Python "PIL" module. ImportError: No module named _imaging
       INFO     2009-05-03 22:23:14,050 dev_appserver_main.py:463] Running application bfgapp on port 8080: http://localhost:8080
 
+   You may need to run "Make Symlinks" from the Google App Engine
+   Launcher GUI application if your system doesn't already have the
+   ``dev_appserver.py`` script sitting around somewhere.
+
 #. Hack on your bfg application, using a normal run, debug, restart
-   process.
+   process.  For tips on how to use the ``pdb`` module within Google
+   App Engine, `see this blog post
+   <http://jjinux.blogspot.com/2008/05/python-debugging-google-app-engine-apps.html>`_.
+   In particular, you can create a function like so and call it to
+   drop your console into a pdb trace:
+
+   .. code-block:: python
+      :linenos:
+
+      def set_trace():
+          import pdb, sys
+          debugger = pdb.Pdb(stdin=sys.__stdin__, 
+              stdout=sys.__stdout__)
+          debugger.set_trace(sys._getframe().f_back)
 
 #. `Sign up for a GAE account <http://code.google.com/appengine/>`_
    and create an application.  You'll need a mobile phone to accept an
@@ -130,8 +177,9 @@ system.
 
       $ python2.5 /usr/local/bin/appcfg.py update bfgapp/app
 
-   You will almost certainly find that you hit the 1000-file GAE file
-   limit.
+   You almost certainly won't hit the 3000-file GAE file number limit
+   when invoking this command.  If you do, however, it will look like
+   so:
 
    .. code-block:: python
 
@@ -141,31 +189,11 @@ system.
        Max number of files and blobs is 1000.
        --- end server output ---
 
-   You will be able to get around this by zipping libraries. You can
-   use ``pip`` to create zipfiles from packages.  For example:
+   If you do experience this error, you will be able to get around
+   this by zipping libraries. You can use ``pip`` to create zipfiles
+   from packages.  See :ref:`pip_zip` for more information about this.
 
-   .. code-block:: python
-
-     $ bin/pip zip -l
-
-   This shows your zipped packages (by default, none) and your
-   unzipped packages. You can zip a package like so:
-
-   .. code-block:: python 
-
-     $ bin/pip zip pytz-2009g-py2.5.egg
-
-   Note that it requires the whole egg file name.  A the time of this
-   tutorial's writing, the 1000 file limit can be subverted by causing
-   the following packages to be zipped:
-
-   - pytz
-   - chameleon.core
-   - chameleon.zpt
-   - zope.i18n
-   - zope.testing
-
-   After zipping, a successful upload looks like so::
+   A successful upload looks like so::
 
     [chrism@vitaminf bfgapp]$ python2.5 /usr/local/bin/appcfg.py update ../bfgapp/app/
     Scanning files on local disk.
@@ -198,7 +226,35 @@ system.
 
 #. Visit "<yourapp>.appspot.com" in a browser.
 
+.. _pip_zip:
 
+Zipping Files Via Pip
+---------------------
 
+If you hit the Google App Engine 3000-file limit, you may need to
+create zipfile archives out of some distributions installed in your
+application's virtualenv.
 
+First, see which packages are available for zipping:
 
+.. code-block:: python
+
+  $ bin/pip zip -l
+
+This shows your zipped packages (by default, none) and your unzipped
+packages. You can zip a package like so:
+
+.. code-block:: python 
+
+  $ bin/pip zip pytz-2009g-py2.5.egg
+
+Note that it requires the whole egg file name.  For a BFG app, the
+following packages are good candidates to be zipped.
+
+- pytz
+- chameleon.core
+- chameleon.zpt
+- zope.i18n
+- zope.testing
+
+Once the zipping procedure is finished you can try uploading again.
