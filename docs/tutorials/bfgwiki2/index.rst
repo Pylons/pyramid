@@ -4,10 +4,9 @@ SQLAlchemy + URL Dispatch Wiki Tutorial
 =======================================
 
 This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch`
--based BFG application to a developer with at least passing
-familiarity to Python.  When we're done with the tutorial, the
-developer will have created a basic Wiki application with
-authentication.
+-based :mod:`repoze.bfg` application to a developer familiar with
+Python.  When the tutorial is finished, the developer will have
+created a basic Wiki application with authentication.
 
 Contents:
 

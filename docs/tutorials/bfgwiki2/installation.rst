@@ -2,9 +2,9 @@
 Installation
 ============
 
-For the most part, the installation process for this tutorial follows
-the `Installing repoze.bfg
-<http://docs.repoze.org/bfg/narr/install.html>`_.  We install
+For the most part, the installation process for this tutorial
+duplicates the steps described in :ref:`installing_chapter` and
+:ref:`project_narr`, however it also explains how to install
 additional libraries for tutorial purposes.
 
 Preparation
@@ -52,7 +52,7 @@ Preparation, UNIX
    shell environment wired to use the virtualenv.
 
 #. Use ``easy_install`` and point to the BFG "current" index to get
-   BFG and its direct dependencies installed:
+   :mod:`repoze.bfg` and its direct dependencies installed:
 
    .. code-block:: bash
 
@@ -101,8 +101,8 @@ Preparation, Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "current index to get BFG
-   and its direct dependencies installed:
+#. Use ``easy_install`` and point to the BFG "current index to get
+   :mod:`repoze.bfg` and its direct dependencies installed:
 
    .. code-block:: bat
 
@@ -120,9 +120,10 @@ Preparation, Windows
 Making a Project
 ================
 
-Your next step is to create a project.  BFG supplies a variety of
-templates to generate sample projects.  We will use the
-:term:`SQLAlchemy` + :term:`URL Dispatch` -oriented template.
+Your next step is to create a project.  :mod:`repoze.bfg` supplies a
+variety of templates to generate sample projects.  We will use the
+``bfg_routesalchemy`` template, which generates an application that
+uses :term:`SQLAlchemy` and :term:`URL dispatch`.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "bigfntut".
@@ -138,6 +139,12 @@ On Windows:
 .. code-block:: bat
 
    c:\bigfntut> Scripts\paster create -t bfg_routesalchemy tutorial
+
+.. note:: If you are using Windows, the ``bfg_routesalchemy`` Paster
+   template may not deal gracefully with installation into a location
+   that contains spaces in the path.  If you experience startup
+   problems, try putting both the virtualenv and the project into
+   directories that do not contain spaces in their paths.
 
 Installing the Project in "Development Mode"
 ============================================
@@ -253,8 +260,9 @@ Decisions the ``bfg_routesalchemy`` Template Has Made For You
 Creating a project using the ``bfg_routesalchemy`` template makes the
 assumption that you are willing to use :term:`SQLAlchemy` as a
 database access tool and :term:`url dispatch` to map URLs to code.
-BFG supports any persistent storage mechanism (e.g. object database or
-filesystem files, etc), and supports an additional mechanism to map
-URLs to code (:term:`traversal`).  However, for the purposes of
-this tutorial, we'll be using url dispatch and SQLAlchemy.
+:mod:`repoze.bfg` supports any persistent storage mechanism
+(e.g. object database or filesystem files, etc).  It also supports an
+additional mechanism to map URLs to code (:term:`traversal`).
+However, for the purposes of this tutorial, we'll only be using url
+dispatch and SQLAlchemy.
 

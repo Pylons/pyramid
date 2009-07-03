@@ -4,18 +4,21 @@ Installation
 
 For the most part, the installation process for this tutorial
 duplicates the steps described in :ref:`installing_chapter` and
-:ref:`project_narr`.
+:ref:`project_narr`, however it also explains how to install
+additional libraries for tutorial purposes.
 
 Preparation
 ========================
 
-The steps to prepare for the tutorial are slightly different depending
-on whether you're using UNIX or Windows.
+Please take the following steps to prepare for the tutorial.  The
+steps to prepare for the tutorial are slightly different depending on
+whether you're using UNIX or Windows.
 
 Preparation, UNIX
 -----------------
 
-#. Obtain, install, or find `Python 2.5
+#. If you don't already have a Python 2.5 interpreter installed on
+   your system, obtain, install, or find `Python 2.5
    <http://python.org/download/releases/2.5.4/>`_ for your system.
 
 #. Install latest `setuptools` into the Python you
@@ -57,7 +60,7 @@ Preparation, UNIX
 
 #. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
    ``repoze.zodbconn``, ``repoze.who``, ``nose`` and ``coverage`` from
-   a *different* index (the "bfgsite" index).
+   a different custom index (the "bfgsite" index).
 
    .. code-block:: bash
 
@@ -121,9 +124,9 @@ Preparation, Windows
 Making a Project
 ================
 
-:mod:`repoze.bfg` supplies a variety of templates to generate sample
-projects.  For this tutorial, we will use the :term:`ZODB` -oriented
-template named ``bfg_zodb``.
+Your next step is to create a project.  :mod:`repoze.bfg` supplies a
+variety of templates to generate sample projects.  For this tutorial,
+we will use the :term:`ZODB` -oriented template named ``bfg_zodb``.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "bigfntut".
