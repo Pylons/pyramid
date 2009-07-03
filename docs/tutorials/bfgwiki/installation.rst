@@ -2,27 +2,18 @@
 Installation
 ============
 
-For the most part, the installation process for this tutorial follows
-the `Installing repoze.bfg
-<http://docs.repoze.org/bfg/narr/install.html>`_ and `Creating a
-repoze.bfg Project <http://docs.repoze.org/bfg/narr/project.html>`_
-pages.
+For the most part, the installation process for this tutorial
+duplicates the steps described in :ref:`installing_chapter` and
+:ref:`project_narr`.
 
-Preparation (with CD)
-=====================
-
-Follow the instructions within the ``INSTALL.txt`` file found on the
-CD.
-
-Preparation (without CD)
+Preparation
 ========================
 
-If you don't possess a CDROM with the tutorial files on it, take the
-following steps.  The steps are slightly different depending on
-whether you're using UNIX or Windows.
+The steps to prepare for the tutorial are slightly different depending
+on whether you're using UNIX or Windows.
 
-Preparation (without CD), UNIX
-------------------------------
+Preparation, UNIX
+-----------------
 
 #. Obtain, install, or find `Python 2.5
    <http://python.org/download/releases/2.5.4/>`_ for your system.
@@ -58,7 +49,7 @@ Preparation (without CD), UNIX
    shell environment wired to use the virtualenv.
 
 #. Use ``easy_install`` and point to the BFG "current" index to get
-   BFG and its direct dependencies installed:
+   :mod:`repoze.bfg` and its direct dependencies installed:
 
    .. code-block:: bash
 
@@ -66,15 +57,15 @@ Preparation (without CD), UNIX
 
 #. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
    ``repoze.zodbconn``, ``repoze.who``, ``nose`` and ``coverage`` from
-   a *different* index (the "lemonade" index).
+   a *different* index (the "bfgsite" index).
 
    .. code-block:: bash
 
-     $ bin/easy_install -i http://dist.repoze.org/lemonade/dev/simple \
+     $ bin/easy_install -i http://dist.repoze.org/bfgsite/simple \
         docutils repoze.tm repoze.zodbconn repoze.who nose coverage
 
-Preparation (without CD), Windows
----------------------------------
+Preparation, Windows
+--------------------
 
 #. Install, or find `Python 2.5
    <http://python.org/download/releases/2.5.4/>`_ for your system.
@@ -110,8 +101,8 @@ Preparation (without CD), Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "current index to get BFG
-   and its direct dependencies installed:
+#. Use ``easy_install`` and point to the BFG "current" index to get
+   :mod:`repoze.bfg` and its direct dependencies installed:
 
    .. code-block:: bat
 
@@ -119,23 +110,20 @@ Preparation (without CD), Windows
 
 #. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
    ``repoze.zodbconn``, ``repoze.who``, ``nose`` and ``coverage`` from
-   a *different* index (the "lemonade" index).
+   a *different* index (the "bfgsite" index).
 
    .. code-block:: bat
 
-     c:\bigfntut> Scripts\easy_install -i http://dist.repoze.org/lemonade/dev/simple docutils repoze.tm repoze.zodbconn repoze.who nose coverage
+     c:\bigfntut> Scripts\easy_install -i http://dist.repoze.org/bfgsite/simple docutils repoze.tm repoze.zodbconn repoze.who nose coverage
 
 .. _making_a_project:
 
 Making a Project
 ================
 
-Whether you arrived at this point by installing your own environment
-using the steps above, or you used the instructions in the tutorial
-disc, your next steps are to create a project.
-
-BFG supplies a variety of templates to generate sample projects.  We
-will use the :term:`ZODB` -oriented template.
+:mod:`repoze.bfg` supplies a variety of templates to generate sample
+projects.  For this tutorial, we will use the :term:`ZODB` -oriented
+template named ``bfg_zodb``.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "bigfntut".
@@ -239,8 +227,9 @@ On Windows:
 
   c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial --cover-erase --with-coverage
 
-Looks like the BFG template for ZODB projects is missing some test
-coverage, particularly in the file named ``models.py``.
+Looks like the code in the ``bfg_zodb`` template for ZODB projects is
+missing some test coverage, particularly in the file named
+``models.py``.
 
 Visit the Application in a Browser
 ==================================
@@ -253,9 +242,9 @@ Decisions the ``bfg_zodb`` Template Has Made For You
 
 Creating a project using the ``bfg_zodb`` template makes the
 assumption that you are willing to use :term:`ZODB` as persistent
-storage and :term:`traversal` to map URLs to code.  BFG supports any
-persistent storage mechanism (e.g. a SQL database or filesystem files,
-etc), and supports an additional mechanism to map URLs to code
-(:term:`URL dispatch`).  However, for the purposes of this tutorial,
-we'll be using traversal and ZODB.
+storage and :term:`traversal` to map URLs to code.  :mod:`repoze.bfg`
+supports any persistent storage mechanism (e.g. a SQL database or
+filesystem files, etc).  It also supports an additional mechanism to
+map URLs to code (:term:`URL dispatch`).  However, for the purposes of
+this tutorial, we'll only be using traversal and ZODB.
 

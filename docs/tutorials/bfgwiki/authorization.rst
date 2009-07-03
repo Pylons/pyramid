@@ -25,9 +25,10 @@ Changing ``configure.zcml``
 We'll change our ``configure.zcml`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
 enable declarative security checking.  We'll also add a ``forbidden``
-stanza.  This configures our login view to show up when BFG detects
-that a view invocation can not be authorized.  When you're done, your
-``configure.zcml`` will look like so:
+stanza.  This configures our login view to show up when
+:mod:`repoze.bfg` detects that a view invocation can not be
+authorized.  When you're done, your ``configure.zcml`` will look like
+so:
 
 .. literalinclude:: src/authorization/tutorial/configure.zcml
    :linenos:
@@ -83,7 +84,8 @@ into its template.  We'll add something like this to each view body:
    logged_in = authenticated_userid(request)
 
 We'll then change the return value of ``render_template_to_response``
-to pass the `resulting `logged_in`` value to the template, e.g.:
+within each view to pass the `resulting `logged_in`` value to the
+template, e.g.:
 
 .. code-block:: python
    :linenos:
@@ -124,9 +126,10 @@ Giving Our Root Model Object an ACL
 -----------------------------------
 
 We need to give our root model object an ACL.  This ACL will be
-sufficient to provide enough information to the BFG security machinery
-to challenge a user who doesn't have appropriate credentials when he
-attempts to invoke the ``add_page`` or ``edit_page`` views.
+sufficient to provide enough information to the :mod:`repoze.bfg`
+security machinery to challenge a user who doesn't have appropriate
+credentials when he attempts to invoke the ``add_page`` or
+``edit_page`` views.
 
 We need to perform some imports at module scope in our ``models.py``
 file:

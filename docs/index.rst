@@ -72,9 +72,6 @@ Per-module :mod:`repoze.bfg` API documentation.
 Tutorials
 =========
 
-Step-by-step tutorials which demonstrate how you might use and deploy
-:mod:`repoze.bfg`.
-
 ZODB + traversal Wiki tutorial, demonstrating how to build a
 :term:`traversal` based application using :term:`ZODB` and
 :term:`authentication`.  Good for people with prior Zope experience

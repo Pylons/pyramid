@@ -3,14 +3,15 @@ Using View Decorators Rather than ZCML ``view`` directives
 ==========================================================
 
 So far we've been using :term:`ZCML` to map model types to views.
-It's often easier to use the "bfg_view" view decorator to do this
+It's often easier to use the ``bfg_view`` view decorator to do this
 mapping.  Using view decorators provides better locality of reference
 for the mapping, because you can see which model types and view names
 the view will serve right next to the view function itself.  In this
 mode, however, you lose the ability for some views to be overridden
-"from the outside" (by someone using your application as a framework).
-Since this application is *definitely* not a framework, it makes sense
-for us to switch over to using view decorators.
+"from the outside" (by someone using your application as a framework,
+as explained in the :ref:`extending_chapter`).  Since this application
+is not meant to be a framework, it makes sense for us to switch over
+to using view decorators.
 
 Adding View Decorators
 ======================
@@ -213,7 +214,7 @@ On UNIX:
 
 On Windows:
 
-.. code-block:: bash
+.. code-block:: bat
 
 
   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
