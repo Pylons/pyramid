@@ -8,7 +8,7 @@ from repoze.bfg.traversal import quote_path_segment
 
 def wsgiapp(wrapped):
     """ Decorator to turn a WSGI application into a repoze.bfg view
-    callable.  This decorator differs from the `wsgiapp2`` decorator
+    callable.  This decorator differs from the ``wsgiapp2`` decorator
     inasmuch as fixups of ``PATH_INFO`` and ``SCRIPT_NAME`` within the
     WSGI environment *are not* performed before the application is
     invoked.
@@ -41,7 +41,7 @@ def wsgiapp(wrapped):
 
 def wsgiapp2(wrapped):
     """ Decorator to turn a WSGI application into a repoze.bfg view
-    callable.  This decorator differs from the `wsgiapp`` decorator
+    callable.  This decorator differs from the ``wsgiapp`` decorator
     inasmuch as fixups of ``PATH_INFO`` and ``SCRIPT_NAME`` within the
     WSGI environment *are* performed before the application is
     invoked.

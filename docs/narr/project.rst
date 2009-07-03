@@ -615,11 +615,12 @@ in the model, and the HTML given back to the browser.
   This example uses ``render_template_to_response`` which is a
   shortcut function.  If you want more control over the response, use
   the ``render_template`` function, also present in
-  :ref:`template_module`.  You may then create your own :term:`WebOb`
-  Response object, using the result of ``render_template`` as the
-  response's body.  There is also a ``get_template`` API in the same
-  module, which you can use to retrieve the template object without
-  rendering it at all, for additional control.
+  :ref:`chameleon_zpt_module`.  You may then create your own
+  :term:`WebOb` Response object, using the result of
+  ``render_template`` as the response's body.  There is also a
+  ``get_template`` API in the same module, which you can use to
+  retrieve the template object without rendering it at all, for
+  additional control.
 
 .. note::
 

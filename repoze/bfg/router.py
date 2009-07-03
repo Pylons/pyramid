@@ -242,32 +242,6 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     dictionary, the value passed as ``filename`` will be ignored,
     replaced with the ``configure_zcml`` value.
 
-    ``authentication_policy`` should be an object that implements the
-    ``repoze.bfg.interfaces.IAuthenticationPolicy`` interface (e.g.
-    it might be an instance of
-    ``repoze.bfg.authentication.RemoteUserAuthenticationPolicy``) or
-    ``None``.  If ``authentication_policy`` is ``None``, no
-    authentication or authorization will be performed.  Instead, BFG
-    will ignore any view permission assertions in your application and
-    imperative security checks performed by your application will
-    always return ``True``.  This argument is deprecated in
-    :mod:`repoze.bfg` 1.0; use a ZCML directive such as
-    ``authtktauthenticationpolicy`` instead, as documented in the
-    Security chapter of the :mod:`repoze.bfg` documentation.
-
-    ``authorization_policy`` is an object that implements the
-    ``repoze.bfg.interfaces.IAuthorizationPoicy`` interface
-    (notionally) or ``None``.  If the ``authentication_policy``
-    argument is ``None``, this argument is ignored entirely because
-    being able to authorize access to a user depends on being able to
-    authenticate that user.  If the ``authentication_policy`` argument
-    is *not* ``None``, and the ``authorization_policy`` argument *is*
-    ``None``, the authorization policy defaults to an authorization
-    implementation that uses ACLs.  This argument is deprecated in
-    :mod:`repoze.bfg` 1.0; use a ZCML directive such as
-    ``aclauthorizationpolicy`` instead, as documented in the Security
-    chapter of the :mod:`repoze.bfg` documentation.
-
     ``options``, if used, should be a dictionary containing runtime
     options (e.g. the key/value pairs in an app section of a
     PasteDeploy file), with each key representing the option and the

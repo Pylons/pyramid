@@ -7,9 +7,9 @@ An *event* is an object broadcast by the :mod:`repoze.bfg` framework
 at particularly interesting points during the lifetime of an
 application.  You don't need to use, know about, or care about events
 in order to create most :mod:`repoze.bfg` applications, but they can
-be useful when you want to do slightly advanced operations, such as
-"skinning" a site slightly differently based on, for example, the
-hostname used to reach the site.
+be useful when you want to perform slightly advanced operations.  For
+example, subscribing to an event can allow you to "skin" a site
+slightly differently based on the hostname used to reach the site.
 
 Events in :mod:`repoze.bfg` are always broadcast by the framework.
 However, they only become useful when you register a *subscriber*.  A
@@ -43,9 +43,10 @@ lives in a ``subscribers.py`` module within your application:
 The above example means "every time the :mod:`repoze.bfg` framework
 emits an event object that supplies an ``INewRequest`` interface, call
 the ``mysubscriber`` function with the event object.  As you can see,
-subscriptions are made to *interfaces*.  The event object sent to a
-subscriber will always have an interface.  You can use the interface
-itself to determine what attributes of the event are available.
+a subscription is made in terms of an :term:`interface`.  The event
+object sent to a subscriber will always have possess an interface.
+The interface itself provides documentation of what attributes of the
+event are available.
 
 For example, if you create event listener functions in a
 ``subscribers.py`` file in your application like so:
@@ -78,15 +79,16 @@ file:
 
 This causes the functions as to be registered as event subscribers
 within the :term:`application registry` .  Under this configuration,
-when the application is run, every new request and every response will
-be printed to the console.  We know that ``INewRequest`` events have a
-``request`` attribute, which is a :term:`WebOb` request, because the
-interface defined at ``repoze.bfg.interfaces.INewRequest`` says it
-must.  Likewise, we know that ``INewResponse`` events have a
-``response`` attribute, which is a response object constructed by your
-application, because the interface defined at
-``repoze.bfg.interfaces.INewResponse`` says it must.  These particular
-interfaces, along with others, are documented in the
+when the application is run, each time a new request or response is
+detected, a message will be printed to the console.
+
+We know that ``INewRequest`` events have a ``request`` attribute,
+which is a :term:`WebOb` request, because the interface defined at
+``repoze.bfg.interfaces.INewRequest`` says it must.  Likewise, we know
+that ``INewResponse`` events have a ``response`` attribute, which is a
+response object constructed by your application, because the interface
+defined at ``repoze.bfg.interfaces.INewResponse`` says it must.  These
+particular interfaces, along with others, are documented in the
 :ref:`events_module` API chapter.
 
 .. note::
@@ -95,11 +97,12 @@ interfaces, along with others, are documented in the
    components.  The ``INewResponse`` event exists purely for symmetry
    with ``INewRequest``, really.
 
-The *subscriber* ZCML element takes two values: ``for``, which is the
-interface the subscriber is registered for (which limits the events
-that the subscriber will receive to those specified by the interface),
-and ``handler`` which is a Python dotted-name path to the subscriber
-function.
+The *subscriber* ZCML element takes two attributes: ``for``, and
+``handler``.  The value of ``for`` is the interface the subscriber is
+registered for.  Registering a subscriber for a specific interface
+limits the event types that the subscriber will receive to those
+specified by the interface. The value of ``handler`` is a Python
+dotted-name path to the subscriber function.
 
 The return value of a subscriber function is ignored.
 
@@ -109,12 +112,12 @@ Using An Event to Vary the Request Type
 ---------------------------------------
 
 The most common usage of the ``INewRequestEvent`` is to attach an
-:term:`interface` to the request to be able to differentiate, for
-example, a request issued by a browser from a request issued by a JSON
-client.  This differentiation makes it possible to register different
-views against different ``request_type`` interfaces; for instance,
-depending on the presence of a request header, you might return JSON
-data.
+:term:`interface` to a request after introspecting the request data in
+some way.  For example, you might want to be able to differentiate a
+request issued by a browser from a request issued by a JSON client.
+This differentiation makes it possible to register different views
+against different ``request_type`` interfaces; for instance, depending
+on the presence of a request header, you might return JSON data.
 
 To do this, you should subscribe an function to the ``INewRequest``
 event type, and you should use the ``zope.interface.alsoProvides`` API
@@ -137,14 +140,14 @@ object provided by the event.  Here's an example.
        if 'application/json' in accept:
            alsoProvides(request, IJSONRequest)
 
-Then in your view registration ZCML, if you subscribe
-``categorize_request`` for the ``repoze.bfg.interfaces.INewRequest``
-type, you can use the ``request_type`` attribute to point at different
-view functions depending upon the interface implemented by the
-request.  For example, if the above subscriber function was
-registered, the three view registrations below could be used to point
-at separate view functions using separate request type interfaces for
-the same model object.
+If you subscribe ``categorize_request`` for the
+``repoze.bfg.interfaces.INewRequest`` type, the ``IJSONRequest``
+interface will be attached to each request object that has ``accept``
+headers which match ``application/json``.
+
+Thereafter, you can use the ``request_type`` attribute of a
+term:`view` ZCML statement or a ``@bfg_view`` decorator to refer to
+this ``IJSONRequest`` interface.  For example:
 
 .. code-block:: xml
    :linenos:
@@ -157,7 +160,6 @@ the same model object.
    <!-- html default view -->
    <view
       for=".models.MyModel"
-      request_type="repoze.bfg.interfaces.IRequest"
       view=".views.html_view"/>
 
    <!-- JSON default view -->
@@ -167,30 +169,33 @@ the same model object.
       view=".views.json_view"/>
 
 The interface ``repoze.bfg.interfaces.IRequest`` is automatically
-implemented by every :mod:`repoze.bfg` request, so all requests will
-implement that type, and views registered against models which do not
-supply a ``request_type`` will be considered to be registered for this
-``IRequest`` as a default.
+implemented by every :mod:`repoze.bfg` request.  Views which do not
+supply a ``request_type`` attribute will be considered to be
+registered for ``repoze.bfg.interfaces.IRequest`` as a default.  But
+in the example above, ``.views.json_view`` will be called when a
+request supplies our ``IJSONRequest`` interface, because it is a more
+specific interface.
 
 Of course, you are not limited to using the ``Accept`` header to
-determine which interfaces to attach to a request.  For example, you
-might also choose to use hostname
-(e.g. ``request.environ.get('HTTP_HOST',
+determine which interface to attach to a request within an event
+subscriber.  For example, you might also choose to introspect the
+hostname (e.g. ``request.environ.get('HTTP_HOST',
 request.environ['SERVER_NAME'])``) in order to "skin" your application
 differently based on whether the user should see the "management"
 (e.g. "manage.myapp.com") presentation of the application or the
-"retail" presentation (e.g. "www.myapp.com").  By attaching to the
-request an arbitrary interface after examining the hostname or any
-other information available in the request within an ``INewRequest``
-event subscriber, you can control view lookup precisely.  For example,
-if you wanted to have two slightly different views for requests to two
-different hostnames, you might register one view with a
-``request_type`` of ``.interfaces.IHostnameFoo`` and another with a
-``request_type`` of ``.interfaces.IHostnameBar`` and then arrange for
-an event subscriber to attach ``.interfaces.IHostnameFoo`` to the
-request when the HTTP_HOST is ``foo`` and ``.interfaces.IHostnameBar``
-to the request when the HTTP_HOST is ``bar``.  The appropriate view
-will be called.
+"retail" presentation (e.g. "www.myapp.com").
+
+By attaching to the request an arbitrary interface after examining the
+hostname or any other information available in the request within an
+``INewRequest`` event subscriber, you can control view lookup
+precisely.  For example, if you wanted to have two slightly different
+views for requests to two different hostnames, you might register one
+view with a ``request_type`` of ``.interfaces.IHostnameFoo`` and
+another with a ``request_type`` of ``.interfaces.IHostnameBar`` and
+then arrange for an event subscriber to attach
+``.interfaces.IHostnameFoo`` to the request when the HTTP_HOST is
+``foo`` and ``.interfaces.IHostnameBar`` to the request when the
+HTTP_HOST is ``bar``.  The appropriate view will be called.
 
 You can also form an inheritance hierarchy out of ``request_type``
 interfaces.  When :mod:`repoze.bfg` looks up a view, the most specific
@@ -198,12 +203,3 @@ view for the interface(s) found on the request based on standard
 Python method resolution order through the interface class hierarchy
 will be called.
 
-:mod:`repoze.bfg` also makes available as interfaces standard request
-type interfaces matching HTTP verbs.  When these are specified as a
-``request_type`` for a view, the view will be called only when the
-request has an HTTP verb (aka HTTP method) matching the request type.
-For example, using the string ``repoze.bfg.interfaces.IPOST`` or the
-imported interface definition itself matching that Python dotted name
-as the request_type argument to a view definition is equivalent to
-using the string ``POST``.  See :ref:`interfaces_module` for more
-information about available request types.

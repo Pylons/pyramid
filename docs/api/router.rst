@@ -5,6 +5,4 @@
 
 .. automodule:: repoze.bfg.router
 
-.. autoclass:: Router
-
-.. autofunction:: repoze.bfg.router.make_app
+.. autofunction:: repoze.bfg.router.make_app(root_factory, package=None, filename='configure.zcml')

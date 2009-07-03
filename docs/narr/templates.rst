@@ -56,7 +56,7 @@ has a *status code* of ``200 OK`` and a *content-type* of
 ``text-html``.  If you need more control over the status code and
 content-type, either set attributes on the response that this function
 returns or use the ``render_template`` function instead (see
-:ref:`template_module` for the details), which also renders a ZPT
+:ref:`chameleon_zpt_module` for the details), which also renders a ZPT
 template but returns a string instead of a Response.  You can use the
 string manually as a response body.  Here's an example of using
 ``render_template``:
@@ -201,7 +201,7 @@ which renders this template:
 
 The Chameleon text rendering API is a wholesale mirror of the
 Chameleon text ZPT rendering API, it's just imported from another
-place; see :ref:`template_module` for the API description.
+place; see :ref:`chameleon_text_module` for the API description.
 
 Side Effects of Rendering a Chameleon Template
 ----------------------------------------------
