@@ -1,5 +1,5 @@
-Next release
-============
+1.0b2 (2009-07-03)
+==================
 
 - ``remoteuserauthenticationpolicy`` ZCML directive didn't work
   without an ``environ_key`` directive (didn't match docs).
@@ -14,6 +14,8 @@ Next release
   bfgwiki2 (urldispatch+SA) tutorials.
 
 - Use bfgsite index for all tutorial setup.cfg files.
+
+- Full documentation grammar/style/spelling audit.
 
 1.0b1 (2009-07-02)
 ==================
