@@ -1,6 +1,12 @@
 Next release
 ============
 
+- Fix ``configure_zcml`` filespec check on Windows.  Previously if an
+  absolute filesystem path including a drive letter was passed as
+  ``filename`` (or as ``configure_zcml`` in the options dict) to
+  ``repoze.bfg.router.make_app``, it would be treated as a
+  package:resource_name specification.
+
 - Fix inaccuracies and import errors in bfgwiki (traversal+ZODB) and
   bfgwiki2 (urldispatch+SA) tutorials.
 

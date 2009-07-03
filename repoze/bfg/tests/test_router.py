@@ -674,8 +674,8 @@ class MakeAppTests(unittest.TestCase):
     def test_fixtureapp_default_filename_withpackage(self):
         manager = DummyRegistryManager()
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = DummyRootFactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp, manager=manager)
+        rootfactory = DummyRootFactory(None)
+        app = self._callFUT(rootfactory, fixtureapp, manager=manager)
         self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failUnless(app.registry.queryUtility(IFixture)) # only in c.zcml
@@ -683,8 +683,8 @@ class MakeAppTests(unittest.TestCase):
     def test_fixtureapp_explicit_filename(self):
         manager = DummyRegistryManager()
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = DummyRootFactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp, filename='another.zcml',
+        rootfactory = DummyRootFactory(None)
+        app = self._callFUT(rootfactory, fixtureapp, filename='another.zcml',
                             manager=manager)
         self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
         from repoze.bfg.tests.fixtureapp.models import IFixture
@@ -693,11 +693,11 @@ class MakeAppTests(unittest.TestCase):
     def test_fixtureapp_explicit_filename_in_options(self):
         import os
         manager = DummyRegistryManager()
-        rootpolicy = DummyRootFactory(None)
+        rootfactory = DummyRootFactory(None)
         from repoze.bfg.tests import fixtureapp
         zcmlfile = os.path.join(os.path.dirname(fixtureapp.__file__),
                                 'another.zcml')
-        app = self._callFUT(rootpolicy, fixtureapp, filename='configure.zcml',
+        app = self._callFUT(rootfactory, fixtureapp, filename='configure.zcml',
                             options={'configure_zcml':zcmlfile},
                             manager=manager)
         self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
@@ -706,16 +706,34 @@ class MakeAppTests(unittest.TestCase):
 
     def test_fixtureapp_explicit_specification_in_options(self):
         manager = DummyRegistryManager()
-        rootpolicy = DummyRootFactory(None)
+        rootfactory = DummyRootFactory(None)
         from repoze.bfg.tests import fixtureapp
         zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
-        app = self._callFUT(rootpolicy, fixtureapp, filename='configure.zcml',
+        app = self._callFUT(rootfactory, fixtureapp, filename='configure.zcml',
                             options={'configure_zcml':zcmlfile},
                             manager=manager)
         self.assertEqual(app.registry.__name__,
                          'repoze.bfg.tests.fixtureapp.subpackage')
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failIf(app.registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_fixtureapp_filename_hascolon_isabs(self):
+        manager = DummyRegistryManager()
+        rootfactory = DummyRootFactory(None)
+        from repoze.bfg.tests import fixtureapp
+        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
+        class Dummy:
+            def isabs(self, name):
+                return True
+        os = Dummy()
+        os.path = Dummy()
+        self.assertRaises(IOError, self._callFUT,
+                          rootfactory,
+                          fixtureapp,
+                          filename='configure.zcml',
+                          options={'configure_zcml':zcmlfile},
+                          manager=manager,
+                          os=os)
         
     def test_event(self):
         manager = DummyRegistryManager()
@@ -728,16 +746,16 @@ class MakeAppTests(unittest.TestCase):
             (IWSGIApplicationCreatedEvent,)
             )
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = DummyRootFactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp, manager=manager)
+        rootfactory = DummyRootFactory(None)
+        app = self._callFUT(rootfactory, fixtureapp, manager=manager)
         assert app.created is True
 
     def test_custom_settings(self):
         manager = DummyRegistryManager()
         options= {'mysetting':True}
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = DummyRootFactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp, options=options,
+        rootfactory = DummyRootFactory(None)
+        app = self._callFUT(rootfactory, fixtureapp, options=options,
                             manager=manager)
         from repoze.bfg.interfaces import ISettings
         settings = app.registry.getUtility(ISettings)
@@ -750,8 +768,8 @@ class MakeAppTests(unittest.TestCase):
         options= {'reload_templates':True,
                   'debug_authorization':True}
         from repoze.bfg.tests import fixtureapp
-        rootpolicy = DummyRootFactory(None)
-        app = self._callFUT(rootpolicy, fixtureapp, options=options,
+        rootfactory = DummyRootFactory(None)
+        app = self._callFUT(rootfactory, fixtureapp, options=options,
                             manager=manager)
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ILogger
@@ -762,32 +780,33 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(logger.name, 'repoze.bfg.debug')
         self.assertEqual(settings.reload_templates, True)
         self.assertEqual(settings.debug_authorization, True)
-        self.assertEqual(rootfactory, rootpolicy)
+        self.assertEqual(rootfactory, rootfactory)
         self.failUnless(manager.pushed and manager.popped)
 
-    def test_routes_in_config_with_rootpolicy(self):
+    def test_routes_in_config_with_rootfactory(self):
         manager = DummyRegistryManager()
         options= {'reload_templates':True,
                   'debug_authorization':True}
         from repoze.bfg.urldispatch import RoutesRootFactory
         from repoze.bfg.tests import routesapp
-        rootpolicy = DummyRootFactory(None)
-        app = self._callFUT(rootpolicy, routesapp, options=options,
+        rootfactory = DummyRootFactory(None)
+        app = self._callFUT(rootfactory, routesapp, options=options,
                             manager=manager)
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ILogger
         from repoze.bfg.interfaces import IRootFactory
         settings = app.registry.getUtility(ISettings)
         logger = app.registry.getUtility(ILogger, name='repoze.bfg.debug')
-        rootfactory = app.registry.getUtility(IRootFactory)
+        effective_rootfactory = app.registry.getUtility(IRootFactory)
         self.assertEqual(logger.name, 'repoze.bfg.debug')
         self.assertEqual(settings.reload_templates, True)
         self.assertEqual(settings.debug_authorization, True)
-        self.failUnless(isinstance(rootfactory, RoutesRootFactory))
-        self.assertEqual(rootfactory.default_root_factory, rootpolicy)
+        self.failUnless(isinstance(effective_rootfactory, RoutesRootFactory))
+        self.assertEqual(effective_rootfactory.default_root_factory,
+                         rootfactory)
         self.failUnless(manager.pushed and manager.popped)
 
-    def test_routes_in_config_no_rootpolicy(self):
+    def test_routes_in_config_no_rootfactory(self):
         manager = DummyRegistryManager()
         options= {'reload_templates':True,
                   'debug_authorization':True}
@@ -809,7 +828,7 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(rootfactory.default_root_factory, DefaultRootFactory)
         self.failUnless(manager.pushed and manager.popped)
         
-    def test_no_routes_in_config_no_rootpolicy(self):
+    def test_no_routes_in_config_no_rootfactory(self):
         manager = DummyRegistryManager()
         from repoze.bfg.router import DefaultRootFactory
         from repoze.bfg.interfaces import IRootFactory

@@ -1,4 +1,5 @@
-from cgi import escape
+import cgi
+import os
 import sys
 from webob import Response
 
@@ -183,7 +184,7 @@ class Router(object):
 
 def default_view(context, request, status):
     try:
-        msg = escape(request.environ['repoze.bfg.message'])
+        msg = cgi.escape(request.environ['repoze.bfg.message'])
     except KeyError:
         msg = ''
     html = """
@@ -211,8 +212,8 @@ def default_notfound_view(context, request):
 def make_app(root_factory, package=None, filename='configure.zcml',
              authentication_policy=None, authorization_policy=None,
              options=None, registry=None, debug_logger=None,
-             manager=manager):
-    # registry, debug_logger and manager *only* for unittests
+             manager=manager, os=os):
+    # registry, debug_logger, manager and os *only* for unittests
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
 
@@ -281,7 +282,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     settings = Settings(get_options(options))
     filename = settings['configure_zcml']
 
-    if ':' in filename:
+    if (':' in filename) and (not os.path.isabs(filename)):
         package, filename = filename.split(':', 1)
         __import__(package)
         package = sys.modules[package]
