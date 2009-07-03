@@ -248,7 +248,8 @@ class IRemoteUserAuthenticationPolicyDirective(Interface):
                            default=u'REMOTE_USER')
     callback = GlobalObject(title=u'callback', required=False)
 
-def remoteuserauthenticationpolicy(_context, environ_key, callback=None):
+def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
+                                   callback=None):
     policy = RemoteUserAuthenticationPolicy(environ_key=environ_key,
                                             callback=callback)
     _context.action(

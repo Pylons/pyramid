@@ -584,12 +584,33 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def _callFUT(self, context, **kw):
         from repoze.bfg.zcml import repozewho1authenticationpolicy
         return repozewho1authenticationpolicy(context, **kw)
+
+    def test_it_defaults(self):
+        context = DummyContext()
+        self._callFUT(context)
+        actions = context.actions
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 1)
+
+        regadapt = actions[0]
+        regadapt_discriminator = 'authentication_policy'
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerUtility')
+        policy = regadapt['args'][1]
+        self.assertEqual(policy.callback, None)
+        self.assertEqual(policy.identifier_name, 'auth_tkt')
+        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
+        self.assertEqual(regadapt['args'][3], '')
+        self.assertEqual(regadapt['args'][4], None)
     
     def test_it(self):
         context = DummyContext()
         def callback(identity, request):
             """ """
-        self._callFUT(context, identifier_name='auth_tkt', callback=callback)
+        self._callFUT(context, identifier_name='something', callback=callback)
         actions = context.actions
         from repoze.bfg.interfaces import IAuthenticationPolicy
         from repoze.bfg.zcml import handler
@@ -603,7 +624,7 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['args'][0], 'registerUtility')
         policy = regadapt['args'][1]
         self.assertEqual(policy.callback, callback)
-        self.assertEqual(policy.identifier_name, 'auth_tkt')
+        self.assertEqual(policy.identifier_name, 'something')
         self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
         self.assertEqual(regadapt['args'][3], '')
         self.assertEqual(regadapt['args'][4], None)
@@ -612,7 +633,30 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
     def _callFUT(self, context, **kw):
         from repoze.bfg.zcml import remoteuserauthenticationpolicy
         return remoteuserauthenticationpolicy(context, **kw)
-    
+
+    def test_defaults(self):
+        context = DummyContext()
+        def callback(identity, request):
+            """ """
+        self._callFUT(context)
+        actions = context.actions
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 1)
+
+        regadapt = actions[0]
+        regadapt_discriminator = 'authentication_policy'
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerUtility')
+        policy = regadapt['args'][1]
+        self.assertEqual(policy.environ_key, 'REMOTE_USER')
+        self.assertEqual(policy.callback, None)
+        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
+        self.assertEqual(regadapt['args'][3], '')
+        self.assertEqual(regadapt['args'][4], None)
+
     def test_it(self):
         context = DummyContext()
         def callback(identity, request):
@@ -640,7 +684,28 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
     def _callFUT(self, context, secret, **kw):
         from repoze.bfg.zcml import authtktauthenticationpolicy
         return authtktauthenticationpolicy(context, secret, **kw)
-    
+
+    def test_it_defaults(self):
+        context = DummyContext()
+        self._callFUT(context, 'sosecret')
+        actions = context.actions
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.zcml import handler
+
+        self.assertEqual(len(actions), 1)
+
+        regadapt = actions[0]
+        regadapt_discriminator = 'authentication_policy'
+        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
+        self.assertEqual(regadapt['callable'], handler)
+        self.assertEqual(regadapt['args'][0], 'registerUtility')
+        policy = regadapt['args'][1]
+        self.assertEqual(policy.cookie.secret, 'sosecret')
+        self.assertEqual(policy.callback, None)
+        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
+        self.assertEqual(regadapt['args'][3], '')
+        self.assertEqual(regadapt['args'][4], None)
+
     def test_it_noconfigerror(self):
         context = DummyContext()
         def callback(identity, request):

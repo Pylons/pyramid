@@ -1,6 +1,9 @@
 Next release
 ============
 
+- ``remoteuserauthenticationpolicy`` ZCML directive didn't work
+  without an ``environ_key`` directive (didn't match docs).
+
 - Fix ``configure_zcml`` filespec check on Windows.  Previously if an
   absolute filesystem path including a drive letter was passed as
   ``filename`` (or as ``configure_zcml`` in the options dict) to
