@@ -93,9 +93,9 @@ system.
 
    .. warning:: It's very important that the ``APP_NAME`` is
       ``bfgapp.run:app`` instead of ``bfgapp.run.make_app``.  If you
-      use the latter by mistake, you'll be confused for at least hour
-      when debugging an error like this: ``IOError: [Errno 2] No such
-      file or directory:
+      use the latter by mistake, you'll be confused for at least an
+      hour when debugging an error like this: ``IOError: [Errno 2] No
+      such file or directory:
       '/Users/chrism/projects/bfg_gae/bfgapp2/app/configure.zcml'``.
 
 #.  Edit ``runner.py``
