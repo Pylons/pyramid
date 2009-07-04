@@ -57,14 +57,16 @@ Virtual root support is useful when you'd like to host some model in a
 that does not include the model path itself.  For example, you might
 want to serve the object at the traversal path ``/cms`` as an
 application reachable via ``http://example.com/`` (as opposed to
-``http://example.com/cms``). To specify a virtual root, cause an
-environment variable to be inserted into the WSGI environ named
-``HTTP_X_VHM_ROOT`` with a value that is the absolute pathname to the
-model object in the traversal graph that should behave as the "root"
-model.  As a result, the traversal machinery will respect this value
-during traversal (prepending it to the PATH_INFO before traversal
-starts), and the ``repoze.bfg.url.model_url`` API will generate the
-"correct" virtually-rooted URLs.
+``http://example.com/cms``).
+
+To specify a virtual root, cause an environment variable to be
+inserted into the WSGI environ named ``HTTP_X_VHM_ROOT`` with a value
+that is the absolute pathname to the model object in the traversal
+graph that should behave as the "root" model.  As a result, the
+traversal machinery will respect this value during traversal
+(prepending it to the PATH_INFO before traversal starts), and the
+``repoze.bfg.url.model_url`` API will generate the "correct"
+virtually-rooted URLs.
 
 An example of an Apache ``mod_proxy`` configuration that will host the
 ``/cms`` subobject as ``http://www.example.com/`` using this facility
