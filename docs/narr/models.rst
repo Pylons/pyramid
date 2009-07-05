@@ -128,7 +128,7 @@ that you don't want to disturb, use the
    alsoProvides(IBlogEntry2, entry)
 
 See the :ref:`views_chapter` for more information about why providing
-models with an interface can be an interesing thing to do with regard
+models with an interface can be an interesting thing to do with regard
 to :term:`view` lookup.
 
 Defining a Graph of Model Instances for Traversal
@@ -253,7 +253,7 @@ conveniently locate one object "inside" another.
 
 Some APIs in :ref:`security_module` accept a model object as a
 parameter.  For example, the ``has_permission`` API accepts a
-"context" (a model object) as one of its arguments; the "acl" is
+"context" (a model object) as one of its arguments; the ACL is
 obtained from this model or one of its ancestors.  Other APIs in the
 same module also accept :term:`context` as an argument, and a context
 is always a model.

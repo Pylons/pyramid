@@ -83,7 +83,7 @@ code that implements a minimal forbidden view:
 .. warning:: the default forbidden view sends a response with a ``401
    Unauthorized`` status code for backwards compatibility reasons.
    You can influence the status code of Forbidden responses by using
-   an alterate forbidden view.  For example, it would make sense to
+   an alternate forbidden view.  For example, it would make sense to
    return a response with a ``403 Forbidden`` status code.
 
 Changing the response factory

@@ -127,7 +127,7 @@ code to execute:
     terminated, the first remaining path element is treated as the
     view name.
 
-    Any subseqent path elements after the view name are deemed the
+    Any subsequent path elements after the view name are deemed the
     :term:`subpath`.  The subpath is always a sequence of path
     segments that come from ``PATH_INFO`` that are "left over" after
     traversal has completed. For instance, if ``PATH_INFO`` was
@@ -144,13 +144,13 @@ code to execute:
     performs a permission lookup.  If a permission declaration is
     found for the view name and context implied by the current
     request, an :term:`authorization policy` is consulted to see if
-    the "current user" (al determined by the the authentication
+    the "current user" (all determined by the the authentication
     policy) can perform the action.  If he can, processing continues.
     If he cannot, the ``forbidden`` view is called (see
     :ref:`changing_the_forbidden_view`).
 
 #.  Armed with the context, the view name, and the subpath, the router
-    performs a view lookup.  It attemtps to look up a view from the
+    performs a view lookup.  It attempts to look up a view from the
     :mod:`repoze.bfg` :term:`application registry` using the view name
     and the context.  If a view function is found, it is called with
     the context and the request.  It returns a response, which is fed
@@ -162,8 +162,8 @@ protocol.
 
 .. _debug_notfound_section:
 
-NotFound Errors
----------------
+``NotFound`` Errors
+-------------------
 
 It's useful to be able to debug ``NotFound`` errors when they occur
 unexpectedly due to an application registry misconfiguration.  To
@@ -181,7 +181,7 @@ Let's pretend the user asks for
 ``http://example.com/foo/bar/baz/biz/buz.txt``. Let's pretend that the
 request's ``PATH_INFO`` in that case is ``/foo/bar/baz/biz/buz.txt``.
 Let's further pretend that when this request comes in that we're
-traversing the follwing graph::
+traversing the following graph::
 
   /--
      |
@@ -210,7 +210,7 @@ error condition.  It signifies that:
 
 - the :term:`subpath` is ``('biz', 'buz.txt')``
 
-Because it's the "context", :mod:`repoze.bfg` examimes "bar" to find
+Because it's the "context", :mod:`repoze.bfg` examines "bar" to find
 out what "type" it is. Let's say it finds that the context is an
 ``IBar`` type (because "bar" happens to have an attribute attached to
 it that indicates it's an ``IBar``).
@@ -248,7 +248,7 @@ The user asks for ``http://example.com/foo/bar/baz/biz/buz.txt``
 - :mod:`repoze.bfg` traverses baz, and attempts to find biz, which it
   finds.
 
-- :mod:`repoze.bfg` traverses biz, and attemtps to find "buz.txt"
+- :mod:`repoze.bfg` traverses biz, and attempts to find "buz.txt"
   which it does not find.
 
 The fact that it does not find "buz.txt" at this point does not
@@ -261,7 +261,7 @@ signify an error condition.  It signifies that:
 
 - the :term:`subpath` is an empty sequence ( ``()`` ).
 
-Because it's the "context", :mod:`repoze.bfg` examimes "biz" to find
+Because it's the "context", :mod:`repoze.bfg` examines "biz" to find
 out what "type" it is. Let's say it finds that the context an ``IBiz``
 type (because "biz" happens to have an attribute attached to it that
 happens indicates it's an ``IBiz``).
@@ -272,7 +272,7 @@ Using the "view name" ("buz.txt") and the type, it asks the
 - Please find me a :term:`view` with the name "buz.txt" that can be
   used for type ``IBiz``.
 
-Let's say that question is answered "here you go, here'a a bit of code
+Let's say that question is answered "here you go, here's a bit of code
 that is willing to deal with that case", and returns a :term:`view`.
 It is passed the "biz" object as the "context" and the current
 :term:`WebOb` :term:`request` as the "request".  It returns a
@@ -337,10 +337,11 @@ Unicode and Traversal
 The traversal machinery by default attempts to first URL-unquote and
 then Unicode-decode each path element in ``PATH_INFO`` from its
 natural byte string (``str`` type) representation.  URL unquoting is
-performed using the Python stdlib ``urllib.unquote`` function.
-Conversion from a URL-decoded string into Unicode is attempted using
-the UTF-8 encoding.  If any URL-unquoted path segment in ``PATH_INFO``
-is not decodeable using the UTF-8 decoding, a TypeError is raised.  A
-segment will be fully URL-unquoted and UTF8-decoded before it is
-passed it to the ``__getitem__`` of any model object during traversal.
+performed using the Python standard library ``urllib.unquote``
+function.  Conversion from a URL-decoded string into Unicode is
+attempted using the UTF-8 encoding.  If any URL-unquoted path segment
+in ``PATH_INFO`` is not decodeable using the UTF-8 decoding, a
+TypeError is raised.  A segment will be fully URL-unquoted and
+UTF8-decoded before it is passed it to the ``__getitem__`` of any
+model object during traversal.
 

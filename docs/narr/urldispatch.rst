@@ -17,7 +17,7 @@ For instance, if all the data in your application lives in a
 relational database, and that relational database has no
 self-referencing tables that form a natural hierarchy, URL dispatch is
 easier to use than traversal, and is often a more natural fit for
-creating an application that maniplates "flat" data.
+creating an application that manipulates "flat" data.
 
 Concept and Usage
 -----------------
@@ -46,7 +46,7 @@ function (usually a traversal function).
 
 A root factory is not required for purely URL-dispatch-based apps: if
 the root factory callable is passed as ``None`` to the ``make_app``
-function, :mod:`repoze.bfg` will return a NotFound error to the user's
+function, :mod:`repoze.bfg` will return a ``NotFound`` error to the user's
 browser when no routes match.
 
 .. note:: See :ref:`modelspy_project_section` for an example of a
@@ -139,7 +139,7 @@ segment ("foo") and two dynamic segments ("baz", and "bar")::
 
     foo/:baz/:bar
 
-The above pattern will match these URLs, generating the followng
+The above pattern will match these URLs, generating the following
 matchdicts::
 
    foo/1/2        -> {'baz':u'1', 'bar':u'2'}
@@ -173,7 +173,7 @@ not need to be preceded by a slash.  For example::
 
     foo/:baz/:bar*traverse
 
-The above pattern will match these URLs, generating the followng
+The above pattern will match these URLs, generating the following
 matchdicts::
 
    foo/1/2/               -> {'baz':1, 'bar':2, 'traverse':()}
@@ -204,7 +204,7 @@ commonly declared.
 Example 1
 ~~~~~~~~~
 
-The simplest route delcaration:
+The simplest route declaration:
 
 .. code-block:: xml
    :linenos:
@@ -232,7 +232,7 @@ The ``mypackage.views`` module referred to above might look like so:
 
 In this case the context object passed to the view will be an instance
 of the ``repoze.bfg.urldispatch.DefaultRoutesContext``.  This is the
-type of obejct created for a context when there is no "factory"
+type of object created for a context when there is no "factory"
 specified in the ``route`` declaration.  It is a mapping object, a lot
 like a dictionary.
 

@@ -43,7 +43,7 @@ URL Dispatch Only
 ~~~~~~~~~~~~~~~~~
 
 An application that uses :term:`url dispatch` exclusively to map URLs
-to code will usually exlusively have declarations like this within
+to code will usually exclusively have declarations like this within
 their ``configure.zcml`` file:
 
 .. code-block:: xml
@@ -93,10 +93,11 @@ code just won't have any ``<route>`` declarations.  Instead, its ZCML
      />
 
 "Under the hood", the above view statements register a view using the
-:term:`context` interface ``None``, the IRequest :term:`request type`
-with a :term:`view name` matching the name= argument.  The "foobar"
-view above will match the URL ``/a/b/c/foobar`` or ``/foobar``, etc,
-assuming that no view is named "a", "b", or "c" during traversal.
+:term:`context` interface ``None``, the ``IRequest`` :term:`request
+type` with a :term:`view name` matching the name= argument.  The
+"foobar" view above will match the URL ``/a/b/c/foobar`` or
+``/foobar``, etc, assuming that no view is named "a", "b", or "c"
+during traversal.
 
 Hybrid Applications
 -------------------
@@ -198,7 +199,7 @@ view will be called.
 
 A ``<route>`` declaration *must* precede (in XML order) any ``<view>``
 declaration which names it as a ``route_name``.  If it does not, at
-application startup time a ConfigurationError will be raised.
+application startup time a ``ConfigurationError`` will be raised.
 
 Route Factories
 ---------------
@@ -225,7 +226,7 @@ Using ``*subpath`` in a Route Path
 ----------------------------------
 
 There are certain (extremely rare) cases when you'd like to influence
-the traversal :term:`subpath` when a route matches without atually
+the traversal :term:`subpath` when a route matches without actually
 performing traversal.  For instance, the ``repoze.bfg.wsgi.wsgiapp2``
 decorator and the ``repoze.bfg.view.static`` helper attempt to compute
 ``PATH_INFO`` from the request's subpath, so it's useful to be able to
@@ -467,4 +468,4 @@ A ``<route>`` Statement *Must* Precede Any ``<view>`` Statement Which Mentions I
 
 A ``<route>`` declaration *must* precede (in XML order) any ``<view>``
 declaration which names it as a ``route_name``.  If it does not, at
-application startup time a ConfigurationError will be raised.
+application startup time a ``ConfigurationError`` will be raised.

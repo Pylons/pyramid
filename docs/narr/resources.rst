@@ -11,9 +11,9 @@ example, each of the following is a resource:
 
 - a GIF image file contained within a Python package.
 
-- a CSS file contined within a Python package.
+- a CSS file contained within a Python package.
 
-- a Javascript source file contained within a Python package.
+- a JavaScript source file contained within a Python package.
 
 - A directory within a package that does not have an ``__init__.py``
   in it (if it possessed an ``__init__.py`` it would *be* a package).
@@ -94,7 +94,7 @@ following kinds of resources defined in any Python package:
 
 - Individual :term:`Chameleon` templates.
 
-- A directory containing multuple Chameleon templates.
+- A directory containing multiple Chameleon templates.
 
 - Individual static files served up by an instance of the
   ``repoze.bfg.view.static`` helper class.

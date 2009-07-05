@@ -54,7 +54,7 @@ and an instance of the class
 ``repoze.bfg.authorization.ACLAuthorizationPolicy`` to be injected as
 the :term:`authorization policy` used by this application.
 
-:mod:`repoze.bfg` ships with a few prechewed authentication and
+:mod:`repoze.bfg` ships with a few pre-chewed authentication and
 authorization policies that should prove useful.  See
 :ref:`authentication_policies_directives_section` and
 :ref:`authorization_policies_directives_section` for more information.
@@ -278,7 +278,7 @@ module.  These can be imported for use in ACLs.
 
   An object representing, literally, *all* permissions.  Useful in an
   ACL like so: ``(Allow, 'fred', ALL_PERMISSIONS)``.  The
-  ``ALL_PERMISSIONS`` object is actually a standin object that has a
+  ``ALL_PERMISSIONS`` object is actually a stand-in object that has a
   ``__contains__`` method that always returns True, which, for all
   known authorization policies, has the effect of indicating that a
   given principal "has" any permission asked for by the system.
@@ -399,7 +399,7 @@ information in the debugger or via print statements when a
 Built-In Authentication Policy Directives
 -----------------------------------------
 
-:mod:`repoze.who` ships with a few "prechewed" authentication policy
+:mod:`repoze.who` ships with a few "pre-chewed" authentication policy
 implementations that you can make use of within your application.
 
 ``repozewho1authenticationpolicy``
@@ -497,7 +497,7 @@ user information.  It defaults to ``repoze.bfg.auth_tkt``.
 
 ``secure`` is a boolean value.  If it's set to "true", the cookie will
 only be sent back by the browser over a secure (HTTPS) connection.
-It defauls to "false".
+It defaults to "false".
 
 ``include_ip`` is a boolean value.  If it's set to true, the
 requesting IP address is made part of the authentication data in the
@@ -587,11 +587,11 @@ detection.
 Creating Your Own Authorization Policy
 --------------------------------------
 
-An authentiction policy the policy that allows or denies access after
+An authentication policy the policy that allows or denies access after
 a user has been authenticated.  By default, :mod:`repoze.bfg` will use
 the ``repoze.bfg.authorization.ACLAuthorizationPolicy`` if an
 authentication policy is activated and an authorization policy isn't
-otherwise specificed.  In some cases, it's useful to be able to use a
+otherwise specified.  In some cases, it's useful to be able to use a
 different authentication policy than the
 ``repoze.bfg.authorization.ACLAuthorizationPolicy``.  For example, it
 might be desirable to construct an alternate authorization policy

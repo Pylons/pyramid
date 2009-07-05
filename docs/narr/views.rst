@@ -143,7 +143,7 @@ app_iter
 
   An iterable representing the body of the response.  This can be a
   list, e.g. ``['<html><head></head><body>Hello
-  world!</body></html>']`` or it can be a filelike object, or any
+  world!</body></html>']`` or it can be a file-like object, or any
   other sort of iterable.
 
 If a view happens to return something to the :mod:`repoze.bfg`
@@ -262,7 +262,7 @@ route_name
   unless you want to perform traversal *after* a route has matched.*
   This value must match the ``name`` of a ``<route>`` declaration (see
   :ref:`urldispatch_chapter`) that must match before this view will be
-  called.  The ``<route>`` declaration specifed by ``route_name`` must
+  called.  The ``<route>`` declaration specified by ``route_name`` must
   exist in ZCML before the view that names the route
   (XML-ordering-wise) .  Note that the ``<route>`` declaration
   referred to by ``route_name`` usually has a ``*traverse`` token in
@@ -300,7 +300,7 @@ decorator to do this work.
    to scan for view declarations.  Additionally, if you use
    decorators, it means that other people will not be able to override
    your view declarations externally using ZCML: this is a common
-   requirement if you're developing an exensible application (e.g. a
+   requirement if you're developing an extensible application (e.g. a
    framework).  See :ref:`extending_chapter` for more information
    about building extensible applications.
 

@@ -39,7 +39,7 @@ The testing API provided by ``repoze.bfg`` allows you to simulate
 various application registry registrations for use under a unit
 testing framework without needing to invoke the actual application
 ZCML configuration.  For example, if you wanted to test the above
-``view_fn`` (assming it lived in ``my.package``), you could write a
+``view_fn`` (assuming it lived in ``my.package``), you could write a
 unittest TestCase that used the testing API.
 
 .. code-block:: python

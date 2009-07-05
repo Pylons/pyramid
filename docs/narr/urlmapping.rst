@@ -15,7 +15,7 @@ dispatcher
 :term:`Routes` URL mapping system.
 
 :mod:`repoze.bfg` supports :term:`URL dispatch` via a subsystem that
-was inpsired by :term:`Routes`.  :term:`URL dispatch` is convenient
+was inspired by :term:`Routes`.  :term:`URL dispatch` is convenient
 and straightforward.  When you limit your application to using URL
 dispatch, you know every URL that your application might generate or
 respond to, and all the URL matching elements are listed in a single

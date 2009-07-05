@@ -100,7 +100,7 @@ with ``debug_``). on in one fell swoop, you can use
 settings that do not start with ``debug_*`` such as
 ``reload_templates``.
 
-If you want to turn all ``reload`` settings (everysetting that starts
+If you want to turn all ``reload`` settings (every setting that starts
 with ``reload_``). on in one fell swoop, you can use
 ``BFG_RELOAD_ALL=1`` as an environment variable setting or you may use
 ``reload_all=true`` in the config file.  Note that this does not

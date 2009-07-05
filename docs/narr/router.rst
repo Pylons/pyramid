@@ -60,7 +60,7 @@ processing?
    ``__getitem__`` on the root object and subobjects) to find a
    :term:`context`.  If the root object has no ``__getitem__`` method,
    the root itself is assumed to be the context.  The exact traversal
-   agorithm is described in :ref:`traversal_chapter`. The traverser
+   algorithm is described in :ref:`traversal_chapter`. The traverser
    function returns a dictionary, which contains a :term:`context` and
    a :term:`view name` as well as other ancillary information.
 
