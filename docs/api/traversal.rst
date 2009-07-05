@@ -21,8 +21,5 @@
 
   .. autofunction:: traverse
 
-Secondary APIs
-~~~~~~~~~~~~~~
-
   .. autofunction:: traversal_path(path)
 
