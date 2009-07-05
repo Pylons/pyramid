@@ -210,11 +210,11 @@ before the filename:
 Press "Ctrl-D" to exit the interactive shell.
 
 You should always use a section name argument that refers to the
-actual ``app`` section within the config file that points at your BFG
-application *without any middleware wrapping*.  In particular, a
-section name is inappropriate as the second argument to "bfgshell" if
-the configuration section it names is a ``pipeline`` rather than an
-``app``.
+actual ``app`` section within the Paste configuration file that points
+at your BFG application *without any middleware wrapping*.  In
+particular, a section name is inappropriate as the second argument to
+"bfgshell" if the configuration section it names is a ``pipeline``
+rather than an ``app``.
 
 Runnning The Project Application
 --------------------------------
