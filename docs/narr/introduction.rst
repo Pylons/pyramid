@@ -62,7 +62,7 @@ job of why explaining why they don't use "MVC" acronym:
 
 :mod:`repoze.bfg` uses terminology similar to Django.  The skeleton
 code generator of :mod:`repoze.bfg` generates a directory layout very
-simliar to the directory layout suggested by the `Django Book
+similar to the directory layout suggested by the `Django Book
 <http://www.djangobook.com/>`_ .  Additionally, as suggested above,
 the concepts of :term:`view`, :term:`model` and :term:`template` are
 used by :mod:`repoze.bfg` as they would be by Django.
@@ -112,7 +112,7 @@ it has no reliance on the ZODB package.  Likewise, :term:`Django`
 tends to make the assumption that you're going to want to store your
 application's data in a relational database.  :mod:`repoze.bfg` makes
 no such assumption; it allows you to use a relational database but
-doesn't enourage or discourage an application developer about such a
+doesn't encourage or discourage an application developer about such a
 decision.
 
 Why?
