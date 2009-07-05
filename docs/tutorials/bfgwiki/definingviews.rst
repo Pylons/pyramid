@@ -55,7 +55,7 @@ page's ``__parent__``) already contains a page with the matched
 WikiWord name, the ``check`` function generates a view link to be used
 as the substitution value and returns it.  If the wiki does not
 already contain a page with with the matched WikiWord name, the
-function generates an "add" link as the subsitution value and returns
+function generates an "add" link as the substitution value and returns
 it.
 
 As a result, the ``content`` variable is now a fully formed bit of
@@ -321,7 +321,7 @@ Adding an Element to the Pipeline
 
 Let's add a piece of middleware to the WSGI pipeline.
 "egg:Paste#evalerror" middleware which displays debuggable errors in
-the browser while you're developing (not recommeded for deployment).
+the browser while you're developing (not recommended for deployment).
 Let's insert evalerror into the pipeline right below
 "egg:repoze.zodbconn#closer", making our resulting ``tutorial.ini``
 file look like so:
