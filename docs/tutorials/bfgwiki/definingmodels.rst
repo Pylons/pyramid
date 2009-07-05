@@ -11,6 +11,17 @@ objects.  A single instance of the "Wiki" class will serve as a
 container for "Page" objects, which will be instances of the "Page"
 class.
 
+Deleting the Database
+---------------------
+
+We're going to remove a Python model class.  Since this class is
+referred to within our persistent storage (within ``Data.fs``), we'll
+have strange things happen the next time we want to visit the
+application in a browser.  Remove the ``Data.fs`` from the
+``tutorial`` directory before proceeding any further.  It's always
+fine to do this as long as you don't care about the content of the
+database; the database itself will be recreated as necessary.
+
 Adding Model Classes
 --------------------
 
