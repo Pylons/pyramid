@@ -14,18 +14,19 @@ class.
 Deleting the Database
 ---------------------
 
-We're going to remove a Python model class.  Since this class is
-referred to within our persistent storage (within ``Data.fs``), we'll
-have strange things happen the next time we want to visit the
-application in a browser.  Remove the ``Data.fs`` from the
-``tutorial`` directory before proceeding any further.  It's always
-fine to do this as long as you don't care about the content of the
-database; the database itself will be recreated as necessary.
+We're going to remove the ``MyModel`` Python model class from our
+``models.py`` file.  Since this class is referred to within our
+persistent storage (within ``Data.fs``), we'll have strange things
+happen the next time we want to visit the application in a browser.
+Remove the ``Data.fs`` from the ``tutorial`` directory before
+proceeding any further.  It's always fine to do this as long as you
+don't care about the content of the database; the database itself will
+be recreated as necessary.
 
 Adding Model Classes
 --------------------
 
-The first thing we want to do is remove the ``MyModel`` class from the
+The next thing we want to do is remove the ``MyModel`` class from the
 generated ``models.py`` file.  The ``MyModel`` class is only a sample
 and we're not going to use it.
 
