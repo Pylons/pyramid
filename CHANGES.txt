@@ -8,6 +8,8 @@ Next release
 - Added "Deleting the Database" section to the "Defining Models"
   chapter of the traversal wiki tutorial.
 
+- Spell checking of narratives and tutorials.
+
 1.0b2 (2009-07-03)
 ==================
 
