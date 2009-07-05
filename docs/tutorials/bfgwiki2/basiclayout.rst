@@ -58,7 +58,7 @@ Content Models with ``models.py``
 ---------------------------------
 
 In a SQLAlchemy-based application, a *model* object is an object
-composed by quering the SQL database which backs an application.
+composed by querying the SQL database which backs an application.
 SQLAlchemy is an "object relational mapper" (an ORM).  The
 ``models.py`` file is where the ``bfg_routesalchemy`` Paster template
 put the classes that implement our models.

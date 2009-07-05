@@ -61,7 +61,7 @@ Configuring a ``repoze.bfg`` Authentication Policy
 --------------------------------------------------
 
 For any :mod:`repoze.bfg` application to perform authorization, we
-need to add a ``secrity.py`` module and we'll need to change our
+need to add a ``security.py`` module and we'll need to change our
 :term:`application registry` to add an :term:`authentication policy`
 and a :term:`authorization policy`.
 
@@ -97,7 +97,7 @@ Adding ``security.py``
 Add a ``security.py`` module within your package (in the same
 directory as "run.py", "views.py", etc) with the following content:
 The groupfinder defined here is an authorization policy "callback"; it
-is a be a callable that accepts a userid ana a request.  If the userid
+is a be a callable that accepts a userid and a request.  If the userid
 exists in the system, the callback will return a sequence of group
 identifiers (or an empty sequence if the user isn't a member of any
 groups).  If the userid *does not* exist in the system, the callback

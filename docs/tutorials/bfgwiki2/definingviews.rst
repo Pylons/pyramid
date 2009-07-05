@@ -97,7 +97,7 @@ already contains a page with the matched WikiWord name, the ``check``
 function generates a view link to be used as the substitution value
 and returns it.  If the wiki does not already contain a page with with
 the matched WikiWord name, the function generates an "add" link as the
-subsitution value and returns it.
+substitution value and returns it.
 
 As a result, the ``content`` variable is now a fully formed bit of
 HTML containing various view and add links for WikiWords based on the
@@ -306,7 +306,7 @@ Adding an Element to the Pipeline
 
 Let's add a piece of middleware to the WSGI pipeline.  We'll add
 ``egg:Paste#evalerror`` middleware which displays debuggable errors in
-the browser while you're developing (this is *not* recommeded for
+the browser while you're developing (this is *not* recommended for
 deployment as it is a security risk).  Let's insert evalerror into the
 pipeline right above "egg:repoze.tm2#tm", making our resulting
 ``tutorial.ini`` file look like so:
