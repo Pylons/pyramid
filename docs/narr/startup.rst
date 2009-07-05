@@ -103,11 +103,11 @@ press ``return`` after running ``paster serve MyProject.ini``.
    factory` function from the ``myproject.models`` Python module.  It
    then also imports the "bare" ``myproject`` package, and passes
    ``get_root``, ``myproject``, and the ``options`` keyword as the
-   ``app`` function's extra keyword args to the ``make_app`` function
-   of the ``repoze.bfg.router`` module.  ``**kw`` here contains all
-   the options in the ``[app:main]`` section of our .ini file except
-   the "use" option (which is internal to paste).  In this case,
-   ``**kw`` will be something like ``{'reload_templates':'true',
+   ``app`` function's extra keyword arguments to the ``make_app``
+   function of the ``repoze.bfg.router`` module.  ``**kw`` here
+   contains all the options in the ``[app:main]`` section of our .ini
+   file except the "use" option (which is internal to paste).  In this
+   case, ``**kw`` will be something like ``{'reload_templates':'true',
    'debug_authorization':'false', 'debug_notfound':'false'}``.
 
    ``get_root`` is the first argument to ``make_app``, and it is a
@@ -117,13 +117,13 @@ press ``return`` after running ``paster serve MyProject.ini``.
 
    We pass in the bare ``myproject`` package so that the ``make_app``
    callback knows where to look for the :term:`application registry`
-   file (conventially named ``configure.zcml``).  ``make_app`` will
+   file (conventionally named ``configure.zcml``).  ``make_app`` will
    use the package's path and look for ``configure.zcml`` within that
    package's filesystem directory.
 
    If you for some reason need or want to load a different application
    registry filename for your application, you can pass an optional
-   ``filename=`` paramter to make_app (e.g. ``make_app(get_root,
+   ``filename=`` parameter to make_app (e.g. ``make_app(get_root,
    myproject, filename='meta.zcml', options=options``).  If the
    filename is absolute, the ``package`` argument is ignored.
 
@@ -139,7 +139,7 @@ press ``return`` after running ``paster serve MyProject.ini``.
    registry that is created will be used for your application.
 
 #. A ``WSGIApplicationCreatedEvent`` event is emitted (see
-   :ref:`events_chapter` for more informations about events).
+   :ref:`events_chapter` for more information about events).
 
 #. Assuming there were no errors, the ``app`` function in
    ``myproject`` returns the router instance created by ``make_app``
