@@ -21,7 +21,7 @@ Preparation, UNIX
    your system, obtain, install, or find `Python 2.5
    <http://python.org/download/releases/2.5.4/>`_ for your system.
 
-#. Install latest `setuptools` into the Python you
+#. Install the latest `setuptools` into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
    <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
    the ``python`` interpreter of your Python 2.5 installation:
@@ -70,7 +70,7 @@ Preparation, Windows
 #. Install, or find `Python 2.5
    <http://python.org/download/releases/2.5.4/>`_ for your system.
 
-#. Install latest `setuptools` into the Python you
+#. Install the latest `setuptools` into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
    <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
    the ``python`` interpreter of your Python 2.5 installation using a
@@ -101,7 +101,7 @@ Preparation, Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "current index to get
+#. Use ``easy_install`` and point to the BFG "current" index to get
    :mod:`repoze.bfg` and its direct dependencies installed:
 
    .. code-block:: bat
