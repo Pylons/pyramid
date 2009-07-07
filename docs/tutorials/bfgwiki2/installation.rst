@@ -17,6 +17,11 @@ Windows.
 Preparation, UNIX
 -----------------
 
+#. Install SQLite3 and its development packages if you don't already
+   have them installed.  Usually this is via your system's package
+   manager.  For example, on a Debian Linux system, do ``sudo apt-get
+   install libsqlite3-dev``.
+
 #. If you don't already have a Python 2.5 interpreter installed on
    your system, obtain, install, or find `Python 2.5
    <http://python.org/download/releases/2.5.4/>`_ for your system.
