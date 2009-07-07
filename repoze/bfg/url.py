@@ -13,8 +13,8 @@ from repoze.bfg.traversal import quote_path_segment
 def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named BFG route.
     
-    Use the request object as the first positional argument.  Use the
-    route's ``name`` as the second positional argument.  Additional
+    Use the route's ``name`` as the first positional argument.  Use a
+    request object as the second positional argument.  Additional
     positional arguments are appended to the URL as path segments
     after it is generated.
     
