@@ -116,8 +116,8 @@ If You Don't Yet Have A Python Interpreter (Windows)
 
 If your Windows system doesn't have a Python interpreter, you'll need
 to install it by downloading a Python 2.4, 2.5 or 2.6-series
-interpreter executable from `<python.org
-http://python.org/download/>`_ (the files labeled "Windows
+interpreter executable from `python.org's download section
+<http://python.org/download/>`_ (the files labeled "Windows
 Installer").  Once you've downloaded it, double click on the
 executable and accept the defaults during the installation process.
 You may also need to download and install the `Python for Windows
