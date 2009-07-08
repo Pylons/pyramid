@@ -782,7 +782,7 @@ encoded in another character set within form data e.g. when
 ``request.params['somename']`` is accessed.
 
 If you are using the ``webob.Response`` class to generate a response,
-or if you use the ``render_template``* templating APIs, the UTF-8
+or if you use the ``render_template_*`` templating APIs, the UTF-8
 charset is set automatically as the default via the ``Content-Type``
 header.  If you return a ``Content-Type`` header without an explicit
 charset, a WebOb request will add a ``;charset=utf-8`` trailer to the
