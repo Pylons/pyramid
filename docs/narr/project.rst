@@ -575,7 +575,7 @@ registry`. It looks like so:
 
 Much of the heavy lifting in a :mod:`repoze.bfg` application comes in
 the form of *views*.  A :term:`view` is the bridge between the content
-in the model, and the HTML given back to the browser.
+in the model, and the response given back to a browser.
 
 .. literalinclude:: MyProject/myproject/views.py
    :linenos:
@@ -593,7 +593,7 @@ in the model, and the HTML given back to the browser.
    of the class ``MyModel`` should run this ``my_view`` function.
 
    The function is handed two pieces of information: the
-   :term:`context` and the term:`request`.  The *context* is the term
+   :term:`context` and the :term:`request`.  The *context* is the term
    :term:`model` found via :term:`traversal` (or via :term:`URL
    dispatch`).  The *request* is an instance of the :term:`WebOb`
    ``Request`` class representing the browser's request to our server.
