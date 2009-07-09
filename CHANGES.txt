@@ -1,6 +1,15 @@
 Next release
 ============
 
+- Added a workaround for a bug in Python 2.6, 2.6.1, and 2.6.2 having
+  to do with a recursion error in the mimetypes module when trying to
+  serve static files from Paste's FileApp:
+  http://bugs.python.org/issue5853.  Symptom: File
+  "/usr/lib/python2.6/mimetypes.py", line 244, in guess_type return
+  guess_type(url, strict) RuntimeError: maximum recursion depth
+  exceeded.  Thanks to Armin Ronacher for identifying the symptom and
+  pointing out a fix.
+
 - Minor edits to tutorials for accuracy based on feedback.
 
 1.0 (2009-07-05)
