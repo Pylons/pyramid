@@ -1,6 +1,10 @@
 Next release
 ============
 
+- Fixed documentation bug showing invalid test for values from the
+  ``matchdict``:  they are stored as attributes of the ``Article``, rather
+  than subitems.
+
 - Fixed documentation bug showing wrong environment key for the ``matchdict``
   produced by the matching route.
 

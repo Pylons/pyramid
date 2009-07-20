@@ -354,7 +354,7 @@ The ``.models`` module referred to above might look like so:
            self.__dict__.update(environ['bfg.routes.matchdict'])
 
        def is_root(self):
-           return self['article'] == 'root'
+           return self.article == 'root'
 
 The ``.views`` module referred to above might look like so:
 
