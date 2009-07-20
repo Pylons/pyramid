@@ -1,6 +1,9 @@
 Next release
 ============
 
+- Fixed documentation bug showing wrong environment key for the ``matchdict``
+  produced by the matching route.
+
 - Added a workaround for a bug in Python 2.6, 2.6.1, and 2.6.2 having
   to do with a recursion error in the mimetypes module when trying to
   serve static files from Paste's FileApp:

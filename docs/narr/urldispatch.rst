@@ -351,7 +351,7 @@ The ``.models`` module referred to above might look like so:
 
    class Article(object):
        def __init__(self, environ):
-           self.__dict__.update(environ['repoze.bfg.matchdict'])
+           self.__dict__.update(environ['bfg.routes.matchdict'])
 
        def is_root(self):
            return self['article'] == 'root'
