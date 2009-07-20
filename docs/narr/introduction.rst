@@ -109,11 +109,10 @@ which persistence mechanisms you should use to build an application.
 Zope applications are typically reliant on :term:`ZODB`;
 :mod:`repoze.bfg` allows you to build :term:`ZODB` applications, but
 it has no reliance on the ZODB package.  Likewise, :term:`Django`
-tends to make the assumption that you're going to want to store your
-application's data in a relational database.  :mod:`repoze.bfg` makes
-no such assumption; it allows you to use a relational database but
-doesn't encourage or discourage an application developer about such a
-decision.
+tends to assume that you want to store your application's data in a
+relational database.  :mod:`repoze.bfg` makes no such assumption; it
+allows you to use a relational database but doesn't encourage or
+discourage an application developer about such a decision.
 
 Why?
 ----
