@@ -32,6 +32,8 @@ install_requires=[
     'setuptools',
     'chameleon.core >= 1.0b32',  # non-lxml version
     'chameleon.zpt >= 1.0b16',   # newest version as of non-xml core release
+    'Paste',
+    'PasteDeploy',
     'PasteScript',
     'WebOb',
     'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
