@@ -1,6 +1,12 @@
 Next release
 ============
 
+- Added support for ``has_resource``, ``resource_isdir``, and
+  ``resource_listdir`` to the resource "OverrideProvider"; this fixes
+  a bug with a symptom that a file could not be overridden in a
+  resource directory unless a file with the same name existed in the
+  original directory being overridden.
+
 - Fixed documentation bug showing invalid test for values from the
   ``matchdict``:  they are stored as attributes of the ``Article``, rather
   than subitems.

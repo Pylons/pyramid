@@ -52,6 +52,30 @@ class TestOverrideProvider(unittest.TestCase):
         result = provider.get_resource_string(None, resource_name)
         self.assertEqual(result, expected)
 
+    def test_has_resource_no_overrides(self):
+        resource_name = 'test_resource.py'
+        import repoze.bfg.tests
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.has_resource(resource_name)
+        self.assertEqual(result, True)
+
+    def test_resource_isdir_no_overrides(self):
+        file_resource_name = 'test_resource.py'
+        directory_resource_name = 'fixtures'
+        import repoze.bfg.tests
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.resource_isdir(file_resource_name)
+        self.assertEqual(result, False)
+        result = provider.resource_isdir(directory_resource_name)
+        self.assertEqual(result, True)
+
+    def test_resource_listdir_no_overrides(self):
+        resource_name = 'fixtures'
+        import repoze.bfg.tests
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.resource_isdir(resource_name)
+        self.failUnless(result)
+
     def test_get_resource_filename_override_returns_None(self):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
@@ -88,6 +112,33 @@ class TestOverrideProvider(unittest.TestCase):
         result = provider.get_resource_filename(None, resource_name)
         self.assertEqual(result, expected)
 
+    def test_has_resource_override_returns_None(self):
+        overrides = DummyOverrides(None)
+        self._registerOverrides(overrides)
+        resource_name = 'test_resource.py'
+        import repoze.bfg.tests
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.has_resource(resource_name)
+        self.assertEqual(result, True)
+
+    def test_resource_isdir_override_returns_None(self):
+        overrides = DummyOverrides(None)
+        self._registerOverrides(overrides)
+        resource_name = 'fixtures'
+        import repoze.bfg.tests
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.resource_isdir(resource_name)
+        self.assertEqual(result, True)
+
+    def test_resource_listdir_override_returns_None(self):
+        overrides = DummyOverrides(None)
+        self._registerOverrides(overrides)
+        resource_name = 'fixtures'
+        import repoze.bfg.tests
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.resource_listdir(resource_name)
+        self.failUnless(result)
+
     def test_get_resource_filename_override_returns_value(self):
         overrides = DummyOverrides('value')
         import repoze.bfg.tests
@@ -111,6 +162,30 @@ class TestOverrideProvider(unittest.TestCase):
         provider = self._makeOne(repoze.bfg.tests)
         result = provider.get_resource_string(None, 'test_resource.py')
         self.assertEqual(result, 'value')
+
+    def test_has_resource_override_returns_True(self):
+        overrides = DummyOverrides(True)
+        import repoze.bfg.tests
+        self._registerOverrides(overrides)
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.has_resource('test_resource.py')
+        self.assertEqual(result, True)
+
+    def test_resource_isdir_override_returns_False(self):
+        overrides = DummyOverrides(False)
+        import repoze.bfg.tests
+        self._registerOverrides(overrides)
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.resource_isdir('fixtures')
+        self.assertEqual(result, False)
+
+    def test_resource_listdir_override_returns_values(self):
+        overrides = DummyOverrides(['a'])
+        import repoze.bfg.tests
+        self._registerOverrides(overrides)
+        provider = self._makeOne(repoze.bfg.tests)
+        result = provider.resource_listdir('fixtures')
+        self.assertEqual(result, ['a'])
 
 class TestPackageOverrides(unittest.TestCase):
     def _getTargetClass(self):
@@ -215,6 +290,13 @@ class TestPackageOverrides(unittest.TestCase):
         expected = open(os.path.join(here, 'test_resource.py')).read()
         self.assertEqual(po.get_string('whatever'), expected)
         
+    def test_has_resource(self):
+        overrides = [ DummyOverride(None), DummyOverride(
+            ('repoze.bfg.tests', 'test_resource.py'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.has_resource('whatever'), True)
 
 class TestDirectoryOverride(unittest.TestCase):
     def _getTargetClass(self):
@@ -269,7 +351,7 @@ class DummyOverrides:
     def get_filename(self, resource_name):
         return self.result
 
-    get_stream = get_string = get_filename
+    listdir = isdir = has_resource = get_stream = get_string = get_filename
     
 class DummyPkgResources:
     def __init__(self):

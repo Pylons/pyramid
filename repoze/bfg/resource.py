@@ -46,6 +46,33 @@ class OverrideProvider(pkg_resources.DefaultProvider):
         return pkg_resources.DefaultProvider.get_resource_string(
             self, manager, resource_name)
 
+    def has_resource(self, resource_name):
+        overrides = self._get_overrides()
+        if overrides is not None:
+            result = overrides.has_resource(resource_name)
+            if result is not None:
+                return result
+        return pkg_resources.DefaultProvider.has_resource(
+            self, resource_name)
+
+    def resource_isdir(self, resource_name):
+        overrides = self._get_overrides()
+        if overrides is not None:
+            result = overrides.isdir(resource_name)
+            if result is not None:
+                return result
+        return pkg_resources.DefaultProvider.resource_isdir(
+            self, resource_name)
+
+    def resource_listdir(self, resource_name):
+        overrides = self._get_overrides()
+        if overrides is not None:
+            result = overrides.listdir(resource_name)
+            if result is not None:
+                return result
+        return pkg_resources.DefaultProvider.resource_listdir(
+            self, resource_name)
+        
 class PackageOverrides:
     implements(IPackageOverrides)
     # pkg_resources arg in kw args below for testing
@@ -101,6 +128,22 @@ class PackageOverrides:
         for package, rname in self.search_path(resource_name):
             if pkg_resources.resource_exists(package, rname):
                 return pkg_resources.resource_string(package, rname)
+
+    def has_resource(self, resource_name):
+        for package, rname in self.search_path(resource_name):
+            if pkg_resources.resource_exists(package, rname):
+                return True
+
+    def isdir(self, resource_name):
+        for package, rname in self.search_path(resource_name):
+            if pkg_resources.resource_exists(package, rname):
+                return pkg_resources.resource_isdir(package, rname)
+
+    def listdir(self, resource_name):
+        for package, rname in self.search_path(resource_name):
+            if pkg_resources.resource_exists(package, rname):
+                return pkg_resources.resource_listdir(package, rname)
+    
 
 class DirectoryOverride:
     def __init__(self, path, package, prefix):
