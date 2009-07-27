@@ -402,63 +402,6 @@ Built-In Authentication Policy Directives
 :mod:`repoze.who` ships with a few "pre-chewed" authentication policy
 implementations that you can make use of within your application.
 
-``repozewho1authenticationpolicy``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When this directive is used, authentication information is obtained
-from a ``repoze.who.identity`` key in the WSGI environment, assumed to
-be set by :term:`repoze.who` middleware.
-
-An example of its usage, with all attributes fully expanded:
-
-.. code-block:: xml
-   :linenos:
-
-   <repozewho1authenticationpolicy
-    identifier_name="auth_tkt"
-    callback=".somemodule.somefunc"
-    />
-
-The ``identifier_name`` controls the name used to look up the
-:term:`repoze.who` "identifier" plugin within
-``environ['repoze.who.plugins']`` which is used by this policy to
-"remember" and "forget" credentials.  It defaults to ``auth_tkt``.
-
-The ``callback`` is a Python dotted name to a function passed the
-repoze.who identity and the request as positional arguments.  The
-callback is expected to return None if the user represented by the
-identity doesn't exist or a sequence of group identifiers (possibly
-empty) if the user does exist.  If ``callback`` is None, the userid
-will be assumed to exist with no groups.   It defaults to ``None``.
-
-``remoteuserauthenticationpolicy``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When this directive is used, authentication information is obtained
-from a ``REMOTE_USER`` key in the WSGI environment, assumed to
-be set by a WSGI server or an upstream middleware component.
-
-An example of its usage, with all attributes fully expanded:
-
-.. code-block:: xml
-   :linenos:
-
-   <remoteuserauthenticationpolicy
-    environ_key="REMOTE_USER"
-    callback=".somemodule.somefunc"
-    />
-
-The ``environ_key`` is the name that will be used to obtain the remote
-user value from the WSGI environment.  It defaults to ``REMOTE_USER``.
-
-The ``callback`` is a Python dotted name to a function passed the
-string representing the remote user and the request as positional
-arguments.  The callback is expected to return None if the user
-represented by the string doesn't exist or a sequence of group
-identifiers (possibly empty) if the user does exist.  If ``callback``
-is None, the userid will be assumed to exist with no groups.  It
-defaults to ``None``.
-
 ``authtktauthenticationpolicy``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -516,6 +459,64 @@ specified, when we encounter a cookie that is older than the reissue
 time (in seconds), but younger that the ``timeout``, a new cookie will
 be issued.  It defaults to ``None``, meaning that authentication
 cookies are never reissued.
+
+``remoteuserauthenticationpolicy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When this directive is used, authentication information is obtained
+from a ``REMOTE_USER`` key in the WSGI environment, assumed to
+be set by a WSGI server or an upstream middleware component.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <remoteuserauthenticationpolicy
+    environ_key="REMOTE_USER"
+    callback=".somemodule.somefunc"
+    />
+
+The ``environ_key`` is the name that will be used to obtain the remote
+user value from the WSGI environment.  It defaults to ``REMOTE_USER``.
+
+The ``callback`` is a Python dotted name to a function passed the
+string representing the remote user and the request as positional
+arguments.  The callback is expected to return None if the user
+represented by the string doesn't exist or a sequence of group
+identifiers (possibly empty) if the user does exist.  If ``callback``
+is None, the userid will be assumed to exist with no groups.  It
+defaults to ``None``.
+
+``repozewho1authenticationpolicy``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When this directive is used, authentication information is obtained
+from a ``repoze.who.identity`` key in the WSGI environment, assumed to
+be set by :term:`repoze.who` middleware.
+
+An example of its usage, with all attributes fully expanded:
+
+.. code-block:: xml
+   :linenos:
+
+   <repozewho1authenticationpolicy
+    identifier_name="auth_tkt"
+    callback=".somemodule.somefunc"
+    />
+
+The ``identifier_name`` controls the name used to look up the
+:term:`repoze.who` "identifier" plugin within
+``environ['repoze.who.plugins']`` which is used by this policy to
+"remember" and "forget" credentials.  It defaults to ``auth_tkt``.
+
+The ``callback`` is a Python dotted name to a function passed the
+repoze.who identity and the request as positional arguments.  The
+callback is expected to return None if the user represented by the
+identity doesn't exist or a sequence of group identifiers (possibly
+empty) if the user does exist.  If ``callback`` is None, the userid
+will be assumed to exist with no groups.   It defaults to ``None``.
+
 
 .. _authorization_policies_directives_section:
 
