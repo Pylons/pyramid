@@ -1,7 +1,8 @@
 Next release
 ============
 
-- ...
+- Fixed documentation bugs related to forget and remember in security API
+  docs.
 
 1.0.1 (2009-07-22)
 ==================

@@ -112,8 +112,8 @@ def remember(request, principal, **kw):
     an WebOb-style response object computed previously by the view
     code)::
 
-      from repoze.bfg.security import forget
-      headers = remember(context, request, 'chrism', password='123')
+      from repoze.bfg.security import remember
+      headers = remember(request, 'chrism', password='123', max_age='86400')
       response.headerlist.extend(headers)
       return response
 
@@ -136,7 +136,7 @@ def forget(request):
     computed previously by the view code)::
 
       from repoze.bfg.security import forget
-      headers = forget(context, request)
+      headers = forget(request)
       response.headerlist.extend(headers)
       return response
 
