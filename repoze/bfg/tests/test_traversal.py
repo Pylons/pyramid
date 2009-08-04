@@ -327,7 +327,7 @@ class FindInterfaceTests(unittest.TestCase):
         from repoze.bfg.traversal import find_interface
         return find_interface(context, iface)
 
-    def test_it(self):
+    def test_it_interface(self):
         baz = DummyContext()
         bar = DummyContext(baz)
         foo = DummyContext(bar)
@@ -347,6 +347,26 @@ class FindInterfaceTests(unittest.TestCase):
             pass
         directlyProvides(root, IFoo)
         result = self._callFUT(baz, IFoo)
+        self.assertEqual(result.__name__, 'root')
+
+    def test_it_class(self):
+        class DummyRoot(object):
+            def __init__(self, child):
+                self.child = child
+        baz = DummyContext()
+        bar = DummyContext(baz)
+        foo = DummyContext(bar)
+        root = DummyRoot(foo)
+        root.__parent__ = None
+        root.__name__ = 'root'
+        foo.__parent__ = root
+        foo.__name__ = 'foo'
+        bar.__parent__ = foo
+        bar.__name__ = 'bar'
+        baz.__parent__ = bar
+        baz.__name__ = 'baz'
+        request = DummyRequest()
+        result = self._callFUT(baz, DummyRoot)
         self.assertEqual(result.__name__, 'root')
 
 class FindRootTests(unittest.TestCase):

@@ -1,6 +1,13 @@
 Next release
 ============
 
+- Allow ``repoze.bfg.traversal.find_interface`` API to use a class
+  object as the argument to compare against the ``model`` passed in.
+  This means you can now do ``find_interface(model, SomeClass)`` and
+  the first object which is found in the lineage which has
+  ``SomeClass`` as its class (or the first object found which has
+  ``SomeClass`` as any of its superclasses) will be returned.
+
 - Fixed documentation bugs related to forget and remember in security API
   docs.
 

@@ -5,6 +5,7 @@ from zope.component import getMultiAdapter
 
 from zope.interface import classProvides
 from zope.interface import implements
+from zope.interface.interfaces import IInterface
 
 from repoze.lru import lru_cache
 
@@ -77,15 +78,22 @@ def find_model(model, path):
         raise KeyError('%r has no subelement %s' % (context, view_name))
     return context
 
-def find_interface(model, interface):
+def find_interface(model, class_or_interface):
     """
     Return the first object found in the parent chain of ``model``
-    which provides the interface ``interface``.  Return ``None`` if no
-    object providing ``interface`` can be found in the parent chain.
-    The ``model`` passed in *must* be :term:`location`-aware.
+    which, a) if ``interface_or_class`` is a Python class object, is
+    an instance of the class or any subclass of that class or b) if
+    ``interface_or_class`` is a Zope interface, provides the specified
+    interface.  Return ``None`` if no object providing
+    ``interface_or_class`` can be found in the parent chain.  The
+    ``model`` passed in *must* be :term:`location`-aware.
     """
+    if IInterface.providedBy(class_or_interface):
+        test = class_or_interface.providedBy
+    else:
+        test = lambda arg: isinstance(arg, class_or_interface)
     for location in lineage(model):
-        if interface.providedBy(location):
+        if test(location):
             return location
 
 def model_path(model, *elements):
