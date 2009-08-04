@@ -81,9 +81,9 @@ def find_model(model, path):
 def find_interface(model, class_or_interface):
     """
     Return the first object found in the parent chain of ``model``
-    which, a) if ``interface_or_class`` is a Python class object, is
+    which, a) if ``class_or_interface`` is a Python class object, is
     an instance of the class or any subclass of that class or b) if
-    ``interface_or_class`` is a Zope interface, provides the specified
+    ``class_or_interface`` is a Zope interface, provides the specified
     interface.  Return ``None`` if no object providing
     ``interface_or_class`` can be found in the parent chain.  The
     ``model`` passed in *must* be :term:`location`-aware.
