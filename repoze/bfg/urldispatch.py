@@ -8,10 +8,10 @@ from repoze.bfg.traversal import quote_path_segment
 _marker = object()
 
 class Route(object):
-    def __init__(self, name, matcher, generator, factory):
+    def __init__(self, path, name=None, factory=None):
+        self.path = path
+        self.matcher, self.generator = _compile_route(path)
         self.name = name
-        self.matcher = matcher
-        self.generator = generator
         self.factory = factory
 
     def match(self, path):
@@ -29,9 +29,8 @@ class RoutesRootFactory(object):
     def has_routes(self):
         return bool(self.routelist)
 
-    def connect(self, name, path, factory=None):
-        matcher, generator = _compile_route(path)
-        route = Route(name, matcher, generator, factory)
+    def connect(self, path, name, factory=None):
+        route = Route(path, name, factory)
         self.routelist.append(route)
         self.routes[name] = route
         return route

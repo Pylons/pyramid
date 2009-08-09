@@ -1,6 +1,10 @@
 Next release
 ============
 
+- Change urldispatch internals: Route object is now constructed using
+  a path, a name, and a factory instead of a name, a matcher, a
+  generator, and a factory.
+
 - Allow ``repoze.bfg.traversal.find_interface`` API to use a class
   object as the argument to compare against the ``model`` passed in.
   This means you can now do ``find_interface(model, SomeClass)`` and

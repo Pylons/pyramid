@@ -331,12 +331,12 @@ def route(_context, name, path, view=None, view_for=None, permission=None,
     _context.action(
         discriminator = ('route', name, view_for, request_type),
         callable = connect_route,
-        args = (name, path, factory),
+        args = (path, name, factory),
         )
 
-def connect_route(name, path, factory):
+def connect_route(path, name, factory):
     mapper = getUtility(IRoutesMapper)
-    mapper.connect(name, path, factory)
+    mapper.connect(path, name, factory)
 
 class IViewDirective(Interface):
     for_ = GlobalObject(

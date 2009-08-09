@@ -874,9 +874,9 @@ class TestConnectRouteFunction(unittest.TestCase):
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, name, path, factory):
+    def _callFUT(self, path, name, factory):
         from repoze.bfg.zcml import connect_route
-        return connect_route(name, path, factory)
+        return connect_route(path, name, factory)
 
     def _registerRoutesMapper(self):
         from zope.component import getGlobalSiteManager
@@ -888,8 +888,8 @@ class TestConnectRouteFunction(unittest.TestCase):
 
     def test_defaults(self):
         mapper = self._registerRoutesMapper()
-        self._callFUT('name', 'path', 'factory')
-        self.assertEqual(mapper.connections, [('name', 'path', 'factory')])
+        self._callFUT('path', 'name', 'factory')
+        self.assertEqual(mapper.connections, [('path', 'name', 'factory')])
 
 class TestRouteDirective(unittest.TestCase):
     def setUp(self):
@@ -950,7 +950,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_discriminator[1], 'name')
         self.assertEqual(route_discriminator[2], None)
         self.assertEqual(route_discriminator[3], None)
-        self.assertEqual(route_args, ('name', 'path', None))
+        self.assertEqual(route_args, ('path', 'name', None))
 
     def test_with_view_and_view_for(self):
         from zope.component import getUtility
@@ -993,7 +993,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_discriminator[1], 'name')
         self.assertEqual(route_discriminator[2], IDummy)
         self.assertEqual(route_discriminator[3], None)
-        self.assertEqual(route_args, ('name', 'path', None,))
+        self.assertEqual(route_args, ('path', 'name', None,))
 
     def test_without_view(self):
         from repoze.bfg.zcml import connect_route
@@ -1014,7 +1014,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_discriminator[1], 'name')
         self.assertEqual(route_discriminator[2], None)
         self.assertEqual(route_discriminator[3], None)
-        self.assertEqual(route_args, ('name','path', None))
+        self.assertEqual(route_args, ('path', 'name', None))
 
     def test_with_request_type(self):
         from repoze.bfg.zcml import connect_route
@@ -1035,7 +1035,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_discriminator[1], 'name')
         self.assertEqual(route_discriminator[2], None)
         self.assertEqual(route_discriminator[3], 'GET')
-        self.assertEqual(route_args, ('name','path', None))
+        self.assertEqual(route_args, ('path', 'name', None))
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):

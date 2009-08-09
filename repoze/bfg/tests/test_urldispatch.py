@@ -10,22 +10,33 @@ class TestRoute(unittest.TestCase):
         return self._getTargetClass()(*arg)
 
     def test_ctor(self):
-        route = self._makeOne('name', 'matcher', 'generator', 'factory')
+        route = self._makeOne(':path', 'name', 'factory')
+        self.assertEqual(route.path, ':path')
         self.assertEqual(route.name, 'name')
-        self.assertEqual(route.matcher, 'matcher')
-        self.assertEqual(route.generator, 'generator')
         self.assertEqual(route.factory, 'factory')
+        self.failUnless(route.generator)
+        self.failUnless(route.matcher)
+
+    def test_ctor_defaults(self):
+        route = self._makeOne(':path')
+        self.assertEqual(route.path, ':path')
+        self.assertEqual(route.name, None)
+        self.assertEqual(route.factory, None)
+        self.failUnless(route.generator)
+        self.failUnless(route.matcher)
 
     def test_match(self):
         def matcher(path):
             return 123
-        route = self._makeOne('name', matcher, 'generator', 'factory')
+        route = self._makeOne(':path')
+        route.matcher = matcher
         self.assertEqual(route.match('whatever'), 123)
         
     def test_generate(self):
         def generator(path):
             return 123
-        route = self._makeOne('name', 'matcher', generator, 'factory')
+        route = self._makeOne(':path')
+        route.generator = generator
         self.assertEqual(route.generate({}), 123)
 
 class RoutesRootFactoryTests(unittest.TestCase):
@@ -63,7 +74,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
     def test_route_matches(self):
         get_root = DummyRootFactory(123)
         mapper = self._makeOne(get_root)
-        mapper.connect('foo', 'archives/:action/:article')
+        mapper.connect('archives/:action/:article', 'foo')
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
         self.assertEqual(result, 123)
@@ -76,7 +87,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
     def test_root_route_matches(self):
         root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)
-        mapper.connect('root', '')
+        mapper.connect('', 'root')
         environ = self._getEnviron(PATH_INFO='/')
         result = mapper(environ)
         self.assertEqual(result, 123)
@@ -87,7 +98,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
     def test_root_route_matches2(self):
         root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)
-        mapper.connect('root', '/')
+        mapper.connect('/', 'root')
         environ = self._getEnviron(PATH_INFO='/')
         result = mapper(environ)
         self.assertEqual(result, 123)
@@ -98,7 +109,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
     def test_fallback_to_default_root_factory(self):
         root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)
-        mapper.connect('wont', 'wont/:be/:found')
+        mapper.connect('wont/:be/:found', 'wont')
         environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
         result = mapper(environ)
         self.assertEqual(result, 123)
