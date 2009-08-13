@@ -1,6 +1,9 @@
 Next release
 ============
 
+- Request-only-convention examples in the "Views" narrative
+  documentation were broken.
+
 - Change urldispatch internals: Route object is now constructed using
   a path, a name, and a factory instead of a name, a matcher, a
   generator, and a factory.

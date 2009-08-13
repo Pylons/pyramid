@@ -91,27 +91,27 @@ following types work as views in this style:
 
       from webob import Response
 
-      def aview(request):
+      def view(request):
           return Response('OK')
 
-#. New and old-style classes that have an ``__init__`` method that
-   accepts ``self, request``, e.g.::
+#. New-style and old-style classes that have an ``__init__`` method
+   that accepts ``self, request``, e.g.::
 
       from webob import Response
 
-      def View(object):
+      class view(object):
           __init__(self, request):
-          return Response('OK')
+              return Response('OK')
 
 #. Arbitrary callables that have a ``__call__`` method that accepts
    ``self, request``, e.g.::
 
       from webob import Response
 
-      def AView(object):
+      class View(object):
           def __call__(self, request):
               return Response('OK')
-      view = AView()
+      view = View() # this is the view callable
 
 This style of calling convention is useful for :term:`url dispatch`
 based applications, where the context is seldom used within the view
