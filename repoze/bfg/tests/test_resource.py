@@ -298,6 +298,30 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides= overrides
         self.assertEqual(po.has_resource('whatever'), True)
 
+    def test_isdir_false(self):
+        overrides = [ DummyOverride(
+            ('repoze.bfg.tests', 'test_resource.py'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.isdir('whatever'), False)
+        
+    def test_isdir_true(self):
+        overrides = [ DummyOverride(
+            ('repoze.bfg.tests', 'fixtures'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.assertEqual(po.isdir('whatever'), True)
+
+    def test_listdir(self):
+        overrides = [ DummyOverride(
+            ('repoze.bfg.tests', 'fixtures'))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides= overrides
+        self.failUnless(po.listdir('whatever'))
+
 class TestDirectoryOverride(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.resource import DirectoryOverride
