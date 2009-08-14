@@ -1,18 +1,16 @@
 import os
 import inspect
-
 import mimetypes
 
-try:
-    # See http://bugs.python.org/issue5853 which is a recursion bug
-    # that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
-    # has been applied on the Python 2 trunk).  This workaround should
-    # really be in Paste if anywhere, but it's easiest to just do it
-    # here and get it over with to avoid needing to deal with any
-    # fallout.
+# See http://bugs.python.org/issue5853 which is a recursion bug
+# that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
+# has been applied on the Python 2 trunk).  This workaround should
+# really be in Paste if anywhere, but it's easiest to just do it
+# here and get it over with to avoid needing to deal with any
+# fallout.
+
+if hasattr(mimetypes, 'init'):
     mimetypes.init()
-except AttributeError:
-    pass
 
 from paste.urlparser import StaticURLParser
 
