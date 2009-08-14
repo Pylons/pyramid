@@ -1,6 +1,10 @@
 Next release
 ============
 
+- Move (non-API) default_view, default_forbidden_view, and
+  default_notfound_view functions into the ``repoze.bfg.view`` module
+  (moved from ``repoze.bfg.router``).
+
 - Request-only-convention examples in the "Views" narrative
   documentation were broken.
 

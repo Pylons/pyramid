@@ -1,3 +1,4 @@
+import cgi
 import os
 import inspect
 import mimetypes
@@ -12,12 +13,16 @@ import mimetypes
 if hasattr(mimetypes, 'init'):
     mimetypes.init()
 
+from webob import Response
+
 from paste.urlparser import StaticURLParser
 
 from zope.component import queryMultiAdapter
+from zope.component import queryUtility
 from zope.deprecation import deprecated
 
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.path import caller_path
 from repoze.bfg.path import caller_package
 from repoze.bfg.security import view_execution_permitted
@@ -302,4 +307,31 @@ class bfg_view(object):
         _bfg_view.__request_type__ = self.request_type
         _bfg_view.__route_name__ = self.route_name
         return _bfg_view
+
+def default_view(context, request, status):
+    try:
+        msg = cgi.escape(request.environ['repoze.bfg.message'])
+    except KeyError:
+        msg = ''
+    html = """
+    <html>
+    <title>%s</title>
+    <body>
+    <h1>%s</h1>
+    <code>%s</code>
+    </body>
+    </html>
+    """ % (status, status, msg)
+    headers = [('Content-Length', str(len(html))),
+               ('Content-Type', 'text/html')]
+    response_factory = queryUtility(IResponseFactory, default=Response)
+    return response_factory(status = status,
+                            headerlist = headers,
+                            app_iter = [html])
+
+def default_forbidden_view(context, request):
+    return default_view(context, request, '401 Unauthorized')
+
+def default_notfound_view(context, request):
+    return default_view(context, request, '404 Not Found')
 

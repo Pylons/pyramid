@@ -1,11 +1,8 @@
-import cgi
 import os
 import sys
-from webob import Response
 
 from zope.interface import providedBy
 from zope.component.event import dispatch
-from zope.component import queryUtility
 
 from zope.interface import implements
 
@@ -16,7 +13,6 @@ from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 
 from repoze.bfg.interfaces import ILogger
-from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
@@ -46,6 +42,9 @@ from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import _traverse
 
 from repoze.bfg.urldispatch import RoutesRootFactory
+
+from repoze.bfg.view import default_forbidden_view
+from repoze.bfg.view import default_notfound_view
 
 _marker = object()
 
@@ -181,33 +180,6 @@ class Router(object):
 
         finally:
             self.threadlocal_manager.pop()
-
-def default_view(context, request, status):
-    try:
-        msg = cgi.escape(request.environ['repoze.bfg.message'])
-    except KeyError:
-        msg = ''
-    html = """
-    <html>
-    <title>%s</title>
-    <body>
-    <h1>%s</h1>
-    <code>%s</code>
-    </body>
-    </html>
-    """ % (status, status, msg)
-    headers = [('Content-Length', str(len(html))),
-               ('Content-Type', 'text/html')]
-    response_factory = queryUtility(IResponseFactory, default=Response)
-    return response_factory(status = status,
-                            headerlist = headers,
-                            app_iter = [html])
-
-def default_forbidden_view(context, request):
-    return default_view(context, request, '401 Unauthorized')
-
-def default_notfound_view(context, request):
-    return default_view(context, request, '404 Not Found')
 
 def make_app(root_factory, package=None, filename='configure.zcml',
              authentication_policy=None, authorization_policy=None,

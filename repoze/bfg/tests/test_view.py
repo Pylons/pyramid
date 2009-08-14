@@ -452,10 +452,54 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.assertEqual(result.context, None)
         self.assertEqual(result.request, None)
 
+class TestDefaultForbiddenView(unittest.TestCase):
+    def _callFUT(self, context, request):
+        from repoze.bfg.view import default_forbidden_view
+        return default_forbidden_view(context, request)
+
+    def test_nomessage(self):
+        request = DummyRequest({})
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '401 Unauthorized')
+        self.failUnless('<code></code>' in response.body)
+
+    def test_withmessage(self):
+        request = DummyRequest({'repoze.bfg.message':'abc&123'})
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '401 Unauthorized')
+        self.failUnless('<code>abc&amp;123</code>' in response.body)
+
+class TestDefaultNotFoundView(unittest.TestCase):
+    def _callFUT(self, context, request):
+        from repoze.bfg.view import default_notfound_view
+        return default_notfound_view(context, request)
+
+    def test_nomessage(self):
+        request = DummyRequest({})
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+        self.failUnless('<code></code>' in response.body)
+
+    def test_withmessage(self):
+        request = DummyRequest({'repoze.bfg.message':'abc&123'})
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+        self.failUnless('<code>abc&amp;123</code>' in response.body)
+
+
 class DummyContext:
     pass
 
 class DummyRequest:
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
+        self.environ = environ
+        
     def get_response(self, application):
         return application
 

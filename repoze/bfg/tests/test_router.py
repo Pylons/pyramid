@@ -140,7 +140,7 @@ class RouterTests(unittest.TestCase):
     def test_iforbiddenview_nooverride(self):
         context = DummyContext()
         router = self._makeOne()
-        from repoze.bfg.router import default_forbidden_view
+        from repoze.bfg.view import default_forbidden_view
         self.assertEqual(router.forbidden_view, default_forbidden_view)
 
     def test_inotfoundview_override(self):
@@ -154,7 +154,7 @@ class RouterTests(unittest.TestCase):
     def test_inotfoundview_nooverride(self):
         context = DummyContext()
         router = self._makeOne()
-        from repoze.bfg.router import default_notfound_view
+        from repoze.bfg.view import default_notfound_view
         self.assertEqual(router.notfound_view, default_notfound_view)
 
     def test_call_no_view_registered_no_isettings(self):
@@ -884,23 +884,6 @@ class MakeAppTests(unittest.TestCase):
         self.assertEqual(app.registry.getUtility(IAuthorizationPolicy),
                          authzpolicy)
         self.assertEqual(len(logger.messages), 1) # deprecation warning
-
-class TestDefaultForbiddenView(unittest.TestCase):
-    def _callFUT(self, context, request):
-        from repoze.bfg.router import default_forbidden_view
-        return default_forbidden_view(context, request)
-
-    def test_nomessage(self):
-        request = DummyRequest({})
-        context = DummyContext()
-        response = self._callFUT(context, request)
-        self.failUnless('<code></code>' in response.body)
-
-    def test_withmessage(self):
-        request = DummyRequest({'repoze.bfg.message':'abc&123'})
-        context = DummyContext()
-        response = self._callFUT(context, request)
-        self.failUnless('<code>abc&amp;123</code>' in response.body)
 
 class TestDefaultRootFactory(unittest.TestCase):
     def _getTargetClass(self):
