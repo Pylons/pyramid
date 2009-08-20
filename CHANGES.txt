@@ -1,6 +1,9 @@
 Next release
 ============
 
+- "tests" module removed from the bfg_alchemy paster template; these
+  tests didn't work.
+
 - Move (non-API) default_view, default_forbidden_view, and
   default_notfound_view functions into the ``repoze.bfg.view`` module
   (moved from ``repoze.bfg.router``).
