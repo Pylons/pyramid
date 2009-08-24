@@ -46,6 +46,7 @@ from repoze.bfg.security import ViewPermissionFactory
 
 from repoze.bfg.secpols import registerBBBAuthn
 
+from repoze.bfg.view import static as static_view
 
 import martian
 
@@ -337,6 +338,39 @@ def route(_context, name, path, view=None, view_for=None, permission=None,
 def connect_route(path, name, factory):
     mapper = getUtility(IRoutesMapper)
     mapper.connect(path, name, factory)
+
+class IStaticDirective(Interface):
+    name = TextLine(
+        title=u"The URL prefix of the static view",
+        description=u"""
+        The directory will be served up for the route that starts with
+        this prefix.""",
+        required=True)
+
+    path = TextLine(
+        title=u'Path to the directory which contains resources',
+        description=u'May be package-relative by using a colon to '
+        'seperate package name and path relative to the package directory.',
+        required=True)
+
+    cache_max_age = Int(
+        title=u"Cache maximum age",
+        required=False,
+        default=None)
+
+def static(_context, name, path, cache_max_age=3600):
+    """ Handle ``static`` ZCML directives
+    """
+
+    if ':' in path:
+        package_name, path = path.split(':')
+    else:
+        package_name = _context.resolve('.').__name__
+
+    view = static_view(
+        path, cache_max_age=cache_max_age, package_name=package_name)
+
+    route(_context, name, "%s*subpath" % name, view=view)
 
 class IViewDirective(Interface):
     for_ = GlobalObject(

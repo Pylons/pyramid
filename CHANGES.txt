@@ -1,6 +1,9 @@
 Next release
 ============
 
+- Added ``static`` ZCML directive which registers a route for a static
+  view that serves up files in a directory.
+
 - "tests" module removed from the bfg_alchemy paster template; these
   tests didn't work.
 

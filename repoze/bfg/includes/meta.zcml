@@ -41,6 +41,12 @@
         />
 
     <meta:directive
+        name="static"
+        schema="repoze.bfg.zcml.IStaticDirective"
+        handler="repoze.bfg.zcml.static"
+        />
+
+    <meta:directive
         name="repozewho1authenticationpolicy"
         schema="repoze.bfg.zcml.IRepozeWho1AuthenticationPolicyDirective"
         handler="repoze.bfg.zcml.repozewho1authenticationpolicy"

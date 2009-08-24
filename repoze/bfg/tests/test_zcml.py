@@ -1037,6 +1037,76 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_discriminator[3], 'GET')
         self.assertEqual(route_args, ('path', 'name', None))
 
+class TestStaticDirective(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+        import os
+        here = os.path.dirname(__file__)
+        self.static_path = os.path.join(here, 'fixtures', 'static')
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import static
+        return static(*arg, **kw)
+
+    def test_absolute(self):
+        from repoze.bfg.zcml import handler
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        context = DummyContext()
+        self._callFUT(context, 'name', self.static_path)
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        route_action = actions[0]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, handler)
+        self.assertEqual(route_discriminator[:3], (
+            'view', None, ''))
+        self.assertEqual(route_discriminator[4], IView)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(route_discriminator, (
+            'route', 'name', None, None))
+        self.assertEqual(route_args, (
+            'name*subpath', 'name', None))
+
+    def test_package_relative(self):
+        from repoze.bfg.zcml import handler
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        context = DummyContext()
+        self._callFUT(context, 'name', 'repoze.bfg.tests:fixtures/static')
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        route_action = actions[0]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, handler)
+        self.assertEqual(route_discriminator[:3], (
+            'view', None, ''))
+        self.assertEqual(route_discriminator[4], IView)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(route_discriminator, (
+            'route', 'name', None, None))
+        self.assertEqual(route_args, (
+            'name*subpath', 'name', None))
+
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):
         cleanUp()

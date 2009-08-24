@@ -565,10 +565,8 @@ registry`. It looks like so:
    ``.views.my_view`` could be replaced with
    ``myproject.views.my_view``.
 
-#. Lines 11-15 register a view named ``static``.  This view
-   declaration points at the ``static_view``, which is a view
-   implementation that serves static files from the filesystem for the
-   default application.
+#. Lines 11-14 register a static view, which will register a view
+   which serves up the files from the static directory in the package.
 
 ``views.py``
 ~~~~~~~~~~~~
@@ -582,13 +580,7 @@ in the model, and the response given back to a browser.
 
 #. Lines 1-2 import required functions.
 
-#. Line 4 sets up a ``static_view`` which will be consulted when
-   visitors visit ``/static/<something>``.  This view will serve up
-   CSS and images in our default application.  This view is registered
-   in ``configure.zcml`` as the ``static`` view name for the class
-   ``MyModel`` (the root).
-
-#. Lines 6-9 provide the ``my_view`` that was registered as the view.
+#. Lines 3-6 provide the ``my_view`` that was registered as the view.
    ``configure.zcml`` said that the default URL for instances that are
    of the class ``MyModel`` should run this ``my_view`` function.
 
@@ -621,11 +613,6 @@ in the model, and the response given back to a browser.
   ``get_template`` API in the same module, which you can use to
   retrieve the template object without rendering it at all, for
   additional control.
-
-.. note::
-
-   For more information about the ``static`` view helper function see
-   :ref:`static_resources_section`.
 
 .. _modelspy_project_section:
 

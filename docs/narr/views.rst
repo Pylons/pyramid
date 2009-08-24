@@ -630,18 +630,66 @@ includes other response types for Unauthorized, etc.
 
 .. _static_resources_section:
 
+Serving Static Resources Using a ZCML directive
+-----------------------------------------------
+
+Using the ``static`` ZCML directive is the preferred way to serve
+static resources (like JavaScript and CSS files) within
+:mod:`repoze.bfg`. This directive makes static files available at a
+name relative to the application root URL, e.g. ``/static``.
+
+You can either use a package-relative path to a directory or a path
+relative to the ZCML file (or an absolute path).
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="static"
+      path="some_package:static"
+      />
+
+   <static
+      name="static"
+      path="static"
+      />
+
+   <static
+      name="static"
+      path="/var/www/static"
+      />
+
+Now put your static files (JS, etc) on your filesystem in the
+directory represented as ``/path/to/static/dir``.  After this is done,
+you should be able to view the static files in this directory via a
+browser at URLs prefixed with ``/static/``, for instance
+``/static/foo.js`` will return the file
+``/path/to/static/dir/foo.js``.  The static directory may contain
+subdirectories recursively, and any subdirectories may hold files;
+these will be resolved by the static view as you would expect.
+
+.. note:: To ensure that model objects contained in the root don't
+   "shadow" your static view (model objects take precedence during
+   traversal), or to ensure that your root object's ``__getitem__`` is
+   never called when a static resource is requested, you can refer to
+   your static resources as registered above in URLs as,
+   e.g. ``/@@static/foo.js``.  This is completely equivalent to
+   ``/static/foo.js``.  See :ref:`traversal_chapter` for information
+   about "goggles" (``@@``).
+
 Serving Static Resources Using a View
 -------------------------------------
 
-Using the :mod:`repoze.bfg.view` ``static`` helper class is the
-preferred way to serve static resources (like JavaScript and CSS
-files) within :mod:`repoze.bfg`.  This class creates a callable that
-is capable acting as a :mod:`repoze.bfg` view which serves static
-resources from a directory.  For instance, to serve files within a
-directory located on your filesystem at ``/path/to/static/dir``
-mounted at the URL path ``/static`` in your application, create an
-instance of :mod:`repoze.bfg.view` 's ``static`` class inside a
-``static.py`` file in your application root as below.
+For more flexibility, static resources can be served by a view which
+you register manually. The :mod:`repoze.bfg.view` ``static`` helper
+class is the preferred way to go about this. This class creates a
+callable that is capable acting as a :mod:`repoze.bfg` view which
+serves static resources from a directory.  For instance, to serve
+files within a directory located on your filesystem at
+``/path/to/static/dir`` mounted at the URL path ``/static`` in your
+application, create an instance of :mod:`repoze.bfg.view` 's
+``static`` class inside a ``static.py`` file in your application root
+as below.
 
 .. code-block:: python
    :linenos:
@@ -670,24 +718,6 @@ In this case, ``.models.Root`` refers to the class of which your
    This will also allow ``/static/foo.js`` to work, but it will allow
    for ``/anything/static/foo.js`` too, as long as ``anything`` itself
    is resolveable.
-
-Now put your static files (JS, etc) on your filesystem in the
-directory represented as ``/path/to/static/dir``.  After this is done,
-you should be able to view the static files in this directory via a
-browser at URLs prefixed with ``/static/``, for instance
-``/static/foo.js`` will return the file
-``/path/to/static/dir/foo.js``.  The static directory may contain
-subdirectories recursively, and any subdirectories may hold files;
-these will be resolved by the static view as you would expect.
-
-.. note:: To ensure that model objects contained in the root don't
-   "shadow" your static view (model objects take precedence during
-   traversal), or to ensure that your root object's ``__getitem__`` is
-   never called when a static resource is requested, you can refer to
-   your static resources as registered above in URLs as,
-   e.g. ``/@@static/foo.js``.  This is completely equivalent to
-   ``/static/foo.js``.  See :ref:`traversal_chapter` for information
-   about "goggles" (``@@``).
 
 Using Views to Handle Form Submissions (Unicode and Character Set Issues)
 -------------------------------------------------------------------------
