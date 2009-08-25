@@ -351,7 +351,23 @@ class TestStaticView(unittest.TestCase, BaseTest):
     def test_relpath_withpackage(self):
         import os
         path = 'fixtures'
-        view = self._makeOne(path, package_name='another')
+        view = self._makeOne('another:fixtures')
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertEqual(request.copied, True)
+        here = os.path.abspath(os.path.dirname(__file__))
+        self.assertEqual(response.root_resource, 'fixtures')
+        self.assertEqual(response.resource_name, 'fixtures')
+        self.assertEqual(response.package_name, 'another')
+        self.assertEqual(response.cache_max_age, 3600)
+
+    def test_relpath_withpackage_name(self):
+        import os
+        path = 'fixtures'
+        view = self._makeOne('fixtures', package_name='another')
         context = DummyContext()
         request = DummyRequest()
         request.subpath = ['__init__.py']

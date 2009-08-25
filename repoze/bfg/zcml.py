@@ -354,7 +354,7 @@ class IStaticDirective(Interface):
         required=True)
 
     cache_max_age = Int(
-        title=u"Cache maximum age",
+        title=u"Cache maximum age in seconds",
         required=False,
         default=None)
 

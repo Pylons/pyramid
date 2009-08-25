@@ -630,72 +630,115 @@ includes other response types for Unauthorized, etc.
 
 .. _static_resources_section:
 
-Serving Static Resources Using a ZCML directive
+Serving Static Resources Using a ZCML Directive
 -----------------------------------------------
 
 Using the ``static`` ZCML directive is the preferred way to serve
-static resources (like JavaScript and CSS files) within
-:mod:`repoze.bfg`. This directive makes static files available at a
-name relative to the application root URL, e.g. ``/static``.
+static resources (such as JavaScript and CSS files) within a
+:mod:`repoze.bfg` application. This directive makes static files
+available at a name relative to the application root URL,
+e.g. ``/static``.
 
-You can either use a package-relative path to a directory or a path
-relative to the ZCML file (or an absolute path).
+The directive can accept three attributes:
+
+name
+
+  The (application-root-relative) URL prefix of the static directory.
+  For example, to serve static files from ``/static`` in most
+  applications, you would provide a ``name`` of ``static``.
+
+path
+
+  A path to a directory on disk where the static files live.  This
+  path may either be 1) absolute (e.g. ``/foo/bar/baz``) 2)
+  Python-package-relative (e.g. (``packagename:foo/bar/baz``) or 3)
+  relative to the package directory in which the ZCML file which
+  contains the directive (e.g. ``foo/bar/baz``).
+
+cache_max_age
+
+  The number of seconds that the static resource can be cached, as
+  represented in the returned response's ``Expires`` and/or
+  ``Cache-Control`` headers, when any static file is served from this
+  directive.  This defaults to 3600 (5 minutes).
+
+Here's an example of a ``static`` directive that will serve files up
+``/static`` URL from the ``/var/www/static`` directory of the computer
+which runs the :mod:`repoze.bfg` application.
 
 .. code-block:: xml
    :linenos:
 
    <static
       name="static"
-      path="some_package:static"
+      path="/var/www/static"
       />
+
+Here's an example of a ``static`` directive that will serve files up
+``/static`` URL from the ``a/b/c/static`` directory of the Python
+package named ``some_package``.
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="static"
+      path="some_package:a/b/c/static"
+      />
+
+Here's an example of a ``static`` directive that will serve files up
+under the ``/static`` URL from the ``static`` directory of the Python
+package in which the ``configure.zcml`` file lives.
+
+.. code-block:: xml
+   :linenos:
 
    <static
       name="static"
       path="static"
       />
 
-   <static
-      name="static"
-      path="/var/www/static"
-      />
-
-Now put your static files (JS, etc) on your filesystem in the
-directory represented as ``/path/to/static/dir``.  After this is done,
-you should be able to view the static files in this directory via a
-browser at URLs prefixed with ``/static/``, for instance
-``/static/foo.js`` will return the file
+When you place your static files on filesystem in the directory
+represented as the ``path`` of the directive you, you should be able
+to view the static files in this directory via a browser at URLs
+prefixed with the directive's ``name``.  For instance if the
+``static`` directive's ``name`` is ``static`` and the static
+directive's ``path`` is ``/path/to/static``,
+``http://localhost:6543/static/foo.js`` may return the file
 ``/path/to/static/dir/foo.js``.  The static directory may contain
 subdirectories recursively, and any subdirectories may hold files;
 these will be resolved by the static view as you would expect.
-
-.. note:: To ensure that model objects contained in the root don't
-   "shadow" your static view (model objects take precedence during
-   traversal), or to ensure that your root object's ``__getitem__`` is
-   never called when a static resource is requested, you can refer to
-   your static resources as registered above in URLs as,
-   e.g. ``/@@static/foo.js``.  This is completely equivalent to
-   ``/static/foo.js``.  See :ref:`traversal_chapter` for information
-   about "goggles" (``@@``).
 
 Serving Static Resources Using a View
 -------------------------------------
 
 For more flexibility, static resources can be served by a view which
-you register manually. The :mod:`repoze.bfg.view` ``static`` helper
-class is the preferred way to go about this. This class creates a
-callable that is capable acting as a :mod:`repoze.bfg` view which
-serves static resources from a directory.  For instance, to serve
-files within a directory located on your filesystem at
-``/path/to/static/dir`` mounted at the URL path ``/static`` in your
-application, create an instance of :mod:`repoze.bfg.view` 's
-``static`` class inside a ``static.py`` file in your application root
-as below.
+you register manually.  For example, you may want static resources to
+only be available when the ``context`` of the view is of a particular
+type, or when the request is of a particular type.
+
+The :mod:`repoze.bfg.view` ``static`` helper class is used to perform
+this task. This class creates a callable that is capable acting as a
+:mod:`repoze.bfg` view which serves static resources from a directory.
+For instance, to serve files within a directory located on your
+filesystem at ``/path/to/static/dir`` mounted at the URL path
+``/static`` in your application, create an instance of
+:mod:`repoze.bfg.view` 's ``static`` class inside a ``static.py`` file
+in your application root as below.
 
 .. code-block:: python
    :linenos:
 
    from repoze.bfg.view import static
    static_view = static('/path/to/static/dir')
+
+.. note:: the argument to ``static`` can also be a relative pathname,
+   e.g. ``my/static`` (meaning relative to the Python package of the
+   module in which the view is being defined).  It can also be a
+   package-relative path (e.g. ``anotherpackage:some/subdirectory``)
+   or it can be a "here-relative" path (e.g. ``some/subdirectory``).
+   If the path is "here-relative", it is relative to the package of
+   the module in which the static view is defined.
  
 Subsequently, wire this view up to be accessible as ``/static`` using
 ZCML in your application's ``configure.zcml`` against either the class
@@ -718,6 +761,15 @@ In this case, ``.models.Root`` refers to the class of which your
    This will also allow ``/static/foo.js`` to work, but it will allow
    for ``/anything/static/foo.js`` too, as long as ``anything`` itself
    is resolveable.
+
+.. note:: To ensure that model objects contained in the root don't
+   "shadow" your static view (model objects take precedence during
+   traversal), or to ensure that your root object's ``__getitem__`` is
+   never called when a static resource is requested, you can refer to
+   your static resources as registered above in URLs as,
+   e.g. ``/@@static/foo.js``.  This is completely equivalent to
+   ``/static/foo.js``.  See :ref:`traversal_chapter` for information
+   about "goggles" (``@@``).
 
 Using Views to Handle Form Submissions (Unicode and Character Set Issues)
 -------------------------------------------------------------------------

@@ -1,8 +1,20 @@
 Next release
 ============
 
-- Added ``static`` ZCML directive which registers a route for a static
-  view that serves up files in a directory.
+- The ``repoze.bfg.view.static`` class now accepts a string as its
+  first argument ("root_dir") that represents a package-relative name
+  e.g. ``somepackage:foo/bar/static``.  This is now the preferred
+  mechanism for spelling package-relative static paths using this
+  class.  A ``package_name`` keyword argument has been left around for
+  backwards compatibility.  If it is supplied, it will be honored.
+
+- Fixed documentation for ``repoze.bfg.view.static`` (in narrative
+  ``Views`` chapter).
+
+- Added ``static`` ZCML directive which registers a route for a view
+  that serves up files in a directory.  See the "Views" narrative
+  documentation chapter's "Serving Static Resources Using a ZCML
+  Directive" section for more information.
 
 - "tests" module removed from the bfg_alchemy paster template; these
   tests didn't work.

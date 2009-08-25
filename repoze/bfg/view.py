@@ -161,14 +161,20 @@ class static(object):
     """
     def __init__(self, root_dir, cache_max_age=3600, level=2,
                  package_name=None):
+        # package_name is for bw compat; it is preferred to pass in a
+        # package-relative path as root_dir
+        # (e.g. ``anotherpackage:foo/static``).
         if os.path.isabs(root_dir):
-            root_dir = caller_path(root_dir, level=level)
             self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
+            return
+        if ':' in root_dir:
+            package_name, root_dir = root_dir.split(':', 1)
         else:
             if package_name is None:
                 package_name = caller_package().__name__
-            self.app = PackageURLParser(package_name, root_dir,
-                                        cache_max_age=cache_max_age)
+
+        self.app = PackageURLParser(package_name, root_dir,
+                                    cache_max_age=cache_max_age)
 
     def __call__(self, context, request):
         subpath = '/'.join(request.subpath)
