@@ -112,6 +112,23 @@ class TestPackagePath(unittest.TestCase):
         result = self._callFUT(module)
         self.failIf(hasattr(module, '__bfg_abspath__'))
         self.assertEqual(result, module.package_path)
+
+class TestPackageName(unittest.TestCase):
+    def _callFUT(self, package):
+        from repoze.bfg.path import package_name
+        return package_name(package)
+
+    def test_it_package(self):
+        from repoze.bfg import tests
+        package = DummyPackageOrModule(tests)
+        result = self._callFUT(package)
+        self.assertEqual(result, 'repoze.bfg.tests')
+        
+    def test_it_module(self):
+        from repoze.bfg.tests import test_path
+        module = DummyPackageOrModule(test_path)
+        result = self._callFUT(module)
+        self.assertEqual(result, 'repoze.bfg.tests')
     
 class DummyPackageOrModule:
     def __init__(self, real_package_or_module, raise_exc=None):
@@ -120,6 +137,7 @@ class DummyPackageOrModule:
         import os
         self.__dict__['package_path'] = os.path.dirname(
             os.path.abspath(real_package_or_module.__file__))
+        self.__dict__['__file__'] = real_package_or_module.__file__
 
     def __setattr__(self, key, val):
         if self.raise_exc is not None:

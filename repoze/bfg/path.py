@@ -16,6 +16,19 @@ def caller_module(level=2):
     module = sys.modules[module_name]
     return module
 
+def package_name(pkg_or_module):
+    """ If this function is passed a module, return the dotted Python
+    package name of the package in which the module lives.  If this
+    function is passed a package, return the dotted Python package
+    name of the package itself."""
+    pkg_filename = pkg_or_module.__file__
+    pkg_name = pkg_or_module.__name__
+    splitted = os.path.split(pkg_filename)
+    if splitted[-1] in ('__init__.py', '__init__.pyc', '__init__.pyo'):
+        # it's a package
+        return pkg_name
+    return pkg_name.rsplit('.', 1)[0]
+
 def caller_package(level=2, caller_module=caller_module):
     # caller_module in arglist for tests
     module = caller_module(level+1)
