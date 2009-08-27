@@ -228,6 +228,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     settings = Settings(get_options(options))
     filename = settings['configure_zcml']
 
+    # not os.path.isabs below for windows systems
     if (':' in filename) and (not os.path.isabs(filename)):
         package, filename = filename.split(':', 1)
         __import__(package)

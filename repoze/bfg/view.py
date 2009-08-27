@@ -167,7 +167,8 @@ class static(object):
         if os.path.isabs(root_dir):
             self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
             return
-        if ':' in root_dir:
+        # not os.path.isabs below for windows systems
+        if (':' in root_dir) and (not os.path.isabs(root_dir)):
             package_name, root_dir = root_dir.split(':', 1)
         else:
             if package_name is None:
