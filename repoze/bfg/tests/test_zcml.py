@@ -412,25 +412,25 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 2)
 
         permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IDummy,
+        permission_discriminator = ('permission', IFoo, '', DummyModule,
                                     IViewPermission)
         self.assertEqual(permission['discriminator'], permission_discriminator)
         self.assertEqual(permission['callable'], handler)
         self.assertEqual(permission['args'][0], 'registerAdapter')
         self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
         self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IDummy))
+        self.assertEqual(permission['args'][2], (IFoo, DummyModule))
         self.assertEqual(permission['args'][3], IViewPermission)
         self.assertEqual(permission['args'][4], '')
         self.assertEqual(permission['args'][5], None)
         
         regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IDummy, IView)
+        regadapt_discriminator = ('view', IFoo, '', DummyModule, IView)
         self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
         self.assertEqual(regadapt['callable'], handler)
         self.assertEqual(regadapt['args'][0], 'registerAdapter')
         self.assertEqual(regadapt['args'][1], view)
-        self.assertEqual(regadapt['args'][2], (IFoo, IDummy))
+        self.assertEqual(regadapt['args'][2], (IFoo, DummyModule))
         self.assertEqual(regadapt['args'][3], IView)
         self.assertEqual(regadapt['args'][4], '')
         self.assertEqual(regadapt['args'][5], None)
@@ -466,10 +466,10 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 2)
 
         permission = actions[0]
-        self.assertEqual(permission['args'][2], (IFoo, IDummy))
+        self.assertEqual(permission['args'][2], (IFoo, DummyModule))
         regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IDummy, IView)
-        self.assertEqual(regadapt['args'][2], (IFoo, IDummy))
+        regadapt_discriminator = ('view', IFoo, '', DummyModule, IView)
+        self.assertEqual(regadapt['args'][2], (IFoo, DummyModule))
 
     def test_with_route_name(self):
         from zope.component import getSiteManager
@@ -1076,8 +1076,7 @@ class TestStaticDirective(unittest.TestCase):
         self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator, (
             'route', 'name', None, None))
-        self.assertEqual(route_args, (
-            'name*subpath', 'name', None))
+        self.assertEqual(route_args[0], 'name*subpath')
 
     def test_package_relative(self):
         from repoze.bfg.zcml import handler
@@ -1104,8 +1103,7 @@ class TestStaticDirective(unittest.TestCase):
         self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator, (
             'route', 'name', None, None))
-        self.assertEqual(route_args, (
-            'name*subpath', 'name', None))
+        self.assertEqual(route_args[0], 'name*subpath')
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):
@@ -1145,7 +1143,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         (IDummy, '', IDummy, ''))
+                         (DummyModule, '', DummyModule, ''))
 
     def test_with_colons(self):
         from repoze.bfg.zcml import _override
@@ -1157,7 +1155,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         (IDummy, 'foo.pt', IDummy, 'foo.pt'))
+                         (DummyModule, 'foo.pt', DummyModule, 'foo.pt'))
 
     def test_override_module_with_directory(self):
         from repoze.bfg.zcml import _override
@@ -1169,7 +1167,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         (IDummy, '', IDummy, 'foo/'))
+                         (DummyModule, '', DummyModule, 'foo/'))
 
     def test_override_directory_with_module(self):
         from repoze.bfg.zcml import _override
@@ -1181,7 +1179,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         (IDummy, 'foo/', IDummy, ''))
+                         (DummyModule, 'foo/', DummyModule, ''))
 
     def test_override_module_with_module(self):
         from repoze.bfg.zcml import _override
@@ -1193,7 +1191,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['callable'], _override)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'],
-                         (IDummy, '', IDummy, ''))
+                         (DummyModule, '', DummyModule, ''))
 
 class Test_OverrideFunction(unittest.TestCase):
     def setUp(self):
@@ -1559,7 +1557,8 @@ class TestRequestOnly(unittest.TestCase):
         self.assertTrue(self._callFUT(foo), True)
 
 class DummyModule:
-    __name__ = 'dummy'
+    __path__ = "foo"
+    __name__ = "dummy"
 
 class DummyModuleGrokker:
     def __init__(self):
@@ -1592,7 +1591,7 @@ class DummyContext:
             )
 
     def resolve(self, dottedname):
-        return IDummy
+        return DummyModule
 
 class Dummy:
     pass

@@ -1,3 +1,5 @@
+import os
+import sys
 import inspect
 import types
 
@@ -45,6 +47,8 @@ from repoze.bfg.request import named_request_factories
 from repoze.bfg.security import ViewPermissionFactory
 
 from repoze.bfg.secpols import registerBBBAuthn
+
+from repoze.bfg.static import find_package
 
 from repoze.bfg.view import static as static_view
 
@@ -365,7 +369,11 @@ def static(_context, name, path, cache_max_age=3600):
     if ':' in path:
         package_name, path = path.split(':')
     else:
-        package_name = _context.resolve('.').__name__
+        package_path = _context.resolve('.').__path__[0]
+        package_name = find_package(package_path)
+        if package_name is not None:
+            path = os.path.join(package_path, path)
+            path = path[len(sys.modules[package_name].__path__[0])+1:]
 
     view = static_view(
         path, cache_max_age=cache_max_age, package_name=package_name)
