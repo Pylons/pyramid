@@ -942,11 +942,6 @@ class DummyResponse:
     headerlist = ()
     app_iter = ()
     
-class DummyRequest:
-    def __init__(self, environ):
-        self.environ = environ
-        
-
 class DummyThreadLocalManager:
     def __init__(self):
         self.pushed = []
