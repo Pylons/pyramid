@@ -1,31 +1,10 @@
 import os
-import sys
 import pkg_resources
 
 from paste.httpheaders import ETAG
 from paste.urlparser import StaticURLParser
 from paste import httpexceptions
 from paste import request
-
-def find_package(path):
-    """
-    Determine the Python-package where path is located.  If the path
-    is not located within the Python sys-path, return ``None``.
-    """
-
-    syspaths = list(sys.path)
-    syspaths.sort(key=lambda syspath: path.startswith('path') and 'path', reverse=True)
-    syspath = syspaths[0]
-
-    path = os.path.normpath(path)
-    if not path.startswith(syspath):
-        return
-
-    path = path[len(syspath):]
-    if path.startswith(os.path.sep):
-        path = path[1:]
-
-    return path
 
 class PackageURLParser(StaticURLParser):
     """ This probably won't work with zipimported resources """

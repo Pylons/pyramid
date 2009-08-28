@@ -1040,9 +1040,6 @@ class TestRouteDirective(unittest.TestCase):
 class TestStaticDirective(unittest.TestCase):
     def setUp(self):
         cleanUp()
-        import os
-        here = os.path.dirname(__file__)
-        self.static_path = os.path.join(here, 'fixtures', 'static')
 
     def tearDown(self):
         cleanUp()
@@ -1052,31 +1049,33 @@ class TestStaticDirective(unittest.TestCase):
         return static(*arg, **kw)
 
     def test_absolute(self):
+        import os
+        here = os.path.dirname(__file__)
+        static_path = os.path.join(here, 'fixtures', 'static')
         from repoze.bfg.zcml import handler
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         context = DummyContext()
-        self._callFUT(context, 'name', self.static_path)
+        self._callFUT(context, 'name', static_path)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
-        route_callable = route_action['callable']
-        route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, handler)
-        self.assertEqual(route_discriminator[:3], (
-            'view', None, ''))
-        self.assertEqual(route_discriminator[4], IView)
+        action = actions[0]
+        callable = action['callable']
+        discriminator = action['discriminator']
+        args = action['args']
+        self.assertEqual(callable, handler)
+        self.assertEqual(discriminator[:3], ('view', None, ''))
+        self.assertEqual(discriminator[4], IView)
+        self.assertEqual(args[1].app.directory, static_path)
 
-        route_action = actions[1]
-        route_callable = route_action['callable']
-        route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
-        self.assertEqual(route_discriminator, (
-            'route', 'name', None, None))
-        self.assertEqual(route_args[0], 'name*subpath')
+        action = actions[1]
+        callable = action['callable']
+        discriminator = action['discriminator']
+        args = action['args']
+        self.assertEqual(callable, connect_route)
+        self.assertEqual(discriminator, ('route', 'name', None, None))
+        self.assertEqual(args[0], 'name*subpath')
 
     def test_package_relative(self):
         from repoze.bfg.zcml import handler
@@ -1087,23 +1086,51 @@ class TestStaticDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
-        route_callable = route_action['callable']
-        route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, handler)
-        self.assertEqual(route_discriminator[:3], (
-            'view', None, ''))
-        self.assertEqual(route_discriminator[4], IView)
+        action = actions[0]
+        callable = action['callable']
+        discriminator = action['discriminator']
+        args = action['args']
+        self.assertEqual(callable, handler)
+        self.assertEqual(discriminator[:3], ('view', None, ''))
+        self.assertEqual(discriminator[4], IView)
+        self.assertEqual(args[1].app.package_name, 'repoze.bfg.tests')
+        self.assertEqual(args[1].app.resource_name, 'fixtures/static')
 
-        route_action = actions[1]
-        route_callable = route_action['callable']
-        route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
-        self.assertEqual(route_discriminator, (
-            'route', 'name', None, None))
-        self.assertEqual(route_args[0], 'name*subpath')
+        action = actions[1]
+        callable = action['callable']
+        discriminator = action['discriminator']
+        args = action['args']
+        self.assertEqual(callable, connect_route)
+        self.assertEqual(discriminator, ('route', 'name', None, None))
+        self.assertEqual(args[0], 'name*subpath')
+
+    def test_here_relative(self):
+        from repoze.bfg.zcml import handler
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        import repoze.bfg.tests
+        context = DummyContext(repoze.bfg.tests)
+        self._callFUT(context, 'name', 'fixtures/static')
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        action = actions[0]
+        callable = action['callable']
+        discriminator = action['discriminator']
+        args = action['args']
+        self.assertEqual(callable, handler)
+        self.assertEqual(discriminator[:3], ('view', None, ''))
+        self.assertEqual(discriminator[4], IView)
+        self.assertEqual(args[1].app.package_name, 'repoze.bfg.tests')
+        self.assertEqual(args[1].app.resource_name, 'fixtures/static')
+
+        action = actions[1]
+        callable = action['callable']
+        discriminator = action['discriminator']
+        args = action['args']
+        self.assertEqual(callable, connect_route)
+        self.assertEqual(discriminator, ('route', 'name', None, None))
+        self.assertEqual(args[0], 'name*subpath')
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):
@@ -1559,6 +1586,7 @@ class TestRequestOnly(unittest.TestCase):
 class DummyModule:
     __path__ = "foo"
     __name__ = "dummy"
+    __file__ = ''
 
 class DummyModuleGrokker:
     def __init__(self):
@@ -1579,9 +1607,10 @@ class DummyMartianModule:
         return self.module_grokker
 
 class DummyContext:
-    def __init__(self):
+    def __init__(self, resolved=DummyModule):
         self.actions = []
         self.info = None
+        self.resolved = resolved
 
     def action(self, discriminator, callable, args):
         self.actions.append(
@@ -1591,7 +1620,7 @@ class DummyContext:
             )
 
     def resolve(self, dottedname):
-        return DummyModule
+        return self.resolved
 
 class Dummy:
     pass

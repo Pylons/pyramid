@@ -1,5 +1,4 @@
 import os
-import sys
 import inspect
 import types
 
@@ -39,6 +38,8 @@ from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IRequestFactories
 from repoze.bfg.interfaces import IPackageOverrides
 
+from repoze.bfg.path import package_name
+
 from repoze.bfg.resource import PackageOverrides
 
 from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
@@ -47,8 +48,6 @@ from repoze.bfg.request import named_request_factories
 from repoze.bfg.security import ViewPermissionFactory
 
 from repoze.bfg.secpols import registerBBBAuthn
-
-from repoze.bfg.static import find_package
 
 from repoze.bfg.view import static as static_view
 
@@ -189,13 +188,13 @@ def _override(package, path, override_package, override_prefix,
               PackageOverrides=PackageOverrides):
     # PackageOverrides kw arg for tests
     sm = getSiteManager()
-    package_name = package.__name__
-    override_package_name = override_package.__name__
-    override = queryUtility(IPackageOverrides, name=package_name)
+    pkg_name = package.__name__
+    override_pkg_name = override_package.__name__
+    override = queryUtility(IPackageOverrides, name=pkg_name)
     if override is None:
         override = PackageOverrides(package)
-        sm.registerUtility(override, IPackageOverrides, name=package_name)
-    override.insert(path, override_package_name, override_prefix)
+        sm.registerUtility(override, IPackageOverrides, name=pkg_name)
+    override.insert(path, override_pkg_name, override_prefix)
 
 def resource(context, to_override, override_with):
     if to_override == override_with:
@@ -365,19 +364,13 @@ class IStaticDirective(Interface):
 def static(_context, name, path, cache_max_age=3600):
     """ Handle ``static`` ZCML directives
     """
+    if (not ':' in path) and (not os.path.isabs(path)):
+        # if it's not a package:relative/name and it's not an
+        # /absolute/path it's a relative/path; this means its relative
+        # to the package in which the ZCML file is defined.
+        path = '%s:%s' % (package_name(_context.resolve('.')), path)
 
-    if ':' in path:
-        package_name, path = path.split(':')
-    else:
-        package_path = _context.resolve('.').__path__[0]
-        package_name = find_package(package_path)
-        if package_name is not None:
-            path = os.path.join(package_path, path)
-            path = path[len(sys.modules[package_name].__path__[0])+1:]
-
-    view = static_view(
-        path, cache_max_age=cache_max_age, package_name=package_name)
-
+    view = static_view(path, cache_max_age=cache_max_age)
     route(_context, name, "%s*subpath" % name, view=view)
 
 class IViewDirective(Interface):
