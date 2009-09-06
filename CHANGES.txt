@@ -1,5 +1,5 @@
-Next release
-============
+1.1a1 (2009-09-06)
+==================
 
 - The ``registry_manager`` backwards compatibility alias importable
   from "repoze.bfg.registry", deprecated since repoze.bfg 0.9 has been
