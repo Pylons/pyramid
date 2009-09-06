@@ -12,18 +12,17 @@ from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 
+from repoze.bfg.interfaces import IAuthorizationPolicy
+from repoze.bfg.interfaces import IAuthenticationPolicy
+from repoze.bfg.interfaces import IDefaultRootFactory
+from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import ILogger
+from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import IForbiddenView
-from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import IViewPermission
-from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IDefaultRootFactory
 
 from repoze.bfg.log import make_stream_logger
 
@@ -32,7 +31,7 @@ from repoze.bfg.registry import populateRegistry
 
 from repoze.bfg.request import request_factory
 
-from repoze.bfg.security import Allowed
+from repoze.bfg.security import Unauthorized
 
 from repoze.bfg.settings import Settings
 from repoze.bfg.settings import get_options
@@ -43,8 +42,9 @@ from repoze.bfg.traversal import _traverse
 
 from repoze.bfg.urldispatch import RoutesRootFactory
 
-from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import default_notfound_view
+from repoze.bfg.view import default_forbidden_view
+from repoze.bfg.view import NotFound
 
 _marker = object()
 
@@ -52,22 +52,19 @@ class Router(object):
     """ The main repoze.bfg WSGI application. """
     implements(IRouter)
 
-    debug_authorization = False
     debug_notfound = False
     threadlocal_manager = manager
 
     def __init__(self, registry):
         self.registry = registry
         self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
-        self.forbidden_view = registry.queryUtility(
-            IForbiddenView, default=default_forbidden_view)
         self.notfound_view = registry.queryUtility(
             INotFoundView, default=default_notfound_view)
+        self.forbidden_view = registry.queryUtility(
+            IForbiddenView, default=default_forbidden_view)
         settings = registry.queryUtility(ISettings)
         if settings is not None:
-            self.debug_authorization = settings.debug_authorization
             self.debug_notfound = settings.debug_notfound
-        self.secured = not not registry.queryUtility(IAuthenticationPolicy)
         self.root_factory = registry.queryUtility(IRootFactory,
                                                   default=DefaultRootFactory)
         self.root_policy = self.root_factory # b/w compat
@@ -120,44 +117,10 @@ class Router(object):
                         'Non-response object returned from view %s: %r' %
                         (view_name, response))
 
-            if self.secured:
-                permitted = registry.queryMultiAdapter((context, request),
-                                                       IViewPermission,
-                                                       name=view_name)
-                if permitted is None:
-                    if self.debug_authorization:
-                        permitted =  Allowed(
-                            'Allowed: view name %r against context %r (no '
-                            'permission registered).' % (view_name, context))
-                    else:
-                        permitted = True
-                
-            else:
-                if self.debug_authorization:
-                    permitted =  Allowed(
-                        'Allowed: view name %r against context %r (no '
-                        'authentication policy in use).' % (view_name, context))
-                else:
-                    permitted = True
-
-            if self.debug_authorization:
-                logger and logger.debug(
-                    'debug_authorization of url %s (view name %r against '
-                    'context %r): %s' % (request.url, view_name, context,
-                                         permitted))
-
-            if not permitted:
-                if self.debug_authorization:
-                    msg = str(permitted)
-                else:
-                    msg = 'Unauthorized: failed security policy check'
-                environ['repoze.bfg.message'] = msg
-                return respond(self.forbidden_view(context, request),
-                               '<IForbiddenView>')
-
+            provides = map(providedBy, (context, request))
             view_callable = registry.adapters.lookup(
-                map(providedBy, (context, request)), IView, name=view_name,
-                default=None)
+                provides, IView, name=view_name, default=None)
+            
 
             if view_callable is None:
                 if self.debug_notfound:
@@ -175,7 +138,19 @@ class Router(object):
                 return respond(self.notfound_view(context, request),
                                '<INotFoundView>')
 
-            response = view_callable(context, request)
+            try:
+                response = view_callable(context, request)
+            except Unauthorized, why:
+                msg = why[0]
+                environ = getattr(request, 'environ', {})
+                environ['repoze.bfg.message'] = msg
+                response = self.forbidden_view(context, request)
+            except NotFound, why:
+                msg = why[0]
+                environ = getattr(request, 'environ', {})
+                environ['repoze.bfg.message'] = msg
+                response = self.notfound_view(context, request)
+
             return respond(response, view_name)
 
         finally:

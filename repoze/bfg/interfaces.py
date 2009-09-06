@@ -6,20 +6,9 @@ from zope.component.interfaces import IObjectEvent
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
-class IPOSTRequest(IRequest):
-    """ Request type interface attached to POST requests"""
-
-class IGETRequest(IRequest):
-    """ Request type interface attached to GET requests"""
-
-class IPUTRequest(IRequest):
-    """ Request type interface attached to PUT requests"""
-
-class IDELETERequest(IRequest):
-    """ Request type interface attached to DELETE requests"""
-
-class IHEADRequest(IRequest):
-    """ Request type interface attached to HEAD requests"""
+class IRouteRequest(IRequest):
+    """ *internal only* interface used to mark a request when a route
+    matches.  Not an API."""
 
 class IResponseFactory(Interface):
     """ A utility which generates a response factory """
@@ -36,7 +25,25 @@ class IResponse(Interface):
 
 class IView(Interface):
     def __call__(context, request):
-        """ Must return an object that implements IResponse """
+        """ Must return an object that implements IResponse.  May
+        optionally raise ``repoze.bfg.security.Unauthorized`` if an
+        authorization failure is detected during view execution."""
+
+class ISecuredView(IView):
+    """ Internal interface.  Not an API. """
+    def __call_permissive__(context, request):
+        """ Guaranteed-permissive version of __call__ """
+
+    def __permitted__(context, request):
+        """ Return True if view execution will be permitted using the
+        context and request, False otherwise"""
+
+class IMultiView(ISecuredView):
+    """ *internal only*.  A multiview is a secured view that is a
+    collection of other views.  Each of the views is associated with
+    zero or more predicates.  Not an API."""
+    def add(view, predicates, score):
+        """ Add a view to the multiview. """
 
 class IRootFactory(Interface):
     def __call__(environ):
@@ -226,10 +233,6 @@ class IAuthorizationPolicy(Interface):
         
     def principals_allowed_by_permission(context, permission):
         """ Return a set of principal identifiers allowed by the permission """
-
-class IRequestFactories(Interface):
-    """ Marker utility interface representing a dictionary of request
-    factory descriptions"""
 
 class IPackageOverrides(Interface):
     """ Utility for pkg_resources overrides """

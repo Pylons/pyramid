@@ -9,14 +9,13 @@
      />
 
   <view
-     for=".models.MyApp"
-     view=".views.static_view"
-     name="static"
-     />
-
-  <view
      for=".models.MyModel"
      view=".views.view_model"
+     />
+
+  <static
+     name="static"
+     path="templates/static"
      />
 
   <subscriber for="repoze.bfg.interfaces.INewRequest"

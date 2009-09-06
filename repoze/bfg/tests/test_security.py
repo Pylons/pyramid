@@ -27,29 +27,6 @@ class TestAllPermissionsList(unittest.TestCase):
         from repoze.bfg.security import ALL_PERMISSIONS
         self.assertEqual(ALL_PERMISSIONS.__class__, self._getTargetClass())
 
-class TestViewPermissionFactory(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-        
-    def _getTargetClass(self):
-        from repoze.bfg.security import ViewPermissionFactory
-        return ViewPermissionFactory
-    
-    def _makeOne(self, *arg, **kw):
-        klass = self._getTargetClass()
-        return klass(*arg, **kw)
-        
-    def test_call(self):
-        context = DummyContext()
-        request = DummyRequest({})
-        factory = self._makeOne('repoze.view')
-        self.assertEqual(factory.permission_name, 'repoze.view')
-        result = factory(context, request)
-        self.assertEqual(result, True)
-
 class TestAllowed(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.security import Allowed
@@ -137,19 +114,19 @@ class TestViewExecutionPermitted(unittest.TestCase):
         from repoze.bfg.security import view_execution_permitted
         return view_execution_permitted(*arg, **kw)
 
-    def _registerViewPermission(self, view_name, allow=True):
+    def _registerSecuredView(self, view_name, allow=True):
         import zope.component
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.interfaces import ISecuredView
         class Checker(object):
-            def __call__(self, context, request):
+            def __permitted__(self, context, request):
                 self.context = context
                 self.request = request
                 return allow
         checker = Checker()
         gsm = zope.component.getGlobalSiteManager()
         gsm.registerAdapter(checker, (Interface, Interface),
-                            IViewPermission,
+                            ISecuredView,
                             view_name)
         return checker
 
@@ -175,7 +152,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
             pass
         context = DummyContext()
         directlyProvides(context, IContext)
-        checker = self._registerViewPermission('', True)
+        checker = self._registerSecuredView('', True)
         request = DummyRequest({})
         directlyProvides(request, IRequest)
         result = self._callFUT(context, request, '')

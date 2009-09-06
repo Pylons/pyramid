@@ -259,9 +259,9 @@ application.  Let's see what they are.
 "Global" Views Match Any Route When A More Specific View Doesn't
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that views that *don't* mention a ``route_name`` will *also*
-match when *any* route matches.  For example, the "bazbuz" view below
-will be found if the route named "abc" below is matched.
+Note that views that don't mention a ``route_name`` will *also* match
+when *any* route matches.  For example, the "bazbuz" view below will
+be found if the route named "abc" below is matched.
 
 .. code-block:: xml
 
@@ -323,7 +323,7 @@ name` to try to locate a view callable.
 A view is registered for a ``route`` either as its default view via
 the ``view=`` attribute of a ``route`` declaration in ZCML *or* as a
 standalone ``<view>`` declaration (or via the ``@bfg_route``
-decorator) which has a ``route_name`` that matches the route's name).
+decorator) which has a ``route_name`` that matches the route's name.
 At startup time, when such a registration is encountered, the view is
 registered for the ``context`` type ``None`` (meaning *any* context)
 and a *special* request type which is dynamically generated.  This
@@ -463,9 +463,3 @@ statement ordering is very important, because routes are evaluated in
 a specific order, unlike traversal, which depends on emergent behavior
 rather than an ordered list of directives.
 
-A ``<route>`` Statement *Must* Precede Any ``<view>`` Statement Which Mentions It
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A ``<route>`` declaration *must* precede (in XML order) any ``<view>``
-declaration which names it as a ``route_name``.  If it does not, at
-application startup time a ``ConfigurationError`` will be raised.

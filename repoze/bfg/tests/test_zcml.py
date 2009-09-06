@@ -20,185 +20,144 @@ class TestViewDirective(unittest.TestCase):
                           'repoze.view', None)
 
     def test_view_as_function(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
         context = DummyContext()
-        class IFoo:
+        class IFoo(Interface):
             pass
         view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
+
+        self.assertEqual(len(actions), 1)
+
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        self.failUnless(wrapper)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
+
+    def test_view_as_function_requestonly(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
 
-        self.assertEqual(len(actions), 2)
-
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], view)
-        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
-
-    def test_view_as_function_requestonly(self):
         context = DummyContext()
 
         def view(request):
             return 'OK'
-        class IFoo:
+        class IFoo(Interface):
             pass
         
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
+        self.assertEqual(len(actions), 1)
 
-        self.assertEqual(len(actions), 2)
-
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        wrapper = regadapt['args'][1]
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
         self.failIfEqual(wrapper, view)
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
-        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
 
     def test_view_as_instance(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+
         context = DummyContext()
         class AView:
             def __call__(self, context, request):
                 """ """
         view = AView()
-        class IFoo:
+        class IFoo(Interface):
             pass
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        self.failUnless(wrapper)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
+
+    def test_view_as_instance_requestonly(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
 
-        self.assertEqual(len(actions), 2)
-
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], view)
-        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
-
-    def test_view_as_instance_requestonly(self):
         context = DummyContext()
         class AView:
             def __call__(self, request):
                 return 'OK'
         view = AView()
-        class IFoo:
+        class IFoo(Interface):
             pass
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
+        self.assertEqual(len(actions), 1)
 
-        self.assertEqual(len(actions), 2)
-
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        wrapper = regadapt['args'][1]
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
         self.failIfEqual(wrapper, view)
         self.assertEqual(wrapper.__module__, view.__module__)
         self.failUnless('instance' in wrapper.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
-        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
 
     def test_view_as_oldstyle_class(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
         context = DummyContext()
-        class IFoo:
+        class IFoo(Interface):
             pass
         class view:
             def __init__(self, context, request):
@@ -209,47 +168,36 @@ class TestViewDirective(unittest.TestCase):
                 return self
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
 
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 1)
 
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        wrapper = regadapt['args'][1]
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result.context, None)
         self.assertEqual(result.request, None)
-        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
 
     def test_view_as_oldstyle_class_requestonly(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+
         context = DummyContext()
-        class IFoo:
+        class IFoo(Interface):
             pass
         class view:
             def __init__(self, request):
@@ -259,46 +207,35 @@ class TestViewDirective(unittest.TestCase):
                 return self
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
+        self.assertEqual(len(actions), 1)
 
-        self.assertEqual(len(actions), 2)
-
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        wrapper = regadapt['args'][1]
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result.request, None)
-        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
+
 
     def test_view_as_newstyle_class(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+
         context = DummyContext()
-        class IFoo:
+        class IFoo(Interface):
             pass
         class view(object):
             def __init__(self, context, request):
@@ -309,47 +246,35 @@ class TestViewDirective(unittest.TestCase):
                 return self
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
+        self.assertEqual(len(actions), 1)
 
-        self.assertEqual(len(actions), 2)
-
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        wrapper = regadapt['args'][1]
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result.context, None)
         self.assertEqual(result.request, None)
-        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
 
     def test_view_as_newstyle_class_requestonly(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+
         context = DummyContext()
-        class IFoo:
+        class IFoo(Interface):
             pass
         class view(object):
             def __init__(self, request):
@@ -359,170 +284,470 @@ class TestViewDirective(unittest.TestCase):
                 return self
         self._callFUT(context, 'repoze.view', IFoo, view=view)
         actions = context.actions
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
+        self.assertEqual(len(actions), 1)
 
-        self.assertEqual(len(actions), 2)
-
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        wrapper = regadapt['args'][1]
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
         result = wrapper(None, None)
         self.assertEqual(result.request, None)
-        self.assertEqual(regadapt['args'][2], (IFoo, IRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
+
 
     def test_request_type_asinterface(self):
-        context = DummyContext()
-        class IFoo:
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        class IRequest(Interface):
             pass
+        class IFoo(Interface):
+            pass
+        context = DummyContext(IRequest)
         view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IFoo, view=view,
                       request_type=IDummy)
         actions = context.actions
+
+        self.assertEqual(len(actions), 1)
+
+        action = actions[0]
+        discrim = ('view', IFoo, '', IDummy, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IDummy), IView, name='')
+        self.failUnless(wrapper)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
+
+    def test_request_type_as_noninterface(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from zope.interface import implementedBy
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
+        class IFoo(Interface):
+            pass
+        class Dummy:
+            pass
+        context = DummyContext(Dummy)
+        view = lambda *arg: None
+        self._callFUT(context, 'repoze.view', IFoo, view=view,
+                      request_type=Dummy)
+        actions = context.actions
 
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 1)
 
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', DummyModule,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, DummyModule))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', DummyModule, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], view)
-        self.assertEqual(regadapt['args'][2], (IFoo, DummyModule))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
+        action = actions[0]
+        discrim = ('view', IFoo, '', Dummy, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        iface = implementedBy(Dummy)
+        wrapper = sm.adapters.lookup((IFoo, iface), IView, name='')
+        self.failUnless(wrapper)
+        self.failIf(hasattr(wrapper, '__call_permissive__'))
 
     def test_request_type_ashttpmethod(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRequest
         context = DummyContext()
-        class IFoo:
+        class IFoo(Interface):
             pass
         view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IFoo, view=view,
                       request_type='GET')
         actions = context.actions
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IGETRequest
 
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 1)
 
-        permission = actions[0]
-        self.assertEqual(permission['args'][2], (IFoo, IGETRequest))
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IDummy, IView)
-        self.assertEqual(regadapt['args'][2], (IFoo, IGETRequest))
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'GET', None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.method = 'GET'
+        self.assertEqual(wrapper.__predicated__(None, request), True)
+        request.method = 'POST'
+        self.assertEqual(wrapper.__predicated__(None, request), False)
+        
 
     def test_request_type_asinterfacestring(self):
-        context = DummyContext()
-        class IFoo:
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+        class IFoo(Interface):
             pass
+        class IRequest(Interface):
+            pass
+        context = DummyContext(IRequest)
         view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IFoo, view=view,
                       request_type='whatever')
         actions = context.actions
-        from repoze.bfg.interfaces import IView
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 1)
 
-        permission = actions[0]
-        self.assertEqual(permission['args'][2], (IFoo, DummyModule))
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', DummyModule, IView)
-        self.assertEqual(regadapt['args'][2], (IFoo, DummyModule))
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(actions[0]['discriminator'], discrim)
+        register = actions[0]['callable']
+        register()
+        sm = getSiteManager()
+        regview = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        self.assertEqual(view, regview)
+        self.failIf(hasattr(view, '__call_permissive__'))
+
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, None)
 
     def test_with_route_name(self):
+        from zope.interface import Interface
+        from zope.interface import implementedBy
         from zope.component import getSiteManager
-        from repoze.bfg.interfaces import IRequestFactories
-        class IFoo:
-            pass
-        class IDummyRequest:
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        class IFoo(Interface):
             pass
         context = DummyContext()
-        factories = {None:{'interface':IDummyRequest}}
-        sm = getSiteManager()
-        sm.registerUtility(factories, IRequestFactories, name='foo')
-        view = lambda *arg: None
+        view = lambda *arg: '123'
         self._callFUT(context, 'repoze.view', IFoo, view=view, route_name='foo')
         actions = context.actions
+
+        self.assertEqual(len(actions), 1)
+
+        action = actions[0]
+        register = action['callable']
+        register()
+        sm = getSiteManager() 
+        factory = sm.getUtility(IRouteRequest, 'foo')
+        request_type = implementedBy(factory)
+        discrim = ('view', IFoo, '', request_type, IView, None, None, None,
+                   'foo')
+        self.assertEqual(action['discriminator'], discrim)
+        the_view = sm.adapters.lookup((IFoo, request_type), IView, name='')
+        request = factory({})
+        self.assertEqual(the_view(None, request), '123')
+
+    def test_with_request_method_true(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-        from repoze.bfg.security import ViewPermissionFactory
-        from repoze.bfg.zcml import handler
-
-        self.assertEqual(len(actions), 2)
-
-        permission = actions[0]
-        permission_discriminator = ('permission', IFoo, '', IDummyRequest,
-                                    IViewPermission)
-        self.assertEqual(permission['discriminator'], permission_discriminator)
-        self.assertEqual(permission['callable'], handler)
-        self.assertEqual(permission['args'][0], 'registerAdapter')
-        self.failUnless(isinstance(permission['args'][1],ViewPermissionFactory))
-        self.assertEqual(permission['args'][1].permission_name, 'repoze.view')
-        self.assertEqual(permission['args'][2], (IFoo, IDummyRequest))
-        self.assertEqual(permission['args'][3], IViewPermission)
-        self.assertEqual(permission['args'][4], '')
-        self.assertEqual(permission['args'][5], None)
-        
-        regadapt = actions[1]
-        regadapt_discriminator = ('view', IFoo, '', IDummyRequest, IView)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerAdapter')
-        self.assertEqual(regadapt['args'][1], view)
-        self.assertEqual(regadapt['args'][2], (IFoo, IDummyRequest))
-        self.assertEqual(regadapt['args'][3], IView)
-        self.assertEqual(regadapt['args'][4], '')
-        self.assertEqual(regadapt['args'][5], None)
-
-    def test_with_route_name_bad_order(self):
         context = DummyContext()
-        context.request_factories = {}
+        class IFoo(Interface):
+            pass
         view = lambda *arg: None
-        from zope.configuration.exceptions import ConfigurationError
-        self.assertRaises(ConfigurationError, self._callFUT, context,
-                          'repoze.view', None, view, '', None, 'foo')
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, request_method='POST')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'POST', None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.method = 'POST'
+        self.assertEqual(wrapper(None, request), '123')
+
+    def test_with_request_method_false(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.view import NotFound
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            """ """
+        self._callFUT(context, None, IFoo, view=view, request_method='POST')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'POST', None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.method = 'GET'
+        self.assertRaises(NotFound, wrapper, None, request)
+
+    def test_with_request_param_noval_true(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, request_param='abc')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.params = {'abc':''}
+        self.assertEqual(wrapper(None, request), '123')
+
+    def test_with_request_param_noval_false(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.view import NotFound
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            """ """
+        self._callFUT(context, None, IFoo, view=view, request_param='abc')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.params = {}
+        self.assertRaises(NotFound, wrapper, None, request)
+
+    def test_with_request_paramoval_true(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, request_param='abc=123')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.params = {'abc':'123'}
+        self.assertEqual(wrapper(None, request), '123')
+
+    def test_with_request_param_val_false(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.view import NotFound
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            """ """
+        self._callFUT(context, None, IFoo, view=view, request_param='abc=123')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.params = {'abc':'456'}
+        self.assertRaises(NotFound, wrapper, None, request)
+
+    def test_with_containment_true(self):
+        from zope.component import getSiteManager
+        from zope.interface import directlyProvides
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        sm.registerAdapter(view, (IFoo, IRequest), IView, name='')
+        self._callFUT(context, None, IFoo, view=view, containment=IFoo)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, IFoo, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        context = Dummy()
+        directlyProvides(context, IFoo)
+        self.assertEqual(wrapper(context, request), '123')
+
+    def test_with_containment_false(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.view import NotFound
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            """ """
+        self._callFUT(context, None, IFoo, view=view, containment=IFoo)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, IFoo, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        context = Dummy()
+        self.assertRaises(NotFound, wrapper, context, request)
+
+    def test_multiview_replaces_traditional_view(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewPermission
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        sm.registerAdapter(view, (IFoo, IRequest), IView, name='')
+        self._callFUT(context, 'repoze.view', IFoo, view=view)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        self.failUnless(IMultiView.providedBy(wrapper))
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, wrapper.__permitted__)
+        self.assertEqual(wrapper(None, None), '123')
+
+    def test_multiview_replaces_multiview(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from zope.interface import implements
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewPermission
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        view = lambda *arg: None
+        sm = getSiteManager()
+        class DummyMultiView:
+            implements(IMultiView)
+            def __init__(self):
+                self.views = []
+                self.name = 'name'
+            def add(self, view, score):
+                self.views.append(view)
+            def __call__(self, context, request):
+                return '123'
+            def __permitted__(self, context, request):
+                """ """
+        view = DummyMultiView()
+        sm.registerAdapter(view, (IFoo, IRequest), IMultiView, name='')
+        def view2(context, request):
+            """ """
+        self._callFUT(context, None, IFoo, view=view2)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
+        self.assertEqual(perm, wrapper.__permitted__)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual(wrapper(None, None), '123')
+        self.assertEqual(wrapper.views, [view2])
+
+    def test_for_as_class(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        context = DummyContext()
+        class Foo:
+            pass
+        sm = getSiteManager()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'repoze.view', Foo, view=view)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', Foo, '', IRequest, IView, None, None, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        foo = implementedBy(Foo)
+        wrapper = sm.adapters.lookup((foo, IRequest), IView, name='')
+        self.assertEqual(wrapper, view)
 
 class TestNotFoundDirective(unittest.TestCase):
     def _callFUT(self, context, view):
@@ -530,27 +755,24 @@ class TestNotFoundDirective(unittest.TestCase):
         return notfound(context, view)
     
     def test_it(self):
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import INotFoundView
+
         context = DummyContext()
         def view(request):
             return 'OK'
         self._callFUT(context, view)
         actions = context.actions
-        from repoze.bfg.interfaces import INotFoundView
-        from repoze.bfg.zcml import handler
-
         self.assertEqual(len(actions), 1)
 
         regadapt = actions[0]
-        regadapt_discriminator = ('notfound_view',)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        derived_view = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], INotFoundView)
+        register = regadapt['callable']
+        register()
+        sm = getSiteManager()
+        derived_view = sm.getUtility(INotFoundView)
         self.assertEqual(derived_view(None, None), 'OK')
         self.assertEqual(derived_view.__name__, view.__name__)
-        self.assertEqual(regadapt['args'][2], INotFoundView)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
 
 class TestForbiddenDirective(unittest.TestCase):
     def _callFUT(self, context, view):
@@ -558,155 +780,143 @@ class TestForbiddenDirective(unittest.TestCase):
         return forbidden(context, view)
     
     def test_it(self):
+        from zope.component import getSiteManager
         context = DummyContext()
         def view(request):
             return 'OK'
         self._callFUT(context, view)
         actions = context.actions
         from repoze.bfg.interfaces import IForbiddenView
-        from repoze.bfg.zcml import handler
 
         self.assertEqual(len(actions), 1)
 
         regadapt = actions[0]
-        regadapt_discriminator = ('notfound_view',)
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        derived_view = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], IForbiddenView)
+        register = regadapt['callable']
+        register()
+        sm = getSiteManager()
+        derived_view = sm.getUtility(IForbiddenView)
         self.assertEqual(derived_view(None, None), 'OK')
         self.assertEqual(derived_view.__name__, view.__name__)
-        self.assertEqual(regadapt['args'][2], IForbiddenView)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
 
 class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, context, **kw):
         from repoze.bfg.zcml import repozewho1authenticationpolicy
         return repozewho1authenticationpolicy(context, **kw)
 
     def test_it_defaults(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IAuthenticationPolicy
         context = DummyContext()
         self._callFUT(context)
         actions = context.actions
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.zcml import handler
-
         self.assertEqual(len(actions), 1)
-
         regadapt = actions[0]
-        regadapt_discriminator = 'authentication_policy'
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        policy = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
+        self.assertEqual(regadapt['callable'], None)
+        self.assertEqual(regadapt['args'], ())
+        policy = getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.callback, None)
         self.assertEqual(policy.identifier_name, 'auth_tkt')
-        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
     
     def test_it(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IAuthenticationPolicy
         context = DummyContext()
         def callback(identity, request):
             """ """
         self._callFUT(context, identifier_name='something', callback=callback)
         actions = context.actions
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.zcml import handler
-
         self.assertEqual(len(actions), 1)
-
         regadapt = actions[0]
-        regadapt_discriminator = 'authentication_policy'
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        policy = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
+        self.assertEqual(regadapt['callable'], None)
+        self.assertEqual(regadapt['args'], ())
+        policy = getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.callback, callback)
         self.assertEqual(policy.identifier_name, 'something')
-        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
 
 class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, context, **kw):
         from repoze.bfg.zcml import remoteuserauthenticationpolicy
         return remoteuserauthenticationpolicy(context, **kw)
 
     def test_defaults(self):
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from zope.component import getUtility
         context = DummyContext()
         def callback(identity, request):
             """ """
         self._callFUT(context)
         actions = context.actions
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.zcml import handler
-
         self.assertEqual(len(actions), 1)
-
         regadapt = actions[0]
         regadapt_discriminator = 'authentication_policy'
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        policy = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
+        self.assertEqual(regadapt['callable'], None)
+        self.assertEqual(regadapt['args'], ())
+        policy = getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.environ_key, 'REMOTE_USER')
         self.assertEqual(policy.callback, None)
-        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
 
     def test_it(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IAuthenticationPolicy
         context = DummyContext()
         def callback(identity, request):
             """ """
         self._callFUT(context, environ_key='BLAH', callback=callback)
         actions = context.actions
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.zcml import handler
-
         self.assertEqual(len(actions), 1)
-
         regadapt = actions[0]
-        regadapt_discriminator = 'authentication_policy'
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        policy = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
+        self.assertEqual(regadapt['callable'], None)
+        self.assertEqual(regadapt['args'], ())
+        policy = getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.environ_key, 'BLAH')
         self.assertEqual(policy.callback, callback)
-        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
 
 class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, context, secret, **kw):
         from repoze.bfg.zcml import authtktauthenticationpolicy
         return authtktauthenticationpolicy(context, secret, **kw)
 
     def test_it_defaults(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IAuthenticationPolicy
         context = DummyContext()
         self._callFUT(context, 'sosecret')
         actions = context.actions
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.zcml import handler
-
         self.assertEqual(len(actions), 1)
-
         regadapt = actions[0]
-        regadapt_discriminator = 'authentication_policy'
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        policy = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
+        self.assertEqual(regadapt['callable'], None)
+        self.assertEqual(regadapt['args'], ())
+        policy = getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.cookie.secret, 'sosecret')
         self.assertEqual(policy.callback, None)
-        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
 
     def test_it_noconfigerror(self):
+        from zope.component import getUtility
+        from repoze.bfg.interfaces import IAuthenticationPolicy
         context = DummyContext()
         def callback(identity, request):
             """ """
@@ -715,22 +925,14 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
                       secure=True, include_ip=True, timeout=100,
                       reissue_time=60)
         actions = context.actions
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.zcml import handler
-
         self.assertEqual(len(actions), 1)
-
         regadapt = actions[0]
-        regadapt_discriminator = 'authentication_policy'
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        policy = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
+        self.assertEqual(regadapt['callable'], None)
+        self.assertEqual(regadapt['args'], ())
+        policy = getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.cookie.secret, 'sosecret')
         self.assertEqual(policy.callback, callback)
-        self.assertEqual(regadapt['args'][2], IAuthenticationPolicy)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
 
     def test_it_configerror(self):
         from zope.configuration.exceptions import ConfigurationError
@@ -745,43 +947,74 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
                           reissue_time=500)
 
 class TestACLAuthorizationPolicyDirective(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, context, **kw):
         from repoze.bfg.zcml import aclauthorizationpolicy
         return aclauthorizationpolicy(context, **kw)
     
     def test_it(self):
+        from zope.component import getUtility
         from repoze.bfg.authorization import ACLAuthorizationPolicy
         from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.zcml import handler
         context = DummyContext()
         def callback(identity, request):
             """ """
         self._callFUT(context)
         actions = context.actions
-
         self.assertEqual(len(actions), 1)
-
         regadapt = actions[0]
-        regadapt_discriminator = 'authorization_policy'
-        self.assertEqual(regadapt['discriminator'], regadapt_discriminator)
-        self.assertEqual(regadapt['callable'], handler)
-        self.assertEqual(regadapt['args'][0], 'registerUtility')
-        policy = regadapt['args'][1]
+        self.assertEqual(regadapt['discriminator'], IAuthorizationPolicy)
+        self.assertEqual(regadapt['callable'], None)
+        self.assertEqual(regadapt['args'], ())
+        policy = getUtility(IAuthorizationPolicy)
         self.assertEqual(policy.__class__, ACLAuthorizationPolicy)
-        self.assertEqual(regadapt['args'][2], IAuthorizationPolicy)
-        self.assertEqual(regadapt['args'][3], '')
-        self.assertEqual(regadapt['args'][4], None)
 
 class TestDeriveView(unittest.TestCase):
-    def _callFUT(self, view):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, view, *arg, **kw):
         from repoze.bfg.zcml import derive_view
-        return derive_view(view)
+        return derive_view(view, *arg, **kw)
+
+    def _registerLogger(self):
+        from repoze.bfg.interfaces import ILogger
+        from zope.component import getSiteManager
+        logger = DummyLogger()
+        sm = getSiteManager()
+        sm.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        return logger
+
+    def _registerSettings(self, **d):
+        from repoze.bfg.interfaces import ISettings
+        from zope.component import getSiteManager
+        settings = DummySettings(d)
+        sm = getSiteManager()
+        sm.registerUtility(settings, ISettings)
+
+    def _registerSecurityPolicy(self, permissive):
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from zope.component import getSiteManager
+        policy = DummySecurityPolicy(permissive)
+        sm = getSiteManager()
+        sm.registerUtility(policy, IAuthenticationPolicy)
+        sm.registerUtility(policy, IAuthorizationPolicy)
     
     def test_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
         result = self._callFUT(view)
         self.failUnless(result is view)
+        self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(view(None, None), 'OK')
         
     def test_view_as_function_requestonly(self):
@@ -792,6 +1025,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
     def test_view_as_newstyle_class_context_and_request(self):
@@ -805,6 +1039,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
         
     def test_view_as_newstyle_class_requestonly(self):
@@ -818,6 +1053,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
     def test_view_as_oldstyle_class_context_and_request(self):
@@ -831,6 +1067,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
         
     def test_view_as_oldstyle_class_requestonly(self):
@@ -844,6 +1081,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
     def test_view_as_instance_context_and_request(self):
@@ -853,6 +1091,7 @@ class TestDeriveView(unittest.TestCase):
         view = View()
         result = self._callFUT(view)
         self.failUnless(result is view)
+        self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
         
     def test_view_as_instance_requestonly(self):
@@ -865,7 +1104,157 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.failUnless('instance' in result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
+
+    def test_view_with_debug_authorization_no_authpol(self):
+        def view(context, request):
+            return 'OK'
+        self._registerSettings(debug_authorization=True)
+        logger = self._registerLogger()
+        result = self._callFUT(view, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): Allowed "
+                         "(no authorization policy in use)")
+
+    def test_view_with_debug_authorization_no_permission(self):
+        def view(context, request):
+            return 'OK'
+        self._registerSettings(debug_authorization=True)
+        self._registerSecurityPolicy(True)
+        logger = self._registerLogger()
+        result = self._callFUT(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): Allowed ("
+                         "no permission registered)")
+
+    def test_view_with_debug_authorization_permission_authpol_permitted(self):
+        def view(context, request):
+            return 'OK'
+        self._registerSettings(debug_authorization=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(True)
+        result = self._callFUT(view, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result.__call_permissive__, view)
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): True")
+        
+    def test_view_with_debug_authorization_permission_authpol_denied(self):
+        from repoze.bfg.security import Unauthorized
+        def view(context, request):
+            """ """
+        self._registerSettings(debug_authorization=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(False)
+        result = self._callFUT(view, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result.__call_permissive__, view)
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertRaises(Unauthorized, result, None, request)
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): False")
+
+    def test_view_with_debug_authorization_permission_authpol_denied2(self):
+        def view(context, request):
+            """ """
+        self._registerSettings(debug_authorization=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(False)
+        result = self._callFUT(view, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        permitted = result.__permitted__(None, None)
+        self.assertEqual(permitted, False)
+
+    def test_view_with_predicates_all(self):
+        def view(context, request):
+            return '123'
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return True
+        result = self._callFUT(view, predicates=[predicate1, predicate2])
+        request = DummyRequest()
+        request.method = 'POST'
+        next = result(None, None)
+        self.assertEqual(next, '123')
+        self.assertEqual(predicates, [True, True])
+
+    def test_view_with_predicates_notall(self):
+        from repoze.bfg.view import NotFound
+        def view(context, request):
+            """ """
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return False
+        result = self._callFUT(view, predicates=[predicate1, predicate2])
+        request = DummyRequest()
+        request.method = 'POST'
+        self.assertRaises(NotFound, result, None, None)
+        self.assertEqual(predicates, [True, True])
+
+    def test_view_with_predicates_checker(self):
+        def view(context, request):
+            """ """
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return True
+        result = self._callFUT(view, predicates=[predicate1, predicate2])
+        request = DummyRequest()
+        request.method = 'POST'
+        next = result.__predicated__(None, None)
+        self.assertEqual(next, True)
+        self.assertEqual(predicates, [True, True])
 
 class TestConnectRouteFunction(unittest.TestCase):
     def setUp(self):
@@ -903,103 +1292,119 @@ class TestRouteDirective(unittest.TestCase):
         return route(*arg, **kw)
 
     def test_defaults(self):
-        from zope.component import getUtility
-        from repoze.bfg.interfaces import IRequestFactories
+        from repoze.bfg.zcml import connect_route
         context = DummyContext()
         self._callFUT(context, 'name', 'path')
-        self.failUnless(getUtility(IRequestFactories, name='name'))
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        route_action = actions[0]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
 
     def test_with_view(self):
-        from zope.component import getUtility
-        from repoze.bfg.interfaces import IRequestFactories
-        from repoze.bfg.zcml import handler
+        from zope.interface import Interface
+        from zope.interface import implementedBy
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRouteRequest
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         
         context = DummyContext()
-        view = Dummy()
+        def view(context, request):
+            return '123'
         self._callFUT(context, 'name', 'path', view=view)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
-        factories = getUtility(IRequestFactories, name='name')
-        request_iface = factories[None]['interface']
-
         view_action = actions[0]
-        view_callable = view_action['callable']
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        view_args = view_action['args']
-        self.assertEqual(view_callable, handler)
-        self.assertEqual(len(view_discriminator), 5)
+        self.assertEqual(len(view_discriminator), 9)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], None)
         self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_iface)
+        self.assertEqual(view_discriminator[3], request_type)
         self.assertEqual(view_discriminator[4], IView)
-        self.assertEqual(view_args, ('registerAdapter', view,
-                                     (None, request_iface), IView,
-                                     '', None))
+        self.assertEqual(view_discriminator[5], None)
+        self.assertEqual(view_discriminator[6], None)
+        self.assertEqual(view_discriminator[7], None)
+        self.assertEqual(view_discriminator[8], 'name')
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        wrapped = sm.adapters.lookup((Interface, request_type), IView, name='')
+        request = DummyRequest()
+        self.assertEqual(wrapped(None, request), '123')
         
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
         self.assertEqual(route_callable, connect_route)
-        self.assertEqual(len(route_discriminator), 4)
+        self.assertEqual(len(route_discriminator), 2)
         self.assertEqual(route_discriminator[0], 'route')
         self.assertEqual(route_discriminator[1], 'name')
-        self.assertEqual(route_discriminator[2], None)
-        self.assertEqual(route_discriminator[3], None)
         self.assertEqual(route_args, ('path', 'name', None))
 
     def test_with_view_and_view_for(self):
-        from zope.component import getUtility
-        from repoze.bfg.interfaces import IRequestFactories
-        from repoze.bfg.zcml import handler
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
         
         context = DummyContext()
-        view = Dummy()
+        def view(context, request):
+            return '123'
         self._callFUT(context, 'name', 'path', view=view, view_for=IDummy)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
-        factories = getUtility(IRequestFactories, 'name')
-        request_iface = factories[None]['interface']
-
         view_action = actions[0]
-        view_callable = view_action['callable']
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        view_args = view_action['args']
-        self.assertEqual(view_callable, handler)
-        self.assertEqual(len(view_discriminator), 5)
+        self.assertEqual(len(view_discriminator), 9)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], IDummy)
         self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_iface)
-        self.assertEqual(view_discriminator[4], IView)
-        self.assertEqual(view_args, ('registerAdapter', view,
-                                     (IDummy, request_iface), IView,
-                                     '', None))
+        self.assertEqual(view_discriminator[3], request_type)
+        self.assertEqual(view_discriminator[4], IView) 
+        self.assertEqual(view_discriminator[5], None)
+        self.assertEqual(view_discriminator[6], None)
+        self.assertEqual(view_discriminator[7], None)
+        self.assertEqual(view_discriminator[8], 'name')
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        request = DummyRequest()
+        self.assertEqual(wrapped(None, request), '123')
         
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
         self.assertEqual(route_callable, connect_route)
-        self.assertEqual(len(route_discriminator), 4)
+        self.assertEqual(len(route_discriminator), 2)
         self.assertEqual(route_discriminator[0], 'route')
         self.assertEqual(route_discriminator[1], 'name')
-        self.assertEqual(route_discriminator[2], IDummy)
-        self.assertEqual(route_discriminator[3], None)
         self.assertEqual(route_args, ('path', 'name', None,))
 
     def test_without_view(self):
         from repoze.bfg.zcml import connect_route
-        
         context = DummyContext()
-        view = Dummy()
         self._callFUT(context, 'name', 'path')
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -1009,32 +1414,275 @@ class TestRouteDirective(unittest.TestCase):
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
         self.assertEqual(route_callable, connect_route)
-        self.assertEqual(len(route_discriminator), 4)
+        self.assertEqual(len(route_discriminator), 2)
         self.assertEqual(route_discriminator[0], 'route')
         self.assertEqual(route_discriminator[1], 'name')
-        self.assertEqual(route_discriminator[2], None)
-        self.assertEqual(route_discriminator[3], None)
         self.assertEqual(route_args, ('path', 'name', None))
 
-    def test_with_request_type(self):
+    def test_with_view_request_type(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
         
         context = DummyContext()
-        view = Dummy()
-        self._callFUT(context, 'name', 'path', request_type="GET")
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view,
+                      view_request_type="GET")
         actions = context.actions
-        self.assertEqual(len(actions), 1)
+        self.assertEqual(len(actions), 2)
 
-        route_action = actions[0]
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(view_discriminator[0], 'view')
+        self.assertEqual(view_discriminator[1], None)
+        self.assertEqual(view_discriminator[2],'')
+        self.assertEqual(view_discriminator[3], request_type)
+        self.assertEqual(view_discriminator[4], IView) 
+        self.assertEqual(view_discriminator[5], None)
+        self.assertEqual(view_discriminator[6], None)
+        self.assertEqual(view_discriminator[7], 'GET')
+        self.assertEqual(view_discriminator[8], 'name')
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
         self.assertEqual(route_callable, connect_route)
-        self.assertEqual(len(route_discriminator), 4)
+        self.assertEqual(len(route_discriminator), 2)
         self.assertEqual(route_discriminator[0], 'route')
         self.assertEqual(route_discriminator[1], 'name')
-        self.assertEqual(route_discriminator[2], None)
-        self.assertEqual(route_discriminator[3], 'GET')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_request_type_alias(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, request_type="GET")
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(view_discriminator[0], 'view')
+        self.assertEqual(view_discriminator[1], None)
+        self.assertEqual(view_discriminator[2],'')
+        self.assertEqual(view_discriminator[3], request_type)
+        self.assertEqual(view_discriminator[4], IView) 
+        self.assertEqual(view_discriminator[5], None)
+        self.assertEqual(view_discriminator[6], None)
+        self.assertEqual(view_discriminator[7], 'GET')
+        self.assertEqual(view_discriminator[8], 'name')
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_request_method(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view,
+                      view_request_method="GET")
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(view_discriminator[0], 'view')
+        self.assertEqual(view_discriminator[1], None)
+        self.assertEqual(view_discriminator[2],'')
+        self.assertEqual(view_discriminator[3], request_type)
+        self.assertEqual(view_discriminator[4], IView) 
+        self.assertEqual(view_discriminator[5], None)
+        self.assertEqual(view_discriminator[6], None)
+        self.assertEqual(view_discriminator[7], 'GET')
+        self.assertEqual(view_discriminator[8], 'name')
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_request_method_alias(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, request_method="GET")
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(view_discriminator[0], 'view')
+        self.assertEqual(view_discriminator[1], None)
+        self.assertEqual(view_discriminator[2],'')
+        self.assertEqual(view_discriminator[3], request_type)
+        self.assertEqual(view_discriminator[4], IView) 
+        self.assertEqual(view_discriminator[5], None)
+        self.assertEqual(view_discriminator[6], None)
+        self.assertEqual(view_discriminator[7], 'GET')
+        self.assertEqual(view_discriminator[8], 'name')
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_containment(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, view_containment=True)
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(view_discriminator[0], 'view')
+        self.assertEqual(view_discriminator[1], None)
+        self.assertEqual(view_discriminator[2],'')
+        self.assertEqual(view_discriminator[3], request_type)
+        self.assertEqual(view_discriminator[4], IView) 
+        self.assertEqual(view_discriminator[5], True)
+        self.assertEqual(view_discriminator[6], None)
+        self.assertEqual(view_discriminator[7], None)
+        self.assertEqual(view_discriminator[8], 'name')
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_containment_alias(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, containment=True)
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(view_discriminator[0], 'view')
+        self.assertEqual(view_discriminator[1], None)
+        self.assertEqual(view_discriminator[2],'')
+        self.assertEqual(view_discriminator[3], request_type)
+        self.assertEqual(view_discriminator[4], IView) 
+        self.assertEqual(view_discriminator[5], True)
+        self.assertEqual(view_discriminator[6], None)
+        self.assertEqual(view_discriminator[7], None)
+        self.assertEqual(view_discriminator[8], 'name')
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
         self.assertEqual(route_args, ('path', 'name', None))
 
 class TestStaticDirective(unittest.TestCase):
@@ -1049,65 +1697,87 @@ class TestStaticDirective(unittest.TestCase):
         return static(*arg, **kw)
 
     def test_absolute(self):
+        from paste.urlparser import StaticURLParser
+        from zope.interface import implementedBy
+        from zope.component import getSiteManager
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.zcml import StaticRootFactory
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
         import os
         here = os.path.dirname(__file__)
         static_path = os.path.join(here, 'fixtures', 'static')
-        from repoze.bfg.zcml import handler
-        from repoze.bfg.zcml import connect_route
-        from repoze.bfg.interfaces import IView
         context = DummyContext()
         self._callFUT(context, 'name', static_path)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
         action = actions[0]
-        callable = action['callable']
         discriminator = action['discriminator']
-        args = action['args']
-        self.assertEqual(callable, handler)
-        self.assertEqual(discriminator[:3], ('view', None, ''))
+        self.assertEqual(discriminator[:3], ('view', StaticRootFactory, ''))
         self.assertEqual(discriminator[4], IView)
-        self.assertEqual(args[1].app.directory, static_path)
+        sm = getSiteManager()
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        iface = implementedBy(StaticRootFactory)
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        wrapped = sm.adapters.lookup((iface, request_type), IView, name='')
+        request = DummyRequest()
+        self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
 
         action = actions[1]
         callable = action['callable']
         discriminator = action['discriminator']
         args = action['args']
         self.assertEqual(callable, connect_route)
-        self.assertEqual(discriminator, ('route', 'name', None, None))
+        self.assertEqual(discriminator, ('route', 'name'))
         self.assertEqual(args[0], 'name*subpath')
 
     def test_package_relative(self):
-        from repoze.bfg.zcml import handler
+        from repoze.bfg.static import PackageURLParser
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
+        from repoze.bfg.zcml import StaticRootFactory
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
         context = DummyContext()
         self._callFUT(context, 'name', 'repoze.bfg.tests:fixtures/static')
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
         action = actions[0]
-        callable = action['callable']
         discriminator = action['discriminator']
-        args = action['args']
-        self.assertEqual(callable, handler)
-        self.assertEqual(discriminator[:3], ('view', None, ''))
+        self.assertEqual(discriminator[:3], ('view', StaticRootFactory, ''))
         self.assertEqual(discriminator[4], IView)
-        self.assertEqual(args[1].app.package_name, 'repoze.bfg.tests')
-        self.assertEqual(args[1].app.resource_name, 'fixtures/static')
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        iface = implementedBy(StaticRootFactory)
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view = sm.adapters.lookup((iface, request_type), IView, name='')
+        request = DummyRequest()
+        self.assertEqual(view(None, request).__class__, PackageURLParser)
 
         action = actions[1]
         callable = action['callable']
         discriminator = action['discriminator']
         args = action['args']
         self.assertEqual(callable, connect_route)
-        self.assertEqual(discriminator, ('route', 'name', None, None))
+        self.assertEqual(discriminator, ('route', 'name'))
         self.assertEqual(args[0], 'name*subpath')
 
     def test_here_relative(self):
-        from repoze.bfg.zcml import handler
+        from repoze.bfg.static import PackageURLParser
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
+        from repoze.bfg.zcml import StaticRootFactory
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
         import repoze.bfg.tests
         context = DummyContext(repoze.bfg.tests)
         self._callFUT(context, 'name', 'fixtures/static')
@@ -1115,21 +1785,25 @@ class TestStaticDirective(unittest.TestCase):
         self.assertEqual(len(actions), 2)
 
         action = actions[0]
-        callable = action['callable']
         discriminator = action['discriminator']
-        args = action['args']
-        self.assertEqual(callable, handler)
-        self.assertEqual(discriminator[:3], ('view', None, ''))
+        self.assertEqual(discriminator[:3], ('view', StaticRootFactory, ''))
         self.assertEqual(discriminator[4], IView)
-        self.assertEqual(args[1].app.package_name, 'repoze.bfg.tests')
-        self.assertEqual(args[1].app.resource_name, 'fixtures/static')
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        iface = implementedBy(StaticRootFactory)
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        wrapped = sm.adapters.lookup((iface, request_type), IView, name='')
+        request = DummyRequest()
+        self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
         action = actions[1]
         callable = action['callable']
         discriminator = action['discriminator']
         args = action['args']
         self.assertEqual(callable, connect_route)
-        self.assertEqual(discriminator, ('route', 'name', None, None))
+        self.assertEqual(discriminator, ('route', 'name'))
         self.assertEqual(args[0], 'name*subpath')
 
 class TestResourceDirective(unittest.TestCase):
@@ -1372,22 +2046,36 @@ class TestBFGViewFunctionGrokker(unittest.TestCase):
         return self._getTargetClass()(*arg, **kw)
 
     def test_grok_is_bfg_view(self):
+        from zope.component import getSiteManager
         from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
         from zope.interface import Interface
         grokker = self._makeOne()
         class obj:
-            pass
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
         obj.__is_bfg_view__ = True
         obj.__permission__ = 'foo'
         obj.__for__ = Interface
         obj.__view_name__ = 'foo.html'
         obj.__request_type__ = IRequest
         obj.__route_name__ = None
+        obj.__request_method__ = None
+        obj.__request_param__ = None
+        obj.__containment__ = None
         context = DummyContext()
         result = grokker.grok('name', obj, context=context)
         self.assertEqual(result, True)
         actions = context.actions
-        self.assertEqual(len(actions), 2)
+        self.assertEqual(len(actions), 1)
+        register = actions[0]['callable']
+        register()
+        sm = getSiteManager()
+        wrapped = sm.adapters.lookup((Interface, IRequest), IView,
+                                     name='foo.html')
+        self.assertEqual(wrapped(None, None), 'OK')
 
     def test_grok_is_not_bfg_view(self):
         grokker = self._makeOne()
@@ -1436,152 +2124,17 @@ class TestExcludeFunction(unittest.TestCase):
         self.assertEqual(self._callFUT('.foo'), True)
         self.assertEqual(self._callFUT('foo'), False)
 
-class TestRequestOnly(unittest.TestCase):
-    def _callFUT(self, arg):
-        from repoze.bfg.zcml import requestonly
-        return requestonly(arg)
-    
-    def test_newstyle_class_no_init(self):
-        class foo(object):
-            """ """
-        self.assertFalse(self._callFUT(foo))
+class TestAll(unittest.TestCase):
+    def test_it(self):
+        from repoze.bfg.zcml import all
+        self.assertEqual(all([True, True]), True)
+        self.assertEqual(all([False, False]), False)
+        self.assertEqual(all([False, True]), False)
 
-    def test_newstyle_class_init_toomanyargs(self):
-        class foo(object):
-            def __init__(self, context, request):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-        
-    def test_newstyle_class_init_onearg_named_request(self):
-        class foo(object):
-            def __init__(self, request):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_newstyle_class_init_onearg_named_somethingelse(self):
-        class foo(object):
-            def __init__(self, req):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_newstyle_class_init_defaultargs_firstname_not_request(self):
-        class foo(object):
-            def __init__(self, context, request=None):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_newstyle_class_init_defaultargs_firstname_request(self):
-        class foo(object):
-            def __init__(self, request, foo=1, bar=2):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_newstyle_class_init_noargs(self):
-        class foo(object):
-            def __init__():
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_no_init(self):
-        class foo:
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_init_toomanyargs(self):
-        class foo:
-            def __init__(self, context, request):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-        
-    def test_oldstyle_class_init_onearg_named_request(self):
-        class foo:
-            def __init__(self, request):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_oldstyle_class_init_onearg_named_somethingelse(self):
-        class foo:
-            def __init__(self, req):
-                """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_oldstyle_class_init_defaultargs_firstname_not_request(self):
-        class foo:
-            def __init__(self, context, request=None):
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_oldstyle_class_init_defaultargs_firstname_request(self):
-        class foo:
-            def __init__(self, request, foo=1, bar=2):
-                """ """
-        self.assertTrue(self._callFUT(foo), True)
-
-    def test_oldstyle_class_init_noargs(self):
-        class foo:
-            def __init__():
-                """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_function_toomanyargs(self):
-        def foo(context, request):
-            """ """
-        self.assertFalse(self._callFUT(foo))
-        
-    def test_function_onearg_named_request(self):
-        def foo(request):
-            """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_function_onearg_named_somethingelse(self):
-        def foo(req):
-            """ """
-        self.assertTrue(self._callFUT(foo))
-
-    def test_function_defaultargs_firstname_not_request(self):
-        def foo(context, request=None):
-            """ """
-        self.assertFalse(self._callFUT(foo))
-
-    def test_function_defaultargs_firstname_request(self):
-        def foo(request, foo=1, bar=2):
-            """ """
-        self.assertTrue(self._callFUT(foo), True)
-
-    def test_instance_toomanyargs(self):
-        class Foo:
-            def __call__(self, context, request):
-                """ """
-        foo = Foo()
-        self.assertFalse(self._callFUT(foo))
-        
-    def test_instance_defaultargs_onearg_named_request(self):
-        class Foo:
-            def __call__(self, request):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo))
-
-    def test_instance_defaultargs_onearg_named_somethingelse(self):
-        class Foo:
-            def __call__(self, req):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo))
-
-    def test_instance_defaultargs_firstname_not_request(self):
-        class Foo:
-            def __call__(self, context, request=None):
-                """ """
-        foo = Foo()
-        self.assertFalse(self._callFUT(foo))
-
-    def test_instance_defaultargs_firstname_request(self):
-        class Foo:
-            def __call__(self, request, foo=1, bar=2):
-                """ """
-        foo = Foo()
-        self.assertTrue(self._callFUT(foo), True)
+class TestStaticRootFactory(unittest.TestCase):
+    def test_it(self):
+        from repoze.bfg.zcml import StaticRootFactory
+        StaticRootFactory({}) # it just needs construction
 
 class DummyModule:
     __path__ = "foo"
@@ -1612,7 +2165,7 @@ class DummyContext:
         self.info = None
         self.resolved = resolved
 
-    def action(self, discriminator, callable, args):
+    def action(self, discriminator, callable=None, args=(), kw={}, order=0):
         self.actions.append(
             {'discriminator':discriminator,
              'callable':callable,
@@ -1639,9 +2192,6 @@ from zope.interface import Interface
 class IDummy(Interface):
     pass
 
-class DummySecurityPolicy:
-    pass
-
 class DummyLogger:
     def __init__(self):
         self.messages = []
@@ -1651,9 +2201,18 @@ class DummyLogger:
     debug = info
 
 class DummyRequest:
+    subpath = ()
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
+        self.environ = environ
+        
     def get_response(self, app):
         return app
-    
+
+    def copy(self):
+        return self
+
 class DummyOverrides:
     def __init__(self, package):
         self.package = package
@@ -1666,3 +2225,17 @@ class DummyPackage:
     def __init__(self, name):
         self.__name__ = name
         
+class DummySettings(dict):
+    def __getattr__(self, name):
+        return self[name]
+    
+class DummySecurityPolicy:
+    def __init__(self, permitted=True):
+        self.permitted = permitted
+
+    def effective_principals(self, request):
+        return []
+
+    def permits(self, context, principals, permission):
+        return self.permitted
+

@@ -17,16 +17,20 @@ from webob import Response
 
 from paste.urlparser import StaticURLParser
 
-from zope.component import queryMultiAdapter
 from zope.component import queryUtility
+from zope.component import providedBy
+from zope.component import getSiteManager
+
+from zope.interface import implements
+
 from zope.deprecation import deprecated
 
-from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IResponseFactory
-from repoze.bfg.path import caller_path
+from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IMultiView
+
 from repoze.bfg.path import caller_package
-from repoze.bfg.security import view_execution_permitted
-from repoze.bfg.security import Unauthorized
+
 from repoze.bfg.static import PackageURLParser
 
 deprecated('view_execution_permitted',
@@ -50,19 +54,21 @@ def render_view_to_response(context, request, name='', secure=True):
     ``repoze.bfg.security.Unauthorized`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
-    if secure:
-        permitted = view_execution_permitted(context, request, name)
-        if not permitted:
-            raise Unauthorized(permitted)
-        
-    # It's no use trying to distinguish below whether response is None
-    # because a) we were returned a default or b) because the view
-    # function returned None: the zope.component/zope.interface
-    # machinery doesn't distinguish a None returned from the view from
-    # a sentinel None returned during queryMultiAdapter (even if we
-    # pass a non-None default).
+    provides = map(providedBy, (context, request))
+    sm = getSiteManager()
+    view = sm.adapters.lookup(provides, IView, name=name)
+    if view is None:
+        return None
 
-    return queryMultiAdapter((context, request), IView, name=name)
+    if not secure:
+        # the view will have a __permissive_view__ attribute if it's
+        # secured; otherwise it won't.
+        view = getattr(view, '__call_permissive__', view)
+
+    # if this view is secured, it will raise an Unauthorized
+    # appropriately if the executing user does not have the proper
+    # permission
+    return view(context, request)
 
 def render_view_to_iterable(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
@@ -211,22 +217,52 @@ class bfg_view(object):
        route_name='site1'
        />
 
-    If ``name`` is not supplied, the empty string is used (implying
-    the default view).
-
-    If ``request_type`` is not supplied, the interface
-    ``repoze.bfg.interfaces.IRequest`` is used.
+    The following arguments are supported: ``for_``, ``permission``,
+    ``name``, ``request_type``, ``route_name``, ``request_method``,
+    ``request_param``, and ``containment``.
 
     If ``for_`` is not supplied, the interface
-    ``zope.interface.Interface`` (implying *all* interfaces) is used.
+    ``zope.interface.Interface`` (matching any context) is used.
 
     If ``permission`` is not supplied, no permission is registered for
     this view (it's accessible by any caller).
+
+    If ``name`` is not supplied, the empty string is used (implying
+    the default view name).
+
+    If ``request_type`` is not supplied, the interface
+    ``repoze.bfg.interfaces.IRequest`` is used, implying the standard
+    request interface type.
 
     If ``route_name`` is not supplied, the view declaration is
     considered to be made against a URL that doesn't match any defined
     :term:`route`.  The use of a ``route_name`` is an advanced
     feature, useful only if you're using :term:`url dispatch`.
+
+    If ``request_method`` is not supplied, this view will match a
+    request with any HTTP ``REQUEST_METHOD``
+    (GET/POST/PUT/HEAD/DELETE).  If this parameter *is* supplied, it
+    must be a string naming an HTTP ``REQUEST_METHOD``, indicating
+    that this view will only match when the current request has a
+    ``REQUEST_METHOD`` that matches this value.
+
+    If ``request_param`` is not supplied, this view will be called
+    when a request with any (or no) request GET or POST parameters is
+    encountered.  If the value is present, it must be a string.  If
+    the value supplied to the parameter has no ``=`` sign in it, it
+    implies that the key must exist in the ``request.params``
+    dictionary for this view to'match' the current request.  If the value
+    supplied to the parameter has a ``=`` sign in it, e.g.
+    ``request_params="foo=123"``, then the key (``foo``) must both exist
+    in the ``request.params`` dictionary, and the value must match the
+    right hand side of the expression (``123``) for the view to "match" the
+    current request.
+
+    If ``containment`` is not supplied, this view will be called when
+    the context of the request has any location lineage.  If
+    ``containment`` *is* supplied, it must be a class or :term:`interface`,
+    denoting that the view 'matches' the current request only if any graph
+    lineage node possesses this class or interface.
 
     Any individual or all parameters can be omitted.  The simplest
     bfg_view declaration then becomes::
@@ -239,7 +275,9 @@ class bfg_view(object):
     ``my_view``, registered for models with the
     ``zope.interface.Interface`` interface, using no permission,
     registered against requests which implement the default IRequest
-    interface when no urldispatch route matches.
+    interface when no urldispatch route matches, with any
+    REQUEST_METHOD, any set of request.params values, in any lineage
+    containment.
 
     The ``bfg_view`` decorator can also be used as a class decorator
     in Python 2.6 and better (Python 2.5 and below do not support
@@ -284,35 +322,28 @@ class bfg_view(object):
       <scan package="."/>
     """
     def __init__(self, name='', request_type=None, for_=None, permission=None,
-                 route_name=None):
+                 route_name=None, request_method=None, request_param=None,
+                 containment=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
         self.permission = permission
         self.route_name = route_name
+        self.request_method = request_method
+        self.request_param = request_param
+        self.containment = containment
 
     def __call__(self, wrapped):
-        _bfg_view = wrapped
-        if inspect.isclass(_bfg_view):
-            # If the object we're decorating is a class, turn it into
-            # a function that operates like a Zope view (when it's
-            # invoked, construct an instance using 'context' and
-            # 'request' as position arguments, then immediately invoke
-            # the __call__ method of the instance with no arguments;
-            # __call__ should return an IResponse).
-            def _bfg_class_view(context, request):
-                inst = wrapped(context, request)
-                return inst()
-            _bfg_class_view.__module__ = wrapped.__module__
-            _bfg_class_view.__name__ = wrapped.__name__
-            _bfg_class_view.__doc__ = wrapped.__doc__
-            _bfg_view = _bfg_class_view
+        _bfg_view = map_view(wrapped)
         _bfg_view.__is_bfg_view__ = True
         _bfg_view.__permission__ = self.permission
         _bfg_view.__for__ = self.for_
         _bfg_view.__view_name__ = self.name
         _bfg_view.__request_type__ = self.request_type
         _bfg_view.__route_name__ = self.route_name
+        _bfg_view.__request_method__ = self.request_method
+        _bfg_view.__request_param__ = self.request_param
+        _bfg_view.__containment__ = self.containment
         return _bfg_view
 
 def default_view(context, request, status):
@@ -342,3 +373,141 @@ def default_forbidden_view(context, request):
 def default_notfound_view(context, request):
     return default_view(context, request, '404 Not Found')
 
+class NotFound(Exception):
+    pass
+
+class MultiView(object):
+    implements(IMultiView)
+
+    def __init__(self, name):
+        self.name = name
+        self.views = []
+
+    def add(self, view, score):
+        self.views.append((score, view))
+        self.views.sort()
+
+    def match(self, context, request):
+        for score, view in self.views:
+            if not hasattr(view, '__predicated__'):
+                return view
+            if view.__predicated__(context, request):
+                return view
+        raise NotFound(self.name)
+
+    def __permitted__(self, context, request):
+        view = self.match(context, request)
+        if hasattr(view, '__permitted__'):
+            return view.__permitted__(context, request)
+        return True
+
+    def __call_permissive__(self, context, request):
+        view = self.match(context, request)
+        view = getattr(view, '__call_permissive__', view)
+        return view(context, request)
+
+    def __call__(self, context, request):
+        for score, view in self.views:
+            try:
+                return view(context, request)
+            except NotFound:
+                continue
+        raise NotFound(self.name)
+
+def map_view(view):
+    wrapped_view = view
+
+    if inspect.isclass(view):
+        # If the object we've located is a class, turn it into a
+        # function that operates like a Zope view (when it's invoked,
+        # construct an instance using 'context' and 'request' as
+        # position arguments, then immediately invoke the __call__
+        # method of the instance with no arguments; __call__ should
+        # return an IResponse).
+        if requestonly(view):
+            # its __init__ accepts only a single request argument,
+            # instead of both context and request
+            def _bfg_class_requestonly_view(context, request):
+                inst = view(request)
+                return inst()
+            wrapped_view = _bfg_class_requestonly_view
+        else:
+            # its __init__ accepts both context and request
+            def _bfg_class_view(context, request):
+                inst = view(context, request)
+                return inst()
+            wrapped_view = _bfg_class_view
+
+    elif requestonly(view):
+        # its __call__ accepts only a single request argument,
+        # instead of both context and request
+        def _bfg_requestonly_view(context, request):
+            return view(request)
+        wrapped_view = _bfg_requestonly_view
+
+    decorate_view(wrapped_view, view)
+    return wrapped_view
+
+def requestonly(class_or_callable):
+    """ Return true of the class or callable accepts only a request argument,
+    as opposed to something that accepts context, request """
+    if inspect.isfunction(class_or_callable):
+        fn = class_or_callable
+    elif inspect.isclass(class_or_callable):
+        try:
+            fn = class_or_callable.__init__
+        except AttributeError:
+            return False
+    else:
+        try:
+            fn = class_or_callable.__call__
+        except AttributeError:
+            return False
+
+    try:
+        argspec = inspect.getargspec(fn)
+    except TypeError:
+        return False
+
+    args = argspec[0]
+    defaults = argspec[3]
+
+    if hasattr(fn, 'im_func'):
+        # it's an instance method
+        if not args:
+            return False
+        args = args[1:]
+    if not args:
+        return False
+
+    if len(args) == 1:
+        return True
+
+    elif args[0] == 'request':
+        if len(args) - len(defaults) == 1:
+            return True
+
+    return False
+
+def decorate_view(wrapped_view, original_view):
+    if wrapped_view is not original_view:
+        wrapped_view.__module__ = original_view.__module__
+        wrapped_view.__doc__ = original_view.__doc__
+        try:
+            wrapped_view.__name__ = original_view.__name__
+        except AttributeError:
+            wrapped_view.__name__ = repr(original_view)
+        try:
+            wrapped_view.__permitted__ = original_view.__permitted__
+        except AttributeError:
+            pass
+        try:
+            wrapped_view.__call_permissive__ = original_view.__call_permissive__
+        except AttributeError:
+            pass
+        try:
+            wrapped_view.__predicated__ = original_view.__predicated__
+        except AttributeError:
+            pass
+        return True
+    return False

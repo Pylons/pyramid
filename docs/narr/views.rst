@@ -247,14 +247,34 @@ permission
   call the view.  See :ref:`view_security_section` for more
   information about view security and permissions.
 
-request_type
+request_method
 
   This value can either be one of the strings 'GET', 'POST', 'PUT',
-  'DELETE', or 'HEAD' representing an HTTP method, *or* it may be
-  Python dotted-path string representing the :term:`interface` that
-  the :term:`request` must have in order for this view to be found and
-  called.  See :ref:`view_request_types_section` for more information
-  about request types.
+  'DELETE', or 'HEAD' representing an HTTP ``REQUEST_METHOD``.  A view
+  declaration with this attribute ensures that the view will only be
+  called when the request's ``method`` (aka ``REQUEST_METHOD``) string
+  matches the supplied value.
+
+request_param
+
+  This value can be any string.  A view declaration with this
+  attribute ensures that the view will only be called when the request
+  has a key in the ``request.params`` dictionary (an HTTP ``GET`` or
+  ``POST`` variable) that has a name which matches the supplied value.
+  If the value supplied to the attribute has a ``=`` sign in it,
+  e.g. ``request_params="foo=123"``, then the key (``foo``) must both
+  exist in the ``request.params`` dictionary, and the value must match
+  the right hand side of the expression (``123``) for the view to
+  "match" the current request.
+
+containment
+
+  This value should be a Python dotted-path string representing the
+  class that a graph traversal parent object of the :term:`context`
+  must be an instance of (or :term:`interface` that a parent object
+  must provide) in order for this view to be found and called.  Your
+  models must be "location-aware" to use this feature.  See
+  :ref:`location_aware` for more information about location-awareness.
 
 route_name
 
@@ -271,6 +291,69 @@ route_name
   :term:`root factory`.  See :ref:`hybrid_chapter` for more
   information on using this advanced feature.
 
+request_type
+
+  This value should be a Python dotted-path string representing the
+  :term:`interface` that the :term:`request` must have in order for
+  this view to be found and called.  See
+  :ref:`view_request_types_section` for more information about request
+  types.  For backwards compatibility with :mod:`repoze.bfg` version
+  1.0, this value may also be an HTTP ``REQUEST_METHOD`` string, e.g.
+  ('GET', 'HEAD', 'PUT', 'POST', or 'DELETE').  Passing request method
+  strings as a ``request_type`` is deprecated.  Use the
+  ``request_method`` attribute instead for maximum forward
+  compatibility.
+
+.. _view_lookup_ordering:
+
+View Lookup Ordering
+--------------------
+
+Attributes of the ZCML ``view`` directive can be thought of like
+"narrowers" or "predicates".  In general, the greater number of
+attributes possessed by a view directive, the more specific the
+circumstances need to be before the registered view will be called.
+
+For any given request, a view with five predicates will always be
+found and evaluated before a view with two, for example.  All
+predicatese must match for the associated view to be called.
+
+This does not mean however, that :mod:`repoze.bfg` "stops looking"
+when it finds a view registration with predicates that don't match.
+If one set of view predicates does not match, the "next most specific"
+view (if any) view is consulted for predicates, and so on, until a
+view is found, or no view can be matched up with the request.  The
+first view with a set of predicates all of which match the request
+environment will be invoked.
+
+If no view can be found which has predicates which allow it to be
+matched up with the request, :mod:`repoze.bfg` will return an error to
+the user's browser, representing a "not found" (404) page.  See
+:ref:`changing_the_notfound_view` for more information about changing
+the default notfound view.
+
+There are a several exceptions to the the rule which says that ZCML
+directive attributes represent "narrowings".  Several attributes of
+the ``view`` directive are *not* narrowing predicates.  These are
+``permission`` and ``name``.
+
+The value of the ``permission`` attribute represents the permission
+that must be possessed by the user to invoke any found view.  When a
+view is found that matches all predicates, but the invoking user does
+not possess the permission implied by any associated ``permission`` in
+the current context, processing stops, and an ``Unauthorized`` error
+is raised, usually resulting in a "forbidden" view being shown to the
+invoking user.  No further view narrowing or view lookup is done.
+
+.. note:: 
+
+   See :ref:`changing_the_forbidden_view` for more information about
+   changing the default forbidden view.
+
+The value of the ``name`` attribute represents a direct match of the
+view name returned via traversal.  It is part of intial view lookup
+rather than a predicate/narrower.
+
 .. _mapping_views_to_urls_using_a_decorator_section:
 
 Mapping Views to URLs Using a Decorator
@@ -281,7 +364,8 @@ more comfortable defining your view declarations using Python, you may
 use the ``repoze.bfg.view.bfg_view`` decorator to associate your view
 functions with URLs instead of using :term:`ZCML` for the same
 purpose.  ``repoze.bfg.view.bfg_view`` can be used to associate
-``for``, ``name``, ``permission`` and ``request_type`` information --
+``for``, ``name``, ``permission`` and ``request_method``,
+``containment``, ``request_param`` and ``request_type`` information --
 as done via the equivalent ZCML -- with a function that acts as a
 :mod:`repoze.bfg` view.
 
@@ -343,8 +427,9 @@ All arguments to ``bfg_view`` are optional.
 If ``name`` is not supplied, the empty string is used (implying
 the default view).
 
-If ``request_type`` is not supplied, the interface ``None`` is used,
-implying any request type.
+If ``request_type`` is not supplied, the value ``None`` is used,
+implying any request type.  Otherwise, this should be a class or
+interface.
 
 If ``for_`` is not supplied, the interface
 ``zope.interface.Interface`` (which matches any model) is used.
@@ -356,6 +441,21 @@ this view (it's accessible by any caller).
 If ``route_name`` is supplied, the view will be invoked only if the
 named route matches.  *This is an advanced feature, not often used by
 "civilians"*.
+
+If ``request_method`` is supplied, the view will be invoked only if
+the ``REQUEST_METHOD`` of the request matches the value.
+
+If ``request_param`` is supplied, the view will be invoked only if the
+``request.params`` data structure contains a key matching the value
+provided.
+
+If ``containment`` is supplied, the view will be invoked only if a
+location parent supplies the interface or class implied by the
+provided value.
+
+View lookup ordering for views registered with the ``bfg_view``
+decorator is the same as for those registered via ZCML.  See
+:ref:`view_lookup_ordering` for more information.
 
 All arguments may be omitted.  For example:
 
@@ -371,8 +471,8 @@ All arguments may be omitted.  For example:
 
 Such a registration as the one directly above implies that the view
 name will be ``my_view``, registered ``for_`` any model type, using no
-permission, registered against requests which implement any request
-method or interface.
+permission, registered against requests with any request method /
+request type / request param / route name / containment.
 
 If your view callable is a class, the ``bfg_view`` decorator can also
 be used as a class decorator in Python 2.6 and better (Python 2.5 and
@@ -561,9 +661,10 @@ Custom View Request Types
 
 You can make use of *custom* view request types by attaching an
 :term:`interface` to the request and specifying this interface in the
-``request_type`` parameter.  For example, you might want to make use
-of simple "content negotiation", only invoking a particular view if
-the request has a content-type of 'application/json'.
+``request_type`` parameter as a dotted Python name.  For example, you
+might want to make use of simple "content negotiation", only invoking
+a particular view if the request has a content-type of
+'application/json'.
 
 For information about using interface to specify a request type, see
 :ref:`using_an_event_to_vary_the_request_type`.

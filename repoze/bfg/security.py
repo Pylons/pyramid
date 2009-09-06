@@ -1,14 +1,11 @@
-from zope.component import queryMultiAdapter
+from zope.component import getSiteManager
 from zope.component import queryUtility
+from zope.component import providedBy
 from zope.deprecation import deprecated
-
-from zope.interface import implements
-from zope.interface import classProvides
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import IViewPermission
-from repoze.bfg.interfaces import IViewPermissionFactory
+from repoze.bfg.interfaces import ISecuredView
 
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
@@ -95,13 +92,14 @@ def view_execution_permitted(context, request, name=''):
     ``request``.  Return a boolean result.  If no authentication
     policy is in effect, or if the view is not protected by a
     permission, return True."""
-    result = queryMultiAdapter((context, request), IViewPermission,
-                               name=name, default=None)
-    if result is None:
+    sm = getSiteManager()
+    provides = map(providedBy, (context, request))
+    view = sm.adapters.lookup(provides, ISecuredView, name=name)
+    if view is None:
         return Allowed(
             'Allowed: view name %r in context %r (no permission defined)' %
             (name, context))
-    return result
+    return view.__permitted__(context, request)
 
 def remember(request, principal, **kw):
     """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
@@ -232,16 +230,6 @@ class ACLAllowed(ACLPermitsResult):
     as the ``msg`` attribute."""
     boolval = 1
 
-class ViewPermissionFactory(object):
-    classProvides(IViewPermissionFactory)
-    implements(IViewPermission)
-
-    def __init__(self, permission_name):
-        self.permission_name = permission_name
-
-    def __call__(self, context, request):
-        return has_permission(self.permission_name, context, request)
-        
 class Unauthorized(Exception):
     pass
 

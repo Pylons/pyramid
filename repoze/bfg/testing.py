@@ -1,5 +1,7 @@
 import copy
 
+from zope.deprecation import deprecated
+
 from zope.interface import Interface
 from zope.interface import implements
 
@@ -79,21 +81,40 @@ def registerDummyRenderer(path, renderer=None):
         renderer = DummyTemplateRenderer()
     return registerUtility(renderer, ITemplateRenderer, path)
 
-def registerView(name, result='', view=None, for_=(Interface, Interface)):
+def registerView(name, result='', view=None, for_=(Interface, Interface),
+                 permission=None):
     """ Registers ``repoze.bfg`` view function under the name
     ``name``.  The view will return a webob Response object with the
     ``result`` value as its body attribute.  To gain more control, if
     you pass in a non-None ``view``, this view function will be used
     instead of an automatically generated view function (and
-    ``result`` is not used).  This function is useful when dealing
-    with code that wants to call,
+    ``result`` is not used).  To protect the view using a permission,
+    pass in a non-``None`` value as ``permission``.  This permission
+    will be checked by any existing security policy when view
+    execution is attempted.  This function is useful when dealing with
+    code that wants to call,
     e.g. ``repoze.bfg.view.render_view_to_response``."""
+    from repoze.bfg.interfaces import IView
+    from repoze.bfg.interfaces import ISecuredView
+    from repoze.bfg.security import has_permission
+    from repoze.bfg.security import Unauthorized
     if view is None:
         def view(context, request):
             from webob import Response
             return Response(result)
-    from repoze.bfg.interfaces import IView
-    return registerAdapter(view, for_, IView, name)
+    if permission is None:
+        return registerAdapter(view, for_, IView, name)
+    else:
+        def _secure(context, request):
+            if not has_permission(permission, context, request):
+                raise Unauthorized('no permission')
+            else:
+                return view(context, request)
+        _secure.__call_permissive__ = view
+        def permitted(context, request):
+            return has_permission(permission, context, request)
+        _secure.__permitted__ = permitted
+        return registerAdapter(_secure, for_, ISecuredView, name)
 
 def registerViewPermission(name, result=True, viewpermission=None,
                            for_=(Interface, Interface)):
@@ -108,7 +129,10 @@ def registerViewPermission(name, result=True, viewpermission=None,
     used).  This method is useful when dealing with code that
     wants to call, e.g. ``repoze.bfg.view.view_execution_permitted``.
     Note that view permissions are not checked unless a security
-    policy is in effect (see ``registerSecurityPolicy``)."""
+    policy is in effect (see ``registerSecurityPolicy``).
+
+    **This function was deprecated in repoze.bfg 1.2.**
+    """
     from repoze.bfg.security import Allowed
     from repoze.bfg.security import Denied
     if result is True:
@@ -120,6 +144,17 @@ def registerViewPermission(name, result=True, viewpermission=None,
             return result
     from repoze.bfg.interfaces import IViewPermission
     return registerAdapter(viewpermission, for_, IViewPermission, name)
+
+deprecated('registerViewPermission',
+           'registerViewPermission has been deprecated.  As of repoze.bfg '
+           'version 1.2, view functions are now responsible for protecting '
+           'their own execution.  A call to this function wont prevent a '
+           'view from being executed by the repoze.bfg router, nor '
+           'will the ``repoze.bfg.security.view_execution_permitted`` function '
+           'use the permission registered with this function.  Instead,'
+           'registering a view permission during testing, use the '
+           '``repoze.bfg.testing.registerView`` directive with a '
+           '``permission`` argument.')
 
 def registerUtility(impl, iface=Interface, name=''):
     """ Register a Zope component architecture utility component.

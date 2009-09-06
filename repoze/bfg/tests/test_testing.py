@@ -4,9 +4,13 @@ import unittest
 class TestTestingFunctions(unittest.TestCase):
     def setUp(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.off()
 
     def tearDown(self):
         cleanUp()
+        from zope.deprecation import __show__
+        __show__.on()
 
     def test_registerDummySecurityPolicy(self):
         from repoze.bfg import testing
@@ -143,34 +147,78 @@ class TestTestingFunctions(unittest.TestCase):
         response = render_view_to_response(None, None, 'moo.html')
         self.assertEqual(response.body, '123')
 
-    def test_registerViewPermission_defaults(self):
+    def test_registerView_with_permission_denying(self):
+        from repoze.bfg import testing
+        from repoze.bfg.security import Unauthorized
+        def view(context, request):
+            """ """
+        view = testing.registerView('moo.html', view=view, permission='bar')
+        testing.registerDummySecurityPolicy(permissive=False)
+        import types
+        self.failUnless(isinstance(view, types.FunctionType))
+        from repoze.bfg.view import render_view_to_response
+        self.assertRaises(Unauthorized, render_view_to_response,
+                          None, None, 'moo.html')
+
+    def test_registerView_with_permission_denying2(self):
+        from repoze.bfg import testing
         from repoze.bfg.security import view_execution_permitted
+        def view(context, request):
+            """ """
+        view = testing.registerView('moo.html', view=view, permission='bar')
+        testing.registerDummySecurityPolicy(permissive=False)
+        import types
+        self.failUnless(isinstance(view, types.FunctionType))
+        result = view_execution_permitted(None, None, 'moo.html')
+        self.assertEqual(result, False)
+
+    def test_registerView_with_permission_allowing(self):
+        from repoze.bfg import testing
+        def view(context, request):
+            from webob import Response
+            return Response('123')
+        view = testing.registerView('moo.html', view=view, permission='bar')
+        testing.registerDummySecurityPolicy(permissive=True)
+        import types
+        self.failUnless(isinstance(view, types.FunctionType))
+        from repoze.bfg.view import render_view_to_response
+        result = render_view_to_response(None, None, 'moo.html')
+        self.assertEqual(result.app_iter, ['123'])
+
+    def test_registerViewPermission_defaults(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg import testing
         view = testing.registerViewPermission('moo.html')
-        testing.registerDummySecurityPolicy()
-        result = view_execution_permitted(None, None, 'moo.html')
-        self.failUnless(result)
-        self.assertEqual(result.msg, 'message')
+        sm = getSiteManager()
+        result = sm.getMultiAdapter(
+            (Interface, Interface), IViewPermission, 'moo.html')
+        self.assertEqual(result, True)
         
     def test_registerViewPermission_denying(self):
-        from repoze.bfg.security import view_execution_permitted
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg import testing
         view = testing.registerViewPermission('moo.html', result=False)
-        testing.registerDummySecurityPolicy()
-        result = view_execution_permitted(None, None, 'moo.html')
-        self.failIf(result)
-        self.assertEqual(result.msg, 'message')
+        sm = getSiteManager()
+        result = sm.getMultiAdapter(
+            (Interface, Interface), IViewPermission, 'moo.html')
+        self.assertEqual(result, False)
 
     def test_registerViewPermission_custom(self):
-        from repoze.bfg.security import view_execution_permitted
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IViewPermission
         def viewperm(context, request):
             return True
         from repoze.bfg import testing
-        view = testing.registerViewPermission('moo.html',
-                                              viewpermission=viewperm)
-        testing.registerDummySecurityPolicy()
-        result = view_execution_permitted(None, None, 'moo.html')
-        self.failUnless(result is True)
+        testing.registerViewPermission('moo.html', viewpermission=viewperm)
+        sm = getSiteManager()
+        result = sm.getMultiAdapter(
+            (Interface, Interface), IViewPermission, 'moo.html')
+        self.assertEqual(result, True)
 
     def test_registerAdapter(self):
         from zope.interface import implements

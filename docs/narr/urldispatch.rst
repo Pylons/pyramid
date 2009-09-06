@@ -62,15 +62,22 @@ attributes are optional unless the description names them as required.
 
 path
 
-  The `route path
-  <http://routes.groovie.org/manual.html#route-path>`_,
-  e.g. ``ideas/:idea``.  This attribute is required.
+  The path of the route e.g. ``ideas/:idea``.  This attribute is
+  required.  See :ref:`route_path_pattern_syntax` for information
+  about the syntax of route paths.
 
 name
 
-  The `route name
-  <http://routes.groovie.org/manual.html#route-name>`_,
-  e.g. ``myroute``.  This attribute is required.
+  The name of the route, e.g. ``myroute``.  This attribute is
+  required.  It must be unique among all defined routes in a given
+  configuration.
+
+factory
+
+  The Python dotted-path name to a function that will generate a
+  :mod:`repoze.bfg` context object when this route matches.
+  e.g. ``mypackage.models.MyFactoryClass``.  If this argument is not
+  specified, a default root factory will be used.
 
 view
 
@@ -86,23 +93,79 @@ view_for
   attribute is used.  If this attribute is not specified, the default
   (``None``) will be used.
 
-permission
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
 
-  The permission name required to invoke the view.
-  e.g. ``edit``. (see :ref:`using_security_with_urldispatch` for more
-  information about permissions).
+  This attribute can also be spelled as ``for``.
 
-factory
+view_permission
 
-  The Python dotted-path name to a function that will generate a
-  :mod:`repoze.bfg` context object when this route matches.
-  e.g. ``mypackage.models.MyFactoryClass``.  If this argument is not
-  specified, a default root factory will be used.
+  The permission name required to invoke the view associated with this
+  route.  e.g. ``edit``. (see :ref:`using_security_with_urldispatch`
+  for more information about permissions).
 
-request_type
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
 
-  A string representing an HTTP method name, e.g. ``GET`` or ``POST``
-  or an interface representing a :term:`request type`.
+  This atribute can also be spelled as ``permission``.
+
+view_request_type
+
+  A dotted Python name to an interface representing a :term:`request
+  type`.  For backwards compatibility with :mod:`repoze.bfg` 1.0 and
+  before, this may also be a string naming an HTTP ``REQUEST_METHOD``
+  (any of ``GET``, ``POST``, ``HEAD``, ``DELETE``, ``PUT``).  However,
+  these values should really be specified in ``request_method``.  If
+  this argument is not specified, any request type will be considered
+  a match for the view associated with this route.
+
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
+
+  This attribute can also be spelled as ``request_type``.
+
+view_request_method
+
+  A string representing an HTTP method name, e.g. ``GET``, ``POST``,
+  ``HEAD``, ``DELETE``, ``PUT``.  If this argument is not specified
+  any request method will be considered a match for the view
+  associated with this route.
+
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
+
+  This attribute can also be spelled as ``request_method``.
+
+view_request_param
+
+  This value can be any string.  A view declaration with this
+  attribute ensures that the associated view will only be called when
+  the request has a key in the ``request.params`` dictionary (an HTTP
+  ``GET`` or ``POST`` variable) that has a name which matches the
+  supplied value.  If the value supplied to the attribute has a ``=``
+  sign in it, e.g. ``request_params="foo=123"``, then the key
+  (``foo``) must both exist in the ``request.params`` dictionary, and
+  the value must match the right hand side of the expression (``123``)
+  for the view to "match" the current request.
+
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
+
+  This attribute can also be spelled as ``request_param``.
+
+view_containment
+
+  This value should be a Python dotted-path string representing the
+  class that a graph traversal parent object of the :term:`context`
+  must be an instance of (or :term:`interface` that a parent object
+  must provide) in order for this view to be found and called.  Your
+  models must be "location-aware" to use this feature.  See
+  :ref:`location_aware` for more information about location-awareness.
+
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
+
+  This attribute can also be spelled as ``containment``.
 
 The Matchdict
 -------------
@@ -113,6 +176,8 @@ When this URL path pattern is matched, a dictionary is placed on the
 request named ``matchdict`` with the values that match patterns in the
 ``path`` element.  If the URL pattern does not match, no matchdict is
 generated.
+
+.. _route_path_pattern_syntax:
 
 Path Pattern Syntax
 --------------------

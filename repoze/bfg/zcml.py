@@ -1,5 +1,5 @@
 import os
-import inspect
+import sys
 import types
 
 from zope.configuration import xmlconfig
@@ -14,6 +14,8 @@ from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
 
 from zope.interface import Interface
+from zope.interface.interfaces import IInterface
+from zope.interface import implementedBy
 
 from zope.schema import TextLine
 from zope.schema import Bool
@@ -32,30 +34,45 @@ from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import ISecurityPolicy
+from repoze.bfg.interfaces import ISecuredView
+from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IUnauthorizedAppFactory
 from repoze.bfg.interfaces import ILogger
-from repoze.bfg.interfaces import IRequestFactories
 from repoze.bfg.interfaces import IPackageOverrides
+from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IRouteRequest
 
 from repoze.bfg.path import package_name
 
 from repoze.bfg.resource import PackageOverrides
 
-from repoze.bfg.request import DEFAULT_REQUEST_FACTORIES
-from repoze.bfg.request import named_request_factories
+from repoze.bfg.request import create_route_request_factory
 
-from repoze.bfg.security import ViewPermissionFactory
+from repoze.bfg.security import Unauthorized
 
 from repoze.bfg.secpols import registerBBBAuthn
+from repoze.bfg.settings import get_settings
+
+from repoze.bfg.traversal import find_interface
 
 from repoze.bfg.view import static as static_view
+from repoze.bfg.view import NotFound
+from repoze.bfg.view import MultiView
+from repoze.bfg.view import map_view
+from repoze.bfg.view import decorate_view
+
 
 import martian
 
-def handler(methodName, *args, **kwargs):
-    method = getattr(getSiteManager(), methodName)
-    method(*args, **kwargs)
+try:
+    all = all
+except NameError: # pragma: no cover
+    def all(iterable):
+        for element in iterable:
+            if not element:
+                return False
+        return True
 
 def view(
     _context,
@@ -65,56 +82,154 @@ def view(
     name="",
     request_type=None,
     route_name=None,
+    request_method=None,
+    request_param=None,
+    containment=None,
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
     if not view:
         raise ConfigurationError('"view" attribute was not specified')
 
-    if route_name is None:
-        request_factories = DEFAULT_REQUEST_FACTORIES
-    else:
-        request_factories = queryUtility(IRequestFactories, name=route_name)
-        if request_factories is None:
-            raise ConfigurationError(
-                'Unknown route_name "%s".  <route> definitions must be ordered '
-                'before the view definition which mentions the route\'s name '
-                'within ZCML (or before the "scan" directive is invoked '
-                'within a bfg_view decorator).' % route_name)
-        
-    if request_type in request_factories:
-        request_type = request_factories[request_type]['interface']
-    else:
+    sm = getSiteManager()
+
+    if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
+        # b/w compat for 1.0
+        request_method = request_type
+        request_type = None
+
+    if request_type is None:
+        if route_name is None:
+            request_type = IRequest
+        else:
+            request_type = queryUtility(IRouteRequest, name=route_name)
+            if request_type is None:
+                factory = create_route_request_factory(route_name)
+                request_type = implementedBy(factory)
+                sm.registerUtility(factory, IRouteRequest, name=route_name)
+
+    if isinstance(request_type, basestring):
         request_type = _context.resolve(request_type)
 
-    derived_view = derive_view(view)
+    predicates = []
+    weight = sys.maxint
 
-    if permission:
-        pfactory = ViewPermissionFactory(permission)
-        _context.action(
-            discriminator = ('permission', for_, name, request_type,
-                             IViewPermission),
-            callable = handler,
-            args = ('registerAdapter',
-                    pfactory, (for_, request_type), IViewPermission, name,
-                    _context.info),
-            )
+    # Predicates are added to the predicate list in (presumed)
+    # computation expense order.  All predicates associated with a
+    # view must evaluate true for the view to "match" a request.
+    # Elsewhere in the code, we evaluate them using a generator
+    # expression.  The fastest predicate should be evaluated first,
+    # then the next fastest, and so on, as if one returns false, the
+    # remainder of the predicates won't need to be evaluated.
 
+    # Each predicate is associated with a weight value.  The weight
+    # symbolizes the relative potential "importance" of the predicate
+    # to all other predicates.  A larger weight indicates greater
+    # importance.  These weights are subtracted from an aggregate
+    # 'weight' variable.  The aggregate weight is then divided by the
+    # length of the predicate list to compute a "score" for this view.
+    # The score represents the ordering in which a "multiview" ( a
+    # collection of views that share the same context/request/name
+    # triad but differ in other ways via predicates) will attempt to
+    # call its set of views.  Views with lower scores will be tried
+    # first.  The intent is to a) ensure that views with more
+    # predicates are always evaluated before views with fewer
+    # predicates and b) to ensure a stable call ordering of views that
+    # share the same number of predicates.
+
+    # Views which do not have any predicates get a score of
+    # "sys.maxint", meaning that they will be tried very last.
+
+    if request_method is not None:
+        def request_method_predicate(context, request):
+            return request.method == request_method
+        weight = weight - 10
+        predicates.append(request_method_predicate)
+
+    if request_param is not None:
+        request_param_val = None
+        if '=' in request_param:
+            request_param, request_param_val = request_param.split('=', 1)
+        def request_param_predicate(context, request):
+            if request_param_val is None:
+                return request_param in request.params
+            return request.params.get(request_param) == request_param_val
+        weight = weight - 20
+        predicates.append(request_param_predicate)
+
+    if containment is not None:
+        def containment_predicate(context, request):
+            return find_interface(context, containment) is not None
+        weight = weight - 30
+        predicates.append(containment_predicate)
+
+    if predicates:
+        score = float(weight) / len(predicates)
+    else:
+        score = sys.maxint
+
+    def register():
+        derived_view = derive_view(view, permission, predicates)
+        r_for_ = for_
+        r_request_type = request_type
+        if r_for_ is None:
+            r_for_ = Interface
+        if not IInterface.providedBy(r_for_):
+            r_for_ = implementedBy(r_for_)
+        if not IInterface.providedBy(r_request_type):
+            r_request_type = implementedBy(r_request_type)
+        old_view = sm.adapters.lookup((r_for_, r_request_type), IView,name=name)
+        if old_view is None:
+            if hasattr(derived_view, '__call_permissive__'):
+                sm.registerAdapter(derived_view, (for_, request_type),
+                                   ISecuredView, name, _context.info)
+                if hasattr(derived_view, '__permitted__'):
+                    # bw compat
+                    sm.registerAdapter(derived_view.__permitted__,
+                                       (for_, request_type), IViewPermission,
+                                       name, _context.info)
+            else:
+                sm.registerAdapter(derived_view, (for_, request_type),
+                                   IView, name, _context.info)
+        else:
+            # XXX we could try to be more efficient here and register
+            # a non-secured view for a multiview if none of the
+            # multiview's consituent views have a permission
+            # associated with them, but this code is getting pretty
+            # rough already
+            if IMultiView.providedBy(old_view):
+                multiview = old_view
+            else:
+                multiview = MultiView(name)
+                multiview.add(old_view, sys.maxint)
+            multiview.add(derived_view, score)
+            for i in (IView, ISecuredView):
+                # unregister any existing views
+                sm.adapters.unregister((r_for_, r_request_type), i, name=name)
+            sm.registerAdapter(multiview, (for_, request_type), IMultiView,
+                               name, _context.info)
+            # b/w compat
+            sm.registerAdapter(multiview.__permitted__,
+                               (for_, request_type), IViewPermission,
+                               name, _context.info)
     _context.action(
-        discriminator = ('view', for_, name, request_type, IView),
-        callable = handler,
-        args = ('registerAdapter',
-                derived_view, (for_, request_type), IView, name, _context.info),
+        discriminator = ('view', for_, name, request_type, IView, containment,
+                         request_param, request_method, route_name),
+        callable = register,
+        args = (),
         )
 
 _view = view # for directives that take a view arg
 
 def view_utility(_context, view, iface):
-    derived_view = derive_view(view)
+    def register():
+        derived_view = derive_view(view)
+        sm = getSiteManager()
+        sm.registerUtility(derived_view, iface, '', _context.info)
+
     _context.action(
-        discriminator = ('notfound_view',),
-        callable = handler,
-        args = ('registerUtility', derived_view, iface, '', _context.info),
+        discriminator = iface,
+        callable = register,
         )
 
 def notfound(_context, view):
@@ -123,46 +238,83 @@ def notfound(_context, view):
 def forbidden(_context, view):
     view_utility(_context, view, IForbiddenView)
 
-def derive_view(view):
-    derived_view = view
-    if inspect.isclass(view):
-        # If the object we've located is a class, turn it into a
-        # function that operates like a Zope view (when it's invoked,
-        # construct an instance using 'context' and 'request' as
-        # position arguments, then immediately invoke the __call__
-        # method of the instance with no arguments; __call__ should
-        # return an IResponse).
-        if requestonly(view):
-            # its __init__ accepts only a single request argument,
-            # instead of both context and request
-            def _bfg_class_requestonly_view(context, request):
-                inst = view(request)
-                return inst()
-            derived_view = _bfg_class_requestonly_view
-        else:
-            # its __init__ accepts both context and request
-            def _bfg_class_view(context, request):
-                inst = view(context, request)
-                return inst()
-            derived_view = _bfg_class_view
-
-    elif requestonly(view):
-        # its __call__ accepts only a single request argument,
-        # instead of both context and request
-        def _bfg_requestonly_view(context, request):
-            return view(request)
-        derived_view = _bfg_requestonly_view
-
-    if derived_view is not view:
-        derived_view.__module__ = view.__module__
-        derived_view.__doc__ = view.__doc__
-        try:
-            derived_view.__name__ = view.__name__
-        except AttributeError:
-            derived_view.__name__ = repr(view)
-
+def derive_view(original_view, permission=None, predicates=()):
+    mapped_view = map_view(original_view)
+    secured_view = secure_view(mapped_view, permission)
+    debug_view = authdebug_view(secured_view, permission)
+    derived_view = predicate_wrap(debug_view, predicates)
     return derived_view
-    
+
+def predicate_wrap(view, predicates):
+    if not predicates:
+        return view
+    def _wrapped(context, request):
+        if all((predicate(context, request) for predicate in predicates)):
+            return view(context, request)
+        raise NotFound('predicate mismatch for view %s' % view)
+    def checker(context, request):
+        return all((predicate(context, request) for predicate in predicates))
+    _wrapped.__predicated__ = checker
+    decorate_view(_wrapped, view)
+    return _wrapped
+
+def secure_view(view, permission):
+    wrapped_view = view
+    authn_policy = queryUtility(IAuthenticationPolicy)
+    authz_policy = queryUtility(IAuthorizationPolicy)
+    if authn_policy and authz_policy and (permission is not None):
+        def _secured_view(context, request):
+            principals = authn_policy.effective_principals(request)
+            if authz_policy.permits(context, principals, permission):
+                return view(context, request)
+            msg = getattr(request, 'authdebug_message',
+                          'Unauthorized: %s failed permission check' % view)
+            raise Unauthorized(msg)
+        _secured_view.__call_permissive__ = view
+        def _permitted(context, request):
+            principals = authn_policy.effective_principals(request)
+            return authz_policy.permits(context, principals, permission)
+        _secured_view.__permitted__ = _permitted
+        wrapped_view = _secured_view
+        decorate_view(wrapped_view, view)
+
+    return wrapped_view
+
+def authdebug_view(view, permission):
+    wrapped_view = view
+    authn_policy = queryUtility(IAuthenticationPolicy)
+    authz_policy = queryUtility(IAuthorizationPolicy)
+    settings = get_settings()
+    debug_authorization = getattr(settings, 'debug_authorization', False)
+    if debug_authorization:
+        def _authdebug_view(context, request):
+            view_name = getattr(request, 'view_name', None)
+
+            if authn_policy and authz_policy:
+                if permission is None:
+                    msg = 'Allowed (no permission registered)'
+                else:
+                    principals = authn_policy.effective_principals(request)
+                    msg = str(authz_policy.permits(context, principals,
+                                                   permission))
+            else:
+                msg = 'Allowed (no authorization policy in use)'
+
+            view_name = getattr(request, 'view_name', None)
+            url = getattr(request, 'url', None)
+            msg = ('debug_authorization of url %s (view name %r against '
+                   'context %r): %s' % (url, view_name, context, msg))
+            logger = getUtility(ILogger, 'repoze.bfg.debug')
+            logger and logger.debug(msg)
+            if request is not None:
+                request.authdebug_message = msg
+            return view(context, request)
+
+        wrapped_view = _authdebug_view
+        decorate_view(wrapped_view, view)
+
+    return wrapped_view
+
 def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
     module_grokker = martian.ModuleGrokker()
@@ -240,12 +392,11 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
                                    callback=None):
     policy = RepozeWho1AuthenticationPolicy(identifier_name=identifier_name,
                                             callback=callback)
-    _context.action(
-        discriminator = 'authentication_policy',
-        callable = handler,
-        args = ('registerUtility', policy, IAuthenticationPolicy, '',
-                _context.info),
-        )
+    # authentication policies must be registered eagerly so they can
+    # be found by the view registration machinery
+    sm = getSiteManager()
+    sm.registerUtility(policy, IAuthenticationPolicy)
+    _context.action(discriminator=IAuthenticationPolicy)
 
 class IRemoteUserAuthenticationPolicyDirective(Interface):
     environ_key = TextLine(title=u'environ_key', required=False,
@@ -256,12 +407,11 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
                                    callback=None):
     policy = RemoteUserAuthenticationPolicy(environ_key=environ_key,
                                             callback=callback)
-    _context.action(
-        discriminator = 'authentication_policy',
-        callable = handler,
-        args = ('registerUtility', policy, IAuthenticationPolicy, '',
-                _context.info),
-        )
+    # authentication policies must be registered eagerly so they can
+    # be found by the view registration machinery
+    sm = getSiteManager()
+    sm.registerUtility(policy, IAuthenticationPolicy)
+    _context.action(discriminator=IAuthenticationPolicy)
 
 class IAuthTktAuthenticationPolicyDirective(Interface):
     secret = TextLine(title=u'secret', required=True)
@@ -291,49 +441,91 @@ def authtktauthenticationpolicy(_context,
                                              reissue_time = reissue_time)
     except ValueError, why:
         raise ConfigurationError(str(why))
-    _context.action(
-        discriminator = 'authentication_policy',
-        callable = handler,
-        args = ('registerUtility', policy, IAuthenticationPolicy, '',
-                _context.info),
-        )
+    # authentication policies must be registered eagerly so they can
+    # be found by the view registration machinery
+    sm = getSiteManager()
+    sm.registerUtility(policy, IAuthenticationPolicy)
+    _context.action(discriminator=IAuthenticationPolicy)
 
 class IACLAuthorizationPolicyDirective(Interface):
     pass
 
 def aclauthorizationpolicy(_context):
     policy = ACLAuthorizationPolicy()
-    _context.action(
-        discriminator = 'authorization_policy',
-        callable = handler,
-        args = ('registerUtility', policy, IAuthorizationPolicy, '',
-                _context.info),
-        )
+    # authorization policies must be registered eagerly so they can be
+    # found by the view registration machinery
+    sm = getSiteManager()
+    sm.registerUtility(policy, IAuthorizationPolicy)
+    _context.action(discriminator=IAuthorizationPolicy)
 
 class IRouteDirective(Interface):
     """ The interface for the ``route`` ZCML directive
     """
     name = TextLine(title=u'name', required=True)
     path = TextLine(title=u'path', required=True)
+    factory = GlobalObject(title=u'context factory', required=False)
     view = GlobalObject(title=u'view', required=False)
     view_for = GlobalObject(title=u'view_for', required=False)
+    view_permission = TextLine(title=u'view_permission', required=False)
+    view_request_type = TextLine(title=u'view_request_type', required=False)
+    view_request_method = TextLine(title=u'view_request_method', required=False)
+    view_containment = GlobalObject(
+        title = u'Dotted name of a containment class or interface',
+        required=False)
+    # alias for "view_for"
+    for_ = GlobalObject(title=u'for', required=False)
+    # alias for "view_permission"
     permission = TextLine(title=u'permission', required=False)
-    factory = GlobalObject(title=u'context factory', required=False)
+    # alias for "view_request_type"
     request_type = TextLine(title=u'request_type', required=False)
+    # alias for "view_request_method"
+    request_method = TextLine(title=u'request_method', required=False)
+    # alias for "view_request_param"
+    request_param = TextLine(title=u'request_param', required=False)
+    # alias for "view_containment"
+    containment = GlobalObject(
+        title = u'Dotted name of a containment class or interface',
+        required=False)
 
-def route(_context, name, path, view=None, view_for=None, permission=None,
-          factory=None, request_type=None):
+def route(_context, name, path, view=None, view_for=None,
+          permission=None, factory=None, request_type=None, for_=None,
+          view_permission=None, view_request_type=None, 
+          request_method=None, view_request_method=None,
+          request_param=None, view_request_param=None, containment=None,
+          view_containment=None):
     """ Handle ``route`` ZCML directives
     """
+    # the strange ordering of the request kw args above is for b/w
+    # compatibility purposes.
+    for_ = view_for or for_
+    request_type = view_request_type or request_type
+    permission = view_permission or permission
+    request_method = view_request_method or request_method
+    request_param = view_request_param or request_param
+    containment = view_containment or containment
+
     sm = getSiteManager()
-    request_factories = named_request_factories(name)
-    sm.registerUtility(request_factories, IRequestFactories, name=name)
+    
+    if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
+        # b/w compat for 1.0
+        request_method = request_type
+        request_type = None
+
+    if request_type is None:
+        request_factory = queryUtility(IRouteRequest, name=name)
+        if request_factory is None:
+            request_factory = create_route_request_factory(name)
+            sm.registerUtility(request_factory, IRouteRequest, name=name)
+        request_type = implementedBy(request_factory)
 
     if view:
-        _view(_context, permission, view_for, view, '', request_type, name)
+        _view(_context, permission=permission, for_=for_, view=view, name='',
+              request_type=request_type, route_name=name, 
+              request_method=request_method, request_param=request_param,
+              containment=containment)
 
     _context.action(
-        discriminator = ('route', name, view_for, request_type),
+        discriminator = ('route', name),
         callable = connect_route,
         args = (path, name, factory),
         )
@@ -361,6 +553,10 @@ class IStaticDirective(Interface):
         required=False,
         default=None)
 
+class StaticRootFactory:
+    def __init__(self, environ):
+        pass
+
 def static(_context, name, path, cache_max_age=3600):
     """ Handle ``static`` ZCML directives
     """
@@ -371,7 +567,8 @@ def static(_context, name, path, cache_max_age=3600):
         path = '%s:%s' % (package_name(_context.resolve('.')), path)
 
     view = static_view(path, cache_max_age=cache_max_age)
-    route(_context, name, "%s*subpath" % name, view=view)
+    route(_context, name, "%s*subpath" % name, view=view,
+          view_for=StaticRootFactory, factory=StaticRootFactory)
 
 class IViewDirective(Interface):
     for_ = GlobalObject(
@@ -394,8 +591,7 @@ class IViewDirective(Interface):
     name = TextLine(
         title=u"The name of the view",
         description=u"""
-        The name shows up in URLs/paths. For example 'foo' or
-        'foo.html'.""",
+        The name shows up in URLs/paths. For example 'foo' or 'foo.html'.""",
         required=False,
         )
 
@@ -410,6 +606,25 @@ class IViewDirective(Interface):
     route_name = TextLine(
         title = u'The route that must match for this view to be used',
         required = False)
+
+    containment = GlobalObject(
+        title = u'Dotted name of a containment class or interface',
+        required=False)
+
+    request_method = TextLine(
+        title = u'Request method name that must be matched (e.g. GET/POST)',
+        description = (u'The view will be called if and only if the request '
+                       'method (``request.method``) matches this string. This'
+                       'functionality replaces the older ``request_type`` '
+                       'functionality.'),
+        required=False)
+
+    request_param = TextLine(
+        title = (u'Request parameter name that must exist in '
+                 '``request.params`` for this view to match'),
+        description = (u'The view will be called if and only if the request '
+                       'parameter exists which matches this string.'),
+        required=False)
 
 class INotFoundViewDirective(Interface):
     view = GlobalObject(
@@ -523,57 +738,20 @@ class BFGViewFunctionGrokker(martian.InstanceGrokker):
             name = obj.__view_name__
             request_type = obj.__request_type__
             route_name = obj.__route_name__
+            request_method = obj.__request_method__
+            request_param = obj.__request_param__
+            containment = obj.__containment__
             context = kw['context']
             view(context, permission=permission, for_=for_,
                  view=obj, name=name, request_type=request_type,
-                 route_name=route_name)
+                 route_name=route_name, request_method=request_method,
+                 request_param=request_param, containment=containment)
             return True
         return False
 
 def exclude(name):
     if name.startswith('.'):
         return True
-    return False
-
-def requestonly(class_or_callable):
-    """ Return true of the class or callable accepts only a request argument,
-    as opposed to something that accepts context, request """
-    if inspect.isfunction(class_or_callable):
-        fn = class_or_callable
-    elif inspect.isclass(class_or_callable):
-        try:
-            fn = class_or_callable.__init__
-        except AttributeError:
-            return False
-    else:
-        try:
-            fn = class_or_callable.__call__
-        except AttributeError:
-            return False
-
-    try:
-        argspec = inspect.getargspec(fn)
-    except TypeError:
-        return False
-
-    args = argspec[0]
-    defaults = argspec[3]
-
-    if hasattr(fn, 'im_func'):
-        # it's an instance method
-        if not args:
-            return False
-        args = args[1:]
-    if not args:
-        return False
-
-    if len(args) == 1:
-        return True
-
-    elif args[0] == 'request':
-        if len(args) - len(defaults) == 1:
-            return True
-
     return False
 
 class Uncacheable(object):
