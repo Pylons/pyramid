@@ -34,11 +34,10 @@ from repoze.bfg.path import caller_package
 from repoze.bfg.static import PackageURLParser
 
 deprecated('view_execution_permitted',
-    "('from repoze.bfg.view import view_execution_permitted' is now "
-    "deprecated; instead use 'from repoze.bfg.security import "
-    "view_execution_permitted')",
+    "('from repoze.bfg.view import view_execution_permitted' was  "
+    "deprecated as of repoze.bfg 1.0; instead use 'from "
+    "repoze.bfg.security import view_execution_permitted')",
     )
-
 
 _marker = object()
 
