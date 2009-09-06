@@ -30,7 +30,7 @@ class IView(Interface):
         authorization failure is detected during view execution."""
 
 class ISecuredView(IView):
-    """ Internal interface.  Not an API. """
+    """ *Internal only* interface.  Not an API. """
     def __call_permissive__(context, request):
         """ Guaranteed-permissive version of __call__ """
 
@@ -90,39 +90,9 @@ class ITemplateRendererFactory(Interface):
     def __call__(path, auto_reload=False):
         """ Return an object that implements ``ITemplateRenderer``  """
 
-class ISecurityPolicy(Interface):
-    """ A utility that provides a mechanism to check authorization
-       using authentication data.  This interface was deprecated in
-       BFG 0.9; use the combination of IAuthenticationPolicy and
-       IAuthorization Policy instead"""
-    def permits(context, request, permission):
-        """ Returns True if the combination of the authorization
-        information in the context and the authentication data in the
-        request allow the action implied by the permission"""
-
-    def authenticated_userid(request):
-        """ Return the userid of the currently authenticated user or
-        None if there is no currently authenticated user """
-
-    def effective_principals(request):
-        """ Return the list of 'effective' principals for the request.
-        This must include the userid of the currently authenticated
-        user if a user is currently authenticated."""
-
-    def principals_allowed_by_permission(context, permission):
-        """ Return a sequence of principal identifiers allowed by the
-        ``permission`` in the model implied by ``context``.  This
-        method may not be supported by a given security policy
-        implementation, in which case, it should raise a
-        ``NotImplementedError`` exception."""
-
 class IViewPermission(Interface):
     def __call__(context, request):
         """ Return True if the permission allows, return False if it denies. """
-
-class IViewPermissionFactory(Interface):
-    def __call__(permission_name):
-        """ Returns an IViewPermission """
 
 class IRouter(Interface):
     """WSGI application which routes requests to 'view' code based on
@@ -185,14 +155,6 @@ class INotFoundView(Interface):
         a``message`` key in the WSGI environ provides information
         pertaining to the reason for the notfound error."""
 
-class INotFoundAppFactory(Interface):
-    """ A utility which returns a NotFound WSGI application factory.
-    Deprecated in repoze.bfg 0.9 in favor of INotFoundView"""
-
-class IUnauthorizedAppFactory(Interface):
-    """ A utility which returns an Unauthorized WSGI application
-    factory.  Deprecated in repoze.bfg 0.9 in favor of IForbiddenView"""
-    
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.
     """

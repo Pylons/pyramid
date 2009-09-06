@@ -1,6 +1,59 @@
 Next release
 ============
 
+- The ``IViewPermissionFactory`` interface has been removed.  This was
+  never an API.
+
+- The ``INotFoundAppFactory`` interface has been removed; it has
+  been deprecated since repoze.bfg 0.9.  If you have something like
+  the following in your ``configure.zcml``::
+
+   <utility provides="repoze.bfg.interfaces.INotFoundAppFactory"
+            component="helloworld.factories.notfound_app_factory"/>
+
+  Replace it with something like::
+
+   <notfound 
+       view="helloworld.views.notfound_view"/>
+
+  See "Changing the Not Found View" in the "Hooks" chapter of the
+  documentation for more information.
+
+- The ``IUnauthorizedAppFactory`` interface has been removed; it has
+  been deprecated since repoze.bfg 0.9.  If you have something like
+  the following in your ``configure.zcml``::
+
+   <utility provides="repoze.bfg.interfaces.IUnauthorizedAppFactory"
+            component="helloworld.factories.unauthorized_app_factory"/>
+
+  Replace it with something like::
+
+   <forbidden
+       view="helloworld.views.forbidden_view"/>
+
+  See "Changing the Forbidden View" in the "Hooks" chapter of the
+  documentation for more information.
+
+- ``ISecurityPolicy``-based security policies, deprecated since
+  repoze.bfg 0.9, have been removed.  If you have something like this
+  in your ``configure.zcml``, it will no longer work::
+
+   <utility
+     provides="repoze.bfg.interfaces.ISecurityPolicy"
+     factory="repoze.bfg.security.RemoteUserInheritingACLSecurityPolicy"
+     />
+
+   If ZCML like the above exists in your application, you will receive
+   an error at startup time.  Instead of the above, you'll need
+   something like::
+
+     <remoteuserauthenticationpolicy/>
+     <aclauthorizationpolicy/>
+
+   This is just an example.  See the "Security" chapter of the
+   repoze.bfg documentation for more information about configuring
+   security policies.
+
 - The ``route`` ZCML directive now honors ``view_request_method``,
   ``view_request_param`` and ``view_containment`` attributes, which
   pass along these values to the associated view if any is provided.

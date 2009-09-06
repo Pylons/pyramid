@@ -131,7 +131,7 @@ def registerViewPermission(name, result=True, viewpermission=None,
     Note that view permissions are not checked unless a security
     policy is in effect (see ``registerSecurityPolicy``).
 
-    **This function was deprecated in repoze.bfg 1.2.**
+    **This function was deprecated in repoze.bfg 1.1.**
     """
     from repoze.bfg.security import Allowed
     from repoze.bfg.security import Denied
@@ -147,7 +147,7 @@ def registerViewPermission(name, result=True, viewpermission=None,
 
 deprecated('registerViewPermission',
            'registerViewPermission has been deprecated.  As of repoze.bfg '
-           'version 1.2, view functions are now responsible for protecting '
+           'version 1.1, view functions are now responsible for protecting '
            'their own execution.  A call to this function wont prevent a '
            'view from being executed by the repoze.bfg router, nor '
            'will the ``repoze.bfg.security.view_execution_permitted`` function '

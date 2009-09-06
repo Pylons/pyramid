@@ -1976,61 +1976,6 @@ class TestZCMLConfigure(unittest.TestCase):
         self.assertRaises(IOError, self._callFUT, 'configure.zcml',
                           self.module)
 
-    def test_secpol_BBB(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.interfaces import ISecurityPolicy
-        from repoze.bfg.interfaces import ILogger
-        secpol = DummySecurityPolicy()
-        from zope.component import getGlobalSiteManager
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(secpol, ISecurityPolicy)
-        logger = DummyLogger()
-        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
-        self._callFUT('configure.zcml', self.module)
-        self.failUnless(gsm.queryUtility(IAuthenticationPolicy))
-        self.failUnless(gsm.queryUtility(IAuthorizationPolicy))
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('ISecurityPolicy' in logger.messages[0])
-
-    def test_iunauthorized_appfactory_BBB(self):
-        from repoze.bfg.interfaces import IUnauthorizedAppFactory
-        from repoze.bfg.interfaces import IForbiddenView
-        from zope.component import getGlobalSiteManager
-        from repoze.bfg.interfaces import ILogger
-        context = DummyContext()
-        def factory():
-            return 'yo'
-        logger = DummyLogger()
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(factory, IUnauthorizedAppFactory)
-        logger = DummyLogger()
-        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
-        self._callFUT('configure.zcml', self.module)
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('forbidden' in logger.messages[0])
-        forbidden = gsm.getUtility(IForbiddenView)
-        self.assertEqual(forbidden(None, DummyRequest()), 'yo')
-
-    def test_inotfound_appfactory_BBB(self):
-        from repoze.bfg.interfaces import INotFoundAppFactory
-        from repoze.bfg.interfaces import INotFoundView
-        from zope.component import getGlobalSiteManager
-        from repoze.bfg.interfaces import ILogger
-        context = DummyContext()
-        def factory():
-            return 'yo'
-        logger = DummyLogger()
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(factory, INotFoundAppFactory)
-        logger = DummyLogger()
-        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
-        self._callFUT('configure.zcml', self.module)
-        self.assertEqual(len(logger.messages), 1)
-        self.failUnless('notfound' in logger.messages[0])
-        notfound = gsm.getUtility(INotFoundView)
-        self.assertEqual(notfound(None,DummyRequest()), 'yo')
-
 class TestBFGViewFunctionGrokker(unittest.TestCase):
     def setUp(self):
         cleanUp()
