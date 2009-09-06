@@ -63,35 +63,6 @@ def populateRegistry(registry, filename, package, lock=threading.Lock(),
         lock.release()
         manager.pop()
 
-class FakeRegistryManager(object):
-    manager = manager # for unit tests
-    def push(self, registry):
-        return self.manager.push({'registry':registry, 'request':None})
-
-    set = push # b/c
-
-    def pop(self):
-        result = self.manager.pop()
-        if result:
-            return result['registry']
-
-    def get(self):
-        return self.manager.get()['registry']
-
-    def clear(self):
-        self.manager.clear()
-
-# for use in scripts for backwards compatibility *only*!
-registry_manager = FakeRegistryManager() 
-    
-deprecated('registry_manager',
-           'As of repoze.bfg 0.9, any import of registry_manager from'
-           '``repoze.bfg.registry`` is '
-           'deprecated.  If you are trying to use the registry manager '
-           'within a "debug" script of your own making, use the ``bfgshell`` '
-           'paster command instead. ``registry_manager`` will disappear in '
-           'a later release of repoze.bfg')
-
 getSiteManager = get_current_registry # b/c
 
 deprecated('getSiteManager',

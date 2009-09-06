@@ -65,40 +65,6 @@ class TestPopulateRegistry(unittest.TestCase):
         self.assertEqual(dummylock.released, True)
         self.assertEqual(dummyregmgr.data['registry'], None)
 
-class TestFakeRegistry(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.registry import FakeRegistryManager
-        return FakeRegistryManager
-
-    def _makeOne(self):
-        manager = self._getTargetClass()()
-        manager.manager = DummyThreadLocalManager({'registry':None,
-                                                   'request':None})
-        return manager
-
-    def test_push(self):
-        manager = self._makeOne()
-        result = manager.push(1)
-        self.assertEqual(manager.manager.pushed, {'registry':1,
-                                                  'request':None})
-
-    def test_pop(self):
-        manager = self._makeOne()
-        result = manager.pop()
-        self.assertEqual(manager.manager.popped, True)
-        self.assertEqual(result, None)
-
-    def test_get(self):
-        manager = self._makeOne()
-        result = manager.get()
-        self.assertEqual(result, None)
-
-    def test_clear(self):
-        manager = self._makeOne()
-        manager.clear()
-        self.assertEqual(manager.manager.cleared, True)
-        
-        
 class DummyThreadLocalManager:
     def __init__(self, data):
         self.data = data
