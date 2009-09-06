@@ -76,12 +76,6 @@ class DummyThreadLocalManager:
     def push(self, data):
         self.pushed = data
 
-    def get(self):
-        return self.data
-
-    def clear(self):
-        self.cleared = True
-        
 class DummyLock:
     def acquire(self):
         self.acquired = True
