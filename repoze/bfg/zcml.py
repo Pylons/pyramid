@@ -39,6 +39,7 @@ from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRouteRequest
+from repoze.bfg.interfaces import ITemplateRendererFactory
 
 from repoze.bfg.path import package_name
 
@@ -81,6 +82,8 @@ def view(
     request_method=None,
     request_param=None,
     containment=None,
+    attr=None,
+    template=None,
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
@@ -164,8 +167,14 @@ def view(
     else:
         score = sys.maxint
 
+    if template and (not ':' in template) and (not os.path.isabs(template)):
+        # if it's not a package:relative/name and it's not an
+        # /absolute/path it's a relative/path; this means its relative
+        # to the package in which the ZCML file is defined.
+        template = '%s:%s' % (package_name(_context.resolve('.')), template)
+
     def register():
-        derived_view = derive_view(view, permission, predicates)
+        derived_view = derive_view(view, permission, predicates, attr, template)
         r_for_ = for_
         r_request_type = request_type
         if r_for_ is None:
@@ -210,7 +219,7 @@ def view(
                                name, _context.info)
     _context.action(
         discriminator = ('view', for_, name, request_type, IView, containment,
-                         request_param, request_method, route_name),
+                         request_param, request_method, route_name, attr),
         callable = register,
         args = (),
         )
@@ -234,8 +243,9 @@ def notfound(_context, view):
 def forbidden(_context, view):
     view_utility(_context, view, IForbiddenView)
 
-def derive_view(original_view, permission=None, predicates=()):
-    mapped_view = map_view(original_view)
+def derive_view(original_view, permission=None, predicates=(), attr=None,
+                template=None):
+    mapped_view = map_view(original_view, attr, template)
     secured_view = secure_view(mapped_view, permission)
     debug_view = authdebug_view(secured_view, permission)
     derived_view = predicate_wrap(debug_view, predicates)
@@ -530,6 +540,22 @@ def connect_route(path, name, factory):
     mapper = getUtility(IRoutesMapper)
     mapper.connect(path, name, factory)
 
+class ITemplateRendererDirective(Interface):
+    renderer = GlobalObject(
+        title=u'ITemplateRendererFactory implementation',
+        required=True)
+
+    extension = TextLine(
+        title=u'Filename extension (e.g. ".pt")',
+        required=False)
+
+def template_renderer(_context, renderer, extension=''):
+    # renderer factories must be registered eagerly so they can be
+    # found by the view machinery
+    sm = getSiteManager()
+    sm.registerUtility(renderer, ITemplateRendererFactory, name=extension)
+    _context.action(discriminator=(ITemplateRendererFactory, extension))
+
 class IStaticDirective(Interface):
     name = TextLine(
         title=u"The URL prefix of the static view",
@@ -590,6 +616,16 @@ class IViewDirective(Interface):
         The name shows up in URLs/paths. For example 'foo' or 'foo.html'.""",
         required=False,
         )
+
+    attr = TextLine(
+        title=u'The callable attribute of the view object(default is __call__)',
+        description=u'',
+        required=False)
+
+    template = TextLine(
+        title=u'The template asssociated with the view',
+        description=u'',
+        required=False)
 
     request_type = TextLine(
         title=u"The request type string or dotted name interface for the view",

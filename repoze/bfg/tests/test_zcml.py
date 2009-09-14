@@ -1,3 +1,7 @@
+import logging
+
+logging.basicConfig()
+
 import unittest
 
 from repoze.bfg.testing import cleanUp
@@ -35,7 +39,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -66,7 +71,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -102,7 +108,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -133,7 +140,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -172,7 +180,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -210,7 +219,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -249,7 +259,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -287,7 +298,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -303,6 +315,45 @@ class TestViewDirective(unittest.TestCase):
         perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
         self.assertEqual(perm, None)
 
+    def test_with_reltemplate(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+
+        import repoze.bfg.tests
+
+        context = DummyContext(repoze.bfg.tests)
+        class IFoo(Interface):
+            pass
+        class view(object):
+            def __init__(self, context, request):
+                self.request = request
+                self.context = context
+
+            def __call__(self):
+                return {'a':'1'}
+
+        import os
+        fixture = 'fixtures/minimal.txt'
+        self._callFUT(context, 'repoze.view', IFoo, view=view, template=fixture)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        self.assertEqual(wrapper.__module__, view.__module__)
+        self.assertEqual(wrapper.__name__, view.__name__)
+        self.assertEqual(wrapper.__doc__, view.__doc__)
+        result = wrapper(None, None)
+        self.assertEqual(result.body, 'Hello.\n')
 
     def test_request_type_asinterface(self):
         from zope.component import getSiteManager
@@ -322,7 +373,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IDummy, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IDummy, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -352,7 +404,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', Dummy, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', Dummy, IView, None, None, None, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -378,7 +430,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'GET', None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'GET', None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -407,7 +460,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
 
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
@@ -441,7 +495,7 @@ class TestViewDirective(unittest.TestCase):
         factory = sm.getUtility(IRouteRequest, 'foo')
         request_type = implementedBy(factory)
         discrim = ('view', IFoo, '', request_type, IView, None, None, None,
-                   'foo')
+                   'foo', None)
         self.assertEqual(action['discriminator'], discrim)
         the_view = sm.adapters.lookup((IFoo, request_type), IView, name='')
         request = factory({})
@@ -463,7 +517,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'POST', None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'POST', None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -489,7 +544,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'POST', None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, 'POST', None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -514,7 +570,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -540,7 +597,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -565,7 +623,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -591,7 +650,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -618,7 +678,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, IFoo, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, IFoo, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -645,7 +706,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, IFoo, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, IFoo, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -673,7 +735,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -715,7 +778,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -741,7 +805,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', Foo, '', IRequest, IView, None, None, None, None)
+        discrim = ('view', Foo, '', IRequest, IView, None, None, None, None,
+                   None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -1110,7 +1175,7 @@ class TestDeriveView(unittest.TestCase):
     def test_view_with_debug_authorization_no_authpol(self):
         def view(context, request):
             return 'OK'
-        self._registerSettings(debug_authorization=True)
+        self._registerSettings(debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
         result = self._callFUT(view, permission='view')
         self.assertEqual(view.__module__, result.__module__)
@@ -1130,7 +1195,7 @@ class TestDeriveView(unittest.TestCase):
     def test_view_with_debug_authorization_no_permission(self):
         def view(context, request):
             return 'OK'
-        self._registerSettings(debug_authorization=True)
+        self._registerSettings(debug_authorization=True, reload_templates=True)
         self._registerSecurityPolicy(True)
         logger = self._registerLogger()
         result = self._callFUT(view)
@@ -1151,7 +1216,7 @@ class TestDeriveView(unittest.TestCase):
     def test_view_with_debug_authorization_permission_authpol_permitted(self):
         def view(context, request):
             return 'OK'
-        self._registerSettings(debug_authorization=True)
+        self._registerSettings(debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
         self._registerSecurityPolicy(True)
         result = self._callFUT(view, permission='view')
@@ -1172,7 +1237,7 @@ class TestDeriveView(unittest.TestCase):
         from repoze.bfg.security import Unauthorized
         def view(context, request):
             """ """
-        self._registerSettings(debug_authorization=True)
+        self._registerSettings(debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
         self._registerSecurityPolicy(False)
         result = self._callFUT(view, permission='view')
@@ -1192,7 +1257,7 @@ class TestDeriveView(unittest.TestCase):
     def test_view_with_debug_authorization_permission_authpol_denied2(self):
         def view(context, request):
             """ """
-        self._registerSettings(debug_authorization=True)
+        self._registerSettings(debug_authorization=True, reload_templates=True)
         logger = self._registerLogger()
         self._registerSecurityPolicy(False)
         result = self._callFUT(view, permission='view')
@@ -1330,7 +1395,7 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(len(view_discriminator), 10)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], None)
         self.assertEqual(view_discriminator[2],'')
@@ -1340,6 +1405,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator[6], None)
         self.assertEqual(view_discriminator[7], None)
         self.assertEqual(view_discriminator[8], 'name')
+        self.assertEqual(view_discriminator[9], None)
         register = view_action['callable']
         register()
         sm = getSiteManager()
@@ -1378,7 +1444,7 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(len(view_discriminator), 10)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], IDummy)
         self.assertEqual(view_discriminator[2],'')
@@ -1388,6 +1454,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator[6], None)
         self.assertEqual(view_discriminator[7], None)
         self.assertEqual(view_discriminator[8], 'name')
+        self.assertEqual(view_discriminator[9], None)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         request = DummyRequest()
         self.assertEqual(wrapped(None, request), '123')
@@ -1441,7 +1508,7 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(len(view_discriminator), 10)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], None)
         self.assertEqual(view_discriminator[2],'')
@@ -1451,6 +1518,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator[6], None)
         self.assertEqual(view_discriminator[7], 'GET')
         self.assertEqual(view_discriminator[8], 'name')
+        self.assertEqual(view_discriminator[9], None)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1485,7 +1553,7 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(len(view_discriminator), 10)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], None)
         self.assertEqual(view_discriminator[2],'')
@@ -1495,6 +1563,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator[6], None)
         self.assertEqual(view_discriminator[7], 'GET')
         self.assertEqual(view_discriminator[8], 'name')
+        self.assertEqual(view_discriminator[9], None)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1530,7 +1599,7 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(len(view_discriminator), 10)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], None)
         self.assertEqual(view_discriminator[2],'')
@@ -1540,6 +1609,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator[6], None)
         self.assertEqual(view_discriminator[7], 'GET')
         self.assertEqual(view_discriminator[8], 'name')
+        self.assertEqual(view_discriminator[9], None)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1574,7 +1644,7 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(len(view_discriminator), 10)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], None)
         self.assertEqual(view_discriminator[2],'')
@@ -1584,6 +1654,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator[6], None)
         self.assertEqual(view_discriminator[7], 'GET')
         self.assertEqual(view_discriminator[8], 'name')
+        self.assertEqual(view_discriminator[9], None)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1618,7 +1689,7 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(len(view_discriminator), 10)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], None)
         self.assertEqual(view_discriminator[2],'')
@@ -1628,6 +1699,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator[6], None)
         self.assertEqual(view_discriminator[7], None)
         self.assertEqual(view_discriminator[8], 'name')
+        self.assertEqual(view_discriminator[9], None)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1662,7 +1734,7 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 9)
+        self.assertEqual(len(view_discriminator), 10)
         self.assertEqual(view_discriminator[0], 'view')
         self.assertEqual(view_discriminator[1], None)
         self.assertEqual(view_discriminator[2],'')
@@ -1672,6 +1744,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator[6], None)
         self.assertEqual(view_discriminator[7], None)
         self.assertEqual(view_discriminator[8], 'name')
+        self.assertEqual(view_discriminator[9], None)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -2010,6 +2083,8 @@ class TestBFGViewFunctionGrokker(unittest.TestCase):
         obj.__request_method__ = None
         obj.__request_param__ = None
         obj.__containment__ = None
+        obj.__attr__ = None
+        obj.__template__ = None
         context = DummyContext()
         result = grokker.grok('name', obj, context=context)
         self.assertEqual(result, True)

@@ -8,9 +8,9 @@ from zope.interface import implements
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
 from repoze.bfg.interfaces import ITemplateRendererFactory
-from repoze.bfg.interfaces import ISettings
 
 from repoze.bfg.templating import renderer_from_cache
+from repoze.bfg.templating import _auto_reload
 from chameleon.zpt.template import PageTemplateFile
 
 class ZPTTemplateRenderer(object):
@@ -25,11 +25,6 @@ class ZPTTemplateRenderer(object):
     
     def __call__(self, **kw):
         return self.template(**kw)
-
-def _auto_reload():
-    settings = queryUtility(ISettings)
-    auto_reload = settings and settings.reload_templates
-    return auto_reload
 
 def get_renderer(path):
     """ Return a callable ``ITemplateRenderer`` object representing a

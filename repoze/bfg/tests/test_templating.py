@@ -142,6 +142,37 @@ class TestRendererFromCache(unittest.TestCase):
         self.assertNotEqual(queryUtility(ITemplateRenderer, name=spec),
                             None)
 
+class TestRendererFromPath(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, path, level=4, **kw):
+        from repoze.bfg.templating import renderer_from_path
+        return renderer_from_path(path, level, **kw)
+
+    def test_with_default(self):
+        from repoze.bfg.templating import TextTemplateRenderer
+        import os
+        here = os.path.dirname(os.path.abspath(__file__))
+        fixture = os.path.join(here, 'fixtures/minimal.txt')
+        result = self._callFUT(fixture)
+        self.assertEqual(result.__class__, TextTemplateRenderer)
+
+    def test_with_nondefault(self):
+        from repoze.bfg.interfaces import ITemplateRendererFactory
+        import os
+        here = os.path.dirname(os.path.abspath(__file__))
+        fixture = os.path.join(here, 'fixtures/minimal.pt')
+        renderer = {}
+        def factory(path, **kw):
+            return renderer
+        testing.registerUtility(factory, ITemplateRendererFactory, name='.pt')
+        result = self._callFUT(fixture)
+        self.assertEqual(result, renderer)
+
 class DummyFactory:
     def __init__(self, renderer):
         self.renderer = renderer

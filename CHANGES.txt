@@ -1,3 +1,20 @@
+Next release
+============
+
+- A ZCML ``view`` directive (and the associated ``bfg_view``
+  decorator) can now accept an "attr" value.  If an "attr" value is
+  supplied, it is considered a method named of the view object to be
+  called when the response is required.  This is typically only good
+  for views that are classes or instances (not so useful for
+  functions, as functions typically have no methods other than
+  ``__call__``).
+
+- A ZCML ``view`` directive (and the associated ``bfg_view``
+  decorator) can now accept a "template" value.  If a "template" value
+  is supplied, and the view callable returns a dictionary, the
+  associated template is rendered with the dictionary as keyword
+  arguments.
+
 1.1a1 (2009-09-06)
 ==================
 

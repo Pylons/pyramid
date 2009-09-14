@@ -70,6 +70,12 @@
         handler="repoze.bfg.zcml.aclauthorizationpolicy"
         />
 
+    <meta:directive
+        name="template_renderer"
+        schema="repoze.bfg.zcml.ITemplateRendererDirective"
+        handler="repoze.bfg.zcml.template_renderer"
+        />
+
   </meta:directives>
 
 </configure>

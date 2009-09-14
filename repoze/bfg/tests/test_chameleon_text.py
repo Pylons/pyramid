@@ -5,6 +5,13 @@ from repoze.bfg.testing import cleanUp
 class Base:
     def setUp(self):
         cleanUp()
+        import os
+        try:
+            # avoid spew from chameleon logger?
+            os.unlink(self._getTemplatePath('minimal.txt.py'))
+        except:
+            pass
+            
 
     def tearDown(self):
         cleanUp()

@@ -247,6 +247,34 @@ permission
   call the view.  See :ref:`view_security_section` for more
   information about view security and permissions.
 
+attr
+
+  The view machinery defaults to using the ``__call__`` method of the
+  view callable (or the function itself, if the view callable is a
+  funcion) to obtain a response dictionary.  The ``attr`` value allows
+  you to vary the method attribute used to obtain the response.  For
+  example, if your view was a class, and the class has a method named
+  ``index`` and you wanted to use this method instead of the class'
+  ``__call__`` method to return the response, you'd say
+  ``attr="index"`` in the page ZCML definition.  This is most useful
+  when the page definition is a class.
+
+template
+
+  This is a string implying a path to a filesystem template.  Although
+  a path is usually just a simple relative pathname
+  (e.g. ``templates/foo.pt``, implying that the template is in the
+  "templates" directory relative to the directory in which the ZCML
+  file is defined), a path can be absolute, starting with a slash on
+  UNIX or a drive letter prefix on Windows.  The path can alternately
+  be a :term:`resource` "specification" in the form
+  ``some.dotted.package_name:relative/path``, making it possible to
+  address template resources which live in a separate package.  The
+  ``template`` attribute is optional.  If it is not defined, no
+  template is assoicated with the view.  See
+  :ref:`views_with_templates` for more information about view
+  templates.
+
 request_method
 
   This value can either be one of the strings 'GET', 'POST', 'PUT',
@@ -427,6 +455,13 @@ All arguments to ``bfg_view`` are optional.
 If ``name`` is not supplied, the empty string is used (implying
 the default view).
 
+If ``attr`` is not supplied, ``None`` is used (implying the function
+itself if the view is a function, or the ``__call__`` callable
+attribute if the view is a class).
+
+If ``template`` is not supplied, ``None`` is used (meaning that no
+template is associated with this view).
+
 If ``request_type`` is not supplied, the value ``None`` is used,
 implying any request type.  Otherwise, this should be a class or
 interface.
@@ -514,6 +549,156 @@ decorator syntactic sugar), if you wish:
            return Response('hello from %s!' % self.context)
 
    my_view = bfg_view()(MyView)
+
+.. _views_with_templates:
+
+Views That Have a ``template``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using a ``view`` with an associated ``template`` attribute differs
+from using a ``view`` without an associated ``template`` in a number
+of important ways:
+
+- When the ``template`` attribute is used, the BFG view machinery
+  finds and renders the template internally, unlike a view without an
+  associated ``template``, which, if it needs to render a template,
+  must find and render the template by itself.
+
+- When a ``template`` attribute is used, the may return a Response
+  object *or* a Python dictionary.  This is unlike a BFG ``view``
+  without an associated template, which must always return a Response
+  object.  If a BFG view without an associated template returns a
+  dictionary, an error will result at rendering time.
+
+- If the view callable with an associated template returns a Python
+  dictionary, the named template will be passed the dictionary as its
+  keyword arguments, and the view implementation will return the
+  resulting rendered template in a response to the user.  The callable
+  object (whatever object was used to define the ``view``) will be
+  automatically inserted into the set of keyword arguments passed to
+  the template as the ``view`` keyword.  If the view callable was a
+  class, the ``view`` keyword will be an instance of that class.  Also
+  inserted into the keywords passed to the template are
+  ``template_name`` (the name of the template, which may be a full
+  path or a package-relative name, typically the full string used in
+  the ``template`` atttribute of the directive), ``context`` (the
+  context of the view used to render the template), and ``request``
+  (the request passed to the view used to render the template).  None
+  of these default names are available to a template when the view
+  directive has no associated ``template`` attribute; the developer is
+  responsible for inserting them herself.
+
+- If the ``view`` callable associated with a ``view`` directive
+  returns a Response object (an object with the attributes ``status``,
+  ``headerlist`` and ``app_iter``), any template associated with the
+  ``page`` declaration is ignored, and the response is passed back to
+  BFG.  For example, if your page callable returns an ``HTTPFound``
+  response, no template rendering will be performed:
+
+  .. code-block:: python
+     :linenos:
+
+     from webob.exc import HTTPFound
+     return HTTPFound(location='http://example.com') # templating avoided
+
+Several keyword names in a dictionary return value of a view callable
+are treated specially by :mod:`repoze.bfg`.  These values are passed
+through to the template during rendering, but they also influence the
+response returned to the user separate from any template rendering.
+Page callables should set these values into the dictionary they return
+to influence response attributes.
+
+content_type_
+
+  Defines the content-type of the resulting response,
+  e.g. ``text/xml``.
+
+headerlist_
+
+  A sequence of tuples describing cookie values that should be set in
+  the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
+  'foo')]``.
+
+status_
+
+  A WSGI-style status code (e.g. ``200 OK``) describing the status of
+  the response.
+
+charset_
+
+  The character set (e.g. ``UTF-8``) of the response.
+
+cache_for_
+
+  A value in seconds which will influence ``Cache-Control`` and
+  ``Expires`` headers in the returned response.  The same can also be
+  achieved by returning various values in the headerlist, this is
+  purely a convenience.
+
+View Template Filename Extension Mappings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the ``template`` attribute of a view directive is used, a
+filename extension based mapping is consulted to determine which
+templating renderer implementation to use.  By default, a single
+filename-extension-to-renderer mapping is used: any template name with
+a filename extension of ".pt" is assumed to be rendered via a
+Chameleon ZPT template.
+
+If a template renderer cannot be recognized by the extension of a
+template, it will be assumed that a Chameleon text renderer should be
+used to render the template.
+
+Adding and Overriding Template Filename Extension Mappings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Additonal declarations can be made which override a default
+file-extension-to-renderer mapping or add a new
+file-extension-to-renderer mapping.  This is accomplished via one or
+more separate ZCML directives.
+
+For example, to add Jinja2 rendering (after installing the
+repoze.bfg.jinja2" package), whereby filenames that end in ``.jinja``
+are rendered by a Jinja2 renderer::
+
+  <template_renderer
+    extension=".jinja"
+    renderer="my.package.MyJinja2Renderer"/>
+
+To override the default mapping in which files with a ``.pt``
+extension are rendered via a Chameleon ZPT page template renderer, use
+a variation on the following::
+
+  <template_renderer
+     extension=".pt"
+     renderer="my.package.pt_renderer"/>
+
+By default, when a template extension is unrecognized, the Chameleon
+text templating engine is assumed.  You can override the default
+renderer by creating a directive which has no ``extension``::
+
+  <template_renderer
+      renderer="my.package.default_renderer"/>
+
+A renderer must be a class that has the following interface:
+
+.. code-block:: python
+   :linenos:
+
+   class TemplateRendererFactory:
+       def __init__(self, path, auto_reload=False):
+           """ Constructor """
+
+       def implementation(self):
+           """ Return the object that the underlying templating system
+           uses to render the template; it is typically a callable that
+           accepts arbitrary keyword arguments and returns a string or
+           unicode object """
+
+       def __call__(self, **kw):
+           """ Call a the template implementation with the keywords
+           passed in as arguments and return the result (a string or
+           unicode object) """
 
 .. _using_model_interfaces:
 

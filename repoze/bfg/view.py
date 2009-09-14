@@ -33,6 +33,9 @@ from repoze.bfg.path import caller_package
 
 from repoze.bfg.static import PackageURLParser
 
+from repoze.bfg.templating import renderer_from_path
+from repoze.bfg.templating import _auto_reload
+
 deprecated('view_execution_permitted',
     "('from repoze.bfg.view import view_execution_permitted' was  "
     "deprecated as of repoze.bfg 1.0; instead use 'from "
@@ -229,6 +232,13 @@ class bfg_view(object):
     If ``name`` is not supplied, the empty string is used (implying
     the default view name).
 
+    If ``attr`` is not supplied, ``None`` is used (implying the
+    function itself if the view is a function, or the ``__call__``
+    callable attribute if the view is a class).
+
+    If ``template`` is not supplied, ``None`` is used (meaning that no
+    template is associated with this view).
+
     If ``request_type`` is not supplied, the interface
     ``repoze.bfg.interfaces.IRequest`` is used, implying the standard
     request interface type.
@@ -322,7 +332,7 @@ class bfg_view(object):
     """
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
-                 containment=None):
+                 containment=None, attr=None, template=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
@@ -331,9 +341,11 @@ class bfg_view(object):
         self.request_method = request_method
         self.request_param = request_param
         self.containment = containment
+        self.attr = attr
+        self.template = template
 
     def __call__(self, wrapped):
-        _bfg_view = map_view(wrapped)
+        _bfg_view = map_view(wrapped, self.attr, self.template)
         _bfg_view.__is_bfg_view__ = True
         _bfg_view.__permission__ = self.permission
         _bfg_view.__for__ = self.for_
@@ -413,8 +425,41 @@ class MultiView(object):
                 continue
         raise NotFound(self.name)
 
-def map_view(view):
+def templated_response(template_name, response, view, context, request,
+                       auto_reload=False):
+    if is_response(response):
+        return response
+    renderer = renderer_from_path(template_name, auto_reload=auto_reload)
+    kw = {'view':view, 'template_name':template_name, 'context':context,
+          'request':request}
+    try:
+        kw.update(response)
+    except TypeError:
+        return response
+    result = renderer(**kw)
+    response_factory = queryUtility(IResponseFactory, default=Response)
+    response = response_factory(result)
+    content_type = kw.get('content_type_', None)
+    if content_type is not None:
+        response.content_type = content_type
+    headerlist = kw.get('headerlist_', None)
+    if headerlist is not None:
+        for k, v in headerlist:
+            response.headers.add(k, v)
+    status = kw.get('status_', None)
+    if status is not None:
+        response.status = status
+    charset = kw.get('charset_', None)
+    if charset is not None:
+        response.charset = charset
+    cache_for = kw.get('cache_for_', None)
+    if cache_for is not None:
+        response.cache_expires = cache_for
+    return response
+
+def map_view(view, attr=None, template=None):
     wrapped_view = view
+    auto_reload = _auto_reload()
 
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
@@ -423,33 +468,74 @@ def map_view(view):
         # position arguments, then immediately invoke the __call__
         # method of the instance with no arguments; __call__ should
         # return an IResponse).
-        if requestonly(view):
+        if requestonly(view, attr):
             # its __init__ accepts only a single request argument,
             # instead of both context and request
             def _bfg_class_requestonly_view(context, request):
                 inst = view(request)
-                return inst()
+                if attr is None:
+                    response = inst()
+                else:
+                    response = getattr(inst, attr)()
+                if template:
+                    response = templated_response(template, response, inst,
+                                                  context, request, auto_reload)
+                return response
             wrapped_view = _bfg_class_requestonly_view
         else:
             # its __init__ accepts both context and request
             def _bfg_class_view(context, request):
                 inst = view(context, request)
-                return inst()
+                if attr is None:
+                    response = inst()
+                else:
+                    response = getattr(inst, attr)()
+                if template:
+                    response = templated_response(template, response, inst,
+                                                  context, request, auto_reload)
+                return response
             wrapped_view = _bfg_class_view
 
-    elif requestonly(view):
+    elif requestonly(view, attr):
         # its __call__ accepts only a single request argument,
         # instead of both context and request
         def _bfg_requestonly_view(context, request):
-            return view(request)
+            if attr is None:
+                response = view(request)
+            else:
+                response = getattr(view, attr)(request)
+
+            if template:
+                response = templated_response(template, response, view,
+                                              context, request, auto_reload)
+            return response
         wrapped_view = _bfg_requestonly_view
+
+    elif attr:
+        def _bfg_attr_view(context, request):
+            response = getattr(view, attr)(context, request)
+            if template:
+                response = templated_response(template, response, view,
+                                              context, request, auto_reload)
+            return response
+        wrapped_view = _bfg_attr_view
+
+    elif template:
+        def _templated_view(context, request):
+            response = view(context, request)
+            response = templated_response(template, response, view,
+                                          context, request, auto_reload)
+            return response
+        wrapped_view = _templated_view
 
     decorate_view(wrapped_view, view)
     return wrapped_view
 
-def requestonly(class_or_callable):
+def requestonly(class_or_callable, attr=None):
     """ Return true of the class or callable accepts only a request argument,
     as opposed to something that accepts context, request """
+    if attr is None:
+        attr = '__call__'
     if inspect.isfunction(class_or_callable):
         fn = class_or_callable
     elif inspect.isclass(class_or_callable):
@@ -459,7 +545,7 @@ def requestonly(class_or_callable):
             return False
     else:
         try:
-            fn = class_or_callable.__call__
+            fn = getattr(class_or_callable, attr)
         except AttributeError:
             return False
 
