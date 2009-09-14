@@ -605,7 +605,7 @@ Several keyword names in a dictionary return value of a view callable
 are treated specially by :mod:`repoze.bfg`.  These values are passed
 through to the template during rendering, but they also influence the
 response returned to the user separate from any template rendering.
-Page callables should set these values into the dictionary they return
+View callables should set these values into the dictionary they return
 to influence response attributes.
 
 ``content_type_``
