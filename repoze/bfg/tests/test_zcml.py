@@ -355,6 +355,35 @@ class TestViewDirective(unittest.TestCase):
         result = wrapper(None, None)
         self.assertEqual(result.body, 'Hello.\n')
 
+    def test_with_template_no_view_callable(self):
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewPermission
+
+        import repoze.bfg.tests
+
+        context = DummyContext(repoze.bfg.tests)
+        class IFoo(Interface):
+            pass
+        import os
+        fixture = 'fixtures/minimal.txt'
+        self._callFUT(context, 'repoze.view', IFoo, template=fixture)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        result = wrapper(None, None)
+        self.assertEqual(result.body, 'Hello.\n')
+
     def test_request_type_asinterface(self):
         from zope.component import getSiteManager
         from zope.interface import Interface

@@ -227,7 +227,11 @@ The ``view`` ZCML directive has these possible attributes:
 
 view
 
-  The Python dotted-path name to the view callable.
+  The Python dotted-path name to the view callable.  This attribute is
+  required unless a ``template`` attribute also exists.  If a
+  ``template`` attribute exists on the directive, this attribute
+  defaults to a view that returns an empty dictionary (see
+  :ref:`views_with_templates`).
 
 for
 

@@ -89,7 +89,12 @@ def view(
     ):
 
     if not view:
-        raise ConfigurationError('"view" attribute was not specified')
+        if template:
+            def view(context, request):
+                return {}
+        else:
+            raise ConfigurationError('"view" attribute was not specified and '
+                                     'no template specified')
 
     sm = getSiteManager()
 

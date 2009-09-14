@@ -1,6 +1,9 @@
 Next release
 ============
 
+- The ``view`` attribute of the ``view`` ZCML directive is no longer
+  required if the ZCML directive has a ``template`` attribute.
+
 - A ZCML ``view`` directive (and the associated ``bfg_view``
   decorator) can now accept a "wrapper" value.  If a "wrapper" value
   is supplied, it is the value of a separate view's *name* attribute.
