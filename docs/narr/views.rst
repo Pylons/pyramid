@@ -608,27 +608,27 @@ response returned to the user separate from any template rendering.
 Page callables should set these values into the dictionary they return
 to influence response attributes.
 
-content_type_
+``content_type_``
 
   Defines the content-type of the resulting response,
   e.g. ``text/xml``.
 
-headerlist_
+``headerlist_``
 
   A sequence of tuples describing cookie values that should be set in
   the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
   'foo')]``.
 
-status_
+``status_``
 
   A WSGI-style status code (e.g. ``200 OK``) describing the status of
   the response.
 
-charset_
+``charset_``
 
   The character set (e.g. ``UTF-8``) of the response.
 
-cache_for_
+``cache_for_``
 
   A value in seconds which will influence ``Cache-Control`` and
   ``Expires`` headers in the returned response.  The same can also be
