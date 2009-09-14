@@ -58,7 +58,7 @@ from repoze.bfg.view import NotFound
 from repoze.bfg.view import MultiView
 from repoze.bfg.view import map_view
 from repoze.bfg.view import decorate_view
-
+from repoze.bfg.view import render_view_to_response
 
 import martian
 
@@ -84,6 +84,7 @@ def view(
     containment=None,
     attr=None,
     template=None,
+    wrapper=None,
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
@@ -174,7 +175,8 @@ def view(
         template = '%s:%s' % (package_name(_context.resolve('.')), template)
 
     def register():
-        derived_view = derive_view(view, permission, predicates, attr, template)
+        derived_view = derive_view(view, permission, predicates, attr, template,
+                                   wrapper)
         r_for_ = for_
         r_request_type = request_type
         if r_for_ is None:
@@ -244,12 +246,24 @@ def forbidden(_context, view):
     view_utility(_context, view, IForbiddenView)
 
 def derive_view(original_view, permission=None, predicates=(), attr=None,
-                template=None):
+                template=None, wrapper_viewname=None):
     mapped_view = map_view(original_view, attr, template)
-    secured_view = secure_view(mapped_view, permission)
+    owrapped_view = owrap_view(mapped_view, wrapper_viewname)
+    secured_view = secure_view(owrapped_view, permission)
     debug_view = authdebug_view(secured_view, permission)
     derived_view = predicate_wrap(debug_view, predicates)
     return derived_view
+
+def owrap_view(view, wrapper_viewname):
+    if not wrapper_viewname:
+        return view
+    def _owrapped_view(context, request):
+        response = view(context, request)
+        request.wrapped_response = response
+        request.wrapped_body = response.body
+        return render_view_to_response(context, request, wrapper_viewname)
+    decorate_view(_owrapped_view, view)
+    return _owrapped_view
 
 def predicate_wrap(view, predicates):
     if not predicates:
@@ -625,6 +639,11 @@ class IViewDirective(Interface):
     template = TextLine(
         title=u'The template asssociated with the view',
         description=u'',
+        required=False)
+
+    wrapper = TextLine(
+        title = u'The *name* of the view that acts as a wrapper for this view.',
+        description = u'',
         required=False)
 
     request_type = TextLine(

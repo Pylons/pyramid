@@ -275,6 +275,24 @@ template
   :ref:`views_with_templates` for more information about view
   templates.
 
+wrapper
+
+  The :term:`view name` (*not* an object dotted name) of another view
+  declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
+  which will receive the response body of this view as the
+  ``request.wrapped_body`` attribute of its own request, and the
+  response returned by this view as the ``request.wrapped_response``
+  attribute of its own request.  Using a wrapper makes it possible to
+  "chain" views together to form a composite response.  The response
+  of the outermost wrapper view will be returned to the user.  The
+  wrapper view will be found as any view is found: see
+  :ref:`view_lookup_ordering`.  The "best" wrapper view will be found
+  based on the lookup ordering: "under the hood" this wrapper view is
+  looked up via ``repoze.bfg.view.render_view_to_response(context,
+  request, 'wrapper_viewname')``. The context and request of a wrapper
+  view is the same context and request of the inner view.  If this
+  attribute is unspecified, no view wrapping is done.
+
 request_method
 
   This value can either be one of the strings 'GET', 'POST', 'PUT',
@@ -473,6 +491,8 @@ If ``for_`` is not supplied, the interface
 If ``permission`` is not supplied, no permission is registered for
 this view (it's accessible by any caller).
 
+If ``wrapper`` is not supplied, no wrapper view is used.
+
 If ``route_name`` is supplied, the view will be invoked only if the
 named route matches.  *This is an advanced feature, not often used by
 "civilians"*.
@@ -553,7 +573,7 @@ decorator syntactic sugar), if you wish:
 .. _views_with_templates:
 
 Views That Have a ``template``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Using a ``view`` with an associated ``template`` attribute differs
 from using a ``view`` without an associated ``template`` in a number

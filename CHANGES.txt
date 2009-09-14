@@ -1,3 +1,20 @@
+Next release
+============
+
+- A ZCML ``view`` directive (and the associated ``bfg_view``
+  decorator) can now accept a "wrapper" value.  If a "wrapper" value
+  is supplied, it is the value of a separate view's *name* attribute.
+  When a view with a ``wrapper`` attribute is rendered, the "inner"
+  view is first rendered normally.  Its body is then attached to the
+  request as "wrapped_body", and then a wrapper view name is looked up
+  and rendered (using ``repoze.bfg.render_view_to_response``), passed
+  the request and the context.  The wrapper view is assumed to do
+  something sensible with ``request.wrapped_body``, usually inserting
+  its structure into some other rendered template.  This feature makes
+  it possible to specify (potentially nested) "owrap" relationships
+  between views using only ZCML or decorators (as opposed always using
+  ZPT METAL and analogues to wrap view renderings in outer wrappers).
+
 1.1a2 (2009-09-14)
 ==================
 

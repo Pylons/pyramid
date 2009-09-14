@@ -1321,6 +1321,24 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(next, True)
         self.assertEqual(predicates, [True, True])
 
+    def test_view_with_wrapper_viewname(self):
+        from webob import Response
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IView
+        def inner_view(context, request):
+            return Response('OK')
+        def outer_view(context, request):
+            return Response('outer ' + request.wrapped_body)
+        sm = getSiteManager()
+        sm.registerAdapter(outer_view, (None, None), IView, 'owrap')
+        result = self._callFUT(inner_view, wrapper_viewname='owrap')
+        self.failIf(result is inner_view)
+        self.assertEqual(inner_view.__module__, result.__module__)
+        self.assertEqual(inner_view.__doc__, result.__doc__)
+        request = DummyRequest()
+        response = result(None, request)
+        self.assertEqual(response.body, 'outer OK')
+
 class TestConnectRouteFunction(unittest.TestCase):
     def setUp(self):
         cleanUp()
