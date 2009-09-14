@@ -261,6 +261,7 @@ def owrap_view(view, wrapper_viewname):
         response = view(context, request)
         request.wrapped_response = response
         request.wrapped_body = response.body
+        request.wrapped_view = view
         return render_view_to_response(context, request, wrapper_viewname)
     decorate_view(_owrapped_view, view)
     return _owrapped_view

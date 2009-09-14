@@ -1325,9 +1325,13 @@ class TestDeriveView(unittest.TestCase):
         from webob import Response
         from zope.component import getSiteManager
         from repoze.bfg.interfaces import IView
+        inner_response = Response('OK')
         def inner_view(context, request):
-            return Response('OK')
+            return inner_response
         def outer_view(context, request):
+            self.assertEqual(request.wrapped_response, inner_response)
+            self.assertEqual(request.wrapped_body, inner_response.body)
+            self.assertEqual(request.wrapped_view, inner_view)
             return Response('outer ' + request.wrapped_body)
         sm = getSiteManager()
         sm.registerAdapter(outer_view, (None, None), IView, 'owrap')
