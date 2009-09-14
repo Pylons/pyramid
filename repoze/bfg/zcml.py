@@ -725,11 +725,13 @@ class BFGViewFunctionGrokker(martian.InstanceGrokker):
             request_method = obj.__request_method__
             request_param = obj.__request_param__
             containment = obj.__containment__
+            wrapper = obj.__wrapper_viewname__
             context = kw['context']
             view(context, permission=permission, for_=for_,
                  view=obj, name=name, request_type=request_type,
                  route_name=route_name, request_method=request_method,
-                 request_param=request_param, containment=containment)
+                 request_param=request_param, containment=containment,
+                 wrapper=wrapper)
             return True
         return False
 

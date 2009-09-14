@@ -239,6 +239,9 @@ class bfg_view(object):
     If ``template`` is not supplied, ``None`` is used (meaning that no
     template is associated with this view).
 
+    If ``wrapper`` is not supplied, ``None`` is used (meaning that no
+    view wrapper is associated with this view).
+
     If ``request_type`` is not supplied, the interface
     ``repoze.bfg.interfaces.IRequest`` is used, implying the standard
     request interface type.
@@ -332,7 +335,7 @@ class bfg_view(object):
     """
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
-                 containment=None, attr=None, template=None):
+                 containment=None, attr=None, template=None, wrapper=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
@@ -343,6 +346,7 @@ class bfg_view(object):
         self.containment = containment
         self.attr = attr
         self.template = template
+        self.wrapper_viewname = wrapper
 
     def __call__(self, wrapped):
         _bfg_view = map_view(wrapped, self.attr, self.template)
@@ -355,6 +359,7 @@ class bfg_view(object):
         _bfg_view.__request_method__ = self.request_method
         _bfg_view.__request_param__ = self.request_param
         _bfg_view.__containment__ = self.containment
+        _bfg_view.__wrapper_viewname__ = self.wrapper_viewname
         return _bfg_view
 
 def default_view(context, request, status):
