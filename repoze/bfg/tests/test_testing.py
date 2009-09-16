@@ -54,20 +54,20 @@ class TestTestingFunctions(unittest.TestCase):
         from repoze.bfg.traversal import find_model
         self.assertEqual(find_model(None, '/ob1'), ob1)
 
-    def test_registerDummyRenderer(self):
+    def test_registerTemplateRenderer(self):
         from repoze.bfg import testing
-        renderer = testing.registerDummyRenderer('templates/foo')
+        renderer = testing.registerTemplateRenderer('templates/foo')
         from repoze.bfg.testing import DummyTemplateRenderer
         self.failUnless(isinstance(renderer, DummyTemplateRenderer))
         from repoze.bfg.chameleon_zpt import render_template_to_response
         response = render_template_to_response('templates/foo', foo=1, bar=2)
         self.assertEqual(dict(foo=1, bar=2), renderer._received)
 
-    def test_registerDummyRenderer_explicitrenderer(self):
+    def test_registerTemplateRenderer_explicitrenderer(self):
         from repoze.bfg import testing
         def renderer(kw):
             raise ValueError
-        renderer = testing.registerDummyRenderer('templates/foo', renderer)
+        renderer = testing.registerTemplateRenderer('templates/foo', renderer)
         from repoze.bfg.chameleon_zpt import render_template_to_response
         self.assertRaises(ValueError, render_template_to_response,
                           'templates/foo', foo=1, bar=2)

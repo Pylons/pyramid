@@ -1376,13 +1376,24 @@ class TestDeriveView(unittest.TestCase):
             return Response('outer ' + request.wrapped_body)
         sm = getSiteManager()
         sm.registerAdapter(outer_view, (None, None), IView, 'owrap')
-        result = self._callFUT(inner_view, wrapper_viewname='owrap')
+        result = self._callFUT(inner_view, viewname='inner',
+                               wrapper_viewname='owrap')
         self.failIf(result is inner_view)
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = DummyRequest()
         response = result(None, request)
         self.assertEqual(response.body, 'outer OK')
+
+    def test_view_with_wrapper_viewname_notfound(self):
+        from webob import Response
+        inner_response = Response('OK')
+        def inner_view(context, request):
+            return inner_response
+        request = DummyRequest()
+        wrapped = self._callFUT(
+            inner_view, viewname='inner', wrapper_viewname='owrap')
+        result = self.assertRaises(ValueError, wrapped, None, request)
 
 class TestConnectRouteFunction(unittest.TestCase):
     def setUp(self):

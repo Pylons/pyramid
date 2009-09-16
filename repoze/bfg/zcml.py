@@ -182,7 +182,7 @@ def view(
 
     def register():
         derived_view = derive_view(view, permission, predicates, attr, renderer,
-                                   wrapper)
+                                   wrapper, name)
         r_for_ = for_
         r_request_type = request_type
         if r_for_ is None:
@@ -252,15 +252,15 @@ def forbidden(_context, view):
     view_utility(_context, view, IForbiddenView)
 
 def derive_view(original_view, permission=None, predicates=(), attr=None,
-                renderer=None, wrapper_viewname=None):
+                renderer=None, wrapper_viewname=None, viewname=None):
     mapped_view = map_view(original_view, attr, renderer)
-    owrapped_view = owrap_view(mapped_view, wrapper_viewname)
+    owrapped_view = owrap_view(mapped_view, viewname, wrapper_viewname)
     secured_view = secure_view(owrapped_view, permission)
     debug_view = authdebug_view(secured_view, permission)
     derived_view = predicate_wrap(debug_view, predicates)
     return derived_view
 
-def owrap_view(view, wrapper_viewname):
+def owrap_view(view, viewname, wrapper_viewname):
     if not wrapper_viewname:
         return view
     def _owrapped_view(context, request):
@@ -268,7 +268,13 @@ def owrap_view(view, wrapper_viewname):
         request.wrapped_response = response
         request.wrapped_body = response.body
         request.wrapped_view = view
-        return render_view_to_response(context, request, wrapper_viewname)
+        wrapped_response = render_view_to_response(context, request,
+                                                   wrapper_viewname)
+        if wrapped_response is None:
+            raise ValueError(
+                'No wrapper view named %r found when executing view named %r' %
+                             (wrapper_viewname, viewname))
+        return wrapped_response
     decorate_view(_owrapped_view, view)
     return _owrapped_view
 

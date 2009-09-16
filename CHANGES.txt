@@ -1,37 +1,20 @@
 Next release
 ============
 
-- When used under Python < 2.6, BFG now has an installation time
-  dependency on the ``simplejson`` package.
+Documentation
+-------------
 
-- The previous release (1.1a2) added a view configuration attribute
-  named ``template``.  In this release, the attribute has been renamed
-  to ``renderer``.  This signifies that the attribute is more generic:
-  it can now be not just a template name but any renderer name (ala
-  ``json``).  A "renderer" is an object which accepts the return value
-  of a view and converts it to a string.  This includes, but is not
-  limited to, templating systems.
+- The "Views" narrative chapter in the documentation has been updated
+  extensively to discuss "renderers".
 
-- In the previous release (1.1a2), the Chameleon text template
-  renderer was used if the system didn't associate the ``template``
-  view configuration value with a filename with a "known" extension.
-  In this release, you must use a ``renderer`` attribute which is a
-  path that ends with a ``.txt`` extension
-  (e.g. ``templates/foo.txt``) to use the Chameleon text renderer.
+Features
+--------
 
-- The ``ITemplateRenderer`` interface has been changed.  Previously
-  its ``__call__`` method accepted ``**kw``.  It now accepts a single
-  positional parameter named ``kw``.
-
-- The ``ITemplateRendererFactory`` interface has been changed.
-  Previously its ``__call__`` method accepted an ``auto_reload``
-  keyword parameter.  Now it accepts no keyword parameters.  Renderers
-  are now themselves responsible for determining details of
-  auto-reload.
-
-- The ``templating`` module has been removed.  The bulk of its
-  functionality has been moved to a different module named
-  ``renderers``.
+- A ``renderer`` attribute has been added to view configurations,
+  replacing the previous (1.1a2) version's ``template`` attribute.  A
+  "renderer" is an object which accepts the return value of a view and
+  converts it to a string.  This includes, but is not limited to,
+  templating systems.
 
 - A new interface named ``IRenderer`` was added.  The existing
   interface, ``ITemplateRenderer`` now derives from this new
@@ -41,9 +24,6 @@ Next release
   interface named ``ITemplateRenderer`` now derives from this
   interface.  This interface is internal.
 
-- The "Views" narrative chapter in the documentation has been updated
-  extensively to discuss "renderers".
-
 - The ``view`` attribute of the ``view`` ZCML directive is no longer
   required if the ZCML directive also has a ``renderer`` attribute.
   This is useful when the renderer is a template renderer and no names
@@ -51,9 +31,6 @@ Next release
 
 - A new zcml directive ``renderer`` has been added.  It is documented
   in the "Views" narrative chapter of the documentation.
-
-- The ``template_renderer`` ZCML directive introduced in 1.1a2 has
-  been removed.  It has been replaced by the ``renderer`` directive.
 
 - A ZCML ``view`` directive (and the associated ``bfg_view``
   decorator) can now accept a "wrapper" value.  If a "wrapper" value
@@ -68,6 +45,61 @@ Next release
   it possible to specify (potentially nested) "owrap" relationships
   between views using only ZCML or decorators (as opposed always using
   ZPT METAL and analogues to wrap view renderings in outer wrappers).
+
+Dependencies
+------------
+
+- When used under Python < 2.6, BFG now has an installation time
+  dependency on the ``simplejson`` package.
+
+Deprecations
+------------
+
+- The ``repoze.bfg.testing.registerDummyRenderer`` API has been
+  deprecated in favor of
+  ``repoze.bfg.testing.registerTemplateRenderer``.  A deprecation
+  warning is *not* issued at import time for the former name; it will
+  exist "forever".
+
+- The ``repoze.bfg.templating.renderer_from_cache`` function has been
+  moved to ``repoze.bfg.renderer.template_renderer_factory``.  This
+  was never an API, but code in the wild was spotted that used it.  A
+  deprecation warning is issued at import time for the former.
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``ITemplateRenderer`` interface has been changed.  Previously
+  its ``__call__`` method accepted ``**kw``.  It now accepts a single
+  positional parameter named ``kw``.  This is mostly an internal
+  change, but it was exposed in APIs in one place: if you've used the
+  ``repoze.bfg.testing.registerDummyRenderer`` API in your tests with
+  a custom "renderer" argument with your own renderer implementation,
+  you will need to change that renderer implementation to accept
+  ``kw`` instead of ``**kw`` in its ``__call__`` method.
+
+- The ``ITemplateRendererFactory`` interface has been changed.
+  Previously its ``__call__`` method accepted an ``auto_reload``
+  keyword parameter.  Now its ``__call__`` method accepts no keyword
+  parameters.  Renderers are now themselves responsible for
+  determining details of auto-reload.  This is purely an internal
+  change.  This interface was never external.
+
+- The ``template_renderer`` ZCML directive introduced in 1.1a2 has
+  been removed.  It has been replaced by the ``renderer`` directive.
+
+- The previous release (1.1a2) added a view configuration attribute
+  named ``template``.  In this release, the attribute has been renamed
+  to ``renderer``.  This signifies that the attribute is more generic:
+  it can now be not just a template name but any renderer name (ala
+  ``json``).  
+
+- In the previous release (1.1a2), the Chameleon text template
+  renderer was used if the system didn't associate the ``template``
+  view configuration value with a filename with a "known" extension.
+  In this release, you must use a ``renderer`` attribute which is a
+  path that ends with a ``.txt`` extension
+  (e.g. ``templates/foo.txt``) to use the Chameleon text renderer.
 
 1.1a2 (2009-09-14)
 ==================

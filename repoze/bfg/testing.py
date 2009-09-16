@@ -69,17 +69,21 @@ def registerEventListener(event_iface=Interface):
     registerSubscriber(subscriber, event_iface)
     return L
 
-def registerDummyRenderer(path, renderer=None):
-    """ Register a 'renderer' at ``path`` (usually a relative filename
-    ala ``templates/foo.pt``) and return the renderer object.  If the
-    ``renderer`` argument is None, a 'dummy' renderer will be used.
-    This function is useful when testing code that calls the
+def registerTemplateRenderer(path, renderer=None):
+    """ Register a 'template renderer' at ``path`` (usually a relative
+    filename ala ``templates/foo.pt``) and return the renderer object.
+    If the ``renderer`` argument is None, a 'dummy' renderer will be
+    used.  This function is useful when testing code that calls the
     ``render_template_to_response`` or any other ``render_template*``
     API of any of the built-in templating systems."""
     from repoze.bfg.interfaces import ITemplateRenderer
     if renderer is None:
         renderer = DummyTemplateRenderer()
     return registerUtility(renderer, ITemplateRenderer, path)
+
+# registerDummyRenderer is a deprecated alias that should never be removed
+# (far too much usage in the wild)
+registerDummyRenderer = registerTemplateRenderer
 
 def registerView(name, result='', view=None, for_=(Interface, Interface),
                  permission=None):
@@ -251,7 +255,7 @@ class DummySecurityPolicy:
 class DummyTemplateRenderer:
     """
     An instance of this class is returned from
-    ``registerDummyRenderer``.  It has a helper function (``assert_``)
+    ``registerTemplateRenderer``.  It has a helper function (``assert_``)
     that makes it possible to make an assertion which compares data
     passed to the renderer by the view function against expected
     key/value pairs. 

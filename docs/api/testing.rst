@@ -11,7 +11,7 @@
 
   .. autofunction:: registerEventListener
 
-  .. autofunction:: registerDummyRenderer
+  .. autofunction:: registerTemplateRenderer
 
   .. autofunction:: registerView
 
