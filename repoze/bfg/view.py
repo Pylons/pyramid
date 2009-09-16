@@ -26,15 +26,16 @@ from zope.interface import implements
 from zope.deprecation import deprecated
 
 from repoze.bfg.interfaces import IResponseFactory
+from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IMultiView
+from repoze.bfg.interfaces import ITemplateRenderer
 
 from repoze.bfg.path import caller_package
 
 from repoze.bfg.static import PackageURLParser
 
-from repoze.bfg.templating import renderer_from_path
-from repoze.bfg.templating import _auto_reload
+from repoze.bfg.renderers import renderer_from_name
 
 deprecated('view_execution_permitted',
     "('from repoze.bfg.view import view_execution_permitted' was  "
@@ -236,8 +237,8 @@ class bfg_view(object):
     function itself if the view is a function, or the ``__call__``
     callable attribute if the view is a class).
 
-    If ``template`` is not supplied, ``None`` is used (meaning that no
-    template is associated with this view).
+    If ``renderer`` is not supplied, ``None`` is used (meaning that no
+    renderer is associated with this view).
 
     If ``wrapper`` is not supplied, ``None`` is used (meaning that no
     view wrapper is associated with this view).
@@ -335,7 +336,7 @@ class bfg_view(object):
     """
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
-                 containment=None, attr=None, template=None, wrapper=None):
+                 containment=None, attr=None, renderer='', wrapper=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
@@ -345,11 +346,11 @@ class bfg_view(object):
         self.request_param = request_param
         self.containment = containment
         self.attr = attr
-        self.template = template
+        self.renderer = renderer
         self.wrapper_viewname = wrapper
 
     def __call__(self, wrapped):
-        _bfg_view = map_view(wrapped, self.attr, self.template)
+        _bfg_view = map_view(wrapped, self.attr, self.renderer)
         _bfg_view.__is_bfg_view__ = True
         _bfg_view.__permission__ = self.permission
         _bfg_view.__for__ = self.for_
@@ -430,41 +431,43 @@ class MultiView(object):
                 continue
         raise NotFound(self.name)
 
-def templated_response(template_name, response, view, context, request,
-                       auto_reload=False):
+def rendered_response(renderer_name, response, view, context, request):
     if is_response(response):
         return response
-    renderer = renderer_from_path(template_name, auto_reload=auto_reload)
-    kw = {'view':view, 'template_name':template_name, 'context':context,
-          'request':request}
-    try:
-        kw.update(response)
-    except TypeError:
-        return response
-    result = renderer(**kw)
+    renderer = renderer_from_name(renderer_name)
+    if ITemplateRenderer.providedBy(renderer):
+        kw = {'view':view, 'template_name':renderer_name, 'context':context,
+              'request':request}
+        try:
+            kw.update(response)
+        except TypeError:
+            return response
+        result = renderer(kw)
+    else:
+        result = renderer(response)
     response_factory = queryUtility(IResponseFactory, default=Response)
     response = response_factory(result)
-    content_type = kw.get('content_type_', None)
+    attrs = request.environ.get('webob.adhoc_attrs', {})
+    content_type = attrs.get('response_content_type', None)
     if content_type is not None:
         response.content_type = content_type
-    headerlist = kw.get('headerlist_', None)
+    headerlist = attrs.get('response_headerlist', None)
     if headerlist is not None:
         for k, v in headerlist:
             response.headers.add(k, v)
-    status = kw.get('status_', None)
+    status = attrs.get('response_status', None)
     if status is not None:
         response.status = status
-    charset = kw.get('charset_', None)
+    charset = attrs.get('response_charset', None)
     if charset is not None:
         response.charset = charset
-    cache_for = kw.get('cache_for_', None)
+    cache_for = attrs.get('response_cache_for', None)
     if cache_for is not None:
         response.cache_expires = cache_for
     return response
 
-def map_view(view, attr=None, template=None):
+def map_view(view, attr=None, renderer=None):
     wrapped_view = view
-    auto_reload = _auto_reload()
 
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
@@ -482,9 +485,9 @@ def map_view(view, attr=None, template=None):
                     response = inst()
                 else:
                     response = getattr(inst, attr)()
-                if template:
-                    response = templated_response(template, response, inst,
-                                                  context, request, auto_reload)
+                if renderer:
+                    response = rendered_response(renderer, response, inst,
+                                                  context, request)
                 return response
             wrapped_view = _bfg_class_requestonly_view
         else:
@@ -495,9 +498,9 @@ def map_view(view, attr=None, template=None):
                     response = inst()
                 else:
                     response = getattr(inst, attr)()
-                if template:
-                    response = templated_response(template, response, inst,
-                                                  context, request, auto_reload)
+                if renderer:
+                    response = rendered_response(renderer, response, inst,
+                                                 context, request)
                 return response
             wrapped_view = _bfg_class_view
 
@@ -510,28 +513,36 @@ def map_view(view, attr=None, template=None):
             else:
                 response = getattr(view, attr)(request)
 
-            if template:
-                response = templated_response(template, response, view,
-                                              context, request, auto_reload)
+            if renderer:
+                response = rendered_response(renderer, response, view,
+                                             context, request)
             return response
         wrapped_view = _bfg_requestonly_view
 
     elif attr:
         def _bfg_attr_view(context, request):
             response = getattr(view, attr)(context, request)
-            if template:
-                response = templated_response(template, response, view,
-                                              context, request, auto_reload)
+            if renderer:
+                response = rendered_response(renderer, response, view,
+                                             context, request)
             return response
         wrapped_view = _bfg_attr_view
 
-    elif template:
-        def _templated_view(context, request):
+    elif renderer:
+        def _rendered_view(context, request):
             response = view(context, request)
-            response = templated_response(template, response, view,
-                                          context, request, auto_reload)
+            response = rendered_response(renderer, response, view,
+                                         context, request)
             return response
-        wrapped_view = _templated_view
+        wrapped_view = _rendered_view
+
+    elif queryUtility(IRendererFactory):
+        def _default_rendered_view(context, request):
+            response = view(context, request)
+            response = rendered_response(renderer, response, view,
+                                         context, request)
+            return response
+        wrapped_view = _default_rendered_view
 
     decorate_view(wrapped_view, view)
     return wrapped_view

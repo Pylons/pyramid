@@ -1,8 +1,60 @@
 Next release
 ============
 
+- When used under Python < 2.6, BFG now has an installation time
+  dependency on the ``simplejson`` package.
+
+- The previous release (1.1a2) added a view configuration attribute
+  named ``template``.  In this release, the attribute has been renamed
+  to ``renderer``.  This signifies that the attribute is more generic:
+  it can now be not just a template name but any renderer name (ala
+  ``json``).  A "renderer" is an object which accepts the return value
+  of a view and converts it to a string.  This includes, but is not
+  limited to, templating systems.
+
+- In the previous release (1.1a2), the Chameleon text template
+  renderer was used if the system didn't associate the ``template``
+  view configuration value with a filename with a "known" extension.
+  In this release, you must use a ``renderer`` attribute which is a
+  path that ends with a ``.txt`` extension
+  (e.g. ``templates/foo.txt``) to use the Chameleon text renderer.
+
+- The ``ITemplateRenderer`` interface has been changed.  Previously
+  its ``__call__`` method accepted ``**kw``.  It now accepts a single
+  positional parameter named ``kw``.
+
+- The ``ITemplateRendererFactory`` interface has been changed.
+  Previously its ``__call__`` method accepted an ``auto_reload``
+  keyword parameter.  Now it accepts no keyword parameters.  Renderers
+  are now themselves responsible for determining details of
+  auto-reload.
+
+- The ``templating`` module has been removed.  The bulk of its
+  functionality has been moved to a different module named
+  ``renderers``.
+
+- A new interface named ``IRenderer`` was added.  The existing
+  interface, ``ITemplateRenderer`` now derives from this new
+  interface.  This interface is internal.
+
+- A new interface named ``IRendererFactory`` was added.  An existing
+  interface named ``ITemplateRenderer`` now derives from this
+  interface.  This interface is internal.
+
+- The "Views" narrative chapter in the documentation has been updated
+  extensively to discuss "renderers".
+
 - The ``view`` attribute of the ``view`` ZCML directive is no longer
-  required if the ZCML directive has a ``template`` attribute.
+  required if the ZCML directive also has a ``renderer`` attribute.
+  This is useful when the renderer is a template renderer and no names
+  need be passed to the template at render time.
+
+- A new zcml directive ``renderer_factory`` has been added.  It is
+  documented in the "Views" narrative chapter of the documentation.
+
+- The ``template_renderer`` ZCML directive introduced in 1.1a2 has
+  been removed.  It has been replaced by the ``renderer_factory``
+  directive.
 
 - A ZCML ``view`` directive (and the associated ``bfg_view``
   decorator) can now accept a "wrapper" value.  If a "wrapper" value

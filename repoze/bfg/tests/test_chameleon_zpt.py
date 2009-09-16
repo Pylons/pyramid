@@ -44,7 +44,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.pt')
         instance = self._makeOne(minimal)
-        result = instance()
+        result = instance({})
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result,
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')

@@ -65,7 +65,7 @@ class TestTestingFunctions(unittest.TestCase):
 
     def test_registerDummyRenderer_explicitrenderer(self):
         from repoze.bfg import testing
-        def renderer(**kw):
+        def renderer(kw):
             raise ValueError
         renderer = testing.registerDummyRenderer('templates/foo', renderer)
         from repoze.bfg.chameleon_zpt import render_template_to_response
@@ -460,20 +460,20 @@ class TestDummyTemplateRenderer(unittest.TestCase):
 
     def test_getattr(self):
         renderer = self._makeOne()
-        renderer(a=1)
+        renderer({'a':1})
         self.assertEqual(renderer.a, 1)
         self.assertRaises(AttributeError, renderer.__getattr__, 'b')
 
     def test_assert_(self):
         renderer = self._makeOne()
-        renderer(a=1, b=2)
+        renderer({'a':1, 'b':2})
         self.assertRaises(AssertionError, renderer.assert_, c=1)
         self.assertRaises(AssertionError, renderer.assert_, b=3)
         self.failUnless(renderer.assert_(a=1, b=2))
         
     def test_nondefault_string_response(self):
         renderer = self._makeOne('abc')
-        result = renderer(a=1, b=2)
+        result = renderer({'a':1, 'b':2})
         self.assertEqual(result, 'abc')
 
 class CleanUpTests(object):

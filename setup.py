@@ -15,6 +15,7 @@
 __version__ = '1.1a2'
 
 import os
+import sys
 
 from ez_setup import use_setuptools
 use_setuptools()
@@ -44,6 +45,9 @@ install_requires=[
     'martian',
     ]
 
+if sys.version_info[:2] < (2, 6):
+    install_requires.append('simplejson')
+    
 setup(name='repoze.bfg',
       version=__version__,
       description='A web framework for WSGI',

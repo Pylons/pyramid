@@ -264,7 +264,7 @@ class DummyTemplateRenderer:
     def implementation(self):
         return self
     
-    def __call__(self, **kw):
+    def __call__(self, kw):
         self._received.update(kw)
         return self.string_response
 

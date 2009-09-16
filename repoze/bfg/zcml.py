@@ -39,7 +39,7 @@ from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRouteRequest
-from repoze.bfg.interfaces import ITemplateRendererFactory
+from repoze.bfg.interfaces import IRendererFactory
 
 from repoze.bfg.path import package_name
 
@@ -83,18 +83,18 @@ def view(
     request_param=None,
     containment=None,
     attr=None,
-    template=None,
+    renderer=None,
     wrapper=None,
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
     if not view:
-        if template:
+        if renderer:
             def view(context, request):
                 return {}
         else:
             raise ConfigurationError('"view" attribute was not specified and '
-                                     'no template specified')
+                                     'no renderer specified')
 
     sm = getSiteManager()
 
@@ -173,14 +173,15 @@ def view(
     else:
         score = sys.maxint
 
-    if template and (not ':' in template) and (not os.path.isabs(template)):
-        # if it's not a package:relative/name and it's not an
-        # /absolute/path it's a relative/path; this means its relative
-        # to the package in which the ZCML file is defined.
-        template = '%s:%s' % (package_name(_context.resolve('.')), template)
+    if renderer and '.' in renderer:
+        if  (not ':' in renderer) and (not os.path.isabs(renderer) ):
+            # if it's not a package:relative/name and it's not an
+            # /absolute/path it's a relative/path; this means its relative
+            # to the package in which the ZCML file is defined.
+            renderer = '%s:%s' % (package_name(_context.resolve('.')), renderer)
 
     def register():
-        derived_view = derive_view(view, permission, predicates, attr, template,
+        derived_view = derive_view(view, permission, predicates, attr, renderer,
                                    wrapper)
         r_for_ = for_
         r_request_type = request_type
@@ -251,8 +252,8 @@ def forbidden(_context, view):
     view_utility(_context, view, IForbiddenView)
 
 def derive_view(original_view, permission=None, predicates=(), attr=None,
-                template=None, wrapper_viewname=None):
-    mapped_view = map_view(original_view, attr, template)
+                renderer=None, wrapper_viewname=None):
+    mapped_view = map_view(original_view, attr, renderer)
     owrapped_view = owrap_view(mapped_view, wrapper_viewname)
     secured_view = secure_view(owrapped_view, permission)
     debug_view = authdebug_view(secured_view, permission)
@@ -560,21 +561,21 @@ def connect_route(path, name, factory):
     mapper = getUtility(IRoutesMapper)
     mapper.connect(path, name, factory)
 
-class ITemplateRendererDirective(Interface):
-    renderer = GlobalObject(
-        title=u'ITemplateRendererFactory implementation',
+class IRendererDirective(Interface):
+    factory = GlobalObject(
+        title=u'IRendererFactory implementation',
         required=True)
 
-    extension = TextLine(
-        title=u'Filename extension (e.g. ".pt")',
+    name = TextLine(
+        title=u'Token (e.g. ``json``) or filename extension (e.g. ".pt")',
         required=False)
 
-def template_renderer(_context, renderer, extension=''):
+def renderer(_context, factory, name=''):
     # renderer factories must be registered eagerly so they can be
     # found by the view machinery
     sm = getSiteManager()
-    sm.registerUtility(renderer, ITemplateRendererFactory, name=extension)
-    _context.action(discriminator=(ITemplateRendererFactory, extension))
+    sm.registerUtility(factory, IRendererFactory, name=name)
+    _context.action(discriminator=(IRendererFactory, name))
 
 class IStaticDirective(Interface):
     name = TextLine(
@@ -642,8 +643,8 @@ class IViewDirective(Interface):
         description=u'',
         required=False)
 
-    template = TextLine(
-        title=u'The template asssociated with the view',
+    renderer = TextLine(
+        title=u'The renderer asssociated with the view',
         description=u'',
         required=False)
 

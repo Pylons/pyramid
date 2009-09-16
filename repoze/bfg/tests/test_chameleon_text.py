@@ -51,7 +51,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.txt')
         instance = self._makeOne(minimal)
-        result = instance()
+        result = instance({})
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
@@ -59,7 +59,7 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         self._zcmlConfigure()
         nonminimal = self._getTemplatePath('nonminimal.txt')
         instance = self._makeOne(nonminimal)
-        result = instance(name='Chris')
+        result = instance({'name':'Chris'})
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello, Chris!\n')
 

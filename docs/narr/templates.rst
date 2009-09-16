@@ -7,6 +7,8 @@ information that is static.  :mod:`repoze.bfg` offers a number of ways
 to perform templating tasks "out of the box", and provides alternative
 templating language support via add-on "bindings" packages.
 
+.. _chameleon_zpt_templates:
+
 Templating With :term:`Chameleon` ZPT Page Templates
 ----------------------------------------------------
 
@@ -173,6 +175,8 @@ And ``templates/mytemplate.pt`` might look like so:
         <span metal:fill-slot="name">Chris</span>
       </span>
     </html>
+
+.. _chameleon_text_templates:
 
 Templating with :term:`Chameleon` Text Templates
 ------------------------------------------------

@@ -1,47 +1,68 @@
 from webob import Response
 
 from zope.component import queryUtility
+from zope.interface import implements
 
 from repoze.bfg.interfaces import IResponseFactory
+from repoze.bfg.interfaces import ITemplateRenderer
 
-from repoze.bfg.templating import renderer_from_cache
-from repoze.bfg.templating import TextTemplateRenderer
-from repoze.bfg.templating import _auto_reload
+from chameleon.core.template import TemplateFile
+from chameleon.zpt.language import Parser
+
+from repoze.bfg.renderers import template_renderer_factory
+from repoze.bfg.settings import get_settings
+
+class TextTemplateFile(TemplateFile):
+    default_parser = Parser()
+    
+    def __init__(self, filename, parser=None, format='text', doctype=None,
+                 **kwargs):
+        if parser is None:
+            parser = self.default_parser
+        super(TextTemplateFile, self).__init__(filename, parser, format,
+                                               doctype, **kwargs)
+
+def renderer_factory(path):
+    return template_renderer_factory(path, TextTemplateRenderer, level=4)
+
+class TextTemplateRenderer(object):
+    implements(ITemplateRenderer)
+    def __init__(self, path):
+        settings = get_settings()
+        auto_reload = settings and settings['reload_templates']
+        self.template = TextTemplateFile(path, auto_reload=auto_reload)
+
+    def implementation(self):
+        return self.template
+    
+    def __call__(self, kw):
+        return self.template(**kw)
 
 def get_renderer(path):
     """ Return a callable ``ITemplateRenderer`` object representing a
-    ``chameleon`` text template at the package-relative path (may also
+    ``Chameleon`` text template at the package-relative path (may also
     be absolute)."""
-    auto_reload = _auto_reload()
-    renderer = renderer_from_cache(path, TextTemplateRenderer,
-                                   auto_reload=auto_reload)
-    return renderer
+    return renderer_factory(path)
 
 def get_template(path):
-    """ Return a ``chameleon`` text template at the package-relative
+    """ Return a ``Chameleon`` text template at the package-relative
     path (may also be absolute)."""
-    auto_reload = _auto_reload()
-    renderer = renderer_from_cache(path, TextTemplateRenderer,
-                                   auto_reload=auto_reload)
+    renderer = renderer_factory(path)
     return renderer.implementation()
 
 def render_template(path, **kw):
     """ Render a ``chameleon`` text template at the package-relative
     path (may also be absolute) using the kwargs in ``*kw`` as
     top-level names and return a string."""
-    auto_reload = _auto_reload()
-    renderer = renderer_from_cache(path, TextTemplateRenderer,
-                                   auto_reload=auto_reload)
-    return renderer(**kw)
+    renderer = renderer_factory(path)
+    return renderer(kw)
 
 def render_template_to_response(path, **kw):
     """ Render a ``chameleon`` text template at the package-relative
     path (may also be absolute) using the kwargs in ``*kw`` as
     top-level names and return a Response object with the body as the
     template result."""
-    auto_reload = _auto_reload()
-    renderer = renderer_from_cache(path, TextTemplateRenderer,
-                                  auto_reload=auto_reload)
-    result = renderer(**kw)
+    renderer = renderer_factory(path)
+    result = renderer(kw)
     response_factory = queryUtility(IResponseFactory, default=Response)
     return response_factory(result)

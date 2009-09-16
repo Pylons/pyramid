@@ -74,21 +74,26 @@ class ITraverserFactory(Interface):
     def __call__(context):
         """ Return an object that implements ITraverser """
 
-class ITemplateRenderer(Interface):
+class IRenderer(Interface):
+    def __call__(value):
+        """ Call a the renderer implementation with the result of the
+        view (``value``) passed in and return a result (a string or
+        unicode object useful as a response body)"""
+
+class IRendererFactory(Interface):
+    def __call__(name):
+        """ Return an object that implements ``IRenderer``  """
+
+class ITemplateRenderer(IRenderer):
     def implementation():
         """ Return the object that the underlying templating system
         uses to render the template; it is typically a callable that
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
 
-    def __call__(**kw):
-        """ Call a the template implementation with the keywords
-        passed in as arguments and return the result (a string or
-        unicode object) """
-
-class ITemplateRendererFactory(Interface):
-    def __call__(path, auto_reload=False):
-        """ Return an object that implements ``ITemplateRenderer``  """
+class ITemplateRendererFactory(IRendererFactory):
+    def __call__(path):
+        """ Return an object that implements ``ITemplateRenderer`` """
 
 class IViewPermission(Interface):
     def __call__(context, request):

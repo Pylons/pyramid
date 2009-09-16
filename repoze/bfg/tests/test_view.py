@@ -631,6 +631,25 @@ class Test_map_view(unittest.TestCase):
         from repoze.bfg.view import map_view
         return map_view(view, *arg, **kw)
 
+    def _registerRenderer(self):
+        from repoze.bfg.interfaces import IRendererFactory
+        from repoze.bfg.interfaces import ITemplateRenderer
+        from zope.interface import implements
+        from zope.component import getSiteManager
+        class Renderer:
+            implements(ITemplateRenderer)
+            def __call__(self, *arg):
+                return 'Hello!'
+
+        class RendererFactory:
+            def __call__(self, path):
+                self.path = path
+                return Renderer()
+
+        factory = RendererFactory()
+        sm = getSiteManager()
+        sm.registerUtility(factory, IRendererFactory, name='.txt')
+
     def test_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
@@ -646,10 +665,11 @@ class Test_map_view(unittest.TestCase):
         self.assertRaises(TypeError, result, None, None)
 
     def test_view_as_function_with_attr_and_template(self):
+        self._registerRenderer()
         def view(context, request):
             """ """
         result = self._callFUT(view, attr='__name__',
-                               template='fixtures/minimal.txt')
+                               renderer='fixtures/minimal.txt')
         self.failIf(result is view)
         self.assertRaises(TypeError, result, None, None)
         
@@ -701,18 +721,20 @@ class Test_map_view(unittest.TestCase):
 
     def test_view_as_newstyle_class_context_and_request_with_attr_and_template(
         self):
+        self._registerRenderer()
         class view(object):
             def __init__(self, context, request):
                 pass
             def index(self):
                 return {'a':'1'}
         result = self._callFUT(view, attr='index',
-                               template='repoze.bfg.tests:fixtures/minimal.txt')
+                               renderer='repoze.bfg.tests:fixtures/minimal.txt')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None).body, 'Hello.\n')
+        request = DummyRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
         
     def test_view_as_newstyle_class_requestonly(self):
         class view(object):
@@ -741,18 +763,20 @@ class Test_map_view(unittest.TestCase):
         self.assertEqual(result(None, None), 'OK')
 
     def test_view_as_newstyle_class_requestonly_with_attr_and_template(self):
+        self._registerRenderer()
         class view(object):
             def __init__(self, request):
                 pass
             def index(self):
                 return {'a':'1'}
         result = self._callFUT(view, attr='index',
-                               template='repoze.bfg.tests:fixtures/minimal.txt')
+                               renderer='repoze.bfg.tests:fixtures/minimal.txt')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None).body, 'Hello.\n')
+        request = DummyRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
 
     def test_view_as_oldstyle_class_context_and_request(self):
         class view:
@@ -782,18 +806,20 @@ class Test_map_view(unittest.TestCase):
 
     def test_view_as_oldstyle_class_context_and_request_with_attr_and_template(
         self):
+        self._registerRenderer()
         class view:
             def __init__(self, context, request):
                 pass
             def index(self):
                 return {'a':'1'}
         result = self._callFUT(view, attr='index',
-                               template='repoze.bfg.tests:fixtures/minimal.txt')
+                               renderer='repoze.bfg.tests:fixtures/minimal.txt')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None).body, 'Hello.\n')
+        request = DummyRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
 
     def test_view_as_oldstyle_class_requestonly(self):
         class view:
@@ -822,18 +848,20 @@ class Test_map_view(unittest.TestCase):
         self.assertEqual(result(None, None), 'OK')
 
     def test_view_as_oldstyle_class_requestonly_with_attr_and_template(self):
+        self._registerRenderer()
         class view:
             def __init__(self, request):
                 pass
             def index(self):
                 return {'a':'1'}
         result = self._callFUT(view, attr='index',
-                               template='repoze.bfg.tests:fixtures/minimal.txt')
+                               renderer='repoze.bfg.tests:fixtures/minimal.txt')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None).body, 'Hello.\n')
+        request = DummyRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
 
     def test_view_as_instance_context_and_request(self):
         class View:
@@ -854,14 +882,16 @@ class Test_map_view(unittest.TestCase):
         self.assertEqual(result(None, None), 'OK')
 
     def test_view_as_instance_context_and_request_attr_and_template(self):
+        self._registerRenderer()
         class View:
             def index(self, context, request):
                 return {'a':'1'}
         view = View()
         result = self._callFUT(view, attr='index',
-                               template='repoze.bfg.tests:fixtures/minimal.txt')
+                               renderer='repoze.bfg.tests:fixtures/minimal.txt')
         self.failIf(result is view)
-        self.assertEqual(result(None, None).body, 'Hello.\n')
+        request = DummyRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
 
     def test_view_as_instance_requestonly(self):
         class View:
@@ -888,27 +918,31 @@ class Test_map_view(unittest.TestCase):
         self.assertEqual(result(None, None), 'OK')
 
     def test_view_as_instance_requestonly_with_attr_and_template(self):
+        self._registerRenderer()
         class View:
             def index(self, request):
                 return {'a':'1'}
         view = View()
         result = self._callFUT(view, attr='index',
-                               template='repoze.bfg.tests:fixtures/minimal.txt')
+                               renderer='repoze.bfg.tests:fixtures/minimal.txt')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.failUnless('instance' in result.__name__)
-        self.assertEqual(result(None, None).body, 'Hello.\n')
+        request = DummyRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
 
     def test_view_templateonly(self):
+        self._registerRenderer()
         def view(context, request):
             return {'a':'1'}
         result = self._callFUT(view,
-                               template='repoze.bfg.tests:fixtures/minimal.txt')
+                               renderer='repoze.bfg.tests:fixtures/minimal.txt')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(result(None, None).body, 'Hello.\n')
+        request = DummyRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
 
 class TestRequestOnly(unittest.TestCase):
     def _callFUT(self, arg):
@@ -1112,7 +1146,7 @@ class TestDecorateView(unittest.TestCase):
         self.failUnless(view1.__predicated__.im_func is
                         view2.__predicated__.im_func)
 
-class Test_templated_response(unittest.TestCase):
+class Test_rendered_response(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -1120,61 +1154,105 @@ class Test_templated_response(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, template_name, response, view=None,
-                 context=None, request=None, auto_reload=False):
-        from repoze.bfg.view import templated_response
-        return templated_response(template_name, response, view, context,
-                                  request, auto_reload)
+                 context=None, request=None):
+        from repoze.bfg.view import rendered_response
+        if request is None:
+            request = DummyRequest()
+        return rendered_response(template_name, response, view, context,
+                                 request)
+
+    def _registerRenderer(self):
+        from repoze.bfg.interfaces import IRendererFactory
+        from repoze.bfg.interfaces import ITemplateRenderer
+        from zope.interface import implements
+        from zope.component import getSiteManager
+        class Renderer:
+            implements(ITemplateRenderer)
+            def __call__(self, *arg):
+                return 'Hello!'
+
+        class RendererFactory:
+            def __call__(self, path):
+                self.path = path
+                return Renderer()
+
+        factory = RendererFactory()
+        sm = getSiteManager()
+        sm.registerUtility(factory, IRendererFactory, name='.txt')
 
     def test_is_response(self):
+        self._registerRenderer()
         response = DummyResponse()
         result = self._callFUT(
             'repoze.bfg.tests:fixtures/minimal.txt', response)
         self.assertEqual(result, response)
 
     def test_is_not_valid_dict(self):
+        self._registerRenderer()
         response = None
         result = self._callFUT(
             'repoze.bfg.tests:fixtures/minimal.txt', response)
         self.assertEqual(result, response)
         
     def test_valid_dict(self):
+        self._registerRenderer()
         response = {'a':'1'}
         result = self._callFUT(
             'repoze.bfg.tests:fixtures/minimal.txt', response)
-        self.assertEqual(result.body, 'Hello.\n')
+        self.assertEqual(result.body, 'Hello!')
 
     def test_with_content_type(self):
-        response = {'a':'1', 'content_type_':'text/nonsense'}
+        self._registerRenderer()
+        response = {'a':'1'}
+        request = DummyRequest()
+        attrs = {'response_content_type':'text/nonsense'}
+        request.environ['webob.adhoc_attrs'] = attrs
         result = self._callFUT(
-            'repoze.bfg.tests:fixtures/minimal.txt', response)
+            'repoze.bfg.tests:fixtures/minimal.txt', response, request=request)
         self.assertEqual(result.content_type, 'text/nonsense')
 
     def test_with_headerlist(self):
-        response = {'a':'1', 'headerlist_':[('a', '1'), ('b', '2')]}
+        self._registerRenderer()
+        response = {'a':'1'}
+        request = DummyRequest()
+        attrs = {'response_headerlist':[('a', '1'), ('b', '2')]}
+        request.environ['webob.adhoc_attrs'] = attrs
         result = self._callFUT(
-            'repoze.bfg.tests:fixtures/minimal.txt', response)
+            'repoze.bfg.tests:fixtures/minimal.txt', response, request=request)
         self.assertEqual(result.headerlist,
                          [('Content-Type', 'text/html; charset=UTF-8'),
-                          ('Content-Length', '7'),
+                          ('Content-Length', '6'),
                           ('a', '1'),
                           ('b', '2')])
 
     def test_with_status(self):
-        response = {'a':'1', 'status_':'406 You Lose'}
+        self._registerRenderer()
+        response = {'a':'1'}
+        request = DummyRequest()
+        attrs = {'response_status':'406 You Lose'}
+        request.environ['webob.adhoc_attrs'] = attrs
         result = self._callFUT(
-            'repoze.bfg.tests:fixtures/minimal.txt', response)
+            'repoze.bfg.tests:fixtures/minimal.txt', response, request=request)
         self.assertEqual(result.status, '406 You Lose')
 
     def test_with_charset(self):
-        response = {'a':'1', 'charset_':'UTF-16'}
+        self._registerRenderer()
+        response = {'a':'1'}
+        request = DummyRequest()
+        attrs = {'response_charset':'UTF-16'}
+        request.environ['webob.adhoc_attrs'] = attrs
         result = self._callFUT(
-            'repoze.bfg.tests:fixtures/minimal.txt', response)
+            'repoze.bfg.tests:fixtures/minimal.txt', response, request=request)
         self.assertEqual(result.charset, 'UTF-16')
 
     def test_with_cache_for(self):
-        response = {'a':'1', 'cache_for_':100}
+        self._registerRenderer()
+        response = {'a':'1'}
+        request = DummyRequest()
+        attrs = {'response_cache_for':100}
+        request.environ['webob.adhoc_attrs'] = attrs
         result = self._callFUT(
-            'repoze.bfg.tests:fixtures/minimal.txt', response)
+            'repoze.bfg.tests:fixtures/minimal.txt', response, request=request)
         self.assertEqual(result.cache_control.max_age, 100)
 
 class DummyContext:

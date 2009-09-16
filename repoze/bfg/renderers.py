@@ -4,43 +4,27 @@ import pkg_resources
 from zope.component import queryUtility
 from zope.component import getSiteManager
 
-from zope.interface import classProvides
-from zope.interface import implements
-
-from chameleon.core.template import TemplateFile
-from chameleon.zpt.language import Parser
-
-from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import ITemplateRenderer
-from repoze.bfg.interfaces import ITemplateRendererFactory
 from repoze.bfg.path import caller_package
 from repoze.bfg.settings import get_settings
 
-class TextTemplateFile(TemplateFile):
-    default_parser = Parser()
-    
-    def __init__(self, filename, parser=None, format=None, doctype=None,
-                 **kwargs):
-        if parser is None:
-            parser = self.default_parser
-        super(TextTemplateFile, self).__init__(filename, parser, format,
-                                               doctype, **kwargs)
+from repoze.bfg.interfaces import IRendererFactory
+from repoze.bfg.interfaces import ITemplateRenderer
 
-class TextTemplateRenderer(object):
-    classProvides(ITemplateRendererFactory)
-    implements(ITemplateRenderer)
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
-    def __init__(self, path, auto_reload=False):
-        self.template = TextTemplateFile(path, format='text',
-                                         auto_reload=auto_reload)
+# concrete renderer factory implementations
 
-    def implementation(self):
-        return self.template
-    
-    def __call__(self, **kw):
-        return self.template(**kw)
+def json_renderer_factory(name):
+    def _render(value):
+        return json.dumps(value)
+    return _render
 
-def renderer_from_cache(path, factory, level=3, **kw):
+# utility functions
+
+def template_renderer_factory(path, impl, level=3):
     if os.path.isabs(path):
         # 'path' is an absolute filename (not common and largely only
         # for backwards compatibility)
@@ -48,7 +32,7 @@ def renderer_from_cache(path, factory, level=3, **kw):
             raise ValueError('Missing template file: %s' % path)
         renderer = queryUtility(ITemplateRenderer, name=path)
         if renderer is None:
-            renderer = factory(path, **kw)
+            renderer = impl(path)
             sm = getSiteManager()
             sm.registerUtility(renderer, ITemplateRenderer, name=path)
 
@@ -72,9 +56,8 @@ def renderer_from_cache(path, factory, level=3, **kw):
             if not pkg_resources.resource_exists(*spec):
                 raise ValueError('Missing template resource: %s' % utility_name)
             abspath = pkg_resources.resource_filename(*spec)
-            renderer = factory(abspath, **kw)
-            settings = get_settings()
-            if (not settings) or (not settings.get('reload_resources')):
+            renderer = impl(abspath)
+            if not _reload_resources():
                 # cache the template
                 sm = getSiteManager()
                 sm.registerUtility(renderer, ITemplateRenderer,
@@ -82,14 +65,18 @@ def renderer_from_cache(path, factory, level=3, **kw):
         
     return renderer
 
-def renderer_from_path(path, level=4, **kw):
-    extension = os.path.splitext(path)[1]
-    factory = queryUtility(ITemplateRendererFactory, name=extension,
-                           default=TextTemplateRenderer)
-    return renderer_from_cache(path, factory, level, **kw)
+def renderer_from_name(path, level=4):
+    name = os.path.splitext(path)[1]
+    if not name:
+        name = path
+    factory = queryUtility(IRendererFactory, name=name)
+    if factory is None:
+        raise ValueError('No renderer for renderer name %r' % name)
+    return factory(path)
 
-def _auto_reload():
-    settings = queryUtility(ISettings)
-    auto_reload = settings and settings['reload_templates']
-    return auto_reload
+def _reload_resources():
+    settings = get_settings()
+    if settings:
+        return settings['reload_resources']
+    return False
 

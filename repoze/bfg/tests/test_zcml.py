@@ -320,8 +320,7 @@ class TestViewDirective(unittest.TestCase):
         from zope.component import getSiteManager
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
-
+        from repoze.bfg.interfaces import IRendererFactory
         import repoze.bfg.tests
 
         context = DummyContext(repoze.bfg.tests)
@@ -335,9 +334,17 @@ class TestViewDirective(unittest.TestCase):
             def __call__(self):
                 return {'a':'1'}
 
-        import os
+        class Renderer:
+            def __call__(self, path):
+                self.path = path
+                return lambda *arg: 'Hello!'
+
+        renderer = Renderer()
+        sm = getSiteManager()
+        sm.registerUtility(renderer, IRendererFactory, name='.txt')
+
         fixture = 'fixtures/minimal.txt'
-        self._callFUT(context, 'repoze.view', IFoo, view=view, template=fixture)
+        self._callFUT(context, 'repoze.view', IFoo, view=view, renderer=fixture)
         actions = context.actions
         self.assertEqual(len(actions), 1)
 
@@ -347,29 +354,33 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
-        sm = getSiteManager()
         wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
-        result = wrapper(None, None)
-        self.assertEqual(result.body, 'Hello.\n')
+        request = DummyRequest()
+        result = wrapper(None, request)
+        self.assertEqual(result.body, 'Hello!')
+        self.assertEqual(renderer.path, 'repoze.bfg.tests:fixtures/minimal.txt')
 
     def test_with_template_no_view_callable(self):
         from zope.interface import Interface
         from zope.component import getSiteManager
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
+        from repoze.bfg.interfaces import IRendererFactory
 
         import repoze.bfg.tests
 
         context = DummyContext(repoze.bfg.tests)
         class IFoo(Interface):
             pass
-        import os
-        fixture = 'fixtures/minimal.txt'
-        self._callFUT(context, 'repoze.view', IFoo, template=fixture)
+        sm = getSiteManager()
+        def renderer_factory(path):
+            return lambda *arg: 'Hello!'
+        sm.registerUtility(renderer_factory, IRendererFactory, name='.txt')
+
+        self._callFUT(context, 'repoze.view', IFoo, renderer='foo.txt')
         actions = context.actions
         self.assertEqual(len(actions), 1)
 
@@ -379,10 +390,11 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
-        sm = getSiteManager()
         wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
-        result = wrapper(None, None)
-        self.assertEqual(result.body, 'Hello.\n')
+        request = DummyRequest()
+        request.environ = {}
+        result = wrapper(None, request)
+        self.assertEqual(result.body, 'Hello!')
 
     def test_request_type_asinterface(self):
         from zope.component import getSiteManager

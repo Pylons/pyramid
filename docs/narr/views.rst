@@ -6,8 +6,20 @@ Views
 A :term:`view` is a callable which is invoked when a request enters
 your application.  The primary job of any :mod:`repoze.bfg`
 application is is to find and call a :term:`view` when a
-:term:`request` reaches it.  The value returned by a :term:`view` must
-implement the :term:`WebOb` ``Response`` object interface.
+:term:`request` reaches it.
+
+A view callable may either return a :term:`WebOb` ``Response`` object
+directly, or it may return another arbitrary value.  If a view
+callable returns a non-Response result, the result will be renderered
+to a response by the :term:`renderer` associated with the view
+configuration for the view.  If no renderer is associated with a view,
+and that view returns a non-Response object, an error is eventually
+raised.
+
+A view is "configured" via :term:`ZCML` or via a decorator.  Either
+mechanism is equivalent.  The result of making a view declaration in
+ZCML or by attaching a view decorator to a Python object that you'd
+like to act as a view is known as :term:`view configuration`.
 
 .. _function_as_view:
 
@@ -15,8 +27,9 @@ Defining a View as a Function
 -----------------------------
 
 The easiest way to define a view is to create a function that accepts
-two arguments: :term:`context`, and :term:`request`.  For example,
-this is a hello world view implemented as a function:
+two arguments: :term:`context`, and :term:`request` and which returns
+a response object.  For example, this is a "hello world" view
+implemented as a function:
 
 .. code-block:: python
    :linenos:
@@ -26,19 +39,6 @@ this is a hello world view implemented as a function:
    def hello_world(context, request):
        return Response('Hello world!')
 
-The :term:`context` and :term:`request` arguments passed to a view
-function can be defined as follows:
-
-context
-
-  An instance of a :term:`context` found via graph :term:`traversal`
-  or :term:`URL dispatch`.  If the context is found via traversal, it
-  will be a :term:`model` object.
-
-request
-
-  A WebOb request object representing the current WSGI request.
-
 .. _class_as_view:
 
 Defining a View as a Class 
@@ -46,15 +46,13 @@ Defining a View as a Class
 
 .. note:: This feature is new as of :mod:`repoze.bfg` 0.8.1.
 
-When a view callable is a class, the calling semantics are slightly
-different than when it is a function or another non-class callable.
-When a view is a class, the class' ``__init__`` is called with the
-context and the request parameters.  As a result, an instance of the
-class is created.  Subsequently, that instance's ``__call__`` method
-is invoked with no parameters.  The class' ``__call__`` method must
-return a response.  This provides behavior similar to a Zope 'browser
-view' (Zope 'browser views' are typically classes instead of simple
-callables).  So the simplest class that can be a view must have:
+A view callable may also be a class instead of a function.  When a
+view callable is a class, the calling semantics are slightly different
+than when it is a function or another non-class callable.  When a view
+is a class, the class' ``__init__`` is called with the context and the
+request parameters.  As a result, an instance of the class is created.
+Subsequently, that instance's ``__call__`` method is invoked with no
+parameters.  The class' ``__call__`` method must return a response.
 
 - an ``__init__`` method that accepts a ``context`` and a ``request``
   as positional arguments.
@@ -80,11 +78,29 @@ For example:
 The context and request objects passed to ``__init__`` are the same
 types of objects as described in :ref:`function_as_view`.
 
-Alternate "Request-Only" View Argument Convention
--------------------------------------------------
+If you'd like to use a different attribute than ``__call__`` to
+represent the method expected to return a response, you can use an
+``attr`` value as part of view configuration.  See
+:ref:`the_view_zcml_directive`.
+
+Arguments Passed to a View
+--------------------------
+
+The :term:`context` and :term:`request` arguments passed to a view
+function can be defined as follows:
+
+context
+
+  An instance of a :term:`context` found via graph :term:`traversal`
+  or :term:`URL dispatch`.  If the context is found via traversal, it
+  will be a :term:`model` object.
+
+request
+
+  A WebOb request object representing the current WSGI request.
 
 Views may alternately be defined as callables that accept only a
-request object, instead of both a context and a request.  The
+*request* object, instead of both a context and a request.  The
 following types work as views in this style:
 
 #. Functions that accept a single argument ``request``, e.g.::
@@ -119,14 +135,15 @@ code itself.  The view always has access to the context via
 ``request.context`` in any case, so it's still available even if you
 use the request-only calling convention.
 
+.. _the_response:
+
 The Response
 ------------
 
-A view callable must return an object that implements the
-:term:`WebOb` ``Response`` interface.  The easiest way to return
-something that implements this interface is to return a
-``webob.Response`` object.  But any object that has the following
-attributes will work:
+A view callable may return an object that implements the :term:`WebOb`
+``Response`` interface.  The easiest way to return something that
+implements this interface is to return a ``webob.Response`` object.
+But any object that has the following attributes will work:
 
 status
 
@@ -147,8 +164,46 @@ app_iter
   other sort of iterable.
 
 If a view happens to return something to the :mod:`repoze.bfg`
-:term:`router` that does not implement this interface, the router will
-raise an error.
+:term:`router` which does not implement this interface, BFG will
+attempt to use an associated :term:`renderer` to construct a response.
+The specific renderer used can be varied by changing the ``renderer``
+attribute in the view configuration.  See
+:ref:`views_which_use_a_renderer`.
+
+.. _views_which_use_a_renderer:
+
+Writing Views Which Use a Renderer
+----------------------------------
+
+.. note:: This feature is new as of :mod:`repoze.bfg` 1.1
+
+Views needn't always return a WebOb Response object.  Instead, they
+may return an arbitrary Python object, with the expectation that a
+:term:`renderer` will convert that object into a response on behalf of
+the developer.
+
+View configuration can vary the renderer associated with a view via
+the ``renderer`` attribute.  The default renderer is the null renderer
+(meaning no rendering is done).  There is a ``json`` renderer, which
+renders view return values to :term:`JSON`.  Other built-in renderers
+include renderers which use the :term:`Chameleon` templating language
+to render a dictionary to a response.  See :ref:`build_in_renders` for
+the available built-in renders.  Renderers can be added to the system
+as necessary via ZCML directives (see
+:ref:`adding_and_overriding_renderers`).
+
+If the ``view`` callable associated with a ``view`` directive returns
+a Response object (an object with the attributes ``status``,
+``headerlist`` and ``app_iter``), any renderer associated with the
+``view`` declaration is ignored, and the response is passed back to
+BFG unmolested.  For example, if your page callable returns an
+``HTTPFound`` response, no renderer will be employed.
+
+.. code-block:: python
+   :linenos:
+
+   from webob.exc import HTTPFound
+   return HTTPFound(location='http://example.com') # renderer avoided
 
 .. _mapping_views_to_urls_using_zcml_section:
 
@@ -220,6 +275,8 @@ A ZCML ``view`` declaration's ``view`` attribute can also name a
 class.  In this case, the rules described in :ref:`class_as_view`
 apply for the class which is named.
 
+.. _the_view_zcml_directive:
+
 The ``view`` ZCML Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -263,21 +320,40 @@ attr
   ``attr="index"`` in the page ZCML definition.  This is most useful
   when the page definition is a class.
 
-template
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-  This is a string implying a path to a filesystem template.  Although
-  a path is usually just a simple relative pathname
-  (e.g. ``templates/foo.pt``, implying that the template is in the
-  "templates" directory relative to the directory in which the ZCML
-  file is defined), a path can be absolute, starting with a slash on
-  UNIX or a drive letter prefix on Windows.  The path can alternately
-  be a :term:`resource` "specification" in the form
+renderer
+
+  This is either a single term (e.g. ``json``) or a string implying a
+  path (e.g. ``templates/views.pt``).  If the renderer is a single
+  term, the specified term will be used to look up a renderer
+  implementation, and that renderer inplementation will be used to
+  construct a response from the view return value.  If the renderer
+  term contains a dot (``.``), the specified term will be treated as a
+  path, and the filename extension of the last element in the path
+  will be used to look up the renderer implementation, which will be
+  passed the full path.  The renderer implementation will be used to
+  construct a response from the view return value.
+
+  Note that if the view itself returns a response (see
+  :ref:`the_response), the specified renderer implementation is never
+  called.
+
+  When the renderer is a path, although a path is usually just a
+  simple relative pathname (e.g. ``templates/foo.pt``, implying that a
+  template named "foo.pt" is in the "templates" directory relative to
+  the directory in which the ZCML file is defined), a path can be
+  absolute, starting with a slash on UNIX or a drive letter prefix on
+  Windows.  The path can alternately be a :term:`resource`
+  "specification" in the form
   ``some.dotted.package_name:relative/path``, making it possible to
-  address template resources which live in a separate package.  The
-  ``template`` attribute is optional.  If it is not defined, no
-  template is assoicated with the view.  See
-  :ref:`views_with_templates` for more information about view
-  templates.
+  address template resources which live in a separate package.
+
+  The ``renderer`` attribute is optional.  If it is not defined, the
+  "null" renderer is assumed (no rendering is performed and the value
+  is passed back to the upstream BFG machinery unmolested).
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 wrapper
 
@@ -297,6 +373,8 @@ wrapper
   view is the same context and request of the inner view.  If this
   attribute is unspecified, no view wrapping is done.
 
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 request_method
 
   This value can either be one of the strings 'GET', 'POST', 'PUT',
@@ -304,6 +382,8 @@ request_method
   declaration with this attribute ensures that the view will only be
   called when the request's ``method`` (aka ``REQUEST_METHOD``) string
   matches the supplied value.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 request_param
 
@@ -317,6 +397,8 @@ request_param
   the right hand side of the expression (``123``) for the view to
   "match" the current request.
 
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 containment
 
   This value should be a Python dotted-path string representing the
@@ -325,6 +407,8 @@ containment
   must provide) in order for this view to be found and called.  Your
   models must be "location-aware" to use this feature.  See
   :ref:`location_aware` for more information about location-awareness.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 route_name
 
@@ -354,56 +438,6 @@ request_type
   ``request_method`` attribute instead for maximum forward
   compatibility.
 
-.. _view_lookup_ordering:
-
-View Lookup Ordering
---------------------
-
-Attributes of the ZCML ``view`` directive can be thought of like
-"narrowers" or "predicates".  In general, the greater number of
-attributes possessed by a view directive, the more specific the
-circumstances need to be before the registered view will be called.
-
-For any given request, a view with five predicates will always be
-found and evaluated before a view with two, for example.  All
-predicatese must match for the associated view to be called.
-
-This does not mean however, that :mod:`repoze.bfg` "stops looking"
-when it finds a view registration with predicates that don't match.
-If one set of view predicates does not match, the "next most specific"
-view (if any) view is consulted for predicates, and so on, until a
-view is found, or no view can be matched up with the request.  The
-first view with a set of predicates all of which match the request
-environment will be invoked.
-
-If no view can be found which has predicates which allow it to be
-matched up with the request, :mod:`repoze.bfg` will return an error to
-the user's browser, representing a "not found" (404) page.  See
-:ref:`changing_the_notfound_view` for more information about changing
-the default notfound view.
-
-There are a several exceptions to the the rule which says that ZCML
-directive attributes represent "narrowings".  Several attributes of
-the ``view`` directive are *not* narrowing predicates.  These are
-``permission`` and ``name``.
-
-The value of the ``permission`` attribute represents the permission
-that must be possessed by the user to invoke any found view.  When a
-view is found that matches all predicates, but the invoking user does
-not possess the permission implied by any associated ``permission`` in
-the current context, processing stops, and an ``Unauthorized`` error
-is raised, usually resulting in a "forbidden" view being shown to the
-invoking user.  No further view narrowing or view lookup is done.
-
-.. note:: 
-
-   See :ref:`changing_the_forbidden_view` for more information about
-   changing the default forbidden view.
-
-The value of the ``name`` attribute represents a direct match of the
-view name returned via traversal.  It is part of intial view lookup
-rather than a predicate/narrower.
-
 .. _mapping_views_to_urls_using_a_decorator_section:
 
 Mapping Views to URLs Using a Decorator
@@ -415,9 +449,11 @@ use the ``repoze.bfg.view.bfg_view`` decorator to associate your view
 functions with URLs instead of using :term:`ZCML` for the same
 purpose.  ``repoze.bfg.view.bfg_view`` can be used to associate
 ``for``, ``name``, ``permission`` and ``request_method``,
-``containment``, ``request_param`` and ``request_type`` information --
-as done via the equivalent ZCML -- with a function that acts as a
-:mod:`repoze.bfg` view.
+``containment``, ``request_param`` and ``request_type``, ``attr``,
+``renderer``, and ``wrapper`` information -- as done via the
+equivalent ZCML -- with a function that acts as a :mod:`repoze.bfg`
+view.  All ZCML attributes are available in decorator form and mean
+precisely the same thing.
 
 To make :mod:`repoze.bfg` process your ``bfg_view`` declarations, you
 *must* insert the following boilerplate into your application's
@@ -481,8 +517,8 @@ If ``attr`` is not supplied, ``None`` is used (implying the function
 itself if the view is a function, or the ``__call__`` callable
 attribute if the view is a class).
 
-If ``template`` is not supplied, ``None`` is used (meaning that no
-template is associated with this view).
+If ``renderer`` is not supplied, ``None`` is used (meaning that the
+null renderer is associated with this view).
 
 If ``request_type`` is not supplied, the value ``None`` is used,
 implying any request type.  Otherwise, this should be a class or
@@ -574,155 +610,188 @@ decorator syntactic sugar), if you wish:
 
    my_view = bfg_view()(MyView)
 
-.. _views_with_templates:
+.. _view_lookup_ordering:
 
-Views That Have a ``template``
-------------------------------
+View Lookup Ordering
+--------------------
 
-Using a ``view`` with an associated ``template`` attribute differs
-from using a ``view`` without an associated ``template`` in a number
-of important ways:
+Most attributes of view configuration can be thought of like
+"narrowers" or "predicates".  In general, the greater number of
+attributes possessed by a view's configuration, the more specific the
+circumstances need to be before the registered view callable will be
+invoked.
 
-- When the ``template`` attribute is used, the BFG view machinery
-  finds and renders the template internally, unlike a view without an
-  associated ``template``, which, if it needs to render a template,
-  must find and render the template by itself.
+For any given request, a view with five predicates will always be
+found and evaluated before a view with two, for example.  All
+predicates must match for the associated view to be called.
 
-- When a ``template`` attribute is used, the may return a Response
-  object *or* a Python dictionary.  This is unlike a BFG ``view``
-  without an associated template, which must always return a Response
-  object.  If a BFG view without an associated template returns a
-  dictionary, an error will result at rendering time.
+This does not mean however, that :mod:`repoze.bfg` "stops looking"
+when it finds a view registration with predicates that don't match.
+If one set of view predicates does not match, the "next most specific"
+view (if any) view is consulted for predicates, and so on, until a
+view is found, or no view can be matched up with the request.  The
+first view with a set of predicates all of which match the request
+environment will be invoked.
 
-- If the view callable with an associated template returns a Python
-  dictionary, the named template will be passed the dictionary as its
-  keyword arguments, and the view implementation will return the
-  resulting rendered template in a response to the user.  The callable
-  object (whatever object was used to define the ``view``) will be
-  automatically inserted into the set of keyword arguments passed to
-  the template as the ``view`` keyword.  If the view callable was a
-  class, the ``view`` keyword will be an instance of that class.  Also
-  inserted into the keywords passed to the template are
-  ``template_name`` (the name of the template, which may be a full
-  path or a package-relative name, typically the full string used in
-  the ``template`` atttribute of the directive), ``context`` (the
-  context of the view used to render the template), and ``request``
-  (the request passed to the view used to render the template).  None
-  of these default names are available to a template when the view
-  directive has no associated ``template`` attribute; the developer is
-  responsible for inserting them herself.
+If no view can be found which has predicates which allow it to be
+matched up with the request, :mod:`repoze.bfg` will return an error to
+the user's browser, representing a "not found" (404) page.  See
+:ref:`changing_the_notfound_view` for more information about changing
+the default notfound view.
 
-- If the ``view`` callable associated with a ``view`` directive
-  returns a Response object (an object with the attributes ``status``,
-  ``headerlist`` and ``app_iter``), any template associated with the
-  ``page`` declaration is ignored, and the response is passed back to
-  BFG.  For example, if your page callable returns an ``HTTPFound``
-  response, no template rendering will be performed:
+There are a several exceptions to the the rule which says that view
+configuration attributes represent "narrowings".  Several attributes
+of the ``view`` directive are *not* narrowing predicates.  These are
+``permission``, ``name``, ``renderer``, and ``attr``.
 
-  .. code-block:: python
-     :linenos:
+The value of the ``permission`` attribute represents the permission
+that must be possessed by the user to invoke any found view.  When a
+view is found that matches all predicates, but the invoking user does
+not possess the permission implied by any associated ``permission`` in
+the current context, processing stops, and an ``Unauthorized`` error
+is raised, usually resulting in a "forbidden" view being shown to the
+invoking user.  No further view narrowing or view lookup is done.
 
-     from webob.exc import HTTPFound
-     return HTTPFound(location='http://example.com') # templating avoided
+.. note:: 
 
-Several keyword names in a dictionary return value of a view callable
-are treated specially by :mod:`repoze.bfg`.  These values are passed
-through to the template during rendering, but they also influence the
-response returned to the user separate from any template rendering.
-View callables should set these values into the dictionary they return
-to influence response attributes.
+   See :ref:`changing_the_forbidden_view` for more information about
+   changing the default forbidden view.
 
-``content_type_``
+The value of the ``name`` attribute represents a direct match of the
+view name returned via traversal.  It is part of intial view lookup
+rather than a predicate/narrower.
 
-  Defines the content-type of the resulting response,
-  e.g. ``text/xml``.
+The value of the ``renderer`` attribute represents the renderer used
+to convert non-response return values from a view.
 
-``headerlist_``
+The value of the ``attr`` attribute represents the attribute name
+looked up on the view object to return a response.
 
-  A sequence of tuples describing cookie values that should be set in
-  the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
-  'foo')]``.
+.. _built_in_renders:
 
-``status_``
+Built-In Renderers
+------------------
 
-  A WSGI-style status code (e.g. ``200 OK``) describing the status of
-  the response.
+Several built-in renderers exist in BFG.  These renderers can be used
+in the ``renderer`` attribute of view configurations.
 
-``charset_``
+``json``: JSON Renderer
+~~~~~~~~~~~~~~~~~~~~~~~
 
-  The character set (e.g. ``UTF-8``) of the response.
+The ``json`` renderer is a renderer which renders view callable
+results to :term:`JSON`.  If a view callable returns a non-Response
+object it is called.  It passes the return value through the
+``simplejson.dumps`` function, and wraps the result in a response
+object.  For example:
 
-``cache_for_``
-
-  A value in seconds which will influence ``Cache-Control`` and
-  ``Expires`` headers in the returned response.  The same can also be
-  achieved by returning various values in the headerlist, this is
-  purely a convenience.
-
-View Template Filename Extension Mappings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When the ``template`` attribute of a view directive is used, a
-filename extension based mapping is consulted to determine which
-templating renderer implementation to use.  By default, a single
-filename-extension-to-renderer mapping is used: any template name with
-a filename extension of ".pt" is assumed to be rendered via a
-Chameleon ZPT template.
-
-If a template renderer cannot be recognized by the extension of a
-template, it will be assumed that a Chameleon text renderer should be
-used to render the template.
-
-Adding and Overriding Template Filename Extension Mappings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Additonal declarations can be made which override a default
-file-extension-to-renderer mapping or add a new
-file-extension-to-renderer mapping.  This is accomplished via one or
-more separate ZCML directives.
-
-For example, to add Jinja2 rendering (after installing the
-repoze.bfg.jinja2" package), whereby filenames that end in ``.jinja``
-are rendered by a Jinja2 renderer::
-
-  <template_renderer
-    extension=".jinja"
-    renderer="my.package.MyJinja2Renderer"/>
-
-To override the default mapping in which files with a ``.pt``
-extension are rendered via a Chameleon ZPT page template renderer, use
-a variation on the following::
-
-  <template_renderer
-     extension=".pt"
-     renderer="my.package.pt_renderer"/>
-
-By default, when a template extension is unrecognized, the Chameleon
-text templating engine is assumed.  You can override the default
-renderer by creating a directive which has no ``extension``::
-
-  <template_renderer
-      renderer="my.package.default_renderer"/>
-
-A renderer must be a class that has the following interface:
+Here's an example of a view that returns a dictionary.  If the
+``json`` renderer is specified in the configuration for this view, the
+view will render the returned dictionary to a JSON serialization:
 
 .. code-block:: python
    :linenos:
 
-   class TemplateRendererFactory:
-       def __init__(self, path, auto_reload=False):
-           """ Constructor """
+   from webob import Response
+   from repoze.bfg.view import bfg_view
 
-       def implementation(self):
-           """ Return the object that the underlying templating system
-           uses to render the template; it is typically a callable that
-           accepts arbitrary keyword arguments and returns a string or
-           unicode object """
+   @bfg_view(renderer='json')
+   def hello_world(context, request):
+       return {'content':'Hello!'}
 
-       def __call__(self, **kw):
-           """ Call a the template implementation with the keywords
-           passed in as arguments and return the result (a string or
-           unicode object) """
+The body of the response returned by such a view will be a string
+representing the JSON serialization of the return value:
+
+.. code-block: python
+   :linenos:
+
+   '{"content": "Hello!"}'
+
+The return value needn't be a dictionary, but the return value must
+contain values renderable by ``simplejson.dumps``.
+
+You can configure a view to use the JSON renderer in ZCML by naming
+``json`` as the ``renderer`` attribute of a view configuration, e.g.:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       for=".models.Hello"
+       view=".views.hello_world"
+       name="hello"
+       renderer="json"
+       />
+
+Views which use the JSON renderer can vary non-body response
+attributes by attaching properties to the request.  See
+:ref:`response_request_attrs`.
+
+``*.pt`` or ``*.txt``: Chameleon Template Renderers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Two built-in renderers exist for :term:`Chameleon` templates.
+
+If the ``renderer`` attribute of a view configuration is a path which
+has a final path element with a filename extension of ``.pt``, the
+Chameleon ZPT renderer is used.  See :ref:`chameleon_zpt_templates`
+for more information about ZPT templates.
+
+If the ``renderer`` attribute of a view configuration is a path which
+has a final path element with a filename extension of ``.txt``, the
+Chameleon text renderer is used.  See :ref:`chameleon_zpt_templates`
+for more information about Chameleon text templates.
+
+The behavior of these renderers is the same, except for the engine
+used to render the template.
+
+When a ``renderer`` attribute that names a Chameleon template path
+(e.g. ``templates/foo.pt`` or ``templates/foo.txt``) is used, the view
+must return a Response object or a Python *dictionary*.  If the view
+callable with an associated template returns a Python dictionary, the
+named template will be passed the dictionary as its keyword arguments,
+and the view implementation will return the resulting rendered
+template in a response to the user.
+
+The callable object (whatever object was used to define the ``view``)
+will be automatically inserted into the set of keyword arguments
+passed to the template as the ``view`` keyword.  If the view callable
+was a class, the ``view`` keyword will be an instance of that class.
+Also inserted into the keywords passed to the template are
+``template_name`` (the name of the template, which may be a full path
+or a package-relative name, typically the full string used in the
+``renderer`` atttribute of the directive), ``context`` (the context of
+the view used to render the template), and ``request`` (the request
+passed to the view used to render the template).
+
+Here's an example view configuration which uses a Chameleon ZPT
+renderer:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       for=".models.Hello"
+       view=".views.hello_world"
+       name="hello"
+       renderer="templates/foo.pt"
+       />
+
+Here's an example view configuration which uses a Chameleon text
+renderer:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       for=".models.Hello"
+       view=".views.hello_world"
+       name="hello"
+       renderer="templates/foo.txt"
+       />
+
+Views with use a Chameleon renderer can vary response attributes by
+attaching properties to the request.  See
+:ref:`response_request_attrs`.
 
 .. _using_model_interfaces:
 
@@ -810,73 +879,6 @@ view registered for the context's class will "win".
 
 See :term:`Interface` in the glossary to find more information about
 interfaces.
-
-.. _view_request_types_section:
-
-Standard View Request Types
----------------------------
-
-You can optionally add a *request_type* attribute to your ``view``
-declaration or ``bfg_view`` decorator, which indicates what "kind" of
-request the view should be used for.  If the request type for a
-request doesn't match the request type that a view defines as its
-``request_type`` argument, that view won't be called.
-
-The request type can be one of the strings 'GET', 'POST', 'PUT',
-'DELETE', or 'HEAD'.  When the request type is one of these strings,
-the view will only be called when the HTTP method of a request matches
-this type.
-
-For example, the following bit of ZCML will match an HTTP POST
-request:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       for=".models.Hello"
-       view=".views.handle_post"
-       name="handle_post"
-       request_type="POST"
-       />
-
-A ``bfg_view`` decorator that does the same as the above ZCML ``view``
-declaration which matches only on HTTP POST might look something like:
-
-.. code-block:: python
-   :linenos:
-
-   from myproject.models import Hello
-   from webob import Response
-
-   @bfg_view(for=Hello, request_type='POST')
-   def handle_post(context, request):
-       return Response('hello'
-
-The above examples register views for the POST request type, so it
-will only be called if the request's HTTP method is ``POST``.  Even if
-all the other specifiers match (e.g. the model type is the class
-``.models.Hello``, and the view_name is ``handle_post``), if the
-request verb is not POST, it will not be invoked.  This provides a way
-to ensure that views you write are only called via specific HTTP
-verbs.
-
-The least specific request type is ``None``.  All requests are
-guaranteed to implement this request type.  It is also the default
-request type for views that omit a ``request_type`` argument.
-
-Custom View Request Types
--------------------------
-
-You can make use of *custom* view request types by attaching an
-:term:`interface` to the request and specifying this interface in the
-``request_type`` parameter as a dotted Python name.  For example, you
-might want to make use of simple "content negotiation", only invoking
-a particular view if the request has a content-type of
-'application/json'.
-
-For information about using interface to specify a request type, see
-:ref:`using_an_event_to_vary_the_request_type`.
 
 .. _view_security_section:
 
@@ -1208,3 +1210,170 @@ rendered in a request that has a ``;charset=utf-8`` stanza on its
    to Unicode objects implicitly in :mod:`repoze.bfg`'s default
    configuration.  The keys are still strings.
 
+.. _view_request_types_section:
+
+Custom View Request Types
+-------------------------
+
+You can make use of *custom* view request types by attaching an
+:term:`interface` to the request and specifying this interface in the
+``request_type`` parameter as a dotted Python name.  For example, you
+might want to make use of simple "content negotiation", only invoking
+a particular view if the request has a content-type of
+'application/json'.
+
+For information about using interface to specify a request type, see
+:ref:`using_an_event_to_vary_the_request_type`.
+
+.. _response_request_attrs:
+
+Varying Attributes of Rendered Responses
+----------------------------------------
+
+Before a response that is constructed as the result of the use of a
+:term:`renderer` is returned to BFG, several attributes of the request
+are examined which have the potential to influence response behavior.
+
+View callables that don't directly return a response should set these
+values on the ``request`` object via ``setattr`` within the view
+callable to influence automatically constructed response attributes.
+
+``response_content_type``
+
+  Defines the content-type of the resulting response,
+  e.g. ``text/xml``.
+
+``response_headerlist``
+
+  A sequence of tuples describing cookie values that should be set in
+  the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
+  'foo')]``.
+
+``response_status``
+
+  A WSGI-style status code (e.g. ``200 OK``) describing the status of
+  the response.
+
+``response_charset``
+
+  The character set (e.g. ``UTF-8``) of the response.
+
+``response_cache_for``
+
+  A value in seconds which will influence ``Cache-Control`` and
+  ``Expires`` headers in the returned response.  The same can also be
+  achieved by returning various values in the ``response_headerlist``,
+  this is purely a convenience.
+
+.. _adding_and_overriding_renderers:
+
+Adding and Overriding Renderers
+-------------------------------
+
+Additonal ZCML declarations can be made which override an existing
+:term:`renderer` or which add a new renderer.  Adding or overriding a
+renderer is accomplished via one or more separate ZCML directives.
+
+For example, to add a renderer which renders views which have a
+``renderer`` attribute that is a path that ends in ``.jinja``::
+
+  <renderer
+    name=".jinja"
+    factory="my.package.MyJinja2Renderer"/>
+
+The ``factory`` attribute is a dotted Python name that must point to
+an implementation of a renderer.  A renderer implementation is usually
+a class which has the following interface:
+
+.. code-block:: python
+   :linenos:
+
+   class RendererFactory:
+       def __init__(self, name):
+           """ Constructor: ``name`` may be a path """
+
+       def __call__(self, value): 
+           """ Call a the renderer implementation with the value
+           passed in as arguments and return the result (a string or
+           unicode object) """
+
+A renderer's ``name`` is the second element.  There are essentially
+two different kinds of ``renderer`` registrations with respect to the
+name:
+
+- a ``renderer`` registration which has a ``name`` attribute which
+  has a value that starts with a dot (``.``).
+
+- a ``renderer`` registration which has a ``name`` attribute which
+  has a value that *does not* start with a dot.
+
+Renderer registrations that have a ``name`` attribute which starts
+with a dot are meant to be *wildcard* registrations.  When a ``view``
+configuration is encountered which has a ``renderer`` attribute that
+contains a dot, at startup time, the path is split on its final dot,
+and the second element of the split (the filename extension,
+typically) is used to look up a renderer for the configured view.  The
+renderer's factory is still passed the entire ``renderer`` attribute
+value (not just the extension).
+
+Renderer registrations that have ``name`` attribute which *does not*
+start with a dot are meant to be absolute registrations.  When a
+``view`` configuration is encountered which has a ``renderer``
+attribute that does not contain a dot, the full value of the
+``renderer`` attribute is used to look up the renderer for the
+configured view.
+
+Here's an example of a renderer registration in ZCML:
+
+  <renderer
+    name="amf"
+    factory="my.package.MyAMFRenderer"/>
+
+Adding the above ZCML to your application will allow you to use the
+``my.package.MyAMFRenderer`` renderer implementation in ``view``
+configurations by referring to it as ``amf`` in the ``renderer``
+attribute:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(renderer='amf')
+   def myview(context, request):
+       return {'Hello':'world'}
+
+By default, when a template extension is unrecognized, an error is
+thrown at rendering time.  You can associate more than one filename
+extension with the same renderer implementation as necessary if you
+need to use a different file extension for the same kinds of
+templates.  For example, to associate the ``.zpt`` extension with the
+Chameleon page template renderer factory, use::
+
+  <renderer
+     name=".zpt"
+     factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
+
+To override the default mapping in which files with a ``.pt``
+extension are rendered via a Chameleon ZPT page template renderer, use
+a variation on the following in your application's ZCML::
+
+  <renderer
+     name=".pt"
+     factory="my.package.pt_renderer"/>
+
+To override the default mapping in which files with a ``.txt``
+extension are rendered via a Chameleon text template renderer, use a
+variation on the following in your application's ZCML::
+
+  <renderer
+     name=".txt"
+     factory="my.package.text_renderer"/>
+
+To associate a *default* renderer with *all* view configurations (even
+ones which do not possess a ``renderer`` attribute), use a variation
+on the following (ie. omit the ``name`` attribute to the renderer
+tag):
+
+  <renderer
+     factory="repoze.bfg.renderers.json_renderer_factory"/>

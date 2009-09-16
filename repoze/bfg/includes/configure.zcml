@@ -18,9 +18,19 @@
       for="* repoze.bfg.interfaces.IRequest"
   />
 
-  <template_renderer
-     renderer="repoze.bfg.chameleon_zpt.ZPTTemplateRenderer"
-     extension=".pt"
+  <renderer
+     factory="repoze.bfg.chameleon_zpt.renderer_factory"
+     name=".pt"
+     />
+
+  <renderer
+     factory="repoze.bfg.chameleon_text.renderer_factory"
+     name=".txt"
+     />
+
+  <renderer
+     factory="repoze.bfg.renderers.json_renderer_factory"
+     name="json"
      />
 
 </configure>

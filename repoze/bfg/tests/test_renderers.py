@@ -3,16 +3,16 @@ import unittest
 from repoze.bfg.testing import cleanUp
 from repoze.bfg import testing
 
-class TestRendererFromCache(unittest.TestCase):
+class TestTemplateRendererFactory(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, path, factory, level=3, **kw):
-        from repoze.bfg.templating import renderer_from_cache
-        return renderer_from_cache(path, factory, level, **kw)
+    def _callFUT(self, path, factory, level=3):
+        from repoze.bfg.renderers import template_renderer_factory
+        return template_renderer_factory(path, factory, level)
 
     def test_abspath_notfound(self):
         from repoze.bfg.interfaces import ITemplateRenderer
@@ -87,10 +87,10 @@ class TestRendererFromCache(unittest.TestCase):
         import os
         from repoze.bfg.tests import test_templating
         module_name = test_templating.__name__
-        relpath = 'test_templating.py'
+        relpath = 'test_renderers.py'
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('test_templating.py', factory)
+        result = self._callFUT('test_renderers.py', factory)
         self.failUnless(result is renderer)
         path = os.path.abspath(__file__)
         if path.endswith('pyc'): # pragma: no cover
@@ -102,7 +102,7 @@ class TestRendererFromCache(unittest.TestCase):
         import os
         from repoze.bfg import tests
         module_name = tests.__name__
-        relpath = 'test_templating.py'
+        relpath = 'test_renderers.py'
         renderer = {}
         factory = DummyFactory(renderer)
         spec = '%s:%s' % (module_name, relpath)
@@ -122,9 +122,9 @@ class TestRendererFromCache(unittest.TestCase):
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('test_templating.py', factory)
+        result = self._callFUT('test_renderers.py', factory)
         self.failUnless(result is renderer)
-        spec = '%s:%s' % ('repoze.bfg.tests', 'test_templating.py')
+        spec = '%s:%s' % ('repoze.bfg.tests', 'test_renderers.py')
         self.assertEqual(queryUtility(ITemplateRenderer, name=spec),
                          None)
 
@@ -136,9 +136,9 @@ class TestRendererFromCache(unittest.TestCase):
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('test_templating.py', factory)
+        result = self._callFUT('test_renderers.py', factory)
         self.failUnless(result is renderer)
-        spec = '%s:%s' % ('repoze.bfg.tests', 'test_templating.py')
+        spec = '%s:%s' % ('repoze.bfg.tests', 'test_renderers.py')
         self.assertNotEqual(queryUtility(ITemplateRenderer, name=spec),
                             None)
 
@@ -149,19 +149,11 @@ class TestRendererFromPath(unittest.TestCase):
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, path, level=4, **kw):
-        from repoze.bfg.templating import renderer_from_path
-        return renderer_from_path(path, level, **kw)
+    def _callFUT(self, path, level=4):
+        from repoze.bfg.renderers import renderer_from_name
+        return renderer_from_name(path, level)
 
-    def test_with_default(self):
-        from repoze.bfg.templating import TextTemplateRenderer
-        import os
-        here = os.path.dirname(os.path.abspath(__file__))
-        fixture = os.path.join(here, 'fixtures/minimal.txt')
-        result = self._callFUT(fixture)
-        self.assertEqual(result.__class__, TextTemplateRenderer)
-
-    def test_with_nondefault(self):
+    def test_it(self):
         from repoze.bfg.interfaces import ITemplateRendererFactory
         import os
         here = os.path.dirname(os.path.abspath(__file__))

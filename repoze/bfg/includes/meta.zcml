@@ -71,9 +71,9 @@
         />
 
     <meta:directive
-        name="template_renderer"
-        schema="repoze.bfg.zcml.ITemplateRendererDirective"
-        handler="repoze.bfg.zcml.template_renderer"
+        name="renderer"
+        schema="repoze.bfg.zcml.IRendererDirective"
+        handler="repoze.bfg.zcml.renderer"
         />
 
   </meta:directives>
