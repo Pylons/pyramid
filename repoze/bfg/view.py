@@ -336,7 +336,7 @@ class bfg_view(object):
     """
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
-                 containment=None, attr=None, renderer='', wrapper=None):
+                 containment=None, attr=None, renderer=None, wrapper=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
@@ -469,6 +469,10 @@ def rendered_response(renderer_name, response, view, context, request):
 def map_view(view, attr=None, renderer=None):
     wrapped_view = view
 
+    if renderer is None:
+        if queryUtility(IRendererFactory) is not None: # default renderer
+            renderer = ''
+
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
         # function that operates like a Zope view (when it's invoked,
@@ -485,7 +489,7 @@ def map_view(view, attr=None, renderer=None):
                     response = inst()
                 else:
                     response = getattr(inst, attr)()
-                if renderer:
+                if renderer is not None:
                     response = rendered_response(renderer, response, inst,
                                                   context, request)
                 return response
@@ -498,7 +502,7 @@ def map_view(view, attr=None, renderer=None):
                     response = inst()
                 else:
                     response = getattr(inst, attr)()
-                if renderer:
+                if renderer is not None:
                     response = rendered_response(renderer, response, inst,
                                                  context, request)
                 return response
@@ -513,7 +517,7 @@ def map_view(view, attr=None, renderer=None):
             else:
                 response = getattr(view, attr)(request)
 
-            if renderer:
+            if renderer is not None:
                 response = rendered_response(renderer, response, view,
                                              context, request)
             return response
@@ -522,27 +526,19 @@ def map_view(view, attr=None, renderer=None):
     elif attr:
         def _bfg_attr_view(context, request):
             response = getattr(view, attr)(context, request)
-            if renderer:
+            if renderer is not None:
                 response = rendered_response(renderer, response, view,
                                              context, request)
             return response
         wrapped_view = _bfg_attr_view
 
-    elif renderer:
+    elif renderer is not None:
         def _rendered_view(context, request):
             response = view(context, request)
             response = rendered_response(renderer, response, view,
                                          context, request)
             return response
         wrapped_view = _rendered_view
-
-    elif queryUtility(IRendererFactory):
-        def _default_rendered_view(context, request):
-            response = view(context, request)
-            response = rendered_response(renderer, response, view,
-                                         context, request)
-            return response
-        wrapped_view = _default_rendered_view
 
     decorate_view(wrapped_view, view)
     return wrapped_view

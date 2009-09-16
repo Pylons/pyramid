@@ -165,6 +165,21 @@ class TestRendererFromName(unittest.TestCase):
         result = self._callFUT(fixture)
         self.assertEqual(result, renderer)
 
+    def test_it_no_renderer(self):
+        self.assertRaises(ValueError, self._callFUT, 'foo')
+        
+
+class Test_json_renderer_factory(unittest.TestCase):
+    def _callFUT(self, name):
+        from repoze.bfg.renderers import json_renderer_factory
+        return json_renderer_factory(name)
+
+    def test_it(self):
+        renderer = self._callFUT(None)
+        result = renderer({'a':1})
+        self.assertEqual(result, '{"a": 1}')
+                          
+
 class DummyFactory:
     def __init__(self, renderer):
         self.renderer = renderer

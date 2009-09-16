@@ -56,8 +56,3 @@ def render_template_to_response(path, **kw):
     response_factory = queryUtility(IResponseFactory, default=Response)
     return response_factory(result)
 
-def _auto_reload():
-    settings = get_settings()
-    if settings:
-        return settings['reload_templates']
-    return False

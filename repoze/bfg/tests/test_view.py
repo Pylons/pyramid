@@ -631,7 +631,7 @@ class Test_map_view(unittest.TestCase):
         from repoze.bfg.view import map_view
         return map_view(view, *arg, **kw)
 
-    def _registerRenderer(self):
+    def _registerRenderer(self, name='.txt'):
         from repoze.bfg.interfaces import IRendererFactory
         from repoze.bfg.interfaces import ITemplateRenderer
         from zope.interface import implements
@@ -648,7 +648,7 @@ class Test_map_view(unittest.TestCase):
 
         factory = RendererFactory()
         sm = getSiteManager()
-        sm.registerUtility(factory, IRendererFactory, name='.txt')
+        sm.registerUtility(factory, IRendererFactory, name=name)
 
     def test_view_as_function_context_and_request(self):
         def view(context, request):
@@ -664,7 +664,7 @@ class Test_map_view(unittest.TestCase):
         self.failIf(result is view)
         self.assertRaises(TypeError, result, None, None)
 
-    def test_view_as_function_with_attr_and_template(self):
+    def test_view_as_function_with_attr_and_renderer(self):
         self._registerRenderer()
         def view(context, request):
             """ """
@@ -719,7 +719,7 @@ class Test_map_view(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.assertEqual(result(None, None), 'OK')
 
-    def test_view_as_newstyle_class_context_and_request_with_attr_and_template(
+    def test_view_as_newstyle_class_context_and_request_with_attr_and_renderer(
         self):
         self._registerRenderer()
         class view(object):
@@ -762,7 +762,7 @@ class Test_map_view(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.assertEqual(result(None, None), 'OK')
 
-    def test_view_as_newstyle_class_requestonly_with_attr_and_template(self):
+    def test_view_as_newstyle_class_requestonly_with_attr_and_renderer(self):
         self._registerRenderer()
         class view(object):
             def __init__(self, request):
@@ -804,7 +804,7 @@ class Test_map_view(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.assertEqual(result(None, None), 'OK')
 
-    def test_view_as_oldstyle_class_context_and_request_with_attr_and_template(
+    def test_view_as_oldstyle_class_context_and_request_with_attr_and_renderer(
         self):
         self._registerRenderer()
         class view:
@@ -847,7 +847,7 @@ class Test_map_view(unittest.TestCase):
         self.assertEqual(view.__name__, result.__name__)
         self.assertEqual(result(None, None), 'OK')
 
-    def test_view_as_oldstyle_class_requestonly_with_attr_and_template(self):
+    def test_view_as_oldstyle_class_requestonly_with_attr_and_renderer(self):
         self._registerRenderer()
         class view:
             def __init__(self, request):
@@ -881,7 +881,7 @@ class Test_map_view(unittest.TestCase):
         self.failIf(result is view)
         self.assertEqual(result(None, None), 'OK')
 
-    def test_view_as_instance_context_and_request_attr_and_template(self):
+    def test_view_as_instance_context_and_request_attr_and_renderer(self):
         self._registerRenderer()
         class View:
             def index(self, context, request):
@@ -917,7 +917,7 @@ class Test_map_view(unittest.TestCase):
         self.failUnless('instance' in result.__name__)
         self.assertEqual(result(None, None), 'OK')
 
-    def test_view_as_instance_requestonly_with_attr_and_template(self):
+    def test_view_as_instance_requestonly_with_attr_and_renderer(self):
         self._registerRenderer()
         class View:
             def index(self, request):
@@ -932,12 +932,23 @@ class Test_map_view(unittest.TestCase):
         request = DummyRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
 
-    def test_view_templateonly(self):
+    def test_view_rendereronly(self):
         self._registerRenderer()
         def view(context, request):
             return {'a':'1'}
         result = self._callFUT(view,
                                renderer='repoze.bfg.tests:fixtures/minimal.txt')
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        request = DummyRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+
+    def test_view_defaultrendereronly(self):
+        self._registerRenderer(name='')
+        def view(context, request):
+            return {'a':'1'}
+        result = self._callFUT(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1153,12 +1164,12 @@ class Test_rendered_response(unittest.TestCase):
     def tearDown(self):
         cleanUp()
 
-    def _callFUT(self, template_name, response, view=None,
+    def _callFUT(self, renderer_name, response, view=None,
                  context=None, request=None):
         from repoze.bfg.view import rendered_response
         if request is None:
             request = DummyRequest()
-        return rendered_response(template_name, response, view, context,
+        return rendered_response(renderer_name, response, view, context,
                                  request)
 
     def _registerRenderer(self):
