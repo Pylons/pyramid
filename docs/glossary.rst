@@ -27,6 +27,12 @@ Glossary
   Resource
     Any file contained within a Python :term:`package` which is *not*
     a Python source code file.
+  Resource Specification
+    A colon-delimited identifier for a resource.  The colon separates
+    a Python :term:`package` name from a package subpath.  For
+    example, the resource specification ``my.package:static/baz.css``
+    identifies the file named ``baz.css`` in the ``static``
+    subdirectory of the ``my.package`` Python package.
   Package
     A directory on disk which contains an ``__init__.py`` file, making
     it recognizable to Python as a location which can be ``import`` -ed.
@@ -61,6 +67,14 @@ Glossary
     is the primary mechanism by which a developer writes user
     interface code within :mod:`repoze.bfg`.  See :ref:`views_chapter`
     for more information about :mod:`repoze.bfg` views.
+  View Configuration
+    View configuration is the act of associating a view callable with
+    configuration information.  This configuration information helps
+    map the view callable to URLs and can influence the response of a
+    view callable.  :mod:`repoze.bfg` views can be configured via
+    :term:`ZCML` or by a special ``@bfg_view`` decorator.  See
+    :ref:`views_chapter` for more information about view
+    configuration.
   View name
     The "URL name" of a view, e.g ``index.html``.  If a view is
     configured without a name, its name is considered to be the empty
@@ -398,3 +412,14 @@ Glossary
   SQLAlchemy
     `SQLAlchemy' <http://www.sqlalchemy.org/>`_ is an object
     relational mapper used in tutorials within this documentation.
+  JSON
+    `JavaScript Object Notation <http://www.json.org/>`_ is a data
+    serialization format.
+  Renderer
+    A registered serializer that can be configured via :term:`view
+    configuration` which converts a non-:term:`Response` return values
+    from a :term:`view` into a string (and ultimately a response).
+    Using a renderer can make writing views that require templating or
+    other serialization less tedious.  See
+    :ref:`views_which_use_a_renderer` for more information.
+
