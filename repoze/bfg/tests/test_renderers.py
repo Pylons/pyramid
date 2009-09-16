@@ -142,7 +142,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         self.assertNotEqual(queryUtility(ITemplateRenderer, name=spec),
                             None)
 
-class TestRendererFromPath(unittest.TestCase):
+class TestRendererFromName(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
