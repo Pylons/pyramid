@@ -136,6 +136,8 @@ view_request_method
 
   This attribute can also be spelled as ``request_method``.
 
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 view_request_param
 
   This value can be any string.  A view declaration with this
@@ -153,6 +155,8 @@ view_request_param
 
   This attribute can also be spelled as ``request_param``.
 
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 view_containment
 
   This value should be a Python dotted-path string representing the
@@ -166,6 +170,50 @@ view_containment
   effect.
 
   This attribute can also be spelled as ``containment``.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+view_attr
+
+  The view machinery defaults to using the ``__call__`` method of the
+  view callable (or the function itself, if the view callable is a
+  funcion) to obtain a response dictionary.  The ``attr`` value allows
+  you to vary the method attribute used to obtain the response.  For
+  example, if your view was a class, and the class has a method named
+  ``index`` and you wanted to use this method instead of the class'
+  ``__call__`` method to return the response, you'd say
+  ``attr="index"`` in the view configuration for the view.  This is
+  most useful when the view definition is a class.
+
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
+
+  This attribute can also be spelled as ``attr``.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+view_renderer
+
+  This is either a single string term (e.g. ``json``) or a string
+  implying a path or :term:`resource specification`
+  (e.g. ``templates/views.pt``).  If the renderer value is a single
+  term (does not contain a dot ``.``), the specified term will be used
+  to look up a renderer implementation, and that renderer
+  inplementation will be used to construct a response from the view
+  return value.  If the renderer term contains a dot (``.``), the
+  specified term will be treated as a path, and the filename extension
+  of the last element in the path will be used to look up the renderer
+  implementation, which will be passed the full path.  The renderer
+  implementation will be used to construct a response from the view
+  return value.  See :ref:`views_which_use_a_renderer` for more
+  information.
+
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
+
+  This attribute can also be spelled as ``renderer``.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 The Matchdict
 -------------

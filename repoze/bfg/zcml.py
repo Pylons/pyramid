@@ -505,6 +505,8 @@ class IRouteDirective(Interface):
     view_containment = GlobalObject(
         title = u'Dotted name of a containment class or interface',
         required=False)
+    view_attr = TextLine(title=u'view_attr', required=False)
+    view_renderer = TextLine(title=u'view_renderer', required=False)
     # alias for "view_for"
     for_ = GlobalObject(title=u'for', required=False)
     # alias for "view_permission"
@@ -519,13 +521,18 @@ class IRouteDirective(Interface):
     containment = GlobalObject(
         title = u'Dotted name of a containment class or interface',
         required=False)
+    # alias for "view_attr"
+    attr = TextLine(title=u'attr', required=False)
+    # alias for "view_renderer"
+    renderer = TextLine(title=u'renderer', required=False)
 
 def route(_context, name, path, view=None, view_for=None,
           permission=None, factory=None, request_type=None, for_=None,
           view_permission=None, view_request_type=None, 
           request_method=None, view_request_method=None,
           request_param=None, view_request_param=None, containment=None,
-          view_containment=None):
+          view_containment=None, attr=None, view_attr=None, renderer=None,
+          view_renderer=None):
     """ Handle ``route`` ZCML directives
     """
     # the strange ordering of the request kw args above is for b/w
@@ -536,6 +543,8 @@ def route(_context, name, path, view=None, view_for=None,
     request_method = view_request_method or request_method
     request_param = view_request_param or request_param
     containment = view_containment or containment
+    attr = view_attr or attr
+    renderer = view_renderer or renderer
 
     sm = getSiteManager()
     
@@ -555,7 +564,7 @@ def route(_context, name, path, view=None, view_for=None,
         _view(_context, permission=permission, for_=for_, view=view, name='',
               request_type=request_type, route_name=name, 
               request_method=request_method, request_param=request_param,
-              containment=containment)
+              containment=containment, attr=attr, renderer=renderer)
 
     _context.action(
         discriminator = ('route', name),

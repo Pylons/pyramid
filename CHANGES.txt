@@ -1,3 +1,10 @@
+Next release
+============
+
+- Give the ``route`` ZCML directive the ``view_attr`` and
+  ``view_renderer`` parameters (bring up to speed with 1.1a3
+  features).  These can also be spelled as ``attr`` and ``renderer``.
+
 1.1a3 (2009-09-16)
 ==================
 
