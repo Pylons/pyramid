@@ -49,12 +49,11 @@ Next release
   This is useful when the renderer is a template renderer and no names
   need be passed to the template at render time.
 
-- A new zcml directive ``renderer_factory`` has been added.  It is
-  documented in the "Views" narrative chapter of the documentation.
+- A new zcml directive ``renderer`` has been added.  It is documented
+  in the "Views" narrative chapter of the documentation.
 
 - The ``template_renderer`` ZCML directive introduced in 1.1a2 has
-  been removed.  It has been replaced by the ``renderer_factory``
-  directive.
+  been removed.  It has been replaced by the ``renderer`` directive.
 
 - A ZCML ``view`` directive (and the associated ``bfg_view``
   decorator) can now accept a "wrapper" value.  If a "wrapper" value
