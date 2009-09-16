@@ -65,18 +65,18 @@ class TestTemplateRendererFactory(unittest.TestCase):
         from repoze.bfg.interfaces import ITemplateRenderer
         from repoze.bfg import tests
         module_name = tests.__name__
-        relpath = 'test_templating.py'
+        relpath = 'test_renderers.py'
         spec = '%s:%s' % (module_name, relpath)
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=spec)
-        result = self._callFUT('test_templating.py', None)
+        result = self._callFUT('test_renderers.py', None)
         self.failUnless(result is renderer)
 
     def test_relpath_is_package_alreadyregistered(self):
         from repoze.bfg.interfaces import ITemplateRenderer
         from repoze.bfg import tests
         module_name = tests.__name__
-        relpath = 'test_templating.py'
+        relpath = 'test_renderers.py'
         spec = '%s:%s' % (module_name, relpath)
         renderer = {}
         testing.registerUtility(renderer, ITemplateRenderer, name=spec)
@@ -85,8 +85,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
 
     def test_relpath_notyetregistered(self):
         import os
-        from repoze.bfg.tests import test_templating
-        module_name = test_templating.__name__
+        from repoze.bfg.tests import test_renderers
+        module_name = test_renderers.__name__
         relpath = 'test_renderers.py'
         renderer = {}
         factory = DummyFactory(renderer)
