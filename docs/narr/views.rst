@@ -214,7 +214,7 @@ If the ``view`` callable associated with a ``view`` directive returns
 a Response object (an object with the attributes ``status``,
 ``headerlist`` and ``app_iter``), any renderer associated with the
 ``view`` declaration is ignored, and the response is passed back to
-BFG unmolested.  For example, if your page callable returns an
+BFG unmolested.  For example, if your view callable returns an
 ``HTTPFound`` response, no renderer will be employed.
 
 .. code-block:: python
@@ -347,8 +347,8 @@ attr
   example, if your view was a class, and the class has a method named
   ``index`` and you wanted to use this method instead of the class'
   ``__call__`` method to return the response, you'd say
-  ``attr="index"`` in the page ZCML definition.  This is most useful
-  when the page definition is a class.
+  ``attr="index"`` in the view configuration for the view.  This is
+  most useful when the view definition is a class.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
