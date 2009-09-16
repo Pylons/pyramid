@@ -1,5 +1,5 @@
-Next release
-============
+1.1a3 (2009-09-16)
+==================
 
 Documentation
 -------------
@@ -21,7 +21,7 @@ Features
   interface.  This interface is internal.
 
 - A new interface named ``IRendererFactory`` was added.  An existing
-  interface named ``ITemplateRenderer`` now derives from this
+  interface named ``ITemplateRendererFactory`` now derives from this
   interface.  This interface is internal.
 
 - The ``view`` attribute of the ``view`` ZCML directive is no longer
@@ -59,7 +59,8 @@ Deprecations
   deprecated in favor of
   ``repoze.bfg.testing.registerTemplateRenderer``.  A deprecation
   warning is *not* issued at import time for the former name; it will
-  exist "forever".
+  exist "forever"; its existence has been removed from the
+  documentation, however.
 
 - The ``repoze.bfg.templating.renderer_from_cache`` function has been
   moved to ``repoze.bfg.renderer.template_renderer_factory``.  This
