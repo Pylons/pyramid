@@ -76,7 +76,7 @@ def renderer_from_name(path, level=4):
 
 def _reload_resources():
     settings = get_settings()
-    if settings:
-        return settings['reload_resources']
-    return False
+    return settings and settings.get('reload_resources')
+
+
 

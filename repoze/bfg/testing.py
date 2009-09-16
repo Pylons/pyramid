@@ -262,7 +262,9 @@ class DummyTemplateRenderer:
         self.string_response = string_response
         
     def implementation(self):
-        return self
+        def callit(**kw):
+            return self(kw)
+        return callit
     
     def __call__(self, kw):
         self._received.update(kw)

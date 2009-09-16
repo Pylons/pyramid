@@ -456,7 +456,10 @@ class TestDummyTemplateRenderer(unittest.TestCase):
 
     def test_implementation(self):
         renderer = self._makeOne()
-        self.assertEqual(renderer.implementation(), renderer)
+        impl = renderer.implementation()
+        impl(a=1, b=2)
+        self.assertEqual(renderer._received['a'], 1)
+        self.assertEqual(renderer._received['b'], 2)
 
     def test_getattr(self):
         renderer = self._makeOne()
