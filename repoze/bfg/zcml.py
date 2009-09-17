@@ -35,7 +35,6 @@ from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRouteRequest
@@ -47,31 +46,15 @@ from repoze.bfg.resource import PackageOverrides
 
 from repoze.bfg.request import create_route_request_factory
 
-from repoze.bfg.security import Unauthorized
-
-from repoze.bfg.settings import get_settings
-
 from repoze.bfg.static import StaticRootFactory
 
 from repoze.bfg.traversal import find_interface
 
 from repoze.bfg.view import static as static_view
-from repoze.bfg.view import NotFound
 from repoze.bfg.view import MultiView
-from repoze.bfg.view import map_view
-from repoze.bfg.view import decorate_view
-from repoze.bfg.view import render_view_to_response
+from repoze.bfg.view import derive_view
 
 import martian
-
-try:
-    all = all
-except NameError: # pragma: no cover
-    def all(iterable):
-        for element in iterable:
-            if not element:
-                return False
-        return True
 
 def view(
     _context,
@@ -252,103 +235,6 @@ def notfound(_context, view):
 
 def forbidden(_context, view):
     view_utility(_context, view, IForbiddenView)
-
-def derive_view(original_view, permission=None, predicates=(), attr=None,
-                renderer=None, wrapper_viewname=None, viewname=None):
-    mapped_view = map_view(original_view, attr, renderer)
-    owrapped_view = owrap_view(mapped_view, viewname, wrapper_viewname)
-    secured_view = secure_view(owrapped_view, permission)
-    debug_view = authdebug_view(secured_view, permission)
-    derived_view = predicate_wrap(debug_view, predicates)
-    return derived_view
-
-def owrap_view(view, viewname, wrapper_viewname):
-    if not wrapper_viewname:
-        return view
-    def _owrapped_view(context, request):
-        response = view(context, request)
-        request.wrapped_response = response
-        request.wrapped_body = response.body
-        request.wrapped_view = view
-        wrapped_response = render_view_to_response(context, request,
-                                                   wrapper_viewname)
-        if wrapped_response is None:
-            raise ValueError(
-                'No wrapper view named %r found when executing view named %r' %
-                             (wrapper_viewname, viewname))
-        return wrapped_response
-    decorate_view(_owrapped_view, view)
-    return _owrapped_view
-
-def predicate_wrap(view, predicates):
-    if not predicates:
-        return view
-    def _wrapped(context, request):
-        if all((predicate(context, request) for predicate in predicates)):
-            return view(context, request)
-        raise NotFound('predicate mismatch for view %s' % view)
-    def checker(context, request):
-        return all((predicate(context, request) for predicate in predicates))
-    _wrapped.__predicated__ = checker
-    decorate_view(_wrapped, view)
-    return _wrapped
-
-def secure_view(view, permission):
-    wrapped_view = view
-    authn_policy = queryUtility(IAuthenticationPolicy)
-    authz_policy = queryUtility(IAuthorizationPolicy)
-    if authn_policy and authz_policy and (permission is not None):
-        def _secured_view(context, request):
-            principals = authn_policy.effective_principals(request)
-            if authz_policy.permits(context, principals, permission):
-                return view(context, request)
-            msg = getattr(request, 'authdebug_message',
-                          'Unauthorized: %s failed permission check' % view)
-            raise Unauthorized(msg)
-        _secured_view.__call_permissive__ = view
-        def _permitted(context, request):
-            principals = authn_policy.effective_principals(request)
-            return authz_policy.permits(context, principals, permission)
-        _secured_view.__permitted__ = _permitted
-        wrapped_view = _secured_view
-        decorate_view(wrapped_view, view)
-
-    return wrapped_view
-
-def authdebug_view(view, permission):
-    wrapped_view = view
-    authn_policy = queryUtility(IAuthenticationPolicy)
-    authz_policy = queryUtility(IAuthorizationPolicy)
-    settings = get_settings()
-    debug_authorization = getattr(settings, 'debug_authorization', False)
-    if debug_authorization:
-        def _authdebug_view(context, request):
-            view_name = getattr(request, 'view_name', None)
-
-            if authn_policy and authz_policy:
-                if permission is None:
-                    msg = 'Allowed (no permission registered)'
-                else:
-                    principals = authn_policy.effective_principals(request)
-                    msg = str(authz_policy.permits(context, principals,
-                                                   permission))
-            else:
-                msg = 'Allowed (no authorization policy in use)'
-
-            view_name = getattr(request, 'view_name', None)
-            url = getattr(request, 'url', None)
-            msg = ('debug_authorization of url %s (view name %r against '
-                   'context %r): %s' % (url, view_name, context, msg))
-            logger = getUtility(ILogger, 'repoze.bfg.debug')
-            logger and logger.debug(msg)
-            if request is not None:
-                request.authdebug_message = msg
-            return view(context, request)
-
-        wrapped_view = _authdebug_view
-        decorate_view(wrapped_view, view)
-
-    return wrapped_view
 
 def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests

@@ -1266,6 +1266,329 @@ class Test_rendered_response(unittest.TestCase):
             'repoze.bfg.tests:fixtures/minimal.txt', response, request=request)
         self.assertEqual(result.cache_control.max_age, 100)
 
+class TestDeriveView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, view, *arg, **kw):
+        from repoze.bfg.view import derive_view
+        return derive_view(view, *arg, **kw)
+
+    def _registerLogger(self):
+        from repoze.bfg.interfaces import ILogger
+        from zope.component import getSiteManager
+        logger = DummyLogger()
+        sm = getSiteManager()
+        sm.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        return logger
+
+    def _registerSettings(self, **d):
+        from repoze.bfg.interfaces import ISettings
+        from zope.component import getSiteManager
+        settings = DummySettings(d)
+        sm = getSiteManager()
+        sm.registerUtility(settings, ISettings)
+
+    def _registerSecurityPolicy(self, permissive):
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from zope.component import getSiteManager
+        policy = DummySecurityPolicy(permissive)
+        sm = getSiteManager()
+        sm.registerUtility(policy, IAuthenticationPolicy)
+        sm.registerUtility(policy, IAuthorizationPolicy)
+    
+    def test_view_as_function_context_and_request(self):
+        def view(context, request):
+            return 'OK'
+        result = self._callFUT(view)
+        self.failUnless(result is view)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(view(None, None), 'OK')
+        
+    def test_view_as_function_requestonly(self):
+        def view(request):
+            return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_view_as_newstyle_class_context_and_request(self):
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+        
+    def test_view_as_newstyle_class_requestonly(self):
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_view_as_oldstyle_class_context_and_request(self):
+        class view:
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+        
+    def test_view_as_oldstyle_class_requestonly(self):
+        class view:
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_view_as_instance_context_and_request(self):
+        class View:
+            def __call__(self, context, request):
+                return 'OK'
+        view = View()
+        result = self._callFUT(view)
+        self.failUnless(result is view)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+        
+    def test_view_as_instance_requestonly(self):
+        class View:
+            def __call__(self, request):
+                return 'OK'
+        view = View()
+        result = self._callFUT(view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.failUnless('instance' in result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_view_with_debug_authorization_no_authpol(self):
+        def view(context, request):
+            return 'OK'
+        self._registerSettings(debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        result = self._callFUT(view, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): Allowed "
+                         "(no authorization policy in use)")
+
+    def test_view_with_debug_authorization_no_permission(self):
+        def view(context, request):
+            return 'OK'
+        self._registerSettings(debug_authorization=True, reload_templates=True)
+        self._registerSecurityPolicy(True)
+        logger = self._registerLogger()
+        result = self._callFUT(view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): Allowed ("
+                         "no permission registered)")
+
+    def test_view_with_debug_authorization_permission_authpol_permitted(self):
+        def view(context, request):
+            return 'OK'
+        self._registerSettings(debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(True)
+        result = self._callFUT(view, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result.__call_permissive__, view)
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): True")
+        
+    def test_view_with_debug_authorization_permission_authpol_denied(self):
+        from repoze.bfg.security import Unauthorized
+        def view(context, request):
+            """ """
+        self._registerSettings(debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(False)
+        result = self._callFUT(view, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result.__call_permissive__, view)
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertRaises(Unauthorized, result, None, request)
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): False")
+
+    def test_view_with_debug_authorization_permission_authpol_denied2(self):
+        def view(context, request):
+            """ """
+        self._registerSettings(debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger()
+        self._registerSecurityPolicy(False)
+        result = self._callFUT(view, permission='view')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        request = DummyRequest()
+        request.view_name = 'view_name'
+        request.url = 'url'
+        permitted = result.__permitted__(None, None)
+        self.assertEqual(permitted, False)
+
+    def test_view_with_predicates_all(self):
+        def view(context, request):
+            return '123'
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return True
+        result = self._callFUT(view, predicates=[predicate1, predicate2])
+        request = DummyRequest()
+        request.method = 'POST'
+        next = result(None, None)
+        self.assertEqual(next, '123')
+        self.assertEqual(predicates, [True, True])
+
+    def test_view_with_predicates_notall(self):
+        from repoze.bfg.view import NotFound
+        def view(context, request):
+            """ """
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return False
+        result = self._callFUT(view, predicates=[predicate1, predicate2])
+        request = DummyRequest()
+        request.method = 'POST'
+        self.assertRaises(NotFound, result, None, None)
+        self.assertEqual(predicates, [True, True])
+
+    def test_view_with_predicates_checker(self):
+        def view(context, request):
+            """ """
+        predicates = []
+        def predicate1(context, request):
+            predicates.append(True)
+            return True
+        def predicate2(context, request):
+            predicates.append(True)
+            return True
+        result = self._callFUT(view, predicates=[predicate1, predicate2])
+        request = DummyRequest()
+        request.method = 'POST'
+        next = result.__predicated__(None, None)
+        self.assertEqual(next, True)
+        self.assertEqual(predicates, [True, True])
+
+    def test_view_with_wrapper_viewname(self):
+        from webob import Response
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IView
+        inner_response = Response('OK')
+        def inner_view(context, request):
+            return inner_response
+        def outer_view(context, request):
+            self.assertEqual(request.wrapped_response, inner_response)
+            self.assertEqual(request.wrapped_body, inner_response.body)
+            self.assertEqual(request.wrapped_view, inner_view)
+            return Response('outer ' + request.wrapped_body)
+        sm = getSiteManager()
+        sm.registerAdapter(outer_view, (None, None), IView, 'owrap')
+        result = self._callFUT(inner_view, viewname='inner',
+                               wrapper_viewname='owrap')
+        self.failIf(result is inner_view)
+        self.assertEqual(inner_view.__module__, result.__module__)
+        self.assertEqual(inner_view.__doc__, result.__doc__)
+        request = DummyRequest()
+        response = result(None, request)
+        self.assertEqual(response.body, 'outer OK')
+
+    def test_view_with_wrapper_viewname_notfound(self):
+        from webob import Response
+        inner_response = Response('OK')
+        def inner_view(context, request):
+            return inner_response
+        request = DummyRequest()
+        wrapped = self._callFUT(
+            inner_view, viewname='inner', wrapper_viewname='owrap')
+        result = self.assertRaises(ValueError, wrapped, None, request)
+
+class TestAll(unittest.TestCase):
+    def test_it(self):
+        from repoze.bfg.view import all
+        self.assertEqual(all([True, True]), True)
+        self.assertEqual(all([False, False]), False)
+        self.assertEqual(all([False, True]), False)
+
+
 class DummyContext:
     pass
 
@@ -1296,3 +1619,24 @@ class DummyResponse:
         else:
             self.app_iter = [body]
             
+class DummyLogger:
+    def __init__(self):
+        self.messages = []
+    def info(self, msg):
+        self.messages.append(msg)
+    warn = info
+    debug = info
+
+class DummySettings(dict):
+    def __getattr__(self, name):
+        return self[name]
+    
+class DummySecurityPolicy:
+    def __init__(self, permitted=True):
+        self.permitted = permitted
+
+    def effective_principals(self, request):
+        return []
+
+    def permits(self, context, principals, permission):
+        return self.permitted
