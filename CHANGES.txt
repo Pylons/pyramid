@@ -1,6 +1,11 @@
 Next release
 ============
 
+- Add a ``repoze.bfg.url.static_url`` API which is capable of
+  generating URLs to static resources defined by the ``<static>`` ZCML
+  directive.  See the "Views" narrative chapter's section titled
+  "Generating Static Resource URLs" for more information.
+
 - Add a ``string`` renderer.  This renderer converts a non-Response
   return value of any view callble into a string.  It is documented in
   the "Views" narrative chapter.

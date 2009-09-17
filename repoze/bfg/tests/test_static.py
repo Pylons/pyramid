@@ -148,6 +148,13 @@ class TestPackageURLParser(unittest.TestCase):
         self.failUnless('404 Not Found' in body)
         self.assertEqual(sr.status, '404 Not Found')
 
+class TestStaticRootFactory(unittest.TestCase):
+    def test_it(self):
+        from repoze.bfg.static import StaticRootFactory
+        factory = StaticRootFactory('abc') 
+        self.assertEqual(factory.spec, 'abc')
+        self.assertEqual(factory({}), factory)
+
 class DummyStartResponse:
     def __call__(self, status, headerlist, exc_info=None):
         self.status = status

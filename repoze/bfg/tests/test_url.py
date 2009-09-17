@@ -202,7 +202,62 @@ class TestRouteUrl(unittest.TestCase):
         mapper.raise_exc = KeyError
         request = DummyRequest()
         self.assertRaises(KeyError, self._callFUT, 'flub', request, a=1)
+
+class TestStaticUrl(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
         
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.url import static_url
+        return static_url(*arg, **kw)
+
+    def test_notfound(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        from zope.component import getSiteManager
+        mapper = DummyRoutesMapper(result='/1/2/3')
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
+        request = DummyRequest()
+        self.assertRaises(ValueError, self._callFUT, 'static/foo.css', request)
+
+    def test_abspath(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        from zope.component import getSiteManager
+        mapper = DummyRoutesMapper(result='/1/2/3')
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
+        request = DummyRequest()
+        self.assertRaises(ValueError, self._callFUT, '/static/foo.css', request)
+
+    def test_found_rel(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        from repoze.bfg.static import StaticRootFactory
+        from zope.component import getSiteManager
+        factory = StaticRootFactory('repoze.bfg.tests:fixtures')
+        routes = [DummyRoute('name', factory=factory)]
+        mapper = DummyRoutesMapper(result='/1/2/3', routes = routes)
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
+        request = DummyRequest()
+        url = self._callFUT('fixtures/minimal.pt', request)
+        self.assertEqual(url, 'http://example.com:5432/1/2/3')
+
+    def test_found_abs(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        from repoze.bfg.static import StaticRootFactory
+        from zope.component import getSiteManager
+        factory = StaticRootFactory('repoze.bfg.tests:fixtures')
+        routes = [DummyRoute('name', factory=factory)]
+        mapper = DummyRoutesMapper(result='/1/2/3', routes = routes)
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
+        request = DummyRequest()
+        url = self._callFUT('repoze.bfg.tests:fixtures/minimal.pt', request)
+        self.assertEqual(url, 'http://example.com:5432/1/2/3')
+
 class DummyContext(object):
     def __init__(self, next=None):
         self.next = next
@@ -216,11 +271,19 @@ class DummyRequest:
 
 class DummyRoutesMapper:
     raise_exc = None
-    def __init__(self, result='/1/2/3', raise_exc=False):
+    def __init__(self, result='/1/2/3', raise_exc=False, routes=()):
         self.result = result
+        self.routes = routes
+
+    def get_routes(self):
+        return self.routes
         
     def generate(self, *route_args, **newargs):
         if self.raise_exc:
             raise self.raise_exc
         return self.result
     
+class DummyRoute:
+    def __init__(self, name, factory=None):
+        self.name = name
+        self.factory = factory

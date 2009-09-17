@@ -120,6 +120,15 @@ class RoutesRootFactoryTests(unittest.TestCase):
         mapper.connect('whatever', 'archives/:action/:article')
         self.assertEqual(mapper.has_routes(), True)
 
+    def test_get_routes(self):
+        from repoze.bfg.urldispatch import Route
+        mapper = self._makeOne(None)
+        self.assertEqual(mapper.get_routes(), [])
+        mapper.connect('whatever', 'archives/:action/:article')
+        routes = mapper.get_routes()
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0].__class__, Route)
+
     def test_generate(self):
         mapper = self._makeOne(None)
         def generator(kw):

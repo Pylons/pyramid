@@ -51,6 +51,8 @@ from repoze.bfg.security import Unauthorized
 
 from repoze.bfg.settings import get_settings
 
+from repoze.bfg.static import StaticRootFactory
+
 from repoze.bfg.traversal import find_interface
 
 from repoze.bfg.view import static as static_view
@@ -611,10 +613,6 @@ class IStaticDirective(Interface):
         required=False,
         default=None)
 
-class StaticRootFactory:
-    def __init__(self, environ):
-        pass
-
 def static(_context, name, path, cache_max_age=3600):
     """ Handle ``static`` ZCML directives
     """
@@ -626,7 +624,7 @@ def static(_context, name, path, cache_max_age=3600):
 
     view = static_view(path, cache_max_age=cache_max_age)
     route(_context, name, "%s*subpath" % name, view=view,
-          view_for=StaticRootFactory, factory=StaticRootFactory)
+          view_for=StaticRootFactory, factory=StaticRootFactory(path))
 
 class IViewDirective(Interface):
     for_ = GlobalObject(

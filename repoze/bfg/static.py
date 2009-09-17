@@ -76,3 +76,10 @@ class PackageURLParser(StaticURLParser):
         return '<%s %s:%s at %s>' % (self.__class__.__name__, self.package_name,
                                      self.root_resource, id(self))
 
+class StaticRootFactory:
+    def __init__(self, spec):
+        self.spec = spec
+
+    def __call__(self, environ):
+        return self
+

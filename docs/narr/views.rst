@@ -1093,6 +1093,75 @@ directive's ``path`` is ``/path/to/static``,
 subdirectories recursively, and any subdirectories may hold files;
 these will be resolved by the static view as you would expect.
 
+.. note:: The ``<static>`` ZCML directive is new in :mod:`repoze.bfg`
+   1.1.
+
+Generating Static Resource URLs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a ``<static>`` directive is used to register a static resource
+directory, a special helper API named ``repoze.bfg.static_url`` can be
+used to generate the appropriate URL for a package resource that lives
+in one of the directories named by the ``<static>`` directive's
+``path`` attribute.
+
+For example, let's assume you create a set of ``static`` declarations
+in ZCML like so:
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="static1"
+      path="resources/1"
+      />
+
+   <static
+      name="static2"
+      path="resources/2"
+      />
+
+These declarations create URL-accessible directories which have URLs
+which begin, respectively, with ``/static1`` and ``/static2``.  The
+resources in the ``resources/1`` directory are consulted when a user
+visits a URL which begins with ``/static1``, and the resources in the
+``resources/2`` directory are consulted when a user visits a URL which
+begins with ``/static2``.
+
+You needn't generate the URLs to static resources "by hand" in such a
+configuration.  Instead, use the ``repoze.bfg.url.static_url`` API to
+generate them for you.  For example, let's imagine that the following
+code lives in a module that shares the same directory as the above
+ZCML file:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.url import static_url
+   from repoze.bfg.chameleon_zpt import render_template_to_response
+
+   def my_view(context, request):
+       css_url = static_url('resources/1/foo.css', request)
+       js_url = static_url('resources/2/foo.js', request)
+       return render_template_to_response('templates/my_template.pt',
+                                          css_url = css_url,
+                                          js_url = js_url)
+
+If the request "application URL" of the running system is
+``http://example.com``, the ``css_url`` generated above would be:
+``http://example.com/static1/foo.css``.  The ``js_url`` generated
+above would be ``'http://example.com/static2/foo.js``.
+
+One benefit of using the ``static_url`` function rather than
+constructing static URLs "by hand" is that if you need to change the
+``name`` of a static URL declaration in ZCML, the generated URLs will
+continue to resolve properly after the rename.
+
+See :ref:`url_module` for detailed information about inputs and
+outputs of the ``static_url`` function.
+
+.. note:: The ``static_url`` API is new in :mod:`repoze.bfg` 1.1.
+
 Serving Static Resources Using a View
 -------------------------------------
 

@@ -29,6 +29,9 @@ class RoutesRootFactory(object):
     def has_routes(self):
         return bool(self.routelist)
 
+    def get_routes(self):
+        return self.routelist
+
     def connect(self, path, name, factory=None):
         route = Route(path, name, factory)
         self.routelist.append(route)

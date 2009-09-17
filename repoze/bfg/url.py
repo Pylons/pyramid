@@ -1,5 +1,6 @@
 """ Utility functions for dealing with URLs in repoze.bfg """
 
+import os
 import urllib
 
 from zope.component import queryMultiAdapter
@@ -7,6 +8,8 @@ from zope.component import getUtility
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import IRoutesMapper
 
+from repoze.bfg.path import caller_package
+from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.traversal import TraversalContextURL
 from repoze.bfg.traversal import quote_path_segment
 
@@ -29,9 +32,9 @@ def route_url(route_name, request, *elements, **kw):
         route_url('foobar', request, foo='1')          => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2') => <KeyError exception>
         route_url('foobar', request, foo='1', bar='2',
-                   'traverse=('a','b')                 =>  http://e.com/1/2/a/b
+                   'traverse=('a','b'))                =>  http://e.com/1/2/a/b
         route_url('foobar', request, foo='1', bar='2',
-                   'traverse=('/a/b')                 =>  http://e.com/1/2/a/b
+                   'traverse=('/a/b'))                 =>  http://e.com/1/2/a/b
 
     Values replacing ``:segment`` arguments can be passed as strings
     or Unicode objects.  They will be encoded to UTF-8 and URL-quoted
@@ -196,6 +199,55 @@ def model_url(model, request, *elements, **kw):
         suffix = ''
 
     return model_url + suffix + qs + anchor
+
+def static_url(path, request, **kw):
+    """
+    Generates a fully qualified URL for a static resource.  The
+    resource must live within a location defined via the ``<static>``
+    ZCML directive.
+
+    The ``path`` argument points at a file or directory on disk which
+    a URL should be generated for.  The ``path`` may be either a
+    relative path (e.g. ``static/foo.css``) or a :term:`resource
+    specification` (e.g. ``mypackage:static/foo.css``).  A ``path``
+    may not be an absolute filesystem path (a ValueError will be
+    raised if this function is supplied with an absolute path).
+
+    The ``request`` argument should be a WebOb request.
+
+    The purpose of the ``**kw`` argument is the same as the purpose of
+    the ``route_url`` ``*kw`` argument.  See the documentation for
+    that function to understand the arguments which you can provide to
+    it.  However, typically, you don't need to pass anything as
+    ``*kw`` when generating a static resource URL.
+
+    This function raises a ValueError if a ``<static>`` ZCML
+    definition cannot be found which matches the path specification.
+
+    .. note:: This feature is new in :mod:`repoze.bfg` 1.1.
+    """
+    mapper = getUtility(IRoutesMapper)
+    routes = mapper.get_routes()
+    if os.path.isabs(path):
+        raise ValueError('Absolute paths cannot be used to generate static '
+                         'urls (use a package-relative path or a resource '
+                         'specification).')
+    if not ':' in path:
+        # if it's not a package:relative/name and it's not an
+        # /absolute/path it's a relative/path; this means its relative
+        # to the package in which the caller's module is defined.
+        package = caller_package(level=2)
+        path = '%s:%s' % (package.__name__, path)
+    
+    for route in routes:
+        factory = route.factory
+        if factory.__class__ is StaticRootFactory:
+            if path.startswith(factory.spec):
+                subpath = path[len(factory.spec):]
+                kw['subpath'] = subpath
+                return route_url(route.name, request, **kw)
+
+    raise ValueError('No static URL definition matching %s' % path)
 
 def urlencode(query, doseq=False):
     """

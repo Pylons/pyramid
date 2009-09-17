@@ -1848,7 +1848,7 @@ class TestStaticDirective(unittest.TestCase):
         from zope.interface import implementedBy
         from zope.component import getSiteManager
         from repoze.bfg.zcml import connect_route
-        from repoze.bfg.zcml import StaticRootFactory
+        from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         import os
@@ -1887,7 +1887,7 @@ class TestStaticDirective(unittest.TestCase):
         from zope.component import getSiteManager
         from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
-        from repoze.bfg.zcml import StaticRootFactory
+        from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         context = DummyContext()
@@ -1922,7 +1922,7 @@ class TestStaticDirective(unittest.TestCase):
         from zope.component import getSiteManager
         from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
-        from repoze.bfg.zcml import StaticRootFactory
+        from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         import repoze.bfg.tests
@@ -2225,11 +2225,6 @@ class TestAll(unittest.TestCase):
         self.assertEqual(all([True, True]), True)
         self.assertEqual(all([False, False]), False)
         self.assertEqual(all([False, True]), False)
-
-class TestStaticRootFactory(unittest.TestCase):
-    def test_it(self):
-        from repoze.bfg.zcml import StaticRootFactory
-        StaticRootFactory({}) # it just needs construction
 
 class DummyModule:
     __path__ = "foo"
