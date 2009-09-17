@@ -795,6 +795,39 @@ Several built-in "renderers" exist in :mod:`repoze.bfg`.  These
 renderers can be used in the ``renderer`` attribute of view
 configurations.
 
+``string``: String Renderer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``string`` renderer is a renderer which renders a view callable
+result to a string.  If a view callable returns a non-Response object,
+and the ``string`` renderer is associated in that view's
+configuration, the result will be to run the object through the Python
+``str`` function to generate a string.  Note that if a Unicode object
+is returned, it is not ``str()`` -ified.
+
+Here's an example of a view that returns a dictionary.  If the
+``string`` renderer is specified in the configuration for this view,
+the view will render the returned dictionary to the ``str()``
+representation of the dictionary:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(renderer='string')
+   def hello_world(context, request):
+       return {'content':'Hello!'}
+
+The body of the response returned by such a view will be a string
+representing the ``str()`` serialization of the return value:
+
+.. code-block: python
+   :linenos:
+
+   {'content': 'Hello!'}
+
 ``json``: JSON Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -802,7 +835,7 @@ The ``json`` renderer is a renderer which renders view callable
 results to :term:`JSON`.  If a view callable returns a non-Response
 object it is called.  It passes the return value through the
 ``simplejson.dumps`` function, and wraps the result in a response
-object.  For example:
+object.
 
 Here's an example of a view that returns a dictionary.  If the
 ``json`` renderer is specified in the configuration for this view, the

@@ -33,4 +33,9 @@
      name="json"
      />
 
+  <renderer
+     factory="repoze.bfg.renderers.string_renderer_factory"
+     name="string"
+     />
+
 </configure>

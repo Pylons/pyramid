@@ -178,7 +178,29 @@ class Test_json_renderer_factory(unittest.TestCase):
         renderer = self._callFUT(None)
         result = renderer({'a':1})
         self.assertEqual(result, '{"a": 1}')
+
+class Test_string_renderer_factory(unittest.TestCase):
+    def _callFUT(self, name):
+        from repoze.bfg.renderers import string_renderer_factory
+        return string_renderer_factory(name)
+
+    def test_it_unicode(self):
+        renderer = self._callFUT(None)
+        value = unicode('La Pe\xc3\xb1a', 'utf-8')
+        result = renderer(value)
+        self.assertEqual(result, value)
                           
+    def test_it_str(self):
+        renderer = self._callFUT(None)
+        value = 'La Pe\xc3\xb1a'
+        result = renderer(value)
+        self.assertEqual(result, value)
+
+    def test_it_other(self):
+        renderer = self._callFUT(None)
+        value = None
+        result = renderer(value)
+        self.assertEqual(result, 'None')
 
 class DummyFactory:
     def __init__(self, renderer):

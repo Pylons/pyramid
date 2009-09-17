@@ -114,8 +114,8 @@ class Router(object):
                     return response.app_iter
                 except AttributeError:
                     raise ValueError(
-                        'Non-response object returned from view %s: %r' %
-                        (view_name, response))
+                        'Non-response object returned from view named %s '
+                        '(and no renderer): %r' % (view_name, response))
 
             provides = map(providedBy, (context, request))
             view_callable = registry.adapters.lookup(

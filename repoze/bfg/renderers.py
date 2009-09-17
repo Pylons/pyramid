@@ -22,6 +22,13 @@ def json_renderer_factory(name):
         return json.dumps(value)
     return _render
 
+def string_renderer_factory(name):
+    def _render(value):
+        if not isinstance(value, basestring):
+            value = str(value)
+        return value
+    return _render
+
 # utility functions
 
 def template_renderer_factory(path, impl, level=3):
