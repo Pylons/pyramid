@@ -1,10 +1,10 @@
 import os
 import pkg_resources
 
-from paste.httpheaders import ETAG
-from paste.urlparser import StaticURLParser
 from paste import httpexceptions
 from paste import request
+from paste.httpheaders import ETAG
+from paste.urlparser import StaticURLParser
 
 class PackageURLParser(StaticURLParser):
     """ This probably won't work with zipimported resources """

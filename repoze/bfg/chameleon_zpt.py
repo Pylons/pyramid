@@ -3,10 +3,10 @@ from webob import Response
 from zope.component import queryUtility
 from zope.interface import implements
 
+from chameleon.zpt.template import PageTemplateFile
+
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
-
-from chameleon.zpt.template import PageTemplateFile
 
 from repoze.bfg.renderers import template_renderer_factory
 from repoze.bfg.settings import get_settings

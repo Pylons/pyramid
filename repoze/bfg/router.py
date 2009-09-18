@@ -1,19 +1,13 @@
 import os
 import sys
 
+from zope.interface import implements
 from zope.interface import providedBy
+
 from zope.component.event import dispatch
 
-from zope.interface import implements
-
-from repoze.bfg.authorization import ACLAuthorizationPolicy
-
-from repoze.bfg.events import NewRequest
-from repoze.bfg.events import NewResponse
-from repoze.bfg.events import WSGIApplicationCreatedEvent
-
-from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IAuthenticationPolicy
+from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IDefaultRootFactory
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import ILogger
@@ -24,27 +18,23 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import IView
 
+from repoze.bfg.authorization import ACLAuthorizationPolicy
+from repoze.bfg.events import NewRequest
+from repoze.bfg.events import NewResponse
+from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.log import make_stream_logger
-
 from repoze.bfg.registry import Registry
 from repoze.bfg.registry import populateRegistry
-
 from repoze.bfg.request import request_factory
-
 from repoze.bfg.security import Unauthorized
-
 from repoze.bfg.settings import Settings
 from repoze.bfg.settings import get_options
-
 from repoze.bfg.threadlocal import manager
-
 from repoze.bfg.traversal import _traverse
-
 from repoze.bfg.urldispatch import RoutesRootFactory
-
-from repoze.bfg.view import default_notfound_view
-from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import NotFound
+from repoze.bfg.view import default_forbidden_view
+from repoze.bfg.view import default_notfound_view
 
 _marker = object()
 

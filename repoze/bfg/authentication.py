@@ -1,16 +1,17 @@
+from codecs import utf_8_decode
+from codecs import utf_8_encode
 import datetime
 import time
 
-from codecs import utf_8_decode
-from codecs import utf_8_encode
-from paste.request import get_cookies
 from paste.auth import auth_tkt
+from paste.request import get_cookies
 
 from zope.interface import implements
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.security import Everyone
+
 from repoze.bfg.security import Authenticated
+from repoze.bfg.security import Everyone
 
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """

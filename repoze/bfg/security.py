@@ -1,6 +1,6 @@
 from zope.component import getSiteManager
-from zope.component import queryUtility
 from zope.component import providedBy
+from zope.component import queryUtility
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy

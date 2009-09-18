@@ -1,13 +1,10 @@
 import os
 import sys
-
 from code import interact
 
 from paste.deploy import loadapp
-
-from paste.script.templates import Template
 from paste.script.command import Command
-
+from paste.script.templates import Template
 from paste.util.template import paste_script_template_renderer
 
 from repoze.bfg.scripting import get_root

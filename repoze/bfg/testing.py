@@ -2,8 +2,8 @@ import copy
 
 from zope.deprecation import deprecated
 
-from zope.interface import Interface
 from zope.interface import implements
+from zope.interface import Interface
 
 from repoze.bfg.interfaces import IRequest
 

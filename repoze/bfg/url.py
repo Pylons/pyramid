@@ -3,8 +3,9 @@
 import os
 import urllib
 
-from zope.component import queryMultiAdapter
 from zope.component import getUtility
+from zope.component import queryMultiAdapter
+
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import IRoutesMapper
 

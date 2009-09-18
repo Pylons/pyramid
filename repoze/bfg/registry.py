@@ -1,16 +1,13 @@
 import threading
 
-import zope.component
-
 from zope.component import getGlobalSiteManager
 from zope.component import getSiteManager as original_getSiteManager
 from zope.component.registry import Components
-
 from zope.deprecation import deprecated
+import zope.component
 
-from repoze.bfg.threadlocal import manager
 from repoze.bfg.threadlocal import get_current_registry
-
+from repoze.bfg.threadlocal import manager
 from repoze.bfg.zcml import zcml_configure
 
 class Registry(Components):

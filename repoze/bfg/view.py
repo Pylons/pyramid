@@ -1,7 +1,7 @@
 import cgi
-import os
 import inspect
 import mimetypes
+import os
 
 # See http://bugs.python.org/issue5853 which is a recursion bug
 # that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
@@ -17,29 +17,27 @@ from webob import Response
 
 from paste.urlparser import StaticURLParser
 
-from zope.component import queryUtility
-from zope.component import providedBy
 from zope.component import getSiteManager
-
-from zope.interface import implements
-
+from zope.component import providedBy
+from zope.component import queryUtility
 from zope.deprecation import deprecated
+from zope.interface import implements
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import ILogger
-from repoze.bfg.interfaces import IResponseFactory
-from repoze.bfg.interfaces import IRendererFactory
-from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IMultiView
+from repoze.bfg.interfaces import IRendererFactory
+from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
+from repoze.bfg.interfaces import IView
 
 from repoze.bfg.path import caller_package
+from repoze.bfg.renderers import renderer_from_name
+from repoze.bfg.resource import resource_spec
 from repoze.bfg.security import Unauthorized
 from repoze.bfg.settings import get_settings
 from repoze.bfg.static import PackageURLParser
-from repoze.bfg.renderers import renderer_from_name
-from repoze.bfg.resource import resource_spec
 
 try:
     all = all

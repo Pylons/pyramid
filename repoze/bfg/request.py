@@ -1,11 +1,9 @@
+from zope.component import queryUtility
+from zope.deprecation import deprecated
 from zope.interface import implements
 from zope.interface.interface import InterfaceClass
 
-from zope.component import queryUtility
-
 from webob import Request as WebobRequest
-
-from zope.deprecation import deprecated
 
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRouteRequest

@@ -1,6 +1,6 @@
 import os
-
 import pkg_resources
+
 from zope.component import queryUtility
 from zope.interface import implements
 

@@ -2,8 +2,8 @@ import re
 from urllib import unquote
 
 from repoze.bfg.traversal import _url_quote
-from repoze.bfg.traversal import traversal_path
 from repoze.bfg.traversal import quote_path_segment
+from repoze.bfg.traversal import traversal_path
 
 _marker = object()
 

@@ -1,61 +1,53 @@
-import os
 import sys
 import types
 
 from zope.configuration import xmlconfig
+import zope.configuration.config
 
 from zope.component import getSiteManager
 from zope.component import getUtility
 from zope.component import queryUtility
 
-import zope.configuration.config
-
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
 
 from zope.interface import Interface
-from zope.interface.interfaces import IInterface
 from zope.interface import implementedBy
+from zope.interface.interfaces import IInterface
 
-from zope.schema import TextLine
 from zope.schema import Bool
 from zope.schema import Int
+from zope.schema import TextLine
+
+import martian
+
+from repoze.bfg.interfaces import IAuthenticationPolicy
+from repoze.bfg.interfaces import IAuthorizationPolicy
+from repoze.bfg.interfaces import IForbiddenView
+from repoze.bfg.interfaces import IMultiView
+from repoze.bfg.interfaces import INotFoundView
+from repoze.bfg.interfaces import IPackageOverrides
+from repoze.bfg.interfaces import IRendererFactory
+from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IRouteRequest
+from repoze.bfg.interfaces import IRoutesMapper
+from repoze.bfg.interfaces import ISecuredView
+from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IViewPermission
 
 from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
-
-from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import IViewPermission
-from repoze.bfg.interfaces import INotFoundView
-from repoze.bfg.interfaces import IForbiddenView
-from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import ISecuredView
-from repoze.bfg.interfaces import IMultiView
-from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import IPackageOverrides
-from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import IRouteRequest
-from repoze.bfg.interfaces import IRendererFactory
-
 from repoze.bfg.path import package_name
-
+from repoze.bfg.request import create_route_request_factory
 from repoze.bfg.resource import PackageOverrides
 from repoze.bfg.resource import resource_spec
-
-from repoze.bfg.request import create_route_request_factory
-
 from repoze.bfg.static import StaticRootFactory
-
 from repoze.bfg.traversal import find_interface
-
-from repoze.bfg.view import static as static_view
 from repoze.bfg.view import MultiView
 from repoze.bfg.view import derive_view
-
-import martian
+from repoze.bfg.view import static as static_view
 
 def view(
     _context,

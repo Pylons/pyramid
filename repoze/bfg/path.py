@@ -1,6 +1,6 @@
 import os
-import sys
 import pkg_resources
+import sys
 
 def caller_path(path, level=2):
     """ Return an absolute path """

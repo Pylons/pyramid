@@ -1,16 +1,15 @@
 import os
 import pkg_resources
 
-from zope.component import queryUtility
 from zope.component import getSiteManager
-
-from repoze.bfg.path import caller_package
-from repoze.bfg.settings import get_settings
+from zope.component import queryUtility
 
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import ITemplateRenderer
 
+from repoze.bfg.path import caller_package
 from repoze.bfg.resource import resource_spec
+from repoze.bfg.settings import get_settings
 
 try:
     import json
