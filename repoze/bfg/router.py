@@ -16,6 +16,7 @@ from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.authorization import ACLAuthorizationPolicy
@@ -78,8 +79,8 @@ class Router(object):
             request = request_factory(environ)
             threadlocals['request'] = request
             registry.has_listeners and registry.notify(NewRequest(request))
-
-            tdict = _traverse(root, environ, registry)
+            traverser = registry.getAdapter(root, ITraverserFactory)
+            tdict = _traverse(root, environ, traverser=traverser)
             if '_deprecation_warning' in tdict:
                 warning = tdict.pop('_deprecation_warning')
                 if not warning in self.traverser_warned:

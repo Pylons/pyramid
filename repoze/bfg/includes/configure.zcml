@@ -7,14 +7,14 @@
   <include file="meta.zcml" />
 
   <adapter
-      factory="repoze.bfg.traversal.ModelGraphTraverser"
       provides="repoze.bfg.interfaces.ITraverserFactory"
+      factory="repoze.bfg.traversal.ModelGraphTraverser"
       for="*"
   />
 
   <adapter
-      factory="repoze.bfg.traversal.TraversalContextURL"
       provides="repoze.bfg.interfaces.IContextURL"
+      factory="repoze.bfg.traversal.TraversalContextURL"
       for="* repoze.bfg.interfaces.IRequest"
   />
 

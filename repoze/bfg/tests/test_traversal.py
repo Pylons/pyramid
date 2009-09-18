@@ -971,14 +971,12 @@ class UnderTraverseTests(unittest.TestCase):
         result = self._callFUT(context, None)
         self.assertEqual(result, {})
 
-    def test_withregistry(self):
-        from zope.component import getSiteManager
-        registry = getSiteManager()
-        traverser = make_traverser({})
-        self._registerTraverserFactory(traverser)
+    def test_with_traverser(self):
+        def traverser(environ):
+            return {'a':'1'}
         context = DummyContext()
-        result = self._callFUT(context, None, registry)
-        self.assertEqual(result, {})
+        result = self._callFUT(context, None, traverser)
+        self.assertEqual(result, {'a':'1'})
 
     def test_issixtuple(self):
         traverser = make_traverser((1,2,3,4,5,6))
