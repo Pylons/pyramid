@@ -49,6 +49,80 @@ from repoze.bfg.view import MultiView
 from repoze.bfg.view import derive_view
 from repoze.bfg.view import static as static_view
 
+###################### directives ##########################
+
+class IViewDirective(Interface):
+    for_ = GlobalObject(
+        title=u"The interface or class this view is for.",
+        required=False
+        )
+
+    permission = TextLine(
+        title=u"Permission",
+        description=u"The permission needed to use the view.",
+        required=False
+        )
+
+    view = GlobalObject(
+        title=u"",
+        description=u"The view function",
+        required=False,
+        )
+
+    name = TextLine(
+        title=u"The name of the view",
+        description=u"""
+        The name shows up in URLs/paths. For example 'foo' or 'foo.html'.""",
+        required=False,
+        )
+
+    attr = TextLine(
+        title=u'The callable attribute of the view object(default is __call__)',
+        description=u'',
+        required=False)
+
+    renderer = TextLine(
+        title=u'The renderer asssociated with the view',
+        description=u'',
+        required=False)
+
+    wrapper = TextLine(
+        title = u'The *name* of the view that acts as a wrapper for this view.',
+        description = u'',
+        required=False)
+
+    request_type = TextLine(
+        title=u"The request type string or dotted name interface for the view",
+        description=(u"The view will be called if the interface represented by "
+                     u"'request_type' is implemented by the request.  The "
+                     u"default request type is repoze.bfg.interfaces.IRequest"),
+        required=False
+        )
+
+    route_name = TextLine(
+        title = u'The route that must match for this view to be used',
+        required = False)
+
+    containment = GlobalObject(
+        title = u'Dotted name of a containment class or interface',
+        required=False)
+
+    request_method = TextLine(
+        title = u'Request method name that must be matched (e.g. GET/POST)',
+        description = (u'The view will be called if and only if the request '
+                       'method (``request.method``) matches this string. This'
+                       'functionality replaces the older ``request_type`` '
+                       'functionality.'),
+        required=False)
+
+    request_param = TextLine(
+        title = (u'Request parameter name that must exist in '
+                 '``request.params`` for this view to match'),
+        description = (u'The view will be called if and only if the request '
+                       'parameter exists which matches this string.'),
+        required=False)
+
+
 def view(
     _context,
     permission=None,
@@ -208,6 +282,26 @@ def view(
 
 _view = view # for directives that take a view arg
 
+class INotFoundViewDirective(Interface):
+    view = GlobalObject(
+        title=u"",
+        description=u"The notfound view callable",
+        required=True,
+        )
+
+def notfound(_context, view):
+    view_utility(_context, view, INotFoundView)
+
+class IForbiddenViewDirective(Interface):
+    view = GlobalObject(
+        title=u"",
+        description=u"The forbidden view callable",
+        required=True,
+        )
+
+def forbidden(_context, view):
+    view_utility(_context, view, IForbiddenView)
+
 def view_utility(_context, view, iface):
     def register():
         derived_view = derive_view(view)
@@ -219,18 +313,6 @@ def view_utility(_context, view, iface):
         callable = register,
         )
 
-def notfound(_context, view):
-    view_utility(_context, view, INotFoundView)
-
-def forbidden(_context, view):
-    view_utility(_context, view, IForbiddenView)
-
-def scan(_context, package, martian=martian):
-    # martian overrideable only for unit tests
-    module_grokker = martian.ModuleGrokker()
-    module_grokker.register(BFGViewFunctionGrokker())
-    martian.grok_dotted_name(package.__name__, grokker=module_grokker,
-                             context=_context, exclude_filter=exclude)
 
 class IResourceDirective(Interface):
     """
@@ -403,6 +485,12 @@ class IRouteDirective(Interface):
     # alias for "view_renderer"
     renderer = TextLine(title=u'renderer', required=False)
 
+class IRouteRequirementDirective(Interface):
+    """ The interface for the ``requirement`` route subdirective """
+    attr = TextLine(title=u'attr', required=True)
+    expr = TextLine(title=u'expression', required=True)
+
+
 def route(_context, name, path, view=None, view_for=None,
           permission=None, factory=None, request_type=None, for_=None,
           view_permission=None, view_request_type=None, 
@@ -469,6 +557,20 @@ def renderer(_context, factory, name=''):
     sm.registerUtility(factory, IRendererFactory, name=name)
     _context.action(discriminator=(IRendererFactory, name))
 
+class IScanDirective(Interface):
+    package = GlobalObject(
+        title=u"The package we'd like to scan.",
+        required=True,
+        )
+
+def scan(_context, package, martian=martian):
+    # martian overrideable only for unit tests
+    module_grokker = martian.ModuleGrokker()
+    module_grokker.register(BFGViewFunctionGrokker())
+    martian.grok_dotted_name(package.__name__, grokker=module_grokker,
+                             context=_context, exclude_filter=exclude)
+
+
 class IStaticDirective(Interface):
     name = TextLine(
         title=u"The URL prefix of the static view",
@@ -496,101 +598,7 @@ def static(_context, name, path, cache_max_age=3600):
     route(_context, name, "%s*subpath" % name, view=view,
           view_for=StaticRootFactory, factory=StaticRootFactory(path))
 
-class IViewDirective(Interface):
-    for_ = GlobalObject(
-        title=u"The interface or class this view is for.",
-        required=False
-        )
-
-    permission = TextLine(
-        title=u"Permission",
-        description=u"The permission needed to use the view.",
-        required=False
-        )
-
-    view = GlobalObject(
-        title=u"",
-        description=u"The view function",
-        required=False,
-        )
-
-    name = TextLine(
-        title=u"The name of the view",
-        description=u"""
-        The name shows up in URLs/paths. For example 'foo' or 'foo.html'.""",
-        required=False,
-        )
-
-    attr = TextLine(
-        title=u'The callable attribute of the view object(default is __call__)',
-        description=u'',
-        required=False)
-
-    renderer = TextLine(
-        title=u'The renderer asssociated with the view',
-        description=u'',
-        required=False)
-
-    wrapper = TextLine(
-        title = u'The *name* of the view that acts as a wrapper for this view.',
-        description = u'',
-        required=False)
-
-    request_type = TextLine(
-        title=u"The request type string or dotted name interface for the view",
-        description=(u"The view will be called if the interface represented by "
-                     u"'request_type' is implemented by the request.  The "
-                     u"default request type is repoze.bfg.interfaces.IRequest"),
-        required=False
-        )
-
-    route_name = TextLine(
-        title = u'The route that must match for this view to be used',
-        required = False)
-
-    containment = GlobalObject(
-        title = u'Dotted name of a containment class or interface',
-        required=False)
-
-    request_method = TextLine(
-        title = u'Request method name that must be matched (e.g. GET/POST)',
-        description = (u'The view will be called if and only if the request '
-                       'method (``request.method``) matches this string. This'
-                       'functionality replaces the older ``request_type`` '
-                       'functionality.'),
-        required=False)
-
-    request_param = TextLine(
-        title = (u'Request parameter name that must exist in '
-                 '``request.params`` for this view to match'),
-        description = (u'The view will be called if and only if the request '
-                       'parameter exists which matches this string.'),
-        required=False)
-
-class INotFoundViewDirective(Interface):
-    view = GlobalObject(
-        title=u"",
-        description=u"The notfound view callable",
-        required=True,
-        )
-
-class IForbiddenViewDirective(Interface):
-    view = GlobalObject(
-        title=u"",
-        description=u"The forbidden view callable",
-        required=True,
-        )
-
-class IRouteRequirementDirective(Interface):
-    """ The interface for the ``requirement`` route subdirective """
-    attr = TextLine(title=u'attr', required=True)
-    expr = TextLine(title=u'expression', required=True)
-
-class IScanDirective(Interface):
-    package = GlobalObject(
-        title=u"The package we'd like to scan.",
-        required=True,
-        )
+################# utility stuff ####################
 
 def zcml_configure(name, package):
     context = zope.configuration.config.ConfigurationMachine()
