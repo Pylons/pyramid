@@ -422,4 +422,9 @@ Glossary
     Using a renderer can make writing views that require templating or
     other serialization less tedious.  See
     :ref:`views_which_use_a_renderer` for more information.
+  mod_wsgi
+    `mod_wsgi <http://code.google.com/p/modwsgi/>`_ is an Apache
+    module developed by Graham Dumpleton.  It allows :term:`WSGI`
+    applications (such as applications developed using
+    :mod:`repoze.bfg`) to be served using the Apache web server.
 

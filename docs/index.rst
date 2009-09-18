@@ -106,6 +106,13 @@ SQLAlchemy + url dispatch Wiki tutorial, demonstrating how to build a
 
    tutorials/gae/index.rst
 
+:mod:`repoze.bfg` under :term:`mod_wsgi`
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorials/modwsgi/index.rst
+
 Change History
 ==============
 
