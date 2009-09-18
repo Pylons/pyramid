@@ -51,7 +51,7 @@ commands and files.
        $ cd projects/modwsgi
        $ /usr/local/bin/virtualenv --no-site-packages env
 
-#.  Install mod:`repoze.bfg` into the newly created virtualenv:
+#.  Install :mod:`repoze.bfg` into the newly created virtualenv:
 
     .. code-block:: bash
        :linenos:
