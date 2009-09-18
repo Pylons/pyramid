@@ -10,6 +10,8 @@ from repoze.bfg.settings import get_settings
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import ITemplateRenderer
 
+from repoze.bfg.resource import resource_spec
+
 try:
     import json
 except ImportError:
@@ -45,30 +47,23 @@ def template_renderer_factory(path, impl, level=3):
 
     else:
         # 'path' is a relative filename or a package:relpath spec
-        if ':' in path:
-            # it's a package:relpath spec
-            spec = path.split(':', 1)
-            utility_name = path
-        else:
-            # it's a relpath only
-            package = caller_package(level=level)
-            spec = (package.__name__, path) 
-            utility_name = '%s:%s' % spec # utility name must be a string
-        renderer = queryUtility(ITemplateRenderer, name=utility_name)
+        spec = resource_spec(path, caller_package(level=level).__name__)
+        renderer = queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
             # service unit tests here by trying the relative path
             # string as the utility name directly
             renderer = queryUtility(ITemplateRenderer, name=path)
+        pkg, path = spec.split(':', 1)
         if renderer is None:
-            if not pkg_resources.resource_exists(*spec):
-                raise ValueError('Missing template resource: %s' % utility_name)
-            abspath = pkg_resources.resource_filename(*spec)
+            if not pkg_resources.resource_exists(pkg, path):
+                raise ValueError('Missing template resource: %s' % spec)
+            abspath = pkg_resources.resource_filename(pkg, path)
             renderer = impl(abspath)
             if not _reload_resources():
                 # cache the template
                 sm = getSiteManager()
                 sm.registerUtility(renderer, ITemplateRenderer,
-                                   name=utility_name)
+                                   name=spec)
         
     return renderer
 

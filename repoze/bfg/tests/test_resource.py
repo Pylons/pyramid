@@ -340,6 +340,27 @@ class TestDirectoryOverride(unittest.TestCase):
         o = self._makeOne('foo/', 'package', 'bar/')
         result = o('baz/notfound.pt')
         self.assertEqual(result, None)
+
+class Test_resource_spec(unittest.TestCase):
+    def _callFUT(self, path, package):
+        from repoze.bfg.resource import resource_spec
+        return resource_spec(path, package)
+
+    def test_abspath(self):
+        import os
+        here = os.path.dirname(__file__)
+        path= os.path.abspath(here)
+        self.assertEqual(self._callFUT(path, 'apackage'), path)
+
+    def test_rel_spec(self):
+        pkg, path = 'repoze.bfg.tests', 'test_resource.py'
+        self.assertEqual(self._callFUT(path, pkg),
+                         'repoze.bfg.tests:test_resource.py')
+        
+    def test_abs_spec(self):
+        pkg, path = 'repoze.bfg.tests', 'repoze.bfg.nottests:test_resource.py'
+        self.assertEqual(self._callFUT(path, pkg),
+                         'repoze.bfg.nottests:test_resource.py')
         
 
 class TestFileOverride(unittest.TestCase):

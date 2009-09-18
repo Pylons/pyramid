@@ -1,3 +1,5 @@
+import os
+
 import pkg_resources
 from zope.component import queryUtility
 from zope.interface import implements
@@ -166,4 +168,11 @@ class FileOverride:
     def __call__(self, resource_name):
         if resource_name == self.path:
             return self.package, self.prefix
+
+def resource_spec(spec, package_name):
+    if os.path.isabs(spec):
+        return spec
+    if ':' in spec:
+        return spec
+    return '%s:%s' % (package_name, spec)
 

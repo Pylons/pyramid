@@ -39,6 +39,7 @@ from repoze.bfg.security import Unauthorized
 from repoze.bfg.settings import get_settings
 from repoze.bfg.static import PackageURLParser
 from repoze.bfg.renderers import renderer_from_name
+from repoze.bfg.resource import resource_spec
 
 try:
     all = all
@@ -188,13 +189,9 @@ class static(object):
         if os.path.isabs(root_dir):
             self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
             return
-        # not os.path.isabs below for windows systems
-        if (':' in root_dir) and (not os.path.isabs(root_dir)):
-            package_name, root_dir = root_dir.split(':', 1)
-        else:
-            if package_name is None:
-                package_name = caller_package().__name__
-
+        caller_package_name = caller_package().__name__
+        spec = resource_spec(root_dir, package_name or caller_package_name)
+        package_name, root_dir = spec.split(':', 1)
         self.app = PackageURLParser(package_name, root_dir,
                                     cache_max_age=cache_max_age)
 

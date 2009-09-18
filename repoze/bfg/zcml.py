@@ -43,6 +43,7 @@ from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.path import package_name
 
 from repoze.bfg.resource import PackageOverrides
+from repoze.bfg.resource import resource_spec
 
 from repoze.bfg.request import create_route_request_factory
 
@@ -159,11 +160,7 @@ def view(
         score = sys.maxint
 
     if renderer and '.' in renderer:
-        if  (not ':' in renderer) and (not os.path.isabs(renderer) ):
-            # if it's not a package:relative/name and it's not an
-            # /absolute/path it's a relative/path; this means its relative
-            # to the package in which the ZCML file is defined.
-            renderer = '%s:%s' % (package_name(_context.resolve('.')), renderer)
+        renderer = resource_spec(renderer, package_name(_context.resolve('.')))
 
     def register():
         derived_view = derive_view(view, permission, predicates, attr, renderer,
@@ -502,12 +499,7 @@ class IStaticDirective(Interface):
 def static(_context, name, path, cache_max_age=3600):
     """ Handle ``static`` ZCML directives
     """
-    if (not ':' in path) and (not os.path.isabs(path)):
-        # if it's not a package:relative/name and it's not an
-        # /absolute/path it's a relative/path; this means its relative
-        # to the package in which the ZCML file is defined.
-        path = '%s:%s' % (package_name(_context.resolve('.')), path)
-
+    path = resource_spec(path, package_name(_context.resolve('.')))
     view = static_view(path, cache_max_age=cache_max_age)
     route(_context, name, "%s*subpath" % name, view=view,
           view_for=StaticRootFactory, factory=StaticRootFactory(path))
