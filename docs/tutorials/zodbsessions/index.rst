@@ -19,6 +19,10 @@ sessioning to your application.
    ``repoze.session``-based sessions in applications that don't
    already use ZODB.  For this, see `the standalone repoze.session
    usage documentation <http://docs.repoze.org/session/usage.html>`_.
+   If you don't want to use ZODB to do sessioning, you might choose to
+   use a relational/filestorage sessioning system such as `Beaker
+   <http://pypi.python.org/pypi/Beaker>`_.  :mod:`repoze.bfg` is fully
+   compatible with this system too.
 
 Installing Dependencies
 -----------------------
