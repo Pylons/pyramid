@@ -113,6 +113,13 @@ SQLAlchemy + url dispatch Wiki tutorial, demonstrating how to build a
 
    tutorials/modwsgi/index.rst
 
+Using ZODB's :term:`ZEO` with :mod:`repoze.bfg`
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorials/zeo/index.rst
+
 Change History
 ==============
 

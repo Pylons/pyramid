@@ -4,6 +4,9 @@ Next release
 Documentation
 -------------
 
+- Added a tutorial which explains how to add ZEO to a ZODB-based
+  ``repoze.bfg`` application.
+
 - Added a tutorial which explains how to run a ``repoze.bfg``
   application under `mod_wsgi <http://code.google.com/p/modwsgi/>`_.
   See "Running a repoze.bfg Application under mod_wsgi" in the
