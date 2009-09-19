@@ -7,7 +7,7 @@ Sessions are server-side namespaces which are associated with a site
 user that expire automatically after some period of disuse.
 
 If your application is ZODB-based (e.g. you've created an application
-from the ``bfg_zodb`` paster template, or you've follow the
+from the ``bfg_zodb`` paster template, or you've followed the
 instructions in :ref:`zodb_with_zeo`), you can make use of the
 ``repoze.session`` and ``repoze.browserid`` packages to add
 sessioning to your application.
@@ -83,7 +83,9 @@ Configuration
       use = egg:repoze.browserid#browserid
       secret_key = my-secret-key
 
-   Replace "my-secret-key" with any random string.
+   Replace ``my-secret-key`` with any random string.  This string
+   represents the value which the client-side "browser id" cookie is
+   encrypted with, to prevent tampering.
 
    If a ``pipeline`` named ``main`` does not already exist in the
    paste ``.ini`` file , add a ``pipeline`` section named ``main``.
@@ -151,9 +153,9 @@ Configuration
            return session
 
     Note in the call to ``SessionDataManager`` that '3600' represents
-    the disuse timeout (5 minutes == 3600 seconds), and '5' above
-    represents a write granularity time (the session will be marked as
-    active at most every five seconds).  Vary these values as necessary.
+    the disuse timeout (5 minutes == 3600 seconds), and '5' represents
+    a write granularity time (the session will be marked as active at
+    most every five seconds).  Vary these values as necessary.
 
 #.  Whenever you want to use a session in your application, call this API:
 
