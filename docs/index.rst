@@ -120,6 +120,13 @@ Using ZODB's :term:`ZEO` with :mod:`repoze.bfg`
 
    tutorials/zeo/index.rst
 
+Using ZODB Sessions in :mod:`repoze.bfg`
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorials/zodbsessions/index.rst
+
 Change History
 ==============
 

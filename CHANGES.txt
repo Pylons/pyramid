@@ -4,6 +4,9 @@ Next release
 Documentation
 -------------
 
+- Added a tutorial which explains how to use ``repoze.session``
+  (ZODB-based sessions) in a ZODB-based repoze.bfg app.
+
 - Added a tutorial which explains how to add ZEO to a ZODB-based
   ``repoze.bfg`` application.
 

@@ -62,6 +62,9 @@ Installing Dependencies
    of this tutorial, we'll assume that your "application" is actually
    just the result of the ``bfg_starter`` Paster template.
 
+Configuration
+-------------
+
 #. Edit your application's Paste ``.ini`` file.
 
    If you already have an ``app`` section in the ``.ini`` file named
@@ -179,6 +182,9 @@ Installing Dependencies
                root['myapp'] = MyModel()
                transaction.commit()
            return root['myapp']
+
+Running
+-------
     
 #.  Start the ZEO server in a terminal with the current directory set
     to the package directory:
@@ -193,17 +199,17 @@ Installing Dependencies
     .. code-block:: bash
        :linenos:
 
-      [chrism@snowpro myapp]$ ../bin/runzeo -C zeo.conf 
-      ------
-      2009-09-19T13:48:41 INFO ZEO.runzeo (9910) created PID file './zeo.pid'
-      ------
-      2009-09-19T13:48:41 INFO ZEO.runzeo (9910) opening storage '1' using BlobStorage
-      ------
-      2009-09-19T13:48:41 WARNING ZODB.FileStorage Ignoring index for ./myapp.db
-      ------
-      2009-09-19T13:48:41 INFO ZEO.StorageServer (9910) StorageServer created RW with storages: 1:RW:./myapp.db
-      ------
-      2009-09-19T13:48:41 INFO ZEO.zrpc (9910) listening on ./zeo.sock
+       [chrism@snowpro myapp]$ ../bin/runzeo -C zeo.conf 
+       ------
+       2009-09-19T13:48:41 INFO ZEO.runzeo (9910) created PID file './zeo.pid'
+       ------
+       2009-09-19T13:48:41 INFO ZEO.runzeo (9910) opening storage '1' using BlobStorage
+       ------
+       2009-09-19T13:48:41 WARNING ZODB.FileStorage Ignoring index for ./myapp.db
+       ------
+       2009-09-19T13:48:41 INFO ZEO.StorageServer (9910) StorageServer created RW with storages: 1:RW:./myapp.db
+       ------
+       2009-09-19T13:48:41 INFO ZEO.zrpc (9910) listening on ./zeo.sock
 
 #.  While the ZEO server is running, start the application server:
 
@@ -217,8 +223,9 @@ Installing Dependencies
 #.  The root object is now a "folderish" ZODB object.  Nothing else
     about the application has changed.  
 
-#.  You can manipulate the database directly by using the ``bfgshell``
-    command in a separate terminal window:
+#.  You can manipulate the database directly (even when the
+    application's HTTP server is running) by using the ``bfgshell``
+    command in a third terminal window:
 
     .. code-block:: bash
        :linenos:
