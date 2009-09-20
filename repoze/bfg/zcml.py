@@ -596,8 +596,6 @@ def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
     multi_grokker = BFGMultiGrokker()
     multi_grokker.register(BFGViewGrokker())
-##     multi_grokker.register(BFGViewNewStyleClassGrokker())
-##     multi_grokker.register(BFGViewOldStyleClassGrokker())
     module_grokker = martian.ModuleGrokker(grokker=multi_grokker)
     martian.grok_dotted_name(package.__name__, grokker=module_grokker,
                              context=_context, exclude_filter=exclude)
