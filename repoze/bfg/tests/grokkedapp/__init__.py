@@ -29,6 +29,13 @@ class grokked_class(object):
         
 grokked_class = bfg_view(name='grokked_class')(grokked_class)
 
+class Foo(object):
+    def __call__(self, context, request):
+        return 'grokked_instance'
+
+grokked_instance = Foo()
+grokked_instance = bfg_view(name='grokked_instance')(grokked_instance)
+
 # ungrokkable
 
 A = 1

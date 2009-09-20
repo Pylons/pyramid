@@ -121,35 +121,47 @@ class TestGrokkedApp(unittest.TestCase):
 
         action = actions[-3]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another_grokked_class')
+        self.assertEqual(action[0][2], 'another_grokked_instance')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
         action = actions[-4]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another')
+        self.assertEqual(action[0][2], 'another_grokked_class')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
         action = actions[-5]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'oldstyle_grokked_class')
+        self.assertEqual(action[0][2], 'another')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
-        
+
         action = actions[-6]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], '')
+        self.assertEqual(action[0][2], 'oldstyle_grokked_class')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
         action = actions[-7]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'grokked_class')
+        self.assertEqual(action[0][2], '')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
         action = actions[-8]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'grokked_instance')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+
+        action = actions[-9]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'grokked_class')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+
+        action = actions[-10]
         self.assertEqual(action[0][1], None)
         self.assertEqual(action[0][2], '')
         self.assertEqual(action[0][3], IRequest)
@@ -170,6 +182,9 @@ class TestGrokkedApp(unittest.TestCase):
         result= render_view_to_response(ctx, req, 'grokked_class')
         self.assertEqual(result, 'grokked_class')
 
+        result= render_view_to_response(ctx, req, 'grokked_instance')
+        self.assertEqual(result, 'grokked_instance')
+
         result= render_view_to_response(ctx, req, 'oldstyle_grokked_class')
         self.assertEqual(result, 'oldstyle_grokked_class')
 
@@ -183,6 +198,9 @@ class TestGrokkedApp(unittest.TestCase):
 
         result= render_view_to_response(ctx, req, 'another_grokked_class')
         self.assertEqual(result, 'another_grokked_class')
+
+        result= render_view_to_response(ctx, req, 'another_grokked_instance')
+        self.assertEqual(result, 'another_grokked_instance')
 
         result= render_view_to_response(ctx, req,
                                         'another_oldstyle_grokked_class')

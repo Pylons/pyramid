@@ -1808,7 +1808,7 @@ class TestZCMLConfigure(unittest.TestCase):
         self.assertRaises(IOError, self._callFUT, 'configure.zcml',
                           self.module)
 
-class TestBFGViewFunctionGrokker(unittest.TestCase):
+class TestBFGViewGrokker(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -1816,8 +1816,8 @@ class TestBFGViewFunctionGrokker(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from repoze.bfg.zcml import BFGViewFunctionGrokker
-        return BFGViewFunctionGrokker
+        from repoze.bfg.zcml import BFGViewGrokker
+        return BFGViewGrokker
 
     def _makeOne(self, *arg, **kw):
         return self._getTargetClass()(*arg, **kw)
@@ -1881,7 +1881,7 @@ class TestZCMLScanDirective(unittest.TestCase):
         return scan(context, package, martian)
 
     def test_it(self):
-        from repoze.bfg.zcml import SimpleMultiGrokker
+        from repoze.bfg.zcml import BFGMultiGrokker
         from repoze.bfg.zcml import exclude
         martian = DummyMartianModule()
         module_grokker = DummyModuleGrokker()
@@ -1889,7 +1889,7 @@ class TestZCMLScanDirective(unittest.TestCase):
         self._callFUT(None, dummy_module, martian)
         self.assertEqual(martian.name, 'dummy')
         multi_grokker = martian.module_grokker.multi_grokker
-        self.assertEqual(multi_grokker.__class__, SimpleMultiGrokker)
+        self.assertEqual(multi_grokker.__class__, BFGMultiGrokker)
         self.assertEqual(martian.context, None)
         self.assertEqual(martian.exclude_filter, exclude)
 

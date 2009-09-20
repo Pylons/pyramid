@@ -594,17 +594,27 @@ class IScanDirective(Interface):
 
 def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
-    multi_grokker = SimpleMultiGrokker()
-    multi_grokker.register(BFGViewFunctionGrokker())
-    multi_grokker.register(BFGViewNewStyleClassGrokker())
-    multi_grokker.register(BFGViewOldStyleClassGrokker())
+    multi_grokker = BFGMultiGrokker()
+    multi_grokker.register(BFGViewGrokker())
+##     multi_grokker.register(BFGViewNewStyleClassGrokker())
+##     multi_grokker.register(BFGViewOldStyleClassGrokker())
     module_grokker = martian.ModuleGrokker(grokker=multi_grokker)
     martian.grok_dotted_name(package.__name__, grokker=module_grokker,
                              context=_context, exclude_filter=exclude)
 
 ################# utility stuff ####################
 
-class BFGViewGrokker(object):
+class BFGViewMarker(object):
+    pass
+
+class BFGMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
+    def get_bases(self, obj):
+        if hasattr(obj, '__is_bfg_view__'):
+            return [BFGViewMarker]
+        return []
+
+class BFGViewGrokker(martian.InstanceGrokker):
+    martian.component(BFGViewMarker)
     def grok(self, name, obj, **kw):
         if hasattr(obj, '__is_bfg_view__'):
             permission = obj.__permission__
@@ -627,29 +637,10 @@ class BFGViewGrokker(object):
             return True
         return False
 
-class BFGViewFunctionGrokker(BFGViewGrokker, martian.InstanceGrokker):
-    martian.component(types.FunctionType)
-
-class BFGViewOldStyleClassGrokker(BFGViewGrokker, martian.InstanceGrokker):
-    martian.component(types.ClassType)
-
-class BFGViewNewStyleClassGrokker(BFGViewGrokker, martian.InstanceGrokker):
-    martian.component(type)
-
 def exclude(name):
     if name.startswith('.'):
         return True
     return False
-
-class SimpleMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
-    # this is an amalgam of martian.core.MultiInstanceGrokker and
-    # martian.core.MultiClassGrokker.
-    def get_bases(self, obj):
-        if type(obj) is types.ModuleType:
-            return []
-        if hasattr(obj, '__class__'):
-            return inspect.getmro(obj.__class__)
-        return [types.ClassType]
 
 class Uncacheable(object):
     """ Include in discriminators of actions which are not cacheable;
