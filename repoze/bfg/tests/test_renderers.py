@@ -149,9 +149,9 @@ class TestRendererFromName(unittest.TestCase):
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, path, level=4):
+    def _callFUT(self, path):
         from repoze.bfg.renderers import renderer_from_name
-        return renderer_from_name(path, level)
+        return renderer_from_name(path)
 
     def test_it(self):
         from repoze.bfg.interfaces import ITemplateRendererFactory
@@ -176,7 +176,7 @@ class Test_json_renderer_factory(unittest.TestCase):
 
     def test_it(self):
         renderer = self._callFUT(None)
-        result = renderer({'a':1})
+        result = renderer({'a':1}, {})
         self.assertEqual(result, '{"a": 1}')
 
 class Test_string_renderer_factory(unittest.TestCase):
@@ -187,19 +187,19 @@ class Test_string_renderer_factory(unittest.TestCase):
     def test_it_unicode(self):
         renderer = self._callFUT(None)
         value = unicode('La Pe\xc3\xb1a', 'utf-8')
-        result = renderer(value)
+        result = renderer(value, {})
         self.assertEqual(result, value)
                           
     def test_it_str(self):
         renderer = self._callFUT(None)
         value = 'La Pe\xc3\xb1a'
-        result = renderer(value)
+        result = renderer(value, {})
         self.assertEqual(result, value)
 
     def test_it_other(self):
         renderer = self._callFUT(None)
         value = None
-        result = renderer(value)
+        result = renderer(value, {})
         self.assertEqual(result, 'None')
 
 class DummyFactory:

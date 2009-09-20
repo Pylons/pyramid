@@ -35,8 +35,13 @@ class TextTemplateRenderer(object):
     def implementation(self):
         return self.template
     
-    def __call__(self, kw):
-        return self.template(**kw)
+    def __call__(self, value, system):
+        try:
+            system.update(value)
+        except TypeError:
+            raise ValueError('renderer was passed non-dictionary as value')
+        result = self.template(**system)
+        return result
 
 def get_renderer(path):
     """ Return a callable ``ITemplateRenderer`` object representing a
@@ -55,7 +60,7 @@ def render_template(path, **kw):
     path (may also be absolute) using the kwargs in ``*kw`` as
     top-level names and return a string."""
     renderer = renderer_factory(path)
-    return renderer(kw)
+    return renderer(kw, {})
 
 def render_template_to_response(path, **kw):
     """ Render a ``chameleon`` text template at the package-relative
@@ -63,6 +68,6 @@ def render_template_to_response(path, **kw):
     top-level names and return a Response object with the body as the
     template result."""
     renderer = renderer_factory(path)
-    result = renderer(kw)
+    result = renderer(kw, {})
     response_factory = queryUtility(IResponseFactory, default=Response)
     return response_factory(result)

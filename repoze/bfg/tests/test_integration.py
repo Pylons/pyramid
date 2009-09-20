@@ -39,7 +39,7 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.zcml import scan
-        context = DummyContext()
+        context = DummyZCMLContext()
         from repoze.bfg.tests import test_integration
         scan(context, test_integration)
         actions = context.actions
@@ -99,39 +99,96 @@ class TestGrokkedApp(unittest.TestCase):
         cleanUp()
 
     def test_it(self):
-        import inspect
+        from repoze.bfg.view import render_view_to_response
+        from zope.interface import directlyProvides
+        from repoze.bfg.zcml import zcml_configure
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRequest
         import repoze.bfg.tests.grokkedapp as package
-        from zope.configuration import config
-        from zope.configuration import xmlconfig
-        context = config.ConfigurationMachine()
-        xmlconfig.registerCommonDirectives(context)
-        context.package = package
-        xmlconfig.include(context, 'configure.zcml', package)
-        actions = context.actions
+        actions = zcml_configure('configure.zcml', package)
 
-        postview = actions[-1]
-        self.assertEqual(postview[0][1], None)
-        self.assertEqual(postview[0][2], '')
-        self.assertEqual(postview[0][3], IRequest)
-        self.assertEqual(postview[0][4], IView)
+        action = actions[-1]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'another_oldstyle_grokked_class')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
         
-        klassview = actions[-2]
-        self.assertEqual(klassview[0][1], None)
-        self.assertEqual(klassview[0][2], 'grokked_klass')
-        self.assertEqual(klassview[0][3], IRequest)
-        self.assertEqual(klassview[0][4], IView)
-        self.failUnless(inspect.isfunction(package.grokked_klass))
-        self.assertEqual(package.grokked_klass(None, None), None)
+        action = actions[-2]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'another')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
 
-        funcview = actions[-3]
-        self.assertEqual(funcview[0][1], None)
-        self.assertEqual(funcview[0][2], '')
-        self.assertEqual(funcview[0][3], IRequest)
-        self.assertEqual(funcview[0][4], IView)
+        action = actions[-3]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'another_grokked_class')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
 
-class DummyContext:
+        action = actions[-4]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'another')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+
+        action = actions[-5]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'oldstyle_grokked_class')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+        
+        action = actions[-6]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], '')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+
+        action = actions[-7]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'grokked_class')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+
+        action = actions[-8]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], '')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+
+        ctx = DummyContext()
+        req = DummyRequest()
+        directlyProvides(req, IRequest)
+
+        req.method = 'GET'
+        result = render_view_to_response(ctx, req, '')
+        self.assertEqual(result, 'grokked')
+
+        req.method = 'POST'
+        result = render_view_to_response(ctx, req, '')
+        self.assertEqual(result, 'grokked_post')
+
+        result= render_view_to_response(ctx, req, 'grokked_class')
+        self.assertEqual(result, 'grokked_class')
+
+        result= render_view_to_response(ctx, req, 'oldstyle_grokked_class')
+        self.assertEqual(result, 'oldstyle_grokked_class')
+
+        req.method = 'GET'
+        result = render_view_to_response(ctx, req, 'another')
+        self.assertEqual(result, 'another_grokked')
+
+        req.method = 'POST'
+        result = render_view_to_response(ctx, req, 'another')
+        self.assertEqual(result, 'another_grokked_post')
+
+        result= render_view_to_response(ctx, req, 'another_grokked_class')
+        self.assertEqual(result, 'another_grokked_class')
+
+        result= render_view_to_response(ctx, req,
+                                        'another_oldstyle_grokked_class')
+        self.assertEqual(result, 'another_oldstyle_grokked_class')
+
+class DummyContext(object):
     pass
 
 class DummyRequest:
@@ -141,7 +198,7 @@ class DummyRequest:
     def get_response(self, application):
         return application(None, None)
 
-class DummyContext:
+class DummyZCMLContext:
     def __init__(self):
         self.actions = []
         self.info = None

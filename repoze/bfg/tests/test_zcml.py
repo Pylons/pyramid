@@ -1845,6 +1845,8 @@ class TestBFGViewFunctionGrokker(unittest.TestCase):
         obj.__attr__ = None
         obj.__template__ = None
         obj.__wrapper_viewname__ = None
+        obj.__renderer__ = None
+        obj.__attr__ = None
         context = DummyContext()
         result = grokker.grok('name', obj, context=context)
         self.assertEqual(result, True)
@@ -1879,13 +1881,15 @@ class TestZCMLScanDirective(unittest.TestCase):
         return scan(context, package, martian)
 
     def test_it(self):
+        from repoze.bfg.zcml import SimpleMultiGrokker
+        from repoze.bfg.zcml import exclude
         martian = DummyMartianModule()
         module_grokker = DummyModuleGrokker()
         dummy_module = DummyModule()
-        from repoze.bfg.zcml import exclude
         self._callFUT(None, dummy_module, martian)
         self.assertEqual(martian.name, 'dummy')
-        self.assertEqual(len(martian.module_grokker.registered), 1)
+        multi_grokker = martian.module_grokker.multi_grokker
+        self.assertEqual(multi_grokker.__class__, SimpleMultiGrokker)
         self.assertEqual(martian.context, None)
         self.assertEqual(martian.exclude_filter, exclude)
 
@@ -1910,11 +1914,8 @@ class DummyModule:
     __file__ = ''
 
 class DummyModuleGrokker:
-    def __init__(self):
-        self.registered = []
-        
-    def register(self, other):
-        self.registered.append(other)
+    def __init__(self, grokker=None):
+        self.multi_grokker = grokker
         
 class DummyMartianModule:
     def grok_dotted_name(self, name, grokker, context, exclude_filter=None):
@@ -1923,8 +1924,8 @@ class DummyMartianModule:
         self.exclude_filter = exclude_filter
         return True
 
-    def ModuleGrokker(self):
-        self.module_grokker = DummyModuleGrokker()
+    def ModuleGrokker(self, grokker=None):
+        self.module_grokker = DummyModuleGrokker(grokker)
         return self.module_grokker
 
 class DummyContext:

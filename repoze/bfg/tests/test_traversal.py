@@ -971,6 +971,11 @@ class UnderTraverseTests(unittest.TestCase):
         from zope.interface import Interface
         gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
 
+    def test_default_traverser_factory(self):
+        context = DummyContext()
+        result = self._callFUT(context, {})
+        self.assertEqual(result['view_name'], '')
+
     def test_isdict(self):
         traverser = make_traverser({})
         self._registerTraverserFactory(traverser)

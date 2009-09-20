@@ -75,10 +75,17 @@ class ITraverserFactory(Interface):
         """ Return an object that implements ITraverser """
 
 class IRenderer(Interface):
-    def __call__(value):
+    def __call__(value, system):
         """ Call a the renderer implementation with the result of the
         view (``value``) passed in and return a result (a string or
-        unicode object useful as a response body)"""
+        unicode object useful as a response body).  Values computed by
+        the system are passed by the system in the ``system``
+        parameter, which is a dictionary.  Keys in the dictionary
+        include: ``view`` (the view object that returned the value),
+        ``renderer_name`` (the template name or simple name of the
+        renderer), ``context`` (the context object passed to the
+        view), and ``request`` (the request object passed to the
+        view)."""
 
 class IRendererFactory(Interface):
     def __call__(name):

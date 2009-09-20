@@ -2,6 +2,7 @@ import re
 import urllib
 
 from zope.component import queryMultiAdapter
+from zope.component import queryAdapter
 
 from zope.interface import classProvides
 from zope.interface import implements
@@ -272,7 +273,9 @@ def traverse(model, path):
 
 def _traverse(model, environ, traverser=None):
     if traverser is None:
-        traverser = ITraverserFactory(model)
+        traverser = queryAdapter(model, ITraverserFactory)
+        if traverser is None:
+            traverser = ModelGraphTraverser(model)
 
     result = traverser(environ)
 

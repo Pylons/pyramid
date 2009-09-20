@@ -11,16 +11,9 @@ class Base:
             os.unlink(self._getTemplatePath('minimal.txt.py'))
         except:
             pass
-            
 
     def tearDown(self):
         cleanUp()
-
-    def _zcmlConfigure(self):
-        import repoze.bfg.includes
-        import zope.configuration.xmlconfig
-        zope.configuration.xmlconfig.file('configure.zcml',
-                                          package=repoze.bfg.includes)
 
     def _getTemplatePath(self, name):
         import os
@@ -48,23 +41,25 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
     def test_call(self):
-        self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.txt')
         instance = self._makeOne(minimal)
-        result = instance({})
+        result = instance({}, {})
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello.\n')
 
+    def test_call_with_nondict_value(self):
+        minimal = self._getTemplatePath('minimal.txt')
+        instance = self._makeOne(minimal)
+        self.assertRaises(ValueError, instance, None, {})
+
     def test_call_nonminimal(self):
-        self._zcmlConfigure()
         nonminimal = self._getTemplatePath('nonminimal.txt')
         instance = self._makeOne(nonminimal)
-        result = instance({'name':'Chris'})
+        result = instance({'name':'Chris'}, {})
         self.failUnless(isinstance(result, str))
         self.assertEqual(result, 'Hello, Chris!\n')
 
     def test_implementation(self):
-        self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.txt')
         instance = self._makeOne(minimal)
         result = instance.implementation()()
@@ -77,7 +72,6 @@ class RenderTemplateTests(Base, unittest.TestCase):
         return render_template(name, **kw)
 
     def test_it(self):
-        self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
         self.failUnless(isinstance(result, str))
@@ -89,7 +83,6 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         return render_template_to_response(name, **kw)
 
     def test_minimal(self):
-        self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
         from webob import Response
@@ -165,7 +158,6 @@ class GetTemplateTests(unittest.TestCase, Base):
         return get_template(name)
 
     def test_nonabs_registered(self):
-        self._zcmlConfigure()
         from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.chameleon_text import TextTemplateRenderer
@@ -179,7 +171,6 @@ class GetTemplateTests(unittest.TestCase, Base):
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
         
     def test_nonabs_unregistered(self):
-        self._zcmlConfigure()
         from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.chameleon_text import TextTemplateRenderer

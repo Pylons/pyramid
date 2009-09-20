@@ -19,12 +19,12 @@ except ImportError:
 # concrete renderer factory implementations
 
 def json_renderer_factory(name):
-    def _render(value):
+    def _render(value, system):
         return json.dumps(value)
     return _render
 
 def string_renderer_factory(name):
-    def _render(value):
+    def _render(value, system):
         if not isinstance(value, basestring):
             value = str(value)
         return value
@@ -49,11 +49,11 @@ def template_renderer_factory(path, impl, level=3):
         spec = resource_spec(path, caller_package(level=level).__name__)
         renderer = queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
-            # service unit tests here by trying the relative path
-            # string as the utility name directly
+            # service unit tests by trying the relative path string as
+            # the utility name directly
             renderer = queryUtility(ITemplateRenderer, name=path)
-        pkg, path = spec.split(':', 1)
         if renderer is None:
+            pkg, path = spec.split(':', 1)
             if not pkg_resources.resource_exists(pkg, path):
                 raise ValueError('Missing template resource: %s' % spec)
             abspath = pkg_resources.resource_filename(pkg, path)
@@ -66,7 +66,7 @@ def template_renderer_factory(path, impl, level=3):
         
     return renderer
 
-def renderer_from_name(path, level=4):
+def renderer_from_name(path):
     name = os.path.splitext(path)[1]
     if not name:
         name = path

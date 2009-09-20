@@ -270,7 +270,7 @@ class DummyTemplateRenderer:
             return self(kw)
         return callit
     
-    def __call__(self, kw):
+    def __call__(self, kw, system=None):
         self._received.update(kw)
         return self.string_response
 

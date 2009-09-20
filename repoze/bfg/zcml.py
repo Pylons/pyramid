@@ -1,3 +1,4 @@
+import inspect
 import sys
 import types
 
@@ -20,6 +21,7 @@ from zope.schema import Int
 from zope.schema import TextLine
 
 import martian
+import martian.core
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -557,20 +559,6 @@ def renderer(_context, factory, name=''):
     sm.registerUtility(factory, IRendererFactory, name=name)
     _context.action(discriminator=(IRendererFactory, name))
 
-class IScanDirective(Interface):
-    package = GlobalObject(
-        title=u"The package we'd like to scan.",
-        required=True,
-        )
-
-def scan(_context, package, martian=martian):
-    # martian overrideable only for unit tests
-    module_grokker = martian.ModuleGrokker()
-    module_grokker.register(BFGViewFunctionGrokker())
-    martian.grok_dotted_name(package.__name__, grokker=module_grokker,
-                             context=_context, exclude_filter=exclude)
-
-
 class IStaticDirective(Interface):
     name = TextLine(
         title=u"The URL prefix of the static view",
@@ -598,21 +586,25 @@ def static(_context, name, path, cache_max_age=3600):
     route(_context, name, "%s*subpath" % name, view=view,
           view_for=StaticRootFactory, factory=StaticRootFactory(path))
 
+class IScanDirective(Interface):
+    package = GlobalObject(
+        title=u"The package we'd like to scan.",
+        required=True,
+        )
+
+def scan(_context, package, martian=martian):
+    # martian overrideable only for unit tests
+    multi_grokker = SimpleMultiGrokker()
+    multi_grokker.register(BFGViewFunctionGrokker())
+    multi_grokker.register(BFGViewNewStyleClassGrokker())
+    multi_grokker.register(BFGViewOldStyleClassGrokker())
+    module_grokker = martian.ModuleGrokker(grokker=multi_grokker)
+    martian.grok_dotted_name(package.__name__, grokker=module_grokker,
+                             context=_context, exclude_filter=exclude)
+
 ################# utility stuff ####################
 
-def zcml_configure(name, package):
-    context = zope.configuration.config.ConfigurationMachine()
-    xmlconfig.registerCommonDirectives(context)
-    context.package = package
-    xmlconfig.include(context, name, package)
-    context.execute_actions(clear=False)
-    return context.actions
-
-file_configure = zcml_configure # backwards compat (>0.8.1)
-
-class BFGViewFunctionGrokker(martian.InstanceGrokker):
-    martian.component(types.FunctionType)
-
+class BFGViewGrokker(object):
     def grok(self, name, obj, **kw):
         if hasattr(obj, '__is_bfg_view__'):
             permission = obj.__permission__
@@ -624,21 +616,52 @@ class BFGViewFunctionGrokker(martian.InstanceGrokker):
             request_param = obj.__request_param__
             containment = obj.__containment__
             wrapper = obj.__wrapper_viewname__
+            attr = obj.__attr__
+            renderer = obj.__renderer__
             context = kw['context']
             view(context, permission=permission, for_=for_,
                  view=obj, name=name, request_type=request_type,
                  route_name=route_name, request_method=request_method,
                  request_param=request_param, containment=containment,
-                 wrapper=wrapper)
+                 attr=attr, renderer=renderer, wrapper=wrapper)
             return True
         return False
+
+class BFGViewFunctionGrokker(BFGViewGrokker, martian.InstanceGrokker):
+    martian.component(types.FunctionType)
+
+class BFGViewOldStyleClassGrokker(BFGViewGrokker, martian.InstanceGrokker):
+    martian.component(types.ClassType)
+
+class BFGViewNewStyleClassGrokker(BFGViewGrokker, martian.InstanceGrokker):
+    martian.component(type)
 
 def exclude(name):
     if name.startswith('.'):
         return True
     return False
 
+class SimpleMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
+    # this is an amalgam of martian.core.MultiInstanceGrokker and
+    # martian.core.MultiClassGrokker.
+    def get_bases(self, obj):
+        if type(obj) is types.ModuleType:
+            return []
+        if hasattr(obj, '__class__'):
+            return inspect.getmro(obj.__class__)
+        return [types.ClassType]
+
 class Uncacheable(object):
     """ Include in discriminators of actions which are not cacheable;
     this class only exists for backwards compatibility (<0.8.1)"""
+
+def zcml_configure(name, package):
+    context = zope.configuration.config.ConfigurationMachine()
+    xmlconfig.registerCommonDirectives(context)
+    context.package = package
+    xmlconfig.include(context, name, package)
+    context.execute_actions(clear=False)
+    return context.actions
+
+file_configure = zcml_configure # backwards compat (>0.8.1)
 

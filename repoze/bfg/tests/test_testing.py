@@ -65,7 +65,7 @@ class TestTestingFunctions(unittest.TestCase):
 
     def test_registerTemplateRenderer_explicitrenderer(self):
         from repoze.bfg import testing
-        def renderer(kw):
+        def renderer(kw, system):
             raise ValueError
         renderer = testing.registerTemplateRenderer('templates/foo', renderer)
         from repoze.bfg.chameleon_zpt import render_template_to_response

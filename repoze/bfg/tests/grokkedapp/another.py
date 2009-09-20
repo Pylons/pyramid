@@ -1,12 +1,12 @@
 from repoze.bfg.view import bfg_view
 
-@bfg_view()
+@bfg_view(name='another')
 def grokked(context, request):
-    return 'grokked'
+    return 'another_grokked'
 
-@bfg_view(request_method='POST')
+@bfg_view(request_method='POST', name='another')
 def grokked_post(context, request):
-    return 'grokked_post'
+    return 'another_grokked_post'
     
 class oldstyle_grokked_class:
     def __init__(self, context, request):
@@ -14,9 +14,9 @@ class oldstyle_grokked_class:
         self.request = request
 
     def __call__(self):
-        return 'oldstyle_grokked_class'
+        return 'another_oldstyle_grokked_class'
     
-oldstyle_grokked_class = bfg_view(name='oldstyle_grokked_class')(
+oldstyle_grokked_class = bfg_view(name='another_oldstyle_grokked_class')(
     oldstyle_grokked_class)
 
 class grokked_class(object):
@@ -25,9 +25,9 @@ class grokked_class(object):
         self.request = request
 
     def __call__(self):
-        return 'grokked_class'
+        return 'another_grokked_class'
         
-grokked_class = bfg_view(name='grokked_class')(grokked_class)
+grokked_class = bfg_view(name='another_grokked_class')(grokked_class)
 
 # ungrokkable
 

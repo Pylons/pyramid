@@ -31,6 +31,28 @@ Features
   ``view_renderer`` parameters (bring up to speed with 1.1a3
   features).  These can also be spelled as ``attr`` and ``renderer``.
 
+Backwards Incompatibilities
+---------------------------
+
+- An object implementing the ``IRenderer`` interface (and
+  ``ITemplateRenderer`, which is a subclass of ``IRenderer``) must now
+  accept an extra ``system`` argument in its ``__call__`` method
+  implementation.  Values computed by the system (as opposed to by the
+  view) are passed by the system in the ``system`` parameter, which
+  will always be a dictionary.  Keys in the dictionary include:
+  ``view`` (the view object that returned the value),
+  ``renderer_name`` (the template name or simple name of the
+  renderer), ``context`` (the context object passed to the view), and
+  ``request`` (the request object passed to the view).  Previously
+  only ITemplateRenderers received system arguments as elements inside
+  the main ``value`` dictionary.
+
+Internal
+--------
+
+- The way ``bfg_view`` declarations are scanned for has been modified.
+  This should have no external effects.
+
 - Speed: do not register an ITraverserFactory in configure.zcml;
   instead rely on queryAdapter and a manual default to
   ModelGraphTraverser.
@@ -40,6 +62,7 @@ Features
 
 - General speed microimprovements for helloworld benchmark: replace
   try/excepts with statements which use 'in' keyword.
+
 
 1.1a3 (2009-09-16)
 ==================
@@ -115,12 +138,15 @@ Backwards Incompatibilities
 
 - The ``ITemplateRenderer`` interface has been changed.  Previously
   its ``__call__`` method accepted ``**kw``.  It now accepts a single
-  positional parameter named ``kw``.  This is mostly an internal
-  change, but it was exposed in APIs in one place: if you've used the
+  positional parameter named ``kw`` (REVISED: it accepts two
+  positional parameters as of 1.1a4: ``value`` and ``system``).  This
+  is mostly an internal change, but it was exposed in APIs in one
+  place: if you've used the
   ``repoze.bfg.testing.registerDummyRenderer`` API in your tests with
   a custom "renderer" argument with your own renderer implementation,
   you will need to change that renderer implementation to accept
-  ``kw`` instead of ``**kw`` in its ``__call__`` method.
+  ``kw`` instead of ``**kw`` in its ``__call__`` method (REVISED: make
+  it accept ``value`` and ``system`` positional arguments as of 1.1a4).
 
 - The ``ITemplateRendererFactory`` interface has been changed.
   Previously its ``__call__`` method accepted an ``auto_reload``

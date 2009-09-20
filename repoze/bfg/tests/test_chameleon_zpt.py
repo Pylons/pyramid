@@ -9,12 +9,6 @@ class Base(object):
     def tearDown(self):
         cleanUp()
 
-    def _zcmlConfigure(self):
-        import repoze.bfg.includes
-        import zope.configuration.xmlconfig
-        zope.configuration.xmlconfig.file('configure.zcml',
-                                          package=repoze.bfg.includes)
-
     def _getTemplatePath(self, name):
         import os
         here = os.path.abspath(os.path.dirname(__file__))
@@ -41,16 +35,19 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
     def test_call(self):
-        self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.pt')
         instance = self._makeOne(minimal)
-        result = instance({})
+        result = instance({}, {})
         self.failUnless(isinstance(result, unicode))
         self.assertEqual(result,
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
+    def test_call_with_nondict_value(self):
+        minimal = self._getTemplatePath('minimal.pt')
+        instance = self._makeOne(minimal)
+        self.assertRaises(ValueError, instance, None, {})
+
     def test_implementation(self):
-        self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.pt')
         instance = self._makeOne(minimal)
         result = instance.implementation()()
@@ -65,7 +62,6 @@ class RenderTemplateTests(Base, unittest.TestCase):
         return render_template(name, **kw)
 
     def test_it(self):
-        self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
         self.failUnless(isinstance(result, unicode))
@@ -78,7 +74,6 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         return render_template_to_response(name, **kw)
 
     def test_it(self):
-        self._zcmlConfigure()
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
         from webob import Response
@@ -149,7 +144,6 @@ class GetTemplateTests(Base, unittest.TestCase):
         return get_template(name)
 
     def test_nonabs_registered(self):
-        self._zcmlConfigure()
         from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.chameleon_zpt import ZPTTemplateRenderer
@@ -163,7 +157,6 @@ class GetTemplateTests(Base, unittest.TestCase):
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
         
     def test_nonabs_unregistered(self):
-        self._zcmlConfigure()
         from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.chameleon_zpt import ZPTTemplateRenderer

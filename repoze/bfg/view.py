@@ -357,7 +357,7 @@ class bfg_view(object):
         self.wrapper_viewname = wrapper
 
     def __call__(self, wrapped):
-        _bfg_view = map_view(wrapped, self.attr, self.renderer)
+        _bfg_view = wrapped #map_view(wrapped, self.attr, self.renderer)
         _bfg_view.__is_bfg_view__ = True
         _bfg_view.__permission__ = self.permission
         _bfg_view.__for__ = self.for_
@@ -368,6 +368,8 @@ class bfg_view(object):
         _bfg_view.__request_param__ = self.request_param
         _bfg_view.__containment__ = self.containment
         _bfg_view.__wrapper_viewname__ = self.wrapper_viewname
+        _bfg_view.__attr__ = self.attr
+        _bfg_view.__renderer__ = self.renderer
         return _bfg_view
 
 def default_view(context, request, status):
@@ -438,20 +440,12 @@ class MultiView(object):
                 continue
         raise NotFound(self.name)
 
-def rendered_response(renderer_name, response, view, context, request):
-    if is_response(response):
+def rendered_response(renderer, response, view, context,request, renderer_name):
+    if ( hasattr(response, 'app_iter') and hasattr(response, 'headerlist') and
+         hasattr(response, 'status') ):
         return response
-    renderer = renderer_from_name(renderer_name)
-    if ITemplateRenderer.providedBy(renderer):
-        kw = {'view':view, 'template_name':renderer_name, 'context':context,
-              'request':request}
-        try:
-            kw.update(response)
-        except TypeError:
-            return response
-        result = renderer(kw)
-    else:
-        result = renderer(response)
+    result = renderer(response, {'view':view, 'renderer_name':renderer_name,
+                                 'context':context, 'request':request})
     response_factory = queryUtility(IResponseFactory, default=Response)
     response = response_factory(result)
     attrs = request.environ.get('webob.adhoc_attrs', {})
@@ -473,12 +467,18 @@ def rendered_response(renderer_name, response, view, context, request):
         response.cache_expires = cache_for
     return response
 
-def map_view(view, attr=None, renderer=None):
+def map_view(view, attr=None, renderer_name=None):
     wrapped_view = view
 
-    if renderer is None:
-        if queryUtility(IRendererFactory) is not None: # default renderer
-            renderer = ''
+    renderer = None
+
+    if renderer_name is None:
+        factory = queryUtility(IRendererFactory) # global default renderer
+        if factory is not None:
+            renderer_name = ''
+            renderer = factory(renderer_name)
+    else:
+        renderer = renderer_from_name(renderer_name)
 
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
@@ -497,8 +497,10 @@ def map_view(view, attr=None, renderer=None):
                 else:
                     response = getattr(inst, attr)()
                 if renderer is not None:
-                    response = rendered_response(renderer, response, inst,
-                                                  context, request)
+                    response = rendered_response(renderer, 
+                                                 response, inst,
+                                                 context, request,
+                                                 renderer_name)
                 return response
             wrapped_view = _bfg_class_requestonly_view
         else:
@@ -510,8 +512,10 @@ def map_view(view, attr=None, renderer=None):
                 else:
                     response = getattr(inst, attr)()
                 if renderer is not None:
-                    response = rendered_response(renderer, response, inst,
-                                                 context, request)
+                    response = rendered_response(renderer, 
+                                                 response, inst,
+                                                 context, request,
+                                                 renderer_name)
                 return response
             wrapped_view = _bfg_class_view
 
@@ -525,8 +529,10 @@ def map_view(view, attr=None, renderer=None):
                 response = getattr(view, attr)(request)
 
             if renderer is not None:
-                response = rendered_response(renderer, response, view,
-                                             context, request)
+                response = rendered_response(renderer,
+                                             response, view,
+                                             context, request,
+                                             renderer_name)
             return response
         wrapped_view = _bfg_requestonly_view
 
@@ -534,16 +540,20 @@ def map_view(view, attr=None, renderer=None):
         def _bfg_attr_view(context, request):
             response = getattr(view, attr)(context, request)
             if renderer is not None:
-                response = rendered_response(renderer, response, view,
-                                             context, request)
+                response = rendered_response(renderer, 
+                                             response, view,
+                                             context, request,
+                                             renderer_name)
             return response
         wrapped_view = _bfg_attr_view
 
     elif renderer is not None:
         def _rendered_view(context, request):
             response = view(context, request)
-            response = rendered_response(renderer, response, view,
-                                         context, request)
+            response = rendered_response(renderer, 
+                                         response, view,
+                                         context, request,
+                                         renderer_name)
             return response
         wrapped_view = _rendered_view
 
@@ -617,8 +627,8 @@ def decorate_view(wrapped_view, original_view):
     return False
 
 def derive_view(original_view, permission=None, predicates=(), attr=None,
-                renderer=None, wrapper_viewname=None, viewname=None):
-    mapped_view = map_view(original_view, attr, renderer)
+                renderer_name=None, wrapper_viewname=None, viewname=None):
+    mapped_view = map_view(original_view, attr, renderer_name)
     owrapped_view = owrap_view(mapped_view, viewname, wrapper_viewname)
     secured_view = secure_view(owrapped_view, permission)
     debug_view = authdebug_view(secured_view, permission)
