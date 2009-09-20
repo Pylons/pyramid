@@ -178,7 +178,6 @@ def model_url(model, request, *elements, **kw):
     
     context_url = queryMultiAdapter((model, request), IContextURL)
     if context_url is None:
-        # b/w compat for unit tests
         context_url = TraversalContextURL(model, request)
     model_url = context_url()
 

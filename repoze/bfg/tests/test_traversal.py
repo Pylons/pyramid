@@ -848,7 +848,7 @@ class TestVirtualRoot(unittest.TestCase):
         from repoze.bfg.traversal import virtual_root
         return virtual_root(model, request)
 
-    def test_it(self):
+    def test_registered(self):
         from zope.component import getGlobalSiteManager
         from repoze.bfg.interfaces import IContextURL
         from zope.interface import Interface
@@ -859,6 +859,13 @@ class TestVirtualRoot(unittest.TestCase):
         request = DummyRequest()
         result = self._callFUT(context, request)
         self.assertEqual(result, '123')
+
+    def test_default(self):
+        context = DummyContext()
+        request = DummyRequest()
+        request.environ['PATH_INFO'] = '/'
+        result = self._callFUT(context, request)
+        self.assertEqual(result, context)
 
 class TraverseTests(unittest.TestCase):
     def setUp(self):

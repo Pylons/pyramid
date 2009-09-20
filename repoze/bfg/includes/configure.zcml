@@ -6,18 +6,6 @@
 
   <include file="meta.zcml" />
 
-  <adapter
-      provides="repoze.bfg.interfaces.ITraverserFactory"
-      factory="repoze.bfg.traversal.ModelGraphTraverser"
-      for="*"
-  />
-
-  <adapter
-      provides="repoze.bfg.interfaces.IContextURL"
-      factory="repoze.bfg.traversal.TraversalContextURL"
-      for="* repoze.bfg.interfaces.IRequest"
-  />
-
   <renderer
      factory="repoze.bfg.chameleon_zpt.renderer_factory"
      name=".pt"

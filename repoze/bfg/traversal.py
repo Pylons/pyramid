@@ -1,7 +1,7 @@
 import re
 import urllib
 
-from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
 
 from zope.interface import classProvides
 from zope.interface import implements
@@ -372,7 +372,9 @@ def virtual_root(model, request):
     is called with a ``model`` argument which is a context obtained
     via URL dispatch, the model passed in will be returned
     unconditonally."""
-    urlgenerator = getMultiAdapter((model, request), IContextURL)
+    urlgenerator = queryMultiAdapter((model, request), IContextURL)
+    if urlgenerator is None:
+        urlgenerator = TraversalContextURL(model, request)
     return urlgenerator.virtual_root()
 
 @lru_cache(1000)
@@ -519,16 +521,15 @@ class ModelGraphTraverser(object):
             except KeyError:
                 path = '/'
 
-        try:
+        if VH_ROOT_KEY in environ:
             vroot_path = environ[VH_ROOT_KEY]
-        except KeyError:
-            vroot_tuple = ()
-            vpath = path
-            vroot_idx = -1
-        else:
             vroot_tuple = traversal_path(vroot_path)
             vpath = vroot_path + path
             vroot_idx = len(vroot_tuple) -1
+        else:
+            vroot_tuple = ()
+            vpath = path
+            vroot_idx = -1
 
         ob = vroot = self.root
 
@@ -590,16 +591,16 @@ class TraversalContextURL(object):
         self.request = request
 
     def virtual_root(self):
+        environ = self.request.environ
+        vroot_varname = self.vroot_varname
+        if vroot_varname in environ:
+            return find_model(self.context, environ[vroot_varname])
+        # shortcut instead of using find_root; we probably already
+        # have it on the request
         try:
-            vroot_path = self.request.environ[self.vroot_varname]
-        except KeyError:
-            # shortcut instead of using find_root; we probably already
-            # have it on the request
-            try:
-                return self.request.root
-            except AttributeError:
-                return find_root(self.context)
-        return find_model(self.context, vroot_path)
+            return self.request.root
+        except AttributeError:
+            return find_root(self.context)
         
     def __call__(self):
         """ Generate a URL based on the lineage of a model obtained
@@ -614,17 +615,17 @@ class TraversalContextURL(object):
         if path != '/':
             path = path + '/'
         request = self.request
+        environ = request.environ
+        vroot_varname = self.vroot_varname
 
         # if the path starts with the virtual root path, trim it out
-        try:
-            vroot_path = request.environ[self.vroot_varname]
-        except KeyError:
-            pass
-        else:
+        if vroot_varname in environ:
+            vroot_path = environ[vroot_varname]
             if path.startswith(vroot_path):
                 path = path[len(vroot_path):]
 
         environ = request.environ
+
         if 'bfg.routes.route' in environ:
             route = environ['bfg.routes.route']
             matchdict = environ['bfg.routes.matchdict'].copy()

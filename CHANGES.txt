@@ -31,6 +31,16 @@ Features
   ``view_renderer`` parameters (bring up to speed with 1.1a3
   features).  These can also be spelled as ``attr`` and ``renderer``.
 
+- Speed: do not register an ITraverserFactory in configure.zcml;
+  instead rely on queryAdapter and a manual default to
+  ModelGraphTraverser.
+
+- Speed: do not register an IContextURL in configure.zcml; instead
+  rely on queryAdapter and a manual default to TraversalContextURL.
+
+- General speed microimprovements for helloworld benchmark: replace
+  try/excepts with statements which use 'in' keyword.
+
 1.1a3 (2009-09-16)
 ==================
 

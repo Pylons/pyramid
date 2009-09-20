@@ -137,6 +137,37 @@ class RouterTests(unittest.TestCase):
         from repoze.bfg.view import default_notfound_view
         self.assertEqual(router.notfound_view, default_notfound_view)
 
+    def test_call_traverser_default(self):
+        environ = self._makeEnviron()
+        context = DummyContext()
+        logger = self._registerLogger()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '404 Not Found')
+        self.failUnless('<code>/</code>' in result[0], result)
+        self.failIf('debug_notfound' in result[0])
+        self.assertEqual(len(logger.messages), 0)
+
+    def test_has_webob_adhoc_attrs(self):
+        environ = self._makeEnviron()
+        environ['webob.adhoc_attrs'] = {}
+        context = DummyContext()
+        logger = self._registerLogger()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '404 Not Found')
+        self.failUnless('<code>/</code>' in result[0], result)
+        self.failIf('debug_notfound' in result[0])
+        self.assertEqual(len(logger.messages), 0)
+
     def test_call_no_view_registered_no_isettings(self):
         environ = self._makeEnviron()
         context = DummyContext()

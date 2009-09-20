@@ -31,6 +31,7 @@ from repoze.bfg.security import Unauthorized
 from repoze.bfg.settings import Settings
 from repoze.bfg.settings import get_options
 from repoze.bfg.threadlocal import manager
+from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.traversal import _traverse
 from repoze.bfg.urldispatch import RoutesRootFactory
 from repoze.bfg.view import NotFound
@@ -79,7 +80,9 @@ class Router(object):
             request = request_factory(environ)
             threadlocals['request'] = request
             registry.has_listeners and registry.notify(NewRequest(request))
-            traverser = registry.getAdapter(root, ITraverserFactory)
+            traverser = registry.queryAdapter(root, ITraverserFactory)
+            if traverser is None:
+                traverser = ModelGraphTraverser(root)
             tdict = _traverse(root, environ, traverser=traverser)
             if '_deprecation_warning' in tdict:
                 warning = tdict.pop('_deprecation_warning')
@@ -94,8 +97,11 @@ class Router(object):
             # bottleneck; since we're sure we're using a
             # webob.Request, we can go around its back and set stuff
             # into the environ directly
-            attrs = environ.setdefault('webob.adhoc_attrs', {})
-            attrs.update(tdict)
+            if 'webob.adhoc_attrs' in environ:
+                attrs = environ.setdefault('webob.adhoc_attrs', {})
+                attrs.update(tdict)
+            else:
+                environ['webob.adhoc_attrs'] = tdict
 
             def respond(response, view_name):
                 registry.has_listeners and registry.notify(
@@ -111,7 +117,6 @@ class Router(object):
             provides = map(providedBy, (context, request))
             view_callable = registry.adapters.lookup(
                 provides, IView, name=view_name, default=None)
-            
 
             if view_callable is None:
                 if self.debug_notfound:
