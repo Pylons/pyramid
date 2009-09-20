@@ -10,34 +10,30 @@ class TestRoute(unittest.TestCase):
         return self._getTargetClass()(*arg)
 
     def test_ctor(self):
+        import types
         route = self._makeOne(':path', 'name', 'factory')
         self.assertEqual(route.path, ':path')
         self.assertEqual(route.name, 'name')
         self.assertEqual(route.factory, 'factory')
-        self.failUnless(route.generator)
-        self.failUnless(route.matcher)
+        self.failUnless(route.generate.__class__ is types.FunctionType)
+        self.failUnless(route.match.__class__ is types.FunctionType)
 
     def test_ctor_defaults(self):
+        import types
         route = self._makeOne(':path')
         self.assertEqual(route.path, ':path')
         self.assertEqual(route.name, None)
         self.assertEqual(route.factory, None)
-        self.failUnless(route.generator)
-        self.failUnless(route.matcher)
+        self.failUnless(route.generate.__class__ is types.FunctionType)
+        self.failUnless(route.match.__class__ is types.FunctionType)
 
     def test_match(self):
-        def matcher(path):
-            return 123
         route = self._makeOne(':path')
-        route.matcher = matcher
-        self.assertEqual(route.match('whatever'), 123)
+        self.assertEqual(route.match('/whatever'), {'path':'whatever'})
         
     def test_generate(self):
-        def generator(path):
-            return 123
         route = self._makeOne(':path')
-        route.generator = generator
-        self.assertEqual(route.generate({}), 123)
+        self.assertEqual(route.generate({'path':'abc'}), '/abc')
 
 class RoutesRootFactoryTests(unittest.TestCase):
     def setUp(self):

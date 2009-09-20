@@ -10,15 +10,9 @@ _marker = object()
 class Route(object):
     def __init__(self, path, name=None, factory=None):
         self.path = path
-        self.matcher, self.generator = _compile_route(path)
+        self.match, self.generate = _compile_route(path)
         self.name = name
         self.factory = factory
-
-    def match(self, path):
-        return self.matcher(path)
-
-    def generate(self, kw):
-        return self.generator(kw)
 
 class RoutesRootFactory(object):
     def __init__(self, default_root_factory):
@@ -42,7 +36,10 @@ class RoutesRootFactory(object):
         return self.routes[name].generate(kw)
 
     def __call__(self, environ):
-        path = environ.get('PATH_INFO', '/')
+        try:
+            path = environ['PATH_INFO']
+        except KeyError:
+            path = '/'
         for route in self.routelist:
             match = route.match(path)
             if match is not None:
