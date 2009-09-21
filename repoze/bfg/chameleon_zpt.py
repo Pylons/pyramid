@@ -27,7 +27,7 @@ class ZPTTemplateRenderer(object):
     def __call__(self, value, system):
         try:
             system.update(value)
-        except TypeError:
+        except (TypeError, ValueError):
             raise ValueError('renderer was passed non-dictionary as value')
         result = self.template(**system)
         return result
