@@ -110,6 +110,14 @@ class RoutesRootFactoryTests(unittest.TestCase):
         result = mapper(environ)
         self.assertEqual(result, 123)
 
+    def test_no_path_info(self):
+        root_factory = DummyRootFactory(123)
+        mapper = self._makeOne(root_factory)
+        mapper.connect('/', 'root')
+        environ = self._getEnviron()
+        result = mapper(environ)
+        self.assertEqual(result, 123)
+
     def test_has_routes(self):
         mapper = self._makeOne(None)
         self.assertEqual(mapper.has_routes(), False)

@@ -627,8 +627,6 @@ class TraversalContextURL(object):
             if path.startswith(vroot_path):
                 path = path[len(vroot_path):]
 
-        environ = request.environ
-
         if 'bfg.routes.route' in environ:
             route = environ['bfg.routes.route']
             matchdict = environ['bfg.routes.matchdict'].copy()
@@ -641,9 +639,9 @@ class TraversalContextURL(object):
                     (matchdict, str(why)))
             app_url = request.application_url
             return app_url + segments
-        else:
-            app_url = request.application_url # never ends in a slash
-            return app_url + path
+
+        app_url = request.application_url # never ends in a slash
+        return app_url + path
 
 always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                'abcdefghijklmnopqrstuvwxyz'
