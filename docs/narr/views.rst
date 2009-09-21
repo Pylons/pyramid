@@ -915,8 +915,8 @@ dictionary returned by the view are augumented.  The callable object
 automatically inserted into the set of keyword arguments passed to the
 template as the ``view`` keyword.  If the view callable was a class,
 the ``view`` keyword will be an instance of that class.  Also inserted
-into the keywords passed to the template are ``template_name`` (the
-name of the template, which may be a full path or a package-relative
+into the keywords passed to the template are ``renderer_name`` (the
+name of the renderer, which may be a full path or a package-relative
 name, typically the full string used in the ``renderer`` atttribute of
 the directive), ``context`` (the context of the view used to render
 the template), and ``request`` (the request passed to the view used to
@@ -1433,14 +1433,16 @@ a class which has the following interface:
        def __init__(self, name):
            """ Constructor: ``name`` may be a path """
 
-       def __call__(self, value): 
-           """ Call a the renderer implementation with the value
-           passed in as arguments and return the result (a string or
-           unicode object) """
+       def __call__(self, value, system): """ Call a the renderer
+           implementation with the value and the system value passed
+           in as arguments and return the result (a string or unicode
+           object).  The value is the return value of a view.  The
+           system value is a dictionary containing available system
+           values (e.g. ``view``, ``context``, and ``request``). """
 
-A renderer's ``name`` is the second element.  There are essentially
-two different kinds of ``renderer`` registrations with respect to the
-name:
+A renderer's ``name`` is the second element of a ``<renderer>`` tag.
+There are essentially two different kinds of ``renderer``
+registrations with respect to the name:
 
 - a ``renderer`` registration which has a ``name`` attribute which
   has a value that starts with a dot (``.``).
