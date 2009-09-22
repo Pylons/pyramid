@@ -105,65 +105,66 @@ class TestGrokkedApp(unittest.TestCase):
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRequest
         import repoze.bfg.tests.grokkedapp as package
-        actions = zcml_configure('configure.zcml', package)
+        actions = zcml_configure('configure.zcml', package)[-10:]
+        actions.sort()
 
-        action = actions[-1]
+        action = actions[0]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another_oldstyle_grokked_class')
+        self.assertEqual(action[0][2], '')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
         
-        action = actions[-2]
+        action = actions[1]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], '')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+
+        action = actions[2]
         self.assertEqual(action[0][1], None)
         self.assertEqual(action[0][2], 'another')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
-        action = actions[-3]
+        action = actions[3]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another_grokked_instance')
+        self.assertEqual(action[0][2], 'another')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
-        action = actions[-4]
+        action = actions[4]
         self.assertEqual(action[0][1], None)
         self.assertEqual(action[0][2], 'another_grokked_class')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
-        action = actions[-5]
+        action = actions[5]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another')
+        self.assertEqual(action[0][2], 'another_grokked_instance')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
-        action = actions[-6]
+        action = actions[6]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'oldstyle_grokked_class')
+        self.assertEqual(action[0][2], 'another_oldstyle_grokked_class')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
-        action = actions[-7]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], '')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
-
-        action = actions[-8]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'grokked_instance')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
-
-        action = actions[-9]
+        action = actions[7]
         self.assertEqual(action[0][1], None)
         self.assertEqual(action[0][2], 'grokked_class')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
-        action = actions[-10]
+        action = actions[8]
         self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], '')
+        self.assertEqual(action[0][2], 'grokked_instance')
+        self.assertEqual(action[0][3], IRequest)
+        self.assertEqual(action[0][4], IView)
+
+        action = actions[9]
+        self.assertEqual(action[0][1], None)
+        self.assertEqual(action[0][2], 'oldstyle_grokked_class')
         self.assertEqual(action[0][3], IRequest)
         self.assertEqual(action[0][4], IView)
 
