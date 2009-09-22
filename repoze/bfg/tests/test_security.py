@@ -134,7 +134,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         import zope.component
         gsm = zope.component.getGlobalSiteManager()
         from repoze.bfg.interfaces import ISettings
-        settings = DummySettings(debug_authorization=True)
+        settings = dict(debug_authorization=True)
         gsm.registerUtility(settings, ISettings)
         context = DummyContext()
         request = DummyRequest({})
@@ -345,8 +345,4 @@ class DummyAuthorizationPolicy:
 
     def principals_allowed_by_permission(self, context, permission):
         return self.result
-
-class DummySettings:
-    def __init__(self, **kw):
-        self.__dict__.update(kw)
 

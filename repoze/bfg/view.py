@@ -680,7 +680,9 @@ def authdebug_view(view, permission):
     authn_policy = queryUtility(IAuthenticationPolicy)
     authz_policy = queryUtility(IAuthorizationPolicy)
     settings = get_settings()
-    debug_authorization = getattr(settings, 'debug_authorization', False)
+    debug_authorization = False
+    if settings is not None:
+        debug_authorization = settings.get('debug_authorization', False)
     if debug_authorization:
         def _authdebug_view(context, request):
             view_name = getattr(request, 'view_name', None)

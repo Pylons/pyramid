@@ -1233,10 +1233,9 @@ class TestDeriveView(unittest.TestCase):
         sm.registerUtility(logger, ILogger, 'repoze.bfg.debug')
         return logger
 
-    def _registerSettings(self, **d):
+    def _registerSettings(self, **settings):
         from repoze.bfg.interfaces import ISettings
         from zope.component import getSiteManager
-        settings = DummySettings(d)
         sm = getSiteManager()
         sm.registerUtility(settings, ISettings)
 
@@ -1575,10 +1574,6 @@ class DummyLogger:
     warn = info
     debug = info
 
-class DummySettings(dict):
-    def __getattr__(self, name):
-        return self[name]
-    
 class DummySecurityPolicy:
     def __init__(self, permitted=True):
         self.permitted = permitted
