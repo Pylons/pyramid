@@ -48,18 +48,16 @@ class Router(object):
     threadlocal_manager = manager
 
     def __init__(self, registry):
+        q = registry.queryUtility
+        self.logger = q(ILogger, 'repoze.bfg.debug')
+        self.notfound_view = q(INotFoundView, default=default_notfound_view)
+        self.forbidden_view = q(IForbiddenView, default=default_forbidden_view)
+        self.root_factory = q(IRootFactory, default=DefaultRootFactory)
+        self.root_policy = self.root_factory # b/w compat
         self.registry = registry
-        self.logger = registry.queryUtility(ILogger, 'repoze.bfg.debug')
-        self.notfound_view = registry.queryUtility(
-            INotFoundView, default=default_notfound_view)
-        self.forbidden_view = registry.queryUtility(
-            IForbiddenView, default=default_forbidden_view)
         settings = registry.queryUtility(ISettings)
         if settings is not None:
-            self.debug_notfound = settings.debug_notfound
-        self.root_factory = registry.queryUtility(IRootFactory,
-                                                  default=DefaultRootFactory)
-        self.root_policy = self.root_factory # b/w compat
+            self.debug_notfound = settings['debug_notfound']
         self.traverser_warned = {}
 
     def __call__(self, environ, start_response):

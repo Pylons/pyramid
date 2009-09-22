@@ -24,13 +24,8 @@ class RouterTests(unittest.TestCase):
 
     def _registerSettings(self, **kw):
         from repoze.bfg.interfaces import ISettings
-        class Settings:
-            def __init__(self, **kw):
-                self.__dict__.update(kw)
-
-        defaultkw = {'debug_authorization':False, 'debug_notfound':False}
-        defaultkw.update(kw)
-        settings = Settings(**defaultkw)
+        settings = {'debug_authorization':False, 'debug_notfound':False}
+        settings.update(kw)
         self.registry.registerUtility(settings, ISettings)
 
     def _registerTraverserFactory(self, context, view_name='', subpath=None,
