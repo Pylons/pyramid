@@ -27,7 +27,7 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
 
     def test_it(self):
         import types
-        self.assertEqual(wsgiapptest.__is_bfg_view__, True)
+        self.failUnless(wsgiapptest.__bfg_view_settings__)
         self.failUnless(type(wsgiapptest) is types.FunctionType)
         context = DummyContext()
         request = DummyRequest()

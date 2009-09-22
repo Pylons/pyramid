@@ -1833,20 +1833,12 @@ class TestBFGViewGrokker(unittest.TestCase):
                 pass
             def __call__(self):
                 return 'OK'
-        obj.__is_bfg_view__ = True
-        obj.__permission__ = 'foo'
-        obj.__for__ = Interface
-        obj.__view_name__ = 'foo.html'
-        obj.__request_type__ = IRequest
-        obj.__route_name__ = None
-        obj.__request_method__ = None
-        obj.__request_param__ = None
-        obj.__containment__ = None
-        obj.__attr__ = None
-        obj.__template__ = None
-        obj.__wrapper_viewname__ = None
-        obj.__renderer__ = None
-        obj.__attr__ = None
+        settings = dict(permission='foo', for_=Interface, name='foo.html',
+                        request_type=IRequest, route_name=None,
+                        request_method=None, request_param=None,
+                        containment=None, attr=None, renderer=None,
+                        wrapper_viewname=None)
+        obj.__bfg_view_settings__ = settings
         context = DummyContext()
         result = grokker.grok('name', obj, context=context)
         self.assertEqual(result, True)

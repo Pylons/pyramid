@@ -29,7 +29,6 @@ from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IResponseFactory
-from repoze.bfg.interfaces import ITemplateRenderer
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.path import caller_package
@@ -357,20 +356,8 @@ class bfg_view(object):
         self.wrapper_viewname = wrapper
 
     def __call__(self, wrapped):
-        _bfg_view = wrapped #map_view(wrapped, self.attr, self.renderer)
-        _bfg_view.__is_bfg_view__ = True
-        _bfg_view.__permission__ = self.permission
-        _bfg_view.__for__ = self.for_
-        _bfg_view.__view_name__ = self.name
-        _bfg_view.__request_type__ = self.request_type
-        _bfg_view.__route_name__ = self.route_name
-        _bfg_view.__request_method__ = self.request_method
-        _bfg_view.__request_param__ = self.request_param
-        _bfg_view.__containment__ = self.containment
-        _bfg_view.__wrapper_viewname__ = self.wrapper_viewname
-        _bfg_view.__attr__ = self.attr
-        _bfg_view.__renderer__ = self.renderer
-        return _bfg_view
+        wrapped.__bfg_view_settings__ = self.__dict__.copy()
+        return wrapped
 
 def default_view(context, request, status):
     try:

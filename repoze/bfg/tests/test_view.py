@@ -376,10 +376,10 @@ class TestBFGViewDecorator(unittest.TestCase):
             """ docstring """
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        self.assertEqual(wrapped.__is_bfg_view__, True)
-        self.assertEqual(wrapped.__permission__, None)
-        self.assertEqual(wrapped.__for__, None)
-        self.assertEqual(wrapped.__request_type__, None)
+        settings = wrapped.__bfg_view_settings__
+        self.assertEqual(settings['permission'], None)
+        self.assertEqual(settings['for_'], None)
+        self.assertEqual(settings['request_type'], None)
 
     def test_call_oldstyle_class(self):
         decorator = self._makeOne()
@@ -387,10 +387,10 @@ class TestBFGViewDecorator(unittest.TestCase):
             """ docstring """
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        self.assertEqual(wrapped.__is_bfg_view__, True)
-        self.assertEqual(wrapped.__permission__, None)
-        self.assertEqual(wrapped.__for__, None)
-        self.assertEqual(wrapped.__request_type__, None)
+        settings = wrapped.__bfg_view_settings__
+        self.assertEqual(settings['permission'], None)
+        self.assertEqual(settings['for_'], None)
+        self.assertEqual(settings['request_type'], None)
 
     def test_call_newstyle_class(self):
         decorator = self._makeOne()
@@ -398,10 +398,10 @@ class TestBFGViewDecorator(unittest.TestCase):
             """ docstring """
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        self.assertEqual(wrapped.__is_bfg_view__, True)
-        self.assertEqual(wrapped.__permission__, None)
-        self.assertEqual(wrapped.__for__, None)
-        self.assertEqual(wrapped.__request_type__, None)
+        settings = wrapped.__bfg_view_settings__
+        self.assertEqual(settings['permission'], None)
+        self.assertEqual(settings['for_'], None)
+        self.assertEqual(settings['request_type'], None)
 
 class TestDefaultForbiddenView(unittest.TestCase):
     def _callFUT(self, context, request):

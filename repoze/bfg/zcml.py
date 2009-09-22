@@ -1,6 +1,4 @@
-import inspect
 import sys
-import types
 
 from zope.configuration import xmlconfig
 import zope.configuration.config
@@ -21,7 +19,6 @@ from zope.schema import Int
 from zope.schema import TextLine
 
 import martian
-import martian.core
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -607,25 +604,26 @@ class BFGViewMarker(object):
 
 class BFGMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
     def get_bases(self, obj):
-        if hasattr(obj, '__is_bfg_view__'):
+        if hasattr(obj, '__bfg_view_settings__'):
             return [BFGViewMarker]
         return []
 
 class BFGViewGrokker(martian.InstanceGrokker):
     martian.component(BFGViewMarker)
     def grok(self, name, obj, **kw):
-        if hasattr(obj, '__is_bfg_view__'):
-            permission = obj.__permission__
-            for_ = obj.__for__
-            name = obj.__view_name__
-            request_type = obj.__request_type__
-            route_name = obj.__route_name__
-            request_method = obj.__request_method__
-            request_param = obj.__request_param__
-            containment = obj.__containment__
-            wrapper = obj.__wrapper_viewname__
-            attr = obj.__attr__
-            renderer = obj.__renderer__
+        if hasattr(obj, '__bfg_view_settings__'):
+            settings = obj.__bfg_view_settings__
+            permission = settings['permission']
+            for_ = settings['for_']
+            name = settings['name']
+            request_type = settings['request_type']
+            route_name = settings['route_name']
+            request_method = settings['request_method']
+            request_param = settings['request_param']
+            containment = settings['containment']
+            wrapper = settings['wrapper_viewname']
+            attr = settings['attr']
+            renderer = settings['renderer']
             context = kw['context']
             view(context, permission=permission, for_=for_,
                  view=obj, name=name, request_type=request_type,
