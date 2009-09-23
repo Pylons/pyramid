@@ -82,10 +82,6 @@ class Router(object):
             if traverser is None:
                 traverser = ModelGraphTraverser(root)
             tdict = _traverse(root, environ, traverser=traverser)
-            if '_deprecation_warning' in tdict:
-                warning = tdict.pop('_deprecation_warning')
-                if not warning in self.traverser_warned:
-                    self.logger and self.logger.warn(warning)
             context, view_name, subpath, traversed, vroot, vroot_path = (
                 tdict['context'], tdict['view_name'], tdict['subpath'],
                 tdict['traversed'], tdict['virtual_root'],

@@ -953,6 +953,17 @@ class TraverseTests(unittest.TestCase):
         self.assertEqual(root.wascontext, True)
         self.assertEqual(root.environ['PATH_INFO'], '/')
 
+    def test_empty_sequence(self):
+        root = DummyContext()
+        model = DummyContext()
+        model.__parent__ = root
+        model.__name__ = 'baz'
+        traverser = make_traverser({'context':root, 'view_name':''})
+        self._registerTraverserFactory(traverser)
+        self._callFUT(model, [])
+        self.assertEqual(model.wascontext, True)
+        self.assertEqual(model.environ['PATH_INFO'], '')
+
 class UnderTraverseTests(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -989,38 +1000,6 @@ class UnderTraverseTests(unittest.TestCase):
         context = DummyContext()
         result = self._callFUT(context, None, traverser)
         self.assertEqual(result, {'a':'1'})
-
-    def test_issixtuple(self):
-        traverser = make_traverser((1,2,3,4,5,6))
-        self._registerTraverserFactory(traverser)
-        context = DummyContext()
-        result = self._callFUT(context, None)
-        self.assertEqual(result['context'], 1)
-        self.assertEqual(result['view_name'], 2)
-        self.assertEqual(result['subpath'], 3)
-        self.assertEqual(result['traversed'], 4)
-        self.assertEqual(result['virtual_root'], 5)
-        self.assertEqual(result['virtual_root_path'], 6)
-        self.assertEqual(result['root'], None)
-        self.failUnless(result['_deprecation_warning'].startswith(
-               "<class 'repoze.bfg.tests.test_traversal.DummyTraverser'>"))
-        self.failUnless("6-argument tuple" in result['_deprecation_warning'])
-
-    def test_isthreetuple(self):
-        traverser = make_traverser((1,2,3))
-        self._registerTraverserFactory(traverser)
-        context = DummyContext()
-        result = self._callFUT(context, None)
-        self.assertEqual(result['context'], 1)
-        self.assertEqual(result['view_name'], 2)
-        self.assertEqual(result['subpath'], 3)
-        self.assertEqual(result['traversed'], None)
-        self.assertEqual(result['virtual_root'], None)
-        self.assertEqual(result['virtual_root_path'], None)
-        self.assertEqual(result['root'], None)
-        self.failUnless(result['_deprecation_warning'].startswith(
-               "<class 'repoze.bfg.tests.test_traversal.DummyTraverser'>"))
-        self.failUnless("3-argument tuple" in result['_deprecation_warning'])
 
 def make_traverser(result):
     class DummyTraverser(object):

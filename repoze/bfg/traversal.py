@@ -141,10 +141,6 @@ def model_path(model, *elements):
     # which caches the joined result for us
     return _join_path_tuple(model_path_tuple(model, *elements))
 
-@lru_cache(1000)
-def _join_path_tuple(tuple):
-    return tuple and '/'.join([quote_path_segment(x) for x in tuple]) or '/'
-
 def traverse(model, path):
     """Given a model object as ``model`` and a string or tuple
     representing a path as ``path`` (such as the return value of
@@ -265,9 +261,8 @@ def traverse(model, path):
         # unicode and it expects path segments to be utf-8 and
         # urlencoded (it's the same traverser which accepts PATH_INFO
         # from user agents; user agents always send strings).
-        path = [quote_path_segment(name) for name in path]
         if path:
-            path = '/'.join(path) or '/'
+            path = _join_path_tuple(tuple(path))
         else:
             path = ''
 
@@ -283,30 +278,6 @@ def _traverse(model, environ, traverser=None):
             traverser = ModelGraphTraverser(model)
 
     result = traverser(environ)
-
-    if result.__class__ is not dict: # isinstance slightly slower
-        deprecation_warning = None
-        try:
-            # b/w compat for 6-arg returning ITraversers (0.7.1 til 0.8a7)
-            ctx, view_name, subpath, traversed, vroot, vroot_path = result
-        except ValueError:
-            # b/w compat for 3-arg returning ITraversers (0.7.0-style
-            # and below)
-            ctx, view_name, subpath = result
-            traversed = None
-            vroot = None
-            vroot_path = None
-        deprecation_warning = (
-            '%r is an pre-0.8-style ITraverser returning a %s-argument tuple; '
-            'please update it to the new ITraverser interface which returns '
-            'a dictionary for improved functionality.  See the '
-            '"repoze.bfg.interfaces" module for the new ITraverser interface '
-            'definition.' % (traverser.__class__, len(result)))
-            
-        result = {'context':ctx, 'view_name':view_name, 'subpath':subpath,
-                  'traversed':traversed, 'virtual_root':vroot,
-                  'virtual_root_path':vroot_path, 'root':None,
-                  '_deprecation_warning':deprecation_warning}
     return result
 
 def model_path_tuple(model, *elements):

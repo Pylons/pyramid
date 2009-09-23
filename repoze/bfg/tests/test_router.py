@@ -265,22 +265,6 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
         self.assertEqual(environ['webob.adhoc_attrs']['root'], context)
 
-    def test_call_deprecation_warning(self):
-        context = DummyContext()
-        self._registerTraverserFactory(context, _deprecation_warning='abc')
-        response = DummyResponse()
-        response.app_iter = ['Hello world']
-        view = DummyView(response)
-        environ = self._makeEnviron()
-        self._registerView(view, '', None, None)
-        router = self._makeOne()
-        logger = self._registerLogger()
-        router.logger = logger
-        start_response = DummyStartResponse()
-        router(environ, start_response)
-        self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(logger.messages[0], 'abc')
-
     def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
         context = DummyContext()
         self._registerTraverserFactory(context, view_name='foo',
