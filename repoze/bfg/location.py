@@ -55,5 +55,15 @@ def lineage(model):
     """
     while model is not None:
         yield model
-        model = getattr(model, '__parent__', None)
+        # The common case is that the AttributeError exception below
+        # is exceptional as long as the developer is a "good citizen"
+        # who has a root object with a __parent__ of None.  Using an
+        # exception here instead of a getattr with a default is an
+        # important micro-optimization, because this function is
+        # called in any non-trivial application over and over again to
+        # generate URLs and paths.
+        try:
+            model = model.__parent__
+        except AttributeError:
+            model = None
 
