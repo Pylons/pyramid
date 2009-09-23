@@ -13,7 +13,6 @@ from repoze.bfg.path import caller_package
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.traversal import TraversalContextURL
 from repoze.bfg.traversal import quote_path_segment
-from repoze.bfg.traversal import _join_path_tuple
 
 def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named BFG route.
@@ -104,7 +103,7 @@ def route_url(route_name, request, *elements, **kw):
         anchor = '#' + anchor
 
     if elements:
-        suffix = _join_path_tuple(elements)
+        suffix = '/'.join([quote_path_segment(s) for s in elements])
         if not path.endswith('/'):
             suffix = '/' + suffix
     else:
@@ -195,7 +194,7 @@ def model_url(model, request, *elements, **kw):
         anchor = '#' + anchor
 
     if elements:
-        suffix = _join_path_tuple(elements)
+        suffix = '/'.join([quote_path_segment(s) for s in elements])
     else:
         suffix = ''
 

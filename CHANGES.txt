@@ -15,10 +15,6 @@ Features
 
 - Speed up ``repoze.bfg.traversal.traverse`` slightly.
 
-- Speed up ``repoze.bfg.url.model_url`` slightly.
-
-- Speed up ``repoze.bfg.url.route_url`` slightly.
-
 Internal
 --------
 
