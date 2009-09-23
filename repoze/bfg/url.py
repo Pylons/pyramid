@@ -5,6 +5,8 @@ import os
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 
+from repoze.lru import lru_cache
+
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import IRoutesMapper
 
@@ -103,7 +105,7 @@ def route_url(route_name, request, *elements, **kw):
         anchor = '#' + anchor
 
     if elements:
-        suffix = '/'.join([quote_path_segment(s) for s in elements])
+        suffix = _join_elements(elements)
         if not path.endswith('/'):
             suffix = '/' + suffix
     else:
@@ -194,7 +196,7 @@ def model_url(model, request, *elements, **kw):
         anchor = '#' + anchor
 
     if elements:
-        suffix = '/'.join([quote_path_segment(s) for s in elements])
+        suffix = _join_elements(elements)
     else:
         suffix = ''
 
@@ -249,3 +251,6 @@ def static_url(path, request, **kw):
 
     raise ValueError('No static URL definition matching %s' % path)
 
+@lru_cache(1000)
+def _join_elements(elements):
+    return '/'.join([quote_path_segment(s) for s in elements])
