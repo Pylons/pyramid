@@ -194,7 +194,7 @@ def view(
     # share the same number of predicates.
 
     # Views which do not have any predicates get a score of
-    # "sys.maxint", meaning that they will be tried very last.
+    # sys.maxint, meaning that they will be tried very last.
 
     if request_method is not None:
         def request_method_predicate(context, request):
@@ -219,10 +219,8 @@ def view(
         weight = weight - 30
         predicates.append(containment_predicate)
 
-    if predicates:
-        score = float(weight) / len(predicates)
-    else:
-        score = sys.maxint
+    # this will be == sys.maxint if no predicates
+    score = weight / (len(predicates) + 1)
 
     if renderer and '.' in renderer:
         renderer = resource_spec(renderer, package_name(_context.resolve('.')))

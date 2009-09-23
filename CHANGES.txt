@@ -1,6 +1,18 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- On 64-bit Linux systems, views that were members of a multiview
+  (orderings of views with predicates) were not evaluated in the
+  proper order.  Symptom: in a configuration that had two views with
+  the same name but one with a ``request_method=POST`` predicate and
+  one without, the one without the predicate would be called
+  unconditionally (even if the request was a POST request).  Thanks
+  much to Sebastien Douche for providing the buildbots that pointed
+  this out.
+
 Documentation
 -------------
 
