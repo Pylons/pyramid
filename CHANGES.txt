@@ -1,5 +1,5 @@
-Next release
-============
+1.1a4 (2009-09-23)
+==================
 
 Bug Fixes
 ---------
@@ -74,7 +74,6 @@ Internal
 
 - General speed microimprovements for helloworld benchmark: replace
   try/excepts with statements which use 'in' keyword.
-
 
 1.1a3 (2009-09-16)
 ==================
