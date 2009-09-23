@@ -152,11 +152,11 @@ def registerViewPermission(name, result=True, viewpermission=None,
 deprecated('registerViewPermission',
            'registerViewPermission has been deprecated.  As of repoze.bfg '
            'version 1.1, view functions are now responsible for protecting '
-           'their own execution.  A call to this function wont prevent a '
+           'their own execution.  A call to this function won\'t prevent a '
            'view from being executed by the repoze.bfg router, nor '
            'will the ``repoze.bfg.security.view_execution_permitted`` function '
            'use the permission registered with this function.  Instead,'
-           'registering a view permission during testing, use the '
+           'to register a view permission during testing, use the '
            '``repoze.bfg.testing.registerView`` directive with a '
            '``permission`` argument.')
 
