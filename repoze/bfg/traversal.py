@@ -1,4 +1,3 @@
-import re
 import urllib
 
 from zope.component import queryMultiAdapter
@@ -16,6 +15,7 @@ from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import VH_ROOT_KEY
 
 from repoze.bfg.location import lineage
+from repoze.bfg.encode import url_quote
 
 def find_root(model):
     """ Find the root node in the graph to which ``model``
@@ -137,8 +137,13 @@ def model_path(model, *elements):
               will be prepended to the generated path rather than a
               single leading '/' character.
     """
-    path = _model_path_list(model, *elements)
-    return path and '/'.join([quote_path_segment(x) for x in path]) or '/'
+    # joining strings is a bit expensive so we delegate to a function
+    # which caches the joined result for us
+    return _join_path_tuple(model_path_tuple(model, *elements))
+
+@lru_cache(1000)
+def _join_path_tuple(tuple):
+    return tuple and '/'.join([quote_path_segment(x) for x in tuple]) or '/'
 
 def traverse(model, path):
     """Given a model object as ``model`` and a string or tuple
@@ -345,8 +350,8 @@ def model_path_tuple(model, *elements):
 
 def _model_path_list(model, *elements):
     """ Implementation detail shared by model_path and model_path_tuple """
-    lpath = reversed(list(lineage(model)))
-    path = [ location.__name__ or '' for location in lpath ]
+    path = [loc.__name__ or '' for loc in lineage(model)]
+    path.reverse()
     path.extend(elements)
     return path
 
@@ -485,9 +490,9 @@ def quote_path_segment(segment):
         return _segment_cache[segment]
     except KeyError:
         if segment.__class__ is unicode: # isinstance slighly slower (~15%)
-            result = _url_quote(segment.encode('utf-8'))
+            result = url_quote(segment.encode('utf-8'))
         else:
-            result = _url_quote(segment)
+            result = url_quote(segment)
         # we don't need a lock to mutate _segment_cache, as the below
         # will generate exactly one Python bytecode (STORE_SUBSCR)
         _segment_cache[segment] = result
@@ -643,48 +648,7 @@ class TraversalContextURL(object):
         app_url = request.application_url # never ends in a slash
         return app_url + path
 
-always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-               'abcdefghijklmnopqrstuvwxyz'
-               '0123456789' '_.-')
-_safemaps = {}
-_must_quote = {}
+@lru_cache(1000)
+def _join_path_tuple(tuple):
+    return tuple and '/'.join([quote_path_segment(x) for x in tuple]) or '/'
 
-def _url_quote(s, safe = ''):
-    """quote('abc def') -> 'abc%20def'
-
-    Faster version of Python stdlib urllib.quote which also quotes
-    the '/' character.  
-
-    Each part of a URL, e.g. the path info, the query, etc., has a
-    different set of reserved characters that must be quoted.
-
-    RFC 2396 Uniform Resource Identifiers (URI): Generic Syntax lists
-    the following reserved characters.
-
-    reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" |
-                  "$" | ","
-
-    Each of these characters is reserved in some component of a URL,
-    but not necessarily in all of them.
-
-    Unlike the default version of this function in the Python stdlib,
-    by default, the quote function is intended for quoting individual
-    path segments instead of an already composed path that might have
-    '/' characters in it.  Thus, it *will* encode any '/' character it
-    finds in a string.
-    """
-    cachekey = (safe, always_safe)
-    try:
-        safe_map = _safemaps[cachekey]
-        if not _must_quote[cachekey].search(s):
-            return s
-    except KeyError:
-        safe += always_safe
-        _must_quote[cachekey] = re.compile(r'[^%s]' % safe)
-        safe_map = {}
-        for i in range(256):
-            c = chr(i)
-            safe_map[c] = (c in safe) and c or ('%%%02X' % i)
-        _safemaps[cachekey] = safe_map
-    res = map(safe_map.__getitem__, s)
-    return ''.join(res)

@@ -6,6 +6,36 @@ Features
 
 - Speed up ``repoze.bfg.location.lineage`` slightly.
 
+- Speed up ``repoze.bfg.encode.urlencode`` (nee'
+  ``repoze.bfg.url.urlencode``) slightly.
+
+- Speed up ``repoze.bfg.traversal.model_path`` and
+  ``repoze.bfg.traversal.model_path_tuple`` slightly.
+
+Internal
+--------
+
+- Move ``repoze.bfg.traversal._url_quote`` into ``repoze.bfg.encode``
+  as ``url_quote``.
+
+Backwards Incompatibilities
+---------------------------
+
+- We previously had a Unicode-aware wrapper for the
+  ``urllib.urlencode`` function named ``repoze.bfg.url.urlencode``
+  which delegated to the stdlib function, but which marshalled all
+  unicode values to utf-8 strings before calling the stdlib version.
+  A newer replacement now lives in ``repoze.bfg.encode`` (old imports
+  will still work).  The replacement does not delegate to the stdlib.
+
+  The replacement diverges from the stdlib implementation and the
+  previous ``repoze.bfg.url`` url implementation inasmuch as its
+  ``doseq`` argument is a decoy: it always behaves in the
+  ``doseq=True`` way (which is the only sane behavior) for speed
+  purposes.
+
+  The old import location (``repoze.bfg.url.urlencode``) still
+  functions and has not been deprecated.
 
 1.1a4 (2009-09-23)
 ==================

@@ -1,9 +1,9 @@
 import re
 from urllib import unquote
 
-from repoze.bfg.traversal import _url_quote
-from repoze.bfg.traversal import quote_path_segment
 from repoze.bfg.traversal import traversal_path
+from repoze.bfg.traversal import quote_path_segment
+from repoze.bfg.encode import url_quote
 
 _marker = object()
 
@@ -111,7 +111,7 @@ def _compile_route(route):
                 v = '/'.join([quote_path_segment(x) for x in v])
             elif k != star:
                 try:
-                    v = _url_quote(v)
+                    v = url_quote(v)
                 except TypeError:
                     pass
             newdict[k] = v

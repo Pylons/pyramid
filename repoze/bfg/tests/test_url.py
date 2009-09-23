@@ -129,34 +129,6 @@ class ModelURLTests(unittest.TestCase):
         result = self._callFUT(root, request)
         self.assertEqual(result, 'http://example.com:5432/')
 
-class UrlEncodeTests(unittest.TestCase):
-    def _callFUT(self, query, doseq=False):
-        from repoze.bfg.url import urlencode
-        return urlencode(query, doseq)
-
-    def test_ascii_only(self):
-        result = self._callFUT([('a',1), ('b',2)])
-        self.assertEqual(result, 'a=1&b=2')
-
-    def test_unicode_key(self):
-        la = unicode('LaPe\xc3\xb1a', 'utf-8')
-        result = self._callFUT([(la, 1), ('b',2)])
-        self.assertEqual(result, 'LaPe%C3%B1a=1&b=2')
-
-    def test_unicode_val_single(self):
-        la = unicode('LaPe\xc3\xb1a', 'utf-8')
-        result = self._callFUT([('a', la), ('b',2)])
-        self.assertEqual(result, 'a=LaPe%C3%B1a&b=2')
-
-    def test_unicode_val_multiple(self):
-        la = [unicode('LaPe\xc3\xb1a', 'utf-8')] * 2
-        result = self._callFUT([('a', la), ('b',2)], doseq=True)
-        self.assertEqual(result, 'a=LaPe%C3%B1a&a=LaPe%C3%B1a&b=2')
-
-    def test_dict(self):
-        result = self._callFUT({'a':1})
-        self.assertEqual(result, 'a=1')
-
 class TestRouteUrl(unittest.TestCase):
     def setUp(self):
         cleanUp()

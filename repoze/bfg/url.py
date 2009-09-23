@@ -1,7 +1,6 @@
 """ Utility functions for dealing with URLs in repoze.bfg """
 
 import os
-import urllib
 
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
@@ -9,6 +8,7 @@ from zope.component import queryMultiAdapter
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import IRoutesMapper
 
+from repoze.bfg.encode import urlencode
 from repoze.bfg.path import caller_package
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.traversal import TraversalContextURL
@@ -248,49 +248,4 @@ def static_url(path, request, **kw):
                 return route_url(route.name, request, **kw)
 
     raise ValueError('No static URL definition matching %s' % path)
-
-def urlencode(query, doseq=False):
-    """
-    A wrapper around Python's stdlib `urllib.urlencode function
-    <http://docs.python.org/library/urllib.html>`_ which accepts
-    unicode keys and values within the ``query`` dict/sequence; all
-    Unicode keys and values are first converted to UTF-8 before being
-    used to compose the query string.  The behavior of the function is
-    otherwise the same as the stdlib version.
-
-    The value of ``query`` must be a sequence of two-tuples
-    representing key/value pairs *or* an object (often a dictionary)
-    with an ``.items()`` method that returns a sequence of two-tuples
-    representing key/value pairs.  ``doseq`` controls what happens
-    when a sequence is presented as one of the values.  See the Python
-    stdlib documentation for ``urllib.urlencode`` for more
-    information.
-    """
-    if hasattr(query, 'items'):
-        # presumed to be a dictionary
-        query = query.items()
-
-    newquery = []
-    for k, v in query:
-
-        if k.__class__ is unicode:
-            k = k.encode('utf-8')
-
-        try:
-            v.__iter__
-        except AttributeError:
-            if v.__class__ is unicode:
-                v = v.encode('utf-8')
-        else:
-            L = []
-            for x in v:
-                if x.__class__ is unicode:
-                    x = x.encode('utf-8')
-                L.append(x)
-            v = L
-
-        newquery.append((k, v))
-
-    return urllib.urlencode(newquery, doseq=doseq)
-
 
