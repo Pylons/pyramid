@@ -767,7 +767,6 @@ class TestViewDirective(unittest.TestCase):
         context = DummyContext()
         class IFoo(Interface):
             pass
-        view = lambda *arg: None
         sm = getSiteManager()
         def view(context, request):
             return '123'
@@ -786,6 +785,98 @@ class TestViewDirective(unittest.TestCase):
         perm = sm.adapters.lookup((IFoo, IRequest), IViewPermission, name='')
         self.assertEqual(perm, wrapper.__permitted__)
         self.assertEqual(wrapper(None, None), '123')
+
+    def test_multiview_call_ordering(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        context = DummyContext()
+        class IFoo(Interface):
+            pass
+        def view1(context, request): return 'view1'
+        def view2(context, request): return 'view2'
+        def view3(context, request): return 'view3'
+        def view4(context, request): return 'view4'
+        def view5(context, request): return 'view5'
+        def view6(context, request): return 'view6'
+        def view7(context, request): return 'view7'
+        def view8(context, request): return 'view8'
+        self._callFUT(context, 'repoze.view', IFoo, view=view1)
+        self._callFUT(context, 'repoze.view', IFoo, view=view2,
+                      request_method='POST')
+        self._callFUT(context, 'repoze.view', IFoo, view=view3,
+                      request_param='param')
+        self._callFUT(context, 'repoze.view', IFoo, view=view4,
+                      containment=IFoo)
+        self._callFUT(context, 'repoze.view', IFoo, view=view5,
+                      request_method='POST', request_param='param')
+        self._callFUT(context, 'repoze.view', IFoo, view=view6,
+                      request_method='POST', containment=IFoo)
+        self._callFUT(context, 'repoze.view', IFoo, view=view7,
+                      request_param='param', containment=IFoo)
+        self._callFUT(context, 'repoze.view', IFoo, view=view8,
+                      request_type='POST', request_param='param',
+                      containment=IFoo)
+        for action in context.actions:
+            register = action['callable']
+            register()
+
+        sm = getSiteManager()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+
+        ctx = Dummy()
+        request = DummyRequest()
+        request.method = 'GET'
+        request.params = {}
+        self.assertEqual(wrapper(ctx, request), 'view1')
+
+        ctx = Dummy()
+        request = DummyRequest()
+        request.params = {}
+        request.method = 'POST'
+        self.assertEqual(wrapper(ctx, request), 'view2')
+
+        ctx = Dummy()
+        request = DummyRequest()
+        request.params = {'param':'1'}
+        request.method = 'GET'
+        self.assertEqual(wrapper(ctx, request), 'view3')
+
+        ctx = Dummy()
+        directlyProvides(ctx, IFoo)
+        request = DummyRequest()
+        request.method = 'GET'
+        request.params = {}
+        self.assertEqual(wrapper(ctx, request), 'view4')
+
+        ctx = Dummy()
+        request = DummyRequest()
+        request.method = 'POST'
+        request.params = {'param':'1'}
+        self.assertEqual(wrapper(ctx, request), 'view5')
+
+        ctx = Dummy()
+        directlyProvides(ctx, IFoo)
+        request = DummyRequest()
+        request.params = {}
+        request.method = 'POST'
+        self.assertEqual(wrapper(ctx, request), 'view6')
+
+        ctx = Dummy()
+        directlyProvides(ctx, IFoo)
+        request = DummyRequest()
+        request.method = 'GET'
+        request.params = {'param':'1'}
+        self.assertEqual(wrapper(ctx, request), 'view7')
+
+        ctx = Dummy()
+        directlyProvides(ctx, IFoo)
+        request = DummyRequest()
+        request.method = 'POST'
+        request.params = {'param':'1'}
+        self.assertEqual(wrapper(ctx, request), 'view8')
 
     def test_multiview_replaces_multiview(self):
         from zope.component import getSiteManager
