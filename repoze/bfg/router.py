@@ -69,9 +69,9 @@ class Router(object):
         """
         registry = self.registry
         logger = self.logger
-
+        manager = self.threadlocal_manager
         threadlocals = {'registry':registry, 'request':None}
-        self.threadlocal_manager.push(threadlocals)
+        manager.push(threadlocals)
  
         try:
             root = self.root_factory(environ)
@@ -97,17 +97,6 @@ class Router(object):
             else:
                 environ['webob.adhoc_attrs'] = tdict
 
-            def respond(response, view_name):
-                registry.has_listeners and registry.notify(
-                    NewResponse(response))
-                try:
-                    start_response(response.status, response.headerlist)
-                    return response.app_iter
-                except AttributeError:
-                    raise ValueError(
-                        'Non-response object returned from view named %s '
-                        '(and no renderer): %r' % (view_name, response))
-
             provides = map(providedBy, (context, request))
             view_callable = registry.adapters.lookup(
                 provides, IView, name=view_name, default=None)
@@ -125,26 +114,33 @@ class Router(object):
                 else:
                     msg = request.path_info
                 environ['repoze.bfg.message'] = msg
-                return respond(self.notfound_view(context, request),
-                               '<INotFoundView>')
+                response = self.notfound_view(context, request)
+            else:
+                try:
+                    response = view_callable(context, request)
+                except Unauthorized, why:
+                    msg = why[0]
+                    environ = getattr(request, 'environ', {})
+                    environ['repoze.bfg.message'] = msg
+                    response = self.forbidden_view(context, request)
+                except NotFound, why:
+                    msg = why[0]
+                    environ = getattr(request, 'environ', {})
+                    environ['repoze.bfg.message'] = msg
+                    response = self.notfound_view(context, request)
+
+            registry.has_listeners and registry.notify(NewResponse(response))
 
             try:
-                response = view_callable(context, request)
-            except Unauthorized, why:
-                msg = why[0]
-                environ = getattr(request, 'environ', {})
-                environ['repoze.bfg.message'] = msg
-                response = self.forbidden_view(context, request)
-            except NotFound, why:
-                msg = why[0]
-                environ = getattr(request, 'environ', {})
-                environ['repoze.bfg.message'] = msg
-                response = self.notfound_view(context, request)
-
-            return respond(response, view_name)
+                start_response(response.status, response.headerlist)
+                return response.app_iter
+            except AttributeError:
+                raise ValueError(
+                    'Non-response object returned from view named %s '
+                    '(and no renderer): %r' % (view_name, response))
 
         finally:
-            self.threadlocal_manager.pop()
+            manager.pop()
 
 def make_app(root_factory, package=None, filename='configure.zcml',
              authentication_policy=None, authorization_policy=None,

@@ -28,6 +28,8 @@ Features
 - Sped up ``repoze.bfg.traversal.ModelGraphTraverser:__call__``
   slightly.
 
+- Minor speedup of ``repoze.bfg.router.Router.__call__``.
+
 Internal
 --------
 
