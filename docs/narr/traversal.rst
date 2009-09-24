@@ -77,6 +77,8 @@ the :term:`context`.
 How :mod:`repoze.bfg` Processes a Request Using Traversal
 ---------------------------------------------------------
 
+.. image:: modelgraphtraverser.png
+
 When a user requests a page from your :mod:`repoze.bfg` -powered
 application, the system uses this algorithm to determine which Python
 code to execute:
