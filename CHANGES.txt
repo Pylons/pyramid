@@ -1,6 +1,12 @@
 Next release
 ============
 
+Documentation
+-------------
+
+- Added a diagram of model graph traversal to the "Traversal"
+  narrative chapter of the documentation.
+
 Features
 --------
 
@@ -32,8 +38,8 @@ Backwards Incompatibilities
   ``urllib.urlencode`` function named ``repoze.bfg.url.urlencode``
   which delegated to the stdlib function, but which marshalled all
   unicode values to utf-8 strings before calling the stdlib version.
-  A newer replacement now lives in ``repoze.bfg.encode`` (old imports
-  will still work).  The replacement does not delegate to the stdlib.
+  A newer replacement now lives in ``repoze.bfg.encode`` The
+  replacement does not delegate to the stdlib.
 
   The replacement diverges from the stdlib implementation and the
   previous ``repoze.bfg.url`` url implementation inasmuch as its
