@@ -256,7 +256,8 @@ def traverse(model, path):
     each element in the ``virtual_root_path`` will be Unicode as
     opposed to a string, and will be URL-decoded.
     """
-    if hasattr(path, '__iter__'): # it's a tuple or some other iterable
+
+    if hasattr(path, '__iter__'):
         # the traverser factory expects PATH_INFO to be a string, not
         # unicode and it expects path segments to be utf-8 and
         # urlencoded (it's the same traverser which accepts PATH_INFO
@@ -510,7 +511,8 @@ class ModelGraphTraverser(object):
             vpath = path
             vroot_idx = -1
 
-        ob = vroot = self.root
+        root = self.root
+        ob = vroot = root
 
         if vpath == '/' or (not vpath):
             # prevent a call to traversal_path if we know it's going
@@ -524,39 +526,42 @@ class ModelGraphTraverser(object):
             vpath_tuple = traversal_path(vpath)
             for segment in vpath_tuple:
                 if segment[:2] =='@@':
-                    return dict(context=ob, view_name=segment[2:],
-                                subpath=vpath_tuple[i+1:],
-                                traversed=vpath_tuple[:vroot_idx+i+1],
-                                virtual_root=vroot,
-                                virtual_root_path=vroot_tuple,
-                                root=self.root)
+                    return {'context':ob,
+                            'view_name':segment[2:],
+                            'subpath':vpath_tuple[i+1:],
+                            'traversed':vpath_tuple[:vroot_idx+i+1],
+                            'virtual_root':vroot,
+                            'virtual_root_path':vroot_tuple,
+                            'root':root}
                 try:
                     getitem = ob.__getitem__
                 except AttributeError:
-                    return dict(context=ob, view_name=segment,
-                                subpath=vpath_tuple[i+1:],
-                                traversed=vpath_tuple[:vroot_idx+i+1],
-                                virtual_root=vroot,
-                                virtual_root_path=vroot_tuple,
-                                root=self.root)
+                    return {'context':ob,
+                            'view_name':segment,
+                            'subpath':vpath_tuple[i+1:],
+                            'traversed':vpath_tuple[:vroot_idx+i+1],
+                            'virtual_root':vroot,
+                            'virtual_root_path':vroot_tuple,
+                            'root':root}
 
                 try:
                     next = getitem(segment)
                 except KeyError:
-                    return dict(context=ob, view_name=segment,
-                                subpath=vpath_tuple[i+1:],
-                                traversed=vpath_tuple[:vroot_idx+i+1],
-                                virtual_root=vroot,
-                                virtual_root_path=vroot_tuple,
-                                root=self.root)
+                    return {'context':ob,
+                            'view_name':segment,
+                            'subpath':vpath_tuple[i+1:],
+                            'traversed':vpath_tuple[:vroot_idx+i+1],
+                            'virtual_root':vroot,
+                            'virtual_root_path':vroot_tuple,
+                            'root':root}
                 if i == vroot_idx: 
                     vroot = next
                 ob = next
                 i += 1
 
-        return dict(context=ob, view_name=u'', subpath=subpath,
-                    traversed=vpath_tuple, virtual_root=vroot,
-                    virtual_root_path=vroot_tuple, root=self.root)
+        return {'context':ob, 'view_name':u'', 'subpath':subpath,
+                'traversed':vpath_tuple, 'virtual_root':vroot,
+                'virtual_root_path':vroot_tuple, 'root':root}
 
 class TraversalContextURL(object):
     """ The IContextURL adapter used to generate URLs for a context

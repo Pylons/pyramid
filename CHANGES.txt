@@ -25,6 +25,9 @@ Features
 
 - Speed up ``repoze.bfg.url.route_url`` slightly.
 
+- Sped up ``repoze.bfg.traversal.ModelGraphTraverser:__call__``
+  slightly.
+
 Internal
 --------
 
