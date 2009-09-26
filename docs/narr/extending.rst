@@ -3,9 +3,9 @@
 Extending An Existing :mod:`repoze.bfg` Application
 ===================================================
 
-If the developer of a :mod:`repoze.bfg` has obeyed certain constraints
-while building the application, a third party should be able to change
-the behavior of that application without needing to modify the actual
+If the developer of a :mod:`repoze.bfg` application has obeyed certain
+constraints while building the application, a third party should be able to
+change the behavior of that application without needing to modify the actual
 source code that makes up the application.  The behavior of a
 :mod:`repoze.bfg` application that obeys these constraints can be
 *overridden* or *extended* without modification.
