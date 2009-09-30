@@ -541,6 +541,65 @@ hostname implied ``http:/example.com``).  See the
 :mod:`repoze.bfg.url.route_url` API documentation for more
 information.
 
+Redirecting to Slash-Appended Routes
+------------------------------------
+
+For behavior like Django's ``APPEND_SLASH=True``, use the
+``repoze.bfg.view.append_slash_notfound_view`` view as the Not Found
+view in your application.  When this view is the Not Found view
+(indicating that no view was found), and any routes have been defined
+in the configuration of your application, if the value of
+``PATH_INFO`` does not already end in a slash, and if the value of
+``PATH_INFO`` *plus* a slash matches any route's path, do an HTTP
+redirect to the slash-appended ``PATH_INFO``.
+
+Let's use an example, because this behavior is a bit magical.  If this
+your route configuration is looks like so, and the
+``append_slash_notfound_view`` is configured in your application:
+
+.. code-block:: xml
+   :linenos:
+
+   <route
+     view=".views.no_slash"
+     path="no_slash"
+    />
+
+   <route
+     view=".views.has_slash"
+     path="has_slash/"
+    />
+
+If a request enters the application with the ``PATH_INFO`` value of
+``/no_slash``, the first route will match.  If a request enters the
+application with the ``PATH_INFO`` value of ``/no_slash``, *no* route
+will match, and the slash-appending "not found" view will *not* find a
+matching route with an appended slash.
+
+If a request enters the application with the ``PATH_INFO`` value of
+``/has_slash/``, the second route will match.  If a request enters the
+application with the ``PATH_INFO`` value of ``/has_slash``, a route
+*will* be found by the slash appending notfound view.  An HTTP
+redirect to ``/has_slash/`` will be returned to the user's browser.
+
+Note that this will *lose* ``POST`` data information (turning it into
+a GET), so you shouldn't rely on this to redirect POST requests.
+
+To configure the slash-appending not found view in your application,
+change the application's ``configure.zcml``, adding the following
+stanza:
+
+.. code-block:: xml
+   :linenos:
+
+   <notfound
+     view="repoze.bfg.views.append_slash_notfound_view"
+    />
+
+See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
+information about the slash-appending not found view and for a more
+general description of how to configure a not found view.
+
 Cleaning Up After a Request
 ---------------------------
 
