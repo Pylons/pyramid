@@ -600,6 +600,8 @@ See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
 information about the slash-appending not found view and for a more
 general description of how to configure a not found view.
 
+.. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 Cleaning Up After a Request
 ---------------------------
 
