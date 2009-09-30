@@ -254,6 +254,14 @@ port 6543.
    development easier, as changes to Python code under
    :mod:`repoze.bfg` is not put into effect until the server restarts.
 
+.. note:: You can also use :term:`mod_wsgi` to serve your
+   :mod:`repoze.bfg` application using the Apache web server rather
+   than the "pure-Python" server that is started as a result of
+   ``paster serve``.  See :ref:`modwsgi_tutorial` for details.
+   However, it is usually easier to develop an application using the
+   ``paster serve`` webserver, as exception and debugging output will
+   be sent to the console.
+
 Viewing the Application
 -----------------------
 
