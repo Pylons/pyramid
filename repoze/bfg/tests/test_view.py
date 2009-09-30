@@ -462,6 +462,8 @@ class AppendSlashNotFoundView(unittest.TestCase):
         class DummyMapper(object):
             def __init__(self):
                 self.routelist = [ DummyRoute(match) ]
+            def get_routes(self):
+                return self.routelist
         mapper = DummyMapper()
         import zope.component
         gsm = zope.component.getGlobalSiteManager()

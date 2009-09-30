@@ -749,7 +749,7 @@ def append_slash_notfound_view(context, request):
     mapper = queryUtility(IRoutesMapper)
     if mapper is not None and not path.endswith('/'):
         slashpath = path + '/'
-        for route in mapper.routelist:
+        for route in mapper.get_routes():
             if route.match(slashpath) is not None:
                 return HTTPFound(location=slashpath)
     return default_view(context, request, '404 Not Found')
