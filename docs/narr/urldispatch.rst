@@ -349,6 +349,29 @@ type of object created for a context when there is no "factory"
 specified in the ``route`` declaration.  It is a mapping object, a lot
 like a dictionary.
 
+When using :term:`url dispatch` exclusively in an application (as
+opposed to using both url dispatch and :term:`traversal`), the
+*context* of the view isn't terribly interesting most of the time,
+particularly if you never use a ``factory`` attribute on your route
+definitions.  For this reason, :mod:`repoze.bfg` supports view
+callables defined with only a ``request`` argument in their argument
+specification.  For example, the below view statement is competely
+equivalent to the above view statement:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+
+   def hello_view(request):
+       return Response('Hello!')
+
+Even if you use the request-only argument format in view callables,
+you can still get to the ``context`` of the view (if necessary) by
+accessing ``request.context``.
+
+See also: :ref:`request_only_view_definitions`.
+
 Example 2
 ~~~~~~~~~
 

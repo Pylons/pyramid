@@ -10,6 +10,9 @@ Documentation
 - An ``exceptions`` API chapter was added, documenting the new
   ``repoze.bfg.exceptions`` module.
 
+- Describe "request-only" view calling conventions inside the
+  urldispatch narrative chapter, where it's most helpful.
+
 Features
 --------
 

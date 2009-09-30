@@ -82,6 +82,8 @@ represent the method expected to return a response, you can use an
 ``attr`` value as part of view configuration.  See
 :ref:`view_configuration`.
 
+.. _request_only_view_definitions:
+
 Request-Only View Definitions
 -----------------------------
 
