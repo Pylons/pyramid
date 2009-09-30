@@ -228,8 +228,6 @@ def static_url(path, request, **kw):
 
     .. note:: This feature is new in :mod:`repoze.bfg` 1.1.
     """
-    mapper = getUtility(IRoutesMapper)
-    routes = mapper.get_routes()
     if os.path.isabs(path):
         raise ValueError('Absolute paths cannot be used to generate static '
                          'urls (use a package-relative path or a resource '
@@ -241,6 +239,9 @@ def static_url(path, request, **kw):
         package = caller_package(level=2)
         path = '%s:%s' % (package.__name__, path)
     
+    mapper = getUtility(IRoutesMapper)
+    routes = mapper.get_routes()
+
     for route in routes:
         factory = route.factory
         if factory.__class__ is StaticRootFactory:
