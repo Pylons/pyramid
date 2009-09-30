@@ -572,14 +572,14 @@ your route configuration is looks like so, and the
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/no_slash``, the first route will match.  If a request enters the
-application with the ``PATH_INFO`` value of ``/no_slash``, *no* route
+application with the ``PATH_INFO`` value of ``/no_slash/``, *no* route
 will match, and the slash-appending "not found" view will *not* find a
 matching route with an appended slash.
 
-If a request enters the application with the ``PATH_INFO`` value of
-``/has_slash/``, the second route will match.  If a request enters the
-application with the ``PATH_INFO`` value of ``/has_slash``, a route
-*will* be found by the slash appending notfound view.  An HTTP
+However, if a request enters the application with the ``PATH_INFO``
+value of ``/has_slash/``, the second route will match.  If a request
+enters the application with the ``PATH_INFO`` value of ``/has_slash``,
+a route *will* be found by the slash appending notfound view.  An HTTP
 redirect to ``/has_slash/`` will be returned to the user's browser.
 
 Note that this will *lose* ``POST`` data information (turning it into
