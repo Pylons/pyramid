@@ -7,6 +7,9 @@ Documentation
 - Added a diagram of model graph traversal to the "Traversal"
   narrative chapter of the documentation.
 
+- An ``exceptions`` API chapter was added, documenting the new
+  ``repoze.bfg.exceptions`` module.
+
 Features
 --------
 
@@ -30,11 +33,27 @@ Features
 
 - Minor speedup of ``repoze.bfg.router.Router.__call__``.
 
+- New ``repoze.bfg.exceptions`` module was created to house exceptions
+  that were previously sprinkled through various modules.
+
 Internal
 --------
 
 - Move ``repoze.bfg.traversal._url_quote`` into ``repoze.bfg.encode``
   as ``url_quote``.
+
+Deprecations
+------------
+
+- The import of ``repoze.bfg.view.NotFound`` is deprecated in favor of
+  ``repoze.bfg.exceptions.NotFound``.  The old location still
+  functions, but emits a deprecation warning.
+
+- The import of ``repoze.bfg.security.Unauthorized`` is deprecated in
+  favor of ``repoze.bfg.exceptions.Forbidden``.  The old location
+  still functions but emits a deprecation warning.  The rename from
+  ``Unauthorized`` to ``Forbidden`` brings parity to the the name of
+  the exception and the system view it invokes when raised.
 
 Backwards Incompatibilities
 ---------------------------

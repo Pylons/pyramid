@@ -31,12 +31,16 @@ from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IView
 
+from repoze.bfg.exceptions import NotFound
+from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.path import caller_package
 from repoze.bfg.renderers import renderer_from_name
 from repoze.bfg.resource import resource_spec
-from repoze.bfg.security import Unauthorized
 from repoze.bfg.settings import get_settings
 from repoze.bfg.static import PackageURLParser
+
+# b/c imports
+from repoze.bfg.security import view_execution_permitted
 
 try:
     all = all
@@ -53,6 +57,12 @@ deprecated('view_execution_permitted',
     "repoze.bfg.security import view_execution_permitted')",
     )
 
+deprecated('NotFound',
+    "('from repoze.bfg.view import NotFound' was  "
+    "deprecated as of repoze.bfg 1.1; instead use 'from "
+    "repoze.bfg.exceptions import NotFound')",
+    )
+
 _marker = object()
 
 def render_view_to_response(context, request, name='', secure=True):
@@ -64,7 +74,7 @@ def render_view_to_response(context, request, name='', secure=True):
     protected by a permission, the permission will be checked before
     calling the view function.  If the permission check disallows view
     execution (based on the current security policy), a
-    ``repoze.bfg.security.Unauthorized`` exception will be raised; its
+    ``repoze.bfg.exceptions.Forbidden`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     provides = map(providedBy, (context, request))
@@ -78,7 +88,7 @@ def render_view_to_response(context, request, name='', secure=True):
         # secured; otherwise it won't.
         view = getattr(view, '__call_permissive__', view)
 
-    # if this view is secured, it will raise an Unauthorized
+    # if this view is secured, it will raise a Forbidden
     # appropriately if the executing user does not have the proper
     # permission
     return view(context, request)
@@ -98,7 +108,7 @@ def render_view_to_iterable(context, request, name='', secure=True):
     a permission, the permission will be checked before calling the
     view function.  If the permission check disallows view execution
     (based on the current security policy), a
-    ``repoze.bfg.security.Unauthorized`` exception will be raised; its
+    ``repoze.bfg.exceptions.Forbidden`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     response = render_view_to_response(context, request, name, secure)
@@ -119,7 +129,7 @@ def render_view(context, request, name='', secure=True):
     permission, the permission will be checked before calling the view
     function.  If the permission check disallows view execution (based
     on the current security policy), a
-    ``repoze.bfg.security.Unauthorized`` exception will be raised; its
+    ``repoze.bfg.exceptions.Forbidden`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     iterable = render_view_to_iterable(context, request, name, secure)
@@ -385,9 +395,6 @@ def default_forbidden_view(context, request):
 
 def default_notfound_view(context, request):
     return default_view(context, request, '404 Not Found')
-
-class NotFound(Exception):
-    pass
 
 class MultiView(object):
     implements(IMultiView)
@@ -664,7 +671,7 @@ def secure_view(view, permission):
                 return view(context, request)
             msg = getattr(request, 'authdebug_message',
                           'Unauthorized: %s failed permission check' % view)
-            raise Unauthorized(msg)
+            raise Forbidden(msg)
         _secured_view.__call_permissive__ = view
         def _permitted(context, request):
             principals = authn_policy.effective_principals(request)
@@ -711,4 +718,3 @@ def authdebug_view(view, permission):
         decorate_view(wrapped_view, view)
 
     return wrapped_view
-

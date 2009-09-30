@@ -101,7 +101,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
     from repoze.bfg.interfaces import IView
     from repoze.bfg.interfaces import ISecuredView
     from repoze.bfg.security import has_permission
-    from repoze.bfg.security import Unauthorized
+    from repoze.bfg.exceptions import Forbidden
     if view is None:
         def view(context, request):
             from webob import Response
@@ -111,7 +111,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
     else:
         def _secure(context, request):
             if not has_permission(permission, context, request):
-                raise Unauthorized('no permission')
+                raise Forbidden('no permission')
             else:
                 return view(context, request)
         _secure.__call_permissive__ = view

@@ -672,10 +672,10 @@ class DummyView:
 
     def __call__(self, context, request):
         if self.raise_unauthorized:
-            from repoze.bfg.security import Unauthorized
-            raise Unauthorized('unauthorized')
+            from repoze.bfg.exceptions import Forbidden
+            raise Forbidden('unauthorized')
         if self.raise_notfound:
-            from repoze.bfg.view import NotFound
+            from repoze.bfg.exceptions import NotFound
             raise NotFound('notfound')
         return self.response
 

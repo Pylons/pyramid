@@ -57,6 +57,7 @@ Per-module :mod:`repoze.bfg` API documentation.
    api/chameleon_text
    api/chameleon_zpt
    api/events
+   api/exceptions
    api/location
    api/paster
    api/router

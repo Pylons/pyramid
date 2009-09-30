@@ -2,9 +2,20 @@ from zope.component import getSiteManager
 from zope.component import providedBy
 from zope.component import queryUtility
 
+from zope.deprecation import deprecated
+
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import ISecuredView
+
+# b/c import
+from repoze.bfg.exceptions import Forbidden as Unauthorized
+
+deprecated('Unauthorized',
+    "('from repoze.bfg.security import Unauthorized' was  "
+    "deprecated as of repoze.bfg 1.1; instead use 'from "
+    "repoze.bfg.exceptions import Forbidden')",
+    )
 
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
@@ -228,7 +239,4 @@ class ACLAllowed(ACLPermitsResult):
     attributes for debugging purposes.  The same summary is available
     as the ``msg`` attribute."""
     boolval = 1
-
-class Unauthorized(Exception):
-    pass
 

@@ -467,14 +467,14 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(mv.views, [(99, 'view2'), (100, 'view')])
 
     def test_match_not_found(self):
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
         self.assertRaises(NotFound, mv.match, context, request)
 
     def test_match_predicate_fails(self):
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         mv = self._makeOne()
         def view(context, request):
             """ """
@@ -496,7 +496,7 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(result, view)
 
     def test_permitted_no_views(self):
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
@@ -527,14 +527,14 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(result, False)
 
     def test__call__not_found(self):
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
         self.assertRaises(NotFound, mv, context, request)
 
     def test___call__intermediate_not_found(self):
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
@@ -561,7 +561,7 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(response, expected_response)
 
     def test__call_permissive__not_found(self):
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
@@ -1408,7 +1408,7 @@ class TestDeriveView(unittest.TestCase):
                          "'view_name' against context None): True")
         
     def test_view_with_debug_authorization_permission_authpol_denied(self):
-        from repoze.bfg.security import Unauthorized
+        from repoze.bfg.exceptions import Forbidden
         def view(context, request):
             """ """
         self._registerSettings(debug_authorization=True, reload_templates=True)
@@ -1422,7 +1422,7 @@ class TestDeriveView(unittest.TestCase):
         request = DummyRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        self.assertRaises(Unauthorized, result, None, request)
+        self.assertRaises(Forbidden, result, None, request)
         self.assertEqual(len(logger.messages), 1)
         self.assertEqual(logger.messages[0],
                          "debug_authorization of url url (view name "
@@ -1462,7 +1462,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(predicates, [True, True])
 
     def test_view_with_predicates_notall(self):
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         def view(context, request):
             """ """
         predicates = []

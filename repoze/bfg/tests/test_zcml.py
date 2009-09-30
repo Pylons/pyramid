@@ -573,7 +573,7 @@ class TestViewDirective(unittest.TestCase):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         context = DummyContext()
         class IFoo(Interface):
             pass
@@ -626,7 +626,7 @@ class TestViewDirective(unittest.TestCase):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         context = DummyContext()
         class IFoo(Interface):
             pass
@@ -679,7 +679,7 @@ class TestViewDirective(unittest.TestCase):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         context = DummyContext()
         class IFoo(Interface):
             pass
@@ -735,7 +735,7 @@ class TestViewDirective(unittest.TestCase):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.view import NotFound
+        from repoze.bfg.exceptions import NotFound
         context = DummyContext()
         class IFoo(Interface):
             pass

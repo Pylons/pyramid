@@ -680,7 +680,7 @@ The value of the ``permission`` attribute represents the permission
 that must be possessed by the user to invoke any found view.  When a
 view is found that matches all predicates, but the invoking user does
 not possess the permission implied by any associated ``permission`` in
-the current context, processing stops, and an ``Unauthorized`` error
+the current context, processing stops, and an ``Forbidden`` error
 is raised, usually resulting in a "forbidden" view being shown to the
 invoking user.  No further view narrowing or view lookup is done.
 
@@ -989,7 +989,7 @@ user does not possess the ``add`` permission relative to the current
 .. note::
 
    Packages such as :term:`repoze.who` are capable of intercepting an
-   ``Unauthorized`` response and displaying a form that asks a user to
+   ``Forbidden`` response and displaying a form that asks a user to
    authenticate.  Use this kind of package to ask the user for
    authentication credentials.
 

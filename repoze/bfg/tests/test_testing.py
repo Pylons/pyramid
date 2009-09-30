@@ -149,7 +149,7 @@ class TestTestingFunctions(unittest.TestCase):
 
     def test_registerView_with_permission_denying(self):
         from repoze.bfg import testing
-        from repoze.bfg.security import Unauthorized
+        from repoze.bfg.exceptions import Forbidden
         def view(context, request):
             """ """
         view = testing.registerView('moo.html', view=view, permission='bar')
@@ -157,7 +157,7 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        self.assertRaises(Unauthorized, render_view_to_response,
+        self.assertRaises(Forbidden, render_view_to_response,
                           None, None, 'moo.html')
 
     def test_registerView_with_permission_denying2(self):

@@ -26,8 +26,10 @@ class IResponse(Interface):
 class IView(Interface):
     def __call__(context, request):
         """ Must return an object that implements IResponse.  May
-        optionally raise ``repoze.bfg.security.Unauthorized`` if an
-        authorization failure is detected during view execution."""
+        optionally raise ``repoze.bfg.exceptions.Forbidden`` if an
+        authorization failure is detected during view execution or
+        ``repoze.bfg.exceptions.NotFound`` if the not found page is
+        meant to be returned."""
 
 class ISecuredView(IView):
     """ *Internal only* interface.  Not an API. """
