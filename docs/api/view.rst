@@ -19,3 +19,6 @@
   .. autoclass:: static
      :members:
 
+  .. autofunction:: append_slash_notfound_view
+
+

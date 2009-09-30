@@ -14,6 +14,7 @@ if hasattr(mimetypes, 'init'):
     mimetypes.init()
 
 from webob import Response
+from webob.exc import HTTPFound
 
 from paste.urlparser import StaticURLParser
 
@@ -29,6 +30,7 @@ from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IResponseFactory
+from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.exceptions import NotFound
@@ -718,3 +720,36 @@ def authdebug_view(view, permission):
         decorate_view(wrapped_view, view)
 
     return wrapped_view
+
+def append_slash_notfound_view(context, request):
+    """For behavior like Django's ``APPEND_SLASH=True``, use this view
+    as the Not Found view in your application.  
+
+    When this view is the Not Found view (indicating that no view was
+    found), and any routes have been defined in the configuration of
+    your application, if the value of ``PATH_INFO`` does not already
+    end in a slash, and if the value of ``PATH_INFO`` *plus* a slash
+    matches any route's path, do an HTTP redirect to the
+    slash-appended PATH_INFO.  Note that this will *lose* ``POST``
+    data information (turning it into a GET), so you shouldn't rely on
+    this to redirect POST requests.
+
+    Add the following to your application's ``configure.zcml`` to use
+    this view as the Not Found view::
+
+      <notfound
+         view="repoze.bfg.view.append_slash_notfound_view"/>
+
+    See also :ref:`changing_the_notfound_view`.
+
+    .. note:: This function is new as of :mod:`repoze.bfg` version 1.1.
+
+    """
+    path = request.environ.get('PATH_INFO', '/')
+    mapper = queryUtility(IRoutesMapper)
+    if mapper is not None and not path.endswith('/'):
+        slashpath = path + '/'
+        for route in mapper.routelist:
+            if route.match(slashpath) is not None:
+                return HTTPFound(location=slashpath)
+    return default_view(context, request, '404 Not Found')

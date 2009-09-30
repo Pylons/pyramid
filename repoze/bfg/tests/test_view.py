@@ -441,6 +441,61 @@ class TestDefaultNotFoundView(unittest.TestCase):
         self.assertEqual(response.status, '404 Not Found')
         self.failUnless('<code>abc&amp;123</code>' in response.body)
 
+class AppendSlashNotFoundView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, context, request):
+        from repoze.bfg.view import append_slash_notfound_view
+        return append_slash_notfound_view(context, request)
+
+    def _registerMapper(self, match=True):
+        from repoze.bfg.interfaces import IRoutesMapper
+        class DummyRoute(object):
+            def __init__(self, val):
+                self.val = val
+            def match(self, path):
+                return self.val
+        class DummyMapper(object):
+            def __init__(self):
+                self.routelist = [ DummyRoute(match) ]
+        mapper = DummyMapper()
+        import zope.component
+        gsm = zope.component.getGlobalSiteManager()
+        gsm.registerUtility(mapper, IRoutesMapper)
+        return mapper
+
+    def test_no_mapper(self):
+        request = DummyRequest({'PATH_INFO':'/abc'})
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_no_path(self):
+        self._registerMapper(True)
+        request = DummyRequest({})
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_mapper_path_already_slash_ending(self):
+        self._registerMapper(True)
+        request = DummyRequest({'PATH_INFO':'/abc/'})
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+
+    def test_matches(self):
+        self._registerMapper(True)
+        request = DummyRequest({'PATH_INFO':'/abc'})
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.location, '/abc/')
+
 class TestMultiView(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.view import MultiView
