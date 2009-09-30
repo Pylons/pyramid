@@ -13,6 +13,9 @@ Documentation
 - Describe "request-only" view calling conventions inside the
   urldispatch narrative chapter, where it's most helpful.
 
+- Add a diagram which explains the operation of the BFG router to the
+  "Router" narrative chapter.
+
 Features
 --------
 

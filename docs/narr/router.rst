@@ -3,6 +3,8 @@
 How :mod:`repoze.bfg` Processes A Request
 =========================================
 
+.. image:: router.png
+
 Once a :mod:`repoze.bfg` application is up and running, it is ready to
 accept requests and return responses.
 
@@ -65,11 +67,11 @@ processing?
    a :term:`view name` as well as other ancillary information.
 
 #. The request is decorated with various names returned from the
-   traverser (such as ``context``, ``view_name``, ``matchdict``, and
-   so forth), so they can be accessed via e.g. ``request.context``
-   within :term:`view` code.
+   traverser (such as ``context``, ``view_name``, and so forth), so
+   they can be accessed via e.g. ``request.context`` within
+   :term:`view` code.
 
-#. If an :term:`authentication policy` is in use, :mod:`repoze.bfg`
+#. If an :term:`authorization policy` is in use, :mod:`repoze.bfg`
    passes the context, the request, and the view_name to a function
    which determines whether the view being asked for can be executed
    by the requesting user, based on credential information in the
