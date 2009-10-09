@@ -7,5 +7,6 @@ class ViewTests(unittest.TestCase):
         from myproject.views import my_view
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        self.assertEqual(my_view(context, request), {'project':'MyProject'})
+        info = my_view(context, request)
+        self.assertEqual(info['project'], 'MyProject')
 
