@@ -245,9 +245,10 @@ our package's ``templates/static`` directory:
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/style.css`` by virtue of the
-``static_view`` view we've defined in the ``views.py`` file.  Any
-number and type of static resources can be placed in this directory
-(or subdirectories) and are just referred to by URL within templates.
+``<static>`` directive we've defined in the ``configure.zcml`` file.
+Any number and type of static resources can be placed in this
+directory (or subdirectories) and are just referred to by URL within
+templates.
 
 Mapping Views to URLs in ``configure.zcml``
 ===========================================
@@ -256,9 +257,7 @@ The ``configure.zcml`` file contains ``route`` declarations (and a
 lone ``view`` declaration) which serve to map URLs via :term:`url
 dispatch` to view functions.  First, we’ll get rid of the existing
 ``route`` created by the template using the name ``home``. It’s only
-an example and isn’t relevant to our application. We'll leave the
-static ``view`` declaration as it is, since we are going to use it to
-serve CSS.
+an example and isn’t relevant to our application. 
 
 We then need to add four ``route`` declarations to ``configure.zcml``.
 Note that the *ordering* of these declarations is very important.

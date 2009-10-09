@@ -11,10 +11,9 @@
     view=".views.my_view"
     />
 
-  <route
-    path="/static/*subpath"
+  <static
     name="static"
-    view=".views.static_view"
+    path="templates/static"
     />
 
 </configure>

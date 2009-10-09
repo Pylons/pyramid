@@ -5,7 +5,6 @@ from docutils.core import publish_parts
 from webob.exc import HTTPFound
 
 from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.view import static
 from repoze.bfg.security import authenticated_userid
 from repoze.bfg.url import route_url
 
@@ -14,8 +13,6 @@ from tutorial.models import Page
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
-
-static_view = static('templates/static')
 
 def view_wiki(request):
     return HTTPFound(location = route_url('view_page', request,
