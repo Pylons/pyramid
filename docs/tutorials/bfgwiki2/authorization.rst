@@ -57,17 +57,6 @@ See :ref:`assigning_acls` for more information about what an
    globally.  See the ``factory`` attribute in
    :ref:`route_zcml_directive` for more info.
 
-Configuring a ``repoze.bfg`` Authentication Policy
---------------------------------------------------
-
-For any :mod:`repoze.bfg` application to perform authorization, we
-need to add a ``security.py`` module and we'll need to change our
-:term:`application registry` to add an :term:`authentication policy`
-and an :term:`authorization policy`.
-
-Changing ``run.py``
-~~~~~~~~~~~~~~~~~~~
-
 We'll pass the ``RootFactory`` we created in the step above in as the
 first argument to ``make_app``.  When we're done, your application's
 ``run.py`` will look like this.
@@ -75,6 +64,14 @@ first argument to ``make_app``.  When we're done, your application's
 .. literalinclude:: src/authorization/tutorial/run.py
    :linenos:
    :language: python
+
+Configuring a ``repoze.bfg`` Authentication Policy
+--------------------------------------------------
+
+For any :mod:`repoze.bfg` application to perform authorization, we
+need to add a ``security.py`` module and we'll need to change our
+:term:`application registry` to add an :term:`authentication policy`
+and an :term:`authorization policy`.
 
 Changing ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
