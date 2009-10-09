@@ -86,7 +86,7 @@ def render_view_to_response(context, request, name='', secure=True):
         return None
 
     if not secure:
-        # the view will have a __permissive_view__ attribute if it's
+        # the view will have a __call_permissive__ attribute if it's
         # secured; otherwise it won't.
         view = getattr(view, '__call_permissive__', view)
 
