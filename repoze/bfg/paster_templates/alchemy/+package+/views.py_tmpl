@@ -1,13 +1,5 @@
-from repoze.bfg.chameleon_zpt import render_template_to_response
-
 def view_root(context, request):
-    return render_template_to_response('templates/root.pt',
-                                       request = request,
-                                       items = list(context),
-                                       project = '{{project}}')
+    return {'items':list(context), 'project':'{{project}}'}
 
 def view_model(context, request):
-    return render_template_to_response('templates/model.pt',
-                                       request = request,
-                                       item = context,
-                                       project = '{{project}}')
+    return {'item':context, 'project':'{{project}}'}
