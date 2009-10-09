@@ -566,7 +566,7 @@ registry`. It looks like so:
    ``repoze.bfg.includes`` package (which can be found in the main
    :mod:`repoze.bfg` sources).
 
-#. Lines 6-9 register a "default view" (a view that has no ``name``
+#. Lines 6-10 register a "default view" (a view that has no ``name``
    attribute).  It is ``for`` model objects that are instances of the
    ``MyModel`` class.  The ``view`` attribute points at a Python
    function that does all the work for this view.  Note that the
@@ -579,9 +579,11 @@ registry`. It looks like so:
    ``myproject.models.MyModel`` (forming a full Python dotted-path
    name to the ``MyModel`` class).  Likewise the shortcut
    ``.views.my_view`` could be replaced with
-   ``myproject.views.my_view``.
+   ``myproject.views.my_view``.  The view declaration also names a
+   ``renderer``, which in this case is a template that will be used to
+   render the result of the view callable.
 
-#. Lines 11-14 register a static view, which will register a view
+#. Lines 12-15 register a static view, which will register a view
    which serves up the files from the static directory in the package.
 
 ``views.py``
@@ -594,9 +596,7 @@ in the model, and the response given back to a browser.
 .. literalinclude:: MyProject/myproject/views.py
    :linenos:
 
-#. Lines 1-2 import required functions.
-
-#. Lines 3-6 provide the ``my_view`` that was registered as the view.
+#. Lines 1-2 provide the ``my_view`` that was registered as the view.
    ``configure.zcml`` said that the default URL for instances that are
    of the class ``MyModel`` should run this ``my_view`` function.
 
@@ -606,29 +606,21 @@ in the model, and the response given back to a browser.
    dispatch`).  The *request* is an instance of the :term:`WebOb`
    ``Request`` class representing the browser's request to our server.
 
-#. The view renders a :term:`Chameleon` template and returns the
-   result as the :term:`response`.  Note that because our
-   ``MyProject.ini`` has a ``reload_templates = true`` directive
-   indicating that templates should be reloaded when they change, you
-   won't need to restart the application server to see changes you
-   make to templates.  During development, this is handy.  If this
-   directive had been ``false`` (or if the directive did not exist),
-   you would need to restart the application server for each template
-   change.  For production applications, you should set your project's
-   ``reload_templates`` to ``false`` to increase the speed at which
-   templates may be rendered.
+#. The view returns a dictionary.  :mod:`repoze.bfg` uses the
+   dictionary to render a :term:`Chameleon` template (the
+   ``templates/my_template.pt`` template, as per the
+   ``configure.zcml`` file configuration) and returns the result as
+   the :term:`response`.
 
-.. note::
-
-  This example uses ``render_template_to_response`` which is a
-  shortcut function.  If you want more control over the response, use
-  the ``render_template`` function, also present in
-  :ref:`chameleon_zpt_module`.  You may then create your own
-  :term:`WebOb` Response object, using the result of
-  ``render_template`` as the response's body.  There is also a
-  ``get_template`` API in the same module, which you can use to
-  retrieve the template object without rendering it at all, for
-  additional control.
+.. note:: because our ``MyProject.ini`` has a ``reload_templates =
+   true`` directive indicating that templates should be reloaded when
+   they change, you won't need to restart the application server to
+   see changes you make to templates.  During development, this is
+   handy.  If this directive had been ``false`` (or if the directive
+   did not exist), you would need to restart the application server
+   for each template change.  For production applications, you should
+   set your project's ``reload_templates`` to ``false`` to increase
+   the speed at which templates may be rendered.
 
 .. _modelspy_project_section:
 
@@ -687,8 +679,9 @@ The single :term:`Chameleon` template in the project looks like so:
    :language: xml
 
 It displays a default page when rendered.  It is referenced by the
-``my_view`` function in the ``views.py`` module.  Templates are
-accessed and used by view functions.
+``view`` declaration in the ``configure.zcml`` file.  Templates are
+accessed and used by view declarations and sometimes by view
+functions themselves.
 
 ``templates/static``
 ~~~~~~~~~~~~~~~~~~~~
@@ -704,10 +697,9 @@ The ``tests.py`` module includes unit tests for your application.
 .. literalinclude:: MyProject/myproject/tests.py
    :linenos:
 
-This sample ``tests.py`` file has a single unit test and a single
-integration test defined within it.  These two tests are executed when
-you run ``python setup.py test -q``.  You may add more tests here as
-you build your application.  You are not required to write tests to
-use :mod:`repoze.bfg`, this file is simply provided as convenience and
-example.
+This sample ``tests.py`` file has a single unit test defined within
+it.  This test is executed when you run ``python setup.py test -q``.
+You may add more tests here as you build your application.  You are
+not required to write tests to use :mod:`repoze.bfg`, this file is
+simply provided as convenience and example.
 
