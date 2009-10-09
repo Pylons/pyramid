@@ -45,6 +45,11 @@ Our resulting ``setup.py`` should look like so:
    :linenos:
    :language: python
 
+.. note:: After these new dependencies are added, you will need to
+   rerun ``python setup.py develop`` inside the root of the
+   ``tutorial`` package to obtain and register the newly added
+   dependency package.
+
 Adding View Functions
 =====================
 
