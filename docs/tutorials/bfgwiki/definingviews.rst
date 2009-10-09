@@ -259,11 +259,7 @@ Mapping Views to URLs in ``configure.zcml``
 
 The ``configure.zcml`` file contains ``view`` declarations which serve
 to map URLs (via :term:`traversal`) to view functions.  You'll need to
-add five ``view`` declarations to ``configure.zcml``.
-
-#. Add a declaration which maps the "Wiki" class in our ``models.py``
-   file to the view named ``static_view`` in our ``views.py`` file with
-   the view name ``static``.
+add four ``view`` declarations to ``configure.zcml``.
 
 #. Add a declaration which maps the "Wiki" class in our ``models.py``
    file to the view named ``view_wiki`` in our ``views.py`` file with

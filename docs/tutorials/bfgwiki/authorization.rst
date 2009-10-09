@@ -169,13 +169,6 @@ pass a ``permission`` argument to each of our ``bfg_view`` decorators.
 To do so, within ``views.py``:
 
 - We add ``permission='view'`` to the ``bfg_view`` decorator attached
-  to the ``static_view`` view function.  This makes the assertion that
-  only users who possess the effective ``view`` permission at the time
-  of the request may invoke this view.  We've granted ``Everyone`` the
-  view permission at the root model via its ACL, so everyone will be
-  able to invoke the ``static_view`` view.
-
-- We add ``permission='view'`` to the ``bfg_view`` decorator attached
   to the ``view_wiki`` view function. This makes the assertion that
   only users who possess the effective ``view`` permission at the time
   of the request may invoke this view.  We've granted ``Everyone`` the

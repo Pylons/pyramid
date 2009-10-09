@@ -18,9 +18,8 @@ Adding View Decorators
 
 We're going to import the ``bfg_view`` callable from the
 ``repoze.bfg.view`` module.  This callable can be used as a function
-decorator.  We'll use it to decorate our ``static_view``,
-``view_wiki``, ``view_page``, ``add_page`` and ``edit_page`` view
-functions.
+decorator.  We'll use it to decorate our ``view_wiki``, ``view_page``,
+``add_page`` and ``edit_page`` view functions.
 
 The ``bfg_view`` callable accepts a number of arguments:
 
@@ -34,35 +33,6 @@ The ``bfg_view`` callable accepts a number of arguments:
 
 There are other arguments which this callable accepts, but these are
 the ones we're going to use.
-
-The ``static_view`` view function
----------------------------------
-
-Because our ``bfg_view`` decorator can only decorate view functions
-and classes (not instances), we rename our ``static_view`` to
-``static_app`` and create a new function named ``static_view`` which
-simply calls ``static_app`` with the context and request.  We decorate
-the resulting ``static_view`` function with the following:
-
-.. code-block:: python
-   :linenos:
-
-   @bfg_view(for_=Wiki, name='static')
-
-This indicates that the view is "for" the Wiki class and has the
-view_name ``static``.  After injecting this decorator, we can now
-*remove* the following from our ``configure.zcml`` file:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-      for=".models.Wiki"
-      view=".views.static_view"
-      name="static"
-      />
-
-Our decorator takes its place.
 
 The ``view_wiki`` view function
 -------------------------------
