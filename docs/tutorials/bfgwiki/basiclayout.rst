@@ -38,9 +38,9 @@ XML namespace.  Our sample ZCML file looks like the following:
    Since this ``<view>`` doesn't have a ``name`` attribute, it is the
    "default" view for that class.
 
-#. *Lines 11-15*.  Register a view on the ``MyModels`` class that
-   answers URL segments of ``static``.  This is a view that will serve
-   up static resources for us, in this case, at
+#. *Lines 11-15*.  Register a ``static`` view which answers requests
+   which start with ``/static``.  This is a view that will serve up
+   static resources for us, in this case, at
    ``http://localhost:6543/static/`` and below.
 
 Content Models with ``models.py``

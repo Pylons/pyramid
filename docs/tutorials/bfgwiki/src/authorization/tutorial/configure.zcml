@@ -14,4 +14,9 @@
 
   <aclauthorizationpolicy/>
 
+  <static
+    name="static"
+    path="templates/static"
+    />
+
 </configure>

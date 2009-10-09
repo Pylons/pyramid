@@ -3,11 +3,10 @@
   <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
 
-  <view
-     for=".models.Wiki"
-     view=".views.static_view"
-     name="static"
-     />
+  <static
+    name="static"
+    path="templates/static"
+    />
 
   <view
      for=".models.Wiki"

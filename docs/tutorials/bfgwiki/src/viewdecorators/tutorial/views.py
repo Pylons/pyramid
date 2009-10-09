@@ -4,7 +4,6 @@ import re
 from webob.exc import HTTPFound
 from repoze.bfg.url import model_url
 from repoze.bfg.chameleon_zpt import render_template_to_response
-from repoze.bfg.view import static
 from repoze.bfg.view import bfg_view
 
 from tutorial.models import Page
@@ -12,12 +11,6 @@ from tutorial.models import Wiki
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
-
-static_app = static('templates/static')
-
-@bfg_view(for_=Wiki, name='static')
-def static_view(context, request):
-    return static_app(context, request)
 
 @bfg_view(for_=Wiki)
 def view_wiki(context, request):
