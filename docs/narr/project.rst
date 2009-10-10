@@ -161,12 +161,12 @@ Here's sample output from a test run:
    running build_ext
    ..
    ----------------------------------------------------------------------
-   Ran 2 tests in 0.647s
+   Ran 1 test in 0.108s
 
    OK
 
 The tests are found in the ``tests.py`` module in your ``paster
-create`` -generated project.  Two sample tests exist.
+create`` -generated project.  One sample test exists.
 
 The Interactive Shell
 ---------------------
@@ -556,15 +556,18 @@ registry`. It looks like so:
    :linenos:
    :language: xml
 
-#. Lines 1 provides the root node and namespaces for the configuration
+#. Line 1 provides the root node and namespaces for the configuration
    language.  ``http://namespaces.repoze.org/bfg`` is the default XML
    namespace.  Add-on packages may require other namespaces.
 
-#. Lines 4 initializes :mod:`repoze.bfg`-specific configuration
+#. Line 4 initializes :mod:`repoze.bfg`-specific configuration
    directives by including the ``repoze.bfg.includes`` package.  This
    causes all of the ZCML within the ``configure.zcml`` of the
    ``repoze.bfg.includes`` package (which can be found in the main
-   :mod:`repoze.bfg` sources).
+   :mod:`repoze.bfg` sources) to be "included" in this configuration
+   file's scope.  Effectively this means that we can use (for this
+   example) the ``view`` and ``static`` directives which follow later
+   in this file.
 
 #. Lines 6-10 register a "default view" (a view that has no ``name``
    attribute).  It is ``for`` model objects that are instances of the
@@ -579,12 +582,22 @@ registry`. It looks like so:
    ``myproject.models.MyModel`` (forming a full Python dotted-path
    name to the ``MyModel`` class).  Likewise the shortcut
    ``.views.my_view`` could be replaced with
-   ``myproject.views.my_view``.  The view declaration also names a
-   ``renderer``, which in this case is a template that will be used to
-   render the result of the view callable.
+   ``myproject.views.my_view``.
+
+   The view declaration also names a ``renderer``, which in this case
+   is a template that will be used to render the result of the view
+   callable.  This particular view delcaration points at
+   ``templates/mytemplate.pt``, which is a *relative* file
+   specification (it's relative to the directory in which the
+   ``configure.zcml`` file lives).  The template file it points at is
+   a :term:`Chameleon` ZPT template file.
 
 #. Lines 12-15 register a static view, which will register a view
-   which serves up the files from the static directory in the package.
+   which serves up the files from the ``templates/static`` directory
+   relative to the directory in which the ``configure.zcml`` file
+   lives.
+
+#. Line 17 ends the ``configure`` root tag.
 
 ``views.py``
 ~~~~~~~~~~~~
@@ -596,21 +609,25 @@ in the model, and the response given back to a browser.
 .. literalinclude:: MyProject/myproject/views.py
    :linenos:
 
-#. Lines 1-2 provide the ``my_view`` that was registered as the view.
-   ``configure.zcml`` said that the default URL for instances that are
-   of the class ``MyModel`` should run this ``my_view`` function.
+Lines 1-2 provide the ``my_view`` that was registered as the view.
+``configure.zcml`` said that the default URL for instances that are of
+the class ``MyModel`` should run this ``my_view`` function.
 
-   The function is handed two pieces of information: the
-   :term:`context` and the :term:`request`.  The *context* is the term
-   :term:`model` found via :term:`traversal` (or via :term:`URL
-   dispatch`).  The *request* is an instance of the :term:`WebOb`
-   ``Request`` class representing the browser's request to our server.
+The function is handed two pieces of information: the :term:`context`
+and the :term:`request`.  The *context* is the term :term:`model`
+found via :term:`traversal` (or via :term:`URL dispatch`).  The
+*request* is an instance of the :term:`WebOb` ``Request`` class
+representing the browser's request to our server.
 
-#. The view returns a dictionary.  :mod:`repoze.bfg` uses the
-   dictionary to render a :term:`Chameleon` template (the
-   ``templates/my_template.pt`` template, as per the
-   ``configure.zcml`` file configuration) and returns the result as
-   the :term:`response`.
+This view returns a dictionary.  When this view is invoked, a
+:term:`renderer` renders the dictionary returned by the view, and
+returns the result as the :term:`response`.  This view is configured
+to invoke a renderer which uses a :term:`Chameleon` ZPT template
+(``templates/my_template.pt``, as specified in the ``configure.zcml``
+file).
+
+See :ref:`views_which_use_a_renderer` for more information about how
+views, renderers, and templates relate and cooperate.
 
 .. note:: because our ``MyProject.ini`` has a ``reload_templates =
    true`` directive indicating that templates should be reloaded when
@@ -679,9 +696,11 @@ The single :term:`Chameleon` template in the project looks like so:
    :language: xml
 
 It displays a default page when rendered.  It is referenced by the
-``view`` declaration in the ``configure.zcml`` file.  Templates are
-accessed and used by view declarations and sometimes by view
-functions themselves.
+``view`` declaration's ``renderer`` attribute in the
+``configure.zcml`` file.  Templates are accessed and used by view
+declarations and sometimes by view functions themselves.  See
+:ref:`views_which_use_a_renderer` for more information about
+renderers.
 
 ``templates/static``
 ~~~~~~~~~~~~~~~~~~~~
