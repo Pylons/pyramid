@@ -4,6 +4,13 @@ Next release
 Documentation
 -------------
 
+- Change "Traversal + ZODB" and "URL Dispatch + SQLAlchemy" Wiki
+  tutorials to make use of the new-to-1.1 "renderer" feature (return
+  dictionaries from all views).
+
+- Add tests to the "URL Dispatch + SQLAlchemy" tutorial after the
+  "view" step.
+
 - Added a diagram of model graph traversal to the "Traversal"
   narrative chapter of the documentation.
 
