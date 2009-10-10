@@ -220,6 +220,28 @@ def registerTraverserFactory(traverser, for_=Interface):
     from repoze.bfg.interfaces import ITraverserFactory
     return registerAdapter(traverser, for_, ITraverserFactory)
 
+def registerRoute(path, name, factory=None):
+    """ Register a new route using a path (e.g. ``:pagename``), a name
+    (e.g. 'home'), and an optional root factory.  This is useful for
+    testing code that calls e.g. ``route_url``."""
+    from repoze.bfg.interfaces import IRoutesMapper
+    from zope.component import queryUtility
+    from repoze.bfg.urldispatch import RoutesRootFactory
+    from zope.component import getSiteManager
+    mapper = queryUtility(IRoutesMapper)
+    if mapper is None:
+        mapper = RoutesRootFactory(DummyRootFactory)
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
+    mapper.connect(path, name, factory)
+
+class DummyRootFactory(object):
+    __parent__ = None
+    __name__ = None
+    def __init__(self, environ):
+        if 'bfg.routes.matchdict' in environ:
+            self.__dict__.update(environ['bfg.routes.matchdict'])
+
 class DummySecurityPolicy:
     """ A standin for both an IAuthentication and IAuthorization policy """
     def __init__(self, userid=None, groupids=(), permissive=True):
@@ -410,6 +432,7 @@ class DummyRequest:
         self.headers = headers
         self.params = params
         self.cookies = cookies
+        self.matchdict = {}
         self.GET = params
         if post is not None:
             self.method = 'POST'

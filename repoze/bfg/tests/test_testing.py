@@ -259,6 +259,34 @@ class TestTestingFunctions(unittest.TestCase):
         testing.registerUtility(utility, iface, name='mudge')
         self.assertEqual(getUtility(iface, name='mudge')(), 'foo')
 
+    def test_registerRoute(self):
+        from repoze.bfg.url import route_url
+        from repoze.bfg.interfaces import IRoutesMapper
+        from repoze.bfg.testing import registerRoute
+        from zope.component import getSiteManager
+        class Factory:
+            def __init__(self, environ):
+                """ """
+        class DummyRequest:
+            application_url = 'http://example.com'
+        registerRoute(':pagename', 'home', Factory)
+        sm = getSiteManager()
+        mapper = sm.getUtility(IRoutesMapper)
+        self.assertEqual(len(mapper.routelist), 1)
+        request = DummyRequest()
+        self.assertEqual(route_url('home', request, pagename='abc'),
+                         'http://example.com/abc')
+
+class TestDummyRootFactory(unittest.TestCase):
+    def _makeOne(self, environ):
+        from repoze.bfg.testing import DummyRootFactory
+        return DummyRootFactory(environ)
+
+    def test_it(self):
+        environ = {'bfg.routes.matchdict':{'a':1}}
+        factory = self._makeOne(environ)
+        self.assertEqual(factory.a, 1)
+
 class TestDummySecurityPolicy(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.testing import DummySecurityPolicy
