@@ -40,6 +40,44 @@ implements a minimal NotFound view:
    This error will be different when the ``debug_notfound``
    environment setting is true than it is when it is false.
 
+Other available attributes of the ``notfound`` ZCML directive are as
+follows:
+
+attr
+
+  The attribute of the view callable to use if ``__call__`` is not
+  correct (has the same meaning as in the context of
+  :ref:`the_view_zcml_directive`; see the description of ``attr``
+  there).
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+renderer
+
+  This is either a single string term (e.g. ``json``) or a string
+  implying a path or :term:`resource specification`
+  (e.g. ``templates/views.pt``) used when the view returns a
+  non-:term:`response` object.  This attribute has the same meaning as
+  it would in the context of :ref:`the_view_zcml_directive`; see the
+  description of ``renderer`` there).
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+wrapper
+
+  The :term:`view name` (*not* an object dotted name) of another view
+  declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
+  which will receive the response body of this view as the
+  ``request.wrapped_body`` attribute of its own request, and the
+  response returned by this view as the ``request.wrapped_response``
+  attribute of its own request.  This attribute has the same meaning
+  as it would in the context of :ref:`the_view_zcml_directive`; see
+  the description of ``wrapper`` there).  Note that the wrapper view
+  *should not* be protected by any permission; behavior is undefined
+  if it does.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 .. _changing_the_forbidden_view:
 
 Changing the Forbidden View
@@ -85,6 +123,45 @@ code that implements a minimal forbidden view:
    You can influence the status code of Forbidden responses by using
    an alternate forbidden view.  For example, it would make sense to
    return a response with a ``403 Forbidden`` status code.
+
+Other available attributes of the ``forbidden`` ZCML directive are as
+follows:
+
+attr
+
+  The attribute of the view callable to use if ``__call__`` is not
+  correct (has the same meaning as in the context of
+  :ref:`the_view_zcml_directive`; see the description of ``attr``
+  there).
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+renderer
+
+  This is either a single string term (e.g. ``json``) or a string
+  implying a path or :term:`resource specification`
+  (e.g. ``templates/views.pt``) used when the view returns a
+  non-:term:`response` object.  This attribute has the same meaning as
+  it would in the context of :ref:`the_view_zcml_directive`; see the
+  description of ``renderer`` there).
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+wrapper
+
+  The :term:`view name` (*not* an object dotted name) of another view
+  declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
+  which will receive the response body of this view as the
+  ``request.wrapped_body`` attribute of its own request, and the
+  response returned by this view as the ``request.wrapped_response``
+  attribute of its own request.  This attribute has the same meaning
+  as it would in the context of :ref:`the_view_zcml_directive`; see
+  the description of ``wrapper`` there).  Note that the wrapper view
+  *should not* be protected by any permission; behavior is undefined
+  if it does.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 
 Changing the response factory
 -----------------------------

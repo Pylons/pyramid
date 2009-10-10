@@ -18,13 +18,13 @@
 
     <meta:directive
         name="notfound"
-        schema="repoze.bfg.zcml.INotFoundViewDirective"
+        schema="repoze.bfg.zcml.ISystemViewDirective"
         handler="repoze.bfg.zcml.notfound"
         />
 
     <meta:directive
         name="forbidden"
-        schema="repoze.bfg.zcml.IForbiddenViewDirective"
+        schema="repoze.bfg.zcml.ISystemViewDirective"
         handler="repoze.bfg.zcml.forbidden"
         />
 

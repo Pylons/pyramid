@@ -4,6 +4,11 @@ Next release
 Documentation
 -------------
 
+- The ``notfound`` and ``forbidden`` ZCML directives now accept the
+  following addtional attributes: ``attr``, ``renderer``, and
+  ``wrapper``.  These have the same meaning as they do in the context
+  of a ZCML ``view`` directive.
+
 - Added a diagram of model graph traversal to the "Traversal"
   narrative chapter of the documentation.
 

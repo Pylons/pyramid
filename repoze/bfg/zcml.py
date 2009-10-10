@@ -279,29 +279,49 @@ def view(
 
 _view = view # for directives that take a view arg
 
-class INotFoundViewDirective(Interface):
+class ISystemViewDirective(Interface):
     view = GlobalObject(
         title=u"",
-        description=u"The notfound view callable",
-        required=True,
+        description=u"The view function",
+        required=False,
         )
 
-def notfound(_context, view):
-    view_utility(_context, view, INotFoundView)
+    attr = TextLine(
+        title=u'The callable attribute of the view object(default is __call__)',
+        description=u'',
+        required=False)
 
-class IForbiddenViewDirective(Interface):
-    view = GlobalObject(
-        title=u"",
-        description=u"The forbidden view callable",
-        required=True,
-        )
+    renderer = TextLine(
+        title=u'The renderer asssociated with the view',
+        description=u'',
+        required=False)
 
-def forbidden(_context, view):
-    view_utility(_context, view, IForbiddenView)
+    wrapper = TextLine(
+        title = u'The *name* of the view that acts as a wrapper for this view.',
+        description = u'',
+        required=False)
 
-def view_utility(_context, view, iface):
+def notfound(_context, view=None, attr=None, renderer=None, wrapper=None):
+    view_utility(_context, view, attr, renderer, wrapper, INotFoundView)
+
+def forbidden(_context, view=None, attr=None, renderer=None, wrapper=None):
+    view_utility(_context, view, attr, renderer, wrapper, IForbiddenView)
+
+def view_utility(_context, view, attr, renderer, wrapper, iface):
+    if not view:
+        if renderer:
+            def view(context, request):
+                return {}
+        else:
+            raise ConfigurationError('"view" attribute was not specified and '
+                                     'no renderer specified')
+
+    if renderer and '.' in renderer:
+        renderer = resource_spec(renderer, package_name(_context.resolve('.')))
+
     def register():
-        derived_view = derive_view(view)
+        derived_view = derive_view(view, attr=attr, renderer_name=renderer,
+                                   wrapper_viewname=wrapper)
         sm = getSiteManager()
         sm.registerUtility(derived_view, iface, '', _context.info)
 
@@ -309,7 +329,6 @@ def view_utility(_context, view, iface):
         discriminator = iface,
         callable = register,
         )
-
 
 class IResourceDirective(Interface):
     """

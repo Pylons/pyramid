@@ -947,6 +947,12 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(wrapper, view)
 
 class TestNotFoundDirective(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, context, view):
         from repoze.bfg.zcml import notfound
         return notfound(context, view)
@@ -972,6 +978,12 @@ class TestNotFoundDirective(unittest.TestCase):
         self.assertEqual(derived_view.__name__, view.__name__)
 
 class TestForbiddenDirective(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
     def _callFUT(self, context, view):
         from repoze.bfg.zcml import forbidden
         return forbidden(context, view)
@@ -995,6 +1007,67 @@ class TestForbiddenDirective(unittest.TestCase):
         derived_view = sm.getUtility(IForbiddenView)
         self.assertEqual(derived_view(None, None), 'OK')
         self.assertEqual(derived_view.__name__, view.__name__)
+
+class TestViewUtility(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+        
+    def _callFUT(self, context, view, attr, renderer, wrapper, iface):
+        from repoze.bfg.zcml import view_utility
+        return view_utility(context, view, attr, renderer, wrapper, iface)
+
+    def test_no_view_no_renderer(self):
+        from zope.configuration.exceptions import ConfigurationError
+        context = DummyContext()
+        self.assertRaises(ConfigurationError, self._callFUT, context,
+                          None, None, None, None, None)
+    
+    def test_no_view_with_renderer(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRendererFactory
+        sm = getSiteManager()
+        def renderer(path):
+            return lambda *arg: 'OK'
+        sm.registerUtility(renderer, IRendererFactory, name='dummy')
+        class IDummy(Interface):
+            pass
+        context = DummyContext()
+        self._callFUT(context, None, None, 'dummy', None, IDummy)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        regadapt = actions[0]
+        self.assertEqual(regadapt['discriminator'], IDummy)
+        register = regadapt['callable']
+        register()
+        derived_view = sm.getUtility(IDummy)
+        request = DummyRequest()
+        self.assertEqual(derived_view(None, request).body, 'OK')
+
+    def test_template_renderer(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRendererFactory
+        sm = getSiteManager()
+        def renderer(path):
+            return lambda *arg: 'OK'
+        sm.registerUtility(renderer, IRendererFactory, name='.pt')
+        class IDummy(Interface):
+            pass
+        context = DummyContext()
+        self._callFUT(context, None, None, 'fixtures/minimal.pt', None, IDummy)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        regadapt = actions[0]
+        self.assertEqual(regadapt['discriminator'], IDummy)
+        register = regadapt['callable']
+        register()
+        derived_view = sm.getUtility(IDummy)
+        request = DummyRequest()
+        self.assertEqual(derived_view(None, request).body, 'OK')
 
 class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
