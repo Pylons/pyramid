@@ -109,18 +109,13 @@ HTML containing various view and add links for WikiWords based on the
 content of our current page object.
 
 We then generate an edit URL (because it's easier to do here than in
-the template), and we call the
-``repoze.bfg.chameleon_zpt.render_template_to_response`` function with
-a number of arguments.  The first argument is the *relative* path to a
-:term:`Chameleon` ZPT template.  It is relative to the directory of
-the file in which we're creating the ``view_page`` function.  The
-``render_template_to_response`` function also accepts ``request``,
-``page``, ``content``, and ``edit_url`` as keyword arguments.  As a
-result, the template will be able to use these names to perform
-various rendering tasks.
-
-The result of ``render_template_to_response`` is returned to
-:mod:`repoze.bfg`.  Unsurprisingly, it is a response object.
+the template), and we return a dictionary with a number of arguments.
+The fact that this view returns a dictionary (as opposed to a
+:term:`response` object) is a cue to :mod:`repoze.bfg` that it should
+try to use a :term:`renderer` associated with the view configuration
+to render a template.  In our case, the template which will be
+rendered will be the ``templates/view.pt`` template, as per the
+configuration put into effect in ``configure.zcml``.
 
 The ``add_page`` view function
 ------------------------------
@@ -138,17 +133,17 @@ the page we'd like to add.  If our add view is invoked via,
 e.g. ``http://localhost:6543/add_page/SomeName``, the ``pagename``
 value in the matchdict will be ``SomeName``.
 
-If the view rendering is *not* a result of a form submission (if the
+If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is False), the view
 renders a template.  To do so, it generates a "save url" which the
 template use as the form post URL during rendering.  We're lazy here,
 so we're trying to use the same template (``templates/edit.pt``) for
 the add view as well as the page edit view, so we create a dummy Page
 object in order to satisfy the edit form's desire to have *some* page
-object exposed as ``page``, and we'll render the template to a
-response.
+object exposed as ``page``, and BFG will render the template
+associated with this view to a response.
 
-If the view rendering *is* a result of a form submission (if the
+If the view execution *is* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is True), we scrape
 the page body from the form data, create a Page object using the name
 in the matchdict ``pagename``, and obtain the page body from the
@@ -166,12 +161,12 @@ it also acts as the handler for the form it renders.  The
 will have a ``pagename`` key matching the name of the page the user
 wants to edit.
 
-If the view rendering is *not* a result of a form submission (if the
+If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is False), the view
 simply renders the edit form, passing the request, the page object,
 and a save_url which will be used as the action of the generated form.
 
-If the view rendering *is* a result of a form submission (if the
+If the view execution *is* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is True), the view
 grabs the ``body`` element of the request parameter and sets it as the
 ``data`` key in the matchdict.  It then redirects to the default view
@@ -346,3 +341,47 @@ the top of it that generates an exception (e.g. ``raise
 Exception('Forced Exception')``).  Then visit the error-raising view
 in a browser.  You should see an interactive exception handler in the
 browser which allows you to examine values in a post-mortem mode.
+
+Adding Tests
+============
+
+Since we've added a good bit of imperative code here, it's useful to
+define tests for the views we've created.  We'll change our tests.py
+module to look like this:
+
+.. literalinclude:: src/views/tutorial/tests.py
+   :linenos:
+   :language: python
+
+We can then run the tests using something like:
+
+.. code-block:: bash
+   :linenos:
+
+   $ python setup.py test -q
+
+The expected output is something like:
+
+.. code-block:: bash
+   :linenos:
+
+   running test
+   running egg_info
+   writing requirements to tutorial.egg-info/requires.txt
+   writing tutorial.egg-info/PKG-INFO
+   writing top-level names to tutorial.egg-info/top_level.txt
+   writing dependency_links to tutorial.egg-info/dependency_links.txt
+   writing entry points to tutorial.egg-info/entry_points.txt
+   unrecognized .svn/entries format in 
+   reading manifest file 'tutorial.egg-info/SOURCES.txt'
+   writing manifest file 'tutorial.egg-info/SOURCES.txt'
+   running build_ext
+   ......
+   ----------------------------------------------------------------------
+   Ran 6 tests in 0.181s
+
+   OK
+
+
+
+   

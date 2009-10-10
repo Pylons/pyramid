@@ -143,18 +143,16 @@ into its template.  We'll add something like this to each view body:
 
    logged_in = authenticated_userid(request)
 
-We'll then change the return value of ``render_template_to_response``
-to pass the `resulting `logged_in`` value to the template, e.g.:
+We'll then change the return value of these views to pass the
+`resulting `logged_in`` value to the template, e.g.:
 
 .. code-block:: python
    :linenos:
 
-   return render_template_to_response('templates/view.pt',
-                                      request = request,
-                                      page = page,
-                                      content = content,
-                                      logged_in = logged_in,
-                                      edit_url = edit_url)
+   return dict(page = page,
+               content = content,
+               logged_in = logged_in,
+               edit_url = edit_url)
 
 Adding the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
