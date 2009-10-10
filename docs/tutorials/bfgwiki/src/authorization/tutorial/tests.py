@@ -41,12 +41,6 @@ class AppmakerTests(unittest.TestCase):
                          'This is the front page')
 
 class ViewWikiTests(unittest.TestCase):
-    def setUp(self):
-        testing.cleanUp()
-        
-    def tearDown(self):
-        testing.cleanUp()
-
     def test_it(self):
         from tutorial.views import view_wiki
         context = testing.DummyModel()
@@ -55,12 +49,6 @@ class ViewWikiTests(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/FrontPage')
 
 class ViewPageTests(unittest.TestCase):
-    def setUp(self):
-        testing.cleanUp()
-        
-    def tearDown(self):
-        testing.cleanUp()
-
     def _callFUT(self, context, request):
         from tutorial.views import view_page
         return view_page(context, request)
@@ -87,12 +75,6 @@ class ViewPageTests(unittest.TestCase):
         
     
 class AddPageTests(unittest.TestCase):
-    def setUp(self):
-        testing.cleanUp()
-        
-    def tearDown(self):
-        testing.cleanUp()
-
     def _callFUT(self, context, request):
         from tutorial.views import add_page
         return add_page(context, request)
@@ -119,12 +101,6 @@ class AddPageTests(unittest.TestCase):
         self.assertEqual(page.__parent__, context)
 
 class EditPageTests(unittest.TestCase):
-    def setUp(self):
-        testing.cleanUp()
-        
-    def tearDown(self):
-        testing.cleanUp()
-
     def _callFUT(self, context, request):
         from tutorial.views import edit_page
         return edit_page(context, request)
