@@ -23,6 +23,8 @@
 
   .. autofunction:: registerSubscriber
 
+  .. autofunction:: registerRoute
+
   .. autofunction:: cleanUp
 
   .. autoclass:: DummyModel
