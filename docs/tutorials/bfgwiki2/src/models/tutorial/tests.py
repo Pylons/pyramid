@@ -8,21 +8,14 @@ def _initTestingDB():
 
 class TestMyView(unittest.TestCase):
     def setUp(self):
-        testing.cleanUp()
         _initTestingDB()
         
-    def tearDown(self):
-        testing.cleanUp()
-
-    def _callFUT(self, context, request):
+    def _callFUT(self, request):
         from tutorial.views import my_view
-        return my_view(context, request)
+        return my_view(request)
 
     def test_it(self):
         request = testing.DummyRequest()
-        context = testing.DummyModel()
-        renderer = testing.registerDummyRenderer('templates/mytemplate.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.root.name, 'root')
-        self.assertEqual(renderer.request, request)
-        self.assertEqual(renderer.project, 'tutorial')
+        info = self._callFUT(request)
+        self.assertEqual(info['root'].name, 'root')
+        self.assertEqual(info['project'], 'tutorial')

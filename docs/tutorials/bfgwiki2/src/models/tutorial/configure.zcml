@@ -9,6 +9,7 @@
   <route path=""
     name="home"
     view=".views.my_view"
+    renderer="templates/mytemplate.pt"
     />
 
   <static
