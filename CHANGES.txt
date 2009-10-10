@@ -19,6 +19,10 @@ Documentation
 Features
 --------
 
+- Add a new ``repoze.bfg.testing`` API: ``registerRoute``, for
+  registering routes to satisfy calls to
+  e.g. ``repoze.bfg.url.route_url`` in unit tests.
+
 - The ``notfound`` and ``forbidden`` ZCML directives now accept the
   following addtional attributes: ``attr``, ``renderer``, and
   ``wrapper``.  These have the same meaning as they do in the context
