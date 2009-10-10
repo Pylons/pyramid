@@ -15,6 +15,7 @@
      path="login"
      name="login"
      view=".login.login"
+     renderer="templates/login.pt"
      />
 
   <route
@@ -33,24 +34,28 @@
      path=":pagename"
      name="view_page"
      view=".views.view_page"
-     />
-
-  <route
-     path=":pagename/edit_page"
-     name="edit_page"
-     view=".views.edit_page"
-     permission="edit"
+     renderer="templates/view.pt"
      />
 
   <route
      path="add_page/:pagename"
      name="add_page"
      view=".views.add_page"
+     renderer="templates/edit.pt"
      permission="edit"
      />
 
-   <forbidden
-      view=".login.login"/>
+  <route
+     path=":pagename/edit_page"
+     name="edit_page"
+     view=".views.edit_page"
+     renderer="templates/edit.pt"
+     permission="edit"
+     />
+
+  <forbidden
+     view=".login.login"
+     renderer="templates/login.pt"/>
 
   <authtktauthenticationpolicy
     secret="sosecret"

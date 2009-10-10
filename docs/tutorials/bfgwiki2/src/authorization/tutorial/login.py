@@ -1,6 +1,5 @@
 from webob.exc import HTTPFound
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.security import remember
 from repoze.bfg.security import forget
 from repoze.bfg.url import route_url
@@ -25,14 +24,12 @@ def login(request):
                              headers = headers)
         message = 'Failed login'
 
-    return render_template_to_response(
-        'templates/login.pt',
+    return dict(
         message = message,
         url = request.application_url + '/login',
         came_from = came_from,
         login = login,
         password = password,
-        request  =request,
         )
     
 def logout(request):
