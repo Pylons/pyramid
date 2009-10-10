@@ -881,6 +881,8 @@ Views which use the JSON renderer can vary non-body response
 attributes by attaching properties to the request.  See
 :ref:`response_request_attrs`.
 
+.. _chameleon_template_renderers:
+
 ``*.pt`` or ``*.txt``: Chameleon Template Renderers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

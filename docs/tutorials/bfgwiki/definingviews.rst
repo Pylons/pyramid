@@ -140,12 +140,12 @@ it also acts as the handler for the form it renders.  The ``context``
 of the ``edit_page`` view will *always* be a Page object (never a Wiki
 object).
 
-If the view rendering is *not* a result of a form submission (if the
+If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is False), the view
 simply renders the edit form, passing the request, the page object,
 and a save_url which will be used as the action of the generated form.
 
-If the view rendering *is* a result of a form submission (if the
+If the view execution *is* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is True), the view
 grabs the ``body`` element of the request parameter and sets it as the
 ``data`` attribute of the page context.  It then redirects to the
@@ -188,6 +188,15 @@ the below:
    :linenos:
    :language: xml
 
+.. note:: The names available for our use in a template are always
+   those that are present in the dictionary returned by the view
+   callable.  But our templates make use of a ``request`` object that
+   none of our tutorial views return in their dictionary.  This value
+   appears as if "by magic".  However, ``request`` is one of several
+   names that are available "by default" in a template when a template
+   renderer is used.  See :ref:`chameleon_template_renderers` for more
+   information about other names that are available by default in a
+   template when a Chameleon template is used as a renderer.
 
 The ``edit.pt`` Template
 ------------------------

@@ -142,7 +142,6 @@ class EditPageTests(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest({'form.submitted':True,
                                         'body':'Hello yo!'})
-        renderer = testing.registerDummyRenderer('templates/edit.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/')
         self.assertEqual(context.data, 'Hello yo!')
