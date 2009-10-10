@@ -6,7 +6,8 @@
   <scan package="."/>
 
   <forbidden
-    view=".login.login"/>
+    view=".login.login"
+    renderer="templates/login.pt"/>
 
   <authtktauthenticationpolicy
     secret="sosecret"
