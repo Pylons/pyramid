@@ -4,7 +4,6 @@ from docutils.core import publish_parts
 
 from webob.exc import HTTPFound
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.url import route_url
 
 from tutorial.models import DBSession
@@ -35,11 +34,7 @@ def view_page(request):
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
     edit_url = route_url('edit_page', request, pagename=matchdict['pagename'])
-    return render_template_to_response('templates/view.pt',
-                                       request = request,
-                                       page = page,
-                                       content = content,
-                                       edit_url = edit_url)
+    return dict(page=page, content=content, edit_url=edit_url)
 
 def add_page(request):
     name = request.matchdict['pagename']
@@ -52,10 +47,7 @@ def add_page(request):
                                               pagename=name))
     save_url = route_url('add_page', request, pagename=name)
     page = Page('', '')
-    return render_template_to_response('templates/edit.pt',
-                                       request = request,
-                                       page = page,
-                                       save_url = save_url)
+    return dict(page=page, save_url=save_url)
     
 def edit_page(request):
     name = request.matchdict['pagename']
@@ -66,11 +58,7 @@ def edit_page(request):
         session.add(page)
         return HTTPFound(location = route_url('view_page', request,
                                               pagename=name))
-
-    return render_template_to_response('templates/edit.pt',
-                                       request = request,
-                                       page = page,
-                                       save_url = route_url('edit_page',
-                                                            request,
-                                                            pagename=name),
-                                       )
+    return dict(
+        page=page,
+        save_url = route_url('edit_page', request, pagename=name),
+        )
