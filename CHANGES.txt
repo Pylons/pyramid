@@ -4,11 +4,6 @@ Next release
 Documentation
 -------------
 
-- The ``notfound`` and ``forbidden`` ZCML directives now accept the
-  following addtional attributes: ``attr``, ``renderer``, and
-  ``wrapper``.  These have the same meaning as they do in the context
-  of a ZCML ``view`` directive.
-
 - Added a diagram of model graph traversal to the "Traversal"
   narrative chapter of the documentation.
 
@@ -23,6 +18,11 @@ Documentation
 
 Features
 --------
+
+- The ``notfound`` and ``forbidden`` ZCML directives now accept the
+  following addtional attributes: ``attr``, ``renderer``, and
+  ``wrapper``.  These have the same meaning as they do in the context
+  of a ZCML ``view`` directive.
 
 - For behavior like Django's ``APPEND_SLASH=True``, use the
   ``repoze.bfg.view.append_slash_notfound_view`` view as the Not Found
