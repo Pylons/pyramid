@@ -17,17 +17,20 @@
      for=".models.Wiki"
      name="add_page"
      view=".views.add_page"
+     renderer="templates/edit.pt"
      />
 
   <view
      for=".models.Page"
      view=".views.view_page"
+     renderer="templates/view.pt"
      />
 
   <view
      for=".models.Page"
      name="edit_page"
      view=".views.edit_page"
+     renderer="templates/edit.pt"
      />
 
 </configure>

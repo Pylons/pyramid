@@ -72,18 +72,17 @@ class ViewPageTests(unittest.TestCase):
         context.__parent__ = wiki
         context.__name__ = 'thepage'
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/view.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.request, request)
+        info = self._callFUT(context, request)
+        self.assertEqual(info['page'], context)
         self.assertEqual(
-            renderer.content,
+            info['content'], 
             '<div class="document">\n'
             '<p>Hello <a href="http://example.com/add_page/CruelWorld">'
             'CruelWorld</a> '
             '<a href="http://example.com/IDoExist/">'
             'IDoExist</a>'
             '</p>\n</div>\n')
-        self.assertEqual(renderer.edit_url,
+        self.assertEqual(info['edit_url'],
                          'http://example.com/thepage/edit_page')
         
     
@@ -99,13 +98,14 @@ class AddPageTests(unittest.TestCase):
         return add_page(context, request)
 
     def test_it_notsubmitted(self):
+        from repoze.bfg.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
         request.subpath = ['AnotherPage']
-        renderer = testing.registerDummyRenderer('templates/edit.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.request, request)
-        self.assertEqual(renderer.page.data, '')
+        info = self._callFUT(context, request)
+        self.assertEqual(info['page'].data,'')
+        self.assertEqual(info['save_url'],
+                         model_url(context, request, 'add_page', 'AnotherPage'))
         
     def test_it_submitted(self):
         context = testing.DummyModel()
@@ -130,12 +130,13 @@ class EditPageTests(unittest.TestCase):
         return edit_page(context, request)
 
     def test_it_notsubmitted(self):
+        from repoze.bfg.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/edit.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(renderer.request, request)
-        self.assertEqual(renderer.page, context)
+        info = self._callFUT(context, request)
+        self.assertEqual(info['page'], context)
+        self.assertEqual(info['save_url'],
+                         model_url(context, request, 'edit_page'))
         
     def test_it_submitted(self):
         context = testing.DummyModel()

@@ -1,6 +1,5 @@
 from webob.exc import HTTPFound
 
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.view import bfg_view
 from repoze.bfg.url import model_url
 
@@ -10,7 +9,7 @@ from repoze.bfg.security import forget
 from tutorial.models import Wiki
 from tutorial.security import USERS
 
-@bfg_view(for_=Wiki, name='login')
+@bfg_view(for_=Wiki, name='login', renderer='templates/login.pt')
 def login(context, request):
     login_url = model_url(context, request, 'login')
     referrer = request.url
@@ -29,14 +28,12 @@ def login(context, request):
                              headers = headers)
         message = 'Failed login'
 
-    return render_template_to_response(
-        'templates/login.pt',
+    return dict(
         message = message,
         url = request.application_url + '/login',
         came_from = came_from,
         login = login,
         password = password,
-        request  =request,
         )
     
 @bfg_view(for_=Wiki, name='logout')

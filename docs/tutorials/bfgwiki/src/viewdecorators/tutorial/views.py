@@ -3,7 +3,6 @@ import re
 
 from webob.exc import HTTPFound
 from repoze.bfg.url import model_url
-from repoze.bfg.chameleon_zpt import render_template_to_response
 from repoze.bfg.view import bfg_view
 
 from tutorial.models import Page
@@ -16,7 +15,7 @@ wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 def view_wiki(context, request):
     return HTTPFound(location = model_url(context, request, 'FrontPage'))
 
-@bfg_view(for_=Page)
+@bfg_view(for_=Page, renderer='templates/view.pt')
 def view_page(context, request):
     wiki = context.__parent__
 
@@ -33,13 +32,9 @@ def view_page(context, request):
     content = publish_parts(context.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
     edit_url = model_url(context, request, 'edit_page')
-    return render_template_to_response('templates/view.pt',
-                                       request = request,
-                                       page = context,
-                                       content = content,
-                                       edit_url = edit_url)
-
-@bfg_view(for_=Wiki, name='add_page')
+    return dict(page = context, content = content, edit_url = edit_url)
+    
+@bfg_view(for_=Wiki, name='add_page', renderer='templates/edit.pt')
 def add_page(context, request):
     name = request.subpath[0]
     if 'form.submitted' in request.params:
@@ -53,22 +48,15 @@ def add_page(context, request):
     page = Page('')
     page.__name__ = name
     page.__parent__ = context
-    return render_template_to_response('templates/edit.pt',
-                                       request = request,
-                                       page = page,
-                                       save_url = save_url)
-
-@bfg_view(for_=Page, name='edit_page')
+    return dict(page = page, save_url = save_url)
+    
+@bfg_view(for_=Page, name='edit_page', renderer='templates/edit.pt')
 def edit_page(context, request):
     if 'form.submitted' in request.params:
         context.data = request.params['body']
         return HTTPFound(location = model_url(context, request))
 
-    return render_template_to_response('templates/edit.pt',
-                                       request = request,
-                                       page = context,
-                                       save_url = model_url(context, request,
-                                                            'edit_page')
-                                       )
+    return dict(page = context,
+                save_url = model_url(context, request, 'edit_page'))
     
     

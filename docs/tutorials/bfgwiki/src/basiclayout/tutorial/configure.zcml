@@ -6,6 +6,7 @@
   <view
      for=".models.MyModel"
      view=".views.my_view"
+     renderer="templates/mytemplate.pt"
      />
 
   <static

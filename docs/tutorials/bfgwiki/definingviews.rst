@@ -6,6 +6,19 @@ Views in BFG are typically simple Python functions that accept two
 parameters: :term:`context`, and :term:`request`.  A view is assumed
 to return a :term:`response` object.
 
+.. note:: A :mod:`repoze.bfg` view can also be defined as callable
+   which accepts *one* arguments: a :term:`request`.  You'll see this
+   two-argument pattern used in other :mod:`repoze.bfg` tutorials and
+   applications.  Either calling convention will work in any
+   :mod:`repoze.bfg` application.  In :term:`traversal` based
+   applications, such as this tutorial, the context is used frequently
+   within the body of a view method, so it makes sense to use the
+   two-argument syntax in this application.  However, in :term:`url
+   dispatch` based applications, however, the context object is rarely
+   used in the view body itself, so within code that uses
+   URL-dispatch-only, it's common to define views as callables that
+   accept only a request to avoid the visual "noise".
+
 Adding View Functions
 =====================
 
@@ -63,18 +76,22 @@ HTML containing various view and add links for WikiWords based on the
 content of our current page object.
 
 We then generate an edit URL (because it's easier to do here than in
-the template), and we call the
-``repoze.bfg.chameleon_zpt.render_template_to_response`` function with
-a number of arguments.  The first argument is the *relative* path to a
-:term:`Chameleon` ZPT template.  It is relative to the directory of
-the file in which we're creating the ``view_page`` function.  The
-``render_template_to_response`` function also accepts ``request``,
-``page``, ``content``, and ``edit_url`` as keyword arguments.  As a
-result, the template will be able to use these names to perform
-various rendering tasks.
+the template), and we wrap up a number of arguments in a dictionary
+and return it.
 
-The result of ``render_template_to_response`` is returned to
-:mod:`repoze.bfg`.  Unsurprisingly, it is a response object.
+The arguments we wrap into a dictionary include ``page``, ``content``,
+and ``edit_url``.  As a result, the *template* associated with this
+view will be able to use these names to perform various rendering
+tasks.  The template associated with this view will be a template
+which lives in ``templates/view.pt``, which we'll associate with this
+view via the ``configure.zcml`` file.
+
+Note the contrast between this view and the ``view_wiki`` view.  In
+the ``view_wiki`` view, we return a *response* object.  In this view,
+we return a *dictionary*.  It is *always* fine to return a response
+object from a :mod:`repoze.bfg` view.  Returning a dictionary is
+allowed only when there is a ``renderer`` associated with the view in
+the view configuration.
 
 The ``add_page`` view function
 ------------------------------
@@ -263,19 +280,36 @@ add four ``view`` declarations to ``configure.zcml``.
 
 #. Add a declaration which maps the "Wiki" class in our ``models.py``
    file to the view named ``view_wiki`` in our ``views.py`` file with
-   no view name.  This is the default view for a Wiki.
-
-#. Add a declaration which maps the "Page" class in our ``models.py``
-   file to the view named ``view_page`` in our ``views.py`` file with
-   no view name.  This is the default view for a Page.
+   no view name.  This is the default view for a Wiki.  It does not
+   use a ``renderer`` because the ``view_wiki`` view callable always
+   returns a *response* object rather than a dictionary.
 
 #. Add a declaration which maps the "Wiki" class in our ``models.py``
    file to the view named ``add_page`` in our ``views.py`` file with
-   the view name ``add_page``.  This is the add view for a new Page.
+   the view name ``add_page``.  Associate this view with the
+   ``templates/edit.pt`` template file via the ``renderer`` attribute.
+   This view will use the :term:`Chameleon` ZPT renderer configured
+   with the ``templates/edit.pt`` template to render non-*response*
+   return values from the ``add_page`` view.  This is the add view for
+   a new Page.
+
+#. Add a declaration which maps the "Page" class in our ``models.py``
+   file to the view named ``view_page`` in our ``views.py`` file with
+   no view name.  Associate this view with the ``templates/view.pt``
+   template file via the ``renderer`` attribute.  This view will use
+   the :term:`Chameleon` ZPT renderer configured with the
+   ``templates/view.pt`` template to render non-*response* return
+   values from the ``view_page`` view.  This is the default view for a
+   Page.
 
 #. Add a declaration which maps the "Page" class in our ``models.py``
    file to the view named ``edit_page`` in our ``views.py`` file with
-   the view name ``edit_page``.  This is the edit view for a page.
+   the view name ``edit_page``.  Associate this view with the
+   ``templates/edit.pt`` template file via the ``renderer`` attribute.
+   This view will use the :term:`Chameleon` ZPT renderer configured
+   with the ``templates/edit.pt`` template to render non-*response*
+   return values from the ``edit_page`` view.  This is the edit view
+   for a page.
 
 As a result of our edits, the ``configure.zcml`` file should look
 something like so:
@@ -349,10 +383,10 @@ our application in a browser.  The views we'll try are as follows:
   <http://localhost:6543/add_page/SomePageName>`_ in a browser invokes
   the add view for a page.
 
-- To generate an error, do `http://localhost:6543/add_page
-  <http://localhost:6543/add_page>`_.  IndexError for
-  ``request.subpath[0]``.  You'll see an interactive traceback
-  facility provided by evalerror.
+- To generate an error, visit `http://localhost:6543/add_page
+  <http://localhost:6543/add_page>`_ which will generate an
+  ``IndexError`` for the expression ``request.subpath[0]``.  You'll
+  see an interactive traceback facility provided by evalerror.
 
 
 

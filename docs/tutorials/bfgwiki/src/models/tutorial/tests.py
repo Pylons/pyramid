@@ -48,28 +48,9 @@ class AppmakerTests(unittest.TestCase):
         self.failUnless(root['app_root'] is app_root)
 
 class ViewTests(unittest.TestCase):
-
-    """ These tests are unit tests for the view.  They test the
-    functionality of *only* the view.  They register and use dummy
-    implementations of repoze.bfg functionality to allow you to avoid
-    testing 'too much'"""
-
-    def setUp(self):
-        """ cleanUp() is required to clear out the application registry
-        between tests (done in setUp for good measure too)
-        """
-        testing.cleanUp()
-        
-    def tearDown(self):
-        """ cleanUp() is required to clear out the application registry
-        between tests
-        """
-        testing.cleanUp()
-
     def test_my_view(self):
         from tutorial.views import my_view
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        renderer = testing.registerDummyRenderer('templates/mytemplate.pt')
-        response = my_view(context, request)
-        renderer.assert_(project='tutorial')
+        info = my_view(context, request)
+        self.assertEqual(info['project'], 'tutorial')

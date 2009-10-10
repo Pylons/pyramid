@@ -31,6 +31,11 @@ The ``bfg_view`` callable accepts a number of arguments:
 
   The name of the view.
 
+``renderer``
+
+  The renderer (usually a *template name*) that will be used when the
+  view returns a non-:term:`response` object.
+
 There are other arguments which this callable accepts, but these are
 the ones we're going to use.
 
@@ -67,7 +72,7 @@ The decorator above the ``view_page`` function will be:
 .. code-block:: python
    :linenos:
 
-   @bfg_view(for_=Page)
+   @bfg_view(for_=Page, renderer='templates/view.pt')
 
 This indicates that the view is "for" the Page class and has the
 *empty* view_name (indicating the default view).  After injecting this
@@ -80,8 +85,8 @@ decorator, we can now *remove* the following from our
    <view
       for=".models.Page"
       view=".views.view_page"
+      renderer="templates/view.pt"
       />
-
 
 Our new decorator takes its place.
 
@@ -93,7 +98,7 @@ The decorator above the ``add_page`` function will be:
 .. code-block:: python
    :linenos:
 
-   @bfg_view(for_=Wiki, name='add_page')
+   @bfg_view(for_=Wiki, name='add_page', renderer='templates/edit.pt')
 
 This indicates that the view is "for" the Wiki class and has the
 ``add_page`` view_name.  After injecting this decorator, we can now
@@ -106,6 +111,7 @@ This indicates that the view is "for" the Wiki class and has the
       for=".models.Wiki"
       name="add_page"
       view=".views.add_page"
+      renderer="templates/edit.pt"
       />
 
 Our new decorator takes its place.
@@ -118,7 +124,7 @@ The decorator above the ``edit_page`` function will be:
 .. code-block:: python
    :linenos:
 
-   @bfg_view(for_=Page, name='edit_page')
+   @bfg_view(for_=Page, name='edit_page', renderer='templates/edit.pt')
 
 This indicates that the view is "for" the Page class and has the
 ``edit_page`` view_name.  After injecting this decorator, we can now
@@ -131,6 +137,7 @@ This indicates that the view is "for" the Page class and has the
       for=".models.Page"
       name="edit_page"
       view=".views.edit_page"
+      renderer="templates/edit.pt"
       />
 
 Our new decorator takes its place.
