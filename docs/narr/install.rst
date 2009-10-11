@@ -236,10 +236,10 @@ virtualenv (``bfgenv``) directory:
 .. code-block:: bash
    :linenos:
 
-   $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
+   $ bin/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
 
 .. warning:: Note carefully the ``-i
-   http://dist.repoze.org/bfg/current/simple`` above.  It is required.
+   http://dist.repoze.org/bfg/1.1/simple`` above.  It is required.
    :mod:`repoze.bfg` software is maintained in its own index;
    :mod:`repoze.bfg` cannot be installed from PyPI.
 
@@ -288,12 +288,12 @@ Installing :mod:`repoze.bfg` on a Windows System
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "current index to get BFG
+#. Use ``easy_install`` and point to the BFG "1.1" index to get BFG
    and its direct dependencies installed:
 
    .. code-block:: bat
 
-     c:\bfgenv> Scripts\easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
+     c:\bfgenv> Scripts\easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
 
 Installing :mod:`repoze.bfg` on Google App Engine
 -------------------------------------------------

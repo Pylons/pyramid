@@ -56,12 +56,12 @@ Preparation, UNIX
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "current" index to get
+#. Use ``easy_install`` and point to the BFG "1.1" index to get
    :mod:`repoze.bfg` and its direct dependencies installed:
 
    .. code-block:: bash
 
-     $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
+     $ bin/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
@@ -106,12 +106,12 @@ Preparation, Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "current" index to get
+#. Use ``easy_install`` and point to the BFG "1.1" index to get
    :mod:`repoze.bfg` and its direct dependencies installed:
 
    .. code-block:: bat
 
-     c:\bigfntut> Scripts/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
+     c:\bigfntut> Scripts/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
