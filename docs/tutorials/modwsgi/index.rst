@@ -100,23 +100,19 @@ commands and files.
     create a file named ``/etc/apache2/other/modwsgi.conf`` on my own
     system while installing Apache, so this stuff went in there.
 
-    .. code-block:: bash
+    .. code-block:: apache
        :linenos:
 
        # Use only 1 Python sub-interpreter.  Multiple sub-interpreters
        # play badly with C extensions.
-       WSGIApplicationGroup 0
-
+       WSGIApplicationGroup %{GLOBAL}
        WSGIPassAuthorization On
-
-       WSGIDaemonProcess bfg user=chrism group=staff processes=1 threads=6 \
+       WSGIDaemonProcess bfg user=chrism group=staff processes=1 threads=4 \
          python-path=/Users/chrism/projects/modwsgi/env/lib/python2.6/site-packages
-
        WSGIScriptAlias /myapp /Users/chrism/projects/modwsgi/env/bfg.wsgi
 
        <Directory /Users/chrism/projects/modwsgi/env>
          WSGIProcessGroup bfg
-         WSGIApplicationGroup %{GLOBAL}
          Order allow, deny
          Allow from all
        </Directory>
