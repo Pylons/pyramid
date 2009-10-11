@@ -183,7 +183,8 @@ file which points to your *application* as opposed to any other
 section within the ``.ini`` file.  For example, if your application
 ``.ini`` file might have a ``[app:main]`` section that looks like so:
 
-.. code-block: 
+.. code-block:: ini
+   :linenos:
 
    [app:main]
    use = egg:MyProject#app

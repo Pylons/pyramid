@@ -7,18 +7,23 @@ Hosting an Application Under a URL Prefix
 -----------------------------------------
 
 :mod:`repoze.bfg` supports a traditional form of virtual hosting
-provided by packages like Paste's `urlmap
-<http://pythonpaste.org/modules/urlmap.html>`_ "composite" WSGI
-application.  Using such a package, you can host a :mod:`repoze.bfg`
-application as a "subset" of some other site
-(e.g. ``http://example.com/mybfgapplication/``).
+whereby you can host a :mod:`repoze.bfg` application as a "subset" of
+some other site (e.g. under ``http://example.com/mybfgapplication/``
+as opposed to under ``http://example.com/``).
+
+If you use a "pure Python" environment, this functionality is provided
+by Paste's `urlmap <http://pythonpaste.org/modules/urlmap.html>`_
+"composite" WSGI application.  Alternately, you can use
+:term:`mod_wsgi` to serve your application, which handles this virtual
+hosting translation for you "under the hood".
 
 If you use the ``urlmap`` composite application "in front" of a
-:mod:`repoze.bfg` application, nothing special needs to be done within
-the application for URLs to be generated that contain the prefix
-spelled by the package config.  Packages such as ``urlmap`` manipulate
-the WSGI environment in such a way that the ``PATH_INFO`` and
-``SCRIPT_NAME`` variables are correct for some given prefix.
+:mod:`repoze.bfg` application or if you use :term:`mod_wsgi` to serve
+up a :mod:`repoze.bfg` application, nothing special needs to be done
+within the application for URLs to be generated that contain the
+prefix spelled by the package config.  ``urlmap`` and ``mod_wsgi`` and
+manipulate the WSGI environment in such a way that the ``PATH_INFO``
+and ``SCRIPT_NAME`` variables are correct for some given prefix.
 
 .. note:: If you're using an Apache server to proxy to a Paste
    ``urlmap`` composite, you may have to use the `ProxyPreserveHost
@@ -44,6 +49,18 @@ a ``urlmap`` composite.
 This "roots" the :mod:`repoze.bfg` application at the prefix
 ``/bfgapp`` and serves up the composite as the "main" application in
 the file.
+
+If you use :term:`mod_wsgi`, you do not need to use a ``composite``
+application in your .ini file.  The ``WSGIScriptAlias`` configuration
+setting in a :term:`mod_wsgi` configuration does the work for you:
+
+.. code-block:: apache
+   :linenos:
+
+   WSGIScriptAlias /bfgapp /Users/chrism/projects/modwsgi/env/bfg.wsgi
+
+In the above configuration, we root a :mod:`repoze.bfg` application at
+``/bfgapp`` within the Apache configuration.
 
 Virtual Root Support
 --------------------
@@ -72,7 +89,8 @@ An example of an Apache ``mod_proxy`` configuration that will host the
 ``/cms`` subobject as ``http://www.example.com/`` using this facility
 is below:
 
-.. code-block:: xml
+.. code-block:: apache
+   :linenos:
 
     NameVirtualHost *:80
 
@@ -84,14 +102,20 @@ is below:
       RequestHeader add X-Vhm-Root /cms
     </VirtualHost>
 
+.. note:: Use of the ``RequestHeader`` directive requires that the
+   Apache `mod_headers
+   <http://httpd.apache.org/docs/2.2/mod/mod_headers.html>`_ module be
+   available in the Apache environment you're using.
+
 For a :mod:`repoze.bfg` application running under ``mod_wsgi``, the
 same can be achieved using ``SetEnv``:
 
-.. code-block:: xml
+.. code-block:: apache
+   :linenos:
 
     <Location />
-       SetEnv HTTP_X_VHM_ROOT /cms
-     </Location>
+      SetEnv HTTP_X_VHM_ROOT /cms
+    </Location>
 
 Setting a virtual root has no effect when using an application based
 on :term:`URL dispatch`.
@@ -103,3 +127,7 @@ The API documentation in :ref:`traversal_module` documents a
 ``repoze.bfg.traversal.virtual_root`` API.  When called, it returns
 the virtual root object (or the physical root object if no virtual
 root has been specified).
+
+:ref:`modwsgi_tutorial` has detailed information about using
+:term:`mod_wsgi` to serve :mod:`repoze.bfg` applications.
+
