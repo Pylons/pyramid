@@ -1,3 +1,4 @@
+import re
 import sys
 
 from zope.configuration import xmlconfig
@@ -121,6 +122,26 @@ class IViewDirective(Interface):
                        'parameter exists which matches this string.'),
         required=False)
 
+    xhr = Bool(
+        title = (u'True if request has an X-Requested-With header with the '
+                 'value "XMLHttpRequest"'),
+        description=(u'Useful for detecting AJAX requests issued from '
+                     'jQuery, Protoype and other JavaScript libraries'),
+        required=False)
+
+    accept = TextLine(
+        title = (u'Mimetype(s) that must be present in "Accept" HTTP header '
+                 'for the view to match a request'),
+        description=(u'Accepts a mimetype match token in the form '
+                     '"text/plain", a wildcard mimetype match token in the '
+                     'form "text/*" or a match-all wildcard mimetype match '
+                     'token in the form "*/*".'),
+        required = False)
+
+    header = TextLine(
+        title=u'Header name/value pair in the form "name=<regex>"',
+        description=u'Regular expression matching for header values',
+        required = False)
 
 def view(
     _context,
@@ -136,6 +157,9 @@ def view(
     attr=None,
     renderer=None,
     wrapper=None,
+    xhr=False,
+    accept=None,
+    header=None,
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
@@ -167,9 +191,6 @@ def view(
     if isinstance(request_type, basestring):
         request_type = _context.resolve(request_type)
 
-    predicates = []
-    weight = sys.maxint
-
     # Predicates are added to the predicate list in (presumed)
     # computation expense order.  All predicates associated with a
     # view must evaluate true for the view to "match" a request.
@@ -196,10 +217,19 @@ def view(
     # Views which do not have any predicates get a score of
     # sys.maxint, meaning that they will be tried very last.
 
+    predicates = []
+    weight = sys.maxint
+
+    if xhr:
+        def xhr_predicate(context, request):
+            return request.is_xhr
+        weight = weight - 10
+        predicates.append(xhr_predicate)
+
     if request_method is not None:
         def request_method_predicate(context, request):
             return request.method == request_method
-        weight = weight - 10
+        weight = weight - 20
         predicates.append(request_method_predicate)
 
     if request_param is not None:
@@ -210,13 +240,35 @@ def view(
             if request_param_val is None:
                 return request_param in request.params
             return request.params.get(request_param) == request_param_val
-        weight = weight - 20
+        weight = weight - 30
         predicates.append(request_param_predicate)
+
+    if header is not None:
+        header_name = header
+        header_val = None
+        if ':' in header:
+            header_name, header_val = header.split(':', 1)
+            try:
+                header_val = re.compile(header_val)
+            except re.error, why:
+                raise ConfigurationError(why[0])
+        def header_predicate(context, request):
+            if header_val is None:
+                return header_name in request.headers
+            val = request.headers.get(header_name)
+            return header_val.match(val) is not None
+        predicates.append(header_predicate)
+
+    if accept is not None:
+        def accept_predicate(context, request):
+            return accept in request.accept
+        weight = weight - 40
+        predicates.append(accept_predicate)
 
     if containment is not None:
         def containment_predicate(context, request):
             return find_interface(context, containment) is not None
-        weight = weight - 30
+        weight = weight - 50
         predicates.append(containment_predicate)
 
     # this will be == sys.maxint if no predicates
@@ -272,7 +324,8 @@ def view(
                                name, _context.info)
     _context.action(
         discriminator = ('view', for_, name, request_type, IView, containment,
-                         request_param, request_method, route_name, attr),
+                         request_param, request_method, route_name, attr,
+                         xhr, accept, header),
         callable = register,
         args = (),
         )
@@ -482,6 +535,9 @@ class IRouteDirective(Interface):
         required=False)
     view_attr = TextLine(title=u'view_attr', required=False)
     view_renderer = TextLine(title=u'view_renderer', required=False)
+    view_header = TextLine(title=u'view_header', required=False)
+    view_accept = TextLine(title=u'view_accept', required=False)
+    view_xhr = Bool(title=u'view_xhr', required=False)
     # alias for "view_for"
     for_ = GlobalObject(title=u'for', required=False)
     # alias for "view_permission"
@@ -500,6 +556,12 @@ class IRouteDirective(Interface):
     attr = TextLine(title=u'attr', required=False)
     # alias for "view_renderer"
     renderer = TextLine(title=u'renderer', required=False)
+    # alias for "view_header"
+    header = TextLine(title=u'header', required=False)
+    # alias for "view_accept"
+    accept = TextLine(title=u'accept', required=False)
+    # alias for "view_xhr"
+    xhr = Bool(title=u'xhr', required=False)
 
 class IRouteRequirementDirective(Interface):
     """ The interface for the ``requirement`` route subdirective """
@@ -513,7 +575,8 @@ def route(_context, name, path, view=None, view_for=None,
           request_method=None, view_request_method=None,
           request_param=None, view_request_param=None, containment=None,
           view_containment=None, attr=None, view_attr=None, renderer=None,
-          view_renderer=None):
+          view_renderer=None, header=None, view_header=None, accept=None,
+          view_accept=None, xhr=False, view_xhr=False):
     """ Handle ``route`` ZCML directives
     """
     # the strange ordering of the request kw args above is for b/w
@@ -526,6 +589,9 @@ def route(_context, name, path, view=None, view_for=None,
     containment = view_containment or containment
     attr = view_attr or attr
     renderer = view_renderer or renderer
+    header = view_header or header
+    accept = view_accept or accept
+    xhr = view_xhr or xhr
 
     sm = getSiteManager()
     
@@ -545,7 +611,8 @@ def route(_context, name, path, view=None, view_for=None,
         _view(_context, permission=permission, for_=for_, view=view, name='',
               request_type=request_type, route_name=name, 
               request_method=request_method, request_param=request_param,
-              containment=containment, attr=attr, renderer=renderer)
+              containment=containment, attr=attr, renderer=renderer,
+              header=header, accept=accept, xhr=xhr)
 
     _context.action(
         discriminator = ('route', name),
@@ -641,12 +708,16 @@ class BFGViewGrokker(martian.InstanceGrokker):
             wrapper = settings['wrapper_viewname']
             attr = settings['attr']
             renderer = settings['renderer']
+            xhr = settings['xhr']
+            accept = settings['accept']
+            header = settings['header']
             context = kw['context']
             view(context, permission=permission, for_=for_,
                  view=obj, name=name, request_type=request_type,
                  route_name=route_name, request_method=request_method,
                  request_param=request_param, containment=containment,
-                 attr=attr, renderer=renderer, wrapper=wrapper)
+                 attr=attr, renderer=renderer, wrapper=wrapper,
+                 xhr=xhr, accept=accept, header=header)
             return True
         return False
 

@@ -472,6 +472,49 @@ request_type
   ``request_method`` attribute instead for maximum forward
   compatibility.
 
+xhr
+
+  Thie value should be either ``True`` or ``False``.  If this value is
+  specified and is ``True``, the :term:`request` must possess an
+  ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header that has
+  the value ``XMLHttpRequest`` for this view to be found and called.
+  This is useful for detecting AJAX requests issued from jQuery,
+  Prototype and other Javascript libraries.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+accept
+
+  The value of this attribute represents a match query for one or more
+  mimetypes in the ``Accept`` HTTP request header.  If this value is
+  specified, it must be in one of the following forms: a mimetype
+  match token in the form ``text/plain``, a wildcard mimetype match
+  token in the form ``text/*`` or a match-all wildcard mimetype match
+  token in the form ``*/*``.  If any of the forms matches the
+  ``Accept`` header of the request, this predicate will be true.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+header
+
+  The value of this attribute represents an HTTP header name or a
+  header name/value pair.  If the value contains a ``:`` (colon), it
+  will be considered a name/value pair (e.g. ``User-Agent:Mozilla/.*``
+  or ``Host:localhost``).  The *value* of an attribute that represent
+  a name/value pair should be a regular expression.  If the value does
+  not contain a colon, the entire value will be considered to be the
+  header name (e.g. ``If-Modified-Since``).  If the value evaluates to
+  a header name only without a value, the header specified by the name
+  must be present in the request for this predicate to be true.  If
+  the value evaluates to a header name/value pair, the header
+  specified by the name must be present in the request *and* the
+  regular expression specified as the value must match the header
+  value.  Whether or not the value represents a header name or a
+  header name/value pair, the case of the header name is not
+  significant.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 .. _mapping_views_to_urls_using_a_decorator_section:
 
 View Configuration Using the ``@bfg_view`` Decorator
@@ -484,10 +527,11 @@ functions with URLs instead of using :term:`ZCML` for the same
 purpose.  ``repoze.bfg.view.bfg_view`` can be used to associate
 ``for``, ``name``, ``permission`` and ``request_method``,
 ``containment``, ``request_param`` and ``request_type``, ``attr``,
-``renderer``, and ``wrapper`` information -- as done via the
-equivalent ZCML -- with a function that acts as a :mod:`repoze.bfg`
-view.  All ZCML attributes (save for the ``view`` attribute) are
-available in decorator form and mean precisely the same thing.
+``renderer``, ``wrapper``, ``xhr``, ``accept``, and ``header``
+information -- as done via the equivalent ZCML -- with a function that
+acts as a :mod:`repoze.bfg` view.  All ZCML attributes (save for the
+``view`` attribute) are available in decorator form and mean precisely
+the same thing.
 
 To make :mod:`repoze.bfg` process your ``@bfg_view`` declarations, you
 *must* insert the following boilerplate into your application's
@@ -581,6 +625,26 @@ provided.
 If ``containment`` is supplied, the view will be invoked only if a
 location parent supplies the interface or class implied by the
 provided value.
+
+If ``xhr`` is specified, it must be a boolean value.  If the value is
+``True``, the view will only be invoked if the request's
+``X-Requested-With`` header has the value ``XMLHttpRequest``.
+
+If ``accept`` is specified, it must be a mimetype value.  If
+``accept`` is specified, the view will only be invoked if the
+``Accept`` HTTP header matches the value requested.  See the
+description of ``accept`` in :ref:`the_view_zcml_directive` for
+information about the allowable composition and matching behavior of
+this value.
+
+If ``header`` is specified, it must be a header name or a
+``headername:headervalue`` pair.  If ``header`` is specified, and
+possesses a value the view will only be invoked if an HTTP header
+matches the value requested.  If ``header`` is specified without a
+value (a bare header name only), the view will only be invoked if the
+HTTP header exists with any value in the request.  See the description
+of ``header`` in :ref:`the_view_zcml_directive` for information about
+the allowable composition and matching behavior of this value.
 
 View lookup ordering for views registered with the ``bfg_view``
 decorator is the same as for those registered via ZCML.  See

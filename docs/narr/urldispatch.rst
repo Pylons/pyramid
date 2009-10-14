@@ -215,6 +215,56 @@ view_renderer
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
+view_xhr
+
+  Thie value should be either ``True`` or ``False``.  If this value is
+  specified and is ``True``, the :term:`request` must possess an
+  ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header for this
+  view to be found and called.  This is useful for detecting AJAX
+  requests issued from jQuery, Prototype and other Javascript
+  libraries.
+
+  This attribute can also be spelled as ``xhr``.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+view_accept
+
+  The value of this attribute represents a match query for one or more
+  mimetypes in the ``Accept`` HTTP request header.  If this value is
+  specified, it must be in one of the following forms: a mimetype
+  match token in the form ``text/plain``, a wildcard mimetype match
+  token in the form ``text/*`` or a match-all wildcard mimetype match
+  token in the form ``*/*``.  If any of the forms matches the
+  ``Accept`` header of the request, this predicate will be true.
+
+  This attribute can also be spelled as ``accept``.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+view_header
+
+  The value of this attribute represents an HTTP header name or a
+  header name/value pair.  If the value contains a ``:`` (colon), it
+  will be considered a name/value pair (e.g. ``User-Agent:Mozilla/.*``
+  or ``Host:localhost``).  The *value* of an attribute that represent
+  a name/value pair should be a regular expression.  If the value does
+  not contain a colon, the entire value will be considered to be the
+  header name (e.g. ``If-Modified-Since``).  If the value evaluates to
+  a header name only without a value, the header specified by the name
+  must be present in the request for this predicate to be true.  If
+  the value evaluates to a header name/value pair, the header
+  specified by the name must be present in the request *and* the
+  regular expression specified as the value must match the header
+  value.  Whether or not the value represents a header name or a
+  header name/value pair, the case of the header name is not
+  significant.
+
+  This attribute can also be spelled as ``header``.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+
 The Matchdict
 -------------
 

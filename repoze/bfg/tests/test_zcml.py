@@ -40,7 +40,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -72,7 +72,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -109,7 +109,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -141,7 +141,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -181,7 +181,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -220,7 +220,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -260,7 +260,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -299,7 +299,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -350,7 +350,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -386,7 +386,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -415,7 +415,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IDummy, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -445,7 +445,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         action = actions[0]
-        discrim = ('view', IFoo, '', Dummy, IView, None, None, None, None, None)
+        discrim = ('view', IFoo, '', Dummy, IView, None, None, None, None,
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -472,7 +473,7 @@ class TestViewDirective(unittest.TestCase):
 
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, 'GET', None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -502,7 +503,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
 
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
@@ -536,7 +537,7 @@ class TestViewDirective(unittest.TestCase):
         factory = sm.getUtility(IRouteRequest, 'foo')
         request_type = implementedBy(factory)
         discrim = ('view', IFoo, '', request_type, IView, None, None, None,
-                   'foo', None)
+                   'foo', None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         the_view = sm.adapters.lookup((IFoo, request_type), IView, name='')
         request = factory({})
@@ -559,7 +560,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, 'POST', None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -586,7 +587,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, 'POST', None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -612,7 +613,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -639,7 +640,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -665,7 +666,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -692,13 +693,242 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
         wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
         request = DummyRequest()
         request.params = {'abc':'456'}
+        self.assertRaises(NotFound, wrapper, None, request)
+
+    def test_with_xhr_true(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, xhr=True)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None, True, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.is_xhr = True
+        self.assertEqual(wrapper(None, request), '123')
+
+    def test_with_xhr_false(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.exceptions import NotFound
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, xhr=True)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None, True, None, None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.is_xhr = False
+        self.assertRaises(NotFound, wrapper, None, request)
+
+    def test_with_header_badregex(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from zope.configuration.exceptions import ConfigurationError
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self.assertRaises(ConfigurationError, self._callFUT,
+                          context, None, IFoo,
+                          view=view, header='Host:a\\')
+
+    def test_with_header_noval_match(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, header='Host')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None, False, None, 'Host')
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.headers  = {'Host':'whatever'}
+        self.assertEqual(wrapper(None, request), '123')
+
+    def test_with_header_noval_nomatch(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.exceptions import NotFound
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, header='Host')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None, False, None, 'Host')
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.headers  = {'NotHost':'whatever'}
+        self.assertRaises(NotFound, wrapper, None, request)
+
+    def test_with_header_val_match(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, header=r'Host:\d')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None, False, None, r'Host:\d')
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.headers  = {'Host':'1'}
+        self.assertEqual(wrapper(None, request), '123')
+
+    def test_with_header_val_nomatch(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.exceptions import NotFound
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, header=r'Host:\d')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None, False, None, r'Host:\d')
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.headers  = {'Host':'abc'}
+        self.assertRaises(NotFound, wrapper, None, request)
+
+    def test_with_accept_match(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, accept='text/xml')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None, False, 'text/xml', None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.accept = ['text/xml']
+        self.assertEqual(wrapper(None, request), '123')
+
+    def test_with_accept_nomatch(self):
+        from zope.component import getSiteManager
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.exceptions import NotFound
+        class IFoo(Interface):
+            pass
+        context = DummyContext()
+        view = lambda *arg: None
+        sm = getSiteManager()
+        def view(context, request):
+            return '123'
+        self._callFUT(context, None, IFoo, view=view, accept='text/xml')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
+                   None, False, 'text/xml', None)
+        self.assertEqual(action['discriminator'], discrim)
+        register = action['callable']
+        register()
+        wrapper = sm.adapters.lookup((IFoo, IRequest), IView, name='')
+        request = DummyRequest()
+        request.accept = ['text/html']
         self.assertRaises(NotFound, wrapper, None, request)
 
     def test_with_containment_true(self):
@@ -720,7 +950,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, IFoo, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -748,7 +978,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, IFoo, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -776,7 +1006,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -911,7 +1141,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', IFoo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -938,7 +1168,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         discrim = ('view', Foo, '', IRequest, IView, None, None, None, None,
-                   None)
+                   None, False, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -1318,17 +1548,9 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 10)
-        self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], None)
-        self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_type)
-        self.assertEqual(view_discriminator[4], IView)
-        self.assertEqual(view_discriminator[5], None)
-        self.assertEqual(view_discriminator[6], None)
-        self.assertEqual(view_discriminator[7], None)
-        self.assertEqual(view_discriminator[8], 'name')
-        self.assertEqual(view_discriminator[9], None)
+        discrim = ('view', None, '', request_type, IView, None, None, None,
+                   'name', None, False, None, None)
+        self.assertEqual(view_discriminator, discrim)
         register = view_action['callable']
         register()
         sm = getSiteManager()
@@ -1367,17 +1589,9 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 10)
-        self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], IDummy)
-        self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_type)
-        self.assertEqual(view_discriminator[4], IView) 
-        self.assertEqual(view_discriminator[5], None)
-        self.assertEqual(view_discriminator[6], None)
-        self.assertEqual(view_discriminator[7], None)
-        self.assertEqual(view_discriminator[8], 'name')
-        self.assertEqual(view_discriminator[9], None)
+        discrim = ('view', IDummy, '', request_type, IView, None, None, None,
+                   'name', None, False, None, None)
+        self.assertEqual(view_discriminator, discrim)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         request = DummyRequest()
         self.assertEqual(wrapped(None, request), '123')
@@ -1431,17 +1645,9 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 10)
-        self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], None)
-        self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_type)
-        self.assertEqual(view_discriminator[4], IView) 
-        self.assertEqual(view_discriminator[5], None)
-        self.assertEqual(view_discriminator[6], None)
-        self.assertEqual(view_discriminator[7], 'GET')
-        self.assertEqual(view_discriminator[8], 'name')
-        self.assertEqual(view_discriminator[9], None)
+        discrim = ('view', None, '', request_type, IView, None, None, 'GET',
+                   'name', None, False, None, None)
+        self.assertEqual(view_discriminator, discrim)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1476,17 +1682,9 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 10)
-        self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], None)
-        self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_type)
-        self.assertEqual(view_discriminator[4], IView) 
-        self.assertEqual(view_discriminator[5], None)
-        self.assertEqual(view_discriminator[6], None)
-        self.assertEqual(view_discriminator[7], 'GET')
-        self.assertEqual(view_discriminator[8], 'name')
-        self.assertEqual(view_discriminator[9], None)
+        discrim = ('view', None, '', request_type, IView, None, None, 'GET',
+                   'name', None, False, None, None)
+        self.assertEqual(view_discriminator, discrim)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1522,17 +1720,9 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 10)
-        self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], None)
-        self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_type)
-        self.assertEqual(view_discriminator[4], IView) 
-        self.assertEqual(view_discriminator[5], None)
-        self.assertEqual(view_discriminator[6], None)
-        self.assertEqual(view_discriminator[7], 'GET')
-        self.assertEqual(view_discriminator[8], 'name')
-        self.assertEqual(view_discriminator[9], None)
+        discrim = ('view', None, '', request_type, IView, None, None, 'GET',
+                   'name', None, False, None, None)
+        self.assertEqual(view_discriminator, discrim)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1567,17 +1757,9 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 10)
-        self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], None)
-        self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_type)
-        self.assertEqual(view_discriminator[4], IView) 
-        self.assertEqual(view_discriminator[5], None)
-        self.assertEqual(view_discriminator[6], None)
-        self.assertEqual(view_discriminator[7], 'GET')
-        self.assertEqual(view_discriminator[8], 'name')
-        self.assertEqual(view_discriminator[9], None)
+        discrim = ('view', None, '', request_type, IView, None, None, 'GET',
+                   'name', None, False, None, None)
+        self.assertEqual(view_discriminator, discrim)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1612,17 +1794,9 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 10)
-        self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], None)
-        self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_type)
-        self.assertEqual(view_discriminator[4], IView) 
-        self.assertEqual(view_discriminator[5], True)
-        self.assertEqual(view_discriminator[6], None)
-        self.assertEqual(view_discriminator[7], None)
-        self.assertEqual(view_discriminator[8], 'name')
-        self.assertEqual(view_discriminator[9], None)
+        discrim = ('view', None, '', request_type, IView, True, None, None,
+                   'name', None, False, None, None)
+        self.assertEqual(view_discriminator, discrim)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -1657,17 +1831,232 @@ class TestRouteDirective(unittest.TestCase):
         request_factory = sm.getUtility(IRouteRequest, 'name')
         request_type = implementedBy(request_factory)
         view_discriminator = view_action['discriminator']
-        self.assertEqual(len(view_discriminator), 10)
-        self.assertEqual(view_discriminator[0], 'view')
-        self.assertEqual(view_discriminator[1], None)
-        self.assertEqual(view_discriminator[2],'')
-        self.assertEqual(view_discriminator[3], request_type)
-        self.assertEqual(view_discriminator[4], IView) 
-        self.assertEqual(view_discriminator[5], True)
-        self.assertEqual(view_discriminator[6], None)
-        self.assertEqual(view_discriminator[7], None)
-        self.assertEqual(view_discriminator[8], 'name')
-        self.assertEqual(view_discriminator[9], None)
+        discrim = ('view', None, '', request_type, IView, True, None, None,
+                   'name', None, False, None, None)
+        self.assertEqual(view_discriminator, discrim)
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_header(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, view_header='Host')
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', None, '', request_type, IView, None, None, None,
+                   'name', None, False, None, 'Host')
+        self.assertEqual(view_discriminator, discrim)
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_header_alias(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, header='Host')
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', None, '', request_type, IView, None, None, None,
+                   'name', None, False, None, 'Host')
+        self.assertEqual(view_discriminator, discrim)
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_xhr(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, view_xhr=True)
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', None, '', request_type, IView, None, None, None,
+                   'name', None, True, None, None)
+        self.assertEqual(view_discriminator, discrim)
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_xhr_alias(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, xhr=True)
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', None, '', request_type, IView, None, None, None,
+                   'name', None, True, None, None)
+        self.assertEqual(view_discriminator, discrim)
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_accept(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view,
+                      view_accept='text/xml')
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', None, '', request_type, IView, None, None, None,
+                   'name', None, False, 'text/xml', None)
+        self.assertEqual(view_discriminator, discrim)
+        wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+        route_action = actions[1]
+        route_callable = route_action['callable']
+        route_discriminator = route_action['discriminator']
+        route_args = route_action['args']
+        self.assertEqual(route_callable, connect_route)
+        self.assertEqual(len(route_discriminator), 2)
+        self.assertEqual(route_discriminator[0], 'route')
+        self.assertEqual(route_discriminator[1], 'name')
+        self.assertEqual(route_args, ('path', 'name', None))
+
+    def test_with_view_xhr_alias(self):
+        from zope.component import getSiteManager
+        from zope.interface import implementedBy
+        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        
+        context = DummyContext()
+        def view(context, request):
+            """ """
+        self._callFUT(context, 'name', 'path', view=view, accept='text/xml')
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        view_action = actions[0]
+        register = view_action['callable']
+        register()
+        sm = getSiteManager()
+        request_factory = sm.getUtility(IRouteRequest, 'name')
+        request_type = implementedBy(request_factory)
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', None, '', request_type, IView, None, None, None,
+                   'name', None, False, 'text/xml', None)
+        self.assertEqual(view_discriminator, discrim)
         wrapped = sm.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
@@ -2001,7 +2390,8 @@ class TestBFGViewGrokker(unittest.TestCase):
                         request_type=IRequest, route_name=None,
                         request_method=None, request_param=None,
                         containment=None, attr=None, renderer=None,
-                        wrapper_viewname=None)
+                        wrapper_viewname=None, xhr=False, header=None,
+                        accept=None)
         obj.__bfg_view_settings__ = settings
         context = DummyContext()
         result = grokker.grok('name', obj, context=context)

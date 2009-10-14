@@ -1,11 +1,22 @@
 Next release
 ============
 
+Features
+--------
+
+- Add ``xhr``, ``accept``, and ``header`` view configuration
+  predicates to ZCML view declaration, ZCML route declaration, and
+  ``bfg_view`` decorator.  See the ``Views`` narrative documentation
+  chapter for more information about these predicates.
+
 Documentation
 -------------
 
 - Virtual hosting narrative docs chapter updated with info about
   ``mod_wsgi``.
+
+- Point all index URLs at the literal 1.1 index (this alpha cycle may
+  go on a while).
 
 1.1a5 (2009-10-10)
 ==================

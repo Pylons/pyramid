@@ -240,7 +240,8 @@ class bfg_view(object):
 
     The following arguments are supported: ``for_``, ``permission``,
     ``name``, ``request_type``, ``route_name``, ``request_method``,
-    ``request_param``, and ``containment``.
+    ``request_param``, ``containment``, ``xhr``, ``accept``, and
+    ``header``.
 
     If ``for_`` is not supplied, the interface
     ``zope.interface.Interface`` (matching any context) is used.
@@ -294,6 +295,27 @@ class bfg_view(object):
     ``containment`` *is* supplied, it must be a class or :term:`interface`,
     denoting that the view 'matches' the current request only if any graph
     lineage node possesses this class or interface.
+
+    If ``xhr`` is specified, it must be a boolean value.  If the value
+    is ``True``, the view will only be invoked if the request's
+    ``X-Requested-With`` header has the value ``XMLHttpRequest``.
+
+    If ``accept`` is specified, it must be a mimetype value.  If
+    ``accept`` is specified, the view will only be invoked if the
+    ``Accept`` HTTP header matches the value requested.  See the
+    description of ``accept`` in :ref:`the_view_zcml_directive` for
+    information about the allowable composition and matching behavior
+    of this value.
+
+    If ``header`` is specified, it must be a header name or a
+    ``headername:headervalue`` pair.  If ``header`` is specified, and
+    possesses a value the view will only be invoked if an HTTP header
+    matches the value requested.  If ``header`` is specified without a
+    value (a bare header name only), the view will only be invoked if
+    the HTTP header exists with any value in the request.  See the
+    description of ``header`` in :ref:`the_view_zcml_directive` for
+    information about the allowable composition and matching behavior
+    of this value.
 
     Any individual or all parameters can be omitted.  The simplest
     bfg_view declaration then becomes::
@@ -354,7 +376,8 @@ class bfg_view(object):
     """
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
-                 containment=None, attr=None, renderer=None, wrapper=None):
+                 containment=None, attr=None, renderer=None, wrapper=None,
+                 xhr=False, accept=None, header=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
@@ -366,6 +389,9 @@ class bfg_view(object):
         self.attr = attr
         self.renderer = renderer
         self.wrapper_viewname = wrapper
+        self.xhr = xhr
+        self.accept = accept
+        self.header = header
 
     def __call__(self, wrapped):
         wrapped.__bfg_view_settings__ = self.__dict__.copy()
