@@ -11,9 +11,9 @@ class BaseTest(object):
 
     def _registerView(self, app, name, *for_):
         import zope.component
-        gsm = zope.component.getGlobalSiteManager()
+        sm = zope.component.getSiteManager()
         from repoze.bfg.interfaces import IView
-        gsm.registerAdapter(app, for_, IView, name)
+        sm.registerAdapter(app, for_, IView, name)
 
     def _makeEnviron(self, **extras):
         environ = {
@@ -466,8 +466,8 @@ class AppendSlashNotFoundView(unittest.TestCase):
                 return self.routelist
         mapper = DummyMapper()
         import zope.component
-        gsm = zope.component.getGlobalSiteManager()
-        gsm.registerUtility(mapper, IRoutesMapper)
+        sm = zope.component.getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
         return mapper
 
     def test_no_mapper(self):

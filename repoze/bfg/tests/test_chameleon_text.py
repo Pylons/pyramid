@@ -19,7 +19,14 @@ class Base:
         import os
         here = os.path.abspath(os.path.dirname(__file__))
         return os.path.join(here, 'fixtures', name)
+
+    def _registerUtility(self, utility, iface, name=''):
+        from zope.component import getSiteManager
+        sm = getSiteManager()
+        sm.registerUtility(utility, iface, name=name)
+        return sm
         
+
 class TextTemplateRendererTests(Base, unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.chameleon_text import TextTemplateRenderer
@@ -92,13 +99,11 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         self.assertEqual(len(result.headerlist), 2)
 
     def test_iresponsefactory_override(self):
-        from zope.component import getGlobalSiteManager
-        gsm = getGlobalSiteManager()
         from webob import Response
         class Response2(Response):
             pass
         from repoze.bfg.interfaces import IResponseFactory
-        gsm.registerUtility(Response2, IResponseFactory)
+        self._registerUtility(Response2, IResponseFactory)
         minimal = self._getTemplatePath('minimal.txt')
         result = self._callFUT(minimal)
         self.failUnless(isinstance(result, Response2))
@@ -109,40 +114,34 @@ class GetRendererTests(Base, unittest.TestCase):
         return get_renderer(name)
 
     def test_nonabs_registered(self):
-        from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         from repoze.bfg.interfaces import ITemplateRenderer
         minimal = self._getTemplatePath('minimal.txt')
         utility = TextTemplateRenderer(minimal)
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
+        self._registerUtility(utility, ITemplateRenderer, name=minimal)
         result = self._callFUT(minimal)
         self.assertEqual(result, utility)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
         
     def test_nonabs_unregistered(self):
-        from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         from repoze.bfg.interfaces import ITemplateRenderer
         minimal = self._getTemplatePath('minimal.txt')
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), None)
         utility = TextTemplateRenderer(minimal)
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
+        self._registerUtility(utility, ITemplateRenderer, name=minimal)
         result = self._callFUT(minimal)
         self.assertEqual(result, utility)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
 
     def test_explicit_registration(self):
-        from zope.component import getGlobalSiteManager
         from repoze.bfg.interfaces import ITemplateRenderer
         class Dummy:
             template = object()
-        gsm = getGlobalSiteManager()
         utility = Dummy()
-        gsm.registerUtility(utility, ITemplateRenderer, name='foo')
+        self._registerUtility(utility, ITemplateRenderer, name='foo')
         result = self._callFUT('foo')
         self.failUnless(result is utility)
 
@@ -158,42 +157,36 @@ class GetTemplateTests(unittest.TestCase, Base):
         return get_template(name)
 
     def test_nonabs_registered(self):
-        from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         from repoze.bfg.interfaces import ITemplateRenderer
         minimal = self._getTemplatePath('minimal.txt')
         utility = TextTemplateRenderer(minimal)
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
+        self._registerUtility(utility, ITemplateRenderer, name=minimal)
         result = self._callFUT(minimal)
         self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
         
     def test_nonabs_unregistered(self):
-        from zope.component import getGlobalSiteManager
         from zope.component import queryUtility
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         from repoze.bfg.interfaces import ITemplateRenderer
         minimal = self._getTemplatePath('minimal.txt')
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), None)
         utility = TextTemplateRenderer(minimal)
-        gsm = getGlobalSiteManager()
-        gsm.registerUtility(utility, ITemplateRenderer, name=minimal)
+        self._registerUtility(utility, ITemplateRenderer, name=minimal)
         result = self._callFUT(minimal)
         self.assertEqual(result.filename, minimal)
         self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
 
     def test_explicit_registration(self):
-        from zope.component import getGlobalSiteManager
         from repoze.bfg.interfaces import ITemplateRenderer
         class Dummy:
             template = object()
             def implementation(self):
                 return self.template
-        gsm = getGlobalSiteManager()
         utility = Dummy()
-        gsm.registerUtility(utility, ITemplateRenderer, name='foo')
+        self._registerUtility(utility, ITemplateRenderer, name='foo')
         result = self._callFUT('foo')
         self.failUnless(result is utility.template)
         

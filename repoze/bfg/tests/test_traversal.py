@@ -391,10 +391,10 @@ class FindModelTests(unittest.TestCase):
 
     def _registerTraverserFactory(self, traverser):
         import zope.component
-        gsm = zope.component.getGlobalSiteManager()
+        sm = zope.component.getSiteManager()
         from repoze.bfg.interfaces import ITraverserFactory
         from zope.interface import Interface
-        gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
+        sm.registerAdapter(traverser, (Interface,), ITraverserFactory)
 
     def test_list(self):
         model = DummyContext()
@@ -663,10 +663,10 @@ class TraversalContextURLTests(unittest.TestCase):
 
     def _registerTraverserFactory(self, traverser):
         import zope.component
-        gsm = zope.component.getGlobalSiteManager()
+        sm = zope.component.getSiteManager()
         from repoze.bfg.interfaces import ITraverserFactory
         from zope.interface import Interface
-        gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
+        sm.registerAdapter(traverser, (Interface,), ITraverserFactory)
 
     def test_class_conforms_to_IContextURL(self):
         from zope.interface.verify import verifyClass
@@ -849,12 +849,12 @@ class TestVirtualRoot(unittest.TestCase):
         return virtual_root(model, request)
 
     def test_registered(self):
-        from zope.component import getGlobalSiteManager
+        from zope.component import getSiteManager
         from repoze.bfg.interfaces import IContextURL
         from zope.interface import Interface
-        gsm = getGlobalSiteManager()
-        gsm.registerAdapter(DummyContextURL, (Interface,Interface),
-                            IContextURL)
+        sm = getSiteManager()
+        sm.registerAdapter(DummyContextURL, (Interface,Interface),
+                           IContextURL)
         context = DummyContext()
         request = DummyRequest()
         result = self._callFUT(context, request)
@@ -880,10 +880,10 @@ class TraverseTests(unittest.TestCase):
 
     def _registerTraverserFactory(self, traverser):
         import zope.component
-        gsm = zope.component.getGlobalSiteManager()
+        sm = zope.component.getSiteManager()
         from repoze.bfg.interfaces import ITraverserFactory
         from zope.interface import Interface
-        gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
+        sm.registerAdapter(traverser, (Interface,), ITraverserFactory)
 
     def test_list(self):
         model = DummyContext()
@@ -977,10 +977,10 @@ class UnderTraverseTests(unittest.TestCase):
 
     def _registerTraverserFactory(self, traverser):
         import zope.component
-        gsm = zope.component.getGlobalSiteManager()
+        sm = zope.component.getSiteManager()
         from repoze.bfg.interfaces import ITraverserFactory
         from zope.interface import Interface
-        gsm.registerAdapter(traverser, (Interface,), ITraverserFactory)
+        sm.registerAdapter(traverser, (Interface,), ITraverserFactory)
 
     def test_default_traverser_factory(self):
         context = DummyContext()

@@ -35,10 +35,11 @@ class TestGetSettings(unittest.TestCase):
         self.assertEqual(self._callFUT(), None)
 
     def test_it_withsettings(self):
+        from zope.component import getSiteManager
         from repoze.bfg.interfaces import ISettings
-        from zope.component import provideUtility
+        sm = getSiteManager()
         settings = {'a':1}
-        provideUtility(settings, ISettings)
+        sm.registerUtility(settings, ISettings)
         self.assertEqual(self._callFUT(), settings)
 
 class TestGetOptions(unittest.TestCase):

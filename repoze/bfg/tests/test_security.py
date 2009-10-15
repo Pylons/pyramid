@@ -124,18 +124,18 @@ class TestViewExecutionPermitted(unittest.TestCase):
                 self.request = request
                 return allow
         checker = Checker()
-        gsm = zope.component.getGlobalSiteManager()
-        gsm.registerAdapter(checker, (Interface, Interface),
-                            ISecuredView,
-                            view_name)
+        sm = zope.component.getSiteManager()
+        sm.registerAdapter(checker, (Interface, Interface),
+                           ISecuredView,
+                           view_name)
         return checker
 
     def test_no_permission(self):
         import zope.component
-        gsm = zope.component.getGlobalSiteManager()
+        sm = zope.component.getSiteManager()
         from repoze.bfg.interfaces import ISettings
         settings = dict(debug_authorization=True)
-        gsm.registerUtility(settings, ISettings)
+        sm.registerUtility(settings, ISettings)
         context = DummyContext()
         request = DummyRequest({})
         result = self._callFUT(context, request, '')
@@ -162,16 +162,16 @@ def _registerAuthenticationPolicy(result):
     from repoze.bfg.interfaces import IAuthenticationPolicy
     policy = DummyAuthenticationPolicy(result)
     import zope.component
-    gsm = zope.component.getGlobalSiteManager()
-    gsm.registerUtility(policy, IAuthenticationPolicy)
+    sm = zope.component.getSiteManager()
+    sm.registerUtility(policy, IAuthenticationPolicy)
     return policy
 
 def _registerAuthorizationPolicy(result):
     from repoze.bfg.interfaces import IAuthorizationPolicy
     policy = DummyAuthorizationPolicy(result)
     import zope.component
-    gsm = zope.component.getGlobalSiteManager()
-    gsm.registerUtility(policy, IAuthorizationPolicy)
+    sm = zope.component.getSiteManager()
+    sm.registerUtility(policy, IAuthorizationPolicy)
     return policy
 
 

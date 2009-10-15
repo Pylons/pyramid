@@ -17,6 +17,12 @@ def _registerRoutes():
     testing.registerRoute('add_page/:pagename', 'add_page')
 
 class ViewWikiTests(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+        
     def test_it(self):
         from tutorial.views import view_wiki
         testing.registerRoute(':pagename', 'view_page')
@@ -27,9 +33,11 @@ class ViewWikiTests(unittest.TestCase):
 class ViewPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
+        testing.setUp()
 
     def tearDown(self):
         self.session.remove()
+        testing.tearDown()
         
     def _callFUT(self, request):
         from tutorial.views import view_page
@@ -59,9 +67,11 @@ class ViewPageTests(unittest.TestCase):
 class AddPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
+        testing.setUp()
 
     def tearDown(self):
         self.session.remove()
+        testing.tearDown()
 
     def _callFUT(self, request):
         from tutorial.views import add_page
@@ -89,9 +99,11 @@ class AddPageTests(unittest.TestCase):
 class EditPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
+        testing.setUp()
 
     def tearDown(self):
         self.session.remove()
+        testing.tearDown()
 
     def _callFUT(self, request):
         from tutorial.views import edit_page

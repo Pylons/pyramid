@@ -50,10 +50,10 @@ unittest TestCase that used the testing API.
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           testing.cleanUp()
+           testing.setUp()
 
        def tearDown(self):
-           testing.cleanUp()
+           testing.tearDown()
        
        def test_view_fn_not_submitted(self):
            from my.package import view_fn
@@ -105,11 +105,12 @@ assertion.  We assert at the end of this that the renderer's ``say``
 attribute is ``Yo``, as this is what is expected of the view function
 in the branch it's testing.
 
-Note that the test calls the ``repoze.bfg.testing.cleanUp`` function
-in its ``setUp`` and ``tearDown`` functions.  This is required to
+Note that the test calls the ``repoze.bfg.testing.setUp`` function in
+its ``setUp`` method and the ``repoze.bfg.testing.tearDown`` function
+in its ``tearDown`` method.  Use of this pattern is required to
 perform cleanup between the test runs.  If you use any of the testing
-API, be sure to call this function at setup and teardown of individual
-tests.
+API, be sure to call ``repoze.bfg.testing.setUp`` in the test setup
+and ``repoze.bfg.testing.tearDown`` in the test teardown.
 
 See the :ref:`testing_module` chapter for the entire :mod:`repoze.bfg`
 -specific testing API.  This chapter describes APIs for registering a

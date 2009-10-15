@@ -25,6 +25,10 @@
 
   .. autofunction:: registerRoute
 
+  .. autofunction:: setUp
+
+  .. autofunction:: tearDown
+
   .. autofunction:: cleanUp
 
   .. autoclass:: DummyModel

@@ -1,40 +1,28 @@
-import os
-import sys
+from zope.component.event import dispatch
 
 from zope.interface import implements
 from zope.interface import providedBy
 
-from zope.component.event import dispatch
-
-from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import IDefaultRootFactory
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
-from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IView
 
-from repoze.bfg.authorization import ACLAuthorizationPolicy
+from repoze.bfg.configuration import make_registry
+from repoze.bfg.configuration import DefaultRootFactory
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
-from repoze.bfg.log import make_stream_logger
-from repoze.bfg.registry import Registry
-from repoze.bfg.registry import populateRegistry
 from repoze.bfg.request import request_factory
-from repoze.bfg.settings import Settings
-from repoze.bfg.settings import get_options
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.traversal import _traverse
-from repoze.bfg.urldispatch import RoutesRootFactory
 from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import default_notfound_view
 
@@ -76,6 +64,14 @@ class Router(object):
         try:
             root = self.root_factory(environ)
             request = request_factory(environ)
+
+            # webob.Request's __setattr__ (as of 0.9.5 and lower) is a
+            # bottleneck; since we're sure we're using a
+            # webob.Request, we can go around its back and set stuff
+            # into the environ directly
+            attrs = environ.setdefault('webob.adhoc_attrs', {})
+            attrs['registry'] = registry
+
             threadlocals['request'] = request
             registry.has_listeners and registry.notify(NewRequest(request))
             traverser = registry.queryAdapter(root, ITraverserFactory)
@@ -86,16 +82,7 @@ class Router(object):
                 tdict['context'], tdict['view_name'], tdict['subpath'],
                 tdict['traversed'], tdict['virtual_root'],
                 tdict['virtual_root_path'])
-
-            # webob.Request's __setattr__ (as of 0.9.5 and lower) is a
-            # bottleneck; since we're sure we're using a
-            # webob.Request, we can go around its back and set stuff
-            # into the environ directly
-            if 'webob.adhoc_attrs' in environ:
-                attrs = environ.setdefault('webob.adhoc_attrs', {})
-                attrs.update(tdict)
-            else:
-                environ['webob.adhoc_attrs'] = tdict
+            attrs.update(tdict)
 
             provides = map(providedBy, (context, request))
             view_callable = registry.adapters.lookup(
@@ -142,11 +129,10 @@ class Router(object):
         finally:
             manager.pop()
 
+# make_registry kw arg for unit testing only
 def make_app(root_factory, package=None, filename='configure.zcml',
              authentication_policy=None, authorization_policy=None,
-             options=None, registry=None, debug_logger=None,
-             manager=manager, os=os):
-    # registry, debug_logger, manager and os *only* for unittests
+             options=None, manager=manager, make_registry=make_registry):
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
 
@@ -180,72 +166,10 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     PasteDeploy file), with each key representing the option and the
     key's value representing the specific option value,
     e.g. ``{'reload_templates':True}``"""
-    if options is None:
-        options = {}
-
-    if not 'configure_zcml' in options:
-        options['configure_zcml'] = filename
-
-    settings = Settings(get_options(options))
-    filename = settings['configure_zcml']
-
-    # not os.path.isabs below for windows systems
-    if (':' in filename) and (not os.path.isabs(filename)):
-        package, filename = filename.split(':', 1)
-        __import__(package)
-        package = sys.modules[package]
-
-    if registry is None:
-        regname = filename
-        if package:
-            regname = package.__name__
-        registry = Registry(regname)
-
-    registry.registerUtility(settings, ISettings)
-
-    if debug_logger is None:
-        debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
-    registry.registerUtility(debug_logger, ILogger, 'repoze.bfg.debug')
-
-    if root_factory is None:
-        root_factory = DefaultRootFactory
-
-    # register the *default* root factory so apps can find it later
-    registry.registerUtility(root_factory, IDefaultRootFactory)
-
-    mapper = RoutesRootFactory(root_factory)
-    registry.registerUtility(mapper, IRoutesMapper)
-
-    if authentication_policy:
-        debug_logger.warn(
-            'The "authentication_policy" and "authorization_policy" '
-            'arguments to repoze.bfg.router.make_app have been deprecated '
-            'in repoze.bfg version 1.0.  Instead of using these arguments to '
-            'configure an authorization/authentication policy pair, use '
-            'a pair of ZCML directives (such as "authtktauthenticationpolicy" '
-            'and "aclauthorizationpolicy" documented within the Security '
-            'chapter in the BFG documentation.  If you need to use a custom '
-            'authentication or authorization policy, you should make a ZCML '
-            'directive for it and use that directive within your '
-            'application\'s ZCML')
-        registry.registerUtility(authentication_policy, IAuthenticationPolicy)
-        if authorization_policy is None:
-            authorization_policy = ACLAuthorizationPolicy()
-        registry.registerUtility(authorization_policy, IAuthorizationPolicy)
-
-    populateRegistry(registry, filename, package)
-
-    if mapper.has_routes():
-        # if the user had any <route/> statements in his configuration,
-        # use the RoutesRootFactory as the IRootFactory; otherwise use the
-        # default root factory (optimization; we don't want to go through
-        # the Routes logic if we know there are no routes to match)
-        root_factory = mapper
-
-    registry.registerUtility(root_factory, IRootFactory)
-
+    registry = make_registry(root_factory, package, filename,
+                             authentication_policy, authorization_policy,
+                             options)
     app = Router(registry)
-
     # We push the registry on to the stack here in case any ZCA API is
     # used in listeners subscribed to the WSGIApplicationCreatedEvent
     # we send.
@@ -256,16 +180,5 @@ def make_app(root_factory, package=None, filename='configure.zcml',
         dispatch(WSGIApplicationCreatedEvent(app))
     finally:
         manager.pop()
-
     return app
-
-class DefaultRootFactory:
-    __parent__ = None
-    __name__ = None
-    def __init__(self, environ):
-        if 'bfg.routes.matchdict' in environ:
-            # provide backwards compatibility for applications which
-            # used routes (at least apps without any custom "context
-            # factory") in BFG 0.9.X and before
-            self.__dict__.update(environ['bfg.routes.matchdict'])
 

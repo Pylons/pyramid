@@ -9,6 +9,38 @@ Features
   ``bfg_view`` decorator.  See the ``Views`` narrative documentation
   chapter for more information about these predicates.
 
+- Add ``setUp`` and ``tearDown`` functions to the
+  ``repoze.bfg.testing`` module.  Using ``setUp`` in a test setup and
+  ``tearDown`` in a test teardown is now the recommended way to do
+  component registry setup and teardown.  Previously, it was
+  recommended that a single function named
+  ``repoze.bfg.testing.cleanUp`` be called in both the test setup and
+  tear down.  ``repoze.bfg.testing.cleanUp`` still exists (and will
+  exist "forever" due to its widespread use); it is now just an alias
+  for ``repoze.bfg.testing.setUp`` and is nominally deprecated.
+
+- The BFG component registry is now available in view and event
+  subscriber code as an attribute of the request
+  ie. ``request.registry``.  This fact is currently undocumented
+  except for this note, because BFG developers never need to interact
+  with the registry directly anywhere else.
+
+- The BFG component registry now inherits from ``dict``, meaning that
+  it can optionally be used as a simple dictionary.  *Component*
+  registrations performed against it via e.g. ``registerUtility``,
+  ``registerAdapter``, and similar API methods are kept in a
+  completely separate namespace than its dict members, so using the
+  its component API methods won't effect the keys and values in the
+  dictionary namespace.  Likewise, though the component registry
+  "happens to be" a dictionary, use of mutating dictionary methods
+  such as ``__setitem__`` will have no influence on any component
+  registrations made against it.  In other words, the registry object
+  you obtain via e.g. ``repoze.bfg.threadlocal.get_current_registry``
+  or ``request.registry`` happens to be both a component registry and
+  a dictionary, but using its component-registry API won't impact data
+  added to it via its dictionary API and vice versa.  This is a
+  forward compatibility move based on the goals of "marco".
+
 Documentation
 -------------
 
@@ -17,6 +49,56 @@ Documentation
 
 - Point all index URLs at the literal 1.1 index (this alpha cycle may
   go on a while).
+
+- Various tutorial test modules updated to use
+  ``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``
+  methods in order to encourage this as best practice going forward.
+
+Backwards Incompatibilities
+---------------------------
+
+- Importing ``getSiteManager`` and ``get_registry`` from
+  ``repoze.bfg.registry`` is no longer supported.  These imports were
+  deprecated in repoze.bfg 1.0.  Import of ``getSiteManager`` should
+  be done as ``from zope.component import getSiteManager``.  Import of
+  ``get_registry`` should be done as ``from repoze.bfg.threadlocal
+  import get_current_registry``.  This was done to prevent a circular
+  import dependency.
+
+- Code bases which alternately invoke both
+  ``zope.testing.cleanup.cleanUp`` and ``repoze.bfg.testing.cleanUp``
+  (treating them equivalently, using them interchangeably) in the
+  setUp/tearDown of unit tests will begin to experience test failures
+  due to lack of test isolation.  The "right" mechanism is
+  ``repoze.bfg.testing.cleanUp`` (or the combination of
+  ``repoze.bfg.testing.setUp`` and
+  ``repoze.bfg.testing.tearDown``). but a good number of legacy
+  codebases will use ``zope.testing.cleanup.cleanUp`` instead.  We
+  support ``zope.testing.cleanup.cleanUp`` but not in combination with
+  ``repoze.bfg.testing.cleanUp`` in the same codebase.  You should use
+  one or the other test cleanup function in a single codebase, but not
+  both.
+
+Internal
+--------
+
+- Created new ``repoze.bfg.configuration`` module which assumes
+  responsibilities previously held by the ``repoze.bfg.registry`` and
+  ``repoze.bfg.router`` modules (avoid a circular import dependency).
+
+- The result of the ``zope.component.getSiteManager`` function in unit
+  tests set up with ``repoze.bfg.testing.cleanUp`` or
+  ``repoze.bfg.testing.setUp`` will be an instance of
+  ``repoze.bfg.registry.Registry`` instead of the global
+  ``zope.component.globalregistry.base`` registry.  This also means
+  that the threadlocal ZCA API functions such as ``getAdapter`` and
+  ``getUtility`` as well as internal BFG machinery (such as
+  ``model_url`` and ``route_url``) will consult this registry within
+  unit tests. This is a forward compatibility move based on the goals
+  of "marco".
+
+- Removed ``repoze.bfg.testing.addCleanUp`` function and associated
+  module-scope globals.  This was never an API.
 
 1.1a5 (2009-10-10)
 ==================

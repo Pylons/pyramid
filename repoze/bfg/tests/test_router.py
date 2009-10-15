@@ -2,7 +2,7 @@ import unittest
 
 from repoze.bfg.testing import cleanUp
 
-class RouterTests(unittest.TestCase):
+class TestRouter(unittest.TestCase):
     def setUp(self):
         from repoze.bfg.registry import Registry
         from zope.component import getSiteManager
@@ -407,230 +407,6 @@ class RouterTests(unittest.TestCase):
         self.assertEqual(len(router.threadlocal_manager.pushed), 1)
         self.assertEqual(len(router.threadlocal_manager.popped), 1)
 
-class MakeAppTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-        
-    def _callFUT(self, *arg, **kw):
-        from repoze.bfg.router import make_app
-        return make_app(*arg, **kw)
-
-    def test_fixtureapp_default_filename_withpackage(self):
-        manager = DummyRegistryManager()
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        app = self._callFUT(rootfactory, fixtureapp, manager=manager)
-        self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failUnless(app.registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_fixtureapp_explicit_filename(self):
-        manager = DummyRegistryManager()
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        app = self._callFUT(rootfactory, fixtureapp, filename='another.zcml',
-                            manager=manager)
-        self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(app.registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_fixtureapp_explicit_filename_in_options(self):
-        import os
-        manager = DummyRegistryManager()
-        rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
-        zcmlfile = os.path.join(os.path.dirname(fixtureapp.__file__),
-                                'another.zcml')
-        app = self._callFUT(rootfactory, fixtureapp, filename='configure.zcml',
-                            options={'configure_zcml':zcmlfile},
-                            manager=manager)
-        self.assertEqual(app.registry.__name__, 'repoze.bfg.tests.fixtureapp')
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(app.registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_fixtureapp_explicit_specification_in_options(self):
-        manager = DummyRegistryManager()
-        rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
-        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
-        app = self._callFUT(rootfactory, fixtureapp, filename='configure.zcml',
-                            options={'configure_zcml':zcmlfile},
-                            manager=manager)
-        self.assertEqual(app.registry.__name__,
-                         'repoze.bfg.tests.fixtureapp.subpackage')
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(app.registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_fixtureapp_filename_hascolon_isabs(self):
-        manager = DummyRegistryManager()
-        rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
-        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
-        class Dummy:
-            def isabs(self, name):
-                return True
-        os = Dummy()
-        os.path = Dummy()
-        self.assertRaises(IOError, self._callFUT,
-                          rootfactory,
-                          fixtureapp,
-                          filename='configure.zcml',
-                          options={'configure_zcml':zcmlfile},
-                          manager=manager,
-                          os=os)
-        
-    def test_event(self):
-        manager = DummyRegistryManager()
-        def subscriber(event):
-            event.app.created = True        
-        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
-        from zope.component import getGlobalSiteManager
-        getGlobalSiteManager().registerHandler(
-            subscriber,
-            (IWSGIApplicationCreatedEvent,)
-            )
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        app = self._callFUT(rootfactory, fixtureapp, manager=manager)
-        assert app.created is True
-
-    def test_custom_settings(self):
-        manager = DummyRegistryManager()
-        options= {'mysetting':True}
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        app = self._callFUT(rootfactory, fixtureapp, options=options,
-                            manager=manager)
-        from repoze.bfg.interfaces import ISettings
-        settings = app.registry.getUtility(ISettings)
-        self.assertEqual(settings.reload_templates, False)
-        self.assertEqual(settings.debug_authorization, False)
-        self.assertEqual(settings.mysetting, True)
-
-    def test_registrations(self):
-        manager = DummyRegistryManager()
-        options= {'reload_templates':True,
-                  'debug_authorization':True}
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        app = self._callFUT(rootfactory, fixtureapp, options=options,
-                            manager=manager)
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ILogger
-        from repoze.bfg.interfaces import IRootFactory
-        settings = app.registry.getUtility(ISettings)
-        logger = app.registry.getUtility(ILogger, name='repoze.bfg.debug')
-        rootfactory = app.registry.getUtility(IRootFactory)
-        self.assertEqual(logger.name, 'repoze.bfg.debug')
-        self.assertEqual(settings.reload_templates, True)
-        self.assertEqual(settings.debug_authorization, True)
-        self.assertEqual(rootfactory, rootfactory)
-        self.failUnless(manager.pushed and manager.popped)
-
-    def test_routes_in_config_with_rootfactory(self):
-        manager = DummyRegistryManager()
-        options= {'reload_templates':True,
-                  'debug_authorization':True}
-        from repoze.bfg.urldispatch import RoutesRootFactory
-        from repoze.bfg.tests import routesapp
-        rootfactory = DummyRootFactory(None)
-        app = self._callFUT(rootfactory, routesapp, options=options,
-                            manager=manager)
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ILogger
-        from repoze.bfg.interfaces import IRootFactory
-        settings = app.registry.getUtility(ISettings)
-        logger = app.registry.getUtility(ILogger, name='repoze.bfg.debug')
-        effective_rootfactory = app.registry.getUtility(IRootFactory)
-        self.assertEqual(logger.name, 'repoze.bfg.debug')
-        self.assertEqual(settings.reload_templates, True)
-        self.assertEqual(settings.debug_authorization, True)
-        self.failUnless(isinstance(effective_rootfactory, RoutesRootFactory))
-        self.assertEqual(effective_rootfactory.default_root_factory,
-                         rootfactory)
-        self.failUnless(manager.pushed and manager.popped)
-
-    def test_routes_in_config_no_rootfactory(self):
-        manager = DummyRegistryManager()
-        options= {'reload_templates':True,
-                  'debug_authorization':True}
-        from repoze.bfg.urldispatch import RoutesRootFactory
-        from repoze.bfg.router import DefaultRootFactory
-        from repoze.bfg.tests import routesapp
-        app = self._callFUT(None, routesapp, options=options,
-                            manager=manager)
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ILogger
-        from repoze.bfg.interfaces import IRootFactory
-        settings = app.registry.getUtility(ISettings)
-        logger = app.registry.getUtility(ILogger, name='repoze.bfg.debug')
-        rootfactory = app.registry.getUtility(IRootFactory)
-        self.assertEqual(logger.name, 'repoze.bfg.debug')
-        self.assertEqual(settings.reload_templates, True)
-        self.assertEqual(settings.debug_authorization, True)
-        self.failUnless(isinstance(rootfactory, RoutesRootFactory))
-        self.assertEqual(rootfactory.default_root_factory, DefaultRootFactory)
-        self.failUnless(manager.pushed and manager.popped)
-        
-    def test_no_routes_in_config_no_rootfactory(self):
-        manager = DummyRegistryManager()
-        from repoze.bfg.router import DefaultRootFactory
-        from repoze.bfg.interfaces import IRootFactory
-        options= {'reload_templates':True,
-                  'debug_authorization':True}
-        from repoze.bfg.tests import fixtureapp
-        app = self._callFUT(None, fixtureapp, options=options,
-                            manager=manager)
-        rootfactory = app.registry.getUtility(IRootFactory)
-        self.assertEqual(rootfactory, DefaultRootFactory)
-
-    def test_authorization_policy_no_authentication_policy(self):
-        manager = DummyRegistryManager()
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        authzpolicy = DummyContext()
-        from repoze.bfg.tests import routesapp
-        logger = DummyLogger()
-        app = self._callFUT(None, routesapp, authorization_policy=authzpolicy,
-                            debug_logger=logger, manager=manager)
-        self.failIf(app.registry.queryUtility(IAuthorizationPolicy))
-        self.assertEqual(logger.messages, [])
-        
-    def test_authentication_policy_no_authorization_policy(self):
-        manager = DummyRegistryManager()
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.authorization import ACLAuthorizationPolicy
-        authnpolicy = DummyContext()
-        from repoze.bfg.tests import routesapp
-        logger = DummyLogger()
-        app = self._callFUT(None, routesapp, authentication_policy=authnpolicy,
-                            debug_logger=logger, manager=manager)
-        self.assertEqual(app.registry.getUtility(IAuthenticationPolicy),
-                         authnpolicy)
-        self.assertEqual(
-            app.registry.getUtility(IAuthorizationPolicy).__class__,
-            ACLAuthorizationPolicy)
-        self.assertEqual(len(logger.messages), 1) # deprecation warning
-                        
-    def test_authentication_policy_and_authorization_policy(self):
-        manager = DummyRegistryManager()
-        from repoze.bfg.interfaces import IAuthorizationPolicy
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        authnpolicy = DummyContext()
-        authzpolicy = DummyContext()
-        from repoze.bfg.tests import routesapp
-        logger = DummyLogger()
-        app = self._callFUT(None, routesapp, authentication_policy=authnpolicy,
-                            authorization_policy = authzpolicy,
-                            debug_logger=logger, manager=manager)
-        self.assertEqual(app.registry.getUtility(IAuthenticationPolicy),
-                         authnpolicy)
-        self.assertEqual(app.registry.getUtility(IAuthorizationPolicy),
-                         authzpolicy)
-        self.assertEqual(len(logger.messages), 1) # deprecation warning
 
 class TestDefaultRootFactory(unittest.TestCase):
     def _getTargetClass(self):
@@ -652,13 +428,38 @@ class TestDefaultRootFactory(unittest.TestCase):
         self.assertEqual(root.a, 1)
         self.assertEqual(root.b, 2)
 
+class TestMakeApp(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
 
-class DummyRegistryManager:
-    def push(self, registry):
-        self.pushed = True
+    def tearDown(self):
+        cleanUp()
 
-    def pop(self):
-        self.popped = True
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.router import make_app
+        return make_app(None, *arg, **kw)
+
+    def test_it(self):
+        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        from zope.component import getSiteManager
+        from repoze.bfg.tests import fixtureapp
+        sm = getSiteManager()
+        class DummyMakeRegistry(object):
+            def __call__(self, *arg):
+                self.arg = arg
+                return sm
+        def subscriber(event):
+            event.app.created = True        
+        dummy_make_registry = DummyMakeRegistry()
+        manager = DummyRegistryManager()
+        sm.registerHandler(subscriber, (IWSGIApplicationCreatedEvent,))
+        rootfactory = DummyRootFactory(None)
+        app = self._callFUT(rootfactory, fixtureapp, manager=manager,
+                            make_registry=dummy_make_registry)
+        self.failUnless(app.created)
+        self.failUnless(manager.pushed)
+        self.failUnless(manager.popped)
+        self.assertEqual(len(dummy_make_registry.arg), 6)
 
 class DummyContext:
     pass
@@ -719,4 +520,11 @@ class DummyLogger:
         self.messages.append(msg)
     warn = info
     debug = info
+
+class DummyRegistryManager:
+    def push(self, registry):
+        self.pushed = True
+
+    def pop(self):
+        self.popped = True
 

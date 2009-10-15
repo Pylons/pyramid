@@ -21,10 +21,11 @@ class TestThreadLocalManager(unittest.TestCase):
         self.assertEqual(local.get(), 1)
 
     def test_default(self):
-        from zope.component import getGlobalSiteManager
-        local = self._makeOne(getGlobalSiteManager)
+        def thedefault():
+            return '123'
+        local = self._makeOne(thedefault)
         self.assertEqual(local.stack, [])
-        self.assertEqual(local.get(), getGlobalSiteManager())
+        self.assertEqual(local.get(), '123')
 
     def test_push_and_pop(self):
         local = self._makeOne()

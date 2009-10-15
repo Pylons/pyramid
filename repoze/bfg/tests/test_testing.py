@@ -507,39 +507,52 @@ class TestDummyTemplateRenderer(unittest.TestCase):
         result = renderer({'a':1, 'b':2})
         self.assertEqual(result, 'abc')
 
-class CleanUpTests(object):
+class TestSetUp(unittest.TestCase):
     def setUp(self):
-        from repoze.bfg.testing import _cleanups
-        self._old_cleanups = _cleanups[:]
-
-    def tearDown(self):
-        from repoze.bfg import testing
-        testing._cleanups = self._old_cleanups
-    
-class TestAddCleanUp(CleanUpTests, unittest.TestCase):
-    def _getFUT(self, ):
-        from repoze.bfg.testing import addCleanUp
-        return addCleanUp
+        from zope.component import getSiteManager
+        getSiteManager.reset()
+        
+    def _callFUT(self, ):
+        from repoze.bfg.testing import setUp
+        return setUp()
 
     def test_it(self):
-        addCleanUp = self._getFUT()
-        addCleanUp(1, ('a', 'b'), {'foo':'bar'})
-        from repoze.bfg.testing import _cleanups
-        self.assertEqual(_cleanups[-1], (1, ('a', 'b'), {'foo':'bar'}))
+        from zope.component.globalregistry import base
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        getSiteManager.sethook(lambda *arg: base)
+        class IFoo(Interface):
+            pass
+        def foo():
+            """ """
+        base.registerUtility(foo, IFoo)
+        sm = getSiteManager()
+        self.assertEqual(sm.queryUtility(IFoo), foo)
+        self._callFUT()
+        newsm = getSiteManager()
+        self.assertEqual(newsm.queryUtility(IFoo), None)
 
-class TestCleanUp(CleanUpTests, unittest.TestCase):
-    def _getFUT(self, ):
+class TestCleanUp(TestSetUp):
+    def _callFUT(self, ):
         from repoze.bfg.testing import cleanUp
-        return cleanUp
+        return cleanUp()
+        
+class TestTearDown(unittest.TestCase):
+    def setUp(self):
+        from zope.component import getSiteManager
+        getSiteManager.reset()
+        
+    def _callFUT(self, ):
+        from repoze.bfg.testing import tearDown
+        return tearDown()
 
     def test_it(self):
-        from repoze.bfg.testing import _cleanups
-        cleanUp = self._getFUT()
-        L = []
-        def f(*arg, **kw):
-            L.append((arg, kw))
-        _cleanups.append((f, ('a', '1'), {'kw':'1'}))
-        cleanUp()
-        self.assertEqual(L, [(('a', '1'), {'kw':'1'})])
-                              
+        from zope.component.globalregistry import base
+        from zope.component import getSiteManager
+        getSiteManager.sethook(lambda *arg: 'foo')
+        sm = getSiteManager()
+        self.assertEqual(sm, 'foo')
+        self._callFUT()
+        newsm = getSiteManager()
+        self.assertEqual(newsm, base)
         

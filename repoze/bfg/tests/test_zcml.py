@@ -1486,11 +1486,11 @@ class TestConnectRouteFunction(unittest.TestCase):
         return connect_route(path, name, factory)
 
     def _registerRoutesMapper(self):
-        from zope.component import getGlobalSiteManager
-        gsm = getGlobalSiteManager()
+        from zope.component import getSiteManager
+        sm = getSiteManager()
         mapper = DummyMapper()
         from repoze.bfg.interfaces import IRoutesMapper
-        gsm.registerUtility(mapper, IRoutesMapper)
+        sm.registerUtility(mapper, IRoutesMapper)
         return mapper
 
     def test_defaults(self):

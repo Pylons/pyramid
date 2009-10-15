@@ -1,4 +1,5 @@
 import threading
+
 from zope.component import getGlobalSiteManager
 
 class ThreadLocalManager(threading.local):
@@ -30,10 +31,8 @@ class ThreadLocalManager(threading.local):
         self.stack[:] = []
 
 def defaults():
-    defaults = {'request':None}
     gsm = getGlobalSiteManager()
-    defaults['registry'] = gsm
-    return defaults
+    return {'request':None, 'registry':gsm}
 
 manager = ThreadLocalManager(default=defaults)
 

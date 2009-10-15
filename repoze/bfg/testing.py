@@ -1,11 +1,14 @@
 import copy
 
+from zope.configuration.xmlconfig import _clearContext
+from zope.component import getSiteManager
 from zope.deprecation import deprecated
-
 from zope.interface import implements
 from zope.interface import Interface
 
 from repoze.bfg.interfaces import IRequest
+
+from repoze.bfg.registry import Registry
 
 _marker = object()
 
@@ -171,8 +174,8 @@ def registerUtility(impl, iface=Interface, name=''):
     <http://www.muthukadan.net/docs/zca.html>`_ for more information
     about ZCA utilities."""
     import zope.component 
-    gsm = zope.component.getGlobalSiteManager()
-    gsm.registerUtility(impl, iface, name=name)
+    sm = zope.component.getSiteManager()
+    sm.registerUtility(impl, iface, name=name)
     return impl
 
 def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
@@ -191,10 +194,10 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     <http://www.muthukadan.net/docs/zca.html>`_ for more information
     about ZCA adapters."""
     import zope.component
-    gsm = zope.component.getGlobalSiteManager()
+    sm = zope.component.getSiteManager()
     if not isinstance(for_, (tuple, list)):
         for_ = (for_,)
-    gsm.registerAdapter(impl, for_, provides, name=name)
+    sm.registerAdapter(impl, for_, provides, name=name)
     return impl
 
 def registerSubscriber(subscriber, iface=Interface):
@@ -210,10 +213,10 @@ def registerSubscriber(subscriber, iface=Interface):
     <http://www.muthukadan.net/docs/zca.html>`_ for more information
     about ZCA subscribers."""
     import zope.component
-    gsm = zope.component.getGlobalSiteManager()
+    sm = zope.component.getSiteManager()
     if not isinstance(iface, (tuple, list)):
         iface = (iface,)
-    gsm.registerHandler(subscriber, iface)
+    sm.registerHandler(subscriber, iface)
     return subscriber
 
 def registerTraverserFactory(traverser, for_=Interface):
@@ -227,7 +230,6 @@ def registerRoute(path, name, factory=None):
     from repoze.bfg.interfaces import IRoutesMapper
     from zope.component import queryUtility
     from repoze.bfg.urldispatch import RoutesRootFactory
-    from zope.component import getSiteManager
     mapper = queryUtility(IRoutesMapper)
     if mapper is None:
         mapper = RoutesRootFactory(DummyRootFactory)
@@ -457,34 +459,46 @@ class DummyRequest:
         self.marshalled = params # repoze.monty
         self.__dict__.update(kw)
 
-_cleanups = []
+def setUp():
+    """Set up a fresh BFG testing registry.  Use in the ``setUp``
+    method of unit tests that use the ``register*`` methods in the
+    testing module (e.g. if your unit test uses
+    ``repoze.bfg.testing.registerDummySecurityPolicy``).  If you use
+    the ``register*`` functions without calling ``setUp``, unit tests
+    will not be isolated with respect to registrations they perform.
+    Additionally, the *global* component registry will be used, which
+    may have a different API than is expected by BFG itself.
 
-def addCleanUp(func, args=(), kw=None):
-    """Register a cleanup routines
-
-    Pass a function to be called to cleanup global data.
-    Optional argument tuple and keyword arguments may be passed.
+    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
     """
-    if kw is None:
-        kw = {}
-    _cleanups.append((func, args, kw))
+    registry = Registry('testing')
+    getSiteManager.sethook(lambda *arg: registry)
+    _clearContext()
+
+def tearDown():
+    """Tear down a previously set up (via
+    ``repoze.bfg.testing.setUp``) testing registry.  Use in the
+    ``tearDown`` method of unit tests that use the ``register*``
+    methods in the testing module (e.g. if your unit test uses
+    ``repoze.bfg.testing.registerDummySecurityPolicy``).  Using
+    ``tearDown`` is effectively optional if you call setUp at the
+    beginning of every test which requires registry isolation.
+
+    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+    """
+    getSiteManager.reset()
 
 def cleanUp():
-    """Clean up BFG testing registrations.  Use in the ``tearDown`` of
-    unit tests that use the ``register*`` methods in the testing
-    module (e.g. if your unit test uses
-    ``repoze.bfg.testing.registerDummyRenderer`` or
-    ``repoze.bfg.testing.registerDummySecurityPolicy``).  If you use
-    the ``register*`` functions without calling cleanUp, unit tests
-    will not be isolated with respect to registrations they perform."""
-    for func, args, kw in _cleanups:
-        func(*args, **kw)
-
-from zope.component.globalregistry import base
-from zope.configuration.xmlconfig import _clearContext
-from repoze.bfg.registry import original_getSiteManager
-from repoze.bfg.threadlocal import manager
-addCleanUp(original_getSiteManager.reset)
-addCleanUp(manager.clear)
-addCleanUp(lambda: base.__init__('base'))
-addCleanUp(_clearContext)
+    """ Deprecated (as of BFG 1.1) function whichs sets up a new
+    registry for BFG testing registrations.  Use in the ``setUp`` and
+    ``tearDown`` of unit tests that use the ``register*`` methods in
+    the testing module (e.g. if your unit test uses
+    ``repoze.bfg.testing.registerDummySecurityPolicy``).  Use of this
+    function is deprecated in favor of using
+    ``repoze.bfg.testing.setUp`` in the test setUp and
+    ``repoze.bfg.testing.tearDown`` in the test tearDown.  This is
+    currently just an alias for ``repoze.bfg.testing.setUp``.
+    Although this function is effectively deprecated, due to its
+    extensive production usage, it will never be removed."""
+    setUp()

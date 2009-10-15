@@ -16,15 +16,15 @@ class ModelURLTests(unittest.TestCase):
     def _registerContextURL(self):
         from repoze.bfg.interfaces import IContextURL
         from zope.interface import Interface
-        from zope.component import getGlobalSiteManager
+        from zope.component import getSiteManager
         class DummyContextURL(object):
             def __init__(self, context, request):
                 pass
             def __call__(self):
                 return 'http://example.com/context/'
-        gsm = getGlobalSiteManager()
-        gsm.registerAdapter(DummyContextURL, (Interface, Interface),
-                            IContextURL)
+        sm = getSiteManager()
+        sm.registerAdapter(DummyContextURL, (Interface, Interface),
+                           IContextURL)
 
     def test_root_default(self):
         self._registerContextURL()
