@@ -232,9 +232,6 @@ class DummyRootFactory:
     def __init__(self, root):
         self.root = root
 
-    def __call__(self, environ):
-        return self.root
-
 class DummyLogger:
     def __init__(self):
         self.messages = []
@@ -253,14 +250,3 @@ class DummyLock:
     def release(self):
         self.released = True
         
-class DummyThreadLocalManager:
-    def __init__(self, data):
-        self.data = data
-
-    def pop(self):
-        self.popped = True
-        return self.data
-
-    def push(self, data):
-        self.pushed = data
-

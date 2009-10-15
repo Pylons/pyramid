@@ -6,10 +6,6 @@ class Registry(Components, dict):
     # to notify them
     has_listeners = False
 
-    def reset(self):
-        self.__init__(self.__name__)
-        self.clear()
-
     def registerSubscriptionAdapter(self, *arg, **kw):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
         self.has_listeners = True

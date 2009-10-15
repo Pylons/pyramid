@@ -740,7 +740,7 @@ class TestViewDirective(unittest.TestCase):
         view = lambda *arg: None
         sm = getSiteManager()
         def view(context, request):
-            return '123'
+            """ """
         self._callFUT(context, None, IFoo, view=view, xhr=True)
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -758,8 +758,6 @@ class TestViewDirective(unittest.TestCase):
     def test_with_header_badregex(self):
         from zope.component import getSiteManager
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
         from zope.configuration.exceptions import ConfigurationError
         class IFoo(Interface):
             pass
@@ -767,7 +765,7 @@ class TestViewDirective(unittest.TestCase):
         view = lambda *arg: None
         sm = getSiteManager()
         def view(context, request):
-            return '123'
+            """ """
         self.assertRaises(ConfigurationError, self._callFUT,
                           context, None, IFoo,
                           view=view, header='Host:a\\')
@@ -810,7 +808,7 @@ class TestViewDirective(unittest.TestCase):
         view = lambda *arg: None
         sm = getSiteManager()
         def view(context, request):
-            return '123'
+            """ """
         self._callFUT(context, None, IFoo, view=view, header='Host')
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -863,7 +861,7 @@ class TestViewDirective(unittest.TestCase):
         view = lambda *arg: None
         sm = getSiteManager()
         def view(context, request):
-            return '123'
+            """ """
         self._callFUT(context, None, IFoo, view=view, header=r'Host:\d')
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -916,7 +914,7 @@ class TestViewDirective(unittest.TestCase):
         view = lambda *arg: None
         sm = getSiteManager()
         def view(context, request):
-            return '123'
+            """ """
         self._callFUT(context, None, IFoo, view=view, accept='text/xml')
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -2033,7 +2031,7 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(route_discriminator[1], 'name')
         self.assertEqual(route_args, ('path', 'name', None))
 
-    def test_with_view_xhr_alias(self):
+    def test_with_view_accept_alias(self):
         from zope.component import getSiteManager
         from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
