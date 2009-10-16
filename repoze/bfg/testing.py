@@ -8,6 +8,7 @@ from zope.interface import Interface
 
 from repoze.bfg.interfaces import IRequest
 
+from repoze.bfg.configuration import zcml_configure # API import alias
 from repoze.bfg.registry import Registry
 
 _marker = object()
@@ -457,6 +458,7 @@ class DummyRequest:
         self.root = None
         self.virtual_root = None
         self.marshalled = params # repoze.monty
+        self.registry = getSiteManager()
         self.__dict__.update(kw)
 
 def setUp():

@@ -1,9 +1,6 @@
 import re
 import sys
 
-from zope.configuration import xmlconfig
-import zope.configuration.config
-
 from zope.component import getSiteManager
 from zope.component import getUtility
 from zope.component import queryUtility
@@ -39,6 +36,7 @@ from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
+from repoze.bfg.configuration import zcml_configure
 from repoze.bfg.path import package_name
 from repoze.bfg.request import create_route_request_factory
 from repoze.bfg.resource import PackageOverrides
@@ -729,14 +727,6 @@ def exclude(name):
 class Uncacheable(object):
     """ Include in discriminators of actions which are not cacheable;
     this class only exists for backwards compatibility (<0.8.1)"""
-
-def zcml_configure(name, package):
-    context = zope.configuration.config.ConfigurationMachine()
-    xmlconfig.registerCommonDirectives(context)
-    context.package = package
-    xmlconfig.include(context, name, package)
-    context.execute_actions(clear=False)
-    return context.actions
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
 

@@ -406,6 +406,7 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/foo')
 
     def test_defaults(self):
+        from zope.component import getSiteManager
         request = self._makeOne()
         self.assertEqual(request.method, 'GET')
         self.assertEqual(request.application_url, 'http://example.com')
@@ -430,6 +431,7 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.root, None)
         self.assertEqual(request.virtual_root, None)
         self.assertEqual(request.virtual_root_path, ())
+        self.assertEqual(request.registry, getSiteManager())
 
     def test_params_explicit(self):
         request = self._makeOne(params = {'foo':'bar'})

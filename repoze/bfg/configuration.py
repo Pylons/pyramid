@@ -4,6 +4,9 @@ import threading
 
 import zope.component
 
+from zope.configuration import xmlconfig
+from zope.configuration.config import ConfigurationMachine
+
 from zope.component import getGlobalSiteManager
 from zope.component import getSiteManager
 
@@ -23,7 +26,6 @@ from repoze.bfg.settings import get_options
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.urldispatch import RoutesRootFactory
-from repoze.bfg.zcml import zcml_configure
 
 def make_registry(root_factory, package=None, filename='configure.zcml',
                   authentication_policy=None, authorization_policy=None,
@@ -131,4 +133,18 @@ class DefaultRootFactory:
             # used routes (at least apps without any custom "context
             # factory") in BFG 0.9.X and before
             self.__dict__.update(environ['bfg.routes.matchdict'])
+
+def zcml_configure(name, package):
+    """ Given a ZCML filename as ``name`` and a Python package as
+    ``package`` which the filename should be relative to, load the
+    ZCML into the current ZCML registry.
+
+    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+    """
+    context = ConfigurationMachine()
+    xmlconfig.registerCommonDirectives(context)
+    context.package = package
+    xmlconfig.include(context, name, package)
+    context.execute_actions(clear=False)
+    return context.actions
 

@@ -41,6 +41,11 @@ Features
   added to it via its dictionary API and vice versa.  This is a
   forward compatibility move based on the goals of "marco".
 
+- Expose and document ``repoze.bfg.testing.zcml_configure`` API.  This
+  function populates a component registry from a ZCML file for testing
+  purposes.  It is documented in the "Unit and Integration Testing"
+  chapter.
+
 Documentation
 -------------
 
@@ -55,7 +60,8 @@ Documentation
   methods in order to encourage this as best practice going forward.
 
 - Added "Creating Integration Tests" section to unit testing narrative
-  documentation chapter.
+  documentation chapter.  As a result, the name of the unittesting
+  chapter is now "Unit and Integration Testing".
 
 Backwards Incompatibilities
 ---------------------------

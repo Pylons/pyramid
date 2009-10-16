@@ -161,8 +161,7 @@ environment.
            """
            testing.setUp()
            import myapp
-           import zope.configuration.xmlconfig
-           zope.configuration.xmlconfig.file('configure.zcml', package=myapp)
+           testing.zcml_configure('configure.zcml', package=myapp)
 
        def tearDown(self):
            """ Clear out the application registry """
