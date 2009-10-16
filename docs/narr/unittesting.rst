@@ -1,7 +1,7 @@
 .. _unittesting_chapter:
 
-Unit Testing
-============
+Unit and Integration Testing
+============================
 
 The suggested mechanism for unit testing :mod:`repoze.bfg`
 applications is the Python ``unittest`` module.  :mod:`repoze.bfg`
@@ -9,8 +9,8 @@ provides a number of facilities that make unit tests easier to write.
 The facilities become particularly useful when your code calls into
 :mod:`repoze.bfg` -related framework functions.
 
-Using the ``repoze.bfg.testing`` API
-------------------------------------
+Using the ``repoze.bfg.testing`` API in Unit Tests
+--------------------------------------------------
 
 The ``repoze.bfg.testing`` module provides a number of functions which
 can be used during unit testing.  For example, let's imagine you want
@@ -117,4 +117,76 @@ See the :ref:`testing_module` chapter for the entire :mod:`repoze.bfg`
 security policy, registering models at paths, registering event
 listeners, registering views and view permissions, and classes
 representing "dummy" implementations of a request and a model.
+
+.. _integration_tests:
+
+Creating Integration Tests
+--------------------------
+
+In :mod:`repoze.bfg`, a unit test typically relies on "mock" or
+"dummy" implementations to give the code under test only enough
+context to run.
+
+"Integration testing" implies another sort of testing.  In the context
+of a :mod:`repoze.bfg`, integration test, the test logic tests the
+functionality of some code *and* its integration with the rest of the
+:mod:`repoze.bfg` framework.
+
+In :mod:`repoze.bfg`, you create an integration test by *loading its
+ZCML* in the test's setup code.  This causes the entire
+:mod:`repoze.bfg` environment to be set up and torn down as if your
+application was running "for real".  This is a heavy-hammer way of
+making sure that your tests have enough context to run properly, and
+it tests your code's integration with the rest of :mod:`repoze.bfg`.
+
+Let's demonstrate this by showing an integration test for a view.  The
+below test assumes that your application's package name is ``myapp``,
+and that there is a ``views`` module in the app with a function with
+the name ``my_view`` in it that returns the response 'Welcome to this
+application' after accessing some values that require a fully set up
+environment.
+
+.. code-block:: python
+   :linenos:
+
+   import unittest
+
+   from repoze.bfg import testing
+
+   class ViewIntegrationTests(unittest.TestCase):
+       def setUp(self):
+           """ This sets up the application registry with the
+           registrations your application declares in its configure.zcml
+           (including dependent registrations for repoze.bfg itself).
+           """
+           testing.setUp()
+           import myapp
+           import zope.configuration.xmlconfig
+           zope.configuration.xmlconfig.file('configure.zcml', package=myapp)
+
+       def tearDown(self):
+           """ Clear out the application registry """
+           testing.tearDown()
+
+       def test_my_view(self):
+           from myapp.views import my_view
+           context = testing.DummyModel()
+           request = testing.DummyRequest()
+           result = my_view(context, request)
+           self.assertEqual(result.status, '200 OK')
+           body = result.app_iter[0]
+           self.failUnless('Welcome to' in body)
+           self.assertEqual(len(result.headerlist), 2)
+           self.assertEqual(result.headerlist[0],
+                            ('Content-Type', 'text/html; charset=UTF-8'))
+           self.assertEqual(result.headerlist[1], ('Content-Length',
+                                                   str(len(body))))
+
+Unless you cannot avoid it, you should prefer writing unit tests that
+use the :mod:`repoze.bfg.testing` API to set up the right "mock"
+registrations rather than creating an integration test.  Unit tests
+will run faster (because they don't have to parse and execute ZCML for
+each test) and the result of a unit test is usually easier to make
+assertions about.
+
 

@@ -54,6 +54,9 @@ Documentation
   ``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``
   methods in order to encourage this as best practice going forward.
 
+- Added "Creating Integration Tests" section to unit testing narrative
+  documentation chapter.
+
 Backwards Incompatibilities
 ---------------------------
 

@@ -723,3 +723,5 @@ You may add more tests here as you build your application.  You are
 not required to write tests to use :mod:`repoze.bfg`, this file is
 simply provided as convenience and example.
 
+See :ref:`unittesting_chapter` for more information about writing
+:mod:`repoze.bfg` unit tests.
