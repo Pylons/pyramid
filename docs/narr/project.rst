@@ -112,8 +112,9 @@ Installing your Newly Created Project for Development
 
 Using the interpreter from the :term:`virtualenv` you create during
 :ref:`installing_chapter`, invoke the following command when inside
-the project directory against the file named ``setup.py`` in the
-paster-generated project directory:
+the project directory.  The file named ``setup.py`` will be in the
+root of the paster-generated project directory.  The ``python`` you're
+invoking should be the one from your virtualenv.
 
 .. code-block:: bash
    :linenos:
