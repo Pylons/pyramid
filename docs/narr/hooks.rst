@@ -212,7 +212,7 @@ pattern via configuration.
 Use an ``adapter`` stanza in your application's ``configure.zcml`` to
 change the default traverser:
 
-.. code-block: python
+.. code-block:: xml
    :linenos:
 
     <adapter
@@ -263,7 +263,7 @@ returned an object that implemented that class or interface, a custom
 traverser would be used.  Otherwise, the default traverser would be
 used.  For example:
 
-.. code-block: python
+.. code-block:: xml
    :linenos:
 
     <adapter
@@ -297,7 +297,7 @@ generates a URL for a specific type of :term:`context` by adding an
 adapter stanza for ``IContextURL`` to your application's
 ``configure.zcml``:
 
-.. code-block: python
+.. code-block:: xml
    :linenos:
 
     <adapter
