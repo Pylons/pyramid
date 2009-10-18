@@ -693,8 +693,8 @@ class BFGMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
 class BFGViewGrokker(martian.InstanceGrokker):
     martian.component(BFGViewMarker)
     def grok(self, name, obj, **kw):
-        if hasattr(obj, '__bfg_view_settings__'):
-            settings = obj.__bfg_view_settings__
+        config = getattr(obj, '__bfg_view_settings__', [])
+        for settings in config:
             permission = settings['permission']
             for_ = settings['for_']
             name = settings['name']
@@ -716,8 +716,7 @@ class BFGViewGrokker(martian.InstanceGrokker):
                  request_param=request_param, containment=containment,
                  attr=attr, renderer=renderer, wrapper=wrapper,
                  xhr=xhr, accept=accept, header=header)
-            return True
-        return False
+        return bool(config)
 
 def exclude(name):
     if name.startswith('.'):

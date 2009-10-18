@@ -2390,7 +2390,7 @@ class TestBFGViewGrokker(unittest.TestCase):
                         containment=None, attr=None, renderer=None,
                         wrapper_viewname=None, xhr=False, header=None,
                         accept=None)
-        obj.__bfg_view_settings__ = settings
+        obj.__bfg_view_settings__ = [settings]
         context = DummyContext()
         result = grokker.grok('name', obj, context=context)
         self.assertEqual(result, True)

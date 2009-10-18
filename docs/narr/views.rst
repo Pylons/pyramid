@@ -708,6 +708,27 @@ decorator syntactic sugar), if you wish:
 
    my_view = bfg_view()(MyView)
 
+More than one ``bfg_view`` decorator can be stacked on top of any
+number of others.  Each decorator creates a separate view
+registration.  For example:
+
+.. code-block:: python
+   :linenos:
+
+    from repoze.bfg.view import bfg_view
+
+    @bfg_view(name='edit')
+    @bfg_view(name='change')
+    def edit(context, request):
+        pass
+
+This registers the same view under two different names.
+
+.. note:: ``bfg_view`` decorator stacking is a feature new in
+   :mod:`repoze.bfg` 1.1.  Previously, these decorators could not be
+   stacked without the effect of the "upper" decorator cancelling the
+   effect of the the decorator beneath it.
+
 .. _view_lookup_ordering:
 
 View Lookup Ordering

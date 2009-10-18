@@ -105,68 +105,43 @@ class TestGrokkedApp(unittest.TestCase):
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRequest
         import repoze.bfg.tests.grokkedapp as package
-        actions = zcml_configure('configure.zcml', package)[-10:]
+        
+        actions = zcml_configure('configure.zcml', package)
         actions.sort()
 
-        action = actions[0]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], '')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
-        
-        action = actions[1]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], '')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
+        num = 18
 
-        action = actions[2]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
+        action_names = [actions[x][0][2] for x in range(len(actions[:num]))]
+        action_types = [(actions[x][0][1],
+                         actions[x][0][3],
+                         actions[x][0][4]) for x in range(len(actions[:num]))]
 
-        action = actions[3]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
+        for typ in action_types:
+            self.assertEqual(typ, (None, IRequest, IView))
 
-        action = actions[4]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another_grokked_class')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
+        self.assertEqual(
+            action_names, [
+                '',
+                '',
+                'another',
+                'another',
+                'another_grokked_class',
+                'another_grokked_instance',
+                'another_oldstyle_grokked_class',
+                'another_stacked1',
+                'another_stacked2',
+                'another_stacked_class1',
+                'another_stacked_class2',
+                'grokked_class',
+                'grokked_instance',
+                'oldstyle_grokked_class',
+                'stacked1',
+                'stacked2',
+                'stacked_class1',
+                'stacked_class2',
+                ]
+            )
 
-        action = actions[5]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another_grokked_instance')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
-
-        action = actions[6]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'another_oldstyle_grokked_class')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
-
-        action = actions[7]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'grokked_class')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
-
-        action = actions[8]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'grokked_instance')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
-
-        action = actions[9]
-        self.assertEqual(action[0][1], None)
-        self.assertEqual(action[0][2], 'oldstyle_grokked_class')
-        self.assertEqual(action[0][3], IRequest)
-        self.assertEqual(action[0][4], IView)
 
         ctx = DummyContext()
         req = DummyRequest()
@@ -206,6 +181,30 @@ class TestGrokkedApp(unittest.TestCase):
         result= render_view_to_response(ctx, req,
                                         'another_oldstyle_grokked_class')
         self.assertEqual(result, 'another_oldstyle_grokked_class')
+
+        result = render_view_to_response(ctx, req, 'stacked1')
+        self.assertEqual(result, 'stacked')
+
+        result = render_view_to_response(ctx, req, 'stacked2')
+        self.assertEqual(result, 'stacked')
+
+        result = render_view_to_response(ctx, req, 'another_stacked1')
+        self.assertEqual(result, 'another_stacked')
+
+        result = render_view_to_response(ctx, req, 'another_stacked2')
+        self.assertEqual(result, 'another_stacked')
+
+        result = render_view_to_response(ctx, req, 'stacked_class1')
+        self.assertEqual(result, 'stacked_class')
+
+        result = render_view_to_response(ctx, req, 'stacked_class2')
+        self.assertEqual(result, 'stacked_class')
+
+        result = render_view_to_response(ctx, req, 'another_stacked_class1')
+        self.assertEqual(result, 'another_stacked_class')
+
+        result = render_view_to_response(ctx, req, 'another_stacked_class2')
+        self.assertEqual(result, 'another_stacked_class')
 
 class DummyContext(object):
     pass

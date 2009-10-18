@@ -376,7 +376,7 @@ class TestBFGViewDecorator(unittest.TestCase):
             """ docstring """
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__
+        settings = wrapped.__bfg_view_settings__[0]
         self.assertEqual(settings['permission'], None)
         self.assertEqual(settings['for_'], None)
         self.assertEqual(settings['request_type'], None)
@@ -387,7 +387,7 @@ class TestBFGViewDecorator(unittest.TestCase):
             """ docstring """
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__
+        settings = wrapped.__bfg_view_settings__[0]
         self.assertEqual(settings['permission'], None)
         self.assertEqual(settings['for_'], None)
         self.assertEqual(settings['request_type'], None)
@@ -398,10 +398,25 @@ class TestBFGViewDecorator(unittest.TestCase):
             """ docstring """
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__
+        settings = wrapped.__bfg_view_settings__[0]
         self.assertEqual(settings['permission'], None)
         self.assertEqual(settings['for_'], None)
         self.assertEqual(settings['request_type'], None)
+
+    def test_stacking(self):
+        decorator1 = self._makeOne(name='1')
+        decorator2 = self._makeOne(name='2')
+        def foo():
+            """ docstring """
+        wrapped1 = decorator1(foo)
+        wrapped2 = decorator2(wrapped1)
+        self.failUnless(wrapped1 is foo)
+        self.failUnless(wrapped2 is foo)
+        self.assertEqual(len(wrapped2.__bfg_view_settings__), 2)
+        settings1 = wrapped2.__bfg_view_settings__[0]
+        self.assertEqual(settings1['name'], '1')
+        settings2 = wrapped2.__bfg_view_settings__[1]
+        self.assertEqual(settings2['name'], '2')
 
 class TestDefaultForbiddenView(unittest.TestCase):
     def _callFUT(self, context, request):

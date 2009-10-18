@@ -1,3 +1,24 @@
+Next release
+============
+
+Features
+--------
+
+- More than one ``@bfg_view`` decorator may now be stacked on top of
+  any number of others.  Each invocation of the decorator registers a
+  single view.  For instance, the following combination of decorators
+  and a function will register two views::
+
+    from repoze.bfg.view import bfg_view
+
+    @bfg_view(name='edit')
+    @bfg_view(name='change')
+    def edit(context, request):
+        pass
+
+  This makes it possible to associate more than one view configuration
+  for a single callable without requiring ZCML.
+
 1.1a6 (2009-10-15)
 ==================
 

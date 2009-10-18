@@ -394,7 +394,9 @@ class bfg_view(object):
         self.header = header
 
     def __call__(self, wrapped):
-        wrapped.__bfg_view_settings__ = self.__dict__.copy()
+        settings = getattr(wrapped, '__bfg_view_settings__', [])
+        settings.append(self.__dict__.copy())
+        wrapped.__bfg_view_settings__ = settings
         return wrapped
 
 def default_view(context, request, status):

@@ -7,6 +7,22 @@ def grokked(context, request):
 @bfg_view(request_method='POST')
 def grokked_post(context, request):
     return 'grokked_post'
+
+@bfg_view(name='stacked2')
+@bfg_view(name='stacked1')
+def stacked(context, request):
+    return 'stacked'
+
+class stacked_class(object):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        return 'stacked_class'
+
+stacked_class = bfg_view(name='stacked_class1')(stacked_class)
+stacked_class = bfg_view(name='stacked_class2')(stacked_class)
     
 class oldstyle_grokked_class:
     def __init__(self, context, request):
