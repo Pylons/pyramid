@@ -199,4 +199,142 @@ an object that implements any particular interface; it simply needs
 have a ``status`` attribute, a ``headerlist`` attribute, and and
 ``app_iter`` attribute.
 
+.. _changing_the_traverser:
+
+Changing the Traverser
+----------------------
+
+The default :term:`traversal` algorithm that BFG uses is explained in
+:ref:`how_bfg_traverses`.  Though it is rarely necessary, this default
+algorithm can be swapped out selectively for a different traversal
+pattern via configuration.
+
+Use an ``adapter`` stanza in your application's ``configure.zcml`` to
+change the default traverser:
+
+.. code-block: python
+   :linenos:
+
+    <adapter
+      factory="myapp.traversal.Traverser"
+      provides="repoze.bfg.interfaces.ITraverserFactory"
+      for="*"
+      />
+
+In the example above, ``myapp.traversal.Traverser`` is assumed to be
+a class that implements the following interface:
+
+.. code-block:: python
+   :linenos:
+
+   class Traverser(object):
+       def __init__(self, root):
+           """ Accept the root object returned from the root factory """
+
+       def __call__(self, environ):
+           """ Return a dictionary with (at least) the keys ``root``,
+           ``context``, ``view_name``, ``subpath``, ``traversed``,
+           ``virtual_root``, and ``virtual_root_path``.  These values are
+           typically the result of an object graph traversal.  ``root``
+           is the physical root object, ``context`` will be a model
+           object, ``view_name`` will be the view name used (a Unicode
+           name), ``subpath`` will be a sequence of Unicode names that
+           followed the view name but were not traversed, ``traversed``
+           will be a sequence of Unicode names that were traversed
+           (including the virtual root path, if any) ``virtual_root``
+           will be a model object representing the virtual root (or the
+           physical root if traversal was not performed), and
+           ``virtual_root_path`` will be a sequence representing the
+           virtual root path (a sequence of Unicode names) or None if
+           traversal was not performed.
+
+           Extra keys for special purpose functionality can be added as
+           necessary.
+
+           All values returned in the dictionary will be made available
+           as attributes of the ``request`` object.
+           """
+
+More than one traversal algorithm can be active at the same time.  For
+instance, if your :term:`root factory` returns more than one type of
+object conditionally, you could claim that an alternate traverser is
+``for`` only one particular class or interface.  When the root factory
+returned an object that implemented that class or interface, a custom
+traverser would be used.  Otherwise, the default traverser would be
+used.  For example:
+
+.. code-block: python
+   :linenos:
+
+    <adapter
+      factory="myapp.traversal.Traverser"
+      provides="repoze.bfg.interfaces.ITraverserFactory"
+      for="myapp.models.MyRoot"
+      />
+
+If the above stanza was added to a ``configure.zcml`` file,
+:mod:`repoze.bfg` would use the ``myapp.traversal.Traverser`` only
+when the application :term:`root factory` returned an instance of the
+``myapp.models.MyRoot`` object.  Otherwise it would use the default
+:mod:`repoze.bfg` traverser to do traversal.
+
+Example implementations of alternate traversers can be found "in the
+wild" within `repoze.bfg.traversalwrapper
+<http://pypi.python.org/pypi/repoze.bfg.traversalwrapper>`_ and
+`repoze.bfg.metatg <http://svn.repoze.org/repoze.bfg.metatg/trunk/>`_.
+
+Changing How :mod:`repoze.bfg.url.model_url` Generates a URL
+------------------------------------------------------------
+
+When you add a traverser as described in
+:ref:`changing_the_traverser`, it's often convenient to continue to
+use the ``repoze.bfg.url.model_url`` API.  However, since the way
+traversal is done will have been modified, the URLs it generates by
+default may be incorrect.
+
+If you've added a traverser, you can change how ``model_url``
+generates a URL for a specific type of :term:`context` by adding an
+adapter stanza for ``IContextURL`` to your application's
+``configure.zcml``:
+
+.. code-block: python
+   :linenos:
+
+    <adapter
+      factory="myapp.traversal.URLGenerator"
+      provides="repoze.bfg.interfaces.IContextURL"
+      for="myapp.models.MyRoot *"
+      />
+
+In the above example, the ``myapp.traversal.URLGenerator`` class will
+be used to provide services to ``model_url`` any time the
+:term:`context` passed to ``model_url`` is of class
+``myapp.models.MyRoot``.  The asterisk following represents the type
+of interface that must be possessed by the :term:`request` (in this
+case, any interface, represented by asterisk).
+
+The API that must be implemented by a class that provides
+``IContextURL`` is as follows:
+
+.. code-block:: python
+  :linenos:
+
+   class IContextURL(Interface):
+       """ An adapter which deals with URLs related to a context.
+       """
+       def __init__(self, context, request):
+           """ Accept the context and request """
+
+       def virtual_root(self):
+           """ Return the virtual root object related to a request and the
+           current context"""
+
+       def __call__(self):
+           """ Return a URL that points to the context """
+
+The default context URL generator is available for perusal as the
+class ``TraversalContextURL`` in the `traversal module
+<http://svn.repoze.org/repoze.bfg/trunk/repoze/bfg/traversal.py>`_ of
+the BFG subversion repository.
+
 

@@ -74,6 +74,8 @@ model instance in your object graph or when the path segments implied
 by the URL "run out".  The object that traversal "stops on" becomes
 the :term:`context`.
 
+.. _how_bfg_traverses:
+
 How :mod:`repoze.bfg` Processes a Request Using Traversal
 ---------------------------------------------------------
 

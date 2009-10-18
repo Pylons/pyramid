@@ -38,6 +38,13 @@ Features
   happens to be the method they're attached to), so the view class
   must have a suitable constructor.
 
+Documentation
+-------------
+
+- Added ``Changing the Traverser`` and ``Changing How
+  :mod:`repoze.bfg.url.model_url` Generates a URL`` to the "Hooks"
+  narrative chapter of the docs.
+
 1.1a6 (2009-10-15)
 ==================
 
