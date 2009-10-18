@@ -19,7 +19,7 @@ from zope.schema import Int
 from zope.schema import TextLine
 
 import martian
-import martian.interfaces
+import martian.interfaces  # pyflakes whines, but don't delete it
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -740,4 +740,3 @@ class Uncacheable(object):
     this class only exists for backwards compatibility (<0.8.1)"""
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
-
