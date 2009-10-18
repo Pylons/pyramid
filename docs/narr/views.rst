@@ -8,6 +8,18 @@ your application.  The primary job of any :mod:`repoze.bfg`
 application is is to find and call a :term:`view` when a
 :term:`request` reaches it.
 
+How :mod:`repoze.bfg` invokes a view is somewhat analogous to how
+someone might interactively use an operating system command shell such
+as ``bash`` or ``cmd`` to find some file or directory on a filesystem
+and subsequently operate against that file or directory using a
+program.  In this analogy, if you think of :mod:`repoze.bfg` as the
+person using the command shell, your application's :term:`model` graph
+as the filesystem, :term:`traversal` or :term:`url dispatch` as the
+act of using ``cd`` to find a file or directory on the filesystem to
+operate against, and a :term:`view` callable as a program invoked
+against the type of file or directory found, you'll have a basic
+understanding of how view invocation works in :mod:`repoze.bfg`.
+
 A view callable may always return a :term:`WebOb` ``Response`` object
 directly.  It may optionally return another arbitrary non-`Response`
 value.  If a view callable returns a non-Response result, the result
@@ -727,7 +739,7 @@ This registers the same view under two different names.
 .. note:: ``bfg_view`` decorator stacking is a feature new in
    :mod:`repoze.bfg` 1.1.  Previously, these decorators could not be
    stacked without the effect of the "upper" decorator cancelling the
-   effect of the the decorator beneath it.
+   effect of the the decorator "beneath" it.
 
 The bfg_view decorator can also be used against class methods:
 
@@ -770,8 +782,10 @@ could be spelled equivalently as the below:
        def amethod(self):
            return Response('hello from %s!' % self.context)
 
-.. warning:: The ability to use the ``bfg_view`` decorator as a method
-             decorator is new in :mod:`repoze.bfg` version 1.1.
+.. note:: The ability to use the ``bfg_view`` decorator as a method
+          decorator is new in :mod:`repoze.bfg` version 1.1.
+          Previously it could only be used as a class or function
+          decorator.
 
 .. _view_lookup_ordering:
 
