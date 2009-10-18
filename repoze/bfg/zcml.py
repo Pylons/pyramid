@@ -701,7 +701,6 @@ class BFGMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
 
 class BFGClassGrokker(object):
     implements(martian.interfaces.IGrokker)
-    martian = martian # for unit tests
     martian.component(Class)
     def grok(self, name, class_, module_info=None, **kw):
         # The class itself may be decorated, so we feed it to BFGViewGrokker
@@ -710,9 +709,9 @@ class BFGClassGrokker(object):
         # grok any decorations attached to the class' method (direct
         # methods only, not methods of any base class)
         methods = inspect.getmembers(class_, inspect.ismethod)
-        basemethods = class_.__dict__.keys()
+        classmethods = class_.__dict__.keys()
         for method_name, method in methods:
-            if method_name in basemethods:
+            if method_name in classmethods:
                 # it's not an inherited method
                 config = getattr(method, '__bfg_view_settings__', [])
                 for settings in config:
