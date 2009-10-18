@@ -729,6 +729,50 @@ This registers the same view under two different names.
    stacked without the effect of the "upper" decorator cancelling the
    effect of the the decorator beneath it.
 
+The bfg_view decorator can also be used against class methods:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+   from repoze.bfg.view import bfg_view
+
+   class MyView(object):
+       def __init__(self, context, request):
+           self.context = context
+           self.request = request
+
+       @bfg_view(name='hello')
+       def amethod(self):
+           return Response('hello from %s!' % self.context)
+
+When the bfg_view decorator is used against a class method, a view is
+registered for the *class*, so the class constructor must accept
+either ``request`` or ``context, request``.  The method which is
+decorated must return a response (or rely on a :term:`renderer` to
+generate one). Using the decorator against a particular method of a
+class is equivalent to using the ``attr`` parameter in a decorator
+attached to the class itself.  For example, the above registration
+implied by the decorator being used against the ``amethod`` method
+could be spelled equivalently as the below:
+
+.. code-block:: python
+
+   from webob import Response
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(attr='amethod', name='hello')
+   class MyView(object):
+       def __init__(self, context, request):
+           self.context = context
+           self.request = request
+
+       def amethod(self):
+           return Response('hello from %s!' % self.context)
+
+.. warning:: The ability to use the ``bfg_view`` decorator as a method
+             decorator is new in :mod:`repoze.bfg` version 1.1.
+
 .. _view_lookup_ordering:
 
 View Lookup Ordering

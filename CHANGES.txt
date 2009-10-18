@@ -19,6 +19,25 @@ Features
   This makes it possible to associate more than one view configuration
   for a single callable without requiring ZCML.
 
+- The ``@bfg_view`` decorator can now be used against a class method::
+
+    from webob import Response
+    from repoze.bfg.view import bfg_view
+
+    class MyView(object):
+        def __init__(self, context, request):
+            self.context = context
+            self.request = request
+
+        @bfg_view(name='hello')
+        def amethod(self):
+            return Response('hello from %s!' % self.context)
+
+  When the bfg_view decorator is used against a class method, a view
+  is registered for the *class* (it's a "class view" where the "attr"
+  happens to be the method they're attached to), so the view class
+  must have a suitable constructor.
+
 1.1a6 (2009-10-15)
 ==================
 

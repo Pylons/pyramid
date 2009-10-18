@@ -52,6 +52,29 @@ class Foo(object):
 grokked_instance = Foo()
 grokked_instance = bfg_view(name='grokked_instance')(grokked_instance)
 
+class Base(object):
+    @bfg_view(name='basemethod')
+    def basemethod(self):
+        """ """
+    
+class MethodViews(Base):
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    @bfg_view(name='method1')
+    def method1(self):
+        return 'method1'
+
+    @bfg_view(name='method2')
+    def method2(self):
+        return 'method2'
+
+    @bfg_view(name='stacked_method2')
+    @bfg_view(name='stacked_method1')
+    def stacked(self):
+        return 'stacked_method'
+
 # ungrokkable
 
 A = 1
@@ -59,4 +82,9 @@ B = {}
 
 def stuff():
     """ """
-    
+
+class Whatever(object):
+    pass
+
+class Whatever2:
+    pass

@@ -109,15 +109,17 @@ class TestGrokkedApp(unittest.TestCase):
         actions = zcml_configure('configure.zcml', package)
         actions.sort()
 
-        num = 18
+        num = 23
 
-        action_names = [actions[x][0][2] for x in range(len(actions[:num]))]
         action_types = [(actions[x][0][1],
                          actions[x][0][3],
                          actions[x][0][4]) for x in range(len(actions[:num]))]
 
         for typ in action_types:
             self.assertEqual(typ, (None, IRequest, IView))
+
+        action_names = [actions[x][0][2] for x in range(len(actions[:num]))]
+        action_names.sort()
 
         self.assertEqual(
             action_names, [
@@ -132,13 +134,18 @@ class TestGrokkedApp(unittest.TestCase):
                 'another_stacked2',
                 'another_stacked_class1',
                 'another_stacked_class2',
+                'basemethod',
                 'grokked_class',
                 'grokked_instance',
+                'method1',
+                'method2',
                 'oldstyle_grokked_class',
                 'stacked1',
                 'stacked2',
                 'stacked_class1',
                 'stacked_class2',
+                'stacked_method1',
+                'stacked_method2',
                 ]
             )
 
@@ -205,6 +212,21 @@ class TestGrokkedApp(unittest.TestCase):
 
         result = render_view_to_response(ctx, req, 'another_stacked_class2')
         self.assertEqual(result, 'another_stacked_class')
+
+        self.assertRaises(TypeError,
+                          render_view_to_response, ctx, req, 'basemethod')
+
+        result = render_view_to_response(ctx, req, 'method1')
+        self.assertEqual(result, 'method1')
+
+        result = render_view_to_response(ctx, req, 'method2')
+        self.assertEqual(result, 'method2')
+
+        result = render_view_to_response(ctx, req, 'stacked_method1')
+        self.assertEqual(result, 'stacked_method')
+
+        result = render_view_to_response(ctx, req, 'stacked_method2')
+        self.assertEqual(result, 'stacked_method')
 
 class DummyContext(object):
     pass

@@ -1,6 +1,8 @@
+import inspect
 import re
 import sys
 
+from zope.interface import implements
 from zope.component import getSiteManager
 from zope.component import getUtility
 from zope.component import queryUtility
@@ -17,6 +19,7 @@ from zope.schema import Int
 from zope.schema import TextLine
 
 import martian
+import martian.interfaces
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -675,47 +678,56 @@ def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
     multi_grokker = BFGMultiGrokker()
     multi_grokker.register(BFGViewGrokker())
+    multi_grokker.register(BFGClassGrokker())
     module_grokker = martian.ModuleGrokker(grokker=multi_grokker)
     martian.grok_dotted_name(package.__name__, grokker=module_grokker,
                              context=_context, exclude_filter=exclude)
 
 ################# utility stuff ####################
 
-class BFGViewMarker(object):
+class Class(object):
+    pass
+
+class AnythingButAClass(object):
     pass
 
 class BFGMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
     def get_bases(self, obj):
-        if hasattr(obj, '__bfg_view_settings__'):
-            return [BFGViewMarker]
+        if inspect.isclass(obj):
+            return [Class]
+        elif hasattr(obj, '__bfg_view_settings__'):
+            return [AnythingButAClass]
         return []
 
+class BFGClassGrokker(object):
+    implements(martian.interfaces.IGrokker)
+    martian = martian # for unit tests
+    martian.component(Class)
+    def grok(self, name, class_, module_info=None, **kw):
+        # The class itself may be decorated, so we feed it to BFGViewGrokker
+        found = BFGViewGrokker().grok(name, class_, **kw)
+
+        # grok any decorations attached to the class' method (direct
+        # methods only, not methods of any base class)
+        methods = inspect.getmembers(class_, inspect.ismethod)
+        basemethods = class_.__dict__.keys()
+        for method_name, method in methods:
+            if method_name in basemethods:
+                # it's not an inherited method
+                config = getattr(method, '__bfg_view_settings__', [])
+                for settings in config:
+                    settings = dict(settings)
+                    settings['attr'] = settings['attr'] or method_name
+                    view(kw['context'], view=class_, **settings)
+                    found = True
+        return found
+
 class BFGViewGrokker(martian.InstanceGrokker):
-    martian.component(BFGViewMarker)
+    martian.component(AnythingButAClass)
     def grok(self, name, obj, **kw):
         config = getattr(obj, '__bfg_view_settings__', [])
         for settings in config:
-            permission = settings['permission']
-            for_ = settings['for_']
-            name = settings['name']
-            request_type = settings['request_type']
-            route_name = settings['route_name']
-            request_method = settings['request_method']
-            request_param = settings['request_param']
-            containment = settings['containment']
-            wrapper = settings['wrapper_viewname']
-            attr = settings['attr']
-            renderer = settings['renderer']
-            xhr = settings['xhr']
-            accept = settings['accept']
-            header = settings['header']
-            context = kw['context']
-            view(context, permission=permission, for_=for_,
-                 view=obj, name=name, request_type=request_type,
-                 route_name=route_name, request_method=request_method,
-                 request_param=request_param, containment=containment,
-                 attr=attr, renderer=renderer, wrapper=wrapper,
-                 xhr=xhr, accept=accept, header=header)
+            view(kw['context'], view=obj, **settings)
         return bool(config)
 
 def exclude(name):
