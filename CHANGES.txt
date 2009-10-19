@@ -1,5 +1,5 @@
-Next release
-============
+1.1a7 (2009-10-18)
+==================
 
 Features
 --------
@@ -46,6 +46,13 @@ Documentation
 - Added ``Changing the Traverser`` and ``Changing How
   :mod:`repoze.bfg.url.model_url` Generates a URL`` to the "Hooks"
   narrative chapter of the docs.
+
+Internal
+--------
+
+- Remove ``ez_setup.py`` and imports of it within ``setup.py``.  In
+  the new world, and as per virtualenv setup instructions, people will
+  already have either setuptools or distribute.
 
 1.1a6 (2009-10-15)
 ==================
