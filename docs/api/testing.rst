@@ -25,6 +25,8 @@
 
   .. autofunction:: registerRoute
 
+  .. autofunction:: registerSettings
+
   .. autofunction:: setUp
 
   .. autofunction:: tearDown

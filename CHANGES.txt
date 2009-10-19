@@ -7,6 +7,11 @@ Features
 - ``paster bfgshell`` now supports IPython if it's available for
   import.  Thanks to Daniel Holth for the initial patch.
 
+- Add ``repoze.bfg.testing.registerSettings`` API, which is documented
+  in the "repoze.bfg.testing" API chapter.  This allows for
+  registration of "settings" values obtained via
+  ``repoze.bfg.settings.get_settings()`` for use in unit tests.
+
 Documentation
 -------------
 

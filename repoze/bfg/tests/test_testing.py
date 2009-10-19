@@ -277,6 +277,21 @@ class TestTestingFunctions(unittest.TestCase):
         self.assertEqual(route_url('home', request, pagename='abc'),
                          'http://example.com/abc')
 
+    def test_registerSettings(self):
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.testing import registerSettings
+        from zope.component import getSiteManager
+        registerSettings({'a':1, 'b':2})
+        sm = getSiteManager()
+        settings = sm.getUtility(ISettings)
+        self.assertEqual(settings['a'], 1)
+        self.assertEqual(settings['b'], 2)
+        registerSettings(b=3, c=4)
+        settings = sm.getUtility(ISettings)
+        self.assertEqual(settings['a'], 1)
+        self.assertEqual(settings['b'], 3)
+        self.assertEqual(settings['c'], 4)
+
 class TestDummyRootFactory(unittest.TestCase):
     def _makeOne(self, environ):
         from repoze.bfg.testing import DummyRootFactory

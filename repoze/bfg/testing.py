@@ -238,6 +238,35 @@ def registerRoute(path, name, factory=None):
         sm.registerUtility(mapper, IRoutesMapper)
     mapper.connect(path, name, factory)
 
+def registerSettings(dictarg=None, **kw):
+    """ Register one or more 'setting' key/value pairs.  A setting is
+    a single key/value pair in the dictionary-ish object returned from
+    the API ``repoze.bfg.settings.get_settings()``.
+
+    You may pass a dictionary::
+
+       registerSettings({'external_uri':'http://example.com'})
+
+    Or a set of key/value pairs::
+    
+       registerSettings(external_uri='http://example.com')
+
+    Use of this function is required when you need to test code that
+    calls the ``repoze.bfg.settings.get_settings()`` API and uses
+    return values from it.
+    """
+    from repoze.bfg.interfaces import ISettings
+    from zope.component import queryUtility
+    from repoze.bfg.settings import Settings
+    settings = queryUtility(ISettings)
+    if settings is None:
+        settings = Settings()
+        sm = getSiteManager()
+        sm.registerUtility(settings, ISettings)
+    if dictarg is not None:
+        settings.update(dictarg)
+    settings.update(kw)
+
 class DummyRootFactory(object):
     __parent__ = None
     __name__ = None
