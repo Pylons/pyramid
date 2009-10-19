@@ -1,3 +1,9 @@
+Next release
+============
+
+- Add a chapter titled "Request and Response" to the narrative
+  documentation, content cribbed from the WebOb documentation.
+
 1.1a7 (2009-10-18)
 ==================
 

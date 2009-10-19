@@ -32,6 +32,7 @@ Narrative documentation in chapter form explaining how to use
    narr/traversal
    narr/urldispatch
    narr/views
+   narr/webob
    narr/templates
    narr/models
    narr/security
