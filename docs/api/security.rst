@@ -5,26 +5,28 @@
 
 .. automodule:: repoze.bfg.security
 
-API Functions
-~~~~~~~~~~~~~
+Authentication API Functions
+----------------------------
 
 .. autofunction:: authenticated_userid
 
 .. autofunction:: effective_principals
 
-.. autofunction:: has_permission
-
-.. autofunction:: principals_allowed_by_permission
-
 .. autofunction:: forget
 
 .. autofunction:: remember
 
+Authorization API Functions
+---------------------------
+
+.. autofunction:: has_permission
+
+.. autofunction:: principals_allowed_by_permission
+
 .. autofunction:: view_execution_permitted
 
-
 Constants
-~~~~~~~~~
+---------
 
 .. attribute:: Everyone
 
@@ -54,7 +56,7 @@ Constants
     policy, representing the concept "don't inherit any other ACEs".
 
 Return Values
-~~~~~~~~~~~~~
+-------------
 
 .. attribute:: Allow
 
