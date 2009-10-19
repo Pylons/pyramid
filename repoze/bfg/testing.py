@@ -254,6 +254,8 @@ def registerSettings(dictarg=None, **kw):
     Use of this function is required when you need to test code that
     calls the ``repoze.bfg.settings.get_settings()`` API and uses
     return values from it.
+
+    .. note:: This API is new as of :mod:`repoze.bfg` 1.1.
     """
     from repoze.bfg.interfaces import ISettings
     from zope.component import queryUtility
