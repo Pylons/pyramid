@@ -1,6 +1,12 @@
 Next release
 ============
 
+Features
+--------
+
+- ``paster bfgshell`` now supports IPython if it's available for
+  import.  Thanks to Daniel Holth for the initial patch.
+
 Documentation
 -------------
 

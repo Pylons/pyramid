@@ -200,7 +200,7 @@ the name ``main`` as a section name:
 .. code-block::  bash
    :linenos:
 
-    [chrism@vitaminf bfgshellenv]$ ../bin/paster bfgshell MyProject.ini main
+    [chrism@vitaminf bfgshellenv]$ ../bin/paster bfgshell --plugin=repoze.bfg MyProject.ini main
 
     Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
     [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
@@ -208,10 +208,18 @@ the name ``main`` as a section name:
     >>> root
     <foo.models.MyModel object at 0x445270>
 
-If that command fails because ``paster`` claims it knows nothing about
-the "bfgshell" command (this happens under certain conditions that are
-not yet well-understood) try passing the flag ``--plugin=repoze.bfg``
-before the filename:
+... note:: You *might* get away without passing
+           ``--plugin=repoze.bfg`` to the bfgshell command; the
+           ``--plugin=repoze.bfg`` option is required under conditions
+           that are not yet well-understood.
+
+If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_
+installed in the interpreter you use to invoke the ``paster`` command,
+the ``bfgshell`` command will use an IPython interactive shell instead
+of a standard Python interpreter shell.  If you don't want this to
+happen, even if you have IPython installed, you can pass the
+``--disable-ipython`` flag to the ``bfgshell`` command to use a
+standard Python interpreter shell unconditionally.
 
 .. code-block::  bash
    :linenos:

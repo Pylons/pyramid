@@ -8,14 +8,18 @@ class TestBFGShellCommand(unittest.TestCase):
     def _makeOne(self):
         return self._getTargetClass()('bfgshell')
 
-    def test_command(self):
+    def test_command_ipython_disabled(self):
         command = self._makeOne()
         interact = DummyInteractor()
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.interact = (interact,)
         command.loadapp = (loadapp,)
+        command.IPShellEmbed = True # fake out
         command.args = ('/foo/bar/myapp.ini', 'myapp')
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython =True
         command.command()
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
@@ -26,6 +30,31 @@ class TestBFGShellCommand(unittest.TestCase):
         self.assertEqual(pushed['request'], None)
         self.assertEqual(interact.local, {'root':dummy_root})
         self.failUnless(interact.banner)
+        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+
+    def test_command_ipython_enabled(self):
+        command = self._makeOne()
+        interact = DummyInteractor()
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        command.loadapp = (loadapp,)
+        dummy_shell_factory = DummyIPShellFactory()
+        command.IPShellEmbed = dummy_shell_factory
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython = False
+        command.command()
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.failUnless(loadapp.relative_to)
+        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
+        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(pushed['registry'], dummy_registry)
+        self.assertEqual(pushed['request'], None)
+        self.assertEqual(dummy_shell_factory.shell.local_ns,{'root':dummy_root})
+        self.assertEqual(dummy_shell_factory.shell.global_ns, {})
+        self.failUnless(dummy_shell_factory.shell.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
 class TestGetApp(unittest.TestCase):
@@ -45,6 +74,22 @@ class TestGetApp(unittest.TestCase):
 
 class Dummy:
     pass
+
+class DummyIPShellFactory(object):
+    def __call__(self, argv):
+        shell = DummyIPShell()
+        self.shell = shell
+        return shell
+
+class DummyIPShell(object):
+    IP = Dummy()
+    IP.BANNER = 'foo'
+    def set_banner(self, banner):
+        self.banner = banner
+
+    def __call__(self, local_ns, global_ns):
+        self.local_ns = local_ns
+        self.global_ns = global_ns
 
 dummy_root = Dummy()
 

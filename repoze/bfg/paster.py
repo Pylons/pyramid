@@ -9,6 +9,12 @@ from paste.util.template import paste_script_template_renderer
 
 from repoze.bfg.scripting import get_root
 
+try:
+    from IPython.Shell import IPShellEmbed
+except ImportError:
+    IPShellEmbed = None
+
+
 class StarterProjectTemplate(Template):
     _template_dir = 'paster_templates/starter'
     summary = 'repoze.bfg starter project'
@@ -66,8 +72,14 @@ class BFGShellCommand(Command):
     group_name = 'bfg'
 
     parser = Command.standard_parser(simulate=True)
+    parser.add_option('-d', '--disable-ipython',
+                      action='store_true',
+                      dest='disable_ipython',
+                      help="Don't use IPython even if it is available")
+
     interact = (interact,) # for testing
     loadapp = (loadapp,) # for testing
+    IPShellEmbed = IPShellEmbed # for testing
     verbose = 3
 
     def command(self):
@@ -77,8 +89,17 @@ class BFGShellCommand(Command):
         config_file, section_name = self.args
         app = get_app(config_file, section_name, loadapp=self.loadapp[0])
         root, closer = get_root(app)
-        try:
-            self.interact[0](banner, local={'root':root})
-        finally:
-            closer()
-            
+        if self.IPShellEmbed is not None and not self.options.disable_ipython:
+            shell = self.IPShellEmbed(argv=self.args)
+            shell.set_banner(shell.IP.BANNER + '\n\n' + banner)
+            try:
+                shell(local_ns={'root':root}, global_ns={})
+            finally:
+                closer()
+        else:
+            try:
+                self.interact[0](banner, local={'root':root})
+            finally:
+                closer()
+
+                
