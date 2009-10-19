@@ -326,8 +326,8 @@ The ``view`` ZCML Directive
 
 The ``view`` ZCML directive has many possible attributes.  Some of the
 attributes are descriptive or influence rendering.  Other attributes
-are *predicates*, meaning that they evaluate to true or false when
-view lookup is performed.
+are :term:`predicate` attributes, meaning that they imply an
+evaluation to true or false when view lookup is performed.
 
 *All* predicates named in a view configuration must evaluate to true
 in order for the view callable it names to be considered "invokable"
@@ -335,11 +335,11 @@ for a given request.  See :ref:`view_lookup_ordering` for a
 description of how a view configuration matches (or doesn't match)
 during a request.
 
-View attributes which are predicates are marked with the value
-"(*predicate*)" next to their names in the list of possible attributes
-below.
+The possible attributes of the ``view`` ZCML directive are described
+below.  They are divided into predicate and non-predicate categories.
 
-The possible attributes of the ``view`` ZCML directive are:
+Non-Predicate Attributes
+########################
 
 view
 
@@ -429,7 +429,10 @@ wrapper
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-for (*predicate*)
+Predicate Attributes
+####################
+
+for
 
   A Python dotted-path name representing the Python class that the
   :term:`context` must be an instance of, *or* the :term:`interface`
@@ -438,7 +441,7 @@ for (*predicate*)
   is an instance of the represented class or if the :term:`context`
   provides the represented interface; it is otherwise false.
 
-request_method (*predicate*)
+request_method
 
   This value can either be one of the strings 'GET', 'POST', 'PUT',
   'DELETE', or 'HEAD' representing an HTTP ``REQUEST_METHOD``.  A view
@@ -448,7 +451,7 @@ request_method (*predicate*)
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-request_param (*predicate*)
+request_param
 
   This value can be any string.  A view declaration with this
   attribute ensures that the view will only be called when the request
@@ -462,7 +465,7 @@ request_param (*predicate*)
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-containment (*predicate*)
+containment
 
   This value should be a Python dotted-path string representing the
   class that a graph traversal parent object of the :term:`context`
@@ -473,7 +476,7 @@ containment (*predicate*)
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-route_name (*predicate*)
+route_name
 
   *This attribute services an advanced feature that isn't often used
   unless you want to perform traversal *after* a route has matched.*
@@ -488,7 +491,7 @@ route_name (*predicate*)
   :term:`root factory`.  See :ref:`hybrid_chapter` for more
   information on using this advanced feature.
 
-request_type (*predicate*)
+request_type
 
   This value should be a Python dotted-path string representing the
   :term:`interface` that the :term:`request` must have in order for
@@ -501,7 +504,7 @@ request_type (*predicate*)
   ``request_method`` attribute instead for maximum forward
   compatibility.
 
-xhr (*predicate*)
+xhr
 
   Thie value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`request` must possess an
@@ -512,7 +515,7 @@ xhr (*predicate*)
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-accept (*predicate*)
+accept
 
   The value of this attribute represents a match query for one or more
   mimetypes in the ``Accept`` HTTP request header.  If this value is
@@ -524,7 +527,7 @@ accept (*predicate*)
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-header (*predicate*)
+header
 
   The value of this attribute represents an HTTP header name or a
   header name/value pair.  If the value contains a ``:`` (colon), it

@@ -432,4 +432,11 @@ Glossary
     module developed by Graham Dumpleton.  It allows :term:`WSGI`
     applications (such as applications developed using
     :mod:`repoze.bfg`) to be served using the Apache web server.
+  Predicate
+    An attribute of a ZCML ``view`` directive or an argument to a
+    ``bfg_view`` decorator which implies a value which evaluates to
+    true or false for a given :term:`request`.  All predicates
+    attached to a view configuration must evaluate to true for the
+    associated view to be considered as a possible callable for a
+    given request.
 
