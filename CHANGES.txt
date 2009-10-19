@@ -6,8 +6,9 @@ Features
 
 - More than one ``@bfg_view`` decorator may now be stacked on top of
   any number of others.  Each invocation of the decorator registers a
-  single view.  For instance, the following combination of decorators
-  and a function will register two views::
+  single view configuration.  For instance, the following combination
+  of decorators and a function will register two view configurations
+  for the same view callable::
 
     from repoze.bfg.view import bfg_view
 
@@ -17,7 +18,7 @@ Features
         pass
 
   This makes it possible to associate more than one view configuration
-  for a single callable without requiring ZCML.
+  with a single callable without requiring any ZCML.
 
 - The ``@bfg_view`` decorator can now be used against a class method::
 
