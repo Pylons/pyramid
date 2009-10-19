@@ -35,8 +35,9 @@ Features
 
   When the bfg_view decorator is used against a class method, a view
   is registered for the *class* (it's a "class view" where the "attr"
-  happens to be the method they're attached to), so the view class
-  must have a suitable constructor.
+  happens to be the name of the method it is attached to), so the
+  class it's defined within must have a suitable constructor: one that
+  accepts ``context, request`` or just ``request``.
 
 Documentation
 -------------
