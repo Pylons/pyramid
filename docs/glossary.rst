@@ -7,12 +7,14 @@ Glossary
 .. glossary::
 
   Request
-    A ``WebOb`` request object.
+    A ``WebOb`` request object.  See :ref:`webob_chapter` for
+    information about request objects.
   Response
     An object that has three attributes: app_iter (representing an
     iterable body), headerlist (representing the http headers sent
     upstream), and status (representing the http status string).  This
-    is the interface defined for ``WebOb`` response objects.
+    is the interface defined for ``WebOb`` response objects.  See
+    :ref:`webob_chapter` for information about response objects.
   Setuptools
     `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
     builds on Python's ``distutils`` to provide easier building,

@@ -1,3 +1,5 @@
+.. _webob_chapter:
+
 Request and Response Objects
 ============================
 
