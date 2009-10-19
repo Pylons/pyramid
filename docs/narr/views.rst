@@ -324,7 +324,22 @@ apply for the class which is named.
 The ``view`` ZCML Directive
 +++++++++++++++++++++++++++
 
-The ``view`` ZCML directive has these possible attributes:
+The ``view`` ZCML directive has many possible attributes.  Some of the
+attributes are descriptive or influence rendering.  Other attributes
+are *predicates*, meaning that they evaluate to true or false when
+view lookup is performed.
+
+*All* predicates named in a view configuration must evaluate to true
+in order for the view callable it names to be considered "invokable"
+for a given request.  See :ref:`view_lookup_ordering` for a
+description of how a view configuration matches (or doesn't match)
+during a request.
+
+View attributes which are predicates are marked with the value
+"(*predicate*)" next to their names in the list of possible attributes
+below.
+
+The possible attributes of the ``view`` ZCML directive are:
 
 view
 
@@ -333,13 +348,6 @@ view
   ``renderer`` attribute exists on the directive, this attribute
   defaults to a view that returns an empty dictionary (see
   :ref:`views_which_use_a_renderer`).
-
-for
-
-  A Python dotted-path name representing the Python class that the
-  :term:`context` must be an instance of, *or* the :term:`interface`
-  that the :term:`context` must provide in order for this view to be
-  found and called.
 
 name
 
@@ -421,7 +429,16 @@ wrapper
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-request_method
+for (*predicate*)
+
+  A Python dotted-path name representing the Python class that the
+  :term:`context` must be an instance of, *or* the :term:`interface`
+  that the :term:`context` must provide in order for this view to be
+  found and called.  This predicate is true when the :term:`context`
+  is an instance of the represented class or if the :term:`context`
+  provides the represented interface; it is otherwise false.
+
+request_method (*predicate*)
 
   This value can either be one of the strings 'GET', 'POST', 'PUT',
   'DELETE', or 'HEAD' representing an HTTP ``REQUEST_METHOD``.  A view
@@ -431,7 +448,7 @@ request_method
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-request_param
+request_param (*predicate*)
 
   This value can be any string.  A view declaration with this
   attribute ensures that the view will only be called when the request
@@ -445,7 +462,7 @@ request_param
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-containment
+containment (*predicate*)
 
   This value should be a Python dotted-path string representing the
   class that a graph traversal parent object of the :term:`context`
@@ -456,7 +473,7 @@ containment
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-route_name
+route_name (*predicate*)
 
   *This attribute services an advanced feature that isn't often used
   unless you want to perform traversal *after* a route has matched.*
@@ -471,7 +488,7 @@ route_name
   :term:`root factory`.  See :ref:`hybrid_chapter` for more
   information on using this advanced feature.
 
-request_type
+request_type (*predicate*)
 
   This value should be a Python dotted-path string representing the
   :term:`interface` that the :term:`request` must have in order for
@@ -484,7 +501,7 @@ request_type
   ``request_method`` attribute instead for maximum forward
   compatibility.
 
-xhr
+xhr (*predicate*)
 
   Thie value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`request` must possess an
@@ -495,7 +512,7 @@ xhr
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-accept
+accept (*predicate*)
 
   The value of this attribute represents a match query for one or more
   mimetypes in the ``Accept`` HTTP request header.  If this value is
@@ -507,7 +524,7 @@ accept
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-header
+header (*predicate*)
 
   The value of this attribute represents an HTTP header name or a
   header name/value pair.  If the value contains a ``:`` (colon), it
@@ -598,7 +615,9 @@ your application registry:
     request_type="POST"
     />
 
-All arguments to ``bfg_view`` are optional.
+All arguments to ``bfg_view`` are optional.  Every argument to
+``bfg_view`` matches the meaning of the same-named attribute in ZCML
+view configuration described in :ref:`the_view_zcml_directive`.  
 
 If ``name`` is not supplied, the empty string is used (implying
 the default view).
@@ -792,7 +811,7 @@ could be spelled equivalently as the below:
 View Lookup Ordering
 --------------------
 
-Most attributes of view configuration can be thought of like
+Many attributes of view configuration can be thought of like
 "narrowers" or "predicates".  In general, the greater number of
 attributes possessed by a view's configuration, the more specific the
 circumstances need to be before the registered view callable will be
