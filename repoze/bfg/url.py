@@ -53,7 +53,7 @@ def route_url(route_name, request, *elements, **kw):
 
     If a keyword argument ``_query`` is present, it will used to
     compose a query string that will be tacked on to the end of the
-    URL.  The value of ``query`` must be a sequence of two-tuples *or*
+    URL.  The value of ``_query`` must be a sequence of two-tuples *or*
     a data structure with an ``.items()`` method that returns a
     sequence of two-tuples (presumably a dictionary).  This data
     structure will be turned into a query string per the documentation
@@ -71,18 +71,18 @@ def route_url(route_name, request, *elements, **kw):
 
     If a keyword argument ``_anchor`` is present, its string
     representation will be used as a named anchor in the generated URL
-    (e.g. if ``anchor`` is passed as ``foo`` and the model URL is
+    (e.g. if ``_anchor`` is passed as ``foo`` and the model URL is
     ``http://example.com/model/url``, the resulting generated URL will
     be ``http://example.com/model/url#foo``).
 
     .. note:: If ``_anchor`` is passed as a string, it should be UTF-8
-              encoded. If ``anchor`` is passed as a Unicode object, it
+              encoded. If ``_anchor`` is passed as a Unicode object, it
               will be converted to UTF-8 before being appended to the
               URL.  The anchor value is not quoted in any way before
               being appended to the generated URL.
 
-    If both ``anchor`` and ``query`` are specified, the anchor element
-    will always follow the query element,
+    If both ``_anchor`` and ``_query`` are specified, the anchor
+    element will always follow the query element,
     e.g. ``http://example.com?foo=1#bar``.
 
     This function raises a ``KeyError`` if the URL cannot be generated
