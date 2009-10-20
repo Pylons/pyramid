@@ -352,8 +352,10 @@ class AuthTktCookieHelper(object):
                 (timestamp,old_userid,old_tokens,
                  old_userdata) = auth_tkt.parse_ticket(
                     self.secret, old_cookie_value, remote_addr)
+                now = time.time()
+                expired = self.timeout and ((timestamp + self.timeout) < now)
             except auth_tkt.BadTicket:
-                pass
+                expired = False
 
         encoding_data = self.userid_type_encoders.get(type(userid))
         if encoding_data:
@@ -368,7 +370,7 @@ class AuthTktCookieHelper(object):
         old_data = (old_userid, old_tokens, old_userdata)
         new_data = (userid, tokens, userdata)
 
-        if old_data != new_data:
+        if old_data != new_data or expired:
             ticket = auth_tkt.AuthTicket(
                 self.secret,
                 userid,

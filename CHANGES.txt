@@ -12,6 +12,14 @@ Features
   registration of "settings" values obtained via
   ``repoze.bfg.settings.get_settings()`` for use in unit tests.
 
+Bug Fixes
+---------
+
+- Re-issue authentication ticket if the cookie has expired when using
+  ``repoze.bfg.security.remember`` when the
+  ``authtktauthenticationpolicy`` authentication policy is in effect.
+  (Patch from Andreas Zeidler).
+
 Documentation
 -------------
 

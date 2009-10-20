@@ -528,6 +528,14 @@ class TestAuthTktCookieHelper(unittest.TestCase):
             value)
         self.failUnless('; Expires=' in value)
 
+    def test_remember_reissue_expired_cookie(self):
+        import time
+        plugin = self._makeOne('secret', timeout=2, reissue_time=1)
+        old_val = self._makeTicket(userid='userid', time=time.time()-3)
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % old_val})
+        result = plugin.remember(request, 'userid', userdata='userdata')
+        self.failIf(result is None, 'not re-issued?')
+
     def test_forget(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
