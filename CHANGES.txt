@@ -21,6 +21,9 @@ Documentation
 - Call out predicate attributes of ZCML directive within "Views"
   chapter.
 
+- Fix route_url documentation (``_query`` argument documented as
+  ``query`` and ``_anchor`` argument documented as ``anchor``).
+
 1.1a7 (2009-10-18)
 ==================
 
