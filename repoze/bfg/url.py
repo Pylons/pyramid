@@ -206,7 +206,7 @@ def static_url(path, request, **kw):
     """
     Generates a fully qualified URL for a static resource.  The
     resource must live within a location defined via the ``<static>``
-    ZCML directive.
+    ZCML directive (see :ref:`static_resources_section`).
 
     The ``path`` argument points at a file or directory on disk which
     a URL should be generated for.  The ``path`` may be either a
