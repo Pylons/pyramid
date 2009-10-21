@@ -2544,6 +2544,48 @@ class TestExcludeFunction(unittest.TestCase):
         self.assertEqual(self._callFUT('.foo'), True)
         self.assertEqual(self._callFUT('foo'), False)
 
+class TestGetMembersFunction(unittest.TestCase):
+    def _callFUT(self, object, predicate=None):
+        from repoze.bfg.zcml import getmembers
+        return getmembers(object, predicate)
+
+    def test_with_attribute_error(self):
+        class Dummy:
+            @property
+            def raises(self):
+                raise AttributeError('raises')
+        ob = Dummy()
+        result = self._callFUT(ob, None)
+        result.sort()
+        self.assertEqual(result,
+                         [('__doc__', None),
+                          ('__module__', 'repoze.bfg.tests.test_zcml')]
+                         )
+
+    def test_without_attribute_error(self):
+        class Dummy:
+            def doesntraise(self):
+                pass
+        ob = Dummy()
+        result = self._callFUT(ob, None)
+        result.sort()
+        self.assertEqual(result,
+                         [('__doc__', None),
+                          ('__module__', 'repoze.bfg.tests.test_zcml'),
+                          ('doesntraise', ob.doesntraise)]
+                         )
+
+    def test_predicate(self):
+        class Dummy:
+            def doesntraise(self):
+                pass
+        ob = Dummy()
+        def predicate(testing):
+            return getattr(testing, '__name__', None) == 'doesntraise'
+        result = self._callFUT(ob, predicate)
+        result.sort()
+        self.assertEqual(result,[('doesntraise', ob.doesntraise)])
+
 class DummyModule:
     __path__ = "foo"
     __name__ = "dummy"

@@ -707,8 +707,13 @@ class BFGClassGrokker(object):
         found = BFGViewGrokker().grok(name, class_, **kw)
 
         # grok any decorations attached to the class' method (direct
-        # methods only, not methods of any base class)
-        methods = inspect.getmembers(class_, inspect.ismethod)
+        # methods only, not methods of any base class); we can't use
+        # inspect.getmembers here because it doesn't deal with a
+        # corner case where objects that inherit from Persistent
+        # advertises a '__provides__' as per dir(ob) but getattr(ob,
+        # '__provides__') raises an AttributeError.  Unknown why this
+        # happens, but it doesn't matter: need to deal with it.
+        methods = getmembers(class_, inspect.ismethod)
         classmethods = class_.__dict__.keys()
         for method_name, method in methods:
             if method_name in classmethods:
@@ -739,3 +744,19 @@ class Uncacheable(object):
     this class only exists for backwards compatibility (<0.8.1)"""
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
+
+def getmembers(object, predicate=None):
+    """Return all members of an object as (name, value) pairs sorted
+    by name.  Optionally, only return members that satisfy a given
+    predicate.  Differs from inspect.getmembers inasmuch as it ignores
+    AttributeErrors."""
+    results = []
+    for key in dir(object):
+        try:
+            value = getattr(object, key)
+        except AttributeError:
+            continue
+        if not predicate or predicate(value):
+            results.append((key, value))
+    results.sort()
+    return results

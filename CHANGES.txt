@@ -29,6 +29,10 @@ Bug Fixes
   ``authtktauthenticationpolicy`` authentication policy is in effect.
   (Patch from Andreas Zeidler).
 
+- Fix bug encountered during "scan" (when ``<scan ..>`` directive is
+  used in ZCML) introduced in 1.1a7.  Symptom: ``AttributeError:
+  object has no attribute __provides__`` raised at startup time.
+
 Documentation
 -------------
 
