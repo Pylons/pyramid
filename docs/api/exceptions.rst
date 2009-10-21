@@ -5,7 +5,8 @@
 
 .. automodule:: repoze.bfg.exceptions
 
-  .. autoclass:: NotFound
-
   .. autoclass:: Forbidden
 
+  .. autoclass:: NotFound
+
+  .. autoclass:: Respond

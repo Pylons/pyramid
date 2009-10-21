@@ -12,6 +12,11 @@ Features
   registration of "settings" values obtained via
   ``repoze.bfg.settings.get_settings()`` for use in unit tests.
 
+- A new exception exists: ``repoze.bfg.exceptions.Respond``.  This
+  exception can be raised during view execution return a response.
+  This is effectively a goto, useable by code that has no capability
+  to otherwise return a response.
+
 Bug Fixes
 ---------
 
