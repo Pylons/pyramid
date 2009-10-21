@@ -17,6 +17,10 @@ Features
   This is effectively a goto, useable by code that has no capability
   to otherwise return a response.
 
+- The name ``root`` is available as an attribute of the request
+  slightly earlier now (before a NewRequest event is emitted).
+  ``root`` is the result of the application "root factory".
+
 Bug Fixes
 ---------
 

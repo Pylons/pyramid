@@ -72,6 +72,7 @@ class Router(object):
             # into the environ directly
             attrs = environ.setdefault('webob.adhoc_attrs', {})
             attrs['registry'] = registry
+            attrs['root'] = root
 
             threadlocals['request'] = request
             registry.has_listeners and registry.notify(NewRequest(request))
