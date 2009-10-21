@@ -412,11 +412,24 @@ class TestBFGViewDecorator(unittest.TestCase):
         wrapped2 = decorator2(wrapped1)
         self.failUnless(wrapped1 is foo)
         self.failUnless(wrapped2 is foo)
-        self.assertEqual(len(wrapped2.__bfg_view_settings__), 2)
-        settings1 = wrapped2.__bfg_view_settings__[0]
+        self.assertEqual(len(foo.__bfg_view_settings__), 2)
+        settings1 = foo.__bfg_view_settings__[0]
         self.assertEqual(settings1['name'], '1')
-        settings2 = wrapped2.__bfg_view_settings__[1]
+        settings2 = foo.__bfg_view_settings__[1]
         self.assertEqual(settings2['name'], '2')
+
+    def test_call_as_method(self):
+        decorator = self._makeOne()
+        def foo(self): pass
+        def bar(self): pass
+        class foo(object):
+            """ docstring """
+            foomethod = decorator(foo)
+            barmethod = decorator(bar)
+        settings = foo.__bfg_view_settings__
+        self.assertEqual(len(settings), 2)
+        self.assertEqual(settings[0]['attr'], 'foo')
+        self.assertEqual(settings[1]['attr'], 'bar')
 
 class TestDefaultForbiddenView(unittest.TestCase):
     def _callFUT(self, context, request):

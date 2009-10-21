@@ -1,8 +1,6 @@
-import inspect
 import re
 import sys
 
-from zope.interface import implements
 from zope.component import getSiteManager
 from zope.component import getUtility
 from zope.component import queryUtility
@@ -19,7 +17,6 @@ from zope.schema import Int
 from zope.schema import TextLine
 
 import martian
-import martian.interfaces  # pyflakes whines, but don't delete it
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -678,56 +675,23 @@ def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
     multi_grokker = BFGMultiGrokker()
     multi_grokker.register(BFGViewGrokker())
-    multi_grokker.register(BFGClassGrokker())
     module_grokker = martian.ModuleGrokker(grokker=multi_grokker)
     martian.grok_dotted_name(package.__name__, grokker=module_grokker,
                              context=_context, exclude_filter=exclude)
 
 ################# utility stuff ####################
 
-class Class(object):
-    pass
-
-class AnythingButAClass(object):
+class BFGViewMarker(object):
     pass
 
 class BFGMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
     def get_bases(self, obj):
-        if inspect.isclass(obj):
-            return [Class]
-        elif hasattr(obj, '__bfg_view_settings__'):
-            return [AnythingButAClass]
+        if hasattr(obj, '__bfg_view_settings__'):
+            return [BFGViewMarker]
         return []
 
-class BFGClassGrokker(object):
-    implements(martian.interfaces.IGrokker)
-    martian.component(Class)
-    def grok(self, name, class_, module_info=None, **kw):
-        # The class itself may be decorated, so we feed it to BFGViewGrokker
-        found = BFGViewGrokker().grok(name, class_, **kw)
-
-        # grok any decorations attached to the class' method (direct
-        # methods only, not methods of any base class); we can't use
-        # inspect.getmembers here because it doesn't deal with a
-        # corner case where objects that inherit from Persistent
-        # advertises a '__provides__' as per dir(ob) but getattr(ob,
-        # '__provides__') raises an AttributeError.  Unknown why this
-        # happens, but it doesn't matter: need to deal with it.
-        methods = getmembers(class_, inspect.ismethod)
-        classmethods = class_.__dict__.keys()
-        for method_name, method in methods:
-            if method_name in classmethods:
-                # it's not an inherited method
-                config = getattr(method, '__bfg_view_settings__', [])
-                for settings in config:
-                    settings = dict(settings)
-                    settings['attr'] = settings['attr'] or method_name
-                    view(kw['context'], view=class_, **settings)
-                    found = True
-        return found
-
 class BFGViewGrokker(martian.InstanceGrokker):
-    martian.component(AnythingButAClass)
+    martian.component(BFGViewMarker)
     def grok(self, name, obj, **kw):
         config = getattr(obj, '__bfg_view_settings__', [])
         for settings in config:
@@ -745,18 +709,3 @@ class Uncacheable(object):
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
 
-def getmembers(object, predicate=None):
-    """Return all members of an object as (name, value) pairs sorted
-    by name.  Optionally, only return members that satisfy a given
-    predicate.  Differs from inspect.getmembers inasmuch as it ignores
-    AttributeErrors."""
-    results = []
-    for key in dir(object):
-        try:
-            value = getattr(object, key)
-        except AttributeError:
-            continue
-        if not predicate or predicate(value):
-            results.append((key, value))
-    results.sort()
-    return results

@@ -45,6 +45,21 @@ Documentation
 - Fix route_url documentation (``_query`` argument documented as
   ``query`` and ``_anchor`` argument documented as ``anchor``).
 
+Internal
+--------
+
+- Change how ``bfg_view`` decorator works when used as a class method
+  decorator.  In 1.1a7, it actually tried to grope every class in
+  scanned package at startup time looking for methods, which led to
+  some strange symptoms (e.g. ``AttributeError: object has no
+  attribute __provides__``).  Now, instead of groping methods at
+  startup time, we just cause the ``bfg_view`` decorator itself to
+  populate its class' __dict__ when its used inside a class as a
+  method decorator.  This is essentially a reversion back to 1.1a6
+  "grokking" behavior plus some special magic for using the
+  ``bfg_view`` decorator as method decorator inside the ``bfg_view``
+  class itself.
+
 1.1a7 (2009-10-18)
 ==================
 

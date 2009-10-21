@@ -2,6 +2,7 @@ import cgi
 import inspect
 import mimetypes
 import os
+import sys
 
 # See http://bugs.python.org/issue5853 which is a recursion bug
 # that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
@@ -23,6 +24,7 @@ from zope.component import providedBy
 from zope.component import queryUtility
 from zope.deprecation import deprecated
 from zope.interface import implements
+from zope.interface.advice import getFrameInfo
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -435,9 +437,20 @@ class bfg_view(object):
         self.header = header
 
     def __call__(self, wrapped):
-        settings = getattr(wrapped, '__bfg_view_settings__', [])
-        settings.append(self.__dict__.copy())
-        wrapped.__bfg_view_settings__ = settings
+        setting = self.__dict__.copy()
+        frame = sys._getframe(1)
+        scope, module, f_locals, f_globals = getFrameInfo(frame)
+        if scope == 'class':
+            # we're in the midst of a class statement; the setdefault
+            # below actually adds a __bfg_view_settings__ attr to the
+            # class __dict__ if one does not already exist
+            settings = f_locals.setdefault('__bfg_view_settings__', [])
+            if setting['attr'] is None:
+                setting['attr'] = wrapped.__name__
+        else:
+            settings = getattr(wrapped, '__bfg_view_settings__', [])
+            wrapped.__bfg_view_settings__ = settings
+        settings.append(setting)
         return wrapped
 
 def default_view(context, request, status):
