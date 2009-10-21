@@ -347,6 +347,8 @@ class AuthTktCookieHelper(object):
 
         timestamp, old_userid, old_tokens, old_userdata = None, '', '', ''
 
+        expired = False
+
         if old_cookie_value:
             try:
                 (timestamp,old_userid,old_tokens,
