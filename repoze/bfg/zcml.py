@@ -141,6 +141,12 @@ class IViewDirective(Interface):
         description=u'Regular expression matching for header values',
         required = False)
 
+    path_info = TextLine(
+        title = (u'Regular expression which must match the ``PATH_INFO`` '
+                 'header for the view to match a request'),
+        description=(u'Accepts a regular expression.'),
+        required = False)
+
 def view(
     _context,
     permission=None,
@@ -158,6 +164,7 @@ def view(
     xhr=False,
     accept=None,
     header=None,
+    path_info=None,
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
@@ -269,6 +276,15 @@ def view(
         weight = weight - 50
         predicates.append(containment_predicate)
 
+    if path_info is not None:
+        try:
+            path_info_val = re.compile(path_info)
+        except re.error, why:
+            raise ConfigurationError(why[0])
+        def path_info_predicate(context, request):
+            return path_info_val.match(request.path_info)
+        predicates.append(path_info_predicate)
+
     # this will be == sys.maxint if no predicates
     score = weight / (len(predicates) + 1)
 
@@ -323,7 +339,7 @@ def view(
     _context.action(
         discriminator = ('view', for_, name, request_type, IView, containment,
                          request_param, request_method, route_name, attr,
-                         xhr, accept, header),
+                         xhr, accept, header, path_info),
         callable = register,
         args = (),
         )
@@ -536,6 +552,7 @@ class IRouteDirective(Interface):
     view_header = TextLine(title=u'view_header', required=False)
     view_accept = TextLine(title=u'view_accept', required=False)
     view_xhr = Bool(title=u'view_xhr', required=False)
+    view_path_info = TextLine(title=u'view_path_info', required=False)
     # alias for "view_for"
     for_ = GlobalObject(title=u'for', required=False)
     # alias for "view_permission"
@@ -560,6 +577,8 @@ class IRouteDirective(Interface):
     accept = TextLine(title=u'accept', required=False)
     # alias for "view_xhr"
     xhr = Bool(title=u'xhr', required=False)
+    # alias for "view_path_info"
+    path_info = TextLine(title=u'path_info', required=False)
 
 class IRouteRequirementDirective(Interface):
     """ The interface for the ``requirement`` route subdirective """
@@ -574,7 +593,8 @@ def route(_context, name, path, view=None, view_for=None,
           request_param=None, view_request_param=None, containment=None,
           view_containment=None, attr=None, view_attr=None, renderer=None,
           view_renderer=None, header=None, view_header=None, accept=None,
-          view_accept=None, xhr=False, view_xhr=False):
+          view_accept=None, xhr=False, view_xhr=False,
+          path_info=None, view_path_info=None):
     """ Handle ``route`` ZCML directives
     """
     # the strange ordering of the request kw args above is for b/w
@@ -590,9 +610,10 @@ def route(_context, name, path, view=None, view_for=None,
     header = view_header or header
     accept = view_accept or accept
     xhr = view_xhr or xhr
+    path_info = view_path_info or path_info
 
     sm = getSiteManager()
-    
+
     if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
         # b/w compat for 1.0
         request_method = request_type
@@ -610,7 +631,7 @@ def route(_context, name, path, view=None, view_for=None,
               request_type=request_type, route_name=name, 
               request_method=request_method, request_param=request_param,
               containment=containment, attr=attr, renderer=renderer,
-              header=header, accept=accept, xhr=xhr)
+              header=header, accept=accept, xhr=xhr, path_info=path_info)
 
     _context.action(
         discriminator = ('route', name),

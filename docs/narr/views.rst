@@ -545,6 +545,12 @@ header
   header name/value pair, the case of the header name is not
   significant.
 
+path_info
+
+  The value of this attribute represents a regex query for the
+  ``PATH_INFO`` HTTP request header. If the regex matches, this
+  predicate will be true.
+
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 .. _mapping_views_to_urls_using_a_decorator_section:

@@ -242,8 +242,8 @@ class bfg_view(object):
 
     The following arguments are supported: ``for_``, ``permission``,
     ``name``, ``request_type``, ``route_name``, ``request_method``,
-    ``request_param``, ``containment``, ``xhr``, ``accept``, and
-    ``header``.
+    ``request_param``, ``containment``, ``xhr``, ``accept``,
+    ``header`` and ``path_info``.
 
     If ``for_`` is not supplied, the interface
     ``zope.interface.Interface`` (matching any context) is used.
@@ -318,6 +318,10 @@ class bfg_view(object):
     description of ``header`` in :ref:`the_view_zcml_directive` for
     information about the allowable composition and matching behavior
     of this value.
+
+    If ``path_info`` is specified, it must be a regular
+    expression. The view will only be invoked if the ``PATH_INFO``
+    HTTP header matches the expression.
 
     Any individual or all parameters can be omitted.  The simplest
     bfg_view declaration then becomes::
@@ -420,7 +424,7 @@ class bfg_view(object):
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
                  containment=None, attr=None, renderer=None, wrapper=None,
-                 xhr=False, accept=None, header=None):
+                 xhr=False, accept=None, header=None, path_info=None):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
@@ -435,6 +439,7 @@ class bfg_view(object):
         self.xhr = xhr
         self.accept = accept
         self.header = header
+        self.path_info = path_info
 
     def __call__(self, wrapped):
         setting = self.__dict__.copy()
