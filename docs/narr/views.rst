@@ -547,9 +547,9 @@ header
 
 path_info
 
-  The value of this attribute represents a regex query for the
-  ``PATH_INFO`` HTTP request header. If the regex matches, this
-  predicate will be true.
+  The value of this attribute represents a regular expression pattern
+  that will be tested against the ``PATH_INFO`` WSGI environment
+  variable.  If the regex matches, this predicate will be true.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
