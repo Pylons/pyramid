@@ -237,6 +237,16 @@ def view(
         weight = weight - 20
         predicates.append(request_method_predicate)
 
+    if path_info is not None:
+        try:
+            path_info_val = re.compile(path_info)
+        except re.error, why:
+            raise ConfigurationError(why[0])
+        def path_info_predicate(context, request):
+            return path_info_val.match(request.path_info)
+        weight = weight - 30
+        predicates.append(path_info_predicate)
+
     if request_param is not None:
         request_param_val = None
         if '=' in request_param:
@@ -245,7 +255,7 @@ def view(
             if request_param_val is None:
                 return request_param in request.params
             return request.params.get(request_param) == request_param_val
-        weight = weight - 30
+        weight = weight - 40
         predicates.append(request_param_predicate)
 
     if header is not None:
@@ -262,28 +272,20 @@ def view(
                 return header_name in request.headers
             val = request.headers.get(header_name)
             return header_val.match(val) is not None
+        weight = weight - 50
         predicates.append(header_predicate)
 
     if accept is not None:
         def accept_predicate(context, request):
             return accept in request.accept
-        weight = weight - 40
+        weight = weight - 60
         predicates.append(accept_predicate)
 
     if containment is not None:
         def containment_predicate(context, request):
             return find_interface(context, containment) is not None
-        weight = weight - 50
+        weight = weight - 70
         predicates.append(containment_predicate)
-
-    if path_info is not None:
-        try:
-            path_info_val = re.compile(path_info)
-        except re.error, why:
-            raise ConfigurationError(why[0])
-        def path_info_predicate(context, request):
-            return path_info_val.match(request.path_info)
-        predicates.append(path_info_predicate)
 
     # this will be == sys.maxint if no predicates
     score = weight / (len(predicates) + 1)
