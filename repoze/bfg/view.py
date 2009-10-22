@@ -321,7 +321,7 @@ class bfg_view(object):
 
     If ``path_info`` is specified, it must be a regular
     expression. The view will only be invoked if the ``PATH_INFO``
-    HTTP header matches the expression.
+    WSGI environment variable matches the expression.
 
     Any individual or all parameters can be omitted.  The simplest
     bfg_view declaration then becomes::
