@@ -545,6 +545,8 @@ header
   header name/value pair, the case of the header name is not
   significant.
 
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 path_info
 
   The value of this attribute represents a regular expression pattern
