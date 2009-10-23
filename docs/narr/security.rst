@@ -422,6 +422,7 @@ An example of its usage, with all attributes fully expanded:
     include_ip="false"
     timeout="86400"
     reissue_time="600"
+    max_age="31536000"
     />
 
 The ``secret`` is a string that will be used to encrypt the data
@@ -449,16 +450,30 @@ requesting user agent, the cookie is considered invalid.  It defaults
 to "false".
 
 ``timeout`` is an integer value.  It represents the maximum age in
-seconds allowed for a cookie to live.  If ``timeout`` is specified,
-you must also set ``reissue_time`` to a lower value.  It defaults to
-``None``, meaning that the cookie will only live for the duration of
-the user's browser session.
+seconds which the auth_tkt ticket will be considered valid.  If
+``timeout`` is specified, and ``reissue_time`` is also specified,
+``reissue_time`` must be a smaller value than ``timeout``.  It
+defaults to ``None``, meaning that the ticket will be considered valid
+forever.
 
 ``reissue_time`` is an integer value.  If ``reissue_time`` is
 specified, when we encounter a cookie that is older than the reissue
 time (in seconds), but younger that the ``timeout``, a new cookie will
 be issued.  It defaults to ``None``, meaning that authentication
-cookies are never reissued.
+cookies are never reissued.  A value of ``0`` means reissue a cookie
+in the response to every request that requires authentication.
+
+``max_age`` is the maximum age of the auth_tkt *cookie*, in seconds.
+This differs from ``timeout`` inasmuch as ``timeout`` represents the
+lifetime of the ticket contained in the cookie, while this value
+represents the lifetime of the cookie itself.  When this value is set,
+the cookie's ``Max-Age`` and ``Expires`` settings will be set,
+allowing the auth_tkt cookie to last between browser sessions.  It is
+typically nonsenical to set this to a value that is lower than
+``timeout`` or ``reissue_time``, although it is not explicitly
+prevented.  It defaults to ``None``, meaning (on all major browser
+platforms) that auth_tkt cookies will last for the lifetime of the
+user's browser session.
 
 ``remoteuserauthenticationpolicy``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

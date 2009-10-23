@@ -99,6 +99,26 @@ class Test_create_route_request_factory(unittest.TestCase):
         self.failUnless(IRouteRequest.implementedBy(factory))
         self.failUnless(IRequest.implementedBy(factory))
 
+class Test_add_global_response_headers(unittest.TestCase):
+    def _callFUT(self, request, headerlist):
+        from repoze.bfg.request import add_global_response_headers
+        return add_global_response_headers(request, headerlist)
+
+    def test_no_adhoc_attrs(self):
+        request = DummyRequest()
+        headers = [('a', 1), ('b', 2)]
+        self._callFUT(request, headers)
+        attrs = request.environ['webob.adhoc_attrs']
+        self.assertEqual(attrs['global_response_headers'], headers)
+
+    def test_with_adhoc_attrs(self):
+        request = DummyRequest()
+        headers = [('a', 1), ('b', 2)]
+        attrs = request.environ['webob.adhoc_attrs'] = {}
+        attrs['global_response_headers'] = headers[:]
+        self._callFUT(request, [('c', 1)])
+        self.assertEqual(attrs['global_response_headers'], headers + [('c', 1)])
+
 class DummyRoute:
     def __init__(self, name):
         self.name = name

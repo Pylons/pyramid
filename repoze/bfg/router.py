@@ -121,12 +121,20 @@ class Router(object):
             registry.has_listeners and registry.notify(NewResponse(response))
 
             try:
-                start_response(response.status, response.headerlist)
-                return response.app_iter
+                headers = response.headerlist
+                app_iter = response.app_iter
+                status = response.status
             except AttributeError:
                 raise ValueError(
                     'Non-response object returned from view named %s '
                     '(and no renderer): %r' % (view_name, response))
+
+            if 'global_response_headers' in attrs:
+                headers = list(headers)
+                headers.extend(attrs['global_response_headers'])
+            
+            start_response(response.status, headers)
+            return response.app_iter
 
         finally:
             manager.pop()

@@ -499,6 +499,7 @@ class IAuthTktAuthenticationPolicyDirective(Interface):
     include_ip = Bool(title=u"include_ip", required=False, default=False)
     timeout = Int(title=u"timeout", required=False, default=None)
     reissue_time = Int(title=u"reissue_time", required=False, default=None)
+    max_age = Int(title=u"max_age", required=False, default=None)
 
 def authtktauthenticationpolicy(_context,
                                 secret,
@@ -507,7 +508,8 @@ def authtktauthenticationpolicy(_context,
                                 secure=False,
                                 include_ip=False,
                                 timeout=None,
-                                reissue_time=None):
+                                reissue_time=None,
+                                max_age=None):
     try:
         policy = AuthTktAuthenticationPolicy(secret,
                                              callback=callback,
@@ -515,7 +517,8 @@ def authtktauthenticationpolicy(_context,
                                              secure=secure,
                                              include_ip = include_ip,
                                              timeout = timeout,
-                                             reissue_time = reissue_time)
+                                             reissue_time = reissue_time,
+                                             max_age=max_age)
     except ValueError, why:
         raise ConfigurationError(str(why))
     # authentication policies must be registered eagerly so they can

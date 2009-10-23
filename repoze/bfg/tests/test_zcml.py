@@ -1036,8 +1036,7 @@ class TestViewDirective(unittest.TestCase):
         context = DummyContext()
         view = lambda *arg: None
         sm = getSiteManager()
-        def view(context, request):
-            return '123'
+        def view(context, request): pass
         self._callFUT(context, None, IFoo, view=view, path_info='/boo')
         actions = context.actions
         self.assertEqual(len(actions), 1)

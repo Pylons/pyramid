@@ -10,6 +10,7 @@ from zope.interface import implements
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 
+from repoze.bfg.request import add_global_response_headers
 from repoze.bfg.security import Authenticated
 from repoze.bfg.security import Everyone
 
@@ -173,7 +174,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        expected to return None if the userid doesn't exist or a sequence
        of group identifiers (possibly empty) if the user does exist.  If
        ``callback`` is None, the userid will be assumed to exist with no
-       groups.
+       groups.  Optional.
 
     ``cookie_name``
 
@@ -192,16 +193,39 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``timeout``
 
-       Default: ``None``.  Maximum age in seconds allowed for a cookie
-       to live.  If ``timeout`` is specified, you must also set
-       ``reissue_time`` to a lower value.
+       Default: ``None``.  Maximum number of seconds after which a
+       newly issued ticket will be considered valid.  After this
+       amount of time, the ticket will expire (effectively logging the
+       user out).  If this value is ``None``, the token never expires.
+       Optional.
 
     ``reissue_time``
 
-       Default: ``None``.  If ``reissue_time`` is specified, when we
-       encounter a cookie that is older than the reissue time (in
-       seconds), but younger that the ``timeout``, a new cookie will
-       be issued.
+       Default: ``None``.  If this parameter is set, it represents the
+       number of seconds that must pass before an authentication token
+       cookie is reissued.  The duration is measured as the number of
+       seconds since the last auth_tkt cookie was issued and 'now'.
+       If the ``timeout`` value is ``None``, this parameter has no
+       effect.  If this parameter is provided, and the value of
+       ``timeout`` is not ``None``, the value of ``reissue_time`` must
+       be smaller than value of ``timeout``.  A good rule of thumb: if
+       you want auto-reissued cookies: set this to the ``timeout``
+       value divided by ten.  If this value is ``0``, a new ticket
+       cookie will be reissued on every request which needs
+       authentication. Optional.
+
+    ``max_age``
+
+      Default: ``None``.  The max age of the auth_tkt cookie, in
+      seconds.  This differs from ``timeout`` inasmuch as ``timeout``
+      represents the lifetime of the ticket contained in the cookie,
+      while this value represents the lifetime of the cookie itself.
+      When this value is set, the cookie's ``Max-Age`` and ``Expires``
+      settings will be set, allowing the auth_tkt cookie to last
+      between browser sessions.  It is typically nonsenical to set
+      this to a value that is lower than ``timeout`` or
+      ``reissue_time``, although it is not explicitly prevented.
+      Optional.
     """
     implements(IAuthenticationPolicy)
     def __init__(self,
@@ -211,7 +235,8 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  secure=False,
                  include_ip=False,
                  timeout=None,
-                 reissue_time=None):
+                 reissue_time=None,
+                 max_age=None):
         self.cookie = AuthTktCookieHelper(
             secret,
             cookie_name=cookie_name,
@@ -219,6 +244,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             include_ip=include_ip,
             timeout=timeout,
             reissue_time=reissue_time,
+            max_age=max_age,
             )
         self.callback = callback
 
@@ -228,86 +254,59 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             return result['userid']
 
     def remember(self, request, principal, **kw):
-        """ Accepts the following kw args: ``tokens``, ``userdata``,
-        ``max_age``."""
+        """ Accepts the following kw args: ``max_age``."""
         return self.cookie.remember(request, principal, **kw)
 
     def forget(self, request):
         return self.cookie.forget(request)
-        
+
+def b64encode(v):
+    return v.encode('base64').strip().replace('\n', '')
+
+def b64decode(v):
+    return v.decode('base64')
+
+EXPIRE = object()
+
 class AuthTktCookieHelper(object):
+    auth_tkt = auth_tkt # for tests
+
     userid_type_decoders = {
         'int':int,
-        'unicode':lambda x: utf_8_decode(x)[0],
+        'unicode':lambda x: utf_8_decode(x)[0], # bw compat for old cookies
+        'b64unicode': lambda x: utf_8_decode(b64decode(x))[0],
+        'b64str': lambda x: b64decode(x),
         }
 
     userid_type_encoders = {
         int: ('int', str),
         long: ('int', str),
-        unicode: ('unicode', lambda x: utf_8_encode(x)[0]),
+        unicode: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
+        str: ('b64str', lambda x: b64encode(x)),
         }
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
-                 include_ip=False, timeout=None, reissue_time=None):
+                 include_ip=False, timeout=None, reissue_time=None,
+                 max_age=None):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
         self.secure = secure
-        if timeout and ( (not reissue_time) or (reissue_time > timeout) ):
-            raise ValueError('When timeout is specified, reissue_time must '
-                             'be set to a lower value')
         self.timeout = timeout
+        if reissue_time is not None and timeout is not None:
+            if reissue_time > timeout:
+                raise ValueError('reissue_time must be lower than timeout')
         self.reissue_time = reissue_time
-
-    # IIdentifier
-    def identify(self, request):
-        environ = request.environ
-        cookies = get_cookies(environ)
-        cookie = cookies.get(self.cookie_name)
-
-        if cookie is None or not cookie.value:
-            return None
-
-        if self.include_ip:
-            remote_addr = environ['REMOTE_ADDR']
-        else:
-            remote_addr = '0.0.0.0'
-        
-        try:
-            timestamp, userid, tokens, user_data = auth_tkt.parse_ticket(
-                self.secret, cookie.value, remote_addr)
-        except auth_tkt.BadTicket:
-            return None
-
-        if self.timeout and ( (timestamp + self.timeout) < time.time() ):
-            return None
-
-        userid_typename = 'userid_type:'
-        user_data_info = user_data.split('|')
-        for datum in filter(None, user_data_info):
-            if datum.startswith(userid_typename):
-                userid_type = datum[len(userid_typename):]
-                decoder = self.userid_type_decoders.get(userid_type)
-                if decoder:
-                    userid = decoder(userid)
-            
-        environ['REMOTE_USER_TOKENS'] = tokens
-        environ['REMOTE_USER_DATA'] = user_data
-        environ['AUTH_TYPE'] = 'cookie'
-
-        identity = {}
-        identity['timestamp'] = timestamp
-        identity['userid'] = userid
-        identity['tokens'] = tokens
-        identity['userdata'] = user_data
-        return identity
+        self.max_age = max_age
 
     def _get_cookies(self, environ, value, max_age=None):
-        if max_age is not None:
-            later = datetime.datetime.now() + datetime.timedelta(
+        if max_age is EXPIRE:
+            max_age = "; Max-Age=0; Expires=Wed, 31-Dec-97 23:59:59 GMT"
+        elif max_age is not None:
+            later = datetime.datetime.utcnow() + datetime.timedelta(
                 seconds=int(max_age))
             # Wdy, DD-Mon-YY HH:MM:SS GMT
-            expires = later.strftime('%a, %d %b %Y %H:%M:%S')
+            expires = later.strftime('%a, %d %b %Y %H:%M:%S GMT')
             # the Expires header is *required* at least for IE7 (IE7 does
             # not respect Max-Age)
             max_age = "; Max-Age=%s; Expires=%s" % (max_age, expires)
@@ -326,66 +325,90 @@ class AuthTktCookieHelper(object):
             ]
         return cookies
 
-    # IIdentifier
+    def identify(self, request):
+        environ = request.environ
+        cookies = get_cookies(environ)
+        cookie = cookies.get(self.cookie_name)
+
+        if cookie is None or not cookie.value:
+            return None
+
+        if self.include_ip:
+            remote_addr = environ['REMOTE_ADDR']
+        else:
+            remote_addr = '0.0.0.0'
+        
+        try:
+            timestamp, userid, tokens, user_data = self.auth_tkt.parse_ticket(
+                self.secret, cookie.value, remote_addr)
+        except self.auth_tkt.BadTicket:
+            return None
+
+        now = time.time()
+
+        if self.timeout and ( (timestamp + self.timeout) < now ):
+            return None
+
+        userid_typename = 'userid_type:'
+        user_data_info = user_data.split('|')
+        for datum in filter(None, user_data_info):
+            if datum.startswith(userid_typename):
+                userid_type = datum[len(userid_typename):]
+                decoder = self.userid_type_decoders.get(userid_type)
+                if decoder:
+                    userid = decoder(userid)
+
+        reissue = self.reissue_time is not None
+            
+        if not hasattr(request, '_authtkt_reissued'):
+            if reissue and ( (now - timestamp) > self.reissue_time):
+                headers = self.remember(request, userid, max_age=self.max_age)
+                add_global_response_headers(request, headers)
+                request._authtkt_reissued = True
+
+        environ['REMOTE_USER_TOKENS'] = tokens
+        environ['REMOTE_USER_DATA'] = user_data
+        environ['AUTH_TYPE'] = 'cookie'
+
+        identity = {}
+        identity['timestamp'] = timestamp
+        identity['userid'] = userid
+        identity['tokens'] = tokens
+        identity['userdata'] = user_data
+        return identity
+
     def forget(self, request):
         # return a set of expires Set-Cookie headers
         environ = request.environ
-        return self._get_cookies(environ, '""')
+        return self._get_cookies(environ, '', max_age=EXPIRE)
     
-    # IIdentifier
-    def remember(self, request, userid, tokens='', userdata='', max_age=None):
+    def remember(self, request, userid, max_age=None):
+        max_age = max_age or self.max_age
         environ = request.environ
+
         if self.include_ip:
             remote_addr = environ['REMOTE_ADDR']
         else:
             remote_addr = '0.0.0.0'
 
-        cookies = get_cookies(environ)
-        old_cookie = cookies.get(self.cookie_name)
-        existing = cookies.get(self.cookie_name)
-        old_cookie_value = getattr(existing, 'value', None)
-
-        timestamp, old_userid, old_tokens, old_userdata = None, '', '', ''
-
-        expired = False
-
-        if old_cookie_value:
-            try:
-                (timestamp,old_userid,old_tokens,
-                 old_userdata) = auth_tkt.parse_ticket(
-                    self.secret, old_cookie_value, remote_addr)
-                now = time.time()
-                expired = self.timeout and ((timestamp + self.timeout) < now)
-            except auth_tkt.BadTicket:
-                expired = False
+        user_data = ''
 
         encoding_data = self.userid_type_encoders.get(type(userid))
         if encoding_data:
             encoding, encoder = encoding_data
             userid = encoder(userid)
-            userdata = 'userid_type:%s' % encoding
+            user_data = 'userid_type:%s' % encoding
         
-        if not isinstance(tokens, basestring):
-            tokens = ','.join(tokens)
-        if not isinstance(old_tokens, basestring):
-            old_tokens = ','.join(old_tokens)
-        old_data = (old_userid, old_tokens, old_userdata)
-        new_data = (userid, tokens, userdata)
+        ticket = self.auth_tkt.AuthTicket(
+            self.secret,
+            userid,
+            remote_addr,
+            user_data=user_data,
+            cookie_name=self.cookie_name,
+            secure=self.secure)
 
-        if old_data != new_data or expired:
-            ticket = auth_tkt.AuthTicket(
-                self.secret,
-                userid,
-                remote_addr,
-                tokens=tokens,
-                user_data=userdata,
-                cookie_name=self.cookie_name,
-                secure=self.secure)
-            new_cookie_value = ticket.cookie_value()
-            
-            cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
-            wild_domain = '.' + cur_domain
-            if old_cookie_value != new_cookie_value:
-                # return a set of Set-Cookie headers
-                return self._get_cookies(environ, new_cookie_value, max_age)
+        cookie_value = ticket.cookie_value()
+        cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
+        wild_domain = '.' + cur_domain
+        return self._get_cookies(environ, cookie_value, max_age)
     

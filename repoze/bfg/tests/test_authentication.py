@@ -269,6 +269,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
     def _makeOne(self, *arg, **kw):
         plugin = self._getTargetClass()(*arg, **kw)
+        plugin.auth_tkt = DummyAuthTktModule()
         return plugin
 
     def _makeRequest(self, kw=None):
@@ -279,21 +280,21 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         environ['SERVER_NAME'] = 'localhost'
         return DummyRequest(environ)
 
-    def _makeTicket(self, userid='userid', remote_addr='0.0.0.0',
-                    tokens = [], userdata='userdata',
-                    cookie_name='auth_tkt', secure=False,
-                    time=None):
-        from paste.auth import auth_tkt
-        ticket = auth_tkt.AuthTicket(
-            'secret',
-            userid,
-            remote_addr,
-            tokens=tokens,
-            user_data=userdata,
-            time=time,
-            cookie_name=cookie_name,
-            secure=secure)
-        return ticket.cookie_value()
+    def _cookieValue(self, cookie):
+        return eval(cookie.value)
+
+    def _parseHeaders(self, headers):
+        return [ self._parseHeader(header) for header in headers ]
+
+    def _parseHeader(self, header):
+        cookie = self._parseCookie(header[1])
+        return cookie
+
+    def _parseCookie(self, cookie):
+        from Cookie import SimpleCookie
+        cookies = SimpleCookie()
+        cookies.load(cookie)
+        return cookies.get('auth_tkt')
 
     def test_identify_nocookie(self):
         plugin = self._makeOne('secret')
@@ -303,271 +304,239 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         
     def test_identify_good_cookie_include_ip(self):
         plugin = self._makeOne('secret', include_ip=True)
-        val = self._makeTicket(remote_addr='1.1.1.1')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % val})
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
         result = plugin.identify(request)
         self.assertEqual(len(result), 4)
-        self.assertEqual(result['tokens'], [''])
+        self.assertEqual(result['tokens'], ())
         self.assertEqual(result['userid'], 'userid')
-        self.assertEqual(result['userdata'], 'userdata')
-        self.failUnless('timestamp' in result)
+        self.assertEqual(result['userdata'], '')
+        self.assertEqual(result['timestamp'], 0)
+        self.assertEqual(plugin.auth_tkt.value, 'ticket')
+        self.assertEqual(plugin.auth_tkt.remote_addr, '1.1.1.1')
+        self.assertEqual(plugin.auth_tkt.secret, 'secret')
         environ = request.environ
-        self.assertEqual(environ['REMOTE_USER_TOKENS'], [''])
-        self.assertEqual(environ['REMOTE_USER_DATA'],'userdata')
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
+        self.assertEqual(environ['REMOTE_USER_DATA'],'')
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_dont_include_ip(self):
         plugin = self._makeOne('secret', include_ip=False)
-        val = self._makeTicket()
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % val})
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
         result = plugin.identify(request)
         self.assertEqual(len(result), 4)
-        self.assertEqual(result['tokens'], [''])
+        self.assertEqual(result['tokens'], ())
         self.assertEqual(result['userid'], 'userid')
-        self.assertEqual(result['userdata'], 'userdata')
-        self.failUnless('timestamp' in result)
+        self.assertEqual(result['userdata'], '')
+        self.assertEqual(result['timestamp'], 0)
+        self.assertEqual(plugin.auth_tkt.value, 'ticket')
+        self.assertEqual(plugin.auth_tkt.remote_addr, '0.0.0.0')
+        self.assertEqual(plugin.auth_tkt.secret, 'secret')
         environ = request.environ
-        self.assertEqual(environ['REMOTE_USER_TOKENS'], [''])
-        self.assertEqual(environ['REMOTE_USER_DATA'],'userdata')
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
+        self.assertEqual(environ['REMOTE_USER_DATA'],'')
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_int_useridtype(self):
         plugin = self._makeOne('secret', include_ip=False)
-        val = self._makeTicket(userid='1', userdata='userid_type:int')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % val})
+        plugin.auth_tkt.userid = '1'
+        plugin.auth_tkt.user_data = 'userid_type:int'
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
         result = plugin.identify(request)
         self.assertEqual(len(result), 4)
-        self.assertEqual(result['tokens'], [''])
+        self.assertEqual(result['tokens'], ())
         self.assertEqual(result['userid'], 1)
         self.assertEqual(result['userdata'], 'userid_type:int')
-        self.failUnless('timestamp' in result)
+        self.assertEqual(result['timestamp'], 0)
         environ = request.environ
-        self.assertEqual(environ['REMOTE_USER_TOKENS'], [''])
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
         self.assertEqual(environ['REMOTE_USER_DATA'],'userid_type:int')
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_good_cookie_unknown_useridtype(self):
         plugin = self._makeOne('secret', include_ip=False)
-        val = self._makeTicket(userid='userid', userdata='userid_type:unknown')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % val})
+        plugin.auth_tkt.userid = 'abc'
+        plugin.auth_tkt.user_data = 'userid_type:unknown'
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
         result = plugin.identify(request)
         self.assertEqual(len(result), 4)
-        self.assertEqual(result['tokens'], [''])
-        self.assertEqual(result['userid'], 'userid')
+        self.assertEqual(result['tokens'], ())
+        self.assertEqual(result['userid'], 'abc')
         self.assertEqual(result['userdata'], 'userid_type:unknown')
-        self.failUnless('timestamp' in result)
+        self.assertEqual(result['timestamp'], 0)
         environ = request.environ
-        self.assertEqual(environ['REMOTE_USER_TOKENS'], [''])
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
         self.assertEqual(environ['REMOTE_USER_DATA'],'userid_type:unknown')
+        self.assertEqual(environ['AUTH_TYPE'],'cookie')
+
+    def test_identify_good_cookie_b64str_useridtype(self):
+        plugin = self._makeOne('secret', include_ip=False)
+        plugin.auth_tkt.userid = 'encoded'.encode('base64').strip()
+        plugin.auth_tkt.user_data = 'userid_type:b64str'
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
+        result = plugin.identify(request)
+        self.assertEqual(len(result), 4)
+        self.assertEqual(result['tokens'], ())
+        self.assertEqual(result['userid'], 'encoded')
+        self.assertEqual(result['userdata'], 'userid_type:b64str')
+        self.assertEqual(result['timestamp'], 0)
+        environ = request.environ
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
+        self.assertEqual(environ['REMOTE_USER_DATA'],'userid_type:b64str')
+        self.assertEqual(environ['AUTH_TYPE'],'cookie')
+
+    def test_identify_good_cookie_b64unicode_useridtype(self):
+        plugin = self._makeOne('secret', include_ip=False)
+        plugin.auth_tkt.userid = '\xc3\xa9ncoded'.encode('base64').strip()
+        plugin.auth_tkt.user_data = 'userid_type:b64unicode'
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=ticket'})
+        result = plugin.identify(request)
+        self.assertEqual(len(result), 4)
+        self.assertEqual(result['tokens'], ())
+        self.assertEqual(result['userid'], unicode('\xc3\xa9ncoded', 'utf-8'))
+        self.assertEqual(result['userdata'], 'userid_type:b64unicode')
+        self.assertEqual(result['timestamp'], 0)
+        environ = request.environ
+        self.assertEqual(environ['REMOTE_USER_TOKENS'], ())
+        self.assertEqual(environ['REMOTE_USER_DATA'],'userid_type:b64unicode')
         self.assertEqual(environ['AUTH_TYPE'],'cookie')
 
     def test_identify_bad_cookie(self):
         plugin = self._makeOne('secret', include_ip=True)
+        plugin.auth_tkt.parse_raise = True
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
         result = plugin.identify(request)
         self.assertEqual(result, None)
     
-    def test_remember_creds_same(self):
-        plugin = self._makeOne('secret')
-        val = self._makeTicket(userid='userid')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % val})
-        result = plugin.remember(request, 'userid', userdata='userdata')
+    def test_identify_cookie_timed_out(self):
+        plugin = self._makeOne('secret', timeout=1)
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        result = plugin.identify(request)
         self.assertEqual(result, None)
 
-    def test_remember_creds_different(self):
+    def test_identify_cookie_reissue(self):
+        import time
+        plugin = self._makeOne('secret', timeout=5, reissue_time=0)
+        plugin.auth_tkt.timestamp = time.time()
+        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
+        result = plugin.identify(request)
+        self.failUnless(result)
+        attrs = request.environ['webob.adhoc_attrs']
+        response_headers = attrs['global_response_headers']
+        self.assertEqual(len(response_headers), 3)
+        self.assertEqual(response_headers[0][0], 'Set-Cookie')
+
+    def test_remember(self):
         plugin = self._makeOne('secret')
-        old_val = self._makeTicket(userid='userid')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % old_val})
-        result = plugin.remember(request, 'other', userdata='userdata')
+        request = self._makeRequest()
+        result = plugin.remember(request, 'userid')
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.failUnless(result[0][1].endswith('; Path=/'))
         self.failUnless(result[0][1].startswith('auth_tkt='))
-        self.failIf(result[0][1].startswith('auth_tkt="%s"' % old_val))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
         self.failUnless(result[1][1].endswith('; Path=/; Domain=localhost'))
         self.failUnless(result[1][1].startswith('auth_tkt='))
-        self.failIf(result[1][1].startswith('auth_tkt="%s"' % old_val))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.failUnless(result[2][1].endswith('; Path=/; Domain=.localhost'))
         self.failUnless(result[2][1].startswith('auth_tkt='))
-        self.failIf(result[2][1].startswith('auth_tkt="%s"' % old_val))
 
-    def test_remember_creds_different_include_ip(self):
+    def test_remember_include_ip(self):
         plugin = self._makeOne('secret', include_ip=True)
-        old_val = self._makeTicket(userid='userid', remote_addr='1.1.1.1')
-        request = self._makeRequest({'HTTP_COOKIE': 'auth_tkt=%s' % old_val})
-        new_val = self._makeTicket(userid='other',
-                                   userdata='userdata',
-                                   remote_addr='1.1.1.1')
-        result = plugin.remember(request, 'other', userdata='userdata')
+        request = self._makeRequest()
+        result = plugin.remember(request, 'other')
         self.assertEqual(len(result), 3)
-        self.assertEqual(result[0],
-                         ('Set-Cookie',
-                          'auth_tkt="%s"; Path=/' % new_val))
-        self.assertEqual(result[1],
-                         ('Set-Cookie',
-                           'auth_tkt="%s"; Path=/; Domain=localhost'
-                            % new_val))
-        self.assertEqual(result[2],
-                         ('Set-Cookie',
-                           'auth_tkt="%s"; Path=/; Domain=.localhost'
-                            % new_val))
 
-    def test_remember_creds_different_bad_old_cookie(self):
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.failUnless(result[0][1].endswith('; Path=/'))
+        self.failUnless(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.failUnless(result[1][1].endswith('; Path=/; Domain=localhost'))
+        self.failUnless(result[1][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[2][0], 'Set-Cookie')
+        self.failUnless(result[2][1].endswith('; Path=/; Domain=.localhost'))
+        self.failUnless(result[2][1].startswith('auth_tkt='))
+
+    def test_remember_string_userid(self):
         plugin = self._makeOne('secret')
-        old_val = 'BOGUS'
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % old_val})
-        new_val = self._makeTicket(userid='other', userdata='userdata')
-        result = plugin.remember(request, userid='other', userdata='userdata')
+        request = self._makeRequest()
+        result = plugin.remember(request, 'userid')
+        values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
-        self.assertEqual(result[0],
-                         ('Set-Cookie',
-                          'auth_tkt="%s"; Path=/' % new_val))
-        self.assertEqual(result[1],
-                         ('Set-Cookie',
-                           'auth_tkt="%s"; Path=/; Domain=localhost'
-                            % new_val))
-        self.assertEqual(result[2],
-                         ('Set-Cookie',
-                           'auth_tkt="%s"; Path=/; Domain=.localhost'
-                            % new_val))
+        val = self._cookieValue(values[0])
+        self.assertEqual(val['userid'], 'userid'.encode('base64').strip())
+        self.assertEqual(val['user_data'], 'userid_type:b64str')
 
-    def test_remember_creds_different_with_nonstring_tokens(self):
+    def test_remember_int_userid(self):
         plugin = self._makeOne('secret')
-        old_val = self._makeTicket(userid='userid')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % old_val})
-        new_val = self._makeTicket(userid='other',
-                                   userdata='userdata',
-                                   tokens='foo,bar',
-                                  )
-        result = plugin.remember(request, 'other',
-                                           userdata='userdata',
-                                           tokens=['foo', 'bar'],
-                                          )
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[0],
-                         ('Set-Cookie',
-                          'auth_tkt="%s"; Path=/' % new_val))
-        self.assertEqual(result[1],
-                         ('Set-Cookie',
-                           'auth_tkt="%s"; Path=/; Domain=localhost'
-                            % new_val))
-        self.assertEqual(result[2],
-                         ('Set-Cookie',
-                           'auth_tkt="%s"; Path=/; Domain=.localhost'
-                            % new_val))
-
-    def test_remember_creds_different_int_userid(self):
-        plugin = self._makeOne('secret')
-        old_val = self._makeTicket(userid='userid')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % old_val})
-        new_val = self._makeTicket(userid='1', userdata='userid_type:int')
+        request = self._makeRequest()
         result = plugin.remember(request, 1)
-        
+        values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
-        self.assertEqual(result[0],
-                         ('Set-Cookie',
-                          'auth_tkt="%s"; Path=/' % new_val))
+        val = self._cookieValue(values[0])
+        self.assertEqual(val['userid'], '1')
+        self.assertEqual(val['user_data'], 'userid_type:int')
 
-    def test_remember_creds_different_long_userid(self):
+    def test_remember_long_userid(self):
         plugin = self._makeOne('secret')
-        old_val = self._makeTicket(userid='userid')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % old_val})
-        new_val = self._makeTicket(userid='1', userdata='userid_type:int')
+        request = self._makeRequest()
         result = plugin.remember(request, long(1))
+        values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
-        self.assertEqual(result[0],
-                         ('Set-Cookie',
-                          'auth_tkt="%s"; Path=/' % new_val))
+        val = self._cookieValue(values[0])
+        self.assertEqual(val['userid'], '1')
+        self.assertEqual(val['user_data'], 'userid_type:int')
 
-    def test_remember_creds_different_unicode_userid(self):
+    def test_remember_unicode_userid(self):
         plugin = self._makeOne('secret')
-        old_val = self._makeTicket(userid='userid')
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % old_val})
+        request = self._makeRequest()
         userid = unicode('\xc2\xa9', 'utf-8')
-        new_val = self._makeTicket(userid=userid.encode('utf-8'),
-                                   userdata='userid_type:unicode')
         result = plugin.remember(request, userid)
-        self.assertEqual(type(result[0][1]), str)
+        values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
-        self.assertEqual(result[0],
-                         ('Set-Cookie',
-                          'auth_tkt="%s"; Path=/' % new_val))
+        val = self._cookieValue(values[0])
+        self.assertEqual(val['userid'],
+                         userid.encode('utf-8').encode('base64').strip())
+        self.assertEqual(val['user_data'], 'userid_type:b64unicode')
 
     def test_remember_max_age(self):
         plugin = self._makeOne('secret')
-        environ = {'HTTP_HOST':'example.com'}
-        tkt = self._makeTicket(userid='chris', userdata='')
-        request = self._makeRequest(environ)
-        result = plugin.remember(request, 'chris', max_age='500')
+        request = self._makeRequest()
+        userid = unicode('\xc2\xa9', 'utf-8')
+        result = plugin.remember(request, 'userid', max_age='500')
+        values = self._parseHeaders(result)
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(values[0]['max-age'], '500')
+        self.assertEqual(values[0]['expires'], 'Fri,') # SimpleCookie problem
         
-        name,value = result.pop(0)
-        self.assertEqual('Set-Cookie', name)
-        self.failUnless(
-            value.startswith('auth_tkt="%s"; Path=/; Max-Age=500' % tkt),
-            value)
-        self.failUnless('; Expires=' in value)
-        
-        name,value = result.pop(0)
-        self.assertEqual('Set-Cookie', name)
-        self.failUnless(
-            value.startswith(
-            'auth_tkt="%s"; Path=/; Domain=example.com; Max-Age=500'
-            % tkt), value)
-        self.failUnless('; Expires=' in value)
-
-        name,value = result.pop(0)
-        self.assertEqual('Set-Cookie', name)
-        self.failUnless(
-            value.startswith(
-            'auth_tkt="%s"; Path=/; Domain=.example.com; Max-Age=500' % tkt),
-            value)
-        self.failUnless('; Expires=' in value)
-
-    def test_remember_reissue_expired_cookie(self):
-        import time
-        plugin = self._makeOne('secret', timeout=2, reissue_time=1)
-        old_val = self._makeTicket(userid='userid', time=time.time()-3)
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % old_val})
-        result = plugin.remember(request, 'userid', userdata='userdata')
-        self.failIf(result is None, 'not re-issued?')
-
     def test_forget(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
         headers = plugin.forget(request)
         self.assertEqual(len(headers), 3)
-        header = headers[0]
-        name, value = header
+        name, value = headers[0]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value, 'auth_tkt=""""; Path=/')
-        header = headers[1]
-        name, value = header
+        self.assertEqual(value,
+          'auth_tkt=""; Path=/; Max-Age=0; Expires=Wed, 31-Dec-97 23:59:59 GMT')
+        name, value = headers[1]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value, 'auth_tkt=""""; Path=/; Domain=localhost')
-        header = headers[2]
-        name, value = header
+        self.assertEqual(value,
+                         'auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
+                         'Expires=Wed, 31-Dec-97 23:59:59 GMT')
+        name, value = headers[2]
         self.assertEqual(name, 'Set-Cookie')
-        self.assertEqual(value, 'auth_tkt=""""; Path=/; Domain=.localhost')
-
-    def test_timeout_no_reissue(self):
-        self.assertRaises(ValueError, self._makeOne, 'userid', timeout=1)
+        self.assertEqual(value,
+                         'auth_tkt=""; Path=/; Domain=.localhost; Max-Age=0; '
+                         'Expires=Wed, 31-Dec-97 23:59:59 GMT')
 
     def test_timeout_lower_than_reissue(self):
         self.assertRaises(ValueError, self._makeOne, 'userid', timeout=1,
                           reissue_time=2)
-
-    def test_identify_bad_cookie_expired(self):
-        import time
-        helper = self._makeOne('secret', timeout=2, reissue_time=1)
-        val = self._makeTicket(userid='userid', time=time.time()-3)
-        request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=%s' % val})
-        result = helper.identify(request)
-        self.assertEqual(result, None)
 
 class DummyContext:
     pass
@@ -596,4 +565,39 @@ class DummyCookieHelper:
 
     def forget(self, *arg):
         return []
+
+class DummyAuthTktModule(object):
+    def __init__(self, timestamp=0, userid='userid', tokens=(), user_data='',
+                 parse_raise=False):
+        self.timestamp = timestamp
+        self.userid = userid
+        self.tokens = tokens
+        self.user_data = user_data
+        self.parse_raise = parse_raise
+        def parse_ticket(secret, value, remote_addr):
+            self.secret = secret
+            self.value = value
+            self.remote_addr = remote_addr
+            if self.parse_raise:
+                raise self.BadTicket()
+            return self.timestamp, self.userid, self.tokens, self.user_data
+        self.parse_ticket = parse_ticket
+        
+        class AuthTicket(object):
+            def __init__(self, secret, userid, remote_addr, **kw):
+                self.secret = secret
+                self.userid = userid
+                self.remote_addr = remote_addr
+                self.kw = kw
+
+            def cookie_value(self):
+                result = {'secret':self.secret, 'userid':self.userid,
+                          'remote_addr':self.remote_addr}
+                result.update(self.kw)
+                result = repr(result)
+                return result
+        self.AuthTicket = AuthTicket
+
+    class BadTicket(Exception):
+        pass
 

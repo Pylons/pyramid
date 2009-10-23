@@ -4,8 +4,7 @@ Next release
 Features
 --------
 
-- Add ``path_info``, ``accept``, and ``header`` view configuration
-  predicate.
+- Add ``path_info`` view configuration predicate.
 
 - ``paster bfgshell`` now supports IPython if it's available for
   import.  Thanks to Daniel Holth for the initial patch.
@@ -18,11 +17,18 @@ Features
 - A new exception exists: ``repoze.bfg.exceptions.Respond``.  This
   exception can be raised during view execution return a response.
   This is effectively a goto, useable by code that has no capability
-  to otherwise return a response.
+  to otherwise return a response.  It is documented in the
+  ``repoze.bfg.exceptions`` API documentation.
 
 - The name ``root`` is available as an attribute of the request
   slightly earlier now (before a NewRequest event is emitted).
   ``root`` is the result of the application "root factory".
+
+- Added ``max_age`` parameter to ``authtktauthenticationpolicy`` ZCML
+  directive.  If this value is set, it must be an integer representing
+  the number of seconds which the auth tkt cookie will survive.
+  Mainly, its existence allows the auth_tkt cookie to survive across
+  browser sessions.
 
 Bug Fixes
 ---------
@@ -36,6 +42,12 @@ Bug Fixes
   used in ZCML) introduced in 1.1a7.  Symptom: ``AttributeError:
   object has no attribute __provides__`` raised at startup time.
 
+- The ``reissue_time`` argument to the ``authtktauthenticationpolicy``
+  ZCML directive now actually works.  When it is set to an integer
+  value, an authticket set-cookie header is appended to the response
+  whenever a request requires authentication and 'now' minus the
+  authticket's timestamp is greater than ``reissue_time`` seconds.
+
 Documentation
 -------------
 
@@ -48,20 +60,39 @@ Documentation
 - Fix route_url documentation (``_query`` argument documented as
   ``query`` and ``_anchor`` argument documented as ``anchor``).
 
+Backwards Incompatibilities
+---------------------------
+
+- The ``authtkt`` authentication policy ``remember`` method now no
+  longer honors ``token`` or ``userdata`` keyword arguments.
+
 Internal
 --------
 
 - Change how ``bfg_view`` decorator works when used as a class method
-  decorator.  In 1.1a7, it actually tried to grope every class in
-  scanned package at startup time looking for methods, which led to
-  some strange symptoms (e.g. ``AttributeError: object has no
-  attribute __provides__``).  Now, instead of groping methods at
-  startup time, we just cause the ``bfg_view`` decorator itself to
-  populate its class' __dict__ when its used inside a class as a
-  method decorator.  This is essentially a reversion back to 1.1a6
-  "grokking" behavior plus some special magic for using the
-  ``bfg_view`` decorator as method decorator inside the ``bfg_view``
-  class itself.
+  decorator.  In 1.1a7, the``scan``directive actually tried to grope
+  every class in scanned package at startup time, calling ``dir``
+  against each found class, and subsequently invoking ``getattr``
+  against each thing found by ``dir`` to see if it was a method.  This
+  led to some strange symptoms (e.g. ``AttributeError: object has no
+  attribute __provides__``), and was generally just a bad idea.  Now,
+  instead of groping classes for methods at startup time, we just
+  cause the ``bfg_view`` decorator itself to populate the method's
+  class' ``__dict__`` when it is used as a method decorator.  This
+  also requires a nasty _getframe thing but it's slightly less nasty
+  than the startup time groping behavior.  This is essentially a
+  reversion back to 1.1a6 "grokking" behavior plus some special magic
+  for using the ``bfg_view`` decorator as method decorator inside the
+  ``bfg_view`` class itself.
+
+- The router now checks for a ``global_response_headers`` attribute of
+  the request object before returning a response.  If this value
+  exists, it is presumed to be a sequence of two-tuples, representing
+  a set of headers to append to the 'normal' response headers.  This
+  feature is internal, rather than exposed internally, because it's
+  unclear whether it will stay around in the long term.  It was added
+  to support the ``reissue_time`` feature of the authtkt
+  authentication policy.
 
 1.1a7 (2009-10-18)
 ==================

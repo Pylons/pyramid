@@ -36,6 +36,11 @@ def create_route_request_factory(name):
 
     return RouteRequest
 
+def add_global_response_headers(request, headerlist):
+    attrs = request.environ.setdefault('webob.adhoc_attrs', {})
+    response_headers = attrs.setdefault('global_response_headers', [])
+    response_headers.extend(headerlist)
+
 from repoze.bfg.threadlocal import get_current_request as get_request # b/c
 
 deprecated('get_request',

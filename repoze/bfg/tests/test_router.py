@@ -391,6 +391,27 @@ class TestRouter(unittest.TestCase):
         response = router(environ, start_response)
         self.assertEqual(start_response.status, '201 Created')
 
+    def test_call_request_has_global_response_headers(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        response = DummyResponse('200 OK')
+        response.headerlist = [('a', 1)]
+        view = DummyView(response)
+        environ = self._makeEnviron()
+        environ['webob.adhoc_attrs'] = {'global_response_headers':[('b', 2)]}
+        self._registerView(view, '', IContext, IRequest)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        response = router(environ, start_response)
+        self.assertEqual(start_response.status, '200 OK')
+        self.assertEqual(start_response.headers, [('a', 1), ('b', 2)])
+
     def test_call_eventsends(self):
         context = DummyContext()
         self._registerTraverserFactory(context)
