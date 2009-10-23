@@ -19,7 +19,6 @@ from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
-from repoze.bfg.exceptions import Respond
 from repoze.bfg.request import request_factory
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import ModelGraphTraverser
@@ -115,8 +114,6 @@ class Router(object):
                     msg = why[0]
                     environ['repoze.bfg.message'] = msg
                     response = self.notfound_view(context, request)
-                except Respond, why:
-                    response = why[0]
 
             registry.has_listeners and registry.notify(NewResponse(response))
 

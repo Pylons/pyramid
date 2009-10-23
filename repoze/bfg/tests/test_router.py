@@ -372,25 +372,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(start_response.status, '404 Not Found')
         self.assertEqual(environ['repoze.bfg.message'], 'notfound')
 
-    def test_call_view_raises_respond(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        class IContext(Interface):
-            pass
-        from repoze.bfg.interfaces import IRequest
-        context = DummyContext()
-        directlyProvides(context, IContext)
-        self._registerTraverserFactory(context, subpath=[''])
-        response = DummyResponse('200 OK')
-        raised = DummyResponse('201 Created')
-        view = DummyView(response, raise_respond=raised)
-        environ = self._makeEnviron()
-        self._registerView(view, '', IContext, IRequest)
-        router = self._makeOne()
-        start_response = DummyStartResponse()
-        response = router(environ, start_response)
-        self.assertEqual(start_response.status, '201 Created')
-
     def test_call_request_has_global_response_headers(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
@@ -506,11 +487,10 @@ class DummyContext:
 
 class DummyView:
     def __init__(self, response, raise_unauthorized=False,
-                 raise_notfound=False, raise_respond=False):
+                 raise_notfound=False):
         self.response = response
         self.raise_unauthorized = raise_unauthorized
         self.raise_notfound = raise_notfound
-        self.raise_respond = raise_respond
 
     def __call__(self, context, request):
         if self.raise_unauthorized:
@@ -519,9 +499,6 @@ class DummyView:
         if self.raise_notfound:
             from repoze.bfg.exceptions import NotFound
             raise NotFound('notfound')
-        if self.raise_respond:
-            from repoze.bfg.exceptions import Respond
-            raise Respond(self.raise_respond)
         return self.response
 
 class DummyRootFactory:

@@ -9,4 +9,3 @@
 
   .. autoclass:: NotFound
 
-  .. autoclass:: Respond
