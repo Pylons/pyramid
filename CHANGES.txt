@@ -78,7 +78,7 @@ Internal
   the request object before returning a response.  If this value
   exists, it is presumed to be a sequence of two-tuples, representing
   a set of headers to append to the 'normal' response headers.  This
-  feature is internal, rather than exposed internally, because it's
+  feature is internal, rather than exposed externally, because it's
   unclear whether it will stay around in the long term.  It was added
   to support the ``reissue_time`` feature of the authtkt
   authentication policy.
