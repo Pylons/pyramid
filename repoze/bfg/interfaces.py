@@ -80,9 +80,7 @@ class ITraverser(Interface):
         as attributes of the ``request`` object.
         """
 
-class ITraverserFactory(Interface):
-    def __call__(context):
-        """ Return an object that implements ITraverser """
+ITraverserFactory = ITraverser # b / c for 1.0 code
 
 class IRenderer(Interface):
     def __call__(value, system):

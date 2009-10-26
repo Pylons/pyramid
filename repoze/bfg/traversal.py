@@ -3,7 +3,6 @@ import urllib
 from zope.component import queryMultiAdapter
 from zope.component import queryAdapter
 
-from zope.interface import classProvides
 from zope.interface import implements
 from zope.interface.interfaces import IInterface
 
@@ -11,7 +10,6 @@ from repoze.lru import lru_cache
 
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import ITraverser
-from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import VH_ROOT_KEY
 
 from repoze.bfg.location import lineage
@@ -474,7 +472,6 @@ class ModelGraphTraverser(object):
     every object in the graph supplies a ``__name__`` and
     ``__parent__`` attribute (ie. every object 'provides ILocation') ."""
 
-    classProvides(ITraverserFactory)
     implements(ITraverser)
 
     def __init__(self, root):

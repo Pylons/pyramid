@@ -55,10 +55,6 @@ Backwards Incompatibilities
 - The ``authtkt`` authentication policy ``remember`` method now no
   longer honors ``token`` or ``userdata`` keyword arguments.
 
-- The traversal machinery now adapts to ``ITraverser`` instead of
-  ``ITraverserFactory``, matching the expectation that adaptation
-  returns an object which implements the required interface.
-
 Internal
 --------
 
@@ -86,6 +82,8 @@ Internal
   unclear whether it will stay around in the long term.  It was added
   to support the ``reissue_time`` feature of the authtkt
   authentication policy.
+
+- The interface ITraverserFactory is now just an alias for ITraverser.
 
 1.1a7 (2009-10-18)
 ==================
