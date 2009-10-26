@@ -28,9 +28,10 @@ class TestRouter(unittest.TestCase):
         settings.update(kw)
         self.registry.registerUtility(settings, ISettings)
 
-    def _makeTraverserFactory(self, context, view_name='', subpath=None,
+    def _registerTraverserFactory(self, context, view_name='', subpath=None,
                                   traversed=None, virtual_root=None,
                                   virtual_root_path=None, **kw):
+        from repoze.bfg.interfaces import ITraverser
 
         if virtual_root is None:
             virtual_root = context
@@ -41,13 +42,8 @@ class TestRouter(unittest.TestCase):
         if virtual_root_path is None:
             virtual_root_path = []
 
-        from zope.interface import implements
-        from repoze.bfg.interfaces import ITraverser
-
         class DummyTraverserFactory:
-            implements(ITraverser)
-
-            def __init__(self, root=None):
+            def __init__(self, root):
                 self.root = root
 
             def __call__(self, path):
@@ -61,11 +57,6 @@ class TestRouter(unittest.TestCase):
                 kw.update(values)
                 return kw
 
-        return DummyTraverserFactory
-
-    def _registerTraverserFactory(self, *args, **kwargs):
-        DummyTraverserFactory = self._makeTraverserFactory(*args, **kwargs)
-        from repoze.bfg.interfaces import ITraverser
         self.registry.registerAdapter(DummyTraverserFactory, (None,),
                                       ITraverser, name='')
 
@@ -155,31 +146,6 @@ class TestRouter(unittest.TestCase):
         self.failUnless('<code>/</code>' in result[0], result)
         self.failIf('debug_notfound' in result[0])
         self.assertEqual(len(logger.messages), 0)
-
-    def test_call_traverser_model(self):
-        environ = self._makeEnviron()
-        from zope.interface import Interface
-        class IContext(Interface):
-            pass
-        context = DummyContext()
-        from zope.interface import directlyProvides
-        directlyProvides(context, IContext)
-        RootFactory = self._makeTraverserFactory(context, view_name='def')
-        root = RootFactory()
-        self._registerRootFactory(root)
-        from repoze.bfg.interfaces import IRequest
-        response = DummyResponse()
-        response.app_iter = ['Hello world']
-        view = DummyView(response)
-        self._registerView(view, 'def', IContext, IRequest)
-        logger = self._registerLogger()
-        router = self._makeOne()
-        start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        self.assertEqual(result, ['Hello world'])
-        headers = start_response.headers
-        status = start_response.status
-        self.assertEqual(status, '200 OK')
 
     def test_has_webob_adhoc_attrs(self):
         environ = self._makeEnviron()
