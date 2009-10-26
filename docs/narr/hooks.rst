@@ -278,6 +278,9 @@ when the application :term:`root factory` returned an instance of the
 ``myapp.models.MyRoot`` object.  Otherwise it would use the default
 :mod:`repoze.bfg` traverser to do traversal.
 
+Note that the root object may itself implement ``ITraverser`` in which
+case adaptation is skipped.
+
 Example implementations of alternate traversers can be found "in the
 wild" within `repoze.bfg.traversalwrapper
 <http://pypi.python.org/pypi/repoze.bfg.traversalwrapper>`_ and

@@ -273,9 +273,12 @@ def traverse(model, path):
     return _traverse(model, {'PATH_INFO':path})
 
 def _traverse(model, environ):
-    traverser = queryAdapter(model, ITraverser)
-    if traverser is None:
-        traverser = ModelGraphTraverser(model)
+    if ITraverser.providedBy(model):
+        traverser = model
+    else:
+        traverser = queryAdapter(model, ITraverser)
+        if traverser is None:
+            traverser = ModelGraphTraverser(model)
 
     result = traverser(environ)
     return result

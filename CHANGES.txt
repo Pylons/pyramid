@@ -4,6 +4,10 @@ Next release
 Features
 --------
 
+- The root factory may now return an object which implements
+  ``ITraverser`` directly. In this case, no adaptation is done before
+  traversal.
+
 - Add ``path_info`` view configuration predicate.
 
 - ``paster bfgshell`` now supports IPython if it's available for
