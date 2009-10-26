@@ -44,7 +44,6 @@ class Router(object):
         settings = registry.queryUtility(ISettings)
         if settings is not None:
             self.debug_notfound = settings['debug_notfound']
-        self.traverser_warned = {}
 
     def __call__(self, environ, start_response):
         """
