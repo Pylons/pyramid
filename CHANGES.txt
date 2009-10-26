@@ -55,6 +55,10 @@ Backwards Incompatibilities
 - The ``authtkt`` authentication policy ``remember`` method now no
   longer honors ``token`` or ``userdata`` keyword arguments.
 
+- The traversal machinery now adapts to ``ITraverser`` instead of
+  ``ITraverserFactory``, matching the expectation that adaptation
+  returns an object which implements the required interface.
+
 Internal
 --------
 

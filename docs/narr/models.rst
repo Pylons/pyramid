@@ -222,7 +222,7 @@ and so on.
 
     <adapter
         factory="repoze.bfg.traversalwrapper.ModelGraphTraverser"
-        provides="repoze.bfg.interfaces.ITraverserFactory"
+        provides="repoze.bfg.interfaces.ITraverser"
         for="*"
     />
 

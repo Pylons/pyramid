@@ -273,7 +273,7 @@ def traverse(model, path):
     return _traverse(model, {'PATH_INFO':path})
 
 def _traverse(model, environ):
-    traverser = queryAdapter(model, ITraverserFactory)
+    traverser = queryAdapter(model, ITraverser)
     if traverser is None:
         traverser = ModelGraphTraverser(model)
 
@@ -476,6 +476,7 @@ class ModelGraphTraverser(object):
 
     classProvides(ITraverserFactory)
     implements(ITraverser)
+
     def __init__(self, root):
         self.root = root
 
@@ -492,7 +493,7 @@ class ModelGraphTraverser(object):
             if not hasattr(subpath, '__iter__'):
                 # this is not a *subpath stararg (just a :subpath)
                 subpath = traversal_path(subpath)
-            
+
         else:
             # this request did not match a Routes route
             subpath = ()

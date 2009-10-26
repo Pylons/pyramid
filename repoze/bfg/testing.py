@@ -55,7 +55,7 @@ def registerModels(models):
                     'traversed':traversed, 'virtual_root':ob,
                     'virtual_root_path':(), 'root':ob}
 
-    registerTraverserFactory(DummyTraverserFactory)
+    registerTraverser(DummyTraverserFactory)
     return models
 
 def registerEventListener(event_iface=Interface):
@@ -220,9 +220,9 @@ def registerSubscriber(subscriber, iface=Interface):
     sm.registerHandler(subscriber, iface)
     return subscriber
 
-def registerTraverserFactory(traverser, for_=Interface):
-    from repoze.bfg.interfaces import ITraverserFactory
-    return registerAdapter(traverser, for_, ITraverserFactory)
+def registerTraverser(traverser, for_=Interface):
+    from repoze.bfg.interfaces import ITraverser
+    return registerAdapter(traverser, for_, ITraverser)
 
 def registerRoute(path, name, factory=None):
     """ Register a new route using a path (e.g. ``:pagename``), a name

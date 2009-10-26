@@ -31,7 +31,7 @@ class TestRouter(unittest.TestCase):
     def _registerTraverserFactory(self, context, view_name='', subpath=None,
                                   traversed=None, virtual_root=None,
                                   virtual_root_path=None, **kw):
-        from repoze.bfg.interfaces import ITraverserFactory
+        from repoze.bfg.interfaces import ITraverser
 
         if virtual_root is None:
             virtual_root = context
@@ -56,9 +56,9 @@ class TestRouter(unittest.TestCase):
                           'virtual_root_path':virtual_root_path}
                 kw.update(values)
                 return kw
-            
+
         self.registry.registerAdapter(DummyTraverserFactory, (None,),
-                                      ITraverserFactory, name='')
+                                      ITraverser, name='')
 
     def _registerView(self, app, name, *for_):
         from repoze.bfg.interfaces import IView

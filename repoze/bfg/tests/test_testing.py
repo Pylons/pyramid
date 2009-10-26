@@ -34,8 +34,8 @@ class TestTestingFunctions(unittest.TestCase):
         from repoze.bfg import testing
         testing.registerModels(models)
         from zope.component import getAdapter
-        from repoze.bfg.interfaces import ITraverserFactory
-        adapter = getAdapter(None, ITraverserFactory)
+        from repoze.bfg.interfaces import ITraverser
+        adapter = getAdapter(None, ITraverser)
         result = adapter({'PATH_INFO':'/ob1'})
         self.assertEqual(result['context'], ob1)
         self.assertEqual(result['view_name'], '')

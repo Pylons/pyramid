@@ -217,7 +217,7 @@ change the default traverser:
 
     <adapter
       factory="myapp.traversal.Traverser"
-      provides="repoze.bfg.interfaces.ITraverserFactory"
+      provides="repoze.bfg.interfaces.ITraverser"
       for="*"
       />
 
@@ -268,7 +268,7 @@ used.  For example:
 
     <adapter
       factory="myapp.traversal.Traverser"
-      provides="repoze.bfg.interfaces.ITraverserFactory"
+      provides="repoze.bfg.interfaces.ITraverser"
       for="myapp.models.MyRoot"
       />
 
