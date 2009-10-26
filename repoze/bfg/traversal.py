@@ -272,11 +272,10 @@ def traverse(model, path):
 
     return _traverse(model, {'PATH_INFO':path})
 
-def _traverse(model, environ, traverser=None):
+def _traverse(model, environ):
+    traverser = queryAdapter(model, ITraverserFactory)
     if traverser is None:
-        traverser = queryAdapter(model, ITraverserFactory)
-        if traverser is None:
-            traverser = ModelGraphTraverser(model)
+        traverser = ModelGraphTraverser(model)
 
     result = traverser(environ)
     return result
@@ -474,6 +473,7 @@ class ModelGraphTraverser(object):
     """ A model graph traverser that should be used (for speed) when
     every object in the graph supplies a ``__name__`` and
     ``__parent__`` attribute (ie. every object 'provides ILocation') ."""
+
     classProvides(ITraverserFactory)
     implements(ITraverser)
     def __init__(self, root):

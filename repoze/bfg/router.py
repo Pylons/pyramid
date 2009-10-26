@@ -9,7 +9,6 @@ from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import ITraverserFactory
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.configuration import make_registry
@@ -21,7 +20,6 @@ from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.request import request_factory
 from repoze.bfg.threadlocal import manager
-from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.traversal import _traverse
 from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import default_notfound_view
@@ -60,7 +58,7 @@ class Router(object):
         manager = self.threadlocal_manager
         threadlocals = {'registry':registry, 'request':None}
         manager.push(threadlocals)
- 
+
         try:
             root = self.root_factory(environ)
             request = request_factory(environ)
@@ -75,10 +73,7 @@ class Router(object):
 
             threadlocals['request'] = request
             registry.has_listeners and registry.notify(NewRequest(request))
-            traverser = registry.queryAdapter(root, ITraverserFactory)
-            if traverser is None:
-                traverser = ModelGraphTraverser(root)
-            tdict = _traverse(root, environ, traverser=traverser)
+            tdict = _traverse(root, environ)
             context, view_name, subpath, traversed, vroot, vroot_path = (
                 tdict['context'], tdict['view_name'], tdict['subpath'],
                 tdict['traversed'], tdict['virtual_root'],

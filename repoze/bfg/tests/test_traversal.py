@@ -970,10 +970,10 @@ class UnderTraverseTests(unittest.TestCase):
 
     def tearDown(self):
         cleanUp()
-        
-    def _callFUT(self, context, environ, registry=None):
+
+    def _callFUT(self, context, environ):
         from repoze.bfg.traversal import _traverse
-        return _traverse(context, environ, registry)
+        return _traverse(context, environ)
 
     def _registerTraverserFactory(self, traverser):
         import zope.component
@@ -993,13 +993,6 @@ class UnderTraverseTests(unittest.TestCase):
         context = DummyContext()
         result = self._callFUT(context, None)
         self.assertEqual(result, {})
-
-    def test_with_traverser(self):
-        def traverser(environ):
-            return {'a':'1'}
-        context = DummyContext()
-        result = self._callFUT(context, None, traverser)
-        self.assertEqual(result, {'a':'1'})
 
 def make_traverser(result):
     class DummyTraverser(object):
