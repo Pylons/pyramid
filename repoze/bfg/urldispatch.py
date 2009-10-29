@@ -46,8 +46,6 @@ class RoutesRootFactory(object):
                 environ['wsgiorg.routing_args'] = ((), match)
                 environ['bfg.routes.route'] = route
                 environ['bfg.routes.matchdict'] = match
-                adhoc_attrs = environ.setdefault('webob.adhoc_attrs', {})
-                adhoc_attrs['matchdict'] = match
                 factory = route.factory or self.default_root_factory
                 return factory(environ)
 

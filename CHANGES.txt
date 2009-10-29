@@ -10,6 +10,23 @@ Bug Fixes
   combination of a predicate value with an ``=`` sign and one without
   (e.g. ``a`` vs. ``a=123``).
 
+Internal
+--------
+
+- The ``repoze.bfg.request.Request`` class, which is a subclass of
+  ``webob.Request`` now defines its own ``__setattr__``,
+  ``__getattr__`` and ``__delattr__`` methods, which override the
+  default WebOb behavior.  The default WebOb behavior stores
+  attributes of the request in ``self.environ['webob.adhoc_attrs']``,
+  and retrieves them from that dictionary during a ``__getattr__``.
+  This behavior was undesirable for speed and "expectation" reasons.
+  Now attributes of the ``request`` are stored in ``request.__dict__``
+  (as you otherwise might expect from an object that did not override
+  these methods).
+
+- The router no longer calls ``repoze.bfg.traversal._traverse`` and
+  does its work "inline" (speed).
+
 1.1a8 (2009-10-27)
 ==================
 

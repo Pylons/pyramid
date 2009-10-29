@@ -9,6 +9,7 @@ from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.configuration import make_registry
@@ -20,7 +21,7 @@ from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.request import request_factory
 from repoze.bfg.threadlocal import manager
-from repoze.bfg.traversal import _traverse
+from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import default_notfound_view
 
@@ -62,17 +63,16 @@ class Router(object):
             root = self.root_factory(environ)
             request = request_factory(environ)
 
-            # webob.Request's __setattr__ (as of 0.9.5 and lower) is a
-            # bottleneck; since we're sure we're using a
-            # webob.Request, we can go around its back and set stuff
-            # into the environ directly
-            attrs = environ.setdefault('webob.adhoc_attrs', {})
+            attrs = request.__dict__
             attrs['registry'] = registry
             attrs['root'] = root
 
             threadlocals['request'] = request
             registry.has_listeners and registry.notify(NewRequest(request))
-            tdict = _traverse(root, environ)
+            traverser = registry.queryAdapter(root, ITraverser)
+            if traverser is None:
+                traverser = ModelGraphTraverser(root)
+            tdict = traverser(environ)
             context, view_name, subpath, traversed, vroot, vroot_path = (
                 tdict['context'], tdict['view_name'], tdict['subpath'],
                 tdict['traversed'], tdict['virtual_root'],

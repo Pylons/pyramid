@@ -1255,7 +1255,7 @@ class Test_rendered_response(unittest.TestCase):
         response = {'a':'1'}
         request = DummyRequest()
         attrs = {'response_content_type':'text/nonsense'}
-        request.environ['webob.adhoc_attrs'] = attrs
+        request.__dict__.update(attrs)
         result = self._callFUT(renderer, response, request=request)
         self.assertEqual(result.content_type, 'text/nonsense')
 
@@ -1264,7 +1264,7 @@ class Test_rendered_response(unittest.TestCase):
         response = {'a':'1'}
         request = DummyRequest()
         attrs = {'response_headerlist':[('a', '1'), ('b', '2')]}
-        request.environ['webob.adhoc_attrs'] = attrs
+        request.__dict__.update(attrs)
         result = self._callFUT(renderer, response, request=request)
         self.assertEqual(result.headerlist,
                          [('Content-Type', 'text/html; charset=UTF-8'),
@@ -1277,7 +1277,7 @@ class Test_rendered_response(unittest.TestCase):
         response = {'a':'1'}
         request = DummyRequest()
         attrs = {'response_status':'406 You Lose'}
-        request.environ['webob.adhoc_attrs'] = attrs
+        request.__dict__.update(attrs)
         result = self._callFUT(renderer, response, request=request)
         self.assertEqual(result.status, '406 You Lose')
 
@@ -1286,7 +1286,7 @@ class Test_rendered_response(unittest.TestCase):
         response = {'a':'1'}
         request = DummyRequest()
         attrs = {'response_charset':'UTF-16'}
-        request.environ['webob.adhoc_attrs'] = attrs
+        request.__dict__.update(attrs)
         result = self._callFUT(renderer, response, request=request)
         self.assertEqual(result.charset, 'UTF-16')
 
@@ -1295,7 +1295,7 @@ class Test_rendered_response(unittest.TestCase):
         response = {'a':'1'}
         request = DummyRequest()
         attrs = {'response_cache_for':100}
-        request.environ['webob.adhoc_attrs'] = attrs
+        request.__dict__.update(attrs)
         result = self._callFUT(renderer, response, request=request)
         self.assertEqual(result.cache_control.max_age, 100)
 

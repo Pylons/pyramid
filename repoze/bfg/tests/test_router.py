@@ -147,22 +147,6 @@ class TestRouter(unittest.TestCase):
         self.failIf('debug_notfound' in result[0])
         self.assertEqual(len(logger.messages), 0)
 
-    def test_has_webob_adhoc_attrs(self):
-        environ = self._makeEnviron()
-        environ['webob.adhoc_attrs'] = {}
-        context = DummyContext()
-        logger = self._registerLogger()
-        router = self._makeOne()
-        start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
-        self.failUnless('<code>/</code>' in result[0], result)
-        self.failIf('debug_notfound' in result[0])
-        self.assertEqual(len(logger.messages), 0)
-
     def test_call_no_view_registered_no_isettings(self):
         environ = self._makeEnviron()
         context = DummyContext()
@@ -260,10 +244,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ['Hello world'])
         self.assertEqual(start_response.headers, ())
         self.assertEqual(start_response.status, '200 OK')
-        self.assertEqual(environ['webob.adhoc_attrs']['view_name'], '')
-        self.assertEqual(environ['webob.adhoc_attrs']['subpath'], [])
-        self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
-        self.assertEqual(environ['webob.adhoc_attrs']['root'], context)
+        request = view.request
+        self.assertEqual(request.view_name, '')
+        self.assertEqual(request.subpath, [])
+        self.assertEqual(request.context, context)
+        self.assertEqual(request.root, context)
 
     def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
         context = DummyContext()
@@ -282,10 +267,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ['Hello world'])
         self.assertEqual(start_response.headers, ())
         self.assertEqual(start_response.status, '200 OK')
-        self.assertEqual(environ['webob.adhoc_attrs']['view_name'], 'foo')
-        self.assertEqual(environ['webob.adhoc_attrs']['subpath'], ['bar'])
-        self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
-        self.assertEqual(environ['webob.adhoc_attrs']['root'], context)
+        request = view.request
+        self.assertEqual(request.view_name, 'foo')
+        self.assertEqual(request.subpath, ['bar'])
+        self.assertEqual(request.context, context)
+        self.assertEqual(request.root, context)
 
     def test_call_view_registered_specific_success(self):
         from zope.interface import Interface
@@ -308,10 +294,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ['Hello world'])
         self.assertEqual(start_response.headers, ())
         self.assertEqual(start_response.status, '200 OK')
-        self.assertEqual(environ['webob.adhoc_attrs']['view_name'], '')
-        self.assertEqual(environ['webob.adhoc_attrs']['subpath'], [])
-        self.assertEqual(environ['webob.adhoc_attrs']['context'], context)
-        self.assertEqual(environ['webob.adhoc_attrs']['root'], context)
+        request = view.request
+        self.assertEqual(request.view_name, '')
+        self.assertEqual(request.subpath, [])
+        self.assertEqual(request.context, context)
+        self.assertEqual(request.root, context)
 
     def test_call_view_registered_specific_fail(self):
         from zope.interface import Interface
@@ -383,13 +370,14 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse('200 OK')
         response.headerlist = [('a', 1)]
-        view = DummyView(response)
+        def view(context, request):
+            request.global_response_headers = [('b', 2)]
+            return response
         environ = self._makeEnviron()
-        environ['webob.adhoc_attrs'] = {'global_response_headers':[('b', 2)]}
         self._registerView(view, '', IContext, IRequest)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        response = router(environ, start_response)
+        router(environ, start_response)
         self.assertEqual(start_response.status, '200 OK')
         self.assertEqual(start_response.headers, [('a', 1), ('b', 2)])
 
@@ -493,6 +481,8 @@ class DummyView:
         self.raise_notfound = raise_notfound
 
     def __call__(self, context, request):
+        self.context = context
+        self.request = request
         if self.raise_unauthorized:
             from repoze.bfg.exceptions import Forbidden
             raise Forbidden('unauthorized')

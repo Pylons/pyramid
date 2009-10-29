@@ -420,8 +420,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
         result = plugin.identify(request)
         self.failUnless(result)
-        attrs = request.environ['webob.adhoc_attrs']
-        response_headers = attrs['global_response_headers']
+        response_headers = request.global_response_headers
         self.assertEqual(len(response_headers), 3)
         self.assertEqual(response_headers[0][0], 'Set-Cookie')
 

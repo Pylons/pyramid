@@ -268,15 +268,12 @@ def traverse(model, path):
     if path and path[0] == '/':
         model = find_root(model)
 
-    return _traverse(model, {'PATH_INFO':path})
-
-def _traverse(model, environ):
+    environ = {'PATH_INFO':path}
     traverser = queryAdapter(model, ITraverser)
     if traverser is None:
         traverser = ModelGraphTraverser(model)
 
-    result = traverser(environ)
-    return result
+    return traverser(environ)
 
 def model_path_tuple(model, *elements):
     """

@@ -531,7 +531,7 @@ def rendered_response(renderer, response, view, context,request, renderer_name):
                                  'context':context, 'request':request})
     response_factory = queryUtility(IResponseFactory, default=Response)
     response = response_factory(result)
-    attrs = request.environ.get('webob.adhoc_attrs', {})
+    attrs = request.__dict__
     content_type = attrs.get('response_content_type', None)
     if content_type is not None:
         response.content_type = content_type

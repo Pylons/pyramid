@@ -964,35 +964,12 @@ class TraverseTests(unittest.TestCase):
         self.assertEqual(model.wascontext, True)
         self.assertEqual(model.environ['PATH_INFO'], '')
 
-class UnderTraverseTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, context, environ):
-        from repoze.bfg.traversal import _traverse
-        return _traverse(context, environ)
-
-    def _registerTraverser(self, traverser):
-        import zope.component
-        sm = zope.component.getSiteManager()
-        from repoze.bfg.interfaces import ITraverser
-        from zope.interface import Interface
-        sm.registerAdapter(traverser, (Interface,), ITraverser)
-
-    def test_default_traverser_factory(self):
-        context = DummyContext()
-        result = self._callFUT(context, {})
+    def test_default_traverser(self):
+        model = DummyContext()
+        result = self._callFUT(model, '')
         self.assertEqual(result['view_name'], '')
-
-    def test_isdict(self):
-        traverser = make_traverser({})
-        self._registerTraverser(traverser)
-        context = DummyContext()
-        result = self._callFUT(context, None)
-        self.assertEqual(result, {})
+        self.assertEqual(result['context'], model)
+        
 
 def make_traverser(result):
     class DummyTraverser(object):

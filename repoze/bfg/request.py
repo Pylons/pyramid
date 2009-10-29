@@ -19,12 +19,19 @@ class Request(WebobRequest):
     implements(IRequest)
     charset = 'utf-8'
 
+    # override default WebOb "environ['adhoc_attr']" mutation behavior
+    __getattr__ = object.__getattribute__
+    __setattr__ = object.__setattr__
+    __delattr__ = object.__delattr__
+
 def request_factory(environ):
     if 'bfg.routes.route' in environ:
         route = environ['bfg.routes.route']
         factory = queryUtility(IRouteRequest, name=route.name)
         if factory is not None:
-            return factory(environ)
+            request = factory(environ)
+            request.matchdict = environ['bfg.routes.matchdict']
+            return request
     return Request(environ)
 
 def create_route_request_factory(name):
@@ -34,10 +41,15 @@ def create_route_request_factory(name):
         implements(iface)
         charset = 'utf-8'
 
+        # override default WebOb "environ['adhoc_attr']" mutation behavior
+        __getattr__ = object.__getattribute__
+        __setattr__ = object.__setattr__
+        __delattr__ = object.__delattr__
+
     return RouteRequest
 
 def add_global_response_headers(request, headerlist):
-    attrs = request.environ.setdefault('webob.adhoc_attrs', {})
+    attrs = request.__dict__
     response_headers = attrs.setdefault('global_response_headers', [])
     response_headers.extend(headerlist)
 

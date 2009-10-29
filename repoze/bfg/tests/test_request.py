@@ -78,14 +78,18 @@ class TestRequestFactory(unittest.TestCase):
         sm = getSiteManager()
         sm.registerUtility(DummyRequest, IRouteRequest, 'routename')
         route = DummyRoute('routename')
-        result = self._callFUT({'bfg.routes.route':route})
+        result = self._callFUT({'bfg.routes.route':route,
+                                'bfg.routes.matchdict':{'match':'1'}})
         self.assertEqual(result.__class__, DummyRequest)
+        self.assertEqual(result.matchdict, {'match':'1'})
 
     def test_it_with_route_notfound(self):
         from repoze.bfg.request import Request
         route = DummyRoute('routename')
-        result = self._callFUT({'bfg.routes.route':route})
+        result = self._callFUT({'bfg.routes.route':route,
+                                'bfg.routes.matchdict':{'match':'1'}})
         self.assertEqual(result.__class__, Request)
+        self.failIf(getattr(result, 'matchdict', None) is not None)
 
 class Test_create_route_request_factory(unittest.TestCase):
     def _callFUT(self, name):
@@ -104,20 +108,12 @@ class Test_add_global_response_headers(unittest.TestCase):
         from repoze.bfg.request import add_global_response_headers
         return add_global_response_headers(request, headerlist)
 
-    def test_no_adhoc_attrs(self):
+    def test_it(self):
         request = DummyRequest()
         headers = [('a', 1), ('b', 2)]
-        self._callFUT(request, headers)
-        attrs = request.environ['webob.adhoc_attrs']
-        self.assertEqual(attrs['global_response_headers'], headers)
-
-    def test_with_adhoc_attrs(self):
-        request = DummyRequest()
-        headers = [('a', 1), ('b', 2)]
-        attrs = request.environ['webob.adhoc_attrs'] = {}
-        attrs['global_response_headers'] = headers[:]
+        request.global_response_headers = headers[:]
         self._callFUT(request, [('c', 1)])
-        self.assertEqual(attrs['global_response_headers'], headers + [('c', 1)])
+        self.assertEqual(request.global_response_headers, headers + [('c', 1)])
 
 class DummyRoute:
     def __init__(self, name):
