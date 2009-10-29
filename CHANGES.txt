@@ -1,3 +1,15 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- An incorrect ZCML conflict would be encountered when the
+  ``request_param`` predicate attribute was used on the ZCML ``view``
+  directive if any two otherwise same-predicated views had the
+  combination of a predicate value with an ``=`` sign and one without
+  (e.g. ``a`` vs. ``a=123``).
+
 1.1a8 (2009-10-27)
 ==================
 

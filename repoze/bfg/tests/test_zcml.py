@@ -649,7 +649,7 @@ class TestViewDirective(unittest.TestCase):
         request.params = {}
         self.assertRaises(NotFound, wrapper, None, request)
 
-    def test_with_request_paramoval_true(self):
+    def test_with_request_param_val_true(self):
         from zope.component import getSiteManager
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
@@ -665,8 +665,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
-                   None, False, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc=123', None,
+                   None, None, False, None, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
@@ -692,8 +692,8 @@ class TestViewDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc', None, None,
-                   None, False, None, None, None)
+        discrim = ('view', IFoo, '', IRequest, IView, None, 'abc=123', None,
+                   None, None, False, None, None, None)
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()

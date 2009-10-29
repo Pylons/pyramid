@@ -147,55 +147,9 @@ class IViewDirective(Interface):
         description=(u'Accepts a regular expression.'),
         required = False)
 
-def view(
-    _context,
-    permission=None,
-    for_=None,
-    view=None,
-    name="",
-    request_type=None,
-    route_name=None,
-    request_method=None,
-    request_param=None,
-    containment=None,
-    attr=None,
-    renderer=None,
-    wrapper=None,
-    xhr=False,
-    accept=None,
-    header=None,
-    path_info=None,
-    cacheable=True, # not used, here for b/w compat < 0.8
-    ):
-
-    if not view:
-        if renderer:
-            def view(context, request):
-                return {}
-        else:
-            raise ConfigurationError('"view" attribute was not specified and '
-                                     'no renderer specified')
-
-    sm = getSiteManager()
-
-    if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
-        # b/w compat for 1.0
-        request_method = request_type
-        request_type = None
-
-    if request_type is None:
-        if route_name is None:
-            request_type = IRequest
-        else:
-            request_type = queryUtility(IRouteRequest, name=route_name)
-            if request_type is None:
-                factory = create_route_request_factory(route_name)
-                request_type = implementedBy(factory)
-                sm.registerUtility(factory, IRouteRequest, name=route_name)
-
-    if isinstance(request_type, basestring):
-        request_type = _context.resolve(request_type)
-
+def _make_predicates(xhr=None, request_method=None, path_info=None,
+                     request_param=None, header=None, accept=None,
+                     containment=None):
     # Predicates are added to the predicate list in (presumed)
     # computation expense order.  All predicates associated with a
     # view must evaluate true for the view to "match" a request.
@@ -289,9 +243,64 @@ def view(
 
     # this will be == sys.maxint if no predicates
     score = weight / (len(predicates) + 1)
+    return score, predicates
+
+def view(
+    _context,
+    permission=None,
+    for_=None,
+    view=None,
+    name="",
+    request_type=None,
+    route_name=None,
+    request_method=None,
+    request_param=None,
+    containment=None,
+    attr=None,
+    renderer=None,
+    wrapper=None,
+    xhr=False,
+    accept=None,
+    header=None,
+    path_info=None,
+    cacheable=True, # not used, here for b/w compat < 0.8
+    ):
+
+    if not view:
+        if renderer:
+            def view(context, request):
+                return {}
+        else:
+            raise ConfigurationError('"view" attribute was not specified and '
+                                     'no renderer specified')
+
+    sm = getSiteManager()
+
+    if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
+        # b/w compat for 1.0
+        request_method = request_type
+        request_type = None
+
+    if request_type is None:
+        if route_name is None:
+            request_type = IRequest
+        else:
+            request_type = queryUtility(IRouteRequest, name=route_name)
+            if request_type is None:
+                factory = create_route_request_factory(route_name)
+                request_type = implementedBy(factory)
+                sm.registerUtility(factory, IRouteRequest, name=route_name)
+
+    if isinstance(request_type, basestring):
+        request_type = _context.resolve(request_type)
 
     if renderer and '.' in renderer:
         renderer = resource_spec(renderer, package_name(_context.resolve('.')))
+
+    score, predicates = _make_predicates(
+        xhr=xhr, request_method=request_method, path_info=path_info,
+        request_param=request_param, header=header, accept=accept,
+        containment=containment)
 
     def register():
         derived_view = derive_view(view, permission, predicates, attr, renderer,
