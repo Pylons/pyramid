@@ -10,8 +10,30 @@ Bug Fixes
   combination of a predicate value with an ``=`` sign and one without
   (e.g. ``a`` vs. ``a=123``).
 
+Features
+--------
+
+- In previous versions of BFG, the "root factory" (the ``get_root``
+  callable passed to ``make_app`` or a function pointed to by the
+  ``factory`` attribute of a route) was called with a "bare" WSGI
+  environment.  In this version, and going forward, it will be called
+  with a ``request`` object.  The request object passed to the factory
+  implements dictionary-like methods in such a way that existing root
+  factory code which expects to be passed an environ will continue to
+  work.
+
 Internal
 --------
+
+- The request implements dictionary-like methods that mutate and query
+  the WSGI environ.  This is only for the purpose of backwards
+  compatibility with root factories which expect an ``environ`` rather
+  than a request.
+
+- The ``repoze.bfg.request.create_route_request_factory`` function,
+  which returned a request factory was removed in favor of a
+  ``repoze.bfg.request.route_request_interface`` function, which
+  returns an interface.
 
 - The ``repoze.bfg.request.Request`` class, which is a subclass of
   ``webob.Request`` now defines its own ``__setattr__``,
@@ -26,6 +48,25 @@ Internal
 
 - The router no longer calls ``repoze.bfg.traversal._traverse`` and
   does its work "inline" (speed).
+
+- Reverse the order in which the router calls the request factory and
+  the root factory.  The request factory is now called first; the
+  resulting request is passed to the root factory.
+
+- The ``repoze.bfg.request.request_factory`` function has been
+  removed.  Its functionality is no longer required.
+
+- The "routes root factory" that wraps the default root factory when
+  there are routes mentioned in the configuration now attaches an
+  interface to the request via ``zope.interface.directlyProvides``.
+  This replaces logic in the (now-gone)
+  ``repoze.bfg.request.request_factory`` function.
+
+- The ``route`` and ``view`` ZCML directives now register an interface
+  as a named utility (retrieved from
+  ``repoze.bfg.request.route_request_interface``) rather than a
+  request factory (the previous return value of the now-missing 
+  ``repoze.bfg.request.create_route_request_factory``.
 
 1.1a8 (2009-10-27)
 ==================

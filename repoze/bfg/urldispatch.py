@@ -1,6 +1,10 @@
 import re
 from urllib import unquote
 
+from zope.interface import directlyProvides
+
+from repoze.bfg.interfaces import IRouteRequest
+
 from repoze.bfg.traversal import traversal_path
 from repoze.bfg.traversal import quote_path_segment
 from repoze.bfg.encode import url_quote
@@ -35,7 +39,29 @@ class RoutesRootFactory(object):
     def generate(self, name, kw):
         return self.routes[name].generate(kw)
 
-    def __call__(self, environ):
+    def __call__(self, request):
+        try:
+            # As of BFG 1.1a9, a root factory is now typically called
+            # with a request object (instead of a WSGI environ, as in
+            # previous versions) by the router.  Simultaneously, as of
+            # 1.1a9, the RoutesRootFactory *requires* that the object
+            # passed to it be a request, instead of an environ, as it
+            # uses both the ``registry`` attribute of the request, and
+            # if a route is found, it decorates the object with an
+            # interface using directlyProvides.  However, existing app
+            # code "in the wild" calls the root factory explicitly
+            # with a dictionary argument (e.g. a subscriber to
+            # WSGIApplicationCreatedEvent does
+            # ``app.root_factory({})``).  It makes no sense for such
+            # code to depend on the side effects of a
+            # RoutesRootFactory, for bw compat purposes we catch the
+            # exception that will be raised when passed a dictionary
+            # and just return the result of the default root factory.
+            environ = request.environ
+            registry = request.registry
+        except AttributeError:
+            return self.default_root_factory(request)
+
         try:
             path = environ['PATH_INFO']
         except KeyError:
@@ -46,6 +72,10 @@ class RoutesRootFactory(object):
                 environ['wsgiorg.routing_args'] = ((), match)
                 environ['bfg.routes.route'] = route
                 environ['bfg.routes.matchdict'] = match
+                request.matchdict = match
+                iface = registry.queryUtility(IRouteRequest, name=route.name)
+                if iface is not None:
+                    directlyProvides(request, iface)
                 factory = route.factory or self.default_root_factory
                 return factory(environ)
 

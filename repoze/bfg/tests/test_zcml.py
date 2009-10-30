@@ -517,7 +517,6 @@ class TestViewDirective(unittest.TestCase):
 
     def test_with_route_name(self):
         from zope.interface import Interface
-        from zope.interface import implementedBy
         from zope.component import getSiteManager
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -534,13 +533,12 @@ class TestViewDirective(unittest.TestCase):
         register = action['callable']
         register()
         sm = getSiteManager() 
-        factory = sm.getUtility(IRouteRequest, 'foo')
-        request_type = implementedBy(factory)
+        request_type = sm.getUtility(IRouteRequest, 'foo')
         discrim = ('view', IFoo, '', request_type, IView, None, None, None,
                    'foo', None, False, None, None, None)
         self.assertEqual(action['discriminator'], discrim)
         the_view = sm.adapters.lookup((IFoo, request_type), IView, name='')
-        request = factory({})
+        request = DummyRequest({})
         self.assertEqual(the_view(None, request), '123')
 
     def test_with_request_method_true(self):
@@ -1591,7 +1589,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view(self):
         from zope.interface import Interface
-        from zope.interface import implementedBy
         from zope.component import getSiteManager
         from repoze.bfg.interfaces import IRouteRequest
         from repoze.bfg.zcml import connect_route
@@ -1608,8 +1605,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, False, None, None, None)
@@ -1633,7 +1629,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_and_view_for(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1649,8 +1644,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', IDummy, '', request_type, IView, None, None, None,
                    'name', None, False, None, None, None)
@@ -1688,7 +1682,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_request_type(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1705,8 +1698,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, 'GET',
                    'name', None, False, None, None, None)
@@ -1726,7 +1718,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_request_type_alias(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1742,8 +1733,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, 'GET',
                    'name', None, False, None, None, None)
@@ -1763,7 +1753,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_request_method(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1780,8 +1769,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, 'GET',
                    'name', None, False, None, None, None)
@@ -1801,7 +1789,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_request_method_alias(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1817,8 +1804,8 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
+
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, 'GET',
                    'name', None, False, None, None, None)
@@ -1838,7 +1825,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_containment(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1854,8 +1840,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, True, None, None,
                    'name', None, False, None, None, None)
@@ -1875,7 +1860,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_containment_alias(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1891,8 +1875,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, True, None, None,
                    'name', None, False, None, None, None)
@@ -1912,7 +1895,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_header(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1928,8 +1910,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, False, None, 'Host', None)
@@ -1949,7 +1930,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_header_alias(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -1965,8 +1945,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, False, None, 'Host', None)
@@ -1986,7 +1965,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_path_info(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -2002,8 +1980,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, False, None, None, '/foo')
@@ -2023,7 +2000,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_xhr(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -2039,8 +2015,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, True, None, None, None)
@@ -2060,7 +2035,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_xhr_alias(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -2076,8 +2050,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, True, None, None, None)
@@ -2097,7 +2070,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_accept(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -2114,8 +2086,7 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, False, 'text/xml', None, None)
@@ -2135,7 +2106,6 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_view_accept_alias(self):
         from zope.component import getSiteManager
-        from zope.interface import implementedBy
         from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -2151,8 +2121,8 @@ class TestRouteDirective(unittest.TestCase):
         register = view_action['callable']
         register()
         sm = getSiteManager()
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
+
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, False, 'text/xml', None, None)
@@ -2206,8 +2176,7 @@ class TestStaticDirective(unittest.TestCase):
         register()
         sm = getSiteManager()
         iface = implementedBy(StaticRootFactory)
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         wrapped = sm.adapters.lookup((iface, request_type), IView, name='')
         request = DummyRequest()
         self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
@@ -2241,8 +2210,7 @@ class TestStaticDirective(unittest.TestCase):
         register()
         sm = getSiteManager()
         iface = implementedBy(StaticRootFactory)
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         view = sm.adapters.lookup((iface, request_type), IView, name='')
         request = DummyRequest()
         self.assertEqual(view(None, request).__class__, PackageURLParser)
@@ -2277,8 +2245,7 @@ class TestStaticDirective(unittest.TestCase):
         register()
         sm = getSiteManager()
         iface = implementedBy(StaticRootFactory)
-        request_factory = sm.getUtility(IRouteRequest, 'name')
-        request_type = implementedBy(request_factory)
+        request_type = sm.getUtility(IRouteRequest, 'name')
         wrapped = sm.adapters.lookup((iface, request_type), IView, name='')
         request = DummyRequest()
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)

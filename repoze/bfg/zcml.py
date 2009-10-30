@@ -38,7 +38,7 @@ from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.configuration import zcml_configure
 from repoze.bfg.path import package_name
-from repoze.bfg.request import create_route_request_factory
+from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import PackageOverrides
 from repoze.bfg.resource import resource_spec
 from repoze.bfg.static import StaticRootFactory
@@ -287,9 +287,8 @@ def view(
         else:
             request_type = queryUtility(IRouteRequest, name=route_name)
             if request_type is None:
-                factory = create_route_request_factory(route_name)
-                request_type = implementedBy(factory)
-                sm.registerUtility(factory, IRouteRequest, name=route_name)
+                request_type = route_request_iface(route_name)
+                sm.registerUtility(request_type, IRouteRequest, name=route_name)
 
     if isinstance(request_type, basestring):
         request_type = _context.resolve(request_type)
@@ -634,11 +633,10 @@ def route(_context, name, path, view=None, view_for=None,
         request_type = None
 
     if request_type is None:
-        request_factory = queryUtility(IRouteRequest, name=name)
-        if request_factory is None:
-            request_factory = create_route_request_factory(name)
-            sm.registerUtility(request_factory, IRouteRequest, name=name)
-        request_type = implementedBy(request_factory)
+        request_type = queryUtility(IRouteRequest, name=name)
+        if request_type is None:
+            request_type = route_request_iface(name)
+            sm.registerUtility(request_type, IRouteRequest, name=name)
 
     if view:
         _view(_context, permission=permission, for_=for_, view=view, name='',

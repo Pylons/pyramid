@@ -19,7 +19,7 @@ from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
-from repoze.bfg.request import request_factory
+from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.view import default_forbidden_view
@@ -60,14 +60,13 @@ class Router(object):
         manager.push(threadlocals)
 
         try:
-            root = self.root_factory(environ)
-            request = request_factory(environ)
-
+            request = Request(environ)
+            threadlocals['request'] = request
             attrs = request.__dict__
             attrs['registry'] = registry
+            root = self.root_factory(request)
             attrs['root'] = root
 
-            threadlocals['request'] = request
             registry.has_listeners and registry.notify(NewRequest(request))
             traverser = registry.queryAdapter(root, ITraverser)
             if traverser is None:

@@ -1,5 +1,4 @@
 import unittest
-from repoze.bfg.testing import cleanUp
 
 class TestMakeRequestASCII(unittest.TestCase):
     def _callFUT(self, event):
@@ -12,10 +11,14 @@ class TestMakeRequestASCII(unittest.TestCase):
         self._callFUT(event)
         self.assertEqual(request.charset, None)
 
-class RequestTestBase(object):
+class TestRequest(unittest.TestCase):
     def _makeOne(self, environ):
-        request = self._getTargetClass()(environ)
-        return request
+        return self._getTargetClass()(environ)
+
+    def _getTargetClass(self):
+        from repoze.bfg.request import Request
+        return Request
+        
 
     def test_params_decoded_from_utf_8_by_default(self):
         environ = {
@@ -44,64 +47,114 @@ class RequestTestBase(object):
         inst = self._makeOne({})
         self.assertTrue(IRequest.providedBy(inst))
 
-class TestRequest(unittest.TestCase, RequestTestBase):
-        def _getTargetClass(self):
-            from repoze.bfg.request import Request
-            return Request
-    
-class TestRouteRequest(unittest.TestCase, RequestTestBase):
-        def _getTargetClass(self):
-            from repoze.bfg.request import create_route_request_factory
-            return create_route_request_factory('abc')
+    def test___contains__(self):
+        environ ={'zooma':1}
+        inst = self._makeOne(environ)
+        self.failUnless('zooma' in inst)
 
-class TestRequestFactory(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
+    def test___delitem__(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        del inst['zooma']
+        self.failIf('zooma' in environ)
 
-    def tearDown(self):
-        cleanUp()
+    def test___getitem__(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst['zooma'], 1)
+
+    def test___iter__(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        iterator = iter(inst)
+        self.assertEqual(list(iterator), list(iter(environ)))
+
+    def test___setitem__(self):
+        environ = {}
+        inst = self._makeOne(environ)
+        inst['zooma'] = 1
+        self.assertEqual(environ, {'zooma':1})
+
+    def test_get(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst.get('zooma'), 1)
         
-    def _callFUT(self, environ):
-        from repoze.bfg.request import request_factory
-        return request_factory(environ)
+    def test_has_key(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst.has_key('zooma'), True)
 
-    def test_it_no_route(self):
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.request import Request
-        result = self._callFUT({})
-        self.assertEqual(result.__class__, Request)
-        self.failUnless(IRequest.providedBy(result))
+    def test_items(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst.items(), environ.items())
 
-    def test_it_with_route_found(self):
-        from zope.component import getSiteManager
-        from repoze.bfg.interfaces import IRouteRequest
-        sm = getSiteManager()
-        sm.registerUtility(DummyRequest, IRouteRequest, 'routename')
-        route = DummyRoute('routename')
-        result = self._callFUT({'bfg.routes.route':route,
-                                'bfg.routes.matchdict':{'match':'1'}})
-        self.assertEqual(result.__class__, DummyRequest)
-        self.assertEqual(result.matchdict, {'match':'1'})
+    def test_iteritems(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(list(inst.iteritems()), list(environ.iteritems()))
 
-    def test_it_with_route_notfound(self):
-        from repoze.bfg.request import Request
-        route = DummyRoute('routename')
-        result = self._callFUT({'bfg.routes.route':route,
-                                'bfg.routes.matchdict':{'match':'1'}})
-        self.assertEqual(result.__class__, Request)
-        self.failIf(getattr(result, 'matchdict', None) is not None)
+    def test_iterkeys(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(list(inst.iterkeys()), list(environ.iterkeys()))
 
-class Test_create_route_request_factory(unittest.TestCase):
+    def test_itervalues(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(list(inst.itervalues()), list(environ.itervalues()))
+
+    def test_keys(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        self.assertEqual(inst.keys(), environ.keys())
+
+    def test_pop(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        popped = inst.pop('zooma')
+        self.assertEqual(environ, {})
+        self.assertEqual(popped, 1)
+
+    def test_popitem(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        popped = inst.popitem()
+        self.assertEqual(environ, {})
+        self.assertEqual(popped, ('zooma', 1))
+
+    def test_setdefault(self):
+        environ = {}
+        inst = self._makeOne(environ)
+        marker = []
+        result = inst.setdefault('a', marker)
+        self.assertEqual(environ, {'a':marker})
+        self.assertEqual(result, marker)
+
+    def test_update(self):
+        environ = {}
+        inst = self._makeOne(environ)
+        inst.update({'a':1}, b=2)
+        self.assertEqual(environ, {'a':1, 'b':2})
+
+    def test_values(self):
+        environ = {'zooma':1}
+        inst = self._makeOne(environ)
+        result = inst.values()
+        self.assertEqual(result, environ.values())
+
+class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):
-        from repoze.bfg.request import create_route_request_factory
-        return create_route_request_factory(name)
+        from repoze.bfg.request import route_request_iface
+        return route_request_iface(name)
 
     def test_it(self):
         from repoze.bfg.interfaces import IRouteRequest
         from repoze.bfg.interfaces import IRequest
-        factory = self._callFUT('routename')
-        self.failUnless(IRouteRequest.implementedBy(factory))
-        self.failUnless(IRequest.implementedBy(factory))
+        iface = self._callFUT('routename')
+        self.failUnless(iface.extends(IRouteRequest))
+        self.failUnless(iface.extends(IRequest))
 
 class Test_add_global_response_headers(unittest.TestCase):
     def _callFUT(self, request, headerlist):
@@ -115,9 +168,6 @@ class Test_add_global_response_headers(unittest.TestCase):
         self._callFUT(request, [('c', 1)])
         self.assertEqual(request.global_response_headers, headers + [('c', 1)])
 
-class DummyRoute:
-    def __init__(self, name):
-        self.name = name
 class DummyRequest:
     def __init__(self, environ=None):
         if environ is None:

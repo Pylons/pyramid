@@ -1,5 +1,5 @@
 import unittest
-from repoze.bfg.testing import cleanUp
+from repoze.bfg import testing
 
 class TestRoute(unittest.TestCase):
     def _getTargetClass(self):
@@ -37,16 +37,30 @@ class TestRoute(unittest.TestCase):
 
 class RoutesRootFactoryTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
         
-    def _getEnviron(self, **kw):
+    def _getRequest(self, **kw):
+        from zope.component import getSiteManager
         environ = {'SERVER_NAME':'localhost',
                    'wsgi.url_scheme':'http'}
         environ.update(kw)
-        return environ
+        request = DummyRequest(environ)
+        sm = getSiteManager()
+        request.registry = sm
+        return request
+
+    def _registerRouteRequest(self, name):
+        from repoze.bfg.interfaces import IRouteRequest
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        class IRequest(Interface):
+            """ """
+        sm = getSiteManager()
+        sm.registerUtility(IRequest, IRouteRequest, name=name)
+        return IRequest
 
     def _getTargetClass(self):
         from repoze.bfg.urldispatch import RoutesRootFactory
@@ -61,61 +75,80 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(mapper.default_root_factory, None)
 
     def test_no_route_matches(self):
-        get_root = DummyRootFactory(123)
-        mapper = self._makeOne(get_root)
-        environ = self._getEnviron(PATH_INFO='/')
-        result = mapper(environ)
+        root_factory = DummyRootFactory(123)
+        mapper = self._makeOne(root_factory)
+        request = self._getRequest(PATH_INFO='/')
+        result = mapper(request)
+        self.assertEqual(result, 123)
+
+    def test_passed_environ_returns_default(self):
+        root_factory = DummyRootFactory(123)
+        mapper = self._makeOne(root_factory)
+        request = self._getRequest(PATH_INFO='/')
+        result = mapper(request.environ)
         self.assertEqual(result, 123)
 
     def test_route_matches(self):
-        get_root = DummyRootFactory(123)
-        mapper = self._makeOne(get_root)
+        root_factory = DummyRootFactory(123)
+        req_iface = self._registerRouteRequest('foo')
+        mapper = self._makeOne(root_factory)
         mapper.connect('archives/:action/:article', 'foo')
-        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
-        result = mapper(environ)
+        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        result = mapper(request)
         self.assertEqual(result, 123)
+        environ = request.environ
         routing_args = environ['wsgiorg.routing_args'][1]
         self.assertEqual(routing_args['action'], 'action1')
         self.assertEqual(routing_args['article'], 'article1')
         self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
         self.assertEqual(environ['bfg.routes.route'].name, 'foo')
+        self.assertEqual(request.matchdict, routing_args)
+        self.failUnless(req_iface.providedBy(request))
 
     def test_root_route_matches(self):
         root_factory = DummyRootFactory(123)
+        req_iface = self._registerRouteRequest('root')
         mapper = self._makeOne(root_factory)
         mapper.connect('', 'root')
-        environ = self._getEnviron(PATH_INFO='/')
-        result = mapper(environ)
+        request = self._getRequest(PATH_INFO='/')
+        result = mapper(request)
+        environ = request.environ
         self.assertEqual(result, 123)
         self.assertEqual(environ['bfg.routes.route'].name, 'root')
         self.assertEqual(environ['bfg.routes.matchdict'], {})
         self.assertEqual(environ['wsgiorg.routing_args'], ((), {}))
+        self.assertEqual(request.matchdict, {})
+        self.failUnless(req_iface.providedBy(request))
 
     def test_root_route_matches2(self):
         root_factory = DummyRootFactory(123)
+        req_iface = self._registerRouteRequest('root')
         mapper = self._makeOne(root_factory)
         mapper.connect('/', 'root')
-        environ = self._getEnviron(PATH_INFO='/')
-        result = mapper(environ)
+        request = self._getRequest(PATH_INFO='/')
+        result = mapper(request)
+        environ = request.environ
         self.assertEqual(result, 123)
         self.assertEqual(environ['bfg.routes.route'].name, 'root')
         self.assertEqual(environ['bfg.routes.matchdict'], {})
         self.assertEqual(environ['wsgiorg.routing_args'], ((), {}))
+        self.assertEqual(request.matchdict, {})
+        self.failUnless(req_iface.providedBy(request))
 
     def test_fallback_to_default_root_factory(self):
         root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)
         mapper.connect('wont/:be/:found', 'wont')
-        environ = self._getEnviron(PATH_INFO='/archives/action1/article1')
-        result = mapper(environ)
+        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        result = mapper(request)
         self.assertEqual(result, 123)
 
     def test_no_path_info(self):
         root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)
         mapper.connect('/', 'root')
-        environ = self._getEnviron()
-        result = mapper(environ)
+        request = self._getRequest()
+        result = mapper(request)
         self.assertEqual(result, 123)
 
     def test_has_routes(self):
@@ -230,7 +263,8 @@ class DummyContext(object):
     """ """
         
 class DummyRequest(object):
-    """ """
+    def __init__(self, environ):
+        self.environ = environ
     
 class DummyRoute(object):
     def __init__(self, generator):
