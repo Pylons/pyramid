@@ -13,6 +13,8 @@ def app(global_config, **kw):
     zodb_uri = kw.get('zodb_uri')
     if zodb_uri is None:
         raise ValueError("No 'zodb_uri' in application configuration.")
-    get_root = PersistentApplicationFinder(zodb_uri, appmaker)
+    finder = PersistentApplicationFinder(zodb_uri, appmaker)
+    def get_root(request):
+        return finder(request.environ)
     return make_app(get_root, tutorial, options=kw)
 

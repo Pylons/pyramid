@@ -103,11 +103,13 @@ be in ``run.py`` and its ``app`` function:
    file's ``[app:main]`` section.  This will be a URI (something like
    ``file:///path/to/Data.fs``).
 
-#. Line *16*. We create a :term:`root factory` using the
-   ``PersistentApplicationFinder`` helper class, passing it the
-   ZODB URI and our appmaker.
+#. Line *16*. We create a "finder" object using the
+   ``PersistentApplicationFinder`` helper class, passing it the ZODB
+   URI and our appmaker.
 
-#. Line *17*.  We use the ``repoze.bfg.router.make_app`` to return a
+#. *Lines 17 - 18*.  We create a :term:`root factory` using the finder.
+
+#. Line *19*.  We use the ``repoze.bfg.router.make_app`` to return a
    :term:`WSGI` application.  The ``make_app`` function takes the root
    factory (``get_root``), the *package* representing our application,
    and the keywords parsed by PasteDeploy.

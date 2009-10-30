@@ -33,8 +33,8 @@ class Page(Base):
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'), (Allow, 'editor', 'edit') ]
-    def __init__(self, environ):
-        self.__dict__.update(environ['bfg.routes.matchdict'])
+    def __init__(self, request):
+        self.__dict__.update(request.matchdict)
 
 def initialize_sql(db, echo=False):
     engine = create_engine(db, echo=echo)

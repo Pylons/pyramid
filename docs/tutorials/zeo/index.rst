@@ -173,7 +173,9 @@ Configuration
            serve``"""
            # paster app config callback
            zodb_uri = kw['zodb_uri']
-           get_root = PersistentApplicationFinder(zodb_uri, appmaker)
+           finder = PersistentApplicationFinder(zodb_uri, appmaker)
+           def get_root(request):
+               return finder(request.environ)
            import myapp
            return make_app(get_root, myapp, options=kw)
 

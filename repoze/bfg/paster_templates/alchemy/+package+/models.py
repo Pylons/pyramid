@@ -61,7 +61,7 @@ class MyApp(object):
 
 root = MyApp()
 
-def default_get_root(environ):
+def default_get_root(request):
     return root
 
 def populate():
