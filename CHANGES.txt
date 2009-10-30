@@ -30,6 +30,13 @@ Features
   dictionary-like methods in such a way that existing traverser code
   which expects to be passed an environ will continue to work.
 
+Documentation
+-------------
+
+- Various changes were made to narrative and API documentation
+  supporting the change from passing a request rather than an environ
+  to root factories and traversers.
+
 Internal
 --------
 
