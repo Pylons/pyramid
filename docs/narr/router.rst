@@ -21,18 +21,22 @@ processing?
    the WSGI environment to the ``__call__`` method of the
    :mod:`repoze.bfg` :term:`router` object.
 
+#. A :term:`request` object is created based on the WSGI environment.
+
 #. To service :term:`url dispatch`, the :mod:`repoze.bfg`
    :term:`router` calls a :term:`URL dispatch` "root factory wrapper"
    callable, which acts as a :term:`root factory`.  The job of the
-   mapper is to examine the ``PATH_INFO`` and other various keys in
-   the environment to determine whether any user-defined :term:`route`
-   matches the current WSGI environment.  The :term:`router` passes
-   the WSGI environment as an argument to the mapper.
+   mapper is to examine the ``PATH_INFO`` implied by the request to
+   determine whether any user-defined :term:`route` matches the
+   current WSGI environment.  The :term:`router` passes the request as
+   an argument to the mapper.
 
 #. If any route matches, the WSGI environment is mutated; a
    ``bfg.routes.route`` key and a ``bfg.routes.matchdict`` are added
-   to the WSGI environment.  If a route *doesn't* match, neither of
-   these keys is added to the WSGI environment.
+   to the WSGI environment, and an attribute named ``matchdict`` is
+   added to the request.  If a route *doesn't* match, neither of these
+   keys is added to the WSGI environment and the request object is not
+   mutated.
 
 #. Regardless of whether any route matched or not, the :term:`URL
    dispatch` mapper returns a root object.  If a particular
@@ -44,27 +48,17 @@ processing?
    ``make_app`` is ``None``, a default root factory is used to
    generate a root.
 
-#. A :term:`WebOb` :term:`request` is generated using the WSGI
-   environment.  The request type (its class and any :term:`interface`
-   attached to it) is dependent upon a combination of the
-   ``REQUEST_METHOD`` of the WSGI environment as well as any
-   :term:`route` match.  For example, a very particular kind of
-   request object is generated when the request has a
-   ``REQUEST_METHOD`` of ``POST`` and a :term:`route` named "home"
-   matches.  We use the request type to determine exactly which
-   :term:`view` to call later.
-
 #. A ``NewRequest`` :term:`event` is sent to any subscribers.
 
 #. The :mod:`repoze.bfg` router calls a "traverser" function with the
-   root object and the WSGI environment.  The traverser function
-   attempts to traverse the root object (using any existing
-   ``__getitem__`` on the root object and subobjects) to find a
-   :term:`context`.  If the root object has no ``__getitem__`` method,
-   the root itself is assumed to be the context.  The exact traversal
-   algorithm is described in :ref:`traversal_chapter`. The traverser
-   function returns a dictionary, which contains a :term:`context` and
-   a :term:`view name` as well as other ancillary information.
+   root object and the request.  The traverser function attempts to
+   traverse the root object (using any existing ``__getitem__`` on the
+   root object and subobjects) to find a :term:`context`.  If the root
+   object has no ``__getitem__`` method, the root itself is assumed to
+   be the context.  The exact traversal algorithm is described in
+   :ref:`traversal_chapter`. The traverser function returns a
+   dictionary, which contains a :term:`context` and a :term:`view
+   name` as well as other ancillary information.
 
 #. The request is decorated with various names returned from the
    traverser (such as ``context``, ``view_name``, and so forth), so

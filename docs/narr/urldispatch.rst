@@ -472,7 +472,7 @@ dispatch will by default be an instance of the object returned by the
 default :term:`root factory`.  You can override this behavior by
 passing in a ``factory`` argument to the ZCML directive for a
 particular route.  The ``factory`` should be a callable that accepts a
-WSGI environment and returns an instance of a class that will be the
+:term:`request` and returns an instance of a class that will be the
 context used by the view.
 
 An example of using a route with a factory:
@@ -489,7 +489,7 @@ An example of using a route with a factory:
 
 The above route will manufacture an ``Idea`` model as a context,
 assuming that ``mypackage.models.Idea`` resolves to a class that
-accepts a WSGI environment in its ``__init__``.
+accepts a request in its ``__init__``.
 
 .. note:: Values prefixed with a period (``.``) for the ``factory``
    and ``view`` attributes of a ``route`` (such as ``.models.Idea``
@@ -536,8 +536,8 @@ The ``.models`` module referred to above might look like so:
    :linenos:
 
    class Article(object):
-       def __init__(self, environ):
-           self.__dict__.update(environ['bfg.routes.matchdict'])
+       def __init__(self, request):
+           self.__dict__.update(request.matchdict)
 
        def is_root(self):
            return self.article == 'root'
@@ -739,8 +739,8 @@ Such a ``factory`` might look like so:
    :linenos:
 
    class Article(object):
-       def __init__(self, environ):
-          matchdict = environ['bfg.routes.matchdict']
+       def __init__(self, request):
+          matchdict = request.matchdict
           article = matchdict.get('article', None)
           if article == '1':
               self.__acl__ = [ (Allow, 'editor', 'view') ]

@@ -268,12 +268,12 @@ def traverse(model, path):
     if path and path[0] == '/':
         model = find_root(model)
 
-    environ = {'PATH_INFO':path}
+    request = FakeRequest({'PATH_INFO':path})
     traverser = queryAdapter(model, ITraverser)
     if traverser is None:
         traverser = ModelGraphTraverser(model)
 
-    return traverser(environ)
+    return traverser(request)
 
 def model_path_tuple(model, *elements):
     """
@@ -474,7 +474,15 @@ class ModelGraphTraverser(object):
     def __init__(self, root):
         self.root = root
 
-    def __call__(self, environ):
+    def __call__(self, request):
+        try:
+            environ = request.environ
+        except AttributeError:
+            # In BFG 1.0 and before, this API expected an environ
+            # rather than a request; some bit of code may still be
+            # passing us an environ.  If so, deal.
+            environ = request
+
         if 'bfg.routes.matchdict' in environ:
             matchdict = environ['bfg.routes.matchdict']
 
@@ -623,3 +631,8 @@ class TraversalContextURL(object):
 def _join_path_tuple(tuple):
     return tuple and '/'.join([quote_path_segment(x) for x in tuple]) or '/'
 
+class FakeRequest(dict):
+    def __init__(self, environ):
+        self.update(environ)
+        self.environ = self # XXX circref?
+        

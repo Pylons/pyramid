@@ -46,7 +46,7 @@ class TestRouter(unittest.TestCase):
             def __init__(self, root):
                 self.root = root
 
-            def __call__(self, path):
+            def __call__(self, request):
                 values = {'root':self.root,
                           'context':context,
                           'view_name':view_name,

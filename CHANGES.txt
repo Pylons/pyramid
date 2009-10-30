@@ -22,6 +22,14 @@ Features
   factory code which expects to be passed an environ will continue to
   work.
 
+- The ``__call__`` of a plugin "traverser" implementation (registered
+  as an adapter for ``ITraverser`` or ``ITraverserFactory``) will now
+  receive a *request* as the single argument to its ``__call__``
+  method.  In previous versions it was passed a WSGI ``environ``
+  object.  The request object passed to the factory implements
+  dictionary-like methods in such a way that existing traverser code
+  which expects to be passed an environ will continue to work.
+
 Internal
 --------
 

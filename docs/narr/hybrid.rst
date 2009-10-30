@@ -138,7 +138,7 @@ looks like so:
    root = Traversable(
            {'a':Traversable({'b':Traversable({'c':Traversable({})})})})
 
-   def root_factory(environ):
+   def root_factory(request):
        return root
 
 We've defined a bogus graph here that can be traversed, and a

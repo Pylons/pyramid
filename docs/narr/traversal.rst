@@ -23,11 +23,10 @@ Users interact with your :mod:`repoze.bfg` -based application via a
 *router*, which is just a fancy :term:`WSGI` application.  At system
 startup time, the router is configured with a callback known as a
 :term:`root factory`, supplied by the application developer.  The root
-factory is passed the WSGI "environment" (a dictionary) and it is
-expected to return an object which represents the root of the model
-graph.  All :term:`traversal` will begin at this root object.  The
-root object is usually a *mapping* object (such as a Python
-dictionary).
+factory is passed a :term:`request` object and it is expected to
+return an object which represents the root of the model graph.  All
+:term:`traversal` will begin at this root object.  The root object is
+usually a *mapping* object (such as a Python dictionary).
 
 .. note:: If a :term:`root factory` is passed to the :mod:`repoze.bfg`
    "make_app" function as the value ``None``, a default root factory
@@ -42,6 +41,14 @@ dictionary).
    name ``*traverse`` is in a route's ``path`` pattern, when it is
    matched, it is also possible to do traversal *after* a route has
    been matched.  See :ref:`hybrid_chapter` for more information.
+
+.. warning:: In BFG 1.0 and prior versions, the root factory was
+    passed a term WSGI *environment* object (a dictionary) while in
+    BFG 1.1+ it is passed a request object.  For backwards
+    compatibility purposes, the request object passed to the root
+    factory has a dictionary-like interface that emulates the WSGI
+    environment, so code expecting the argument to be a dictionary
+    will continue to work.
 
 Items contained within the object graph are analogous to the concept
 of :term:`model` objects used by many other frameworks (and
@@ -93,10 +100,10 @@ code to execute:
 #.  The router creates a :term:`WebOb` request object based on the
     WSGI environment.
 
-#.  The :term:`root factory` is called with the WSGI environment.  It
+#.  The :term:`root factory` is called with the :term:`request`.  It
     returns a :term:`root` object.
 
-#.  The router uses the WSGI environment's ``PATH_INFO`` variable to
+#.  The router uses the request's ``PATH_INFO`` information to
     determine the path segments to traverse.  The leading slash is
     stripped off ``PATH_INFO``, and the remaining path segments are
     split on the slash character to form a traversal sequence, so a

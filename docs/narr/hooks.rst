@@ -231,7 +231,7 @@ a class that implements the following interface:
        def __init__(self, root):
            """ Accept the root object returned from the root factory """
 
-       def __call__(self, environ):
+       def __call__(self, request):
            """ Return a dictionary with (at least) the keys ``root``,
            ``context``, ``view_name``, ``subpath``, ``traversed``,
            ``virtual_root``, and ``virtual_root_path``.  These values are
@@ -254,6 +254,16 @@ a class that implements the following interface:
            All values returned in the dictionary will be made available
            as attributes of the ``request`` object.
            """
+
+.. warning:: In :mod:`repoze.bfg.` 1.0 and previous versions, the
+     traverser ``__call__`` method accepted a WSGI *environment*
+     dictionary rather than a :term:`request` object.  The request
+     object passed to the traverser implements a dictionary-like API
+     which mutates and queries the environment, as a backwards
+     compatibility shim, in order to allow older code to work.
+     However, for maximum forward compatibility, traverser code
+     targeting :mod:`repoze.bfg` 1.1 and higher should expect a
+     request object directly.
 
 More than one traversal algorithm can be active at the same time.  For
 instance, if your :term:`root factory` returns more than one type of

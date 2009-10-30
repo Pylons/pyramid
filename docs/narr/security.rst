@@ -522,7 +522,7 @@ An example of its usage, with all attributes fully expanded:
 
 The ``identifier_name`` controls the name used to look up the
 :term:`repoze.who` "identifier" plugin within
-``environ['repoze.who.plugins']`` which is used by this policy to
+``request.environ['repoze.who.plugins']`` which is used by this policy to
 "remember" and "forget" credentials.  It defaults to ``auth_tkt``.
 
 The ``callback`` is a Python dotted name to a function passed the

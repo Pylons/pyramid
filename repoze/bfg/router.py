@@ -71,7 +71,7 @@ class Router(object):
             traverser = registry.queryAdapter(root, ITraverser)
             if traverser is None:
                 traverser = ModelGraphTraverser(root)
-            tdict = traverser(environ)
+            tdict = traverser(request)
             context, view_name, subpath, traversed, vroot, vroot_path = (
                 tdict['context'], tdict['view_name'], tdict['subpath'],
                 tdict['traversed'], tdict['virtual_root'],
@@ -136,8 +136,8 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
 
-    ``root_factory`` must be a callable that accepts a WSGI
-    environment and returns a traversal root object.  The traversal
+    ``root_factory`` must be a callable that accepts a :term:`request`
+    object and which returns a traversal root object.  The traversal
     root returned by the root factory is the *default* traversal root;
     it can be overridden on a per-view basis.  ``root_factory`` may be
     ``None``, in which case a 'default default' traversal root is
