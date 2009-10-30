@@ -12,7 +12,7 @@ from repoze.bfg.renderers import template_renderer_factory
 from repoze.bfg.settings import get_settings
 
 def renderer_factory(path, level=4):
-    return template_renderer_factory(path, ZPTTemplateRenderer, level=4)
+    return template_renderer_factory(path, ZPTTemplateRenderer, level=level)
 
 class ZPTTemplateRenderer(object):
     implements(ITemplateRenderer)
