@@ -417,26 +417,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(len(router.threadlocal_manager.popped), 1)
 
 
-class TestDefaultRootFactory(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.router import DefaultRootFactory
-        return DefaultRootFactory
-
-    def _makeOne(self, environ):
-        return self._getTargetClass()(environ)
-
-    def test_no_matchdict(self):
-        environ = {}
-        root = self._makeOne(environ)
-        self.assertEqual(root.__parent__, None)
-        self.assertEqual(root.__name__, None)
-
-    def test_matchdict(self):
-        environ = {'bfg.routes.matchdict':{'a':1, 'b':2}}
-        root = self._makeOne(environ)
-        self.assertEqual(root.a, 1)
-        self.assertEqual(root.b, 2)
-
 class TestMakeApp(unittest.TestCase):
     def setUp(self):
         cleanUp()

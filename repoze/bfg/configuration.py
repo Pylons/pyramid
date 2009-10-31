@@ -127,12 +127,12 @@ def make_registry(root_factory, package=None, filename='configure.zcml',
 class DefaultRootFactory:
     __parent__ = None
     __name__ = None
-    def __init__(self, environ):
-        if 'bfg.routes.matchdict' in environ:
-            # provide backwards compatibility for applications which
-            # used routes (at least apps without any custom "context
-            # factory") in BFG 0.9.X and before
-            self.__dict__.update(environ['bfg.routes.matchdict'])
+    def __init__(self, request):
+        matchdict = getattr(request, 'matchdict', {})
+        # provide backwards compatibility for applications which
+        # used routes (at least apps without any custom "context
+        # factory") in BFG 0.9.X and before
+        self.__dict__.update(matchdict)
 
 def zcml_configure(name, package):
     """ Given a ZCML filename as ``name`` and a Python package as
