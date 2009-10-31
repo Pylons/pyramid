@@ -60,12 +60,14 @@ class Router(object):
         manager.push(threadlocals)
 
         try:
+            # setup
             request = Request(environ)
             threadlocals['request'] = request
             attrs = request.__dict__
             attrs['registry'] = registry
             registry.has_listeners and registry.notify(NewRequest(request))
 
+            # view lookup
             root = self.root_factory(request)
             attrs['root'] = root
             traverser = registry.queryAdapter(root, ITraverser)
@@ -81,6 +83,7 @@ class Router(object):
             view_callable = registry.adapters.lookup(
                 provides, IView, name=view_name, default=None)
 
+            # view execution
             if view_callable is None:
                 if self.debug_notfound:
                     msg = (
@@ -107,6 +110,7 @@ class Router(object):
                     environ['repoze.bfg.message'] = msg
                     response = self.notfound_view(context, request)
 
+            # response handling
             registry.has_listeners and registry.notify(NewResponse(response))
 
             try:
