@@ -83,6 +83,15 @@ Internal
   request factory (the previous return value of the now-missing 
   ``repoze.bfg.request.create_route_request_factory``.
 
+Backwards Incompatibilities
+---------------------------
+
+- Explicitly revert the feature introduced in 1.1a8: where the name
+  ``root`` is available as an attribute of the request before a
+  NewRequest event is emitted.  This makes some potential future
+  features impossible, or at least awkward (such as grouping traversal
+  and view lookup into a single adapter lookup).
+
 1.1a8 (2009-10-27)
 ==================
 

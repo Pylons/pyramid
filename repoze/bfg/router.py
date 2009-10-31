@@ -64,10 +64,10 @@ class Router(object):
             threadlocals['request'] = request
             attrs = request.__dict__
             attrs['registry'] = registry
+            registry.has_listeners and registry.notify(NewRequest(request))
+
             root = self.root_factory(request)
             attrs['root'] = root
-
-            registry.has_listeners and registry.notify(NewRequest(request))
             traverser = registry.queryAdapter(root, ITraverser)
             if traverser is None:
                 traverser = ModelGraphTraverser(root)
@@ -77,7 +77,6 @@ class Router(object):
                 tdict['traversed'], tdict['virtual_root'],
                 tdict['virtual_root_path'])
             attrs.update(tdict)
-
             provides = map(providedBy, (context, request))
             view_callable = registry.adapters.lookup(
                 provides, IView, name=view_name, default=None)
