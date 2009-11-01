@@ -187,6 +187,29 @@ view_permission
 
   This atribute can also be spelled as ``permission``.
 
+view_renderer
+
+  This is either a single string term (e.g. ``json``) or a string
+  implying a path or :term:`resource specification`
+  (e.g. ``templates/views.pt``).  If the renderer value is a single
+  term (does not contain a dot ``.``), the specified term will be used
+  to look up a renderer implementation, and that renderer
+  inplementation will be used to construct a response from the view
+  return value.  If the renderer term contains a dot (``.``), the
+  specified term will be treated as a path, and the filename extension
+  of the last element in the path will be used to look up the renderer
+  implementation, which will be passed the full path.  The renderer
+  implementation will be used to construct a response from the view
+  return value.  See :ref:`views_which_use_a_renderer` for more
+  information.
+
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
+
+  This atribute can also be spelled as ``renderer``.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 view_request_type
 
   A dotted Python name to an interface representing a :term:`request
@@ -212,35 +235,6 @@ view_containment
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-view_request_method
-
-  A string representing an HTTP method name, e.g. ``GET``, ``POST``,
-  ``HEAD``, ``DELETE``, ``PUT``.  If this argument is not specified
-  any request method will be considered a match for the view
-  associated with this route.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-view_request_param
-
-  This value can be any string.  A view declaration with this
-  attribute ensures that the associated view will only be called when
-  the request has a key in the ``request.params`` dictionary (an HTTP
-  ``GET`` or ``POST`` variable) that has a name which matches the
-  supplied value.  If the value supplied to the attribute has a ``=``
-  sign in it, e.g. ``request_params="foo=123"``, then the key
-  (``foo``) must both exist in the ``request.params`` dictionary, and
-  the value must match the right hand side of the expression (``123``)
-  for the view to "match" the current request.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 view_attr
 
   The view machinery defaults to using the ``__call__`` method of the
@@ -255,73 +249,6 @@ view_attr
 
   If the ``view`` attribute is not provided, this attribute has no
   effect.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-view_renderer
-
-  This is either a single string term (e.g. ``json``) or a string
-  implying a path or :term:`resource specification`
-  (e.g. ``templates/views.pt``).  If the renderer value is a single
-  term (does not contain a dot ``.``), the specified term will be used
-  to look up a renderer implementation, and that renderer
-  inplementation will be used to construct a response from the view
-  return value.  If the renderer term contains a dot (``.``), the
-  specified term will be treated as a path, and the filename extension
-  of the last element in the path will be used to look up the renderer
-  implementation, which will be passed the full path.  The renderer
-  implementation will be used to construct a response from the view
-  return value.  See :ref:`views_which_use_a_renderer` for more
-  information.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-view_xhr
-
-  Thie value should be either ``True`` or ``False``.  If this value is
-  specified and is ``True``, the :term:`request` must possess an
-  ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header for this
-  view to be found and called.  This is useful for detecting AJAX
-  requests issued from jQuery, Prototype and other Javascript
-  libraries.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-view_accept
-
-  The value of this attribute represents a match query for one or more
-  mimetypes in the ``Accept`` HTTP request header.  If this value is
-  specified, it must be in one of the following forms: a mimetype
-  match token in the form ``text/plain``, a wildcard mimetype match
-  token in the form ``text/*`` or a match-all wildcard mimetype match
-  token in the form ``*/*``.  If any of the forms matches the
-  ``Accept`` header of the request, this predicate will be true.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-view_header
-
-  The value of this attribute represents an HTTP header name or a
-  header name/value pair.  If the value contains a ``:`` (colon), it
-  will be considered a name/value pair (e.g. ``User-Agent:Mozilla/.*``
-  or ``Host:localhost``).  The *value* of an attribute that represent
-  a name/value pair should be a regular expression.  If the value does
-  not contain a colon, the entire value will be considered to be the
-  header name (e.g. ``If-Modified-Since``).  If the value evaluates to
-  a header name only without a value, the header specified by the name
-  must be present in the request for this predicate to be true.  If
-  the value evaluates to a header name/value pair, the header
-  specified by the name must be present in the request *and* the
-  regular expression specified as the value must match the header
-  value.  Whether or not the value represents a header name or a
-  header name/value pair, the case of the header name is not
-  significant.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
