@@ -35,6 +35,8 @@ Documentation
 - In ``<route>`` declarations in tutorial ZCML, rename ``renderer``
   attribute to ``view_renderer`` (fwd compat).
 
+- Fix various tutorials broken by 1.1a9 ``<route>`` directive changes.
+
 Internal
 --------
 

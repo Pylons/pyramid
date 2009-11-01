@@ -55,7 +55,7 @@
 
   <forbidden
      view=".login.login"
-     view_renderer="templates/login.pt"/>
+     renderer="templates/login.pt"/>
 
   <authtktauthenticationpolicy
     secret="sosecret"

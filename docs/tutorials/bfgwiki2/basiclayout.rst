@@ -41,10 +41,10 @@ following:
    template) that is given a ``request`` object and which returns a
    response or a dictionary.  You will use mostly ``<route>``
    statements in a :term:`URL dispatch` based application to map URLs
-   to code.  This ``route`` also names a ``renderer``, which is a
+   to code.  This ``route`` also names a ``view_renderer``, which is a
    template which lives in the ``templates`` subdirectory of the
-   package.  When the ``.views.my_view`` view returns a dictionary,
-   a "renderer" will use this template to create a response.
+   package.  When the ``.views.my_view`` view returns a dictionary, a
+   "renderer" will use this template to create a response.
 
 #. *Lines 15-18*.  Register a ``<static>`` directive that will match
    any URL hat starts with ``/static/``.  This will serve up static

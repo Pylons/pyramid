@@ -85,11 +85,12 @@ authorized.  We'll also change ``configure.zcml`` to add a
 ``forbidden`` stanza which points at our login view.  This configures
 our newly created login view to show up when :mod:`repoze.bfg` detects
 that a view invocation can not be authorized.  Also, we'll add
-``permission`` attributes with the value ``edit`` to the ``edit_page``
-and ``add_page`` routes.  This indicates that the views which these
-routes reference cannot be invoked without the authenticated user
-possessing the ``edit`` permission with respect to the current
-context.  When you're done, your ``configure.zcml`` will look like so
+``view_permission`` attributes with the value ``edit`` to the
+``edit_page`` and ``add_page`` routes.  This indicates that the views
+which these routes reference cannot be invoked without the
+authenticated user possessing the ``edit`` permission with respect to
+the current context.  When you're done, your ``configure.zcml`` will
+look like so
 
 .. literalinclude:: src/authorization/tutorial/configure.zcml
    :linenos:
