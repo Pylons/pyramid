@@ -107,6 +107,9 @@ Backwards Incompatibilities
   features impossible, or at least awkward (such as grouping traversal
   and view lookup into a single adapter lookup).
 
+- The ``containment``, ``attr`` and ``renderer`` attributes of the
+  ``route`` ZCML directive were removed.
+
 1.1a8 (2009-10-27)
 ==================
 
