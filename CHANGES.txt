@@ -16,8 +16,7 @@ Bug Fixes
   declarations: rename ``renderer`` attribute to ``view_renderer``.
 
 - Header values returned by the ``authtktauthenticationpolicy``
-  ``remember`` and ``forget`` methods would be of type ``unicode`` if
-  the ``cookie_name`` attribute was used in the ZCML declaration.
+  ``remember`` and ``forget`` methods would be of type ``unicode``.
   This violated the WSGI spec, causing a ``TypeError`` to be raised
   when these headers were used under ``mod_wsgi``.
 
