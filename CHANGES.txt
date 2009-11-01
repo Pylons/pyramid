@@ -20,8 +20,8 @@ Bug Fixes
   This violated the WSGI spec, causing a ``TypeError`` to be raised
   when these headers were used under ``mod_wsgi``.
 
-- If a routes-only BFG app was mounted under a path in modwsgi, ala
-  ``WSGIScriptAlias /myapp
+- If a BFG app that had a route matching the root URL was mounted
+  under a path in modwsgi, ala ``WSGIScriptAlias /myapp
   /Users/chrism/projects/modwsgi/env/bfg.wsgi``, the home route (a
   route with the path of ``'/'`` or ``''``) would not match when the
   path ``/myapp`` was visited (only when the path ``/myapp/`` was
