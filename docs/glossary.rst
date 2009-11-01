@@ -62,13 +62,17 @@ Glossary
     "view" directive's "view" attribute): the colon (``:``) is not
     used; in its place is a dot.
   View
-    A "view" is a callable which returns a response object.  It should
-    accept two values: :term:`context` and :term:`request`.  An
-    alternate calling convention allows a view to be defined as a a
-    callable which only accepts a single ``request`` argument.  A view
-    is the primary mechanism by which a developer writes user
-    interface code within :mod:`repoze.bfg`.  See :ref:`views_chapter`
-    for more information about :mod:`repoze.bfg` views.
+    Common vernacular for a :term:`view callable`.
+  View Callable
+    A "view callable" is a callable Python object which returns a
+    response object which is associated with a :term:`view
+    configuration`.  It should accept two values: :term:`context` and
+    :term:`request`.  An alternate calling convention allows a view to
+    be defined as a a callable which only accepts a single ``request``
+    argument.  A view callable is the primary mechanism by which a
+    developer writes user interface code within :mod:`repoze.bfg`.
+    See :ref:`views_chapter` for more information about
+    :mod:`repoze.bfg` view callables.
   View Configuration
     View configuration is the act of associating a view callable with
     configuration information.  This configuration information helps
