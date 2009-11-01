@@ -68,6 +68,9 @@ class RoutesRootFactory(object):
             path = environ['PATH_INFO']
         except KeyError:
             path = '/'
+        if not path: # empty if mounted under a path in mod_wsgi, for example
+            path = '/'
+
         for route in self.routelist:
             match = route.match(path)
             if match is not None:

@@ -194,6 +194,21 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(request.matchdict, {})
         self.failUnless(req_iface.providedBy(request))
 
+    def test_root_route_when_path_info_empty(self):
+        root_factory = DummyRootFactory(123)
+        req_iface = self._registerRouteRequest('root')
+        mapper = self._makeOne(root_factory)
+        mapper.connect('/', 'root')
+        request = self._getRequest(PATH_INFO='')
+        result = mapper(request)
+        environ = request.environ
+        self.assertEqual(result, 123)
+        self.assertEqual(environ['bfg.routes.route'].name, 'root')
+        self.assertEqual(environ['bfg.routes.matchdict'], {})
+        self.assertEqual(environ['wsgiorg.routing_args'], ((), {}))
+        self.assertEqual(request.matchdict, {})
+        self.failUnless(req_iface.providedBy(request))
+
     def test_fallback_to_default_root_factory(self):
         root_factory = DummyRootFactory(123)
         mapper = self._makeOne(root_factory)

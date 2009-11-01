@@ -15,6 +15,7 @@ from zope.interface.interfaces import IInterface
 from zope.schema import Bool
 from zope.schema import Int
 from zope.schema import TextLine
+from zope.schema import ASCIILine
 
 import martian
 
@@ -501,8 +502,8 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
 class IAuthTktAuthenticationPolicyDirective(Interface):
     secret = TextLine(title=u'secret', required=True)
     callback = GlobalObject(title=u'callback', required=False)
-    cookie_name = TextLine(title=u'cookie_name', required=False,
-                           default=u'repoze.bfg.auth_tkt')
+    cookie_name = ASCIILine(title=u'cookie_name', required=False,
+                            default='repoze.bfg.auth_tkt')
     secure = Bool(title=u"secure", required=False, default=False)
     include_ip = Bool(title=u"include_ip", required=False, default=False)
     timeout = Int(title=u"timeout", required=False, default=None)
