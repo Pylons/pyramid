@@ -78,9 +78,10 @@ Glossary
     configuration information.  This configuration information helps
     map the view callable to URLs and can influence the response of a
     view callable.  :mod:`repoze.bfg` views can be configured via
-    :term:`ZCML` or by a special ``@bfg_view`` decorator.  See
+    :term:`ZCML` or by a special ``@bfg_view`` decorator (see
+    :ref:`mapping_views_to_urls_using_a_decorator_section`.).  See
     :ref:`views_chapter` for more information about view
-    configuration.
+    configuration. 
   View name
     The "URL name" of a view, e.g ``index.html``.  If a view is
     configured without a name, its name is considered to be the empty
@@ -301,16 +302,14 @@ Glossary
     about route configuration.
   ZCML
     `Zope Configuration Markup Language
-    <http://www.muthukadan.net/docs/zca.html#zcml>`_, the XML dialect
-    used by Zope and :mod:`repoze.bfg` to describe associating a view
-    with a model type.  ZCML is capable of performing many different
-    registrations and declarations, but its primary purpose in
-    :mod:`repoze.bfg` is to perform view mappings via the ``view``
-    declaration.  The ``configure.zcml`` file in a :mod:`repoze.bfg`
-    application represents the application's :term:`application
-    registry`.  You can also use decorators to configure views in
-    :mod:`repoze.bfg`; see
-    :ref:`mapping_views_to_urls_using_a_decorator_section`.
+    <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
+    used by Zope and :mod:`repoze.bfg` for configuration tasks.  ZCML
+    is capable of performing many different registrations and
+    declarations, but its primary purpose in :mod:`repoze.bfg` is to
+    perform :term:`view configuration` and :term:`route configuration`
+    within the ``configure.zcml`` file in a :mod:`repoze.bfg`
+    application.  ZCML in a :mod:`repoze.bfg` application represents
+    the application's :term:`application registry`.
   Zope Component Architecture
     The `Zope Component Architecture
     <http://www.muthukadan.net/docs/zca.html>`_ (aka ZCA) is a system
@@ -459,7 +458,6 @@ Glossary
     route does not match the current request, the next route (in
     definition order) is attempted.
   Predicate
-
     A test which returns true or false.  Two different types of
     predicates exist in :mod:`repoze.bfg`: a :term:`view predicate`
     and a :term:`route predicate`.  View predicates are attached to
