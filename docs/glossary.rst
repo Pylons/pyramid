@@ -293,6 +293,12 @@ Glossary
     A single pattern matched by the :term:`url dispatch` subsystem,
     which generally resolves to a :term:`root factory` (and then
     ultimately a :term:`view`).  See also :term:`url dispatch`.
+  Route Configuration
+    Route configuration is the act of using a :term:`ZCML` ``<route>``
+    statement to associate request parameters with a particular
+    :term:`route` using pattern matching and :term:`route predicate`
+    statements.  See :ref:`urldispatch_chapter` for more information
+    about route configuration.
   ZCML
     `Zope Configuration Markup Language
     <http://www.muthukadan.net/docs/zca.html#zcml>`_, the XML dialect
@@ -438,11 +444,25 @@ Glossary
     module developed by Graham Dumpleton.  It allows :term:`WSGI`
     applications (such as applications developed using
     :mod:`repoze.bfg`) to be served using the Apache web server.
-  Predicate
+  View Predicate
     An attribute of a ZCML ``view`` directive or an argument to a
     ``bfg_view`` decorator which implies a value which evaluates to
     true or false for a given :term:`request`.  All predicates
     attached to a view configuration must evaluate to true for the
     associated view to be considered as a possible callable for a
     given request.
+  Route Predicate
+    An attribute of a ZCML ``route`` directive which implies a value
+    that evaluates to true or fale for a given :term:`request`.  All
+    predicates attached to a route configuration must evaluate to true
+    for the associated route to "match" the current request.  If a
+    route does not match the current request, the next route (in
+    definition order) is attempted.
+  Predicate
+
+    A test which returns true or false.  Two different types of
+    predicates exist in :mod:`repoze.bfg`: a :term:`view predicate`
+    and a :term:`route predicate`.  View predicates are attached to
+    :term:`view configuration` and route predicates are attached to
+    :term:`route configuration`.
 
