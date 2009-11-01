@@ -1613,14 +1613,6 @@ class TestDeriveView(unittest.TestCase):
             inner_view, viewname='inner', wrapper_viewname='owrap')
         result = self.assertRaises(ValueError, wrapped, None, request)
 
-class TestAll(unittest.TestCase):
-    def test_it(self):
-        from repoze.bfg.view import all
-        self.assertEqual(all([True, True]), True)
-        self.assertEqual(all([False, False]), False)
-        self.assertEqual(all([False, True]), False)
-
-
 class DummyContext:
     pass
 

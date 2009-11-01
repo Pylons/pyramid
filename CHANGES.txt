@@ -83,6 +83,9 @@ Internal
   request factory (the previous return value of the now-missing 
   ``repoze.bfg.request.create_route_request_factory``.
 
+- The ``repoze.bfg.functional`` module was renamed to
+  ``repoze.bfg.compat``.
+
 Backwards Incompatibilities
 ---------------------------
 

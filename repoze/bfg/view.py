@@ -35,6 +35,7 @@ from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IView
 
+from repoze.bfg.compat import all
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.path import caller_package
@@ -45,15 +46,6 @@ from repoze.bfg.static import PackageURLParser
 
 # b/c imports
 from repoze.bfg.security import view_execution_permitted
-
-try:
-    all = all
-except NameError: # pragma: no cover
-    def all(iterable):
-        for element in iterable:
-            if not element:
-                return False
-        return True
 
 deprecated('view_execution_permitted',
     "('from repoze.bfg.view import view_execution_permitted' was  "
