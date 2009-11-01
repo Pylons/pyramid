@@ -633,6 +633,6 @@ def _join_path_tuple(tuple):
 
 class FakeRequest(dict):
     def __init__(self, environ):
+        self.environ = environ
         self.update(environ)
-        self.environ = self # XXX circref?
         

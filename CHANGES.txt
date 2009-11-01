@@ -1,3 +1,11 @@
+Next release
+============
+
+Internal
+--------
+
+- Deal with a potential circref in the traversal module.
+
 1.1a9 (2009-10-31)
 ==================
 
