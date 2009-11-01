@@ -85,6 +85,84 @@ view
   view callable when this route matches.
   e.g. ``mypackage.views.my_view``.
 
+xhr
+
+  Thie value should be either ``True`` or ``False``.  If this value is
+  specified and is ``True``, the :term:`request` must possess an
+  ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header for this
+  route to match.  This is useful for detecting AJAX requests issued
+  from jQuery, Prototype and other Javascript libraries.  If this
+  predicate returns false, route matching continues.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+request_method
+
+  A string representing an HTTP method name, e.g. ``GET``, ``POST``,
+  ``HEAD``, ``DELETE``, ``PUT``.  If this argument is not specified,
+  this route will match if the request has *any* request method.  If
+  this predicate returns false, route matching continues.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+path_info
+
+  The value of this attribute represents a regular expression pattern
+  that will be tested against the ``PATH_INFO`` WSGI environment
+  variable.  If the regex matches, this predicate will be true.  If
+  this predicate returns false, route matching continues.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+request_param
+
+  This value can be any string.  A view declaration with this
+  attribute ensures that the associated route will only match when the
+  request has a key in the ``request.params`` dictionary (an HTTP
+  ``GET`` or ``POST`` variable) that has a name which matches the
+  supplied value.  If the value supplied to the attribute has a ``=``
+  sign in it, e.g. ``request_params="foo=123"``, then the key
+  (``foo``) must both exist in the ``request.params`` dictionary, and
+  the value must match the right hand side of the expression (``123``)
+  for the route to "match" the current request.  If this predicate
+  returns false, route matching continues.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+header
+
+  The value of this attribute represents an HTTP header name or a
+  header name/value pair.  If the value contains a ``:`` (colon), it
+  will be considered a name/value pair (e.g. ``User-Agent:Mozilla/.*``
+  or ``Host:localhost``).  The *value* of an attribute that represent
+  a name/value pair should be a regular expression.  If the value does
+  not contain a colon, the entire value will be considered to be the
+  header name (e.g. ``If-Modified-Since``).  If the value evaluates to
+  a header name only without a value, the header specified by the name
+  must be present in the request for this predicate to be true.  If
+  the value evaluates to a header name/value pair, the header
+  specified by the name must be present in the request *and* the
+  regular expression specified as the value must match the header
+  value.  Whether or not the value represents a header name or a
+  header name/value pair, the case of the header name is not
+  significant.  If this predicate returns false, route matching
+  continues.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+accept
+
+  The value of this attribute represents a match query for one or more
+  mimetypes in the ``Accept`` HTTP request header.  If this value is
+  specified, it must be in one of the following forms: a mimetype
+  match token in the form ``text/plain``, a wildcard mimetype match
+  token in the form ``text/*`` or a match-all wildcard mimetype match
+  token in the form ``*/*``.  If any of the forms matches the
+  ``Accept`` header of the request, this predicate will be true.  If
+  this predicate returns false, route matching continues.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
 view_for
 
   The Python dotted-path name to a class or an interface that the
@@ -112,17 +190,27 @@ view_permission
 view_request_type
 
   A dotted Python name to an interface representing a :term:`request
-  type`.  For backwards compatibility with :mod:`repoze.bfg` 1.0 and
-  before, this may also be a string naming an HTTP ``REQUEST_METHOD``
-  (any of ``GET``, ``POST``, ``HEAD``, ``DELETE``, ``PUT``).  However,
-  these values should really be specified in ``request_method``.  If
-  this argument is not specified, any request type will be considered
-  a match for the view associated with this route.
+  type`.  If this argument is not specified, any request type will be
+  considered a match for the view associated with this route.
 
   If the ``view`` attribute is not provided, this attribute has no
   effect.
 
   This attribute can also be spelled as ``request_type``.
+
+view_containment
+
+  This value should be a Python dotted-path string representing the
+  class that a graph traversal parent object of the :term:`context`
+  must be an instance of (or :term:`interface` that a parent object
+  must provide) in order for this view to be found and called.  Your
+  models must be "location-aware" to use this feature.  See
+  :ref:`location_aware` for more information about location-awareness.
+
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 view_request_method
 
@@ -133,8 +221,6 @@ view_request_method
 
   If the ``view`` attribute is not provided, this attribute has no
   effect.
-
-  This attribute can also be spelled as ``request_method``.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
@@ -153,24 +239,6 @@ view_request_param
   If the ``view`` attribute is not provided, this attribute has no
   effect.
 
-  This attribute can also be spelled as ``request_param``.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-view_containment
-
-  This value should be a Python dotted-path string representing the
-  class that a graph traversal parent object of the :term:`context`
-  must be an instance of (or :term:`interface` that a parent object
-  must provide) in order for this view to be found and called.  Your
-  models must be "location-aware" to use this feature.  See
-  :ref:`location_aware` for more information about location-awareness.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  This attribute can also be spelled as ``containment``.
-
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 view_attr
@@ -187,8 +255,6 @@ view_attr
 
   If the ``view`` attribute is not provided, this attribute has no
   effect.
-
-  This attribute can also be spelled as ``attr``.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
@@ -211,8 +277,6 @@ view_renderer
   If the ``view`` attribute is not provided, this attribute has no
   effect.
 
-  This attribute can also be spelled as ``renderer``.
-
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 view_xhr
@@ -224,7 +288,8 @@ view_xhr
   requests issued from jQuery, Prototype and other Javascript
   libraries.
 
-  This attribute can also be spelled as ``xhr``.
+  If the ``view`` attribute is not provided, this attribute has no
+  effect.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
@@ -237,8 +302,6 @@ view_accept
   token in the form ``text/*`` or a match-all wildcard mimetype match
   token in the form ``*/*``.  If any of the forms matches the
   ``Accept`` header of the request, this predicate will be true.
-
-  This attribute can also be spelled as ``accept``.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
@@ -260,10 +323,7 @@ view_header
   header name/value pair, the case of the header name is not
   significant.
 
-  This attribute can also be spelled as ``header``.
-
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 
 The Matchdict
 -------------

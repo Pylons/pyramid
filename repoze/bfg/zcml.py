@@ -197,7 +197,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         except re.error, why:
             raise ConfigurationError(why[0])
         def path_info_predicate(context, request):
-            return path_info_val.match(request.path_info)
+            return path_info_val.match(request.path_info) is not None
         weight = weight - 30
         predicates.append(path_info_predicate)
 
@@ -553,9 +553,19 @@ class IRouteDirective(Interface):
     path = TextLine(title=u'path', required=True)
     factory = GlobalObject(title=u'context factory', required=False)
     view = GlobalObject(title=u'view', required=False)
+
     view_for = GlobalObject(title=u'view_for', required=False)
+    # alias for view_for
+    for_ = GlobalObject(title=u'for', required=False)
+
     view_permission = TextLine(title=u'view_permission', required=False)
+    # alias for view_permission
+    permission = TextLine(title=u'permission', required=False)
+
     view_request_type = TextLine(title=u'view_request_type', required=False)
+    # alias for view_request_type
+    request_type = TextLine(title=u'request_type', required=False)
+
     view_request_method = TextLine(title=u'view_request_method', required=False)
     view_containment = GlobalObject(
         title = u'Dotted name of a containment class or interface',
@@ -566,31 +576,12 @@ class IRouteDirective(Interface):
     view_accept = TextLine(title=u'view_accept', required=False)
     view_xhr = Bool(title=u'view_xhr', required=False)
     view_path_info = TextLine(title=u'view_path_info', required=False)
-    # alias for "view_for"
-    for_ = GlobalObject(title=u'for', required=False)
-    # alias for "view_permission"
-    permission = TextLine(title=u'permission', required=False)
-    # alias for "view_request_type"
-    request_type = TextLine(title=u'request_type', required=False)
-    # alias for "view_request_method"
+
     request_method = TextLine(title=u'request_method', required=False)
-    # alias for "view_request_param"
     request_param = TextLine(title=u'request_param', required=False)
-    # alias for "view_containment"
-    containment = GlobalObject(
-        title = u'Dotted name of a containment class or interface',
-        required=False)
-    # alias for "view_attr"
-    attr = TextLine(title=u'attr', required=False)
-    # alias for "view_renderer"
-    renderer = TextLine(title=u'renderer', required=False)
-    # alias for "view_header"
     header = TextLine(title=u'header', required=False)
-    # alias for "view_accept"
     accept = TextLine(title=u'accept', required=False)
-    # alias for "view_xhr"
     xhr = Bool(title=u'xhr', required=False)
-    # alias for "view_path_info"
     path_info = TextLine(title=u'path_info', required=False)
 
 class IRouteRequirementDirective(Interface):
@@ -601,59 +592,72 @@ class IRouteRequirementDirective(Interface):
 
 def route(_context, name, path, view=None, view_for=None,
           permission=None, factory=None, request_type=None, for_=None,
+          header=None, xhr=False, accept=None, path_info=None,
           view_permission=None, view_request_type=None, 
           request_method=None, view_request_method=None,
-          request_param=None, view_request_param=None, containment=None,
-          view_containment=None, attr=None, view_attr=None, renderer=None,
-          view_renderer=None, header=None, view_header=None, accept=None,
-          view_accept=None, xhr=False, view_xhr=False,
-          path_info=None, view_path_info=None):
+          request_param=None, view_request_param=None,
+          view_containment=None, view_attr=None,
+          view_renderer=None, view_header=None, 
+          view_accept=None, view_xhr=False,
+          view_path_info=None):
     """ Handle ``route`` ZCML directives
     """
     # the strange ordering of the request kw args above is for b/w
     # compatibility purposes.
-    for_ = view_for or for_
-    request_type = view_request_type or request_type
-    permission = view_permission or permission
-    request_method = view_request_method or request_method
-    request_param = view_request_param or request_param
-    containment = view_containment or containment
-    attr = view_attr or attr
-    renderer = view_renderer or renderer
-    header = view_header or header
-    accept = view_accept or accept
-    xhr = view_xhr or xhr
-    path_info = view_path_info or path_info
+    # these are route predicates; if they do not match, the next route
+    # in the routelist will be tried
+    _, predicates = _make_predicates(xhr=xhr,
+                                     request_method=request_method,
+                                     path_info=path_info,
+                                     request_param=request_param,
+                                     header=header,
+                                     accept=accept)
 
     sm = getSiteManager()
 
     if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
         # b/w compat for 1.0
-        request_method = request_type
+        view_request_method = request_type
         request_type = None
 
-    if request_type is None:
-        request_type = queryUtility(IRouteRequest, name=name)
-        if request_type is None:
-            request_type = route_request_iface(name)
-            sm.registerUtility(request_type, IRouteRequest, name=name)
+    request_iface = queryUtility(IRouteRequest, name=name)
+    if request_iface is None:
+        request_iface = route_request_iface(name)
+        sm.registerUtility(request_iface, IRouteRequest, name=name)
 
     if view:
-        _view(_context, permission=permission, for_=for_, view=view, name='',
-              request_type=request_type, route_name=name, 
-              request_method=request_method, request_param=request_param,
-              containment=containment, attr=attr, renderer=renderer,
-              header=header, accept=accept, xhr=xhr, path_info=path_info)
+        view_for = view_for or for_
+        view_request_type = view_request_type or request_type
+        view_permission = view_permission or permission
+        _view(
+            _context,
+            permission=view_permission,
+            for_=view_for,
+            view=view,
+            name='',
+            request_type=view_request_type,
+            route_name=name, 
+            request_method=view_request_method,
+            request_param=view_request_param,
+            containment=view_containment,
+            attr=view_attr,
+            renderer=view_renderer,
+            header=view_header,
+            accept=view_accept,
+            xhr=view_xhr,
+            path_info=view_path_info,
+            )
 
     _context.action(
-        discriminator = ('route', name),
+        discriminator = ('route', name, xhr, request_method, path_info,
+                         request_param, header, accept),
         callable = connect_route,
-        args = (path, name, factory),
+        args = (path, name, factory, predicates),
         )
 
-def connect_route(path, name, factory):
+def connect_route(path, name, factory, predicates):
     mapper = getUtility(IRoutesMapper)
-    mapper.connect(path, name, factory)
+    mapper.connect(path, name, factory, predicates=predicates)
 
 class IRendererDirective(Interface):
     factory = GlobalObject(

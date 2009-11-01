@@ -30,6 +30,18 @@ Features
   dictionary-like methods in such a way that existing traverser code
   which expects to be passed an environ will continue to work.
 
+- The ZCML ``route`` directive's attributes ``xhr``,
+  ``request_method``, ``path_info``, ``request_param``, ``header`` and
+  ``accept`` are now *route* predicates rather than *view* predicates.
+  If one or more of these predicates is specified in the route
+  configuration, all of the predicates must return true for the route
+  to match a request.  If one or more of the route predicates
+  associated with a route returns ``False`` when checked during a
+  request, the route match fails, and the next match in the routelist
+  is tried.  This differs from the previous behavior, where no route
+  predicates existed and all predicates were considered view
+  predicates, because in that scenario, the next route was not tried.
+
 Documentation
 -------------
 

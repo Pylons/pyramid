@@ -5,18 +5,20 @@ from zope.interface import directlyProvides
 
 from repoze.bfg.interfaces import IRouteRequest
 
+from repoze.bfg.compat import all
+from repoze.bfg.encode import url_quote
 from repoze.bfg.traversal import traversal_path
 from repoze.bfg.traversal import quote_path_segment
-from repoze.bfg.encode import url_quote
 
 _marker = object()
 
 class Route(object):
-    def __init__(self, path, name=None, factory=None):
+    def __init__(self, path, name=None, factory=None, predicates=()):
         self.path = path
         self.match, self.generate = _compile_route(path)
         self.name = name
         self.factory = factory
+        self.predicates = predicates
 
 class RoutesRootFactory(object):
     def __init__(self, default_root_factory):
@@ -30,8 +32,8 @@ class RoutesRootFactory(object):
     def get_routes(self):
         return self.routelist
 
-    def connect(self, path, name, factory=None):
-        route = Route(path, name, factory)
+    def connect(self, path, name, factory=None, predicates=()):
+        route = Route(path, name, factory, predicates)
         self.routelist.append(route)
         self.routes[name] = route
         return route
@@ -69,6 +71,9 @@ class RoutesRootFactory(object):
         for route in self.routelist:
             match = route.match(path)
             if match is not None:
+                preds = route.predicates
+                if preds and not all((p(None, request) for p in preds)):
+                    continue
                 environ['wsgiorg.routing_args'] = ((), match)
                 environ['bfg.routes.route'] = route
                 environ['bfg.routes.matchdict'] = match
