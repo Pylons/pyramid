@@ -566,12 +566,15 @@ class IRouteDirective(Interface):
     # alias for view_request_type
     request_type = TextLine(title=u'request_type', required=False)
 
+    view_renderer = TextLine(title=u'view_renderer', required=False)
+    # alias for view_renderer
+    renderer = TextLine(title=u'renderer', required=False)
+
     view_request_method = TextLine(title=u'view_request_method', required=False)
     view_containment = GlobalObject(
         title = u'Dotted name of a containment class or interface',
         required=False)
     view_attr = TextLine(title=u'view_attr', required=False)
-    view_renderer = TextLine(title=u'view_renderer', required=False)
     view_header = TextLine(title=u'view_header', required=False)
     view_accept = TextLine(title=u'view_accept', required=False)
     view_xhr = Bool(title=u'view_xhr', required=False)
@@ -597,7 +600,7 @@ def route(_context, name, path, view=None, view_for=None,
           view_permission=None, view_request_type=None, 
           view_request_method=None, view_request_param=None,
           view_containment=None, view_attr=None,
-          view_renderer=None, view_header=None, 
+          renderer=None, view_renderer=None, view_header=None, 
           view_accept=None, view_xhr=False,
           view_path_info=None):
     """ Handle ``route`` ZCML directives
@@ -629,6 +632,7 @@ def route(_context, name, path, view=None, view_for=None,
         view_for = view_for or for_
         view_request_type = view_request_type or request_type
         view_permission = view_permission or permission
+        view_renderer = view_renderer or renderer
         _view(
             _context,
             permission=view_permission,

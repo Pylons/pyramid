@@ -10,7 +10,7 @@
     path=""
     name="home"
     view=".views.my_view"
-    renderer="templates/mytemplate.pt"
+    view_renderer="templates/mytemplate.pt"
     />
 
   <static

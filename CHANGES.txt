@@ -9,6 +9,18 @@ Bug Fixes
   of this bug: applications generated using the ``bfg_zodb`` paster
   template in 1.1a9 did not work properly.
 
+- Reinstate ``renderer`` alias for ``view_renderer`` in the
+  ``<route>`` ZCML directive (in-the-wild 1.1a bw compat).
+
+- ``bfg_routesalchemy`` paster template: change ``<route>``
+  declarations: rename ``renderer`` attribute to ``view_renderer``.
+
+Documentation
+-------------
+
+- In ``<route>`` declarations in tutorial ZCML, rename ``renderer``
+  attribute to ``view_renderer`` (fwd compat).
+
 Internal
 --------
 
