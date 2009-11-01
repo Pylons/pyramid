@@ -1,3 +1,14 @@
+Next release
+============
+
+Documentation
+-------------
+
+- Fix "Hybrid" narrative chapter: stop claiming that ``<view>``
+  statements that mention a route_name need to come afer (in XML
+  order) the ``<route>`` statement which creates the route.  This
+  hasn't been true since 1.1a1.
+
 1.1b1 (2009-11-01)
 ==================
 
@@ -713,6 +724,9 @@ Backwards Incompatibilities
 1.1a2 (2009-09-14)
 ==================
 
+Features
+--------
+
 - A ZCML ``view`` directive (and the associated ``bfg_view``
   decorator) can now accept an "attr" value.  If an "attr" value is
   supplied, it is considered a method named of the view object to be
@@ -731,15 +745,175 @@ Backwards Incompatibilities
 1.1a1 (2009-09-06)
 ==================
 
+Bug Fixes
+---------
+
+- "tests" module removed from the bfg_alchemy paster template; these
+  tests didn't work.
+
+- Bugfix: the ``discriminator`` for the ZCML "route" directive was
+  incorrect.  It was possible to register two routes that collided
+  without the system spitting out a ConfigurationConflictError at
+  startup time.
+
+Features
+--------
+
+- Feature addition: view predicates.  These are exposed as the
+  ``request_method``, ``request_param``, and ``containment``
+  attributes of a ZCML ``view`` declaration, or the respective
+  arguments to a ``@bfg_view`` decorator.  View predicates can be used
+  to register a view for a more precise set of environment parameters
+  than was previously possible.  For example, you can register two
+  views with the same ``name`` with different ``request_param``
+  attributes.  If the ``request.params`` dict contains 'foo'
+  (request_param="foo"), one view might be called; if it contains
+  'bar' (request_param="bar"), another view might be called.
+  ``request_param`` can also name a key/value pair ala ``foo=123``.
+  This will match only when the ``foo`` key is in the request.params
+  dict and it has the value '123'.  This particular example makes it
+  possible to write separate view functions for different form
+  submissions.  The other predicates, ``containment`` and
+  ``request_method`` work similarly.  ``containment`` is a view
+  predicate that will match only when the context's graph lineage has
+  an object possessing a particular class or interface, for example.
+  ``request_method`` is a view predicate that will match when the HTTP
+  ``REQUEST_METHOD`` equals some string (eg. 'POST').
+
+- The ``@bfg_view`` decorator now accepts three additional arguments:
+  ``request_method``, ``request_param``, and ``containment``.
+  ``request_method`` is used when you'd like the view to match only a
+  request with a particular HTTP ``REQUEST_METHOD``; a string naming
+  the ``REQUEST_METHOD`` can also be supplied as ``request_type`` for
+  backwards compatibility.  ``request_param`` is used when you'd like
+  a view to match only a request that contains a particular
+  ``request.params`` key (with or without a value).  ``containment``
+  is used when you'd like to match a request that has a context that
+  has some class or interface in its graph lineage.  These are
+  collectively known as "view predicates".
+
+- The ``route`` ZCML directive now honors ``view_request_method``,
+  ``view_request_param`` and ``view_containment`` attributes, which
+  pass along these values to the associated view if any is provided.
+  Additionally, the ``request_type`` attribute can now be spelled as
+  ``view_request_type``, and ``permission`` can be spelled as
+  ``view_permission``.  Any attribute which starts with ``view_`` can
+  now be spelled without the ``view_`` prefix, so ``view_for`` can be
+  spelled as ``for`` now, etc.  Both forms are documented in the
+  urldispatch narraitve documentation chapter.
+
+- The ``request_param`` ZCML view directive attribute (and its
+  ``bfg_view`` decorator cousin) can now specify both a key and a
+  value.  For example, ``request_param="foo=123"`` means that the foo
+  key must have a value of ``123`` for the view to "match".
+
+- Allow ``repoze.bfg.traversal.find_interface`` API to use a class
+  object as the argument to compare against the ``model`` passed in.
+  This means you can now do ``find_interface(model, SomeClass)`` and
+  the first object which is found in the lineage which has
+  ``SomeClass`` as its class (or the first object found which has
+  ``SomeClass`` as any of its superclasses) will be returned.
+
+- Added ``static`` ZCML directive which registers a route for a view
+  that serves up files in a directory.  See the "Views" narrative
+  documentation chapter's "Serving Static Resources Using a ZCML
+  Directive" section for more information.
+
+- The ``repoze.bfg.view.static`` class now accepts a string as its
+  first argument ("root_dir") that represents a package-relative name
+  e.g. ``somepackage:foo/bar/static``.  This is now the preferred
+  mechanism for spelling package-relative static paths using this
+  class.  A ``package_name`` keyword argument has been left around for
+  backwards compatibility.  If it is supplied, it will be honored.
+
+- The API ``repoze.bfg.testing.registerView`` now takes a
+  ``permission`` argument.  Use this instead of using
+  ``repoze.bfg.testing.registerViewPermission``.
+
+- The ordering of route declarations vs. the ordering of view
+  declarations that use a "route_name" in ZCML no longer matters.
+  Previously it had been impossible to use a route_name from a route
+  that had not yet been defined in ZCML (order-wise) within a "view"
+  declaration.
+
+- The repoze.bfg router now catches both
+  ``repoze.bfg.security.Unauthorized`` and
+  ``repoze.bfg.view.NotFound`` exceptions while rendering a view.
+  When the router catches an ``Unauthorized``, it returns the
+  registered forbidden view.  When the router catches a ``NotFound``,
+  it returns the registered notfound view.
+
+Internal
+--------
+
+- Change urldispatch internals: Route object is now constructed using
+  a path, a name, and a factory instead of a name, a matcher, a
+  generator, and a factory.
+
+- Move (non-API) default_view, default_forbidden_view, and
+  default_notfound_view functions into the ``repoze.bfg.view`` module
+  (moved from ``repoze.bfg.router``).
+
+- Removed ViewPermissionFactory from ``repoze.bfg.security``.  View
+  permission checking is now done by registering and looking up an
+  ISecuredView.
+
+- The ``static`` ZCML directive now uses a custom root factory when
+  constructing a route.
+
+Documentation
+-------------
+
+- Request-only-convention examples in the "Views" narrative
+  documentation were broken.
+
+- Fixed documentation bugs related to forget and remember in security API
+  docs.
+
+- Fixed documentation for ``repoze.bfg.view.static`` (in narrative
+  ``Views`` chapter).
+
+- The interface ``IRequestFactories`` was removed from the
+  repoze.bfg.interfaces module.  This interface was never an API.
+
+- The interfaces ``IPOSTRequest``, ``IGETRequest``, ``IPUTRequest``,
+  ``IDELETERequest``, and ``IHEADRequest`` have been removed from the
+  ``repoze.bfg.interfaces`` module.  These were not documented as APIs
+  post-1.0.  Instead of using one of these, use a ``request_method``
+  ZCML attribute or ``request_method`` bfg_view decorator parameter
+  containing an HTTP method name (one of ``GET``, ``POST``, ``HEAD``,
+  ``PUT``, ``DELETE``) instead of one of these interfaces if you were
+  using one explicitly.  Passing a string in the set (``GET``,
+  ``HEAD``, ``PUT``, ``POST``, ``DELETE``) as a ``request_type``
+  argument will work too.  Rationale: instead of relying on interfaces
+  attached to the request object, BFG now uses a "view predicate" to
+  determine the request type.
+
+- The function named ``named_request_factories`` and the data
+  structure named ``DEFAULT_REQUEST_FACTORIES`` have been removed from
+  the ``repoze.bfg.request`` module.  These were never APIs.
+
+- The ``IViewPermissionFactory`` interface has been removed.  This was
+  never an API.
+
+Deprecations
+------------
+
+- The API ``repoze.bfg.testing.registerViewPermission`` has been
+  deprecated.
+
+Backwards Incompatibilities
+---------------------------
+
+- Views registered without the help of the ZCML ``view`` directive are
+  now responsible for performing their own authorization checking.
+
 - The ``registry_manager`` backwards compatibility alias importable
   from "repoze.bfg.registry", deprecated since repoze.bfg 0.9 has been
   removed.  If you are tring to use the registry manager within a
   debug script of your own, use a combination of the
   "repoze.bfg.paster.get_app" and "repoze.bfg.scripting.get_root" APIs
   instead.
-
-- The ``IViewPermissionFactory`` interface has been removed.  This was
-  never an API.
 
 - The ``INotFoundAppFactory`` interface has been removed; it has
   been deprecated since repoze.bfg 0.9.  If you have something like
@@ -791,95 +965,6 @@ Backwards Incompatibilities
    repoze.bfg documentation for more information about configuring
    security policies.
 
-- The ``route`` ZCML directive now honors ``view_request_method``,
-  ``view_request_param`` and ``view_containment`` attributes, which
-  pass along these values to the associated view if any is provided.
-  Additionally, the ``request_type`` attribute can now be spelled as
-  ``view_request_type``, and ``permission`` can be spelled as
-  ``view_permission``.  Any attribute which starts with ``view_`` can
-  now be spelled without the ``view_`` prefix, so ``view_for`` can be
-  spelled as ``for`` now, etc.  Both forms are documented in the
-  urldispatch narraitve documentation chapter.
-
-- The ``request_param`` ZCML view directive attribute (and its
-  ``bfg_view`` decorator cousin) can now specify both a key and a
-  value.  For example, ``request_param="foo=123"`` means that the foo
-  key must have a value of ``123`` for the view to "match".
-
-- Bugfix: the ``discriminator`` for the ZCML "route" directive was
-  incorrect.  It was possible to register two routes that collided
-  without the system spitting out a ConfigurationConflictError at
-  startup time.
-
-- The ``static`` ZCML directive now uses a custom root factory when
-  constructing a route.
-
-- The ordering of route declarations vs. the ordering of view
-  declarations that use a "route_name" in ZCML no longer matters.
-  Previously it had been impossible to use a route_name from a route
-  that had not yet been defined in ZCML (order-wise) within a "view"
-  declaration.
-
-- The ``@bfg_view`` decorator now accepts three additional arguments:
-  ``request_method``, ``request_param``, and ``containment``.
-  ``request_method`` is used when you'd like the view to match only a
-  request with a particular HTTP ``REQUEST_METHOD``; a string naming
-  the ``REQUEST_METHOD`` can also be supplied as ``request_type`` for
-  backwards compatibility.  ``request_param`` is used when you'd like
-  a view to match only a request that contains a particular
-  ``request.params`` key (with or without a value).  ``containment``
-  is used when you'd like to match a request that has a context that
-  has some class or interface in its graph lineage.  These are
-  collectively known as "view predicates".
-
-- The interface ``IRequestFactories`` was removed from the
-  repoze.bfg.interfaces module.  This interface was never an API.
-
-- The interfaces ``IPOSTRequest``, ``IGETRequest``, ``IPUTRequest``,
-  ``IDELETERequest``, and ``IHEADRequest`` have been removed from the
-  ``repoze.bfg.interfaces`` module.  These were not documented as APIs
-  post-1.0.  Instead of using one of these, use a ``request_method``
-  ZCML attribute or ``request_method`` bfg_view decorator parameter
-  containing an HTTP method name (one of ``GET``, ``POST``, ``HEAD``,
-  ``PUT``, ``DELETE``) instead of one of these interfaces if you were
-  using one explicitly.  Passing a string in the set (``GET``,
-  ``HEAD``, ``PUT``, ``POST``, ``DELETE``) as a ``request_type``
-  argument will work too.  Rationale: instead of relying on interfaces
-  attached to the request object, BFG now uses a "view predicate" to
-  determine the request type.
-
-- The function named ``named_request_factories`` and the data
-  structure named ``DEFAULT_REQUEST_FACTORIES`` have been removed from
-  the ``repoze.bfg.request`` module.  These were never APIs.
-
-- Feature addition: view predicates.  These are exposed as the
-  ``request_method``, ``request_param``, and ``containment``
-  attributes of a ZCML ``view`` declaration, or the respective
-  arguments to a ``@bfg_view`` decorator.  View predicates can be used
-  to register a view for a more precise set of environment parameters
-  than was previously possible.  For example, you can register two
-  views with the same ``name`` with different ``request_param``
-  attributes.  If the ``request.params`` dict contains 'foo'
-  (request_param="foo"), one view might be called; if it contains
-  'bar' (request_param="bar"), another view might be called.
-  ``request_param`` can also name a key/value pair ala ``foo=123``.
-  This will match only when the ``foo`` key is in the request.params
-  dict and it has the value '123'.  This particular example makes it
-  possible to write separate view functions for different form
-  submissions.  The other predicates, ``containment`` and
-  ``request_method`` work similarly.  ``containment`` is a view
-  predicate that will match only when the context's graph lineage has
-  an object possessing a particular class or interface, for example.
-  ``request_method`` is a view predicate that will match when the HTTP
-  ``REQUEST_METHOD`` equals some string (eg. 'POST').
-
-- The repoze.bfg router now catches both
-  ``repoze.bfg.security.Unauthorized`` and
-  ``repoze.bfg.view.NotFound`` exceptions while rendering a view.
-  When the router catches an ``Unauthorized``, it returns the
-  registered forbidden view.  When the router catches a ``NotFound``,
-  it returns the registered notfound view.
-
 - Custom ZCML directives which register an authentication or
   authorization policy (ala "authtktauthenticationpolicy" or
   "aclauthorizationpolicy") should register the policy "eagerly" in
@@ -887,59 +972,6 @@ Backwards Incompatibilities
   authentication or authorization policy is not found in the component
   registry by the view machinery during deferred ZCML processing, view
   security will not work as expected.
-
-- The API ``repoze.bfg.testing.registerViewPermission`` has been
-  deprecated.
-
-- The API ``repoze.bfg.testing.registerView`` now takes a
-  ``permission`` argument.  Use this instead of using
-  ``repoze.bfg.testing.registerViewPermission``.
-
-- Removed ViewPermissionFactory from ``repoze.bfg.security``.  View
-  permission checking is now done by registering and looking up an
-  ISecuredView.
-
-- Views registered without the help of the ZCML ``view`` directive are
-  now responsible for performing their own authorization checking.
-
-- The ``repoze.bfg.view.static`` class now accepts a string as its
-  first argument ("root_dir") that represents a package-relative name
-  e.g. ``somepackage:foo/bar/static``.  This is now the preferred
-  mechanism for spelling package-relative static paths using this
-  class.  A ``package_name`` keyword argument has been left around for
-  backwards compatibility.  If it is supplied, it will be honored.
-
-- Fixed documentation for ``repoze.bfg.view.static`` (in narrative
-  ``Views`` chapter).
-
-- Added ``static`` ZCML directive which registers a route for a view
-  that serves up files in a directory.  See the "Views" narrative
-  documentation chapter's "Serving Static Resources Using a ZCML
-  Directive" section for more information.
-
-- "tests" module removed from the bfg_alchemy paster template; these
-  tests didn't work.
-
-- Move (non-API) default_view, default_forbidden_view, and
-  default_notfound_view functions into the ``repoze.bfg.view`` module
-  (moved from ``repoze.bfg.router``).
-
-- Request-only-convention examples in the "Views" narrative
-  documentation were broken.
-
-- Change urldispatch internals: Route object is now constructed using
-  a path, a name, and a factory instead of a name, a matcher, a
-  generator, and a factory.
-
-- Allow ``repoze.bfg.traversal.find_interface`` API to use a class
-  object as the argument to compare against the ``model`` passed in.
-  This means you can now do ``find_interface(model, SomeClass)`` and
-  the first object which is found in the lineage which has
-  ``SomeClass`` as its class (or the first object found which has
-  ``SomeClass`` as any of its superclasses) will be returned.
-
-- Fixed documentation bugs related to forget and remember in security API
-  docs.
 
 1.0.1 (2009-07-22)
 ==================

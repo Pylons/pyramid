@@ -197,10 +197,6 @@ It's :term:`view name` will be looked for during traversal.  So if our
 URL is "http://example.com/one/two/a/another", the ``.views.another``
 view will be called.
 
-A ``<route>`` declaration *must* precede (in XML order) any ``<view>``
-declaration which names it as a ``route_name``.  If it does not, at
-application startup time a ``ConfigurationError`` will be raised.
-
 Route Factories
 ---------------
 
