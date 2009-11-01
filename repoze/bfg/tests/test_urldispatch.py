@@ -87,6 +87,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
         request = self._getRequest(PATH_INFO='/')
         result = mapper(request.environ)
         self.assertEqual(result, 123)
+        self.assertEqual(root_factory.request, request.environ)
 
     def test_route_matches(self):
         root_factory = DummyRootFactory(123)
@@ -96,6 +97,25 @@ class RoutesRootFactoryTests(unittest.TestCase):
         request = self._getRequest(PATH_INFO='/archives/action1/article1')
         result = mapper(request)
         self.assertEqual(result, 123)
+        environ = request.environ
+        routing_args = environ['wsgiorg.routing_args'][1]
+        self.assertEqual(routing_args['action'], 'action1')
+        self.assertEqual(routing_args['article'], 'article1')
+        self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
+        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
+        self.assertEqual(request.matchdict, routing_args)
+        self.failUnless(req_iface.providedBy(request))
+
+    def test_route_matches_and_has_factory(self):
+        root_factory = DummyRootFactory(123)
+        req_iface = self._registerRouteRequest('foo')
+        mapper = self._makeOne(root_factory)
+        factory = DummyRootFactory(456)
+        mapper.connect('archives/:action/:article', 'foo', factory)
+        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        result = mapper(request)
+        self.assertEqual(result, 456)
+        self.assertEqual(factory.request, request)
         environ = request.environ
         routing_args = environ['wsgiorg.routing_args'][1]
         self.assertEqual(routing_args['action'], 'action1')
@@ -181,6 +201,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
         request = self._getRequest(PATH_INFO='/archives/action1/article1')
         result = mapper(request)
         self.assertEqual(result, 123)
+        self.assertEqual(root_factory.request, request)
 
     def test_no_path_info(self):
         root_factory = DummyRootFactory(123)
@@ -189,6 +210,7 @@ class RoutesRootFactoryTests(unittest.TestCase):
         request = self._getRequest()
         result = mapper(request)
         self.assertEqual(result, 123)
+        self.assertEqual(root_factory.request, request)
 
     def test_has_routes(self):
         mapper = self._makeOne(None)
@@ -295,7 +317,8 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
 class DummyRootFactory(object):
     def __init__(self, result):
         self.result = result
-    def __call__(self, environ):
+    def __call__(self, request):
+        self.request = request
         return self.result
 
 class DummyContext(object):

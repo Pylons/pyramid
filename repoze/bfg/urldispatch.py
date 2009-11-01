@@ -82,9 +82,9 @@ class RoutesRootFactory(object):
                 if iface is not None:
                     directlyProvides(request, iface)
                 factory = route.factory or self.default_root_factory
-                return factory(environ)
+                return factory(request)
 
-        return self.default_root_factory(environ)
+        return self.default_root_factory(request)
 
 # stolen from bobo and modified
 route_re = re.compile(r'(/:[a-zA-Z]\w*)')
