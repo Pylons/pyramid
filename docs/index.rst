@@ -15,6 +15,14 @@ responses.
 <http://agendaless.com>`_ and other contributors.  It is licensed
 under a `BSD-like license <http://repoze.org/license.html>`_.
 
+"What's New" Documents
+======================
+
+.. toctree::
+   :maxdepth: 2
+
+   whatsnew-1.1
+
 Narrative documentation
 =======================
 
@@ -129,8 +137,8 @@ Using ZODB Sessions in :mod:`repoze.bfg`
 
    tutorials/zodbsessions/index.rst
 
-Change History
-==============
+Detailed Change History
+=======================
 
 .. toctree::
    :maxdepth: 1

@@ -210,7 +210,7 @@ View configuration can vary the renderer associated with a view via
 the ``renderer`` attribute.  For example, this ZCML associates the
 ``json`` renderer with a view:
 
-.. code-block:: python
+.. code-block:: xml
    :linenos:
 
    <view
@@ -364,11 +364,11 @@ attr
 
   The view machinery defaults to using the ``__call__`` method of the
   view callable (or the function itself, if the view callable is a
-  funcion) to obtain a response dictionary.  The ``attr`` value allows
-  you to vary the method attribute used to obtain the response.  For
-  example, if your view was a class, and the class has a method named
-  ``index`` and you wanted to use this method instead of the class'
-  ``__call__`` method to return the response, you'd say
+  function) to obtain a response dictionary.  The ``attr`` value
+  allows you to vary the method attribute used to obtain the response.
+  For example, if your view was a class, and the class has a method
+  named ``index`` and you wanted to use this method instead of the
+  class' ``__call__`` method to return the response, you'd say
   ``attr="index"`` in the view configuration for the view.  This is
   most useful when the view definition is a class.
 
@@ -441,6 +441,34 @@ for
   is an instance of the represented class or if the :term:`context`
   provides the represented interface; it is otherwise false.
 
+route_name
+
+  *This attribute services an advanced feature that isn't often used
+  unless you want to perform traversal *after* a route has matched.*
+  This value must match the ``name`` of a ``<route>`` declaration (see
+  :ref:`urldispatch_chapter`) that must match before this view will be
+  called.  The ``<route>`` declaration specified by ``route_name`` must
+  exist in ZCML before the view that names the route
+  (XML-ordering-wise) .  Note that the ``<route>`` declaration
+  referred to by ``route_name`` usually has a ``*traverse`` token in
+  the value of its ``path`` attribute, representing a part of the path
+  that will be used by traversal against the result of the route's
+  :term:`root factory`.  See :ref:`hybrid_chapter` for more
+  information on using this advanced feature.
+
+request_type
+
+  This value should be a Python dotted-path string representing the
+  :term:`interface` that the :term:`request` must have in order for
+  this view to be found and called.  See
+  :ref:`view_request_types_section` for more information about request
+  types.  For backwards compatibility with :mod:`repoze.bfg` version
+  1.0, this value may also be an HTTP ``REQUEST_METHOD`` string, e.g.
+  ('GET', 'HEAD', 'PUT', 'POST', or 'DELETE').  Passing request method
+  strings as a ``request_type`` is deprecated.  Use the
+  ``request_method`` attribute instead for maximum forward
+  compatibility.
+
 request_method
 
   This value can either be one of the strings 'GET', 'POST', 'PUT',
@@ -475,34 +503,6 @@ containment
   :ref:`location_aware` for more information about location-awareness.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-route_name
-
-  *This attribute services an advanced feature that isn't often used
-  unless you want to perform traversal *after* a route has matched.*
-  This value must match the ``name`` of a ``<route>`` declaration (see
-  :ref:`urldispatch_chapter`) that must match before this view will be
-  called.  The ``<route>`` declaration specified by ``route_name`` must
-  exist in ZCML before the view that names the route
-  (XML-ordering-wise) .  Note that the ``<route>`` declaration
-  referred to by ``route_name`` usually has a ``*traverse`` token in
-  the value of its ``path`` attribute, representing a part of the path
-  that will be used by traversal against the result of the route's
-  :term:`root factory`.  See :ref:`hybrid_chapter` for more
-  information on using this advanced feature.
-
-request_type
-
-  This value should be a Python dotted-path string representing the
-  :term:`interface` that the :term:`request` must have in order for
-  this view to be found and called.  See
-  :ref:`view_request_types_section` for more information about request
-  types.  For backwards compatibility with :mod:`repoze.bfg` version
-  1.0, this value may also be an HTTP ``REQUEST_METHOD`` string, e.g.
-  ('GET', 'HEAD', 'PUT', 'POST', or 'DELETE').  Passing request method
-  strings as a ``request_type`` is deprecated.  Use the
-  ``request_method`` attribute instead for maximum forward
-  compatibility.
 
 xhr
 

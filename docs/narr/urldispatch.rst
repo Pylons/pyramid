@@ -87,7 +87,7 @@ view
 
 xhr
 
-  Thie value should be either ``True`` or ``False``.  If this value is
+  This value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`request` must possess an
   ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header for this
   route to match.  This is useful for detecting AJAX requests issued

@@ -9,6 +9,9 @@ Documentation
   order) the ``<route>`` statement which creates the route.  This
   hasn't been true since 1.1a1.
 
+- "What's New in ``repoze.bfg`` 1.1" document added to narrative
+  documentation.
+
 1.1b1 (2009-11-01)
 ==================
 
@@ -861,6 +864,16 @@ Internal
 - The ``static`` ZCML directive now uses a custom root factory when
   constructing a route.
 
+- The interface ``IRequestFactories`` was removed from the
+  repoze.bfg.interfaces module.  This interface was never an API.
+
+- The function named ``named_request_factories`` and the data
+  structure named ``DEFAULT_REQUEST_FACTORIES`` have been removed from
+  the ``repoze.bfg.request`` module.  These were never APIs.
+
+- The ``IViewPermissionFactory`` interface has been removed.  This was
+  never an API.
+
 Documentation
 -------------
 
@@ -873,8 +886,14 @@ Documentation
 - Fixed documentation for ``repoze.bfg.view.static`` (in narrative
   ``Views`` chapter).
 
-- The interface ``IRequestFactories`` was removed from the
-  repoze.bfg.interfaces module.  This interface was never an API.
+Deprecations
+------------
+
+- The API ``repoze.bfg.testing.registerViewPermission`` has been
+  deprecated.
+
+Backwards Incompatibilities
+---------------------------
 
 - The interfaces ``IPOSTRequest``, ``IGETRequest``, ``IPUTRequest``,
   ``IDELETERequest``, and ``IHEADRequest`` have been removed from the
@@ -888,22 +907,6 @@ Documentation
   argument will work too.  Rationale: instead of relying on interfaces
   attached to the request object, BFG now uses a "view predicate" to
   determine the request type.
-
-- The function named ``named_request_factories`` and the data
-  structure named ``DEFAULT_REQUEST_FACTORIES`` have been removed from
-  the ``repoze.bfg.request`` module.  These were never APIs.
-
-- The ``IViewPermissionFactory`` interface has been removed.  This was
-  never an API.
-
-Deprecations
-------------
-
-- The API ``repoze.bfg.testing.registerViewPermission`` has been
-  deprecated.
-
-Backwards Incompatibilities
----------------------------
 
 - Views registered without the help of the ZCML ``view`` directive are
   now responsible for performing their own authorization checking.
