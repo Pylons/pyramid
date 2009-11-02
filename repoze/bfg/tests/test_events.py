@@ -66,6 +66,31 @@ class WSGIAppEventTests(unittest.TestCase):
         from zope.interface.verify import verifyClass
         verifyClass(IWSGIApplicationCreatedEvent, WSGIApplicationCreatedEvent)
 
+class AfterTraversalEventTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.events import AfterTraversal
+        return AfterTraversal
+
+    def _makeOne(self, request):
+        return self._getTargetClass()(request)
+
+    def test_class_implements(self):
+        from repoze.bfg.interfaces import IAfterTraversal
+        from zope.interface.verify import verifyClass
+        klass = self._getTargetClass()
+        verifyClass(IAfterTraversal, klass)
+        
+    def test_instance_implements(self):
+        from repoze.bfg.interfaces import IAfterTraversal
+        from zope.interface.verify import verifyObject
+        request = DummyRequest()
+        inst = self._makeOne(request)
+        verifyObject(IAfterTraversal, inst)
+
+    def test_ctor(self):
+        request = DummyRequest()
+        inst = self._makeOne(request)
+        self.assertEqual(inst.request, request)
 
 class DummyRequest:
     pass

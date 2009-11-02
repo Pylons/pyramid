@@ -120,6 +120,11 @@ class IRouter(Interface):
     registry = Attribute(
         """Component architecture registry local to this application.""")
     
+class IAfterTraversal(Interface):
+    """ An event type that is emitted after repoze.bfg completes
+    traversal but before it calls any view code."""
+    request = Attribute('The request object')
+
 class INewRequest(Interface):
     """ An event type that is emitted whenever repoze.bfg begins to
     process a new request """

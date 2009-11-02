@@ -382,6 +382,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(start_response.headers, [('a', 1), ('b', 2)])
 
     def test_call_eventsends(self):
+        from repoze.bfg.interfaces import INewRequest
+        from repoze.bfg.interfaces import INewResponse
+        from repoze.bfg.interfaces import IAfterTraversal
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -389,15 +392,16 @@ class TestRouter(unittest.TestCase):
         view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
-        from repoze.bfg.interfaces import INewRequest
-        from repoze.bfg.interfaces import INewResponse
         request_events = self._registerEventListener(INewRequest)
+        aftertraversal_events = self._registerEventListener(IAfterTraversal)
         response_events = self._registerEventListener(INewResponse)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(len(request_events), 1)
         self.assertEqual(request_events[0].request.environ, environ)
+        self.assertEqual(len(aftertraversal_events), 1)
+        self.assertEqual(aftertraversal_events[0].request.environ, environ)
         self.assertEqual(len(response_events), 1)
         self.assertEqual(response_events[0].response, response)
 

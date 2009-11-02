@@ -14,6 +14,7 @@ from repoze.bfg.interfaces import IView
 
 from repoze.bfg.configuration import make_registry
 from repoze.bfg.configuration import DefaultRootFactory
+from repoze.bfg.events import AfterTraversal
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
@@ -54,6 +55,7 @@ class Router(object):
         iterable.
         """
         registry = self.registry
+        has_listeners = registry.has_listeners
         logger = self.logger
         manager = self.threadlocal_manager
         threadlocals = {'registry':registry, 'request':None}
@@ -65,7 +67,7 @@ class Router(object):
             threadlocals['request'] = request
             attrs = request.__dict__
             attrs['registry'] = registry
-            registry.has_listeners and registry.notify(NewRequest(request))
+            has_listeners and registry.notify(NewRequest(request))
 
             # view lookup
             root = self.root_factory(request)
@@ -79,6 +81,7 @@ class Router(object):
                 tdict['traversed'], tdict['virtual_root'],
                 tdict['virtual_root_path'])
             attrs.update(tdict)
+            has_listeners and registry.notify(AfterTraversal(request))
             provides = map(providedBy, (context, request))
             view_callable = registry.adapters.lookup(
                 provides, IView, name=view_name, default=None)
@@ -111,7 +114,7 @@ class Router(object):
                     response = self.notfound_view(context, request)
 
             # response handling
-            registry.has_listeners and registry.notify(NewResponse(response))
+            has_listeners and registry.notify(NewResponse(response))
 
             try:
                 headers = response.headerlist

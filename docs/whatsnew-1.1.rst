@@ -595,6 +595,23 @@ Minor Miscellaneous Feature Additions
   registered forbidden view.  When the router catches a ``NotFound``,
   it returns the registered notfound view.
 
+- Add a new event type: ``repoze.bfg.events.AfterTraversal``.  Events
+  of this type will be sent after traversal is completed, but before
+  any view code is invoked.  Like ``repoze.bfg.events.NewRequest``,
+  This event will have a single attribute: ``request`` representing
+  the current request.  Unlike the request attribute of
+  ``repoze.bfg.events.NewRequest`` however, during an AfterTraversal
+  event, the request object will possess attributes set by the
+  traverser, most notably ``context``, which will be the context used
+  when a view is found and invoked.  The interface
+  ``repoze.bfg.events.IAfterTraversal`` can be used to subscribe to
+  the event.  For example::
+
+    <subscriber for="repoze.bfg.interfaces.IAfterTraversal"
+                handler="my.app.handle_after_traverse"/>
+
+  Like any framework event, a subscriber function should expect one
+  parameter: ``event``.
 
 Backwards Incompatibilities
 ---------------------------
