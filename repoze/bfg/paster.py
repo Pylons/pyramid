@@ -10,9 +10,9 @@ from paste.util.template import paste_script_template_renderer
 from repoze.bfg.scripting import get_root
 
 try:
-    from IPython.Shell import IPShellEmbed
+    from IPython.Shell import IPShell
 except ImportError:
-    IPShellEmbed = None
+    IPShell = None
 
 
 class StarterProjectTemplate(Template):
@@ -79,7 +79,7 @@ class BFGShellCommand(Command):
 
     interact = (interact,) # for testing
     loadapp = (loadapp,) # for testing
-    IPShellEmbed = IPShellEmbed # for testing
+    IPShell = IPShell # for testing
     verbose = 3
 
     def command(self):
@@ -89,11 +89,11 @@ class BFGShellCommand(Command):
         config_file, section_name = self.args
         app = get_app(config_file, section_name, loadapp=self.loadapp[0])
         root, closer = get_root(app)
-        if self.IPShellEmbed is not None and not self.options.disable_ipython:
-            shell = self.IPShellEmbed(argv=self.args)
-            shell.set_banner(shell.IP.BANNER + '\n\n' + banner)
+        if self.IPShell is not None and not self.options.disable_ipython:
             try:
-                shell(local_ns={'root':root}, global_ns={})
+                shell = self.IPShell(argv=[], user_ns={'root':root})
+                shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
+                shell.mainloop()
             finally:
                 closer()
         else:

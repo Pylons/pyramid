@@ -39,7 +39,7 @@ class TestBFGShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
         dummy_shell_factory = DummyIPShellFactory()
-        command.IPShellEmbed = dummy_shell_factory
+        command.IPShell = dummy_shell_factory
         command.args = ('/foo/bar/myapp.ini', 'myapp')
         class Options(object): pass
         command.options = Options()
@@ -54,7 +54,7 @@ class TestBFGShellCommand(unittest.TestCase):
         self.assertEqual(pushed['request'], None)
         self.assertEqual(dummy_shell_factory.shell.local_ns,{'root':dummy_root})
         self.assertEqual(dummy_shell_factory.shell.global_ns, {})
-        self.failUnless(dummy_shell_factory.shell.banner)
+        self.failUnless('\n\n' in dummy_shell_factory.shell.IP.BANNER)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
 class TestGetApp(unittest.TestCase):
@@ -76,20 +76,21 @@ class Dummy:
     pass
 
 class DummyIPShellFactory(object):
-    def __call__(self, argv):
+    def __call__(self, argv, user_ns=None):
         shell = DummyIPShell()
+        shell(user_ns, {})
         self.shell = shell
         return shell
 
 class DummyIPShell(object):
     IP = Dummy()
     IP.BANNER = 'foo'
-    def set_banner(self, banner):
-        self.banner = banner
-
     def __call__(self, local_ns, global_ns):
         self.local_ns = local_ns
         self.global_ns = global_ns
+
+    def mainloop(self):
+        pass
 
 dummy_root = Dummy()
 

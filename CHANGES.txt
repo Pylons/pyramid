@@ -1,3 +1,23 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- Compound statements that used an assignment entered into in an
+  interactive IPython session invoked via ``paster bfgshell`` no
+  longer fail to mutate the shell namespace correctly.  For example,
+  this set of statements used to fail::
+
+    In [2]: def bar(x): return x
+      ...:
+    In [3]: list(bar(x) for x in 'abc')
+    Out[3]: NameError: 'bar'
+
+  In this release, the ``bar`` function is found and the correct
+  output is now sent to the console.  Thanks to Daniel Holth for the
+  patch.
+
 1.1b2 (2009-11-02)
 ==================
 
