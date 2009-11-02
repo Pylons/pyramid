@@ -1,5 +1,19 @@
-Next release
-============
+1.1b2 (2009-11-02)
+==================
+
+Bug Fixes
+---------
+
+- Prevent PyPI installation failure due to ``easy_install`` trying way
+  too hard to guess the best version of Paste.  When ``easy_install``
+  pulls from PyPI it reads links off various pages to determine "more
+  up to date" versions. It incorrectly picks up a link for an ancient
+  version of a package named "Paste-Deploy-0.1" (note the dash) when
+  trying to find the "Paste" distribution and somehow believes it's
+  the latest version of "Paste".  It also somehow "helpfully" decides
+  to check out a version of this package from SVN.  We pin the Paste
+  dependency version to a version greater than 1.7 to work around
+  this ``easy_install`` bug.
 
 Documentation
 -------------

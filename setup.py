@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '1.1b1'
+__version__ = '1.1b2'
 
 import os
 import sys
@@ -30,7 +30,7 @@ install_requires=[
     'setuptools',
     'Chameleon',
     'sourcecodegen>=0.6.11', # tests fail without this requirement?  (wtf)
-    'Paste',
+    'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',
     'WebOb',
