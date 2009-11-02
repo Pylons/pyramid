@@ -28,8 +28,8 @@ except IOError:
 
 install_requires=[
     'setuptools',
-    'chameleon.core >= 1.0b32',  # non-lxml version
-    'chameleon.zpt >= 1.0b16',   # newest version as of non-xml core release
+    'Chameleon',
+    'sourcecodegen>=0.6.11', # tests fail without this requirement?  (wtf)
     'Paste',
     'PasteDeploy',
     'PasteScript',
