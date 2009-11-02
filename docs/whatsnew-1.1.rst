@@ -7,8 +7,8 @@ backwards incompatibilities between the two versions and deprecations
 added to 1.1, as well as sotware dependency changes and notable
 documentation additions.
 
-Features
---------
+Major Feature Additions
+-----------------------
 
 The major feature additions of 1.1 are:
 
