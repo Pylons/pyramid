@@ -12,6 +12,14 @@ Documentation
 - "What's New in ``repoze.bfg`` 1.1" document added to narrative
   documentation.
 
+Dependencies
+------------
+
+- Rather than depending on ``chameleon.core`` and ``chameleon.zpt``
+  distributions individually, depend on Malthe's repackaged
+  ``Chameleon`` distribution (which includes both ``chameleon.core``
+  and ``chameleon.zpt``).
+
 1.1b1 (2009-11-01)
 ==================
 
