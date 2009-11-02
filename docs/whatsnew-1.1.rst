@@ -73,7 +73,7 @@ name` could be spelled via a ``@bfg_view`` decorator with a different
 
 In the above configuration, the ``document_view`` :term:`view
 callable` will be chosen when the :term:`context` is of the class
-``myapp.models.Document``, while the ``folder_view`` view callbale
+``myapp.models.Document``, while the ``folder_view`` view callable
 will be chosen when the context is of class ``myapp.models.Folder``.
 
 There were a number of other attributes that could influence the
@@ -505,7 +505,7 @@ IPython Support
 ~~~~~~~~~~~~~~~
 
 If it is installed in the environment used to run :mod:`repoze.bfg`,
-aqn `IPython <http://ipython.scipy.org/moin/>` shell will be opened
+an `IPython <http://ipython.scipy.org/moin/>`_ shell will be opened
 when the ``paster bfgshell`` command is invoked.
 
 Common Codepaths Have Been Accelerated
