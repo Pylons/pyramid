@@ -409,7 +409,7 @@ hardcode path values in template URLs.
 
 The view machinery defaults to using the ``__call__`` method of the
 view callable (or the function itself, if the view callable is a
-function) to obtain a response dictionary.
+function) to obtain a response.
 
 In :mod:`repoze.bfg` 1.1, the ``attr`` view configuration value allows
 you to vary the attribute of a view callable used to obtain the
@@ -421,7 +421,32 @@ For example, if your view is a class, and the class has a method named
 in the view configuration for the view.
 
 Specifying ``attr`` is most useful when the view definition is a
-class.
+class.  For example:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+      view=".views.MyViewClass"
+      attr="index"
+      />
+
+The referenced ``MyViewClass`` might look like so:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+
+   class MyViewClass(object):
+       def __init__(context, request):
+           self.context = context
+           self.request = request
+
+       def index(self):
+           return Response('OK')
+
+The ``index`` method of the class will be used to obtain a response.
 
 ``@bfg_view`` Decorators May Now Be Stacked
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
