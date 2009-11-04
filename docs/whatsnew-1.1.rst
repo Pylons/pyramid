@@ -589,8 +589,8 @@ Minor Miscellaneous Feature Additions
   declaration.
 
 - The repoze.bfg router now catches both
-  ``repoze.bfg.security.Unauthorized`` and
-  ``repoze.bfg.view.NotFound`` exceptions while rendering a view.
+  ``repoze.bfg.exceptions.Unauthorized`` and
+  ``repoze.bfg.exceptions.NotFound`` exceptions while rendering a view.
   When the router catches an ``Unauthorized``, it returns the
   registered forbidden view.  When the router catches a ``NotFound``,
   it returns the registered notfound view.
