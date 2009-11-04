@@ -27,7 +27,7 @@ class TestBFGShellCommand(unittest.TestCase):
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'], None)
+        self.assertEqual(pushed['request'].environ, {})
         self.assertEqual(interact.local, {'root':dummy_root})
         self.failUnless(interact.banner)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
@@ -51,7 +51,7 @@ class TestBFGShellCommand(unittest.TestCase):
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'], None)
+        self.assertEqual(pushed['request'].environ, {})
         self.assertEqual(dummy_shell_factory.shell.local_ns,{'root':dummy_root})
         self.assertEqual(dummy_shell_factory.shell.global_ns, {})
         self.failUnless('\n\n' in dummy_shell_factory.shell.IP.BANNER)

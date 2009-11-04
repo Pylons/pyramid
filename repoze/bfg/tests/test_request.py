@@ -168,6 +168,24 @@ class Test_add_global_response_headers(unittest.TestCase):
         self._callFUT(request, [('c', 1)])
         self.assertEqual(request.global_response_headers, headers + [('c', 1)])
 
+class TestFakeRequest(unittest.TestCase):
+    def _makeOne(self, environ):
+        from repoze.bfg.request import FakeRequest
+        return FakeRequest(environ)
+
+    def test_environ(self):
+        environ = {'a':1, 'b':2}
+        request = self._makeOne(environ)
+        self.assertEqual(request.environ['a'], 1)
+        self.assertEqual(request.environ['b'], 2)
+        
+    def test_asdict(self):
+        environ = {'a':1, 'b':2}
+        request = self._makeOne(environ)
+        self.assertEqual(request['a'], 1)
+        self.assertEqual(request['b'], 2)
+
+
 class DummyRequest:
     def __init__(self, environ=None):
         if environ is None:

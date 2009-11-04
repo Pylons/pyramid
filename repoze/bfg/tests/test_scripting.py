@@ -1,29 +1,29 @@
 import unittest
 
 class TestGetRoot(unittest.TestCase):
-    def _callFUT(self, app, environ=None):
+    def _callFUT(self, app, request=None):
         from repoze.bfg.paster import get_root
-        return get_root(app, environ)
+        return get_root(app, request)
 
-    def test_it_noenviron(self):
+    def test_it_norequest(self):
         app = DummyApp()
         root, closer = self._callFUT(app)
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'], None)
+        self.assertEqual(pushed['request'].environ, {})
         self.assertEqual(len(app.threadlocal_manager.popped), 0)
         closer()
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
-    def test_it_withenviron(self):
+    def test_it_withrequest(self):
         app = DummyApp()
-        environ = {}
-        root, closer = self._callFUT(app, environ)
+        request = DummyRequest({})
+        root, closer = self._callFUT(app, request)
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'], None)
+        self.assertEqual(pushed['request'], request)
         self.assertEqual(len(app.threadlocal_manager.popped), 0)
         closer()
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
@@ -53,4 +53,8 @@ class DummyThreadLocalManager:
 
     def pop(self):
         self.popped.append(True)
+        
+class DummyRequest:
+    def __init__(self, environ):
+        self.environ = environ
         

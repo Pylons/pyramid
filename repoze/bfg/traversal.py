@@ -14,6 +14,7 @@ from repoze.bfg.interfaces import VH_ROOT_KEY
 
 from repoze.bfg.location import lineage
 from repoze.bfg.encode import url_quote
+from repoze.bfg.request import FakeRequest
 
 def find_root(model):
     """ Find the root node in the graph to which ``model``
@@ -631,8 +632,3 @@ class TraversalContextURL(object):
 def _join_path_tuple(tuple):
     return tuple and '/'.join([quote_path_segment(x) for x in tuple]) or '/'
 
-class FakeRequest(dict):
-    def __init__(self, environ):
-        self.environ = environ
-        self.update(environ)
-        
