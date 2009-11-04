@@ -29,7 +29,8 @@ The major feature additions of 1.1 are:
   compute the path of static resources.
 
 - View configurations can now name an ``attr`` representing the method
-  that should be called to return a response.
+  or attribute of the view callable that should be called to return a
+  response.
 
 - ``@bfg_view`` decorators may now be stacked, allowing for the same
   view callable to be associated with multiple different view
@@ -123,7 +124,7 @@ except the containment has an instance of the class
 ``calendar_document_view`` will be called instead.
 
 All view predicates configurable via the ``@bfg_view`` decorator are
-available via :term:`ZCML` :term:`view configuration` as wel..
+available via :term:`ZCML` :term:`view configuration` as well.
 
 Additional new 1.1 view predicates besides ``containment`` are:
 
