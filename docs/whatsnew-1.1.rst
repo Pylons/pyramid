@@ -723,6 +723,10 @@ Backwards Incompatibilities
    repoze.bfg documentation for more information about configuring
    security policies.
 
+- The ``repoze.bfg.scripting.get_app`` function now expects a
+  ``request`` object as its second argument rather than an
+  ``environ``.
+
 Deprecations and Behavior Differences
 -------------------------------------
 
