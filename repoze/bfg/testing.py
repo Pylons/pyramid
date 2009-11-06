@@ -46,8 +46,8 @@ def registerModels(models):
         def __init__(self, context):
             self.context = context
 
-        def __call__(self, environ):
-            path = environ['PATH_INFO']
+        def __call__(self, request):
+            path = request['PATH_INFO']
             ob = models[path]
             from repoze.bfg.traversal import traversal_path
             traversed = traversal_path(path)
@@ -272,9 +272,9 @@ def registerSettings(dictarg=None, **kw):
 class DummyRootFactory(object):
     __parent__ = None
     __name__ = None
-    def __init__(self, environ):
-        if 'bfg.routes.matchdict' in environ:
-            self.__dict__.update(environ['bfg.routes.matchdict'])
+    def __init__(self, request):
+        if 'bfg.routes.matchdict' in request:
+            self.__dict__.update(request['bfg.routes.matchdict'])
 
 class DummySecurityPolicy:
     """ A standin for both an IAuthentication and IAuthorization policy """
