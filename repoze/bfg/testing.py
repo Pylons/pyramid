@@ -255,7 +255,11 @@ def registerRoutesMapper(root_factory=None):
     ``repoze.bfg.testing.registerRoute``, the routes mapper registered
     by ``repoze.bfg.testing.registerRoutesMapper`` will be used as the
     mapper in which the route is registered during
-    ``repoze.bfg.testing.registerRoute``."""
+    ``repoze.bfg.testing.registerRoute``.
+
+    .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
+
+    """
     from repoze.bfg.interfaces import IRoutesMapper
     from repoze.bfg.urldispatch import RoutesRootFactory
     if root_factory is None:
