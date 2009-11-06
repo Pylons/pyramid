@@ -13,13 +13,13 @@ source code that makes up the application.  The behavior of a
 Rules for Building An Extensible Application
 --------------------------------------------
 
-There's only one rule you need to obey if you want to build an
-extensible :mod:`repoze.bfg` application: you must not use the
-``@bfg_view`` decorator or any other decorator meant to be detected
-via the ZCML ``<scan>`` directive.  Instead, you must use :term:`ZCML`
-for the equivalent purpose. :term:`ZCML` statements that belong to an
-application can be "overridden" by integrators as necessary, but
-decorators which perform the same tasks cannot.
+There's only one rule you need to obey if you want to build a
+maximally extensible :mod:`repoze.bfg` application: you should not use
+the ``@bfg_view`` decorator or any other decorator meant to be
+detected via the ZCML ``<scan>`` directive.  Instead, you must use
+:term:`ZCML` for the equivalent purpose. :term:`ZCML` statements that
+belong to an application can be "overridden" by integrators as
+necessary, but decorators which perform the same tasks cannot.
 
 It's also often helpful for third party application "extenders" (aka
 "integrators") if the ZCML that composes the configuration for an
@@ -35,12 +35,29 @@ registrations he needs.  He is not forced to "accept everything" or
 Extending an Existing Application
 ---------------------------------
 
-If you've inherited a :mod:`repoze.bfg` application that you'd like to
-extend which uses ``@bfg_view`` decorators, you'll unfortunately need
-to change the source code of the original application, moving the view
-declarations out of the decorators and into :term:`ZCML`.  Once this
-is done, you should be able to extend or modify the application like
-any other.
+The steps for extending an existing application depend largely on
+whether the application does or does not use ``@bfg_view`` decorators.
+
+Extending an Application Which Possesses ``@bfg_view`` Decorators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you've inherited a :mod:`repoze.bfg` application which uses
+``@bfg_view`` decorators, one of two things may be true:
+
+- If you just want to *extend* the application, you can write
+  additional ZCML that registers more views, loading the existing
+  views by using the ``scan`` ZCML directive.
+
+- If you want to *override* one or more views in the application,
+  you'll unfortunately need to change the source code of the original
+  application, moving or copying the view declaration information out
+  of decorator arguments into ``view`` statements in :term:`ZCML`.
+
+Once this is done, you should be able to extend or modify the
+application like any other (follow the instructions below).
+
+Extending an Application Which Does Not Possess ``@bfg_view`` Decorators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To extend or override the behavior of an existing application, you
 will need to write some :term:`ZCML`, and perhaps some implementations
