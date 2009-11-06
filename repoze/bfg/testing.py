@@ -227,7 +227,10 @@ def registerTraverser(traverser, for_=Interface):
 def registerRoute(path, name, factory=None):
     """ Register a new route using a path (e.g. ``:pagename``), a name
     (e.g. 'home'), and an optional root factory.  This is useful for
-    testing code that calls e.g. ``route_url``."""
+    testing code that calls e.g. ``route_url``.
+
+    .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
+    """
     from repoze.bfg.interfaces import IRoutesMapper
     from zope.component import queryUtility
     from repoze.bfg.urldispatch import RoutesRootFactory
