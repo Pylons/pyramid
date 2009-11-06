@@ -25,6 +25,8 @@
 
   .. autofunction:: registerRoute
 
+  .. autofunction:: registerRoutesMapper
+
   .. autofunction:: registerSettings
 
   .. autofunction:: setUp

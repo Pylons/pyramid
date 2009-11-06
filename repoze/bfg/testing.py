@@ -238,6 +238,33 @@ def registerRoute(path, name, factory=None):
         sm.registerUtility(mapper, IRoutesMapper)
     mapper.connect(path, name, factory)
 
+def registerRoutesMapper(root_factory=None):
+    """ Register a new routes mapper using the provided
+    ``root_factory`` as the root factory it wraps.  If
+    ``root_factory`` is ``None``, use a default root factory
+    implementation.
+
+    Use of this function is beneficial when you want to register an
+    empty routes mapper with a custom ``root_factory``.
+
+    Note that ``repoze.bfg.testing.registerRoute`` also registers a
+    route mapper if one is not already registered, thus it is not
+    necessary to call this function before calling
+    ``repoze.bfg.testing.registerRoute``.  However, if
+    ``repoze.bfg.registerRoutesMapper`` *is* called before
+    ``repoze.bfg.testing.registerRoute``, the routes mapper registered
+    by ``repoze.bfg.testing.registerRoutesMapper`` will be used as the
+    mapper in which the route is registered during
+    ``repoze.bfg.testing.registerRoute``."""
+    from repoze.bfg.interfaces import IRoutesMapper
+    from repoze.bfg.urldispatch import RoutesRootFactory
+    if root_factory is None:
+        root_factory = DummyRootFactory
+    mapper = RoutesRootFactory(root_factory)
+    sm = getSiteManager()
+    sm.registerUtility(mapper, IRoutesMapper)
+    return mapper
+
 def registerSettings(dictarg=None, **kw):
     """ Register one or more 'setting' key/value pairs.  A setting is
     a single key/value pair in the dictionary-ish object returned from

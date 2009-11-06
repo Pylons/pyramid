@@ -277,6 +277,20 @@ class TestTestingFunctions(unittest.TestCase):
         self.assertEqual(route_url('home', request, pagename='abc'),
                          'http://example.com/abc')
 
+    def test_registerRoutesMapper(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        from repoze.bfg.testing import registerRoutesMapper
+        from zope.component import getSiteManager
+        class Factory:
+            def __init__(self, environ):
+                """ """
+        class DummyRequest:
+            application_url = 'http://example.com'
+        result = registerRoutesMapper()
+        sm = getSiteManager()
+        mapper = sm.getUtility(IRoutesMapper)
+        self.assertEqual(result, mapper)
+
     def test_registerSettings(self):
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.testing import registerSettings

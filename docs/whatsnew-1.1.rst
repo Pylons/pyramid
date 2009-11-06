@@ -614,6 +614,12 @@ Minor Miscellaneous Feature Additions
   Like any framework event, a subscriber function should expect one
   parameter: ``event``.
 
+- A ``repoze.bfg.testing.registerRoutesMapper`` testing facility has
+  been added.  This testing function registers a routes "mapper"
+  object in the registry, for tests which require its presence.  This
+  function is documented in the ``repoze.bfg.testing`` API
+  documentation.
+
 Backwards Incompatibilities
 ---------------------------
 

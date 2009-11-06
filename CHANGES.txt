@@ -1,6 +1,14 @@
 Next release
 ============
 
+Features
+--------
+
+- ``repoze.bfg.testing.registerRoutesMapper`` testing facility added.
+  This testing function registers a routes "mapper" object in the
+  registry, for tests which require its presence.  This function is
+  documented in the ``repoze.bfg.testing`` API documentation.
+
 Bug Fixes
 ---------
 
