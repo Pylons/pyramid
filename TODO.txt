@@ -3,7 +3,8 @@
   directives to use these methods of the registry.
 
 - Emit a set of events at startup that calls an event listener with
-  the registry before and after ZCML parsing.
+  the registry before and after ZCML parsing.  Or just document that
+  the registry can be mutated via the run.py code.
 
 - Make ZCML filename argument optional to ``make_app``.  Document
   configuration without ZCML.
