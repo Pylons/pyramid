@@ -11,3 +11,5 @@
 
 - Replace martian with something simpler.
 
+- Maybe move code from within repoze.bfg.configuration.make_registry
+  to repoze.bfg.registry.Registry constructor.
