@@ -138,8 +138,8 @@ class Router(object):
 # make_registry and manager kw args for unit testing only
 # note that ``options`` is a b/w compat alias for ``settings``
 def make_app(root_factory, package=None, filename='configure.zcml',
-             authentication_policy=None, authorization_policy=None,
              settings=None, options=None,
+             authentication_policy=None, authorization_policy=None,
              manager=manager, make_registry=make_registry):
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
