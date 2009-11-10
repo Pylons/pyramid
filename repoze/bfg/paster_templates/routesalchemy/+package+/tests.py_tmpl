@@ -8,14 +8,15 @@ def _initTestingDB():
 
 class TestMyView(unittest.TestCase):
     def setUp(self):
+        testing.setUp()
         _initTestingDB()
-        
-    def _callFUT(self, request):
-        from {{package}}.views import my_view
-        return my_view(request)
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_it(self):
+        from {{package}}.views import my_view
         request = testing.DummyRequest()
-        info = self._callFUT(request)
+        info = my_view(request)
         self.assertEqual(info['root'].name, 'root')
         self.assertEqual(info['project'], '{{package}}')
