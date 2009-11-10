@@ -167,17 +167,17 @@ Configuration
        from myapp.models import MyModel
        import transaction
 
-       def app(global_config, **kw):
+       def app(global_config, **settings):
            """ This function returns a repoze.bfg.router.Router object.  It
            is usually called by the PasteDeploy framework during ``paster
            serve``"""
            # paster app config callback
-           zodb_uri = kw['zodb_uri']
+           zodb_uri = settings['zodb_uri']
            finder = PersistentApplicationFinder(zodb_uri, appmaker)
            def get_root(request):
                return finder(request.environ)
            import myapp
-           return make_app(get_root, myapp, options=kw)
+           return make_app(get_root, myapp, settings=settings)
 
        def appmaker(root):
            if not 'myapp' in root:

@@ -432,27 +432,54 @@ class TestMakeApp(unittest.TestCase):
         from repoze.bfg.router import make_app
         return make_app(None, *arg, **kw)
 
-    def test_it(self):
-        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
-        from zope.component import getSiteManager
-        from repoze.bfg.tests import fixtureapp
-        sm = getSiteManager()
+    def _get_make_registry(self, sm):
         class DummyMakeRegistry(object):
             def __call__(self, *arg):
                 self.arg = arg
                 return sm
+        return DummyMakeRegistry()
+
+    def test_it(self):
+        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        from repoze.bfg.tests import fixtureapp
+        from zope.component import getSiteManager
+        sm = getSiteManager()
+        dummy_make_registry = self._get_make_registry(sm)
         def subscriber(event):
             event.app.created = True        
-        dummy_make_registry = DummyMakeRegistry()
         manager = DummyRegistryManager()
         sm.registerHandler(subscriber, (IWSGIApplicationCreatedEvent,))
         rootfactory = DummyRootFactory(None)
+        settings = {'a':1}
         app = self._callFUT(rootfactory, fixtureapp, manager=manager,
+                            settings=settings,
                             make_registry=dummy_make_registry)
         self.failUnless(app.created)
         self.failUnless(manager.pushed)
         self.failUnless(manager.popped)
         self.assertEqual(len(dummy_make_registry.arg), 6)
+        self.assertEqual(dummy_make_registry.arg[-1], settings)
+
+    def test_it_options_means_settings(self):
+        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        from zope.component import getSiteManager
+        from repoze.bfg.tests import fixtureapp
+        sm = getSiteManager()
+        dummy_make_registry = self._get_make_registry(sm)
+        def subscriber(event):
+            event.app.created = True        
+        manager = DummyRegistryManager()
+        sm.registerHandler(subscriber, (IWSGIApplicationCreatedEvent,))
+        rootfactory = DummyRootFactory(None)
+        settings = {'a':1}
+        app = self._callFUT(rootfactory, fixtureapp, options=settings,
+                            manager=manager,
+                            make_registry=dummy_make_registry)
+        self.failUnless(app.created)
+        self.failUnless(manager.pushed)
+        self.failUnless(manager.popped)
+        self.assertEqual(len(dummy_make_registry.arg), 6)
+        self.assertEqual(dummy_make_registry.arg[-1], settings)
 
 class DummyContext:
     pass

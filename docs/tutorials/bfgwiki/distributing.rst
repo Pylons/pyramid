@@ -50,7 +50,6 @@ The output of such a command will be something like:
   making hard links in tutorial-0.1...
   hard linking CHANGES.txt -> tutorial-0.1
   hard linking README.txt -> tutorial-0.1
-  hard linking ez_setup.py -> tutorial-0.1
   hard linking setup.cfg -> tutorial-0.1
   hard linking setup.py -> tutorial-0.1
   hard linking tutorial.ini -> tutorial-0.1

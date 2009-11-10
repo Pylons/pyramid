@@ -15,15 +15,15 @@ def handle_teardown(event):
     environ = event.request.environ
     environ['tutorial.sasession'] = Cleanup(DBSession.remove)
 
-def app(global_config, **kw):
+def app(global_config, **settings):
     """ This function returns a repoze.bfg.router.Router object.
     
     It is usually called by the PasteDeploy framework during ``paster serve``.
     """
-    db_string = kw.get('db_string')
+    db_string = settings.get('db_string')
     if db_string is None:
         raise ValueError("No 'db_string' value in application configuration.")
     initialize_sql(db_string)
 
-    return make_app(RootFactory, tutorial, options=kw)
+    return make_app(RootFactory, tutorial, settings=settings)
 

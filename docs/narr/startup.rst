@@ -74,11 +74,11 @@ press ``return`` after running ``paster serve MyProject.ini``.
    Note that the constructor function accepts a ``global_config``
    argument (which is a dictionary of key/value pairs mentioned in the
    ``[DEFAULT]`` section of the configuration file).  It also accepts
-   a ``**kw`` argument, which collects another set of arbitrary
+   a ``**settings`` argument, which collects another set of arbitrary
    key/value pairs.  The arbitrary key/value pairs received by this
-   function in ``**kw`` will be composed of all the key/value pairs
-   that are present in the ``[app:main]`` section (except for the
-   ``use=`` setting) when this function is called by the
+   function in ``**settings`` will be composed of all the key/value
+   pairs that are present in the ``[app:main]`` section (except for
+   the ``use=`` setting) when this function is called by the
    :term:`PasteDeploy` framework when you run ``paster serve``.
 
    Our generated ``MyProject.ini`` file looks like so:
@@ -102,13 +102,14 @@ press ``return`` after running ``paster serve MyProject.ini``.
    Note that the ``app`` function imports the ``get_root`` :term:`root
    factory` function from the ``myproject.models`` Python module.  It
    then also imports the "bare" ``myproject`` package, and passes
-   ``get_root``, ``myproject``, and the ``options`` keyword as the
+   ``get_root``, ``myproject``, and the ``settings`` keyword as the
    ``app`` function's extra keyword arguments to the ``make_app``
-   function of the ``repoze.bfg.router`` module.  ``**kw`` here
+   function of the ``repoze.bfg.router`` module.  ``**settings`` here
    contains all the options in the ``[app:main]`` section of our .ini
    file except the "use" option (which is internal to paste).  In this
-   case, ``**kw`` will be something like ``{'reload_templates':'true',
-   'debug_authorization':'false', 'debug_notfound':'false'}``.
+   case, ``**settings`` will be something like
+   ``{'reload_templates':'true', 'debug_authorization':'false',
+   'debug_notfound':'false'}``.
 
    ``get_root`` is the first argument to ``make_app``, and it is a
    root factory callable that is invoked on every request to retrieve
@@ -124,7 +125,7 @@ press ``return`` after running ``paster serve MyProject.ini``.
    If you for some reason need or want to load a different application
    registry filename for your application, you can pass an optional
    ``filename=`` parameter to make_app (e.g. ``make_app(get_root,
-   myproject, filename='meta.zcml', options=options``).  If the
+   myproject, filename='meta.zcml', settings=settings``).  If the
    filename is absolute, the ``package`` argument is ignored.
 
 #. The ``make_app`` function does its work.  It finds and parses the

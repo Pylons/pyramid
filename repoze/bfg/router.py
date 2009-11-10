@@ -135,10 +135,12 @@ class Router(object):
         finally:
             manager.pop()
 
-# make_registry kw arg for unit testing only
+# make_registry and manager kw args for unit testing only
+# note that ``options`` is a b/w compat alias for ``settings``
 def make_app(root_factory, package=None, filename='configure.zcml',
              authentication_policy=None, authorization_policy=None,
-             options=None, manager=manager, make_registry=make_registry):
+             settings=None, options=None,
+             manager=manager, make_registry=make_registry):
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
 
@@ -167,14 +169,18 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     dictionary, the value passed as ``filename`` will be ignored,
     replaced with the ``configure_zcml`` value.
 
-    ``options``, if used, should be a dictionary containing runtime
-    options (e.g. the key/value pairs in an app section of a
+    ``settings``, if used, should be a dictionary containing runtime
+    settings (e.g. the key/value pairs in an app section of a
     PasteDeploy file), with each key representing the option and the
     key's value representing the specific option value,
-    e.g. ``{'reload_templates':True}``"""
+    e.g. ``{'reload_templates':True}``.  Note that the keyword
+    parameter ``options`` is a backwards compatibility alias for the
+    ``settings`` keyword parameter.
+    """
+    settings = settings or options
     registry = make_registry(root_factory, package, filename,
                              authentication_policy, authorization_policy,
-                             options)
+                             settings)
     app = Router(registry)
     # We push the registry on to the stack here in case any ZCA API is
     # used in listeners subscribed to the WSGIApplicationCreatedEvent

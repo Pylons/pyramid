@@ -65,7 +65,6 @@ project we name ``MyProject``:
      Copying +project+.ini_tmpl to ./MyProject/MyProject.ini
      Copying CHANGES.txt_tmpl to ./MyProject/CHANGES.txt
      Copying README.txt_tmpl to ./MyProject/README.txt
-     Copying ez_setup.py to ./MyProject/ez_setup.py
      Copying setup.py_tmpl to ./MyProject/setup.py
    Running /Users/chrism/projects/repoze/bfg/bin/python setup.py egg_info
 
@@ -298,7 +297,6 @@ The ``MyProject`` project has the following directory structure::
   MyProject/
   |-- CHANGES.txt
   |-- README.txt
-  |-- ez_setup.py
   |-- myproject
   |   |-- __init__.py
   |   |-- configure.zcml
@@ -327,10 +325,6 @@ describe, run, and test your application.
 #. ``README.txt`` describes the application in general.  It is
    conventionally written in :term:`ReStructuredText` format.
 
-#. ``ez_setup.py`` is a file that is used by ``setup.py`` to install
-   :term:`Setuptools` if the executing user does not have it
-   installed.
-
 #. ``MyProject.ini`` is a :term:`PasteDeploy` configuration file that
    can be used to execute your application.
 
@@ -339,10 +333,6 @@ describe, run, and test your application.
    file.
 
 We won't describe the ``CHANGES.txt`` or ``README.txt`` files.
-``ez_setup.py`` is a file only used by ``setup.py`` in case a user who
-wants to install your package does not have :term:`Setuptools` already
-installed.  It is only imported by and used by ``setup.py``, so we
-won't describe it here either.
 
 .. _MyProject_ini:
 
@@ -351,8 +341,8 @@ won't describe it here either.
 
 The ``MyProject.ini`` file is a :term:`PasteDeploy` configuration
 file.  Its purpose is to specify an application to run when you invoke
-``paster serve`` when you start an application, as well as the options
-provided to that application.
+``paster serve`` when you start an application, as well as the
+deployment settings provided to that application.
 
 The generated ``MyProject.ini`` file looks like so:
 
@@ -468,11 +458,9 @@ Our generated ``setup.py`` looks like this:
 .. literalinclude:: MyProject/setup.py
    :linenos:
 
-The top of the file imports and uses ``ez_setup``, which causes
-:term:`Setuptools` to be installed on an invoking user's computer if
-it isn't already.  The ``setup.py`` file calls the setuptools
-``setup`` function, which does various things depending on the
-arguments passed to ``setup.py`` on the command line.
+The ``setup.py`` file calls the setuptools ``setup`` function, which
+does various things depending on the arguments passed to ``setup.py``
+on the command line.
 
 Within the arguments to this function call, information about your
 application is kept.  While it's beyond the scope of this

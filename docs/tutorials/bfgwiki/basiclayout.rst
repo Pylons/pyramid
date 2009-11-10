@@ -112,5 +112,5 @@ be in ``run.py`` and its ``app`` function:
 #. Line *19*.  We use the ``repoze.bfg.router.make_app`` to return a
    :term:`WSGI` application.  The ``make_app`` function takes the root
    factory (``get_root``), the *package* representing our application,
-   and the keywords parsed by PasteDeploy.
+   and the settings keywords parsed by PasteDeploy.
 

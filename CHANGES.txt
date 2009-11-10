@@ -1,3 +1,29 @@
+Next release
+============
+
+Templates
+---------
+
+- Remove ``ez_setup.py`` and its import from all paster templates,
+  samples, and tutorials for ``distribute`` compatibility.  The
+  documentation already explains how to install virtualenv (which will
+  include some ``setuptools`` package), so these files, imports and
+  usages were superfluous.
+
+Deprecations
+------------
+
+- The ``options`` kw arg to the ``repoze.bfg.router.make_app``
+  function is deprecated.  In its place is the keyword argument
+  ``settings``.  The ``options`` keyword continues to work, and a
+  deprecation warning is not emitted when it is detected.  However,
+  the paster templates, code samples, and documentation now make
+  reference to ``settings`` rather than ``options``.  This
+  change/deprecation was mainly made for purposes of clarity and
+  symmetry with the ``get_settings()`` API and dicussions of
+  "settings" in various places in the docs: we want to use the same
+  name to refer to the same thing everywhere.
+
 1.1b3 (2009-11-06)
 ==================
 

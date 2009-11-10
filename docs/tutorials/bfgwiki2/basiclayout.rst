@@ -138,6 +138,6 @@ be in ``run.py`` and its ``app`` function:
    :mod:`repoze.bfg` :term:`traversal` mechanism.  Since this is a URL
    dispatch application, the root factory is ``None``.  The second
    argument is the *package* representing our application, and the
-   third argument, ``options`` is passed as a keyword argument.  It
-   contains a dictionary of options parsed by PasteDeploy.
+   third argument, ``settings`` is passed as a keyword argument.  It
+   contains a dictionary of settings parsed by PasteDeploy.
 
