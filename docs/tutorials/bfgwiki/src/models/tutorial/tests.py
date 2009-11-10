@@ -48,6 +48,12 @@ class AppmakerTests(unittest.TestCase):
         self.failUnless(root['app_root'] is app_root)
 
 class ViewTests(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
     def test_my_view(self):
         from tutorial.views import my_view
         context = testing.DummyModel()
