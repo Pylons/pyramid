@@ -226,6 +226,13 @@ def static_url(path, request, **kw):
     resource must live within a location defined via the ``<static>``
     ZCML directive (see :ref:`static_resources_section`).
 
+    Example::
+
+        static_url('mypackage:static/foo.css', request) =>
+
+                                http://example.com/static/foo.css
+
+
     The ``path`` argument points at a file or directory on disk which
     a URL should be generated for.  The ``path`` may be either a
     relative path (e.g. ``static/foo.css``) or a :term:`resource
@@ -236,7 +243,7 @@ def static_url(path, request, **kw):
     The ``request`` argument should be a WebOb request.
 
     The purpose of the ``**kw`` argument is the same as the purpose of
-    the ``route_url`` ``*kw`` argument.  See the documentation for
+    the ``route_url`` ``**kw`` argument.  See the documentation for
     that function to understand the arguments which you can provide to
     it.  However, typically, you don't need to pass anything as
     ``*kw`` when generating a static resource URL.
