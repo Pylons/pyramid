@@ -1,6 +1,11 @@
 Next release
 ============
 
+Documentation
+-------------
+
+- Add examples to ``repoze.bfg.url.model_url`` docstring.
+
 Templates
 ---------
 

@@ -132,6 +132,24 @@ def model_url(model, request, *elements, **kw):
        context of a URL dispatch; contexts found this way do not need
        to be location-aware.
 
+    Examples::
+
+        model_url(context, request) =>
+
+                                   http://example.com/
+
+        model_url(context, request, 'a.html') =>
+
+                                   http://example.com/a.html
+
+        model_url(context, request, 'a.html', query={'q':'1'}) =>
+
+                                   http://example.com/a.html?q=1
+
+        model_url(context, request, 'a.html', anchor='abc') =>
+
+                                   http://example.com/#abc
+
     Any positional arguments passed in as ``elements`` must be strings
     or unicode objects.  These will be joined by slashes and appended
     to the generated model URL.  Each of the elements passed in is
