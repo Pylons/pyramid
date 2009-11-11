@@ -132,6 +132,6 @@ except NameError: # pragma: no cover
 
 try:
     import json
-except ImportError:
+except ImportError: # pragma: no cover
     import simplejson as json
 
