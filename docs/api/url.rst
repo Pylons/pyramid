@@ -5,7 +5,7 @@
 
 .. automodule:: repoze.bfg.url
 
-  .. autofunction:: model_url
+  .. autofunction:: repoze.bfg.url.model_url(context, request, *elements, query=None, anchor=None)
 
   .. autofunction:: route_url
 
