@@ -199,7 +199,7 @@ the name ``main`` as a section name:
 .. code-block::  bash
    :linenos:
 
-    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell  MyProject.ini main
+    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
 
     Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
     [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
