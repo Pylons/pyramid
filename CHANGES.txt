@@ -1,6 +1,13 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- Use ``alsoProvides`` in the urldispatch module to attach an
+  interface to the request rather than ``directlyProvides`` to avoid
+  disturbing interfaces set in a NewRequest event handler.
+
 Documentation
 -------------
 

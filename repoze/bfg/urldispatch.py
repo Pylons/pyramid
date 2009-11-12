@@ -1,7 +1,7 @@
 import re
 from urllib import unquote
 
-from zope.interface import directlyProvides
+from zope.interface import alsoProvides
 
 from repoze.bfg.interfaces import IRouteRequest
 
@@ -50,7 +50,7 @@ class RoutesRootFactory(object):
             # passed to it be a request, instead of an environ, as it
             # uses both the ``registry`` attribute of the request, and
             # if a route is found, it decorates the object with an
-            # interface using directlyProvides.  However, existing app
+            # interface using alsoProvides.  However, existing app
             # code "in the wild" calls the root factory explicitly
             # with a dictionary argument (e.g. a subscriber to
             # WSGIApplicationCreatedEvent does
@@ -83,7 +83,7 @@ class RoutesRootFactory(object):
                 request.matchdict = match
                 iface = registry.queryUtility(IRouteRequest, name=route.name)
                 if iface is not None:
-                    directlyProvides(request, iface)
+                    alsoProvides(request, iface)
                 factory = route.factory or self.default_root_factory
                 return factory(request)
 
