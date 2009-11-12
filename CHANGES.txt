@@ -1,5 +1,5 @@
-Next release
-============
+1.1b4 (2009-11-12)
+==================
 
 Bug Fixes
 ---------
@@ -15,7 +15,7 @@ Documentation
 
 - Add examples to ``repoze.bfg.url.model_url`` docstring.
 
-- Add "Defending BFG Design" chapter.
+- Add "Defending BFG Design" chapter to frontpage docs.
 
 Templates
 ---------
