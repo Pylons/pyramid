@@ -145,6 +145,14 @@ Detailed Change History
 
    changes
 
+Design Documentation
+====================
+
+.. toctree::
+   :maxdepth: 2
+
+   designdefense
+
 Sample Applications
 ===================
 
