@@ -8,13 +8,13 @@ detail some of the design decisions and tradeoffs here.
 BFG Uses The Zope Component Architecture ("ZCA")
 ------------------------------------------------
 
-BFG uses the :term:`Zope Component Architecture` (ZCA) "under the
-hood".  This is a point of some contention.  :mod:`repoze.bfg` is of a
-:term:`Zope` pedigree, so it was natural for it developers to use the
+BFG uses the :term:`Zope Component Architecture` (ZCA) under the hood.
+This is a point of some contention.  :mod:`repoze.bfg` is of a
+:term:`Zope` pedigree, so it was natural for its developers to use the
 ZCA at its inception.  However, :mod:`repoze.bfg` allegiance to its
 Zope pedigree is not blind.  We understand that using the ZCA has
 issues and consequences, which we've attempted to address as best we
-can.  Here'a a full disclosure about BFG's use of the ZCA, and the
+can.  Here'a an introspection about BFG's use of the ZCA, and the
 tradeoffs its usage involves.
 
 Problems
@@ -42,7 +42,7 @@ above that are pretty obvious.
 First, what's a "utility"?  Well, for the purposes of this dicussion,
 and for the purpose of the code above, it's just not very important.
 If you really care, you can go read `this
-<http://www.muthukadan.net/docs/zca.html#utility>`.  However, still
+<http://www.muthukadan.net/docs/zca.html#utility>`_.  However, still,
 folks need to understand the concept in order to parse the code while
 reading it.  This is problem number one.
 
@@ -60,8 +60,8 @@ question: a bad sign so far.  Note also that the answer is circular, a
 *really* bad sign.
 
 Fourth, where does ``getUtility`` look to get the data?  Well, the
-"component registry" of course.  What's component registry?  Right.
-Problem number four.
+"component registry" of course.  What's a component registry?  Problem
+number four.
 
 Fifth, assuming you buy that there's some magical registry hanging
 around, where *is* this registry?  Homina homina... "around"?  That's
@@ -112,7 +112,7 @@ He now has the current user id.
 Under its hood however, the implementation of ``authenticated_userid``
 is this:
 
-.. code-block: python
+.. code-block:: python
    :linenos:
 
    def authenticated_userid(request):
@@ -148,11 +148,12 @@ via preordained framework plugpoints like traversal or view lookup
 
 :mod:`repoze.bfg` framework developers were so concerned about
 conceptual load issues of the ZCA API for framework developers that a
-`replacement <http://svn.repoze.org/repoze.component/trunk>`_ was
-actually developed.  Though this package is fully functional and
-well-tested, and its API is much nicer than the ZCA API, work on it
-was largely abandoned and it is not used in :mod:`repoze.bfg`.  We
-continued to use the ZCA within :mod:`repoze.bfg`.
+`replacement <http://svn.repoze.org/repoze.component/trunk>`_ named
+:mod:`repoze.component` was actually developed.  Though this package
+is fully functional and well-tested, and its API is much nicer than
+the ZCA API, work on it was largely abandoned and it is not used in
+:mod:`repoze.bfg`.  We continued to use the ZCA within
+:mod:`repoze.bfg`.
 
 Making framework developers and extenders understand the ZCA is a
 tradeoff.  We (the :mod:`repoze.bfg` developers) like the features
@@ -202,21 +203,21 @@ in some code that has access to the :term:`request`:
 
 In *this* world, we've reduced the conceptual problem to understanding
 attributes and the dictionary API.  Every Python programmer knows
-these things, even framework programmers!
+these things, even framework programmers!  Future versions of
+:mod:`repoze.bfg` will try to make use of more domain specific APIs
+such as this.  While :mod:`repoze.bfg` still uses some suboptimal
+unnamed utility registrations and other superfluous ZCA API usages,
+future versions of it will where possible disuse these things in favor
+of straight dictionary assignments and lookups, as demonstrated above,
+to be kinder to new developers and extenders.  We'll continue to seek
+ways to reduce framework extender cognitive load.
 
-We continued using ZCA rather than ditching it for
+We continued using ZCA rather than disusing it in favor of
 :mod:`repoze.component` largely because the ZCA concept of interfaces
 provides for use of an interface hierarchy, which is useful in a lot
 of scenarios (such as context type inheritance).  Coming up with a
 marker type that was something like an interface that allowed for this
 functionality seemed like it was just reinventing the wheel.
-
-While :mod:`repoze.bfg` still uses some suboptimal unnamed utility
-registrations, future versions of it will (where possible) disuse
-these things in favor of straight dictionary assignments and lookups,
-as demonstrated above, to be kinder to new developers and extenders.
-We'll continue to seek ways to reduce framework extender cognitive
-load.
 
 Rationale
 +++++++++
@@ -227,12 +228,11 @@ Here are the main rationales for BFG's design decision to use the ZCA:
   "pedigree".  Much of the design of :mod:`repoze.bfg` is stolen
   directly from :term:`Zope`.  Zope uses the ZCA to do a number of
   tricks.  :mod:`repoze.bfg` mimics these tricks apeishly, and,
-  because the ZCA works pretty well for that set of tricks, the
-  :mod:`repoze.bfg` mimicry uses it for the same purposes.  For
-  example, the way that BFG maps a :term:`request` to a :term:`view
-  callable` is lifted almost entirely from Zope.  The ZCA plays an
-  important role in the particulars of how this request to view
-  mapping is done.
+  because the ZCA works pretty well for that set of tricks,
+  :mod:`repoze.bfg` uses it for the same purposes.  For example, the
+  way that BFG maps a :term:`request` to a :term:`view callable` is
+  lifted almost entirely from Zope.  The ZCA plays an important role
+  in the particulars of how this request to view mapping is done.
 
 - Features.  The ZCA essentially provides what can be considered
   something like a "superdictionary", which allows for more complex
@@ -318,12 +318,13 @@ But, yes, your application currently does need to possess a ZCML file
 for it to begin executing successfully even if its only contents are a
 ``<scan>`` directive that kicks off the location of decorated views.
 
-In any case, in the interest of completeness and in the spirit of ,
-BFG 1.2 will include a completely imperative mode for all
-configuration.  You will be able to make "single file" apps in this
-mode, which should help people who need to see everything done
-completely imperatively.  For example, the very most basic
-:mod:`repoze.bfg` "helloworld" program will become something like::
+In any case, in the interest of completeness and in the spirit of
+providing a lowest common denominator, BFG 1.2 will include a
+completely imperative mode for all configuration.  You will be able to
+make "single file" apps in this mode, which should help people who
+need to see everything done completely imperatively.  For example, the
+very most basic :mod:`repoze.bfg` "helloworld" program will become
+something like::
 
   from webob import Response
   from  wsgiref import simple_server
