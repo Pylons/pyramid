@@ -106,6 +106,29 @@ class RoutesRootFactoryTests(unittest.TestCase):
         self.assertEqual(request.matchdict, routing_args)
         self.failUnless(req_iface.providedBy(request))
 
+    def test_route_matches_already_has_iface(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        root_factory = DummyRootFactory(123)
+        req_iface = self._registerRouteRequest('foo')
+        mapper = self._makeOne(root_factory)
+        mapper.connect('archives/:action/:article', 'foo')
+        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        class IFoo(Interface):
+            pass
+        directlyProvides(request, IFoo)
+        result = mapper(request)
+        self.assertEqual(result, 123)
+        environ = request.environ
+        routing_args = environ['wsgiorg.routing_args'][1]
+        self.assertEqual(routing_args['action'], 'action1')
+        self.assertEqual(routing_args['article'], 'article1')
+        self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
+        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
+        self.assertEqual(request.matchdict, routing_args)
+        self.failUnless(req_iface.providedBy(request))
+        self.failUnless(IFoo.providedBy(request))
+
     def test_route_matches_and_has_factory(self):
         root_factory = DummyRootFactory(123)
         req_iface = self._registerRouteRequest('foo')
