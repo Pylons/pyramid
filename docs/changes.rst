@@ -2,3 +2,5 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. include:: ../CHANGES.txt
+
+.. include:: ../HISTORY.txt

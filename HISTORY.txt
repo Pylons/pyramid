@@ -1,0 +1,2983 @@
+1.0.1 (2009-07-22)
+==================
+
+- Added support for ``has_resource``, ``resource_isdir``, and
+  ``resource_listdir`` to the resource "OverrideProvider"; this fixes
+  a bug with a symptom that a file could not be overridden in a
+  resource directory unless a file with the same name existed in the
+  original directory being overridden.
+
+- Fixed documentation bug showing invalid test for values from the
+  ``matchdict``:  they are stored as attributes of the ``Article``, rather
+  than subitems.
+
+- Fixed documentation bug showing wrong environment key for the ``matchdict``
+  produced by the matching route.
+
+- Added a workaround for a bug in Python 2.6, 2.6.1, and 2.6.2 having
+  to do with a recursion error in the mimetypes module when trying to
+  serve static files from Paste's FileApp:
+  http://bugs.python.org/issue5853.  Symptom: File
+  "/usr/lib/python2.6/mimetypes.py", line 244, in guess_type return
+  guess_type(url, strict) RuntimeError: maximum recursion depth
+  exceeded.  Thanks to Armin Ronacher for identifying the symptom and
+  pointing out a fix.
+
+- Minor edits to tutorials for accuracy based on feedback.
+
+- Declared Paste and PasteDeploy dependencies.
+
+1.0 (2009-07-05)
+================
+
+- Retested and added some content to GAE tutorial.
+
+- Edited "Extending" narrative docs chapter.
+
+- Added "Deleting the Database" section to the "Defining Models"
+  chapter of the traversal wiki tutorial.
+
+- Spell checking of narratives and tutorials.
+
+1.0b2 (2009-07-03)
+==================
+
+- ``remoteuserauthenticationpolicy`` ZCML directive didn't work
+  without an ``environ_key`` directive (didn't match docs).
+
+- Fix ``configure_zcml`` filespec check on Windows.  Previously if an
+  absolute filesystem path including a drive letter was passed as
+  ``filename`` (or as ``configure_zcml`` in the options dict) to
+  ``repoze.bfg.router.make_app``, it would be treated as a
+  package:resource_name specification.
+
+- Fix inaccuracies and import errors in bfgwiki (traversal+ZODB) and
+  bfgwiki2 (urldispatch+SA) tutorials.
+
+- Use bfgsite index for all tutorial setup.cfg files.
+
+- Full documentation grammar/style/spelling audit.
+
+1.0b1 (2009-07-02)
+==================
+
+Features
+--------
+
+- Allow a Paste config file (``configure_zcml``) value or an
+  environment variable (``BFG_CONFIGURE_ZCML``) to name a ZCML file
+  (optionally package-relative) that will be used to bootstrap the
+  application.  Previously, the integrator could not influence which
+  ZCML file was used to do the boostrapping (only the original
+  application developer could do so).
+
+Documentation
+-------------
+
+- Added a "Resources" chapter to the narrative documentation which
+  explains how to override resources within one package from another
+  package.
+
+- Added an "Extending" chapter to the narrative documentation which
+  explains how to extend or modify an existing BFG application using
+  another Python package and ZCML.
+
+1.0a9 (2009-07-01)
+==================
+
+Features
+--------
+
+- Make it possible to pass strings in the form
+  "package_name:relative/path" to APIs like ``render_template``,
+  ``render_template_to_response``, and ``get_template``.  Sometimes
+  the package in which a caller lives is a direct namespace package,
+  so the module which is returned is semi-useless for navigating from.
+  In this way, the caller can control the horizontal and vertical of
+  where things get looked up from.
+
+1.0a8 (2009-07-01)
+==================
+
+Deprecations
+------------
+
+- Deprecate the ``authentication_policy`` and ``authorization_policy``
+  arguments to ``repoze.bfg.router.make_app``.  Instead, developers
+  should use the various authentication policy ZCML directives
+  (``repozewho1authenticationpolicy``,
+  ``remoteuserauthenticationpolicy`` and
+  ``authtktauthenticationpolicy``) and the `aclauthorizationpolicy``
+  authorization policy directive as described in the changes to the
+  "Security" narrative documenation chapter and the wiki tutorials.
+
+Features
+--------
+
+- Add three new ZCML directives which configure authentication
+  policies:
+
+  - ``repozewho1authenticationpolicy``
+
+  - ``remoteuserauthenticationpolicy``
+
+  - ``authtktauthenticationpolicy``
+
+- Add a new ZCML directive which configures an ACL authorization
+  policy named ``aclauthorizationpolicy``.
+
+Bug Fixes
+---------
+
+- Bug fix: when a ``repoze.bfg.resource.PackageOverrides`` class was
+  instantiated, and the package it was overriding already had a
+  ``__loader__`` attribute, it would fail at startup time, even if the
+  ``__loader__`` attribute was another PackageOverrides instance.  We
+  now replace any ``__loader__`` that is also a PackageOverrides
+  instance.  Symptom: ``ConfigurationExecutionError: <type
+  'exceptions.TypeError'>: Package <module 'karl.views' from
+  '/Users/chrism/projects/osi/bfgenv/src/karl/karl/views/__init__.pyc'>
+  already has a __loader__ (probably a module in a zipped egg)``.
+
+1.0a7 (2009-06-30)
+==================
+
+Features
+--------
+
+- Add a ``reload_resources`` configuration file setting (aka the
+  ``BFG_RELOAD_RESOURCES`` environment variable).  When this is set to
+  true, the server never needs to be restarted when moving files
+  between directory resource overrides (esp. for templates currently).
+
+- Add a ``reload_all`` configuration file setting (aka the
+  ``BFG_RELOAD_ALL`` environment variable) that implies both
+  ``reload_resources`` and ``reload_templates``.
+
+- The ``static`` helper view class now uses a ``PackageURLParser`` in
+  order to allow for the overriding of static resources (CSS / logo
+  files, etc) using the ``resource`` ZCML directive.  The
+  ``PackageURLParser`` class was added to a (new) ``static`` module in
+  BFG; it is a subclass of the ``StaticURLParser`` class in
+  ``paste.urlparser``.
+
+- The ``repoze.bfg.templating.renderer_from_cache`` function now
+  checks for the ``reload_resources`` setting; if it's true, it does
+  not register a template renderer (it won't use the registry as a
+  template renderer cache).
+
+Documentation
+-------------
+
+- Add ``pkg_resources`` to the glossary.
+
+- Update the "Environment" docs to note the existence of
+  ``reload_resources`` and ``reload_all``.
+
+- Updated the ``bfg_alchemy`` paster template to include two views:
+  the view on the root shows a list of links to records;  the view on
+  a record shows the details for that object.
+
+Internal
+--------
+
+- Use a colon instead of a tab as the separator between package name
+  and relpath to form the "spec" when register a ITemplateRenderer.
+
+- Register a ``repoze.bfg.resource.OverrideProvider`` as a
+  pkg_resources provider only for modules which are known to have
+  overrides, instead of globally, when a <resource> directive is used
+  (performance).
+
+1.0a6 (2009-06-29)
+==================
+
+Bug Fixes
+---------
+
+- Use ``caller_package`` function instead of ``caller_module``
+  function within ``templating`` to avoid needing to name the caller
+  module in resource overrides (actually match docs).
+
+- Make it possible to override templates stored directly in a module
+  with templates in a subdirectory of the same module, stored directly
+  within another module, or stored in a subdirectory of another module
+  (actually match docs).
+
+1.0a5 (2009-06-28)
+==================
+
+Features
+--------
+
+- A new ZCML directive exists named "resource".  This ZCML directive
+  allows you to override Chameleon templates within a package (both
+  directories full of templates and individual template files) with
+  other templates in the same package or within another package.  This
+  allows you to "fake out" a view's use of a template, causing it to
+  retrieve a different template than the one actually named by a
+  relative path to a call like
+  ``render_template_to_response('templates/mytemplate.pt')``.  For
+  example, you can override a template file by doing::
+
+    <resource
+      to_override="some.package:templates/mytemplate.pt"
+      override_with="another.package:othertemplates/anothertemplate.pt"
+     />
+
+  The string passed to "to_override" and "override_with" is named a
+  "specification".  The colon separator in a specification separates
+  the package name from a package-relative directory name.  The colon
+  and the following relative path are optional.  If they are not
+  specified, the override attempts to resolve every lookup into a
+  package from the directory of another package.  For example::
+
+    <resource
+      to_override="some.package"
+      override_with="another.package"
+     />
+
+
+  Individual subdirectories within a package can also be overridden::
+
+    <resource
+      to_override="some.package:templates/"
+      override_with="another.package:othertemplates/"
+     />
+
+  If you wish to override a directory with another directory, you must
+  make sure to attach the slash to the end of both the ``to_override``
+  specification and the ``override_with`` specification.  If you fail
+  to attach a slash to the end of a specification that points a
+  directory, you will get unexpected results.  You cannot override a
+  directory specification with a file specification, and vice versa (a
+  startup error will occur if you try).
+
+  You cannot override a resource with itself (a startup error will
+  occur if you try).
+
+  Only individual *package* resources may be overridden.  Overrides
+  will not traverse through subpackages within an overridden package.
+  This means that if you want to override resources for both
+  ``some.package:templates``, and ``some.package.views:templates``,
+  you will need to register two overrides.
+
+  The package name in a specification may start with a dot, meaning
+  that the package is relative to the package in which the ZCML file
+  resides.  For example::
+
+    <resource
+      to_override=".subpackage:templates/"
+      override_with="another.package:templates/"
+     />
+
+  Overrides for the same ``to_overrides`` specification can be named
+  multiple times within ZCML.  Each ``override_with`` path will be
+  consulted in the order defined within ZCML, forming an override
+  search path.
+
+  Resource overrides can actually override resources other than
+  templates.  Any software which uses the ``pkg_resources``
+  ``get_resource_filename``, ``get_resource_stream`` or
+  ``get_resource_string`` APIs will obtain an overridden file when an
+  override is used.  However, the only built-in facility which uses
+  the ``pkg_resources`` API within BFG is the templating stuff, so we
+  only call out template overrides here.
+
+- Use the ``pkg_resources`` API to locate template filenames instead
+  of dead-reckoning using the ``os.path`` module.
+
+- The ``repoze.bfg.templating`` module now uses ``pkg_resources`` to
+  locate and register template files instead of using an absolute
+  path name.
+
+1.0a4 (2009-06-25)
+==================
+
+Features
+--------
+
+- Cause ``:segment`` matches in route paths to put a Unicode-decoded
+  and URL-dequoted value in the matchdict for the value matched.
+  Previously a non-decoded non-URL-dequoted string was placed in the
+  matchdict as the value.
+
+- Cause ``*remainder`` matches in route paths to put a *tuple* in the
+  matchdict dictionary in order to be able to present Unicode-decoded
+  and URL-dequoted values for the traversal path.  Previously a
+  non-decoded non-URL-dequoted string was placed in the matchdict as
+  the value.
+
+- Add optional ``max_age`` keyword value to the ``remember`` method of
+  ``repoze.bfg.authentication.AuthTktAuthenticationPolicy``; if this
+  value is passed to ``remember``, the generated cookie will have a
+  corresponding Max-Age value.
+
+Documentation
+-------------
+
+- Add information to the URL Dispatch narrative documentation about
+  path pattern matching syntax.
+
+Bug Fixes
+---------
+
+- Make ``route_url`` URL-quote segment replacements during generation.
+  Remainder segments are not quoted.
+
+1.0a3 (2009-06-24)
+==================
+
+Implementation Changes
+----------------------
+
+- ``repoze.bfg`` no longer relies on the Routes package to interpret
+  URL paths.  All known existing ``path`` patterns will continue to
+  work with the reimplemented logic, which lives in
+  ``repoze.bfg.urldispatch``.  ``<route>`` ZCML directives which use
+  certain attributes (uncommon ones) may not work (see "Backwards
+  Incompatibilities" below).
+
+Bug Fixes
+---------
+
+- ``model_url`` when passed a request that was generated as a result
+  of a route match would fail in a call to ``route.generate``.
+
+- BFG-on-GAE didn't work due to a corner case bug in the fallback
+  Python implementation of ``threading.local`` (symptom:
+  "Initialization arguments are not supported").  Thanks to Michael
+  Bernstein for the bug report.
+
+Documentation
+-------------
+
+- Added a "corner case" explanation to the "Hybrid Apps" chapter
+  explaining what to do when "the wrong" view is matched.
+
+- Use ``repoze.bfg.url.route_url`` API in tutorials rather than Routes
+  ``url_for`` API.
+
+Features
+--------
+
+- Added the ``repoze.bfg.url.route_url`` API.  This API allows you to
+  generate URLs based on ``<route>`` declarations.  See the URL
+  Dispatch narrative chapter and the "repoze.bfg.url" module API
+  documentation for more information.
+
+Backwards Incompatibilities
+---------------------------
+
+- As a result of disusing Routes, using the Routes ``url_for`` API
+  inside a BFG application (as was suggested by previous iterations of
+  tutorials) will no longer work.  Use the
+  ``repoze.bfg.url.route_url`` method instead.
+
+- The following attributes on the ``<route>`` ZCML directive no longer
+  work: ``encoding``, ``static``, ``filter``, ``condition_method``,
+  ``condition_subdomain``, ``condition_function``, ``explicit``, or
+  ``subdomains``.  These were all Routes features.
+
+- The ``<route>`` ZCML directive no longer supports the
+  ``<requirement>`` subdirective.  This was a Routes feature.
+
+1.0a2 (2009-06-23)
+==================
+
+Bug Fixes
+---------
+
+- The ``bfg_routesalchemy`` paster template app tests failed due to a
+  mismatch between test and view signatures.
+
+Features
+--------
+
+- Add a ``view_for`` attribute to the ``route`` ZCML directive.  This
+  attribute should refer to an interface or a class (ala the ``for``
+  attribute of the ``view`` ZCML directive).
+
+Documentation
+-------------
+
+- Conditional documentation in installation section ("how to install a
+  Python interpreter").
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``callback`` argument of the ``repoze.bfg.authentication``
+  authentication policies named ``RepozeWho1AuthenticationPolicy``,
+  ``RemoteUserAuthenticationPolicy``, and
+  ``AuthTktAuthenticationPolicy`` now must accept two positional
+  arguments: the orginal argument accepted by each (userid or
+  identity) plus a second argument, which will be the current request.
+  Apologies, this is required to service finding groups when there is
+  no "global" database connection.
+
+1.0a1 (2009-06-22)
+==================
+
+Features
+--------
+
+- A new ZCML directive was added named ``notfound``.  This ZCML
+  directive can be used to name a view that should be invoked when the
+  request can't otherwise be resolved to a view callable.  For example::
+
+    <notfound 
+        view="helloworld.views.notfound_view"/>
+
+- A new ZCML directive was added named ``forbidden``.  This ZCML
+  directive can be used to name a view that should be invoked when a
+  view callable for a request is found, but cannot be invoked due to
+  an authorization failure.  For example::
+
+   <forbidden
+       view="helloworld.views.forbidden_view"/>
+
+- Allow views to be *optionally* defined as callables that accept only
+  a request object, instead of both a context and a request (which
+  still works, and always will).  The following types work as views in
+  this style:
+
+  - functions that accept a single argument ``request``, e.g.::
+
+      def aview(request):
+          pass
+
+  - new and old-style classes that have an ``__init__`` method that
+    accepts ``self, request``, e.g.::
+
+      def View(object):
+          __init__(self, request):
+             pass
+
+  - Arbitrary callables that have a ``__call__`` method that accepts
+    ``self, request``, e.g.::
+
+      def AView(object):
+          def __call__(self, request):
+             pass
+      view = AView()
+
+  This likely should have been the calling convention all along, as
+  the request has ``context`` as an attribute already, and with views
+  called as a result of URL dispatch, having the context in the
+  arguments is not very useful.  C'est la vie.
+
+- Cache the absolute path in the caller's package globals within
+  ``repoze.bfg.path`` to get rid of repeated (expensive) calls to
+  os.path.abspath.
+
+- Add ``reissue_time`` and ``timeout`` parameters to
+  ``repoze.bfg.authentication.AuthTktAuthenticationPolicy``
+  constructor.  If these are passed, cookies will be reset every so
+  often (cadged from the same change to repoze.who lately).
+
+- The matchdict related to the matching of a Routes route is available
+  on the request as the ``matchdict`` attribute:
+  ``request.matchdict``.  If no route matched, this attribute will be
+  None.
+
+- Make 404 responses slightly cheaper by showing
+  ``environ["PATH_INFO"]`` on the notfound result page rather than the
+  fullly computed URL.
+
+- Move LRU cache implementation into a separate package
+  (``repoze.lru``).
+
+- The concepts of traversal and URL dispatch have been unified.  It is
+  now possible to use the same sort of factory as both a traversal
+  "root factory" and what used to be referred to as a urldispatch
+  "context factory".
+
+- When the root factory argument (as a first argument) passed to
+  ``repoze.bfg.router.make_app`` is ``None``, a *default* root factory
+  is used.  This is in support of using routes as "root finders"; it
+  supplants the idea that there is a default
+  ``IRoutesContextFactory``.
+
+- The `view`` ZCML statement and the ``repoze.bfg.view.bfg_view``
+  decorator now accept an extra argument: ``route_name``.  If a
+  ``route_name`` is specified, it must match the name of a previously
+  defined ``route`` statement.  When it is specified, the view will
+  only be called when that route matches during a request.
+
+- It is now possible to perfom traversal *after* a route has matched.
+  Use the pattern ``*traverse`` in a ``<route>`` ``path`` attribute
+  within ZCML, and the path remainder which it matches will be used as
+  a traversal path.
+
+- When any route defined matches, the WSGI environment will now
+  contain a key ``bfg.routes.route`` (the Route object which matched),
+  and a key ``bfg.routes.matchdict`` (the result of calling route.match).
+
+Deprecations
+------------
+
+- Utility registrations against
+  ``repoze.bfg.interfaces.INotFoundView`` and
+  ``repoze.bfg.interfaces.IForbiddenView`` are now deprecated.  Use
+  the ``notfound`` and ``forbidden`` ZCML directives instead (see the
+  "Hooks" chapter for more information).  Such registrations will
+  continue to work, but the notfound and forbidden directives do
+  "extra work" to ensure that the callable named by the directive can
+  be called by the router even if it's a class or
+  request-argument-only view.
+
+Removals
+--------
+
+- The ``IRoutesContext``, ``IRoutesContextFactory``, and
+  ``IContextNotFound`` interfaces were removed from
+  ``repoze.bfg.interfaces``.  These were never APIs.
+
+- The ``repoze.bfg.urldispatch.RoutesContextNotFound``,
+  ``repoze.bfg.urldispatch.RoutesModelTraverser`` and
+  ``repoze.bfg.urldispatch.RoutesContextURL`` classes were removed.
+  These were also never APIs.
+
+Backwards Incompatibilities
+---------------------------
+
+- Moved the ``repoze.bfg.push`` module, which implemented the ``pushpage``
+  decorator, into a separate distribution, ``repoze.bfg.pushpage``.
+  Applications which used this decorator should continue to work after
+  adding that distribution to their installation requirements.
+
+- Changing the default request factory via an IRequestFactory utility
+  registration (as used to be documented in the "Hooks" chapter's
+  "Changing the request factory" section) is no longer supported.  The
+  dance to manufacture a request is complicated as a result of
+  unifying traversal and url dispatch, making it highly unlikely for
+  anyone to be able to override it properly.  For those who just want
+  to decorate or modify a request, use a NewRequestEvent subscriber
+  (see the Events chapter in the documentation).
+
+- The ``repoze.bfg.IRequestFactory`` interface was removed.  See the
+  bullet above for why.
+
+- Routes "context factories" (spelled as the factory argument to a
+  route statement in ZCML) must now expect the WSGI environ as a
+  single argument rather than a set of keyword arguments.  They can
+  obtain the match dictionary by asking for
+  environ['bfg.routes.matchdict'].  This is the same set of keywords
+  that used to be passed to urldispatch "context factories" in BFG 0.9
+  and below.
+
+- Using the ``@zope.component.adapter`` decorator on a bfg view
+  function no longer works.  Use the ``@repoze.bfg.view.bfg_view``
+  decorator instead to mark a function (or a class) as a view.
+
+- The name under which the matching route object is found in the
+  environ was changed from ``bfg.route`` to ``bfg.routes.route``.
+
+- Finding the root is now done *before* manufacturing a request object
+  (and sending a new request event) within the router (it used to be
+  performed afterwards).
+
+- Adding ``*path_info`` to a route no longer changes the PATH_INFO for
+  a request that matches using URL dispatch.  This feature was only
+  there to service the ``repoze.bfg.wsgi.wsgiapp2`` decorator and it
+  did it wrong; use ``*subpath`` instead now.
+
+- The values of ``subpath``, ``traversed``, and ``virtual_root_path``
+  attached to the request object are always now tuples instead of
+  lists (performance).
+
+Bug Fixes
+---------
+
+- The ``bfg_alchemy`` Paster template named "repoze.tm" in its
+  pipeline rather than "repoze.tm2", causing the startup to fail.
+
+- Move BBB logic for registering an
+  IAuthenticationPolicy/IForbiddenView/INotFoundView based on older
+  concepts from the router module's ``make_app`` function into the
+  ``repoze.bfg.zcml.zcml_configure`` callable, to service
+  compatibility with scripts that use "zope.configuration.xmlconfig"
+  (replace with ``repoze.bfg.zml.zcml_configure`` as necessary to get
+  BBB logic)
+
+Documentation
+-------------
+
+- Add interface docs related to how to create authentication policies
+  and authorization policies to the "Security" narrative chapter.
+
+- Added a (fairly sad) "Combining Traversal and URL Dispatch" chapter
+  to the narrative documentation.  This explains the usage of
+  ``*traverse`` and ``*subpath`` in routes URL patters.
+
+- A "router" chapter explaining the request/response lifecycle at a
+  high level was added.
+
+- Replaced all mentions and explanations of a routes "context factory"
+  with equivalent explanations of a "root factory" (context factories
+  have been disused).
+
+- Updated Routes bfgwiki2 tutorial to reflect the fact that context
+  factories are now no longer used.
+
+0.9.1 (2009-06-02)
+==================
+
+Features
+--------
+
+- Add API named ``repoze.bfg.settings.get_settings`` which retrieves a
+  derivation of values passed as the ``options`` value of
+  ``repoze.bfg.router.make_app``.  This API should be preferred
+  instead of using getUtility(ISettings).  I added a new
+  ``repoze.bfg.settings`` API document as well.
+
+Bug Fixes
+---------
+
+- Restored missing entry point declaration for bfg_alchemy paster
+  template, which was accidentally removed in 0.9.
+
+Documentation
+-------------
+
+- Fix a reference to ``wsgiapp`` in the ``wsgiapp2`` API documentation
+  within the ``repoze.bfg.wsgi`` module.
+
+API Removals
+------------
+
+- The ``repoze.bfg.location.locate`` API was removed: it didn't do
+  enough to be very helpful and had a misleading name.
+
+0.9 (2009-06-01)
+================
+
+Bug Fixes
+---------
+
+- It was not possible to register a custom ``IRoutesContextFactory``
+  for use as a default context factory as documented in the "Hooks"
+  chapter.
+
+Features
+--------
+
+- The ``request_type`` argument of ZCML ``view`` declarations and
+  ``bfg_view`` decorators can now be one of the strings ``GET``,
+  ``POST``, ``PUT``, ``DELETE``, or ``HEAD`` instead of a reference to
+  the respective interface type imported from
+  ``repoze.bfg.interfaces``.
+
+- The ``route`` ZCML directive now accepts ``request_type`` as an
+  alias for its ``condition_method`` argument for symmetry with the
+  ``view`` directive.
+
+- The ``bfg_routesalchemy`` paster template now provides a unit test
+  and actually uses the database during a view rendering.
+
+Removals
+--------
+
+- Remove ``repoze.bfg.threadlocal.setManager``.  It was only used in
+  unit tests.
+
+- Remove ``repoze.bfg.wsgi.HTTPException``,
+  ``repoze.bfg.wsgi.NotFound``, and ``repoze.bfg.wsgi.Unauthorized``.
+  These classes were disused with the introduction of the
+  ``IUnauthorizedView`` and ``INotFoundView`` machinery.
+
+Documentation
+-------------
+
+- Add description to narrative templating chapter about how to use
+  Chameleon text templates.
+
+- Changed Views narrative chapter to use method strings rather than
+  interface types, and moved advanced interface type usage to Events
+  narrative chapter.
+
+- Added a Routes+SQLAlchemy wiki tutorial.
+
+0.9a8 (2009-05-31)
+==================
+
+Features
+--------
+
+- It is now possible to register a custom
+  ``repoze.bfg.interfaces.INotFoundView`` for a given application.
+  This feature replaces the
+  ``repoze.bfg.interfaces.INotFoundAppFactory`` feature previously
+  described in the Hooks chapter.  The INotFoundView will be called
+  when the framework detects that a view lookup done as a result of a
+  request fails; it should accept a context object and a request
+  object; it should return an IResponse object (a webob response,
+  basically).  See the Hooks narrative chapter of the BFG docs for
+  more info.
+
+- The error presented when a view invoked by the router returns a
+  non-response object now includes the view's name for troubleshooting
+  purposes.
+
+Bug Fixes
+---------
+
+- A "new response" event is emitted for forbidden and notfound views.
+
+Deprecations
+------------
+
+- The ``repoze.bfg.interfaces.INotFoundAppFactory`` interface has been
+  deprecated in favor of using the new
+  ``repoze.bfg.interfaces.INotFoundView`` mechanism.
+
+Renames
+-------
+
+- Renamed ``repoze.bfg.interfaces.IForbiddenResponseFactory`` to
+  ``repoze.bfg.interfaces.IForbiddenView``.
+
+0.9a7 (2009-05-30)
+==================
+
+Features
+--------
+
+- Remove "context" argument from ``effective_principals`` and
+  ``authenticated_userid`` function APIs in ``repoze.bfg.security``,
+  effectively a doing reversion to 0.8 and before behavior.  Both
+  functions now again accept only the ``request`` parameter.
+
+0.9a6 (2009-05-29)
+==================
+
+Documentation
+-------------
+
+- Changed "BFG Wiki" tutorial to use AuthTktAuthenticationPolicy
+  rather than repoze.who.
+
+Features
+--------
+
+- Add an AuthTktAuthenticationPolicy.  This policy retrieves
+  credentials from an auth_tkt cookie managed by the application
+  itself (instead of relying on an upstream data source for
+  authentication data).  See the Security API chapter of the
+  documentation for more info.
+
+- Allow RemoteUserAuthenticationPolicy and
+  RepozeWho1AuthenticationPolicy to accept various constructor
+  arguments.  See the Security API chapter of the documentation for
+  more info.
+
+0.9a5 (2009-05-28)
+==================
+
+Features
+--------
+
+- Add a ``get_app`` API functions to the ``paster`` module.  This
+  obtains a WSGI application from a config file given a config file
+  name and a section name.  See the ``repoze.bfg.paster`` API docs for
+  more information.
+
+- Add a new module named ``scripting``.  It contains a ``get_root``
+  API function, which, provided a Router instance, returns a traversal
+  root object and a "closer".  See the ``repoze.bfg.scripting`` API
+  docs for more info.
+
+0.9a4 (2009-05-27)
+==================
+
+Bug Fixes
+---------
+
+- Try checking for an "old style" security policy *after* we parse
+  ZCML (thinko).
+
+0.9a3 (2009-05-27)
+==================
+
+Features
+--------
+
+- Allow IAuthenticationPolicy and IAuthorizationPolicy to be
+  overridden via ZCML registrations (do ZCML parsing after
+  registering these in router.py).
+
+Documentation
+-------------
+
+- Added "BFG Wiki" tutorial to documentation; it describes
+  step-by-step how to create a traversal-based ZODB application with
+  authentication.
+
+Deprecations
+------------
+
+- Added deprecations for imports of ``ACLSecurityPolicy``,
+  ``InheritingACLSecurityPolicy``, ``RemoteUserACLSecurityPolicy``,
+  ``RemoteUserInheritingACLSecurityPolicy``, ``WhoACLSecurityPolicy``,
+  and ``WhoInheritingACLSecurityPolicy`` from the
+  ``repoze.bfg.security`` module; for the meantime (for backwards
+  compatibility purposes) these live in the ``repoze.bfg.secpols``
+  module.  Note however, that the entire concept of a "security
+  policy" is deprecated in BFG in favor of separate authentication and
+  authorization policies, so any use of a security policy will
+  generate additional deprecation warnings even if you do start using
+  ``repoze.bfg.secpols``.  ``repoze.bfg.secpols`` will disappear in a
+  future release of ``repoze.bfg``.
+
+Deprecated Import Alias Removals
+--------------------------------
+
+- Remove ``repoze.bfg.template`` module.  All imports from this
+  package have been deprecated since 0.3.8.  Instead, import
+  ``get_template``, ``render_template``, and
+  ``render_template_to_response`` from the
+  ``repoze.bfg.chameleon_zpt`` module. 
+
+- Remove backwards compatibility import alias for
+  ``repoze.bfg.traversal.split_path`` (deprecated since 0.6.5).  This
+  must now be imported as ``repoze.bfg.traversal.traversal_path``).
+
+- Remove backwards compatibility import alias for
+  ``repoze.bfg.urldispatch.RoutesContext`` (deprecated since 0.6.5).
+  This must now be imported as
+  ``repoze.bfg.urldispatch.DefaultRoutesContext``.
+
+- Removed backwards compatibility import aliases for
+  ``repoze.bfg.router.get_options`` and ``repoze.bfg.router.Settings``
+  (deprecated since 0.6.2).  These both must now be imported from
+  ``repoze.bfg.settings``.
+
+- Removed backwards compatibility import alias for
+  ``repoze.bfg.interfaces.IRootPolicy`` (deprecated since 0.6.2).  It
+  must be imported as ``repoze.bfg.interfaces.IRootFactory`` now.
+
+- Removed backwards compatibility import alias for
+  ``repoze.bfg.interfaces.ITemplate`` (deprecated since 0.4.4).  It
+  must be imported as ``repoze.bfg.interfaces.ITemplateRenderer`` now.
+
+- Removed backwards compatibility import alias for
+  ``repoze.bfg.interfaces.ITemplateFactory`` (deprecated since 0.4.4).
+  It must be imported as
+  ``repoze.bfg.interfaces.ITemplateRendererFactory`` now.
+
+- Removed backwards compatibility import alias for
+  ``repoze.bfg.chameleon_zpt.ZPTTemplateFactory`` (deprecated since
+  0.4.4).  This must be imported as ``repoze.bfg.ZPTTemplateRenderer``
+  now.
+
+0.9a2 (2009-05-27)
+==================
+
+Features
+--------
+
+- A paster command has been added named "bfgshell".  This command can
+  be used to get an interactive prompt with your BFG root object in
+  the global namespace.  E.g.::
+
+    bin/paster bfgshell /path/to/myapp.ini myapp
+
+  See the ``Project`` chapter in the BFG documentation for more
+  information.
+
+Deprecations
+------------
+
+- The name ``repoze.bfg.registry.registry_manager`` was never an API,
+  but scripts in the wild were using it to set up an environment for
+  use under a debug shell.  A backwards compatibility shim has been
+  added for this purpose, but the feature is deprecated.
+
+0.9a1 (2009-5-27)
+=================
+
+Features
+--------
+
+- New API functions named ``forget`` and ``remember`` are available in
+  the ``security`` module.  The ``forget`` function returns headers
+  which will cause the currently authenticated user to be logged out
+  when set in a response.  The ``remember`` function (when passed the
+  proper arguments) will return headers which will cause a principal
+  to be "logged in" when set in a response.  See the Security API
+  chapter of the docs for more info.
+
+- New keyword arguments to the ``repoze.bfg.router.make_app`` call
+  have been added: ``authentication_policy`` and
+  ``authorization_policy``.  These should, respectively, be an
+  implementation of an authentication policy (an object implementing
+  the ``repoze.bfg.interfaces.IAuthenticationPolicy`` interface) and
+  an implementation of an authorization policy (an object implementing
+  ``repoze.bfg.interfaces.IAuthorizationPolicy)``.  Concrete
+  implementations of authentication policies exist in
+  ``repoze.bfg.authentication``.  Concrete implementations of
+  authorization policies exist in ``repoze.bfg.authorization``.
+
+  Both ``authentication_policy`` and ``authorization_policy`` default
+  to ``None``.
+
+  If ``authentication_policy`` is ``None``, but
+  ``authorization_policy`` is *not* ``None``, then
+  ``authorization_policy`` is ignored (the ability to do authorization
+  depends on authentication).
+
+  If the ``authentication_policy`` argument is *not* ``None``, and the
+  ``authorization_policy`` argument *is* ``None``, the authorization
+  policy defaults to an authorization implementation that uses ACLs
+  (``repoze.bfg.authorization.ACLAuthorizationPolicy``).
+
+  We no longer encourage configuration of "security policies" using
+  ZCML, as previously we did for ``ISecurityPolicy``.  This is because
+  it's not uncommon to need to configure settings for concrete
+  authorization or authentication policies using paste .ini
+  parameters; the app entry point for your application is the natural
+  place to do this.
+
+- Two new abstractions have been added in the way of adapters used by
+  the system: an ``IAuthorizationPolicy`` and an
+  ``IAuthenticationPolicy``.  A combination of these (as registered by
+  the ``securitypolicy`` ZCML directive) take the place of the
+  ``ISecurityPolicy`` abstraction in previous releases of repoze.who.
+  The API functions in ``repoze.who.security`` (such as
+  ``authentication_userid``, ``effective_principals``,
+  ``has_permission``, and so on) have been changed to try to make use
+  of these new adapters.  If you're using an older ``ISecurityPolicy``
+  adapter, the system will still work, but it will print deprecation
+  warnings when such a policy is used.
+
+- The way the (internal) IViewPermission utilities registered via ZCML
+  are invoked has changed.  They are purely adapters now, returning a
+  boolean result, rather than returning a callable. You shouldn't have
+  been using these anyway. ;-)
+
+- New concrete implementations of IAuthenticationPolicy have been
+  added to the ``repoze.bfg.authentication`` module:
+  ``RepozeWho1AuthenticationPolicy`` which uses ``repoze.who``
+  identity to retrieve authentication data from and
+  ``RemoteUserAuthenticationPolicy``, which uses the ``REMOTE_USER``
+  value in the WSGI environment to retrieve authentication data.
+
+- A new concrete implementation of IAuthorizationPolicy has been added
+  to the ``repoze.bfg.authorization`` module:
+  ``ACLAuthorizationPolicy`` which uses ACL inheritance to do
+  authorization.
+
+- It is now possible to register a custom
+  ``repoze.bfg.interfaces.IForbiddenResponseFactory`` for a given
+  application.  This feature replaces the
+  ``repoze.bfg.interfaces.IUnauthorizedAppFactory`` feature previously
+  described in the Hooks chapter.  The IForbiddenResponseFactory will
+  be called when the framework detects an authorization failure; it
+  should accept a context object and a request object; it should
+  return an IResponse object (a webob response, basically).  Read the
+  below point for more info and see the Hooks narrative chapter of the
+  BFG docs for more info.
+
+Backwards Incompatibilities
+---------------------------
+
+- Custom NotFound and Forbidden (nee' Unauthorized) WSGI applications
+  (registered as a utility for INotFoundAppFactory and
+  IUnauthorizedAppFactory) could rely on an environment key named
+  ``message`` describing the circumstance of the response.  This key
+  has been renamed to ``repoze.bfg.message`` (as per the WSGI spec,
+  which requires environment extensions to contain dots).
+
+Deprecations
+------------
+
+- The ``repoze.bfg.interfaces.IUnauthorizedAppFactory`` interface has
+  been deprecated in favor of using the new
+  ``repoze.bfg.interfaces.IForbiddenResponseFactory`` mechanism.
+
+- The ``view_execution_permitted`` API should now be imported from the
+  ``repoze.bfg.security`` module instead of the ``repoze.bfg.view``
+  module.
+
+- The ``authenticated_userid`` and ``effective_principals`` APIs in
+  ``repoze.bfg.security`` used to only take a single argument
+  (request).  They now accept two arguments (``context`` and
+  ``request``).  Calling them with a single argument is still
+  supported but issues a deprecation warning.  (NOTE: this change was
+  reverted in 0.9a7; meaning the 0.9 versions of these functions
+  again accept ``request`` only, just like 0.8 and before).
+
+- Use of "old-style" security policies (those base on ISecurityPolicy)
+  is now deprecated.  See the "Security" chapter of the docs for info
+  about activating an authorization policy and an authentication poicy.
+
+0.8.1 (2009-05-21)
+==================
+
+Features
+--------
+
+- Class objects may now be used as view callables (both via ZCML and
+  via use of the ``bfg_view`` decorator in Python 2.6 as a class
+  decorator).  The calling semantics when using a class as a view
+  callable is similar to that of using a class as a Zope "browser
+  view": the class' ``__init__`` must accept two positional parameters
+  (conventionally named ``context``, and ``request``).  The resulting
+  instance must be callable (it must have a ``__call__`` method).
+  When called, the instance should return a response.  For example::
+
+    from webob import Response
+
+    class MyView(object):
+        def __init__(self, context, request):
+            self.context = context
+            self.request = request
+
+        def __call__(self):
+            return Response('hello from %s!' % self.context)
+
+   See the "Views" chapter in the documentation and the
+   ``repoze.bfg.view`` API documentation for more information.
+
+- Removed the pickling of ZCML actions (the code that wrote
+  ``configure.zcml.cache`` next to ``configure.zcml`` files in
+  projects).  The code which managed writing and reading of the cache
+  file was a source of subtle bugs when users switched between
+  imperative (e.g. ``@bfg_view``) registrations and declarative
+  registrations (e.g. the ``view`` directive in ZCML) on the same
+  project. On a moderately-sized project (535 ZCML actions and 15 ZCML
+  files), executing actions read from the pickle was saving us only
+  about 200ms (2.5 sec vs 2.7 sec average). On very small projects (1
+  ZCML file and 4 actions), startup time was comparable, and sometimes
+  even slower when reading from the pickle, and both ways were so fast
+  that it really just didn't matter anyway.
+
+0.8 (2009-05-18)
+================
+
+Features
+--------
+
+- Added a ``traverse`` function to the ``repoze.bfg.traversal``
+  module.  This function may be used to retrieve certain values
+  computed during path resolution.  See the Traversal API chapter of
+  the documentation for more information about this function.
+
+Deprecations
+------------
+
+- Internal: ``ITraverser`` callables should now return a dictionary
+  rather than a tuple.  Up until 0.7.0, all ITraversers were assumed
+  to return a 3-tuple.  In 0.7.1, ITraversers were assumed to return a
+  6-tuple.  As (by evidence) it's likely we'll need to add further
+  information to the return value of an ITraverser callable, 0.8
+  assumes that an ITraverser return a dictionary with certain elements
+  in it.  See the ``repoze.bfg.interfaces.ITraverser`` interface for
+  the list of keys that should be present in the dictionary.
+  ``ITraversers`` which return tuples will still work, although a
+  deprecation warning will be issued.
+
+Backwards Incompatibilities
+---------------------------
+
+- If your code used the ITraverser interface directly (not via an API
+  function such as ``find_model``) via an adapter lookup, you'll need
+  to change your code to expect a dictionary rather than a 3- or
+  6-tuple if your code ever gets return values from the default
+  ModelGraphTraverser or RoutesModelTraverser adapters.
+
+0.8a7 (2009-05-16)
+==================
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``RoutesMapper`` class in ``repoze.bfg.urldispatch`` has been
+  removed, as well as its documentation.  It had been deprecated since
+  0.6.3.  Code in ``repoze.bfg.urldispatch.RoutesModelTraverser``
+  which catered to it has also been removed.
+
+- The semantics of the ``route`` ZCML directive have been simplified.
+  Previously, it was assumed that to use a route, you wanted to map a
+  route to an externally registered view.  The new ``route`` directive
+  instead has a ``view`` attribute which is required, specifying the
+  dotted path to a view callable.  When a route directive is
+  processed, a view is *registered* using the name attribute of the
+  route directive as its name and the callable as its value.  The
+  ``view_name`` and ``provides`` attributes of the ``route`` directive
+  are therefore no longer used.  Effectively, if you were previously
+  using the ``route`` directive, it means you must change a pair of
+  ZCML directives that look like this::
+
+    <route
+       name="home"
+       path=""
+       view_name="login"
+       factory=".models.root.Root"
+     />
+
+    <view
+       for=".models.root.Root"
+       name="login"
+       view=".views.login_view"
+     />
+    
+  To a ZCML directive that looks like this::
+
+    <route
+       name="home"
+       path=""
+       view=".views.login_view"
+       factory=".models.root.Root"
+     />
+
+  In other words, to make old code work, remove the ``view``
+  directives that were only there to serve the purpose of backing
+  ``route`` directives, and move their ``view=`` attribute into the
+  ``route`` directive itself.
+
+  This change also necessitated that the ``name`` attribute of the
+  ``route`` directive is now required.  If you were previously using
+  ``route`` directives without a ``name`` attribute, you'll need to
+  add one (the name is arbitrary, but must be unique among all
+  ``route`` and ``view`` statements).
+
+  The ``provides`` attribute of the ``route`` directive has also been
+  removed.  This directive specified a sequence of interface types
+  that the generated context would be decorated with.  Since route
+  views are always generated now for a single interface
+  (``repoze.bfg.IRoutesContext``) as opposed to being looked up
+  arbitrarily, there is no need to decorate any context to ensure a
+  view is found.
+
+Documentation
+-------------
+
+- Added API docs for the ``repoze.bfg.testing`` methods
+  ``registerAdapter``, ``registerUtiity``, ``registerSubscriber``, and
+  ``cleanUp``.
+
+- Added glossary entry for "root factory".
+
+- Noted existence of ``repoze.bfg.pagetemplate`` template bindings in
+  "Available Add On Template System Bindings" in Templates chapter in
+  narrative docs.
+
+- Update "Templates" narrative chapter in docs (expand to show a
+  sample template and correct macro example).
+
+Features
+--------
+
+- Courtesty Carlos de la Guardia, added an ``alchemy`` Paster
+  template.  This paster template sets up a BFG project that uses
+  SQAlchemy (with SQLite) and uses traversal to resolve URLs.  (no
+  Routes areused).  This template can be used via ``paster create -t
+  bfg_alchemy``.
+
+- The Routes ``Route`` object used to resolve the match is now put
+  into the environment as ``bfg.route`` when URL dispatch is used.
+
+- You can now change the default Routes "context factory" globally.
+  See the "ZCML Hooks" chapter of the documentation (in the "Changing
+  the Default Routes Context Factory" section).
+
+0.8a6 (2009-05-11)
+==================
+
+Features
+--------
+
+- Added a ``routesalchemy`` Paster template.  This paster template
+  sets up a BFG project that uses SQAlchemy (with SQLite) and uses
+  Routes exclusively to resolve URLs (no traversal root factory is
+  used).  This template can be used via ``paster create -t
+  bfg_routesalchemy``.
+
+Documentation
+-------------
+
+- Added documentation to the URL Dispatch chapter about how to catch
+  the root URL using a ZCML ``route`` directive.
+
+- Added documentation to the URL Dispatch chapter about how to perform
+  a cleanup function at the end of a request (e.g. close the SQL
+  connection).
+
+Bug Fixes
+---------
+
+- In version 0.6.3, passing a ``get_root`` callback (a "root factory")
+  to ``repoze.bfg.router.make_app`` became optional if any ``route``
+  declaration was made in ZCML.  The intent was to make it possible to
+  disuse traversal entirely, instead relying entirely on URL dispatch
+  (Routes) to resolve all contexts.  However a compound set of bugs
+  prevented usage of a Routes-based root view (a view which responds
+  to "/").  One bug existed in `repoze.bfg.urldispatch``, another
+  existed in Routes itself.
+
+  To resolve this issue, the urldispatch module was fixed, and a fork
+  of the Routes trunk was put into the "dev" index named
+  ``Routes-1.11dev-chrism-home``.  The source for the fork exists at
+  `http://bitbucket.org/chrism/routes-home/
+  <http://bitbucket.org/chrism/routes-home/>`_; its contents have been
+  merged into the Routes trunk (what will be Routes 1.11).
+
+0.8a5 (2009-05-08)
+==================
+
+Features
+--------
+
+- Two new security policies were added:
+  RemoteUserInheritingACLSecurityPolicy and
+  WhoInheritingACLSecurityPolicy.  These are security policies which
+  take into account *all* ACLs defined in the lineage of a context
+  rather than stopping at the first ACL found in a lineage.  See the
+  "Security" chapter of the API documentation for more information.
+
+- The API and narrative documentation dealing with security was
+  changed to introduce the new "inheriting" security policy variants.
+
+- Added glossary entry for "lineage".
+
+Deprecations
+------------
+
+- The security policy previously named
+  ``RepozeWhoIdentityACLSecurityPolicy`` now has the slightly saner
+  name of ``WhoACLSecurityPolicy``.  A deprecation warning is emitted
+  when this policy is imported under the "old" name; usually this is
+  due to its use in ZCML within your application.  If you're getting
+  this deprecation warning, change your ZCML to use the new name,
+  e.g. change::
+
+   <utility
+     provides="repoze.bfg.interfaces.ISecurityPolicy"
+     factory="repoze.bfg.security.RepozeWhoIdentityACLSecurityPolicy"
+     />
+
+  To::
+
+   <utility
+     provides="repoze.bfg.interfaces.ISecurityPolicy"
+     factory="repoze.bfg.security.WhoACLSecurityPolicy"
+     />
+
+0.8a4 (2009-05-04)
+==================
+
+Features
+--------
+
+- ``zope.testing`` is no longer a direct dependency, although our
+  dependencies (such as ``zope.interface``, ``repoze.zcml``, etc)
+  still depend on it.
+
+- Tested on Google App Engine.  Added a tutorial to the documentation
+  explaining how to deploy a BFG app to GAE.
+
+Backwards Incompatibilities
+---------------------------
+
+- Applications which rely on ``zope.testing.cleanup.cleanUp`` in unit
+  tests can still use that function indefinitely.  However, for
+  maximum forward compatibility, they should import ``cleanUp`` from
+  ``repoze.bfg.testing`` instead of from ``zope.testing.cleanup``.
+  The BFG paster templates and docs have been changed to use this
+  function instead of the ``zope.testing.cleanup`` version.
+
+0.8a3 (2009-05-03)
+===================
+
+Features
+--------
+
+- Don't require a successful import of ``zope.testing`` at BFG
+  application runtime.  This allows us to get rid of ``zope.testing``
+  on platforms like GAE which have file limits.
+
+0.8a2 (2009-05-02)
+==================
+
+Features
+--------
+
+- We no longer include the ``configure.zcml`` of the ``chameleon.zpt``
+  package within the ``configure.zcml`` of the "repoze.bfg.includes"
+  package.  This has been a no-op for some time now.
+
+- The ``repoze.bfg.chameleon_zpt`` package no longer imports from
+  ``chameleon.zpt`` at module scope, deferring the import until later
+  within a method call.  The ``chameleon.zpt`` package can't be
+  imported on platforms like GAE.
+
+0.8a1 (2009-05-02)
+==================
+
+Deprecation Warning and Import Alias Removals
+---------------------------------------------
+
+- Since version 0.6.1, a deprecation warning has been emitted when the
+  name ``model_url`` is imported from the ``repoze.bfg.traversal``
+  module.  This import alias (and the deprecation warning) has been
+  removed.  Any import of the ``model_url`` function will now need to
+  be done from ``repoze.bfg.url``; any import of the name
+  ``model_url`` from ``repoze.bfg.traversal`` will now fail.  This was
+  done to remove a dependency on zope.deferredimport.
+
+- Since version 0.6.5, a deprecation warning has been emitted when the
+  name ``RoutesModelTraverser`` is imported from the
+  ``repoze.bfg.traversal`` module.  This import alias (and the
+  deprecation warning) has been removed.  Any import of the
+  ``RoutesModelTraverser`` class will now need to be done from
+  ``repoze.bfg.urldispatch``; any import of the name
+  ``RoutesModelTraverser`` from ``repoze.bfg.traversal`` will now
+  fail.  This was done to remove a dependency on zope.deferredimport.
+
+Features
+--------
+
+- This release of ``repoze.bfg`` is "C-free".  This means it has no
+  hard dependencies on any software that must be compiled from C
+  source at installation time.  In particular, ``repoze.bfg`` no
+  longer depends on the ``lxml`` package.
+
+  This change has introduced some backwards incompatibilities,
+  described in the "Backwards Incompatibilities" section below.
+
+- This release was tested on Windows XP.  It appears to work fine and
+  all the tests pass.
+
+Backwards Incompatibilities
+---------------------------
+
+Incompatibilities related to making ``repoze.bfg`` "C-free":
+
+- Removed the ``repoze.bfg.chameleon_genshi`` module, and thus support
+  for Genshi-style chameleon templates.  Genshi-style Chameleon
+  templates depend upon ``lxml``, which is implemented in C (as
+  opposed to pure Python) and the ``repoze.bfg`` core is "C-free" as
+  of this release. You may get Genshi-style Chameleon support back by
+  installing the ``repoze.bfg.chameleon_genshi`` package availalable
+  from http://svn.repoze.org/repoze.bfg.chameleon_genshi (also
+  available in the index at http://dist.repoze.org/bfg/0.8/simple).
+  All existing code that depended on the ``chameleon_genshi`` module
+  prior to this release of ``repoze.bfg`` should work without change
+  after this addon is installed.
+
+- Removed the ``repoze.bfg.xslt`` module and thus support for XSL
+  templates.  The ``repoze.bfg.xslt`` module depended upon ``lxml``,
+  which is implemented in C, and the ``repoze.bfg`` core is "C-free"
+  as of this release.  You bay get XSL templating back by installing
+  the ``repoze.bfg.xslt`` package available from
+  http://svn.repoze.org/repoze.bfg.xslt/ (also available in the index
+  at http://dist.repoze.org/bfg/0.8/simple).  All existing code that
+  depended upon the ``xslt`` module prior to this release of
+  ``repoze.bfg`` should work without modification after this addon is
+  installed.
+
+- Removed the ``repoze.bfg.interfaces.INodeTemplateRenderer``
+  interface and the an old b/w compat aliases from that interface to
+  ``repoze.bfg.interfaces.INodeTemplate``.  This interface must now be
+  imported from the ``repoze.bfg.xslt.interfaces`` package after
+  installation of the ``repoze.bfg.xslt`` addon package described
+  above as ``repoze.bfg.interfaces.INodeTemplateRenderer``.  This
+  interface was never part of any public API.
+
+Other backwards incompatibilities:
+
+- The ``render_template`` function in ``repoze.bfg.chameleon_zpt``
+  returns Unicode instead of a string.  Likewise, the individual
+  values returned by the iterable created by the
+  ``render_template_to_iterable`` function are also each Unicode.
+  This is actually a backwards incompatibility inherited from our new
+  use of the combination of ``chameleon.core`` 1.0b32 (the
+  non-lxml-depending version) and ``chameleon.zpt`` 1.0b16+ ; the
+  ``chameleon.zpt`` PageTemplateFile implementation used to return a
+  string, but now returns Unicode.
+
+0.7.1 (2009-05-01)
+==================
+
+Index-Related
+-------------
+
+- The canonical package index location for ``repoze.bfg`` has changed.
+  The "old" index (http://dist.repoze.org/lemonade/dev/simple) has
+  been superseded by a new index location
+  (`http://dist.repoze.org/bfg/current/simple
+  <http://dist.repoze.org/bfg/current/simple>`_).  The installation
+  documentation has been updated as well as the ``setup.cfg`` file in
+  this package.  The "lemonade" index still exists, but it is not
+  guaranteed to have the latest BFG software in it, nor will it be
+  maintained in the future.
+
+Features
+--------
+
+- The "paster create" templates have been modified to use links to the
+  new "bfg.repoze.org" and "docs.repoze.org" websites.
+
+- Added better documentation for virtual hosting at a URL prefix
+  within the virtual hosting docs chapter.
+
+- The interface for ``repoze.bfg.interfaces.ITraverser`` and the
+  built-in implementations that implement the interface
+  (``repoze.bfg.traversal.ModelGraphTraverser``, and
+  ``repoze.bfg.urldispatch.RoutesModelTraverser``) now expect the
+  ``__call__`` method of an ITraverser to return 3 additional
+  arguments: ``traversed``, ``virtual_root``, and
+  ``virtual_root_path`` (the old contract was that the ``__call__``
+  method of an ITraverser returned; three arguments, the contract new
+  is that it returns six).  ``traversed`` will be a sequence of
+  Unicode names that were traversed (including the virtual root path,
+  if any) or ``None`` if no traversal was performed, ``virtual_root``
+  will be a model object representing the virtual root (or the
+  physical root if traversal was not performed), and
+  ``virtual_root_path`` will be a sequence representing the virtual
+  root path (a sequence of Unicode names) or ``None`` if traversal was
+  not performed.
+
+  Six arguments are now returned from BFG ITraversers.  They are
+  returned in this order: ``context``, ``view_name``, ``subpath``,
+  ``traversed``, ``virtual_root``, and ``virtual_root_path``.
+
+  Places in the BFG code which called an ITraverser continue to accept
+  a 3-argument return value, although BFG will generate and log a
+  warning when one is encountered.
+
+- The request object now has the following attributes: ``traversed``
+  (the sequence of names traversed or ``None`` if traversal was not
+  performed), ``virtual_root`` (the model object representing the
+  virtual root, including the virtual root path if any), and
+  ``virtual_root_path`` (the seuquence of names representing the
+  virtual root path or ``None`` if traversal was not performed).
+
+- A new decorator named ``wsgiapp2`` was added to the
+  ``repoze.bfg.wsgi`` module.  This decorator performs the same
+  function as ``repoze.bfg.wsgi.wsgiapp`` except it fixes up the
+  ``SCRIPT_NAME``, and ``PATH_INFO`` environment values before
+  invoking the WSGI subapplication.
+
+- The ``repoze.bfg.testing.DummyRequest`` object now has default
+  attributes for ``traversed``, ``virtual_root``, and
+  ``virtual_root_path``.
+
+- The RoutesModelTraverser now behaves more like the Routes
+  "RoutesMiddleware" object when an element in the match dict is named
+  ``path_info`` (usually when there's a pattern like
+  ``http://foo/*path_info``).  When this is the case, the
+  ``PATH_INFO`` environment variable is set to the value in the match
+  dict, and the ``SCRIPT_NAME`` is appended to with the prefix of the
+  original ``PATH_INFO`` not including the value of the new variable.
+
+- The notfound debug now shows the traversed path, the virtual root,
+  and the virtual root path too.
+
+- Speed up / clarify 'traversal' module's 'model_path', 'model_path_tuple',
+  and '_model_path_list' functions.
+
+Backwards Incompatibilities
+---------------------------
+
+- In previous releases, the ``repoze.bfg.url.model_url``,
+  ``repoze.bfg.traversal.model_path`` and
+  ``repoze.bfg.traversal.model_path_tuple`` functions always ignored
+  the ``__name__`` argument of the root object in a model graph (
+  effectively replacing it with a leading ``/`` in the returned value)
+  when a path or URL was generated.  The code required to perform this
+  operation was not efficient.  As of this release, the root object in
+  a model graph *must* have a ``__name__`` attribute that is either
+  ``None`` or the empty string (``''``) for URLs and paths to be
+  generated properly from these APIs.  If your root model object has a
+  ``__name__`` argument that is not one of these values, you will need
+  to change your code for URLs and paths to be generated properly.  If
+  your model graph has a root node with a string ``__name__`` that is
+  not null, the value of ``__name__`` will be prepended to every path
+  and URL generated.
+
+- The ``repoze.bfg.location.LocationProxy`` class and the
+  ``repoze.bfg.location.ClassAndInstanceDescr`` class have both been
+  removed in order to be able to eventually shed a dependency on
+  ``zope.proxy``.  Neither of these classes was ever an API.
+
+- In all previous releases, the ``repoze.bfg.location.locate``
+  function worked like so: if a model did not explicitly provide the
+  ``repoze.bfg.interfaces.ILocation`` interface, ``locate`` returned a
+  ``LocationProxy`` object representing ``model`` with its
+  ``__parent__`` attribute assigned to ``parent`` and a ``__name__``
+  attribute assigned to ``__name__``.  In this release, the
+  ``repoze.bfg.location.locate`` function simply jams the ``__name__``
+  and ``__parent__`` attributes on to the supplied model
+  unconditionally, no matter if the object implements ILocation or
+  not, and it never returns a proxy.  This was done because the
+  LocationProxy behavior has now moved into an add-on package
+  (``repoze.bfg.traversalwrapper``), in order to eventually be able to
+  shed a dependency on ``zope.proxy``.
+
+- In all previous releases, by default, if traversal was used (as
+  opposed to URL-dispatch), and the root object supplied
+  the``repoze.bfg.interfaces.ILocation`` interface, but the children
+  returned via its ``__getitem__`` returned an object that did not
+  implement the same interface, ``repoze.bfg`` provided some
+  implicit help during traversal.  This traversal feature wrapped
+  subobjects from the root (and thereafter) that did not implement
+  ``ILocation`` in proxies which automatically provided them with a
+  ``__name__`` and ``__parent__`` attribute based on the name being
+  traversed and the previous object traversed.  This feature has now
+  been removed from the base ``repoze.bfg`` package for purposes of
+  eventually shedding a dependency on ``zope.proxy``.
+
+  In order to re-enable the wrapper behavior for older applications
+  which cannot be changed, register the "traversalwrapper"
+  ``ModelGraphTraverser`` as the traversal policy, rather than the
+  default ``ModelGraphTraverser``. To use this feature, you will need
+  to install the ``repoze.bfg.traversalwrapper`` package (an add-on
+  package, available at
+  http://svn.repoze.org/repoze.bfg.traversalwrapper) Then change your
+  application's ``configure.zcml`` to include the following stanza:
+
+    <adapter
+        factory="repoze.bfg.traversalwrapper.ModelGraphTraverser"
+        provides="repoze.bfg.interfaces.ITraverserFactory"
+        for="*"
+        />
+
+   When this ITraverserFactory is used instead of the default, no
+   object in the graph (even the root object) must supply a
+   ``__name__`` or ``__parent__`` attribute.  Even if subobjects
+   returned from the root *do* implement the ILocation interface,
+   these will still be wrapped in proxies that override the object's
+   "real" ``__parent__`` and ``__name__`` attributes.
+
+   See also changes to the "Models" chapter of the documentation (in
+   the "Location-Aware Model Instances") section.
+
+0.7.0 (2009-04-11)
+==================
+
+Bug Fixes
+---------
+
+- Fix a bug in ``repoze.bfg.wsgi.HTTPException``: the content length
+  was returned as an int rather than as a string.
+ 
+- Add explicit dependencies on ``zope.deferredimport``,
+  ``zope.deprecation``, and ``zope.proxy`` for forward compatibility
+  reasons (``zope.component`` will stop relying on
+  ``zope.deferredimport`` soon and although we use it directly, it's
+  only a transitive dependency, and ''zope.deprecation`` and
+  ``zope.proxy`` are used directly even though they're only transitive
+  dependencies as well).
+
+- Using ``model_url`` or ``model_path`` against a broken model graph
+  (one with models that had a non-root model with a ``__name__`` of
+  ``None``) caused an inscrutable error to be thrown: ( if not
+  ``_must_quote[cachekey].search(s): TypeError: expected string or
+  buffer``).  Now URLs and paths generated against graphs that have
+  None names in intermediate nodes will replace the None with the
+  empty string, and, as a result, the error won't be raised.  Of
+  course the URL or path will still be bogus.
+
+Features
+--------
+
+- Make it possible to have ``testing.DummyTemplateRenderer`` return
+  some nondefault string representation.
+
+- Added a new ``anchor`` keyword argument to ``model_url``.  If 
+  ``anchor`` is present, its string representation will be used 
+  as a named anchor in the generated URL (e.g. if ``anchor`` is 
+  passed as ``foo`` and the model URL is 
+  ``http://example.com/model/url``, the generated URL will be 
+  ``http://example.com/model/url#foo``).
+
+Backwards Incompatibilities
+---------------------------
+
+- The default request charset encoding is now ``utf-8``.  As a result,
+  the request machinery will attempt to decode values from the utf-8
+  encoding to Unicode automatically when they are obtained via
+  ``request.params``, ``request.GET``, and ``request.POST``.  The
+  previous behavior of BFG was to return a bytestring when a value was
+  accessed in this manner.  This change will break form handling code
+  in apps that rely on values from those APIs being considered
+  bytestrings.  If you are manually decoding values from form
+  submissions in your application, you'll either need to change the
+  code that does that to expect Unicode values from
+  ``request.params``, ``request.GET`` and ``request.POST``, or you'll
+  need to explicitly reenable the previous behavior.  To reenable the
+  previous behavior, add the following to your application's
+  ``configure.zcml``::
+
+    <subscriber for="repoze.bfg.interfaces.INewRequest"
+                handler="repoze.bfg.request.make_request_ascii"/>
+
+  See also the documentation in the "Views" chapter of the BFG docs
+  entitled "Using Views to Handle Form Submissions (Unicode and
+  Character Set Issues)".
+
+Documentation
+-------------
+
+- Add a section to the narrative Views chapter entitled "Using Views
+  to Handle Form Submissions (Unicode and Character Set Issues)"
+  explaining implicit decoding of form data values.
+
+0.6.9 (2009-02-16)
+==================
+
+Bug Fixes
+---------
+
+- lru cache was unstable under concurrency (big surprise!) when it
+  tried to redelete a key in the cache that had already been deleted.
+  Symptom: line 64 in put:del data[oldkey]:KeyError: '/some/path'.
+  Now we just ignore the key error if we can't delete the key (it has
+  already been deleted).
+
+- Empty location names in model paths when generating a URL using
+  ``repoze.bfg.model_url`` based on a model obtained via traversal are
+  no longer ignored in the generated URL.  This means that if a
+  non-root model object has a ``__name__`` of ``''``, the URL will
+  reflect it (e.g. ``model_url`` will generate ``http://foo/bar//baz``
+  if an object with the ``__name__`` of ``''`` is a child of bar and
+  the parent of baz).  URLs generated with empty path segments are,
+  however, still irresolveable by the model graph traverser on request
+  ingress (the traverser strips empty path segment names).
+
+Features
+--------
+
+- Microspeedups of ``repoze.bfg.traversal.model_path``,
+  ``repoze.bfg.traversal.model_path_tuple``,
+  ``repoze.bfg.traversal.quote_path_segment``, and
+  ``repoze.bfg.url.urlencode``.
+
+- add zip_safe = false to setup.cfg.
+
+Documentation
+-------------
+
+- Add a note to the ``repoze.bfg.traversal.quote_path_segment`` API
+  docs about caching of computed values.
+
+Implementation Changes
+----------------------
+
+- Simplification of
+  ``repoze.bfg.traversal.TraversalContextURL.__call__`` (it now uses
+  ``repoze.bfg.traversal.model_path`` instead of rolling its own
+  path-generation).
+
+0.6.8 (2009-02-05)
+==================
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``repoze.bfg.traversal.model_path`` API now returns a *quoted*
+  string rather than a string represented by series of unquoted
+  elements joined via ``/`` characters.  Previously it returned a
+  string or unicode object representing the model path, with each
+  segment name in the path joined together via ``/`` characters,
+  e.g. ``/foo /bar``.  Now it returns a string, where each segment is
+  a UTF-8 encoded and URL-quoted element e.g. ``/foo%20/bar``.  This
+  change was (as discussed briefly on the repoze-dev maillist)
+  necessary to accomodate model objects which themselves have
+  ``__name__`` attributes that contain the ``/`` character.
+
+  For people that have no models that have high-order Unicode
+  ``__name__`` attributes or ``__name__`` attributes with values that
+  require URL-quoting with in their model graphs, this won't cause any
+  issue.  However, if you have code that currently expects
+  ``model_path`` to return an unquoted string, or you have an existing
+  application with data generated via the old method, and you're too
+  lazy to change anything, you may wish replace the BFG-imported
+  ``model_path`` in your code with this function (this is the code of
+  the "old" ``model_path`` implementation)::
+
+        from repoze.bfg.location import lineage
+
+        def i_am_too_lazy_to_move_to_the_new_model_path(model, *elements):
+            rpath = []
+            for location in lineage(model):
+                if location.__name__:
+                    rpath.append(location.__name__)
+            path = '/' + '/'.join(reversed(rpath))
+            if elements:
+                suffix = '/'.join(elements)
+                path = '/'.join([path, suffix])
+            return path
+
+- The ``repoze.bfg.traversal.find_model`` API no longer implicitly
+  converts unicode representations of a full path passed to it as a
+  Unicode object into a UTF-8 string.  Callers should either use
+  prequoted path strings returned by
+  ``repoze.bfg.traversal.model_path``, or tuple values returned by the
+  result of ``repoze.bfg.traversal.model_path_tuple`` or they should
+  use the guidelines about passing a string ``path`` argument
+  described in the ``find_model`` API documentation.
+
+Bugfixes
+--------
+
+- Each argument contained in ``elements`` passed to
+  ``repoze.bfg.traversal.model_path`` will now have any ``/``
+  characters contained within quoted to ``%2F`` in the returned
+  string.  Previously, ``/`` characters in elements were left unquoted
+  (a bug).
+
+Features
+--------
+
+- A ``repoze.bfg.traversal.model_path_tuple`` API was added.  This API
+  is an alternative to ``model_path`` (which returns a string);
+  ``model_path_tuple`` returns a model path as a tuple (much like
+  Zope's ``getPhysicalPath``).
+
+- A ``repoze.bfg.traversal.quote_path_segment`` API was added.  This
+  API will quote an individual path segment (string or unicode
+  object).  See the ``repoze.bfg.traversal`` API documentation for
+  more information.
+
+- The ``repoze.bfg.traversal.find_model`` API now accepts "path
+  tuples" (see the above note regarding ``model_path_tuple``) as well
+  as string path representations (from
+  ``repoze.bfg.traversal.model_path``) as a ``path`` argument.
+
+- Add ` `renderer`` argument (defaulting to None) to
+  ``repoze.bfg.testing.registerDummyRenderer``.  This makes it
+  possible, for instance, to register a custom renderer that raises an
+  exception in a unit test.
+
+Implementation Changes
+----------------------
+
+- Moved _url_quote function back to ``repoze.bfg.traversal`` from
+  ``repoze.bfg.url``.  This is not an API.
+
+0.6.7 (2009-01-27)
+==================
+
+Features
+--------
+
+- The ``repoze.bfg.url.model_url`` API now works against contexts
+  derived from Routes URL dispatch (``Routes.util.url_for`` is called
+  under the hood).
+
+- "Virtual root" support for traversal-based applications has been
+  added.  Virtual root support is useful when you'd like to host some
+  model in a ``repoze.bfg`` model graph as an application under a
+  URL pathname that does not include the model path itself.  For more
+  information, see the (new) "Virtual Hosting" chapter in the
+  documentation.
+
+- A ``repoze.bfg.traversal.virtual_root`` API has been added.  When
+  called, it returns the virtual root object (or the physical root
+  object if no virtual root has been specified).
+
+Implementation Changes
+----------------------
+
+- ``repoze.bfg.traversal.RoutesModelTraverser`` has been moved to
+  ``repoze.bfg.urldispatch``.
+
+- ``model_url`` URL generation is now performed via an adapter lookup
+  based on the context and the request.
+
+- ZCML which registers two adapters for the ``IContextURL`` interface
+  has been added to the configure.zcml in ``repoze.bfg.includes``.
+
+0.6.6 (2009-01-26)
+==================
+
+Implementation Changes
+----------------------
+
+- There is an indirection in ``repoze.bfg.url.model_url`` now that
+  consults a utility to generate the base model url (without extra
+  elements or a query string).  Eventually this will service virtual
+  hosting; for now it's undocumented and should not be hooked.
+
+0.6.5 (2009-01-26)
+==================
+
+Features
+--------
+
+- You can now override the NotFound and Unauthorized responses that
+  ``repoze.bfg`` generates when a view cannot be found or cannot be
+  invoked due to lack of permission.  See the "ZCML Hooks" chapter in
+  the docs for more information.
+
+- Added Routes ZCML directive attribute explanations in documentation.
+
+- Added a ``traversal_path`` API to the traversal module; see the
+  "traversal" API chapter in the docs.  This was a function previously
+  known as ``split_path`` that was not an API but people were using it
+  anyway.  Unlike ``split_path``, it now returns a tuple instead of a
+  list (as its values are cached).
+
+Behavior Changes
+----------------
+
+- The ``repoze.bfg.view.render_view_to_response`` API will no longer
+  raise a ValueError if an object returned by a view function it calls
+  does not possess certain attributes (``headerlist``, ``app_iter``,
+  ``status``).  This API used to attempt to perform a check using the
+  ``is_response`` function in ``repoze.bfg.view``, and raised a
+  ``ValueError`` if the ``is_response`` check failed.  The
+  responsibility is now the caller's to ensure that the return value
+  from a view function is a "real" response.
+
+- WSGI environ dicts passed to ``repoze.bfg`` 's Router must now
+  contain a REQUEST_METHOD key/value; if they do not, a KeyError will
+  be raised (speed).  
+
+- It is no longer permissible to pass a "nested" list of principals to
+  ``repoze.bfg.ACLAuthorizer.permits`` (e.g. ``['fred', ['larry',
+  'bob']]``).  The principals list must be fully expanded.  This
+  feature was never documented, and was never an API, so it's not a
+  backwards incompatibility.
+
+- It is no longer permissible for a security ACE to contain a "nested"
+  list of permissions (e.g. ``(Allow, Everyone, ['read', ['view',
+  ['write', 'manage']]])`)`.  The list must instead be fully expanded
+  (e.g. ``(Allow, Everyone, ['read', 'view', 'write', 'manage])``).  This
+  feature was never documented, and was never an API, so it's not a
+  backwards incompatibility.
+
+- The ``repoze.bfg.urldispatch.RoutesRootFactory`` now injects the
+  ``wsgiorg.routing_args`` environment variable into the environ when
+  a route matches.  This is a tuple of ((), routing_args) where
+  routing_args is the value that comes back from the routes mapper
+  match (the "match dict").
+
+- The ``repoze.bfg.traversal.RoutesModelTraverser`` class now wants to
+  obtain the ``view_name`` and ``subpath`` from the
+  ``wsgiorgs.routing_args`` environment variable.  It falls back to
+  obtaining these from the context for backwards compatibility.
+
+Implementation Changes
+----------------------
+
+- Get rid of ``repoze.bfg.security.ACLAuthorizer``: the
+  ``ACLSecurityPolicy`` now does what it did inline.
+
+- Get rid of ``repoze.bfg.interfaces.NoAuthorizationInformation``
+  exception: it was used only by ``ACLAuthorizer``.
+
+- Use a homegrown NotFound error instead of ``webob.exc.HTTPNotFound``
+  (the latter is slow).
+
+- Use a homegrown Unauthorized error instead of
+  ``webob.exc.Unauthorized`` (the latter is slow).
+
+- the ``repoze.bfg.lru.lru_cached`` decorator now uses functools.wraps
+  in order to make documentation of LRU-cached functions possible.
+
+- Various speed micro-tweaks.
+
+Bug Fixes
+---------
+
+- ``repoze.bfg.testing.DummyModel`` did not have a ``get`` method;
+  it now does.
+
+0.6.4 (2009-01-23)
+==================
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``unicode_path_segments`` configuration variable and the
+  ``BFG_UNICODE_PATH_SEGMENTS`` configuration variable have been
+  removed.  Path segments are now always passed to model
+  ``__getitem__`` methods as unicode.  "True" has been the default for
+  this setting since 0.5.4, but changing this configuration setting to
+  false allowed you to go back to passing raw path element strings to
+  model ``__getitem__`` methods.  Removal of this knob services a
+  speed goal (we get about +80 req/s by removing the check), and it's
+  clearer just to always expect unicode path segments in model
+  ``__getitem__`` methods.
+
+Implementation Changes
+----------------------
+
+- ``repoze.bfg.traversal.split_path`` now also handles decoding
+  path segments to unicode (for speed, because its results are
+  cached).
+
+- ``repoze.bfg.traversal.step`` was made a method of the
+   ModelGraphTraverser.
+
+- Use "precooked" Request subclasses
+  (e.g. ``repoze.bfg.request.GETRequest``) that correspond to HTTP
+  request methods within ``router.py`` when constructing a request
+  object rather than using ``alsoProvides`` to attach the proper
+  interface to an unsubclassed ``webob.Request``.  This pattern is
+  purely an optimization (e.g. preventing calls to ``alsoProvides``
+  means the difference between 590 r/s and 690 r/s on a MacBook 2GHz).
+
+- Tease out an extra 4% performance boost by changing the Router;
+  instead of using imported ZCA APIs, use the same APIs directly
+  against the registry that is an attribute of the Router.
+
+- The registry used by BFG is now a subclass of
+  ``zope.component.registry.Components`` (defined as
+  ``repoze.bfg.registry.Registry``); it has a ``notify`` method, a
+  ``registerSubscriptionAdapter`` and a ``registerHandler`` method.
+  If no subscribers are registered via ``registerHandler`` or
+  ``registerSubscriptionAdapter``, ``notify`` is a noop for speed.
+
+- The Allowed and Denied classes in ``repoze.bfg.security`` now are
+  lazier about constructing the representation of a reason message for
+  speed; ``repoze.bfg.view_execution_permitted`` takes advantage of
+  this.
+
+- The ``is_response`` check was sped up by about half at the expense
+  of making its code slightly uglier.
+
+New Modules
+-----------
+
+- ``repoze.bfg.lru`` implements an LRU cache class and a decorator for
+  internal use.
+
+0.6.3 (2009-01-19)
+==================
+
+Bug Fixes
+---------
+
+- Readd ``root_policy`` attribute on Router object (as a property
+  which returns the IRootFactory utility).  It was inadvertently
+  removed in 0.6.2.  Code in the wild depended upon its presence
+  (esp. scripts and "debug" helpers).
+
+Features
+--------
+
+- URL-dispatch has been overhauled: it is no longer necessary to
+  manually create a RoutesMapper in your application's entry point
+  callable in order to use URL-dispatch (aka `Routes
+  <http://routes.groovie.org>`_).  A new ``route`` directive has been
+  added to the available list of ZCML directives.  Each ``route``
+  directive inserted into your application's ``configure.zcml``
+  establishes a Routes mapper connection.  If any ``route``
+  declarations are made via ZCML within a particular application, the
+  ``get_root`` callable passed in to ``repoze.bfg.router.make_app``
+  will automatically be wrapped in the equivalent of a RoutesMapper.
+  Additionally, the new ``route`` directive allows the specification
+  of a ``context_interfaces`` attribute for a route, this will be used
+  to tag the manufactured routes context with specific interfaces when
+  a route specifying a ``context_interfaces`` attribute is matched.
+
+- A new interface ``repoze.bfg.interfaces.IContextNotFound`` was
+  added.  This interface is attached to a "dummy" context generated
+  when Routes cannot find a match and there is no "fallback" get_root
+  callable that uses traversal.
+
+- The ``bfg_starter`` and ``bfg_zodb`` "paster create" templates now
+  contain images and CSS which are displayed when the default page is
+  displayed after initial project generation.
+
+- Allow the ``repoze.bfg.view.static`` helper to be passed a relative
+  ``root_path`` name; it will be considered relative to the file in
+  which it was called.
+
+- The functionality of ``repoze.bfg.convention`` has been merged into
+  the core.  Applications which make use of ``repoze.bfg.convention``
+  will continue to work indefinitely, but it is recommended that apps
+  stop depending upon it.  To do so, substitute imports of
+  ``repoze.bfg.convention.bfg_view`` with imports of
+  ``repoze.bfg.view.bfg_view``, and change the stanza in ZCML from
+  ``<convention package=".">`` to ``<scan package=".">``.  As a result
+  of the merge, bfg has grown a new dependency: ``martian``.
+
+- View functions which use the pushpage decorator are now pickleable
+  (meaning their use won't prevent a ``configure.zcml.cache`` file
+  from being written to disk).
+
+- Instead of invariably using ``webob.Request`` as the "request
+  factory" (e.g. in the ``Router`` class) and ``webob.Response`` and
+  the "response factory" (e.g. in ``render_template_to_response``),
+  allow both to be overridden via a ZCML utility hook.  See the "Using
+  ZCML Hooks" chapter of the documentation for more information.
+
+Deprecations
+------------
+
+- The class ``repoze.bfg.urldispatch.RoutesContext`` has been renamed
+  to ``repoze.bfg.urldispatch.DefaultRoutesContext``.  The class
+  should be imported by the new name as necessary (although in reality
+  it probably shouldn't be imported from anywhere except internally
+  within BFG, as it's not part of the API).
+
+Implementation Changes
+----------------------
+
+- The ``repoze.bfg.wsgi.wsgiapp`` decorator now uses
+  ``webob.Request.get_response`` to do its work rather than relying on
+  homegrown WSGI code.
+
+- The ``repoze.bfg.view.static`` helper now uses
+  ``webob.Request.get_response`` to do its work rather than relying on
+  homegrown WSGI code.
+
+- The ``repoze.bfg.urldispatch.RoutesModelTraverser`` class has been
+  moved to ``repoze.bfg.traversal.RoutesModelTraverser``.
+
+- The ``repoze.bfg.registry.makeRegistry`` function was renamed to
+  ``repoze.bfg.registry.populateRegistry`` and now accepts a
+  ``registry`` argument (which should be an instance of
+  ``zope.component.registry.Components``).
+
+Documentation Additions
+-----------------------
+
+- Updated narrative urldispatch chapter with changes required by
+  ``<route..>`` ZCML directive.
+
+- Add a section on "Using BFG Security With URL Dispatch" into the
+  urldispatch chapter of the documentation.
+
+- Better documentation of security policy implementations that ship
+  with repoze.bfg.
+
+- Added a "Using ZPT Macros in repoze.bfg" section to the narrative
+  templating chapter.
+
+0.6.2 (2009-01-13)
+==================
+
+Features
+--------
+
+- Tests can be run with coverage output if you've got ``nose``
+  installed in the interpreter which you use to run tests.  Using an
+  interpreter with ``nose`` installed, do ``python setup.py
+  nosetests`` within a checkout of the ``repoze.bfg`` package to see
+  test coverage output.
+
+- Added a ``post`` argument to the ``repoze.bfg.testing:DummyRequest``
+  constructor.
+  
+- Added ``__len__`` and ``__nonzero__`` to ``repoze.bfg.testing:DummyModel``.
+
+- The ``repoze.bfg.registry.get_options`` callable (now renamed to
+  ``repoze.bfg.setings.get_options``) used to return only
+  framework-specific keys and values in the dictionary it returned.
+  It now returns all the keys and values in the dictionary it is
+  passed *plus* any framework-specific settings culled from the
+  environment.  As a side effect, all PasteDeploy application-specific
+  config file settings are made available as attributes of the
+  ``ISettings`` utility from within BFG.
+
+- Renamed the existing BFG paster template to ``bfg_starter``.  Added
+  another template (``bfg_zodb``) showing default ZODB setup using
+  ``repoze.zodbconn``.
+
+- Add a method named ``assert_`` to the DummyTemplateRenderer.  This
+  method accepts keyword arguments.  Each key/value pair in the
+  keyword arguments causes an assertion to be made that the renderer
+  received this key with a value equal to the asserted value.
+
+- Projects generated by the paster templates now use the
+  ``DummyTemplateRenderer.assert_`` method in their view tests.
+
+- Make the (internal) thread local registry manager maintain a stack
+  of registries in order to make it possible to call one BFG
+  application from inside another.
+
+- An interface specific to the HTTP verb (GET/PUT/POST/DELETE/HEAD) is
+  attached to each request object on ingress.  The HTTP-verb-related
+  interfaces are defined in ``repoze.bfg.interfaces`` and are
+  ``IGETRequest``, ``IPOSTRequest``, ``IPUTRequest``,
+  ``IDELETERequest`` and ``IHEADRequest``.  These interfaces can be
+  specified as the ``request_type`` attribute of a bfg view
+  declaration.  A view naming a specific HTTP-verb-matching interface
+  will be found only if the view is defined with a request_type that
+  matches the HTTP verb in the incoming request.  The more general
+  ``IRequest`` interface can be used as the request_type to catch all
+  requests (and this is indeed the default).  All requests implement
+  ``IRequest``. The HTTP-verb-matching idea was pioneered by
+  `repoze.bfg.restrequest
+  <http://pypi.python.org/pypi/repoze.bfg.restrequest/1.0.1>`_ . That
+  package is no longer required, but still functions fine.
+
+Bug Fixes
+---------
+
+- Fix a bug where the Paste configuration's ``unicode_path_segments``
+  (and os.environ's ``BFG_UNICODE_PATH_SEGMENTS``) may have been
+  defaulting to false in some circumstances.  It now always defaults
+  to true, matching the documentation and intent.
+
+- The ``repoze.bfg.traversal.find_model`` API did not work properly
+  when passed a ``path`` argument which was unicode and contained
+  high-order bytes when the ``unicode_path_segments`` or
+  ``BFG_UNICODE_PATH_SEGMENTS`` configuration variables were "true".
+
+- A new module was added: ``repoze.bfg.settings``.  This contains
+  deployment-settings-related code.
+
+Implementation Changes
+----------------------
+
+- The ``make_app`` callable within ``repoze.bfg.router`` now registers
+  the ``root_policy`` argument as a utility (unnamed, using the new
+  ``repoze.bfg.interfaces.IRootFactory`` as a provides interface)
+  rather than passing it as the first argument to the
+  ``repoze.bfg.router.Router`` class.  As a result, the
+  ``repoze.bfg.router.Router`` router class only accepts a single
+  argument: ``registry``.  The ``repoze.bfg.router.Router`` class
+  retrieves the root policy via a utility lookup now.  The
+  ``repoze.bfg.router.make_app`` API also now performs some important
+  application registrations that were previously handled inside
+  ``repoze.bfg.registry.makeRegistry``.
+
+New Modules
+-----------
+
+- A ``repoze.bfg.settings`` module was added.  It contains code
+  related to deployment settings.  Most of the code it contains was
+  moved to it from the ``repoze.bfg.registry`` module.
+
+Behavior Changes
+----------------
+
+- The ``repoze.bfg.settings.Settings`` class (an instance of which is
+  registered as a utility providing
+  ``repoze.bfg.interfaces.ISettings`` when any application is started)
+  now automatically calls ``repoze.bfg.settings.get_options`` on the
+  options passed to its constructor.  This means that usage of
+  ``get_options`` within an application's ``make_app`` function is no
+  longer required (the "raw" ``options`` dict or None may be passed).
+
+- Remove old cold which attempts to recover from trying to unpickle a
+  ``z3c.pt`` template; Chameleon has been the templating engine for a
+  good long time now.  Running repoze.bfg against a sandbox that has
+  pickled ``z3c.pt`` templates it will now just fail with an
+  unpickling error, but can be fixed by deleting the template cache
+  files.
+
+Deprecations
+------------
+
+- Moved the ``repoze.bfg.registry.Settings`` class.  This has been
+  moved to ``repoze.bfg.settings.Settings``. A deprecation warning is
+  issued when it is imported from the older location.
+
+- Moved the ``repoze.bfg.registry.get_options`` function This has been
+  moved to ``repoze.bfg.settings.get_options``.  A deprecation warning
+  is issued when it is imported from the older location.
+
+- The ``repoze.bfg.interfaces.IRootPolicy`` interface was renamed
+  within the interfaces package.  It has been renamed to
+  ``IRootFactory``.  A deprecation warning is issued when it is
+  imported from the older location.
+
+0.6.1 (2009-01-06)
+==================
+
+New Modules
+-----------
+
+- A new module ``repoze.bfg.url`` has been added.  It contains the
+  ``model_url`` API (moved from ``repoze.bfg.traversal``) and an
+  implementation of ``urlencode`` (like Python's
+  ``urllib.urlencode``) which can handle Unicode keys and values in
+  parameters to the ``query`` argument.
+
+Deprecations
+------------
+
+- The ``model_url`` function has been moved from
+  ``repoze.bfg.traversal`` into ``repoze.bfg.url``.  It can still
+  be imported from ``repoze.bfg.traversal`` but an import from
+  ``repoze.bfg.traversal`` will emit a DeprecationWarning.
+
+Features
+--------
+
+- A ``static`` helper class was added to the ``repoze.bfg.views``
+  module.  Instances of this class are willing to act as BFG views
+  which return static resources using files on disk.  See the
+  ``repoze.bfg.view`` docs for more info.
+
+- The ``repoze.bfg.url.model_url`` API (nee'
+  ``repoze.bfg.traversal.model_url``) now accepts and honors a
+  keyword argument named ``query``.  The value of this argument
+  will be used to compose a query string, which will be attached to
+  the generated URL before it is returned.  See the API docs (in
+  the docs directory or `on the web
+  <http://static.repoze.org/bfgdocs>`_) for more information.
+
+0.6 (2008-12-26)
+================
+
+Backwards Incompatibilities
+---------------------------
+
+- Rather than prepare the "stock" implementations of the ZCML directives
+  from the ``zope.configuration`` package for use under ``repoze.bfg``,
+  ``repoze.bfg`` now makes available the implementations of directives
+  from the ``repoze.zcml`` package (see http://static.repoze.org/zcmldocs).
+  As a result, the ``repoze.bfg`` package now depends on the
+  ``repoze.zcml`` package, and no longer depends directly on the
+  ``zope.component``, ``zope.configuration``, ``zope.interface``, or
+  ``zope.proxy`` packages.
+
+  The primary reason for this change is to enable us to eventually reduce
+  the number of inappropriate ``repoze.bfg`` Zope package dependencies,
+  as well as to shed features of dependent package directives that don't
+  make sense for ``repoze.bfg``.
+
+  Note that currently the set of requirements necessary to use bfg has not
+  changed.  This is due to inappropriate Zope package requirements in
+  ``chameleon.zpt``, which will hopefully be remedied soon. NOTE: in
+  lemonade index a 1.0b8-repozezcml0 package exists which does away with
+  these requirements.
+
+- BFG applications written prior to this release which expect the "stock"
+  ``zope.component`` ZCML directive implementations (e.g. ``adapter``,
+  ``subscriber``, or ``utility``) to function now must either 1) include
+  the ``meta.zcml`` file from ``zope.component`` manually (e.g. ``<include
+  package="zope.component" file="meta.zcml">``) and include the
+  ``zope.security`` package as an ``install_requires`` dependency or 2)
+  change the ZCML in their applications to use the declarations from
+  `repoze.zcml <http://static.repoze.org/zcmldocs/>`_ instead of the stock
+  declarations.  ``repoze.zcml`` only makes available the ``adapter``,
+  ``subscriber`` and ``utility`` directives.
+
+  In short, if you've got an existing BFG application, after this
+  update, if your application won't start due to an import error for
+  "zope.security", the fastest way to get it working again is to add
+  ``zope.security`` to the "install_requires" of your BFG
+  application's ``setup.py``, then add the following ZCML anywhere
+  in your application's ``configure.zcml``::
+
+   <include package="zope.component" file="meta.zcml">
+
+  Then re-``setup.py develop`` or reinstall your application.
+
+- The ``http://namespaces.repoze.org/bfg`` XML namespace is now the default
+  XML namespace in ZCML for paster-generated applications.  The docs have
+  been updated to reflect this.
+
+- The copies of BFG's ``meta.zcml`` and ``configure.zcml`` were removed
+  from the root of the ``repoze.bfg`` package.  In 0.3.6, a new package
+  named ``repoze.bfg.includes`` was added, which contains the "correct"
+  copies of these ZCML files; the ones that were removed were for backwards
+  compatibility purposes.
+
+- The BFG ``view`` ZCML directive no longer calls
+  ``zope.component.interface.provideInterface`` for the ``for`` interface.
+  We don't support ``provideInterface`` in BFG because it mutates the
+  global registry.
+
+Other
+-----
+
+- The minimum requirement for ``chameleon.core`` is now 1.0b13.  The
+  minimum requirement for ``chameleon.zpt`` is now 1.0b8.  The minimum
+  requirement for ``chameleon.genshi`` is now 1.0b2.
+
+- Updated paster template "ez_setup.py" to one that requires setuptools
+  0.6c9.
+
+- Turn ``view_execution_permitted`` from the ``repoze.bfg.view`` module
+  into a documented API.
+
+- Doc cleanups.
+
+- Documented how to create a view capable of serving static resources.
+
+0.5.6 (2008-12-18)
+==================
+
+- Speed up ``traversal.model_url`` execution by using a custom url quoting
+  function instead of Python's ``urllib.quote``, by caching URL path
+  segment quoting and encoding results, by disusing Python's
+  ``urlparse.urljoin`` in favor of a simple string concatenation, and by
+  using ``ob.__class__ is unicode`` rather than ``isinstance(ob, unicode)``
+  in one strategic place.
+
+0.5.5 (2008-12-17)
+==================
+
+Backwards Incompatibilities
+---------------------------
+
+- In the past, during traversal, the ModelGraphTraverser (the default
+  traverser) always passed each URL path segment to any ``__getitem__``
+  method of a model object as a byte string (a ``str`` object).  Now, by
+  default the ModelGraphTraverser attempts to decode the path segment to
+  Unicode (a ``unicode`` object) using the UTF-8 encoding before passing it
+  to the ``__getitem__`` method of a model object.  This makes it possible
+  for model objects to be dumber in ``__getitem__`` when trying to resolve
+  a subobject, as model objects themselves no longer need to try to divine
+  whether or not to try to decode the path segment passed by the
+  traverser.
+
+  Note that since 0.5.4, URLs generated by repoze.bfg's ``model_url`` API
+  will contain UTF-8 encoded path segments as necessary, so any URL
+  generated by BFG itself will be decodeable by the traverser.  If another
+  application generates URLs to a BFG application, to be resolved
+  successully, it should generate the URL with UTF-8 encoded path segments
+  to be successfully resolved.  The decoder is not at all magical: if a
+  non-UTF-8-decodeable path segment (e.g. one encoded using UTF-16 or some
+  other insanity) is passed in the URL, BFG will raise a ``TypeError`` with
+  a message indicating it could not decode the path segment.
+
+  To turn on the older behavior, where path segments were not decoded to
+  Unicode before being passed to model object ``__getitem__`` by the
+  traverser, and were passed as a raw byte string, set the
+  ``unicode_path_segments`` configuration setting to a false value in your
+  BFG application's section of the paste .ini file, for example::
+
+    unicode_path_segments = False
+
+  Or start the application using the ``BFG_UNICODE_PATH_SEGMENT`` envvar
+  set to a false value::
+
+    BFG_UNICODE_PATH_SEGMENTS=0
+
+0.5.4 (2008-12-13)
+==================
+
+Backwards Incompatibilities
+---------------------------
+
+- URL-quote "extra" element names passed in as ``**elements`` to the
+  ``traversal.model_url`` API.  If any of these names is a Unicode string,
+  encode it to UTF-8 before URL-quoting.  This is a slight backwards
+  incompatibility that will impact you if you were already UTF-8 encoding
+  or URL-quoting the values you passed in as ``elements`` to this API.
+
+Bugfixes
+--------
+
+- UTF-8 encode each segment in the model path used to generate a URL before
+  url-quoting it within the ``traversal.model_url`` API.  This is a bugfix,
+  as Unicode cannot always be successfully URL-quoted.
+
+Features
+--------
+
+- Make it possible to run unit tests using a buildout-generated Python
+  "interpreter".  
+
+- Add ``request.root`` to ``router.Router`` in order to have easy access to
+  the application root.
+
+0.5.3 (2008-12-07)
+==================
+
+- Remove the ``ITestingTemplateRenderer`` interface.  When
+  ``testing.registerDummyRenderer`` is used, it instead registers a dummy
+  implementation using ``ITemplateRenderer`` interface, which is checked
+  for when the built-in templating facilities do rendering.  This change
+  also allows developers to make explcit named utility registrations in
+  the ZCML registry against ``ITemplateRenderer``; these will be found
+  before any on-disk template is looked up.
+
+0.5.2 (2008-12-05)
+==================
+
+- The component registration handler for views (functions or class
+  instances) now observes component adaptation annotations (see
+  ``zope.component.adaptedBy``) and uses them before the fallback values
+  for ``for_`` and ``request_type``. This change does not affect existing
+  code insomuch as the code does not rely on these defaults when an
+  annotation is set on the view (unlikely).  This means that for a
+  new-style class you can do ``zope.component.adapts(ISomeContext,
+  ISomeRequest)`` at class scope or at module scope as a decorator to a
+  bfg view function you can do ``@zope.component.adapter(ISomeContext,
+  ISomeRequest)``.  This differs from r.bfg.convention inasmuch as you
+  still need to put something in ZCML for the registrations to get done;
+  it's only the defaults that will change if these declarations exist.
+
+- Strip all slashes from end and beginning of path in clean_path within
+  traversal machinery.
+
+0.5.1 (2008-11-25)
+==================
+
+- Add ``keys``, ``items``, and ``values`` methods to
+  ``testing.DummyModel``.
+
+- Add __delitem__ method to ``testing.DummyModel``.
+
+0.5.0 (2008-11-18)
+==================
+
+- Fix ModelGraphTraverser; don't try to change the ``__name__`` or
+  ``__parent__`` of an object that claims it implements ILocation during
+  traversal even if the ``__name__`` or ``__parent__`` of the object
+  traversed does not match the name used in the traversal step or the or
+  the traversal parent .  Rationale: it was insane to do so. This bug was
+  only found due to a misconfiguration in an application that mistakenly
+  had intermediate persistent non-ILocation objects; traversal was causing
+  a persistent write on every request under this setup.
+
+- ``repoze.bfg.location.locate`` now unconditionally sets ``__name__`` and
+  ``__parent__`` on objects which provide ILocation (it previously only set
+  them conditionally if they didn't match attributes already present on the
+  object via equality).
+
+0.4.9 (2008-11-17)
+==================
+
+- Add chameleon text template API (chameleon ${name} renderings where the
+  template does not need to be wrapped in any containing XML).
+
+- Change docs to explain install in terms of a virtualenv
+  (unconditionally).
+
+- Make pushpage decorator compatible with repoze.bfg.convention's
+  ``bfg_view`` decorator when they're stacked.
+
+- Add content_length attribute to testing.DummyRequest.
+
+- Change paster template ``tests.py`` to include a true unit test.  Retain
+  old test as an integration test.  Update documentation.
+
+- Document view registrations against classes and ``repoze.bfg.convention``
+  in context.
+
+- Change the default paster template to register its single view against a
+  class rather than an interface.
+
+- Document adding a request type interface to the request via a subscriber
+  function in the events narrative documentation.
+
+0.4.8 (2008-11-12)
+==================
+
+Backwards Incompatibilities
+---------------------------
+
+- ``repoze.bfg.traversal.model_url`` now always appends a slash to all
+  generated URLs unless further elements are passed in as the third and
+  following arguments.  Rationale: views often use ``model_url`` without
+  the third-and-following arguments in order to generate a URL for a model
+  in order to point at the default view of a model.  The URL that points to
+  the default view of the *root* model is technically ``http://mysite/`` as
+  opposed to ``http://mysite`` (browsers happen to ask for '/' implicitly
+  in the GET request).  Because URLs are never automatically generated for
+  anything *except* models by ``model_url``, and because the root model is
+  not really special, we continue this pattern.  The impact of this change
+  is minimal (at most you will have too many slashes in your URL, which BFG
+  deals with gracefully anyway).
+
+0.4.7 (2008-11-11)
+==================
+
+Features
+--------
+
+- Allow ``testing.registerEventListener`` to be used with Zope 3 style
+  "object events" (subscribers accept more than a single event argument).
+  We extend the list with the arguments, rather than append.
+
+0.4.6 (2008-11-10)
+==================
+
+Bug Fixes
+---------
+
+- The ``model_path`` and ``model_url`` traversal APIs returned the wrong
+  value for the root object (e.g. ``model_path`` returned ``''`` for the
+  root object, while it should have been returning ``'/'``).
+
+0.4.5 (2008-11-09)
+==================
+
+Features
+--------
+
+- Added a ``clone`` method and a ``__contains__`` method to the DummyModel
+  testing object.
+
+- Allow DummyModel objects to receive extra keyword arguments, which will
+  be attached as attributes.
+
+- The DummyTemplateRenderer now returns ``self`` as its implementation.
+
+0.4.4 (2008-11-08)
+==================
+
+Features
+--------
+
+- Added a ``repoze.bfg.testing`` module to attempt to make it slightly
+  easier to write unittest-based automated tests of BFG applications.
+  Information about this module is in the documentation.
+
+- The default template renderer now supports testing better by looking for
+  ``ITestingTemplateRenderer`` using a relative pathname.  This is exposed
+  indirectly through the API named ``registerTemplateRenderer`` in
+  ``repoze.bfg.testing``.
+
+Deprecations
+------------
+
+- The names ``repoze.bfg.interfaces.ITemplate`` ,
+  ``repoze.bfg.interfaces.ITemplateFactory`` and
+  ``repoze.bfg.interfaces.INodeTemplate`` have been deprecated.  These
+  should now be imported as ``repoze.bfg.interfaces.ITemplateRenderer`` and
+  ``repoze.bfg.interfaces.ITemplateRendererFactory``, and
+  ``INodeTemplateRenderer`` respectively.
+
+- The name ``repoze.bfg.chameleon_zpt.ZPTTemplateFactory`` is deprecated.
+  Use ``repoze.bfg.chameleon_zpt.ZPTTemplateRenderer``.
+
+- The name ``repoze.bfg.chameleon_genshi.GenshiTemplateFactory`` is
+  deprecated.  Use ``repoze.bfg.chameleon_genshi.GenshiTemplateRenderer``.
+
+- The name ``repoze.bfg.xslt.XSLTemplateFactory`` is deprecated.  Use
+  ``repoze.bfg.xslt.XSLTemplateRenderer``.
+
+0.4.3 (2008-11-02)
+==================
+
+Bug Fixes
+---------
+
+- Not passing the result of "get_options" as the second argument of
+  make_app could cause attribute errors when attempting to look up settings
+  against the ISettings object (internal).  Fixed by giving the Settings
+  objects defaults for ``debug_authorization`` and ``debug_notfound``.
+
+- Return an instance of ``Allowed`` (rather than ``True``) from
+  ``has_permission`` when no security policy is in use.
+
+- Fix bug where default deny in authorization check would throw a TypeError
+  (use ``ACLDenied`` instead of ``Denied``).
+
+0.4.2 (2008-11-02)
+==================
+
+Features
+--------
+
+- Expose a single ILogger named "repoze.bfg.debug" as a utility; this
+  logger is registered unconditionally and is used by the authorization
+  debug machinery.  Applications may also make use of it as necessary
+  rather than inventing their own logger, for convenience.
+
+- The ``BFG_DEBUG_AUTHORIZATION`` envvar and the ``debug_authorization``
+  config file value now only imply debugging of view-invoked security
+  checks.  Previously, information was printed for every call to
+  ``has_permission`` as well, which made output confusing.  To debug
+  ``has_permission`` checks and other manual permission checks, use the
+  debugger and print statements in your own code.
+
+- Authorization debugging info is now only present in the HTTP response
+  body oif ``debug_authorization`` is true.
+
+- The format of authorization debug messages was improved.
+
+- A new ``BFG_DEBUG_NOTFOUND`` envvar was added and a symmetric
+  ``debug_notfound`` config file value was added.  When either is true, and
+  a NotFound response is returned by the BFG router (because a view could
+  not be found), debugging information is printed to stderr.  When this
+  value is set true, the body of HTTPNotFound responses will also contain
+  the same debugging information.
+
+- ``Allowed`` and ``Denied`` responses from the security machinery are now
+  specialized into two types: ACL types, and non-ACL types.  The
+  ACL-related responses are instances of ``repoze.bfg.security.ACLAllowed``
+  and ``repoze.bfg.security.ACLDenied``.  The non-ACL-related responses are
+  ``repoze.bfg.security.Allowed`` and ``repoze.bfg.security.Denied``.  The
+  allowed-type responses continue to evaluate equal to things that
+  themselves evaluate equal to the ``True`` boolean, while the denied-type
+  responses continue to evaluate equal to things that themselves evaluate
+  equal to the ``False`` boolean.  The only difference between the two
+  types is the information attached to them for debugging purposes.
+
+- Added a new ``BFG_DEBUG_ALL`` envvar and a symmetric ``debug_all`` config
+  file value.  When either is true, all other debug-related flags are set
+  true unconditionally (e.g. ``debug_notfound`` and
+  ``debug_authorization``).
+
+Documentation
+-------------
+
+- Added info about debug flag changes.
+
+- Added a section to the security chapter named "Debugging Imperative
+  Authorization Failures" (for e.g. ``has_permssion``).
+
+Bug Fixes
+---------
+
+- Change default paster template generator to use ``Paste#http`` server
+  rather than ``PasteScript#cherrpy`` server.  The cherrypy server has a
+  security risk in it when ``REMOTE_USER`` is trusted by the downstream
+  application.
+
+0.4.1 (2008-10-28)
+==================
+
+Bug Fixes
+---------
+
+- If the ``render_view_to_response`` function was called, if the view was
+  found and called, but it returned something that did not implement
+  IResponse, the error would pass by unflagged.  This was noticed when I
+  created a view function that essentially returned None, but received a
+  NotFound error rather than a ValueError when the view was rendered.  This
+  was fixed.
+
+0.4.0 (2008-10-03)
+==================
+
+Docs 
+----
+
+- An "Environment and Configuration" chapter was added to the narrative 
+  portion of the documentation.
+
+Features
+--------
+
+- Ensure bfg doesn't generate warnings when running under Python
+  2.6.
+
+- The environment variable ``BFG_RELOAD_TEMPLATES`` is now available
+  (serves the same purpose as ``reload_templates`` in the config file).
+
+- A new configuration file option ``debug_authorization`` was added.
+  This turns on printing of security authorization debug statements
+  to ``sys.stderr``.  The ``BFG_DEBUG_AUTHORIZATION`` environment
+  variable was also added; this performs the same duty.
+
+Bug Fixes
+---------
+
+- The environment variable ``BFG_SECURITY_DEBUG`` did not always work.
+  It has been renamed to ``BFG_DEBUG_AUTHORIZATION`` and fixed.
+
+Deprecations
+------------
+
+- A deprecation warning is now issued when old API names from the
+  ``repoze.bfg.templates`` module are imported.
+
+Backwards incompatibilities
+---------------------------
+
+- The ``BFG_SECURITY_DEBUG`` environment variable was renamed to
+  ``BFG_DEBUG_AUTHORIZATION``.
+
+0.3.9 (2008-08-27)
+==================
+
+Features
+--------
+
+- A ``repoze.bfg.location`` API module was added.
+
+Backwards incompatibilities
+---------------------------
+
+- Applications must now use the ``repoze.bfg.interfaces.ILocation``
+  interface rather than ``zope.location.interfaces.ILocation`` to
+  represent that a model object is "location-aware".  We've removed
+  a dependency on ``zope.location`` for cleanliness purposes: as
+  new versions of zope libraries are released which have improved
+  dependency information, getting rid of our dependence on
+  ``zope.location`` will prevent a newly installed repoze.bfg
+  application from requiring the ``zope.security``, egg, which not
+  truly used at all in a "stock" repoze.bfg setup.  These
+  dependencies are still required by the stack at this time; this
+  is purely a futureproofing move.
+
+  The security and model documentation for previous versions of
+  ``repoze.bfg`` recommended using the
+  ``zope.location.interfaces.ILocation`` interface to represent
+  that a model object is "location-aware".  This documentation has
+  been changed to reflect that this interface should now be
+  imported from ``repoze.bfg.interfaces.ILocation`` instead.
+
+0.3.8 (2008-08-26)
+==================
+
+Docs
+----
+
+- Documented URL dispatch better in narrative form.
+
+Bug fixes
+---------
+
+- Routes URL dispatch did not have access to the WSGI environment,
+  so conditions such as method=GET did not work.
+
+Features
+--------
+
+- Add ``principals_allowed_by_permission`` API to security module.
+
+- Replace ``z3c.pt`` support with support for ``chameleon.zpt``.
+  Chameleon is the new name for the package that used to be named
+  ``z3c.pt``.  NOTE: If you update a ``repoze.bfg`` SVN checkout
+  that you're using for development, you will need to run "setup.py
+  install" or "setup.py develop" again in order to obtain the
+  proper Chameleon packages.  ``z3c.pt`` is no longer supported by
+  ``repoze.bfg``.  All API functions that used to render ``z3c.pt``
+  templates will work fine with the new packages, and your
+  templates should render almost identically.
+
+- Add a ``repoze.bfg.chameleon_zpt`` module.  This module provides
+  Chameleon ZPT support.
+
+- Add a ``repoze.bfg.xslt`` module.  This module provides XSLT
+  support.
+
+- Add a ``repoze.bfg.chameleon_genshi`` module.  This provides
+  direct Genshi support, which did not exist previously.
+
+Deprecations
+------------
+
+- Importing API functions directly from ``repoze.bfg.template`` is
+  now deprecated.  The ``get_template``, ``render_template``,
+  ``render_template_to_response`` functions should now be imported
+  from ``repoze.chameleon_zpt``.  The ``render_transform``, and
+  ``render_transform_to_response`` functions should now be imported
+  from ``repoze.bfg.xslt``.  The ``repoze.bfg.template`` module
+  will remain around "forever" to support backwards compatibility.
+
+0.3.7 (2008-09-09)
+==================
+
+Features
+--------
+
+- Add compatibility with z3c.pt 1.0a7+ (z3c.pt became a namespace package).
+
+Bug fixes
+---------
+
+- ``repoze.bfg.traversal.find_model`` function did not function properly.
+
+0.3.6 (2008-09-04)
+==================
+
+Features
+--------
+
+- Add startup process docs.
+
+- Allow configuration cache to be bypassed by actions which include special
+  "uncacheable" discriminators (for actions that have variable results).
+
+Bug Fixes
+---------
+
+- Move core repoze.bfg ZCML into a ``repoze.bfg.includes`` package so we
+  can use repoze.bfg better as a namespace package.  Adjust the code
+  generator to use it.  We've left around the ``configure.zcml`` in the
+  repoze.bfg package directly so as not to break older apps.
+
+- When a zcml application registry cache was unpickled, and it contained a
+  reference to an object that no longer existed (such as a view), bfg would
+  not start properly.
+
+0.3.5 (2008-09-01)
+==================
+
+Features
+--------
+
+- Event notification is issued after application is created and configured
+  (``IWSGIApplicationCreatedEvent``).
+
+- New API module: ``repoze.bfg.view``.  This module contains the functions
+  named ``render_view_to_response``, ``render_view_to_iterable``,
+  ``render_view`` and ``is_response``, which are documented in the API
+  docs.  These features aid programmatic (non-server-driven) view
+  execution.
+
+0.3.4 (2008-08-28)
+==================
+
+Backwards incompatibilities
+---------------------------
+
+- Make ``repoze.bfg`` a namespace package so we can allow folks to create
+  subpackages (e.g. ``repoze.bfg.otherthing``) within separate eggs.  This
+  is a backwards incompatible change which makes it impossible to import
+  "make_app" and "get_options" from the ``repoze.bfg`` module directly.
+  This change will break all existing apps generated by the paster code
+  generator.  Instead, you need to import these functions as
+  ``repoze.bfg.router:make_app`` and ``repoze.bfg.registry:get_options``,
+  respectively.  Sorry folks, it has to be done now or never, and
+  definitely better now.
+
+Features
+--------
+
+- Add ``model_path`` API function to traversal module.
+
+Bugfixes
+
+- Normalize path returned by repoze.bfg.caller_path.
+
+0.3.3 (2008-08-23)
+==================
+
+- Fix generated test.py module to use project name rather than package
+  name.
+
+0.3.2 (2008-08-23)
+==================
+
+- Remove ``sampleapp`` sample application from bfg package itself.
+
+- Remove dependency on FormEncode (only needed by sampleapp).
+
+- Fix paster template generation so that case-sensitivity is preserved for
+  project vs. package name.
+
+- Depend on ``z3c.pt`` version 1.0a1 (which requires the ``[lxml]`` extra
+  currently).
+
+- Read and write a pickled ZCML actions list, stored as
+  ``configure.zcml.cache`` next to the applications's "normal"
+  configuration file.  A given bfg app will usually start faster if it's
+  able to read the pickle data.  It fails gracefully to reading the real
+  ZCML file if it cannot read the pickle.
+
+0.3.1 (2008-08-20)
+==================
+
+- Generated application differences: ``make_app`` entry point renamed to
+  ``app`` in order to have a different name than the bfg function of the
+  same name, to prevent confusion.
+
+- Add "options" processing to bfg's ``make_app`` to support runtime
+  options.  A new API function named ``get_options`` was added to the
+  registry module.  This function is typically used in an application's
+  ``app`` entry point.  The Paste config file section for the app can now
+  supply the ``reload_templates`` option, which, if true, will prevent the
+  need to restart the appserver in order for ``z3c.pt`` or XSLT template
+  changes to be detected.
+
+- Use only the module name in generated project's "test_suite" (run all
+  tests found in the package).
+
+- Default port for generated apps changed from 5432 to 6543 (Postgres
+  default port is 6543).
+
+0.3.0 (2008-08-16)
+==================
+
+- Add ``get_template`` API to template module.
+
+0.2.9 (2008-08-11)
+==================
+
+- 0.2.8 was "brown bag" release.  It didn't work at all.  Symptom:
+  ComponentLookupError when trying to render a page.
+
+0.2.8 (2008-08-11)
+==================
+
+- Add ``find_model`` and ``find_root`` traversal APIs.  In the process,
+  make ITraverser a uni-adapter (on context) rather than a multiadapter (on
+  context and request).
+
+0.2.7 (2008-08-05)
+==================
+
+- Add a ``request_type`` attribute to the available attributes of a
+  ``bfg:view`` configure.zcml element.  This attribute will have a value
+  which is a dotted Python path, pointing at an interface.  If the request
+  object implements this interface when the view lookup is performed, the
+  appropriate view will be called.  This is meant to allow for simple
+  "skinning" of sites based on request type.  An event subscriber should
+  attach the interface to the request on ingress to support skins.
+
+- Remove "template only" views.  These were just confusing and were never
+  documented.
+
+- Small url dispatch overhaul: the ``connect`` method of the
+  ``urldispatch.RoutesMapper`` object now accepts a keyword parameter named
+  ``context_factory``.  If this parameter is supplied, it must be a
+  callable which returns an instance.  This instance is used as the context
+  for the request when a route is matched.
+
+- The registration of a RoutesModelTraverser no longer needs to be
+  performed by the application; it's in the bfg ZCML now.
+
+0.2.6 (2008-07-31)
+==================
+
+- Add event sends for INewRequest and INewResponse.  See the events.rst
+  chapter in the documentation's ``api`` directory.
+
+0.2.5 (2008-07-28)
+==================
+
+- Add ``model_url`` API.
+
+0.2.4 (2008-07-27)
+==================
+
+- Added url-based dispatch.
+
+0.2.3 (2008-07-20)
+==================
+
+- Add API functions for authenticated_userid and effective_principals.
+
+0.2.2 (2008-07-20)
+==================
+
+- Add authenticated_userid and effective_principals API to security
+  policy.
+
+0.2.1 (2008-07-20)
+==================
+
+- Add find_interface API.
+
+0.2 (2008-07-19)
+================
+
+- Add wsgiapp decorator.
+
+- The concept of "view factories" was removed in favor of always calling a
+  view, which is a callable that returns a response directly (as opposed to
+  returning a view).  As a result, the ``factory`` attribute in the
+  bfg:view ZCML statement has been renamed to ``view``.  Various interface
+  names were changed also.
+
+- ``render_template`` and ``render_transform`` no longer return a Response
+  object.  Instead, these return strings.  The old behavior can be obtained
+  by using ``render_template_to_response`` and
+  ``render_transform_to_response``.
+
+- Added 'repoze.bfg.push:pushpage' decorator, which creates BFG views from
+  callables which take (context, request) and return a mapping of top-level
+  names.
+
+- Added ACL-based security.
+
+- Support for XSLT templates via a render_transform method
+
+0.1 (2008-07-08)
+================
+
+- Initial release.
+
