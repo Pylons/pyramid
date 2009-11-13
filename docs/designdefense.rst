@@ -344,6 +344,103 @@ In this mode, no ZCML will be required.  Hopefully this mode will
 allow people who are used to doing everything imperatively feel more
 comfortable.
 
+BFG Does Traversal, And I Don't Like Traversal
+----------------------------------------------
+
+In :mod:`repoze.bfg`, :term:`traversal` is the act of resolving a URL
+path to a :term:`model` object in a graph full of "model objects".
+Some people are uncomfortable with this notion, and believe it is
+"wrong".
+
+This is understandable.  The people who believe it is wrong almost
+invariably have all of their data in a relational database.
+Relational databases aren't hierarchical, so "traversing" one like a
+graph is not possible.  It also confuses folks that the graph being
+traversed is a graph of "model" objects: in a relational database
+application, the model is most certainly not hierarchical, and often
+model objects must be explicitly manufactured by an ORM as a result of
+some query performed by a :term:`view`.  The naming overlap is
+slightly unfortunate: for the purpose of avoiding confusion, if we had
+it to do all over again, we might refer to the graph that
+:mod:`repoze.bfg` traverses a "node graph" or "object graph" rather
+than a "model graph".
+
+In any case, I believe folks who deem traversal "wrong" are neglecting
+to take into account that many persistence mechanisms *are*
+hierarchical.  Examples inlcude a filesystem, an LDAP database, a
+:term:`ZODB` (or another type of graph) database, an XML document, and
+the Python module namespace.  It is often convenient to model the
+frontend to a hierarchical data store as a graph, using traversal to
+apply views to objects that either *are* the nodes in the graph being
+traversed (such as in the case of ZODB) or at least ones which stand
+in for them (such as in the case of wrappers for files from the
+filesystem).
+
+Also, many website structures are naturally hierarchical, even if the
+data which drives them isn't.  For example, newspaper websites are
+often extremely hierarchical: sections within sections within
+sections, ad infinitum.  If you want your URLs to indicate this
+structure, and the structure is indefinite (the number of nested
+sections can be "N" instead of some fixed number), traversal is an
+excellent way to model this, even if the backend is a relational
+database.  In this situation, the graph being traversed is actually
+less a "model graph" than a site structure.
+
+But the point is ultimately moot.  If you use :mod:`repoze.bfg`, and
+you don't want to model your application in terms of traversal, you
+needn't use it at all.  Instead, use :term:`URL dispatch` to map URL
+paths to views.
+
+BFG Does URL Dispatch, And I Don't Like URL Dispatch
+----------------------------------------------------
+
+In :mod:`repoze.bfg`, :term:`url dispatch` is the act of resolving a
+URL path to a :term:`view` callable by performing pattern matching
+against some set of ordered route definitions.  The route definitions
+are examined in order: the first pattern which matches is used to
+associate the URL with a view callable.
+
+Some people are uncomfortable with this notion, and believe it is
+wrong.  These are usually people who are steeped deeply in
+:term:`Zope`.  Zope does not provide any mechanism except
+:term:`traversal` to map code to URLs.  This is mainly because Zope
+effectively requires use of :term:`ZODB`, which is a hierarchical
+object store.  Zope also supports relational databases, but typically
+the code that calls into the database lives somewhere in the ZODB
+object graph (or at least is a :term:`view` related to a node in the
+object graph), and traversal is required to reach this code.
+
+I'll argue that URL dispatch is ultimately useful, even if you want to
+use traversal as well.  You can actully *combine* URL dispatch and
+traversal in :mod:`repoze.bfg` (see :ref:`hybrid_chapter`).  One
+example of such a usage: if you want to emulate something like Zope
+2's "Zope Management Interface" UI on top of your model graph (or any
+administrative interface), you can register a route like ``<route
+name="manage" path="manage/*traverse"/>`` and then associate
+"management" views in your code by using the ``route_name`` argument
+to a ``view`` configuration, e.g. ``<view view=".some.callable"
+for=".some.Model" route_name="manage"/>``.  If you wire things up this
+way someone then walks up to for example, ``/manage/ob1/ob2``, they
+might be presented with a management interface, but walking up to
+``/ob1/ob2`` would present them with the default object view.  There
+are other tricks you can pull in these hybrid configurations if you're
+clever (and maybe masochistic) too.
+
+Also, if you are a URL dispatch hater, if you should ever be asked to
+write an application that must use some legacy relational database
+structure, you might find that using URL dispatch comes in handy for
+one-off associations between views and URL paths.  Sometimes it's just
+pointless to add a node to the object graph that effectively
+represents the entry point for some bit of code.  You can just use a
+route and be done with it.  If a route matches, a view associated with
+the route will be called; if no route matches, :mod:`repoze.bfg` falls
+back to using traversal.
+
+But the point is ultimately moot.  If you use :mod:`repoze.bfg`, and
+you really don't want to use URL dispatch, you needn't use it at all.
+Instead, use :term:`traversal` exclusively to map URL paths to views,
+just like you do in :term:`Zope`.
+
 Other Topics
 ------------
 
@@ -354,10 +451,6 @@ We'll be trying to cover the following in this document as time allows:
 - BFG Template Lookup Is "Complex"
 
 - BFG Views Do Not Accept Arbitrary Keyword Arguments
-
-- BFG Does Traversal, And I Don't Like Traversal
-
-- BFG Does URL Dispatch, And I Don't Like URL Dispatch
 
 Other challenges are encouraged to be sent to the `Repoze-Dev
 <http://lists.repoze.org/listinfo/repoze-dev>`_ maillist.  We'll try
