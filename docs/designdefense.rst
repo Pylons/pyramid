@@ -354,20 +354,20 @@ Some people are uncomfortable with this notion, and believe it is
 
 This is understandable.  The people who believe it is wrong almost
 invariably have all of their data in a relational database.
-Relational databases aren't hierarchical, so "traversing" one like a
-graph is not possible.  It also confuses folks that the graph being
-traversed is a graph of "model" objects: in a relational database
-application, the model is most certainly not hierarchical, and often
-model objects must be explicitly manufactured by an ORM as a result of
-some query performed by a :term:`view`.  The naming overlap is
-slightly unfortunate: for the purpose of avoiding confusion, if we had
-it to do all over again, we might refer to the graph that
+Relational databases aren't naturally hierarchical, so "traversing"
+one like a graph is not possible.  It also confuses folks that the
+graph being traversed is a graph of "model" objects: in a relational
+database application, the model is most certainly not hierarchical,
+and often model objects must be explicitly manufactured by an ORM as a
+result of some query performed by a :term:`view`.  The naming overlap
+is slightly unfortunate: for the purpose of avoiding confusion, if we
+had it to do all over again, we might refer to the graph that
 :mod:`repoze.bfg` traverses a "node graph" or "object graph" rather
 than a "model graph".
 
 In any case, I believe folks who deem traversal "wrong" are neglecting
 to take into account that many persistence mechanisms *are*
-hierarchical.  Examples inlcude a filesystem, an LDAP database, a
+hierarchical.  Examples include a filesystem, an LDAP database, a
 :term:`ZODB` (or another type of graph) database, an XML document, and
 the Python module namespace.  It is often convenient to model the
 frontend to a hierarchical data store as a graph, using traversal to
@@ -441,6 +441,68 @@ you really don't want to use URL dispatch, you needn't use it at all.
 Instead, use :term:`traversal` exclusively to map URL paths to views,
 just like you do in :term:`Zope`.
 
+BFG Views Do Not Accept Arbitrary Keyword Arguments
+---------------------------------------------------
+
+Many web frameworks (Zope, TurboGears, Pylons, Django) allow for their
+variant of a :term:`view callable` to accept arbitrary keyword or
+positional arguments, which are "filled in" using values present in
+the ``request.POST`` or ``request.GET`` dictionaries or by values
+present in the "route match dictionary".  For example, a Django view
+will accept positional arguments which match information in an
+associated "urlconf" such as ``r'^polls/(?P<poll_id>\d+)/$``:
+
+.. code-block:: python
+   :linenos:
+
+   def aview(request, poll_id):
+       return HttpResponse(poll_id)
+
+Zope, likewise allows you to add arbitrary keyword and positional
+arguments to any method of a model object found via traversal:
+
+.. code-block:: python
+   :linenos:
+
+   class MyZopeObject(Persistent):
+        def aview(self, a, b, c=None):
+            return '%s %s %c' % (a, b, c)
+
+When this method is called as the result of being the published
+callable, the Zope request object's GET and POST namespaces are
+searched for keys which match the names of the positional and keyword
+arguments in the request, and the method is called (if possible) with
+its argument list filled with values mentioned therein.  TurboGears
+and Pylons operate similarly.
+
+:mod:`repoze.bfg` has neither of these features.  :mod:`repoze.bfg`
+view callables always accept only ``context`` and ``request`` (or just
+``request``), and no other arguments.  The rationale: this argument
+specification matching done aggressively can be costly, and
+:mod:`repoze.bfg` has performance as one of its main goals, so we've
+decided to make people obtain information by interrogating the request
+object for it in the view body instead of providing magic to do
+unpacking into the view argument list.  The feature itself also just
+seems a bit like a gimmick.  Getting the arguments you wnt explicitly
+from the request via getitem is not really very hard; it's certainly
+never a bottleneck for the author when he writes web apps.
+
+It is possible to replicate the Zope-like behavior in a view callable
+decorator, however, should you badly want something like it back.  No
+such decorator currently exists.  If you'd like to create one, Google
+for "zope mapply" and adapt the function you'll find to a decorator
+that pulls the argument mapping information out of the
+``request.params`` dictionary.
+
+A similar feature could be implemented to provide the Django-like
+behavior as a decorator by wrapping the view with a decorator that
+looks in ``request.matchdict``.
+
+It's possible at some point that :mod:`repoze.bfg` will grow some form
+of argument matching feature (it would be simple to make it an
+always-on optional feature that has no cost unless you actually use
+it) for, but curently it has none.
+
 Other Topics
 ------------
 
@@ -449,8 +511,6 @@ We'll be trying to cover the following in this document as time allows:
 - BFG View Lookup and Registration Is "Complex"
 
 - BFG Template Lookup Is "Complex"
-
-- BFG Views Do Not Accept Arbitrary Keyword Arguments
 
 Other challenges are encouraged to be sent to the `Repoze-Dev
 <http://lists.repoze.org/listinfo/repoze-dev>`_ maillist.  We'll try
