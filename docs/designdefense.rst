@@ -553,6 +553,76 @@ authorization or authentication policy and using ACLs.  You can build
 security model via decorators or plain-old-imperative logic in view
 code.
 
+BFG Is Too Big
+--------------
+
+"OMG!  The :mod:`repoze.bfg` compressed tarball is, like, 1MB!  It
+must be enormous!"
+
+No.  We just ship it with test code and helper templates.  Here's a
+breakdown of what's included in subdirectories of the package tree:
+
+docs/
+
+  2.3MB
+
+repoze/bfg/tests
+
+  548KB
+
+repoze/bfg/paster_templates
+
+  372KB
+
+repoze/bfg (except for ``repoze/bfg/tests and repoze/bfg/paster_templates``)
+
+  513K
+
+In other words, the actual BFG code is about 10% of the total size of
+the tarball omitting docs, helper templates used for package
+generation, and test code.
+
+Of the approximately 13K lines of Python code in the package, the code
+that actually has a chance of executing during normal operation,
+excluding tests and paster template Python files, accounts for
+approximately 3K lines of Python code.  This is comparable to Pylons,
+which ships with a little over 2K lines of Python code, excluding
+tests.
+
+BFG Has Too Many Dependencies
+-----------------------------
+
+This is true.  The total number of packages (at the time of this
+writing) that :mod:`repoze.bfg` depends upon transitively is 17.  This
+is a lot more than zero dependencies, about which some microframeworks
+boast.
+
+The :mod:`zope.component` and :mod:`zope.configuration` packages on
+which :mod:`repoze.bfg` depends have transitive dependencies on
+several other packages (:mod:`zope.schema`, :mod:`zope.i18n`,
+:mod:`zope.event`, :mod:`zope.interface`, :mod:`zope.deprecation`,
+:mod:`zope.i18nmessageid`).  We'd prefer that these packages have
+fewer packages as transitive dependencies, and that much of the
+functionality of these packages was moved into a smaller *number* of
+packages.  We've been working with the Zope community to try to
+collapse (or at least untangle) some of these dependencies.
+:mod:`repoze.bfg` also has its own dependencies, such as
+:mod:`martian`, :term:`Paste`, :term:`Chameleon`, :term:`WebOb` and
+several other repoze packages.
+
+It should be noted that :mod:`repoze.bfg` is positively lithe compared
+to :term:`Zope` or :term:`Grok` (which have, in their most common
+configurations, roughly 118 dependencies), and has a number of package
+dependencies comparable to other similar frameworks such as Pylons.
+We try not to reinvent too many wheels, and this comes at a cost.  The
+cost is some number of dependencies.
+
+However, "number of packages" is just not a terribly great metric to
+measure complexity.  For example, the :mod:`zope.event` package on
+which :mod:`repoze.bfg` depends has a grand total of four lines of
+code (see above, we're continually trying to agitate for a collapsing
+of packages).
+
 Other Topics
 ------------
 
