@@ -504,6 +504,55 @@ of argument matching feature (it would be simple to make it an
 always-on optional feature that has no cost unless you actually use
 it) for, but curently it has none.
 
+BFG Provides Too Few "Rails"
+----------------------------
+
+:mod:`repoze.bfg` has a relatively parsimonious feature set.  It is
+not a particularly "opinionated" web framework.  This is by design.
+
+:mod:`repoze.bfg` contains no built in ORM nor any particular database
+bindings.  It contains no prebaked REST helper functionality.  It
+contains no form generation framework.  It contains no sessioning
+library.  It does not help with internationalization of content.  It
+has no adminstrative web user interface.  It has no built in text
+indexing.  And so on.
+
+:mod:`repoze.bfg` developers put opinionated functionality in
+applications (and superframeworks) which we build on top of
+:mod:`repoze.bfg` such as `KARL <http://www.karlproject.org/>`_.  BFG
+is a reasonable platform on which to *build* a system that wants to be
+more opinionated.  It's likely that such systems will emerge that are
+built on BFG from various sources.
+
+BFG Provides Too Many "Rails"
+-----------------------------
+
+:mod:`repoze.bfg` provides some features that other web frameworks do
+not.  Most notably it has machinery which resolves a URL first to a
+:term:`context` before calling a view (which has the capability to
+accept the context in its argument list), and a declarative
+authorization system that makes use of this feature.  Most other web
+frameworks besides :term:`Zope`, from which the pattern was stolen,
+have no equivalent core feature.
+
+We consider this an important feature for a particular class of
+applications (CMS-style applications, which the authors are often
+commissioned to write) that usually use :term:`traversal` against a
+persistent model graph.  The model graph contains security
+declarations (as :term:`ACL` objects).
+
+Having context-sensitive declarative security for individual objects
+in the model graph is simply required for this class of application.
+Other frameworks save for Zope just do not have this feature.  This is
+the one of the primary reasons that BFG was actually written.
+
+If you don't like this, it doesn't mean you can't use
+:mod:`repoze.bfg`.  Just ignore this feature and avoid configuring an
+authorization or authentication policy and using ACLs.  You can build
+"Pylons-style" applications using :mod:`repoze.bfg` that use their own
+security model via decorators or plain-old-imperative logic in view
+code.
+
 Other Topics
 ------------
 
