@@ -238,11 +238,6 @@ virtualenv (``bfgenv``) directory:
 
    $ bin/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
 
-.. warning:: Note carefully the ``-i
-   http://dist.repoze.org/bfg/1.1/simple`` above.  It is required.
-   :mod:`repoze.bfg` software is maintained in its own index;
-   :mod:`repoze.bfg` cannot be installed from PyPI.
-
 This command will take longer than the previous ones to complete, as it
 downloads and installs a number of dependencies.
 
