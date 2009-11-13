@@ -153,7 +153,15 @@ conceptual load issues of the ZCA API for framework developers that a
 is fully functional and well-tested, and its API is much nicer than
 the ZCA API, work on it was largely abandoned and it is not used in
 :mod:`repoze.bfg`.  We continued to use the ZCA within
-:mod:`repoze.bfg`.
+:mod:`repoze.bfg` because it ultimately proved a better fit.
+
+.. note:: We continued using ZCA rather than disusing it in favor of
+   :mod:`repoze.component` largely because the ZCA concept of
+   interfaces provides for use of an interface hierarchy, which is
+   useful in a lot of scenarios (such as context type inheritance).
+   Coming up with a marker type that was something like an interface
+   that allowed for this functionality seemed like it was just
+   reinventing the wheel.
 
 Making framework developers and extenders understand the ZCA is a
 tradeoff.  We (the :mod:`repoze.bfg` developers) like the features
@@ -211,13 +219,6 @@ future versions of it will where possible disuse these things in favor
 of straight dictionary assignments and lookups, as demonstrated above,
 to be kinder to new developers and extenders.  We'll continue to seek
 ways to reduce framework extender cognitive load.
-
-We continued using ZCA rather than disusing it in favor of
-:mod:`repoze.component` largely because the ZCA concept of interfaces
-provides for use of an interface hierarchy, which is useful in a lot
-of scenarios (such as context type inheritance).  Coming up with a
-marker type that was something like an interface that allowed for this
-functionality seemed like it was just reinventing the wheel.
 
 Rationale
 +++++++++
@@ -356,14 +357,14 @@ This is understandable.  The people who believe it is wrong almost
 invariably have all of their data in a relational database.
 Relational databases aren't naturally hierarchical, so "traversing"
 one like a graph is not possible.  It also confuses folks that the
-graph being traversed is a graph of "model" objects: in a relational
-database application, the model is most certainly not hierarchical,
-and often model objects must be explicitly manufactured by an ORM as a
-result of some query performed by a :term:`view`.  The naming overlap
-is slightly unfortunate: for the purpose of avoiding confusion, if we
-had it to do all over again, we might refer to the graph that
-:mod:`repoze.bfg` traverses a "node graph" or "object graph" rather
-than a "model graph".
+graph being traversed is termed a graph of "model" objects: in a
+relational database application, the model is most certainly not
+hierarchical, and often model objects must be explicitly manufactured
+by an ORM as a result of some query performed by a :term:`view`.  The
+naming overlap is slightly unfortunate: for the purpose of avoiding
+confusion, if we had it to do all over again, we might refer to the
+graph that :mod:`repoze.bfg` traverses a "node graph" or "object
+graph" rather than a "model graph".
 
 In any case, I believe folks who deem traversal "wrong" are neglecting
 to take into account that many persistence mechanisms *are*
