@@ -630,13 +630,80 @@ BFG "Cheats" To Obtain Speed
 Complaints have been lodged by other web framework authors at various
 times that :mod:`repoze.bfg` "cheats" to gain performance.  One
 claimed cheating mechanism is our use (transitively) of the C
-extensions provided by :term:`zope.interface` to do fast lookups.
+extensions provided by :mod:`zope.interface` to do fast lookups.
 Another claimed cheating mechanism is the religious avoidance of
 extraneous function calls.
 
 If there's such a thing as cheating to get better performance, we want
 to cheat as much as possible.  This is otherwise known as
 optimization.
+
+BFG Gets Its Terminology Wrong ("MVC")
+--------------------------------------
+
+"I'm a MVC web framework user, and I'm confused.  BFG calls the
+controller a view!  And it doesn't have any controllers."
+
+People very much want to give web applications the same properties as
+common desktop GUI platforms by using similar terminology, and to
+provide some frame of reference for how various components in the
+common web framework might hang together.  But in the opinion of the
+author, "MVC" doesn't match the web very well in general. Quoting from
+the `Model-View-Controller Wikipedia entry
+<http://en.wikipedia.org/wiki/Model–view–controller>`_::
+
+  Though MVC comes in different flavors, control flow is generally as
+  follows:
+
+    The user interacts with the user interface in some way (for
+    example, presses a mouse button).
+
+    The controller handles the input event from the user interface,
+    often via a registered handler or callback and converts the event
+    into appropriate user action, understandable for the model.
+
+    The controller notifies the model of the user action, possibly  
+    resulting in a change in the model's state. (For example, the
+    controller updates the user's shopping cart.)[5]
+
+    A view queries the model in order to generate an appropriate
+    user interface (for example, the view lists the shopping cart's     
+    contents). Note that the view gets its own data from the model.
+
+    The controller may (in some implementations) issue a general
+    instruction to the view to render itself. In others, the view is
+    automatically notified by the model of changes in state
+    (Observer) which require a screen update.
+
+    The user interface waits for further user interactions, which
+    restarts the cycle.
+
+To be honest, it seems as if someone edited this Wikipedia definition,
+torturously couching concepts in the most generic terms possible in
+order to account for the use of the term "MVC" by current web
+frameworks.  I doubt such a broad definition would ever be agreed to
+by the original authors of the MVC pattern.  But *even so*, it seems
+most "MVC" web frameworks fail to meet even this falsely generic
+definition.
+
+For example, do your templates (views) always query models directly as
+is claimed in "note that the view gets its own data from the model"?
+Probaby not.  My "controllers" tend to do this, massaging the data for
+easier use by the "view" (template). What do you do when your
+"controller" returns JSON? Do your controllers use a template to
+generate JSON? If not, what's the "view" then?  Most MVC-style GUI web
+frameworks have some sort of event system hooked up that lets the view
+detect when the model changes.  The web just has no such facility in
+its current form: it's pull-only.
+
+So, in the interest of not mistaking desire with reality, and instead
+of trying to jam the square peg that is the web into the round hole of
+"MVC", we just punt and say there are two things: the model, and the
+view. The model stores the data, the view presents it.  The templates
+are really just an implementation detail of any given view: a view
+doesn't need a template to return a response.  There's no
+"controller": it just doesn't exist.  This seems to us like a more
+reasonable model, given the current constraints of the web.
 
 Other Topics
 ------------
