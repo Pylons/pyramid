@@ -594,8 +594,8 @@ BFG Has Too Many Dependencies
 
 This is true.  The total number of packages (at the time of this
 writing) that :mod:`repoze.bfg` depends upon transitively is 17.  This
-is a lot more than zero dependencies, about which some microframeworks
-boast.
+is a lot more than zero dependencies: a metric which some
+"microframeworks" (and Django) boast of.
 
 The :mod:`zope.component` and :mod:`zope.configuration` packages on
 which :mod:`repoze.bfg` depends have transitive dependencies on
@@ -611,17 +611,32 @@ collapse (or at least untangle) some of these dependencies.
 several other repoze packages.
 
 It should be noted that :mod:`repoze.bfg` is positively lithe compared
-to :term:`Zope` or :term:`Grok` (which have, in their most common
-configurations, roughly 118 dependencies), and has a number of package
-dependencies comparable to other similar frameworks such as Pylons.
-We try not to reinvent too many wheels, and this comes at a cost.  The
-cost is some number of dependencies.
+to :term:`Zope` or :term:`Grok` which have, in their most common
+configurations, roughly 118 dependencies. :mod:`repoze.bfg` has a
+number of package dependencies comparable to other similar frameworks
+such as Pylons.  We try not to reinvent too many wheels (at least the
+ones that don't need reinventing), and this comes at a cost.  The cost
+is some number of dependencies.
 
 However, "number of packages" is just not a terribly great metric to
 measure complexity.  For example, the :mod:`zope.event` package on
 which :mod:`repoze.bfg` depends has a grand total of four lines of
-code (see above, we're continually trying to agitate for a collapsing
-of packages).
+code.  As noted above, we're continually trying to agitate for a
+collapsing of packages like this.
+
+BFG "Cheats" To Obtain Speed
+----------------------------
+
+Complaints have been lodged by other web framework authors at various
+times that :mod:`repoze.bfg` "cheats" to gain performance.  One
+claimed cheating mechanism is our use (transitively) of the C
+extensions provided by :term:`zope.interface` to do fast lookups.
+Another claimed cheating mechanism is the religious avoidance of
+extraneous function calls.
+
+If there's such a thing as cheating to get better performance, we want
+to cheat as much as possible.  This is otherwise known as
+optimization.
 
 Other Topics
 ------------
