@@ -345,19 +345,19 @@ will become something like:
 .. code-block:: python
    :linenos:
 
-    from webob import Response
-    from  wsgiref import simple_server
-    from repoze.bfg.registry import Registry
-    from repoze.bfg.router import Router
+   from webob import Response
+   from wsgiref import simple_server
+   from repoze.bfg.registry import Registry
+   from repoze.bfg.router import Router
 
-    def helloworld_view(request):
-        return Response(hello')
+   def helloworld_view(request):
+       return Response(hello')
 
-    if __name__ == '__main__':
-        reg = Registry()
-        reg.view(helloworld_view)
-        app = Router(reg)
-        simple_server.make_server('', 8080, app).serve_forever()
+   if __name__ == '__main__':
+       reg = Registry()
+       reg.view(helloworld_view)
+       app = Router(reg)
+       simple_server.make_server('', 8080, app).serve_forever()
 
 In this mode, no ZCML will be required for end users.  Hopefully this
 mode will allow people who are used to doing everything imperatively
