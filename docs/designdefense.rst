@@ -345,37 +345,94 @@ In this mode, no ZCML will be required.  Hopefully this mode will
 allow people who are used to doing everything imperatively feel more
 comfortable.
 
+.. _model_traversal_confusion:
+
+BFG Uses "Model" To Represent A Node In The Graph of Objects Traversed
+----------------------------------------------------------------------
+
+The :mod:`repoze.bfg` documentation refers to the graph being
+traversed when :term:`traversal` is used as a "model graph".  Some of
+the :mod:`repoze.bfg` APIs also use the word "model" in them when
+referring to a node in this graph (e.g. ``repoze.bfg.url.model_url``).
+
+This confuses people who write applications that always use ORM
+packages such as SQLAlchemy, which has a different notion of the
+definition of a "model".  In a relational database, and when using the
+API of common ORM packages, the model is almost certainly not a
+directed acyclic graph (as may be the case in many graph databases).
+Often model objects must be explicitly manufactured by an ORM as a
+result of some query performed by a :term:`view`.  As a result, it can
+be unnatural to think of the nodes traversed as "model" objects if you
+develop your application using traversal and a relational database.
+When you develop such applications, the things that :mod:`repoze.bfg`
+refers to as "models" in such an application may just be stand-ins
+that perform a query and generate some wrapper *for* an ORM "model"
+(or set of ORM models).  The graph *might* be composed completely of
+"model" objects (as defined by the ORM) but it also might not be. 
+
+The naming impedance mismatch between the way the term "model" is used
+to refer to a node in a graph in :mod:`repoze.bfg` and the way the
+term "model" is used by packages like SQLAlchemy is unfortunate.  For
+the purpose of avoiding confusion, if we had it to do all over again,
+we might refer to the graph that :mod:`repoze.bfg` traverses a "node
+graph" or "object graph" rather than a "model graph", but since we've
+baked the name into the API, it's a little late.  Sorry.
+
+In our defense, many :mod:`repoze.bfg` applications (especially ones
+which use :term:`ZODB`) do indeed traverse a graph full of model
+nodes.  Each node in the graph is a separate persistent object that is
+stored within a database.  This was the use case considered when
+coming up with the "model" terminology.
+
+I Can't Figure Out How "BFG" Is Related to "Repoze"
+---------------------------------------------------
+
+When the `Repoze project <http://repoze.org>`_ was first started,
+:mod:`repoze.bfg` did not exist.  The `website <http://repoze.org>`_
+for the project had (and still has, of this writing) a tagline of
+"Plumbing Zope into the WSGI Pipeline", and contained descriptions of
+:term:`WSGI` middleware that were inspired by Zope features, and
+applications that help :term:`Zope` to run within a WSGI environment.
+The original intent was to create a "namespace" of packages
+("repoze.*") that contained software that formed a decomposition of
+Zope features into more WSGI-friendly components.  It was never the
+intention of the Repoze project to actually create another web
+framework.
+
+However, due to an early naming mistake, the software composing the
+BFG framework framework wwas added to this set of packages as
+:mod:`repoze.bfg`.  While BFG uses Zope technology, it is otherwise
+unrelated to the original goals of "Repoze" as stated on the
+repoze.org website.  If we had it to do all over again, the BFG
+package would be named simply "bfg".  But we don't.
+
+At this point, therefore, the name "Repoze" should be considered
+basically just a "brand".  Its presence in the name of a package means
+nothing except that it has an origin as a piece of software developed
+by a member of the Repoze community.
+
 BFG Does Traversal, And I Don't Like Traversal
 ----------------------------------------------
 
 In :mod:`repoze.bfg`, :term:`traversal` is the act of resolving a URL
-path to a :term:`model` object in a graph full of "model objects".
-Some people are uncomfortable with this notion, and believe it is
-"wrong".
+path to a :term:`model` object in an object graph.  Some people are
+uncomfortable with this notion, and believe it is wrong.
 
 This is understandable.  The people who believe it is wrong almost
 invariably have all of their data in a relational database.
 Relational databases aren't naturally hierarchical, so "traversing"
-one like a graph is not possible.  It also confuses folks that the
-graph being traversed is termed a graph of "model" objects: in a
-relational database application, the model is most certainly not
-hierarchical, and often model objects must be explicitly manufactured
-by an ORM as a result of some query performed by a :term:`view`.  The
-naming overlap is slightly unfortunate: for the purpose of avoiding
-confusion, if we had it to do all over again, we might refer to the
-graph that :mod:`repoze.bfg` traverses a "node graph" or "object
-graph" rather than a "model graph".
+one like a graph is not possible.  This problem is related to
+:ref:`model_traversal_confusion`.
 
-In any case, I believe folks who deem traversal "wrong" are neglecting
-to take into account that many persistence mechanisms *are*
-hierarchical.  Examples include a filesystem, an LDAP database, a
-:term:`ZODB` (or another type of graph) database, an XML document, and
-the Python module namespace.  It is often convenient to model the
-frontend to a hierarchical data store as a graph, using traversal to
-apply views to objects that either *are* the nodes in the graph being
-traversed (such as in the case of ZODB) or at least ones which stand
-in for them (such as in the case of wrappers for files from the
-filesystem).
+Folks who deem traversal unilaterally "wrong" are neglecting to take
+into account that many persistence mechanisms *are* hierarchical.
+Examples include a filesystem, an LDAP database, a :term:`ZODB` (or
+another type of graph) database, an XML document, and the Python
+module namespace.  It is often convenient to model the frontend to a
+hierarchical data store as a graph, using traversal to apply views to
+objects that either *are* the nodes in the graph being traversed (such
+as in the case of ZODB) or at least ones which stand in for them (such
+as in the case of wrappers for files from the filesystem).
 
 Also, many website structures are naturally hierarchical, even if the
 data which drives them isn't.  For example, newspaper websites are
