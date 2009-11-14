@@ -379,10 +379,12 @@ However, currently, there are times when a BFG application developer
 will be required to interact with ZCML, and thus XML.  Alas; it is
 what it is.  You might think some other configuration file format
 would be better.  But all configuration formats suck in one way or
-another; I personally don't think any of our lives would be markedly
+another.  I personally don't think any of our lives would be markedly
 better if the format were YAML, JSON, or INI.  It's all just plumbing
-that you mostly cut and paste once you're past 20 minutes into a
-project.
+that you mostly cut and paste once you've progressed 30 minutes into
+your first project.  It seems that most of the folks who tend to
+agitate for another configuration file format are folks that haven't
+yet spent that 30 minutes.
 
 .. _model_traversal_confusion:
 
