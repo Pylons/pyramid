@@ -912,9 +912,9 @@ features and bugfixes is clearly useful.  You can do that with a
 any application.  But deployment of an application written in
 :mod:`repoze.bfg` makes it possible to avoid the need for this even if
 the application doesn't define any plugpoints ahead of time.  It's
-possible that most other web framework promoters dismiss this feature
-in favor of branching and merging because applications written in
-their framework of choice aren't extensible out of the box in a
+possible that promoters of competing web frameworks dismiss this
+feature in favor of branching and merging because applications written
+in their framework of choice aren't extensible out of the box in a
 comparably fundamental way.
 
 While :mod:`repoze.bfg` application are fundamentally extensible even
