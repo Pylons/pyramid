@@ -37,7 +37,7 @@ typical "unnamed utility" lookup:
 After this code runs, ``settings`` will be a Python dictionary.  But
 it's unlikely that any "civilian" would know that just by reading the
 code.  There are a number of comprehension issues with the bit of code
-above that are pretty obvious.
+above that are obvious.
 
 First, what's a "utility"?  Well, for the purposes of this dicussion,
 and for the purpose of the code above, it's just not very important.
@@ -217,8 +217,8 @@ such as this.  While :mod:`repoze.bfg` still uses some suboptimal
 unnamed utility registrations and other superfluous ZCA API usages,
 future versions of it will where possible disuse these things in favor
 of straight dictionary assignments and lookups, as demonstrated above,
-to be kinder to new developers and extenders.  We'll continue to seek
-ways to reduce framework extender cognitive load.
+to be kinder to new framework developers.  We'll also continue to seek
+ways to reduce framework developer cognitive load.
 
 Rationale
 +++++++++
@@ -229,11 +229,11 @@ Here are the main rationales for BFG's design decision to use the ZCA:
   "pedigree".  Much of the design of :mod:`repoze.bfg` is stolen
   directly from :term:`Zope`.  Zope uses the ZCA to do a number of
   tricks.  :mod:`repoze.bfg` mimics these tricks apeishly, and,
-  because the ZCA works pretty well for that set of tricks,
-  :mod:`repoze.bfg` uses it for the same purposes.  For example, the
-  way that BFG maps a :term:`request` to a :term:`view callable` is
-  lifted almost entirely from Zope.  The ZCA plays an important role
-  in the particulars of how this request to view mapping is done.
+  because the ZCA works well for that set of tricks, :mod:`repoze.bfg`
+  uses it for the same purposes.  For example, the way that BFG maps a
+  :term:`request` to a :term:`view callable` is lifted almost entirely
+  from Zope.  The ZCA plays an important role in the particulars of
+  how this request to view mapping is done.
 
 - Features.  The ZCA essentially provides what can be considered
   something like a "superdictionary", which allows for more complex
@@ -299,12 +299,11 @@ If you *extend* or *develop* :mod:`repoze.bfg` (create new ZCML
 directives, use some of the more obscure "ZCML hooks" as described in
 :ref:`hooks_chapter`, or work on the :mod:`repoze.bfg` core code), you
 will be faced with needing to understand at least some ZCA concepts.
-The ZCA API is pretty quirky: we've tried to make it at least slightly
-nicer by disusing it for common registrations and lookups such as
-unnamed utilities.  Some places it's used unabashedly, and will be
-forever.  We know it's a bit quirky, but it's also useful and
-fundamentally understandable if you take the time to do some reading
-about it.
+The ZCA API is quirky: we've tried to make it at least slightly nicer
+by disusing it for common registrations and lookups such as unnamed
+utilities.  Some places it's used unabashedly, and will be forever.
+We know it's a bit quirky, but it's also useful and fundamentally
+understandable if you take the time to do some reading about it.
 
 .. _zcml_encouragement:
 
@@ -440,12 +439,16 @@ Zope features into more WSGI-friendly components.  It was never the
 intention of the Repoze project to actually create another web
 framework.
 
-However, due to an early naming mistake, the software composing the
-BFG framework framework wwas added to this set of packages as
-:mod:`repoze.bfg`.  While BFG uses Zope technology, it is otherwise
-unrelated to the original goals of "Repoze" as stated on the
-repoze.org website.  If we had it to do all over again, the BFG
-package would be named simply "bfg".  But we don't.
+However, as time progressed, the folks who ran the Repoze project
+decided to create BFG, which *is* a web framework.  Due to an early
+naming mistake, the software composing the BFG framework was named
+:mod:`repoze.bfg`.  This mistake was not corrected before the software
+garnered a significant user base, and in the interest of backwards
+compatibility, most likely never will be.  While BFG uses Zope
+technology, it is otherwise unrelated to the original goals of
+"Repoze" as stated on the repoze.org website.  If we had it to do all
+over again, the BFG package would be named simply ``bfg``.  But we
+don't have it to do all over again.
 
 At this point, therefore, the name "Repoze" should be considered
 basically just a "brand".  Its presence in the name of a package means
