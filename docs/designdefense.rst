@@ -340,21 +340,24 @@ include a completely imperative mode for all configuration.  You will
 be able to make "single file" apps in this mode, which should help
 people who need to see everything done completely imperatively.  For
 example, the very most basic :mod:`repoze.bfg` "helloworld" program
-will become something like::
+will become something like:
 
-  from webob import Response
-  from  wsgiref import simple_server
-  from repoze.bfg.registry import Registry
-  from repoze.bfg.router import Router
+.. code-block:: python
+   :linenos:
 
-  def helloworld_view(request):
-      return Response(hello')
+    from webob import Response
+    from  wsgiref import simple_server
+    from repoze.bfg.registry import Registry
+    from repoze.bfg.router import Router
 
-  if __name__ == '__main__':
-      reg = Registry()
-      reg.view(helloworld_view)
-      app = Router(reg)
-      simple_server.make_server('', 8080, app).serve_forever()
+    def helloworld_view(request):
+        return Response(hello')
+
+    if __name__ == '__main__':
+        reg = Registry()
+        reg.view(helloworld_view)
+        app = Router(reg)
+        simple_server.make_server('', 8080, app).serve_forever()
 
 In this mode, no ZCML will be required for end users.  Hopefully this
 mode will allow people who are used to doing everything imperatively
