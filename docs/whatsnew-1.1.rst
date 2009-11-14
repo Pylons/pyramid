@@ -675,7 +675,7 @@ Backwards Incompatibilities
 
 - The ``registry_manager`` backwards compatibility alias importable
   from "repoze.bfg.registry", deprecated since repoze.bfg 0.9 has been
-  removed.  If you are tyring to use the registry manager within a
+  removed.  If you are trying to use the registry manager within a
   debug script of your own, use a combination of the
   "repoze.bfg.paster.get_app" and "repoze.bfg.scripting.get_root" APIs
   instead.
