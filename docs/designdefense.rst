@@ -849,9 +849,9 @@ merging typically ensues.
 
 It's clear that making *every* application extensible isn't a goal.
 The majority of web applications only have a single deployment, and
-thus needn't be extensible atall.  However, some web applications have
-multiple deployments, and some have *many* deployments.  For example,
-a generic "content management" system (CMS) may have basic
+thus needn't be extensible at all.  However, some web applications
+have multiple deployments, and some have *many* deployments.  For
+example, a generic "content management" system (CMS) may have basic
 functionality that needs to be extended for a particular deployment.
 That CMS system may be deployed for many organizations at many places.
 Some number of deployments of this CMS may be deployed centrally by a
