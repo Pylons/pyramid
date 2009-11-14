@@ -880,14 +880,8 @@ in their framework of choice just aren't arbitrarily extensible out of
 the box in this manner; the machinery to make it so just doesn't
 exist.
 
-Other Topics
-------------
-
-We'll be trying to cover the following in this document as time allows:
-
-- BFG View Lookup and Registration Is "Complex"
-
-- BFG Template Lookup Is "Complex"
+Other Challenges
+----------------
 
 Other challenges are encouraged to be sent to the `Repoze-Dev
 <http://lists.repoze.org/listinfo/repoze-dev>`_ maillist.  We'll try
