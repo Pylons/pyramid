@@ -696,37 +696,44 @@ tests.
 BFG Has Too Many Dependencies
 -----------------------------
 
-This is true.  The total number of packages (at the time of this
-writing) that :mod:`repoze.bfg` depends upon transitively is 17.  This
-is a lot more than zero dependencies: a metric which some
-"microframeworks" (and Django) boast of.
+This is true.  At the time of this writing, the total number of Python
+package distributions that :mod:`repoze.bfg` depends upon transitively
+is 17 if you use Python 2.6, or 18, if you use Python 2.4 or 2.5.
+This is a lot more than zero dependencies: a metric which various
+Python microframeworks and Django boast.
 
 The :mod:`zope.component` and :mod:`zope.configuration` packages on
 which :mod:`repoze.bfg` depends have transitive dependencies on
 several other packages (:mod:`zope.schema`, :mod:`zope.i18n`,
 :mod:`zope.event`, :mod:`zope.interface`, :mod:`zope.deprecation`,
-:mod:`zope.i18nmessageid`).  We'd prefer that these packages have
-fewer packages as transitive dependencies, and that much of the
-functionality of these packages was moved into a smaller *number* of
-packages.  We've been working with the Zope community to try to
-collapse (or at least untangle) some of these dependencies.
-:mod:`repoze.bfg` also has its own dependencies, such as
+:mod:`zope.i18nmessageid`).  We've been working with the Zope
+community to try to collapse and untangle some of these dependencies.
+We'd prefer that these packages have fewer packages as transitive
+dependencies, and that much of the functionality of these packages was
+moved into a smaller *number* of packages.
+
+:mod:`repoze.bfg` also has its own direct dependencies, such as
 :mod:`martian`, :term:`Paste`, :term:`Chameleon`, :term:`WebOb` and
-several other repoze packages.
+several other repoze packages, and some of these in turn have their
+own transitive dependencies.
 
 It should be noted that :mod:`repoze.bfg` is positively lithe compared
-to :term:`Zope` or :term:`Grok` which have, in their most common
-configurations, roughly 118 dependencies. :mod:`repoze.bfg` has a
-number of package dependencies comparable to other similar frameworks
-such as Pylons.  We try not to reinvent too many wheels (at least the
-ones that don't need reinventing), and this comes at a cost.  The cost
-is some number of dependencies.
+to :term:`Grok`, a different Zope-based framework.  As of this
+writing, in its default configuration, Grok has 126 package
+distribution dependencies. The number of package dependencies required
+by :mod:`repoze.bfg` is many times fewer than Grok (or Zope itself,
+upon which Grok is based).  :mod:`repoze.bfg` has a number of package
+distribution dependencies comparable to similarly-targeted frameworks
+such as Pylons.
 
-However, "number of packages" is just not a terribly great metric to
-measure complexity.  For example, the :mod:`zope.event` package on
-which :mod:`repoze.bfg` depends has a grand total of four lines of
-code.  As noted above, we're continually trying to agitate for a
-collapsing of packages like this.
+We try not to reinvent too many wheels (at least the ones that don't
+need reinventing), and this comes at the cost of some number of
+dependencies.  However, "number of package distributions" is just not
+a terribly great metric to measure complexity.  For example, the
+:mod:`zope.event` distribution on which :mod:`repoze.bfg` depends has
+a grand total of four lines of runtime code.  As noted above, we're
+continually trying to agitate for a collapsing of these sorts of
+packages into fewer distribution files.
 
 BFG "Cheats" To Obtain Speed
 ----------------------------
@@ -739,7 +746,7 @@ Another claimed cheating mechanism is the religious avoidance of
 extraneous function calls.
 
 If there's such a thing as cheating to get better performance, we want
-to cheat as much as possible.  This is otherwise known as
+to cheat as much as possible.  This should more accurately be called
 optimization.
 
 BFG Gets Its Terminology Wrong ("MVC")
@@ -798,7 +805,7 @@ easier use by the "view" (template). What do you do when your
 generate JSON? If not, what's the "view" then?  Most MVC-style GUI web
 frameworks have some sort of event system hooked up that lets the view
 detect when the model changes.  The web just has no such facility in
-its current form: it's pull-only.
+its current form: it's effectively pull-only.
 
 So, in the interest of not mistaking desire with reality, and instead
 of trying to jam the square peg that is the web into the round hole of
@@ -809,23 +816,30 @@ doesn't need a template to return a response.  There's no
 "controller": it just doesn't exist.  This seems to us like a more
 reasonable model, given the current constraints of the web.
 
-BFG Applications are Extensible; I Don't Believe In Extensible Applications
----------------------------------------------------------------------------
+BFG Applications are Extensible; I Don't Believe In Application Extensibility
+-----------------------------------------------------------------------------
 
 Any :mod:`repoze.bfg` application written obeying certain constraints
-is *extensible*. "Extensible", in this context, means:
+is *extensible*. This feature is discussed in the :mod:`repoze.bfg`
+documentation chapter named :ref:`extending_chapter`.  It is made
+possible by the use of the :term:`Zope Component Architecture` and
+:term:`ZCML` within :mod:`repoze.bfg`.
+
+"Extensible", in this context, means:
 
 - The behavior of an application can be overridden or extended in a
   particular *deployment* of the application without requiring that
   the deployer modify the source of the original application.
 
-- The original developer does not need to anticipate all extensibility
-  plugpoints at application creation time.
+- The original developer is not required to anticipate any
+  extensibility plugpoints at application creation time to allow
+  fundamental application behavior to be overriden or extended.
 
-This feature is discussed in the :mod:`repoze.bfg` documentation
-chapter named :ref:`extending_chapter`.  It is made possible by the
-use of the :term:`Zope Component Architecture` and :term:`ZCML` within
-:mod:`repoze.bfg`.
+- The original developer may optionally choose to anticipate an
+  application-specific set of plugpoints, which will may be hooked by
+  a deployer.  If he chooses to use the facilities provided by the
+  ZCA, the original developer does not need to think terribly hard
+  about the mechanics of introducing such a plugpoint.
 
 Many developers seem to believe that creating extensible applications
 is "not worth it".  They instead suggest that modifying the source of
@@ -833,52 +847,76 @@ a given application for each deployment to override behavior is more
 reasonable.  Much discussion about version control branching and
 merging typically ensues.
 
-It's clear that making *every* application maximally extensible isn't
-a goal.  The majority of web applications only have a single
-deployment.  However, some web applications have multiple deployments,
-and some have *many* deployments.  For example, a generic "content
-management" system (CMS) may have basic functionality that needs to be
-extended for a particular deployment.  That CMS system may be deployed
-for many organizations, but managed centrally by a third party.  It's
-useful to be able to extend the system for each deployment via
-preordained plugpoints than it is to continually keep a software
-branch of the system in sync with some upstream source: the upstream
-developers may change code in such a way that your changes to the same
-codebase conflict with theirs.  Merging such changes over time can be
-nightmarish.
+It's clear that making *every* application extensible isn't a goal.
+The majority of web applications only have a single deployment, and
+thus needn't be extensible atall.  However, some web applications have
+multiple deployments, and some have *many* deployments.  For example,
+a generic "content management" system (CMS) may have basic
+functionality that needs to be extended for a particular deployment.
+That CMS system may be deployed for many organizations at many places.
+Some number of deployments of this CMS may be deployed centrally by a
+third party and managed as a group.  It's useful to be able to extend
+such a system for each deployment via preordained plugpoints than it
+is to continually keep each software branch of the system in sync with
+some upstream source: the upstream developers may change code in such
+a way that your changes to the same codebase conflict with theirs.
+Merging such changes over time can be difficult and it's often useful
+to be able to modify an application for a particular deployment in a
+less invasive way.
 
-When you use :mod:`repoze.bfg` (or :term:`Zope`, for that matter), and
-you follow a set of clearly defined rules (explained in
-:ref:`extending_chapter`), you don't need to *make* your application
-extensible.  It just *is* extensible.  Any application you write in
-the framework in this manner is extensible at a basic level.  If
-you've not thoughtfully exposed convenient "override knobs" at a high
-level while developing the application, the mechanisms that people can
-use to extend it will be necessarily coarse: views and routes,
-typically, will be capable of being overridden, usually via
-:term:`ZCML`. But for minor (and even *major*) customizations, these
-are often the only override plugpoints necessary: if the application
-doesn't do exactly what the deployment requires, it's often possible
-for a deployer to override a view or a route and quickly make it do
-what he or she wants it to do.  Need a different styling?  Override
-the main template and the CSS in a separate Python package.  Need a
-"screen" to do something differently or expose more information?
-Override the view that shows the screen within that same separate
-Python package.  Need an additional feature?  Add a view to the
-package.  And so forth.
+When you use :mod:`repoze.bfg` (or :term:`Zope`, for that matter), if
+you follow the set of rules defined in :ref:`extending_chapter`, you
+don't need to *make* your application extensible: any application you
+write in the framework just *is* automatically extensible at a basic
+level.  The mechanisms that people can use to extend it will be
+necessarily coarse.  Views, routes, and resources typically, will be
+capable of being overridden, usually via :term:`ZCML`. But for minor
+(and even *major*) customizations, these are often the only override
+plugpoints necessary: if the application doesn't do exactly what the
+deployment requires, it's often possible for a deployer to override a
+view or a route and quickly make it do what he or she wants it to do
+in *arbitrary ways* not anticipated by the original developer.
+Deployment needs a different styling?  Override the main template and
+the CSS in a separate Python package which defines overrides.
+Deployment needs a "screen" to do something differently or expose more
+information?  Override the view that shows the screen within that same
+separate Python package.  Deployment need an additional feature?  Add
+a view to the override package.  As long as the fundamental design of
+the upstream package doesn't change, these types of modifications
+often survive across many releases of the upstream package without
+needing to be revisited.
 
-I believe that the people who dismiss extensible applications
-wholesale, and instead suggest branching somewhat miss the point.
-Yes, branching an application and continually merging in order to get
-new features and bugfixes is clearly useful.  You can do that with a
+While :mod:`repoze.bfg` application are fundamentally extensible even
+if you don't write them with specific extensibility in mind, if you're
+adventurous, you can also take it a step further.  If you learn more
+about the :term:`Zope Component Architecture`, you can use it to
+expose other more domain-specific override knobs while developing an
+application.  The override knobs you expose don't need to be as coarse
+as the ones provided automatically by the framework.  For example, you
+might compose your own :term:`ZCML` directive that configures a set of
+views for a prebaked purpose (e.g. ``restview`` or somesuch) ,
+allowing other people to refer to that directive when they make
+declarations in the ``configure.zcml`` of their customization package.
+
+Extending an application externally is not a panacea, and carries a
+set of risks similar to branching and merging: sometimes major changes
+upstream will cause you to need to revisit and update some of your
+modifications.  But all of your modifications are contained in one
+well-defined place, and you won't regularly need to deal wth merge
+conflicts that trivial changes to upstream packages often entail when
+it comes time to update the upstream package.  If you extend an
+application externally, there just is no textual merge.
+
+Branching an application and continually merging in order to get new
+features and bugfixes is clearly useful.  You can do that with a
 :mod:`repoze.bfg` application just as usefully as you can do it with
-any application.  But writing an application using :mod:`repoze.bfg`
-it possible to avoid needing to do this, *even if the application
-doesn't define its own plugpoints ahead of time*.  Most other web
-framework promoters dismiss this feature because applications written
-in their framework of choice just aren't arbitrarily extensible out of
-the box in this manner; the machinery to make it so just doesn't
-exist.
+any application.  But use of an application written in
+:mod:`repoze.bfg` makes it possible to avoid needing to do this, *even
+if the application doesn't define any plugpoints ahead of time*.  It's
+possible that most other web framework promoters dismiss this feature
+in favor of branching and merging because applications written in
+their framework of choice aren't extensible out of the box in such a
+fundamental way.
 
 Other Challenges
 ----------------
