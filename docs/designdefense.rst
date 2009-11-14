@@ -668,11 +668,11 @@ breakdown of what's included in subdirectories of the package tree:
 
 docs/
 
-  2.3MB
+  2.2MB
 
 repoze/bfg/tests
 
-  548KB
+  580KB
 
 repoze/bfg/paster_templates
 
@@ -680,7 +680,7 @@ repoze/bfg/paster_templates
 
 repoze/bfg (except for ``repoze/bfg/tests and repoze/bfg/paster_templates``)
 
-  513K
+  316K
 
 In other words, the actual BFG code is about 10% of the total size of
 the tarball omitting docs, helper templates used for package
