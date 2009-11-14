@@ -185,7 +185,7 @@ view_permission
   If the ``view`` attribute is not provided, this attribute has no
   effect.
 
-  This atribute can also be spelled as ``permission``.
+  This attribute can also be spelled as ``permission``.
 
 view_renderer
 
@@ -194,7 +194,7 @@ view_renderer
   (e.g. ``templates/views.pt``).  If the renderer value is a single
   term (does not contain a dot ``.``), the specified term will be used
   to look up a renderer implementation, and that renderer
-  inplementation will be used to construct a response from the view
+  implementation will be used to construct a response from the view
   return value.  If the renderer term contains a dot (``.``), the
   specified term will be treated as a path, and the filename extension
   of the last element in the path will be used to look up the renderer
@@ -206,7 +206,7 @@ view_renderer
   If the ``view`` attribute is not provided, this attribute has no
   effect.
 
-  This atribute can also be spelled as ``renderer``.
+  This attribute can also be spelled as ``renderer``.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
@@ -239,7 +239,7 @@ view_attr
 
   The view machinery defaults to using the ``__call__`` method of the
   view callable (or the function itself, if the view callable is a
-  funcion) to obtain a response dictionary.  The ``attr`` value allows
+  function) to obtain a response dictionary.  The ``attr`` value allows
   you to vary the method attribute used to obtain the response.  For
   example, if your view was a class, and the class has a method named
   ``index`` and you wanted to use this method instead of the class'
@@ -392,7 +392,7 @@ opposed to using both url dispatch and :term:`traversal`), the
 particularly if you never use a ``factory`` attribute on your route
 definitions.  For this reason, :mod:`repoze.bfg` supports view
 callables defined with only a ``request`` argument in their argument
-specification.  For example, the below view statement is competely
+specification.  For example, the below view statement is completely
 equivalent to the above view statement:
 
 .. code-block:: python

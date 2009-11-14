@@ -140,7 +140,7 @@ Configuration
    See :ref:`MyProject_ini` for more information about project Paste
    ``.ini`` files.
 
-#.  Add a ``get_session`` API to your application.  I've chosed to add
+#.  Add a ``get_session`` API to your application.  I've chosen to add
     it directly to my ``views.py`` file, although it can live anywhere.
 
     .. code-block:: python

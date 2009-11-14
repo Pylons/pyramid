@@ -381,7 +381,7 @@ renderer
   (e.g. ``templates/views.pt``).  If the renderer value is a single
   term (does not contain a dot ``.``), the specified term will be used
   to look up a renderer implementation, and that renderer
-  inplementation will be used to construct a response from the view
+  implementation will be used to construct a response from the view
   return value.  If the renderer term contains a dot (``.``), the
   specified term will be treated as a path, and the filename extension
   of the last element in the path will be used to look up the renderer
@@ -506,7 +506,7 @@ containment
 
 xhr
 
-  Thie value should be either ``True`` or ``False``.  If this value is
+  This value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`request` must possess an
   ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header that has
   the value ``XMLHttpRequest`` for this view to be found and called.
@@ -865,7 +865,7 @@ invoking user.  No further view narrowing or view lookup is done.
    changing the default forbidden view.
 
 The value of the ``name`` attribute represents a direct match of the
-view name returned via traversal.  It is part of intial view lookup
+view name returned via traversal.  It is part of initial view lookup
 rather than a predicate/narrower.
 
 The value of the ``renderer`` attribute represents the renderer used
@@ -1087,14 +1087,14 @@ rendered template in a response to the user.  If the view returns
 anything but a dictionary, an error will be raised.
 
 Before passing keywords to the template, the keywords derived from the
-dictionary returned by the view are augumented.  The callable object
+dictionary returned by the view are augmented.  The callable object
 (whatever object was used to define the ``view``) will be
 automatically inserted into the set of keyword arguments passed to the
 template as the ``view`` keyword.  If the view callable was a class,
 the ``view`` keyword will be an instance of that class.  Also inserted
 into the keywords passed to the template are ``renderer_name`` (the
 name of the renderer, which may be a full path or a package-relative
-name, typically the full string used in the ``renderer`` atttribute of
+name, typically the full string used in the ``renderer`` attribute of
 the directive), ``context`` (the context of the view used to render
 the template), and ``request`` (the request passed to the view used to
 render the template).
@@ -1390,7 +1390,7 @@ In this case, ``.models.Root`` refers to the class of which your
    ``static`` to be accessible as the static view against any model.
    This will also allow ``/static/foo.js`` to work, but it will allow
    for ``/anything/static/foo.js`` too, as long as ``anything`` itself
-   is resolveable.
+   is resolvable.
 
 .. note:: To ensure that model objects contained in the root don't
    "shadow" your static view (model objects take precedence during
@@ -1588,7 +1588,7 @@ callable to influence automatically constructed response attributes.
 Adding and Overriding Renderers
 -------------------------------
 
-Additonal ZCML declarations can be made which override an existing
+Additional ZCML declarations can be made which override an existing
 :term:`renderer` or which add a new renderer.  Adding or overriding a
 renderer is accomplished via one or more separate ZCML directives.
 

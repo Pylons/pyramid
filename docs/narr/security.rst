@@ -469,7 +469,7 @@ lifetime of the ticket contained in the cookie, while this value
 represents the lifetime of the cookie itself.  When this value is set,
 the cookie's ``Max-Age`` and ``Expires`` settings will be set,
 allowing the auth_tkt cookie to last between browser sessions.  It is
-typically nonsenical to set this to a value that is lower than
+typically nonsensical to set this to a value that is lower than
 ``timeout`` or ``reissue_time``, although it is not explicitly
 prevented.  It defaults to ``None``, meaning (on all major browser
 platforms) that auth_tkt cookies will last for the lifetime of the

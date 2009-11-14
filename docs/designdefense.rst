@@ -3,7 +3,7 @@ Defending BFG's Design
 
 From time to time, challenges to various aspects of :mod:`repoze.bfg`
 design are lodged.  To give context to the discussions that follow, we
-detail some of the design decisions and tradeoffs here.
+detail some of the design decisions and trade-offs here.
 
 BFG Uses The Zope Component Architecture ("ZCA")
 ------------------------------------------------
@@ -14,8 +14,8 @@ This is a point of some contention.  :mod:`repoze.bfg` is of a
 ZCA at its inception.  However, :mod:`repoze.bfg` allegiance to its
 Zope pedigree is not blind.  We understand that using the ZCA has
 issues and consequences, which we've attempted to address as best we
-can.  Here'a an introspection about BFG's use of the ZCA, and the
-tradeoffs its usage involves.
+can.  Here's an introspection about BFG's use of the ZCA, and the
+trade offs its usage involves.
 
 Problems
 ++++++++
@@ -39,7 +39,7 @@ it's unlikely that any "civilian" would know that just by reading the
 code.  There are a number of comprehension issues with the bit of code
 above that are obvious.
 
-First, what's a "utility"?  Well, for the purposes of this dicussion,
+First, what's a "utility"?  Well, for the purposes of this discussion,
 and for the purpose of the code above, it's just not very important.
 If you really care, you can go read `this
 <http://www.muthukadan.net/docs/zca.html#utility>`_.  However, still,
@@ -70,7 +70,7 @@ require knowledge of internals).  Can there be more than one?  Yes.
 So *which* registry does it find the registration in?  Well, the
 "current" registry of course.  In terms of :mod:`repoze.bfg`, the
 current registry is a thread local variable.  Using an API that
-consults a thread local makes understanding how it works nonlocal.
+consults a thread local makes understanding how it works non-local.
 
 Sixth, fine, you've bought in to the fact that there's a registry that
 is just "hanging around".  But how does the registry get populated?
@@ -164,7 +164,7 @@ the ZCA API, work on it was largely abandoned and it is not used in
    reinventing the wheel.
 
 Making framework developers and extenders understand the ZCA is a
-tradeoff.  We (the :mod:`repoze.bfg` developers) like the features
+trade-off.  We (the :mod:`repoze.bfg` developers) like the features
 that the ZCA gives us, and we have long-ago borne the weight of
 understanding what it does and how it works.  The authors of
 :mod:`repoze.bfg` understand the ZCA deeply and can read code that
@@ -228,7 +228,7 @@ Here are the main rationales for BFG's design decision to use the ZCA:
 - Pedigree.  A nontrivial part of the answer to this question is
   "pedigree".  Much of the design of :mod:`repoze.bfg` is stolen
   directly from :term:`Zope`.  Zope uses the ZCA to do a number of
-  tricks.  :mod:`repoze.bfg` mimics these tricks apeishly, and,
+  tricks.  :mod:`repoze.bfg` mimics these tricks apishly, and,
   because the ZCA works well for that set of tricks, :mod:`repoze.bfg`
   uses it for the same purposes.  For example, the way that BFG maps a
   :term:`request` to a :term:`view callable` is lifted almost entirely
@@ -432,7 +432,7 @@ I Can't Figure Out How "BFG" Is Related to "Repoze"
 
 When the `Repoze project <http://repoze.org>`_ was first started,
 :mod:`repoze.bfg` did not exist.  The `website <http://repoze.org>`_
-for the project had (and still has, of this writing) a tagline of
+for the project had (and still has, of this writing) a tag line of
 "Plumbing Zope into the WSGI Pipeline", and contained descriptions of
 :term:`WSGI` middleware that were inspired by Zope features, and
 applications that help :term:`Zope` to run within a WSGI environment.
@@ -516,7 +516,7 @@ object graph (or at least is a :term:`view` related to a node in the
 object graph), and traversal is required to reach this code.
 
 I'll argue that URL dispatch is ultimately useful, even if you want to
-use traversal as well.  You can actully *combine* URL dispatch and
+use traversal as well.  You can actually *combine* URL dispatch and
 traversal in :mod:`repoze.bfg` (see :ref:`hybrid_chapter`).  One
 example of such a usage: if you want to emulate something like Zope
 2's "Zope Management Interface" UI on top of your model graph (or any
@@ -588,7 +588,7 @@ specification matching done aggressively can be costly, and
 decided to make people obtain information by interrogating the request
 object for it in the view body instead of providing magic to do
 unpacking into the view argument list.  The feature itself also just
-seems a bit like a gimmick.  Getting the arguments you wnt explicitly
+seems a bit like a gimmick.  Getting the arguments you want explicitly
 from the request via getitem is not really very hard; it's certainly
 never a bottleneck for the author when he writes web apps.
 
@@ -606,7 +606,7 @@ looks in ``request.matchdict``.
 It's possible at some point that :mod:`repoze.bfg` will grow some form
 of argument matching feature (it would be simple to make it an
 always-on optional feature that has no cost unless you actually use
-it) for, but curently it has none.
+it) for, but currently it has none.
 
 BFG Provides Too Few "Rails"
 ----------------------------
@@ -618,7 +618,7 @@ not a particularly "opinionated" web framework.  This is by design.
 bindings.  It contains no prebaked REST helper functionality.  It
 contains no form generation framework.  It contains no sessioning
 library.  It does not help with internationalization of content.  It
-has no adminstrative web user interface.  It has no built in text
+has no administrative web user interface.  It has no built in text
 indexing.  And so on.
 
 :mod:`repoze.bfg` developers put opinionated functionality in
@@ -783,7 +783,7 @@ the `Model-View-Controller Wikipedia entry
     restarts the cycle.
 
 To be honest, it seems as if someone edited this Wikipedia definition,
-torturously couching concepts in the most generic terms possible in
+tortuously couching concepts in the most generic terms possible in
 order to account for the use of the term "MVC" by current web
 frameworks.  I doubt such a broad definition would ever be agreed to
 by the original authors of the MVC pattern.  But *even so*, it seems
@@ -792,7 +792,7 @@ definition.
 
 For example, do your templates (views) always query models directly as
 is claimed in "note that the view gets its own data from the model"?
-Probaby not.  My "controllers" tend to do this, massaging the data for
+Probably not.  My "controllers" tend to do this, massaging the data for
 easier use by the "view" (template). What do you do when your
 "controller" returns JSON? Do your controllers use a template to
 generate JSON? If not, what's the "view" then?  Most MVC-style GUI web
@@ -809,8 +809,8 @@ doesn't need a template to return a response.  There's no
 "controller": it just doesn't exist.  This seems to us like a more
 reasonable model, given the current constraints of the web.
 
-BFG Applications are Exensible; I Don't Believe In Extensible Applications
---------------------------------------------------------------------------
+BFG Applications are Extensible; I Don't Believe In Extensible Applications
+---------------------------------------------------------------------------
 
 Any :mod:`repoze.bfg` application written obeying certain constraints
 is *extensible*. "Extensible", in this context, means:

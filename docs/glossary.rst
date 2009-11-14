@@ -258,7 +258,7 @@ Glossary
     `chameleon <http://chameleon.repoze.org>`_ is an attribute
     language template compiler which supports both the :term:`ZPT` and
     :term:`Genshi` templating specifications.  It is written and
-    maintained by Malthe Borch.  It has serveral extensions, such as
+    maintained by Malthe Borch.  It has several extensions, such as
     the ability to use bracketed (Genshi-style) ``${name}`` syntax,
     even within ZPT.  It is also much faster than the reference
     implementations of both ZPT and Genshi.  :mod:`repoze.bfg` offers
@@ -452,7 +452,7 @@ Glossary
     given request.
   Route Predicate
     An attribute of a ZCML ``route`` directive which implies a value
-    that evaluates to true or fale for a given :term:`request`.  All
+    that evaluates to true or false for a given :term:`request`.  All
     predicates attached to a route configuration must evaluate to true
     for the associated route to "match" the current request.  If a
     route does not match the current request, the next route (in

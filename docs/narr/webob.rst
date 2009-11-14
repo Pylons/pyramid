@@ -212,13 +212,13 @@ Here's the highlights:
     the cookie value to ``''``.
 
 ``response.cache_expires(seconds=0)``:
-    This makes this response cachable for the given number of seconds,
+    This makes this response cacheable for the given number of seconds,
     or if ``seconds`` is 0 then the response is uncacheable (this also
     sets the ``Expires`` header).
 
 ``response(environ, start_response)``: The response object is a WSGI
     application.  As an application, it acts according to how you
-    creat it.  It *can* do conditional responses if you pass
+    create it.  It *can* do conditional responses if you pass
     ``conditional_response=True`` when instantiating (or set that
     attribute later).  It can also do HEAD and Range requests.
 

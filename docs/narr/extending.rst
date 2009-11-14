@@ -212,7 +212,7 @@ accessible within a Python *package*.  An entire chapter is devoted to
 resources: :ref:`resources_chapter`.  Within this chapter is a section
 named :ref:`overriding_resources_section`.  This section of that
 chapter describes in detail how to override package resources with
-other resouces by using :term:`ZCML` ``<resource>`` declarations.  Add
+other resources by using :term:`ZCML` ``<resource>`` declarations.  Add
 such ``<resource>`` declarations to your override package's
 ``configure.zcml`` to perform overrides.
 

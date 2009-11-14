@@ -362,7 +362,7 @@ this writing, and neither does the generated sample application.
 
 The ``[app:main]`` section represents configuration for your
 application.  This section name represents the ``main`` application
-(and it's an ``app`` -lication, thus ``app:main``), sigifiying that
+(and it's an ``app`` -lication, thus ``app:main``), signifying that
 this is the default application run by ``paster serve`` when it is
 invoked against this configuration file.  The name ``main`` is a
 convention signifying that it the default application.
@@ -464,7 +464,7 @@ on the command line.
 
 Within the arguments to this function call, information about your
 application is kept.  While it's beyond the scope of this
-documentation to explan everything about setuptools setup files, we'll
+documentation to explain everything about setuptools setup files, we'll
 provide a whirlwind tour of what exists in this file here.
 
 Your application's name (this can be any string) is specified in the
@@ -488,7 +488,7 @@ as a directory, which is more convenient).  ``install_requires`` and
 application, which means all tests found in the package will be
 installed.  We examined ``entry_points`` in our discussion of the
 ``MyProject.ini`` file; this file defines the ``app`` entry point that
-represent's our project's application.
+represents our project's application.
 
 Usually you only need to think about the contents of the ``setup.py``
 file when distributing your application to other people, or when
@@ -577,7 +577,7 @@ registry`. It looks like so:
    "shortcuts" which point at files relative to the :term:`package` in
    which the ``configure.zcml`` file lives.  In this case, since the
    ``configure.zcml`` file lives within the ``myproject`` package, the
-   shorcut ``.models.MyModel`` could also be spelled
+   shortcut ``.models.MyModel`` could also be spelled
    ``myproject.models.MyModel`` (forming a full Python dotted-path
    name to the ``MyModel`` class).  Likewise the shortcut
    ``.views.my_view`` could be replaced with
@@ -585,7 +585,7 @@ registry`. It looks like so:
 
    The view declaration also names a ``renderer``, which in this case
    is a template that will be used to render the result of the view
-   callable.  This particular view delcaration points at
+   callable.  This particular view declaration points at
    ``templates/mytemplate.pt``, which is a *relative* file
    specification (it's relative to the directory in which the
    ``configure.zcml`` file lives).  The template file it points at is

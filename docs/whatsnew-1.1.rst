@@ -4,7 +4,7 @@ What's New In :mod:`repoze.bfg` 1.1
 This article explains the new features in :mod:`repoze.bfg` version
 1.1 as compared to the previous 1.0 release.  It also documents
 backwards incompatibilities between the two versions and deprecations
-added to 1.1, as well as sotware dependency changes and notable
+added to 1.1, as well as software dependency changes and notable
 documentation additions.
 
 Major Feature Additions
@@ -675,7 +675,7 @@ Backwards Incompatibilities
 
 - The ``registry_manager`` backwards compatibility alias importable
   from "repoze.bfg.registry", deprecated since repoze.bfg 0.9 has been
-  removed.  If you are tring to use the registry manager within a
+  removed.  If you are tyring to use the registry manager within a
   debug script of your own, use a combination of the
   "repoze.bfg.paster.get_app" and "repoze.bfg.scripting.get_root" APIs
   instead.

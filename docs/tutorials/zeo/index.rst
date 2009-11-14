@@ -18,7 +18,7 @@ exposed by :term:`mod_wsgi`.
 The easiest way to get started with ZODB in a :mod:`repoze.bfg`
 application is to use the ZODB ``bfg_zodb`` paster template.  See
 :ref:`additional_paster_templates` for more information about using
-theis template.  However, the Paster template does not set up a
+this template.  However, the Paster template does not set up a
 ZEO-capable application.  This chapter shows you how to do that "from
 scratch".
 
