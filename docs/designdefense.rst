@@ -2,20 +2,25 @@ Defending BFG's Design
 ======================
 
 From time to time, challenges to various aspects of :mod:`repoze.bfg`
-design are lodged.  To give context to the discussions that follow, we
-detail some of the design decisions and trade-offs here.
+design are lodged.  To give context to discussions that follow, we
+detail some of the design decisions and trade-offs here.  In some
+cases, we acknowledge that the framework can be made better and we
+describe future steps which will be taken to improve it; in some cases
+we just file the challenge as "noted", as you can't please everybody
+all the time.
 
 BFG Uses The Zope Component Architecture ("ZCA")
 ------------------------------------------------
 
-BFG uses the :term:`Zope Component Architecture` (ZCA) under the hood.
-This is a point of some contention.  :mod:`repoze.bfg` is of a
-:term:`Zope` pedigree, so it was natural for its developers to use the
-ZCA at its inception.  However, :mod:`repoze.bfg` allegiance to its
-Zope pedigree is not blind.  We understand that using the ZCA has
-issues and consequences, which we've attempted to address as best we
-can.  Here's an introspection about BFG's use of the ZCA, and the
-trade offs its usage involves.
+:mod:`repoze.bfg` uses the :term:`Zope Component Architecture` (ZCA)
+under the hood.  This is a point of some contention.
+:mod:`repoze.bfg` is of a :term:`Zope` pedigree, so it was natural for
+its developers to use the ZCA at its inception.  However,
+:mod:`repoze.bfg` allegiance to its Zope pedigree is not blind.  We
+understand that using the ZCA has issues and consequences, which we've
+attempted to address as best we can.  Here's an introspection about
+:mod:`repoze.bfg` use of the ZCA, and the trade-offs its usage
+involves.
 
 Problems
 ++++++++
@@ -41,16 +46,16 @@ above that are obvious.
 
 First, what's a "utility"?  Well, for the purposes of this discussion,
 and for the purpose of the code above, it's just not very important.
-If you really care, you can go read `this
+If you really want to know, you can read `this
 <http://www.muthukadan.net/docs/zca.html#utility>`_.  However, still,
-folks need to understand the concept in order to parse the code while
-reading it.  This is problem number one.
+readers of such code need to understand the concept in order to parse
+it.  This is problem number one.
 
-Second, what's this ``ISettings`` thing?  Well, it's an
-:term:`interface`.  Is that important here?  Not really, we're just
-using it as a "key" for some lookup based on its identity as a marker:
-it represents an object that has the dictionary API, but that's not
-really very important.  That's problem number two.
+Second, what's this ``ISettings`` thing?  It's an :term:`interface`.
+Is that important here?  Not really, we're just using it as a "key"
+for some lookup based on its identity as a marker: it represents an
+object that has the dictionary API, but that's not very important in
+this context.  That's problem number two.
 
 Third of all, what does ``getUtility`` do?  It's performing a lookup
 for the ``ISettings`` "utility" that should return.. well, a utility.
@@ -64,20 +69,21 @@ Fourth, where does ``getUtility`` look to get the data?  Well, the
 number four.
 
 Fifth, assuming you buy that there's some magical registry hanging
-around, where *is* this registry?  Homina homina... "around"?  That's
-sort of the best answer in this context (a more specific answer would
-require knowledge of internals).  Can there be more than one?  Yes.
-So *which* registry does it find the registration in?  Well, the
-"current" registry of course.  In terms of :mod:`repoze.bfg`, the
-current registry is a thread local variable.  Using an API that
-consults a thread local makes understanding how it works non-local.
+around, where *is* this registry?  *Homina homina*... "around"?
+That's sort of the best answer in this context (a more specific answer
+would require knowledge of internals).  Can there be more than one
+registry?  Yes.  So *which* registry does it find the registration in?
+Well, the "current" registry of course.  In terms of
+:mod:`repoze.bfg`, the current registry is a thread local variable.
+Using an API that consults a thread local makes understanding how it
+works non-local.
 
-Sixth, fine, you've bought in to the fact that there's a registry that
-is just "hanging around".  But how does the registry get populated?
-Why, :term:`ZCML` of course.  Sometimes.  In this particular case,
-however, the registration of ``ISettings`` is made by the framework
-itself "under the hood": it's not present in any ZCML.  This is
-extremely hard to comprehend.
+You've now bought in to the fact that there's a registry that is just
+"hanging around".  But how does the registry get populated?  Why,
+:term:`ZCML` of course.  Sometimes.  In this particular case, however,
+the registration of ``ISettings`` is made by the framework itself
+"under the hood": it's not present in any ZCML.  This is extremely
+hard to comprehend.  Problem number six.
 
 Clearly there's some amount of cognitive load here that needs to be
 borne by a reader of code that extends the :mod:`repoze.bfg` framework
@@ -88,11 +94,11 @@ applications.  This is suboptimal.
 Ameliorations
 +++++++++++++
 
-First, the biggest amelioration: :mod:`repoze.bfg` *does not expect
+First, the primary amelioration: :mod:`repoze.bfg` *does not expect
 application developers to understand ZCA concepts or its API*.  If an
 *application* developer needs to understand a ZCA concept or API
 during the creation of a :mod:`repoze.bfg` application, we've failed
-on some axis.  
+on some axis.
 
 Instead, the framework hides the presence of the ZCA behind
 special-purpose API functions that *do* use the ZCA API.  Take for
@@ -125,23 +131,24 @@ is this:
            return None
        return policy.authenticated_userid(request)
 
-Using such wrappers, we strive to always hide the ZCA this way from
-application developers: application developers should just never know
-about the ZCA.  They call a function with some object germane to the
-domain, it returns a result; they needn't understand components at
-all.  A corollary that follows is that any reader of an application
-that has been written using :mod:`repoze.bfg` needn't understand the
-ZCA either.
+Using such wrappers, we strive to always hide the ZCA from application
+developers.  Application developers should just never know about the
+ZCA: they should call a Python function with some object germane to
+the domain as an argument, and it should returns a result.  A
+corollary that follows is that any reader of an application that has
+been written using :mod:`repoze.bfg` needn't understand the ZCA
+either.
 
-Hiding the ZCA from application developers and code readers in this
-way a form of enhancing "domain specificity".  No end user wants to
-understand the minutiae of the mechanics of how a web framework does
-its thing.  People want to deal in concepts that are closer to the
-domain they're working in: for example, web developers want to know
-about *users*, not *utilities*.  :mod:`repoze.bfg` uses the ZCA as an
-implementation detail, not as a feature which is exposed to end users.
+Hiding the ZCA from application developers and code readers is a form
+of enhancing "domain specificity".  No application developer wants to
+need to understand the minutiae of the mechanics of how a web
+framework does its thing.  People want to deal in concepts that are
+closer to the domain they're working in: for example, web developers
+want to know about *users*, not *utilities*.  :mod:`repoze.bfg` uses
+the ZCA as an implementation detail, not as a feature which is exposed
+to end users.
 
-However, unlike application developers, BFG *framework developers*,
+However, unlike application developers, *framework developers*,
 including people who want to override :mod:`repoze.bfg` functionality
 via preordained framework plugpoints like traversal or view lookup
 *must* understand the ZCA.
@@ -170,14 +177,14 @@ understanding what it does and how it works.  The authors of
 :mod:`repoze.bfg` understand the ZCA deeply and can read code that
 uses it as easily as any other code.
 
-We recognize that developers who my want to extend the framework are
-not as comfortable with the :term:`Zope Component Architecture` (and
-ZCML) as the original developers are with it.  So, for the purposes of
-being kind to third-party :mod:`repoze.bfg` framework developers in,
-we've turned the component registry used in BFG into something that is
-accessible using the plain old dictionary API (like the
-:mod:`repoze.component` API).  For example, the snippet of code in the
-problem section above was:
+But we recognize that developers who my want to extend the framework
+are not as comfortable with the :term:`Zope Component Architecture`
+(and ZCML) as the original developers are with it.  So, for the
+purposes of being kind to third-party :mod:`repoze.bfg` framework
+developers in, we've turned the component registry used by
+:mod:`repoze.bfg` into something that is accessible using the plain
+old dictionary API (like the :mod:`repoze.component` API).  For
+example, the snippet of code in the problem section above was:
 
 .. code-block:: python
    :linenos:
@@ -223,17 +230,18 @@ to reduce framework developer cognitive load.
 Rationale
 +++++++++
 
-Here are the main rationales for BFG's design decision to use the ZCA:
+Here are the main rationales involved in the :mod:`repoze.bfg`
+decision to use the ZCA:
 
 - Pedigree.  A nontrivial part of the answer to this question is
   "pedigree".  Much of the design of :mod:`repoze.bfg` is stolen
   directly from :term:`Zope`.  Zope uses the ZCA to do a number of
-  tricks.  :mod:`repoze.bfg` mimics these tricks apishly, and,
-  because the ZCA works well for that set of tricks, :mod:`repoze.bfg`
-  uses it for the same purposes.  For example, the way that BFG maps a
-  :term:`request` to a :term:`view callable` is lifted almost entirely
-  from Zope.  The ZCA plays an important role in the particulars of
-  how this request to view mapping is done.
+  tricks.  :mod:`repoze.bfg` mimics these tricks apishly, and, because
+  the ZCA works well for that set of tricks, :mod:`repoze.bfg` uses it
+  for the same purposes.  For example, the way that :mod:`repoze.bfg`
+  maps a :term:`request` to a :term:`view callable` is lifted almost
+  entirely from Zope.  The ZCA plays an important role in the
+  particulars of how this request to view mapping is done.
 
 - Features.  The ZCA essentially provides what can be considered
   something like a "superdictionary", which allows for more complex
@@ -243,12 +251,13 @@ Here are the main rationales for BFG's design decision to use the ZCA:
   of object, or when the context implements some :term:`interface`.
 
 - Singularity.  There's only one "place" where "application
-  configuration" lives in a BFG application: in a component registry.
-  The component registry answers questions made to it by the framework
-  at runtime based on the configuration of *an application*.  Note:
-  "an application" is not the same as "a process", multiple
-  independently configured copies of the same BFG application are
-  capable of running in the same process space.
+  configuration" lives in a :mod:`repoze.bfg` application: in a
+  component registry.  The component registry answers questions made
+  to it by the framework at runtime based on the configuration of *an
+  application*.  Note: "an application" is not the same as "a
+  process", multiple independently configured copies of the same
+  :mod:`repoze.bfg` application are capable of running in the same
+  process space.
 
 - Composability.  A ZCA registry can be populated imperatively, or
   there's an existing mechanism to populate a registry via the use of
@@ -259,11 +268,12 @@ Here are the main rationales for BFG's design decision to use the ZCA:
 - Pluggability.  Use of the ZCA allows for framework extensibility via
   a well-defined and widely understood plugin architecture.  As long
   as framework developers and extenders understand the ZCA, it's
-  possible to extend BFG almost arbitrarily.  For example, it's
-  relatively easy to build a ZCML directive that registers several
-  views "all at once", allowing app developers to use that ZCML
-  directive as a "macro" in code that they write.  This is somewhat of
-  a differentiating feature from other (non-Zope) frameworks.
+  possible to extend :mod:`repoze.bfg` almost arbitrarily.  For
+  example, it's relatively easy to build a ZCML directive that
+  registers several views "all at once", allowing app developers to
+  use that ZCML directive as a "macro" in code that they write.  This
+  is somewhat of a differentiating feature from other (non-Zope)
+  frameworks.
 
 - Testability.  Judicious use of the ZCA in framework code makes
   testing that code slightly easier.  Instead of using monkeypatching
@@ -272,9 +282,9 @@ Here are the main rationales for BFG's design decision to use the ZCA:
   find our mock objects.
 
 - Speed.  The ZCA is very fast for a specific set of complex lookup
-  scenarios that BFG uses, having been optimized through the years for
-  just these purposes.  The ZCA contains optional C code for this
-  purpose which demonstrably has no (or very few) bugs.
+  scenarios that :mod:`repoze.bfg` uses, having been optimized through
+  the years for just these purposes.  The ZCA contains optional C code
+  for this purpose which demonstrably has no (or very few) bugs.
 
 - Ecosystem.  Many existing Zope packages can be used in
   :mod:`repoze.bfg` with few (or no) changes due to our use of the ZCA
@@ -284,15 +294,15 @@ Conclusion
 ++++++++++
 
 If you only *develop applications* using :mod:`repoze.bfg`, there's
-just basically nothing to think about here.  You just should never
-need to understand the ZCA or even know about its presence: use
-documented APIs instead.  However, you may be an application developer
-who doesn't read API documentation because it's unmanly. Instead you
-read the raw source code, and because you haven't read the
-documentation, you don't know what functions, classes, and methods
-even *form* the BFG API.  As a result, you've now written code that
-uses internals and you've pained yourself into a conceptual corner as
-a result of needing to wrestle with some ZCA-using implementation
+not much to complain about here.  You just should never need to
+understand the ZCA or even know about its presence: use documented
+APIs instead.  However, you may be an application developer who
+doesn't read API documentation because it's unmanly. Instead you read
+the raw source code, and because you haven't read the documentation,
+you don't know what functions, classes, and methods even *form* the
+:mod:`repoze.bfg` API.  As a result, you've now written code that uses
+internals and you've pained yourself into a conceptual corner as a
+result of needing to wrestle with some ZCA-using implementation
 detail.  If this is you, it's extremely hard to have a lot of sympathy
 for you.  You'll either need to get familiar with how we're using the
 ZCA or you'll need to use only the documented APIs; that's why we
@@ -305,7 +315,7 @@ will be faced with needing to understand at least some ZCA concepts.
 The ZCA API is quirky: we've tried to make it at least slightly nicer
 by disusing it for common registrations and lookups such as unnamed
 utilities.  Some places it's used unabashedly, and will be forever.
-We know it's a bit quirky, but it's also useful and fundamentally
+We know it's quirky, but it's also useful and fundamentally
 understandable if you take the time to do some reading about it.
 
 .. _zcml_encouragement:
@@ -314,23 +324,23 @@ BFG "Encourages Use of ZCML"
 ----------------------------
 
 :term:`ZCML` is a configuration language that can be used to configure
-the :term:`Zope Component Architecture` registry that BFG uses as its
-application configuration.
+the :term:`Zope Component Architecture` registry that
+:mod:`repoze.bfg` uses as its application configuration.
 
 Quick answer: well, it doesn't *really* encourage the use of ZCML.
 Application developers can use the ``bfg_view`` decorator for the most
-common form of configuration.  But, yes, a BFG application currently
-does need to possess a ZCML file for it to begin executing
-successfully even if its only contents are a ``<scan>`` directive that
-kicks off the location of decorated views.
+common form of configuration.  But, yes, a :mod:`repoze.bfg`
+application currently does need to possess a ZCML file for it to begin
+executing successfully even if its only contents are a ``<scan>``
+directive that kicks off the location of decorated views.
 
-In any case, in the interest of completeness and in the spirit of
-providing a lowest common denominator, BFG 1.2 will include a
-completely imperative mode for all configuration.  You will be able to
-make "single file" apps in this mode, which should help people who
-need to see everything done completely imperatively.  For example, the
-very most basic :mod:`repoze.bfg` "helloworld" program will become
-something like::
+However, in the interest of completeness and in the spirit of
+providing a lowest common denominator, :mod:`repoze.bfg` 1.2 will
+include a completely imperative mode for all configuration.  You will
+be able to make "single file" apps in this mode, which should help
+people who need to see everything done completely imperatively.  For
+example, the very most basic :mod:`repoze.bfg` "helloworld" program
+will become something like::
 
   from webob import Response
   from  wsgiref import simple_server
@@ -371,22 +381,22 @@ This declaration associates a :term:`view` with a route pattern.
 We've tried to make the most common usages of :mod:`repoze.bfg`
 palatable for XML-haters.  For example, the ``bfg_view`` decorator
 function allows you to replace ``<view>`` statements in a ZCML file
-with decorators attached to functions or methods.  In the future, BFG
-will contain a mode that makes configuration completely imperative as
-described in :ref:`zcml_encouragement`.  In BFG 1.2, no
-:mod:`repoze.bfg` developer will need to interact with ZCML/XML unless
-they choose to.
+with decorators attached to functions or methods.  In the future,
+:mod:`repoze.bfg` will contain a mode that makes configuration
+completely imperative as described in :ref:`zcml_encouragement`.  In
+version 1.2, no :mod:`repoze.bfg` developer will need to interact with
+ZCML/XML unless they choose to.
 
-However, currently, there are times when a BFG application developer
-will be required to interact with ZCML, and thus XML.  Alas; it is
-what it is.  You might think some other configuration file format
-would be better.  But all configuration formats suck in one way or
-another.  I personally don't think any of our lives would be markedly
-better if the format were YAML, JSON, or INI.  It's all just plumbing
-that you mostly cut and paste once you've progressed 30 minutes into
-your first project.  It seems that most of the folks who tend to
-agitate for another configuration file format are folks that haven't
-yet spent that 30 minutes.
+However, currently, there are times when a :mod:`repoze.bfg`
+application developer will be required to interact with ZCML, and thus
+XML.  Alas; it is what it is.  You might think some other
+configuration file format would be better.  But all configuration
+formats suck in one way or another.  I personally don't think any of
+our lives would be markedly better if the format were YAML, JSON, or
+INI.  It's all just plumbing that you mostly cut and paste once you've
+progressed 30 minutes into your first project.  Most of the folks who
+tend to agitate for another configuration file format are folks that
+haven't yet spent that 30 minutes.
 
 .. _model_traversal_confusion:
 
@@ -398,10 +408,10 @@ traversed when :term:`traversal` is used as a "model graph".  Some of
 the :mod:`repoze.bfg` APIs also use the word "model" in them when
 referring to a node in this graph (e.g. ``repoze.bfg.url.model_url``).
 
-This confuses people who write applications that always use ORM
-packages such as SQLAlchemy, which has a different notion of the
-definition of a "model".  In a relational database, and when using the
-API of common ORM packages, the model is almost certainly not a
+A terminology overlap confuses people who write applications that
+always use ORM packages such as SQLAlchemy, which has a different
+notion of the definition of a "model".  When using the API of common
+ORM packages, its conception of "model" is almost certainly not a
 directed acyclic graph (as may be the case in many graph databases).
 Often model objects must be explicitly manufactured by an ORM as a
 result of some query performed by a :term:`view`.  As a result, it can
@@ -411,7 +421,7 @@ When you develop such applications, the things that :mod:`repoze.bfg`
 refers to as "models" in such an application may just be stand-ins
 that perform a query and generate some wrapper *for* an ORM "model"
 (or set of ORM models).  The graph *might* be composed completely of
-"model" objects (as defined by the ORM) but it also might not be. 
+"model" objects (as defined by the ORM) but it also might not be.
 
 The naming impedance mismatch between the way the term "model" is used
 to refer to a node in a graph in :mod:`repoze.bfg` and the way the
@@ -443,15 +453,16 @@ intention of the Repoze project to actually create another web
 framework.
 
 However, as time progressed, the folks who ran the Repoze project
-decided to create BFG, which *is* a web framework.  Due to an early
-naming mistake, the software composing the BFG framework was named
-:mod:`repoze.bfg`.  This mistake was not corrected before the software
-garnered a significant user base, and in the interest of backwards
-compatibility, most likely never will be.  While BFG uses Zope
-technology, it is otherwise unrelated to the original goals of
-"Repoze" as stated on the repoze.org website.  If we had it to do all
-over again, the BFG package would be named simply ``bfg``.  But we
-don't have it to do all over again.
+decided to create :mod:`repoze.bfg`, which *is* a web framework.  Due
+to an early naming mistake, the software composing the framework was
+named :mod:`repoze.bfg`.  This mistake was not corrected before the
+software garnered a significant user base, and in the interest of
+backwards compatibility, most likely never will be.  While
+:mod:`repoze.bfg` uses Zope technology, it is otherwise unrelated to
+the original goals of "Repoze" as stated on the repoze.org website.
+If we had it to do all over again, the :mod:`repoze.bfg` package would
+be named simply :mod:`bfg`.  But we don't have it to do all over
+again.
 
 At this point, therefore, the name "Repoze" should be considered
 basically just a "brand".  Its presence in the name of a package means
@@ -611,22 +622,18 @@ it) for, but currently it has none.
 BFG Provides Too Few "Rails"
 ----------------------------
 
-:mod:`repoze.bfg` has a relatively parsimonious feature set.  It is
-not a particularly "opinionated" web framework.  This is by design.
+By design, :mod:`repoze.bfg` is not a particularly "opinionated" web
+framework.  It has a relatively parsimonious feature set.  It contains
+no built in ORM nor any particular database bindings.  It contains no
+form generation framework or sessioning library.  It does not help
+with internationalization of content.  It has no administrative web
+user interface.  It has no built in text indexing.  It does not
+dictate how you arrange your code.
 
-:mod:`repoze.bfg` contains no built in ORM nor any particular database
-bindings.  It contains no prebaked REST helper functionality.  It
-contains no form generation framework.  It contains no sessioning
-library.  It does not help with internationalization of content.  It
-has no administrative web user interface.  It has no built in text
-indexing.  And so on.
-
-:mod:`repoze.bfg` developers put opinionated functionality in
-applications (and superframeworks) which we build on top of
-:mod:`repoze.bfg` such as `KARL <http://www.karlproject.org/>`_.  BFG
-is a reasonable platform on which to *build* a system that wants to be
-more opinionated.  It's likely that such systems will emerge that are
-built on BFG from various sources.
+Such opinionated functionality exists in applications and frameworks
+built *on top* of :mod:`repoze.bfg`.  It's intended that higher-level
+systems emerge built using :mod:`repoze.bfg` as a base.  See also
+:ref:`apps_are_extensible`.
 
 BFG Provides Too Many "Rails"
 -----------------------------
@@ -643,12 +650,13 @@ We consider this an important feature for a particular class of
 applications (CMS-style applications, which the authors are often
 commissioned to write) that usually use :term:`traversal` against a
 persistent model graph.  The model graph contains security
-declarations (as :term:`ACL` objects).
+declarations as :term:`ACL` objects.
 
 Having context-sensitive declarative security for individual objects
 in the model graph is simply required for this class of application.
 Other frameworks save for Zope just do not have this feature.  This is
-the one of the primary reasons that BFG was actually written.
+the one of the primary reasons that :mod:`repoze.bfg` was actually
+written.
 
 If you don't like this, it doesn't mean you can't use
 :mod:`repoze.bfg`.  Just ignore this feature and avoid configuring an
@@ -660,8 +668,8 @@ code.
 BFG Is Too Big
 --------------
 
-"OMG!  The :mod:`repoze.bfg` compressed tarball is, like, 1MB!  It
-must be enormous!"
+"The :mod:`repoze.bfg` compressed tarball is 1MB.  It must be
+enormous!"
 
 No.  We just ship it with test code and helper templates.  Here's a
 breakdown of what's included in subdirectories of the package tree:
@@ -682,16 +690,14 @@ repoze/bfg (except for ``repoze/bfg/tests and repoze/bfg/paster_templates``)
 
   316K
 
-In other words, the actual BFG code is about 10% of the total size of
-the tarball omitting docs, helper templates used for package
-generation, and test code.
-
-Of the approximately 13K lines of Python code in the package, the code
-that actually has a chance of executing during normal operation,
-excluding tests and paster template Python files, accounts for
-approximately 3K lines of Python code.  This is comparable to Pylons,
-which ships with a little over 2K lines of Python code, excluding
-tests.
+The actual :mod:`repoze.bfg` runtime code is about 10% of the total
+size of the tarball omitting docs, helper templates used for package
+generation, and test code.  Of the approximately 13K lines of Python
+code in the package, the code that actually has a chance of executing
+during normal operation, excluding tests and paster template Python
+files, accounts for approximately 3K lines of Python code.  This is
+comparable to Pylons, which ships with a little over 2K lines of
+Python code, excluding tests.
 
 BFG Has Too Many Dependencies
 -----------------------------
@@ -720,9 +726,9 @@ own transitive dependencies.
 It should be noted that :mod:`repoze.bfg` is positively lithe compared
 to :term:`Grok`, a different Zope-based framework.  As of this
 writing, in its default configuration, Grok has 126 package
-distribution dependencies. The number of package dependencies required
-by :mod:`repoze.bfg` is many times fewer than Grok (or Zope itself,
-upon which Grok is based).  :mod:`repoze.bfg` has a number of package
+distribution dependencies. The number of dependencies required by
+:mod:`repoze.bfg` is many times fewer than Grok (or Zope itself, upon
+which Grok is based).  :mod:`repoze.bfg` has a number of package
 distribution dependencies comparable to similarly-targeted frameworks
 such as Pylons.
 
@@ -746,14 +752,16 @@ Another claimed cheating mechanism is the religious avoidance of
 extraneous function calls.
 
 If there's such a thing as cheating to get better performance, we want
-to cheat as much as possible.  This should more accurately be called
-optimization.
+to cheat as much as possible.  We optimize :mod:`repoze.bfg`
+aggressively.  This comes at a cost: the core code has sections that
+could be expressed more readably.  As an amelioration, we've commented
+these sections liberally.
 
 BFG Gets Its Terminology Wrong ("MVC")
 --------------------------------------
 
-"I'm a MVC web framework user, and I'm confused.  BFG calls the
-controller a view!  And it doesn't have any controllers."
+"I'm a MVC web framework user, and I'm confused.  :mod:`repoze.bfg`
+calls the controller a view!  And it doesn't have any controllers."
 
 People very much want to give web applications the same properties as
 common desktop GUI platforms by using similar terminology, and to
@@ -789,12 +797,12 @@ the `Model-View-Controller Wikipedia entry
     The user interface waits for further user interactions, which
     restarts the cycle.
 
-To be honest, it seems as if someone edited this Wikipedia definition,
-tortuously couching concepts in the most generic terms possible in
-order to account for the use of the term "MVC" by current web
-frameworks.  I doubt such a broad definition would ever be agreed to
-by the original authors of the MVC pattern.  But *even so*, it seems
-most "MVC" web frameworks fail to meet even this falsely generic
+To the author, it seems as if someone edited this Wikipedia
+definition, tortuously couching concepts in the most generic terms
+possible in order to account for the use of the term "MVC" by current
+web frameworks.  I doubt such a broad definition would ever be agreed
+to by the original authors of the MVC pattern.  But *even so*, it
+seems most "MVC" web frameworks fail to meet even this falsely generic
 definition.
 
 For example, do your templates (views) always query models directly as
@@ -815,6 +823,8 @@ are really just an implementation detail of any given view: a view
 doesn't need a template to return a response.  There's no
 "controller": it just doesn't exist.  This seems to us like a more
 reasonable model, given the current constraints of the web.
+
+.. _apps_are_extensible:
 
 BFG Applications are Extensible; I Don't Believe In Application Extensibility
 -----------------------------------------------------------------------------
