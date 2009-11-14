@@ -371,19 +371,18 @@ palatable for XML-haters.  For example, the ``bfg_view`` decorator
 function allows you to replace ``<view>`` statements in a ZCML file
 with decorators attached to functions or methods.  In the future, BFG
 will contain a mode that makes configuration completely imperative as
-described in
+described in :term:`zcml_encouragement`.  In BFG 1.2, no
+:mod:`repoze.bfg` developer will need to interact with ZCML/XML unless
+they choose to.
 
 However, currently, there are times when a BFG application developer
-will be required to interact with ZCML, and thus XML.  Alas, it is
-what it is.  All configuration formats suck in one way or another; I
-personally don't think any of our lives would be markedly better if
-the format were YAML, JSON, or INI.  It's all just plumbing that you
-mostly cut and paste.
-
-As described in :term:`zcml_encouragement`, in BFG 1.2, there will be
-mode of configuration which is completely imperative (completely
-Python-driven).  At this point, no :mod:`repoze.bfg` developer will
-need to interact with ZCML/XML, they'll just be able to use Python.
+will be required to interact with ZCML, and thus XML.  Alas; it is
+what it is.  You might think some other configuration file format
+would be better.  But all configuration formats suck in one way or
+another; I personally don't think any of our lives would be markedly
+better if the format were YAML, JSON, or INI.  It's all just plumbing
+that you mostly cut and paste once you're past 20 minutes into a
+project.
 
 .. _model_traversal_confusion:
 
