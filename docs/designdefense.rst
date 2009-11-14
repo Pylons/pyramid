@@ -170,14 +170,14 @@ understanding what it does and how it works.  The authors of
 :mod:`repoze.bfg` understand the ZCA deeply and can read code that
 uses it as easily as any other code.
 
-However, we do recognize that other developers who my want to extend
-the framework are not as comfortable with ZCA we are with it.  So, for
-the purposes of being kind to framework developers who may be dismayed
-by some of the more flagrant uses of the ZCA API in :mod:`repoze.bfg`,
+We recognize that developers who my want to extend the framework are
+not as comfortable with the :term:`Zope Component Architecture` (and
+ZCML) as the original developers are with it.  So, for the purposes of
+being kind to third-party :mod:`repoze.bfg` framework developers in,
 we've turned the component registry used in BFG into something that is
 accessible using the plain old dictionary API (like the
-:mod:`repoze.component` API).  Our example in the problem section
-above was:
+:mod:`repoze.component` API).  example in the problem section above
+was:
 
 .. code-block:: python
    :linenos:
@@ -306,6 +306,8 @@ forever.  We know it's a bit quirky, but it's also useful and
 fundamentally understandable if you take the time to do some reading
 about it.
 
+.. _zcml_encouragement:
+
 BFG "Encourages Use of ZCML"
 ----------------------------
 
@@ -313,11 +315,12 @@ BFG "Encourages Use of ZCML"
 the :term:`Zope Component Architecture` registry that BFG uses as its
 application configuration.
 
-Quick answer: well, no, it doesn't.. not really.  You can use the
-``bfg_view`` decorator for the most common form of configuration.
-But, yes, your application currently does need to possess a ZCML file
-for it to begin executing successfully even if its only contents are a
-``<scan>`` directive that kicks off the location of decorated views.
+Quick answer: well, it doesn't *really* encourage the use of ZCML.
+Application developers can use the ``bfg_view`` decorator for the most
+common form of configuration.  But, yes, a BFG application currently
+does need to possess a ZCML file for it to begin executing
+successfully even if its only contents are a ``<scan>`` directive that
+kicks off the location of decorated views.
 
 In any case, in the interest of completeness and in the spirit of
 providing a lowest common denominator, BFG 1.2 will include a
@@ -341,9 +344,46 @@ something like::
       app = Router(reg)
       simple_server.make_server('', 8080, app).serve_forever()
 
-In this mode, no ZCML will be required.  Hopefully this mode will
-allow people who are used to doing everything imperatively feel more
-comfortable.
+In this mode, no ZCML will be required for end users.  Hopefully this
+mode will allow people who are used to doing everything imperatively
+feel more comfortable.
+
+BFG Uses ZCML; ZCML is XML and I Don't Like XML
+-----------------------------------------------
+
+:term:`ZCML` is a configuration language in the XML syntax.  It
+contains elements that are mostly singleton tags that are called
+*declarations*.  For an example:
+
+.. code-block:: xml
+   :linenos:
+
+   <route
+      view=".views.my_view"
+      path="/"
+      name="root"
+      />
+
+This declaration associates a :term:`view` with a route pattern.
+
+We've tried to make the most common usages of :mod:`repoze.bfg`
+palatable for XML-haters.  For example, the ``bfg_view`` decorator
+function allows you to replace ``<view>`` statements in a ZCML file
+with decorators attached to functions or methods.  In the future, BFG
+will contain a mode that makes configuration completely imperative as
+described in
+
+However, currently, there are times when a BFG application developer
+will be required to interact with ZCML, and thus XML.  Alas, it is
+what it is.  All configuration formats suck in one way or another; I
+personally don't think any of our lives would be markedly better if
+the format were YAML, JSON, or INI.  It's all just plumbing that you
+mostly cut and paste.
+
+As described in :term:`zcml_encouragement`, in BFG 1.2, there will be
+mode of configuration which is completely imperative (completely
+Python-driven).  At this point, no :mod:`repoze.bfg` developer will
+need to interact with ZCML/XML, they'll just be able to use Python.
 
 .. _model_traversal_confusion:
 
