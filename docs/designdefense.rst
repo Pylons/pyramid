@@ -859,64 +859,79 @@ third party and managed as a group.  It's useful to be able to extend
 such a system for each deployment via preordained plugpoints than it
 is to continually keep each software branch of the system in sync with
 some upstream source: the upstream developers may change code in such
-a way that your changes to the same codebase conflict with theirs.
-Merging such changes over time can be difficult and it's often useful
-to be able to modify an application for a particular deployment in a
-less invasive way.
+a way that your changes to the same codebase conflict with theirs in
+fiddly, trivial ways.  Merging such changes repeatedly over the
+lifetime of a deployment can be difficult and time consuming, and it's
+often useful to be able to modify an application for a particular
+deployment in a less invasive way.
 
-When you use :mod:`repoze.bfg` (or :term:`Zope`, for that matter), if
-you follow the set of rules defined in :ref:`extending_chapter`, you
-don't need to *make* your application extensible: any application you
-write in the framework just *is* automatically extensible at a basic
-level.  The mechanisms that people can use to extend it will be
-necessarily coarse.  Views, routes, and resources typically, will be
-capable of being overridden, usually via :term:`ZCML`. But for minor
-(and even *major*) customizations, these are often the only override
-plugpoints necessary: if the application doesn't do exactly what the
-deployment requires, it's often possible for a deployer to override a
-view or a route and quickly make it do what he or she wants it to do
-in *arbitrary ways* not anticipated by the original developer.
-Deployment needs a different styling?  Override the main template and
-the CSS in a separate Python package which defines overrides.
-Deployment needs a "screen" to do something differently or expose more
-information?  Override the view that shows the screen within that same
-separate Python package.  Deployment need an additional feature?  Add
-a view to the override package.  As long as the fundamental design of
-the upstream package doesn't change, these types of modifications
-often survive across many releases of the upstream package without
-needing to be revisited.
+When you use :mod:`repoze.bfg`, if you follow the set of rules defined
+in :ref:`extending_chapter`, you don't need to *make* your application
+extensible: any application you write in the framework just *is*
+automatically extensible at a basic level.  The mechanisms that
+deployers use to extend it will be necessarily coarse: typically,
+views, routes, and resources will be capable of being overridden,
+usually via :term:`ZCML`. But for most minor (and even some major)
+customizations, these are often the only override plugpoints
+necessary: if the application doesn't do exactly what the deployment
+requires, it's often possible for a deployer to override a view,
+route, or resource and quickly make it do what he or she wants it to
+do in ways *not necessarily anticipated by the original developer*.
+Here are some example scenarios demonstrating the benefits of such a
+feature.
 
-While :mod:`repoze.bfg` application are fundamentally extensible even
-if you don't write them with specific extensibility in mind, if you're
-adventurous, you can also take it a step further.  If you learn more
-about the :term:`Zope Component Architecture`, you can use it to
-expose other more domain-specific override knobs while developing an
-application.  The override knobs you expose don't need to be as coarse
-as the ones provided automatically by the framework.  For example, you
-might compose your own :term:`ZCML` directive that configures a set of
-views for a prebaked purpose (e.g. ``restview`` or somesuch) ,
-allowing other people to refer to that directive when they make
-declarations in the ``configure.zcml`` of their customization package.
+- If a deployment needs a different styling, the deployer may override
+  the main template and the CSS in a separate Python package which
+  defines overrides.
+
+- If a deployment needs an application page to do something
+  differently needs it to expose more or different information, the
+  deployer may override the view that renders the page within a
+  separate Python package.
+
+- If a deployment needs an additional feature, the deployer may add a
+  view to the override package.
+
+As long as the fundamental design of the upstream package doesn't
+change, these types of modifications often survive across many
+releases of the upstream package without needing to be revisited.
 
 Extending an application externally is not a panacea, and carries a
 set of risks similar to branching and merging: sometimes major changes
 upstream will cause you to need to revisit and update some of your
-modifications.  But all of your modifications are contained in one
-well-defined place, and you won't regularly need to deal wth merge
-conflicts that trivial changes to upstream packages often entail when
-it comes time to update the upstream package.  If you extend an
-application externally, there just is no textual merge.
+modifications.  But you won't regularly need to deal wth meaningless
+textual merge conflicts that trivial changes to upstream packages
+often entail when it comes time to update the upstream package,
+because if you extend an application externally, there just is no
+textual merge done.  Your modifications will also, for whatever its
+worth, be contained in one, canonical, well-defined place.
 
 Branching an application and continually merging in order to get new
 features and bugfixes is clearly useful.  You can do that with a
 :mod:`repoze.bfg` application just as usefully as you can do it with
-any application.  But use of an application written in
-:mod:`repoze.bfg` makes it possible to avoid needing to do this, *even
-if the application doesn't define any plugpoints ahead of time*.  It's
+any application.  But deployment of an application written in
+:mod:`repoze.bfg` makes it possible to avoid the need for this even if
+the application doesn't define any plugpoints ahead of time.  It's
 possible that most other web framework promoters dismiss this feature
 in favor of branching and merging because applications written in
-their framework of choice aren't extensible out of the box in such a
-fundamental way.
+their framework of choice aren't extensible out of the box in a
+comparably fundamental way.
+
+While :mod:`repoze.bfg` application are fundamentally extensible even
+if you don't write them with specific extensibility in mind, if you're
+moderately adventurous, you can also take it a step further.  If you
+learn more about the :term:`Zope Component Architecture`, you can
+optionally use it to expose other more domain-specific configuration
+plugpoints while developing an application.  The plugpoints you expose
+needn't be as coarse as the ones provided automatically by
+:mod:`repoze.bfg` itself.  For example, you might compose your own
+:term:`ZCML` directive that configures a set of views for a prebaked
+purpose (e.g. ``restview`` or somesuch) , allowing other people to
+refer to that directive when they make declarations in the
+``configure.zcml`` of their customization package.  There is a cost
+for this: the developer of an application that defines custom
+plugpoints for its deployers will need to understand the ZCA or he
+will need to develop his own similar extensibility system.
 
 Other Challenges
 ----------------
