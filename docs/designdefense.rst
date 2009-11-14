@@ -176,8 +176,8 @@ ZCML) as the original developers are with it.  So, for the purposes of
 being kind to third-party :mod:`repoze.bfg` framework developers in,
 we've turned the component registry used in BFG into something that is
 accessible using the plain old dictionary API (like the
-:mod:`repoze.component` API).  example in the problem section above
-was:
+:mod:`repoze.component` API).  For example, the snippet of code in the
+problem section above was:
 
 .. code-block:: python
    :linenos:
@@ -211,14 +211,14 @@ in some code that has access to the :term:`request`:
 
 In *this* world, we've reduced the conceptual problem to understanding
 attributes and the dictionary API.  Every Python programmer knows
-these things, even framework programmers!  Future versions of
+these things, even framework programmers.  Future versions of
 :mod:`repoze.bfg` will try to make use of more domain specific APIs
 such as this.  While :mod:`repoze.bfg` still uses some suboptimal
 unnamed utility registrations and other superfluous ZCA API usages,
 future versions of it will where possible disuse these things in favor
 of straight dictionary assignments and lookups, as demonstrated above,
-to be kinder to new framework developers.  We'll also continue to seek
-ways to reduce framework developer cognitive load.
+to be kinder to new framework developers.  We'll continue to seek ways
+to reduce framework developer cognitive load.
 
 Rationale
 +++++++++
@@ -286,14 +286,17 @@ Conclusion
 If you only *develop applications* using :mod:`repoze.bfg`, there's
 just basically nothing to think about here.  You just should never
 need to understand the ZCA or even know about its presence: use
-documented APIs instead.  If you're an application developer who
-doesn't read API documentation because its unmanly, but instead uses
-raw source code, and considers everything an API, and you've pained
-yourself into a conceptual corner as a result of needing to wrestle
-with some ZCA-using internals, it's hard to have a lot of sympathy for
-you.  You'll either need to get familiar with how we're using the ZCA
-or you'll need to use only the documented APIs; that's why we document
-'em.
+documented APIs instead.  However, you may be an application developer
+who doesn't read API documentation because it's unmanly. Instead you
+read the raw source code, and because you haven't read the
+documentation, you don't know what functions, classes, and methods
+even *form* the BFG API.  As a result, you've now written code that
+uses internals and you've pained yourself into a conceptual corner as
+a result of needing to wrestle with some ZCA-using implementation
+detail.  If this is you, it's extremely hard to have a lot of sympathy
+for you.  You'll either need to get familiar with how we're using the
+ZCA or you'll need to use only the documented APIs; that's why we
+document them as APIs.
 
 If you *extend* or *develop* :mod:`repoze.bfg` (create new ZCML
 directives, use some of the more obscure "ZCML hooks" as described in
@@ -370,7 +373,7 @@ palatable for XML-haters.  For example, the ``bfg_view`` decorator
 function allows you to replace ``<view>`` statements in a ZCML file
 with decorators attached to functions or methods.  In the future, BFG
 will contain a mode that makes configuration completely imperative as
-described in :term:`zcml_encouragement`.  In BFG 1.2, no
+described in :ref:`zcml_encouragement`.  In BFG 1.2, no
 :mod:`repoze.bfg` developer will need to interact with ZCML/XML unless
 they choose to.
 
@@ -805,6 +808,77 @@ are really just an implementation detail of any given view: a view
 doesn't need a template to return a response.  There's no
 "controller": it just doesn't exist.  This seems to us like a more
 reasonable model, given the current constraints of the web.
+
+BFG Applications are Exensible; I Don't Believe In Extensible Applications
+--------------------------------------------------------------------------
+
+Any :mod:`repoze.bfg` application written obeying certain constraints
+is *extensible*. "Extensible", in this context, means:
+
+- The behavior of an application can be overridden or extended in a
+  particular *deployment* of the application without requiring that
+  the deployer modify the source of the original application.
+
+- The original developer does not need to anticipate all extensibility
+  plugpoints at application creation time.
+
+This feature is discussed in the :mod:`repoze.bfg` documentation
+chapter named :ref:`extending_chapter`.  It is made possible by the
+use of the :term:`Zope Component Architecture` and :term:`ZCML` within
+:mod:`repoze.bfg`.
+
+Many developers seem to believe that creating extensible applications
+is "not worth it".  They instead suggest that modifying the source of
+a given application for each deployment to override behavior is more
+reasonable.  Much discussion about version control branching and
+merging typically ensues.
+
+It's clear that making *every* application maximally extensible isn't
+a goal.  The majority of web applications only have a single
+deployment.  However, some web applications have multiple deployments,
+and some have *many* deployments.  For example, a generic "content
+management" system (CMS) may have basic functionality that needs to be
+extended for a particular deployment.  That CMS system may be deployed
+for many organizations, but managed centrally by a third party.  It's
+useful to be able to extend the system for each deployment via
+preordained plugpoints than it is to continually keep a software
+branch of the system in sync with some upstream source: the upstream
+developers may change code in such a way that your changes to the same
+codebase conflict with theirs.  Merging such changes over time can be
+nightmarish.
+
+When you use :mod:`repoze.bfg` (or :term:`Zope`, for that matter), and
+you follow a set of clearly defined rules (explained in
+:ref:`extending_chapter`), you don't need to *make* your application
+extensible.  It just *is* extensible.  Any application you write in
+the framework in this manner is extensible at a basic level.  If
+you've not thoughtfully exposed convenient "override knobs" at a high
+level while developing the application, the mechanisms that people can
+use to extend it will be necessarily coarse: views and routes,
+typically, will be capable of being overridden, usually via
+:term:`ZCML`. But for minor (and even *major*) customizations, these
+are often the only override plugpoints necessary: if the application
+doesn't do exactly what the deployment requires, it's often possible
+for a deployer to override a view or a route and quickly make it do
+what he or she wants it to do.  Need a different styling?  Override
+the main template and the CSS in a separate Python package.  Need a
+"screen" to do something differently or expose more information?
+Override the view that shows the screen within that same separate
+Python package.  Need an additional feature?  Add a view to the
+package.  And so forth.
+
+I believe that the people who dismiss extensible applications
+wholesale, and instead suggest branching somewhat miss the point.
+Yes, branching an application and continually merging in order to get
+new features and bugfixes is clearly useful.  You can do that with a
+:mod:`repoze.bfg` application just as usefully as you can do it with
+any application.  But writing an application using :mod:`repoze.bfg`
+it possible to avoid needing to do this, *even if the application
+doesn't define its own plugpoints ahead of time*.  Most other web
+framework promoters dismiss this feature because applications written
+in their framework of choice just aren't arbitrarily extensible out of
+the box in this manner; the machinery to make it so just doesn't
+exist.
 
 Other Topics
 ------------
