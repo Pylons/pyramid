@@ -946,6 +946,16 @@ for this: the developer of an application that defines custom
 plugpoints for its deployers will need to understand the ZCA or he
 will need to develop his own similar extensibility system.
 
+Ultimately, any argument about whether the extensibility features lent
+to applications by :mod:`repoze.bfg` are "good" or "bad" is somewhat
+pointless. You needn't take advantage of the extensibility features
+provided by a particular :mod:`repoze.bfg` application in order to
+affect a modification for a particular set of its deployments.  You
+can ignore the application's extensibility plugpoints entirely, and
+instead use version control branching and merging to manage
+application deployment modifications instead, as if you were deploying
+an application written using any other web framework.
+
 Other Challenges
 ----------------
 
