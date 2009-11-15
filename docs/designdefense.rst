@@ -6,8 +6,8 @@ design are lodged.  To give context to discussions that follow, we
 detail some of the design decisions and trade-offs here.  In some
 cases, we acknowledge that the framework can be made better and we
 describe future steps which will be taken to improve it; in some cases
-we just file the challenge as "noted", as you can't please everybody
-all the time.
+we just file the challenge as "noted", as obviously you can't please
+everyone all of the time.
 
 BFG Uses The Zope Component Architecture ("ZCA")
 ------------------------------------------------
