@@ -588,12 +588,6 @@ class IRouteDirective(Interface):
     xhr = Bool(title=u'xhr', required=False)
     path_info = TextLine(title=u'path_info', required=False)
 
-class IRouteRequirementDirective(Interface):
-    """ The interface for the ``requirement`` route subdirective """
-    attr = TextLine(title=u'attr', required=True)
-    expr = TextLine(title=u'expression', required=True)
-
-
 def route(_context, name, path, view=None, view_for=None,
           permission=None, factory=None, request_type=None, for_=None,
           header=None, xhr=False, accept=None, path_info=None,
