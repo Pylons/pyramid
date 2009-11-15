@@ -1,6 +1,12 @@
 Next release
 ============
 
+Internals
+---------
+
+- Remove dead IRouteRequirement interface from ``repoze.bfg.zcml``
+  module.
+
 Documentation
 -------------
 
