@@ -27,6 +27,7 @@ from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
+from repoze.bfg.interfaces import ITemplateRendererFactory
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 from repoze.bfg.interfaces import ILogger
@@ -468,7 +469,10 @@ class Registry(Components, dict):
         self.registerUtility(policy, IAuthorizationPolicy, info=_info)
 
     def renderer(self, factory, name, _info=u''):
-        self.registerUtility(factory, IRendererFactory, name=name, info=_info)
+        iface = IRendererFactory
+        if name.startswith('.'):
+            iface = ITemplateRendererFactory
+        self.registerUtility(factory, iface, name=name, info=_info)
 
     def resource(self, to_override, override_with, _override=None,
                  _info=u''):
