@@ -232,13 +232,8 @@ def registerRoute(path, name, factory=None):
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
     """
     from repoze.bfg.interfaces import IRoutesMapper
-    from zope.component import queryUtility
-    from repoze.bfg.urldispatch import RoutesRootFactory
-    mapper = queryUtility(IRoutesMapper)
-    if mapper is None:
-        mapper = RoutesRootFactory(DummyRootFactory)
-        sm = getSiteManager()
-        sm.registerUtility(mapper, IRoutesMapper)
+    from zope.component import getUtility
+    mapper = getUtility(IRoutesMapper)
     mapper.connect(path, name, factory)
 
 def registerRoutesMapper(root_factory=None):

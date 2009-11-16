@@ -43,10 +43,7 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         from repoze.bfg.tests import test_integration
         scan(context, test_integration)
         actions = context.actions
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        register = action['callable']
-        register()
+        context.actions[-1]['callable']()
         sm = getSiteManager()
         view = sm.adapters.lookup((INothing, IRequest), IView, name='')
         self.assertEqual(view, wsgiapptest)
@@ -108,47 +105,8 @@ class TestGrokkedApp(unittest.TestCase):
         
         actions = zcml_configure('configure.zcml', package)
         actions.sort()
-
-        num = 23
-
-        action_types = [(actions[x][0][1],
-                         actions[x][0][3],
-                         actions[x][0][4]) for x in range(len(actions[:num]))]
-
-        for typ in action_types:
-            self.assertEqual(typ, (None, IRequest, IView))
-
-        action_names = [actions[x][0][2] for x in range(len(actions[:num]))]
-        action_names.sort()
-
-        self.assertEqual(
-            action_names, [
-                '',
-                '',
-                'another',
-                'another',
-                'another_grokked_class',
-                'another_grokked_instance',
-                'another_oldstyle_grokked_class',
-                'another_stacked1',
-                'another_stacked2',
-                'another_stacked_class1',
-                'another_stacked_class2',
-                'basemethod',
-                'grokked_class',
-                'grokked_instance',
-                'method1',
-                'method2',
-                'oldstyle_grokked_class',
-                'stacked1',
-                'stacked2',
-                'stacked_class1',
-                'stacked_class2',
-                'stacked_method1',
-                'stacked_method2',
-                ]
-            )
-
+        scan_action = actions[0][1]
+        scan_action()
 
         ctx = DummyContext()
         req = DummyRequest()
@@ -243,7 +201,7 @@ class DummyZCMLContext:
         self.actions = []
         self.info = None
 
-    def action(self, discriminator, callable, args):
+    def action(self, discriminator=None, callable=None, args=None):
         self.actions.append(
             {'discriminator':discriminator,
              'callable':callable,

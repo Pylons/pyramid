@@ -21,6 +21,7 @@ from repoze.bfg.interfaces import ISettings
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.log import make_stream_logger
 from repoze.bfg.registry import Registry
+from repoze.bfg.registry import DefaultRootFactory
 from repoze.bfg.settings import Settings
 from repoze.bfg.settings import get_options
 from repoze.bfg.threadlocal import get_current_registry
@@ -62,11 +63,10 @@ def make_registry(root_factory, package=None, filename='configure.zcml',
     if root_factory is None:
         root_factory = DefaultRootFactory
 
-    # register the *default* root factory so apps can find it later
-    registry.registerUtility(root_factory, IDefaultRootFactory)
-
     mapper = RoutesRootFactory(root_factory)
     registry.registerUtility(mapper, IRoutesMapper)
+    # register the *default* root factory so apps can find it later
+    registry.registerUtility(root_factory, IDefaultRootFactory)
 
     if authentication_policy:
         debug_logger.warn(
@@ -113,6 +113,8 @@ def make_registry(root_factory, package=None, filename='configure.zcml',
         lock.release()
         manager.pop()
 
+    mapper = registry.getUtility(IRoutesMapper)
+
     if mapper.has_routes():
         # if the user had any <route/> statements in his configuration,
         # use the RoutesRootFactory as the IRootFactory; otherwise use the
@@ -123,16 +125,6 @@ def make_registry(root_factory, package=None, filename='configure.zcml',
     registry.registerUtility(root_factory, IRootFactory)
 
     return registry
-
-class DefaultRootFactory:
-    __parent__ = None
-    __name__ = None
-    def __init__(self, request):
-        matchdict = getattr(request, 'matchdict', {})
-        # provide backwards compatibility for applications which
-        # used routes (at least apps without any custom "context
-        # factory") in BFG 0.9.X and before
-        self.__dict__.update(matchdict)
 
 def zcml_configure(name, package):
     """ Given a ZCML filename as ``name`` and a Python package as

@@ -217,27 +217,6 @@ class MakeRegistryTests(unittest.TestCase):
         self.assertEqual(dummylock.acquired, True)
         self.assertEqual(dummylock.released, True)
 
-class TestDefaultRootFactory(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.configuration import DefaultRootFactory
-        return DefaultRootFactory
-
-    def _makeOne(self, environ):
-        return self._getTargetClass()(environ)
-
-    def test_no_matchdict(self):
-        environ = {}
-        root = self._makeOne(environ)
-        self.assertEqual(root.__parent__, None)
-        self.assertEqual(root.__name__, None)
-
-    def test_matchdict(self):
-        request = DummyRequest()
-        request.matchdict = {'a':1, 'b':2}
-        root = self._makeOne(request)
-        self.assertEqual(root.a, 1)
-        self.assertEqual(root.b, 2)
-
 class DummyRequest:
     pass
 

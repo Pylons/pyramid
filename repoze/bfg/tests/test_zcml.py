@@ -764,9 +764,8 @@ class TestViewDirective(unittest.TestCase):
         sm = getSiteManager()
         def view(context, request):
             """ """
-        self.assertRaises(ConfigurationError, self._callFUT,
-                          context, None, IFoo,
-                          view=view, header='Host:a\\')
+        self._callFUT(context, None, IFoo, view=view, header='Host:a\\')
+        self.assertRaises(ConfigurationError, context.actions[-1]['callable'])
 
     def test_with_header_noval_match(self):
         from zope.component import getSiteManager
@@ -994,9 +993,8 @@ class TestViewDirective(unittest.TestCase):
         sm = getSiteManager()
         def view(context, request):
             """ """
-        self.assertRaises(ConfigurationError, self._callFUT,
-                          context, None, IFoo,
-                          view=view, path_info='\\')
+        self._callFUT(context, None, IFoo, view=view, path_info='\\')
+        self.assertRaises(ConfigurationError, context.actions[-1]['callable'])
 
     def test_with_path_info_match(self):
         from zope.component import getSiteManager
@@ -1535,31 +1533,6 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
         policy = getUtility(IAuthorizationPolicy)
         self.assertEqual(policy.__class__, ACLAuthorizationPolicy)
 
-class TestConnectRouteFunction(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-        
-    def _callFUT(self, path, name, factory, predicates):
-        from repoze.bfg.zcml import connect_route
-        return connect_route(path, name, factory, predicates)
-
-    def _registerRoutesMapper(self):
-        from zope.component import getSiteManager
-        sm = getSiteManager()
-        mapper = DummyMapper()
-        from repoze.bfg.interfaces import IRoutesMapper
-        sm.registerUtility(mapper, IRoutesMapper)
-        return mapper
-
-    def test_defaults(self):
-        mapper = self._registerRoutesMapper()
-        self._callFUT('path', 'name', 'factory', 'predicates')
-        self.assertEqual(mapper.connections, [('path', 'name', 'factory',
-                                               'predicates')])
-
 class TestRouteDirective(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -1571,31 +1544,38 @@ class TestRouteDirective(unittest.TestCase):
         from repoze.bfg.zcml import route
         return route(*arg, **kw)
 
+    def _assertRoute(self, name, path, num_predicates=0):
+        from zope.component import getSiteManager
+        from repoze.bfg.interfaces import IRoutesMapper
+        sm = getSiteManager()
+        mapper = sm.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        route = routes[0]
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(route.name, name)
+        self.assertEqual(route.path, path)
+        self.assertEqual(len(routes[0].predicates), num_predicates)
+        return route
+
     def test_defaults(self):
-        from repoze.bfg.zcml import connect_route
         context = DummyContext()
         self._callFUT(context, 'name', 'path')
         actions = context.actions
         self.assertEqual(len(actions), 1)
-
         route_action = actions[0]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(
             route_discriminator,
             ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view(self):
         from zope.interface import Interface
-        from zope.component import getSiteManager
-        from repoze.bfg.interfaces import IRouteRequest
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        from zope.component import getSiteManager
 
         context = DummyContext()
         def view(context, request):
@@ -1615,7 +1595,6 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(view_discriminator, discrim)
         register = view_action['callable']
         register()
-        sm = getSiteManager()
         wrapped = sm.adapters.lookup((Interface, request_type), IView, name='')
         request = DummyRequest()
         self.assertEqual(wrapped(None, request), '123')
@@ -1623,18 +1602,15 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(
             route_discriminator,
             ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_and_view_for(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -1661,17 +1637,14 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
-        self.assertEqual(route_discriminator,
-                         ('route', 'name', False, None, None, None, None,None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        self.assertEqual(
+            route_discriminator,
+            ('route', 'name', False, None, None, None, None, None))
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_and_view_for_alias(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -1698,16 +1671,14 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_without_view(self):
-        from repoze.bfg.zcml import connect_route
+        from repoze.bfg.interfaces import IRoutesMapper
+        from zope.component import getSiteManager
         context = DummyContext()
         self._callFUT(context, 'name', 'path')
         actions = context.actions
@@ -1716,15 +1687,19 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[0]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args, ('path', 'name', None, []))
+        route_callable()
+        sm = getSiteManager()
+        mapper = sm.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0].name, 'name')
+        self.assertEqual(routes[0].path, 'path')
+        self.failIf(routes[0].predicates)
 
     def test_with_view_request_type(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -1751,17 +1726,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_request_type_alias(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -1789,16 +1760,13 @@ class TestRouteDirective(unittest.TestCase):
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_request_method(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -1825,17 +1793,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_containment(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -1861,17 +1825,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None,None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_header(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -1897,17 +1857,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None,None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_path_info(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
 
@@ -1933,17 +1889,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_xhr(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -1969,17 +1921,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_accept(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2006,18 +1954,14 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(
             route_discriminator,
             ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_renderer(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         from repoze.bfg.interfaces import IRendererFactory
@@ -2050,17 +1994,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_renderer_alias(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         from repoze.bfg.interfaces import IRendererFactory
@@ -2092,17 +2032,14 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
+        
 
     def test_with_view_permission(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2131,17 +2068,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_permission_alias(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
 
@@ -2168,17 +2101,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_for(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2207,17 +2136,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_view_for_alias(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
 
@@ -2244,17 +2169,13 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     def test_with_request_type_GET(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2280,19 +2201,15 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 0)
+        route_callable()
+        self._assertRoute('name', 'path')
 
     # route predicates
 
     def test_with_xhr(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2318,20 +2235,16 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', True, None, None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 1)
+        route_callable()
+        route = self._assertRoute('name', 'path', 1)
         request = DummyRequest()
         request.is_xhr = True
-        self.assertEqual(predicates[0](None, request), True)
+        self.assertEqual(route.predicates[0](None, request), True)
 
     def test_with_request_method(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2358,20 +2271,16 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, 'GET',None, None, None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 1)
+        route_callable()
+        route = self._assertRoute('name', 'path', 1)
         request = DummyRequest()
         request.method = 'GET'
-        self.assertEqual(predicates[0](None, request), True)
+        self.assertEqual(route.predicates[0](None, request), True)
 
     def test_with_path_info(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
 
@@ -2397,20 +2306,16 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, '/foo',None,None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 1)
+        route_callable()
+        route = self._assertRoute('name', 'path', 1)
         request = DummyRequest()
         request.path_info = '/foo'
-        self.assertEqual(predicates[0](None, request), True)
+        self.assertEqual(route.predicates[0](None, request), True)
 
     def test_with_request_param(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2437,19 +2342,16 @@ class TestRouteDirective(unittest.TestCase):
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
         route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None,'abc', None, None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 1)
+        route_callable()
+        route = self._assertRoute('name', 'path', 1)
         request = DummyRequest()
         request.params = {'abc':'123'}
-        self.assertEqual(predicates[0](None, request), True)
+        self.assertEqual(route.predicates[0](None, request), True)
 
     def test_with_header(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2475,20 +2377,16 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None,None,'Host', None))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 1)
+        route_callable()
+        route = self._assertRoute('name', 'path', 1)
         request = DummyRequest()
         request.headers = {'Host':'example.com'}
-        self.assertEqual(predicates[0](None, request), True)
+        self.assertEqual(route.predicates[0](None, request), True)
 
     def test_with_accept(self):
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
         
@@ -2515,17 +2413,14 @@ class TestRouteDirective(unittest.TestCase):
         route_action = actions[1]
         route_callable = route_action['callable']
         route_discriminator = route_action['discriminator']
-        route_args = route_action['args']
-        self.assertEqual(route_callable, connect_route)
         self.assertEqual(
             route_discriminator,
             ('route', 'name', False, None, None, None, None, 'text/xml'))
-        self.assertEqual(route_args[:3], ('path', 'name', None))
-        predicates = route_args[3]
-        self.assertEqual(len(predicates), 1)
+        route_callable()
+        route = self._assertRoute('name', 'path', 1)
         request = DummyRequest()
         request.accept = ['text/xml']
-        self.assertEqual(predicates[0](None, request), True)
+        self.assertEqual(route.predicates[0](None, request), True)
 
 class TestStaticDirective(unittest.TestCase):
     def setUp(self):
@@ -2542,10 +2437,10 @@ class TestStaticDirective(unittest.TestCase):
         from paste.urlparser import StaticURLParser
         from zope.interface import implementedBy
         from zope.component import getSiteManager
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
+        from repoze.bfg.interfaces import IRoutesMapper
         import os
         here = os.path.dirname(__file__)
         static_path = os.path.join(here, 'fixtures', 'static')
@@ -2571,20 +2466,23 @@ class TestStaticDirective(unittest.TestCase):
         action = actions[1]
         callable = action['callable']
         discriminator = action['discriminator']
-        args = action['args']
-        self.assertEqual(callable, connect_route)
         self.assertEqual(discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(args[0], 'name*subpath')
+        action['callable']()
+        mapper = sm.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0].path, 'name*subpath')
+        self.assertEqual(routes[0].name, 'name')
 
     def test_package_relative(self):
         from repoze.bfg.static import PackageURLParser
         from zope.component import getSiteManager
         from zope.interface import implementedBy
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
+        from repoze.bfg.interfaces import IRoutesMapper
         context = DummyContext()
         self._callFUT(context, 'name', 'repoze.bfg.tests:fixtures/static')
         actions = context.actions
@@ -2604,22 +2502,24 @@ class TestStaticDirective(unittest.TestCase):
         self.assertEqual(view(None, request).__class__, PackageURLParser)
 
         action = actions[1]
-        callable = action['callable']
         discriminator = action['discriminator']
-        args = action['args']
-        self.assertEqual(callable, connect_route)
         self.assertEqual(discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(args[0], 'name*subpath')
+        action['callable']()
+        mapper = sm.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0].path, 'name*subpath')
+        self.assertEqual(routes[0].name, 'name')
 
     def test_here_relative(self):
         from repoze.bfg.static import PackageURLParser
         from zope.component import getSiteManager
         from zope.interface import implementedBy
-        from repoze.bfg.zcml import connect_route
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
+        from repoze.bfg.interfaces import IRoutesMapper
         import repoze.bfg.tests
         context = DummyContext(repoze.bfg.tests)
         self._callFUT(context, 'name', 'fixtures/static')
@@ -2642,11 +2542,14 @@ class TestStaticDirective(unittest.TestCase):
         action = actions[1]
         callable = action['callable']
         discriminator = action['discriminator']
-        args = action['args']
-        self.assertEqual(callable, connect_route)
         self.assertEqual(discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        self.assertEqual(args[0], 'name*subpath')
+        action['callable']()
+        mapper = sm.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0].path, 'name*subpath')
+        self.assertEqual(routes[0].name, 'name')
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):
@@ -2677,100 +2580,64 @@ class TestResourceDirective(unittest.TestCase):
                           'a:foo.pt', 'a:foo/')
 
     def test_no_colons(self):
-        from repoze.bfg.zcml import _override
+        from zope.component import getSiteManager
         context = DummyContext()
         self._callFUT(context, 'a', 'b')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        self.assertEqual(action['callable'], _override)
+        sm = getSiteManager()
+        self.assertEqual(action['callable'], sm.resource)
         self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'],
-                         (DummyModule, '', DummyModule, ''))
+        self.assertEqual(action['args'], ('a', 'b', None))
 
     def test_with_colons(self):
-        from repoze.bfg.zcml import _override
+        from zope.component import getSiteManager
         context = DummyContext()
         self._callFUT(context, 'a:foo.pt', 'b:foo.pt')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        self.assertEqual(action['callable'], _override)
+        sm = getSiteManager()
+        self.assertEqual(action['callable'], sm.resource)
         self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'],
-                         (DummyModule, 'foo.pt', DummyModule, 'foo.pt'))
+        self.assertEqual(action['args'], ('a:foo.pt', 'b:foo.pt', None))
 
     def test_override_module_with_directory(self):
-        from repoze.bfg.zcml import _override
+        from zope.component import getSiteManager
         context = DummyContext()
         self._callFUT(context, 'a', 'b:foo/')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        self.assertEqual(action['callable'], _override)
+        sm = getSiteManager()
+        self.assertEqual(action['callable'], sm.resource)
         self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'],
-                         (DummyModule, '', DummyModule, 'foo/'))
+        self.assertEqual(action['args'], ('a', 'b:foo/', None))
 
     def test_override_directory_with_module(self):
-        from repoze.bfg.zcml import _override
+        from zope.component import getSiteManager
         context = DummyContext()
         self._callFUT(context, 'a:foo/', 'b')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        self.assertEqual(action['callable'], _override)
+        sm = getSiteManager()
+        self.assertEqual(action['callable'], sm.resource)
         self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'],
-                         (DummyModule, 'foo/', DummyModule, ''))
+        self.assertEqual(action['args'], ('a:foo/', 'b', None))
 
     def test_override_module_with_module(self):
-        from repoze.bfg.zcml import _override
+        from zope.component import getSiteManager
         context = DummyContext()
         self._callFUT(context, 'a', 'b')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        self.assertEqual(action['callable'], _override)
-        self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'],
-                         (DummyModule, '', DummyModule, ''))
-
-class Test_OverrideFunction(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import _override
-        return _override(*arg, **kw)
-
-    def _registerOverrides(self, overrides, package_name):
-        from repoze.bfg.interfaces import IPackageOverrides
-        from zope.component import getSiteManager
         sm = getSiteManager()
-        sm.registerUtility(overrides, IPackageOverrides, name=package_name)
-
-    def test_overrides_not_yet_registered(self):
-        from zope.component import queryUtility
-        from repoze.bfg.interfaces import IPackageOverrides
-        package = DummyPackage('package')
-        opackage = DummyPackage('opackage')
-        self._callFUT(package, 'path', opackage, 'oprefix',
-                      PackageOverrides=DummyOverrides)
-        overrides = queryUtility(IPackageOverrides, name='package')
-        self.assertEqual(overrides.package, package)
-        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
-
-    def test_overrides_already_registered(self):
-        package = DummyPackage('package')
-        opackage = DummyPackage('opackage')
-        overrides = DummyOverrides(package)
-        self._registerOverrides(overrides, 'package')
-        self._callFUT(package, 'path', opackage, 'oprefix')
-        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
+        self.assertEqual(action['callable'], sm.resource)
+        self.assertEqual(action['discriminator'], None)
+        self.assertEqual(action['args'], ('a', 'b', None))
 
 class TestZCMLConfigure(unittest.TestCase):
     i = 0
@@ -2818,60 +2685,6 @@ class TestZCMLConfigure(unittest.TestCase):
         self.assertRaises(IOError, self._callFUT, 'configure.zcml',
                           self.module)
 
-class TestBFGViewGrokker(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _getTargetClass(self):
-        from repoze.bfg.zcml import BFGViewGrokker
-        return BFGViewGrokker
-
-    def _makeOne(self, *arg, **kw):
-        return self._getTargetClass()(*arg, **kw)
-
-    def test_grok_is_bfg_view(self):
-        from zope.component import getSiteManager
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from zope.interface import Interface
-        grokker = self._makeOne()
-        class obj:
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        settings = dict(permission='foo', for_=Interface, name='foo.html',
-                        request_type=IRequest, route_name=None,
-                        request_method=None, request_param=None,
-                        containment=None, attr=None, renderer=None,
-                        wrapper=None, xhr=False, header=None,
-                        accept=None)
-        obj.__bfg_view_settings__ = [settings]
-        context = DummyContext()
-        result = grokker.grok('name', obj, context=context)
-        self.assertEqual(result, True)
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        register = actions[0]['callable']
-        register()
-        sm = getSiteManager()
-        wrapped = sm.adapters.lookup((Interface, IRequest), IView,
-                                     name='foo.html')
-        self.assertEqual(wrapped(None, None), 'OK')
-
-    def test_grok_is_not_bfg_view(self):
-        grokker = self._makeOne()
-        class obj:
-            pass
-        context = DummyContext()
-        result = grokker.grok('name', obj, context=context)
-        self.assertEqual(result, False)
-        actions = context.actions
-        self.assertEqual(len(actions), 0)
-
 class TestZCMLScanDirective(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -2884,32 +2697,18 @@ class TestZCMLScanDirective(unittest.TestCase):
         return scan(context, package, martian)
 
     def test_it(self):
-        from repoze.bfg.zcml import BFGMultiGrokker
-        from repoze.bfg.zcml import exclude
+        from repoze.bfg.registry import BFGMultiGrokker
         martian = DummyMartianModule()
         module_grokker = DummyModuleGrokker()
         dummy_module = DummyModule()
-        self._callFUT(None, dummy_module, martian)
+        context = DummyContext()
+        self._callFUT(context, dummy_module, martian)
+        context.actions[-1]['callable']()
         self.assertEqual(martian.name, 'dummy')
         multi_grokker = martian.module_grokker.multi_grokker
         self.assertEqual(multi_grokker.__class__, BFGMultiGrokker)
-        self.assertEqual(martian.context, None)
-        self.assertEqual(martian.exclude_filter, exclude)
-
-class TestExcludeFunction(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, name):
-        from repoze.bfg.zcml import exclude
-        return exclude(name)
-
-    def test_it(self):
-        self.assertEqual(self._callFUT('.foo'), True)
-        self.assertEqual(self._callFUT('foo'), False)
+        self.assertEqual(martian.info, context.info)
+        self.failUnless(martian.exclude_filter)
 
 class DummyModule:
     __path__ = "foo"
@@ -2921,9 +2720,11 @@ class DummyModuleGrokker:
         self.multi_grokker = grokker
         
 class DummyMartianModule:
-    def grok_dotted_name(self, name, grokker, context, exclude_filter=None):
+    def grok_dotted_name(self, name, grokker, _info, _registry,
+                         exclude_filter=None):
         self.name = name
-        self.context = context
+        self.info = _info
+        self.registry = _registry
         self.exclude_filter = exclude_filter
         return True
 
@@ -2950,13 +2751,6 @@ class DummyContext:
 class Dummy:
     pass
 
-class DummyMapper:
-    def __init__(self):
-        self.connections = []
-
-    def connect(self, path, name, factory, predicates=()):
-        self.connections.append((path, name, factory, predicates))
-
 class DummyRoute:
     pass
 
@@ -2978,15 +2772,3 @@ class DummyRequest:
     def copy(self):
         return self
 
-class DummyOverrides:
-    def __init__(self, package):
-        self.package = package
-        self.inserted = []
-
-    def insert(self, path, package, prefix):
-        self.inserted.append((path, package, prefix))
-        
-class DummyPackage:
-    def __init__(self, name):
-        self.__name__ = name
-        
