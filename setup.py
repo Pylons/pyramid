@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '1.1b4'
+__version__ = '1.1'
 
 import os
 import sys
@@ -47,7 +47,7 @@ if sys.version_info[:2] < (2, 6):
     
 setup(name='repoze.bfg',
       version=__version__,
-      description='A web framework for WSGI',
+      description='A WSGI web framework influenced by Zope, Django, and Pylons',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
