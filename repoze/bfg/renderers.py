@@ -4,7 +4,6 @@ import pkg_resources
 from zope.component import getSiteManager
 from zope.component import queryUtility
 
-from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import ITemplateRenderer
 
 from repoze.bfg.compat import json
@@ -63,13 +62,8 @@ def template_renderer_factory(path, impl, level=3):
     return renderer
 
 def renderer_from_name(path):
-    name = os.path.splitext(path)[1]
-    if not name:
-        name = path
-    factory = queryUtility(IRendererFactory, name=name)
-    if factory is None:
-        raise ValueError('No renderer for renderer name %r' % name)
-    return factory(path)
+    sm = getSiteManager()
+    return sm.renderer_from_name(path)
 
 def _reload_resources():
     settings = get_settings()

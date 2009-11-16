@@ -1,5 +1,9 @@
+import os
 import re
 import sys
+import inspect
+
+from webob import Response
 
 from zope.component.registry import Components
 
@@ -19,19 +23,30 @@ from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
+from repoze.bfg.interfaces import ILogger
 
+from repoze.bfg import chameleon_zpt
+from repoze.bfg import chameleon_text
+from repoze.bfg import renderers
+from repoze.bfg.compat import all
+from repoze.bfg.exceptions import NotFound
+from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import PackageOverrides
+from repoze.bfg.settings import get_settings
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.traversal import find_interface
-from repoze.bfg.view import MultiView
-from repoze.bfg.view import derive_view
 from repoze.bfg.view import static as static_view
+from repoze.bfg.view import render_view_to_response
+from repoze.bfg.view import requestonly
+from repoze.bfg.view import decorate_view
+from repoze.bfg.view import MultiView
 from repoze.bfg.urldispatch import RoutesRootFactory
 
 class Registry(Components, dict):
@@ -44,6 +59,10 @@ class Registry(Components, dict):
         Components.__init__(self, name=name, bases=bases)
         mapper = RoutesRootFactory(DefaultRootFactory)
         self.registerUtility(mapper, IRoutesMapper)
+        self.renderer(chameleon_zpt.renderer_factory, '.pt')
+        self.renderer(chameleon_text.renderer_factory, '.txt')
+        self.renderer(renderers.json_renderer_factory, 'json')
+        self.renderer(renderers.string_renderer_factory, 'string')
 
     def registerSubscriptionAdapter(self, *arg, **kw):
         result = Components.registerSubscriptionAdapter(self, *arg, **kw)
@@ -94,8 +113,8 @@ class Registry(Components, dict):
             request_param=request_param, header=header, accept=accept,
             containment=containment)
 
-        derived_view = derive_view(view, permission, predicates, attr,
-                                   renderer, wrapper, name)
+        derived_view = self.derive_view(view, permission, predicates, attr,
+                                        renderer, wrapper, name)
         r_for_ = for_
         r_request_type = request_type
         if r_for_ is None:
@@ -141,6 +160,238 @@ class Registry(Components, dict):
             self.registerAdapter(multiview.__permitted__,
                                  (for_, request_type), IViewPermission,
                                  name, info=_info)
+
+    def map_view(self, view, attr=None, renderer_name=None):
+        wrapped_view = view
+
+        renderer = None
+
+        if renderer_name is None:
+            # global default renderer
+            factory = self.queryUtility(IRendererFactory)
+            if factory is not None:
+                renderer_name = ''
+                renderer = factory(renderer_name)
+        else:
+            renderer = self.renderer_from_name(renderer_name)
+
+        if inspect.isclass(view):
+            # If the object we've located is a class, turn it into a
+            # function that operates like a Zope view (when it's invoked,
+            # construct an instance using 'context' and 'request' as
+            # position arguments, then immediately invoke the __call__
+            # method of the instance with no arguments; __call__ should
+            # return an IResponse).
+            if requestonly(view, attr):
+                # its __init__ accepts only a single request argument,
+                # instead of both context and request
+                def _bfg_class_requestonly_view(context, request):
+                    inst = view(request)
+                    if attr is None:
+                        response = inst()
+                    else:
+                        response = getattr(inst, attr)()
+                    if renderer is not None:
+                        response = self.rendered_response(renderer, 
+                                                          response, inst,
+                                                          context, request,
+                                                          renderer_name)
+                    return response
+                wrapped_view = _bfg_class_requestonly_view
+            else:
+                # its __init__ accepts both context and request
+                def _bfg_class_view(context, request):
+                    inst = view(context, request)
+                    if attr is None:
+                        response = inst()
+                    else:
+                        response = getattr(inst, attr)()
+                    if renderer is not None:
+                        response = self.rendered_response(renderer, 
+                                                          response, inst,
+                                                          context, request,
+                                                          renderer_name)
+                    return response
+                wrapped_view = _bfg_class_view
+
+        elif requestonly(view, attr):
+            # its __call__ accepts only a single request argument,
+            # instead of both context and request
+            def _bfg_requestonly_view(context, request):
+                if attr is None:
+                    response = view(request)
+                else:
+                    response = getattr(view, attr)(request)
+
+                if renderer is not None:
+                    response = self.rendered_response(renderer,
+                                                      response, view,
+                                                      context, request,
+                                                      renderer_name)
+                return response
+            wrapped_view = _bfg_requestonly_view
+
+        elif attr:
+            def _bfg_attr_view(context, request):
+                response = getattr(view, attr)(context, request)
+                if renderer is not None:
+                    response = self.rendered_response(renderer, 
+                                                      response, view,
+                                                      context, request,
+                                                      renderer_name)
+                return response
+            wrapped_view = _bfg_attr_view
+
+        elif renderer is not None:
+            def _rendered_view(context, request):
+                response = view(context, request)
+                response = self.rendered_response(renderer, 
+                                                  response, view,
+                                                  context, request,
+                                                  renderer_name)
+                return response
+            wrapped_view = _rendered_view
+
+        decorate_view(wrapped_view, view)
+        return wrapped_view
+
+    def renderer_from_name(self, path):
+        name = os.path.splitext(path)[1]
+        if not name:
+            name = path
+        factory = self.queryUtility(IRendererFactory, name=name)
+        if factory is None:
+            raise ValueError('No renderer for renderer name %r' % name)
+        return factory(path)
+
+    def rendered_response(self, renderer, response, view, context,request,
+                          renderer_name):
+        if ( hasattr(response, 'app_iter') and hasattr(response, 'headerlist')
+             and hasattr(response, 'status') ):
+            return response
+        result = renderer(response, {'view':view, 'renderer_name':renderer_name,
+                                     'context':context, 'request':request})
+        response_factory = self.queryUtility(IResponseFactory, default=Response)
+        response = response_factory(result)
+        attrs = request.__dict__
+        content_type = attrs.get('response_content_type', None)
+        if content_type is not None:
+            response.content_type = content_type
+        headerlist = attrs.get('response_headerlist', None)
+        if headerlist is not None:
+            for k, v in headerlist:
+                response.headers.add(k, v)
+        status = attrs.get('response_status', None)
+        if status is not None:
+            response.status = status
+        charset = attrs.get('response_charset', None)
+        if charset is not None:
+            response.charset = charset
+        cache_for = attrs.get('response_cache_for', None)
+        if cache_for is not None:
+            response.cache_expires = cache_for
+        return response
+
+    def derive_view(self, original_view, permission=None, predicates=(),
+                    attr=None, renderer_name=None, wrapper_viewname=None,
+                    viewname=None):
+        mapped_view = self.map_view(original_view, attr, renderer_name)
+        owrapped_view = self.owrap_view(mapped_view, viewname, wrapper_viewname)
+        secured_view = self.secure_view(owrapped_view, permission)
+        debug_view = self.authdebug_view(secured_view, permission)
+        derived_view = self.predicate_wrap(debug_view, predicates)
+        return derived_view
+
+    def owrap_view(self, view, viewname, wrapper_viewname):
+        if not wrapper_viewname:
+            return view
+        def _owrapped_view(context, request):
+            response = view(context, request)
+            request.wrapped_response = response
+            request.wrapped_body = response.body
+            request.wrapped_view = view
+            wrapped_response = render_view_to_response(context, request,
+                                                       wrapper_viewname)
+            if wrapped_response is None:
+                raise ValueError(
+                    'No wrapper view named %r found when executing view '
+                    'named %r' % (wrapper_viewname, viewname))
+            return wrapped_response
+        decorate_view(_owrapped_view, view)
+        return _owrapped_view
+
+    def predicate_wrap(self, view, predicates):
+        if not predicates:
+            return view
+        def _wrapped(context, request):
+            if all((predicate(context, request) for predicate in predicates)):
+                return view(context, request)
+            raise NotFound('predicate mismatch for view %s' % view)
+        def checker(context, request):
+            return all((predicate(context, request) for predicate in
+                        predicates))
+        _wrapped.__predicated__ = checker
+        decorate_view(_wrapped, view)
+        return _wrapped
+
+    def secure_view(self, view, permission):
+        wrapped_view = view
+        authn_policy = self.queryUtility(IAuthenticationPolicy)
+        authz_policy = self.queryUtility(IAuthorizationPolicy)
+        if authn_policy and authz_policy and (permission is not None):
+            def _secured_view(context, request):
+                principals = authn_policy.effective_principals(request)
+                if authz_policy.permits(context, principals, permission):
+                    return view(context, request)
+                msg = getattr(request, 'authdebug_message',
+                              'Unauthorized: %s failed permission check' % view)
+                raise Forbidden(msg)
+            _secured_view.__call_permissive__ = view
+            def _permitted(context, request):
+                principals = authn_policy.effective_principals(request)
+                return authz_policy.permits(context, principals, permission)
+            _secured_view.__permitted__ = _permitted
+            wrapped_view = _secured_view
+            decorate_view(wrapped_view, view)
+
+        return wrapped_view
+
+    def authdebug_view(self, view, permission):
+        wrapped_view = view
+        authn_policy = self.queryUtility(IAuthenticationPolicy)
+        authz_policy = self.queryUtility(IAuthorizationPolicy)
+        settings = get_settings()
+        debug_authorization = False
+        if settings is not None:
+            debug_authorization = settings.get('debug_authorization', False)
+        if debug_authorization:
+            def _authdebug_view(context, request):
+                view_name = getattr(request, 'view_name', None)
+
+                if authn_policy and authz_policy:
+                    if permission is None:
+                        msg = 'Allowed (no permission registered)'
+                    else:
+                        principals = authn_policy.effective_principals(request)
+                        msg = str(authz_policy.permits(context, principals,
+                                                       permission))
+                else:
+                    msg = 'Allowed (no authorization policy in use)'
+
+                view_name = getattr(request, 'view_name', None)
+                url = getattr(request, 'url', None)
+                msg = ('debug_authorization of url %s (view name %r against '
+                       'context %r): %s' % (url, view_name, context, msg))
+                logger = self.queryUtility(ILogger, 'repoze.bfg.debug')
+                logger and logger.debug(msg)
+                if request is not None:
+                    request.authdebug_message = msg
+                return view(context, request)
+
+            wrapped_view = _authdebug_view
+            decorate_view(wrapped_view, view)
+
+        return wrapped_view
 
     def route(self, name, path, view=None, view_for=None,
               permission=None, factory=None, request_type=None, for_=None,
@@ -288,8 +539,8 @@ class Registry(Components, dict):
                 raise ConfigurationError('"view" attribute was not specified and '
                                          'no renderer specified')
 
-        derived_view = derive_view(view, attr=attr, renderer_name=renderer,
-                                   wrapper_viewname=wrapper)
+        derived_view = self.derive_view(view, attr=attr, renderer_name=renderer,
+                                        wrapper_viewname=wrapper)
         self.registerUtility(derived_view, iface, '', info=_info)
 
     def static(self, name, path, cache_max_age=3600, _info=u''):

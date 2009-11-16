@@ -1,8 +1,8 @@
 import cgi
-import inspect
 import mimetypes
 import os
 import sys
+import inspect
 
 # See http://bugs.python.org/issue5853 which is a recursion bug
 # that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
@@ -26,22 +26,14 @@ from zope.deprecation import deprecated
 from zope.interface import implements
 from zope.interface.advice import getFrameInfo
 
-from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import IMultiView
-from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IView
 
-from repoze.bfg.compat import all
 from repoze.bfg.exceptions import NotFound
-from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.path import caller_package
-from repoze.bfg.renderers import renderer_from_name
 from repoze.bfg.resource import resource_spec
-from repoze.bfg.settings import get_settings
 from repoze.bfg.static import PackageURLParser
 
 # b/c imports
@@ -477,163 +469,76 @@ def default_forbidden_view(context, request):
 def default_notfound_view(context, request):
     return default_view(context, request, '404 Not Found')
 
-class MultiView(object):
-    implements(IMultiView)
+def append_slash_notfound_view(context, request):
+    """For behavior like Django's ``APPEND_SLASH=True``, use this view
+    as the Not Found view in your application.  
 
-    def __init__(self, name):
-        self.name = name
-        self.views = []
+    When this view is the Not Found view (indicating that no view was
+    found), and any routes have been defined in the configuration of
+    your application, if the value of ``PATH_INFO`` does not already
+    end in a slash, and if the value of ``PATH_INFO`` *plus* a slash
+    matches any route's path, do an HTTP redirect to the
+    slash-appended PATH_INFO.  Note that this will *lose* ``POST``
+    data information (turning it into a GET), so you shouldn't rely on
+    this to redirect POST requests.
 
-    def add(self, view, score):
-        self.views.append((score, view))
-        self.views.sort()
+    Add the following to your application's ``configure.zcml`` to use
+    this view as the Not Found view::
 
-    def match(self, context, request):
-        for score, view in self.views:
-            if not hasattr(view, '__predicated__'):
-                return view
-            if view.__predicated__(context, request):
-                return view
-        raise NotFound(self.name)
+      <notfound
+         view="repoze.bfg.view.append_slash_notfound_view"/>
 
-    def __permitted__(self, context, request):
-        view = self.match(context, request)
-        if hasattr(view, '__permitted__'):
-            return view.__permitted__(context, request)
-        return True
+    See also :ref:`changing_the_notfound_view`.
 
-    def __call_permissive__(self, context, request):
-        view = self.match(context, request)
-        view = getattr(view, '__call_permissive__', view)
-        return view(context, request)
+    .. note:: This function is new as of :mod:`repoze.bfg` version 1.1.
 
-    def __call__(self, context, request):
-        for score, view in self.views:
-            try:
-                return view(context, request)
-            except NotFound:
-                continue
-        raise NotFound(self.name)
+    """
+    path = request.environ.get('PATH_INFO', '/')
+    mapper = queryUtility(IRoutesMapper)
+    if mapper is not None and not path.endswith('/'):
+        slashpath = path + '/'
+        for route in mapper.get_routes():
+            if route.match(slashpath) is not None:
+                return HTTPFound(location=slashpath)
+    return default_view(context, request, '404 Not Found')
 
-def rendered_response(renderer, response, view, context,request, renderer_name):
-    if ( hasattr(response, 'app_iter') and hasattr(response, 'headerlist') and
-         hasattr(response, 'status') ):
-        return response
-    result = renderer(response, {'view':view, 'renderer_name':renderer_name,
-                                 'context':context, 'request':request})
-    response_factory = queryUtility(IResponseFactory, default=Response)
-    response = response_factory(result)
-    attrs = request.__dict__
-    content_type = attrs.get('response_content_type', None)
-    if content_type is not None:
-        response.content_type = content_type
-    headerlist = attrs.get('response_headerlist', None)
-    if headerlist is not None:
-        for k, v in headerlist:
-            response.headers.add(k, v)
-    status = attrs.get('response_status', None)
-    if status is not None:
-        response.status = status
-    charset = attrs.get('response_charset', None)
-    if charset is not None:
-        response.charset = charset
-    cache_for = attrs.get('response_cache_for', None)
-    if cache_for is not None:
-        response.cache_expires = cache_for
-    return response
+def derive_view(original_view, permission=None, predicates=(), attr=None,
+                renderer_name=None, wrapper_viewname=None, viewname=None):
+    sm = getSiteManager()
+    return sm.derive_view(original_view, permission=permission,
+                          predicates=predicates, attr=attr,
+                          renderer_name=renderer_name,
+                          wrapper_viewname=wrapper_viewname, viewname=viewname)
+
+def rendered_response(renderer, response, view, context, request,
+                      renderer_name):
+    sm = getSiteManager()
+    return sm.rendered_response(renderer, response, view, context, request,
+                                renderer_name)
+
+def renderer_from_name(self, path):
+    sm = getSiteManager()
+    return sm.renderer_from_name(path)
 
 def map_view(view, attr=None, renderer_name=None):
-    wrapped_view = view
+    sm = getSiteManager()
+    return sm.map_view(view, attr=attr, renderer_name=renderer_name)
+    
+def owrap_view(view, viewname, wrapper_viewname):
+    sm = getSiteManager()
+    return sm.owrap_view(view, viewname, wrapper_viewname)
 
-    renderer = None
+def predicate_wrap(view, predicates):
+    sm = getSiteManager()
+    return sm.predicate_wrap(view, predicates)
 
-    if renderer_name is None:
-        factory = queryUtility(IRendererFactory) # global default renderer
-        if factory is not None:
-            renderer_name = ''
-            renderer = factory(renderer_name)
-    else:
-        renderer = renderer_from_name(renderer_name)
+def secure_view(view, permission):
+    sm = getSiteManager()
+    return sm.secure_view(view, permission)
 
-    if inspect.isclass(view):
-        # If the object we've located is a class, turn it into a
-        # function that operates like a Zope view (when it's invoked,
-        # construct an instance using 'context' and 'request' as
-        # position arguments, then immediately invoke the __call__
-        # method of the instance with no arguments; __call__ should
-        # return an IResponse).
-        if requestonly(view, attr):
-            # its __init__ accepts only a single request argument,
-            # instead of both context and request
-            def _bfg_class_requestonly_view(context, request):
-                inst = view(request)
-                if attr is None:
-                    response = inst()
-                else:
-                    response = getattr(inst, attr)()
-                if renderer is not None:
-                    response = rendered_response(renderer, 
-                                                 response, inst,
-                                                 context, request,
-                                                 renderer_name)
-                return response
-            wrapped_view = _bfg_class_requestonly_view
-        else:
-            # its __init__ accepts both context and request
-            def _bfg_class_view(context, request):
-                inst = view(context, request)
-                if attr is None:
-                    response = inst()
-                else:
-                    response = getattr(inst, attr)()
-                if renderer is not None:
-                    response = rendered_response(renderer, 
-                                                 response, inst,
-                                                 context, request,
-                                                 renderer_name)
-                return response
-            wrapped_view = _bfg_class_view
-
-    elif requestonly(view, attr):
-        # its __call__ accepts only a single request argument,
-        # instead of both context and request
-        def _bfg_requestonly_view(context, request):
-            if attr is None:
-                response = view(request)
-            else:
-                response = getattr(view, attr)(request)
-
-            if renderer is not None:
-                response = rendered_response(renderer,
-                                             response, view,
-                                             context, request,
-                                             renderer_name)
-            return response
-        wrapped_view = _bfg_requestonly_view
-
-    elif attr:
-        def _bfg_attr_view(context, request):
-            response = getattr(view, attr)(context, request)
-            if renderer is not None:
-                response = rendered_response(renderer, 
-                                             response, view,
-                                             context, request,
-                                             renderer_name)
-            return response
-        wrapped_view = _bfg_attr_view
-
-    elif renderer is not None:
-        def _rendered_view(context, request):
-            response = view(context, request)
-            response = rendered_response(renderer, 
-                                         response, view,
-                                         context, request,
-                                         renderer_name)
-            return response
-        wrapped_view = _rendered_view
-
-    decorate_view(wrapped_view, view)
-    return wrapped_view
+def authdebug_view(self, view, permission):
+    sm = getSiteManager()
+    return sm.authdebug_view(view, permission)
 
 def requestonly(class_or_callable, attr=None):
     """ Return true of the class or callable accepts only a request argument,
@@ -678,6 +583,44 @@ def requestonly(class_or_callable, attr=None):
 
     return False
 
+class MultiView(object):
+    implements(IMultiView)
+
+    def __init__(self, name):
+        self.name = name
+        self.views = []
+
+    def add(self, view, score):
+        self.views.append((score, view))
+        self.views.sort()
+
+    def match(self, context, request):
+        for score, view in self.views:
+            if not hasattr(view, '__predicated__'):
+                return view
+            if view.__predicated__(context, request):
+                return view
+        raise NotFound(self.name)
+
+    def __permitted__(self, context, request):
+        view = self.match(context, request)
+        if hasattr(view, '__permitted__'):
+            return view.__permitted__(context, request)
+        return True
+
+    def __call_permissive__(self, context, request):
+        view = self.match(context, request)
+        view = getattr(view, '__call_permissive__', view)
+        return view(context, request)
+
+    def __call__(self, context, request):
+        for score, view in self.views:
+            try:
+                return view(context, request)
+            except NotFound:
+                continue
+        raise NotFound(self.name)
+
 def decorate_view(wrapped_view, original_view):
     if wrapped_view is not original_view:
         wrapped_view.__module__ = original_view.__module__
@@ -691,7 +634,8 @@ def decorate_view(wrapped_view, original_view):
         except AttributeError:
             pass
         try:
-            wrapped_view.__call_permissive__ = original_view.__call_permissive__
+            wrapped_view.__call_permissive__ = \
+                                       original_view.__call_permissive__
         except AttributeError:
             pass
         try:
@@ -701,134 +645,6 @@ def decorate_view(wrapped_view, original_view):
         return True
     return False
 
-def derive_view(original_view, permission=None, predicates=(), attr=None,
-                renderer_name=None, wrapper_viewname=None, viewname=None):
-    mapped_view = map_view(original_view, attr, renderer_name)
-    owrapped_view = owrap_view(mapped_view, viewname, wrapper_viewname)
-    secured_view = secure_view(owrapped_view, permission)
-    debug_view = authdebug_view(secured_view, permission)
-    derived_view = predicate_wrap(debug_view, predicates)
-    return derived_view
 
-def owrap_view(view, viewname, wrapper_viewname):
-    if not wrapper_viewname:
-        return view
-    def _owrapped_view(context, request):
-        response = view(context, request)
-        request.wrapped_response = response
-        request.wrapped_body = response.body
-        request.wrapped_view = view
-        wrapped_response = render_view_to_response(context, request,
-                                                   wrapper_viewname)
-        if wrapped_response is None:
-            raise ValueError(
-                'No wrapper view named %r found when executing view named %r' %
-                             (wrapper_viewname, viewname))
-        return wrapped_response
-    decorate_view(_owrapped_view, view)
-    return _owrapped_view
-
-def predicate_wrap(view, predicates):
-    if not predicates:
-        return view
-    def _wrapped(context, request):
-        if all((predicate(context, request) for predicate in predicates)):
-            return view(context, request)
-        raise NotFound('predicate mismatch for view %s' % view)
-    def checker(context, request):
-        return all((predicate(context, request) for predicate in predicates))
-    _wrapped.__predicated__ = checker
-    decorate_view(_wrapped, view)
-    return _wrapped
-
-def secure_view(view, permission):
-    wrapped_view = view
-    authn_policy = queryUtility(IAuthenticationPolicy)
-    authz_policy = queryUtility(IAuthorizationPolicy)
-    if authn_policy and authz_policy and (permission is not None):
-        def _secured_view(context, request):
-            principals = authn_policy.effective_principals(request)
-            if authz_policy.permits(context, principals, permission):
-                return view(context, request)
-            msg = getattr(request, 'authdebug_message',
-                          'Unauthorized: %s failed permission check' % view)
-            raise Forbidden(msg)
-        _secured_view.__call_permissive__ = view
-        def _permitted(context, request):
-            principals = authn_policy.effective_principals(request)
-            return authz_policy.permits(context, principals, permission)
-        _secured_view.__permitted__ = _permitted
-        wrapped_view = _secured_view
-        decorate_view(wrapped_view, view)
-
-    return wrapped_view
-
-def authdebug_view(view, permission):
-    wrapped_view = view
-    authn_policy = queryUtility(IAuthenticationPolicy)
-    authz_policy = queryUtility(IAuthorizationPolicy)
-    settings = get_settings()
-    debug_authorization = False
-    if settings is not None:
-        debug_authorization = settings.get('debug_authorization', False)
-    if debug_authorization:
-        def _authdebug_view(context, request):
-            view_name = getattr(request, 'view_name', None)
-
-            if authn_policy and authz_policy:
-                if permission is None:
-                    msg = 'Allowed (no permission registered)'
-                else:
-                    principals = authn_policy.effective_principals(request)
-                    msg = str(authz_policy.permits(context, principals,
-                                                   permission))
-            else:
-                msg = 'Allowed (no authorization policy in use)'
-
-            view_name = getattr(request, 'view_name', None)
-            url = getattr(request, 'url', None)
-            msg = ('debug_authorization of url %s (view name %r against '
-                   'context %r): %s' % (url, view_name, context, msg))
-            logger = queryUtility(ILogger, 'repoze.bfg.debug')
-            logger and logger.debug(msg)
-            if request is not None:
-                request.authdebug_message = msg
-            return view(context, request)
-
-        wrapped_view = _authdebug_view
-        decorate_view(wrapped_view, view)
-
-    return wrapped_view
-
-def append_slash_notfound_view(context, request):
-    """For behavior like Django's ``APPEND_SLASH=True``, use this view
-    as the Not Found view in your application.  
-
-    When this view is the Not Found view (indicating that no view was
-    found), and any routes have been defined in the configuration of
-    your application, if the value of ``PATH_INFO`` does not already
-    end in a slash, and if the value of ``PATH_INFO`` *plus* a slash
-    matches any route's path, do an HTTP redirect to the
-    slash-appended PATH_INFO.  Note that this will *lose* ``POST``
-    data information (turning it into a GET), so you shouldn't rely on
-    this to redirect POST requests.
-
-    Add the following to your application's ``configure.zcml`` to use
-    this view as the Not Found view::
-
-      <notfound
-         view="repoze.bfg.view.append_slash_notfound_view"/>
-
-    See also :ref:`changing_the_notfound_view`.
-
-    .. note:: This function is new as of :mod:`repoze.bfg` version 1.1.
-
-    """
-    path = request.environ.get('PATH_INFO', '/')
-    mapper = queryUtility(IRoutesMapper)
-    if mapper is not None and not path.endswith('/'):
-        slashpath = path + '/'
-        for route in mapper.get_routes():
-            if route.match(slashpath) is not None:
-                return HTTPFound(location=slashpath)
-    return default_view(context, request, '404 Not Found')
+    
+    
