@@ -504,41 +504,50 @@ def append_slash_notfound_view(context, request):
 
 def derive_view(original_view, permission=None, predicates=(), attr=None,
                 renderer_name=None, wrapper_viewname=None, viewname=None):
-    sm = getSiteManager()
-    return sm.derive_view(original_view, permission=permission,
-                          predicates=predicates, attr=attr,
-                          renderer_name=renderer_name,
-                          wrapper_viewname=wrapper_viewname, viewname=viewname)
-
-def rendered_response(renderer, response, view, context, request,
-                      renderer_name):
-    sm = getSiteManager()
-    return sm.rendered_response(renderer, response, view, context, request,
-                                renderer_name)
+    reg = getSiteManager()
+    from repoze.bfg.configuration import Configurator
+    config = Configurator(reg)
+    return config.derive_view(original_view, permission=permission,
+                              predicates=predicates, attr=attr,
+                              renderer_name=renderer_name,
+                              wrapper_viewname=wrapper_viewname,
+                              viewname=viewname)
 
 def renderer_from_name(self, path):
-    sm = getSiteManager()
-    return sm.renderer_from_name(path)
+    reg = getSiteManager()
+    from repoze.bfg.configuration import Configurator
+    config = Configurator(reg)
+    return config.renderer_from_name(path)
 
 def map_view(view, attr=None, renderer_name=None):
-    sm = getSiteManager()
-    return sm.map_view(view, attr=attr, renderer_name=renderer_name)
+    reg = getSiteManager()
+    from repoze.bfg.configuration import Configurator
+    config = Configurator(reg)
+    return reg.map_view(view, attr=attr, renderer_name=renderer_name)
     
 def owrap_view(view, viewname, wrapper_viewname):
-    sm = getSiteManager()
-    return sm.owrap_view(view, viewname, wrapper_viewname)
+    reg = getSiteManager()
+    from repoze.bfg.configuration import Configurator
+    config = Configurator(reg)
+    return config.owrap_view(view, viewname, wrapper_viewname)
 
 def predicate_wrap(view, predicates):
-    sm = getSiteManager()
-    return sm.predicate_wrap(view, predicates)
+    reg = getSiteManager()
+    from repoze.bfg.configuration import Configurator
+    config = Configurator(reg)
+    return reg.predicate_wrap(view, predicates)
 
 def secure_view(view, permission):
-    sm = getSiteManager()
-    return sm.secure_view(view, permission)
+    reg = getSiteManager()
+    from repoze.bfg.configuration import Configurator
+    config = Configurator(reg)
+    return config.secure_view(view, permission)
 
 def authdebug_view(self, view, permission):
-    sm = getSiteManager()
-    return sm.authdebug_view(view, permission)
+    reg = getSiteManager()
+    from repoze.bfg.configuration import Configurator
+    config = Configurator(reg)
+    return config.authdebug_view(view, permission)
 
 def requestonly(class_or_callable, attr=None):
     """ Return true of the class or callable accepts only a request argument,
@@ -644,6 +653,34 @@ def decorate_view(wrapped_view, original_view):
             pass
         return True
     return False
+
+def rendered_response(renderer, response, view, context,request,
+                      renderer_name):
+    if ( hasattr(response, 'app_iter') and hasattr(response, 'headerlist')
+         and hasattr(response, 'status') ):
+        return response
+    result = renderer(response, {'view':view, 'renderer_name':renderer_name,
+                                 'context':context, 'request':request})
+    response_factory = queryUtility(IResponseFactory, default=Response)
+    response = response_factory(result)
+    attrs = request.__dict__
+    content_type = attrs.get('response_content_type', None)
+    if content_type is not None:
+        response.content_type = content_type
+    headerlist = attrs.get('response_headerlist', None)
+    if headerlist is not None:
+        for k, v in headerlist:
+            response.headers.add(k, v)
+    status = attrs.get('response_status', None)
+    if status is not None:
+        response.status = status
+    charset = attrs.get('response_charset', None)
+    if charset is not None:
+        response.charset = charset
+    cache_for = attrs.get('response_cache_for', None)
+    if cache_for is not None:
+        response.cache_expires = cache_for
+    return response
 
 
     

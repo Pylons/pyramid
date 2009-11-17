@@ -62,8 +62,10 @@ def template_renderer_factory(path, impl, level=3):
     return renderer
 
 def renderer_from_name(path):
-    sm = getSiteManager()
-    return sm.renderer_from_name(path)
+    from repoze.bfg.configuration import Configurator
+    reg = getSiteManager()
+    config = Configurator(reg)
+    return config.renderer_from_name(path)
 
 def _reload_resources():
     settings = get_settings()

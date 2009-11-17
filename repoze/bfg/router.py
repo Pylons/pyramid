@@ -2,24 +2,28 @@ from zope.component.event import dispatch
 
 from zope.interface import implements
 from zope.interface import providedBy
+from zope.interface import alsoProvides
 
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
+from repoze.bfg.interfaces import IRouteRequest
+from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 
-from repoze.bfg.configuration import make_registry
 from repoze.bfg.configuration import DefaultRootFactory
+from repoze.bfg.configuration import Configurator
 from repoze.bfg.events import AfterTraversal
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
+from repoze.bfg.registry import Registry
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import ModelGraphTraverser
@@ -41,6 +45,7 @@ class Router(object):
         self.notfound_view = q(INotFoundView, default=default_notfound_view)
         self.forbidden_view = q(IForbiddenView, default=default_forbidden_view)
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
+        self.routes_mapper = q(IRoutesMapper)
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
         settings = registry.queryUtility(ISettings)
@@ -69,9 +74,26 @@ class Router(object):
             attrs['registry'] = registry
             has_listeners and registry.notify(NewRequest(request))
 
-            # view lookup
-            root = self.root_factory(request)
+            # root resolution
+            root_factory = self.root_factory
+            if self.routes_mapper is not None:
+                info = self.routes_mapper(request)
+                match, route = info['match'], info['route']
+                if match:
+                    environ['wsgiorg.routing_args'] = ((), match)
+                    environ['bfg.routes.route'] = route
+                    environ['bfg.routes.matchdict'] = match
+                    request.matchdict = match
+                    iface = registry.queryUtility(IRouteRequest,
+                                                  name=route.name)
+                    if iface is not None:
+                        alsoProvides(request, iface)
+                    root_factory = route.factory or self.root_factory
+                
+            root = root_factory(request)
             attrs['root'] = root
+
+            # view lookup
             traverser = registry.queryAdapter(root, ITraverser)
             if traverser is None:
                 traverser = ModelGraphTraverser(root)
@@ -135,12 +157,10 @@ class Router(object):
         finally:
             manager.pop()
 
-# make_registry and manager kw args for unit testing only
 # note that ``options`` is a b/w compat alias for ``settings``
 def make_app(root_factory, package=None, filename='configure.zcml',
-             settings=None, options=None,
-             authentication_policy=None, authorization_policy=None,
-             manager=manager, make_registry=make_registry):
+             settings=None, options=None, Configurator=Configurator,
+             Router=Router, Registry=Registry, manager=manager):
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
 
@@ -178,9 +198,10 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     ``settings`` keyword parameter.
     """
     settings = settings or options
-    registry = make_registry(root_factory, package, filename,
-                             authentication_policy, authorization_policy,
-                             settings)
+    registry = Registry()
+    config = Configurator(registry)
+    config.default_configuration(root_factory, package=package,
+                                 filename=filename, settings=settings)
     app = Router(registry)
     # We push the registry on to the stack here in case any ZCA API is
     # used in listeners subscribed to the WSGIApplicationCreatedEvent
@@ -193,4 +214,3 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     finally:
         manager.pop()
     return app
-

@@ -99,7 +99,6 @@ class TestGrokkedApp(unittest.TestCase):
         from repoze.bfg.view import render_view_to_response
         from zope.interface import directlyProvides
         from repoze.bfg.zcml import zcml_configure
-        from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRequest
         import repoze.bfg.tests.grokkedapp as package
         

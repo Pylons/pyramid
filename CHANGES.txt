@@ -1,3 +1,18 @@
+Next release
+============
+
+Internals
+---------
+
+The ``repoze.bfg.registry.make_registry`` callable has been removed.
+
+Backwards Incompatibilites
+--------------------------
+
+The ``repoze.bfg.router.make_app`` callable no longer accepts the
+``authentication_policy`` nor the ``authorization_policy`` arguments.
+This feature was deprecated in version 1.0 and has been removed.
+
 1.1 (2009-11-15)
 ================
 

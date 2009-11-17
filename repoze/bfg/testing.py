@@ -10,6 +10,7 @@ from repoze.bfg.interfaces import IRequest
 
 from repoze.bfg.configuration import zcml_configure # API import alias
 from repoze.bfg.registry import Registry
+from repoze.bfg.threadlocal import manager
 
 _marker = object()
 
@@ -232,8 +233,10 @@ def registerRoute(path, name, factory=None):
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
     """
     from repoze.bfg.interfaces import IRoutesMapper
-    from zope.component import getUtility
-    mapper = getUtility(IRoutesMapper)
+    from zope.component import queryUtility
+    mapper = queryUtility(IRoutesMapper)
+    if mapper is None:
+        mapper = registerRoutesMapper(factory)
     mapper.connect(path, name, factory)
 
 def registerRoutesMapper(root_factory=None):
@@ -259,10 +262,8 @@ def registerRoutesMapper(root_factory=None):
 
     """
     from repoze.bfg.interfaces import IRoutesMapper
-    from repoze.bfg.urldispatch import RoutesRootFactory
-    if root_factory is None:
-        root_factory = DummyRootFactory
-    mapper = RoutesRootFactory(root_factory)
+    from repoze.bfg.urldispatch import RoutesMapper
+    mapper = RoutesMapper()
     sm = getSiteManager()
     sm.registerUtility(mapper, IRoutesMapper)
     return mapper
@@ -535,6 +536,8 @@ def setUp():
     """
     registry = Registry('testing')
     getSiteManager.sethook(lambda *arg: registry)
+    manager.clear()
+    manager.push({'registry':registry, 'request':None})
     _clearContext()
 
 def tearDown():
@@ -550,6 +553,7 @@ def tearDown():
 
     """
     getSiteManager.reset()
+    manager.pop()
 
 def cleanUp():
     """ Deprecated (as of BFG 1.1) function whichs sets up a new

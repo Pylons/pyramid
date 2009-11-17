@@ -31,8 +31,8 @@ class ThreadLocalManager(threading.local):
         self.stack[:] = []
 
 def defaults():
-    gsm = getGlobalSiteManager()
-    return {'request':None, 'registry':gsm}
+    reg = getGlobalSiteManager()
+    return {'request':None, 'registry':reg}
 
 manager = ThreadLocalManager(default=defaults)
 

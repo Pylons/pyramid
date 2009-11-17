@@ -1,12 +1,12 @@
-from repoze.bfg.testing import cleanUp
+from repoze.bfg import testing
 import unittest
 
 class TestThreadLocalManager(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _getTargetClass(self):
         from repoze.bfg.threadlocal import ThreadLocalManager
@@ -67,24 +67,29 @@ class TestGetCurrentRequest(unittest.TestCase):
 
 class GetCurrentRegistryTests(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
         
     def _callFUT(self):
         from repoze.bfg.threadlocal import get_current_registry
         return get_current_registry()
 
-    def test_local(self):
+    def test_it(self):
         from repoze.bfg.threadlocal import manager
         try:
             manager.push({'registry':123})
             self.assertEqual(self._callFUT(), 123)
         finally:
             manager.pop()
-    
-    def test_global(self):
+
+class GetCurrentRegistryWithoutTestingRegistry(unittest.TestCase):
+    def _callFUT(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        return get_current_registry()
+
+    def test_it(self):
         from zope.component import getGlobalSiteManager
         self.assertEqual(self._callFUT(), getGlobalSiteManager())
     

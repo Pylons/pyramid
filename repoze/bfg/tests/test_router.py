@@ -14,6 +14,27 @@ class TestRouter(unittest.TestCase):
         getSiteManager.reset()
         cleanUp()
 
+    def _registerRouteRequest(self, name):
+        from repoze.bfg.interfaces import IRouteRequest
+        from zope.interface import Interface
+        from zope.component import getSiteManager
+        class IRequest(Interface):
+            """ """
+        sm = getSiteManager()
+        sm.registerUtility(IRequest, IRouteRequest, name=name)
+        return IRequest
+
+    def _connectRoute(self, path, name, factory=None):
+        from repoze.bfg.interfaces import IRoutesMapper
+        from zope.component import getSiteManager
+        from repoze.bfg.urldispatch import RoutesMapper
+        sm = getSiteManager()
+        mapper = sm.queryUtility(IRoutesMapper)
+        if mapper is None:
+            mapper = RoutesMapper()
+            sm.registerUtility(mapper, IRoutesMapper)
+        mapper.connect(path, name, factory)
+
     def _registerLogger(self):
         from zope.component import getSiteManager
         gsm = getSiteManager()
@@ -420,6 +441,80 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(len(router.threadlocal_manager.pushed), 1)
         self.assertEqual(len(router.threadlocal_manager.popped), 1)
 
+    def test_call_route_matches_and_has_factory(self):
+        req_iface = self._registerRouteRequest('foo')
+        root = object()
+        def factory(request):
+            return root
+        self._connectRoute('archives/:action/:article', 'foo', factory)
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = DummyView(response)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        self._registerView(view, '', None, None)
+        rootfactory = self._registerRootFactory(context)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(result, ['Hello world'])
+        self.assertEqual(start_response.headers, ())
+        self.assertEqual(start_response.status, '200 OK')
+        request = view.request
+        self.assertEqual(request.view_name, '')
+        self.assertEqual(request.subpath, [])
+        self.assertEqual(request.context, context)
+        self.assertEqual(request.root, root)
+        routing_args = environ['wsgiorg.routing_args'][1]
+        self.assertEqual(routing_args['action'], 'action1')
+        self.assertEqual(routing_args['article'], 'article1')
+        self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
+        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
+        self.assertEqual(request.matchdict, routing_args)
+        self.failUnless(req_iface.providedBy(request))
+
+    def test_call_route_matches_doesnt_overwrite_subscriber_iface(self):
+        from repoze.bfg.interfaces import INewRequest
+        from zope.interface import alsoProvides
+        from zope.interface import Interface
+        req_iface = self._registerRouteRequest('foo')
+        class IFoo(Interface):
+            pass
+        def listener(event):
+            alsoProvides(event.request, IFoo)
+        self.registry.registerHandler(listener, (INewRequest,))
+        root = object()
+        def factory(request):
+            return root
+        self._connectRoute('archives/:action/:article', 'foo', factory)
+        context = DummyContext()
+        self._registerTraverserFactory(context)
+        response = DummyResponse()
+        response.app_iter = ['Hello world']
+        view = DummyView(response)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        self._registerView(view, '', None, None)
+        rootfactory = self._registerRootFactory(context)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(result, ['Hello world'])
+        self.assertEqual(start_response.headers, ())
+        self.assertEqual(start_response.status, '200 OK')
+        request = view.request
+        self.assertEqual(request.view_name, '')
+        self.assertEqual(request.subpath, [])
+        self.assertEqual(request.context, context)
+        self.assertEqual(request.root, root)
+        routing_args = environ['wsgiorg.routing_args'][1]
+        self.assertEqual(routing_args['action'], 'action1')
+        self.assertEqual(routing_args['article'], 'article1')
+        self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
+        self.assertEqual(environ['bfg.routes.route'].name, 'foo')
+        self.assertEqual(request.matchdict, routing_args)
+        self.failUnless(req_iface.providedBy(request))
+        self.failUnless(IFoo.providedBy(request))
 
 class TestMakeApp(unittest.TestCase):
     def setUp(self):
@@ -430,42 +525,34 @@ class TestMakeApp(unittest.TestCase):
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.router import make_app
-        return make_app(None, *arg, **kw)
-
-    def _get_make_registry(self, sm):
-        class DummyMakeRegistry(object):
-            def __call__(self, *arg):
-                self.arg = arg
-                return sm
-        return DummyMakeRegistry()
+        return make_app(*arg, **kw)
 
     def test_it(self):
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
         from repoze.bfg.tests import fixtureapp
         from zope.component import getSiteManager
         sm = getSiteManager()
-        dummy_make_registry = self._get_make_registry(sm)
         def subscriber(event):
             event.app.created = True        
         manager = DummyRegistryManager()
         sm.registerHandler(subscriber, (IWSGIApplicationCreatedEvent,))
         rootfactory = DummyRootFactory(None)
         settings = {'a':1}
-        app = self._callFUT(rootfactory, fixtureapp, manager=manager,
-                            settings=settings,
-                            make_registry=dummy_make_registry)
+        app = self._callFUT(rootfactory, fixtureapp, settings=settings,
+                            Configurator=DummyConfigurator, manager=manager)
         self.failUnless(app.created)
         self.failUnless(manager.pushed)
         self.failUnless(manager.popped)
-        self.assertEqual(len(dummy_make_registry.arg), 6)
-        self.assertEqual(dummy_make_registry.arg[-1], settings)
+        self.assertEqual(app.registry.root_factory, rootfactory)
+        self.assertEqual(app.registry.settings, settings)
+        self.assertEqual(app.registry.package, fixtureapp)
+        self.assertEqual(app.registry.filename, 'configure.zcml')
 
     def test_it_options_means_settings(self):
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
-        from zope.component import getSiteManager
         from repoze.bfg.tests import fixtureapp
+        from zope.component import getSiteManager
         sm = getSiteManager()
-        dummy_make_registry = self._get_make_registry(sm)
         def subscriber(event):
             event.app.created = True        
         manager = DummyRegistryManager()
@@ -473,13 +560,14 @@ class TestMakeApp(unittest.TestCase):
         rootfactory = DummyRootFactory(None)
         settings = {'a':1}
         app = self._callFUT(rootfactory, fixtureapp, options=settings,
-                            manager=manager,
-                            make_registry=dummy_make_registry)
+                            Configurator=DummyConfigurator, manager=manager)
         self.failUnless(app.created)
         self.failUnless(manager.pushed)
         self.failUnless(manager.popped)
-        self.assertEqual(len(dummy_make_registry.arg), 6)
-        self.assertEqual(dummy_make_registry.arg[-1], settings)
+        self.assertEqual(app.registry.root_factory, rootfactory)
+        self.assertEqual(app.registry.settings, settings)
+        self.assertEqual(app.registry.package, fixtureapp)
+        self.assertEqual(app.registry.filename, 'configure.zcml')
 
 class DummyContext:
     pass
@@ -551,3 +639,14 @@ class DummyRegistryManager:
     def pop(self):
         self.popped = True
 
+class DummyConfigurator(object):
+    def __init__(self, registry):
+        self.registry = registry
+        
+    def default_configuration(self, root_factory=None, package=None,
+                              filename=None, settings=None):
+        self.registry.root_factory = root_factory
+        self.registry.package = package
+        self.registry.filename = filename
+        self.registry.settings = settings
+                

@@ -27,10 +27,12 @@ from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.configuration import zcml_configure
+from repoze.bfg.configuration import Configurator
 from repoze.bfg.path import package_name
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import resource_spec
 from repoze.bfg.static import StaticRootFactory
+from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.view import static as static_view
 
 ###################### directives ##########################
@@ -162,7 +164,7 @@ def view(
             raise ConfigurationError('"view" attribute was not specified and '
                                      'no renderer specified')
 
-    sm = getSiteManager()
+    reg = get_current_registry()
 
     if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
         # b/w compat for 1.0
@@ -173,10 +175,11 @@ def view(
         if route_name is None:
             request_type = IRequest
         else:
-            request_type = queryUtility(IRouteRequest, name=route_name)
+            request_type = reg.queryUtility(IRouteRequest, name=route_name)
             if request_type is None:
                 request_type = route_request_iface(route_name)
-                sm.registerUtility(request_type, IRouteRequest, name=route_name)
+                reg.registerUtility(request_type, IRouteRequest,
+                                    name=route_name)
 
     if isinstance(request_type, basestring):
         request_type = _context.resolve(request_type)
@@ -185,12 +188,14 @@ def view(
         renderer = resource_spec(renderer, package_name(_context.resolve('.')))
 
     def register():
-        sm.view(permission=permission, for_=for_, view=view, name=name,
-                request_type=request_type, route_name=route_name,
-                request_method=request_method, request_param=request_param,
-                containment=containment, attr=attr, renderer=renderer,
-                wrapper=wrapper, xhr=xhr, accept=accept, header=header,
-                path_info=path_info, _info=_context.info)
+        config = Configurator(reg)
+        config.view(
+            permission=permission, for_=for_, view=view, name=name,
+            request_type=request_type, route_name=route_name,
+            request_method=request_method, request_param=request_param,
+            containment=containment, attr=attr, renderer=renderer,
+            wrapper=wrapper, xhr=xhr, accept=accept, header=header,
+            path_info=path_info, _info=_context.info)
 
     _context.action(
         discriminator = ('view', for_, name, request_type, IView, containment,
@@ -258,7 +263,7 @@ def route(_context, name, path, view=None, view_for=None,
     # compatibility purposes.
     # these are route predicates; if they do not match, the next route
     # in the routelist will be tried
-    sm = getSiteManager()
+    reg = get_current_registry()
 
     if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
         # b/w compat for 1.0
@@ -268,7 +273,7 @@ def route(_context, name, path, view=None, view_for=None,
     request_iface = queryUtility(IRouteRequest, name=name)
     if request_iface is None:
         request_iface = route_request_iface(name)
-        sm.registerUtility(request_iface, IRouteRequest, name=name)
+        reg.registerUtility(request_iface, IRouteRequest, name=name)
 
     if view:
         view_for = view_for or for_
@@ -295,17 +300,18 @@ def route(_context, name, path, view=None, view_for=None,
             )
 
     def register():
-        sm.route(name, path, factory=factory, header=header,
-                 xhr=xhr, accept=accept, path_info=path_info,
-                 request_method=request_method, request_param=request_param,
-                 _info=_context.info)
-
+        config = Configurator(reg)
+        config.route(
+            name, path, factory=factory, header=header,
+            xhr=xhr, accept=accept, path_info=path_info,
+            request_method=request_method, request_param=request_param,
+            _info=_context.info)
+        
     _context.action(
         discriminator = ('route', name, xhr, request_method, path_info,
                          request_param, header, accept),
         callable = register,
         )
-
 
 class ISystemViewDirective(Interface):
     view = GlobalObject(
@@ -348,8 +354,9 @@ def view_utility(_context, view, attr, renderer, wrapper, iface):
         renderer = resource_spec(renderer, package_name(_context.resolve('.')))
 
     def register():
-        sm = getSiteManager()
-        sm.view_utility(view, attr, renderer, wrapper, iface, _context.info)
+        reg = get_current_registry()
+        config = Configurator(reg)
+        config.view_utility(view, attr, renderer, wrapper, iface, _context.info)
 
     _context.action(
         discriminator = iface,
@@ -396,11 +403,12 @@ def resource(_context, to_override, override_with):
                 'A file cannot be overridden with a directory (put a slash '
                 'at the end of to_override if necessary)')
 
-    sm = getSiteManager()
+    reg = get_current_registry()
+    config = Configurator(reg)
 
     _context.action(
         discriminator = None,
-        callable = sm.resource,
+        callable = config.resource,
         args = (to_override, override_with, _context.info),
         )
 
@@ -415,8 +423,9 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
                                             callback=callback)
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    sm = getSiteManager()
-    sm.authentication_policy(policy, _info=_context.info)
+    reg = get_current_registry()
+    config = Configurator(reg)
+    config.authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
 class IRemoteUserAuthenticationPolicyDirective(Interface):
@@ -430,8 +439,9 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
                                             callback=callback)
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    sm = getSiteManager()
-    sm.authentication_policy(policy, _info=_context.info)
+    reg = get_current_registry()
+    config = Configurator(reg)
+    config.authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
 class IAuthTktAuthenticationPolicyDirective(Interface):
@@ -467,8 +477,9 @@ def authtktauthenticationpolicy(_context,
         raise ConfigurationError(str(why))
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
-    sm = getSiteManager()
-    sm.authentication_policy(policy, _info=_context.info)
+    reg = get_current_registry()
+    config = Configurator(reg)
+    config.authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
 class IACLAuthorizationPolicyDirective(Interface):
@@ -478,8 +489,9 @@ def aclauthorizationpolicy(_context):
     policy = ACLAuthorizationPolicy()
     # authorization policies must be registered eagerly so they can be
     # found by the view registration machinery
-    sm = getSiteManager()
-    sm.authorization_policy(policy, _info=_context.info)
+    reg = get_current_registry()
+    config = Configurator(reg)
+    config.authorization_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthorizationPolicy)
 
 class IRendererDirective(Interface):
@@ -494,8 +506,9 @@ class IRendererDirective(Interface):
 def renderer(_context, factory, name=''):
     # renderer factories must be registered eagerly so they can be
     # found by the view machinery
-    sm = getSiteManager()
-    sm.renderer(factory, name, _info=_context.info)
+    reg = get_current_registry()
+    config = Configurator(reg)
+    config.renderer(factory, name, _info=_context.info)
     _context.action(discriminator=(IRendererFactory, name))
 
 class IStaticDirective(Interface):
@@ -534,8 +547,9 @@ class IScanDirective(Interface):
 def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
     def register():
-        sm = getSiteManager()
-        sm.scan(package, _info=_context.info, martian=martian)
+        reg = get_current_registry()
+        config = Configurator(reg)
+        config.scan(package, _info=_context.info, martian=martian)
     _context.action(discriminator=None, callable=register)
 
 class Uncacheable(object):

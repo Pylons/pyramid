@@ -2581,53 +2581,62 @@ class TestResourceDirective(unittest.TestCase):
 
     def test_no_colons(self):
         from zope.component import getSiteManager
+        from repoze.bfg.configuration import Configurator
         context = DummyContext()
         self._callFUT(context, 'a', 'b')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
         sm = getSiteManager()
-        self.assertEqual(action['callable'], sm.resource)
+        self.assertEqual(action['callable'].im_func,
+                         Configurator.resource.im_func)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'], ('a', 'b', None))
 
     def test_with_colons(self):
         from zope.component import getSiteManager
+        from repoze.bfg.configuration import Configurator
         context = DummyContext()
         self._callFUT(context, 'a:foo.pt', 'b:foo.pt')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
         sm = getSiteManager()
-        self.assertEqual(action['callable'], sm.resource)
+        self.assertEqual(action['callable'].im_func,
+                         Configurator.resource.im_func)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'], ('a:foo.pt', 'b:foo.pt', None))
 
     def test_override_module_with_directory(self):
         from zope.component import getSiteManager
+        from repoze.bfg.configuration import Configurator
         context = DummyContext()
         self._callFUT(context, 'a', 'b:foo/')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
         sm = getSiteManager()
-        self.assertEqual(action['callable'], sm.resource)
+        self.assertEqual(action['callable'].im_func,
+                         Configurator.resource.im_func)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'], ('a', 'b:foo/', None))
 
     def test_override_directory_with_module(self):
         from zope.component import getSiteManager
+        from repoze.bfg.configuration import Configurator
         context = DummyContext()
         self._callFUT(context, 'a:foo/', 'b')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
         sm = getSiteManager()
-        self.assertEqual(action['callable'], sm.resource)
+        self.assertEqual(action['callable'].im_func,
+                         Configurator.resource.im_func)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'], ('a:foo/', 'b', None))
 
     def test_override_module_with_module(self):
+        from repoze.bfg.configuration import Configurator
         from zope.component import getSiteManager
         context = DummyContext()
         self._callFUT(context, 'a', 'b')
@@ -2635,7 +2644,8 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         sm = getSiteManager()
-        self.assertEqual(action['callable'], sm.resource)
+        self.assertEqual(action['callable'].im_func,
+                         Configurator.resource.im_func)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'], ('a', 'b', None))
 
@@ -2697,7 +2707,7 @@ class TestZCMLScanDirective(unittest.TestCase):
         return scan(context, package, martian)
 
     def test_it(self):
-        from repoze.bfg.registry import BFGMultiGrokker
+        from repoze.bfg.configuration import BFGMultiGrokker
         martian = DummyMartianModule()
         module_grokker = DummyModuleGrokker()
         dummy_module = DummyModule()
@@ -2720,11 +2730,11 @@ class DummyModuleGrokker:
         self.multi_grokker = grokker
         
 class DummyMartianModule:
-    def grok_dotted_name(self, name, grokker, _info, _registry,
+    def grok_dotted_name(self, name, grokker, _info, _configurator,
                          exclude_filter=None):
         self.name = name
         self.info = _info
-        self.registry = _registry
+        self.configurator = _configurator
         self.exclude_filter = exclude_filter
         return True
 
