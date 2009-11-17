@@ -956,6 +956,11 @@ instead use version control branching and merging to manage
 application deployment modifications instead, as if you were deploying
 an application written using any other web framework.
 
+The Name BFG Is Not Safe For Work
+---------------------------------
+
+"Big Friendly Giant" is not safe for your work?  Where do you work?
+
 Other Challenges
 ----------------
 
