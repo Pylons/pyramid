@@ -79,7 +79,7 @@ class Router(object):
             if self.routes_mapper is not None:
                 info = self.routes_mapper(request)
                 match, route = info['match'], info['route']
-                if match:
+                if match is not None:
                     environ['wsgiorg.routing_args'] = ((), match)
                     environ['bfg.routes.route'] = route
                     environ['bfg.routes.matchdict'] = match

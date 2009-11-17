@@ -79,8 +79,15 @@ def zcml_configure(name, package):
 
 class Configurator(object):
     """ A wrapper around the registry that performs configuration tasks """
-    def __init__(self, registry):
+    def __init__(self, registry, defaults=False):
         self.reg = registry
+        defaults and self.defaults()
+
+    def defaults(self):
+        self.renderer(chameleon_zpt.renderer_factory, '.pt')
+        self.renderer(chameleon_text.renderer_factory, '.txt')
+        self.renderer(renderers.json_renderer_factory, 'json')
+        self.renderer(renderers.string_renderer_factory, 'string')
 
     def default_configuration(self, root_factory, package=None,
                               filename='configure.zcml', settings=None,
@@ -106,10 +113,7 @@ class Configurator(object):
         self.settings(settings)
         self.debug_logger(debug_logger)
         self.root_factory(root_factory or DefaultRootFactory)
-        self.renderer(chameleon_zpt.renderer_factory, '.pt')
-        self.renderer(chameleon_text.renderer_factory, '.txt')
-        self.renderer(renderers.json_renderer_factory, 'json')
-        self.renderer(renderers.string_renderer_factory, 'string')
+        self.defaults()
 
         # We push our ZCML-defined configuration into an app-local
         # component registry in order to allow more than one bfg app to live
