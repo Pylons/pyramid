@@ -513,42 +513,6 @@ def derive_view(original_view, permission=None, predicates=(), attr=None,
                               wrapper_viewname=wrapper_viewname,
                               viewname=viewname)
 
-def renderer_from_name(self, path):
-    reg = getSiteManager()
-    from repoze.bfg.configuration import Configurator
-    config = Configurator(reg)
-    return config.renderer_from_name(path)
-
-def map_view(view, attr=None, renderer_name=None):
-    reg = getSiteManager()
-    from repoze.bfg.configuration import Configurator
-    config = Configurator(reg)
-    return reg.map_view(view, attr=attr, renderer_name=renderer_name)
-    
-def owrap_view(view, viewname, wrapper_viewname):
-    reg = getSiteManager()
-    from repoze.bfg.configuration import Configurator
-    config = Configurator(reg)
-    return config.owrap_view(view, viewname, wrapper_viewname)
-
-def predicate_wrap(view, predicates):
-    reg = getSiteManager()
-    from repoze.bfg.configuration import Configurator
-    config = Configurator(reg)
-    return reg.predicate_wrap(view, predicates)
-
-def secure_view(view, permission):
-    reg = getSiteManager()
-    from repoze.bfg.configuration import Configurator
-    config = Configurator(reg)
-    return config.secure_view(view, permission)
-
-def authdebug_view(self, view, permission):
-    reg = getSiteManager()
-    from repoze.bfg.configuration import Configurator
-    config = Configurator(reg)
-    return config.authdebug_view(view, permission)
-
 def requestonly(class_or_callable, attr=None):
     """ Return true of the class or callable accepts only a request argument,
     as opposed to something that accepts context, request """
@@ -631,28 +595,27 @@ class MultiView(object):
         raise NotFound(self.name)
 
 def decorate_view(wrapped_view, original_view):
-    if wrapped_view is not original_view:
-        wrapped_view.__module__ = original_view.__module__
-        wrapped_view.__doc__ = original_view.__doc__
-        try:
-            wrapped_view.__name__ = original_view.__name__
-        except AttributeError:
-            wrapped_view.__name__ = repr(original_view)
-        try:
-            wrapped_view.__permitted__ = original_view.__permitted__
-        except AttributeError:
-            pass
-        try:
-            wrapped_view.__call_permissive__ = \
-                                       original_view.__call_permissive__
-        except AttributeError:
-            pass
-        try:
-            wrapped_view.__predicated__ = original_view.__predicated__
-        except AttributeError:
-            pass
-        return True
-    return False
+    if wrapped_view is original_view:
+        return False
+    wrapped_view.__module__ = original_view.__module__
+    wrapped_view.__doc__ = original_view.__doc__
+    try:
+        wrapped_view.__name__ = original_view.__name__
+    except AttributeError:
+        wrapped_view.__name__ = repr(original_view)
+    try:
+        wrapped_view.__permitted__ = original_view.__permitted__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__call_permissive__ = original_view.__call_permissive__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__predicated__ = original_view.__predicated__
+    except AttributeError:
+        pass
+    return True
 
 def rendered_response(renderer, response, view, context,request,
                       renderer_name):
@@ -681,7 +644,3 @@ def rendered_response(renderer, response, view, context,request,
     if cache_for is not None:
         response.cache_expires = cache_for
     return response
-
-
-    
-    

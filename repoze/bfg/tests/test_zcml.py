@@ -4,14 +4,14 @@ logging.basicConfig()
 
 import unittest
 
-from repoze.bfg.testing import cleanUp
+from repoze.bfg import testing
 
 class TestViewDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.zcml import view
@@ -1237,11 +1237,11 @@ class TestViewDirective(unittest.TestCase):
 
 class TestNotFoundDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
-        
+        testing.tearDown()
+
     def _callFUT(self, context, view):
         from repoze.bfg.zcml import notfound
         return notfound(context, view)
@@ -1268,11 +1268,11 @@ class TestNotFoundDirective(unittest.TestCase):
 
 class TestForbiddenDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
-        
+        testing.tearDown()
+
     def _callFUT(self, context, view):
         from repoze.bfg.zcml import forbidden
         return forbidden(context, view)
@@ -1299,11 +1299,11 @@ class TestForbiddenDirective(unittest.TestCase):
 
 class TestViewUtility(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
-        
+        testing.tearDown()
+
     def _callFUT(self, context, view, attr, renderer, wrapper, iface):
         from repoze.bfg.zcml import view_utility
         return view_utility(context, view, attr, renderer, wrapper, iface)
@@ -1360,11 +1360,11 @@ class TestViewUtility(unittest.TestCase):
 
 class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
-        
+        testing.tearDown()
+
     def _callFUT(self, context, **kw):
         from repoze.bfg.zcml import repozewho1authenticationpolicy
         return repozewho1authenticationpolicy(context, **kw)
@@ -1403,11 +1403,11 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
 
 class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
-        
+        testing.tearDown()
+
     def _callFUT(self, context, **kw):
         from repoze.bfg.zcml import remoteuserauthenticationpolicy
         return remoteuserauthenticationpolicy(context, **kw)
@@ -1449,11 +1449,11 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
 
 class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
-        
+        testing.tearDown()
+
     def _callFUT(self, context, secret, **kw):
         from repoze.bfg.zcml import authtktauthenticationpolicy
         return authtktauthenticationpolicy(context, secret, **kw)
@@ -1507,11 +1507,11 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
 
 class TestACLAuthorizationPolicyDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
-        
+        testing.tearDown()
+
     def _callFUT(self, context, **kw):
         from repoze.bfg.zcml import aclauthorizationpolicy
         return aclauthorizationpolicy(context, **kw)
@@ -1535,10 +1535,10 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
 
 class TestRouteDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.zcml import route
@@ -2424,10 +2424,10 @@ class TestRouteDirective(unittest.TestCase):
 
 class TestStaticDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.zcml import static
@@ -2553,10 +2553,10 @@ class TestStaticDirective(unittest.TestCase):
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.zcml import resource
@@ -2656,7 +2656,7 @@ class TestZCMLConfigure(unittest.TestCase):
         return zcml_configure(path, package)
     
     def setUp(self):
-        cleanUp()
+        testing.setUp()
         self.tempdir = None
         import sys
         import os
@@ -2675,7 +2675,7 @@ class TestZCMLConfigure(unittest.TestCase):
         self.tempdir = tempdir
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
         import sys
         import shutil
         if self.module is not None:
@@ -2697,10 +2697,10 @@ class TestZCMLConfigure(unittest.TestCase):
 
 class TestZCMLScanDirective(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, context, package, martian):
         from repoze.bfg.zcml import scan

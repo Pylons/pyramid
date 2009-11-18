@@ -231,13 +231,6 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
                        '/a/La%20Pe%C3%B1a')
         self.generates('/foo/:id.html', {'id':'bar'}, '/foo/bar.html')
 
-class DummyRootFactory(object):
-    def __init__(self, result):
-        self.result = result
-    def __call__(self, request):
-        self.request = request
-        return self.result
-
 class DummyContext(object):
     """ """
         

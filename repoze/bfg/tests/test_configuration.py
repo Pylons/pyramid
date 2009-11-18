@@ -2,20 +2,6 @@ import unittest
 
 from repoze.bfg.testing import cleanUp
 
-class MakeRegistryTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _makeOne(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.configuration import Configurator
-        reg = Registry()
-        config = Configurator(reg)
-        
-
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, registry=None):
         from repoze.bfg.registry import Registry
@@ -618,14 +604,6 @@ class DummyRegistryManager:
 class DummyRootFactory:
     def __init__(self, root):
         self.root = root
-
-class DummyLogger:
-    def __init__(self):
-        self.messages = []
-    def info(self, msg):
-        self.messages.append(msg)
-    warn = info
-    debug = info
 
 class DummyContext:
     pass

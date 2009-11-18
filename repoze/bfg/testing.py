@@ -11,6 +11,7 @@ from repoze.bfg.interfaces import IRequest
 from repoze.bfg.configuration import zcml_configure # API import alias
 from repoze.bfg.registry import Registry
 from repoze.bfg.threadlocal import manager
+from repoze.bfg.threadlocal import get_current_registry
 
 _marker = object()
 
@@ -535,9 +536,9 @@ def setUp():
     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
     """
     registry = Registry('testing')
-    getSiteManager.sethook(lambda *arg: registry)
     manager.clear()
     manager.push({'registry':registry, 'request':None})
+    getSiteManager.sethook(get_current_registry)
     _clearContext()
 
 def tearDown():

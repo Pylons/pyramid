@@ -4,6 +4,8 @@ from zope.interface import implements
 from zope.interface import providedBy
 from zope.interface import alsoProvides
 
+from zope.component import getSiteManager
+
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import ILogger
 from repoze.bfg.interfaces import INotFoundView
@@ -26,6 +28,7 @@ from repoze.bfg.exceptions import NotFound
 from repoze.bfg.registry import Registry
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
+from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import default_notfound_view
@@ -40,6 +43,9 @@ class Router(object):
     threadlocal_manager = manager
 
     def __init__(self, registry):
+        # executing sethook means we're taking over getSiteManager for
+        # the lifetime of this process
+        getSiteManager.sethook(get_current_registry)
         q = registry.queryUtility
         self.logger = q(ILogger, 'repoze.bfg.debug')
         self.notfound_view = q(INotFoundView, default=default_notfound_view)
@@ -79,7 +85,7 @@ class Router(object):
             if self.routes_mapper is not None:
                 info = self.routes_mapper(request)
                 match, route = info['match'], info['route']
-                if match is not None:
+                if route is not None:
                     environ['wsgiorg.routing_args'] = ((), match)
                     environ['bfg.routes.route'] = route
                     environ['bfg.routes.matchdict'] = match
@@ -137,7 +143,6 @@ class Router(object):
 
             # response handling
             has_listeners and registry.notify(NewResponse(response))
-
             try:
                 headers = response.headerlist
                 app_iter = response.app_iter
@@ -198,7 +203,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     ``settings`` keyword parameter.
     """
     settings = settings or options
-    registry = Registry()
+    registry = Registry('make_app')
     config = Configurator(registry)
     config.default_configuration(root_factory, package=package,
                                  filename=filename, settings=settings)

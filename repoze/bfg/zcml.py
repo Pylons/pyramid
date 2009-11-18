@@ -1,4 +1,3 @@
-from zope.component import getSiteManager
 from zope.component import queryUtility
 
 from zope.configuration.exceptions import ConfigurationError

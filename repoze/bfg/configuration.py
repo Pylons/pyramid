@@ -62,7 +62,6 @@ from repoze.bfg.view import static as static_view
 
 import martian
 
-
 def zcml_configure(name, package):
     """ Given a ZCML filename as ``name`` and a Python package as
     ``package`` which the filename should be relative to, load the
@@ -136,12 +135,10 @@ class Configurator(object):
             zope.component.getGlobalSiteManager = get_current_registry
             zcml_configure(filename, package)
         finally:
-            # intentional: do not call getSiteManager.reset(); executing
-            # this function means we're taking over getSiteManager for the
-            # lifetime of this process
             zope.component.getGlobalSiteManager = getGlobalSiteManager
             lock.release()
             manager.pop()
+            getSiteManager.reset()
 
     def view(self, permission=None, for_=None, view=None, name="",
              request_type=None, route_name=None, request_method=None,

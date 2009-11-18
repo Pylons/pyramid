@@ -1,5 +1,4 @@
 import unittest
-from repoze.bfg.testing import cleanUp
 
 class TestRegistry(unittest.TestCase):
     def _getTargetClass(self):
@@ -44,31 +43,3 @@ class DummyModule:
     __file__ = ''
 
 
-class DummyContext:
-    def __init__(self, resolved=DummyModule):
-        self.actions = []
-        self.info = None
-        self.resolved = resolved
-
-class DummyRequest:
-    def __init__(self, environ=None):
-        if environ is None:
-            environ = {}
-        self.environ = environ
-        
-    def get_response(self, application):
-        return application
-
-    def copy(self):
-        self.copied = True
-        return self
-
-class DummyResponse:
-    status = '200 OK'
-    headerlist = ()
-    def __init__(self, body=None):
-        if body is None:
-            self.app_iter = ()
-        else:
-            self.app_iter = [body]
-            

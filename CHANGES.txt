@@ -4,7 +4,19 @@ Next release
 Internals
 ---------
 
-The ``repoze.bfg.registry.make_registry`` callable has been removed.
+- The ``repoze.bfg.registry.make_registry`` callable has been removed.
+
+- The ``repoze.bfg.view.map_view`` callable has been removed.
+
+- The ``repoze.bfg.view.owrap_view`` callable has been removed.
+
+- The ``repoze.bfg.view.predicate_wrap`` callable has been removed.
+
+- The ``repoze.bfg.view.secure_view`` callable has been removed.
+
+- The ``repoze.bfg.view.authdebug_view`` callable has been removed.
+
+- The ``repoze.bfg.view.renderer_from_name`` callable has been removed.
 
 Backwards Incompatibilites
 --------------------------
