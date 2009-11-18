@@ -43,6 +43,8 @@ The major feature additions of 1.1 are:
 
 - Commonly executed codepaths have been accelerated.
 
+.. _view_predicates_in_1dot1:
+
 View Predicates
 ~~~~~~~~~~~~~~~
 
@@ -167,6 +169,8 @@ True for a view callable to be invoked.  If one does not evaluate to
 True, the view will not be invoked, and view matching will continue,
 until all potential matches are exhausted (and the Not Found view is
 invoked).
+
+.. _route_predicates_in_1dot1:
 
 Route Predicates
 ~~~~~~~~~~~~~~~~

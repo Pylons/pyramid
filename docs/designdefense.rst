@@ -318,6 +318,61 @@ utilities.  Some places it's used unabashedly, and will be forever.
 We know it's quirky, but it's also useful and fundamentally
 understandable if you take the time to do some reading about it.
 
+BFG Uses Interfaces Too Liberally
+---------------------------------
+
+In this `TOPP Engineering blog entry
+<http://www.coactivate.org/projects/topp-engineering/blog/2008/10/20/what-bothers-me-about-the-component-architecture/>`_,
+Ian Bicking asserts that the way :mod:`repoze.bfg` uses a Zope
+interface to represent an HTTP request method adds too much
+indirection for not enough gain.  We agreed in general, and for this
+reason, :mod:`repoze.bfg` version 1.1 adds :term:`view predicate` and
+:term:`route predicate` modifiers to view configuration.  Predicates
+are request-specific (or :term:`context` -specific) matching narrowers
+which don't use interfaces.  Instead, each predicate uses a
+domain-specific string as a match value.
+
+For example, to write a view configuration which matches only requests
+with the ``POST`` HTTP request method, you might write a ``@bfg_view``
+decorator which mentioned the ``request_method`` predicate:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+   @bfg_view(name='post_view', request_method='POST', renderer='json')
+   def post_view(request):
+       return 'POSTed'
+
+You might further narrow the matching scenario by adding an ``accept``
+predicate that narrows matching to something that accepts a JSON
+response:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+   @bfg_view(name='post_view', request_method='POST', accept='application/json',
+             renderer='json')
+   def post_view(request):
+       return 'POSTed'
+
+Such a view would only match when the request indicated that HTTP
+request method was ``POST`` and that the remote user agent passed
+``application/json`` (or, for that matter, ``application/*``) in its
+``Accept`` request header.
+
+"Under the hood", these features make no use of interfaces.
+
+For more information about predicates, see
+:ref:`view_predicates_in_1dot1` and :ref:`route_predicates_in_1dot1`.
+
+Many "prebaked" predicates exist.  Use of only "prebaked" predicates,
+however, doesn't entirely meet Ian's criterion.  He would like to be
+able to match a request using a lambda or another function which
+interrogates the request imperatively.  This may become a feature in a
+later release.
+
 .. _zcml_encouragement:
 
 BFG "Encourages Use of ZCML"
