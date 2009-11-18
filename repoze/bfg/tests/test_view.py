@@ -1234,7 +1234,12 @@ class TestRequestOnly(unittest.TestCase):
     def test_function_defaultargs_firstname_request(self):
         def foo(request, foo=1, bar=2):
             """ """
-        self.assertTrue(self._callFUT(foo), True)
+        self.assertTrue(self._callFUT(foo))
+
+    def test_function_noargs(self):
+        def foo():
+            """ """
+        self.assertFalse(self._callFUT(foo))
 
     def test_instance_toomanyargs(self):
         class Foo:
