@@ -1456,6 +1456,20 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(None, request)
         self.assertEqual(result, 'OK')
 
+    def test_authentication_policy(self):
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        config = self._makeOne()
+        policy = object()
+        config.authentication_policy(policy)
+        self.assertEqual(config.reg.getUtility(IAuthenticationPolicy), policy)
+
+    def test_authorization_policy(self):
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        config = self._makeOne()
+        policy = object()
+        config.authorization_policy(policy)
+        self.assertEqual(config.reg.getUtility(IAuthorizationPolicy), policy)
+
     def test_derive_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
