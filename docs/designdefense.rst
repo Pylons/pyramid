@@ -1014,7 +1014,64 @@ an application written using any other web framework.
 The Name BFG Is Not Safe For Work
 ---------------------------------
 
-"Big Friendly Giant" is not safe for your work?  Where do you work?
+"Big Friendly Giant" is not safe for your work?  Where do you work? ;-)
+
+The BFG API Isn't "Flat"
+------------------------
+
+The :mod:`repoze.bfg` API is organized in such a way that API imports
+must come from submodules of the ``repoze.bfg`` namespace.  For
+instance:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.settings import get_settings
+   from repoze.bfg.url import model_url
+
+Some folks understandably don't want to think about the submodule
+organization, and would rather be able to do:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg import get_settings
+   from repoze.bfg import model_url
+
+This would indeed be nice.  However, the ``repoze.bfg`` Python package
+is a `namespace package <http://www.python.org/dev/peps/pep-0382/>`_.
+The ``__init__.py`` of a namespace package cannot contain any
+meaningful code such as imports from submodules which would let us
+form a flatter API.  Sorry.
+
+Though it makes the API slightly "thinkier", making the ``repoze.bfg``
+package into a namespace package was an early design decision, which
+we believe has paid off.  The primary goal is to make it possible to
+move features *out* of the core ``repoze.bfg`` distribution and into
+add-on distributions without breaking existing imports.  The
+``repoze.bfg.lxml`` distribution is an example of such a package: this
+functionality used to live in the core distribution, but we later
+decided that a core dependency on ``lxml`` was unacceptable.  Because
+``repoze.bfg`` is a namespace package, we were able to remove the
+``repoze.bfg.lxml`` module from the core and create a distribution
+named ``repoze.bfg.lxml`` which contains an eponymous package.  We
+were then able, via our changelog, to inform people that might have
+been depending on the feature that although it no longer shipped in
+the core distribution, they could get it back *without changing any
+code* by adding an ``install_requires`` line to their application
+package's ``setup.py``.
+
+Often new :mod:`repoze.bfg` features are released as add-on packages
+in the ``repoze.bfg`` namespace.  Because ``repoze.bfg`` is a
+namespace package, if we want to move one of these features *in* to
+the core distribition at some point, we can do so without breaking
+code which imports from the older package namespace.  This is
+currently less useful than the ability to move features *out* of the
+core distribution, as :mod:`setuptools` does not yet have any concept
+of "obsoletes" metadata which we could add to the core distribution.
+This means it's not yet possible to declaratively deprecate the older
+non-core package in the eyes of tools like ``easy_install``, ``pip``
+and ``buildout``.
 
 Other Challenges
 ----------------
