@@ -36,7 +36,7 @@ class ConfiguratorTests(unittest.TestCase):
             (ctx_iface, request_iface), IView, name=name,
             default=None)
 
-    def _callDefaultConfiguration(self, *arg, **kw):
+    def _callDeclarative(self, *arg, **kw):
         inst = self._makeOne()
         inst.declarative(*arg, **kw)
         return inst.reg
@@ -49,6 +49,163 @@ class ConfiguratorTests(unittest.TestCase):
     def _assertNotFound(self, wrapper, *arg):
         from repoze.bfg.exceptions import NotFound
         self.assertRaises(NotFound, wrapper, *arg)
+
+    def _registerEventListener(self, config, event_iface=None):
+        """ Registers an event listener (aka 'subscriber') listening for
+        events of the type ``event_iface`` and returns a list which is
+        appended to by the subscriber.  When an event is dispatched that
+        matches ``event_iface``, that event will be appended to the list.
+        You can then compare the values in the list to expected event
+        notifications.  This method is useful when testing code that wants
+        to call ``zope.component.event.dispatch`` or
+        ``zope.component.event.objectEventNotify``."""
+        if event_iface is None:
+            from zope.interface import Interface
+            event_iface = Interface
+        L = []
+        def subscriber(*event):
+            L.extend(event)
+        config.reg.registerHandler(subscriber, (event_iface,))
+        return L
+
+    def test_make_default_registry(self):
+        config = self._makeOne()
+        reg = config.make_default_registry()
+        self.assertEqual(config.reg, reg)
+
+    def test_make_wsgi_app(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.router import Router
+        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        class GetSiteManager(object):
+            def sethook(self, reg):
+                self.hook = reg
+        class ThreadLocalManager(object):
+            def push(self, d):
+                self.pushed = d
+            def pop(self):
+                self.popped = True
+        gsm = GetSiteManager()
+        manager = ThreadLocalManager()
+        config = self._makeOne()
+        subscriber = self._registerEventListener(config,
+                                                 IWSGIApplicationCreatedEvent)
+        app = config.make_wsgi_app(getSiteManager=gsm, manager=manager)
+        self.assertEqual(app.__class__, Router)
+        self.assertEqual(gsm.hook, get_current_registry)
+        self.assertEqual(manager.pushed['registry'], config.reg)
+        self.assertEqual(manager.pushed['request'], None)
+        self.failUnless(manager.popped)
+        self.assertEqual(len(subscriber), 1)
+
+    def test_declarative_fixtureapp_default_filename_withpackage(self):
+        from repoze.bfg.tests import fixtureapp
+        rootfactory = DummyRootFactory(None)
+        registry = self._callDeclarative(rootfactory, fixtureapp)
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_declarative_fixtureapp_explicit_filename(self):
+        from repoze.bfg.tests import fixtureapp
+        rootfactory = DummyRootFactory(None)
+        registry = self._callDeclarative(
+            rootfactory, fixtureapp, filename='another.zcml')
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_declarative_fixtureapp_explicit_filename_in_settings(self):
+        import os
+        rootfactory = DummyRootFactory(None)
+        from repoze.bfg.tests import fixtureapp
+        zcmlfile = os.path.join(os.path.dirname(fixtureapp.__file__),
+                                'another.zcml')
+        registry = self._callDeclarative(
+            rootfactory, fixtureapp, filename='configure.zcml',
+            settings={'configure_zcml':zcmlfile})
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_declarative_fixtureapp_explicit_specification_in_settings(self):
+        rootfactory = DummyRootFactory(None)
+        from repoze.bfg.tests import fixtureapp
+        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
+        registry = self._callDeclarative(
+            rootfactory, fixtureapp, filename='configure.zcml',
+            settings={'configure_zcml':zcmlfile})
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_declarative_fixtureapp_filename_hascolon_isabs(self):
+        rootfactory = DummyRootFactory(None)
+        from repoze.bfg.tests import fixtureapp
+        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
+        class Dummy:
+            def isabs(self, name):
+                return True
+        os = Dummy()
+        os.path = Dummy()
+        self.assertRaises(IOError, self._callDeclarative,
+                          rootfactory,
+                          fixtureapp,
+                          filename='configure.zcml',
+                          settings={'configure_zcml':zcmlfile},
+                          os=os)
+        
+    def test_declarative_custom_settings(self):
+        settings = {'mysetting':True}
+        from repoze.bfg.tests import fixtureapp
+        rootfactory = DummyRootFactory(None)
+        registry = self._callDeclarative(
+            rootfactory, fixtureapp, settings=settings)
+        from repoze.bfg.interfaces import ISettings
+        settings = registry.getUtility(ISettings)
+        self.assertEqual(settings.reload_templates, False)
+        self.assertEqual(settings.debug_authorization, False)
+        self.assertEqual(settings.mysetting, True)
+
+    def test_declarative_registrations(self):
+        settings = {'reload_templates':True,
+                    'debug_authorization':True}
+        from repoze.bfg.tests import fixtureapp
+        rootfactory = DummyRootFactory(None)
+        registry = self._callDeclarative(
+            rootfactory, fixtureapp, settings=settings)
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.interfaces import ILogger
+        from repoze.bfg.interfaces import IRootFactory
+        settings = registry.getUtility(ISettings)
+        logger = registry.getUtility(ILogger, name='repoze.bfg.debug')
+        rootfactory = registry.getUtility(IRootFactory)
+        self.assertEqual(logger.name, 'repoze.bfg.debug')
+        self.assertEqual(settings.reload_templates, True)
+        self.assertEqual(settings.debug_authorization, True)
+        self.assertEqual(rootfactory, rootfactory)
+
+    def test_declarative_routes_in_config(self):
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.interfaces import ILogger
+        from repoze.bfg.interfaces import IRootFactory
+        from repoze.bfg.interfaces import IRoutesMapper
+        settings = {'reload_templates':True,
+                    'debug_authorization':True}
+        from repoze.bfg.tests import routesapp
+        rootfactory = DummyRootFactory(None)
+        registry = self._callDeclarative(
+            rootfactory, routesapp, settings=settings)
+        settings = registry.getUtility(ISettings)
+        logger = registry.getUtility(ILogger, name='repoze.bfg.debug')
+        self.assertEqual(registry.getUtility(IRootFactory), rootfactory)
+        self.failUnless(registry.getUtility(IRoutesMapper))
+
+    def test_declarative_lock_and_unlock(self):
+        from repoze.bfg.tests import fixtureapp
+        rootfactory = DummyRootFactory(None)
+        dummylock = DummyLock()
+        registry = self._callDeclarative(
+            rootfactory, fixtureapp, filename='configure.zcml',
+            lock=dummylock)
+        self.assertEqual(dummylock.acquired, True)
+        self.assertEqual(dummylock.released, True)
 
     def test_view_view_callable_None_no_renderer(self):
         from zope.configuration.exceptions import ConfigurationError
@@ -791,31 +948,6 @@ class ConfiguratorTests(unittest.TestCase):
         route = self._assertRoute(config, 'name', 'path')
         self.failUnless(hasattr(wrapper, '__call_permissive__'))
 
-    def test__override_not_yet_registered(self):
-        from repoze.bfg.interfaces import IPackageOverrides
-        package = DummyPackage('package')
-        opackage = DummyPackage('opackage')
-        config = self._makeOne()
-        config._override(package, 'path', opackage, 'oprefix',
-                         PackageOverrides=DummyOverrides)
-        overrides = config.reg.queryUtility(IPackageOverrides,
-                                            name='package')
-        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
-        self.assertEqual(overrides.package, package)
-
-    def test__override_already_registered(self):
-        from repoze.bfg.interfaces import IPackageOverrides
-        package = DummyPackage('package')
-        opackage = DummyPackage('opackage')
-        overrides = DummyOverrides(package)
-        config = self._makeOne()
-        config.reg.registerUtility(overrides, IPackageOverrides,
-                                   name='package')
-        config._override(package, 'path', opackage, 'oprefix',
-                         PackageOverrides=DummyOverrides)
-        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
-        self.assertEqual(overrides.package, package)
-
     def test__map_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
@@ -1153,114 +1285,31 @@ class ConfiguratorTests(unittest.TestCase):
         request = DummyRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
 
-    def test_default_config_fixtureapp_default_filename_withpackage(self):
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDefaultConfiguration(rootfactory, fixtureapp)
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
+    def test__override_not_yet_registered(self):
+        from repoze.bfg.interfaces import IPackageOverrides
+        package = DummyPackage('package')
+        opackage = DummyPackage('opackage')
+        config = self._makeOne()
+        config._override(package, 'path', opackage, 'oprefix',
+                         PackageOverrides=DummyOverrides)
+        overrides = config.reg.queryUtility(IPackageOverrides,
+                                            name='package')
+        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
+        self.assertEqual(overrides.package, package)
 
-    def test_default_config_fixtureapp_explicit_filename(self):
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, filename='another.zcml')
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
+    def test__override_already_registered(self):
+        from repoze.bfg.interfaces import IPackageOverrides
+        package = DummyPackage('package')
+        opackage = DummyPackage('opackage')
+        overrides = DummyOverrides(package)
+        config = self._makeOne()
+        config.reg.registerUtility(overrides, IPackageOverrides,
+                                   name='package')
+        config._override(package, 'path', opackage, 'oprefix',
+                         PackageOverrides=DummyOverrides)
+        self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
+        self.assertEqual(overrides.package, package)
 
-    def test_default_config_fixtureapp_explicit_filename_in_settings(self):
-        import os
-        rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
-        zcmlfile = os.path.join(os.path.dirname(fixtureapp.__file__),
-                                'another.zcml')
-        registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, filename='configure.zcml',
-            settings={'configure_zcml':zcmlfile})
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_default_config_fixtureapp_explicit_specification_in_settings(self):
-        rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
-        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
-        registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, filename='configure.zcml',
-            settings={'configure_zcml':zcmlfile})
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_default_config_fixtureapp_filename_hascolon_isabs(self):
-        rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
-        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
-        class Dummy:
-            def isabs(self, name):
-                return True
-        os = Dummy()
-        os.path = Dummy()
-        self.assertRaises(IOError, self._callDefaultConfiguration,
-                          rootfactory,
-                          fixtureapp,
-                          filename='configure.zcml',
-                          settings={'configure_zcml':zcmlfile},
-                          os=os)
-        
-    def test_default_config_custom_settings(self):
-        settings = {'mysetting':True}
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, settings=settings)
-        from repoze.bfg.interfaces import ISettings
-        settings = registry.getUtility(ISettings)
-        self.assertEqual(settings.reload_templates, False)
-        self.assertEqual(settings.debug_authorization, False)
-        self.assertEqual(settings.mysetting, True)
-
-    def test_declarative_registrations(self):
-        settings = {'reload_templates':True,
-                    'debug_authorization':True}
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, settings=settings)
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ILogger
-        from repoze.bfg.interfaces import IRootFactory
-        settings = registry.getUtility(ISettings)
-        logger = registry.getUtility(ILogger, name='repoze.bfg.debug')
-        rootfactory = registry.getUtility(IRootFactory)
-        self.assertEqual(logger.name, 'repoze.bfg.debug')
-        self.assertEqual(settings.reload_templates, True)
-        self.assertEqual(settings.debug_authorization, True)
-        self.assertEqual(rootfactory, rootfactory)
-
-    def test_default_config_routes_in_config(self):
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ILogger
-        from repoze.bfg.interfaces import IRootFactory
-        from repoze.bfg.interfaces import IRoutesMapper
-        settings = {'reload_templates':True,
-                    'debug_authorization':True}
-        from repoze.bfg.tests import routesapp
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDefaultConfiguration(
-            rootfactory, routesapp, settings=settings)
-        settings = registry.getUtility(ISettings)
-        logger = registry.getUtility(ILogger, name='repoze.bfg.debug')
-        self.assertEqual(registry.getUtility(IRootFactory), rootfactory)
-        self.failUnless(registry.getUtility(IRoutesMapper))
-
-    def test_default_config_lock_and_unlock(self):
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        dummylock = DummyLock()
-        registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, filename='configure.zcml',
-            lock=dummylock)
-        self.assertEqual(dummylock.acquired, True)
-        self.assertEqual(dummylock.released, True)
 
 class TestBFGViewGrokker(unittest.TestCase):
     def setUp(self):

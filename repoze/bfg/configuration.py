@@ -68,9 +68,8 @@ class Configurator(object):
     """ A wrapper around the registry that performs configuration tasks """
     def __init__(self, registry=None):
         if registry is None:
-            self.make_default_registry()
-        else:
-            self.reg = registry
+            registry = self.make_default_registry()
+        self.reg = registry
 
     def make_default_registry(self):
         self.reg = Registry()
@@ -95,9 +94,7 @@ class Configurator(object):
         # we send.
         manager.push({'registry':self.reg, 'request':None})
         try:
-            # use dispatch here instead of registry.notify to make unit
-            # tests possible
-            dispatch(WSGIApplicationCreatedEvent(app))
+            self.reg.notify(WSGIApplicationCreatedEvent(app))
         finally:
             manager.pop()
         return app
