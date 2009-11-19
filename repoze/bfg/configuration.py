@@ -562,8 +562,8 @@ class Configurator(object):
 
     def forbidden(self, view=None, attr=None, renderer=None, wrapper=None,
                   _info=u''):
-        self.view_utility(view, attr, renderer, wrapper,
-                          IForbiddenView, _info=_info)
+        self.view_utility(view, attr, renderer, wrapper, IForbiddenView,
+                          _info=_info)
 
     def view_utility(self, view, attr, renderer, wrapper, iface, _info=u''):
         if not view:
