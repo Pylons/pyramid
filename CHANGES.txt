@@ -4,6 +4,9 @@ Next release
 Internals
 ---------
 
+- The routes mapper is no longer a root factory wrapper.  It is now
+  consulted directly by the router.
+
 - The ``repoze.bfg.registry.make_registry`` callable has been removed.
 
 - The ``repoze.bfg.view.map_view`` callable has been removed.
