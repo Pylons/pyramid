@@ -57,6 +57,8 @@ class ACLAuthorizationPolicy(object):
     def permits(self, context, principals, permission):
         """ Return ``ACLAllowed`` if the policy permits access,
         ``ACLDenied`` if not. """
+
+        acl = '<No ACL found on any object in model lineage>'
         
         for location in lineage(context):
             try:
@@ -77,8 +79,14 @@ class ACLAuthorizationPolicy(object):
                             return ACLDenied(ace, acl, permission,
                                              principals, location)
 
-        # default deny if no ACL in lineage at all
-        return ACLDenied(None, None, permission, principals, context)
+        # default deny (if no ACL in lineage at all, or if none of the
+        # principals were mentioned in any ACE we found)
+        return ACLDenied(
+            '<default deny>',
+            acl,
+            permission,
+            principals,
+            context)
 
     def principals_allowed_by_permission(self, context, permission):
         """ Return the set of principals explicitly granted the

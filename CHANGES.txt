@@ -1,6 +1,18 @@
 Next release
 ============
 
+Bug Fixes
+----------
+
+- The ACL authorization policy debugging output when
+  ``debug_authorization`` consule debugging output was turned on
+  wasn't as clear as it could have been when a view execution was
+  denied due to an authorization failure resulting from the set of
+  principals passed never having matched any ACE in any ACL in the
+  lineage.  Now in this case, we report ``<default deny>`` as the ACE
+  value and either the root ACL or ``<No ACL found on any object in
+  model lineage>`` if no ACL was found.
+
 Internals
 ---------
 

@@ -61,12 +61,14 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, True)
         self.assertEqual(result.context, blog)
         self.assertEqual(result.ace, (Allow, 'wilma', VIEW))
+        self.assertEqual(result.acl, blog.__acl__)
 
         result = policy.permits(blog, [Everyone, Authenticated, 'wilma'],
                                 'delete')
         self.assertEqual(result, False)
         self.assertEqual(result.context, community)
         self.assertEqual(result.ace, (Deny, Everyone, ALL_PERMISSIONS))
+        self.assertEqual(result.acl, community.__acl__)
 
         result = policy.permits(blog, [Everyone, Authenticated, 'fred'], 'view')
         self.assertEqual(result, True)
@@ -77,6 +79,7 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, True)
         self.assertEqual(result.context, community)
         self.assertEqual(result.ace, (Allow, 'fred', ALL_PERMISSIONS))
+        self.assertEqual(result.acl, community.__acl__)
 
         result = policy.permits(blog, [Everyone, Authenticated, 'barney'],
                                 'view')
@@ -88,6 +91,7 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, False)
         self.assertEqual(result.context, community)
         self.assertEqual(result.ace, (Deny, Everyone, ALL_PERMISSIONS))
+        self.assertEqual(result.acl, community.__acl__)
         
         result = policy.permits(root, [Everyone, Authenticated, 'someguy'],
                                 'view')
@@ -99,15 +103,21 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, False)
         self.assertEqual(result.context, community)
         self.assertEqual(result.ace, (Deny, Everyone, ALL_PERMISSIONS))
+        self.assertEqual(result.acl, community.__acl__)
 
         result = policy.permits(root, [Everyone], 'view')
         self.assertEqual(result, False)
         self.assertEqual(result.context, root)
-        self.assertEqual(result.ace, None)
+        self.assertEqual(result.ace, '<default deny>')
+        self.assertEqual(result.acl, root.__acl__)
 
         context = DummyContext()
         result = policy.permits(context, [Everyone], 'view')
         self.assertEqual(result, False)
+        self.assertEqual(result.ace, '<default deny>')
+        self.assertEqual(
+            result.acl,
+            '<No ACL found on any object in model lineage>')
 
     def test_principals_allowed_by_permission_direct(self):
         from repoze.bfg.security import Allow
