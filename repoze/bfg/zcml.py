@@ -524,7 +524,10 @@ def get_configurator(reg):
     # when some configuration methods (such as config.view) are
     # called.
     from repoze.bfg.configuration import Configurator
-    config = reg.get('bfg_configurator')
+    try:
+        config = reg.get('bfg_configurator')
+    except:
+        config = None
     if config is None:
         config = Configurator(reg)
     return config
