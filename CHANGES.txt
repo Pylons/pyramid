@@ -112,7 +112,7 @@ Backwards Incompatibilites
   currently pass a non-registry-aware request object, you have two
   choices:
 
-  - Use the ``repoze.bfg.threadlocal.get_current_request`` API in a
+  * Use the ``repoze.bfg.threadlocal.get_current_request`` API in a
     test bounded by the ``repoze.bfg.testing.setUp`` and
     ``repoze.bfg.testing.tearDown`` functions.  This API will return a
     ``repoze.bfg.testing.DummyRequest`` that has the current registry
@@ -120,9 +120,11 @@ Backwards Incompatibilites
     ``repoze.bfg.threadlocal_get_current_registry`` or
     ``zope.component.getSiteManager``) as its ``registry`` attribute.
 
-   - Use the ``repoze.bfg.threadlocal.get_current_registry`` API: call
-    this function and add an attribute to your unit test request
-    object named ``registry`` with the result.
+  * Use the ``repoze.bfg.threadlocal.get_current_registry`` API in a
+    test bounded by the ``repoze.bfg.testing.setUp`` and
+    ``repoze.bfg.testing.tearDown`` functions: call this function and
+    add an attribute to your unit test request object named
+    ``registry`` with the result.
 
 1.1 (2009-11-15)
 ================
