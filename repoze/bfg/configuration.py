@@ -67,7 +67,11 @@ class Configurator(object):
         if registry is None:
             registry = self.make_default_registry()
         self.reg = registry
-        self.reg['bfg_configurator'] = self # yes, a cycle; see get_configurator
+        try:
+            # yes, a cycle; see get_configurator
+            self.reg['bfg_configurator'] = self
+        except TypeError:
+            pass
 
     def make_default_registry(self):
         self.reg = Registry()
@@ -98,9 +102,9 @@ class Configurator(object):
             manager.pop()
         return app
 
-    def declarative(self, root_factory, package=None,
-                    filename='configure.zcml', settings=None,
-                    debug_logger=None, os=os, lock=threading.Lock()):
+    def declarative(self, root_factory, filename='configure.zcml',
+                    settings=None, debug_logger=None, os=os,
+                    lock=threading.Lock()):
 
         self.make_default_registry()
 
@@ -139,6 +143,8 @@ class Configurator(object):
         # site manager API directly in a different thread while we hold the
         # lock.  Those registrations will end up in our application's
         # registry.
+        if package is None:
+            package = sys.modules['__main__']
         lock.acquire()
         manager.push({'registry':self.reg, 'request':None})
         try:
