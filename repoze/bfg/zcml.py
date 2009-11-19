@@ -293,7 +293,6 @@ def route(_context, name, path, view=None, view_for=None,
                 view_path_info),
             )
 
-
 class ISystemViewDirective(Interface):
     view = GlobalObject(
         title=u"",
@@ -316,33 +315,29 @@ class ISystemViewDirective(Interface):
         description = u'',
         required=False)
 
-def notfound(_context, view=None, attr=None, renderer=None, wrapper=None):
-    view_utility(_context, view, attr, renderer, wrapper, INotFoundView)
+class SystemViewHandler(object):
+    def __init__(self, iface):
+        self.iface = iface
 
-def forbidden(_context, view=None, attr=None, renderer=None, wrapper=None):
-    view_utility(_context, view, attr, renderer, wrapper, IForbiddenView)
+    def __call__(self, _context, view=None, attr=None, renderer=None,
+                 wrapper=None):
+        if renderer and '.' in renderer:
+            renderer = resource_spec(
+                renderer, package_name(_context.resolve('.')))
 
-def view_utility(_context, view, attr, renderer, wrapper, iface):
-    if not view:
-        if renderer:
-            def view(context, request):
-                return {}
-        else:
-            raise ConfigurationError('"view" attribute was not specified and '
-                                     'no renderer specified')
+        def register(iface=self.iface):
+            reg = get_current_registry()
+            config = Configurator(reg)
+            config.system_view(iface, view=view, attr=attr, renderer=renderer,
+                               wrapper=wrapper, _info=_context.info)
 
-    if renderer and '.' in renderer:
-        renderer = resource_spec(renderer, package_name(_context.resolve('.')))
-
-    def register():
-        reg = get_current_registry()
-        config = Configurator(reg)
-        config.view_utility(view, attr, renderer, wrapper, iface, _context.info)
-
-    _context.action(
-        discriminator = iface,
-        callable = register,
-        )
+        _context.action(
+            discriminator = self.iface,
+            callable = register,
+            )
+        
+notfound = SystemViewHandler(INotFoundView)
+forbidden = SystemViewHandler(IForbiddenView)
 
 class IResourceDirective(Interface):
     """

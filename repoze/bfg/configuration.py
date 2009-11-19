@@ -554,27 +554,25 @@ class Configurator(object):
                                          name=pkg_name, info=_info)
             override.insert(path, override_pkg_name, override_prefix)
 
+    def forbidden(self, *arg, **kw):
+        return self.system_view(IForbiddenView, *arg, **kw)
 
-    def notfound(self, view=None, attr=None, renderer=None, wrapper=None,
-                 _info=u''):
-        self.view_utility(view, attr, renderer, wrapper, INotFoundView,
-                          _info=_info)
+    def notfound(self, *arg, **kw):
+        return self.system_view(INotFoundView, *arg, **kw)
 
-    def forbidden(self, view=None, attr=None, renderer=None, wrapper=None,
-                  _info=u''):
-        self.view_utility(view, attr, renderer, wrapper, IForbiddenView,
-                          _info=_info)
-
-    def view_utility(self, view, attr, renderer, wrapper, iface, _info=u''):
+    def system_view(self, iface, view=None, attr=None, renderer=None,
+                    wrapper=None, _info=u''):
         if not view:
             if renderer:
                 def view(context, request):
                     return {}
             else:
-                raise ConfigurationError('"view" attribute was not specified '
-                                         'and no renderer specified')
+                raise ConfigurationError('"view" attribute was not '
+                                         'specified and no renderer '
+                                         'specified')
 
-        derived_view = self.derive_view(view, attr=attr, renderer_name=renderer,
+        derived_view = self.derive_view(view, attr=attr,
+                                        renderer_name=renderer,
                                         wrapper_viewname=wrapper)
         self.reg.registerUtility(derived_view, iface, '', info=_info)
 
