@@ -1436,7 +1436,27 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(context, request)
         self.assertEqual(result, 'OK2')
 
-    def test_view_as_function_context_and_request(self):
+    def test_notfound(self):
+        from repoze.bfg.interfaces import INotFoundView
+        config = self._makeOne()
+        view = lambda *arg: 'OK'
+        config.notfound(view)
+        request = self._makeRequest(config)
+        view = config.reg.getUtility(INotFoundView)
+        result = view(None, request)
+        self.assertEqual(result, 'OK')
+
+    def test_forbidden(self):
+        from repoze.bfg.interfaces import IForbiddenView
+        config = self._makeOne()
+        view = lambda *arg: 'OK'
+        config.forbidden(view)
+        request = self._makeRequest(config)
+        view = config.reg.getUtility(IForbiddenView)
+        result = view(None, request)
+        self.assertEqual(result, 'OK')
+
+    def test_derive_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
         config = self._makeOne()
