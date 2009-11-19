@@ -537,10 +537,10 @@ class Configurator(object):
         package = sys.modules[package]
         override_package = sys.modules[override_package]
 
-        if _override is not None:
-            _override(package, path, override_package, override_prefix)
-        else:
-            self._override(package, path, override_package, override_prefix)
+        if _override is None:
+            _override = self._override
+        _override(package, path, override_package, override_prefix,
+                  _info=_info)
 
     def _override(self, package, path, override_package, override_prefix,
                   _info=u'', PackageOverrides=PackageOverrides):

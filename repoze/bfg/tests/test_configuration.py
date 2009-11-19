@@ -1731,6 +1731,37 @@ class ConfiguratorTests(unittest.TestCase):
             inner_view, viewname='inner', wrapper_viewname='owrap')
         result = self.assertRaises(ValueError, wrapped, None, request)
 
+    def test_resource_samename(self):
+        from zope.configuration.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.resource, 'a', 'a')
+
+    def test_resource_override_directory_with_file(self):
+        from zope.configuration.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.resource,
+                          'a:foo/', 'a:foo.pt')
+
+    def test_resource_override_file_with_directory(self):
+        from zope.configuration.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.resource,
+                          'a:foo.pt', 'a:foo/')
+
+    def test_resource_success(self):
+        config = self._makeOne()
+        override = DummyUnderOverride()
+        config.resource(
+            'repoze.bfg.tests.fixtureapp:templates/foo.pt',
+            'repoze.bfg.tests.fixtureapp.subpackage:templates/bar.pt',
+            _override=override)
+        from repoze.bfg.tests import fixtureapp
+        from repoze.bfg.tests.fixtureapp import subpackage
+        self.assertEqual(override.package, fixtureapp)
+        self.assertEqual(override.path, 'templates/foo.pt')
+        self.assertEqual(override.override_package, subpackage)
+        self.assertEqual(override.override_prefix, 'templates/bar.pt')
+
 class TestBFGViewGrokker(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -2256,6 +2287,14 @@ class DummyOverrides:
 
     def insert(self, path, package, prefix):
         self.inserted.append((path, package, prefix))
+
+class DummyUnderOverride:
+    def __call__(self, package, path, override_package, override_prefix,
+                 _info=u''):
+        self.package = package
+        self.path = path
+        self.override_package = override_package
+        self.override_prefix = override_prefix
 
 from zope.interface import Interface
 class IDummy(Interface):

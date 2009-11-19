@@ -353,31 +353,6 @@ class IResourceDirective(Interface):
         required=True)
 
 def resource(_context, to_override, override_with):
-    if to_override == override_with:
-        raise ConfigurationError('You cannot override a resource with itself')
-
-    package = to_override
-    path = ''
-    if ':' in to_override:
-        package, path = to_override.split(':', 1)
-
-    override_package = override_with
-    override_prefix = ''
-    if ':' in override_with:
-        override_package, override_prefix = override_with.split(':', 1)
-
-    if path and path.endswith('/'):
-        if override_prefix and (not override_prefix.endswith('/')):
-            raise ConfigurationError(
-                'A directory cannot be overridden with a file (put a slash '
-                'at the end of override_with if necessary)')
-
-    if override_prefix and override_prefix.endswith('/'):
-        if path and (not path.endswith('/')):
-            raise ConfigurationError(
-                'A file cannot be overridden with a directory (put a slash '
-                'at the end of to_override if necessary)')
-
     reg = get_current_registry()
     config = get_configurator(reg)
 

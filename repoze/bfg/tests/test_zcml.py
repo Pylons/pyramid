@@ -488,24 +488,7 @@ class TestResourceDirective(unittest.TestCase):
         from repoze.bfg.zcml import resource
         return resource(*arg, **kw)
 
-    def test_samename(self):
-        from zope.configuration.exceptions import ConfigurationError
-        context = DummyContext()
-        self.assertRaises(ConfigurationError, self._callFUT, context, 'a', 'a')
-
-    def test_override_directory_with_file(self):
-        from zope.configuration.exceptions import ConfigurationError
-        context = DummyContext()
-        self.assertRaises(ConfigurationError, self._callFUT, context,
-                          'a:foo/', 'a:foo.pt')
-
-    def test_override_file_with_directory(self):
-        from zope.configuration.exceptions import ConfigurationError
-        context = DummyContext()
-        self.assertRaises(ConfigurationError, self._callFUT, context,
-                          'a:foo.pt', 'a:foo/')
-
-    def test_no_colons(self):
+    def test_it(self):
         from zope.component import getSiteManager
         from repoze.bfg.configuration import Configurator
         context = DummyContext()
@@ -519,61 +502,6 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'], ('a', 'b', None))
 
-    def test_with_colons(self):
-        from zope.component import getSiteManager
-        from repoze.bfg.configuration import Configurator
-        context = DummyContext()
-        self._callFUT(context, 'a:foo.pt', 'b:foo.pt')
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        sm = getSiteManager()
-        self.assertEqual(action['callable'].im_func,
-                         Configurator.resource.im_func)
-        self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'], ('a:foo.pt', 'b:foo.pt', None))
-
-    def test_override_module_with_directory(self):
-        from zope.component import getSiteManager
-        from repoze.bfg.configuration import Configurator
-        context = DummyContext()
-        self._callFUT(context, 'a', 'b:foo/')
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        sm = getSiteManager()
-        self.assertEqual(action['callable'].im_func,
-                         Configurator.resource.im_func)
-        self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'], ('a', 'b:foo/', None))
-
-    def test_override_directory_with_module(self):
-        from zope.component import getSiteManager
-        from repoze.bfg.configuration import Configurator
-        context = DummyContext()
-        self._callFUT(context, 'a:foo/', 'b')
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        sm = getSiteManager()
-        self.assertEqual(action['callable'].im_func,
-                         Configurator.resource.im_func)
-        self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'], ('a:foo/', 'b', None))
-
-    def test_override_module_with_module(self):
-        from repoze.bfg.configuration import Configurator
-        from zope.component import getSiteManager
-        context = DummyContext()
-        self._callFUT(context, 'a', 'b')
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        action = actions[0]
-        sm = getSiteManager()
-        self.assertEqual(action['callable'].im_func,
-                         Configurator.resource.im_func)
-        self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'], ('a', 'b', None))
 
 class TestZCMLConfigure(unittest.TestCase):
     i = 0
