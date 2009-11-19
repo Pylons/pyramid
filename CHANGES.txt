@@ -21,6 +21,10 @@ Internals
 
 - The ``repoze.bfg.view.renderer_from_name`` callable has been removed.
 
+- The ``repoze.bfg.settings.get_options`` callable has been removed.
+  Its job has been subsumed by the ``repoze.bfg.settings.Settings``
+  class constructor.
+
 Backwards Incompatibilites
 --------------------------
 

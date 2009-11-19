@@ -42,10 +42,10 @@ from repoze.bfg.compat import all
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.log import make_stream_logger
+from repoze.bfg.registry import Registry
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import PackageOverrides
 from repoze.bfg.settings import Settings
-from repoze.bfg.settings import get_options
 from repoze.bfg.settings import get_settings
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
@@ -77,20 +77,29 @@ def zcml_configure(name, package):
 
 class Configurator(object):
     """ A wrapper around the registry that performs configuration tasks """
-    def __init__(self, registry, defaults=False):
+    def __init__(self, registry=None):
+        if registry is None:
+            registry = self.make_default_registry()
         self.reg = registry
-        defaults and self.defaults()
 
-    def defaults(self):
+    def make_default_registry(self):
+        self.reg = Registry()
         self.renderer(chameleon_zpt.renderer_factory, '.pt')
         self.renderer(chameleon_text.renderer_factory, '.txt')
         self.renderer(renderers.json_renderer_factory, 'json')
         self.renderer(renderers.string_renderer_factory, 'string')
+        settings = Settings({})
+        self.settings(settings)
+        self.root_factory(DefaultRootFactory)
+        self.debug_logger(None)
+        return self.reg
 
     def default_configuration(self, root_factory, package=None,
                               filename='configure.zcml', settings=None,
                               debug_logger=None, manager=manager, os=os,
                               lock=threading.Lock()):
+
+        self.make_default_registry()
 
         # registry, debug_logger, manager, os and lock *only* for unittests
         if settings is None:
@@ -99,7 +108,7 @@ class Configurator(object):
         if not 'configure_zcml' in settings:
             settings['configure_zcml'] = filename
 
-        settings = Settings(get_options(settings))
+        settings = Settings(settings)
         filename = settings['configure_zcml']
 
         # not os.path.isabs below for windows systems
@@ -111,7 +120,6 @@ class Configurator(object):
         self.settings(settings)
         self.debug_logger(debug_logger)
         self.root_factory(root_factory or DefaultRootFactory)
-        self.defaults()
 
         # We push our ZCML-defined configuration into an app-local
         # component registry in order to allow more than one bfg app to live
