@@ -64,6 +64,8 @@ Internals
 - The ``repoze.bfg.view.MultiView`` class has been moved to
   ``repoze.bfg.configuration.MultiView``.
 
+- The ``repoze.bfg.zcml.Uncacheable`` class has been removed.
+
 Backwards Incompatibilites
 --------------------------
 

@@ -502,10 +502,6 @@ def scan(_context, package, martian=martian):
         config.scan(package, _info=_context.info, martian=martian)
     _context.action(discriminator=None, callable=register)
 
-class Uncacheable(object):
-    """ Include in discriminators of actions which are not cacheable;
-    this class only exists for backwards compatibility (<0.8.1)"""
-
 def zcml_configure(name, package):
     """ Given a ZCML filename as ``name`` and a Python package as
     ``package`` which the filename should be relative to, load the
