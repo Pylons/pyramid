@@ -190,7 +190,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     ``settings`` keyword parameter.
     """
     if Configurator is None:
-        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.configuration import Configurator # pragma: no cover
     settings = settings or options
     config = Configurator()
     config.declarative(root_factory, package=package,

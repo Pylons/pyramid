@@ -4,6 +4,8 @@ import sys
 import threading
 import inspect
 
+from webob import Response
+
 import zope.component
 from zope.component.event import dispatch
 
@@ -12,10 +14,12 @@ from zope.configuration import xmlconfig
 
 from zope.component import getGlobalSiteManager
 from zope.component import getSiteManager
+from zope.component import queryUtility
 
 from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface.interfaces import IInterface
+from zope.interface import implements
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -27,6 +31,7 @@ from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRoutesMapper
@@ -54,11 +59,7 @@ from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.urldispatch import RoutesMapper
-from repoze.bfg.view import MultiView
-from repoze.bfg.view import decorate_view
-from repoze.bfg.view import rendered_response
 from repoze.bfg.view import render_view_to_response
-from repoze.bfg.view import requestonly
 from repoze.bfg.view import static as static_view
 
 import martian
@@ -508,8 +509,7 @@ class Configurator(object):
             iface = ITemplateRendererFactory
         self.reg.registerUtility(factory, iface, name=name, info=_info)
 
-    def resource(self, to_override, override_with, _override=None,
-                 _info=u''):
+    def resource(self, to_override, override_with, _info=u'', _override=None,):
         if to_override == override_with:
             raise ConfigurationError('You cannot override a resource with '
                                      'itself')
@@ -715,4 +715,137 @@ class BFGViewGrokker(martian.InstanceGrokker):
             info = kw.get('_info', u'')
             config.view(view=obj, _info=info, **settings)
         return bool(config)
+
+class MultiView(object):
+    implements(IMultiView)
+
+    def __init__(self, name):
+        self.name = name
+        self.views = []
+
+    def add(self, view, score):
+        self.views.append((score, view))
+        self.views.sort()
+
+    def match(self, context, request):
+        for score, view in self.views:
+            if not hasattr(view, '__predicated__'):
+                return view
+            if view.__predicated__(context, request):
+                return view
+        raise NotFound(self.name)
+
+    def __permitted__(self, context, request):
+        view = self.match(context, request)
+        if hasattr(view, '__permitted__'):
+            return view.__permitted__(context, request)
+        return True
+
+    def __call_permissive__(self, context, request):
+        view = self.match(context, request)
+        view = getattr(view, '__call_permissive__', view)
+        return view(context, request)
+
+    def __call__(self, context, request):
+        for score, view in self.views:
+            try:
+                return view(context, request)
+            except NotFound:
+                continue
+        raise NotFound(self.name)
+
+def decorate_view(wrapped_view, original_view):
+    if wrapped_view is original_view:
+        return False
+    wrapped_view.__module__ = original_view.__module__
+    wrapped_view.__doc__ = original_view.__doc__
+    try:
+        wrapped_view.__name__ = original_view.__name__
+    except AttributeError:
+        wrapped_view.__name__ = repr(original_view)
+    try:
+        wrapped_view.__permitted__ = original_view.__permitted__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__call_permissive__ = original_view.__call_permissive__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__predicated__ = original_view.__predicated__
+    except AttributeError:
+        pass
+    return True
+
+def rendered_response(renderer, response, view, context,request,
+                      renderer_name):
+    if ( hasattr(response, 'app_iter') and hasattr(response, 'headerlist')
+         and hasattr(response, 'status') ):
+        return response
+    result = renderer(response, {'view':view, 'renderer_name':renderer_name,
+                                 'context':context, 'request':request})
+    response_factory = queryUtility(IResponseFactory, default=Response)
+    response = response_factory(result)
+    if request is not None: # in tests, it may be None
+        attrs = request.__dict__
+        content_type = attrs.get('response_content_type', None)
+        if content_type is not None:
+            response.content_type = content_type
+        headerlist = attrs.get('response_headerlist', None)
+        if headerlist is not None:
+            for k, v in headerlist:
+                response.headers.add(k, v)
+        status = attrs.get('response_status', None)
+        if status is not None:
+            response.status = status
+        charset = attrs.get('response_charset', None)
+        if charset is not None:
+            response.charset = charset
+        cache_for = attrs.get('response_cache_for', None)
+        if cache_for is not None:
+            response.cache_expires = cache_for
+    return response
+
+def requestonly(class_or_callable, attr=None):
+    """ Return true of the class or callable accepts only a request argument,
+    as opposed to something that accepts context, request """
+    if attr is None:
+        attr = '__call__'
+    if inspect.isfunction(class_or_callable):
+        fn = class_or_callable
+    elif inspect.isclass(class_or_callable):
+        try:
+            fn = class_or_callable.__init__
+        except AttributeError:
+            return False
+    else:
+        try:
+            fn = getattr(class_or_callable, attr)
+        except AttributeError:
+            return False
+
+    try:
+        argspec = inspect.getargspec(fn)
+    except TypeError:
+        return False
+
+    args = argspec[0]
+    defaults = argspec[3]
+
+    if hasattr(fn, 'im_func'):
+        # it's an instance method
+        if not args:
+            return False
+        args = args[1:]
+    if not args:
+        return False
+
+    if len(args) == 1:
+        return True
+
+    elif args[0] == 'request':
+        if len(args) - len(defaults) == 1:
+            return True
+
+    return False
 

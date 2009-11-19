@@ -612,13 +612,6 @@ class DummyLogger:
     warn = info
     debug = info
 
-class DummyRegistryManager:
-    def push(self, registry):
-        self.pushed = True
-
-    def pop(self):
-        self.popped = True
-
 class DummyConfigurator(object):
     def make_wsgi_app(self):
         return self

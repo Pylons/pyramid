@@ -25,6 +25,18 @@ Internals
   Its job has been subsumed by the ``repoze.bfg.settings.Settings``
   class constructor.
 
+- The ``repoze.bfg.view.requestonly`` function has been moved to
+  ``repoze.bfg.configuration.requestonly``.
+
+- The ``repoze.bfg.view.rendered_response`` function has been moved to
+  ``repoze.bfg.configuration.rendered_response``.
+
+- The ``repoze.bfg.view.decorate_view`` function has been moved to
+  ``repoze.bfg.configuration.decorate_view``.
+
+- The ``repoze.bfg.view.MultiView`` class has been moved to
+  ``repoze.bfg.configuration.MultiView``.
+
 Backwards Incompatibilites
 --------------------------
 
