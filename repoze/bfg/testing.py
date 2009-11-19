@@ -538,7 +538,9 @@ def setUp():
     from repoze.bfg.registry import Registry
     registry = Registry('testing')
     manager.clear()
-    manager.push({'registry':registry, 'request':None})
+    request = DummyRequest()
+    request.registry = registry
+    manager.push({'registry':registry, 'request':request})
     getSiteManager.sethook(get_current_registry)
     _clearContext()
 

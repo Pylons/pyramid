@@ -24,7 +24,6 @@ from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
-from repoze.bfg.configuration import Configurator
 from repoze.bfg.path import package_name
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import resource_spec
@@ -168,7 +167,7 @@ def view(
         renderer = resource_spec(renderer, zcml_package)
 
     def register():
-        config = Configurator(reg)
+        config = get_configurator(reg)
         config.view(
             permission=permission, for_=for_, view=view, name=name,
             request_type=request_type, route_name=route_name,
@@ -248,7 +247,7 @@ def route(_context, name, path, view=None, view_for=None,
         view_renderer = resource_spec(view_renderer, zcml_package)
 
     def register():
-        config = Configurator(reg)
+        config = get_configurator(reg)
         config.route(
             name,
             path,
@@ -327,7 +326,7 @@ class SystemViewHandler(object):
 
         def register(iface=self.iface):
             reg = get_current_registry()
-            config = Configurator(reg)
+            config = get_configurator(reg)
             config.system_view(iface, view=view, attr=attr, renderer=renderer,
                                wrapper=wrapper, _info=_context.info)
 
@@ -380,7 +379,7 @@ def resource(_context, to_override, override_with):
                 'at the end of to_override if necessary)')
 
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = get_configurator(reg)
 
     _context.action(
         discriminator = None,
@@ -400,7 +399,7 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = get_configurator(reg)
     config.authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
@@ -416,7 +415,7 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = get_configurator(reg)
     config.authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
@@ -454,7 +453,7 @@ def authtktauthenticationpolicy(_context,
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = get_configurator(reg)
     config.authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
@@ -466,7 +465,7 @@ def aclauthorizationpolicy(_context):
     # authorization policies must be registered eagerly so they can be
     # found by the view registration machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = get_configurator(reg)
     config.authorization_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthorizationPolicy)
 
@@ -483,7 +482,7 @@ def renderer(_context, factory, name=''):
     # renderer factories must be registered eagerly so they can be
     # found by the view machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = get_configurator(reg)
     config.renderer(factory, name, _info=_context.info)
     _context.action(discriminator=(IRendererFactory, name))
 
@@ -524,7 +523,7 @@ def scan(_context, package, martian=martian):
     # martian overrideable only for unit tests
     def register():
         reg = get_current_registry()
-        config = Configurator(reg)
+        config = get_configurator(reg)
         config.scan(package, _info=_context.info, martian=martian)
     _context.action(discriminator=None, callable=register)
 
@@ -548,3 +547,13 @@ def zcml_configure(name, package):
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
 
+def get_configurator(reg):
+    # dont create a new configurator instance unless necessary, as
+    # frames will point to each configurator instance via closures
+    # when some configuration methods (such as config.view) are
+    # called.
+    from repoze.bfg.configuration import Configurator
+    config = reg.get('bfg_configurator')
+    if config is None:
+        config = Configurator(reg)
+    return config

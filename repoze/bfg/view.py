@@ -18,9 +18,7 @@ from webob.exc import HTTPFound
 
 from paste.urlparser import StaticURLParser
 
-from zope.component import getSiteManager
 from zope.component import providedBy
-from zope.component import queryUtility
 from zope.deprecation import deprecated
 from zope.interface.advice import getFrameInfo
 
@@ -62,8 +60,8 @@ def render_view_to_response(context, request, name='', secure=True):
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     provides = map(providedBy, (context, request))
-    sm = getSiteManager()
-    view = sm.adapters.lookup(provides, IView, name=name)
+    reg = request.registry
+    view = reg.adapters.lookup(provides, IView, name=name)
     if view is None:
         return None
 
@@ -454,7 +452,12 @@ def default_view(context, request, status):
     """ % (status, status, msg)
     headers = [('Content-Length', str(len(html))),
                ('Content-Type', 'text/html')]
-    response_factory = queryUtility(IResponseFactory, default=Response)
+    response_factory = Response
+    registry = getattr(request, 'registry', None)
+    if registry is not None:
+        # be kind to old tests
+        response_factory = registry.queryUtility(IResponseFactory,
+                                                 default=Response)
     return response_factory(status = status,
                             headerlist = headers,
                             app_iter = [html])
@@ -490,22 +493,12 @@ def append_slash_notfound_view(context, request):
 
     """
     path = request.environ.get('PATH_INFO', '/')
-    mapper = queryUtility(IRoutesMapper)
+    registry = request.registry
+    mapper = registry.queryUtility(IRoutesMapper)
     if mapper is not None and not path.endswith('/'):
         slashpath = path + '/'
         for route in mapper.get_routes():
             if route.match(slashpath) is not None:
                 return HTTPFound(location=slashpath)
     return default_view(context, request, '404 Not Found')
-
-def derive_view(original_view, permission=None, predicates=(), attr=None,
-                renderer_name=None, wrapper_viewname=None, viewname=None):
-    reg = getSiteManager()
-    from repoze.bfg.configuration import Configurator
-    config = Configurator(reg)
-    return config.derive_view(original_view, permission=permission,
-                              predicates=predicates, attr=attr,
-                              renderer_name=renderer_name,
-                              wrapper_viewname=wrapper_viewname,
-                              viewname=viewname)
 

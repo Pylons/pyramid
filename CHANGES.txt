@@ -31,7 +31,13 @@ Internals
 
 - The ``repoze.bfg.view.authdebug_view`` callable has been removed.
 
-- The ``repoze.bfg.view.renderer_from_name`` callable has been removed.
+- The ``repoze.bfg.view.renderer_from_name`` callable has been
+  removed.  Use ``repoze.bfg.configuration.Configurator.renderer_from_name``
+  instead (still not an API, however).
+
+- The ``repoze.bfg.view.derive_view`` callable has been removed.  Use
+  ``repoze.bfg.configuration.Configurator.derive_view`` instead (still
+  not an API, however).
 
 - The ``repoze.bfg.settings.get_options`` callable has been removed.
   Its job has been subsumed by the ``repoze.bfg.settings.Settings``
@@ -76,6 +82,27 @@ Backwards Incompatibilites
   ``request_type`` or ``view_request_type`` attributes.  These
   attributes didn't actually work in any useful way (see entry above
   this one).
+
+- Each of the ``repoze.bfg.view.render_view``,
+  ``repoze.bfg.view.render_view_to_iterable``,
+  ``repoze.bfg.view.render_view_to_response``,
+  ``repoze.bfg.view.append_slash_notfound_view``,
+  ``repoze.bfg.view.default_notfound_view``,
+  ``repoze.bfg.view.default_forbidden_view``, and the
+  ``repoze.bfg.configuration.rendered_response`` functions now expects
+  to be called with a request object that has a ``registry`` attribute
+  which represents the current ZCA registry.  This should only be a
+  problem when passing a custom request object to code which ends up
+  calling these functions in a unit test.  To retrofit tests that end
+  up calling these functions which expect to be able to use a
+  non-registry-aware request object, use the
+  ``repoze.bfg.threadlocal.get_current_request`` API in the test to
+  create the request; this will return a
+  ``repoze.bfg.testing.DummyRequest`` that has the current registry as
+  its ``registry`` attribute.  Alternatively, use the
+  ``repoze.bfg.threadlocal.get_current_registry`` API: call this
+  function and add an attribute to your unit test request object named
+  ``registry`` with the result.
 
 1.1 (2009-11-15)
 ================

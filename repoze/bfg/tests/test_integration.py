@@ -96,10 +96,9 @@ class TestGrokkedApp(unittest.TestCase):
         cleanUp()
 
     def test_it(self):
+        from repoze.bfg.threadlocal import get_current_request
         from repoze.bfg.view import render_view_to_response
-        from zope.interface import directlyProvides
         from repoze.bfg.zcml import zcml_configure
-        from repoze.bfg.interfaces import IRequest
         import repoze.bfg.tests.grokkedapp as package
         
         actions = zcml_configure('configure.zcml', package)
@@ -109,7 +108,7 @@ class TestGrokkedApp(unittest.TestCase):
 
         ctx = DummyContext()
         req = DummyRequest()
-        directlyProvides(req, IRequest)
+        req = get_current_request()
 
         req.method = 'GET'
         result = render_view_to_response(ctx, req, '')

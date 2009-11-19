@@ -1,16 +1,24 @@
-from repoze.bfg.testing import cleanUp
+from repoze.bfg.testing import setUp
+from repoze.bfg.testing import tearDown
+
 import unittest
 
 class TestTestingFunctions(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        setUp()
         from zope.deprecation import __show__
         __show__.off()
 
     def tearDown(self):
-        cleanUp()
+        tearDown()
         from zope.deprecation import __show__
         __show__.on()
+
+    def _makeRequest(self, **extra_environ):
+        from repoze.bfg.threadlocal import get_current_request
+        request = get_current_request()
+        request.environ.update(extra_environ)
+        return request
 
     def test_registerDummySecurityPolicy(self):
         from repoze.bfg import testing
@@ -123,7 +131,8 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        response = render_view_to_response(None, None, 'moo.html')
+        request = self._makeRequest()
+        response = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(view(None, None).body, response.body)
         
     def test_registerView_withresult(self):
@@ -132,7 +141,8 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        response = render_view_to_response(None, None, 'moo.html')
+        request = self._makeRequest()
+        response = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(response.body, 'yo')
 
     def test_registerView_custom(self):
@@ -144,7 +154,8 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        response = render_view_to_response(None, None, 'moo.html')
+        request = self._makeRequest()
+        response = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(response.body, '123')
 
     def test_registerView_with_permission_denying(self):
@@ -157,8 +168,9 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
+        request = self._makeRequest()
         self.assertRaises(Forbidden, render_view_to_response,
-                          None, None, 'moo.html')
+                          None, request, 'moo.html')
 
     def test_registerView_with_permission_denying2(self):
         from repoze.bfg import testing
@@ -182,7 +194,8 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        result = render_view_to_response(None, None, 'moo.html')
+        request = self._makeRequest()
+        result = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(result.app_iter, ['123'])
 
     def test_registerViewPermission_defaults(self):

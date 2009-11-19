@@ -13,7 +13,6 @@ from zope.configuration import xmlconfig
 
 from zope.component import getGlobalSiteManager
 from zope.component import getSiteManager
-from zope.component import queryUtility
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -51,7 +50,6 @@ from repoze.bfg.registry import Registry
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import PackageOverrides
 from repoze.bfg.settings import Settings
-from repoze.bfg.settings import get_settings
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.threadlocal import manager
@@ -59,7 +57,7 @@ from repoze.bfg.traversal import find_interface
 from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.view import render_view_to_response
-from repoze.bfg.view import static as static_view
+from repoze.bfg.view import static
 
 import martian
 
@@ -69,6 +67,7 @@ class Configurator(object):
         if registry is None:
             registry = self.make_default_registry()
         self.reg = registry
+        self.reg['bfg_configurator'] = self # yes, a cycle; see get_configurator
 
     def make_default_registry(self):
         self.reg = Registry()
@@ -397,7 +396,7 @@ class Configurator(object):
         wrapped_view = view
         authn_policy = self.reg.queryUtility(IAuthenticationPolicy)
         authz_policy = self.reg.queryUtility(IAuthorizationPolicy)
-        settings = get_settings()
+        settings = self.reg.queryUtility(ISettings)
         debug_authorization = False
         if settings is not None:
             debug_authorization = settings.get('debug_authorization', False)
@@ -577,7 +576,7 @@ class Configurator(object):
         self.reg.registerUtility(derived_view, iface, '', info=_info)
 
     def static(self, name, path, cache_max_age=3600, _info=u''):
-        view = static_view(path, cache_max_age=cache_max_age)
+        view = static(path, cache_max_age=cache_max_age)
         self.route(name, "%s*subpath" % name, view=view,
                    view_for=StaticRootFactory, factory=StaticRootFactory(path),
                    _info=_info)
@@ -772,14 +771,19 @@ def decorate_view(wrapped_view, original_view):
         pass
     return True
 
-def rendered_response(renderer, response, view, context,request,
+def rendered_response(renderer, response, view, context, request,
                       renderer_name):
     if ( hasattr(response, 'app_iter') and hasattr(response, 'headerlist')
          and hasattr(response, 'status') ):
         return response
     result = renderer(response, {'view':view, 'renderer_name':renderer_name,
                                  'context':context, 'request':request})
-    response_factory = queryUtility(IResponseFactory, default=Response)
+    response_factory = Response
+    reg = getattr(request, 'registry', None)
+    if reg is not None:
+        # be kind to old unit tests
+        response_factory = reg.queryUtility(IResponseFactory,
+                                            default=Response)
     response = response_factory(result)
     if request is not None: # in tests, it may be None
         attrs = request.__dict__
