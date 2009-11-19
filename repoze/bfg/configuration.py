@@ -7,7 +7,6 @@ import inspect
 from webob import Response
 
 import zope.component
-from zope.component.event import dispatch
 
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration import xmlconfig
@@ -84,6 +83,7 @@ class Configurator(object):
         return self.reg
 
     def make_wsgi_app(self, manager=manager, getSiteManager=getSiteManager):
+        # manager and getSiteManager in arglist for testing dep injection only
         from repoze.bfg.router import Router # avoid circdep
         app = Router(self.reg)
         # executing sethook means we're taking over getSiteManager for

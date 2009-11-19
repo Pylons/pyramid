@@ -438,47 +438,7 @@ class TestStaticDirective(unittest.TestCase):
         from repoze.bfg.zcml import static
         return static(*arg, **kw)
 
-    def test_absolute(self):
-        from paste.urlparser import StaticURLParser
-        from zope.interface import implementedBy
-        from zope.component import getSiteManager
-        from repoze.bfg.static import StaticRootFactory
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IRouteRequest
-        from repoze.bfg.interfaces import IRoutesMapper
-        import os
-        here = os.path.dirname(__file__)
-        static_path = os.path.join(here, 'fixtures', 'static')
-        context = DummyContext()
-        self._callFUT(context, 'name', static_path)
-        actions = context.actions
-        self.assertEqual(len(actions), 2)
-
-        sm = getSiteManager()
-
-        route_action = actions[0]
-        route_action['callable']()
-        discriminator = route_action['discriminator']
-        self.assertEqual(discriminator,
-                         ('route', 'name', False, None, None, None, None, None))
-        mapper = sm.getUtility(IRoutesMapper)
-        routes = mapper.get_routes()
-        self.assertEqual(len(routes), 1)
-        self.assertEqual(routes[0].path, 'name*subpath')
-        self.assertEqual(routes[0].name, 'name')
-
-
-        view_action = actions[1]
-        discriminator = view_action['discriminator']
-        self.assertEqual(discriminator[:3], ('view', StaticRootFactory, ''))
-        self.assertEqual(discriminator[4], IView)
-        iface = implementedBy(StaticRootFactory)
-        request_type = sm.getUtility(IRouteRequest, 'name')
-        wrapped = sm.adapters.lookup((iface, request_type), IView, name='')
-        request = DummyRequest()
-        self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
-
-    def test_package_relative(self):
+    def test_it(self):
         from repoze.bfg.static import PackageURLParser
         from zope.component import getSiteManager
         from zope.interface import implementedBy
@@ -487,7 +447,7 @@ class TestStaticDirective(unittest.TestCase):
         from repoze.bfg.interfaces import IRouteRequest
         from repoze.bfg.interfaces import IRoutesMapper
         context = DummyContext()
-        self._callFUT(context, 'name', 'repoze.bfg.tests:fixtures/static')
+        self._callFUT(context, 'name', 'fixtures/static')
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
@@ -514,41 +474,6 @@ class TestStaticDirective(unittest.TestCase):
         request = DummyRequest()
         self.assertEqual(view(None, request).__class__, PackageURLParser)
 
-    def test_here_relative(self):
-        from repoze.bfg.static import PackageURLParser
-        from zope.component import getSiteManager
-        from zope.interface import implementedBy
-        from repoze.bfg.static import StaticRootFactory
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IRouteRequest
-        from repoze.bfg.interfaces import IRoutesMapper
-        import repoze.bfg.tests
-        context = DummyContext(repoze.bfg.tests)
-        self._callFUT(context, 'name', 'fixtures/static')
-        actions = context.actions
-        self.assertEqual(len(actions), 2)
-
-        sm = getSiteManager()
-        route_action = actions[0]
-        route_action['callable']()
-        discriminator = route_action['discriminator']
-        self.assertEqual(discriminator,
-                         ('route', 'name', False, None, None, None, None, None))
-        mapper = sm.getUtility(IRoutesMapper)
-        routes = mapper.get_routes()
-        self.assertEqual(len(routes), 1)
-        self.assertEqual(routes[0].path, 'name*subpath')
-        self.assertEqual(routes[0].name, 'name')
-
-        view_action = actions[1]
-        discriminator = view_action['discriminator']
-        self.assertEqual(discriminator[:3], ('view', StaticRootFactory, ''))
-        self.assertEqual(discriminator[4], IView)
-        iface = implementedBy(StaticRootFactory)
-        request_type = sm.getUtility(IRouteRequest, 'name')
-        wrapped = sm.adapters.lookup((iface, request_type), IView, name='')
-        request = DummyRequest()
-        self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):

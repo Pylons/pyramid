@@ -59,7 +59,7 @@ class ConfiguratorTests(unittest.TestCase):
         notifications.  This method is useful when testing code that wants
         to call ``zope.component.event.dispatch`` or
         ``zope.component.event.objectEventNotify``."""
-        if event_iface is None:
+        if event_iface is None: # pragma: no cover
             from zope.interface import Interface
             event_iface = Interface
         L = []
@@ -67,6 +67,12 @@ class ConfiguratorTests(unittest.TestCase):
             L.extend(event)
         config.reg.registerHandler(subscriber, (event_iface,))
         return L
+
+    def test_ctor_no_registry(self):
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.configuration import Configurator
+        config = Configurator()
+        self.failUnless(config.reg.getUtility(ISettings))
 
     def test_make_default_registry(self):
         config = self._makeOne()
@@ -1310,6 +1316,56 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
         self.assertEqual(overrides.package, package)
 
+    def test_static_here_relative(self):
+        from repoze.bfg.static import PackageURLParser
+        from zope.interface import implementedBy
+        from repoze.bfg.static import StaticRootFactory
+        from repoze.bfg.interfaces import IView
+        config = self._makeOne()
+        config.static('static', 'fixtures/static')
+        request_type = self._getRouteRequestIface(config, 'static')
+        route = self._assertRoute(config, 'static', 'static*subpath')
+        self.assertEqual(route.factory.__class__, StaticRootFactory)
+        iface = implementedBy(StaticRootFactory)
+        wrapped = config.reg.adapters.lookup(
+            (iface, request_type), IView, name='')
+        request = DummyRequest()
+        self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
+
+    def test_static_package_relative(self):
+        from repoze.bfg.static import PackageURLParser
+        from zope.interface import implementedBy
+        from repoze.bfg.static import StaticRootFactory
+        from repoze.bfg.interfaces import IView
+        config = self._makeOne()
+        config.static('static', 'repoze.bfg.tests:fixtures/static')
+        request_type = self._getRouteRequestIface(config, 'static')
+        route = self._assertRoute(config, 'static', 'static*subpath')
+        self.assertEqual(route.factory.__class__, StaticRootFactory)
+        iface = implementedBy(StaticRootFactory)
+        wrapped = config.reg.adapters.lookup(
+            (iface, request_type), IView, name='')
+        request = DummyRequest()
+        self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
+
+    def test_static_absolute(self):
+        from paste.urlparser import StaticURLParser
+        import os
+        from zope.interface import implementedBy
+        from repoze.bfg.static import StaticRootFactory
+        from repoze.bfg.interfaces import IView
+        config = self._makeOne()
+        here = os.path.dirname(__file__)
+        static_path = os.path.join(here, 'fixtures', 'static')
+        config.static('static', static_path)
+        request_type = self._getRouteRequestIface(config, 'static')
+        route = self._assertRoute(config, 'static', 'static*subpath')
+        self.assertEqual(route.factory.__class__, StaticRootFactory)
+        iface = implementedBy(StaticRootFactory)
+        wrapped = config.reg.adapters.lookup(
+            (iface, request_type), IView, name='')
+        request = DummyRequest()
+        self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
 
 class TestBFGViewGrokker(unittest.TestCase):
     def setUp(self):
@@ -1803,7 +1859,13 @@ class TestRequestOnly(unittest.TestCase):
         self.assertFalse(self._callFUT(foo))
 
 class DummyRequest:
-    pass
+    subpath = ()
+    def __init__(self):
+        self.environ = {'PATH_INFO':'/static'}
+    def copy(self):
+        return self
+    def get_response(self, app):
+        return app
 
 class DummyRootFactory:
     def __init__(self, root):
