@@ -1,6 +1,15 @@
 Next release
 ============
 
+Features
+--------
+
+- The ``repoze.bfg.testing.setUp`` function now causes a request
+  object to be created.  The request object is avaiable via
+  ``repoze.bfg.threadlocal.get_current_request``.  Previously this
+  function did not create a request object; it instead assigned
+  ``None`` to the threadlocal request value.
+
 Bug Fixes
 ----------
 
@@ -91,18 +100,29 @@ Backwards Incompatibilites
   ``repoze.bfg.view.default_forbidden_view``, and the
   ``repoze.bfg.configuration.rendered_response`` functions now expects
   to be called with a request object that has a ``registry`` attribute
-  which represents the current ZCA registry.  This should only be a
-  problem when passing a custom request object to code which ends up
-  calling these functions in a unit test.  To retrofit tests that end
-  up calling these functions which expect to be able to use a
-  non-registry-aware request object, use the
-  ``repoze.bfg.threadlocal.get_current_request`` API in the test to
-  create the request; this will return a
-  ``repoze.bfg.testing.DummyRequest`` that has the current registry as
-  its ``registry`` attribute.  Alternatively, use the
-  ``repoze.bfg.threadlocal.get_current_registry`` API: call this
-  function and add an attribute to your unit test request object named
-  ``registry`` with the result.
+  which represents the current ZCA registry.  Previously these
+  functions used the ZCA threadlocal API to get the current registry.
+
+  This should only cause a problem when passing a custom request
+  object to code which ends up calling these functions in a unit test.
+  Such tests will fail with an AttributeError that might say something
+  like "DummyRequest object has no attribute ``registry``".
+
+  To repair unit tests which end up calling these functions but
+  currently pass a non-registry-aware request object, you have two
+  choices:
+
+  - Use the ``repoze.bfg.threadlocal.get_current_request`` API in a
+    test bounded by the ``repoze.bfg.testing.setUp`` and
+    ``repoze.bfg.testing.tearDown`` functions.  This API will return a
+    ``repoze.bfg.testing.DummyRequest`` that has the current registry
+    (the return value of
+    ``repoze.bfg.threadlocal_get_current_registry`` or
+    ``zope.component.getSiteManager``) as its ``registry`` attribute.
+
+   - Use the ``repoze.bfg.threadlocal.get_current_registry`` API: call
+    this function and add an attribute to your unit test request
+    object named ``registry`` with the result.
 
 1.1 (2009-11-15)
 ================
