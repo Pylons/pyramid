@@ -632,3 +632,12 @@ class TraversalContextURL(object):
 def _join_path_tuple(tuple):
     return tuple and '/'.join([quote_path_segment(x) for x in tuple]) or '/'
 
+class DefaultRootFactory:
+    __parent__ = None
+    __name__ = None
+    def __init__(self, request):
+        matchdict = getattr(request, 'matchdict', {})
+        # provide backwards compatibility for applications which
+        # used routes (at least apps without any custom "context
+        # factory") in BFG 0.9.X and before
+        self.__dict__.update(matchdict)

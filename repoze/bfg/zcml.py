@@ -1,5 +1,7 @@
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
+from zope.configuration.config import ConfigurationMachine
+from zope.configuration import xmlconfig
 
 from zope.interface import Interface
 
@@ -22,7 +24,6 @@ from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
-from repoze.bfg.configuration import zcml_configure
 from repoze.bfg.configuration import Configurator
 from repoze.bfg.path import package_name
 from repoze.bfg.request import route_request_iface
@@ -535,6 +536,20 @@ def scan(_context, package, martian=martian):
 class Uncacheable(object):
     """ Include in discriminators of actions which are not cacheable;
     this class only exists for backwards compatibility (<0.8.1)"""
+
+def zcml_configure(name, package):
+    """ Given a ZCML filename as ``name`` and a Python package as
+    ``package`` which the filename should be relative to, load the
+    ZCML into the current ZCML registry.
+
+    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+    """
+    context = ConfigurationMachine()
+    xmlconfig.registerCommonDirectives(context)
+    context.package = package
+    xmlconfig.include(context, name, package)
+    context.execute_actions(clear=False) # the raison d'etre
+    return context.actions
 
 file_configure = zcml_configure # backwards compat (>0.8.1)
 

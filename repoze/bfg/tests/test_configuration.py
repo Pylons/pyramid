@@ -38,7 +38,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def _callDefaultConfiguration(self, *arg, **kw):
         inst = self._makeOne()
-        inst.default_configuration(*arg, **kw)
+        inst.declarative(*arg, **kw)
         return inst.reg
 
     def _getRouteRequestIface(self, config, name):
@@ -292,7 +292,7 @@ class ConfiguratorTests(unittest.TestCase):
         request.params = {'param':'1'}
         self.assertEqual(wrapper(ctx, request), 'view8')
 
-    def test_view_with_relative_template_renderer(self):
+    def test_view_with_template_renderer(self):
         class view(object):
             def __init__(self, context, request):
                 self.request = request
@@ -302,24 +302,24 @@ class ConfiguratorTests(unittest.TestCase):
                 return {'a':'1'}
         config = self._makeOne()
         renderer = self._registerRenderer(config)
-        fixture = 'fixtures/minimal.txt'
+        fixture = 'repoze.bfg.tests:fixtures/minimal.txt'
         config.view(view=view, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = DummyRequest()
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
-        self.assertEqual(renderer.path, 'fixtures/minimal.txt')
+        self.assertEqual(renderer.path, 'repoze.bfg.tests:fixtures/minimal.txt')
 
-    def test_view_with_relative_template_renderer_no_callable(self):
+    def test_view_with_template_renderer_no_callable(self):
         config = self._makeOne()
         renderer = self._registerRenderer(config)
-        fixture = 'fixtures/minimal.txt'
+        fixture = 'repoze.bfg.tests:fixtures/minimal.txt'
         config.view(view=None, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = DummyRequest()
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
-        self.assertEqual(renderer.path, 'fixtures/minimal.txt')
+        self.assertEqual(renderer.path, 'repoze.bfg.tests:fixtures/minimal.txt')
 
     def test_view_with_request_type_as_iface(self):
         def view(context, request):
@@ -1162,43 +1162,36 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_default_config_fixtureapp_explicit_filename(self):
-        manager = DummyRegistryManager()
         from repoze.bfg.tests import fixtureapp
         rootfactory = DummyRootFactory(None)
         registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, filename='another.zcml',
-            manager=manager)
+            rootfactory, fixtureapp, filename='another.zcml')
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_default_config_fixtureapp_explicit_filename_in_settings(self):
         import os
-        manager = DummyRegistryManager()
         rootfactory = DummyRootFactory(None)
         from repoze.bfg.tests import fixtureapp
         zcmlfile = os.path.join(os.path.dirname(fixtureapp.__file__),
                                 'another.zcml')
         registry = self._callDefaultConfiguration(
             rootfactory, fixtureapp, filename='configure.zcml',
-            settings={'configure_zcml':zcmlfile},
-            manager=manager)
+            settings={'configure_zcml':zcmlfile})
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_default_config_fixtureapp_explicit_specification_in_settings(self):
-        manager = DummyRegistryManager()
         rootfactory = DummyRootFactory(None)
         from repoze.bfg.tests import fixtureapp
         zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
         registry = self._callDefaultConfiguration(
             rootfactory, fixtureapp, filename='configure.zcml',
-            settings={'configure_zcml':zcmlfile},
-            manager=manager)
+            settings={'configure_zcml':zcmlfile})
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_default_config_fixtureapp_filename_hascolon_isabs(self):
-        manager = DummyRegistryManager()
         rootfactory = DummyRootFactory(None)
         from repoze.bfg.tests import fixtureapp
         zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
@@ -1212,32 +1205,28 @@ class ConfiguratorTests(unittest.TestCase):
                           fixtureapp,
                           filename='configure.zcml',
                           settings={'configure_zcml':zcmlfile},
-                          manager=manager,
                           os=os)
         
     def test_default_config_custom_settings(self):
-        manager = DummyRegistryManager()
         settings = {'mysetting':True}
         from repoze.bfg.tests import fixtureapp
         rootfactory = DummyRootFactory(None)
         registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, settings=settings,
-            manager=manager)
+            rootfactory, fixtureapp, settings=settings)
         from repoze.bfg.interfaces import ISettings
         settings = registry.getUtility(ISettings)
         self.assertEqual(settings.reload_templates, False)
         self.assertEqual(settings.debug_authorization, False)
         self.assertEqual(settings.mysetting, True)
 
-    def test_default_config_registrations(self):
+    def test_declarative_registrations(self):
         manager = DummyRegistryManager()
         settings = {'reload_templates':True,
                     'debug_authorization':True}
         from repoze.bfg.tests import fixtureapp
         rootfactory = DummyRootFactory(None)
         registry = self._callDefaultConfiguration(
-            rootfactory, fixtureapp, settings=settings,
-            manager=manager)
+            rootfactory, fixtureapp, settings=settings)
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ILogger
         from repoze.bfg.interfaces import IRootFactory
@@ -1248,7 +1237,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(settings.reload_templates, True)
         self.assertEqual(settings.debug_authorization, True)
         self.assertEqual(rootfactory, rootfactory)
-        self.failUnless(manager.pushed and manager.popped)
 
     def test_default_config_routes_in_config(self):
         from repoze.bfg.interfaces import ISettings
@@ -1324,31 +1312,6 @@ class TestBFGViewGrokker(unittest.TestCase):
         context = DummyContext()
         result = grokker.grok('name', obj)
         self.assertEqual(result, False)
-
-class TestDefaultRootFactory(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.configuration import DefaultRootFactory
-        return DefaultRootFactory
-
-    def _makeOne(self, environ):
-        return self._getTargetClass()(environ)
-
-    def test_no_matchdict(self):
-        environ = {}
-        root = self._makeOne(environ)
-        self.assertEqual(root.__parent__, None)
-        self.assertEqual(root.__name__, None)
-
-    def test_matchdict(self):
-        class DummyRequest:
-            pass
-        request = DummyRequest()
-        request.matchdict = {'a':1, 'b':2}
-        root = self._makeOne(request)
-        self.assertEqual(root.a, 1)
-        self.assertEqual(root.b, 2)
-
-    
 
 class DummyRequest:
     pass

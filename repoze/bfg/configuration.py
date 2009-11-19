@@ -5,10 +5,10 @@ import threading
 import inspect
 
 import zope.component
+from zope.component.event import dispatch
 
-from zope.configuration import xmlconfig
 from zope.configuration.exceptions import ConfigurationError
-from zope.configuration.config import ConfigurationMachine
+from zope.configuration import xmlconfig
 
 from zope.component import getGlobalSiteManager
 from zope.component import getSiteManager
@@ -39,6 +39,7 @@ from repoze.bfg import chameleon_zpt
 from repoze.bfg import chameleon_text
 from repoze.bfg import renderers
 from repoze.bfg.compat import all
+from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.log import make_stream_logger
@@ -51,6 +52,7 @@ from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import find_interface
+from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.view import MultiView
 from repoze.bfg.view import decorate_view
@@ -61,26 +63,13 @@ from repoze.bfg.view import static as static_view
 
 import martian
 
-def zcml_configure(name, package):
-    """ Given a ZCML filename as ``name`` and a Python package as
-    ``package`` which the filename should be relative to, load the
-    ZCML into the current ZCML registry.
-
-    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-    """
-    context = ConfigurationMachine()
-    xmlconfig.registerCommonDirectives(context)
-    context.package = package
-    xmlconfig.include(context, name, package)
-    context.execute_actions(clear=False)
-    return context.actions
-
 class Configurator(object):
     """ A wrapper around the registry that performs configuration tasks """
     def __init__(self, registry=None):
         if registry is None:
-            registry = self.make_default_registry()
-        self.reg = registry
+            self.make_default_registry()
+        else:
+            self.reg = registry
 
     def make_default_registry(self):
         self.reg = Registry()
@@ -94,14 +83,31 @@ class Configurator(object):
         self.debug_logger(None)
         return self.reg
 
-    def default_configuration(self, root_factory, package=None,
-                              filename='configure.zcml', settings=None,
-                              debug_logger=None, manager=manager, os=os,
-                              lock=threading.Lock()):
+    def make_wsgi_app(self, manager=manager, getSiteManager=getSiteManager):
+        from repoze.bfg.router import Router # avoid circdep
+        app = Router(self.reg)
+        # executing sethook means we're taking over getSiteManager for
+        # the lifetime of this process
+        getSiteManager.sethook(get_current_registry)
+        # We push the registry on to the stack here in case any ZCA API is
+        # used in listeners subscribed to the WSGIApplicationCreatedEvent
+        # we send.
+        manager.push({'registry':self.reg, 'request':None})
+        try:
+            # use dispatch here instead of registry.notify to make unit
+            # tests possible
+            dispatch(WSGIApplicationCreatedEvent(app))
+        finally:
+            manager.pop()
+        return app
+
+    def declarative(self, root_factory, package=None,
+                    filename='configure.zcml', settings=None,
+                    debug_logger=None, os=os, lock=threading.Lock()):
 
         self.make_default_registry()
 
-        # registry, debug_logger, manager, os and lock *only* for unittests
+        # debug_logger, os and lock *only* for unittests
         if settings is None:
             settings = {}
 
@@ -120,7 +126,9 @@ class Configurator(object):
         self.settings(settings)
         self.debug_logger(debug_logger)
         self.root_factory(root_factory or DefaultRootFactory)
+        self.load_zcml(filename, package, lock=lock)
 
+    def load_zcml(self, filename, package=None, lock=threading.Lock()):
         # We push our ZCML-defined configuration into an app-local
         # component registry in order to allow more than one bfg app to live
         # in the same process space without one unnecessarily stomping on
@@ -134,13 +142,12 @@ class Configurator(object):
         # site manager API directly in a different thread while we hold the
         # lock.  Those registrations will end up in our application's
         # registry.
-
         lock.acquire()
         manager.push({'registry':self.reg, 'request':None})
         try:
             getSiteManager.sethook(get_current_registry)
             zope.component.getGlobalSiteManager = get_current_registry
-            zcml_configure(filename, package)
+            xmlconfig.file(filename, package, execute=True)
         finally:
             zope.component.getGlobalSiteManager = getGlobalSiteManager
             lock.release()
@@ -567,8 +574,8 @@ class Configurator(object):
                 def view(context, request):
                     return {}
             else:
-                raise ConfigurationError('"view" attribute was not specified and '
-                                         'no renderer specified')
+                raise ConfigurationError('"view" attribute was not specified '
+                                         'and no renderer specified')
 
         derived_view = self.derive_view(view, attr=attr, renderer_name=renderer,
                                         wrapper_viewname=wrapper)
@@ -708,14 +715,4 @@ class BFGViewGrokker(martian.InstanceGrokker):
             info = kw.get('_info', u'')
             config.view(view=obj, _info=info, **settings)
         return bool(config)
-
-class DefaultRootFactory:
-    __parent__ = None
-    __name__ = None
-    def __init__(self, request):
-        matchdict = getattr(request, 'matchdict', {})
-        # provide backwards compatibility for applications which
-        # used routes (at least apps without any custom "context
-        # factory") in BFG 0.9.X and before
-        self.__dict__.update(matchdict)
 

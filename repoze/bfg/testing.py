@@ -1,6 +1,7 @@
 import copy
 
 from zope.configuration.xmlconfig import _clearContext
+
 from zope.component import getSiteManager
 from zope.deprecation import deprecated
 from zope.interface import implements
@@ -8,10 +9,9 @@ from zope.interface import Interface
 
 from repoze.bfg.interfaces import IRequest
 
-from repoze.bfg.configuration import zcml_configure # API import alias
-from repoze.bfg.registry import Registry
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.threadlocal import get_current_registry
+from repoze.bfg.zcml import zcml_configure # API
 
 _marker = object()
 
@@ -535,6 +535,7 @@ def setUp():
 
     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
     """
+    from repoze.bfg.registry import Registry
     registry = Registry('testing')
     manager.clear()
     manager.push({'registry':registry, 'request':None})

@@ -970,6 +970,30 @@ class TraverseTests(unittest.TestCase):
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['context'], model)
 
+class TestDefaultRootFactory(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.traversal import DefaultRootFactory
+        return DefaultRootFactory
+
+    def _makeOne(self, environ):
+        return self._getTargetClass()(environ)
+
+    def test_no_matchdict(self):
+        environ = {}
+        root = self._makeOne(environ)
+        self.assertEqual(root.__parent__, None)
+        self.assertEqual(root.__name__, None)
+
+    def test_matchdict(self):
+        class DummyRequest:
+            pass
+        request = DummyRequest()
+        request.matchdict = {'a':1, 'b':2}
+        root = self._makeOne(request)
+        self.assertEqual(root.a, 1)
+        self.assertEqual(root.b, 2)
+
+
 def make_traverser(result):
     class DummyTraverser(object):
         def __init__(self, context):

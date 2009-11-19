@@ -1,10 +1,6 @@
-from zope.component.event import dispatch
-
 from zope.interface import implements
 from zope.interface import providedBy
 from zope.interface import alsoProvides
-
-from zope.component import getSiteManager
 
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import ILogger
@@ -17,23 +13,17 @@ from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 
-from repoze.bfg.configuration import DefaultRootFactory
-from repoze.bfg.configuration import Configurator
 from repoze.bfg.events import AfterTraversal
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
-from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
-from repoze.bfg.registry import Registry
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
-from repoze.bfg.threadlocal import get_current_registry
+from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import default_notfound_view
-
-_marker = object()
 
 class Router(object):
     """ The main repoze.bfg WSGI application. """
@@ -43,9 +33,6 @@ class Router(object):
     threadlocal_manager = manager
 
     def __init__(self, registry):
-        # executing sethook means we're taking over getSiteManager for
-        # the lifetime of this process
-        getSiteManager.sethook(get_current_registry)
         q = registry.queryUtility
         self.logger = q(ILogger, 'repoze.bfg.debug')
         self.notfound_view = q(INotFoundView, default=default_notfound_view)
@@ -162,10 +149,10 @@ class Router(object):
         finally:
             manager.pop()
 
-# note that ``options`` is a b/w compat alias for ``settings``
+# note that ``options`` is a b/w compat alias for ``settings`` and
+# ``Configurator`` is a testing dep inj
 def make_app(root_factory, package=None, filename='configure.zcml',
-             settings=None, options=None, Configurator=Configurator,
-             Router=Router, Registry=Registry, manager=manager):
+             settings=None, options=None, Configurator=None):
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
 
@@ -202,20 +189,12 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     parameter ``options`` is a backwards compatibility alias for the
     ``settings`` keyword parameter.
     """
+    if Configurator is None:
+        from repoze.bfg.configuration import Configurator
     settings = settings or options
-    registry = Registry('make_app')
-    config = Configurator(registry)
-    config.default_configuration(root_factory, package=package,
-                                 filename=filename, settings=settings)
-    app = Router(registry)
-    # We push the registry on to the stack here in case any ZCA API is
-    # used in listeners subscribed to the WSGIApplicationCreatedEvent
-    # we send.
-    manager.push({'registry':registry, 'request':None})
-    try:
-        # use dispatch here instead of registry.notify to make unit
-        # tests possible
-        dispatch(WSGIApplicationCreatedEvent(app))
-    finally:
-        manager.pop()
+    config = Configurator()
+    config.declarative(root_factory, package=package,
+                       filename=filename, settings=settings)
+    app = config.make_wsgi_app()
     return app
+

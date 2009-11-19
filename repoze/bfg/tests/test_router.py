@@ -528,46 +528,26 @@ class TestMakeApp(unittest.TestCase):
         return make_app(*arg, **kw)
 
     def test_it(self):
-        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
-        from repoze.bfg.tests import fixtureapp
-        from zope.component import getSiteManager
-        sm = getSiteManager()
-        def subscriber(event):
-            event.app.created = True        
-        manager = DummyRegistryManager()
-        sm.registerHandler(subscriber, (IWSGIApplicationCreatedEvent,))
-        rootfactory = DummyRootFactory(None)
         settings = {'a':1}
-        app = self._callFUT(rootfactory, fixtureapp, settings=settings,
-                            Configurator=DummyConfigurator, manager=manager)
-        self.failUnless(app.created)
-        self.failUnless(manager.pushed)
-        self.failUnless(manager.popped)
-        self.assertEqual(app.registry.root_factory, rootfactory)
-        self.assertEqual(app.registry.settings, settings)
-        self.assertEqual(app.registry.package, fixtureapp)
-        self.assertEqual(app.registry.filename, 'configure.zcml')
+        package = object()
+        rootfactory = object()
+        app = self._callFUT(rootfactory, package, settings=settings,
+                            Configurator=DummyConfigurator)
+        self.assertEqual(app.root_factory, rootfactory)
+        self.assertEqual(app.settings, settings)
+        self.assertEqual(app.package, package)
+        self.assertEqual(app.filename, 'configure.zcml')
 
     def test_it_options_means_settings(self):
-        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
-        from repoze.bfg.tests import fixtureapp
-        from zope.component import getSiteManager
-        sm = getSiteManager()
-        def subscriber(event):
-            event.app.created = True        
-        manager = DummyRegistryManager()
-        sm.registerHandler(subscriber, (IWSGIApplicationCreatedEvent,))
-        rootfactory = DummyRootFactory(None)
         settings = {'a':1}
-        app = self._callFUT(rootfactory, fixtureapp, options=settings,
-                            Configurator=DummyConfigurator, manager=manager)
-        self.failUnless(app.created)
-        self.failUnless(manager.pushed)
-        self.failUnless(manager.popped)
-        self.assertEqual(app.registry.root_factory, rootfactory)
-        self.assertEqual(app.registry.settings, settings)
-        self.assertEqual(app.registry.package, fixtureapp)
-        self.assertEqual(app.registry.filename, 'configure.zcml')
+        package = object()
+        rootfactory = object()
+        app = self._callFUT(rootfactory, package, options=settings,
+                            Configurator=DummyConfigurator)
+        self.assertEqual(app.root_factory, rootfactory)
+        self.assertEqual(app.settings, settings)
+        self.assertEqual(app.package, package)
+        self.assertEqual(app.filename, 'configure.zcml')
 
 class DummyContext:
     pass
@@ -640,13 +620,13 @@ class DummyRegistryManager:
         self.popped = True
 
 class DummyConfigurator(object):
-    def __init__(self, registry):
-        self.registry = registry
-        
-    def default_configuration(self, root_factory=None, package=None,
-                              filename=None, settings=None):
-        self.registry.root_factory = root_factory
-        self.registry.package = package
-        self.registry.filename = filename
-        self.registry.settings = settings
+    def make_wsgi_app(self):
+        return self
+    
+    def declarative(self, root_factory=None, package=None,
+                    filename=None, settings=None):
+        self.root_factory = root_factory
+        self.package = package
+        self.filename = filename
+        self.settings = settings
                 
