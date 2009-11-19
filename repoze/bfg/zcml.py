@@ -1,5 +1,3 @@
-from zope.component import queryUtility
-
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalObject
 
@@ -17,9 +15,8 @@ from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRendererFactory
-from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IRouteRequest
 
 from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
@@ -155,14 +152,6 @@ def view(
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
-    if not view:
-        if renderer:
-            def view(context, request):
-                return {}
-        else:
-            raise ConfigurationError('"view" attribute was not specified and '
-                                     'no renderer specified')
-
     reg = get_current_registry()
 
     if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
@@ -170,21 +159,12 @@ def view(
         request_method = request_type
         request_type = None
 
-    if request_type is None:
-        if route_name is None:
-            request_type = IRequest
-        else:
-            request_type = reg.queryUtility(IRouteRequest, name=route_name)
-            if request_type is None:
-                request_type = route_request_iface(route_name)
-                reg.registerUtility(request_type, IRouteRequest,
-                                    name=route_name)
-
-    if isinstance(request_type, basestring):
+    if request_type is not None:
         request_type = _context.resolve(request_type)
 
     if renderer and '.' in renderer:
-        renderer = resource_spec(renderer, package_name(_context.resolve('.')))
+        zcml_package = package_name(_context.resolve('.'))
+        renderer = resource_spec(renderer, zcml_package)
 
     def register():
         config = Configurator(reg)
@@ -221,10 +201,6 @@ class IRouteDirective(Interface):
     # alias for view_permission
     permission = TextLine(title=u'permission', required=False)
 
-    view_request_type = TextLine(title=u'view_request_type', required=False)
-    # alias for view_request_type
-    request_type = TextLine(title=u'request_type', required=False)
-
     view_renderer = TextLine(title=u'view_renderer', required=False)
     # alias for view_renderer
     renderer = TextLine(title=u'renderer', required=False)
@@ -247,12 +223,11 @@ class IRouteDirective(Interface):
     path_info = TextLine(title=u'path_info', required=False)
 
 def route(_context, name, path, view=None, view_for=None,
-          permission=None, factory=None, request_type=None, for_=None,
+          permission=None, factory=None, for_=None,
           header=None, xhr=False, accept=None, path_info=None,
           request_method=None, request_param=None, 
-          view_permission=None, view_request_type=None, 
-          view_request_method=None, view_request_param=None,
-          view_containment=None, view_attr=None,
+          view_permission=None, view_request_method=None,
+          view_request_param=None, view_containment=None, view_attr=None,
           renderer=None, view_renderer=None, view_header=None, 
           view_accept=None, view_xhr=False,
           view_path_info=None):
@@ -264,53 +239,59 @@ def route(_context, name, path, view=None, view_for=None,
     # in the routelist will be tried
     reg = get_current_registry()
 
-    if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
-        # b/w compat for 1.0
-        view_request_method = request_type
-        request_type = None
-
-    request_iface = queryUtility(IRouteRequest, name=name)
-    if request_iface is None:
-        request_iface = route_request_iface(name)
-        reg.registerUtility(request_iface, IRouteRequest, name=name)
-
-    if view:
-        view_for = view_for or for_
-        view_request_type = view_request_type or request_type
-        view_permission = view_permission or permission
-        view_renderer = view_renderer or renderer
-        _view(
-            _context,
-            permission=view_permission,
-            for_=view_for,
-            view=view,
-            name='',
-            request_type=view_request_type,
-            route_name=name, 
-            request_method=view_request_method,
-            request_param=view_request_param,
-            containment=view_containment,
-            attr=view_attr,
-            renderer=view_renderer,
-            header=view_header,
-            accept=view_accept,
-            xhr=view_xhr,
-            path_info=view_path_info,
-            )
+    view_for = view_for or for_
+    view_permission = view_permission or permission
+    view_renderer = view_renderer or renderer
+    if view_renderer and '.' in view_renderer:
+        zcml_package = package_name(_context.resolve('.'))
+        view_renderer = resource_spec(view_renderer, zcml_package)
 
     def register():
         config = Configurator(reg)
         config.route(
-            name, path, factory=factory, header=header,
-            xhr=xhr, accept=accept, path_info=path_info,
-            request_method=request_method, request_param=request_param,
-            _info=_context.info)
+            name,
+            path,
+            factory=factory,
+            header=header,
+            xhr=xhr,
+            accept=accept,
+            path_info=path_info,
+            request_method=request_method,
+            request_param=request_param,
+            view=view,
+            view_for=view_for,
+            view_permission=view_permission,
+            view_request_method=view_request_method,
+            view_request_param=view_request_param,
+            view_containment=view_containment,
+            view_attr=view_attr,
+            view_renderer=view_renderer,
+            view_header=view_header,
+            view_accept=view_accept,
+            view_xhr=view_xhr,
+            view_path_info=view_path_info,
+            _info=_context.info
+            )
         
     _context.action(
         discriminator = ('route', name, xhr, request_method, path_info,
                          request_param, header, accept),
         callable = register,
         )
+
+    if view:
+        request_iface = reg.queryUtility(IRouteRequest, name=name)
+        if request_iface is None:
+            request_iface = route_request_iface(name)
+            reg.registerUtility(request_iface, IRouteRequest, name=name)
+        _context.action(
+            discriminator = (
+                'view', view_for, '', request_iface, IView,
+                view_containment, view_request_param, view_request_method,
+                name, view_attr, view_xhr, view_accept, view_header,
+                view_path_info),
+            )
+
 
 class ISystemViewDirective(Interface):
     view = GlobalObject(

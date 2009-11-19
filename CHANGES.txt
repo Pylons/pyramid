@@ -21,9 +21,30 @@ Internals
 Backwards Incompatibilites
 --------------------------
 
-The ``repoze.bfg.router.make_app`` callable no longer accepts the
-``authentication_policy`` nor the ``authorization_policy`` arguments.
-This feature was deprecated in version 1.0 and has been removed.
+- View registration no longer registers a
+  ``repoze.bfg.interfaces.IViewPermission`` adapter (it is no longer
+  checked by the framework; since 1.1, views have been responsible for
+  providing their own security).
+
+- The ``repoze.bfg.router.make_app`` callable no longer accepts the
+  ``authentication_policy`` nor the ``authorization_policy``
+  arguments.  This feature was deprecated in version 1.0 and has been
+  removed.
+
+- Obscure: the machinery which configured views with a
+  ``request_type`` *and* a ``route_name`` would ignore the request
+  interface implied by ``route_name`` registering a view only for the
+  interface implied by ``request_type``.  In the unlikely event that
+  you were trying to use these two features together, the symptom
+  would have been that views that named a ``request_type`` but which
+  were also associated with routes were not found when the route
+  matched.  Now if a view is configured with both a ``request_type``
+  and a ``route_name``, an error is raised.
+
+- The ``route`` ZCML directive now no longer accepts the
+  ``request_type`` or ``view_request_type`` attributes.  These
+  attributes didn't actually work in any useful way (see entry above
+  this one).
 
 1.1 (2009-11-15)
 ================

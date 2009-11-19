@@ -1,6 +1,7 @@
 from zope.deprecation import deprecated
 from zope.interface import implements
 from zope.interface.interface import InterfaceClass
+from zope.interface.interface import Interface
 
 from webob import Request as WebobRequest
 

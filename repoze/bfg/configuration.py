@@ -34,7 +34,6 @@ from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import ITemplateRendererFactory
 from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import IViewPermission
 
 from repoze.bfg import chameleon_zpt
 from repoze.bfg import chameleon_text
@@ -140,7 +139,7 @@ class Configurator(object):
             manager.pop()
             getSiteManager.reset()
 
-    def view(self, permission=None, for_=None, view=None, name="",
+    def view(self, view=None, name="", for_=None, permission=None, 
              request_type=None, route_name=None, request_method=None,
              request_param=None, containment=None, attr=None,
              renderer=None, wrapper=None, xhr=False, accept=None,
@@ -154,21 +153,22 @@ class Configurator(object):
                 raise ConfigurationError('"view" was not specified and '
                                          'no "renderer" specified')
 
-        if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
-            # b/w compat for 1.0
-            request_method = request_type
-            request_type = None
+        if request_type and route_name:
+            raise ConfigurationError(
+                'A view cannot be configured with both the request_type and '
+                'route_name parameters: these two features when used together '
+                'causes an internal conflict.')
 
         if request_type is None:
-            if route_name is None:
-                request_type = IRequest
-            else:
-                request_type = self.reg.queryUtility(IRouteRequest,
-                                                     name=route_name)
-                if request_type is None:
-                    request_type = route_request_iface(route_name)
-                    self.reg.registerUtility(request_type, IRouteRequest,
-                                             name=route_name)
+            request_type = IRequest
+
+        if route_name is not None:
+            request_type = self.reg.queryUtility(IRouteRequest,
+                                                 name=route_name)
+            if request_type is None:
+                request_type = route_request_iface(route_name)
+                self.reg.registerUtility(request_type, IRouteRequest,
+                                         name=route_name)
 
         score, predicates = _make_predicates(
             xhr=xhr, request_method=request_method, path_info=path_info,
@@ -186,20 +186,14 @@ class Configurator(object):
         if not IInterface.providedBy(r_request_type):
             r_request_type = implementedBy(r_request_type)
         old_view = self.reg.adapters.lookup((r_for_, r_request_type),
-                                            IView,name=name)
+                                            IView, name=name)
         if old_view is None:
             if hasattr(derived_view, '__call_permissive__'):
-                self.reg.registerAdapter(derived_view, (for_, request_type),
-                                         ISecuredView, name, info=_info)
-                if hasattr(derived_view, '__permitted__'):
-                    # bw compat
-                    self.reg.registerAdapter(
-                        derived_view.__permitted__,
-                        (for_, request_type), IViewPermission,
-                        name, info=_info)
+                view_iface = ISecuredView
             else:
-                self.reg.registerAdapter(derived_view, (for_, request_type),
-                                         IView, name, info=_info)
+                view_iface = IView
+            self.reg.registerAdapter(derived_view, (for_, request_type),
+                                     view_iface, name, info=_info)
         else:
             # XXX we could try to be more efficient here and register
             # a non-secured view for a multiview if none of the
@@ -218,12 +212,27 @@ class Configurator(object):
                                              name=name)
             self.reg.registerAdapter(multiview, (for_, request_type),
                                      IMultiView, name, info=_info)
-            # b/w compat
-            self.reg.registerAdapter(multiview.__permitted__,
-                                     (for_, request_type), IViewPermission,
-                                     name, info=_info)
 
-    def map_view(self, view, attr=None, renderer_name=None):
+    def renderer_from_name(self, path):
+        name = os.path.splitext(path)[1]
+        if not name:
+            name = path
+        factory = self.reg.queryUtility(IRendererFactory, name=name)
+        if factory is None:
+            raise ValueError('No renderer for renderer name %r' % name)
+        return factory(path)
+
+    def derive_view(self, original_view, permission=None, predicates=(),
+                    attr=None, renderer_name=None, wrapper_viewname=None,
+                    viewname=None):
+        mapped_view = self._map_view(original_view, attr, renderer_name)
+        owrapped_view = self._owrap_view(mapped_view, viewname,wrapper_viewname)
+        secured_view = self._secure_view(owrapped_view, permission)
+        debug_view = self._authdebug_view(secured_view, permission)
+        derived_view = self._predicate_wrap(debug_view, predicates)
+        return derived_view
+
+    def _map_view(self, view, attr=None, renderer_name=None):
         wrapped_view = view
 
         renderer = None
@@ -317,26 +326,7 @@ class Configurator(object):
         decorate_view(wrapped_view, view)
         return wrapped_view
 
-    def renderer_from_name(self, path):
-        name = os.path.splitext(path)[1]
-        if not name:
-            name = path
-        factory = self.reg.queryUtility(IRendererFactory, name=name)
-        if factory is None:
-            raise ValueError('No renderer for renderer name %r' % name)
-        return factory(path)
-
-    def derive_view(self, original_view, permission=None, predicates=(),
-                    attr=None, renderer_name=None, wrapper_viewname=None,
-                    viewname=None):
-        mapped_view = self.map_view(original_view, attr, renderer_name)
-        owrapped_view = self.owrap_view(mapped_view, viewname, wrapper_viewname)
-        secured_view = self.secure_view(owrapped_view, permission)
-        debug_view = self.authdebug_view(secured_view, permission)
-        derived_view = self.predicate_wrap(debug_view, predicates)
-        return derived_view
-
-    def owrap_view(self, view, viewname, wrapper_viewname):
+    def _owrap_view(self, view, viewname, wrapper_viewname):
         if not wrapper_viewname:
             return view
         def _owrapped_view(context, request):
@@ -354,7 +344,7 @@ class Configurator(object):
         decorate_view(_owrapped_view, view)
         return _owrapped_view
 
-    def predicate_wrap(self, view, predicates):
+    def _predicate_wrap(self, view, predicates):
         if not predicates:
             return view
         def _wrapped(context, request):
@@ -368,7 +358,7 @@ class Configurator(object):
         decorate_view(_wrapped, view)
         return _wrapped
 
-    def secure_view(self, view, permission):
+    def _secure_view(self, view, permission):
         wrapped_view = view
         authn_policy = self.reg.queryUtility(IAuthenticationPolicy)
         authz_policy = self.reg.queryUtility(IAuthorizationPolicy)
@@ -390,7 +380,7 @@ class Configurator(object):
 
         return wrapped_view
 
-    def authdebug_view(self, view, permission):
+    def _authdebug_view(self, view, permission):
         wrapped_view = view
         authn_policy = self.reg.queryUtility(IAuthenticationPolicy)
         authz_policy = self.reg.queryUtility(IAuthorizationPolicy)
@@ -428,11 +418,11 @@ class Configurator(object):
         return wrapped_view
 
     def route(self, name, path, view=None, view_for=None,
-              permission=None, factory=None, request_type=None, for_=None,
+              permission=None, factory=None, for_=None,
               header=None, xhr=False, accept=None, path_info=None,
               request_method=None, request_param=None, 
-              view_permission=None, view_request_type=None, 
-              view_request_method=None, view_request_param=None,
+              view_permission=None, view_request_method=None,
+              view_request_param=None,
               view_containment=None, view_attr=None,
               renderer=None, view_renderer=None, view_header=None, 
               view_accept=None, view_xhr=False,
@@ -448,11 +438,6 @@ class Configurator(object):
                                          header=header,
                                          accept=accept)
 
-        if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
-            # b/w compat for 1.0
-            view_request_method = request_type
-            request_type = None
-
         request_iface = self.reg.queryUtility(IRouteRequest, name=name)
         if request_iface is None:
             request_iface = route_request_iface(name)
@@ -460,7 +445,6 @@ class Configurator(object):
 
         if view:
             view_for = view_for or for_
-            view_request_type = view_request_type or request_type
             view_permission = view_permission or permission
             view_renderer = view_renderer or renderer
             self.view(
@@ -468,7 +452,6 @@ class Configurator(object):
                 for_=view_for,
                 view=view,
                 name='',
-                request_type=view_request_type,
                 route_name=name, 
                 request_method=view_request_method,
                 request_param=view_request_param,
@@ -479,7 +462,7 @@ class Configurator(object):
                 accept=view_accept,
                 xhr=view_xhr,
                 path_info=view_path_info,
-                info=_info,
+                _info=_info,
                 )
 
         mapper = self.reg.queryUtility(IRoutesMapper)

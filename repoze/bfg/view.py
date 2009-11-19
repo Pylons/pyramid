@@ -626,21 +626,22 @@ def rendered_response(renderer, response, view, context,request,
                                  'context':context, 'request':request})
     response_factory = queryUtility(IResponseFactory, default=Response)
     response = response_factory(result)
-    attrs = request.__dict__
-    content_type = attrs.get('response_content_type', None)
-    if content_type is not None:
-        response.content_type = content_type
-    headerlist = attrs.get('response_headerlist', None)
-    if headerlist is not None:
-        for k, v in headerlist:
-            response.headers.add(k, v)
-    status = attrs.get('response_status', None)
-    if status is not None:
-        response.status = status
-    charset = attrs.get('response_charset', None)
-    if charset is not None:
-        response.charset = charset
-    cache_for = attrs.get('response_cache_for', None)
-    if cache_for is not None:
-        response.cache_expires = cache_for
+    if request is not None: # in tests, it may be None
+        attrs = request.__dict__
+        content_type = attrs.get('response_content_type', None)
+        if content_type is not None:
+            response.content_type = content_type
+        headerlist = attrs.get('response_headerlist', None)
+        if headerlist is not None:
+            for k, v in headerlist:
+                response.headers.add(k, v)
+        status = attrs.get('response_status', None)
+        if status is not None:
+            response.status = status
+        charset = attrs.get('response_charset', None)
+        if charset is not None:
+            response.charset = charset
+        cache_for = attrs.get('response_cache_for', None)
+        if cache_for is not None:
+            response.cache_expires = cache_for
     return response

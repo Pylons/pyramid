@@ -155,6 +155,7 @@ class Test_route_request_iface(unittest.TestCase):
         iface = self._callFUT('routename')
         self.failUnless(iface.extends(IRouteRequest))
         self.failUnless(iface.extends(IRequest))
+        self.assertEqual(iface.__name__, 'routename_IRequest')
 
 class Test_add_global_response_headers(unittest.TestCase):
     def _callFUT(self, request, headerlist):
