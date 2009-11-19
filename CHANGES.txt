@@ -5,7 +5,7 @@ Bug Fixes
 ----------
 
 - The ACL authorization policy debugging output when
-  ``debug_authorization`` consule debugging output was turned on
+  ``debug_authorization`` console debugging output was turned on
   wasn't as clear as it could have been when a view execution was
   denied due to an authorization failure resulting from the set of
   principals passed never having matched any ACE in any ACL in the
