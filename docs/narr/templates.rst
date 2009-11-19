@@ -24,7 +24,7 @@ it is significantly faster.
 .. note:: The language definition documentation for Chameleon
    ZPT-style templates is available from `the Chameleon website
    <http://chameleon.repoze.org>`_.  See its `documentation
-   <http://chameleon.repoze.org/docs/zpt/>`_ for the Chameleon ZPT
+   <http://chameleon.repoze.org/docs/latest/>`_ for the Chameleon ZPT
    language specification.
 
 Given that there is a :term:`chameleon.zpt` template named ``foo.pt``
@@ -266,7 +266,7 @@ application's configuration section, e.g.::
 -----------------------------------------------
 
 See `the internationalization chapter
-<http://chameleon.repoze.org/docs/zpt/narr/i18n.html>`_ of the
+<http://chameleon.repoze.org/docs/latest/i18n.html>`_ of the
 Chameleon documentation for information about supporting
 internationalized units of text within Chameleon templates.
 
