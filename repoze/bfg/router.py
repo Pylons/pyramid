@@ -18,6 +18,7 @@ from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
+from repoze.bfg.resource import resolve_resource_spec
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import DefaultRootFactory
@@ -193,8 +194,13 @@ def make_app(root_factory, package=None, filename='configure.zcml',
         from repoze.bfg.configuration import Configurator # pragma: no cover
     settings = settings or options
     config = Configurator()
-    config.declarative(root_factory, package=package,
-                       filename=filename, settings=settings)
+    package_name = package and package.__name__ or None
+    package_name, filename = resolve_resource_spec(filename, package_name)
+    if package_name is not None:
+        spec = '%s:%s' % (package_name, filename)
+    else:
+        spec = filename
+    config.declarative(root_factory, spec, settings=settings)
     app = config.make_wsgi_app()
     return app
 

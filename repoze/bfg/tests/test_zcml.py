@@ -499,7 +499,7 @@ class TestStaticDirective(unittest.TestCase):
         discriminator = route_action['discriminator']
         self.assertEqual(discriminator,
                          ('route', 'name', False, None, None, None, None, None))
-        route_action['callable']()
+        route_action['callable'](*route_action['args'])
         mapper = sm.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         self.assertEqual(len(routes), 1)
@@ -648,6 +648,9 @@ class DummyContext:
              'callable':callable,
              'args':args}
             )
+
+    def path(self, path):
+        return path
 
     def resolve(self, dottedname):
         return self.resolved

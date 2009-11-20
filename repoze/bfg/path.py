@@ -58,5 +58,3 @@ def package_path(package):
     return prefix
 
     
-        
-        

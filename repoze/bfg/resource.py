@@ -1,4 +1,5 @@
 import os
+import sys
 import pkg_resources
 
 from zope.component import queryUtility
@@ -169,10 +170,12 @@ class FileOverride:
         if resource_name == self.path:
             return self.package, self.prefix
 
-def resource_spec(spec, package_name):
+def resolve_resource_spec(spec, package_name='__main__'):
     if os.path.isabs(spec):
-        return spec
+        return None, spec
+    filename = spec
     if ':' in spec:
-        return spec
-    return '%s:%s' % (package_name, spec)
-
+        package_name, filename = spec.split(':', 1)
+    elif package_name is None:
+        package_name, filename = None, spec
+    return package_name, filename

@@ -529,25 +529,21 @@ class TestMakeApp(unittest.TestCase):
 
     def test_it(self):
         settings = {'a':1}
-        package = object()
         rootfactory = object()
-        app = self._callFUT(rootfactory, package, settings=settings,
+        app = self._callFUT(rootfactory, settings=settings,
                             Configurator=DummyConfigurator)
         self.assertEqual(app.root_factory, rootfactory)
         self.assertEqual(app.settings, settings)
-        self.assertEqual(app.package, package)
-        self.assertEqual(app.filename, 'configure.zcml')
+        self.assertEqual(app.spec, 'configure.zcml')
 
     def test_it_options_means_settings(self):
         settings = {'a':1}
-        package = object()
         rootfactory = object()
-        app = self._callFUT(rootfactory, package, options=settings,
+        app = self._callFUT(rootfactory, options=settings,
                             Configurator=DummyConfigurator)
         self.assertEqual(app.root_factory, rootfactory)
         self.assertEqual(app.settings, settings)
-        self.assertEqual(app.package, package)
-        self.assertEqual(app.filename, 'configure.zcml')
+        self.assertEqual(app.spec, 'configure.zcml')
 
 class DummyContext:
     pass
@@ -616,10 +612,8 @@ class DummyConfigurator(object):
     def make_wsgi_app(self):
         return self
     
-    def declarative(self, root_factory=None, package=None,
-                    filename=None, settings=None):
+    def declarative(self, root_factory=None, spec=None, settings=None):
         self.root_factory = root_factory
-        self.package = package
-        self.filename = filename
+        self.spec = spec
         self.settings = settings
                 

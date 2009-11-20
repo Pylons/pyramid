@@ -24,12 +24,9 @@ from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import AuthTktAuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
-from repoze.bfg.path import package_name
 from repoze.bfg.request import route_request_iface
-from repoze.bfg.resource import resource_spec
-from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
-from repoze.bfg.view import static as static_view
+from repoze.bfg.static import StaticRootFactory
 
 ###################### directives ##########################
 
@@ -163,8 +160,7 @@ def view(
         request_type = _context.resolve(request_type)
 
     if renderer and '.' in renderer:
-        zcml_package = package_name(_context.resolve('.'))
-        renderer = resource_spec(renderer, zcml_package)
+        renderer = _context.path(renderer)
 
     def register():
         config = get_configurator(reg)
@@ -243,8 +239,7 @@ def route(_context, name, path, view=None, view_for=None,
     view_permission = view_permission or permission
     view_renderer = view_renderer or renderer
     if view_renderer and '.' in view_renderer:
-        zcml_package = package_name(_context.resolve('.'))
-        view_renderer = resource_spec(view_renderer, zcml_package)
+        view_renderer = _context.path(view_renderer)
 
     def register():
         config = get_configurator(reg)
@@ -321,8 +316,7 @@ class SystemViewHandler(object):
     def __call__(self, _context, view=None, attr=None, renderer=None,
                  wrapper=None):
         if renderer and '.' in renderer:
-            renderer = resource_spec(
-                renderer, package_name(_context.resolve('.')))
+            renderer = _context.path(renderer)
 
         def register(iface=self.iface):
             reg = get_current_registry()
@@ -483,10 +477,22 @@ class IStaticDirective(Interface):
 def static(_context, name, path, cache_max_age=3600):
     """ Handle ``static`` ZCML directives
     """
-    path = resource_spec(path, package_name(_context.resolve('.')))
-    view = static_view(path, cache_max_age=cache_max_age)
-    route(_context, name, "%s*subpath" % name, view=view,
-          view_for=StaticRootFactory, factory=StaticRootFactory(path))
+    abspath = _context.path(path)
+    reg = get_current_registry()
+    config = get_configurator(reg)
+
+    _context.action(
+        discriminator = ('route', name, False, None, None, None, None, None),
+        callable=config.static,
+        args = (name, abspath, cache_max_age, _context.info),
+        )
+
+    _context.action(
+        discriminator = (
+            'view', StaticRootFactory, '', None, IView, None,  None, None,
+            name, None, None, None, None, None,
+            )
+        )
 
 class IScanDirective(Interface):
     package = GlobalObject(

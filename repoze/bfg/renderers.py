@@ -7,8 +7,6 @@ from zope.component import queryUtility
 from repoze.bfg.interfaces import ITemplateRenderer
 
 from repoze.bfg.compat import json
-from repoze.bfg.path import caller_package
-from repoze.bfg.resource import resource_spec
 from repoze.bfg.settings import get_settings
 
 # concrete renderer factory implementations
@@ -27,37 +25,33 @@ def string_renderer_factory(name):
 
 # utility functions
 
-def template_renderer_factory(path, impl, level=3):
-    if os.path.isabs(path):
-        # 'path' is an absolute filename (not common and largely only
-        # for backwards compatibility)
-        if not os.path.exists(path):
-            raise ValueError('Missing template file: %s' % path)
-        renderer = queryUtility(ITemplateRenderer, name=path)
+def template_renderer_factory(spec, impl):
+    if os.path.isabs(spec):
+        # 'spec' is an absolute filename
+        if not os.path.exists(spec):
+            raise ValueError('Missing template file: %s' % spec)
+        renderer = queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
-            renderer = impl(path)
+            renderer = impl(spec)
             sm = getSiteManager()
-            sm.registerUtility(renderer, ITemplateRenderer, name=path)
-
+            sm.registerUtility(renderer, ITemplateRenderer, name=spec)
     else:
-        # 'path' is a relative filename or a package:relpath spec
-        spec = resource_spec(path, caller_package(level=level).__name__)
+        # spec is a package:relpath resource spec
         renderer = queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
             # service unit tests by trying the relative path string as
             # the utility name directly
-            renderer = queryUtility(ITemplateRenderer, name=path)
+            renderer = queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
-            pkg, path = spec.split(':', 1)
-            if not pkg_resources.resource_exists(pkg, path):
+            package_name, filename = spec.split(':', 1)
+            if not pkg_resources.resource_exists(package_name, filename):
                 raise ValueError('Missing template resource: %s' % spec)
-            abspath = pkg_resources.resource_filename(pkg, path)
+            abspath = pkg_resources.resource_filename(package_name, filename)
             renderer = impl(abspath)
             if not _reload_resources():
                 # cache the template
                 sm = getSiteManager()
-                sm.registerUtility(renderer, ITemplateRenderer,
-                                   name=spec)
+                sm.registerUtility(renderer, ITemplateRenderer, name=spec)
         
     return renderer
 

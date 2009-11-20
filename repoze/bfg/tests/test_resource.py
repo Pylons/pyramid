@@ -341,27 +341,32 @@ class TestDirectoryOverride(unittest.TestCase):
         result = o('baz/notfound.pt')
         self.assertEqual(result, None)
 
-class Test_resource_spec(unittest.TestCase):
-    def _callFUT(self, path, package):
-        from repoze.bfg.resource import resource_spec
-        return resource_spec(path, package)
+class Test_resolve_resource_spec(unittest.TestCase):
+    def _callFUT(self, spec, package_name='__main__'):
+        from repoze.bfg.resource import resolve_resource_spec
+        return resolve_resource_spec(spec, package_name)
 
     def test_abspath(self):
         import os
         here = os.path.dirname(__file__)
-        path= os.path.abspath(here)
-        self.assertEqual(self._callFUT(path, 'apackage'), path)
+        path = os.path.abspath(here)
+        package_name, filename = self._callFUT(path, 'apackage')
+        self.assertEqual(filename, path)
+        self.assertEqual(package_name, None)
 
     def test_rel_spec(self):
-        pkg, path = 'repoze.bfg.tests', 'test_resource.py'
-        self.assertEqual(self._callFUT(path, pkg),
-                         'repoze.bfg.tests:test_resource.py')
+        pkg = 'repoze.bfg.tests'
+        path = 'test_resource.py'
+        package_name, filename = self._callFUT(path, pkg)
+        self.assertEqual(package_name, 'repoze.bfg.tests')
+        self.assertEqual(filename, 'test_resource.py')
         
     def test_abs_spec(self):
-        pkg, path = 'repoze.bfg.tests', 'repoze.bfg.nottests:test_resource.py'
-        self.assertEqual(self._callFUT(path, pkg),
-                         'repoze.bfg.nottests:test_resource.py')
-        
+        pkg = 'repoze.bfg.tests'
+        path = 'repoze.bfg.nottests:test_resource.py'
+        package_name, filename = self._callFUT(path, pkg)
+        self.assertEqual(package_name, 'repoze.bfg.nottests')
+        self.assertEqual(filename, 'test_resource.py')
 
 class TestFileOverride(unittest.TestCase):
     def _getTargetClass(self):

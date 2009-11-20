@@ -127,64 +127,28 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(subscriber), 1)
 
     def test_declarative_fixtureapp_default_filename_withpackage(self):
-        from repoze.bfg.tests import fixtureapp
         rootfactory = DummyRootFactory(None)
-        registry = self._callDeclarative(rootfactory, fixtureapp)
+        registry = self._callDeclarative(
+            rootfactory,
+            'repoze.bfg.tests.fixtureapp:configure.zcml')
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
-    def test_declarative_fixtureapp_explicit_filename(self):
-        from repoze.bfg.tests import fixtureapp
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDeclarative(
-            rootfactory, fixtureapp, filename='another.zcml')
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_declarative_fixtureapp_explicit_filename_in_settings(self):
-        import os
-        rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
-        zcmlfile = os.path.join(os.path.dirname(fixtureapp.__file__),
-                                'another.zcml')
-        registry = self._callDeclarative(
-            rootfactory, fixtureapp, filename='configure.zcml',
-            settings={'configure_zcml':zcmlfile})
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
-
     def test_declarative_fixtureapp_explicit_specification_in_settings(self):
         rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
         zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
         registry = self._callDeclarative(
-            rootfactory, fixtureapp, filename='configure.zcml',
+            rootfactory, 'repoze.bfg.tests.fixtureapp:configure.zcml',
             settings={'configure_zcml':zcmlfile})
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
 
-    def test_declarative_fixtureapp_filename_hascolon_isabs(self):
-        rootfactory = DummyRootFactory(None)
-        from repoze.bfg.tests import fixtureapp
-        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
-        class Dummy:
-            def isabs(self, name):
-                return True
-        os = Dummy()
-        os.path = Dummy()
-        self.assertRaises(IOError, self._callDeclarative,
-                          rootfactory,
-                          fixtureapp,
-                          filename='configure.zcml',
-                          settings={'configure_zcml':zcmlfile},
-                          os=os)
-        
     def test_declarative_custom_settings(self):
         settings = {'mysetting':True}
-        from repoze.bfg.tests import fixtureapp
         rootfactory = DummyRootFactory(None)
         registry = self._callDeclarative(
-            rootfactory, fixtureapp, settings=settings)
+            rootfactory, 'repoze.bfg.tests.fixtureapp:configure.zcml',
+            settings=settings)
         from repoze.bfg.interfaces import ISettings
         settings = registry.getUtility(ISettings)
         self.assertEqual(settings.reload_templates, False)
@@ -194,10 +158,10 @@ class ConfiguratorTests(unittest.TestCase):
     def test_declarative_registrations(self):
         settings = {'reload_templates':True,
                     'debug_authorization':True}
-        from repoze.bfg.tests import fixtureapp
         rootfactory = DummyRootFactory(None)
         registry = self._callDeclarative(
-            rootfactory, fixtureapp, settings=settings)
+            rootfactory, 'repoze.bfg.tests.fixtureapp:configure.zcml',
+            settings=settings)
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ILogger
         from repoze.bfg.interfaces import IRootFactory
@@ -216,21 +180,20 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRoutesMapper
         settings = {'reload_templates':True,
                     'debug_authorization':True}
-        from repoze.bfg.tests import routesapp
         rootfactory = DummyRootFactory(None)
         registry = self._callDeclarative(
-            rootfactory, routesapp, settings=settings)
+            rootfactory, 'repoze.bfg.tests.routesapp:configure.zcml',
+            settings=settings)
         settings = registry.getUtility(ISettings)
         logger = registry.getUtility(ILogger, name='repoze.bfg.debug')
         self.assertEqual(registry.getUtility(IRootFactory), rootfactory)
         self.failUnless(registry.getUtility(IRoutesMapper))
 
     def test_declarative_lock_and_unlock(self):
-        from repoze.bfg.tests import fixtureapp
         rootfactory = DummyRootFactory(None)
         dummylock = DummyLock()
         registry = self._callDeclarative(
-            rootfactory, fixtureapp, filename='configure.zcml',
+            rootfactory, 'repoze.bfg.tests.fixtureapp:configure.zcml',
             lock=dummylock)
         self.assertEqual(dummylock.acquired, True)
         self.assertEqual(dummylock.released, True)

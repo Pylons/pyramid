@@ -10,9 +10,9 @@ class TestTemplateRendererFactory(unittest.TestCase):
     def tearDown(self):
         cleanUp()
         
-    def _callFUT(self, path, factory, level=3):
+    def _callFUT(self, path, factory):
         from repoze.bfg.renderers import template_renderer_factory
-        return template_renderer_factory(path, factory, level)
+        return template_renderer_factory(path, factory)
 
     def test_abspath_notfound(self):
         from repoze.bfg.interfaces import ITemplateRenderer
@@ -52,27 +52,11 @@ class TestTemplateRendererFactory(unittest.TestCase):
         result = self._callFUT('foo:bar/baz', None)
         self.failUnless(renderer is result)
 
-    def test_relpath_notfound(self):
-        self.assertRaises(ValueError, self._callFUT, 'wont/exist', None)
-
-    def test_relpath_is_package_notfound(self):
-        from repoze.bfg import tests
-        module_name = tests.__name__
+    def test_spec_notfound(self):
         self.assertRaises(ValueError, self._callFUT,
-                          '%s:wont/exist' % module_name, None)
+                          'repoze.bfg.tests:wont/exist', None)
 
-    def test_relpath_alreadyregistered(self):
-        from repoze.bfg.interfaces import ITemplateRenderer
-        from repoze.bfg import tests
-        module_name = tests.__name__
-        relpath = 'test_renderers.py'
-        spec = '%s:%s' % (module_name, relpath)
-        renderer = {}
-        testing.registerUtility(renderer, ITemplateRenderer, name=spec)
-        result = self._callFUT('test_renderers.py', None)
-        self.failUnless(result is renderer)
-
-    def test_relpath_is_package_alreadyregistered(self):
+    def test_spec_alreadyregistered(self):
         from repoze.bfg.interfaces import ITemplateRenderer
         from repoze.bfg import tests
         module_name = tests.__name__
@@ -83,22 +67,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         result = self._callFUT(spec, None)
         self.failUnless(result is renderer)
 
-    def test_relpath_notyetregistered(self):
-        import os
-        from repoze.bfg.tests import test_renderers
-        module_name = test_renderers.__name__
-        relpath = 'test_renderers.py'
-        renderer = {}
-        factory = DummyFactory(renderer)
-        result = self._callFUT('test_renderers.py', factory)
-        self.failUnless(result is renderer)
-        path = os.path.abspath(__file__)
-        if path.endswith('pyc'): # pragma: no cover
-            path = path[:-1]
-        self.assertEqual(factory.path, path)
-        self.assertEqual(factory.kw, {})
-
-    def test_relpath_is_package_notyetregistered(self):
+    def test_spec_notyetregistered(self):
         import os
         from repoze.bfg import tests
         module_name = tests.__name__
@@ -122,7 +91,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('test_renderers.py', factory)
+        result = self._callFUT('repoze.bfg.tests:test_renderers.py', factory)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('repoze.bfg.tests', 'test_renderers.py')
         self.assertEqual(queryUtility(ITemplateRenderer, name=spec),
@@ -136,7 +105,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('test_renderers.py', factory)
+        result = self._callFUT('repoze.bfg.tests:test_renderers.py', factory)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('repoze.bfg.tests', 'test_renderers.py')
         self.assertNotEqual(queryUtility(ITemplateRenderer, name=spec),

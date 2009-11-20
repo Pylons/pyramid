@@ -46,9 +46,11 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.log import make_stream_logger
+from repoze.bfg.path import caller_package
 from repoze.bfg.registry import Registry
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import PackageOverrides
+from repoze.bfg.resource import resolve_resource_spec
 from repoze.bfg.settings import Settings
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
@@ -64,6 +66,7 @@ import martian
 class Configurator(object):
     """ A wrapper around the registry that performs configuration tasks """
     def __init__(self, registry=None):
+        self.package = caller_package()
         if registry is None:
             registry = self.make_default_registry()
         self.reg = registry
@@ -102,7 +105,7 @@ class Configurator(object):
             manager.pop()
         return app
 
-    def declarative(self, root_factory, filename='configure.zcml',
+    def declarative(self, root_factory, spec='configure.zcml',
                     settings=None, debug_logger=None, os=os,
                     lock=threading.Lock()):
 
@@ -113,23 +116,27 @@ class Configurator(object):
             settings = {}
 
         if not 'configure_zcml' in settings:
-            settings['configure_zcml'] = filename
+            settings['configure_zcml'] = spec
 
         settings = Settings(settings)
-        filename = settings['configure_zcml']
-
-        # not os.path.isabs below for windows systems
-        if (':' in filename) and (not os.path.isabs(filename)):
-            package, filename = filename.split(':', 1)
-            __import__(package)
-            package = sys.modules[package]
+        spec = settings['configure_zcml']
 
         self.settings(settings)
         self.debug_logger(debug_logger)
         self.root_factory(root_factory or DefaultRootFactory)
-        self.load_zcml(filename, package, lock=lock)
+        self.load_zcml(spec, lock=lock)
 
-    def load_zcml(self, filename, package=None, lock=threading.Lock()):
+    def make_spec(self, path_or_spec):
+        package, filename = resolve_resource_spec(path_or_spec,
+                                                  self.package.__name__)
+        if package is None:
+            return filename # absolute filename
+        return '%s:%s' % (package, filename)
+
+    def split_spec(self, path_or_spec):
+        return resolve_resource_spec(path_or_spec, self.package.__name__)
+
+    def load_zcml(self, spec, lock=threading.Lock()):
         # We push our ZCML-defined configuration into an app-local
         # component registry in order to allow more than one bfg app to live
         # in the same process space without one unnecessarily stomping on
@@ -143,8 +150,13 @@ class Configurator(object):
         # site manager API directly in a different thread while we hold the
         # lock.  Those registrations will end up in our application's
         # registry.
-        if package is None:
-            package = sys.modules['__main__']
+        package_name, filename = self.split_spec(spec)
+        if package_name is None: # absolute filename
+            package = None
+        else:
+            __import__(package_name)
+            package = sys.modules[package_name]
+
         lock.acquire()
         manager.push({'registry':self.reg, 'request':None})
         try:
@@ -231,14 +243,17 @@ class Configurator(object):
             self.reg.registerAdapter(multiview, (for_, request_type),
                                      IMultiView, name, info=_info)
 
-    def renderer_from_name(self, path):
-        name = os.path.splitext(path)[1]
-        if not name:
-            name = path
+    def renderer_from_name(self, path_or_spec):
+        if '.' in path_or_spec:
+            name = os.path.splitext(path_or_spec)[1]
+            spec = self.make_spec(path_or_spec)
+        else:
+            name = path_or_spec
+            spec = path_or_spec
         factory = self.reg.queryUtility(IRendererFactory, name=name)
         if factory is None:
             raise ValueError('No renderer for renderer name %r' % name)
-        return factory(path)
+        return factory(spec)
 
     def derive_view(self, original_view, permission=None, predicates=(),
                     attr=None, renderer_name=None, wrapper_viewname=None,
@@ -581,9 +596,10 @@ class Configurator(object):
         self.reg.registerUtility(derived_view, iface, '', info=_info)
 
     def static(self, name, path, cache_max_age=3600, _info=u''):
-        view = static(path, cache_max_age=cache_max_age)
+        spec = self.make_spec(path)
+        view = static(spec, cache_max_age=cache_max_age)
         self.route(name, "%s*subpath" % name, view=view,
-                   view_for=StaticRootFactory, factory=StaticRootFactory(path),
+                   view_for=StaticRootFactory, factory=StaticRootFactory(spec),
                    _info=_info)
 
     def settings(self, settings):

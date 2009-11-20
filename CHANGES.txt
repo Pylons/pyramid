@@ -66,6 +66,12 @@ Internals
 
 - The ``repoze.bfg.zcml.Uncacheable`` class has been removed.
 
+- The ``repoze.bfg.resource.resource_spec`` function has been removed.
+
+- All ZCML directives which deal with attributes which are paths now
+  use the ``path`` method of the ZCML context to resolve a relative
+  name to an absolute one (imperative configuration requirement).
+
 Backwards Incompatibilites
 --------------------------
 

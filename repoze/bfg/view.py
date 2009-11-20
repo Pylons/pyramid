@@ -27,7 +27,7 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.path import caller_package
-from repoze.bfg.resource import resource_spec
+from repoze.bfg.resource import resolve_resource_spec
 from repoze.bfg.static import PackageURLParser
 
 # b/c imports
@@ -170,19 +170,19 @@ class static(object):
        directive will not be able to override the resources it
        contains.
     """
-    def __init__(self, root_dir, cache_max_age=3600, level=2,
-                 package_name=None):
+    def __init__(self, root_dir, cache_max_age=3600, package_name=None):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
-        if os.path.isabs(root_dir):
-            self.app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
-            return
         caller_package_name = caller_package().__name__
-        spec = resource_spec(root_dir, package_name or caller_package_name)
-        package_name, root_dir = spec.split(':', 1)
-        self.app = PackageURLParser(package_name, root_dir,
-                                    cache_max_age=cache_max_age)
+        package_name = package_name or caller_package_name
+        package_name, root_dir = resolve_resource_spec(root_dir, package_name)
+        if package_name is None:
+            app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
+        else:
+            app = PackageURLParser(
+                package_name, root_dir, cache_max_age=cache_max_age)
+        self.app = app
 
     def __call__(self, context, request):
         subpath = '/'.join(request.subpath)

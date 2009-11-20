@@ -11,8 +11,8 @@ from repoze.bfg.interfaces import ITemplateRenderer
 from repoze.bfg.renderers import template_renderer_factory
 from repoze.bfg.settings import get_settings
 
-def renderer_factory(path, level=4):
-    return template_renderer_factory(path, ZPTTemplateRenderer, level=level)
+def renderer_factory(path):
+    return template_renderer_factory(path, ZPTTemplateRenderer)
 
 class ZPTTemplateRenderer(object):
     implements(ITemplateRenderer)
