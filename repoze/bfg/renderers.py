@@ -8,6 +8,7 @@ from repoze.bfg.interfaces import ITemplateRenderer
 
 from repoze.bfg.compat import json
 from repoze.bfg.settings import get_settings
+from repoze.bfg.path import caller_package
 
 # concrete renderer factory implementations
 
@@ -43,7 +44,12 @@ def template_renderer_factory(spec, impl):
             # the utility name directly
             renderer = queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
-            package_name, filename = spec.split(':', 1)
+            try:
+                package_name, filename = spec.split(':', 1)
+            except ValueError:
+                # unit test or someone passing a relative pathname
+                package_name = caller_package(4).__name__
+                filename = spec
             if not pkg_resources.resource_exists(package_name, filename):
                 raise ValueError('Missing template resource: %s' % spec)
             abspath = pkg_resources.resource_filename(package_name, filename)
