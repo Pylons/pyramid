@@ -16,18 +16,21 @@ applications.  As a framework, the primary job of :mod:`repoze.bfg` is
 to make it easier for a developer to create an arbitrary web
 application.
 
-A framework differs from a *library*: library code is always *called*
-by code that you write, while a framework always *calls* code that you
-write.  Using the average library is typically easier than using the
-average framework.  During typical library usage, the developer can
-more granularly avoid ceding any control to code he does not himself
-author.  During typical framework usage, however, the developer must
-cede a greater portion of control to the framework.  In practice,
-using a framework to create a web application is often more practical
-than using a set of libraries if the framework provides a set of
-facilities and assumptions that fit a large portion of your
-application requirements.  :mod:`repoze.bfg` is a framework that fits
-a large set of assumptions in the domain of web application creation.
+.. sidebar:: Frameworks vs. Libraries
+
+   A framework differs from a *library*: library code is always
+   *called* by code that you write, while a framework always *calls*
+   code that you write.  Using the average library is typically easier
+   than using the average framework.  During typical library usage,
+   the developer can more granularly avoid ceding any control to code
+   he does not himself author.  During typical framework usage,
+   however, the developer must cede a greater portion of control to
+   the framework.  In practice, using a framework to create a web
+   application is often more practical than using a set of libraries
+   if the framework provides a set of facilities and assumptions that
+   fit a large portion of your application requirements.
+   :mod:`repoze.bfg` is a framework that fits a large set of
+   assumptions in the domain of web application creation.
 
 Because :mod:`repoze.bfg` is a framework, from the perspective of the
 people who have written :mod:`repoze.bfg` itself, each deployment of
