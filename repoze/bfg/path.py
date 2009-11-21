@@ -34,7 +34,7 @@ def package_name(pkg_or_module):
 def caller_package(level=2, caller_module=caller_module):
     # caller_module in arglist for tests
     module = caller_module(level+1)
-    if '__init__.py' in module.__file__:
+    if '__init__.py' in getattr(module, '__file__', ''): # empty at >>>
         # Module is a package
         return module
     # Go up one level to get package

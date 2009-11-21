@@ -96,10 +96,14 @@ class ConfiguratorTests(unittest.TestCase):
         config = Configurator()
         self.failUnless(config.reg.getUtility(ISettings))
 
-    def test_make_default_registry(self):
-        config = self._makeOne()
-        reg = config.make_default_registry()
-        self.assertEqual(config.reg, reg)
+    def test__default_configuration(self):
+        from repoze.bfg.interfaces import ISettings
+        from repoze.bfg.registry import Registry
+        registry = Registry()
+        config = self._makeOne(registry)
+        config._default_configuration()
+        self.assertEqual(config.reg, registry)
+        self.failIf(config.reg.getUtility(ISettings) is None)
 
     def test_make_wsgi_app(self):
         from repoze.bfg.threadlocal import get_current_registry
@@ -939,343 +943,6 @@ class ConfiguratorTests(unittest.TestCase):
         route = self._assertRoute(config, 'name', 'path')
         self.failUnless(hasattr(wrapper, '__call_permissive__'))
 
-    def test__map_view_as_function_context_and_request(self):
-        def view(context, request):
-            return 'OK'
-        config = self._makeOne()
-        result = config._map_view(view)
-        self.failUnless(result is view)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_function_with_attr(self):
-        def view(context, request):
-            """ """
-        config = self._makeOne()
-        result = config._map_view(view, attr='__name__')
-        self.failIf(result is view)
-        self.assertRaises(TypeError, result, None, None)
-
-    def test__map_view_as_function_with_attr_and_renderer(self):
-        config = self._makeOne()
-        self._registerRenderer(config)
-        view = lambda *arg: 'OK'
-        result = config._map_view(view, attr='__name__',
-                                 renderer_name='fixtures/minimal.txt')
-        self.failIf(result is view)
-        self.assertRaises(TypeError, result, None, None)
-        
-    def test__map_view_as_function_requestonly(self):
-        config = self._makeOne()
-        def view(request):
-            return 'OK'
-        result = config._map_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_function_requestonly_with_attr(self):
-        config = self._makeOne()
-        def view(request):
-            """ """
-        result = config._map_view(view, attr='__name__')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertRaises(TypeError, result, None, None)
-
-    def test__map_view_as_newstyle_class_context_and_request(self):
-        config = self._makeOne()
-        class view(object):
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        result = config._map_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_newstyle_class_context_and_request_with_attr(self):
-        config = self._makeOne()
-        class view(object):
-            def __init__(self, context, request):
-                pass
-            def index(self):
-                return 'OK'
-        result = config._map_view(view, attr='index')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_newstyle_class_context_and_request_attr_and_renderer(
-        self):
-        config = self._makeOne()
-        self._registerRenderer(config)
-        class view(object):
-            def __init__(self, context, request):
-                pass
-            def index(self):
-                return {'a':'1'}
-        result = config._map_view(
-            view, attr='index',
-            renderer_name='repoze.bfg.tests:fixtures/minimal.txt')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        request = self._makeRequest(config)
-        self.assertEqual(result(None, request).body, 'Hello!')
-        
-    def test__map_view_as_newstyle_class_requestonly(self):
-        config = self._makeOne()
-        class view(object):
-            def __init__(self, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        result = config._map_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_newstyle_class_requestonly_with_attr(self):
-        config = self._makeOne()
-        class view(object):
-            def __init__(self, request):
-                pass
-            def index(self):
-                return 'OK'
-        result = config._map_view(view, attr='index')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_newstyle_class_requestonly_with_attr_and_renderer(
-        self):
-        config = self._makeOne()
-        self._registerRenderer(config)
-        class view(object):
-            def __init__(self, request):
-                pass
-            def index(self):
-                return {'a':'1'}
-        result = config._map_view(
-            view, attr='index',
-            renderer_name='repoze.bfg.tests:fixtures/minimal.txt')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        request = self._makeRequest(config)
-        self.assertEqual(result(None, request).body, 'Hello!')
-
-    def test__map_view_as_oldstyle_class_context_and_request(self):
-        config = self._makeOne()
-        class view:
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        result = config._map_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_oldstyle_class_context_and_request_with_attr(self):
-        config = self._makeOne()
-        class view:
-            def __init__(self, context, request):
-                pass
-            def index(self):
-                return 'OK'
-        result = config._map_view(view, attr='index')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_oldstyle_class_context_and_request_attr_and_renderer(
-        self):
-        config = self._makeOne()
-        self._registerRenderer(config)
-        class view:
-            def __init__(self, context, request):
-                pass
-            def index(self):
-                return {'a':'1'}
-        result = config._map_view(
-            view, attr='index',
-            renderer_name='repoze.bfg.tests:fixtures/minimal.txt')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        request = self._makeRequest(config)
-        self.assertEqual(result(None, request).body, 'Hello!')
-
-    def test__map_view_as_oldstyle_class_requestonly(self):
-        config = self._makeOne()
-        class view:
-            def __init__(self, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        result = config._map_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_oldstyle_class_requestonly_with_attr(self):
-        config = self._makeOne()
-        class view:
-            def __init__(self, request):
-                pass
-            def index(self):
-                return 'OK'
-        result = config._map_view(view, attr='index')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_oldstyle_class_requestonly_attr_and_renderer(self):
-        config = self._makeOne()
-        self._registerRenderer(config)
-        class view:
-            def __init__(self, request):
-                pass
-            def index(self):
-                return {'a':'1'}
-        result = config._map_view(
-            view, attr='index',
-            renderer_name='repoze.bfg.tests:fixtures/minimal.txt')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        request = self._makeRequest(config)
-        self.assertEqual(result(None, request).body, 'Hello!')
-
-    def test__map_view_as_instance_context_and_request(self):
-        config = self._makeOne()
-        class View:
-            def __call__(self, context, request):
-                return 'OK'
-        view = View()
-        result = config._map_view(view)
-        self.failUnless(result is view)
-        self.assertEqual(result(None, None), 'OK')
-        
-    def test__map_view_as_instance_context_and_request_and_attr(self):
-        config = self._makeOne()
-        class View:
-            def index(self, context, request):
-                return 'OK'
-        view = View()
-        result = config._map_view(view, attr='index')
-        self.failIf(result is view)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_instance_context_and_request_attr_and_renderer(self):
-        config = self._makeOne()
-        self._registerRenderer(config)
-        class View:
-            def index(self, context, request):
-                return {'a':'1'}
-        view = View()
-        result = config._map_view(
-            view, attr='index',
-            renderer_name='repoze.bfg.tests:fixtures/minimal.txt')
-        self.failIf(result is view)
-        request = self._makeRequest(config)
-        self.assertEqual(result(None, request).body, 'Hello!')
-
-    def test__map_view_as_instance_requestonly(self):
-        config = self._makeOne()
-        class View:
-            def __call__(self, request):
-                return 'OK'
-        view = View()
-        result = config._map_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.failUnless('instance' in result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_instance_requestonly_with_attr(self):
-        config = self._makeOne()
-        class View:
-            def index(self, request):
-                return 'OK'
-        view = View()
-        result = config._map_view(view, attr='index')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.failUnless('instance' in result.__name__)
-        self.assertEqual(result(None, None), 'OK')
-
-    def test__map_view_as_instance_requestonly_with_attr_and_renderer(self):
-        config = self._makeOne()
-        self._registerRenderer(config)
-        class View:
-            def index(self, request):
-                return {'a':'1'}
-        view = View()
-        result = config._map_view(
-            view, attr='index',
-            renderer_name='repoze.bfg.tests:fixtures/minimal.txt')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.failUnless('instance' in result.__name__)
-        request = self._makeRequest(config)
-        self.assertEqual(result(None, request).body, 'Hello!')
-
-    def test__map_view_rendereronly(self):
-        config = self._makeOne()
-        self._registerRenderer(config)
-        def view(context, request):
-            return {'a':'1'}
-        result = config._map_view(
-            view,
-            renderer_name='repoze.bfg.tests:fixtures/minimal.txt')
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        request = self._makeRequest(config)
-        self.assertEqual(result(None, request).body, 'Hello!')
-
-    def test__map_view_defaultrendereronly(self):
-        config = self._makeOne()
-        self._registerRenderer(config, name='')
-        def view(context, request):
-            return {'a':'1'}
-        result = config._map_view(view)
-        self.failIf(result is view)
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        request = self._makeRequest(config)
-        self.assertEqual(result(None, request).body, 'Hello!')
-
     def test__override_not_yet_registered(self):
         from repoze.bfg.interfaces import IPackageOverrides
         package = DummyPackage('package')
@@ -1758,6 +1425,343 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(override.path, 'templates/foo.pt')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, 'templates/bar.pt')
+
+class Test__map_view(unittest.TestCase):
+    def setUp(self):
+        from repoze.bfg.registry import Registry
+        self.registry = Registry()
+
+    def tearDown(self):
+        del self.registry
+        
+    def _registerRenderer(self, name='.txt'):
+        from repoze.bfg.interfaces import IRendererFactory
+        from repoze.bfg.interfaces import ITemplateRenderer
+        from zope.interface import implements
+        class Renderer:
+            implements(ITemplateRenderer)
+            def __init__(self, path):
+                self.__class__.path = path
+            def __call__(self, *arg):
+                return 'Hello!'
+        self.registry.registerUtility(Renderer, IRendererFactory, name=name)
+        return Renderer(name)
+
+    def _makeRequest(self):
+        request = DummyRequest()
+        request.registry = self.registry
+        return request
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.configuration import _map_view
+        return _map_view(*arg, **kw)
+    
+    def test__map_view_as_function_context_and_request(self):
+        def view(context, request):
+            return 'OK'
+        result = self._callFUT(self.registry, view)
+        self.failUnless(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_function_with_attr(self):
+        def view(context, request):
+            """ """
+        result = self._callFUT(self.registry, view, attr='__name__')
+        self.failIf(result is view)
+        self.assertRaises(TypeError, result, None, None)
+
+    def test__map_view_as_function_with_attr_and_renderer(self):
+        self._registerRenderer()
+        view = lambda *arg: 'OK'
+        result = self._callFUT(self.registry, view, attr='__name__',
+                                 renderer_name='fixtures/minimal.txt')
+        self.failIf(result is view)
+        self.assertRaises(TypeError, result, None, None)
+        
+    def test__map_view_as_function_requestonly(self):
+        def view(request):
+            return 'OK'
+        result = self._callFUT(self.registry, view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_function_requestonly_with_attr(self):
+        def view(request):
+            """ """
+        result = self._callFUT(self.registry, view, attr='__name__')
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertRaises(TypeError, result, None, None)
+
+    def test__map_view_as_newstyle_class_context_and_request(self):
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(self.registry, view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_newstyle_class_context_and_request_with_attr(self):
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def index(self):
+                return 'OK'
+        result = self._callFUT(self.registry, view, attr='index')
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_newstyle_class_context_and_request_attr_and_renderer(
+        self):
+        renderer = self._registerRenderer()
+        class view(object):
+            def __init__(self, context, request):
+                pass
+            def index(self):
+                return {'a':'1'}
+        result = self._callFUT(
+            self.registry,
+            view, attr='index',
+            renderer = renderer)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+        
+    def test__map_view_as_newstyle_class_requestonly(self):
+        class view(object):
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(self.registry, view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_newstyle_class_requestonly_with_attr(self):
+        class view(object):
+            def __init__(self, request):
+                pass
+            def index(self):
+                return 'OK'
+        result = self._callFUT(self.registry, view, attr='index')
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_newstyle_class_requestonly_attr_and_renderer(self):
+        renderer = self._registerRenderer()
+        class view(object):
+            def __init__(self, request):
+                pass
+            def index(self):
+                return {'a':'1'}
+        result = self._callFUT(
+            self.registry,
+            view, attr='index',
+            renderer = renderer)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+
+    def test__map_view_as_oldstyle_class_context_and_request(self):
+        class view:
+            def __init__(self, context, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(self.registry, view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_oldstyle_class_context_and_request_with_attr(self):
+        class view:
+            def __init__(self, context, request):
+                pass
+            def index(self):
+                return 'OK'
+        result = self._callFUT(self.registry, view, attr='index')
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_oldstyle_cls_context_request_attr_and_renderer(self):
+        renderer = self._registerRenderer()
+        class view:
+            def __init__(self, context, request):
+                pass
+            def index(self):
+                return {'a':'1'}
+        result = self._callFUT(
+            self.registry,
+            view, attr='index',
+            renderer = renderer)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+
+    def test__map_view_as_oldstyle_class_requestonly(self):
+        class view:
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        result = self._callFUT(self.registry, view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_oldstyle_class_requestonly_with_attr(self):
+        class view:
+            def __init__(self, request):
+                pass
+            def index(self):
+                return 'OK'
+        result = self._callFUT(self.registry, view, attr='index')
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_oldstyle_class_requestonly_attr_and_renderer(self):
+        renderer = self._registerRenderer()
+        class view:
+            def __init__(self, request):
+                pass
+            def index(self):
+                return {'a':'1'}
+        result = self._callFUT(
+            self.registry,
+            view, attr='index',
+            renderer = renderer)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+
+    def test__map_view_as_instance_context_and_request(self):
+        class View:
+            def __call__(self, context, request):
+                return 'OK'
+        view = View()
+        result = self._callFUT(self.registry, view)
+        self.failUnless(result is view)
+        self.assertEqual(result(None, None), 'OK')
+        
+    def test__map_view_as_instance_context_and_request_and_attr(self):
+        class View:
+            def index(self, context, request):
+                return 'OK'
+        view = View()
+        result = self._callFUT(self.registry, view, attr='index')
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_instance_context_and_request_attr_and_renderer(self):
+        renderer = self._registerRenderer()
+        class View:
+            def index(self, context, request):
+                return {'a':'1'}
+        view = View()
+        result = self._callFUT(
+            self.registry,
+            view, attr='index',
+            renderer=renderer)
+        self.failIf(result is view)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+
+    def test__map_view_as_instance_requestonly(self):
+        class View:
+            def __call__(self, request):
+                return 'OK'
+        view = View()
+        result = self._callFUT(self.registry, view)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.failUnless('instance' in result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_instance_requestonly_with_attr(self):
+        class View:
+            def index(self, request):
+                return 'OK'
+        view = View()
+        result = self._callFUT(self.registry, view, attr='index')
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.failUnless('instance' in result.__name__)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test__map_view_as_instance_requestonly_with_attr_and_renderer(self):
+        renderer = self._registerRenderer()
+        class View:
+            def index(self, request):
+                return {'a':'1'}
+        view = View()
+        result = self._callFUT(
+            self.registry,
+            view, attr='index',
+            renderer = renderer)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.failUnless('instance' in result.__name__)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+
+    def test__map_view_rendereronly(self):
+        renderer = self._registerRenderer()
+        def view(context, request):
+            return {'a':'1'}
+        result = self._callFUT(
+            self.registry,
+            view,
+            renderer=renderer)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+
 
 class TestBFGViewGrokker(unittest.TestCase):
     def setUp(self):
