@@ -1459,29 +1459,28 @@ class Test__map_view(unittest.TestCase):
     def test__map_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
-        result = self._callFUT(self.registry, view)
+        result = self._callFUT(view)
         self.failUnless(result is view)
         self.assertEqual(result(None, None), 'OK')
 
     def test__map_view_as_function_with_attr(self):
         def view(context, request):
             """ """
-        result = self._callFUT(self.registry, view, attr='__name__')
+        result = self._callFUT(view, attr='__name__')
         self.failIf(result is view)
         self.assertRaises(TypeError, result, None, None)
 
     def test__map_view_as_function_with_attr_and_renderer(self):
-        self._registerRenderer()
+        renderer = self._registerRenderer()
         view = lambda *arg: 'OK'
-        result = self._callFUT(self.registry, view, attr='__name__',
-                                 renderer_name='fixtures/minimal.txt')
+        result = self._callFUT(view, attr='__name__', renderer=renderer)
         self.failIf(result is view)
         self.assertRaises(TypeError, result, None, None)
         
     def test__map_view_as_function_requestonly(self):
         def view(request):
             return 'OK'
-        result = self._callFUT(self.registry, view)
+        result = self._callFUT(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1491,7 +1490,7 @@ class Test__map_view(unittest.TestCase):
     def test__map_view_as_function_requestonly_with_attr(self):
         def view(request):
             """ """
-        result = self._callFUT(self.registry, view, attr='__name__')
+        result = self._callFUT(view, attr='__name__')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1504,7 +1503,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def __call__(self):
                 return 'OK'
-        result = self._callFUT(self.registry, view)
+        result = self._callFUT(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1517,7 +1516,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return 'OK'
-        result = self._callFUT(self.registry, view, attr='index')
+        result = self._callFUT(view, attr='index')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1532,10 +1531,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(
-            self.registry,
-            view, attr='index',
-            renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer = renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1549,7 +1545,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def __call__(self):
                 return 'OK'
-        result = self._callFUT(self.registry, view)
+        result = self._callFUT(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1562,7 +1558,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return 'OK'
-        result = self._callFUT(self.registry, view, attr='index')
+        result = self._callFUT(view, attr='index')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1576,10 +1572,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(
-            self.registry,
-            view, attr='index',
-            renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer = renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1593,7 +1586,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def __call__(self):
                 return 'OK'
-        result = self._callFUT(self.registry, view)
+        result = self._callFUT(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1606,7 +1599,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return 'OK'
-        result = self._callFUT(self.registry, view, attr='index')
+        result = self._callFUT(view, attr='index')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1620,10 +1613,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(
-            self.registry,
-            view, attr='index',
-            renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer = renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1637,7 +1627,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def __call__(self):
                 return 'OK'
-        result = self._callFUT(self.registry, view)
+        result = self._callFUT(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1650,7 +1640,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return 'OK'
-        result = self._callFUT(self.registry, view, attr='index')
+        result = self._callFUT(view, attr='index')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1664,10 +1654,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(
-            self.registry,
-            view, attr='index',
-            renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer = renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1680,7 +1667,7 @@ class Test__map_view(unittest.TestCase):
             def __call__(self, context, request):
                 return 'OK'
         view = View()
-        result = self._callFUT(self.registry, view)
+        result = self._callFUT(view)
         self.failUnless(result is view)
         self.assertEqual(result(None, None), 'OK')
         
@@ -1689,7 +1676,7 @@ class Test__map_view(unittest.TestCase):
             def index(self, context, request):
                 return 'OK'
         view = View()
-        result = self._callFUT(self.registry, view, attr='index')
+        result = self._callFUT(view, attr='index')
         self.failIf(result is view)
         self.assertEqual(result(None, None), 'OK')
 
@@ -1699,10 +1686,7 @@ class Test__map_view(unittest.TestCase):
             def index(self, context, request):
                 return {'a':'1'}
         view = View()
-        result = self._callFUT(
-            self.registry,
-            view, attr='index',
-            renderer=renderer)
+        result = self._callFUT(view, attr='index', renderer=renderer)
         self.failIf(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
@@ -1712,7 +1696,7 @@ class Test__map_view(unittest.TestCase):
             def __call__(self, request):
                 return 'OK'
         view = View()
-        result = self._callFUT(self.registry, view)
+        result = self._callFUT(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1724,7 +1708,7 @@ class Test__map_view(unittest.TestCase):
             def index(self, request):
                 return 'OK'
         view = View()
-        result = self._callFUT(self.registry, view, attr='index')
+        result = self._callFUT(view, attr='index')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1737,10 +1721,7 @@ class Test__map_view(unittest.TestCase):
             def index(self, request):
                 return {'a':'1'}
         view = View()
-        result = self._callFUT(
-            self.registry,
-            view, attr='index',
-            renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer = renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1752,16 +1733,12 @@ class Test__map_view(unittest.TestCase):
         renderer = self._registerRenderer()
         def view(context, request):
             return {'a':'1'}
-        result = self._callFUT(
-            self.registry,
-            view,
-            renderer=renderer)
+        result = self._callFUT(view, renderer=renderer)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
-
 
 class TestBFGViewGrokker(unittest.TestCase):
     def setUp(self):

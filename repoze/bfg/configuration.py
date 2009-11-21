@@ -242,7 +242,7 @@ class Configurator(object):
                     viewname=None):
         renderer = self.renderer_from_name(renderer_name)
         reg = self.reg
-        mapped_view = _map_view(reg, view, attr, renderer, renderer_name)
+        mapped_view = _map_view(view, attr, renderer, renderer_name)
         owrapped_view = _owrap_view(reg, mapped_view, viewname,wrapper_viewname)
         secured_view = _secure_view(reg, owrapped_view, permission)
         debug_view = _authdebug_view(reg, secured_view, permission)
@@ -688,7 +688,7 @@ def requestonly(class_or_callable, attr=None):
 
     return False
 
-def _map_view(registry, view, attr=None, renderer=None, renderer_name=None):
+def _map_view(view, attr=None, renderer=None, renderer_name=None):
     wrapped_view = view
 
     if inspect.isclass(view):
