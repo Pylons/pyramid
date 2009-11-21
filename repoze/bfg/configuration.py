@@ -187,8 +187,7 @@ class Configurator(object):
             request_type = IRequest
 
         if route_name is not None:
-            request_type = self.reg.queryUtility(IRouteRequest,
-                                                 name=route_name)
+            request_type = self.reg.queryUtility(IRouteRequest, name=route_name)
             if request_type is None:
                 request_type = route_request_iface(route_name)
                 self.reg.registerUtility(request_type, IRouteRequest,
@@ -833,10 +832,7 @@ def _secure_view(view, permission, authn_policy, authz_policy):
 def _authdebug_view(view, permission, authn_policy, authz_policy, settings,
                     logger):
     wrapped_view = view
-    debug_authorization = False
-    if settings is not None:
-        debug_authorization = settings.get('debug_authorization', False)
-    if debug_authorization:
+    if settings and settings.get('debug_authorization', False):
         def _authdebug_view(context, request):
             view_name = getattr(request, 'view_name', None)
 
