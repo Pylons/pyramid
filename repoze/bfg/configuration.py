@@ -240,13 +240,20 @@ class Configurator(object):
     def derive_view(self, view, permission=None, predicates=(),
                     attr=None, renderer_name=None, wrapper_viewname=None,
                     viewname=None):
-        renderer = self.renderer_from_name(renderer_name)
         reg = self.reg
+        renderer = self.renderer_from_name(renderer_name)
+        authn_policy = self.reg.queryUtility(IAuthenticationPolicy)
+        authz_policy = self.reg.queryUtility(IAuthorizationPolicy)
+        settings = self.reg.queryUtility(ISettings)
+        logger = self.reg.queryUtility(ILogger, 'repoze.bfg.debug')
         mapped_view = _map_view(view, attr, renderer, renderer_name)
-        owrapped_view = _owrap_view(mapped_view, viewname,wrapper_viewname)
-        secured_view = _secure_view(reg, owrapped_view, permission)
-        debug_view = _authdebug_view(reg, secured_view, permission)
-        derived_view = _predicate_wrap(reg, debug_view, predicates)
+        owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
+        secured_view = _secure_view(owrapped_view, permission,
+                                    authn_policy, authz_policy)
+        debug_view = _authdebug_view(secured_view, permission, 
+                                     authn_policy, authz_policy, settings,
+                                     logger)
+        derived_view = _predicate_wrap(debug_view, predicates)
         return derived_view
 
     def renderer_from_name(self, path_or_spec):
@@ -789,7 +796,7 @@ def _owrap_view(view, viewname, wrapper_viewname):
     decorate_view(_owrapped_view, view)
     return _owrapped_view
 
-def _predicate_wrap(registry, view, predicates):
+def _predicate_wrap(view, predicates):
     if not predicates:
         return view
     def _wrapped(context, request):
@@ -803,10 +810,8 @@ def _predicate_wrap(registry, view, predicates):
     decorate_view(_wrapped, view)
     return _wrapped
 
-def _secure_view(registry, view, permission):
+def _secure_view(view, permission, authn_policy, authz_policy):
     wrapped_view = view
-    authn_policy = registry.queryUtility(IAuthenticationPolicy)
-    authz_policy = registry.queryUtility(IAuthorizationPolicy)
     if authn_policy and authz_policy and (permission is not None):
         def _secured_view(context, request):
             principals = authn_policy.effective_principals(request)
@@ -825,11 +830,9 @@ def _secure_view(registry, view, permission):
 
     return wrapped_view
 
-def _authdebug_view(registry, view, permission):
+def _authdebug_view(view, permission, authn_policy, authz_policy, settings,
+                    logger):
     wrapped_view = view
-    authn_policy = registry.queryUtility(IAuthenticationPolicy)
-    authz_policy = registry.queryUtility(IAuthorizationPolicy)
-    settings = registry.queryUtility(ISettings)
     debug_authorization = False
     if settings is not None:
         debug_authorization = settings.get('debug_authorization', False)
@@ -851,7 +854,6 @@ def _authdebug_view(registry, view, permission):
             url = getattr(request, 'url', None)
             msg = ('debug_authorization of url %s (view name %r against '
                    'context %r): %s' % (url, view_name, context, msg))
-            logger =registry.queryUtility(ILogger, 'repoze.bfg.debug')
             logger and logger.debug(msg)
             if request is not None:
                 request.authdebug_message = msg
