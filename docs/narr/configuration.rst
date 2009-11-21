@@ -63,7 +63,7 @@ Hello World, Configured Imperatively
 The mechanism simplest for existing Python programmers is "imperative"
 configuration.  This is the configuration mode in which developers
 cede the least amount of control to the framework itself.  Because
-application qdevelopers cede the least amount of control to the
+application developers cede the least amount of control to the
 framework, it is also the easiest configuration mode to understand.
 
 Here's the simplest :mod:`repoze.bfg` application, configured
