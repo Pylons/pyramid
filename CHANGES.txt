@@ -134,6 +134,18 @@ Backwards Incompatibilites
     add an attribute to your unit test request object named
     ``registry`` with the result.
 
+1.1.1 (2009-11-21)
+==================
+
+Bug Fixes
+---------
+
+- "Hybrid mode" applications (applications which explicitly used
+  traversal *after* url dispatch via ``<route>`` paths containing the
+  ``*traverse`` element) were broken in 1.1-final and all 1.1 alpha
+  and beta releases.  Views registered without a ``route_name`` route
+  shadowed views registered with a ``route_name`` inappropriately.
+
 1.1 (2009-11-15)
 ================
 
