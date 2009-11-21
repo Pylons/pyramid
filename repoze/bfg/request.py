@@ -1,12 +1,10 @@
 from zope.deprecation import deprecated
 from zope.interface import implements
 from zope.interface.interface import InterfaceClass
-from zope.interface.interface import Interface
 
 from webob import Request as WebobRequest
 
 from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import IRouteRequest
 
 def make_request_ascii(event):
     """ An event handler that causes the request charset to be ASCII;
@@ -80,7 +78,7 @@ class Request(WebobRequest):
         return self.environ.values()
 
 def route_request_iface(name):
-    return InterfaceClass('%s_IRequest' % name, (IRouteRequest,))
+    return InterfaceClass('%s_IRequest' % name)
 
 def add_global_response_headers(request, headerlist):
     attrs = request.__dict__

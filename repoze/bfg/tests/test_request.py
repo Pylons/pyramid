@@ -150,11 +150,7 @@ class Test_route_request_iface(unittest.TestCase):
         return route_request_iface(name)
 
     def test_it(self):
-        from repoze.bfg.interfaces import IRouteRequest
-        from repoze.bfg.interfaces import IRequest
         iface = self._callFUT('routename')
-        self.failUnless(iface.extends(IRouteRequest))
-        self.failUnless(iface.extends(IRequest))
         self.assertEqual(iface.__name__, 'routename_IRequest')
 
 class Test_add_global_response_headers(unittest.TestCase):

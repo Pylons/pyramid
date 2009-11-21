@@ -6,9 +6,9 @@ from zope.component.interfaces import IObjectEvent
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
-class IRouteRequest(IRequest):
-    """ *internal only* interface used to mark a request when a route
-    matches.  Not an API."""
+class IRouteRequest(Interface):
+    """ *internal only* interface used as in a utility lookup to find
+    route-specific interfaces.  Not an API."""
 
 class IResponseFactory(Interface):
     """ A utility which generates a response factory """
