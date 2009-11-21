@@ -3,9 +3,22 @@
 Creating a :mod:`repoze.bfg` Project
 ====================================
 
-You can use the :mod:`repoze.bfg` sample application generator to get
-started.  This generator uses :term:`Paste` templates to aid in
-the creation of a new project.
+While it's possible to create a :mod:`repoze.bfg` application
+completely manually, it's usfeul to be able to create a "skeleton"
+:mod:`repoze.bfg` application using an application skeleton generator.
+"Skelton" projects can be created using the ``paster create`` command
+in conjunction with :term:`Paste` templates.  Various project
+templates that come with :mod:`repoze.bfg` make different
+configuration assumptions about what type of application you're trying
+to construct.
+
+All existing project templates make the assumption that you want your
+code to live in a Python :term:`package`.  Even if your application is
+extremely simple, it is useful to place code that drives the
+application within a package, because a package is more easily
+extended with new code and an application that lives inside a package
+can be distributed more easily than one which does not live within a
+package.
 
 .. _creating_a_project:
 
