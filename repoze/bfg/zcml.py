@@ -478,14 +478,14 @@ class IStaticDirective(Interface):
 def static(_context, name, path, cache_max_age=3600):
     """ Handle ``static`` ZCML directives
     """
-    abspath = _context.path(path)
+    path = _context.path(path)
     reg = get_current_registry()
     config = Configurator(reg)
 
     _context.action(
         discriminator = ('route', name, False, None, None, None, None, None),
         callable=config.static,
-        args = (name, abspath, cache_max_age, _context.info),
+        args = (name, path, cache_max_age, _context.info),
         )
 
     _context.action(
