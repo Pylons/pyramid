@@ -243,7 +243,7 @@ class Configurator(object):
         renderer = self.renderer_from_name(renderer_name)
         reg = self.reg
         mapped_view = _map_view(view, attr, renderer, renderer_name)
-        owrapped_view = _owrap_view(reg, mapped_view, viewname,wrapper_viewname)
+        owrapped_view = _owrap_view(mapped_view, viewname,wrapper_viewname)
         secured_view = _secure_view(reg, owrapped_view, permission)
         debug_view = _authdebug_view(reg, secured_view, permission)
         derived_view = _predicate_wrap(reg, debug_view, predicates)
@@ -771,7 +771,7 @@ def _map_view(view, attr=None, renderer=None, renderer_name=None):
     decorate_view(wrapped_view, view)
     return wrapped_view
 
-def _owrap_view(registry, view, viewname, wrapper_viewname):
+def _owrap_view(view, viewname, wrapper_viewname):
     if not wrapper_viewname:
         return view
     def _owrapped_view(context, request):
