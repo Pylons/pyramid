@@ -36,26 +36,32 @@ Because :mod:`repoze.bfg` is a framework, from the perspective of the
 people who have written :mod:`repoze.bfg` itself, each deployment of
 an application written using :mod:`repoze.bfg` implies a specific
 *configuration* of the framework iself.  For example, a song-serving
-application might plug code into the framework that manages songs,
-while the ledger-serving application might code into the framework
-that manages accounting information.  :mod:`repoze.bfg` refers to the
-way which code is plugged in to it as "configuration".
+application might plug code into the :mod:`repoze.bfg` framework that
+manages songs, while the ledger-serving application might code into
+the :mod:`repoze.bfg` framework that manages accounting information.
+:mod:`repoze.bfg` refers to the way in which code is plugged in to it
+for a specific deployment as "configuration".
 
-It can be a bit strange to think of code you write which
-:mod:`repoze.bfg` interacts with as "configuration".  Many people
-think of "configuration" as entirely declarative knobs that control
-operation of a specific application deployment; for instance, it's
-easy to think of the values implied by a ``.ini.`` configuration file
-that is read at application startup time as configuration.  However,
-because :mod:`repoze.bfg` is itself a framework, from the perspective
-of the authors of :mod:`repoze.bfg`, when you plug code into it, you
-**are** "configuring" the :mod:`repoze.bfg` framework *itself* for the
-purpose of creating an application.  :mod:`repoze.bfg` refers to this
-act as "configuration".
+It can be a bit strange to think of the act of plugging code which you
+write into :mod:`repoze.bfg` as "configuration".  Many people think of
+"configuration" as knobs that control operation of only a specific
+application deployment; for instance, it's easy to think of the values
+implied by a ``.ini.`` configuration file that is read at application
+startup time as configuration.  However, because :mod:`repoze.bfg` is
+itself a framework, from the perspective of the authors of
+:mod:`repoze.bfg`, when you plug code into it, you **are** indeed
+"configuring" the :mod:`repoze.bfg` framework *itself* for the purpose
+of creating an application deployment.  From the perspective of an
+developer creating an application using :mod:`repoze.bfg`, performing
+the tasks that :mod:`repoze.bfg` calls "configuration" might
+alternately be referred to as "wiring" or
+"plumbing". :mod:`repoze.bfg` refers to it as "configuration", for
+lack of a more elegant term.
 
 There are a number of different mechanisms you may use to configure
 :mod:`repoze.bfg` to create an application: *imperative* configuration
-and *declarative* configuration.
+and *declarative* configuration.  We'll examine both modes in the
+sections which follow.
 
 Hello World, Configured Imperatively
 ------------------------------------
