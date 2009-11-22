@@ -176,7 +176,10 @@ behavior will usually have the same ``for`` and ``name`` (and
 :term:`predicate` attributes, if used) as the original.  These
 ``<view>`` declarations will point at "new" view code.  The new view
 code itself will usually be cut-n-paste copies of view callables from
-the original application with slight tweaks.  For example::
+the original application with slight tweaks.  For example:
+
+.. code-block:: xml
+   :linenos:
 
     <view for="theoriginalapplication.models.SomeModel"
           name="theview"

@@ -82,6 +82,14 @@ within the :term:`application registry` .  Under this configuration,
 when the application is run, each time a new request or response is
 detected, a message will be printed to the console.
 
+.. sidebar:: The ``INewResponse`` Event vs. Middleware
+
+   Postprocessing a response is usually better handled in a WSGI
+   :term:`middleware` component than in subscriber code that is called
+   by an ``INewResponse`` event.  The :mod:`repoze.bfg`
+   ``INewResponse`` event exists almost purely for symmetry with the
+   ``INewRequest`` event.
+
 We know that ``INewRequest`` events have a ``request`` attribute,
 which is a :term:`WebOb` request, because the interface defined at
 ``repoze.bfg.interfaces.INewRequest`` says it must.  Likewise, we know
@@ -90,12 +98,6 @@ response object constructed by your application, because the interface
 defined at ``repoze.bfg.interfaces.INewResponse`` says it must.  These
 particular interfaces, along with others, are documented in the
 :ref:`events_module` API chapter.
-
-.. note::
-
-   Usually postprocessing requests is better handled in middleware
-   components.  The ``INewResponse`` event exists purely for symmetry
-   with ``INewRequest``, really.
 
 The *subscriber* ZCML element takes two attributes: ``for``, and
 ``handler``.  The value of ``for`` is the interface the subscriber is

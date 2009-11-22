@@ -13,25 +13,23 @@ done primarily under Python 2.4 and Python 2.5.  :mod:`repoze.bfg`
 does *not* run under any version of Python before 2.4, and does *not*
 run under Python 3.X.
 
-.. note:: You will need :term:`setuptools` installed
-   on within your Python system in order to run the ``easy_install``
-   command.
+.. sidebar:: You Don't Need A Compiler
 
-.. note:: Installation of :mod:`repoze.bfg` does not require the
-   compilation of any C code, so as long as you have a Python
-   interpreter that meets the above requirements, you do not need to
-   have development tools installed on the target machine to install
+   Installation of :mod:`repoze.bfg` does not require the compilation
+   of any C code, so as long as you have a Python interpreter that
+   meets the requirements mentioned, you do not need to have
+   development tools installed on the target machine to install
    :mod:`repoze.bfg`.
 
 BFG is known to run properly on all popular Unix-like systems such as
 Linux, MacOS X, and FreeBSD.
 
-:mod:`repoze.bfg` does run on Windows systems.  However, none of its
-developers use Windows as a primary development platform.  Therefore,
-most of the platform-specific documentation (excepting this chapter)
-assumes you're using a UNIX system. If you're using a Windows system,
-you'll need to transliterate command lines in the documentation to
-their Windows equivalents.
+:mod:`repoze.bfg` is also known to run on Windows systems.  However,
+none of its developers use Windows as a primary development platform.
+Therefore, most of the platform-specific documentation (excepting this
+chapter) assumes you're using a UNIX system. If you're using a Windows
+system, you'll need to transliterate command lines in the
+documentation to their Windows equivalents.
 
 :mod:`repoze.bfg` is also known to run on Google's App Engine.
 
@@ -303,9 +301,6 @@ When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
 various Chameleon libraries, WebOb, Paste, PasteScript, and
 PasteDeploy libraries are installed.
 
-Additionally, as shown in the next section, PasteScript (aka *paster*)
-templates will be registered that make it easy to start a new
-:mod:`repoze.bfg` project.
-
-
-
+Additionally, as shown in a following chapter, PasteScript (aka
+*paster*) templates will be registered that make it easy to start a
+new :mod:`repoze.bfg` project.

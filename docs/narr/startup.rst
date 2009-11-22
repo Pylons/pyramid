@@ -25,8 +25,10 @@ file to infer settings and starts a server listening on a port.  For
 the purposes of this discussion, we'll assume that you are using this
 command to run your :mod:`repoze.bfg` application.
 
-.. note:: ``paster serve`` is by no means the only way to start up and
-   serve a :mod:`repoze.bfg` application.  Any :term:`WSGI` server is
+.. sidebar:: Using :mod:`repoze.bfg` Without ``paster``
+
+   ``paster serve`` is by no means the only way to start up and serve
+   a :mod:`repoze.bfg` application.  Any :term:`WSGI` server is
    capable of running a :mod:`repoze.bfg` application, and some WSGI
    servers (such as :term:`mod_wsgi`) don't require the
    :term:`PasteDeploy` framework's ``paster serve`` command to do

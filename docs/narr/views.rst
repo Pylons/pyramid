@@ -1645,9 +1645,12 @@ configured view.
 
 Here's an example of a renderer registration in ZCML:
 
-  <renderer
-    name="amf"
-    factory="my.package.MyAMFRenderer"/>
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+     name="amf"
+     factory="my.package.MyAMFRenderer"/>
 
 Adding the above ZCML to your application will allow you to use the
 ``my.package.MyAMFRenderer`` renderer implementation in ``view``
@@ -1668,32 +1671,44 @@ thrown at rendering time.  You can associate more than one filename
 extension with the same renderer implementation as necessary if you
 need to use a different file extension for the same kinds of
 templates.  For example, to associate the ``.zpt`` extension with the
-Chameleon page template renderer factory, use::
+Chameleon page template renderer factory, use:
 
-  <renderer
-     name=".zpt"
-     factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".zpt"
+      factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
 
 To override the default mapping in which files with a ``.pt``
 extension are rendered via a Chameleon ZPT page template renderer, use
-a variation on the following in your application's ZCML::
+a variation on the following in your application's ZCML:
 
-  <renderer
-     name=".pt"
-     factory="my.package.pt_renderer"/>
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".pt"
+      factory="my.package.pt_renderer"/>
 
 To override the default mapping in which files with a ``.txt``
 extension are rendered via a Chameleon text template renderer, use a
-variation on the following in your application's ZCML::
+variation on the following in your application's ZCML:
 
-  <renderer
-     name=".txt"
-     factory="my.package.text_renderer"/>
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".txt"
+      factory="my.package.text_renderer"/>
 
 To associate a *default* renderer with *all* view configurations (even
 ones which do not possess a ``renderer`` attribute), use a variation
 on the following (ie. omit the ``name`` attribute to the renderer
 tag):
 
-  <renderer
-     factory="repoze.bfg.renderers.json_renderer_factory"/>
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      factory="repoze.bfg.renderers.json_renderer_factory"/>

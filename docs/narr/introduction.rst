@@ -8,39 +8,11 @@ uses the :term:`WSGI` protocol to handle requests and responses.
 Similarities to Other Frameworks
 --------------------------------
 
-:mod:`repoze.bfg` was inspired by :term:`Zope`, :term:`Pylons` and
-:term:`Django`.
-
-The :mod:`repoze.bfg` concept of :term:`traversal` is inspired by
-:term:`Zope`.  Additionally, :mod:`repoze.bfg` uses the :term:`Zope
-Component Architecture` internally, as do Zope 2, Zope 3, and
-:term:`Grok`.  :mod:`repoze.bfg` application developers may use either
-:term:`ZCML` (an XML dialect, used in Zope) or decorators to perform
-various application configuration tasks.  The decorator support is
-provided by the :term:`Grok` project.  Like Zope, :mod:`repoze.bfg`
-allows you to create applications which do not need to be forked or
-otherwise modified to be extended by a third party developer.
-
-The :mod:`repoze.bfg` concept of :term:`URL dispatch` is inspired by
-:term:`Pylons`.  Like Pylons, :mod:`repoze.bfg` is mostly policy-free.
-It makes no assertions about which database you should use, and its
-built-in templating facilities are only for convenience.  In essence,
-it only supplies a mechanism to map URLs to :term:`view` code, along
-with a convention for calling those views.  You are free to use
-third-party components in your application that fit your needs.  Also
-like Pylons, :mod:`repoze.bfg` is dependent upon WSGI.
-
-The Django docs state that Django is *not* an "MVC"
-(model/view/controller) framework in their `FAQ
-<http://www.djangoproject.com/documentation/faq/>`_.
-:mod:`repoze.bfg` isn't either.  Django's documentation does a good
-job of why explaining why they don't use "MVC" acronym:
+.. sidebar:: Django's Authors Explain Why It Doesn't Use "MVC" Terminology
 
   Django appears to be a MVC framework, but you call the Controller
   the "view", and the View the "template". How come you don't use the
-  standard names?
-
-  Well, the standard names are debatable.
+  standard names?  Well, the standard names are debatable.
 
   In our interpretation of MVC, the "view" describes the data that
   gets presented to the user. It's not necessarily how the data looks,
@@ -60,12 +32,41 @@ job of why explaining why they don't use "MVC" acronym:
   probably the framework itself: the machinery that sends a request to
   the appropriate view, according to the Django URL configuration.
 
-:mod:`repoze.bfg` uses terminology similar to Django.  The skeleton
-code generator of :mod:`repoze.bfg` generates a directory layout very
-similar to the directory layout suggested by the `Django Book
-<http://www.djangobook.com/>`_ .  Additionally, as suggested above,
-the concepts of :term:`view`, :term:`model` and :term:`template` are
-used by :mod:`repoze.bfg` as they would be by Django.
+:mod:`repoze.bfg` was inspired by :term:`Zope`, :term:`Pylons` and
+:term:`Django`.
+
+The :mod:`repoze.bfg` concept of :term:`traversal` is inspired by
+:term:`Zope`.  Additionally, :mod:`repoze.bfg` uses the :term:`Zope
+Component Architecture` internally, as do Zope 2, Zope 3, and
+:term:`Grok`.  :mod:`repoze.bfg` application developers may use either
+:term:`ZCML` (an XML dialect, used in Zope) or decorators to perform
+various application configuration tasks.  The decorator support is
+provided by the :term:`Grok` project.  Like Zope, :mod:`repoze.bfg`
+allows you to create applications which do not need to be forked or
+otherwise modified to be extended or overridden by a third party
+developer.
+
+The :mod:`repoze.bfg` concept of :term:`URL dispatch` is inspired by
+the :term:`Routes` system used by :term:`Pylons`.  Like Pylons,
+:mod:`repoze.bfg` is mostly policy-free.  It makes no assertions about
+which database you should use, and its built-in templating facilities
+are only for convenience.  In essence, it only supplies a mechanism to
+map URLs to :term:`view` code, along with a convention for calling
+those views.  You are free to use third-party components in your
+application that fit your needs.  Also like Pylons, :mod:`repoze.bfg`
+is dependent upon WSGI.
+
+The Django docs explain that Django is not an "MVC"
+("model/view/controller") framework in their `FAQ
+<http://www.djangoproject.com/documentation/faq/>`_.  The sidebar to
+the right has the Django authors' take on why "MVC" terminology
+doesn't match the web very well.  The concepts of :term:`view` and
+:term:`model` are used by :mod:`repoze.bfg` as they would be by
+Django.
+
+The skeleton code generator of :mod:`repoze.bfg` generates a directory
+layout very similar to the directory layout suggested by the `Django
+Book <http://www.djangobook.com/>`_ .  
 
 Differences from Other Frameworks
 ---------------------------------

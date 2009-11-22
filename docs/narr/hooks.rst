@@ -27,6 +27,7 @@ to the notfound view you want to use.  Here's some sample code that
 implements a minimal NotFound view:
 
 .. code-block:: python
+   :linenos:
 
    from webob.exc import HTTPNotFound
 
@@ -104,6 +105,7 @@ the view invocation was denied.  The ``request`` is the current
 code that implements a minimal forbidden view:
 
 .. code-block:: python
+   :linenos:
 
    from repoze.bfg.chameleon_zpt import render_template_to_response
 
@@ -345,6 +347,4 @@ The API that must be implemented by a class that provides
 The default context URL generator is available for perusal as the
 class ``TraversalContextURL`` in the `traversal module
 <http://svn.repoze.org/repoze.bfg/trunk/repoze/bfg/traversal.py>`_ of
-the BFG subversion repository.
-
-
+the :term:`Repoze` Subversion repository.

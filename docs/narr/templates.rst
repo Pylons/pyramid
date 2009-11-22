@@ -215,8 +215,9 @@ engine writes a file in the same directory as the template file itself
 as a kind of cache, in order to do less work the next time the
 template needs to be read from disk.  When using ``chameleon.core``
 version 1.0b32 and lower, this filename is ``<template_name>.cache``.
-When using ``chameleon.core`` version 1.0b33 and higher, this filename
-is ``<template_name>.py``.  If you see "strange" ``.py`` or ``.cache``
+When using ``chameleon.core`` version 1.0b33 and higher or the
+``Chameleon`` (uppercase-C) package, this filename is
+``<template_name>.py``.  If you see "strange" ``.py`` or ``.cache``
 files showing up in your ``templates`` directory, it is due to this
 feature.  If you're using a version control system such as Subversion,
 you should cause it to ignore these files.  Here's the contents of my

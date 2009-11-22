@@ -23,12 +23,13 @@ factories and 3) the traversal algorithm, and the interactions between
 all of them.  Therefore, use of this pattern is not recommended unless
 you *really* need to use it.
 
-This is a advanced topic that has non-trivial corner cases; you may
-need to understand more deeply how :mod:`repoze.bfg` works to
-understand the concepts discussed in this chapter.  To that end, it's
-useful to read :ref:`router_chapter` to get a more holistic
-understanding of what's happening "under the hood" to use this
-feature.
+.. warning:: Creating applications that use hybrid-mode features of
+   :mod:`repoze.bfg` is a advanced topic that exposes non-trivial
+   corner cases; you may need to understand more deeply how
+   :mod:`repoze.bfg` works to understand the concepts discussed in
+   this chapter.  To that end, it's useful to read
+   :ref:`router_chapter` to get a more holistic understanding of
+   what's happening "under the hood" to use this feature.
 
 The Schism
 ----------

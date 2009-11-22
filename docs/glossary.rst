@@ -15,6 +15,13 @@ Glossary
     upstream), and status (representing the http status string).  This
     is the interface defined for ``WebOb`` response objects.  See
     :ref:`webob_chapter` for information about response objects.
+  Repoze
+    "Repoze" is essentially a "brand" of software developed by
+    `Agendaless Consulting <http://agendaless.com>`_ and a set of
+    contributors.  The term has no special intrinsic meaning.  The
+    project's `website <http://repoze.org>`_ has more information.
+    The software developed "under the brand" is available in a
+    `Subversion repository <http://svn.repoze.org>`_.
   Setuptools
     `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
     builds on Python's ``distutils`` to provide easier building,

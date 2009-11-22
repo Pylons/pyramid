@@ -254,6 +254,16 @@ Once the project is installed for development, you can run the
 application it represents using the ``paster serve`` command against
 the generated ``MyProject.ini`` configuration file:
 
+.. sidebar:: Using ``mod_wsgi``
+
+   You can also use :term:`mod_wsgi` to serve your :mod:`repoze.bfg`
+   application using the Apache web server rather than the
+   "pure-Python" server that is started as a result of ``paster
+   serve``.  See :ref:`modwsgi_tutorial` for details.  However, it is
+   usually easier to develop an application using the ``paster serve``
+   webserver, as exception and debugging output will be sent to the
+   console.
+
 .. code-block:: bash
    :linenos:
 
@@ -276,14 +286,6 @@ port 6543.
    project uses, changes, it will restart the server, which makes
    development easier, as changes to Python code under
    :mod:`repoze.bfg` is not put into effect until the server restarts.
-
-.. note:: You can also use :term:`mod_wsgi` to serve your
-   :mod:`repoze.bfg` application using the Apache web server rather
-   than the "pure-Python" server that is started as a result of
-   ``paster serve``.  See :ref:`modwsgi_tutorial` for details.
-   However, it is usually easier to develop an application using the
-   ``paster serve`` webserver, as exception and debugging output will
-   be sent to the console.
 
 Viewing the Application
 -----------------------
