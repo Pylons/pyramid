@@ -11,7 +11,7 @@ another might be a listing of songs.  These applications obviously
 might not service the same set of customers.  However, both the
 ledger-serving and song-serving applications can be written using
 :mod:`repoze.bfg`, because :mod:`repoze.bfg` is a very general
-*framework* which can be used to create most sorts of web
+*framework* which can be used to create all kinds of web
 applications.  As a framework, the primary job of :mod:`repoze.bfg` is
 to make it easier for a developer to create an arbitrary web
 application.
@@ -38,27 +38,24 @@ application.
    requirements.  :mod:`repoze.bfg` is a framework that fits a large
    set of assumptions in the domain of web application creation.
 
-Because :mod:`repoze.bfg` is a framework, from the perspective of the
-people who have written :mod:`repoze.bfg` itself, each deployment of
-an application written using :mod:`repoze.bfg` implies a specific
-*configuration* of the framework iself.  For example, a song-serving
-application might plug code into the :mod:`repoze.bfg` framework that
-manages songs, while the ledger-serving application might code into
-the :mod:`repoze.bfg` framework that manages accounting information.
+From the perspective of its authors, each deployment of an application
+written using :mod:`repoze.bfg` implies a specific *configuration* of
+the framework itself.  For example, a song-serving application might
+plug code into the framework that manages songs, while the ledger-
+serving application might plug code that manages accounting information.
 :mod:`repoze.bfg` refers to the way in which code is plugged in to it
 for a specific deployment as "configuration".
 
-It may be a bit strange to think of the act of plugging code which you
-write into :mod:`repoze.bfg` as "configuration".  Many people think of
+This way of thinking may sound a bit strange.  Many people think of
 "configuration" as coarse knobs that inform the high-level operation
 of a specific application deployment; for instance, it's easy to think
 of the values implied by a ``.ini`` file that is read at application
-startup time as "configuration".  We can draw an analogy to this type
-of configuration here: because :mod:`repoze.bfg` is itself a
-framework, from the perspective of the authors of :mod:`repoze.bfg`
-itself, when you plug code into it in various ways, you are indeed
+startup time as "configuration".  :mod:`repoze.bfg` goes a bit further
+than that, because it uses standardized ways of plugging the code into 
+the framework, and these can be expressed via configuration as well.
+Thus, when you plug code into it in various ways, you are indeed
 "configuring" :mod:`repoze.bfg` for the purpose of creating an
-application deployment.  From the perspective of an developer creating
+application deployment.  From the perspective of a developer creating
 an application using :mod:`repoze.bfg`, performing the tasks that
 :mod:`repoze.bfg` calls "configuration" might alternately be referred
 to as "wiring" or "plumbing". :mod:`repoze.bfg` refers to it as
@@ -72,11 +69,10 @@ sections which follow.
 Hello World, Configured Imperatively
 ------------------------------------
 
-The mechanism simplest for existing Python programmers is "imperative"
-configuration.  This is the configuration mode in which developers
-cede the least amount of control to the framework itself.  Because
-application developers cede less control to the framework, it is also
-the easiest configuration mode to understand.
+Experienced Python programmers may find the "imperative" configuration
+mechanism fits the way they already do things. This is the configuration
+mode in which developers cede the least amount of control to the framework.
+Because of this, it is also the easiest configuration mode to understand.
 
 Here's the simplest :mod:`repoze.bfg` application, configured
 imperatively:
