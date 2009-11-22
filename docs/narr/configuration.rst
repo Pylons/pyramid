@@ -27,7 +27,7 @@ application.
    selectively, making the resulting application easier to understand
    for the original developer.  When using a framework, the developer
    is typically required to cede a greater portion of control to code
-   he has not authoried: code that resides in the framework itself.
+   he has not authored: code that resides in the framework itself.
    You needn't use a framework at all to create a web application
    using Python.  A rich set of libraries exists for the platform
    which you can snap together to effectively create your own

@@ -67,16 +67,26 @@ class Configurator(object):
     """
     A wrapper around the registry that performs configuration tasks.
     A Configurator is used to configure a :mod:`repoze.bfg`
-    :term:`application registry`.  The Configurator accepts a single
-    argument: ``registry``.  If the ``registry`` argument is passed as
-    a non-``None`` value, it must be an instance of the
-    :mod:`repoze.bfg.registry.Registry` class representing the
-    registry to configure.  If ``registry`` is ``None``, the
-    configurator will create a Registry instance itself and perform
-    some default configuration on the registry it creates.  After
-    construction, the configurator may be used to add configuration to
-    the registry.  The overall state of a registry is called the
-    'configuration state'."""
+    :term:`application registry`.  The Configurator accepts two
+    arguments: ``registry`` and ``package``.  
+
+    If the ``registry`` argument is passed as a non-``None`` value, it
+    must be an instance of the :mod:`repoze.bfg.registry.Registry`
+    class representing the registry to configure.  If ``registry`` is
+    ``None``, the configurator will create a Registry instance itself;
+    it will also perform some default configuration that would not
+    otherwise be done.  After construction, the configurator may be
+    used to add configuration to the registry.  The overall state of a
+    registry is called the 'configuration state'.
+
+    If the ``package`` argument is passed, it must be a reference to a
+    Python package (e.g. ``sys.modules['thepackage']``).  This value
+    is used as a basis to convert relative paths passed to various
+    configuration methods, such as methods which accept a ``renderer``
+    argument, into absolute paths.  If ``None`` is passed (the
+    default), the package is assumed to be the Python package in which
+    the *caller* of the ``Configurator`` constructor lives.
+    """
     def __init__(self, registry=None, package=None):
         self.package = package or caller_package()
         self.reg = registry
@@ -90,8 +100,8 @@ class Configurator(object):
         self.renderer(chameleon_text.renderer_factory, '.txt')
         self.renderer(renderers.json_renderer_factory, 'json')
         self.renderer(renderers.string_renderer_factory, 'string')
-        self.settings({})
         self.root_factory(DefaultRootFactory)
+        self.settings({})
         self.debug_logger(None)
 
     def make_wsgi_app(self, manager=manager, getSiteManager=getSiteManager):
@@ -147,7 +157,8 @@ class Configurator(object):
         """ Load configuration from a :term:`ZCML` file into the
         current configuration state.  The ``spec`` argument is an
         absolute filename, a relative filename, or a :term:`resource
-        specification`, defaulting to ``configure.zcml``."""
+        specification`, defaulting to ``configure.zcml`` (relative to
+        the package of the configurator's caller)."""
 
         # We push our ZCML-defined configuration into an app-local
         # component registry in order to allow more than one bfg app
