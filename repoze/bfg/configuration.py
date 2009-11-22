@@ -64,9 +64,21 @@ from repoze.bfg.view import static
 import martian
 
 class Configurator(object):
-    """ A wrapper around the registry that performs configuration tasks """
-    def __init__(self, registry=None):
-        self.package = caller_package()
+    """
+    A wrapper around the registry that performs configuration tasks.
+    A Configurator is used to configure a :mod:`repoze.bfg`
+    :term:`application registry`.  The Configurator accepts a single
+    argument: ``registry``.  If the ``registry`` argument is passed as
+    a non-``None`` value, it must be an instance of the
+    :mod:`repoze.bfg.registry.Registry` class representing the
+    registry to configure.  If ``registry`` is ``None``, the
+    configurator will create a Registry instance itself and perform
+    some default configuration on the registry it creates.  After
+    construction, the configurator may be used to add configuration to
+    the registry.  The overall state of a registry is called the
+    'configuration state'."""
+    def __init__(self, registry=None, package=None):
+        self.package = package or caller_package()
         self.reg = registry
         if registry is None:
             registry = Registry(self.package.__name__)
@@ -78,11 +90,13 @@ class Configurator(object):
         self.renderer(chameleon_text.renderer_factory, '.txt')
         self.renderer(renderers.json_renderer_factory, 'json')
         self.renderer(renderers.string_renderer_factory, 'string')
-        self.settings(Settings({}))
+        self.settings({})
         self.root_factory(DefaultRootFactory)
         self.debug_logger(None)
 
     def make_wsgi_app(self, manager=manager, getSiteManager=getSiteManager):
+        """ Returns a :mod:`repoze.bfg` WSGI application representing
+        the current configuration state."""
         # manager and getSiteManager in arglist for testing dep injection only
         from repoze.bfg.router import Router # avoid circdep
         app = Router(self.reg)
@@ -102,7 +116,6 @@ class Configurator(object):
     def declarative(self, root_factory, spec='configure.zcml',
                     settings=None, debug_logger=None, os=os,
                     lock=threading.Lock()):
-
         self._default_configuration()
 
         # debug_logger, os and lock *only* for unittests
@@ -130,23 +143,30 @@ class Configurator(object):
     def split_spec(self, path_or_spec):
         return resolve_resource_spec(path_or_spec, self.package.__name__)
 
-    def load_zcml(self, spec, lock=threading.Lock()):
+    def load_zcml(self, spec='configure.zcml', lock=threading.Lock()):
+        """ Load configuration from a :term:`ZCML` file into the
+        current configuration state.  The ``spec`` argument is an
+        absolute filename, a relative filename, or a :term:`resource
+        specification`, defaulting to ``configure.zcml``."""
+
         # We push our ZCML-defined configuration into an app-local
-        # component registry in order to allow more than one bfg app to live
-        # in the same process space without one unnecessarily stomping on
-        # the other's component registrations (although I suspect directives
-        # that have side effects are going to fail).  The only way to do
-        # that currently is to override zope.component.getGlobalSiteManager
-        # for the duration of the ZCML includes.  We acquire a lock in case
-        # another make_app runs in a different thread simultaneously, in a
-        # vain attempt to prevent mixing of registrations.  There's not much
-        # we can do about non-makeRegistry code that tries to use the global
-        # site manager API directly in a different thread while we hold the
-        # lock.  Those registrations will end up in our application's
-        # registry.
+        # component registry in order to allow more than one bfg app
+        # to live in the same process space without one unnecessarily
+        # stomping on the other's component registrations (although I
+        # suspect directives that have side effects are going to
+        # fail).  The only way to do that currently is to override
+        # zope.component.getGlobalSiteManager for the duration of the
+        # ZCML includes.  We acquire a lock in case another load_zcml
+        # runs in a different thread simultaneously, in a vain attempt
+        # to prevent mixing of registrations.  There's not much we can
+        # do about non-load_zcml code that tries to use the global
+        # site manager API directly in a different thread while we
+        # hold the lock.  Those registrations will end up in our
+        # application's registry.
+
         package_name, filename = self.split_spec(spec)
         if package_name is None: # absolute filename
-            package = None
+            package = self.package
         else:
             __import__(package_name)
             package = sys.modules[package_name]
@@ -162,12 +182,15 @@ class Configurator(object):
             lock.release()
             manager.pop()
             getSiteManager.reset()
+        return self.reg
 
     def view(self, view=None, name="", for_=None, permission=None, 
              request_type=None, route_name=None, request_method=None,
              request_param=None, containment=None, attr=None,
              renderer=None, wrapper=None, xhr=False, accept=None,
              header=None, path_info=None, _info=u''):
+        """ Add a :term:`view configuration` to the current
+        configuration state."""
 
         if not view:
             if renderer:
@@ -285,8 +308,8 @@ class Configurator(object):
               renderer=None, view_renderer=None, view_header=None, 
               view_accept=None, view_xhr=False,
               view_path_info=None, _info=u''):
-        # the strange ordering of the request kw args above is for b/w
-        # compatibility purposes.
+        """ Add a :term:`route configuration` to the current
+        configuration state."""
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
         _, predicates = _make_predicates(xhr=xhr,
@@ -330,6 +353,9 @@ class Configurator(object):
         mapper.connect(path, name, factory, predicates=predicates)
 
     def scan(self, package, _info=u'', martian=martian):
+        """ Scan a Python package and any of its subpackages for
+        configuration decorators such as ``@bfg_view``.  Any decorator
+        found will influence the current configuration state."""
         # martian overrideable only for unit tests
         multi_grokker = BFGMultiGrokker()
         multi_grokker.register(BFGViewGrokker())
@@ -340,18 +366,27 @@ class Configurator(object):
             exclude_filter=lambda name: name.startswith('.'))
 
     def authentication_policy(self, policy, _info=u''):
+        """ Add a :mod:`repoze.bfg` :term:`authentication policy` to
+        the current configuration."""
         self.reg.registerUtility(policy, IAuthenticationPolicy, info=_info)
         
     def authorization_policy(self, policy, _info=u''):
+        """ Add a :mod:`repoze.bfg` :term:`authorization policy` to
+        the current configuration state."""
         self.reg.registerUtility(policy, IAuthorizationPolicy, info=_info)
 
     def renderer(self, factory, name, _info=u''):
+        """ Add a :mod:`repoze.bfg` :term:`renderer` to the current
+        configuration state."""
         iface = IRendererFactory
         if name.startswith('.'):
             iface = ITemplateRendererFactory
         self.reg.registerUtility(factory, iface, name=name, info=_info)
 
     def resource(self, to_override, override_with, _info=u'', _override=None,):
+        """ Add a :mod:`repoze.bfg` resource override to the current
+        configuration state.  See :ref:`resources_chapter` for more
+        information about resource overrides."""
         if to_override == override_with:
             raise ConfigurationError('You cannot override a resource with '
                                      'itself')
@@ -399,9 +434,14 @@ class Configurator(object):
             override.insert(path, override_pkg_name, override_prefix)
 
     def forbidden(self, *arg, **kw):
+        """ Add a default forbidden view to the current configuration
+        state."""
+        
         return self.system_view(IForbiddenView, *arg, **kw)
 
     def notfound(self, *arg, **kw):
+        """ Add a default not found view to the current configuration
+        state."""
         return self.system_view(INotFoundView, *arg, **kw)
 
     def system_view(self, iface, view=None, attr=None, renderer=None,
@@ -421,6 +461,7 @@ class Configurator(object):
         self.reg.registerUtility(derived_view, iface, '', info=_info)
 
     def static(self, name, path, cache_max_age=3600, _info=u''):
+        """ Add a static view to the current configuration state."""
         spec = self.make_spec(path)
         view = static(spec, cache_max_age=cache_max_age)
         self.route(name, "%s*subpath" % name, view=view,
@@ -428,6 +469,10 @@ class Configurator(object):
                    _info=_info)
 
     def settings(self, settings):
+        """ Register the value passed in as ``settings`` as the basis
+        of the value returned by the
+        ``repoze.bfg.settings.get_settings`` API."""
+        settings = Settings(settings)
         self.reg.registerUtility(settings, ISettings)
 
     def debug_logger(self, logger):
@@ -436,6 +481,8 @@ class Configurator(object):
         self.reg.registerUtility(logger, ILogger, 'repoze.bfg.debug')
 
     def root_factory(self, factory):
+        """ Add a :term:`root factory` to the current configuration
+        state."""
         self.reg.registerUtility(factory, IRootFactory)
         self.reg.registerUtility(factory, IDefaultRootFactory) # b/c
         

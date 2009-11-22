@@ -3,12 +3,12 @@ import unittest
 from repoze.bfg.testing import cleanUp
 
 class ConfiguratorTests(unittest.TestCase):
-    def _makeOne(self, registry=None):
+    def _makeOne(self, registry=None, package=None):
         from repoze.bfg.registry import Registry
         from repoze.bfg.configuration import Configurator
         if registry is None:
             registry = Registry()
-        return Configurator(registry)
+        return Configurator(registry, package)
 
     def _registerRenderer(self, config, name='.txt'):
         from repoze.bfg.interfaces import IRendererFactory
@@ -91,10 +91,20 @@ class ConfiguratorTests(unittest.TestCase):
         config.reg.registerUtility(settings, ISettings)
 
     def test_ctor_no_registry(self):
+        import sys
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.configuration import Configurator
         config = Configurator()
+        this_pkg = sys.modules['repoze.bfg.tests']
         self.failUnless(config.reg.getUtility(ISettings))
+        self.assertEqual(config.package, this_pkg)
+
+    def test_ctor_with_package_registry(self):
+        import sys
+        from repoze.bfg.configuration import Configurator
+        bfg_pkg = sys.modules['repoze.bfg']
+        config = Configurator(package=bfg_pkg)
+        self.assertEqual(config.package, bfg_pkg)
 
     def test__default_configuration(self):
         from repoze.bfg.interfaces import ISettings
@@ -129,6 +139,37 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.pushed['request'], None)
         self.failUnless(manager.popped)
         self.assertEqual(len(subscriber), 1)
+
+    def test_load_zcml_default(self):
+        import repoze.bfg.tests.fixtureapp
+        config = self._makeOne(package=repoze.bfg.tests.fixtureapp)
+        registry = config.load_zcml()
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_load_zcml_as_resource_spec(self):
+        config = self._makeOne()
+        registry = config.load_zcml(
+            'repoze.bfg.tests.fixtureapp:configure.zcml')
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_load_zcml_as_relative_filename(self):
+        import repoze.bfg.tests.fixtureapp
+        config = self._makeOne(package=repoze.bfg.tests.fixtureapp)
+        registry = config.load_zcml('configure.zcml')
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_load_zcml_as_absolute_filename(self):
+        import os
+        import repoze.bfg.tests.fixtureapp
+        config = self._makeOne(package=repoze.bfg.tests.fixtureapp)
+        dn = os.path.dirname(repoze.bfg.tests.fixtureapp.__file__)
+        c_z = os.path.join(dn, 'configure.zcml')
+        registry = config.load_zcml(c_z)
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_declarative_fixtureapp_default_filename_withpackage(self):
         rootfactory = DummyRootFactory(None)

@@ -18,19 +18,25 @@ application.
 
 .. sidebar:: Frameworks vs. Libraries
 
-   A framework differs from a *library*: library code is always
-   *called* by code that you write, while a framework always *calls*
-   code that you write.  Using the average library is typically easier
-   than using the average framework.  During typical library usage,
-   the developer can more granularly avoid ceding any control to code
-   he does not himself author.  During typical framework usage,
-   however, the developer must cede a greater portion of control to
-   the framework.  In practice, using a framework to create a web
-   application is often more practical than using a set of libraries
-   if the framework provides a set of facilities and assumptions that
-   fit a large portion of your application requirements.
-   :mod:`repoze.bfg` is a framework that fits a large set of
-   assumptions in the domain of web application creation.
+   A *framework* differs from a *library* in one very important way:
+   library code is always *called* by code that you write, while a
+   framework always *calls* code that you write.  Using a set of
+   libraries to create an application is often initially easier than
+   using a framework to create an application, because the developer
+   can choose to cede control to library code he has not authored
+   selectively, making the resulting application easier to understand
+   for the original developer.  When using a framework, the developer
+   is typically required to cede a greater portion of control to code
+   he has not authoried: code that resides in the framework itself.
+   You needn't use a framework at all to create a web application
+   using Python.  A rich set of libraries exists for the platform
+   which you can snap together to effectively create your own
+   framework.  In practice, however, using an existing framework to
+   create an application is often more practical than rolling your own
+   via a set of libraries if the framework provides a set of
+   facilities and assumptions that fit your application domain's
+   requirements.  :mod:`repoze.bfg` is a framework that fits a large
+   set of assumptions in the domain of web application creation.
 
 Because :mod:`repoze.bfg` is a framework, from the perspective of the
 people who have written :mod:`repoze.bfg` itself, each deployment of
@@ -42,21 +48,21 @@ the :mod:`repoze.bfg` framework that manages accounting information.
 :mod:`repoze.bfg` refers to the way in which code is plugged in to it
 for a specific deployment as "configuration".
 
-It can be a bit strange to think of the act of plugging code which you
+It may be a bit strange to think of the act of plugging code which you
 write into :mod:`repoze.bfg` as "configuration".  Many people think of
-"configuration" as knobs that control operation of only a specific
-application deployment; for instance, it's easy to think of the values
-implied by a ``.ini.`` configuration file that is read at application
-startup time as configuration.  However, because :mod:`repoze.bfg` is
-itself a framework, from the perspective of the authors of
-:mod:`repoze.bfg`, when you plug code into it, you **are** indeed
-"configuring" the :mod:`repoze.bfg` framework *itself* for the purpose
-of creating an application deployment.  From the perspective of an
-developer creating an application using :mod:`repoze.bfg`, performing
-the tasks that :mod:`repoze.bfg` calls "configuration" might
-alternately be referred to as "wiring" or
-"plumbing". :mod:`repoze.bfg` refers to it as "configuration", for
-lack of a more elegant term.
+"configuration" as coarse knobs that inform the high-level operation
+of a specific application deployment; for instance, it's easy to think
+of the values implied by a ``.ini`` file that is read at application
+startup time as "configuration".  We can draw an analogy to this type
+of configuration here: because :mod:`repoze.bfg` is itself a
+framework, from the perspective of the authors of :mod:`repoze.bfg`
+itself, when you plug code into it in various ways, you are indeed
+"configuring" :mod:`repoze.bfg` for the purpose of creating an
+application deployment.  From the perspective of an developer creating
+an application using :mod:`repoze.bfg`, performing the tasks that
+:mod:`repoze.bfg` calls "configuration" might alternately be referred
+to as "wiring" or "plumbing". :mod:`repoze.bfg` refers to it as
+"configuration", for lack of a more fitting term.
 
 There are a number of different mechanisms you may use to configure
 :mod:`repoze.bfg` to create an application: *imperative* configuration
@@ -69,8 +75,8 @@ Hello World, Configured Imperatively
 The mechanism simplest for existing Python programmers is "imperative"
 configuration.  This is the configuration mode in which developers
 cede the least amount of control to the framework itself.  Because
-application developers cede the least amount of control to the
-framework, it is also the easiest configuration mode to understand.
+application developers cede less control to the framework, it is also
+the easiest configuration mode to understand.
 
 Here's the simplest :mod:`repoze.bfg` application, configured
 imperatively:
@@ -196,7 +202,7 @@ Let's break this down this line-by-line:
    if __name__ == '__main__':
        config = Configurator()
 
-The ``if __name__ == '__main__':`` line above qrepresents a Python
+The ``if __name__ == '__main__':`` line above represents a Python
 idiom: the code inside this if clause is not invoked unless the script
 is run directly from the command line via, for example, ``python
 helloworld.py`` where the file named ``helloworld.py`` contains the
@@ -298,19 +304,19 @@ Conclusion
 ~~~~~~~~~~
 
 Our hello world application is the simplest possible :mod:`repoze.bfg`
-application, configured "imperatively".  We can see more or less
-what's going on "under the hood" when we configure things
-imperatively.  However, another mode of configuration exists named
-*declarative* configuration.
+application, configured "imperatively".  We can see a good deal of
+what's going on "under the hood" when we configure a :mod:`repoze.bfg`
+application imperatively.  However, another mode of configuration
+exists named *declarative* configuration.
 
 Hello World, Configured Declaratively
 -------------------------------------
 
-:mod:`repoze.bfg` can be configured for the same application
-"declaratively", if so desired.  Declarative configuration relies on
-*declarations* made external to the code in a configuration file
-format named :term:`ZCML` (Zope Configuration Markup Language), an XML
-dialect.
+:mod:`repoze.bfg` can be configured for the same "hello world"
+application "declaratively", if so desired.  Declarative configuration
+relies on *declarations* made external to the code in a configuration
+file format named :term:`ZCML` (Zope Configuration Markup Language),
+an XML dialect.
 
 Declarative configuration mode is the configuration mode in which
 developers cede the most amount of control to the framework itself.
@@ -364,3 +370,4 @@ previously created ``helloworld.py``:
          />
 
     </configure>
+
