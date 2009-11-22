@@ -3,6 +3,17 @@
 Creating Your First :mod:`repoze.bfg` Application
 =================================================
 
+The majority of the logic in any web application is completely
+application-specific.  For example, the body of a web page served by
+one web application might be a representation of the contents of an
+accounting ledger, while the content of of a web page served by
+another might be a listing of songs.  These applications obviously
+might not service the same set of customers.  However, both the
+ledger-serving and song-serving applications can be written using
+:mod:`repoze.bfg`, because :mod:`repoze.bfg` is a very general
+*framework* which can be used to create all kinds of web
+applications.
+
 .. sidebar:: Frameworks vs. Libraries
 
    A *framework* differs from a *library* in one very important way:
@@ -25,26 +36,15 @@ Creating Your First :mod:`repoze.bfg` Application
    requirements.  :mod:`repoze.bfg` is a framework that fits a large
    set of assumptions in the domain of web application creation.
 
-The majority of the logic in any web application is completely
-application-specific.  For example, the body of a web page served by
-one web application might be a representation of the contents of an
-accounting ledger, while the content of of a web page served by
-another might be a listing of songs.  These applications obviously
-might not service the same set of customers.  However, both the
-ledger-serving and song-serving applications can be written using
-:mod:`repoze.bfg`, because :mod:`repoze.bfg` is a very general
-*framework* which can be used to create all kinds of web
-applications.  As a framework, the primary job of :mod:`repoze.bfg` is
-to make it easier for a developer to create an arbitrary web
-application.
-
-From the perspective of its authors, each deployment of an application
-written using :mod:`repoze.bfg` implies a specific *configuration* of
-the framework itself.  For example, a song-serving application might
-plug code into the framework that manages songs, while the ledger-
-serving application might plug code that manages accounting information.
-:mod:`repoze.bfg` refers to the way in which code is plugged in to it
-for a specific deployment as "configuration".
+As a framework, the primary job of :mod:`repoze.bfg` is to make it
+easier for a developer to create an arbitrary web application.  From
+the perspective of the authors of :mod:`repoze.bfg`, each deployment
+of an application written using :mod:`repoze.bfg` implies a specific
+*configuration* of the framework itself.  For example, a song-serving
+application might plug code into the framework that manages songs,
+while the ledger- serving application might plug code that manages
+accounting information.  :mod:`repoze.bfg` refers to the way in which
+code is plugged in to it for a specific deployment as "configuration".
 
 Many people think of "configuration" as coarse knobs that inform the
 high-level operation of a specific application deployment; for
@@ -54,8 +54,9 @@ that is read at application startup time as "configuration".
 standardized ways of plugging code into the framework, and these can
 be expressed via configuration as well.  Thus, when you plug code into
 it in various ways, you are indeed "configuring" :mod:`repoze.bfg` for
-the purpose of creating an application deployment.  From the
-perspective of a developer creating an application using
+the purpose of creating an application deployment.
+
+From the perspective of a developer creating an application using
 :mod:`repoze.bfg`, performing the tasks that :mod:`repoze.bfg` calls
 "configuration" might alternately be referred to as "wiring" or
 "plumbing". :mod:`repoze.bfg` refers to it as "configuration", for
