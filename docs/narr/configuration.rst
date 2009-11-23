@@ -283,7 +283,7 @@ the URL *are* exhausted before :term:`traversal` returns a
 (the empty string).  When no path segements are "left over" after
 traversal, the :term:`default view` for the context found is invoked.
 
-Apologies that his digression was required; on with the chapter.
+Apologies that this digression was required; on with the chapter.
 
 .. note:: 
 
