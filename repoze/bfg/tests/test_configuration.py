@@ -20,7 +20,7 @@ class ConfiguratorTests(unittest.TestCase):
                 self.__class__.path = path
             def __call__(self, *arg):
                 return 'Hello!'
-        config.reg.registerUtility(Renderer, IRendererFactory, name=name)
+        config.registry.registerUtility(Renderer, IRendererFactory, name=name)
         return Renderer
 
     def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
@@ -32,18 +32,18 @@ class ConfiguratorTests(unittest.TestCase):
             ctx_iface = Interface
         if request_iface is None:
             request_iface = IRequest
-        return config.reg.adapters.lookup(
+        return config.registry.adapters.lookup(
             (ctx_iface, request_iface), IView, name=name,
             default=None)
 
     def _callDeclarative(self, *arg, **kw):
         inst = self._makeOne()
         inst.declarative(*arg, **kw)
-        return inst.reg
+        return inst.registry
 
     def _getRouteRequestIface(self, config, name):
         from repoze.bfg.interfaces import IRouteRequest
-        iface = config.reg.getUtility(IRouteRequest, name)
+        iface = config.registry.getUtility(IRouteRequest, name)
         return iface
 
     def _assertNotFound(self, wrapper, *arg):
@@ -65,30 +65,30 @@ class ConfiguratorTests(unittest.TestCase):
         L = []
         def subscriber(*event):
             L.extend(event)
-        config.reg.registerHandler(subscriber, (event_iface,))
+        config.registry.registerHandler(subscriber, (event_iface,))
         return L
 
     def _registerLogger(self, config):
         from repoze.bfg.interfaces import ILogger
         logger = DummyLogger()
-        config.reg.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        config.registry.registerUtility(logger, ILogger, 'repoze.bfg.debug')
         return logger
 
     def _makeRequest(self, config):
         request = DummyRequest()
-        request.registry = config.reg
+        request.registry = config.registry
         return request
 
     def _registerSecurityPolicy(self, config, permissive):
         from repoze.bfg.interfaces import IAuthenticationPolicy
         from repoze.bfg.interfaces import IAuthorizationPolicy
         policy = DummySecurityPolicy(permissive)
-        config.reg.registerUtility(policy, IAuthenticationPolicy)
-        config.reg.registerUtility(policy, IAuthorizationPolicy)
+        config.registry.registerUtility(policy, IAuthenticationPolicy)
+        config.registry.registerUtility(policy, IAuthorizationPolicy)
 
     def _registerSettings(self, config, **settings):
         from repoze.bfg.interfaces import ISettings
-        config.reg.registerUtility(settings, ISettings)
+        config.registry.registerUtility(settings, ISettings)
 
     def test_ctor_no_registry(self):
         import sys
@@ -96,7 +96,7 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.configuration import Configurator
         config = Configurator()
         this_pkg = sys.modules['repoze.bfg.tests']
-        self.failUnless(config.reg.getUtility(ISettings))
+        self.failUnless(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
 
     def test_ctor_with_package_registry(self):
@@ -112,8 +112,8 @@ class ConfiguratorTests(unittest.TestCase):
         registry = Registry()
         config = self._makeOne(registry)
         config._default_configuration()
-        self.assertEqual(config.reg, registry)
-        self.failIf(config.reg.getUtility(ISettings) is None)
+        self.assertEqual(config.registry, registry)
+        self.failIf(config.registry.getUtility(ISettings) is None)
 
     def test_make_wsgi_app(self):
         from repoze.bfg.threadlocal import get_current_registry
@@ -135,7 +135,7 @@ class ConfiguratorTests(unittest.TestCase):
         app = config.make_wsgi_app(getSiteManager=gsm, manager=manager)
         self.assertEqual(app.__class__, Router)
         self.assertEqual(gsm.hook, get_current_registry)
-        self.assertEqual(manager.pushed['registry'], config.reg)
+        self.assertEqual(manager.pushed['registry'], config.registry)
         self.assertEqual(manager.pushed['request'], None)
         self.failUnless(manager.popped)
         self.assertEqual(len(subscriber), 1)
@@ -366,7 +366,7 @@ class ConfiguratorTests(unittest.TestCase):
         view.__call_permissive__ = view
         config = self._makeOne()
         config.view(view=view)
-        wrapper = config.reg.adapters.lookup(
+        wrapper = config.registry.adapters.lookup(
             (Interface, IRequest), ISecuredView, name='', default=None)
         self.assertEqual(wrapper, view)
 
@@ -377,7 +377,8 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IMultiView
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.reg.registerAdapter(view, (Interface, IRequest), IView, name='')
+        config.registry.registerAdapter(
+            view, (Interface, IRequest), IView, name='')
         config.view(view=view)
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -401,8 +402,8 @@ class ConfiguratorTests(unittest.TestCase):
                 """ """
         view = DummyMultiView()
         config = self._makeOne()
-        config.reg.registerAdapter(view, (Interface, IRequest),
-                                   IMultiView, name='')
+        config.registry.registerAdapter(view, (Interface, IRequest),
+                                        IMultiView, name='')
         view2 = lambda *arg: 'OK2'
         config.view(view=view2)
         wrapper = self._getViewCallable(config)
@@ -722,7 +723,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def _assertRoute(self, config, name, path, num_predicates=0):
         from repoze.bfg.interfaces import IRoutesMapper
-        mapper = config.reg.getUtility(IRoutesMapper)
+        mapper = config.registry.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         route = routes[0]
         self.assertEqual(len(routes), 1)
@@ -961,8 +962,8 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IAuthorizationPolicy
         config = self._makeOne()
         policy = lambda *arg: None
-        config.reg.registerUtility(policy, IAuthenticationPolicy)
-        config.reg.registerUtility(policy, IAuthorizationPolicy)
+        config.registry.registerUtility(policy, IAuthenticationPolicy)
+        config.registry.registerUtility(policy, IAuthorizationPolicy)
         view = lambda *arg: 'OK'
         config.route('name', 'path', view=view, view_permission='edit')
         request_type = self._getRouteRequestIface(config, 'name')
@@ -975,8 +976,8 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IAuthorizationPolicy
         config = self._makeOne()
         policy = lambda *arg: None
-        config.reg.registerUtility(policy, IAuthenticationPolicy)
-        config.reg.registerUtility(policy, IAuthorizationPolicy)
+        config.registry.registerUtility(policy, IAuthenticationPolicy)
+        config.registry.registerUtility(policy, IAuthorizationPolicy)
         view = lambda *arg: 'OK'
         config.route('name', 'path', view=view, permission='edit')
         request_type = self._getRouteRequestIface(config, 'name')
@@ -991,8 +992,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config._override(package, 'path', opackage, 'oprefix',
                          PackageOverrides=DummyOverrides)
-        overrides = config.reg.queryUtility(IPackageOverrides,
-                                            name='package')
+        overrides = config.registry.queryUtility(IPackageOverrides,
+                                                 name='package')
         self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
         self.assertEqual(overrides.package, package)
 
@@ -1002,8 +1003,8 @@ class ConfiguratorTests(unittest.TestCase):
         opackage = DummyPackage('opackage')
         overrides = DummyOverrides(package)
         config = self._makeOne()
-        config.reg.registerUtility(overrides, IPackageOverrides,
-                                   name='package')
+        config.registry.registerUtility(overrides, IPackageOverrides,
+                                        name='package')
         config._override(package, 'path', opackage, 'oprefix',
                          PackageOverrides=DummyOverrides)
         self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
@@ -1020,7 +1021,7 @@ class ConfiguratorTests(unittest.TestCase):
         route = self._assertRoute(config, 'static', 'static*subpath')
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
-        wrapped = config.reg.adapters.lookup(
+        wrapped = config.registry.adapters.lookup(
             (iface, request_type), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
@@ -1036,7 +1037,7 @@ class ConfiguratorTests(unittest.TestCase):
         route = self._assertRoute(config, 'static', 'static*subpath')
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
-        wrapped = config.reg.adapters.lookup(
+        wrapped = config.registry.adapters.lookup(
             (iface, request_type), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
@@ -1055,7 +1056,7 @@ class ConfiguratorTests(unittest.TestCase):
         route = self._assertRoute(config, 'static', 'static*subpath')
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
-        wrapped = config.reg.adapters.lookup(
+        wrapped = config.registry.adapters.lookup(
             (iface, request_type), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
@@ -1071,7 +1072,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.system_view(IDummy,
                            renderer='repoze.bfg.tests:fixtures/minimal.pt')
         request = self._makeRequest(config)
-        view = config.reg.getUtility(IDummy)
+        view = config.registry.getUtility(IDummy)
         result = view(None, request)
         self.assertEqual(result.body, 'Hello!')
 
@@ -1083,7 +1084,7 @@ class ConfiguratorTests(unittest.TestCase):
             def index(self):
                 return 'OK'
         config.system_view(IDummy, view=view, attr='index')
-        view = config.reg.getUtility(IDummy)
+        view = config.registry.getUtility(IDummy)
         request = self._makeRequest(config)
         result = view(None, request)
         self.assertEqual(result, 'OK')
@@ -1096,13 +1097,13 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         view = lambda *arg: DummyResponse()
         wrapper = lambda *arg: 'OK2'
-        config.reg.registerAdapter(wrapper, (Interface, Interface),
-                                   IView, name='wrapper')
+        config.registry.registerAdapter(wrapper, (Interface, Interface),
+                                        IView, name='wrapper')
         config.system_view(IDummy, view=view, wrapper='wrapper')
-        view = config.reg.getUtility(IDummy)
+        view = config.registry.getUtility(IDummy)
         request = self._makeRequest(config)
         directlyProvides(request, IRequest)
-        request.registry = config.reg
+        request.registry = config.registry
         context = DummyContext()
         result = view(context, request)
         self.assertEqual(result, 'OK2')
@@ -1113,7 +1114,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config.notfound(view)
         request = self._makeRequest(config)
-        view = config.reg.getUtility(INotFoundView)
+        view = config.registry.getUtility(INotFoundView)
         result = view(None, request)
         self.assertEqual(result, 'OK')
 
@@ -1123,7 +1124,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config.forbidden(view)
         request = self._makeRequest(config)
-        view = config.reg.getUtility(IForbiddenView)
+        view = config.registry.getUtility(IForbiddenView)
         result = view(None, request)
         self.assertEqual(result, 'OK')
 
@@ -1132,14 +1133,16 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         policy = object()
         config.authentication_policy(policy)
-        self.assertEqual(config.reg.getUtility(IAuthenticationPolicy), policy)
+        self.assertEqual(
+            config.registry.getUtility(IAuthenticationPolicy), policy)
 
     def test_authorization_policy(self):
         from repoze.bfg.interfaces import IAuthorizationPolicy
         config = self._makeOne()
         policy = object()
         config.authorization_policy(policy)
-        self.assertEqual(config.reg.getUtility(IAuthorizationPolicy), policy)
+        self.assertEqual(
+            config.registry.getUtility(IAuthorizationPolicy), policy)
 
     def test_derive_view_as_function_context_and_request(self):
         def view(context, request):
@@ -1413,14 +1416,15 @@ class ConfiguratorTests(unittest.TestCase):
             self.assertEqual(request.wrapped_view, inner_view)
             return Response('outer ' + request.wrapped_body)
         config = self._makeOne()
-        config.reg.registerAdapter(outer_view, (None, None), IView, 'owrap')
+        config.registry.registerAdapter(
+            outer_view, (None, None), IView, 'owrap')
         result = config.derive_view(inner_view, viewname='inner',
                                     wrapper_viewname='owrap')
         self.failIf(result is inner_view)
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest(config)
-        request.registry = config.reg
+        request.registry = config.registry
         response = result(None, request)
         self.assertEqual(response.body, 'outer OK')
 
@@ -1431,7 +1435,7 @@ class ConfiguratorTests(unittest.TestCase):
             return inner_response
         config = self._makeOne()
         request = self._makeRequest(config)
-        request.registry = config.reg
+        request.registry = config.registry
         wrapped = config.derive_view(
             inner_view, viewname='inner', wrapper_viewname='owrap')
         result = self.assertRaises(ValueError, wrapped, None, request)

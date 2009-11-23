@@ -86,12 +86,12 @@ class Configurator(object):
     default), the package is assumed to be the Python package in which
     the *caller* of the ``Configurator`` constructor lives.
     """
-    def __init__(self, registry=None, package=None):
+    def __init__(self, registry=None, package=None, settings=None):
         self.package = package or caller_package()
-        self.reg = registry
+        self.registry = registry
         if registry is None:
             registry = Registry(self.package.__name__)
-            self.reg = registry
+            self.registry = registry
             self._default_configuration()
 
     def _default_configuration(self):
@@ -108,16 +108,16 @@ class Configurator(object):
         the current configuration state."""
         # manager and getSiteManager in arglist for testing dep injection only
         from repoze.bfg.router import Router # avoid circdep
-        app = Router(self.reg)
+        app = Router(self.registry)
         # executing sethook means we're taking over getSiteManager for
         # the lifetime of this process
         getSiteManager.sethook(get_current_registry)
         # We push the registry on to the stack here in case any ZCA API is
         # used in listeners subscribed to the WSGIApplicationCreatedEvent
         # we send.
-        manager.push({'registry':self.reg, 'request':None})
+        manager.push({'registry':self.registry, 'request':None})
         try:
-            self.reg.notify(WSGIApplicationCreatedEvent(app))
+            self.registry.notify(WSGIApplicationCreatedEvent(app))
         finally:
             manager.pop()
         return app
@@ -182,7 +182,7 @@ class Configurator(object):
             package = sys.modules[package_name]
 
         lock.acquire()
-        manager.push({'registry':self.reg, 'request':None})
+        manager.push({'registry':self.registry, 'request':None})
         try:
             getSiteManager.sethook(get_current_registry)
             zope.component.getGlobalSiteManager = get_current_registry
@@ -192,7 +192,7 @@ class Configurator(object):
             lock.release()
             manager.pop()
             getSiteManager.reset()
-        return self.reg
+        return self.registry
 
     def view(self, view=None, name="", for_=None, permission=None, 
              request_type=None, route_name=None, request_method=None,
@@ -220,11 +220,12 @@ class Configurator(object):
             request_type = IRequest
 
         if route_name is not None:
-            request_type = self.reg.queryUtility(IRouteRequest, name=route_name)
+            request_type = self.registry.queryUtility(IRouteRequest,
+                                                      name=route_name)
             if request_type is None:
                 request_type = route_request_iface(route_name)
-                self.reg.registerUtility(request_type, IRouteRequest,
-                                         name=route_name)
+                self.registry.registerUtility(request_type, IRouteRequest,
+                                              name=route_name)
 
         score, predicates = _make_predicates(
             xhr=xhr, request_method=request_method, path_info=path_info,
@@ -241,15 +242,15 @@ class Configurator(object):
             r_for_ = implementedBy(r_for_)
         if not IInterface.providedBy(r_request_type):
             r_request_type = implementedBy(r_request_type)
-        old_view = self.reg.adapters.lookup((r_for_, r_request_type),
-                                            IView, name=name)
+        old_view = self.registry.adapters.lookup((r_for_, r_request_type),
+                                                 IView, name=name)
         if old_view is None:
             if hasattr(derived_view, '__call_permissive__'):
                 view_iface = ISecuredView
             else:
                 view_iface = IView
-            self.reg.registerAdapter(derived_view, (for_, request_type),
-                                     view_iface, name, info=_info)
+            self.registry.registerAdapter(derived_view, (for_, request_type),
+                                          view_iface, name, info=_info)
         else:
             # XXX we could try to be more efficient here and register
             # a non-secured view for a multiview if none of the
@@ -264,20 +265,19 @@ class Configurator(object):
             multiview.add(derived_view, score)
             for i in (IView, ISecuredView):
                 # unregister any existing views
-                self.reg.adapters.unregister((r_for_, r_request_type), i,
-                                             name=name)
-            self.reg.registerAdapter(multiview, (for_, request_type),
-                                     IMultiView, name, info=_info)
+                self.registry.adapters.unregister((r_for_, r_request_type), i,
+                                                  name=name)
+            self.registry.registerAdapter(multiview, (for_, request_type),
+                                          IMultiView, name, info=_info)
 
     def derive_view(self, view, permission=None, predicates=(),
                     attr=None, renderer_name=None, wrapper_viewname=None,
                     viewname=None):
-        reg = self.reg
         renderer = self.renderer_from_name(renderer_name)
-        authn_policy = self.reg.queryUtility(IAuthenticationPolicy)
-        authz_policy = self.reg.queryUtility(IAuthorizationPolicy)
-        settings = self.reg.queryUtility(ISettings)
-        logger = self.reg.queryUtility(ILogger, 'repoze.bfg.debug')
+        authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
+        authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
+        settings = self.registry.queryUtility(ISettings)
+        logger = self.registry.queryUtility(ILogger, 'repoze.bfg.debug')
         mapped_view = _map_view(view, attr, renderer, renderer_name)
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
         secured_view = _secure_view(owrapped_view, permission,
@@ -291,7 +291,7 @@ class Configurator(object):
     def renderer_from_name(self, path_or_spec):
         if path_or_spec is None:
             # check for global default renderer
-            factory = self.reg.queryUtility(IRendererFactory)
+            factory = self.registry.queryUtility(IRendererFactory)
             if factory is not None:
                 return factory(path_or_spec)
             return None
@@ -303,7 +303,7 @@ class Configurator(object):
             name = path_or_spec
             spec = path_or_spec
 
-        factory = self.reg.queryUtility(IRendererFactory, name=name)
+        factory = self.registry.queryUtility(IRendererFactory, name=name)
         if factory is None:
             raise ValueError('No renderer for renderer name %r' % name)
         return factory(spec)
@@ -329,10 +329,11 @@ class Configurator(object):
                                          header=header,
                                          accept=accept)
 
-        request_iface = self.reg.queryUtility(IRouteRequest, name=name)
+        request_iface = self.registry.queryUtility(IRouteRequest, name=name)
         if request_iface is None:
             request_iface = route_request_iface(name)
-            self.reg.registerUtility(request_iface, IRouteRequest, name=name)
+            self.registry.registerUtility(
+                request_iface, IRouteRequest, name=name)
 
         if view:
             view_for = view_for or for_
@@ -356,10 +357,10 @@ class Configurator(object):
                 _info=_info,
                 )
 
-        mapper = self.reg.queryUtility(IRoutesMapper)
+        mapper = self.registry.queryUtility(IRoutesMapper)
         if mapper is None:
             mapper = RoutesMapper()
-            self.reg.registerUtility(mapper, IRoutesMapper)
+            self.registry.registerUtility(mapper, IRoutesMapper)
         mapper.connect(path, name, factory, predicates=predicates)
 
     def scan(self, package, _info=u'', martian=martian):
@@ -378,12 +379,12 @@ class Configurator(object):
     def authentication_policy(self, policy, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`authentication policy` to
         the current configuration."""
-        self.reg.registerUtility(policy, IAuthenticationPolicy, info=_info)
+        self.registry.registerUtility(policy, IAuthenticationPolicy, info=_info)
         
     def authorization_policy(self, policy, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`authorization policy` to
         the current configuration state."""
-        self.reg.registerUtility(policy, IAuthorizationPolicy, info=_info)
+        self.registry.registerUtility(policy, IAuthorizationPolicy, info=_info)
 
     def renderer(self, factory, name, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`renderer` to the current
@@ -391,7 +392,7 @@ class Configurator(object):
         iface = IRendererFactory
         if name.startswith('.'):
             iface = ITemplateRendererFactory
-        self.reg.registerUtility(factory, iface, name=name, info=_info)
+        self.registry.registerUtility(factory, iface, name=name, info=_info)
 
     def resource(self, to_override, override_with, _info=u'', _override=None,):
         """ Add a :mod:`repoze.bfg` resource override to the current
@@ -436,11 +437,12 @@ class Configurator(object):
                   _info=u'', PackageOverrides=PackageOverrides):
             pkg_name = package.__name__
             override_pkg_name = override_package.__name__
-            override = self.reg.queryUtility(IPackageOverrides, name=pkg_name)
+            override = self.registry.queryUtility(
+                IPackageOverrides, name=pkg_name)
             if override is None:
                 override = PackageOverrides(package)
-                self.reg.registerUtility(override, IPackageOverrides,
-                                         name=pkg_name, info=_info)
+                self.registry.registerUtility(override, IPackageOverrides,
+                                              name=pkg_name, info=_info)
             override.insert(path, override_pkg_name, override_prefix)
 
     def forbidden(self, *arg, **kw):
@@ -468,7 +470,7 @@ class Configurator(object):
         derived_view = self.derive_view(view, attr=attr,
                                         renderer_name=renderer,
                                         wrapper_viewname=wrapper)
-        self.reg.registerUtility(derived_view, iface, '', info=_info)
+        self.registry.registerUtility(derived_view, iface, '', info=_info)
 
     def static(self, name, path, cache_max_age=3600, _info=u''):
         """ Add a static view to the current configuration state."""
@@ -483,18 +485,18 @@ class Configurator(object):
         of the value returned by the
         ``repoze.bfg.settings.get_settings`` API."""
         settings = Settings(settings)
-        self.reg.registerUtility(settings, ISettings)
+        self.registry.registerUtility(settings, ISettings)
 
     def debug_logger(self, logger):
         if logger is None:
             logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
-        self.reg.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        self.registry.registerUtility(logger, ILogger, 'repoze.bfg.debug')
 
     def root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
         state."""
-        self.reg.registerUtility(factory, IRootFactory)
-        self.reg.registerUtility(factory, IDefaultRootFactory) # b/c
+        self.registry.registerUtility(factory, IRootFactory)
+        self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
         
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
