@@ -5,7 +5,7 @@
 
 .. automodule:: repoze.bfg.configuration
 
-  .. autoclass:: Configurator
+  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, zcml_file=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS)
 
      .. automethod:: route
 
