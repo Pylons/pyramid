@@ -88,6 +88,9 @@ class Configurator(object):
     used to add configuration to the registry.  The overall state of a
     registry is called the 'configuration state'.
 
+    .. warning:: If a ``registry`` is passed to the Configurator, all
+       other arguments are ignored.
+
     If the ``package`` argument is passed, it must be a reference to a
     Python package (e.g. ``sys.modules['thepackage']``).  This value
     is used as a basis to convert relative paths passed to various
