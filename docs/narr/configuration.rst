@@ -46,26 +46,39 @@ while the ledger- serving application might plug code that manages
 accounting information.  :mod:`repoze.bfg` refers to the way in which
 code is plugged in to it for a specific deployment as "configuration".
 
-Many people think of "configuration" as coarse knobs that inform the
-high-level operation of a specific application deployment; for
+Most people understand "configuration" as coarse knobs that inform the
+high-level operation of a specific application deployment.  For
 instance, it's easy to think of the values implied by a ``.ini`` file
-that is read at application startup time as "configuration".
-:mod:`repoze.bfg` goes a bit further than that, because it uses
-standardized ways of plugging code into the framework, and these can
-be expressed via configuration as well.  Thus, when you plug code into
-it in various ways, you are indeed "configuring" :mod:`repoze.bfg` for
-the purpose of creating an application deployment.
+which is parsed at application startup time as "configuration".
+:mod:`repoze.bfg` extends this pattern all the way out to application
+development, using the term "configuration" to express standardized
+methods the framework makes available to developers which can be used
+to plug code into a deployment of the framework itself.  When you plug
+code into the :mod:`repoze.bfg` framework, you are indeed
+"configuring" :mod:`repoze.bfg` for the purpose of creating a
+particular application deployment.
 
-From the perspective of a developer creating an application using
-:mod:`repoze.bfg`, performing the tasks that :mod:`repoze.bfg` calls
-"configuration" might alternately be referred to as "wiring" or
-"plumbing". :mod:`repoze.bfg` refers to it as "configuration", for
-lack of a more fitting term.
+.. admonition:: Tip
+
+   If the term "configuration" as used in this guide just doesn't seem
+   to "click" in your brain, maybe because you just can't bring
+   yourself to consider "configuration" anything except the
+   modification of a configuration file containing higher-level knobs
+   than those exposed by :mod:`repoze.bfg`, it may help to mentally
+   substitute the term "configuration" with "wiring" or "plumbing" as
+   you read the chapter.
 
 There are a number of different mechanisms you may use to configure
 :mod:`repoze.bfg` to create an application: *imperative* configuration
 and *declarative* configuration.  We'll examine both modes in the
 sections which follow.
+
+.. warning::
+
+   If you are using Python 2.4 (as opposed to Python 2.5 or 2.6), you
+   will need to install the ``wsgiref`` package for the examples in
+   this chapter to work.  Use ``easy_install wsgiref`` to get it
+   installed.
 
 .. _helloworld_imperative:
 
@@ -90,25 +103,25 @@ imperatively:
    def hello_world(request):
        return Response('Hello world!')
 
+   def goodbye_world(request):
+       return Response('Goodbye world!')
+
    if __name__ == '__main__':
        config = Configurator()
        config.add_view(hello_world)
+       config.add_view(goodbye_world, name='goodbye')
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
 When this code is inserted into a Python script named
 ``helloworld.py`` and executed by a Python interpreter which has the
 :mod:`repoze.bfg` software installed, this code starts an HTTP server
-on port 8080.  When visited by a user agent on any applicable URL, the
-server simply serves serves up the words "Hello world!" with the HTTP
-response values ``200 OK`` as a response code and a ``Content-Type``
-header value of ``text/plain``.
-
-.. warning::
-
-   If you are using Python 2.4 (as opposed to Python 2.5 or 2.6), you
-   will need to install the ``wsgiref`` package for its import to
-   work.  Use ``easy_install wsgiref`` to get it installed.
+on port 8080.  When visited by a user agent on the root URL (``/``),
+the server simply serves serves up the words "Hello world!" with the
+HTTP response values ``200 OK`` as a response code and a
+``Content-Type`` header value of ``text/plain``.  When visited by a
+user agent on the URL ``/goodbye``, the server serves up "Goodbye
+world!".
 
 Let's examine this program piece-by-piece.
 
@@ -144,8 +157,8 @@ class provides methods which help configure various parts of
 View Declaration
 ~~~~~~~~~~~~~~~~
 
-The above script, beneath its set of imports, defines a function named
-``hello_world``.
+The above script, beneath its set of imports, defines two functions:
+one named ``hello_world`` and one named ``goodbye_world``.
 
 .. code-block:: python
    :linenos:
@@ -153,28 +166,32 @@ The above script, beneath its set of imports, defines a function named
    def hello_world(request):
        return Response('Hello world!')
 
-This function accepts a single argument (``request``), and returns an
-instance of the ``webob.Response`` class.  The string ``'Hello
-world!'`` is passed to the ``Response`` constructor as the *body* of
-the response.
+   def goodbye_world(request):
+       return Response('Goodbye world!')
 
-Such a function is known as a :term:`view callable`.  View callables
-in a "real" :mod:`repoze.bfg` application are often functions which
-accept a request and return a response.  A view callable can be
-represented via another type of object, like a class or an instance,
-but for our purposes here, a function serves us well.
+Both functions accepts a single argument (``request``), and each
+returns an instance of the ``webob.Response`` class.  In the
+``hello_world`` function, the string ``'Hello world!'`` is passed to
+the ``Response`` constructor as the *body* of the response.  In the
+``goodbye_world`` function, the string ``'Goodbye world!'`` is passed.
 
-A :term:`view callable` is invoked by the :mod:`repoze.bfg` web
-framework when a request "matches" its :term:`view configuration`.  It
-is called with a :term:`request` object, which is a representation of
-an HTTP request sent by a remote user agent.  A view callable is
-required to return a :term:`response` object because a response object
-has all the information necessary to formulate an actual HTTP
-response; this object is then converted to text and sent back to the
-requesting user agent.
+Each of these functions is known as a :term:`view callable`.  View
+callables in a "real" :mod:`repoze.bfg` application are often
+functions which accept a request and return a response.  A view
+callable can be represented via another type of object, like a class
+or an instance, but for our purposes here, a function serves us well.
 
-The view callable defined by the script does nothing but return a
-response with the body ``Hello world!``.
+A view callable is called with a :term:`request` object, which is a
+representation of an HTTP request sent by a remote user agent.  A view
+callable is required to return a :term:`response` object because a
+response object has all the information necessary to formulate an
+actual HTTP response; this object is then converted to text and sent
+back to the requesting user agent.
+
+The ``hello_world`` view callable defined by the script does nothing
+but return a response with the body ``Hello world!``; the
+``goodbye_world`` view callable returns a response with the body
+``Goodbye world!``.
 
 .. _helloworld_imperative_appconfig:
 
@@ -192,6 +209,7 @@ imports and function definitions is placed within the confines of an
    if __name__ == '__main__':
        config = Configurator()
        config.add_view(hello_world)
+       config.add_view(goodbye_world, name='goodbye')
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
@@ -218,42 +236,108 @@ only be run during a direct script execution.
 The ``config = Configurator()`` line above creates an instance of the
 ``repoze.bfg.configuration.Configurator`` class.  The resulting
 ``config`` object represents an API which the script uses to configure
-this particular :mod:`repoze.bfg` application.  An instance of the
-``Configurator`` class is a wrapper object which mutates an
-:term:`application registry` as its methods are called.  
+this particular :mod:`repoze.bfg` application.
 
 .. note::
 
-   The ``Configurator`` is not itself an :term:`application registry`.
-   It is only a mechanism used to configure an application registry.
-   The underlying application registry object being configured by a
-   ``Configurator`` is available as its ``registry`` attribute.
+   An instance of the ``Configurator`` class is a *wrapper* object
+   which mutates an :term:`application registry` as its methods are
+   called.  An application registry represents the configuration state
+   of a :mod:`repoze.bfg` application.  The ``Configurator`` is not
+   itself an :term:`application registry`, it is a mechanism used to
+   configure an application registry.  The underlying application
+   registry object being configured by a ``Configurator`` is available
+   as its ``registry`` attribute.
 
 .. code-block:: python
    :linenos:
 
        config.add_view(hello_world)
+       config.add_view(goodbye_world, name='goodbye')
 
-This line calls the ``add_view`` method of the ``Configurator``.  The
-``add_view`` method of a configurator creates a :term:`view
-configuration` within the :term:`application registry`.  A :term:`view
-configuration` represents a set of circumstances which must be true
-for a particular :term:`view callable` to be called when a WSGI
-request is handled by :mod:`repoze.bfg`.
+Each of these lines calls the ``add_view`` method of the
+``Configurator`` API.  The ``add_view`` method of a configurator
+registers a :term:`view configuration` within the :term:`application
+registry`.  A :term:`view configuration` represents a :term:`view
+callable` which must be invoked when a set of circumstances related to
+the :term:`request` is true.  This "set of circumstances" is provided
+as one or more keyword arguments to the ``add_view`` method, otherwise
+known as :term:`predicate` arguments.
 
-The first argument of the configurator's ``add_view`` method must
-always be a reference to the :term:`view callable` that is meant to be
-invoked when the view configuration implied by the remainder of the
-arguments passed to ``add_view`` is found to "match" during a request.
-This particular invocation of the ``add_view`` method passes no other
-arguments; this implies that there are no circumstances which would
-limit the applicability of this view callable.  The view configuration
-implied by this call to ``add_view`` thus will match during *any*
-request.  Since our ``hello_world`` view callable returns a Response
-instance with a body of ``Hello world!```, this means, in the
-configuration implied by the script, that any URL visited by a user
-agent to a server running this application will receive the greeting
-``Hello world!``.
+The line ``config.add_view(hello_world)`` registers the
+``hello_world`` function as a view callble.  The ``add_view`` method
+of a Configurator must be called with a view callable object as its
+first argument, so the first argument passed is ``hello_world``
+function we'd like to use as a :term:`view callable`.  However, this
+line calls ``add_view`` with no additional :term:`predicate`
+arguments, meaning that we'd like :mod:`repoze.bfg` to invoke the
+``hello_world`` view callable for *any* request if another more
+specific view configuration (one with more specific predicate
+arguments) doesn't match it more closely.
+
+Since our ``hello_world`` view callable returns a Response instance
+with a body of ``Hello world!``` in the configuration implied by this
+script, a user agent to a server running this application will receive
+the greeting ``Hello world!`` when any URL is invoked, unless
+:mod:`repoze.bfg` finds a more specific view configuration in its
+application registry for a given request.
+
+The line ``config.add_view(goodbye_world, name='goodbye')`` registers
+the ``hello_world`` function as a view callble.  The line calls
+``add_view`` with the view callable as the first required positional
+argument, and a :term:`predicate` keyword argument ``name`` with the
+value ``'goodbye'``.  This :term:`view configuration` implies that a
+request with a :term:`view name` of ``goodbye`` should cause the
+``goodbye_world`` view callable to be invoked.  For the purposes of
+this discussion, the :term:`view name` can be considered the first
+non-empty path segment in the URL: in particular, this view
+configuration will match when the URL is ``/goodbye``.
+
+.. sidebar:: View Dispatching and Ordering
+
+   If you've been running the code in this tutorial, you've actually
+   unknowingly now configured :mod:`repoze.bfg` to serve an
+   application that relies on :term:`traversal`.  When
+   :term:`traversal` is used, :mod:`repoze.bfg` chooses the most
+   specific view callable based *only* on view :term:`predicate`
+   applicability.  This is unlike :term:`URL dispatch`, another
+   dispatch mode of :mod:`repoze.bfg` (and other frameworks, like
+   :term:`Pylons` and :term:`Django`) which first uses an ordered
+   routing lookup to resolve the request to a view callable by running
+   it through a relatively-ordered series of URL path matches.  We're
+   not really concerned about the finer details of :term:`URL
+   dispatch` right now.  It's just useful to use for demonstrative
+   purposes: the ordering of calls to ``Configurator.add_view`` is
+   never very important.  We can register ``goodbye_world`` first and
+   ``hello_world`` second; :mod:`repoze.bfg` will still give us the
+   most specific callable when a request is dispatched to it.
+
+Since our ``goodbye_world`` view callable returns a Response instance
+with a body of ``Goodbye world!`` in the configuration implied by this
+script, a visit by a user agent to the URL that contains the path info
+``/goodbye`` of the a server running this application will receive the
+greeting ``Goodbye world!`` unless :mod:`repoze.bfg` finds a more
+specific view configuration in its application registry for a given
+request.
+
+Each invocation of the ``add_view`` method implies a :term:`view
+configuration` registration.  Each :term:`predicate` provided as a
+keyword argument to the ``add_view`` method narrows the set of
+circumstances which would cause the view configuration's callable to
+be invoked.  In general, a greater number of predicates supplied along
+with a view configuration will more strictly limit the applicability
+of its associated view callable.  When :mod:`repoze.bfg` processes a
+request, however, the view callable with the *most specific* view
+configuration (the view configuration that matches the largest number
+of predicates) is always invoked.  This has some repercussions. The
+view configuration registration for the ``hello_world`` view callable
+has no predicates, and is thus applicable for *all* requests.  But
+we've also registered a more specific view configuration: the
+``goodbye_world`` view callable has a ``name`` predicate of
+``goodbye``.  Because :mod:`repoze.bfg` uses the most specific view
+configuration for any request, the ``goodbye_world`` view callable
+will be used when the URL contains path information that is
+``/goodbye``.
 
 WGSI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -263,14 +347,13 @@ WGSI Application Creation
 
        app = config.make_wsgi_app()
 
-After configuring a single view, the script creates a WSGI
-*application* via the ``config.make_wsgi_app`` method.  A call to
-``make_wsgi_app`` implies that all "configuration" is finished
-(meaning all method calls to the configurator which set up views, and
-various other configuration settings have been performed).  The
-``make_wsgi_app`` method returns a :term:`WSGI` application object
-that can be used by any WSGI server to present an application to a
-requestor.
+After configuring views, the script creates a WSGI *application* via
+the ``config.make_wsgi_app`` method.  A call to ``make_wsgi_app``
+implies that all "configuration" is finished (meaning all method calls
+to the configurator which set up views, and various other
+configuration settings have been performed).  The ``make_wsgi_app``
+method returns a :term:`WSGI` application object that can be used by
+any WSGI server to present an application to a requestor.
 
 The :mod:`repoze.bfg` application object, in particular, is an
 instance of the ``repoze.bfg.router.Router`` class.  It has a
@@ -278,10 +361,12 @@ reference to the :term:`application registry` which resulted from
 method calls to the configurator used to configure it.  The Router
 consults the registry to obey the policy choices made by a single
 application.  These policy choices were informed by method calls to
-the ``Configurator`` made earlier; in our case, the only policy choice
-made was a single call to the ``add_view`` method, telling our
-application that it should unconditionally serve up the
-``hello_world`` view callable to any requestor.
+the ``Configurator`` made earlier; in our case, the only policy
+choices made were implied by two calls to the ``add_view`` method,
+telling our application that it should effectively serve up the
+``hello_world`` view callable to any user agent when it visits the
+root URL, and the ``goodbye_world`` view callable to any user agent
+when it visits the URL with the path info ``/goodbye``.
 
 WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -304,11 +389,11 @@ stop it by killing the process which runs it.
 Conclusion
 ~~~~~~~~~~
 
-Our hello world application is the simplest possible :mod:`repoze.bfg`
-application, configured "imperatively".  We can see a good deal of
-what's going on "under the hood" when we configure a :mod:`repoze.bfg`
-application imperatively.  However, another mode of configuration
-exists named *declarative* configuration.
+Our hello world application is one of the simplest possible
+:mod:`repoze.bfg` applications, configured "imperatively".  We can see
+a good deal of what's going on "under the hood" when we configure a
+:mod:`repoze.bfg` application imperatively.  However, another mode of
+configuration exists named *declarative* configuration.
 
 Hello World, Configured Declaratively
 -------------------------------------
@@ -369,12 +454,16 @@ previously created ``helloworld.py``:
          view="helloworld.hello_world"
          />
 
+      <view
+         name="goodbye"
+         view="helloworld.goodbye_world"
+         />
+
     </configure>
 
 This pair of files forms an application functionally equivalent to the
 application we created earlier.  Let's examine the differences between
-the code described in :ref:`helloworld_imperative`" and the code
-above.
+the code described in :ref:`helloworld_imperative` and the code above.
 
 In :ref:`helloworld_imperative_appconfig`, we had the following lines
 within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
@@ -385,13 +474,15 @@ within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
    if __name__ == '__main__':
        config = Configurator()
        config.add_view(hello_world)
+       config.add_view(goodbye_world, name='goodbye')
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
 In our "declarative" code, we've added a ``zcml_file`` argument to the
 ``Configurator`` constructor's argument list with the value
-``configure.zcml``, and we've removed the line which reads
-``config.add_view(hello_world)``, so that it now reads as:
+``configure.zcml``, and we've removed the lines which read
+``config.add_view(hello_world)`` and ``config.add_view(goodbye_world,
+name='goodbye')``, so that it now reads as:
 
 .. code-block:: python
    :linenos:
@@ -417,6 +508,11 @@ take a look at the ``configure.zcml`` file now:
 
       <view
          view="helloworld.hello_world"
+         />
+
+      <view
+         name="goodbye"
+         view="helloworld.goodbye_world"
          />
 
     </configure>
@@ -448,7 +544,7 @@ The ``<include>`` Tag
 ~~~~~~~~~~~~~~~~~~~~~
 
 The ``configure.zcml`` ZCML file contains this bit of XML within the
-root tag:
+``<configure>`` root tag:
 
 .. code-block:: xml
    :linenos:
@@ -489,8 +585,8 @@ in a "top-level" ZCML file, it needn't also exist in ZCML files
 The ``<view>`` Tag
 ~~~~~~~~~~~~~~~~~~
 
-The ``configure.zcml`` ZCML file contains this bit of XML after the
-``<include>`` tag, but within the root tag:
+The ``configure.zcml`` ZCML file contains these bits of XML *after* the
+``<include>`` tag, but *within* the ``<configure>`` root tag:
 
 .. code-block:: xml
    :linenos:
@@ -499,27 +595,79 @@ The ``configure.zcml`` ZCML file contains this bit of XML after the
          view="helloworld.hello_world"
          />
 
-This ``<view>`` declaration tag directs :mod:`repoze.bfg` to create a
-:term:`view configuration`.  This ``<view>`` tag has an attribute (the
-attribute is also named ``view``), which points at a :term:`dotted
-Python name`, referencing the ``hello_world`` function defined within
-the ``helloworld`` package.  This tag is functionally equivalent to a
-line we saw previously in our imperatively-configured application:
+      <view
+         name="goodbye"
+         view="helloworld.goodbye_world"
+         />
+
+These ``<view>`` declaration tags direct :mod:`repoze.bfg` to create
+two :term:`view configuration` registrations.  The first ``<view>``
+tag has an attribute (the attribute is also named ``view``), which
+points at a :term:`dotted Python name`, referencing the
+``hello_world`` function defined within the ``helloworld`` package.
+The second ``<view>`` tag has a ``view`` attribute which points at a
+:term:`dotted Python name`, referencing the ``goodbye_world`` function
+defined within the ``helloworld`` package.  The second ``<view>`` tag
+also has an attribute called ``name`` with a value of ``goodbye``.
+
+These effect of the ``<view>`` tag declarations we've put into our
+``configure.zcml`` is functionally equivalent to the effect of lines
+we've already seen in an imperatively-configured application.  We're
+just spelling things differently, using XML instead of Python.
+
+In our previously defined application, in which we added view
+configurations imperatively, we saw this code:
 
 .. code-block:: python
    :linenos:
 
        config.add_view(hello_world)
+       config.add_view(goodbye_world, name='goodbye')
 
-The ``<view>`` declaration tag effectively invokes the ``add_view``
-method of the ``Configurator`` object on your behalf.  Various
-attributes can be specified on the ``<view>`` tag which influence the
-:term:`view configuration` it creates.
+Each ``<view>`` declaration tag encountered in a ZCML file effectively
+invokes the ``add_view`` method of the ``Configurator`` object on the
+behalf of the developer.  Various attributes can be specified on the
+``<view>`` tag which influence the :term:`view configuration` it
+creates.
+
+Since the relative ordering of calls to ``Configuration.add_view``
+doesn't matter (see the sidebar above entitled *View Dispatching and
+Ordering*), the relative order of ``<view>`` tags in ZCML doesn't
+matter either.  The following ZCML orderings are completely
+equivalent:
+
+.. topic:: Hello Before Goodbye
+
+  .. code-block:: xml
+     :linenos:
+
+        <view
+           view="helloworld.hello_world"
+           />
+
+        <view
+           name="goodbye"
+           view="helloworld.goodbye_world"
+           />
+
+.. topic:: Goodbye Before Hello
+
+  .. code-block:: xml
+     :linenos:
+
+        <view
+           name="goodbye"
+           view="helloworld.goodbye_world"
+           />
+
+        <view
+           view="helloworld.hello_world"
+           />
 
 The ``<view>`` tag is an example of a :mod:`repoze.bfg` declaration
 tag.  Other such tags include ``<route>``, ``<scan>``, ``<notfound>``,
-``<forbidden>``, and others.  All of these tags are effectively
-"macros" which call methods on the ``Configurator`` object on your
+``<forbidden>``, and others.  Each of these tags is effectively a
+"macro" which calls methods on the ``Configurator`` object on your
 behalf.
 
 ZCML Conflict Detection
@@ -611,4 +759,7 @@ best fits your brain as necessary.
 For more information about the API of the ``Configurator`` object, see
 :ref:`configuration_module`.  The equivalent ZCML declaration tags are
 introduced in narrative documentation chapters as necessary.
+
+For more information about :term:`view configuration`, see
+:ref:`views_chapter`.
 

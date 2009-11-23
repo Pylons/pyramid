@@ -11,5 +11,7 @@
 - Finish Configurator API documentation.
 
 - notfound/forbidden as Configurator API arguments (get rid of
-  set_notfound_view and set_forbidden_view?)
+  set_notfound_view, set_forbidden_view, set_security_policies?)
+
+- Basic WSGI documentation (pipeline / app / server).
 
