@@ -71,9 +71,9 @@ Glossary
   View
     Common vernacular for a :term:`view callable`.
   View Callable
-    A "view callable" is a callable Python object which returns a
-    response object which is associated with a :term:`view
-    configuration`.  It should accept two values: :term:`context` and
+    A "view callable" is a callable Python object which is associated
+    with a :term:`view configuration`; it returns a :term:`response`
+    object .  It should accept two values: :term:`context` and
     :term:`request`.  An alternate calling convention allows a view to
     be defined as a a callable which only accepts a single ``request``
     argument.  A view callable is the primary mechanism by which a
@@ -132,18 +132,18 @@ Glossary
     :term:`URL dispatch` based on URL data; if it's found via
     traversal, it's usually a :term:`model` object that is part of an
     object graph; if it's found via :term:`URL dispatch`, it's a
-    manufactured context object that contains security information.  A
-    context becomes the subject of a :term:`view`, and typically has
-    security information attached to it.  See the
-    :ref:`traversal_chapter` chapter and the
-    :ref:`urldispatch_chapter` chapter for more information about how
-    a URL is resolved to a context.
+    object manufacture on behalf of the route's "factory".  A context
+    becomes the subject of a :term:`view`, and typically has security
+    information attached to it.  See the :ref:`traversal_chapter`
+    chapter and the :ref:`urldispatch_chapter` chapter for more
+    information about how a URL is resolved to a context.
   Application registry
-    A registry which maps model types to views, as well as performing
-    other application-specific component registrations.  Every
+    A registry of configuration information consulted by
+    :mod:`repoze.bfg` while servicing an appliation.  An application
+    registry maps model types to views, as well as housing other
+    application-specific component registrations.  Every
     :mod:`repoze.bfg` application has one (and only one) application
-    registry, which is represented on disk by its ``configure.zcml``
-    file (and any other included .zcml files)
+    registry.
   Template
     A file with replaceable parts that is capable of representing some
     text, XML, or HTML when rendered.
@@ -357,8 +357,7 @@ Glossary
     Interfaces can also be used to describe the behavior of an object
     (its methods and attributes), but unless they choose to,
     :mod:`repoze.bfg` programmers do not need to understand or use
-    this feature of interfaces.  In other words, bfg developers need
-    to only understand "marker" interfaces.
+    this feature of interfaces.
   Event
     An object broadcast to zero or more :term:`subscriber` callables
     during normal system operations.  :mod:`repoze.bfg` emits events
@@ -387,12 +386,7 @@ Glossary
     that particular interface.  Application code can cause requests to
     possess a different interface by adding the interface to the
     request object within a :term:`subscriber` to the
-    ``repoze.bfg.interfaces.INewRequest`` event type.  String aliases
-    such as ``GET``, ``POST``, etc. representing HTTP method names may
-    be used in place of an interface specification in the
-    ``request_type`` argument passed to view declarations.  ``GET`` is
-    aliased to ``repoze.bfg.interfaces.IGETRequest``, ``POST`` is
-    aliased to ``repoze.bfg.interfaces.IPOSTRequest``, and so on.
+    ``repoze.bfg.interfaces.INewRequest`` event type. 
   repoze.lemonade
     Zope2 CMF-like `data structures and helper facilities
     <http://docs.repoze.org/lemonade>`_ for CA-and-ZODB-based
