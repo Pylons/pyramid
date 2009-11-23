@@ -90,7 +90,7 @@ mechanism fits the way they already do things. This is the configuration
 mode in which developers cede the least amount of control to the framework.
 Because of this, it is also the easiest configuration mode to understand.
 
-Here's the simplest :mod:`repoze.bfg` application, configured
+Here's one of the simplest :mod:`repoze.bfg` applications, configured
 imperatively:
 
 .. code-block:: python
@@ -117,11 +117,11 @@ When this code is inserted into a Python script named
 ``helloworld.py`` and executed by a Python interpreter which has the
 :mod:`repoze.bfg` software installed, this code starts an HTTP server
 on port 8080.  When visited by a user agent on the root URL (``/``),
-the server simply serves serves up the words "Hello world!" with the
-HTTP response values ``200 OK`` as a response code and a
-``Content-Type`` header value of ``text/plain``.  When visited by a
-user agent on the URL ``/goodbye``, the server serves up "Goodbye
-world!".
+the server will simply serve up the text "Hello world!" with the HTTP
+response values ``200 OK`` as a response code and a ``Content-Type``
+header value of ``text/plain``.  But for reasons we'll better
+understand shortly, when visited by a user agent on the URL
+``/goodbye``, the server will serve up "Goodbye world!".
 
 Let's examine this program piece-by-piece.
 
@@ -213,7 +213,7 @@ imports and function definitions is placed within the confines of an
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
-Let's break this down this line-by-line:
+Let's break this down this piece-by-piece:
 
 .. code-block:: python
    :linenos:
@@ -329,15 +329,24 @@ with a view configuration will more strictly limit the applicability
 of its associated view callable.  When :mod:`repoze.bfg` processes a
 request, however, the view callable with the *most specific* view
 configuration (the view configuration that matches the largest number
-of predicates) is always invoked.  This has some repercussions. The
+of predicates) is always invoked. 
+
+Earlier we explained that the server would return ``Hello world!`` if
+you visited the *root* (``/``) URL.  However, actually, because the
 view configuration registration for the ``hello_world`` view callable
-has no predicates, and is thus applicable for *all* requests.  But
-we've also registered a more specific view configuration: the
-``goodbye_world`` view callable has a ``name`` predicate of
-``goodbye``.  Because :mod:`repoze.bfg` uses the most specific view
-configuration for any request, the ``goodbye_world`` view callable
-will be used when the URL contains path information that is
-``/goodbye``.
+has no :term:`predicate` arguments, the ``hello_world`` view callable
+is applicable for *any request*.  For example, if you visit the URL
+with the path info ``/buz``, you will see ``Hello world!``.  The only
+time you *won't* see ``Hello world!`` is when you visit a URL with the
+path info that ends in ``/goodbye``.  This is because we've also
+registered a *more specific* view configuration for this circumstance:
+the ``goodbye_world`` view callable has a ``name`` predicate of
+``goodbye``, meaning that it is a better match for requests that have
+the :term:`view name` ``goodbye`` than the more general
+``hello_world`` view configuration registration.  Because
+:mod:`repoze.bfg` uses the most specific view configuration for any
+request, the ``goodbye_world`` view callable will be used when the URL
+contains path information that ends with ``/goodbye``.
 
 WGSI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
