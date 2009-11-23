@@ -18,7 +18,7 @@ class TestViewDirective(unittest.TestCase):
         return view(*arg, **kw)
 
     def test_request_type_ashttpmethod(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
@@ -33,8 +33,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(action['discriminator'], discrim)
         register = action['callable']
         register()
-        sm = getSiteManager()
-        wrapper = sm.adapters.lookup((IDummy, IRequest), IView, name='')
+        reg = get_current_registry()
+        wrapper = reg.adapters.lookup((IDummy, IRequest), IView, name='')
         request = DummyRequest()
         request.method = 'GET'
         self.assertEqual(wrapper.__predicated__(None, request), True)
@@ -42,7 +42,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(wrapper.__predicated__(None, request), False)
         
     def test_request_type_asinterfacestring(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg.interfaces import IRequest
@@ -57,11 +57,11 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        sm = getSiteManager()
-        regview = sm.adapters.lookup((IDummy, IDummy), IView, name='')
+        reg = get_current_registry()
+        regview = reg.adapters.lookup((IDummy, IDummy), IView, name='')
         self.assertEqual(view, regview)
         self.failIf(hasattr(view, '__call_permissive__'))
-        perm = sm.adapters.lookup((IDummy, IRequest), IViewPermission, name='')
+        perm = reg.adapters.lookup((IDummy, IRequest), IViewPermission, name='')
         self.assertEqual(perm, None)
 
     def test_with_dotted_renderer(self):
@@ -89,7 +89,7 @@ class TestNotFoundDirective(unittest.TestCase):
         return notfound(context, view)
     
     def test_it(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import INotFoundView
 
         context = DummyContext()
@@ -103,8 +103,8 @@ class TestNotFoundDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], INotFoundView)
         register = regadapt['callable']
         register()
-        sm = getSiteManager()
-        derived_view = sm.getUtility(INotFoundView)
+        reg = get_current_registry()
+        derived_view = reg.getUtility(INotFoundView)
         self.assertEqual(derived_view(None, None), 'OK')
         self.assertEqual(derived_view.__name__, view.__name__)
 
@@ -120,7 +120,7 @@ class TestForbiddenDirective(unittest.TestCase):
         return forbidden(context, view)
     
     def test_it(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         context = DummyContext()
         def view(request):
             return 'OK'
@@ -134,8 +134,8 @@ class TestForbiddenDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IForbiddenView)
         register = regadapt['callable']
         register()
-        sm = getSiteManager()
-        derived_view = sm.getUtility(IForbiddenView)
+        reg = get_current_registry()
+        derived_view = reg.getUtility(IForbiddenView)
         self.assertEqual(derived_view(None, None), 'OK')
         self.assertEqual(derived_view.__name__, view.__name__)
 
@@ -163,12 +163,12 @@ class TestSystemViewHandler(unittest.TestCase):
         self.assertRaises(ConfigurationError, register)
     
     def test_no_view_with_renderer(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IRendererFactory
-        sm = getSiteManager()
+        reg = get_current_registry()
         def renderer(path):
             return lambda *arg: 'OK'
-        sm.registerUtility(renderer, IRendererFactory, name='dummy')
+        reg.registerUtility(renderer, IRendererFactory, name='dummy')
         context = DummyContext()
         handler = self._makeOne(IDummy)
         handler(context, renderer='dummy')
@@ -178,17 +178,17 @@ class TestSystemViewHandler(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IDummy)
         register = regadapt['callable']
         register()
-        derived_view = sm.getUtility(IDummy)
+        derived_view = reg.getUtility(IDummy)
         request = DummyRequest()
         self.assertEqual(derived_view(None, request).body, 'OK')
 
     def test_template_renderer(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IRendererFactory
-        sm = getSiteManager()
+        reg = get_current_registry()
         def renderer(path):
             return lambda *arg: 'OK'
-        sm.registerUtility(renderer, IRendererFactory, name='.pt')
+        reg.registerUtility(renderer, IRendererFactory, name='.pt')
         context = DummyContext()
         handler = self._makeOne(IDummy)
         handler(context, renderer='fixtures/minimal.pt')
@@ -198,7 +198,7 @@ class TestSystemViewHandler(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IDummy)
         register = regadapt['callable']
         register()
-        derived_view = sm.getUtility(IDummy)
+        derived_view = reg.getUtility(IDummy)
         request = DummyRequest()
         self.assertEqual(derived_view(None, request).body, 'OK')
 
@@ -214,7 +214,8 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
         return repozewho1authenticationpolicy(context, **kw)
 
     def test_it_defaults(self):
-        from zope.component import getUtility
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         from repoze.bfg.interfaces import IAuthenticationPolicy
         context = DummyContext()
         self._callFUT(context)
@@ -224,12 +225,13 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
-        policy = getUtility(IAuthenticationPolicy)
+        policy = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.callback, None)
         self.assertEqual(policy.identifier_name, 'auth_tkt')
     
     def test_it(self):
-        from zope.component import getUtility
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         from repoze.bfg.interfaces import IAuthenticationPolicy
         context = DummyContext()
         def callback(identity, request):
@@ -241,7 +243,7 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
-        policy = getUtility(IAuthenticationPolicy)
+        policy = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.callback, callback)
         self.assertEqual(policy.identifier_name, 'something')
 
@@ -258,7 +260,8 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
 
     def test_defaults(self):
         from repoze.bfg.interfaces import IAuthenticationPolicy
-        from zope.component import getUtility
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         context = DummyContext()
         def callback(identity, request):
             """ """
@@ -270,13 +273,13 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
-        policy = getUtility(IAuthenticationPolicy)
+        policy = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.environ_key, 'REMOTE_USER')
         self.assertEqual(policy.callback, None)
 
     def test_it(self):
-        from zope.component import getUtility
         from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.threadlocal import get_current_registry
         context = DummyContext()
         def callback(identity, request):
             """ """
@@ -287,7 +290,8 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
-        policy = getUtility(IAuthenticationPolicy)
+        reg = get_current_registry()
+        policy = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.environ_key, 'BLAH')
         self.assertEqual(policy.callback, callback)
 
@@ -303,8 +307,9 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         return authtktauthenticationpolicy(context, secret, **kw)
 
     def test_it_defaults(self):
-        from zope.component import getUtility
         from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         context = DummyContext()
         self._callFUT(context, 'sosecret')
         actions = context.actions
@@ -313,13 +318,14 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
-        policy = getUtility(IAuthenticationPolicy)
+        policy = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.cookie.secret, 'sosecret')
         self.assertEqual(policy.callback, None)
 
     def test_it_noconfigerror(self):
-        from zope.component import getUtility
         from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         context = DummyContext()
         def callback(identity, request):
             """ """
@@ -333,7 +339,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
-        policy = getUtility(IAuthenticationPolicy)
+        policy = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy.cookie.secret, 'sosecret')
         self.assertEqual(policy.callback, callback)
 
@@ -361,9 +367,10 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
         return aclauthorizationpolicy(context, **kw)
     
     def test_it(self):
-        from zope.component import getUtility
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.authorization import ACLAuthorizationPolicy
         from repoze.bfg.interfaces import IAuthorizationPolicy
+        reg = get_current_registry()
         context = DummyContext()
         def callback(identity, request):
             """ """
@@ -374,7 +381,7 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'], IAuthorizationPolicy)
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
-        policy = getUtility(IAuthorizationPolicy)
+        policy = reg.getUtility(IAuthorizationPolicy)
         self.assertEqual(policy.__class__, ACLAuthorizationPolicy)
 
 class TestRouteDirective(unittest.TestCase):
@@ -389,10 +396,10 @@ class TestRouteDirective(unittest.TestCase):
         return route(*arg, **kw)
 
     def _assertRoute(self, name, path, num_predicates=0):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IRoutesMapper
-        sm = getSiteManager()
-        mapper = sm.getUtility(IRoutesMapper)
+        reg = get_current_registry()
+        mapper = reg.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         route = routes[0]
         self.assertEqual(len(routes), 1)
@@ -402,7 +409,7 @@ class TestRouteDirective(unittest.TestCase):
         return route
 
     def test_with_view(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from zope.interface import Interface
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
@@ -420,28 +427,28 @@ class TestRouteDirective(unittest.TestCase):
         self._assertRoute('name', 'path')
 
         view_action = actions[1]
-        sm = getSiteManager()
-        request_type = sm.getUtility(IRouteRequest, 'name')
+        reg = get_current_registry()
+        request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, False, None, None, None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = sm.adapters.lookup((Interface, request_type), IView, name='')
+        wrapped = reg.adapters.lookup((Interface, request_type), IView, name='')
         self.failUnless(wrapped)
 
     def test_with_dotted_renderer(self):
 
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from zope.interface import Interface
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IRouteRequest
 
 
         from repoze.bfg.interfaces import IRendererFactory
-        sm = getSiteManager()
+        reg = get_current_registry()
         def renderer(path):
             return lambda *arg: 'OK'
-        sm.registerUtility(renderer, IRendererFactory, name='.pt')
+        reg.registerUtility(renderer, IRendererFactory, name='.pt')
 
         context = DummyContext()
         view = lambda *arg: 'OK'
@@ -458,12 +465,12 @@ class TestRouteDirective(unittest.TestCase):
         self._assertRoute('name', 'path')
 
         view_action = actions[1]
-        request_type = sm.getUtility(IRouteRequest, 'name')
+        request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', request_type, IView, None, None, None,
                    'name', None, False, None, None, None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = sm.adapters.lookup((Interface, request_type), IView, name='')
+        wrapped = reg.adapters.lookup((Interface, request_type), IView, name='')
         self.failUnless(wrapped)
         request = DummyRequest()
         result = wrapped(None, request)
@@ -482,7 +489,7 @@ class TestStaticDirective(unittest.TestCase):
 
     def test_it(self):
         from repoze.bfg.static import PackageURLParser
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from zope.interface import implementedBy
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
@@ -493,14 +500,14 @@ class TestStaticDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
-        sm = getSiteManager()
+        reg = get_current_registry()
 
         route_action = actions[0]
         discriminator = route_action['discriminator']
         self.assertEqual(discriminator,
                          ('route', 'name', False, None, None, None, None, None))
         route_action['callable'](*route_action['args'])
-        mapper = sm.getUtility(IRoutesMapper)
+        mapper = reg.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         self.assertEqual(len(routes), 1)
         self.assertEqual(routes[0].path, 'name*subpath')
@@ -511,8 +518,8 @@ class TestStaticDirective(unittest.TestCase):
         self.assertEqual(discriminator[:3], ('view', StaticRootFactory, ''))
         self.assertEqual(discriminator[4], IView)
         iface = implementedBy(StaticRootFactory)
-        request_type = sm.getUtility(IRouteRequest, 'name')
-        view = sm.adapters.lookup((iface, request_type), IView, name='')
+        request_type = reg.getUtility(IRouteRequest, 'name')
+        view = reg.adapters.lookup((iface, request_type), IView, name='')
         request = DummyRequest()
         self.assertEqual(view(None, request).__class__, PackageURLParser)
 
@@ -529,14 +536,12 @@ class TestResourceDirective(unittest.TestCase):
         return resource(*arg, **kw)
 
     def test_it(self):
-        from zope.component import getSiteManager
         from repoze.bfg.configuration import Configurator
         context = DummyContext()
         self._callFUT(context, 'a', 'b')
         actions = context.actions
         self.assertEqual(len(actions), 1)
         action = actions[0]
-        sm = getSiteManager()
         self.assertEqual(action['callable'].im_func,
                          Configurator.resource.im_func)
         self.assertEqual(action['discriminator'], None)
