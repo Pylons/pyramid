@@ -65,10 +65,9 @@ import martian
 
 class Configurator(object):
     """
-    A wrapper around the registry that performs configuration tasks.
     A Configurator is used to configure a :mod:`repoze.bfg`
     :term:`application registry`.  The Configurator accepts two
-    arguments: ``registry`` and ``package``.  
+    arguments: ``registry`` and ``package``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :mod:`repoze.bfg.registry.Registry`
