@@ -295,8 +295,8 @@ Finally, we actually serve the application to requestors by starting
 up a WSGI server.  We happen to use the ``wsgiref.simple_server`` WSGI
 server implementation, telling it to serve the application on TCP port
 8080, and we pass it the ``app`` object (an instance of
-``repoze.bfg.router.Router``) as the application we wish to server.
-We then call the ``serve_forever`` method of the result to
+``repoze.bfg.router.Router``) as the application we wish to serve.  We
+then call the ``serve_forever`` method of the result to
 ``simple_server.make_server``, causing the server to start listening
 on the TCP port.  It will serve requests forever, or at least until we
 stop it by killing the process which runs it.
@@ -321,8 +321,8 @@ an XML dialect.
 
 Declarative configuration mode is the configuration mode in which
 developers cede the most amount of control to the framework itself.
-Because application developers cede a more control to the framework,
-it is also harder to understand than purely imperative configuration.
+Because application developers cede more control to the framework, it
+is also harder to understand than purely imperative configuration.
 However, using declarative configuration has a number of benefits, the
 primary benefit being that applications configured declaratively can
 be *overridden* and *extended* by third parties without requiring the
