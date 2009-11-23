@@ -1,15 +1,12 @@
-- Add methods to registry that do the lion's share of the various jobs
-  currently performed by ZCML directives.  Change existing ZCML
-  directives to use these methods of the registry.
-
-- Emit a set of events at startup that calls an event listener with
-  the registry before and after ZCML parsing.  Or just document that
-  the registry can be mutated via the run.py code.
-
 - Make ZCML filename argument optional to ``make_app``.  Document
   configuration without ZCML.
 
 - Replace martian with something simpler.
 
-- Maybe move code from within repoze.bfg.configuration.make_registry
-  to repoze.bfg.registry.Registry constructor.
+- Make sure repoze.bfg.scripting.get_root makes a request with a valid
+  registry arg.
+
+- Get rid of ``declarative`` method of Configurator.
+
+- Allow policies, settings, and a root factory to be passed to
+  Configurator constructor.
