@@ -1,5 +1,6 @@
 import copy
 
+from zope.component import getSiteManager
 from zope.configuration.xmlconfig import _clearContext
 
 from zope.deprecation import deprecated
@@ -532,7 +533,6 @@ def setUp():
     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
     """
     from repoze.bfg.registry import Registry
-    from zope.component import getSiteManager
     registry = Registry('testing')
     manager.clear()
     request = DummyRequest()
@@ -553,7 +553,6 @@ def tearDown():
     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
     """
-    from zope.component import getSiteManager
     getSiteManager.reset()
     manager.pop()
 

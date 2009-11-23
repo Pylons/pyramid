@@ -18,9 +18,9 @@ class TestOverrideProvider(unittest.TestCase):
 
     def _registerOverrides(self, overrides, name='repoze.bfg.tests'):
         from repoze.bfg.interfaces import IPackageOverrides
-        from zope.component import getSiteManager
-        sm = getSiteManager()
-        sm.registerUtility(overrides, IPackageOverrides, name=name)
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
+        reg.registerUtility(overrides, IPackageOverrides, name=name)
 
     def test_get_resource_filename_no_overrides(self):
         import os

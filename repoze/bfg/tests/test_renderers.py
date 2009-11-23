@@ -84,7 +84,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         self.assertEqual(factory.kw, {})
 
     def test_reload_resources_true(self):
-        from zope.component import queryUtility
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ITemplateRenderer
         settings = {'reload_resources':True}
@@ -94,11 +94,12 @@ class TestTemplateRendererFactory(unittest.TestCase):
         result = self._callFUT('repoze.bfg.tests:test_renderers.py', factory)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('repoze.bfg.tests', 'test_renderers.py')
-        self.assertEqual(queryUtility(ITemplateRenderer, name=spec),
+        reg = get_current_registry()
+        self.assertEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                          None)
 
     def test_reload_resources_false(self):
-        from zope.component import queryUtility
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.interfaces import ITemplateRenderer
         settings = {'reload_resources':False}
@@ -108,7 +109,8 @@ class TestTemplateRendererFactory(unittest.TestCase):
         result = self._callFUT('repoze.bfg.tests:test_renderers.py', factory)
         self.failUnless(result is renderer)
         spec = '%s:%s' % ('repoze.bfg.tests', 'test_renderers.py')
-        self.assertNotEqual(queryUtility(ITemplateRenderer, name=spec),
+        reg = get_current_registry()
+        self.assertNotEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                             None)
 
 class TestRendererFromName(unittest.TestCase):

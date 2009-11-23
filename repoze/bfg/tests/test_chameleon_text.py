@@ -21,10 +21,10 @@ class Base:
         return os.path.join(here, 'fixtures', name)
 
     def _registerUtility(self, utility, iface, name=''):
-        from zope.component import getSiteManager
-        sm = getSiteManager()
-        sm.registerUtility(utility, iface, name=name)
-        return sm
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
+        reg.registerUtility(utility, iface, name=name)
+        return reg
         
 
 class TextTemplateRendererTests(Base, unittest.TestCase):
@@ -114,7 +114,7 @@ class GetRendererTests(Base, unittest.TestCase):
         return get_renderer(name)
 
     def test_nonabs_registered(self):
-        from zope.component import queryUtility
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         from repoze.bfg.interfaces import ITemplateRenderer
         minimal = self._getTemplatePath('minimal.txt')
@@ -122,19 +122,21 @@ class GetRendererTests(Base, unittest.TestCase):
         self._registerUtility(utility, ITemplateRenderer, name=minimal)
         result = self._callFUT(minimal)
         self.assertEqual(result, utility)
-        self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
+        reg = get_current_registry()
+        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), utility)
         
     def test_nonabs_unregistered(self):
-        from zope.component import queryUtility
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         from repoze.bfg.interfaces import ITemplateRenderer
         minimal = self._getTemplatePath('minimal.txt')
-        self.assertEqual(queryUtility(ITemplateRenderer, minimal), None)
+        reg = get_current_registry()
+        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), None)
         utility = TextTemplateRenderer(minimal)
         self._registerUtility(utility, ITemplateRenderer, name=minimal)
         result = self._callFUT(minimal)
         self.assertEqual(result, utility)
-        self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
+        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), utility)
 
     def test_explicit_registration(self):
         from repoze.bfg.interfaces import ITemplateRenderer
@@ -157,7 +159,7 @@ class GetTemplateTests(unittest.TestCase, Base):
         return get_template(name)
 
     def test_nonabs_registered(self):
-        from zope.component import queryUtility
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         from repoze.bfg.interfaces import ITemplateRenderer
         minimal = self._getTemplatePath('minimal.txt')
@@ -165,19 +167,21 @@ class GetTemplateTests(unittest.TestCase, Base):
         self._registerUtility(utility, ITemplateRenderer, name=minimal)
         result = self._callFUT(minimal)
         self.assertEqual(result.filename, minimal)
-        self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
+        reg = get_current_registry()
+        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), utility)
         
     def test_nonabs_unregistered(self):
-        from zope.component import queryUtility
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         from repoze.bfg.interfaces import ITemplateRenderer
         minimal = self._getTemplatePath('minimal.txt')
-        self.assertEqual(queryUtility(ITemplateRenderer, minimal), None)
+        reg = get_current_registry()
+        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), None)
         utility = TextTemplateRenderer(minimal)
         self._registerUtility(utility, ITemplateRenderer, name=minimal)
         result = self._callFUT(minimal)
         self.assertEqual(result.filename, minimal)
-        self.assertEqual(queryUtility(ITemplateRenderer, minimal), utility)
+        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), utility)
 
     def test_explicit_registration(self):
         from repoze.bfg.interfaces import ITemplateRenderer

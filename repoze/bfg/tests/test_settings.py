@@ -155,10 +155,10 @@ class TestGetSettings(unittest.TestCase):
         self.assertEqual(self._callFUT(), None)
 
     def test_it_withsettings(self):
-        from zope.component import getSiteManager
         from repoze.bfg.interfaces import ISettings
-        sm = getSiteManager()
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         settings = {'a':1}
-        sm.registerUtility(settings, ISettings)
+        reg.registerUtility(settings, ISettings)
         self.assertEqual(self._callFUT(), settings)
 

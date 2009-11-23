@@ -35,7 +35,7 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         self.assertEqual(result, '123')
 
     def test_scanned(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.zcml import scan
@@ -44,8 +44,8 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         scan(context, test_integration)
         actions = context.actions
         context.actions[-1]['callable']()
-        sm = getSiteManager()
-        view = sm.adapters.lookup((INothing, IRequest), IView, name='')
+        reg = get_current_registry()
+        view = reg.adapters.lookup((INothing, IRequest), IView, name='')
         self.assertEqual(view, wsgiapptest)
 
 here = os.path.dirname(__file__)
