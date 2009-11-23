@@ -43,13 +43,13 @@ class RoutesMapperTests(unittest.TestCase):
         testing.tearDown()
         
     def _getRequest(self, **kw):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         environ = {'SERVER_NAME':'localhost',
                    'wsgi.url_scheme':'http'}
         environ.update(kw)
         request = DummyRequest(environ)
-        sm = getSiteManager()
-        request.registry = sm
+        reg = get_current_registry()
+        request.registry = reg
         return request
 
     def _getTargetClass(self):
