@@ -11,9 +11,7 @@
 
      .. automethod:: view
 
-     .. automethod:: authentication_policy(policy)
-
-     .. automethod:: authorization_policy(policy)
+     .. automethod:: security_policies
 
      .. automethod:: forbidden(view=None, attr=None, renderer=None, wrapper=None)
 
@@ -23,11 +21,7 @@
 
      .. automethod:: resource(to_override, override_with)
 
-     .. automethod:: root_factory(factory)
-
      .. automethod:: scan(package)
-
-     .. automethod:: settings
 
      .. automethod:: static(name, path, cache_max_age=3600)
 
