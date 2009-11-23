@@ -115,7 +115,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         return view_execution_permitted(*arg, **kw)
 
     def _registerSecuredView(self, view_name, allow=True):
-        import zope.component
+        from repoze.bfg.threadlocal import get_current_registry
         from zope.interface import Interface
         from repoze.bfg.interfaces import ISecuredView
         class Checker(object):
@@ -124,18 +124,17 @@ class TestViewExecutionPermitted(unittest.TestCase):
                 self.request = request
                 return allow
         checker = Checker()
-        sm = zope.component.getSiteManager()
-        sm.registerAdapter(checker, (Interface, Interface),
-                           ISecuredView,
-                           view_name)
+        reg = get_current_registry()
+        reg.registerAdapter(checker, (Interface, Interface),
+                            ISecuredView, view_name)
         return checker
 
     def test_no_permission(self):
-        import zope.component
-        sm = zope.component.getSiteManager()
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import ISettings
         settings = dict(debug_authorization=True)
-        sm.registerUtility(settings, ISettings)
+        reg = get_current_registry()
+        reg.registerUtility(settings, ISettings)
         context = DummyContext()
         request = DummyRequest({})
         result = self._callFUT(context, request, '')
