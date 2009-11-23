@@ -3,12 +3,9 @@ import unittest
 from repoze.bfg import testing
 
 class ConfiguratorTests(unittest.TestCase):
-    def _makeOne(self, registry=None, package=None):
-        from repoze.bfg.registry import Registry
+    def _makeOne(self, *arg, **kw):
         from repoze.bfg.configuration import Configurator
-        if registry is None:
-            registry = Registry()
-        return Configurator(registry, package)
+        return Configurator(*arg, **kw)
 
     def _registerRenderer(self, config, name='.txt'):
         from repoze.bfg.interfaces import IRendererFactory
@@ -35,11 +32,6 @@ class ConfiguratorTests(unittest.TestCase):
         return config.registry.adapters.lookup(
             (ctx_iface, request_iface), IView, name=name,
             default=None)
-
-    def _callDeclarative(self, *arg, **kw):
-        inst = self._makeOne()
-        inst.declarative(*arg, **kw)
-        return inst.registry
 
     def _getRouteRequestIface(self, config, name):
         from repoze.bfg.interfaces import IRouteRequest
@@ -69,9 +61,9 @@ class ConfiguratorTests(unittest.TestCase):
         return L
 
     def _registerLogger(self, config):
-        from repoze.bfg.interfaces import ILogger
+        from repoze.bfg.interfaces import IDebugLogger
         logger = DummyLogger()
-        config.registry.registerUtility(logger, ILogger, 'repoze.bfg.debug')
+        config.registry.registerUtility(logger, IDebugLogger)
         return logger
 
     def _makeRequest(self, config):
@@ -94,10 +86,12 @@ class ConfiguratorTests(unittest.TestCase):
         import sys
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.configuration import Configurator
+        from repoze.bfg.interfaces import IRendererFactory
         config = Configurator()
         this_pkg = sys.modules['repoze.bfg.tests']
         self.failUnless(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
+        self.failUnless(config.registry.getUtility(IRendererFactory, 'json'))
 
     def test_ctor_with_package_registry(self):
         import sys
@@ -106,14 +100,63 @@ class ConfiguratorTests(unittest.TestCase):
         config = Configurator(package=bfg_pkg)
         self.assertEqual(config.package, bfg_pkg)
 
-    def test__default_configuration(self):
+    def test_ctor_noreg_zcml_file(self):
+        config = self._makeOne(
+            registry=None,
+            zcml_file='repoze.bfg.tests.fixtureapp:configure.zcml')
+        registry = config.registry
+        from repoze.bfg.tests.fixtureapp.models import IFixture
+        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
+
+    def test_ctor_noreg_zcml_file_routes_in_config(self):
         from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.registry import Registry
-        registry = Registry()
-        config = self._makeOne(registry)
-        config._default_configuration()
-        self.assertEqual(config.registry, registry)
-        self.failIf(config.registry.getUtility(ISettings) is None)
+        from repoze.bfg.interfaces import IRootFactory
+        from repoze.bfg.interfaces import IRoutesMapper
+        config = self._makeOne(
+            zcml_file='repoze.bfg.tests.routesapp:configure.zcml')
+        self.failUnless(config.registry.getUtility(IRoutesMapper))
+
+    def test_ctor_noreg_custom_settings(self):
+        from repoze.bfg.interfaces import ISettings
+        settings = {'reload_templates':True,
+                    'mysetting':True}
+        config = self._makeOne(settings=settings)
+        settings = config.registry.getUtility(ISettings)
+        self.assertEqual(settings['reload_templates'], True)
+        self.assertEqual(settings['debug_authorization'], False)
+        self.assertEqual(settings['mysetting'], True)
+
+    def test_ctor_noreg_debug_logger_None_default(self):
+        from repoze.bfg.interfaces import IDebugLogger
+        config = self._makeOne()
+        logger = config.registry.getUtility(IDebugLogger)
+        self.assertEqual(logger.name, 'repoze.bfg.debug')
+
+    def test_ctor_noreg_debug_logger_non_None(self):
+        from repoze.bfg.interfaces import IDebugLogger
+        logger = object()
+        config = self._makeOne(debug_logger=logger)
+        result = config.registry.getUtility(IDebugLogger)
+        self.assertEqual(logger, result)
+
+    def test_ctor_authentication_policy(self):
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        policy = object()
+        config = self._makeOne(authentication_policy=policy)
+        result = config.registry.getUtility(IAuthenticationPolicy)
+        self.assertEqual(policy, result)
+
+    def test_ctor_no_root_factory(self):
+        from repoze.bfg.interfaces import IRootFactory
+        config = self._makeOne()
+        self.failUnless(config.registry.getUtility(IRootFactory))
+
+    def test_ctor_alternate_renderers(self):
+        from repoze.bfg.interfaces import IRendererFactory
+        renderer = object()
+        config = self._makeOne(renderers=[('yeah', renderer)])
+        self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
+                         renderer)
 
     def test_make_wsgi_app(self):
         from repoze.bfg.threadlocal import get_current_registry
@@ -171,75 +214,13 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
-    def test_declarative_fixtureapp_default_filename_withpackage(self):
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDeclarative(
-            rootfactory,
-            'repoze.bfg.tests.fixtureapp:configure.zcml')
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_declarative_fixtureapp_explicit_specification_in_settings(self):
-        rootfactory = DummyRootFactory(None)
-        zcmlfile = 'repoze.bfg.tests.fixtureapp.subpackage:yetanother.zcml'
-        registry = self._callDeclarative(
-            rootfactory, 'repoze.bfg.tests.fixtureapp:configure.zcml',
-            settings={'configure_zcml':zcmlfile})
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failIf(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_declarative_custom_settings(self):
-        settings = {'mysetting':True}
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDeclarative(
-            rootfactory, 'repoze.bfg.tests.fixtureapp:configure.zcml',
-            settings=settings)
-        from repoze.bfg.interfaces import ISettings
-        settings = registry.getUtility(ISettings)
-        self.assertEqual(settings.reload_templates, False)
-        self.assertEqual(settings.debug_authorization, False)
-        self.assertEqual(settings.mysetting, True)
-
-    def test_declarative_registrations(self):
-        settings = {'reload_templates':True,
-                    'debug_authorization':True}
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDeclarative(
-            rootfactory, 'repoze.bfg.tests.fixtureapp:configure.zcml',
-            settings=settings)
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ILogger
-        from repoze.bfg.interfaces import IRootFactory
-        settings = registry.getUtility(ISettings)
-        logger = registry.getUtility(ILogger, name='repoze.bfg.debug')
-        rootfactory = registry.getUtility(IRootFactory)
-        self.assertEqual(logger.name, 'repoze.bfg.debug')
-        self.assertEqual(settings.reload_templates, True)
-        self.assertEqual(settings.debug_authorization, True)
-        self.assertEqual(rootfactory, rootfactory)
-
-    def test_declarative_routes_in_config(self):
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ILogger
-        from repoze.bfg.interfaces import IRootFactory
-        from repoze.bfg.interfaces import IRoutesMapper
-        settings = {'reload_templates':True,
-                    'debug_authorization':True}
-        rootfactory = DummyRootFactory(None)
-        registry = self._callDeclarative(
-            rootfactory, 'repoze.bfg.tests.routesapp:configure.zcml',
-            settings=settings)
-        settings = registry.getUtility(ISettings)
-        logger = registry.getUtility(ILogger, name='repoze.bfg.debug')
-        self.assertEqual(registry.getUtility(IRootFactory), rootfactory)
-        self.failUnless(registry.getUtility(IRoutesMapper))
-
-    def test_declarative_lock_and_unlock(self):
-        rootfactory = DummyRootFactory(None)
+    def test_load_zcml_lock_and_unlock(self):
+        config = self._makeOne()
         dummylock = DummyLock()
-        registry = self._callDeclarative(
-            rootfactory, 'repoze.bfg.tests.fixtureapp:configure.zcml',
+        registry = config.load_zcml(
+            'repoze.bfg.tests.fixtureapp:configure.zcml',
             lock=dummylock)
+        from repoze.bfg.tests.fixtureapp.models import IFixture
         self.assertEqual(dummylock.acquired, True)
         self.assertEqual(dummylock.released, True)
 
@@ -1061,35 +1042,35 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
 
-    def test_system_view_no_view_no_renderer(self):
+    def test__system_view_no_view_no_renderer(self):
         from zope.configuration.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.system_view, IDummy)
+        self.assertRaises(ConfigurationError, config._system_view, IDummy)
 
-    def test_system_view_no_view_with_renderer(self):
+    def test__system_view_no_view_with_renderer(self):
         config = self._makeOne()
         self._registerRenderer(config, name='.pt')
-        config.system_view(IDummy,
+        config._system_view(IDummy,
                            renderer='repoze.bfg.tests:fixtures/minimal.pt')
         request = self._makeRequest(config)
         view = config.registry.getUtility(IDummy)
         result = view(None, request)
         self.assertEqual(result.body, 'Hello!')
 
-    def test_system_view_with_attr(self):
+    def test__system_view_with_attr(self):
         config = self._makeOne()
         class view(object):
             def __init__(self, context, request):
                 pass
             def index(self):
                 return 'OK'
-        config.system_view(IDummy, view=view, attr='index')
+        config._system_view(IDummy, view=view, attr='index')
         view = config.registry.getUtility(IDummy)
         request = self._makeRequest(config)
         result = view(None, request)
         self.assertEqual(result, 'OK')
 
-    def test_system_view_with_wrapper(self):
+    def test__system_view_with_wrapper(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
         from repoze.bfg.interfaces import IRequest
@@ -1099,7 +1080,7 @@ class ConfiguratorTests(unittest.TestCase):
         wrapper = lambda *arg: 'OK2'
         config.registry.registerAdapter(wrapper, (Interface, Interface),
                                         IView, name='wrapper')
-        config.system_view(IDummy, view=view, wrapper='wrapper')
+        config._system_view(IDummy, view=view, wrapper='wrapper')
         view = config.registry.getUtility(IDummy)
         request = self._makeRequest(config)
         directlyProvides(request, IRequest)
@@ -1144,20 +1125,20 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(
             config.registry.getUtility(IAuthorizationPolicy), policy)
 
-    def test_derive_view_as_function_context_and_request(self):
+    def test__derive_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.failUnless(result is view)
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(view(None, None), 'OK')
         
-    def test_derive_view_as_function_requestonly(self):
+    def test__derive_view_as_function_requestonly(self):
         def view(request):
             return 'OK'
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1165,14 +1146,14 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
-    def test_derive_view_as_newstyle_class_context_and_request(self):
+    def test__derive_view_as_newstyle_class_context_and_request(self):
         class view(object):
             def __init__(self, context, request):
                 pass
             def __call__(self):
                 return 'OK'
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1180,14 +1161,14 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
         
-    def test_derive_view_as_newstyle_class_requestonly(self):
+    def test__derive_view_as_newstyle_class_requestonly(self):
         class view(object):
             def __init__(self, context, request):
                 pass
             def __call__(self):
                 return 'OK'
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1195,14 +1176,14 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
-    def test_derive_view_as_oldstyle_class_context_and_request(self):
+    def test__derive_view_as_oldstyle_class_context_and_request(self):
         class view:
             def __init__(self, context, request):
                 pass
             def __call__(self):
                 return 'OK'
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1210,14 +1191,14 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
         
-    def test_derive_view_as_oldstyle_class_requestonly(self):
+    def test__derive_view_as_oldstyle_class_requestonly(self):
         class view:
             def __init__(self, context, request):
                 pass
             def __call__(self):
                 return 'OK'
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1225,24 +1206,24 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
-    def test_derive_view_as_instance_context_and_request(self):
+    def test__derive_view_as_instance_context_and_request(self):
         class View:
             def __call__(self, context, request):
                 return 'OK'
         view = View()
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.failUnless(result is view)
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
         
-    def test_derive_view_as_instance_requestonly(self):
+    def test__derive_view_as_instance_requestonly(self):
         class View:
             def __call__(self, request):
                 return 'OK'
         view = View()
         config = self._makeOne()
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -1250,13 +1231,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIf(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), 'OK')
 
-    def test_derive_view_with_debug_authorization_no_authpol(self):
+    def test__derive_view_with_debug_authorization_no_authpol(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self._registerSettings(config,
                                debug_authorization=True, reload_templates=True)
         logger = self._registerLogger(config)
-        result = config.derive_view(view, permission='view')
+        result = config._derive_view(view, permission='view')
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
@@ -1271,14 +1252,14 @@ class ConfiguratorTests(unittest.TestCase):
                          "'view_name' against context None): Allowed "
                          "(no authorization policy in use)")
 
-    def test_derive_view_with_debug_authorization_no_permission(self):
+    def test__derive_view_with_debug_authorization_no_permission(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self._registerSettings(config,
                                debug_authorization=True, reload_templates=True)
         self._registerSecurityPolicy(config, True)
         logger = self._registerLogger(config)
-        result = config.derive_view(view)
+        result = config._derive_view(view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
@@ -1293,14 +1274,14 @@ class ConfiguratorTests(unittest.TestCase):
                          "'view_name' against context None): Allowed ("
                          "no permission registered)")
 
-    def test_derive_view_debug_authorization_permission_authpol_permitted(self):
+    def test__derive_view_debug_authorization_permission_authpol_permitted(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self._registerSettings(config, debug_authorization=True,
                                reload_templates=True)
         logger = self._registerLogger(config)
         self._registerSecurityPolicy(config, True)
-        result = config.derive_view(view, permission='view')
+        result = config._derive_view(view, permission='view')
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
@@ -1314,7 +1295,7 @@ class ConfiguratorTests(unittest.TestCase):
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): True")
         
-    def test_derive_view_debug_authorization_permission_authpol_denied(self):
+    def test__derive_view_debug_authorization_permission_authpol_denied(self):
         from repoze.bfg.exceptions import Forbidden
         view = lambda *arg: 'OK'
         config = self._makeOne()
@@ -1322,7 +1303,7 @@ class ConfiguratorTests(unittest.TestCase):
                                debug_authorization=True, reload_templates=True)
         logger = self._registerLogger(config)
         self._registerSecurityPolicy(config, False)
-        result = config.derive_view(view, permission='view')
+        result = config._derive_view(view, permission='view')
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
@@ -1336,14 +1317,14 @@ class ConfiguratorTests(unittest.TestCase):
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): False")
 
-    def test_derive_view_debug_authorization_permission_authpol_denied2(self):
+    def test__derive_view_debug_authorization_permission_authpol_denied2(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self._registerSettings(config,
                                debug_authorization=True, reload_templates=True)
         logger = self._registerLogger(config)
         self._registerSecurityPolicy(config, False)
-        result = config.derive_view(view, permission='view')
+        result = config._derive_view(view, permission='view')
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         self.assertEqual(view.__name__, result.__name__)
@@ -1353,7 +1334,7 @@ class ConfiguratorTests(unittest.TestCase):
         permitted = result.__permitted__(None, None)
         self.assertEqual(permitted, False)
 
-    def test_derive_view_with_predicates_all(self):
+    def test__derive_view_with_predicates_all(self):
         view = lambda *arg: 'OK'
         predicates = []
         def predicate1(context, request):
@@ -1363,14 +1344,14 @@ class ConfiguratorTests(unittest.TestCase):
             predicates.append(True)
             return True
         config = self._makeOne()
-        result = config.derive_view(view, predicates=[predicate1, predicate2])
+        result = config._derive_view(view, predicates=[predicate1, predicate2])
         request = self._makeRequest(config)
         request.method = 'POST'
         next = result(None, None)
         self.assertEqual(next, 'OK')
         self.assertEqual(predicates, [True, True])
 
-    def test_derive_view_with_predicates_checker(self):
+    def test__derive_view_with_predicates_checker(self):
         view = lambda *arg: 'OK'
         predicates = []
         def predicate1(context, request):
@@ -1380,14 +1361,14 @@ class ConfiguratorTests(unittest.TestCase):
             predicates.append(True)
             return True
         config = self._makeOne()
-        result = config.derive_view(view, predicates=[predicate1, predicate2])
+        result = config._derive_view(view, predicates=[predicate1, predicate2])
         request = self._makeRequest(config)
         request.method = 'POST'
         next = result.__predicated__(None, None)
         self.assertEqual(next, True)
         self.assertEqual(predicates, [True, True])
 
-    def test_derive_view_with_predicates_notall(self):
+    def test__derive_view_with_predicates_notall(self):
         from repoze.bfg.exceptions import NotFound
         view = lambda *arg: 'OK'
         predicates = []
@@ -1398,13 +1379,13 @@ class ConfiguratorTests(unittest.TestCase):
             predicates.append(True)
             return False
         config = self._makeOne()
-        result = config.derive_view(view, predicates=[predicate1, predicate2])
+        result = config._derive_view(view, predicates=[predicate1, predicate2])
         request = self._makeRequest(config)
         request.method = 'POST'
         self.assertRaises(NotFound, result, None, None)
         self.assertEqual(predicates, [True, True])
 
-    def test_derive_view_with_wrapper_viewname(self):
+    def test__derive_view_with_wrapper_viewname(self):
         from webob import Response
         from repoze.bfg.interfaces import IView
         inner_response = Response('OK')
@@ -1418,7 +1399,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.registry.registerAdapter(
             outer_view, (None, None), IView, 'owrap')
-        result = config.derive_view(inner_view, viewname='inner',
+        result = config._derive_view(inner_view, viewname='inner',
                                     wrapper_viewname='owrap')
         self.failIf(result is inner_view)
         self.assertEqual(inner_view.__module__, result.__module__)
@@ -1428,7 +1409,7 @@ class ConfiguratorTests(unittest.TestCase):
         response = result(None, request)
         self.assertEqual(response.body, 'outer OK')
 
-    def test_derive_view_with_wrapper_viewname_notfound(self):
+    def test__derive_view_with_wrapper_viewname_notfound(self):
         from webob import Response
         inner_response = Response('OK')
         def inner_view(context, request):
@@ -1436,7 +1417,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         request = self._makeRequest(config)
         request.registry = config.registry
-        wrapped = config.derive_view(
+        wrapped = config._derive_view(
             inner_view, viewname='inner', wrapper_viewname='owrap')
         result = self.assertRaises(ValueError, wrapped, None, request)
 
@@ -2274,6 +2255,50 @@ class TestRequestOnly(unittest.TestCase):
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
 
+class TestMakeApp(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.configuration import make_app
+        return make_app(*arg, **kw)
+
+    def test_it(self):
+        settings = {'a':1}
+        rootfactory = object()
+        app = self._callFUT(rootfactory, settings=settings,
+                            Configurator=DummyConfigurator)
+        self.assertEqual(app.root_factory, rootfactory)
+        self.assertEqual(app.settings, settings)
+        self.assertEqual(app.zcml_file, 'configure.zcml')
+
+    def test_it_options_means_settings(self):
+        settings = {'a':1}
+        rootfactory = object()
+        app = self._callFUT(rootfactory, options=settings,
+                            Configurator=DummyConfigurator)
+        self.assertEqual(app.root_factory, rootfactory)
+        self.assertEqual(app.settings, settings)
+        self.assertEqual(app.zcml_file, 'configure.zcml')
+
+    def test_it_with_package(self):
+        package = object()
+        rootfactory = object()
+        app = self._callFUT(rootfactory, package=package,
+                            Configurator=DummyConfigurator)
+        self.assertEqual(app.package, package)
+
+    def test_it_with_custom_configure_zcml(self):
+        rootfactory = object()
+        settings = {'configure_zcml':'2.zcml'}
+        app = self._callFUT(rootfactory, filename='1.zcml', settings=settings,
+                            Configurator=DummyConfigurator)
+        self.assertEqual(app.zcml_file, '2.zcml')
+
+
 class DummyRequest:
     subpath = ()
     def __init__(self):
@@ -2347,3 +2372,16 @@ class DummySecurityPolicy:
 
     def permits(self, context, principals, permission):
         return self.permitted
+
+class DummyConfigurator(object):
+    def __init__(self, registry=None, package=None,
+                 root_factory=None, zcml_file=None,
+                 settings=None):
+        self.root_factory = root_factory
+        self.package = package
+        self.zcml_file = zcml_file
+        self.settings = settings
+    
+    def make_wsgi_app(self):
+        return self
+    

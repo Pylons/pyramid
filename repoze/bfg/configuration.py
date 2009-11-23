@@ -23,7 +23,7 @@ from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IDefaultRootFactory
 from repoze.bfg.interfaces import IForbiddenView
-from repoze.bfg.interfaces import ILogger
+from repoze.bfg.interfaces import IDebugLogger
 from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IPackageOverrides
@@ -41,6 +41,7 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg import chameleon_zpt
 from repoze.bfg import chameleon_text
 from repoze.bfg import renderers
+from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.compat import all
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
@@ -62,6 +63,13 @@ from repoze.bfg.view import render_view_to_response
 from repoze.bfg.view import static
 
 import martian
+
+DEFAULT_RENDERERS = (
+    ('.pt', chameleon_zpt.renderer_factory),
+    ('.txt', chameleon_text.renderer_factory),
+    ('json', renderers.json_renderer_factory),
+    ('string', renderers.string_renderer_factory),
+    )
 
 class Configurator(object):
     """
@@ -86,22 +94,76 @@ class Configurator(object):
     default), the package is assumed to be the Python package in which
     the *caller* of the ``Configurator`` constructor lives.
     """
-    def __init__(self, registry=None, package=None, settings=None):
+    def __init__(self, registry=None, package=None, settings=None,
+                 root_factory=None, debug_logger=None, zcml_file=None,
+                 authentication_policy=None, authorization_policy=None,
+                 renderers=DEFAULT_RENDERERS):
         self.package = package or caller_package()
         self.registry = registry
         if registry is None:
             registry = Registry(self.package.__name__)
             self.registry = registry
-            self._default_configuration()
+            self.settings(settings)
+            self.root_factory(root_factory)
+            if debug_logger is None:
+                debug_logger = make_stream_logger('repoze.bfg.debug',
+                                                  sys.stderr)
+            registry.registerUtility(debug_logger, IDebugLogger)
+            registry.registerUtility(debug_logger, IDebugLogger,
+                                     'repoze.bfg.debug') # b /c
+            if authentication_policy or authorization_policy:
+                self.security_policies(authentication_policy,
+                                       authorization_policy)
+            for name, renderer in renderers:
+                self.renderer(renderer, name)
+            if zcml_file is not None:
+                self.load_zcml(zcml_file)
 
-    def _default_configuration(self):
-        self.renderer(chameleon_zpt.renderer_factory, '.pt')
-        self.renderer(chameleon_text.renderer_factory, '.txt')
-        self.renderer(renderers.json_renderer_factory, 'json')
-        self.renderer(renderers.string_renderer_factory, 'string')
-        self.root_factory(DefaultRootFactory)
-        self.settings({})
-        self.debug_logger(None)
+    def settings(self, mapping):
+        settings = Settings(mapping or {})
+        self.registry.registerUtility(settings, ISettings)
+
+    def make_spec(self, path_or_spec):
+        package, filename = resolve_resource_spec(path_or_spec,
+                                                  self.package.__name__)
+        if package is None:
+            return filename # absolute filename
+        return '%s:%s' % (package, filename)
+
+    def split_spec(self, path_or_spec):
+        return resolve_resource_spec(path_or_spec, self.package.__name__)
+
+    def renderer_from_name(self, path_or_spec):
+        if path_or_spec is None:
+            # check for global default renderer
+            factory = self.registry.queryUtility(IRendererFactory)
+            if factory is not None:
+                return factory(path_or_spec)
+            return None
+
+        if '.' in path_or_spec:
+            name = os.path.splitext(path_or_spec)[1]
+            spec = self.make_spec(path_or_spec)
+        else:
+            name = path_or_spec
+            spec = path_or_spec
+
+        factory = self.registry.queryUtility(IRendererFactory, name=name)
+        if factory is None:
+            raise ValueError('No renderer for renderer name %r' % name)
+        return factory(spec)
+
+    def authentication_policy(self, policy, _info=u''):
+        """ Add a :mod:`repoze.bfg` :term:`authentication policy` to
+        the current configuration."""
+        self.registry.registerUtility(policy, IAuthenticationPolicy, info=_info)
+        
+    def authorization_policy(self, policy, _info=u''):
+        """ Add a :mod:`repoze.bfg` :term:`authorization policy` to
+        the current configuration state."""
+        self.registry.registerUtility(policy, IAuthorizationPolicy, info=_info)
+
+    # API
 
     def make_wsgi_app(self, manager=manager, getSiteManager=getSiteManager):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
@@ -121,36 +183,6 @@ class Configurator(object):
         finally:
             manager.pop()
         return app
-
-    def declarative(self, root_factory, spec='configure.zcml',
-                    settings=None, debug_logger=None, os=os,
-                    lock=threading.Lock()):
-        self._default_configuration()
-
-        # debug_logger, os and lock *only* for unittests
-        if settings is None:
-            settings = {}
-
-        if not 'configure_zcml' in settings:
-            settings['configure_zcml'] = spec
-
-        settings = Settings(settings)
-        spec = settings['configure_zcml']
-
-        self.settings(settings)
-        self.debug_logger(debug_logger)
-        self.root_factory(root_factory or DefaultRootFactory)
-        self.load_zcml(spec, lock=lock)
-
-    def make_spec(self, path_or_spec):
-        package, filename = resolve_resource_spec(path_or_spec,
-                                                  self.package.__name__)
-        if package is None:
-            return filename # absolute filename
-        return '%s:%s' % (package, filename)
-
-    def split_spec(self, path_or_spec):
-        return resolve_resource_spec(path_or_spec, self.package.__name__)
 
     def load_zcml(self, spec='configure.zcml', lock=threading.Lock()):
         """ Load configuration from a :term:`ZCML` file into the
@@ -194,6 +226,23 @@ class Configurator(object):
             getSiteManager.reset()
         return self.registry
 
+    def security_policies(self, authentication, authorization=None):
+        """ Register security policies safely.  The ``authentication``
+        argument represents a :term:`authentication policy`.  The
+        ``authorization`` argument represents a :term:`authorization
+        policy`.  If the ``authorization`` argument is ``None``, a
+        default ``repoze.bfg.authorization.ACLAuthorizationPolicy``
+        will be registered as the authorization policy."""
+        if authorization is None:
+            authorization = ACLAuthorizationPolicy() # default
+        if authorization and not authentication:
+            raise ConfigurationError(
+                'If the "authorization" is passed a vallue, '
+                'the "authentication" argument musty also be '
+                'passed a value; authorization requires authentication.')
+        self.authentication_policy(authentication)
+        self.authorization_policy(authorization)
+
     def view(self, view=None, name="", for_=None, permission=None, 
              request_type=None, route_name=None, request_method=None,
              request_param=None, containment=None, attr=None,
@@ -232,8 +281,8 @@ class Configurator(object):
             request_param=request_param, header=header, accept=accept,
             containment=containment)
 
-        derived_view = self.derive_view(view, permission, predicates, attr,
-                                        renderer, wrapper, name)
+        derived_view = self._derive_view(view, permission, predicates, attr,
+                                         renderer, wrapper, name)
         r_for_ = for_
         r_request_type = request_type
         if r_for_ is None:
@@ -270,14 +319,14 @@ class Configurator(object):
             self.registry.registerAdapter(multiview, (for_, request_type),
                                           IMultiView, name, info=_info)
 
-    def derive_view(self, view, permission=None, predicates=(),
-                    attr=None, renderer_name=None, wrapper_viewname=None,
-                    viewname=None):
+    def _derive_view(self, view, permission=None, predicates=(),
+                     attr=None, renderer_name=None, wrapper_viewname=None,
+                     viewname=None):
         renderer = self.renderer_from_name(renderer_name)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
         settings = self.registry.queryUtility(ISettings)
-        logger = self.registry.queryUtility(ILogger, 'repoze.bfg.debug')
+        logger = self.registry.queryUtility(IDebugLogger)
         mapped_view = _map_view(view, attr, renderer, renderer_name)
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
         secured_view = _secure_view(owrapped_view, permission,
@@ -287,26 +336,6 @@ class Configurator(object):
                                      logger)
         derived_view = _predicate_wrap(debug_view, predicates)
         return derived_view
-
-    def renderer_from_name(self, path_or_spec):
-        if path_or_spec is None:
-            # check for global default renderer
-            factory = self.registry.queryUtility(IRendererFactory)
-            if factory is not None:
-                return factory(path_or_spec)
-            return None
-
-        if '.' in path_or_spec:
-            name = os.path.splitext(path_or_spec)[1]
-            spec = self.make_spec(path_or_spec)
-        else:
-            name = path_or_spec
-            spec = path_or_spec
-
-        factory = self.registry.queryUtility(IRendererFactory, name=name)
-        if factory is None:
-            raise ValueError('No renderer for renderer name %r' % name)
-        return factory(spec)
 
     def route(self, name, path, view=None, view_for=None,
               permission=None, factory=None, for_=None,
@@ -376,16 +405,6 @@ class Configurator(object):
             _info=_info, _configurator=self,
             exclude_filter=lambda name: name.startswith('.'))
 
-    def authentication_policy(self, policy, _info=u''):
-        """ Add a :mod:`repoze.bfg` :term:`authentication policy` to
-        the current configuration."""
-        self.registry.registerUtility(policy, IAuthenticationPolicy, info=_info)
-        
-    def authorization_policy(self, policy, _info=u''):
-        """ Add a :mod:`repoze.bfg` :term:`authorization policy` to
-        the current configuration state."""
-        self.registry.registerUtility(policy, IAuthorizationPolicy, info=_info)
-
     def renderer(self, factory, name, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`renderer` to the current
         configuration state."""
@@ -449,14 +468,14 @@ class Configurator(object):
         """ Add a default forbidden view to the current configuration
         state."""
         
-        return self.system_view(IForbiddenView, *arg, **kw)
+        return self._system_view(IForbiddenView, *arg, **kw)
 
     def notfound(self, *arg, **kw):
         """ Add a default not found view to the current configuration
         state."""
-        return self.system_view(INotFoundView, *arg, **kw)
+        return self._system_view(INotFoundView, *arg, **kw)
 
-    def system_view(self, iface, view=None, attr=None, renderer=None,
+    def _system_view(self, iface, view=None, attr=None, renderer=None,
                     wrapper=None, _info=u''):
         if not view:
             if renderer:
@@ -467,9 +486,9 @@ class Configurator(object):
                                          'specified and no renderer '
                                          'specified')
 
-        derived_view = self.derive_view(view, attr=attr,
-                                        renderer_name=renderer,
-                                        wrapper_viewname=wrapper)
+        derived_view = self._derive_view(view, attr=attr,
+                                         renderer_name=renderer,
+                                         wrapper_viewname=wrapper)
         self.registry.registerUtility(derived_view, iface, '', info=_info)
 
     def static(self, name, path, cache_max_age=3600, _info=u''):
@@ -480,21 +499,12 @@ class Configurator(object):
                    view_for=StaticRootFactory, factory=StaticRootFactory(spec),
                    _info=_info)
 
-    def settings(self, settings):
-        """ Register the value passed in as ``settings`` as the basis
-        of the value returned by the
-        ``repoze.bfg.settings.get_settings`` API."""
-        settings = Settings(settings)
-        self.registry.registerUtility(settings, ISettings)
-
-    def debug_logger(self, logger):
-        if logger is None:
-            logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
-        self.registry.registerUtility(logger, ILogger, 'repoze.bfg.debug')
-
     def root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
-        state."""
+        state.  If the ``factory`` argument is ``None`` a default root
+        factory will be registered."""
+        if factory is None:
+            factory = DefaultRootFactory
         self.registry.registerUtility(factory, IRootFactory)
         self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
         
@@ -918,4 +928,51 @@ def _authdebug_view(view, permission, authn_policy, authz_policy, settings,
         decorate_view(wrapped_view, view)
 
     return wrapped_view
+
+# note that ``options`` is a b/w compat alias for ``settings`` and
+# ``Configurator`` is a testing dep inj
+def make_app(root_factory, package=None, filename='configure.zcml',
+             settings=None, options=None, Configurator=Configurator):
+    """ Return a Router object, representing a fully configured
+    ``repoze.bfg`` WSGI application.
+
+    ``root_factory`` must be a callable that accepts a :term:`request`
+    object and which returns a traversal root object.  The traversal
+    root returned by the root factory is the *default* traversal root;
+    it can be overridden on a per-view basis.  ``root_factory`` may be
+    ``None``, in which case a 'default default' traversal root is
+    used.
+
+    ``package`` is a Python module representing the application's
+    package.  It is optional, defaulting to ``None``.  ``package`` may
+    be ``None``.  If ``package`` is ``None``, the ``filename`` passed
+    or the value in the ``options`` dictionary named
+    ``configure_zcml`` must be a) absolute pathname to a ZCML file
+    that represents the application's configuration *or* b) a
+    'specification' in the form
+    ``dotted.package.name:relative/file/path.zcml``.
+
+    ``filename`` is the filesystem path to a ZCML file (optionally
+    relative to the package path) that should be parsed to create the
+    application registry.  It defaults to ``configure.zcml``.  It can
+    also be a 'specification' in the form
+    ``dotted_package_name:relatve/file/path.zcml``. Note that if any
+    value for ``configure_zcml`` is passed within the ``options``
+    dictionary, the value passed as ``filename`` will be ignored,
+    replaced with the ``configure_zcml`` value.
+
+    ``settings``, if used, should be a dictionary containing runtime
+    settings (e.g. the key/value pairs in an app section of a
+    PasteDeploy file), with each key representing the option and the
+    key's value representing the specific option value,
+    e.g. ``{'reload_templates':True}``.  Note that the keyword
+    parameter ``options`` is a backwards compatibility alias for the
+    ``settings`` keyword parameter.
+    """
+    settings = settings or options or {}
+    zcml_file = settings.get('configure_zcml', filename)
+    config = Configurator(package=package, settings=settings,
+                          root_factory=root_factory, zcml_file=zcml_file)
+    app = config.make_wsgi_app()
+    return app
 

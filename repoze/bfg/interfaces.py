@@ -151,8 +151,10 @@ class ILocation(Interface):
     __parent__ = Attribute("The parent in the location hierarchy")
     __name__ = Attribute("The name within the parent")
 
-class ILogger(Interface):
+class IDebugLogger(Interface):
     """ Interface representing a PEP 282 logger """
+
+ILogger = IDebugLogger # b/c
 
 class IRoutesMapper(Interface):
     """ Interface representing a Routes ``Mapper`` object """

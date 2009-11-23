@@ -322,8 +322,8 @@ class SystemViewHandler(object):
         def register(iface=self.iface):
             reg = get_current_registry()
             config = Configurator(reg)
-            config.system_view(iface, view=view, attr=attr, renderer=renderer,
-                               wrapper=wrapper, _info=_context.info)
+            config._system_view(iface, view=view, attr=attr, renderer=renderer,
+                                wrapper=wrapper, _info=_context.info)
 
         _context.action(
             discriminator = self.iface,

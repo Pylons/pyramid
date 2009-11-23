@@ -3,7 +3,7 @@ from zope.interface import providedBy
 from zope.interface import alsoProvides
 
 from repoze.bfg.interfaces import IForbiddenView
-from repoze.bfg.interfaces import ILogger
+from repoze.bfg.interfaces import IDebugLogger
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouter
@@ -13,18 +13,20 @@ from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 
+from repoze.bfg.configuration import make_app # b/c import
 from repoze.bfg.events import AfterTraversal
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
-from repoze.bfg.resource import resolve_resource_spec
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import default_notfound_view
+
+make_app = make_app # prevent pyflakes from complaining
 
 class Router(object):
     """ The main repoze.bfg WSGI application. """
@@ -35,7 +37,7 @@ class Router(object):
 
     def __init__(self, registry):
         q = registry.queryUtility
-        self.logger = q(ILogger, 'repoze.bfg.debug')
+        self.logger = q(IDebugLogger)
         self.notfound_view = q(INotFoundView, default=default_notfound_view)
         self.forbidden_view = q(IForbiddenView, default=default_forbidden_view)
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
@@ -149,58 +151,4 @@ class Router(object):
 
         finally:
             manager.pop()
-
-# note that ``options`` is a b/w compat alias for ``settings`` and
-# ``Configurator`` is a testing dep inj
-def make_app(root_factory, package=None, filename='configure.zcml',
-             settings=None, options=None, Configurator=None):
-    """ Return a Router object, representing a fully configured
-    ``repoze.bfg`` WSGI application.
-
-    ``root_factory`` must be a callable that accepts a :term:`request`
-    object and which returns a traversal root object.  The traversal
-    root returned by the root factory is the *default* traversal root;
-    it can be overridden on a per-view basis.  ``root_factory`` may be
-    ``None``, in which case a 'default default' traversal root is
-    used.
-
-    ``package`` is a Python module representing the application's
-    package.  It is optional, defaulting to ``None``.  ``package`` may
-    be ``None``.  If ``package`` is ``None``, the ``filename`` passed
-    or the value in the ``options`` dictionary named
-    ``configure_zcml`` must be a) absolute pathname to a ZCML file
-    that represents the application's configuration *or* b) a
-    'specification' in the form
-    ``dotted_package_name:relative/file/path.zcml``.
-
-    ``filename`` is the filesystem path to a ZCML file (optionally
-    relative to the package path) that should be parsed to create the
-    application registry.  It defaults to ``configure.zcml``.  It can
-    also be a 'specification' in the form
-    ``dotted_package_name:relatve/file/path.zcml``. Note that if any
-    value for ``configure_zcml`` is passed within the ``options``
-    dictionary, the value passed as ``filename`` will be ignored,
-    replaced with the ``configure_zcml`` value.
-
-    ``settings``, if used, should be a dictionary containing runtime
-    settings (e.g. the key/value pairs in an app section of a
-    PasteDeploy file), with each key representing the option and the
-    key's value representing the specific option value,
-    e.g. ``{'reload_templates':True}``.  Note that the keyword
-    parameter ``options`` is a backwards compatibility alias for the
-    ``settings`` keyword parameter.
-    """
-    if Configurator is None:
-        from repoze.bfg.configuration import Configurator # pragma: no cover
-    settings = settings or options
-    config = Configurator()
-    package_name = package and package.__name__ or None
-    package_name, filename = resolve_resource_spec(filename, package_name)
-    if package_name is not None:
-        spec = '%s:%s' % (package_name, filename)
-    else:
-        spec = filename
-    config.declarative(root_factory, spec, settings=settings)
-    app = config.make_wsgi_app()
-    return app
 

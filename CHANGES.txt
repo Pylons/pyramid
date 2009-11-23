@@ -90,6 +90,10 @@ Internals
   ``repoze.bfg.threadlocal.get_current_registry`` API to obtain the
   registry.
 
+- The internal ILogger utility named ``repoze.bfg.debug`` is now just
+  an IDebugLogger unnamed utility.  A named utility with the old name
+  is registered for b/w compat.
+
 Backwards Incompatibilites
 --------------------------
 

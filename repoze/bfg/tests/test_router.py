@@ -29,9 +29,9 @@ class TestRouter(unittest.TestCase):
         mapper.connect(path, name, factory)
 
     def _registerLogger(self):
-        from repoze.bfg.interfaces import ILogger
+        from repoze.bfg.interfaces import IDebugLogger
         logger = DummyLogger()
-        self.registry.registerUtility(logger, ILogger, name='repoze.bfg.debug')
+        self.registry.registerUtility(logger, IDebugLogger)
         return logger
 
     def _registerSettings(self, **kw):
@@ -507,35 +507,6 @@ class TestRouter(unittest.TestCase):
         self.failUnless(req_iface.providedBy(request))
         self.failUnless(IFoo.providedBy(request))
 
-class TestMakeApp(unittest.TestCase):
-    def setUp(self):
-        testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def _callFUT(self, *arg, **kw):
-        from repoze.bfg.router import make_app
-        return make_app(*arg, **kw)
-
-    def test_it(self):
-        settings = {'a':1}
-        rootfactory = object()
-        app = self._callFUT(rootfactory, settings=settings,
-                            Configurator=DummyConfigurator)
-        self.assertEqual(app.root_factory, rootfactory)
-        self.assertEqual(app.settings, settings)
-        self.assertEqual(app.spec, 'configure.zcml')
-
-    def test_it_options_means_settings(self):
-        settings = {'a':1}
-        rootfactory = object()
-        app = self._callFUT(rootfactory, options=settings,
-                            Configurator=DummyConfigurator)
-        self.assertEqual(app.root_factory, rootfactory)
-        self.assertEqual(app.settings, settings)
-        self.assertEqual(app.spec, 'configure.zcml')
-
 class DummyContext:
     pass
 
@@ -599,12 +570,3 @@ class DummyLogger:
     warn = info
     debug = info
 
-class DummyConfigurator(object):
-    def make_wsgi_app(self):
-        return self
-    
-    def declarative(self, root_factory=None, spec=None, settings=None):
-        self.root_factory = root_factory
-        self.spec = spec
-        self.settings = settings
-                
