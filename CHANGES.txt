@@ -100,16 +100,38 @@ Backwards Incompatibilites
   attributes didn't actually work in any useful way (see entry above
   this one).
 
-- Each of the ``repoze.bfg.view.render_view``,
-  ``repoze.bfg.view.render_view_to_iterable``,
-  ``repoze.bfg.view.render_view_to_response``,
-  ``repoze.bfg.view.append_slash_notfound_view``,
-  ``repoze.bfg.view.default_notfound_view``,
-  ``repoze.bfg.view.default_forbidden_view``, and the
-  ``repoze.bfg.configuration.rendered_response`` functions now expects
-  to be called with a request object that has a ``registry`` attribute
-  which represents the current ZCA registry.  Previously these
-  functions used the ZCA threadlocal API to get the current registry.
+- Relating to the following functions:
+
+  ``repoze.bfg.view.render_view``
+
+  ``repoze.bfg.view.render_view_to_iterable``
+
+  ``repoze.bfg.view.render_view_to_response``
+
+  ``repoze.bfg.view.append_slash_notfound_view``
+
+  ``repoze.bfg.view.default_notfound_view``
+
+  ``repoze.bfg.view.default_forbidden_view``
+
+  ``repoze.bfg.configuration.rendered_response``
+
+  ``repoze.bfg.security.has_permission``
+
+  ``repoze.bfg.security.authenticated_userid``
+
+  ``repoze.bfg.security.effective_principals``
+
+  ``repoze.bfg.security.view_execution_permitted``
+
+  ``repoze.bfg.security.remember``
+
+  ``repoze.bfg.security.forget``
+
+  Each of these functions now expects to be called with a request
+  object that has a ``registry`` attribute which represents the
+  current ZCA registry.  Previously these functions used the ZCA
+  threadlocal API to get the current registry.
 
   This should only cause a problem when passing a custom request
   object to code which ends up calling these functions in a unit test.
@@ -1240,21 +1262,21 @@ Backwards Incompatibilities
   repoze.bfg 0.9, have been removed.  If you have something like this
   in your ``configure.zcml``, it will no longer work::
 
-   <utility
-     provides="repoze.bfg.interfaces.ISecurityPolicy"
-     factory="repoze.bfg.security.RemoteUserInheritingACLSecurityPolicy"
-     />
+     <utility
+       provides="repoze.bfg.interfaces.ISecurityPolicy"
+       factory="repoze.bfg.security.RemoteUserInheritingACLSecurityPolicy"
+      />
 
-   If ZCML like the above exists in your application, you will receive
-   an error at startup time.  Instead of the above, you'll need
-   something like::
+  If ZCML like the above exists in your application, you will receive
+  an error at startup time.  Instead of the above, you'll need
+  something like::
 
      <remoteuserauthenticationpolicy/>
      <aclauthorizationpolicy/>
 
-   This is just an example.  See the "Security" chapter of the
-   repoze.bfg documentation for more information about configuring
-   security policies.
+  This is just an example.  See the "Security" chapter of the
+  repoze.bfg documentation for more information about configuring
+  security policies.
 
 - Custom ZCML directives which register an authentication or
   authorization policy (ala "authtktauthenticationpolicy" or

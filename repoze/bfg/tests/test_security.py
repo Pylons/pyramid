@@ -158,23 +158,6 @@ class TestViewExecutionPermitted(unittest.TestCase):
         result = self._callFUT(context, request, '')
         self.failUnless(result is True)
 
-def _registerAuthenticationPolicy(result):
-    from repoze.bfg.interfaces import IAuthenticationPolicy
-    policy = DummyAuthenticationPolicy(result)
-    import zope.component
-    sm = zope.component.getSiteManager()
-    sm.registerUtility(policy, IAuthenticationPolicy)
-    return policy
-
-def _registerAuthorizationPolicy(result):
-    from repoze.bfg.interfaces import IAuthorizationPolicy
-    policy = DummyAuthorizationPolicy(result)
-    import zope.component
-    sm = zope.component.getSiteManager()
-    sm.registerUtility(policy, IAuthorizationPolicy)
-    return policy
-
-
 class TestHasPermission(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -187,18 +170,29 @@ class TestHasPermission(unittest.TestCase):
         return has_permission(*arg)
 
     def test_no_authentication_policy(self):
-        result = self._callFUT('view', None, None)
+        request = _makeRequest()
+        result = self._callFUT('view', None, request)
         self.assertEqual(result, True)
         self.assertEqual(result.msg, 'No authentication policy in use.')
         
     def test_authentication_policy_no_authorization_policy(self):
-        _registerAuthenticationPolicy(None)
-        self.assertRaises(ValueError, self._callFUT, 'view', None, None)
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, None)
+        self.assertRaises(ValueError, self._callFUT, 'view', None, request)
 
     def test_authn_and_authz_policies_registered(self):
-        _registerAuthenticationPolicy(None)
-        pol = _registerAuthorizationPolicy('yo')
-        self.assertEqual(self._callFUT('view', None, None), 'yo')
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, None)
+        _registerAuthorizationPolicy(request.registry, 'yo')
+        self.assertEqual(self._callFUT('view', None, request), 'yo')
+
+    def test_no_registry_on_request(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        request = DummyRequest({})
+        registry = get_current_registry()
+        _registerAuthenticationPolicy(registry, None)
+        _registerAuthorizationPolicy(registry, 'yo')
+        self.assertEqual(self._callFUT('view', None, request), 'yo')
 
 class TestAuthenticatedUserId(unittest.TestCase):
     def setUp(self):
@@ -212,13 +206,21 @@ class TestAuthenticatedUserId(unittest.TestCase):
         return authenticated_userid(request)
 
     def test_no_authentication_policy(self):
-        request = DummyRequest({})
+        request = _makeRequest()
         result = self._callFUT(request)
         self.assertEqual(result, None)
 
     def test_with_authentication_policy(self):
-        _registerAuthenticationPolicy('yo')
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        result = self._callFUT(request)
+        self.assertEqual(result, 'yo')
+
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from repoze.bfg.threadlocal import get_current_registry
         request = DummyRequest({})
+        registry = get_current_registry()
+        _registerAuthenticationPolicy(registry, 'yo')
         result = self._callFUT(request)
         self.assertEqual(result, 'yo')
 
@@ -234,13 +236,21 @@ class TestEffectivePrincipals(unittest.TestCase):
         return effective_principals(request)
 
     def test_no_authentication_policy(self):
-        request = DummyRequest({})
+        request = _makeRequest()
         result = self._callFUT(request)
         self.assertEqual(result, [])
 
     def test_with_authentication_policy(self):
-        _registerAuthenticationPolicy('yo')
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        result = self._callFUT(request)
+        self.assertEqual(result, 'yo')
+
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = DummyRequest({})
+        _registerAuthenticationPolicy(registry, 'yo')
         result = self._callFUT(request)
         self.assertEqual(result, 'yo')
 
@@ -262,7 +272,9 @@ class TestPrincipalsAllowedByPermission(unittest.TestCase):
         self.assertEqual(result, [Everyone])
 
     def test_with_authorization_policy(self):
-        _registerAuthorizationPolicy('yo')
+        from repoze.bfg.threadlocal import get_current_registry
+        registry = get_current_registry()
+        _registerAuthorizationPolicy(registry, 'yo')
         context = DummyContext()
         result = self._callFUT(context, 'view')
         self.assertEqual(result, 'yo')
@@ -280,13 +292,22 @@ class TestRemember(unittest.TestCase):
 
     def test_no_authentication_policy(self):
         context = DummyContext()
-        request = DummyRequest({})
+        request = _makeRequest()
         result = self._callFUT(request, 'me')
         self.assertEqual(result, [])
 
     def test_with_authentication_policy(self):
-        _registerAuthenticationPolicy('yo')
+        request = _makeRequest()
+        registry = request.registry
+        _registerAuthenticationPolicy(registry, 'yo')
+        result = self._callFUT(request, 'me')
+        self.assertEqual(result, 'yo')
+
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = DummyRequest({})
+        _registerAuthenticationPolicy(registry, 'yo')
         result = self._callFUT(request, 'me')
         self.assertEqual(result, 'yo')
 
@@ -302,13 +323,21 @@ class TestForget(unittest.TestCase):
         return forget(*arg)
 
     def test_no_authentication_policy(self):
-        request = DummyRequest({})
+        request = _makeRequest()
         result = self._callFUT(request)
         self.assertEqual(result, [])
 
     def test_with_authentication_policy(self):
-        _registerAuthenticationPolicy('yo')
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        result = self._callFUT(request)
+        self.assertEqual(result, 'yo')
+
+    def test_with_authentication_policy_no_reg_on_request(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        registry = get_current_registry()
         request = DummyRequest({})
+        _registerAuthenticationPolicy(registry, 'yo')
         result = self._callFUT(request)
         self.assertEqual(result, 'yo')
 
@@ -345,4 +374,23 @@ class DummyAuthorizationPolicy:
 
     def principals_allowed_by_permission(self, context, permission):
         return self.result
+
+def _registerAuthenticationPolicy(reg, result):
+    from repoze.bfg.interfaces import IAuthenticationPolicy
+    policy = DummyAuthenticationPolicy(result)
+    reg.registerUtility(policy, IAuthenticationPolicy)
+    return policy
+
+def _registerAuthorizationPolicy(reg, result):
+    from repoze.bfg.interfaces import IAuthorizationPolicy
+    policy = DummyAuthorizationPolicy(result)
+    reg.registerUtility(policy, IAuthorizationPolicy)
+    return policy
+
+def _makeRequest():
+    from repoze.bfg.registry import Registry
+    request = DummyRequest({})
+    request.registry = Registry()
+    return request
+
 

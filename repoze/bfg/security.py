@@ -1,6 +1,4 @@
-from zope.component import getSiteManager
 from zope.component import providedBy
-from zope.component import queryUtility
 
 from zope.deprecation import deprecated
 
@@ -10,6 +8,8 @@ from repoze.bfg.interfaces import ISecuredView
 
 # b/c import
 from repoze.bfg.exceptions import Forbidden as Unauthorized
+
+from repoze.bfg.threadlocal import get_current_registry
 
 deprecated('Unauthorized',
     "('from repoze.bfg.security import Unauthorized' was  "
@@ -43,11 +43,15 @@ def has_permission(permission, context, request):
     function delegates to the current authentication and authorization
     policies.  Return ``Allowed`` unconditionally if no authentication
     policy has been configured in this application."""
-    authn_policy = queryUtility(IAuthenticationPolicy)
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
+    authn_policy = reg.queryUtility(IAuthenticationPolicy)
     if authn_policy is None:
         return Allowed('No authentication policy in use.')
 
-    authz_policy = queryUtility(IAuthorizationPolicy)
+    authz_policy = reg.queryUtility(IAuthorizationPolicy)
     if authz_policy is None:
         raise ValueError('Authentication policy registered without '
                          'authorization policy') # should never happen
@@ -58,8 +62,12 @@ def authenticated_userid(request):
     """ Return the userid of the currently authenticated user or
     ``None`` if there is no authentication policy in effect or there
     is no currently authenticated user. """
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
 
-    policy = queryUtility(IAuthenticationPolicy)
+    policy = reg.queryUtility(IAuthenticationPolicy)
     if policy is None:
         return None
     return policy.authenticated_userid(request)
@@ -70,8 +78,12 @@ def effective_principals(request):
     authenticated user if a user is currently authenticated. If no
     authentication policy is in effect, this will return an empty
     sequence."""
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
 
-    policy = queryUtility(IAuthenticationPolicy)
+    policy = reg.queryUtility(IAuthenticationPolicy)
     if policy is None:
         return []
     return policy.effective_principals(request)
@@ -90,7 +102,8 @@ def principals_allowed_by_permission(context, permission):
        ``NotImplementedError`` exception to be raised when this
        function is invoked.
     """
-    policy = queryUtility(IAuthorizationPolicy)
+    reg = get_current_registry()
+    policy = reg.queryUtility(IAuthorizationPolicy)
     if policy is None:
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
@@ -102,9 +115,12 @@ def view_execution_permitted(context, request, name=''):
     ``request``.  Return a boolean result.  If no authentication
     policy is in effect, or if the view is not protected by a
     permission, return True."""
-    sm = getSiteManager()
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
     provides = map(providedBy, (context, request))
-    view = sm.adapters.lookup(provides, ISecuredView, name=name)
+    view = reg.adapters.lookup(provides, ISecuredView, name=name)
     if view is None:
         return Allowed(
             'Allowed: view name %r in context %r (no permission defined)' %
@@ -129,7 +145,11 @@ def remember(request, principal, **kw):
     return an empty sequence.  If used, the composition and meaning of
     ``**kw`` must be agreed upon by the calling code and the effective
     authentication policy."""
-    policy = queryUtility(IAuthenticationPolicy)
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
+    policy = reg.queryUtility(IAuthenticationPolicy)
     if policy is None:
         return []
     else:
@@ -150,7 +170,11 @@ def forget(request):
 
     If no authentication policy is in use, this function will always
     return an empty sequence."""
-    policy = queryUtility(IAuthenticationPolicy)
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
+    policy = reg.queryUtility(IAuthenticationPolicy)
     if policy is None:
         return []
     else:
