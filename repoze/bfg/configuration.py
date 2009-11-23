@@ -74,8 +74,10 @@ DEFAULT_RENDERERS = (
 class Configurator(object):
     """
     A Configurator is used to configure a :mod:`repoze.bfg`
-    :term:`application registry`.  The Configurator accepts two
-    arguments: ``registry`` and ``package``.
+    :term:`application registry`.  The Configurator accepts a number
+    of arguments: ``registry``, ``package``, ``settings``,
+    ``root_factory``, ``zcml_file``, ``authentication_policy``,
+    ``authorization_policy``, ``renderers`` and ``debug_logger``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :mod:`repoze.bfg.registry.Registry`
@@ -93,11 +95,46 @@ class Configurator(object):
     argument, into absolute paths.  If ``None`` is passed (the
     default), the package is assumed to be the Python package in which
     the *caller* of the ``Configurator`` constructor lives.
+
+    If the ``settings`` argument is passed, it should be a Python
+    dictionary representing the deployment settings for this
+    application.  These are later retrievable using the
+    ``repoze.bfg.settings.get_settings`` API.
+
+    If the ``root_factory`` argument is passed, it should be an object
+    representing the default :term:`root factory` for your
+    application.  If it is ``None``, a default root factory will be
+    used.
+
+    If ``zcml_file`` is passed, it should be a filename relative to
+    the caller package, an absolute filename, or a :term:`resource
+    specification`.  The file it refers to should contain
+    :term:`ZCML`.  The ZCML represented in this file will be loaded.
+
+    If ``authentication_policy`` is passed, it should be an instance
+    of an :term:`authentication policy`.
+
+    If ``authorization_policy`` is passed, it should be an instance
+    of an :term:`authorization policy`.
+
+    .. note:: A ``ConfigurationError`` will be raised if an
+       authorization policy is supplied without authentication policy
+       also being supplied (authorization requires authentication).
+
+    If ``renderers`` is passed, it should be a list of tuples
+    representing a set of :term:`renderer` factories which should be
+    configured into this application.  If it is not passed, a default
+    set of renderer factories is used.
+
+    If ``debug_logger`` is not passed, a default debug logger that
+    logs to stderr will be used.  If it is passed, it should be an
+    instance of a ``logging.Logger`` (PEP 282) class.
+    
     """
     def __init__(self, registry=None, package=None, settings=None,
-                 root_factory=None, debug_logger=None, zcml_file=None,
+                 root_factory=None, zcml_file=None,
                  authentication_policy=None, authorization_policy=None,
-                 renderers=DEFAULT_RENDERERS):
+                 renderers=DEFAULT_RENDERERS, debug_logger=None):
         self.package = package or caller_package()
         self.registry = registry
         if registry is None:

@@ -67,6 +67,8 @@ There are a number of different mechanisms you may use to configure
 and *declarative* configuration.  We'll examine both modes in the
 sections which follow.
 
+.. _helloworld_imperative:
+
 Hello World, Configured Imperatively
 ------------------------------------
 
@@ -173,6 +175,8 @@ requesting user agent.
 
 The view callable defined by the script does nothing but return a
 response with the body ``Hello world!``.
+
+.. _helloworld_imperative_appconfig:
 
 Application Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -318,10 +322,10 @@ an XML dialect.
 Declarative configuration mode is the configuration mode in which
 developers cede the most amount of control to the framework itself.
 Because application developers cede a more control to the framework,
-it is also the hardest mode of configuration to understand.  However,
-using declarative configuration has a number of benefits, the primary
-benefit being that applications configured declaratively can be
-*overridden* and *extended* by third parties without requiring the
+it is also harder to understand than purely imperative configuration.
+However, using declarative configuration has a number of benefits, the
+primary benefit being that applications configured declaratively can
+be *overridden* and *extended* by third parties without requiring the
 third party to change application code.
 
 .. note::
@@ -366,4 +370,245 @@ previously created ``helloworld.py``:
          />
 
     </configure>
+
+This pair of files forms an application functionally equivalent to the
+application we created earlier.  Let's examine the differences between
+the code described in :ref:`helloworld_imperative`" and the code
+above.
+
+In :ref:`helloworld_imperative_appconfig`, we had the following lines
+within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
+
+.. code-block:: python
+   :linenos:
+
+   if __name__ == '__main__':
+       config = Configurator()
+       config.view(hello_world)
+       app = config.make_wsgi_app()
+       simple_server.make_server('', 8080, app).serve_forever()
+
+In our "declarative" code, we've added a ``zcml_file`` argument to the
+``Configurator`` constructor's argument list with the value
+``configure.zcml``, and we've removed the line which reads
+``config.view(hello_world)``, so that it now reads as:
+
+.. code-block:: python
+   :linenos:
+
+   if __name__ == '__main__':
+       config = Configurator(zcml_file='configure.zcml')
+       app = config.make_wsgi_app()
+       simple_server.make_server('', 8080, app).serve_forever()
+
+Everything else is much the same.
+
+The ``zcml_file`` argument to the ``Configurator`` constructor tells
+the configurator to load configuration declarations from the
+``configure.zcml`` file which sits next to ``helloworld.py``.  Let's
+take a look at the ``configure.zcml`` file now:
+
+.. code-block:: xml
+   :linenos:
+
+    <configure xmlns="http://namespaces.repoze.org/bfg">
+
+      <include package="repoze.bfg.includes" />
+
+      <view
+         view="helloworld.hello_world"
+         />
+
+    </configure>
+
+The ``<configure>`` Tag
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``configure.zcml`` ZCML file contains this bit of XML:
+
+.. code-block:: xml
+   :linenos:
+
+    <configure xmlns="http://namespaces.repoze.org/bfg">
+       ... body ...
+    </configure>
+
+Because :term:`ZCML` is XML, and because XML requires a single root
+tag for each document, every ZCML file used by :mod:`repoze.bfg` must
+contain a ``<configure>`` container tag, which acts as the root XML
+tag.  Usually, the start tag of the ``<configure>`` container tag has
+a default namespace associated with it. In the file above, the
+``xmlns="http:/namepaces.repoze.org/bfg"`` attribute of the
+``configure`` start tag names the default XML namespace, which is
+``http://namespaces.repoze.org/bfg``.  See
+:ref:`word_on_xml_namespaces` for more information about XML
+namespaces.
+
+The ``<include>`` Tag
+~~~~~~~~~~~~~~~~~~~~~
+
+The ``configure.zcml`` ZCML file contains this bit of XML within the
+root tag:
+
+.. code-block:: xml
+   :linenos:
+
+      <include package="repoze.bfg.includes" />
+
+This singleton (self-closing) tag instructs ZCML to load a ZCML file
+from the Python package with the :term:`dotted Python name`
+``repoze.bfg.includes``, as specified by its ``package`` attribute.
+This particular ``<include>`` declaration is required because it
+actually allows subseqent declaration tags (such as ``<view>``, which
+we'll see shortly) to be recognized.  The ``<include>`` tag
+effectively just includes another ZCML file; this causes its
+declarations to be executed.  In this case, we want to load the
+declarations from the file named ``configure.zcml`` within the
+``repoze.bfg.includes`` Python package.  We know we want to load the
+``configure.zcml`` from this package because ``configure.zcml`` is the
+default value for another attribute of the ``<include>`` tag named
+``file``.  We could have spelled the include tag more verbosely, but
+equivalently as:
+
+.. code-block:: xml
+   :linenos:
+
+      <include package="repoze.bfg.includes" 
+               file="configure.zcml"/>
+
+The ``<include>`` tag that includes the ZCML statements implied by the
+``configure.zcml`` file from the Python package named
+``repoze.bfg.includes`` is basically required to come before any other
+named declaration in an application's ``configure.zcml``.  If it is
+not included, subsequent declaration tags will fail to be recognized,
+and the configuration system will generate a traceback.  However, the
+``<include package="repoze.bfg.includes"/>`` tag needs to exist only
+in a "top-level" ZCML file, it needn't also exist in ZCML files
+*included by* a top-level ZCML file.
+
+The ``<view>`` Tag
+~~~~~~~~~~~~~~~~~~
+
+The ``configure.zcml`` ZCML file contains this bit of XML after the
+``<include>`` tag, but within the root tag:
+
+.. code-block:: xml
+   :linenos:
+
+      <view
+         view="helloworld.hello_world"
+         />
+
+This ``<view>`` declaration tag directs :mod:`repoze.bfg` to create a
+:term:`view configuration`.  This ``<view>`` tag has an attribute
+(also named ``view``), which points at a :term:`dotted Python name`,
+referencing the ``hello_world`` function defined within the
+``helloworld`` package.  This tag is functionally equivalent to a
+line we saw previously in our imperatively-configured application:
+
+.. code-block:: python
+   :linenos:
+
+       config.view(hello_world)
+
+The ``<view>`` declaration tag effectively invokes the ``view`` method
+of the ``Configurator`` object on your behalf.  Various attributes can
+be specified on the ``<view>`` tag which influence the :term:`view
+configuration` it creates.
+
+The ``<view>`` tag is an example of a :mod:`repoze.bfg` declaration
+tag.  Other such tags include ``<route>``, ``<scan>``, ``<notfound>``,
+``<forbidden>``, and others.  All of these tags are effectively
+"macros" which call methods on the ``Configurator`` object on your
+behalf.
+
+ZCML Conflict Detection
+~~~~~~~~~~~~~~~~~~~~~~~
+
+An additional feature of ZCML is *conflict detection*.  If you define
+two declaration tags within the same ZCML file which logically
+"collide", an exception will be raised, and the application will not
+start.  For example, the following ZCML file has two conflicting
+``<view>`` tags:
+
+.. code-block:: xml
+   :linenos:
+
+    <configure xmlns="http://namespaces.repoze.org/bfg">
+
+      <include package="repoze.bfg.includes" />
+
+      <view
+         view="helloworld.hello_world"
+         />
+
+      <view
+         view="helloworld.hello_world"
+         />
+
+    </configure>
+
+If you try to use this ZCML file as the source of ZCML for an
+application, a ``ConfigurationError`` will be raised when you attempt
+to start the application with information about which tags might have
+conflicted.
+
+.. _word_on_xml_namespaces:
+
+A Word On XML Namespaces
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using the ``http://namespaces.repoze.org/bfg`` namespace as the
+default XML namespace isn't strictly necessary; you can use a
+different default namespace as the default.  However, if you do, the
+declaration tags which are defined by :mod:`repoze.bfg` such as the
+``<view>`` declaration tag will need to be defined in such a way that
+the XML parser that :mod:`repoze.bfg` uses knows which namespace the
+:mod:`repoze.bfg` tags are associated with.  For example, the
+following files are all completely equivalent:
+
+.. topic:: Use of A Non-Default XML Namespace
+
+  .. code-block:: xml
+     :linenos:
+
+      <configure xmlns="http://namespaces.zope.org/zope"
+                 xmlns:bfg="http://namespaces.repoze.org/bfg">
+
+        <include package="repoze.bfg.includes" />
+
+        <bfg:view
+           view="helloworld.hello_world"
+           />
+
+      </configure>
+
+.. topic:: Use of A Per-Tag XML Namespace Without A Default XML Namespace
+
+  .. code-block:: xml
+     :linenos:
+
+      <configure>
+
+        <include package="repoze.bfg.includes" />
+
+        <view xmlns="http://namespaces.repoze.org/bfg"
+           view="helloworld.hello_world"
+           />
+
+      </configure>
+
+For more information about XML namespaces, see `this older, but simple
+XML.com article <http://www.xml.com/pub/a/1999/01/namespaces.html>`_.
+
+Conclusions
+-----------
+
+:mod:`repoze.bfg` allows an application to perform configuration tasks
+either imperatively or declaratively.  You can choose the mode that
+best fits your brain as necessary.
+
+For more information about the API of the ``Configurator`` object, see
+:ref:`configuration_module`.  The equivalent ZCML declaration tags are
+introduced in narrative documentation chapters as necessary.
 
