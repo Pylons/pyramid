@@ -1,46 +1,37 @@
 import unittest
 
-from repoze.bfg.testing import cleanUp
+from repoze.bfg import testing
 
 class TestRouter(unittest.TestCase):
     def setUp(self):
-        from repoze.bfg.registry import Registry
-        from zope.component import getSiteManager
-        self.registry = Registry()
-        getSiteManager.sethook(lambda *arg: self.registry)
+        testing.setUp()
+        from repoze.bfg.threadlocal import get_current_registry
+        self.registry = get_current_registry()
 
     def tearDown(self):
-        from zope.component import getSiteManager
-        getSiteManager.reset()
-        cleanUp()
+        testing.tearDown()
 
     def _registerRouteRequest(self, name):
         from repoze.bfg.interfaces import IRouteRequest
         from zope.interface import Interface
-        from zope.component import getSiteManager
         class IRequest(Interface):
             """ """
-        sm = getSiteManager()
-        sm.registerUtility(IRequest, IRouteRequest, name=name)
+        self.registry.registerUtility(IRequest, IRouteRequest, name=name)
         return IRequest
 
     def _connectRoute(self, path, name, factory=None):
         from repoze.bfg.interfaces import IRoutesMapper
-        from zope.component import getSiteManager
         from repoze.bfg.urldispatch import RoutesMapper
-        sm = getSiteManager()
-        mapper = sm.queryUtility(IRoutesMapper)
+        mapper = self.registry.queryUtility(IRoutesMapper)
         if mapper is None:
             mapper = RoutesMapper()
-            sm.registerUtility(mapper, IRoutesMapper)
+            self.registry.registerUtility(mapper, IRoutesMapper)
         mapper.connect(path, name, factory)
 
     def _registerLogger(self):
-        from zope.component import getSiteManager
-        gsm = getSiteManager()
         from repoze.bfg.interfaces import ILogger
         logger = DummyLogger()
-        gsm.registerUtility(logger, ILogger, name='repoze.bfg.debug')
+        self.registry.registerUtility(logger, ILogger, name='repoze.bfg.debug')
         return logger
 
     def _registerSettings(self, **kw):
@@ -518,10 +509,10 @@ class TestRouter(unittest.TestCase):
 
 class TestMakeApp(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
         from repoze.bfg.router import make_app

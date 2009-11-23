@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg.testing import cleanUp
+from repoze.bfg import testing
 
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, registry=None, package=None):
@@ -359,7 +359,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper, view)
 
     def test_view_register_secured_view(self):
-        from zope.component import Interface
+        from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import ISecuredView
         view = lambda *arg: 'OK'
@@ -371,7 +371,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper, view)
 
     def test_view_multiview_replaces_existing_view(self):
-        from zope.component import Interface
+        from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IMultiView
@@ -384,7 +384,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_view_multiview_replaces_multiview(self):
-        from zope.component import Interface
+        from zope.interface import Interface
         from zope.interface import implements
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IMultiView
@@ -1783,10 +1783,10 @@ class Test__map_view(unittest.TestCase):
 
 class TestBFGViewGrokker(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _getTargetClass(self):
         from repoze.bfg.configuration import BFGViewGrokker
@@ -1796,7 +1796,7 @@ class TestBFGViewGrokker(unittest.TestCase):
         return self._getTargetClass()(*arg, **kw)
 
     def test_grok_is_bfg_view(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from zope.interface import Interface
@@ -1814,12 +1814,12 @@ class TestBFGViewGrokker(unittest.TestCase):
                         wrapper=None, xhr=False, header=None,
                         accept=None)
         obj.__bfg_view_settings__ = [settings]
-        sm = getSiteManager()
-        config = Configurator(sm)
+        reg = get_current_registry()
+        config = Configurator(reg)
         result = grokker.grok('name', obj, _info='', _configurator=config)
         self.assertEqual(result, True)
-        wrapped = sm.adapters.lookup((Interface, IRequest), IView,
-                                     name='foo.html')
+        wrapped = reg.adapters.lookup((Interface, IRequest), IView,
+                                      name='foo.html')
         self.assertEqual(wrapped(None, None), 'OK')
 
     def test_grok_is_not_bfg_view(self):
@@ -1832,10 +1832,10 @@ class TestBFGViewGrokker(unittest.TestCase):
 
 class Test_rendered_response(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        testing.setUp()
 
     def tearDown(self):
-        cleanUp()
+        testing.tearDown()
 
     def _callFUT(self, renderer, response, view=None,
                  context=None, request=None, renderer_name=None):
@@ -2033,7 +2033,6 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(mv.__permitted__(None, None), True)
         
     def test_permitted(self):
-        from zope.component import getSiteManager
         mv = self._makeOne()
         def view(context, request):
             """ """
@@ -2043,7 +2042,6 @@ class TestMultiView(unittest.TestCase):
         mv.views = [(100, view)]
         context = DummyContext()
         request = DummyRequest()
-        sm = getSiteManager()
         result = mv.__permitted__(context, request)
         self.assertEqual(result, False)
 
