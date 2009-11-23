@@ -1,9 +1,10 @@
 - Replace martian with something simpler.
 
-- Get rid of ``declarative`` method of Configurator.
-
-- Allow policies, settings, and a root factory to be passed to
-  Configurator constructor.
-
 - Decide about creating a "real" request object during testing.setUp
   vs. creating a dummy request.
+
+- Finish "configuration" documentation chapter and audit the rest of
+  the docs for "view configuration" and "route configuration"
+  references, etc.
+
+- Finish Configurator API documentation.
