@@ -81,6 +81,13 @@ Internals
 
 - The ``repoze.bfg.request.FakeRequest`` class has been removed.
 
+- Most uses of the ZCA threadlocal API (the ``getSiteManager``,
+  ``getUtility``, ``getAdapter``, ``getMultiAdapter`` threadlocal API)
+  have been removed from the core.  Instead, when a threadlocal is
+  necessary, the core uses the
+  ``repoze.bfg.threadlocal.get_current_registry`` API to obtain the
+  registry.
+
 Backwards Incompatibilites
 --------------------------
 

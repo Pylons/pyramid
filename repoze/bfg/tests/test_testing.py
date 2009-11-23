@@ -6,6 +6,8 @@ import unittest
 class TestTestingFunctions(unittest.TestCase):
     def setUp(self):
         setUp()
+        from repoze.bfg.threadlocal import get_current_registry
+        self.registry = get_current_registry()
         from zope.deprecation import __show__
         __show__.off()
 
@@ -26,11 +28,10 @@ class TestTestingFunctions(unittest.TestCase):
                                             permissive=False)
         from repoze.bfg.interfaces import IAuthenticationPolicy
         from repoze.bfg.interfaces import IAuthorizationPolicy
-        from zope.component import getUtility
-        ut = getUtility(IAuthenticationPolicy)
+        ut = self.registry.getUtility(IAuthenticationPolicy)
         from repoze.bfg.testing import DummySecurityPolicy
         self.failUnless(isinstance(ut, DummySecurityPolicy))
-        ut = getUtility(IAuthorizationPolicy)
+        ut = self.registry.getUtility(IAuthorizationPolicy)
         self.assertEqual(ut.userid, 'user')
         self.assertEqual(ut.groupids, ('group1', 'group2'))
         self.assertEqual(ut.permissive, False)
@@ -41,9 +42,8 @@ class TestTestingFunctions(unittest.TestCase):
         models = {'/ob1':ob1, '/ob2':ob2}
         from repoze.bfg import testing
         testing.registerModels(models)
-        from zope.component import getAdapter
         from repoze.bfg.interfaces import ITraverser
-        adapter = getAdapter(None, ITraverser)
+        adapter = self.registry.getAdapter(None, ITraverser)
         result = adapter({'PATH_INFO':'/ob1'})
         self.assertEqual(result['context'], ob1)
         self.assertEqual(result['view_name'], '')
@@ -199,44 +199,37 @@ class TestTestingFunctions(unittest.TestCase):
         self.assertEqual(result.app_iter, ['123'])
 
     def test_registerViewPermission_defaults(self):
-        from zope.component import getSiteManager
         from zope.interface import Interface
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg import testing
         view = testing.registerViewPermission('moo.html')
-        sm = getSiteManager()
-        result = sm.getMultiAdapter(
+        result = self.registry.getMultiAdapter(
             (Interface, Interface), IViewPermission, 'moo.html')
         self.assertEqual(result, True)
         
     def test_registerViewPermission_denying(self):
-        from zope.component import getSiteManager
         from zope.interface import Interface
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg import testing
         view = testing.registerViewPermission('moo.html', result=False)
-        sm = getSiteManager()
-        result = sm.getMultiAdapter(
+        result = self.registry.getMultiAdapter(
             (Interface, Interface), IViewPermission, 'moo.html')
         self.assertEqual(result, False)
 
     def test_registerViewPermission_custom(self):
-        from zope.component import getSiteManager
         from zope.interface import Interface
         from repoze.bfg.interfaces import IViewPermission
         def viewperm(context, request):
             return True
         from repoze.bfg import testing
         testing.registerViewPermission('moo.html', viewpermission=viewperm)
-        sm = getSiteManager()
-        result = sm.getMultiAdapter(
+        result = self.registry.getMultiAdapter(
             (Interface, Interface), IViewPermission, 'moo.html')
         self.assertEqual(result, True)
 
     def test_registerAdapter(self):
         from zope.interface import implements
         from zope.interface import Interface
-        from zope.component import getMultiAdapter
         class provides(Interface):
             pass
         class Provider:
@@ -252,7 +245,8 @@ class TestTestingFunctions(unittest.TestCase):
         for2 = For_()
         from repoze.bfg import testing
         testing.registerAdapter(Provider, (for_, for_), provides, name='foo')
-        adapter = getMultiAdapter((for1, for2), provides, name='foo')
+        adapter = self.registry.getMultiAdapter(
+            (for1, for2), provides, name='foo')
         self.failUnless(isinstance(adapter, Provider))
         self.assertEqual(adapter.context, for1)
         self.assertEqual(adapter.request, for2)
@@ -260,7 +254,6 @@ class TestTestingFunctions(unittest.TestCase):
     def test_registerUtility(self):
         from zope.interface import implements
         from zope.interface import Interface
-        from zope.component import getUtility
         class iface(Interface):
             pass
         class impl:
@@ -270,21 +263,19 @@ class TestTestingFunctions(unittest.TestCase):
         utility = impl()
         from repoze.bfg import testing
         testing.registerUtility(utility, iface, name='mudge')
-        self.assertEqual(getUtility(iface, name='mudge')(), 'foo')
+        self.assertEqual(self.registry.getUtility(iface, name='mudge')(), 'foo')
 
     def test_registerRoute(self):
         from repoze.bfg.url import route_url
         from repoze.bfg.interfaces import IRoutesMapper
         from repoze.bfg.testing import registerRoute
-        from zope.component import getSiteManager
         class Factory:
             def __init__(self, environ):
                 """ """
         class DummyRequest:
             application_url = 'http://example.com'
         registerRoute(':pagename', 'home', Factory)
-        sm = getSiteManager()
-        mapper = sm.getUtility(IRoutesMapper)
+        mapper = self.registry.getUtility(IRoutesMapper)
         self.assertEqual(len(mapper.routelist), 1)
         request = DummyRequest()
         self.assertEqual(route_url('home', request, pagename='abc'),
@@ -293,28 +284,24 @@ class TestTestingFunctions(unittest.TestCase):
     def test_registerRoutesMapper(self):
         from repoze.bfg.interfaces import IRoutesMapper
         from repoze.bfg.testing import registerRoutesMapper
-        from zope.component import getSiteManager
         class Factory:
             def __init__(self, environ):
                 """ """
         class DummyRequest:
             application_url = 'http://example.com'
         result = registerRoutesMapper()
-        sm = getSiteManager()
-        mapper = sm.getUtility(IRoutesMapper)
+        mapper = self.registry.getUtility(IRoutesMapper)
         self.assertEqual(result, mapper)
 
     def test_registerSettings(self):
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.testing import registerSettings
-        from zope.component import getSiteManager
         registerSettings({'a':1, 'b':2})
-        sm = getSiteManager()
-        settings = sm.getUtility(ISettings)
+        settings = self.registry.getUtility(ISettings)
         self.assertEqual(settings['a'], 1)
         self.assertEqual(settings['b'], 2)
         registerSettings(b=3, c=4)
-        settings = sm.getUtility(ISettings)
+        settings = self.registry.getUtility(ISettings)
         self.assertEqual(settings['a'], 1)
         self.assertEqual(settings['b'], 3)
         self.assertEqual(settings['c'], 4)
@@ -448,7 +435,7 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/foo')
 
     def test_defaults(self):
-        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
         request = self._makeOne()
         self.assertEqual(request.method, 'GET')
         self.assertEqual(request.application_url, 'http://example.com')
@@ -473,7 +460,7 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.root, None)
         self.assertEqual(request.virtual_root, None)
         self.assertEqual(request.virtual_root_path, ())
-        self.assertEqual(request.registry, getSiteManager())
+        self.assertEqual(request.registry, get_current_registry())
 
     def test_params_explicit(self):
         request = self._makeOne(params = {'foo':'bar'})
