@@ -1,6 +1,5 @@
 import cgi
 import mimetypes
-import os
 import sys
 
 # See http://bugs.python.org/issue5853 which is a recursion bug
