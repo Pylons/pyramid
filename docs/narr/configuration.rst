@@ -334,7 +334,7 @@ as one or more keyword arguments to the ``add_view`` method, otherwise
 known as :term:`predicate` arguments.
 
 The line ``config.add_view(hello_world)`` registers the
-``hello_world`` function as a view callble.  The ``add_view`` method
+``hello_world`` function as a view callable.  The ``add_view`` method
 of a Configurator must be called with a view callable object as its
 first argument, so the first argument passed is ``hello_world``
 function we'd like to use as a :term:`view callable`.  However, this
@@ -367,7 +367,7 @@ configuration in its application registry for a given request.
    most specific callable when a request is dispatched to it.
 
 The line ``config.add_view(goodbye_world, name='goodbye')`` registers
-the ``hello_world`` function as a view callble.  The line calls
+the ``hello_world`` function as a view callable.  The line calls
 ``add_view`` with the view callable as the first required positional
 argument, and a :term:`predicate` keyword argument ``name`` with the
 value ``'goodbye'``.  This :term:`view configuration` implies that a
