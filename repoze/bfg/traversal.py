@@ -1,8 +1,5 @@
 import urllib
 
-from zope.component import queryMultiAdapter
-from zope.component import queryAdapter
-
 from zope.interface import implements
 from zope.interface.interfaces import IInterface
 
@@ -14,7 +11,8 @@ from repoze.bfg.interfaces import VH_ROOT_KEY
 
 from repoze.bfg.location import lineage
 from repoze.bfg.encode import url_quote
-from repoze.bfg.request import FakeRequest
+from repoze.bfg.request import Request
+from repoze.bfg.threadlocal import get_current_registry
 
 def find_root(model):
     """ Find the root node in the graph to which ``model``
@@ -269,8 +267,10 @@ def traverse(model, path):
     if path and path[0] == '/':
         model = find_root(model)
 
-    request = FakeRequest({'PATH_INFO':path})
-    traverser = queryAdapter(model, ITraverser)
+    request = Request.blank(path)
+    reg = get_current_registry()
+    request.registry = reg
+    traverser = reg.queryAdapter(model, ITraverser)
     if traverser is None:
         traverser = ModelGraphTraverser(model)
 
@@ -347,7 +347,11 @@ def virtual_root(model, request):
     is called with a ``model`` argument which is a context obtained
     via URL dispatch, the model passed in will be returned
     unconditonally."""
-    urlgenerator = queryMultiAdapter((model, request), IContextURL)
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
+    urlgenerator = reg.queryMultiAdapter((model, request), IContextURL)
     if urlgenerator is None:
         urlgenerator = TraversalContextURL(model, request)
     return urlgenerator.virtual_root()

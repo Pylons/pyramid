@@ -2,7 +2,6 @@ import copy
 
 from zope.configuration.xmlconfig import _clearContext
 
-from zope.component import getSiteManager
 from zope.deprecation import deprecated
 from zope.interface import implements
 from zope.interface import Interface
@@ -31,8 +30,9 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     policy = DummySecurityPolicy(userid, groupids, permissive)
     from repoze.bfg.interfaces import IAuthorizationPolicy
     from repoze.bfg.interfaces import IAuthenticationPolicy
-    registerUtility(policy, IAuthorizationPolicy)
-    registerUtility(policy, IAuthenticationPolicy)
+    reg = get_current_registry()
+    reg.registerUtility(policy, IAuthorizationPolicy)
+    reg.registerUtility(policy, IAuthenticationPolicy)
 
 def registerModels(models):
     """ Registers a dictionary of models.  This is most useful for
@@ -176,9 +176,8 @@ def registerUtility(impl, iface=Interface, name=''):
     string by default.  See `The ZCA book
     <http://www.muthukadan.net/docs/zca.html>`_ for more information
     about ZCA utilities."""
-    import zope.component 
-    sm = zope.component.getSiteManager()
-    sm.registerUtility(impl, iface, name=name)
+    reg = get_current_registry()
+    reg.registerUtility(impl, iface, name=name)
     return impl
 
 def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
@@ -196,11 +195,10 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     default.  See `The ZCA book
     <http://www.muthukadan.net/docs/zca.html>`_ for more information
     about ZCA adapters."""
-    import zope.component
-    sm = zope.component.getSiteManager()
+    reg = get_current_registry()
     if not isinstance(for_, (tuple, list)):
         for_ = (for_,)
-    sm.registerAdapter(impl, for_, provides, name=name)
+    reg.registerAdapter(impl, for_, provides, name=name)
     return impl
 
 def registerSubscriber(subscriber, iface=Interface):
@@ -215,11 +213,10 @@ def registerSubscriber(subscriber, iface=Interface):
     passed to underlying zca registerHandler query.  See `The ZCA book
     <http://www.muthukadan.net/docs/zca.html>`_ for more information
     about ZCA subscribers."""
-    import zope.component
-    sm = zope.component.getSiteManager()
+    reg = get_current_registry()
     if not isinstance(iface, (tuple, list)):
         iface = (iface,)
-    sm.registerHandler(subscriber, iface)
+    reg.registerHandler(subscriber, iface)
     return subscriber
 
 def registerTraverser(traverser, for_=Interface):
@@ -234,8 +231,8 @@ def registerRoute(path, name, factory=None):
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
     """
     from repoze.bfg.interfaces import IRoutesMapper
-    from zope.component import queryUtility
-    mapper = queryUtility(IRoutesMapper)
+    reg = get_current_registry()
+    mapper = reg.queryUtility(IRoutesMapper)
     if mapper is None:
         mapper = registerRoutesMapper(factory)
     mapper.connect(path, name, factory)
@@ -265,8 +262,8 @@ def registerRoutesMapper(root_factory=None):
     from repoze.bfg.interfaces import IRoutesMapper
     from repoze.bfg.urldispatch import RoutesMapper
     mapper = RoutesMapper()
-    sm = getSiteManager()
-    sm.registerUtility(mapper, IRoutesMapper)
+    reg = get_current_registry()
+    reg.registerUtility(mapper, IRoutesMapper)
     return mapper
 
 def registerSettings(dictarg=None, **kw):
@@ -289,13 +286,12 @@ def registerSettings(dictarg=None, **kw):
     .. note:: This API is new as of :mod:`repoze.bfg` 1.1.
     """
     from repoze.bfg.interfaces import ISettings
-    from zope.component import queryUtility
     from repoze.bfg.settings import Settings
-    settings = queryUtility(ISettings)
+    reg = get_current_registry()
+    settings = reg.queryUtility(ISettings)
     if settings is None:
         settings = Settings()
-        sm = getSiteManager()
-        sm.registerUtility(settings, ISettings)
+        reg.registerUtility(settings, ISettings)
     if dictarg is not None:
         settings.update(dictarg)
     settings.update(kw)
@@ -520,7 +516,7 @@ class DummyRequest:
         self.root = None
         self.virtual_root = None
         self.marshalled = params # repoze.monty
-        self.registry = getSiteManager()
+        self.registry = get_current_registry()
         self.__dict__.update(kw)
 
 def setUp():
@@ -536,6 +532,7 @@ def setUp():
     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
     """
     from repoze.bfg.registry import Registry
+    from zope.component import getSiteManager
     registry = Registry('testing')
     manager.clear()
     request = DummyRequest()
@@ -556,6 +553,7 @@ def tearDown():
     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
     """
+    from zope.component import getSiteManager
     getSiteManager.reset()
     manager.pop()
 

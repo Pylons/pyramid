@@ -1,11 +1,10 @@
 import os
-import sys
 import pkg_resources
 
-from zope.component import queryUtility
 from zope.interface import implements
 
 from repoze.bfg.interfaces import IPackageOverrides
+from repoze.bfg.threadlocal import get_current_registry
 
 class OverrideProvider(pkg_resources.DefaultProvider):
     def __init__(self, module):
@@ -13,7 +12,8 @@ class OverrideProvider(pkg_resources.DefaultProvider):
         self.module_name = module.__name__
 
     def _get_overrides(self):
-        overrides = queryUtility(IPackageOverrides, self.module_name)
+        reg = get_current_registry()
+        overrides = reg.queryUtility(IPackageOverrides, self.module_name)
         return overrides
     
     def get_resource_filename(self, manager, resource_name):

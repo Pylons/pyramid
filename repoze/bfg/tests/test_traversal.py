@@ -390,11 +390,11 @@ class FindModelTests(unittest.TestCase):
         return find_model(context, name)
 
     def _registerTraverser(self, traverser):
-        import zope.component
-        sm = zope.component.getSiteManager()
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         from repoze.bfg.interfaces import ITraverser
         from zope.interface import Interface
-        sm.registerAdapter(traverser, (Interface,), ITraverser)
+        reg.registerAdapter(traverser, (Interface,), ITraverser)
 
     def test_list(self):
         model = DummyContext()
@@ -402,7 +402,7 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         result = self._callFUT(model, [''])
         self.assertEqual(result, model)
-        self.assertEqual(model.environ['PATH_INFO'], '/')
+        self.assertEqual(model.request.environ['PATH_INFO'], '/')
 
     def test_generator(self):
         model = DummyContext()
@@ -412,7 +412,7 @@ class FindModelTests(unittest.TestCase):
             yield ''
         result = self._callFUT(model, foo())
         self.assertEqual(result, model)
-        self.assertEqual(model.environ['PATH_INFO'], '/')
+        self.assertEqual(model.request.environ['PATH_INFO'], '/')
 
     def test_self_string_found(self):
         model = DummyContext()
@@ -420,7 +420,7 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         result = self._callFUT(model, '')
         self.assertEqual(result, model)
-        self.assertEqual(model.environ['PATH_INFO'], '')
+        self.assertEqual(model.request.environ['PATH_INFO'], '')
 
     def test_self_tuple_found(self):
         model = DummyContext()
@@ -428,7 +428,7 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         result = self._callFUT(model, ())
         self.assertEqual(result, model)
-        self.assertEqual(model.environ['PATH_INFO'], '')
+        self.assertEqual(model.request.environ['PATH_INFO'], '')
 
     def test_relative_string_found(self):
         model = DummyContext()
@@ -437,7 +437,7 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         result = self._callFUT(model, 'baz')
         self.assertEqual(result, baz)
-        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+        self.assertEqual(model.request.environ['PATH_INFO'], 'baz')
 
     def test_relative_tuple_found(self):
         model = DummyContext()
@@ -446,7 +446,7 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         result = self._callFUT(model, ('baz',))
         self.assertEqual(result, baz)
-        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+        self.assertEqual(model.request.environ['PATH_INFO'], 'baz')
 
     def test_relative_string_notfound(self):
         model = DummyContext()
@@ -454,7 +454,7 @@ class FindModelTests(unittest.TestCase):
         traverser = make_traverser({'context':baz, 'view_name':'bar'})
         self._registerTraverser(traverser)
         self.assertRaises(KeyError, self._callFUT, model, 'baz')
-        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+        self.assertEqual(model.request.environ['PATH_INFO'], 'baz')
 
     def test_relative_tuple_notfound(self):
         model = DummyContext()
@@ -462,7 +462,7 @@ class FindModelTests(unittest.TestCase):
         traverser = make_traverser({'context':baz, 'view_name':'bar'})
         self._registerTraverser(traverser)
         self.assertRaises(KeyError, self._callFUT, model, ('baz',))
-        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+        self.assertEqual(model.request.environ['PATH_INFO'], 'baz')
 
     def test_absolute_string_found(self):
         root = DummyContext()
@@ -474,7 +474,7 @@ class FindModelTests(unittest.TestCase):
         result = self._callFUT(model, '/')
         self.assertEqual(result, root)
         self.assertEqual(root.wascontext, True)
-        self.assertEqual(root.environ['PATH_INFO'], '/')
+        self.assertEqual(root.request.environ['PATH_INFO'], '/')
 
     def test_absolute_tuple_found(self):
         root = DummyContext()
@@ -486,7 +486,7 @@ class FindModelTests(unittest.TestCase):
         result = self._callFUT(model, ('',))
         self.assertEqual(result, root)
         self.assertEqual(root.wascontext, True)
-        self.assertEqual(root.environ['PATH_INFO'], '/')
+        self.assertEqual(root.request.environ['PATH_INFO'], '/')
 
     def test_absolute_string_notfound(self):
         root = DummyContext()
@@ -497,7 +497,7 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         self.assertRaises(KeyError, self._callFUT, model, '/')
         self.assertEqual(root.wascontext, True)
-        self.assertEqual(root.environ['PATH_INFO'], '/')
+        self.assertEqual(root.request.environ['PATH_INFO'], '/')
 
     def test_absolute_tuple_notfound(self):
         root = DummyContext()
@@ -508,7 +508,7 @@ class FindModelTests(unittest.TestCase):
         self._registerTraverser(traverser)
         self.assertRaises(KeyError, self._callFUT, model, ('',))
         self.assertEqual(root.wascontext, True)
-        self.assertEqual(root.environ['PATH_INFO'], '/')
+        self.assertEqual(root.request.environ['PATH_INFO'], '/')
 
 
 class ModelPathTests(unittest.TestCase):
@@ -662,11 +662,11 @@ class TraversalContextURLTests(unittest.TestCase):
         return TraversalContextURL
 
     def _registerTraverser(self, traverser):
-        import zope.component
-        sm = zope.component.getSiteManager()
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         from repoze.bfg.interfaces import ITraverser
         from zope.interface import Interface
-        sm.registerAdapter(traverser, (Interface,), ITraverser)
+        reg.registerAdapter(traverser, (Interface,), ITraverser)
 
     def test_class_conforms_to_IContextURL(self):
         from zope.interface.verify import verifyClass
@@ -774,7 +774,7 @@ class TraversalContextURLTests(unittest.TestCase):
         self._registerTraverser(traverser)
         context_url = self._makeOne(context, request)
         self.assertEqual(context_url.virtual_root(), traversed_to)
-        self.assertEqual(context.environ['PATH_INFO'], '/one')
+        self.assertEqual(context.request.environ['PATH_INFO'], '/one')
 
     def test_empty_names_not_ignored(self):
         bar = DummyContext()
@@ -849,20 +849,18 @@ class TestVirtualRoot(unittest.TestCase):
         return virtual_root(model, request)
 
     def test_registered(self):
-        from zope.component import getSiteManager
         from repoze.bfg.interfaces import IContextURL
         from zope.interface import Interface
-        sm = getSiteManager()
-        sm.registerAdapter(DummyContextURL, (Interface,Interface),
-                           IContextURL)
+        request = _makeRequest()
+        request.registry.registerAdapter(DummyContextURL, (Interface,Interface),
+                                         IContextURL)
         context = DummyContext()
-        request = DummyRequest()
         result = self._callFUT(context, request)
         self.assertEqual(result, '123')
 
     def test_default(self):
         context = DummyContext()
-        request = DummyRequest()
+        request = _makeRequest()
         request.environ['PATH_INFO'] = '/'
         result = self._callFUT(context, request)
         self.assertEqual(result, context)
@@ -879,18 +877,26 @@ class TraverseTests(unittest.TestCase):
         return traverse(context, name)
 
     def _registerTraverser(self, traverser):
-        import zope.component
-        sm = zope.component.getSiteManager()
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
         from repoze.bfg.interfaces import ITraverser
         from zope.interface import Interface
-        sm.registerAdapter(traverser, (Interface,), ITraverser)
+        reg.registerAdapter(traverser, (Interface,), ITraverser)
+
+    def test_request_has_registry(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        model = DummyContext()
+        traverser = make_traverser({'context':model, 'view_name':''})
+        self._registerTraverser(traverser)
+        self._callFUT(model, [''])
+        self.assertEqual(model.request.registry, get_current_registry())
 
     def test_list(self):
         model = DummyContext()
         traverser = make_traverser({'context':model, 'view_name':''})
         self._registerTraverser(traverser)
         self._callFUT(model, [''])
-        self.assertEqual(model.environ['PATH_INFO'], '/')
+        self.assertEqual(model.request.environ['PATH_INFO'], '/')
 
     def test_generator(self):
         model = DummyContext()
@@ -899,21 +905,21 @@ class TraverseTests(unittest.TestCase):
         def foo():
             yield ''
         self._callFUT(model, foo())
-        self.assertEqual(model.environ['PATH_INFO'], '/')
+        self.assertEqual(model.request.environ['PATH_INFO'], '/')
 
     def test_self_string_found(self):
         model = DummyContext()
         traverser = make_traverser({'context':model, 'view_name':''})
         self._registerTraverser(traverser)
         self._callFUT(model, '')
-        self.assertEqual(model.environ['PATH_INFO'], '')
+        self.assertEqual(model.request.environ['PATH_INFO'], '')
 
     def test_self_tuple_found(self):
         model = DummyContext()
         traverser = make_traverser({'context':model, 'view_name':''})
         self._registerTraverser(traverser)
         self._callFUT(model, ())
-        self.assertEqual(model.environ['PATH_INFO'], '')
+        self.assertEqual(model.request.environ['PATH_INFO'], '')
 
     def test_relative_string_found(self):
         model = DummyContext()
@@ -921,7 +927,7 @@ class TraverseTests(unittest.TestCase):
         traverser = make_traverser({'context':baz, 'view_name':''})
         self._registerTraverser(traverser)
         self._callFUT(model, 'baz')
-        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+        self.assertEqual(model.request.environ['PATH_INFO'], 'baz')
 
     def test_relative_tuple_found(self):
         model = DummyContext()
@@ -929,7 +935,7 @@ class TraverseTests(unittest.TestCase):
         traverser = make_traverser({'context':baz, 'view_name':''})
         self._registerTraverser(traverser)
         self._callFUT(model, ('baz',))
-        self.assertEqual(model.environ['PATH_INFO'], 'baz')
+        self.assertEqual(model.request.environ['PATH_INFO'], 'baz')
 
     def test_absolute_string_found(self):
         root = DummyContext()
@@ -940,7 +946,7 @@ class TraverseTests(unittest.TestCase):
         self._registerTraverser(traverser)
         self._callFUT(model, '/')
         self.assertEqual(root.wascontext, True)
-        self.assertEqual(root.environ['PATH_INFO'], '/')
+        self.assertEqual(root.request.environ['PATH_INFO'], '/')
 
     def test_absolute_tuple_found(self):
         root = DummyContext()
@@ -951,7 +957,7 @@ class TraverseTests(unittest.TestCase):
         self._registerTraverser(traverser)
         self._callFUT(model, ('',))
         self.assertEqual(root.wascontext, True)
-        self.assertEqual(root.environ['PATH_INFO'], '/')
+        self.assertEqual(root.request.environ['PATH_INFO'], '/')
 
     def test_empty_sequence(self):
         root = DummyContext()
@@ -962,7 +968,7 @@ class TraverseTests(unittest.TestCase):
         self._registerTraverser(traverser)
         self._callFUT(model, [])
         self.assertEqual(model.wascontext, True)
-        self.assertEqual(model.environ['PATH_INFO'], '')
+        self.assertEqual(model.request.environ['PATH_INFO'], '')
 
     def test_default_traverser(self):
         model = DummyContext()
@@ -999,8 +1005,8 @@ def make_traverser(result):
         def __init__(self, context):
             self.context = context
             context.wascontext = True
-        def __call__(self, environ):
-            self.context.environ = environ
+        def __call__(self, request):
+            self.context.request = request
             return result
     return DummyTraverser
         
@@ -1040,3 +1046,9 @@ class DummyRoute:
         if self.raise_exc:
             raise self.raise_exc
         return self.result
+
+def _makeRequest(environ=None):
+    from repoze.bfg.registry import Registry
+    request = DummyRequest()
+    request.registry = Registry()
+    return request

@@ -1,9 +1,10 @@
 import os
 
-from zope.component import queryUtility
 from zope.interface import implements
 
 from repoze.bfg.interfaces import ISettings
+
+from repoze.bfg.threadlocal import get_current_registry
 
 class Settings(dict):
     """ Deployment settings.  Update application settings (usually
@@ -62,7 +63,8 @@ def get_settings():
     For backwards compatibility, dictionary keys can also be looked up
     as attributes of the settings object.
     """
-    return queryUtility(ISettings)
+    reg = get_current_registry()
+    return reg.queryUtility(ISettings)
 
 def asbool(s):
     s = str(s).strip()

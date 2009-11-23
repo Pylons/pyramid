@@ -93,8 +93,3 @@ deprecated('get_request',
            'deprecated.  Use ``from repoze.bfg.threadlocal import '
            'get_current_request instead.')
 
-class FakeRequest(dict):
-    def __init__(self, environ):
-        self.environ = environ
-        self.update(environ)
-        

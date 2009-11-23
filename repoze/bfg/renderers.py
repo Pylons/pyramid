@@ -1,14 +1,12 @@
 import os
 import pkg_resources
 
-from zope.component import getSiteManager
-from zope.component import queryUtility
-
 from repoze.bfg.interfaces import ITemplateRenderer
 
 from repoze.bfg.compat import json
 from repoze.bfg.settings import get_settings
 from repoze.bfg.path import caller_package
+from repoze.bfg.threadlocal import get_current_registry
 
 # concrete renderer factory implementations
 
@@ -27,22 +25,22 @@ def string_renderer_factory(name):
 # utility functions
 
 def template_renderer_factory(spec, impl):
+    reg = get_current_registry()
     if os.path.isabs(spec):
         # 'spec' is an absolute filename
         if not os.path.exists(spec):
             raise ValueError('Missing template file: %s' % spec)
-        renderer = queryUtility(ITemplateRenderer, name=spec)
+        renderer = reg.queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
             renderer = impl(spec)
-            sm = getSiteManager()
-            sm.registerUtility(renderer, ITemplateRenderer, name=spec)
+            reg.registerUtility(renderer, ITemplateRenderer, name=spec)
     else:
         # spec is a package:relpath resource spec
-        renderer = queryUtility(ITemplateRenderer, name=spec)
+        renderer = reg.queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
             # service unit tests by trying the relative path string as
             # the utility name directly
-            renderer = queryUtility(ITemplateRenderer, name=spec)
+            renderer = reg.queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
             try:
                 package_name, filename = spec.split(':', 1)
@@ -56,14 +54,13 @@ def template_renderer_factory(spec, impl):
             renderer = impl(abspath)
             if not _reload_resources():
                 # cache the template
-                sm = getSiteManager()
-                sm.registerUtility(renderer, ITemplateRenderer, name=spec)
+                reg.registerUtility(renderer, ITemplateRenderer, name=spec)
         
     return renderer
 
 def renderer_from_name(path):
     from repoze.bfg.configuration import Configurator
-    reg = getSiteManager()
+    reg = get_current_registry()
     config = Configurator(reg)
     return config.renderer_from_name(path)
 

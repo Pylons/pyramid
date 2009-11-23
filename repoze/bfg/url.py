@@ -2,9 +2,6 @@
 
 import os
 
-from zope.component import getUtility
-from zope.component import queryMultiAdapter
-
 from repoze.lru import lru_cache
 
 from repoze.bfg.interfaces import IContextURL
@@ -13,8 +10,9 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.encode import urlencode
 from repoze.bfg.path import caller_package
 from repoze.bfg.static import StaticRootFactory
-from repoze.bfg.traversal import TraversalContextURL
+from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.traversal import quote_path_segment
+from repoze.bfg.traversal import TraversalContextURL
 
 def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named BFG route.
@@ -89,7 +87,11 @@ def route_url(route_name, request, *elements, **kw):
     due to missing replacement names.  Extra replacement names are
     ignored.
     """
-    mapper = getUtility(IRoutesMapper)
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
+    mapper = reg.getUtility(IRoutesMapper)
     path = mapper.generate(route_name, kw) # raises KeyError if generate fails
 
     anchor = ''
@@ -195,8 +197,12 @@ def model_url(model, request, *elements, **kw):
     will always follow the query element,
     e.g. ``http://example.com?foo=1#bar``.
     """
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
     
-    context_url = queryMultiAdapter((model, request), IContextURL)
+    context_url = reg.queryMultiAdapter((model, request), IContextURL)
     if context_url is None:
         context_url = TraversalContextURL(model, request)
     model_url = context_url()
@@ -263,8 +269,13 @@ def static_url(path, request, **kw):
         # to the package in which the caller's module is defined.
         package = caller_package(level=2)
         path = '%s:%s' % (package.__name__, path)
+
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry() # b/c
     
-    mapper = getUtility(IRoutesMapper)
+    mapper = reg.getUtility(IRoutesMapper)
     routes = mapper.get_routes()
 
     for route in routes:

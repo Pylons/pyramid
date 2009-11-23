@@ -72,6 +72,15 @@ Internals
   use the ``path`` method of the ZCML context to resolve a relative
   name to an absolute one (imperative configuration requirement).
 
+- The ``repoze.bfg.scripting.get_root`` API now uses a 'real' WebOb
+  request rather than a FakeRequest when it sets up the request as a
+  threadlocal.
+
+- The ``repoze.bfg.traversal.traverse`` API now uses a 'real' WebOb
+  request rather than a FakeRequest when it calls the traverser.
+
+- The ``repoze.bfg.request.FakeRequest`` class has been removed.
+
 Backwards Incompatibilites
 --------------------------
 
@@ -127,6 +136,14 @@ Backwards Incompatibilites
   ``repoze.bfg.security.remember``
 
   ``repoze.bfg.security.forget``
+
+  ``repoze.bfg.url.route_url``
+
+  ``repoze.bfg.url.model_url``
+
+  ``repoze.bfg.url.static_url``
+
+  ``repoze.bfg.traversal.virtual_root``
 
   Each of these functions now expects to be called with a request
   object that has a ``registry`` attribute which represents the

@@ -1,12 +1,7 @@
-- Make ZCML filename argument optional to ``make_app``.  Document
-  configuration without ZCML.
-
 - Replace martian with something simpler.
-
-- Make sure repoze.bfg.scripting.get_root makes a request with a valid
-  registry arg.
 
 - Get rid of ``declarative`` method of Configurator.
 
 - Allow policies, settings, and a root factory to be passed to
   Configurator constructor.
+

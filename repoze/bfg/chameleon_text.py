@@ -1,6 +1,5 @@
 from webob import Response
 
-from zope.component import queryUtility
 from zope.interface import implements
 
 from chameleon.core.template import TemplateFile
@@ -11,6 +10,7 @@ from repoze.bfg.interfaces import ITemplateRenderer
 
 from repoze.bfg.renderers import template_renderer_factory
 from repoze.bfg.settings import get_settings
+from repoze.bfg.threadlocal import get_current_registry
 
 class TextTemplateFile(TemplateFile):
     default_parser = Parser()
@@ -69,5 +69,6 @@ def render_template_to_response(path, **kw):
     template result."""
     renderer = renderer_factory(path)
     result = renderer(kw, {})
-    response_factory = queryUtility(IResponseFactory, default=Response)
+    reg = get_current_registry()
+    response_factory = reg.queryUtility(IResponseFactory, default=Response)
     return response_factory(result)

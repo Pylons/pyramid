@@ -1,4 +1,4 @@
-from repoze.bfg.request import FakeRequest
+from repoze.bfg.request import Request
 
 def get_root(app, request=None):
     """ Return a tuple composed of ``(root, closer)`` when provided a
@@ -9,9 +9,10 @@ def get_root(app, request=None):
     the root.  If ``request`` is not None, it is used as the request
     passed to the BFG application root factory.  A faux request is
     constructed and passed to the root factory if ``request`` is None."""
-    if request is None:
-        request = FakeRequest({})
     registry = app.registry
+    if request is None:
+        request = Request.blank('/')
+        request.registry = registry
     threadlocals = {'registry':registry, 'request':request}
     app.threadlocal_manager.push(threadlocals)
     def closer(request=request): # keep request alive via this function default

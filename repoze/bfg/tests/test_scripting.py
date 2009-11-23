@@ -11,7 +11,7 @@ class TestGetRoot(unittest.TestCase):
         self.assertEqual(len(app.threadlocal_manager.pushed), 1)
         pushed = app.threadlocal_manager.pushed[0]
         self.assertEqual(pushed['registry'], dummy_registry)
-        self.assertEqual(pushed['request'].environ, {})
+        self.assertEqual(pushed['request'].registry, app.registry)
         self.assertEqual(len(app.threadlocal_manager.popped), 0)
         closer()
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
