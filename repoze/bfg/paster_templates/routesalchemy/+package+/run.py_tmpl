@@ -1,6 +1,5 @@
-from repoze.bfg.router import make_app
+from repoze.bfg.configuration import Configurator
 
-import {{package}}
 from {{package}}.models import DBSession
 from {{package}}.models import initialize_sql
 
@@ -23,5 +22,7 @@ def app(global_config, **settings):
     if db_string is None:
         raise ValueError("No 'db_string' value in application configuration.")
     initialize_sql(db_string)
-    return make_app(None, {{package}}, settings=settings)
+    zcml_file = settings.get('configure_zcml', 'configure.zcml')
+    config = Configurator(settings=settings, zcml_file=zcml_file)
+    return config.make_wsgi_app()
 

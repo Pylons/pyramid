@@ -692,11 +692,14 @@ without the PasteDeploy configuration file:
 .. literalinclude:: MyProject/myproject/run.py
    :linenos:
 
-#. Line 1 imports the ``make_app`` functions from
-   :mod:`repoze.bfg.router` that we use later.
+#. Line 1 imports the ``Configurator`` class from
+   :mod:`repoze.bfg.configuration` that we use later.
 
-#. Lines 3-10 define a function that returns a :mod:`repoze.bfg` Router
-   application from :ref:`router_module` .  This is meant to be called
+#. Line 2 imports the ``get_root`` function from
+   :mod:`myproject.models` that we use later.
+
+#. Lines 4-11 define a function that returns a :mod:`repoze.bfg`
+   WSGI application.  This function is meant to be called
    by the :term:`PasteDeploy` framework as a result of running
    ``paster serve``.
 

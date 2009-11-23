@@ -1,4 +1,4 @@
-from repoze.bfg.router import make_app
+from repoze.bfg.configuration import Configurator
 from repoze.zodbconn.finder import PersistentApplicationFinder
 
 def app(global_config, **settings):
@@ -6,8 +6,6 @@ def app(global_config, **settings):
     
     It is usually called by the PasteDeploy framework during ``paster serve``.
     """
-    # paster app config callback
-    import {{package}}
     from {{package}}.models import appmaker
     zodb_uri = settings.get('zodb_uri')
     if zodb_uri is None:
@@ -16,4 +14,7 @@ def app(global_config, **settings):
     finder = PersistentApplicationFinder(zodb_uri, appmaker)
     def get_root(request):
         return finder(request.environ)
-    return make_app(get_root, {{package}}, settings=settings)
+    zcml_file = settings.get('configure_zcml', 'configure.zcml')
+    config = Configurator(root_factory=get_root,
+                          settings=settings, zcml_file=zcml_file)
+    return config.make_wsgi_app()

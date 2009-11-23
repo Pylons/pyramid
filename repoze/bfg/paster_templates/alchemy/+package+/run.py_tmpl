@@ -1,6 +1,5 @@
-from repoze.bfg.router import make_app
+from repoze.bfg.configuration import Configurator
 
-import {{package}}
 from {{package}}.models import appmaker
 from {{package}}.models import DBSession
 
@@ -26,4 +25,8 @@ def app(global_config, **settings):
     if db_echo is None:
         db_echo = True
     get_root = appmaker(db_string, db_echo)
-    return make_app(get_root, {{package}}, settings=settings)
+    zcml_file = settings.get('configure_zcml', 'configure.zcml')
+    config = Configurator(settings=settings, root_factory=get_root, 
+                          zcml_file=zcml_file)
+    return config.make_wsgi_app()
+

@@ -12,6 +12,11 @@ Features
   function did not create a request object; it instead assigned
   ``None`` to the threadlocal request value.
 
+- The ``run.py`` module in various ``repoze.bfg`` ``paster`` templates
+  now use a ``repoze.bfg.configuration.Configurator`` class instead of
+  the (now-legacy) ``repoze.bfg.router.make_app`` function to produce
+  a WSGI application.
+
 Bug Fixes
 ----------
 
@@ -185,6 +190,15 @@ Backwards Incompatibilites
     ``repoze.bfg.testing.tearDown`` functions: call this function and
     add an attribute to your unit test request object named
     ``registry`` with the result.
+
+Deprecations
+------------
+
+- The ``repoze.bfg.router.make_app`` function is now nominally
+  deprecated.  Its import and usage does not throw a warning, nor will
+  it probably ever disappear.  However, using a
+  ``repoze.bfg.configuration.Configurator`` class is now the preferred
+  way to generate a WSGI application.
 
 1.1.1 (2009-11-21)
 ==================

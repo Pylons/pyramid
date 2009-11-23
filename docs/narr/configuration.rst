@@ -347,8 +347,7 @@ In a file named ``helloworld.py``:
        return Response('Hello world!')
 
    if __name__ == '__main__':
-       config = Configurator()
-       config.load_zcml()
+       config = Configurator(zcml_file='configure.zcml')
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
