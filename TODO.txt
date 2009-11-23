@@ -5,3 +5,5 @@
 - Allow policies, settings, and a root factory to be passed to
   Configurator constructor.
 
+- Decide about creating a "real" request object during testing.setUp
+  vs. creating a dummy request.

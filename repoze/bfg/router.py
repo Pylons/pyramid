@@ -88,7 +88,7 @@ class Router(object):
             attrs['root'] = root
 
             # view lookup
-            traverser = registry.queryAdapter(root, ITraverser)
+            traverser = registry.adapters.queryAdapter(root, ITraverser)
             if traverser is None:
                 traverser = ModelGraphTraverser(root)
             tdict = traverser(request)

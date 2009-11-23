@@ -4,9 +4,11 @@ Next release
 Features
 --------
 
-- The ``repoze.bfg.testing.setUp`` function now causes a request
-  object to be created.  The request object is avaiable via
-  ``repoze.bfg.threadlocal.get_current_request``.  Previously this
+- The ``repoze.bfg.testing.setUp`` function now causes a "dummy"
+  request object to be created (an instance of
+  ``repoze.bfg.testing.DummyRequest``).  The DummyRequest object is
+  available via ``repoze.bfg.threadlocal.get_current_request`` when
+  this API is used in the setUp of a unit test.  Previously this
   function did not create a request object; it instead assigned
   ``None`` to the threadlocal request value.
 
