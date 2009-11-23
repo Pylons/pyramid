@@ -7,12 +7,11 @@ The majority of the logic in any web application is completely
 application-specific.  For example, the body of a web page served by
 one web application might be a representation of the contents of an
 accounting ledger, while the content of of a web page served by
-another might be a listing of songs.  These applications obviously
-might not service the same set of customers.  However, both the
-ledger-serving and song-serving applications can be written using
-:mod:`repoze.bfg`, because :mod:`repoze.bfg` is a very general
-*framework* which can be used to create all kinds of web
-applications.
+another might be a listing of songs.  These applications obviously may
+not serve the same set of customers.  However, both the ledger-serving
+and song-serving applications can be written using :mod:`repoze.bfg`,
+because :mod:`repoze.bfg` is a very general *framework* which can be
+used to create all kinds of web applications.
 
 .. sidebar:: Frameworks vs. Libraries
 
@@ -61,12 +60,9 @@ particular application deployment.
 .. admonition:: Tip
 
    If the term "configuration" as used in this guide just doesn't seem
-   to "click" in your brain, maybe because you just can't bring
-   yourself to consider "configuration" anything except the
-   modification of a configuration file containing higher-level knobs
-   than those exposed by :mod:`repoze.bfg`, it may help to mentally
-   substitute the term "configuration" with "wiring" or "plumbing" as
-   you read the chapter.
+   to "click" in your brain, it may help to mentally substitute the
+   term "configuration" with "wiring" or "plumbing" as you read the
+   chapter.
 
 There are a number of different mechanisms you may use to configure
 :mod:`repoze.bfg` to create an application: *imperative* configuration
@@ -143,10 +139,10 @@ The above script defines the following set of imports:
 :term:`response` object.
 
 Like many other Python web frameworks, :mod:`repoze.bfg` uses the
-:term:`WSGI` protocol as a basis between an application and a web
-server.  The ``wsgiref.simple_server`` server is used in this example
-as a WSGI server, purely for convenience.  :mod:`repoze.bfg`
-applications can be served via any WSGI server.
+:term:`WSGI` protocol to connect an application and a web server
+together.  The ``wsgiref.simple_server`` server is used in this
+example as a WSGI server, purely for convenience.  :mod:`repoze.bfg`
+applications can be served by any WSGI server.
 
 The script also imports the ``Configurator`` class from the
 ``repoze.bfg.configuration`` module.  This class is used to configure
@@ -193,8 +189,8 @@ but return a response with the body ``Hello world!``; the
 ``goodbye_world`` view callable returns a response with the body
 ``Goodbye world!``.
 
-Traversal and The Default View
-------------------------------
+Traversal
+~~~~~~~~~
 
 If you've used the code in this tutorial already, you've actually
 unwittingly configured :mod:`repoze.bfg` to serve an application that
@@ -202,31 +198,82 @@ relies on :term:`traversal`.  A full explanation of how
 :mod:`repoze.bfg` locates "the right" :term:`view callable` for a
 given request requires some explanation of traversal.
 
-In :mod:`repoze.bfg` terms, :term:`traversal` is the act of descending
-a *directed graph* of objects using the individual path segments of
-the path info portion of a URL in order to find a :term:`context`
-object.  The graph is traversed, beginning at a root object,
-represented by ``/``; if there are further path segments in the path
-info, the root object's ``__getitem__`` is called with the next path
-segment, and it is presumed to return another graph object, *ad
-infinitum* until all path segments are exhausted; if any node in the
-graph doesn't *have* a ``__getitem__`` method, or if the
-``__getitem__`` of a node raises a ``KeyError``, traversal ends
-immediately.
+In :mod:`repoze.bfg` terms, :term:`traversal` is the act of walking
+over a *directed graph* of objects from a root object using the
+individual path segments of the "path info" portion of a URL (the data
+following the hostname and port number, but before any query strng
+elements or fragments) in order to find a :term:`context` object.
+
+We will use an analogy to clarify traversal.
+
+Let's imagine an inexperienced UNIX computer user, wishing only to
+find a file and to invoke the ``cat`` command against that file.
+Because he is inexperienced, the only commands he knows how to use are
+``cd`` and ``cat``.  And because he is inexperienced, he doesn't
+understand that ``cat`` can take an absolute path specification as an
+argument, so he doesn't know that you can issue a single command
+command ``cat /an/absolute/path`` to get the desired result.  Instead,
+this user believes he must issue the ``cd`` command, starting from the
+root, for each intermediate path segment, *even the path segment that
+represents the file itself*.  Once he gets an error (because you can't
+succesfully ``cd`` into a file) , he knows he has reached the file he
+wants.
+
+This inexperienced user's attempt to execute ``cat`` against the file
+named ``/fiz/buz/myfile`` might be to issue the following set of UNIX
+commands:
+
+.. code-block::  bash
+   :linenos:
+
+   cd fiz
+   cd buz
+   cd myfile
+
+The user now know he has found a *file*, because the ``cd`` command
+issues an error when he executed ``cd myfile``.  Now he knows that he
+can run the ``cat`` command:
+
+.. code-block::  bash
+   :linenos:
+
+   cat myfile
+
+Now he has his answer.
+
+:mod:`repoze.bfg` is very much like this inexperienced UNIX user as it
+uses :term:`traversal` against an object graph.  In this analogy, we
+can map the ``cat`` program to the :mod:`repoze.bfg` concept of a
+:term:`view callable`.  The file being operated on in this analogy is
+the :term:`context` object.  The directory structure is the object
+graph being traversed.  The act of progressively changing directories
+to find the file as well as the handling of a ``cd`` error as a stop
+condition is analogous to :term:`traversal`.
 
 Here's an image that depicts the :mod:`repoze.bfg` traversal process
 graphically as a flowchart:
 
 .. image:: modelgraphtraverser.png
 
+The object graph is traversed, beginning at a root object, represented
+by ``/``; if there are further path segments in the path info, the
+root object's ``__getitem__`` is called with the next path segment,
+and it is presumed to return another graph object, *ad infinitum*
+until all path segments are exhausted; if any node in the graph
+doesn't *have* a ``__getitem__`` method, or if the ``__getitem__`` of
+a node raises a ``KeyError``, traversal ends immediately.
+
 The results of a :term:`traversal` include a :term:`context` and a
 :term:`view name`.  The :term:`view name` is the *first* URL path
 segment in the set of path segments "left over" during
-:term:`traversal`.  Effectively, if traversal returns a non-empty
-:term:`view name`, it means that traversal ran out of nodes in the
-graph before it finished exhausting all the path segments implied by
-the path info of the URL: no segments are "left over".  In this case,
-a non-default view will be invoked.
+:term:`traversal`.
+
+Effectively, if traversal returns a non-empty :term:`view name`, it
+means that traversal "ran out" of nodes in the graph before it
+finished exhausting all the path segments implied by the path info of
+the URL: no segments are "left over".  In this case, because the
+:term:`view name` is non-empty, a *non-default* view callable will be
+invoked.
 
 The :term:`default view` of a :term:`context` is represented by a
 :term:`view configuration` that has the :term:`view name` of the empty
@@ -235,6 +282,16 @@ the URL *are* exhausted before :term:`traversal` returns a
 :term:`context` object, causing the :term:`view name` to be ``''``
 (the empty string).  When no path segements are "left over" after
 traversal, the :term:`default view` for the context found is invoked.
+
+Apologies that his digression was required; on with the chapter.
+
+.. note:: 
+
+   For more in-depth information about traversal-related concepts, see
+   :ref:`traversal_chapter`.
+
+Relating Traversal to the Hello World Application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Our application's :term:`root` object is a default root object used
 when one isn't otherwise specified in application configuration.  This
@@ -256,11 +313,6 @@ callable).  Due to this set of circumstances, you can consider the
 sole possible URL that will resolve to the ``goodbye_world`` in this
 application the URL ``'/goodbye'`` because it is the only URL that
 will resolve to the :term:`view name` of ``goodbye``.
-
-.. note:: 
-
-   For more in-depth information about :term:`traversal`, see
-   :ref:`traversal_chapter`.
 
 .. _helloworld_imperative_appconfig:
 
