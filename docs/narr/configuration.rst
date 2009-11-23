@@ -92,7 +92,7 @@ imperatively:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.view(hello_world)
+       config.add_view(hello_world)
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
@@ -191,7 +191,7 @@ imports and function definitions is placed within the confines of an
 
    if __name__ == '__main__':
        config = Configurator()
-       config.view(hello_world)
+       config.add_view(hello_world)
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
@@ -232,28 +232,28 @@ this particular :mod:`repoze.bfg` application.  An instance of the
 .. code-block:: python
    :linenos:
 
-       config.view(hello_world)
+       config.add_view(hello_world)
 
-This line calls the ``view`` method of the ``Configurator``.  The
-``view`` method of a configurator creates a :term:`view configuration`
-within the :term:`application registry`.  A :term:`view configuration`
-represents a set of circumstances which must be true for a particular
-:term:`view callable` to be called when a WSGI request is handled by
-:mod:`repoze.bfg`.
+This line calls the ``add_view`` method of the ``Configurator``.  The
+``add_view`` method of a configurator creates a :term:`view
+configuration` within the :term:`application registry`.  A :term:`view
+configuration` represents a set of circumstances which must be true
+for a particular :term:`view callable` to be called when a WSGI
+request is handled by :mod:`repoze.bfg`.
 
-The first argument of the configurator's ``view`` method must always
-be a reference to the :term:`view callable` that is meant to be
+The first argument of the configurator's ``add_view`` method must
+always be a reference to the :term:`view callable` that is meant to be
 invoked when the view configuration implied by the remainder of the
-arguments passed to ``view`` is found to "match" during a request.
-This particular invocation of the ``view`` method passes no other
+arguments passed to ``add_view`` is found to "match" during a request.
+This particular invocation of the ``add_view`` method passes no other
 arguments; this implies that there are no circumstances which would
 limit the applicability of this view callable.  The view configuration
-implied by this call to ``view`` thus will match during *any* request.
-Since our ``hello_world`` view callable returns a Response instance
-with a body of ``Hello world!```, this means, in the configuration
-implied by the script, that any URL visited by a user agent to a
-server running this application will receive the greeting ``Hello
-world!``.
+implied by this call to ``add_view`` thus will match during *any*
+request.  Since our ``hello_world`` view callable returns a Response
+instance with a body of ``Hello world!```, this means, in the
+configuration implied by the script, that any URL visited by a user
+agent to a server running this application will receive the greeting
+``Hello world!``.
 
 WGSI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -279,9 +279,9 @@ method calls to the configurator used to configure it.  The Router
 consults the registry to obey the policy choices made by a single
 application.  These policy choices were informed by method calls to
 the ``Configurator`` made earlier; in our case, the only policy choice
-made was a single call to the ``view`` method, telling our application
-that it should unconditionally serve up the ``hello_world`` view
-callable to any requestor.
+made was a single call to the ``add_view`` method, telling our
+application that it should unconditionally serve up the
+``hello_world`` view callable to any requestor.
 
 WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -384,14 +384,14 @@ within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
-       config.view(hello_world)
+       config.add_view(hello_world)
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
 In our "declarative" code, we've added a ``zcml_file`` argument to the
 ``Configurator`` constructor's argument list with the value
 ``configure.zcml``, and we've removed the line which reads
-``config.view(hello_world)``, so that it now reads as:
+``config.add_view(hello_world)``, so that it now reads as:
 
 .. code-block:: python
    :linenos:
@@ -500,21 +500,21 @@ The ``configure.zcml`` ZCML file contains this bit of XML after the
          />
 
 This ``<view>`` declaration tag directs :mod:`repoze.bfg` to create a
-:term:`view configuration`.  This ``<view>`` tag has an attribute
-(also named ``view``), which points at a :term:`dotted Python name`,
-referencing the ``hello_world`` function defined within the
-``helloworld`` package.  This tag is functionally equivalent to a
+:term:`view configuration`.  This ``<view>`` tag has an attribute (the
+attribute is also named ``view``), which points at a :term:`dotted
+Python name`, referencing the ``hello_world`` function defined within
+the ``helloworld`` package.  This tag is functionally equivalent to a
 line we saw previously in our imperatively-configured application:
 
 .. code-block:: python
    :linenos:
 
-       config.view(hello_world)
+       config.add_view(hello_world)
 
-The ``<view>`` declaration tag effectively invokes the ``view`` method
-of the ``Configurator`` object on your behalf.  Various attributes can
-be specified on the ``<view>`` tag which influence the :term:`view
-configuration` it creates.
+The ``<view>`` declaration tag effectively invokes the ``add_view``
+method of the ``Configurator`` object on your behalf.  Various
+attributes can be specified on the ``<view>`` tag which influence the
+:term:`view configuration` it creates.
 
 The ``<view>`` tag is an example of a :mod:`repoze.bfg` declaration
 tag.  Other such tags include ``<route>``, ``<scan>``, ``<notfound>``,

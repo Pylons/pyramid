@@ -5,6 +5,11 @@
 
 - Finish "configuration" documentation chapter and audit the rest of
   the docs for "view configuration" and "route configuration"
-  references, etc.
+  references, etc.  Add one more view registration (and maybe some
+  other registration) in the narrative.
 
 - Finish Configurator API documentation.
+
+- notfound/forbidden as Configurator API arguments (get rid of
+  set_notfound_view and set_forbidden_view?)
+

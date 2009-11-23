@@ -35,7 +35,6 @@ from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ISecuredView
-from repoze.bfg.interfaces import ITemplateRendererFactory
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg import chameleon_zpt
@@ -143,8 +142,8 @@ class Configurator(object):
         if registry is None:
             registry = Registry(self.package.__name__)
             self.registry = registry
-            self.settings(settings)
-            self.root_factory(root_factory)
+            self._set_settings(settings)
+            self._set_root_factory(root_factory)
             if debug_logger is None:
                 debug_logger = make_stream_logger('repoze.bfg.debug',
                                                   sys.stderr)
@@ -152,28 +151,27 @@ class Configurator(object):
             registry.registerUtility(debug_logger, IDebugLogger,
                                      'repoze.bfg.debug') # b /c
             if authentication_policy or authorization_policy:
-                self.security_policies(authentication_policy,
-                                       authorization_policy)
+                self.set_security_policies(authentication_policy,
+                                           authorization_policy)
             for name, renderer in renderers:
-                self.renderer(renderer, name)
+                self.add_renderer(name, renderer)
             if zcml_file is not None:
                 self.load_zcml(zcml_file)
 
-    def settings(self, mapping):
+    def _set_settings(self, mapping):
         settings = Settings(mapping or {})
         self.registry.registerUtility(settings, ISettings)
 
-    def make_spec(self, path_or_spec):
-        package, filename = resolve_resource_spec(path_or_spec,
-                                                  self.package.__name__)
-        if package is None:
-            return filename # absolute filename
-        return '%s:%s' % (package, filename)
-
-    def split_spec(self, path_or_spec):
-        return resolve_resource_spec(path_or_spec, self.package.__name__)
-
-    def renderer_from_name(self, path_or_spec):
+    def _set_root_factory(self, factory):
+        """ Add a :term:`root factory` to the current configuration
+        state.  If the ``factory`` argument is ``None`` a default root
+        factory will be registered."""
+        if factory is None:
+            factory = DefaultRootFactory
+        self.registry.registerUtility(factory, IRootFactory)
+        self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
+        
+    def _renderer_from_name(self, path_or_spec):
         if path_or_spec is None:
             # check for global default renderer
             factory = self.registry.queryUtility(IRendererFactory)
@@ -183,7 +181,7 @@ class Configurator(object):
 
         if '.' in path_or_spec:
             name = os.path.splitext(path_or_spec)[1]
-            spec = self.make_spec(path_or_spec)
+            spec = self._make_spec(path_or_spec)
         else:
             name = path_or_spec
             spec = path_or_spec
@@ -193,15 +191,73 @@ class Configurator(object):
             raise ValueError('No renderer for renderer name %r' % name)
         return factory(spec)
 
-    def authentication_policy(self, policy, _info=u''):
+    def _set_authentication_policy(self, policy, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`authentication policy` to
         the current configuration."""
         self.registry.registerUtility(policy, IAuthenticationPolicy, info=_info)
         
-    def authorization_policy(self, policy, _info=u''):
+    def _set_authorization_policy(self, policy, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`authorization policy` to
         the current configuration state."""
         self.registry.registerUtility(policy, IAuthorizationPolicy, info=_info)
+
+    def _make_spec(self, path_or_spec):
+        package, filename = resolve_resource_spec(path_or_spec,
+                                                  self.package.__name__)
+        if package is None:
+            return filename # absolute filename
+        return '%s:%s' % (package, filename)
+
+    def _split_spec(self, path_or_spec):
+        return resolve_resource_spec(path_or_spec, self.package.__name__)
+
+    def _derive_view(self, view, permission=None, predicates=(),
+                     attr=None, renderer_name=None, wrapper_viewname=None,
+                     viewname=None):
+        renderer = self._renderer_from_name(renderer_name)
+        authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
+        authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
+        settings = self.registry.queryUtility(ISettings)
+        logger = self.registry.queryUtility(IDebugLogger)
+        mapped_view = _map_view(view, attr, renderer, renderer_name)
+        owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
+        secured_view = _secure_view(owrapped_view, permission,
+                                    authn_policy, authz_policy)
+        debug_view = _authdebug_view(secured_view, permission, 
+                                     authn_policy, authz_policy, settings,
+                                     logger)
+        derived_view = _predicate_wrap(debug_view, predicates)
+        return derived_view
+
+
+    def _override(self, package, path, override_package, override_prefix,
+                  _info=u'', PackageOverrides=PackageOverrides):
+            pkg_name = package.__name__
+            override_pkg_name = override_package.__name__
+            override = self.registry.queryUtility(
+                IPackageOverrides, name=pkg_name)
+            if override is None:
+                override = PackageOverrides(package)
+                self.registry.registerUtility(override, IPackageOverrides,
+                                              name=pkg_name, info=_info)
+            override.insert(path, override_pkg_name, override_prefix)
+
+
+    def _system_view(self, iface, view=None, attr=None, renderer=None,
+                    wrapper=None, _info=u''):
+        if not view:
+            if renderer:
+                def view(context, request):
+                    return {}
+            else:
+                raise ConfigurationError('"view" attribute was not '
+                                         'specified and no renderer '
+                                         'specified')
+
+        derived_view = self._derive_view(view, attr=attr,
+                                         renderer_name=renderer,
+                                         wrapper_viewname=wrapper)
+        self.registry.registerUtility(derived_view, iface, '', info=_info)
 
     # API
 
@@ -246,7 +302,7 @@ class Configurator(object):
         # hold the lock.  Those registrations will end up in our
         # application's registry.
 
-        package_name, filename = self.split_spec(spec)
+        package_name, filename = self._split_spec(spec)
         if package_name is None: # absolute filename
             package = self.package
         else:
@@ -266,7 +322,7 @@ class Configurator(object):
             getSiteManager.reset()
         return self.registry
 
-    def security_policies(self, authentication, authorization=None):
+    def set_security_policies(self, authentication, authorization=None):
         """ Register security policies safely.  The ``authentication``
         argument represents a :term:`authentication policy`.  The
         ``authorization`` argument represents a :term:`authorization
@@ -280,14 +336,14 @@ class Configurator(object):
                 'If the "authorization" is passed a vallue, '
                 'the "authentication" argument musty also be '
                 'passed a value; authorization requires authentication.')
-        self.authentication_policy(authentication)
-        self.authorization_policy(authorization)
+        self._set_authentication_policy(authentication)
+        self._set_authorization_policy(authorization)
 
-    def view(self, view=None, name="", for_=None, permission=None, 
-             request_type=None, route_name=None, request_method=None,
-             request_param=None, containment=None, attr=None,
-             renderer=None, wrapper=None, xhr=False, accept=None,
-             header=None, path_info=None, _info=u''):
+    def add_view(self, view=None, name="", for_=None, permission=None, 
+                 request_type=None, route_name=None, request_method=None,
+                 request_param=None, containment=None, attr=None,
+                 renderer=None, wrapper=None, xhr=False, accept=None,
+                 header=None, path_info=None, _info=u''):
         """ Add a :term:`view configuration` to the current
         configuration state."""
 
@@ -359,34 +415,16 @@ class Configurator(object):
             self.registry.registerAdapter(multiview, (for_, request_type),
                                           IMultiView, name, info=_info)
 
-    def _derive_view(self, view, permission=None, predicates=(),
-                     attr=None, renderer_name=None, wrapper_viewname=None,
-                     viewname=None):
-        renderer = self.renderer_from_name(renderer_name)
-        authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
-        authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
-        settings = self.registry.queryUtility(ISettings)
-        logger = self.registry.queryUtility(IDebugLogger)
-        mapped_view = _map_view(view, attr, renderer, renderer_name)
-        owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
-        secured_view = _secure_view(owrapped_view, permission,
-                                    authn_policy, authz_policy)
-        debug_view = _authdebug_view(secured_view, permission, 
-                                     authn_policy, authz_policy, settings,
-                                     logger)
-        derived_view = _predicate_wrap(debug_view, predicates)
-        return derived_view
-
-    def route(self, name, path, view=None, view_for=None,
-              permission=None, factory=None, for_=None,
-              header=None, xhr=False, accept=None, path_info=None,
-              request_method=None, request_param=None, 
-              view_permission=None, view_request_method=None,
-              view_request_param=None,
-              view_containment=None, view_attr=None,
-              renderer=None, view_renderer=None, view_header=None, 
-              view_accept=None, view_xhr=False,
-              view_path_info=None, _info=u''):
+    def add_route(self, name, path, view=None, view_for=None,
+                  permission=None, factory=None, for_=None,
+                  header=None, xhr=False, accept=None, path_info=None,
+                  request_method=None, request_param=None, 
+                  view_permission=None, view_request_method=None,
+                  view_request_param=None,
+                  view_containment=None, view_attr=None,
+                  renderer=None, view_renderer=None, view_header=None, 
+                  view_accept=None, view_xhr=False,
+                  view_path_info=None, _info=u''):
         """ Add a :term:`route configuration` to the current
         configuration state."""
         # these are route predicates; if they do not match, the next route
@@ -408,7 +446,7 @@ class Configurator(object):
             view_for = view_for or for_
             view_permission = view_permission or permission
             view_renderer = view_renderer or renderer
-            self.view(
+            self.add_view(
                 permission=view_permission,
                 for_=view_for,
                 view=view,
@@ -445,15 +483,14 @@ class Configurator(object):
             _info=_info, _configurator=self,
             exclude_filter=lambda name: name.startswith('.'))
 
-    def renderer(self, factory, name, _info=u''):
-        """ Add a :mod:`repoze.bfg` :term:`renderer` to the current
+    def add_renderer(self, name, renderer, _info=u''):
+        """ Add a :mod:`repoze.bfg` :term:`renderer` factory to the current
         configuration state."""
         iface = IRendererFactory
-        if name.startswith('.'):
-            iface = ITemplateRendererFactory
-        self.registry.registerUtility(factory, iface, name=name, info=_info)
+        self.registry.registerUtility(renderer, iface, name=name, info=_info)
 
-    def resource(self, to_override, override_with, _info=u'', _override=None,):
+    def override_resource(self, to_override, override_with,
+                          _info=u'', _override=None,):
         """ Add a :mod:`repoze.bfg` resource override to the current
         configuration state.  See :ref:`resources_chapter` for more
         information about resource overrides."""
@@ -492,62 +529,26 @@ class Configurator(object):
         override(package, path, override_package, override_prefix,
                  _info=_info)
 
-    def _override(self, package, path, override_package, override_prefix,
-                  _info=u'', PackageOverrides=PackageOverrides):
-            pkg_name = package.__name__
-            override_pkg_name = override_package.__name__
-            override = self.registry.queryUtility(
-                IPackageOverrides, name=pkg_name)
-            if override is None:
-                override = PackageOverrides(package)
-                self.registry.registerUtility(override, IPackageOverrides,
-                                              name=pkg_name, info=_info)
-            override.insert(path, override_pkg_name, override_prefix)
-
-    def forbidden(self, *arg, **kw):
+    def set_forbidden_view(self, *arg, **kw):
         """ Add a default forbidden view to the current configuration
         state."""
         
         return self._system_view(IForbiddenView, *arg, **kw)
 
-    def notfound(self, *arg, **kw):
+    def set_notfound_view(self, *arg, **kw):
         """ Add a default not found view to the current configuration
         state."""
         return self._system_view(INotFoundView, *arg, **kw)
 
-    def _system_view(self, iface, view=None, attr=None, renderer=None,
-                    wrapper=None, _info=u''):
-        if not view:
-            if renderer:
-                def view(context, request):
-                    return {}
-            else:
-                raise ConfigurationError('"view" attribute was not '
-                                         'specified and no renderer '
-                                         'specified')
-
-        derived_view = self._derive_view(view, attr=attr,
-                                         renderer_name=renderer,
-                                         wrapper_viewname=wrapper)
-        self.registry.registerUtility(derived_view, iface, '', info=_info)
-
-    def static(self, name, path, cache_max_age=3600, _info=u''):
+    def add_static_view(self, name, path, cache_max_age=3600, _info=u''):
         """ Add a static view to the current configuration state."""
-        spec = self.make_spec(path)
+        spec = self._make_spec(path)
         view = static(spec, cache_max_age=cache_max_age)
-        self.route(name, "%s*subpath" % name, view=view,
-                   view_for=StaticRootFactory, factory=StaticRootFactory(spec),
-                   _info=_info)
+        self.add_route(name, "%s*subpath" % name, view=view,
+                       view_for=StaticRootFactory,
+                       factory=StaticRootFactory(spec),
+                       _info=_info)
 
-    def root_factory(self, factory):
-        """ Add a :term:`root factory` to the current configuration
-        state.  If the ``factory`` argument is ``None`` a default root
-        factory will be registered."""
-        if factory is None:
-            factory = DefaultRootFactory
-        self.registry.registerUtility(factory, IRootFactory)
-        self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
-        
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
                      containment=None):
@@ -662,7 +663,7 @@ class BFGViewGrokker(martian.InstanceGrokker):
         for settings in config:
             config = kw['_configurator']
             info = kw.get('_info', u'')
-            config.view(view=obj, _info=info, **settings)
+            config.add_view(view=obj, _info=info, **settings)
         return bool(config)
 
 class MultiView(object):

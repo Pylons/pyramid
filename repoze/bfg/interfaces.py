@@ -106,10 +106,6 @@ class ITemplateRenderer(IRenderer):
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
 
-class ITemplateRendererFactory(IRendererFactory):
-    def __call__(path):
-        """ Return an object that implements ``ITemplateRenderer`` """
-
 class IViewPermission(Interface):
     def __call__(context, request):
         """ Return True if the permission allows, return False if it denies. """

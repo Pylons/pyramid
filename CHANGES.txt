@@ -116,6 +116,9 @@ Internals
   an IDebugLogger unnamed utility.  A named utility with the old name
   is registered for b/w compat.
 
+- The ``repoze.bfg.interfaces.ITemplateRendererFactory`` interface was
+  removed; it has become unused.
+
 Backwards Incompatibilites
 --------------------------
 

@@ -7,26 +7,24 @@
 
   .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, zcml_file=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS)
 
-     .. automethod:: route
+     .. automethod:: add_route
 
-     .. automethod:: view
+     .. automethod:: add_view
 
-     .. automethod:: security_policies
+     .. automethod:: add_renderer(name, factory)
 
-     .. automethod:: forbidden(view=None, attr=None, renderer=None, wrapper=None)
-
-     .. automethod:: notfound(view=None, attr=None, renderer=None, wrapper=None)
-
-     .. automethod:: renderer(factory, name)
-
-     .. automethod:: resource(to_override, override_with)
-
-     .. automethod:: scan(package)
-
-     .. automethod:: static(name, path, cache_max_age=3600)
+     .. automethod:: add_static_view(name, path, cache_max_age=3600)
 
      .. automethod:: load_zcml(spec)
 
      .. automethod:: make_wsgi_app()
 
- 
+     .. automethod:: override_resource(to_override, override_with)
+
+     .. automethod:: scan(package)
+
+     .. automethod:: set_forbidden_view(view=None, attr=None, renderer=None, wrapper=None)
+
+     .. automethod:: set_notfound_view(view=None, attr=None, renderer=None, wrapper=None)
+
+     .. automethod:: set_security_policies

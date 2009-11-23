@@ -543,7 +543,7 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(len(actions), 1)
         action = actions[0]
         self.assertEqual(action['callable'].im_func,
-                         Configurator.resource.im_func)
+                         Configurator.override_resource.im_func)
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'], ('a', 'b', None))
 

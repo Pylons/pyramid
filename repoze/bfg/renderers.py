@@ -62,11 +62,8 @@ def renderer_from_name(path):
     from repoze.bfg.configuration import Configurator
     reg = get_current_registry()
     config = Configurator(reg)
-    return config.renderer_from_name(path)
+    return config._renderer_from_name(path)
 
 def _reload_resources():
     settings = get_settings()
     return settings and settings.get('reload_resources')
-
-
-

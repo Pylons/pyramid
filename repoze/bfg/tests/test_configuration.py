@@ -224,77 +224,77 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(dummylock.acquired, True)
         self.assertEqual(dummylock.released, True)
 
-    def test_view_view_callable_None_no_renderer(self):
+    def test_add_view_view_callable_None_no_renderer(self):
         from zope.configuration.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.view)
+        self.assertRaises(ConfigurationError, config.add_view)
 
-    def test_view_with_request_type_and_route_name(self):
+    def test_add_view_with_request_type_and_route_name(self):
         from zope.configuration.exceptions import ConfigurationError
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        self.assertRaises(ConfigurationError, config.view, view, '', None,
+        self.assertRaises(ConfigurationError, config.add_view, view, '', None,
                           None, True, True)
 
-    def test_view_view_callable_None_with_renderer(self):
+    def test_add_view_view_callable_None_with_renderer(self):
         config = self._makeOne()
         self._registerRenderer(config, name='dummy')
-        config.view(renderer='dummy')
+        config.add_view(renderer='dummy')
         view = self._getViewCallable(config)
         self.failUnless('Hello!' in view(None, None).body)
 
-    def test_wrapped_view_is_decorated(self):
+    def test_add_view_wrapped_view_is_decorated(self):
         def view(request): # request-only wrapper
             """ """
         config = self._makeOne()
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
 
-    def test_view_with_function_callable(self):
+    def test_add_view_with_function_callable(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
-    def test_view_with_function_callable_requestonly(self):
+    def test_add_view_with_function_callable_requestonly(self):
         def view(request):
             return 'OK'
         config = self._makeOne()
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
-    def test_view_as_instance(self):
+    def test_add_view_as_instance(self):
         class AView:
             def __call__(self, context, request):
                 """ """
                 return 'OK'
         view = AView()
         config = self._makeOne()
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
-    def test_view_as_instance_requestonly(self):
+    def test_add_view_as_instance_requestonly(self):
         class AView:
             def __call__(self, request):
                 """ """
                 return 'OK'
         view = AView()
         config = self._makeOne()
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
-    def test_view_as_oldstyle_class(self):
+    def test_add_view_as_oldstyle_class(self):
         class view:
             def __init__(self, context, request):
                 self.context = context
@@ -303,12 +303,12 @@ class ConfiguratorTests(unittest.TestCase):
             def __call__(self):
                 return 'OK'
         config = self._makeOne()
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
-    def test_view_as_oldstyle_class_requestonly(self):
+    def test_add_view_as_oldstyle_class_requestonly(self):
         class view:
             def __init__(self, request):
                 self.request = request
@@ -316,42 +316,42 @@ class ConfiguratorTests(unittest.TestCase):
             def __call__(self):
                 return 'OK'
         config = self._makeOne()
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
-    def test_view_for_as_class(self):
+    def test_add_view_for_as_class(self):
         from zope.interface import implementedBy
         view = lambda *arg: 'OK'
         class Foo:
             pass
         config = self._makeOne()
-        config.view(for_=Foo, view=view)
+        config.add_view(for_=Foo, view=view)
         foo = implementedBy(Foo)
         wrapper = self._getViewCallable(config, foo)
         self.assertEqual(wrapper, view)
 
-    def test_view_for_as_iface(self):
+    def test_add_view_for_as_iface(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(for_=IDummy, view=view)
+        config.add_view(for_=IDummy, view=view)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
-    def test_view_register_secured_view(self):
+    def test_add_view_register_secured_view(self):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import ISecuredView
         view = lambda *arg: 'OK'
         view.__call_permissive__ = view
         config = self._makeOne()
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = config.registry.adapters.lookup(
             (Interface, IRequest), ISecuredView, name='', default=None)
         self.assertEqual(wrapper, view)
 
-    def test_view_multiview_replaces_existing_view(self):
+    def test_add_view_multiview_replaces_existing_view(self):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
@@ -360,12 +360,12 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.registry.registerAdapter(
             view, (Interface, IRequest), IView, name='')
-        config.view(view=view)
+        config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
-    def test_view_multiview_replaces_multiview(self):
+    def test_add_view_multiview_replaces_multiview(self):
         from zope.interface import Interface
         from zope.interface import implements
         from repoze.bfg.interfaces import IRequest
@@ -386,13 +386,13 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerAdapter(view, (Interface, IRequest),
                                         IMultiView, name='')
         view2 = lambda *arg: 'OK2'
-        config.view(view=view2)
+        config.add_view(view=view2)
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper.views, [view2])
         self.assertEqual(wrapper(None, None), 'OK1')
 
-    def test_view_multiview_call_ordering(self):
+    def test_add_view_multiview_call_ordering(self):
         from zope.interface import directlyProvides
         def view1(context, request): return 'view1'
         def view2(context, request): return 'view2'
@@ -403,15 +403,15 @@ class ConfiguratorTests(unittest.TestCase):
         def view7(context, request): return 'view7'
         def view8(context, request): return 'view8'
         config = self._makeOne()
-        config.view(view=view1)
-        config.view(view=view2, request_method='POST')
-        config.view(view=view3,request_param='param')
-        config.view(view=view4, containment=IDummy)
-        config.view(view=view5, request_method='POST', request_param='param')
-        config.view(view=view6, request_method='POST', containment=IDummy)
-        config.view(view=view7, request_param='param', containment=IDummy)
-        config.view(view=view8, request_method='POST', request_param='param',
-                    containment=IDummy)
+        config.add_view(view=view1)
+        config.add_view(view=view2, request_method='POST')
+        config.add_view(view=view3,request_param='param')
+        config.add_view(view=view4, containment=IDummy)
+        config.add_view(view=view5, request_method='POST',request_param='param')
+        config.add_view(view=view6, request_method='POST', containment=IDummy)
+        config.add_view(view=view7, request_param='param', containment=IDummy)
+        config.add_view(view=view8, request_method='POST',request_param='param',
+                        containment=IDummy)
 
         wrapper = self._getViewCallable(config)
 
@@ -467,7 +467,7 @@ class ConfiguratorTests(unittest.TestCase):
         request.params = {'param':'1'}
         self.assertEqual(wrapper(ctx, request), 'view8')
 
-    def test_view_with_template_renderer(self):
+    def test_add_view_with_template_renderer(self):
         class view(object):
             def __init__(self, context, request):
                 self.request = request
@@ -478,225 +478,225 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         renderer = self._registerRenderer(config)
         fixture = 'repoze.bfg.tests:fixtures/minimal.txt'
-        config.view(view=view, renderer=fixture)
+        config.add_view(view=view, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
         self.assertEqual(renderer.path, 'repoze.bfg.tests:fixtures/minimal.txt')
 
-    def test_view_with_template_renderer_no_callable(self):
+    def test_add_view_with_template_renderer_no_callable(self):
         config = self._makeOne()
         renderer = self._registerRenderer(config)
         fixture = 'repoze.bfg.tests:fixtures/minimal.txt'
-        config.view(view=None, renderer=fixture)
+        config.add_view(view=None, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
         self.assertEqual(renderer.path, 'repoze.bfg.tests:fixtures/minimal.txt')
 
-    def test_view_with_request_type_as_iface(self):
+    def test_add_view_with_request_type_as_iface(self):
         def view(context, request):
             return 'OK'
         config = self._makeOne()
-        config.view(request_type=IDummy, view=view)
+        config.add_view(request_type=IDummy, view=view)
         wrapper = self._getViewCallable(config, None, IDummy)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
-    def test_view_with_request_type_as_noniface(self):
+    def test_add_view_with_request_type_as_noniface(self):
         from zope.interface import providedBy
         def view(context, request):
             return 'OK'
         config = self._makeOne()
-        config.view(request_type=object, view=view)
+        config.add_view(request_type=object, view=view)
         request_iface = providedBy(object)
         wrapper = self._getViewCallable(config, None, request_iface)
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
-    def test_view_with_route_name(self):
+    def test_add_view_with_route_name(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, route_name='foo')
+        config.add_view(view=view, route_name='foo')
         request_type = self._getRouteRequestIface(config, 'foo')
         wrapper = self._getViewCallable(config, None, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
 
-    def test_view_with_request_method_true(self):
+    def test_add_view_with_request_method_true(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, request_method='POST')
+        config.add_view(view=view, request_method='POST')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'POST'
         self.assertEqual(wrapper(None, request), 'OK')
 
-    def test_view_with_request_method_false(self):
+    def test_add_view_with_request_method_false(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, request_method='POST')
+        config.add_view(view=view, request_method='POST')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.method = 'GET'
         self._assertNotFound(wrapper, None, request)
 
-    def test_view_with_request_param_noval_true(self):
+    def test_add_view_with_request_param_noval_true(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, request_param='abc')
+        config.add_view(view=view, request_param='abc')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {'abc':''}
         self.assertEqual(wrapper(None, request), 'OK')
 
-    def test_view_with_request_param_noval_false(self):
+    def test_add_view_with_request_param_noval_false(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, request_param='abc')
+        config.add_view(view=view, request_param='abc')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {}
         self._assertNotFound(wrapper, None, request)
 
-    def test_view_with_request_param_val_true(self):
+    def test_add_view_with_request_param_val_true(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, request_param='abc=123')
+        config.add_view(view=view, request_param='abc=123')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {'abc':'123'}
         self.assertEqual(wrapper(None, request), 'OK')
 
-    def test_view_with_request_param_val_false(self):
+    def test_add_view_with_request_param_val_false(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, request_param='abc=123')
+        config.add_view(view=view, request_param='abc=123')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.params = {'abc':''}
         self._assertNotFound(wrapper, None, request)
 
-    def test_view_with_xhr_true(self):
+    def test_add_view_with_xhr_true(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, xhr=True)
+        config.add_view(view=view, xhr=True)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
 
-    def test_view_with_xhr_false(self):
+    def test_add_view_with_xhr_false(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, xhr=True)
+        config.add_view(view=view, xhr=True)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.is_xhr = False
         self._assertNotFound(wrapper, None, request)
 
-    def test_view_with_header_badregex(self):
+    def test_add_view_with_header_badregex(self):
         from zope.configuration.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
-                          config.view, view=view, header='Host:a\\')
+                          config.add_view, view=view, header='Host:a\\')
 
-    def test_view_with_header_noval_match(self):
+    def test_add_view_with_header_noval_match(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, header='Host')
+        config.add_view(view=view, header='Host')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'Host':'whatever'}
         self.assertEqual(wrapper(None, request), 'OK')
 
-    def test_view_with_header_noval_nomatch(self):
+    def test_add_view_with_header_noval_nomatch(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, header='Host')
+        config.add_view(view=view, header='Host')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'NotHost':'whatever'}
         self._assertNotFound(wrapper, None, request)
 
-    def test_view_with_header_val_match(self):
+    def test_add_view_with_header_val_match(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, header=r'Host:\d')
+        config.add_view(view=view, header=r'Host:\d')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'Host':'1'}
         self.assertEqual(wrapper(None, request), 'OK')
 
-    def test_view_with_header_val_nomatch(self):
+    def test_add_view_with_header_val_nomatch(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, header=r'Host:\d')
+        config.add_view(view=view, header=r'Host:\d')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.headers = {'Host':'abc'}
         self._assertNotFound(wrapper, None, request)
 
-    def test_view_with_accept_match(self):
+    def test_add_view_with_accept_match(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, accept='text/xml')
+        config.add_view(view=view, accept='text/xml')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.accept = ['text/xml']
         self.assertEqual(wrapper(None, request), 'OK')
 
-    def test_view_with_accept_nomatch(self):
+    def test_add_view_with_accept_nomatch(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, accept='text/xml')
+        config.add_view(view=view, accept='text/xml')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.accept = ['text/html']
         self._assertNotFound(wrapper, None, request)
 
-    def test_view_with_containment_true(self):
+    def test_add_view_with_containment_true(self):
         from zope.interface import directlyProvides
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, containment=IDummy)
+        config.add_view(view=view, containment=IDummy)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         context = DummyContext()
         directlyProvides(context, IDummy)
         self.assertEqual(wrapper(context, None), 'OK')
 
-    def test_view_with_containment_false(self):
+    def test_add_view_with_containment_false(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, containment=IDummy)
+        config.add_view(view=view, containment=IDummy)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         context = DummyContext()
         self._assertNotFound(wrapper, context, None)
 
-    def test_view_with_path_info_badregex(self):
+    def test_add_view_with_path_info_badregex(self):
         from zope.configuration.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
-                          config.view, view=view, path_info='\\')
+                          config.add_view, view=view, path_info='\\')
 
-    def test_with_path_info_match(self):
+    def test_add_view_with_path_info_match(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, path_info='/foo')
+        config.add_view(view=view, path_info='/foo')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.path_info = '/foo'
         self.assertEqual(wrapper(None, request), 'OK')
 
-    def test_with_path_info_nomatch(self):
+    def test_add_view_with_path_info_nomatch(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.view(view=view, path_info='/foo')
+        config.add_view(view=view, path_info='/foo')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         request.path_info = '/'
@@ -713,15 +713,15 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(routes[0].predicates), num_predicates)
         return route
 
-    def test_route_defaults(self):
+    def test_add_route_defaults(self):
         config = self._makeOne()
-        config.route('name', 'path')
+        config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'path')
 
-    def test_route_with_xhr(self):
+    def test_add_route_with_xhr(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', xhr=True)
+        config.add_route('name', 'path', xhr=True)
         request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
@@ -732,10 +732,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.is_xhr = False
         self.assertEqual(predicate(None, request), False)
 
-    def test_route_with_request_method(self):
+    def test_add_route_with_request_method(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', request_method='GET')
+        config.add_route('name', 'path', request_method='GET')
         request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
@@ -746,10 +746,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.method = 'POST'
         self.assertEqual(predicate(None, request), False)
 
-    def test_route_with_path_info(self):
+    def test_add_route_with_path_info(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', path_info='/foo')
+        config.add_route('name', 'path', path_info='/foo')
         request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
@@ -760,10 +760,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.path_info = '/'
         self.assertEqual(predicate(None, request), False)
 
-    def test_route_with_request_param(self):
+    def test_add_route_with_request_param(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', request_param='abc')
+        config.add_route('name', 'path', request_param='abc')
         request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
@@ -774,10 +774,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.params = {}
         self.assertEqual(predicate(None, request), False)
 
-    def test_route_with_header(self):
+    def test_add_route_with_header(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', header='Host')
+        config.add_route('name', 'path', header='Host')
         request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
@@ -788,10 +788,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.headers = {}
         self.assertEqual(predicate(None, request), False)
 
-    def test_route_with_accept(self):
+    def test_add_route_with_accept(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', accept='text/xml')
+        config.add_route('name', 'path', accept='text/xml')
         request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
@@ -802,19 +802,19 @@ class ConfiguratorTests(unittest.TestCase):
         request.accept = ['text/html']
         self.assertEqual(predicate(None, request), False)
 
-    def test_route_with_view(self):
+    def test_add_route_with_view(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view)
+        config.add_route('name', 'path', view=view)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
         self._assertRoute(config, 'name', 'path')
 
-    def test_route_with_view_for(self):
+    def test_add_route_with_view_for(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, view_for=IDummy)
+        config.add_route('name', 'path', view=view, view_for=IDummy)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, IDummy, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -822,10 +822,10 @@ class ConfiguratorTests(unittest.TestCase):
         wrapper = self._getViewCallable(config, IOther, request_type)
         self.assertEqual(wrapper, None)
 
-    def test_route_with_view_for_alias(self):
+    def test_add_route_with_view_for_alias(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, for_=IDummy)
+        config.add_route('name', 'path', view=view, for_=IDummy)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, IDummy, request_type)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -833,10 +833,10 @@ class ConfiguratorTests(unittest.TestCase):
         wrapper = self._getViewCallable(config, IOther, request_type)
         self.assertEqual(wrapper, None)
 
-    def test_route_with_view_request_method(self):
+    def test_add_route_with_view_request_method(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, view_request_method='GET')
+        config.add_route('name', 'path', view=view, view_request_method='GET')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
@@ -847,10 +847,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.method = 'POST'
         self._assertNotFound(wrapper, None, request)
 
-    def test_route_with_view_header(self):
+    def test_add_route_with_view_header(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, view_header='Host')
+        config.add_route('name', 'path', view=view, view_header='Host')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
@@ -861,10 +861,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.headers = {}
         self._assertNotFound(wrapper, None, request)
 
-    def test_route_with_view_xhr(self):
+    def test_add_route_with_view_xhr(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, view_xhr=True)
+        config.add_route('name', 'path', view=view, view_xhr=True)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
@@ -875,10 +875,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.is_xhr = False
         self._assertNotFound(wrapper, None, request)
 
-    def test_route_with_view_path_info(self):
+    def test_add_route_with_view_path_info(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, view_path_info='/foo')
+        config.add_route('name', 'path', view=view, view_path_info='/foo')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
@@ -889,10 +889,10 @@ class ConfiguratorTests(unittest.TestCase):
         request.path_info = '/'
         self._assertNotFound(wrapper, None, request)
 
-    def test_route_with_view_accept(self):
+    def test_add_route_with_view_accept(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, view_accept='text/xml')
+        config.add_route('name', 'path', view=view, view_accept='text/xml')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
@@ -903,11 +903,11 @@ class ConfiguratorTests(unittest.TestCase):
         request.accept = ['text/html']
         self._assertNotFound(wrapper, None, request)
 
-    def test_route_with_view_containment(self):
+    def test_add_route_with_view_containment(self):
         from zope.interface import directlyProvides
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, view_containment=IDummy)
+        config.add_route('name', 'path', view=view, view_containment=IDummy)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
@@ -916,29 +916,29 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(context, None), 'OK')
         self._assertNotFound(wrapper, None, None)
 
-    def test_route_with_view_renderer(self):
+    def test_add_route_with_view_renderer(self):
         config = self._makeOne()
         self._registerRenderer(config)
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view,
-                     view_renderer='fixtures/minimal.txt')
+        config.add_route('name', 'path', view=view,
+                         view_renderer='fixtures/minimal.txt')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
         self.assertEqual(wrapper(None, None).body, 'Hello!')
 
-    def test_route_with_view_renderer_alias(self):
+    def test_add_route_with_view_renderer_alias(self):
         config = self._makeOne()
         self._registerRenderer(config)
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view,
-                     renderer='fixtures/minimal.txt')
+        config.add_route('name', 'path', view=view,
+                         renderer='fixtures/minimal.txt')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
         self.assertEqual(wrapper(None, None).body, 'Hello!')
 
-    def test_route_with_view_permission(self):
+    def test_add_route_with_view_permission(self):
         from repoze.bfg.interfaces import IAuthenticationPolicy
         from repoze.bfg.interfaces import IAuthorizationPolicy
         config = self._makeOne()
@@ -946,13 +946,13 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerUtility(policy, IAuthenticationPolicy)
         config.registry.registerUtility(policy, IAuthorizationPolicy)
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, view_permission='edit')
+        config.add_route('name', 'path', view=view, view_permission='edit')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
         self.failUnless(hasattr(wrapper, '__call_permissive__'))
 
-    def test_route_with_view_permission_alias(self):
+    def test_add_route_with_view_permission_alias(self):
         from repoze.bfg.interfaces import IAuthenticationPolicy
         from repoze.bfg.interfaces import IAuthorizationPolicy
         config = self._makeOne()
@@ -960,7 +960,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.registerUtility(policy, IAuthenticationPolicy)
         config.registry.registerUtility(policy, IAuthorizationPolicy)
         view = lambda *arg: 'OK'
-        config.route('name', 'path', view=view, permission='edit')
+        config.add_route('name', 'path', view=view, permission='edit')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
         route = self._assertRoute(config, 'name', 'path')
@@ -991,13 +991,13 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
         self.assertEqual(overrides.package, package)
 
-    def test_static_here_relative(self):
+    def test_add_static_view_here_relative(self):
         from repoze.bfg.static import PackageURLParser
         from zope.interface import implementedBy
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
         config = self._makeOne()
-        config.static('static', 'fixtures/static')
+        config.add_static_view('static', 'fixtures/static')
         request_type = self._getRouteRequestIface(config, 'static')
         route = self._assertRoute(config, 'static', 'static*subpath')
         self.assertEqual(route.factory.__class__, StaticRootFactory)
@@ -1007,13 +1007,13 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
-    def test_static_package_relative(self):
+    def test_add_static_view_package_relative(self):
         from repoze.bfg.static import PackageURLParser
         from zope.interface import implementedBy
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
         config = self._makeOne()
-        config.static('static', 'repoze.bfg.tests:fixtures/static')
+        config.add_static_view('static', 'repoze.bfg.tests:fixtures/static')
         request_type = self._getRouteRequestIface(config, 'static')
         route = self._assertRoute(config, 'static', 'static*subpath')
         self.assertEqual(route.factory.__class__, StaticRootFactory)
@@ -1023,7 +1023,7 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
-    def test_static_absolute(self):
+    def test_add_static_view_absolute(self):
         from paste.urlparser import StaticURLParser
         import os
         from zope.interface import implementedBy
@@ -1032,7 +1032,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         here = os.path.dirname(__file__)
         static_path = os.path.join(here, 'fixtures', 'static')
-        config.static('static', static_path)
+        config.add_static_view('static', static_path)
         request_type = self._getRouteRequestIface(config, 'static')
         route = self._assertRoute(config, 'static', 'static*subpath')
         self.assertEqual(route.factory.__class__, StaticRootFactory)
@@ -1089,39 +1089,39 @@ class ConfiguratorTests(unittest.TestCase):
         result = view(context, request)
         self.assertEqual(result, 'OK2')
 
-    def test_notfound(self):
+    def test_set_notfound_view(self):
         from repoze.bfg.interfaces import INotFoundView
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.notfound(view)
+        config.set_notfound_view(view)
         request = self._makeRequest(config)
         view = config.registry.getUtility(INotFoundView)
         result = view(None, request)
         self.assertEqual(result, 'OK')
 
-    def test_forbidden(self):
+    def test_set_forbidden_view(self):
         from repoze.bfg.interfaces import IForbiddenView
         config = self._makeOne()
         view = lambda *arg: 'OK'
-        config.forbidden(view)
+        config.set_forbidden_view(view)
         request = self._makeRequest(config)
         view = config.registry.getUtility(IForbiddenView)
         result = view(None, request)
         self.assertEqual(result, 'OK')
 
-    def test_authentication_policy(self):
+    def test__set_authentication_policy(self):
         from repoze.bfg.interfaces import IAuthenticationPolicy
         config = self._makeOne()
         policy = object()
-        config.authentication_policy(policy)
+        config._set_authentication_policy(policy)
         self.assertEqual(
             config.registry.getUtility(IAuthenticationPolicy), policy)
 
-    def test_authorization_policy(self):
+    def test__set_authorization_policy(self):
         from repoze.bfg.interfaces import IAuthorizationPolicy
         config = self._makeOne()
         policy = object()
-        config.authorization_policy(policy)
+        config._set_authorization_policy(policy)
         self.assertEqual(
             config.registry.getUtility(IAuthorizationPolicy), policy)
 
@@ -1274,7 +1274,7 @@ class ConfiguratorTests(unittest.TestCase):
                          "'view_name' against context None): Allowed ("
                          "no permission registered)")
 
-    def test__derive_view_debug_authorization_permission_authpol_permitted(self):
+    def test__derive_view_debug_auth_permission_authpol_permitted(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self._registerSettings(config, debug_authorization=True,
@@ -1295,7 +1295,7 @@ class ConfiguratorTests(unittest.TestCase):
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): True")
         
-    def test__derive_view_debug_authorization_permission_authpol_denied(self):
+    def test__derive_view_debug_auth_permission_authpol_denied(self):
         from repoze.bfg.exceptions import Forbidden
         view = lambda *arg: 'OK'
         config = self._makeOne()
@@ -1317,7 +1317,7 @@ class ConfiguratorTests(unittest.TestCase):
                          "debug_authorization of url url (view name "
                          "'view_name' against context None): False")
 
-    def test__derive_view_debug_authorization_permission_authpol_denied2(self):
+    def test__derive_view_debug_auth_permission_authpol_denied2(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self._registerSettings(config,
@@ -1421,27 +1421,27 @@ class ConfiguratorTests(unittest.TestCase):
             inner_view, viewname='inner', wrapper_viewname='owrap')
         result = self.assertRaises(ValueError, wrapped, None, request)
 
-    def test_resource_samename(self):
+    def test_override_resource_samename(self):
         from zope.configuration.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.resource, 'a', 'a')
+        self.assertRaises(ConfigurationError, config.override_resource,'a', 'a')
 
-    def test_resource_override_directory_with_file(self):
+    def test_override_resource_directory_with_file(self):
         from zope.configuration.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.resource,
+        self.assertRaises(ConfigurationError, config.override_resource,
                           'a:foo/', 'a:foo.pt')
 
-    def test_resource_override_file_with_directory(self):
+    def test_override_resource_file_with_directory(self):
         from zope.configuration.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.resource,
+        self.assertRaises(ConfigurationError, config.override_resource,
                           'a:foo.pt', 'a:foo/')
 
-    def test_resource_success(self):
+    def test_override_resource_success(self):
         config = self._makeOne()
         override = DummyUnderOverride()
-        config.resource(
+        config.override_resource(
             'repoze.bfg.tests.fixtureapp:templates/foo.pt',
             'repoze.bfg.tests.fixtureapp.subpackage:templates/bar.pt',
             _override=override)
@@ -1451,6 +1451,15 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(override.path, 'templates/foo.pt')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, 'templates/bar.pt')
+
+    def test_add_renderer(self):
+        from repoze.bfg.interfaces import IRendererFactory
+        config = self._makeOne()
+        renderer = object()
+        config.add_renderer('name', renderer)
+        self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
+                         renderer)
+        
 
 class Test__map_view(unittest.TestCase):
     def setUp(self):

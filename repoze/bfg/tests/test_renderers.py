@@ -125,14 +125,14 @@ class TestRendererFromName(unittest.TestCase):
         return renderer_from_name(path)
 
     def test_it(self):
-        from repoze.bfg.interfaces import ITemplateRendererFactory
+        from repoze.bfg.interfaces import IRendererFactory
         import os
         here = os.path.dirname(os.path.abspath(__file__))
         fixture = os.path.join(here, 'fixtures/minimal.pt')
         renderer = {}
         def factory(path, **kw):
             return renderer
-        testing.registerUtility(factory, ITemplateRendererFactory, name='.pt')
+        testing.registerUtility(factory, IRendererFactory, name='.pt')
         result = self._callFUT(fixture)
         self.assertEqual(result, renderer)
 

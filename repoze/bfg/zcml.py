@@ -165,7 +165,7 @@ def view(
 
     def register():
         config = Configurator(reg)
-        config.view(
+        config.add_view(
             permission=permission, for_=for_, view=view, name=name,
             request_type=request_type, route_name=route_name,
             request_method=request_method, request_param=request_param,
@@ -244,7 +244,7 @@ def route(_context, name, path, view=None, view_for=None,
 
     def register():
         config = Configurator(reg)
-        config.route(
+        config.add_route(
             name,
             path,
             factory=factory,
@@ -353,7 +353,7 @@ def resource(_context, to_override, override_with):
 
     _context.action(
         discriminator = None,
-        callable = config.resource,
+        callable = config.override_resource,
         args = (to_override, override_with, _context.info),
         )
 
@@ -370,7 +370,7 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
     # be found by the view registration machinery
     reg = get_current_registry()
     config = Configurator(reg)
-    config.authentication_policy(policy, _info=_context.info)
+    config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
 class IRemoteUserAuthenticationPolicyDirective(Interface):
@@ -386,7 +386,7 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
     # be found by the view registration machinery
     reg = get_current_registry()
     config = Configurator(reg)
-    config.authentication_policy(policy, _info=_context.info)
+    config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
 class IAuthTktAuthenticationPolicyDirective(Interface):
@@ -424,7 +424,7 @@ def authtktauthenticationpolicy(_context,
     # be found by the view registration machinery
     reg = get_current_registry()
     config = Configurator(reg)
-    config.authentication_policy(policy, _info=_context.info)
+    config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
 class IACLAuthorizationPolicyDirective(Interface):
@@ -436,7 +436,7 @@ def aclauthorizationpolicy(_context):
     # found by the view registration machinery
     reg = get_current_registry()
     config = Configurator(reg)
-    config.authorization_policy(policy, _info=_context.info)
+    config._set_authorization_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthorizationPolicy)
 
 class IRendererDirective(Interface):
@@ -453,7 +453,7 @@ def renderer(_context, factory, name=''):
     # found by the view machinery
     reg = get_current_registry()
     config = Configurator(reg)
-    config.renderer(factory, name, _info=_context.info)
+    config.add_renderer(name, factory, _info=_context.info)
     _context.action(discriminator=(IRendererFactory, name))
 
 class IStaticDirective(Interface):
@@ -484,7 +484,7 @@ def static(_context, name, path, cache_max_age=3600):
 
     _context.action(
         discriminator = ('route', name, False, None, None, None, None, None),
-        callable=config.static,
+        callable=config.add_static_view,
         args = (name, path, cache_max_age, _context.info),
         )
 
