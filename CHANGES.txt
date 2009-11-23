@@ -4,6 +4,11 @@ Next release
 Features
 --------
 
+- A new class now exists: ``repoze.bfg.configuration.Configurator``.
+  This class forms the basis for sharing machinery between
+  "imperatively" configured applications and traditional
+  declaratively-configured applications.
+
 - The ``repoze.bfg.testing.setUp`` function now causes a "dummy"
   request object to be created (an instance of
   ``repoze.bfg.testing.DummyRequest``).  The DummyRequest object is
@@ -16,6 +21,18 @@ Features
   now use a ``repoze.bfg.configuration.Configurator`` class instead of
   the (now-legacy) ``repoze.bfg.router.make_app`` function to produce
   a WSGI application.
+
+Documentation
+-------------
+
+- ``repoze.bfg.configuration`` API documentation has been added.
+
+- A narrative documentation chapter entitled "Creating Your First
+  ``repoze.bfg`` Application" has been added.  This chapter details
+  usage of the new ``repoze.bfg.configuration.Configurator`` class,
+  and demonstrates a simplified "imperative-mode" configuration; doing
+  ``repoze.bfg`` application configuration imperatively was previously
+  much more difficult.
 
 Bug Fixes
 ----------
