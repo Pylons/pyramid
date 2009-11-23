@@ -193,6 +193,75 @@ but return a response with the body ``Hello world!``; the
 ``goodbye_world`` view callable returns a response with the body
 ``Goodbye world!``.
 
+Traversal and The Default View
+------------------------------
+
+If you've used the code in this tutorial already, you've actually
+unwittingly configured :mod:`repoze.bfg` to serve an application that
+relies on :term:`traversal`.  A full explanation of how
+:mod:`repoze.bfg` locates "the right" :term:`view callable` for a
+given request requires some explanation of traversal.
+
+In :mod:`repoze.bfg` terms, :term:`traversal` is the act of descending
+a *directed graph* of objects using the individual path segments of
+the path info portion of a URL in order to find a :term:`context`
+object.  The graph is traversed, beginning at a root object,
+represented by ``/``; if there are further path segments in the path
+info, the root object's ``__getitem__`` is called with the next path
+segment, and it is presumed to return another graph object, *ad
+infinitum* until all path segments are exhausted; if any node in the
+graph doesn't *have* a ``__getitem__`` method, or if the
+``__getitem__`` of a node raises a ``KeyError``, traversal ends
+immediately.
+
+Here's an image that depicts the :mod:`repoze.bfg` traversal process
+graphically as a flowchart:
+
+.. image:: modelgraphtraverser.png
+
+The results of a :term:`traversal` include a :term:`context` and a
+:term:`view name`.  The :term:`view name` is the *first* URL path
+segment in the set of path segments "left over" during
+:term:`traversal`.  Effectively, if traversal returns a non-empty
+:term:`view name`, it means that traversal ran out of nodes in the
+graph before it finished exhausting all the path segments implied by
+the path info of the URL: no segments are "left over".  In this case,
+a non-default view will be invoked.
+
+The :term:`default view` of a :term:`context` is represented by a
+:term:`view configuration` that has the :term:`view name` of the empty
+string.  The :term:`default view` is found when all path elements in
+the URL *are* exhausted before :term:`traversal` returns a
+:term:`context` object, causing the :term:`view name` to be ``''``
+(the empty string).  When no path segements are "left over" after
+traversal, the :term:`default view` for the context found is invoked.
+
+Our application's :term:`root` object is a default root object used
+when one isn't otherwise specified in application configuration.  This
+root object does not have a ``__getitem__`` method, thus it has no
+children.  Although in a more complex system there can be many
+contexts which URLs resolve to in our application, effectively there
+is only ever one context: the root object.
+
+We have only a single default view registered (the registration for
+the ``hello_world`` view callable).  Due to this set of circumstances,
+you can consider the sole possible URL that will resolve to a default
+view in this application the root URL ``'/'``.  It is the only URL
+that will resolve to the :term:`view name` of ``''`` (the empty
+string).
+
+We have only a single view registered for the :term:`view name`
+``goodbye`` (the registration for the ``goodbye_world`` view
+callable).  Due to this set of circumstances, you can consider the
+sole possible URL that will resolve to the ``goodbye_world`` in this
+application the URL ``'/goodbye'`` because it is the only URL that
+will resolve to the :term:`view name` of ``goodbye``.
+
+.. note:: 
+
+   For more in-depth information about :term:`traversal`, see
+   :ref:`traversal_chapter`.
+
 .. _helloworld_imperative_appconfig:
 
 Application Configuration
@@ -269,36 +338,21 @@ The line ``config.add_view(hello_world)`` registers the
 of a Configurator must be called with a view callable object as its
 first argument, so the first argument passed is ``hello_world``
 function we'd like to use as a :term:`view callable`.  However, this
-line calls ``add_view`` with no additional :term:`predicate`
-arguments, meaning that we'd like :mod:`repoze.bfg` to invoke the
-``hello_world`` view callable for *any* request if another more
-specific view configuration (one with more specific predicate
-arguments) doesn't match it more closely.
+line calls ``add_view`` with a single default :term:`predicate`
+argument, the ``name`` predicate with a value of ``''``, meaning that
+we'd like :mod:`repoze.bfg` to invoke the ``hello_world`` view
+callable for any request for the :term:`default view` of an object.
 
 Since our ``hello_world`` view callable returns a Response instance
 with a body of ``Hello world!``` in the configuration implied by this
 script, a user agent to a server running this application will receive
-the greeting ``Hello world!`` when any URL is invoked, unless
-:mod:`repoze.bfg` finds a more specific view configuration in its
-application registry for a given request.
+the greeting ``Hello world!`` when any :term:`default view` is
+invoked, unless :mod:`repoze.bfg` finds a more specific view
+configuration in its application registry for a given request.
 
-The line ``config.add_view(goodbye_world, name='goodbye')`` registers
-the ``hello_world`` function as a view callble.  The line calls
-``add_view`` with the view callable as the first required positional
-argument, and a :term:`predicate` keyword argument ``name`` with the
-value ``'goodbye'``.  This :term:`view configuration` implies that a
-request with a :term:`view name` of ``goodbye`` should cause the
-``goodbye_world`` view callable to be invoked.  For the purposes of
-this discussion, the :term:`view name` can be considered the first
-non-empty path segment in the URL: in particular, this view
-configuration will match when the URL is ``/goodbye``.
+.. sidebar:: View Dispatch and Ordering
 
-.. sidebar:: View Dispatching and Ordering
-
-   If you've been running the code in this tutorial, you've actually
-   unknowingly now configured :mod:`repoze.bfg` to serve an
-   application that relies on :term:`traversal`.  When
-   :term:`traversal` is used, :mod:`repoze.bfg` chooses the most
+   When :term:`traversal` is used, :mod:`repoze.bfg` chooses the most
    specific view callable based *only* on view :term:`predicate`
    applicability.  This is unlike :term:`URL dispatch`, another
    dispatch mode of :mod:`repoze.bfg` (and other frameworks, like
@@ -311,6 +365,17 @@ configuration will match when the URL is ``/goodbye``.
    never very important.  We can register ``goodbye_world`` first and
    ``hello_world`` second; :mod:`repoze.bfg` will still give us the
    most specific callable when a request is dispatched to it.
+
+The line ``config.add_view(goodbye_world, name='goodbye')`` registers
+the ``hello_world`` function as a view callble.  The line calls
+``add_view`` with the view callable as the first required positional
+argument, and a :term:`predicate` keyword argument ``name`` with the
+value ``'goodbye'``.  This :term:`view configuration` implies that a
+request with a :term:`view name` of ``goodbye`` should cause the
+``goodbye_world`` view callable to be invoked.  For the purposes of
+this discussion, the :term:`view name` can be considered the first
+non-empty path segment in the URL: in particular, this view
+configuration will match when the URL is ``/goodbye``.
 
 Since our ``goodbye_world`` view callable returns a Response instance
 with a body of ``Goodbye world!`` in the configuration implied by this
@@ -335,18 +400,20 @@ Earlier we explained that the server would return ``Hello world!`` if
 you visited the *root* (``/``) URL.  However, actually, because the
 view configuration registration for the ``hello_world`` view callable
 has no :term:`predicate` arguments, the ``hello_world`` view callable
-is applicable for *any request*.  For example, if you visit the URL
-with the path info ``/buz``, you will see ``Hello world!``.  The only
-time you *won't* see ``Hello world!`` is when you visit a URL with the
-path info that ends in ``/goodbye``.  This is because we've also
-registered a *more specific* view configuration for this circumstance:
+is applicable for the :term:`default view` of any :term:`context`
+resulting from a request.  This isn't all that interesting in this
+application, because we only *have* one potential context (the root
+object).
+
+We've also registered a view configuration for another circumstance:
 the ``goodbye_world`` view callable has a ``name`` predicate of
-``goodbye``, meaning that it is a better match for requests that have
-the :term:`view name` ``goodbye`` than the more general
-``hello_world`` view configuration registration.  Because
-:mod:`repoze.bfg` uses the most specific view configuration for any
-request, the ``goodbye_world`` view callable will be used when the URL
-contains path information that ends with ``/goodbye``.
+``goodbye``, meaning that it will match for requests that have the
+:term:`view name` ``goodbye`` unlike the ``hello_world`` view
+configuration registration, which will only match the default view
+(view name ``''``) of a request.  Because :mod:`repoze.bfg` chooses
+the best view configuration for any request, the ``goodbye_world``
+view callable will be used when the URL contains path information that
+ends with ``/goodbye``.
 
 WGSI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -358,7 +425,7 @@ WGSI Application Creation
 
 After configuring views, the script creates a WSGI *application* via
 the ``config.make_wsgi_app`` method.  A call to ``make_wsgi_app``
-implies that all "configuration" is finished (meaning all method calls
+implies that all configuration is finished (meaning all method calls
 to the configurator which set up views, and various other
 configuration settings have been performed).  The ``make_wsgi_app``
 method returns a :term:`WSGI` application object that can be used by
@@ -443,6 +510,9 @@ In a file named ``helloworld.py``:
 
    def hello_world(request):
        return Response('Hello world!')
+
+   def goodbye_world(request):
+       return Response('Goodbye world!')
 
    if __name__ == '__main__':
        config = Configurator(zcml_file='configure.zcml')
@@ -640,7 +710,7 @@ behalf of the developer.  Various attributes can be specified on the
 creates.
 
 Since the relative ordering of calls to ``Configuration.add_view``
-doesn't matter (see the sidebar above entitled *View Dispatching and
+doesn't matter (see the sidebar above entitled *View Dispatch and
 Ordering*), the relative order of ``<view>`` tags in ZCML doesn't
 matter either.  The following ZCML orderings are completely
 equivalent:
@@ -768,6 +838,9 @@ best fits your brain as necessary.
 For more information about the API of the ``Configurator`` object, see
 :ref:`configuration_module`.  The equivalent ZCML declaration tags are
 introduced in narrative documentation chapters as necessary.
+
+For more information about :term:`traversal`, see
+:ref:`traversal_chapter`.
 
 For more information about :term:`view configuration`, see
 :ref:`views_chapter`.
