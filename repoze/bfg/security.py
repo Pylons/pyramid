@@ -6,10 +6,10 @@ from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import ISecuredView
 
-# b/c import
-from repoze.bfg.exceptions import Forbidden as Unauthorized
-
+from repoze.bfg.exceptions import Forbidden as Unauthorized # b/c import
 from repoze.bfg.threadlocal import get_current_registry
+
+Unauthorized # prevent PyFlakes from complaining
 
 deprecated('Unauthorized',
     "('from repoze.bfg.security import Unauthorized' was  "

@@ -3,15 +3,20 @@
 - Decide about creating a "real" request object during testing.setUp
   vs. creating a dummy request.
 
-- Finish "configuration" documentation chapter and audit the rest of
-  the docs for "view configuration" and "route configuration"
-  references, etc.  Add one more view registration (and maybe some
-  other registration) in the narrative.
+- Audit the rest of the docs for "view configuration" and "route
+  configuration" references, etc.
 
 - Finish Configurator API documentation.
 
-- notfound/forbidden as Configurator API arguments (get rid of
-  set_notfound_view, set_forbidden_view, set_security_policies?)
+- set_security_policies as API method?
+
+- add set_response_factory or ctor arg and change hooks chapter.
+
+- add set_traverser or ctor arg and change hooks chapter.
+
+- add set_urlgenerator as ctor arg and change hooks chapter?
 
 - Basic WSGI documentation (pipeline / app / server).
+
+- "Model graph" -> "object graph"?
 

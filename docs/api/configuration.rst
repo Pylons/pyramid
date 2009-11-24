@@ -5,15 +5,17 @@
 
 .. automodule:: repoze.bfg.configuration
 
-  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, zcml_file=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS)
-
-     .. automethod:: add_route
-
-     .. automethod:: add_view
+  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, zcml_file=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None)
 
      .. automethod:: add_renderer(name, factory)
 
+     .. automethod:: add_route
+
      .. automethod:: add_static_view(name, path, cache_max_age=3600)
+
+     .. automethod:: add_subscriber
+
+     .. automethod:: add_view
 
      .. automethod:: load_zcml(spec)
 

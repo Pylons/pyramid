@@ -87,6 +87,8 @@ def add_global_response_headers(request, headerlist):
 
 from repoze.bfg.threadlocal import get_current_request as get_request # b/c
 
+get_request # prevent PyFlakes complaints
+
 deprecated('get_request',
            'As of repoze.bfg 1.0, any import of get_request from'
            '``repoze.bfg.request`` is '

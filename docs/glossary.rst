@@ -130,7 +130,7 @@ Glossary
     An alternative to graph traversal as a mechanism for locating a
     :term:`context` for a :term:`view`.  When you use a :term:`route`
     in your :mod:`repoze.bfg` application via a ``<route>``
-    declaration in ZCML, you are using URL dispatch. See the
+    :term:`ZCML declaration` in ZCML, you are using URL dispatch. See the
     :ref:`urldispatch_chapter` for more information.
   Context
     An object in the system that is found during :term:`traversal` or
@@ -316,12 +316,16 @@ Glossary
     `Zope Configuration Markup Language
     <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
     used by Zope and :mod:`repoze.bfg` for configuration tasks.  ZCML
-    is capable of performing many different registrations and
-    declarations, but its primary purpose in :mod:`repoze.bfg` is to
+    is capable of performing different types of :term:`configuration
+    declaration`, but its primary purpose in :mod:`repoze.bfg` is to
     perform :term:`view configuration` and :term:`route configuration`
     within the ``configure.zcml`` file in a :mod:`repoze.bfg`
     application.  ZCML in a :mod:`repoze.bfg` application represents
     the application's :term:`application registry`.
+  ZCML Directive
+    A ZCML "tag" such as ``<view>`` or ``<route>``.
+  ZCML Declaration
+    The concrete use of a :term:`ZCML directive` within a ZCML file.
   Zope Component Architecture
     The `Zope Component Architecture
     <http://www.muthukadan.net/docs/zca.html>`_ (aka ZCA) is a system
@@ -469,4 +473,35 @@ Glossary
     and a :term:`route predicate`.  View predicates are attached to
     :term:`view configuration` and route predicates are attached to
     :term:`route configuration`.
-
+  Decorator
+    A wrapper around a Python function or class which accepts the
+    function or class as its first argument and which returns an
+    arbitrary object.  :mod:`repoze.bfg` provides several decorators,
+    used for configuration and return value modification purposes.  See
+    also `PEP 318 <http://www.python.org/dev/peps/pep-0318/>`_.
+  Configuration Declaration
+    An individual method call made to an instance of a
+    :mod:`repoze.bfg` :term:`Configurator` object which performs an
+    arbitrary action, such as registering a :term:`view configuration`
+    (via the ``view`` method of the configurator) or :term:`route
+    configuration` (via the ``route`` method of the configurator).  A
+    set of configuration declarations is also usually implied via the
+    use of a :term:`ZCML declaration` within an application, or a set
+    of configuration declarations might be performed by a :term:`scan`
+    of code in a package.
+  Configuration Decoration
+    Metadata implying one or more :term:`configuration declaration`
+    invocations.  Often set by configuration Python :term:`decorator`
+    attributes, such as ``repoze.bfg.view.bfg_view``, aka ``@bfg_view``.
+  Scan
+    The term used by :mod:`repoze.bfg` to define the process of
+    importing and examining all code in a Python package or module for
+    :term:`configuration decoration`.
+  Configurator
+    An object used to do :term:`configuration declaration` within an
+    application.  The most common configurator is an instance of the
+    ``repoze.bfg.configuration.Configurator`` class.
+  Imperative Configuration
+    The configuration mode in which you use Python to call methods on
+    a :term:`Configurator` in order to add each :term:`configuration
+    declaration` required by your application.

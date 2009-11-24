@@ -13,6 +13,8 @@ from repoze.bfg.threadlocal import manager
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.zcml import zcml_configure # API
 
+zcml_configure # prevent pyflakes from complaining
+
 _marker = object()
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):

@@ -10,9 +10,9 @@ from paste.util.template import paste_script_template_renderer
 from repoze.bfg.scripting import get_root
 
 try:
-    from IPython.Shell import IPShell
+    from IPython.Shell import IPShell # pragma: no cover
 except ImportError:
-    IPShell = None
+    IPShell = None # pragma: no cover
 
 
 class StarterProjectTemplate(Template):

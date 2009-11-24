@@ -267,7 +267,7 @@ def static_url(path, request, **kw):
         # if it's not a package:relative/name and it's not an
         # /absolute/path it's a relative/path; this means its relative
         # to the package in which the caller's module is defined.
-        package = caller_package(level=2)
+        package = caller_package()
         path = '%s:%s' % (package.__name__, path)
 
     try:

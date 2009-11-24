@@ -262,6 +262,22 @@ class Configurator(object):
 
     # API
 
+    def add_subscriber(self, subscriber, iface=None):
+        """ Add an event subscriber for the event stream implied by
+        the supplied ``iface`` interface.  The ``subscriber`` argument
+        represents a callable object; it will be called with a single
+        object ``event`` whenever :mod:`repoze.bfg` emits an event
+        associated with the ``iface``.  Using the default ``iface``
+        value, ``None`` will cause the subscriber to be registered for
+        all event types. See :ref:`events_chapter` for more
+        information about events and subscribers."""
+        if iface is None:
+            iface = (Interface,)
+        if not isinstance(iface, (tuple, list)):
+            iface = (iface,)
+        self.registry.registerHandler(subscriber, iface)
+        return subscriber
+
     def make_wsgi_app(self, manager=manager, getSiteManager=getSiteManager):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
         the current configuration state."""
@@ -471,11 +487,19 @@ class Configurator(object):
             self.registry.registerUtility(mapper, IRoutesMapper)
         mapper.connect(path, name, factory, predicates=predicates)
 
-    def scan(self, package, _info=u'', martian=martian):
+    def scan(self, package=None, _info=u'', martian=martian):
         """ Scan a Python package and any of its subpackages for
-        configuration decorators such as ``@bfg_view``.  Any decorator
-        found will influence the current configuration state."""
+        objects marked with configuration decorators such as
+        ``@bfg_view``.  Any decorated object found will influence the
+        current configuration state.  See
+
+        The ``package`` argument should be a reference to a Python
+        package or module object.  If ``package`` is ``None``, the
+        package of the *caller* is used.
+        """
         # martian overrideable only for unit tests
+        if package is None:
+            package = caller_package()
         multi_grokker = BFGMultiGrokker()
         multi_grokker.register(BFGViewGrokker())
         module_grokker = martian.ModuleGrokker(grokker=multi_grokker)
@@ -739,8 +763,7 @@ def rendered_response(renderer, response, view, context, request,
     reg = getattr(request, 'registry', None)
     if reg is not None:
         # be kind to old unit tests
-        response_factory = reg.queryUtility(IResponseFactory,
-                                            default=Response)
+        response_factory = reg.queryUtility(IResponseFactory, default=Response)
     response = response_factory(result)
     if request is not None: # in tests, it may be None
         attrs = request.__dict__

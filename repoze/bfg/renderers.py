@@ -4,8 +4,8 @@ import pkg_resources
 from repoze.bfg.interfaces import ITemplateRenderer
 
 from repoze.bfg.compat import json
-from repoze.bfg.settings import get_settings
 from repoze.bfg.path import caller_package
+from repoze.bfg.settings import get_settings
 from repoze.bfg.threadlocal import get_current_registry
 
 # concrete renderer factory implementations

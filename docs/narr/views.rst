@@ -574,10 +574,34 @@ acts as a :mod:`repoze.bfg` view.  All ZCML attributes (save for the
 the same thing.
 
 To make :mod:`repoze.bfg` process your ``@bfg_view`` declarations, you
-*must* insert the following boilerplate into your application's
-``configure.zcml``::
+*must* do one of the following:
 
-  <scan package="."/>
+- If you are using :term:`ZCML`, insert the following boilerplate into
+  your application's ``configure.zcml``:
+
+  .. code-block:: xml
+     :linenos:
+
+      <scan package="."/>
+
+- If you are using :term:`imperative configuration`, use the ``scan``
+  method of the ``Configurator`` object:
+
+  .. code-block:: python
+     :linenos:
+
+      config.scan()
+
+.. note:: See :ref:`configuration_module` for additional API arguments
+   to the ``Configurator.scan`` method.  For example, the ``scan``
+   method allows you to supply a ``package`` argument to better
+   control exactly *which* code will be scanned.  This is the same
+   value implied by the ``package`` attribute of the ZCML ``<scan>``
+   directive.
+
+Please see :ref:`scanning_chapter` for more information about what
+happens when code is scanned for configuration declarations resulting
+from use of decorators like ``@bfg_view``.
 
 After you do so, you will not need to use any other ZCML to configure
 :mod:`repoze.bfg` view declarations.  Instead, you will be able to use

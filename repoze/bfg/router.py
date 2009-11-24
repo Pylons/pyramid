@@ -26,7 +26,7 @@ from repoze.bfg.traversal import ModelGraphTraverser
 from repoze.bfg.view import default_forbidden_view
 from repoze.bfg.view import default_notfound_view
 
-make_app = make_app # prevent pyflakes from complaining
+make_app # prevent pyflakes from complaining
 
 class Router(object):
     """ The main repoze.bfg WSGI application. """

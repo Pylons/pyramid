@@ -27,26 +27,61 @@ when it's called.
 The mere existence of a subscriber function, however, is not
 sufficient to arrange for it to be called.  To arrange for the
 subscriber to be called, you'll need to change your :term:`application
-registry` by modifying your application's ``configure.zcml``.  Here's
-an example of a bit of XML you can add to the ``configure.zcml`` file
-which registers the above ``mysubscriber`` function, which we assume
-lives in a ``subscribers.py`` module within your application:
+registry` by either of the following methods:
 
-.. code-block:: xml
-   :linenos:
+.. topic:: Configuring an Event Listener Imperatively
 
-   <subscriber
-      for="repoze.bfg.interfaces.INewRequest"
-      handler=".subscribers.mysubscriber"
-    />
+   You can imperatively configure a subscriber function to be called
+   for some event type via the ``add_subscriber`` method of a
+   :term:`Configurator`:
 
-The above example means "every time the :mod:`repoze.bfg` framework
-emits an event object that supplies an ``INewRequest`` interface, call
-the ``mysubscriber`` function with the event object.  As you can see,
-a subscription is made in terms of an :term:`interface`.  The event
-object sent to a subscriber will always have possess an interface.
-The interface itself provides documentation of what attributes of the
-event are available.
+   .. code-block:: python
+      :linenos:
+
+      from repoze.bfg.interfaces import INewRequest
+
+      from subscribers import mysubscriber
+
+      config.add_subscriber(mysubscriber, INewRequest)
+
+   The first argument to ``add_subscriber`` is the subscriber
+   function; the second argument is the event type.  See
+   :ref:`configuration_module` for API documentation related to the
+   ``add_subscriber`` method of a :term:`Configurator`.
+
+.. topic:: Configuring an Event Listener Through ZCML
+
+   You can configure an event listener by modifying your application's
+   ``configure.zcml``.  Here's an example of a bit of XML you can add
+   to the ``configure.zcml`` file which registers the above
+   ``mysubscriber`` function, which we assume lives in a
+   ``subscribers.py`` module within your application:
+
+   .. code-block:: xml
+      :linenos:
+
+      <subscriber
+         for="repoze.bfg.interfaces.INewRequest"
+         handler=".subscribers.mysubscriber"
+       />
+
+   The *subscriber* :term:`ZCML directive` takes two attributes:
+   ``for``, and ``handler``.  The value of ``for`` is the interface
+   the subscriber is registered for.  Registering a subscriber for a
+   specific interface limits the event types that the subscriber will
+   receive to those specified by the interface. The value of
+   ``handler`` is a Python dotted-name path to the subscriber
+   function.
+
+Each of the above examples implies that every time the
+:mod:`repoze.bfg` framework emits an event object that supplies an
+``INewRequest`` interface, the ``mysubscriber`` function will be
+called with an *event* object.
+
+As you can see, a subscription is made in terms of an
+:term:`interface`.  The event object sent to a subscriber will always
+have possess an interface.  The interface itself provides
+documentation of what attributes of the event are available.
 
 For example, if you create event listener functions in a
 ``subscribers.py`` file in your application like so:
@@ -77,6 +112,21 @@ file:
       handler=".subscribers.handle_new_response"
     />
 
+Or imperatively via the ``add_subscriber`` method of a
+:term:`Configurator`:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.interfaces import INewRequest
+   from repoze.bfg.interfaces import INewResponse
+
+   from subscribers import handle_new_request
+   from subscribers import handle_new_response
+
+   config.add_subscriber(handle_new_request, INewRequest)
+   config.add_subscriber(handle_new_response, INewResponse)
+
 This causes the functions as to be registered as event subscribers
 within the :term:`application registry` .  Under this configuration,
 when the application is run, each time a new request or response is
@@ -99,14 +149,9 @@ defined at ``repoze.bfg.interfaces.INewResponse`` says it must.  These
 particular interfaces, along with others, are documented in the
 :ref:`events_module` API chapter.
 
-The *subscriber* ZCML element takes two attributes: ``for``, and
-``handler``.  The value of ``for`` is the interface the subscriber is
-registered for.  Registering a subscriber for a specific interface
-limits the event types that the subscriber will receive to those
-specified by the interface. The value of ``handler`` is a Python
-dotted-name path to the subscriber function.
-
-The return value of a subscriber function is ignored.
+The return value of a subscriber function is ignored.  Subscribers to
+the same event type are not guaranteed to be called in any particular
+order relative to one another.
 
 .. _using_an_event_to_vary_the_request_type:
 

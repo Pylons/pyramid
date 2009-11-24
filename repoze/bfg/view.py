@@ -32,6 +32,8 @@ from repoze.bfg.static import PackageURLParser
 # b/c imports
 from repoze.bfg.security import view_execution_permitted
 
+view_execution_permitted # prevent PyFlakes from complaining
+
 deprecated('view_execution_permitted',
     "('from repoze.bfg.view import view_execution_permitted' was  "
     "deprecated as of repoze.bfg 1.0; instead use 'from "

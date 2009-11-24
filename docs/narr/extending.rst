@@ -28,16 +28,19 @@ declarations made using the ZCML ``<view>`` directive (or the
 repoze bfg using the :term:`pkg_resources` API such as static files
 and templates.
 
-There's only one rule you absolutely need to obey if you want to build
-a maximally extensible :mod:`repoze.bfg` application: you should not
-use the ``@bfg_view`` decorator or any other decorator meant to be
-detected via the ZCML ``<scan>`` directive, and you mustn't configure
-your :mod:`repoze.bfg` application *imperatively* by using any code
-which configures the application by mutating the BFG component
-registry via Python.  Instead, you must use :term:`ZCML` for the
-equivalent purposes. :term:`ZCML` declarations that belong to an
-application can be "overridden" by integrators as necessary, but
-decorators and imperative code which perform the same tasks cannot.
+There's only one rule you need to obey if you want to build a
+maximally extensible :mod:`repoze.bfg` application: you should not use
+any :term:`configuration decoration` or :term:`imperative
+configuration`. This means the application developer should avoid
+relying on :term:`configuration decoration` meant to be detected via
+the ZCML ``<scan>`` directive, and you mustn't configure your
+:mod:`repoze.bfg` application *imperatively* by using any code which
+configures the application through methods of the :term:`Configurator`
+except for its ``load_zcml`` method.  Instead, you must use
+:term:`ZCML` for the equivalent purposes. :term:`ZCML` declarations
+that belong to an application can be "overridden" by integrators as
+necessary, but decorators and imperative code which perform the same
+tasks cannot.
 
 In general: use only :term:`ZCML` to configure your application if
 you'd like it to be extensible.
@@ -103,10 +106,10 @@ one of two things may be true:
   :ref:`extending_the_application`.
 
   If the source of trouble is configuration done imperatively (perhaps
-  in the ``make_app`` function called during application startup),
-  you'll need to or copying configuration information out of decorator
-  arguments and code which does imperative configuration into
-  equivalent :term:`ZCML` declarations.
+  in the function called during application startup), you'll need to
+  or copying configuration information out of decorator arguments and
+  code which does imperative configuration into equivalent
+  :term:`ZCML` declarations.
 
 Once this is done, you should be able to extend or modify the
 application like any other (see :ref:`extending_the_application`).

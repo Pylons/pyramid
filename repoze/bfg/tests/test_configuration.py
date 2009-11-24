@@ -109,8 +109,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_ctor_noreg_zcml_file_routes_in_config(self):
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import IRootFactory
         from repoze.bfg.interfaces import IRoutesMapper
         config = self._makeOne(
             zcml_file='repoze.bfg.tests.routesapp:configure.zcml')
@@ -158,6 +156,64 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
+    def test_add_subscriber_defaults(self):
+        from zope.interface import implements
+        from zope.interface import Interface
+        class IEvent(Interface):
+            pass
+        class Event:
+            implements(IEvent)
+        L = []
+        def subscriber(event):
+            L.append(event)
+        config = self._makeOne()
+        config.add_subscriber(subscriber)
+        event = Event()
+        config.registry.notify(event)
+        self.assertEqual(len(L), 1)
+        self.assertEqual(L[0], event)
+        config.registry.notify(object())
+        self.assertEqual(len(L), 2)
+
+    def test_add_subscriber_iface_specified(self):
+        from zope.interface import implements
+        from zope.interface import Interface
+        class IEvent(Interface):
+            pass
+        class Event:
+            implements(IEvent)
+        L = []
+        def subscriber(event):
+            L.append(event)
+        config = self._makeOne()
+        config.add_subscriber(subscriber, IEvent)
+        event = Event()
+        config.registry.notify(event)
+        self.assertEqual(len(L), 1)
+        self.assertEqual(L[0], event)
+        config.registry.notify(object())
+        self.assertEqual(len(L), 1)
+
+    def test_add_object_event_subscriber(self):
+        from zope.interface import implements
+        from zope.interface import Interface
+        class IEvent(Interface):
+            pass
+        class Event:
+            object = 'foo'
+            implements(IEvent)
+        event = Event()
+        L = []
+        def subscriber(object, event):
+            L.append(event)
+        config = self._makeOne()
+        config.add_subscriber(subscriber, (Interface, IEvent))
+        config.registry.subscribers((event.object, event), None)
+        self.assertEqual(len(L), 1)
+        self.assertEqual(L[0], event)
+        config.registry.subscribers((event.object, IDummy), None)
+        self.assertEqual(len(L), 1)
+        
     def test_make_wsgi_app(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.router import Router
@@ -220,7 +276,6 @@ class ConfiguratorTests(unittest.TestCase):
         registry = config.load_zcml(
             'repoze.bfg.tests.fixtureapp:configure.zcml',
             lock=dummylock)
-        from repoze.bfg.tests.fixtureapp.models import IFixture
         self.assertEqual(dummylock.acquired, True)
         self.assertEqual(dummylock.released, True)
 

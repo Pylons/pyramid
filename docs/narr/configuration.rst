@@ -21,29 +21,29 @@ used to create all kinds of web applications.
    libraries to create an application is often initially easier than
    using a framework to create an application, because the developer
    can choose to cede control to library code he has not authored
-   selectively, making the resulting application easier to understand
-   for the original developer.  When using a framework, the developer
-   is typically required to cede a greater portion of control to code
-   he has not authored: code that resides in the framework itself.
-   You needn't use a framework at all to create a web application
-   using Python.  A rich set of libraries exists for the platform
-   which you can snap together to effectively create your own
-   framework.  In practice, however, using an existing framework to
-   create an application is often more practical than rolling your own
-   via a set of libraries if the framework provides a set of
-   facilities and assumptions that fit your application domain's
-   requirements.  :mod:`repoze.bfg` is a framework that fits a large
-   set of assumptions in the domain of web application creation.
+   selectively, making the resulting application easier to understand.
+   When using a framework, the developer is typically required to cede
+   a greater portion of control to code he has not authored: code that
+   resides in the framework itself.  You needn't use a framework at
+   all to create a web application using Python.  A rich set of
+   libraries exists for the platform which you can snap together to
+   effectively create your own framework.  In practice, however, using
+   an existing framework to create an application is often more
+   practical than rolling your own via a set of libraries if the
+   framework provides a set of facilities and assumptions that fit
+   your application requirements.  :mod:`repoze.bfg` is a framework
+   that fits a large set of assumptions in the domain of web
+   application construction.
 
 As a framework, the primary job of :mod:`repoze.bfg` is to make it
-easier for a developer to create an arbitrary web application.  From
-the perspective of the authors of :mod:`repoze.bfg`, each deployment
-of an application written using :mod:`repoze.bfg` implies a specific
-*configuration* of the framework itself.  For example, a song-serving
-application might plug code into the framework that manages songs,
-while the ledger- serving application might plug code that manages
-accounting information.  :mod:`repoze.bfg` refers to the way in which
-code is plugged in to it for a specific deployment as "configuration".
+easier for a developer to create an arbitrary web application.  Each
+deployment of an application written using :mod:`repoze.bfg` implies a
+specific *configuration* of the framework itself.  For example, a
+song-serving application might plug code into the framework that
+manages songs, while the ledger- serving application might plug in
+code that manages accounting information.  :mod:`repoze.bfg` refers to
+the way in which code is plugged in to it for a specific deployment as
+"configuration".
 
 Most people understand "configuration" as coarse knobs that inform the
 high-level operation of a specific application deployment.  For
@@ -56,13 +56,6 @@ to plug code into a deployment of the framework itself.  When you plug
 code into the :mod:`repoze.bfg` framework, you are indeed
 "configuring" :mod:`repoze.bfg` for the purpose of creating a
 particular application deployment.
-
-.. admonition:: Tip
-
-   If the term "configuration" as used in this guide just doesn't seem
-   to "click" in your brain, it may help to mentally substitute the
-   term "configuration" with "wiring" or "plumbing" as you read the
-   chapter.
 
 There are a number of different mechanisms you may use to configure
 :mod:`repoze.bfg` to create an application: *imperative* configuration
@@ -173,9 +166,10 @@ the ``Response`` constructor as the *body* of the response.  In the
 
 Each of these functions is known as a :term:`view callable`.  View
 callables in a "real" :mod:`repoze.bfg` application are often
-functions which accept a request and return a response.  A view
-callable can be represented via another type of object, like a class
-or an instance, but for our purposes here, a function serves us well.
+functions which accept a :term:`request` and return a
+:term:`response`.  A view callable can be represented via another type
+of object, like a class or an instance, but for our purposes here, a
+function serves us well.
 
 A view callable is called with a :term:`request` object, which is a
 representation of an HTTP request sent by a remote user agent.  A view
@@ -192,32 +186,52 @@ but return a response with the body ``Hello world!``; the
 Traversal
 ~~~~~~~~~
 
-If you've used the code in this tutorial already, you've actually
+If you've run the code in this tutorial already, you've actually
 unwittingly configured :mod:`repoze.bfg` to serve an application that
 relies on :term:`traversal`.  A full explanation of how
 :mod:`repoze.bfg` locates "the right" :term:`view callable` for a
-given request requires some explanation of traversal.
+given request requires some explanation of :term:`traversal`.
+
+Traversal is part of a mechanism used by :mod:`repoze.bfg` to map the
+URL of some request to a particular :term:`view callable`.  It is not
+the only mechanism made available by :mod:`repoze.bfg` that allows the
+mapping a URL to a view callable.  Another distinct mode known as
+:term:`URL dispatch` can alternately be used to find a view callable
+based on a URL.  However, our sample application uses only
+:term:`traversal`.
 
 In :mod:`repoze.bfg` terms, :term:`traversal` is the act of walking
-over a *directed graph* of objects from a root object using the
-individual path segments of the "path info" portion of a URL (the data
-following the hostname and port number, but before any query strng
-elements or fragments) in order to find a :term:`context` object.
+over a *directed graph* of objects from a :term:`root` object using
+the individual path segments of the "path info" portion of a URL (the
+data following the hostname and port number, but before any query
+strng elements or fragments, for example the ``/a/b/c`` portion of the
+URL ``http://example.com/a/b/c?foo=1``) in order to find a
+:term:`context` object and a :term:`view name`.  The combination of
+the :term:`context` object and the :term:`view name` (and, in more
+complex configurations, other :term:`predicate` values) are used to
+find "the right" :term:`view callable`, which will be invoked after
+traversal.
 
-We will use an analogy to clarify traversal.
+The object graph of our hello world application is very simple:
+there's exactly one object in our graph; the default :term:`root`
+object.
 
-Let's imagine an inexperienced UNIX computer user, wishing only to
-find a file and to invoke the ``cat`` command against that file.
-Because he is inexperienced, the only commands he knows how to use are
-``cd`` and ``cat``.  And because he is inexperienced, he doesn't
-understand that ``cat`` can take an absolute path specification as an
-argument, so he doesn't know that you can issue a single command
-command ``cat /an/absolute/path`` to get the desired result.  Instead,
-this user believes he must issue the ``cd`` command, starting from the
-root, for each intermediate path segment, *even the path segment that
-represents the file itself*.  Once he gets an error (because you can't
-succesfully ``cd`` into a file) , he knows he has reached the file he
-wants.
+We need to use an analogy to clarify how traversal works on an
+arbitrary object graph.  Let's imagine an inexperienced UNIX computer
+user, wishing only to use the command line to find a file and to
+invoke the ``cat`` command against that file.  Because he is
+inexperienced, the only commands he knows how to use are ``cd``, which
+changes the current directory and ``cat``, which prints the contents
+of a file.  And because he is inexperienced, he doesn't understand
+that ``cat`` can take an absolute path specification as an argument,
+so he doesn't know that you can issue a single command command ``cat
+/an/absolute/path`` to get the desired result.  Instead, this user
+believes he must issue the ``cd`` command, starting from the root, for
+each intermediate path segment, *even the path segment that represents
+the file itself*.  Once he gets an error (because you cannot
+succesfully ``cd`` into a file), he knows he has reached the file he
+wants, and he will be able to execute ``cat`` against the resulting
+path segment.
 
 This inexperienced user's attempt to execute ``cat`` against the file
 named ``/fiz/buz/myfile`` might be to issue the following set of UNIX
@@ -226,6 +240,7 @@ commands:
 .. code-block::  bash
    :linenos:
 
+   cd /
    cd fiz
    cd buz
    cd myfile
@@ -239,16 +254,18 @@ can run the ``cat`` command:
 
    cat myfile
 
-Now he has his answer.
+The contents of ``myfile`` are now printed on the user's behalf.
 
 :mod:`repoze.bfg` is very much like this inexperienced UNIX user as it
 uses :term:`traversal` against an object graph.  In this analogy, we
 can map the ``cat`` program to the :mod:`repoze.bfg` concept of a
-:term:`view callable`.  The file being operated on in this analogy is
-the :term:`context` object.  The directory structure is the object
-graph being traversed.  The act of progressively changing directories
-to find the file as well as the handling of a ``cd`` error as a stop
-condition is analogous to :term:`traversal`.
+:term:`view callable`: it is a program that can be run against some
+:term:`context`.  The file being operated on in this analogy is the
+:term:`context` object; the context is the "last object found" in a
+traversal.  The directory structure is the object graph being
+traversed.  The act of progressively changing directories to find the
+file as well as the handling of a ``cd`` error as a stop condition is
+analogous to :term:`traversal`.
 
 Here's an image that depicts the :mod:`repoze.bfg` traversal process
 graphically as a flowchart:
@@ -256,32 +273,35 @@ graphically as a flowchart:
 .. image:: modelgraphtraverser.png
 
 The object graph is traversed, beginning at a root object, represented
-by ``/``; if there are further path segments in the path info, the
-root object's ``__getitem__`` is called with the next path segment,
-and it is presumed to return another graph object, *ad infinitum*
-until all path segments are exhausted; if any node in the graph
-doesn't *have* a ``__getitem__`` method, or if the ``__getitem__`` of
-a node raises a ``KeyError``, traversal ends immediately.
+by the root URL (``/``); if there are further path segments in the
+path info of the request being processed, the root object's
+``__getitem__`` is called with the next path segment, and it is
+expected to return another graph object.  The resulting object's
+``__getitem__`` is called with the very next path segment, and it is
+expected to return another graph object.  This happens *ad infinitum*
+until all path segments are exhausted.  If at any point during
+traversal any node in the graph doesn't *have* a ``__getitem__``
+method, or if the ``__getitem__`` of a node raises a ``KeyError``,
+traversal ends immediately, and the node becomes the :term:`context`.
 
 The results of a :term:`traversal` include a :term:`context` and a
 :term:`view name`.  The :term:`view name` is the *first* URL path
 segment in the set of path segments "left over" during
-:term:`traversal`.
+:term:`traversal`.  This will either be the empty string (``''``) or a
+non-empty string (one of the path segment strings).  The empty string
+represents the :term:`default view` of a context object.
 
-Effectively, if traversal returns a non-empty :term:`view name`, it
-means that traversal "ran out" of nodes in the graph before it
-finished exhausting all the path segments implied by the path info of
-the URL: no segments are "left over".  In this case, because the
-:term:`view name` is non-empty, a *non-default* view callable will be
-invoked.
+The :term:`default view` is found when all path elements in the URL
+are exhausted before :term:`traversal` returns a :term:`context`
+object, causing the :term:`view name` to be ``''`` (the empty string).
+When no path segements are "left over" after traversal, the
+:term:`default view` for the context found is invoked.
 
-The :term:`default view` of a :term:`context` is represented by a
-:term:`view configuration` that has the :term:`view name` of the empty
-string.  The :term:`default view` is found when all path elements in
-the URL *are* exhausted before :term:`traversal` returns a
-:term:`context` object, causing the :term:`view name` to be ``''``
-(the empty string).  When no path segements are "left over" after
-traversal, the :term:`default view` for the context found is invoked.
+If traversal returns a non-empty :term:`view name`, it means that
+traversal "ran out" of nodes in the graph before it finished
+exhausting all the path segments implied by the path info of the URL:
+no segments are "left over".  In this case, because the :term:`view
+name` is non-empty, a *non-default* view callable will be invoked.
 
 Apologies that this digression was required; on with the chapter.
 
@@ -293,19 +313,19 @@ Apologies that this digression was required; on with the chapter.
 Relating Traversal to the Hello World Application
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Our application's :term:`root` object is a default root object used
-when one isn't otherwise specified in application configuration.  This
-root object does not have a ``__getitem__`` method, thus it has no
-children.  Although in a more complex system there can be many
+Our application's :term:`root` object is the *default* root object
+used when one isn't otherwise specified in application configuration.
+This root object does not have a ``__getitem__`` method, thus it has
+no children.  Although in a more complex system there can be many
 contexts which URLs resolve to in our application, effectively there
 is only ever one context: the root object.
 
 We have only a single default view registered (the registration for
 the ``hello_world`` view callable).  Due to this set of circumstances,
-you can consider the sole possible URL that will resolve to a default
-view in this application the root URL ``'/'``.  It is the only URL
-that will resolve to the :term:`view name` of ``''`` (the empty
-string).
+you can consider the sole possible URL that will resolve to a
+:term:`default view` in this application the root URL ``'/'``.  It is
+the only URL that will resolve to the :term:`view name` of ``''`` (the
+empty string).
 
 We have only a single view registered for the :term:`view name`
 ``goodbye`` (the registration for the ``goodbye_world`` view
@@ -454,8 +474,8 @@ view configuration registration for the ``hello_world`` view callable
 has no :term:`predicate` arguments, the ``hello_world`` view callable
 is applicable for the :term:`default view` of any :term:`context`
 resulting from a request.  This isn't all that interesting in this
-application, because we only *have* one potential context (the root
-object).
+application, because we always only have *one* potential context (the
+root object): it is the only object in the graph.
 
 We've also registered a view configuration for another circumstance:
 the ``goodbye_world`` view callable has a ``name`` predicate of
@@ -882,6 +902,14 @@ XML.com article <http://www.xml.com/pub/a/1999/01/namespaces.html>`_.
 
 Conclusions
 -----------
+
+.. sidebar::  Which Configuration Mode Should I Use?
+
+  We recommend declarative configuration (ZMCL), because it's the more
+  traditional form of configuration used by Zope-based systems, it can
+  be overridden and extended by third party deployers, and there are
+  more examples for it "in the wild".  However, imperative mode
+  configuration can be simpler to understand.
 
 :mod:`repoze.bfg` allows an application to perform configuration tasks
 either imperatively or declaratively.  You can choose the mode that
