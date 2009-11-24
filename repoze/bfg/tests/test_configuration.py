@@ -156,6 +156,39 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
+    def test_ctor_hook_zca_true(self):
+        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
+        try:
+            getSiteManager.reset()
+            config = self._makeOne(hook_zca=True)
+            hooked = getSiteManager.sethook(None)
+            self.assertEqual(hooked, get_current_registry)
+        finally:
+            getSiteManager.reset()
+
+    def test_ctor_hook_zca_false(self):
+        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
+        try:
+            getSiteManager.reset()
+            config = self._makeOne(hook_zca=False)
+            hooked = getSiteManager.sethook(None)
+            self.failIfEqual(hooked, get_current_registry)
+        finally:
+            getSiteManager.reset()
+
+    def test_ctor_hook_zca_default_false(self):
+        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import get_current_registry
+        try:
+            getSiteManager.reset()
+            config = self._makeOne()
+            hooked = getSiteManager.sethook(None)
+            self.failIfEqual(hooked, get_current_registry)
+        finally:
+            getSiteManager.reset()
+
     def test_add_subscriber_defaults(self):
         from zope.interface import implements
         from zope.interface import Interface
@@ -215,25 +248,19 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
         
     def test_make_wsgi_app(self):
-        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.router import Router
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
-        class GetSiteManager(object):
-            def sethook(self, reg):
-                self.hook = reg
         class ThreadLocalManager(object):
             def push(self, d):
                 self.pushed = d
             def pop(self):
                 self.popped = True
-        gsm = GetSiteManager()
         manager = ThreadLocalManager()
         config = self._makeOne()
         subscriber = self._registerEventListener(config,
                                                  IWSGIApplicationCreatedEvent)
-        app = config.make_wsgi_app(getSiteManager=gsm, manager=manager)
+        app = config.make_wsgi_app(manager=manager)
         self.assertEqual(app.__class__, Router)
-        self.assertEqual(gsm.hook, get_current_registry)
         self.assertEqual(manager.pushed['registry'], config.registry)
         self.assertEqual(manager.pushed['request'], None)
         self.failUnless(manager.popped)
@@ -2338,6 +2365,7 @@ class TestMakeApp(unittest.TestCase):
         self.assertEqual(app.root_factory, rootfactory)
         self.assertEqual(app.settings, settings)
         self.assertEqual(app.zcml_file, 'configure.zcml')
+        self.assertEqual(app.hook_zca, True)
 
     def test_it_options_means_settings(self):
         settings = {'a':1}
@@ -2440,12 +2468,16 @@ class DummySecurityPolicy:
 class DummyConfigurator(object):
     def __init__(self, registry=None, package=None,
                  root_factory=None, zcml_file=None,
-                 settings=None):
+                 settings=None, hook_zca=False):
         self.root_factory = root_factory
         self.package = package
         self.zcml_file = zcml_file
         self.settings = settings
+        self.hook_zca = hook_zca
     
     def make_wsgi_app(self):
         return self
     
+class DummyGetSiteManager(object):
+    def sethook(self, reg):
+        self.hook = reg

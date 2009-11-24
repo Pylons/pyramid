@@ -523,13 +523,14 @@ class DummyRequest:
         self.__dict__.update(kw)
 
 def setUp():
-    """Set up a fresh BFG testing registry.  Use in the ``setUp``
+    """
+    Set up a fresh BFG testing registry.  Use in the ``setUp``
     method of unit tests that use the ``register*`` methods in the
     testing module (e.g. if your unit test uses
     ``repoze.bfg.testing.registerDummySecurityPolicy``).  If you use
     the ``register*`` functions without calling ``setUp``, unit tests
     will not be isolated with respect to registrations they perform.
-    Additionally, the *global* component registry will be used, which
+    Additionally, a *global* component registry will be used, which
     may have a different API than is expected by BFG itself.
 
     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
@@ -541,7 +542,7 @@ def setUp():
     request.registry = registry
     manager.push({'registry':registry, 'request':request})
     getSiteManager.sethook(get_current_registry)
-    _clearContext()
+    _clearContext() # XXX why?
 
 def tearDown():
     """Tear down a previously set up (via

@@ -5,7 +5,7 @@
 
 .. automodule:: repoze.bfg.configuration
 
-  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, zcml_file=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None)
+  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, zcml_file=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, hook_zca=False)
 
      .. automethod:: add_renderer(name, factory)
 

@@ -132,12 +132,23 @@ class Configurator(object):
     If ``debug_logger`` is not passed, a default debug logger that
     logs to stderr will be used.  If it is passed, it should be an
     instance of a ``logging.Logger`` (PEP 282) class.
-    
-    """
+
+    If ``hook_zca`` is ``True``, the configurator constructor will run
+    ``zope.component.getSiteManager.sethook(
+    repoze.bfg.threadlocals.get_current_registry)``.  This causes the
+    ``zope.component.getSiteManager`` API to return the
+    :mod:`repoze.bfg` thread local registry.  This has the effect of
+    causing ``zope.component`` thread local API functions such as
+    ``getUtility`` and ``getMultiAdapter`` to use the
+    :mod:`repoze.bfg` registry instead of the global Zope registry
+    during the scope of every :mod:`repoze.bfg` :term:`request`.  By
+    default, this is ``False``. """
+
     def __init__(self, registry=None, package=None, settings=None,
                  root_factory=None, zcml_file=None,
                  authentication_policy=None, authorization_policy=None,
-                 renderers=DEFAULT_RENDERERS, debug_logger=None):
+                 renderers=DEFAULT_RENDERERS, debug_logger=None,
+                 hook_zca=False):
         self.package = package or caller_package()
         self.registry = registry
         if registry is None:
@@ -158,6 +169,8 @@ class Configurator(object):
                 self.add_renderer(name, renderer)
             if zcml_file is not None:
                 self.load_zcml(zcml_file)
+            if hook_zca:
+                getSiteManager.sethook(get_current_registry)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -278,18 +291,17 @@ class Configurator(object):
         self.registry.registerHandler(subscriber, iface)
         return subscriber
 
-    def make_wsgi_app(self, manager=manager, getSiteManager=getSiteManager):
+    def make_wsgi_app(self, manager=manager):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
-        the current configuration state."""
-        # manager and getSiteManager in arglist for testing dep injection only
+        the current configuration state and sends a
+        ``repoze.bfg.interfaces.WSGIApplicationCreatedEvent`` event to
+        all listeners."""
+        # manager in arglist for testing dep injection only
         from repoze.bfg.router import Router # avoid circdep
         app = Router(self.registry)
-        # executing sethook means we're taking over getSiteManager for
-        # the lifetime of this process
-        getSiteManager.sethook(get_current_registry)
-        # We push the registry on to the stack here in case any ZCA API is
-        # used in listeners subscribed to the WSGIApplicationCreatedEvent
-        # we send.
+        # We push the registry on to the stack here in case any code
+        # that depends on the registry threadlocal APIis used in
+        # listeners subscribed to the WSGIApplicationCreatedEvent.
         manager.push({'registry':self.registry, 'request':None})
         try:
             self.registry.notify(WSGIApplicationCreatedEvent(app))
@@ -1037,7 +1049,8 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     settings = settings or options or {}
     zcml_file = settings.get('configure_zcml', filename)
     config = Configurator(package=package, settings=settings,
-                          root_factory=root_factory, zcml_file=zcml_file)
+                          root_factory=root_factory, zcml_file=zcml_file,
+                          hook_zca=True) # hook_zca for bw compat
     app = config.make_wsgi_app()
     return app
 
