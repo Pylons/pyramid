@@ -1,5 +1,3 @@
-from zope.component import adaptedBy
-
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalInterface
 from zope.configuration.fields import GlobalObject
@@ -539,7 +537,7 @@ def adapter(_context, factory, provides=None, for_=None, name=''):
 
     if for_ is None:
         if len(factory) == 1:
-            for_ = adaptedBy(factory[0])
+            for_ = getattr(factory[0], '__component_adapts__', None)
 
         if for_ is None:
             raise TypeError("No for attribute was provided and can't "
@@ -628,7 +626,7 @@ def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
                 "a factory")
 
     if for_ is None:
-        for_ = adaptedBy(factory)
+        for_ = getattr(factory, '__component_adapts__', None)
         if for_ is None:
             raise TypeError("No for attribute was provided and can't "
                             "determine what the factory (or handler) adapts.")
@@ -700,7 +698,7 @@ def utility(_context, provides=None, component=None, factory=None, name=''):
     if factory:
         kw = dict(factory=factory)
     else:
-        # older zope.component registries don't accept factory as a kwarg,
+        # older component registries don't accept factory as a kwarg,
         # so if we don't need it, we don't pass it
         kw = {}
 
