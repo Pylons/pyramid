@@ -150,7 +150,6 @@ class Configurator(object):
                  hook_zca=False):
         self.package = package or caller_package()
         self.registry = registry
-        self.hook_zca = hook_zca
         if registry is None:
             registry = Registry(self.package.__name__)
             self.registry = registry
@@ -171,6 +170,7 @@ class Configurator(object):
                 self.load_zcml(zcml_file)
             if hook_zca:
                 getSiteManager.sethook(get_current_registry)
+                self.registry.zca_hooked = True
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -315,22 +315,6 @@ class Configurator(object):
         absolute filename, a relative filename, or a :term:`resource
         specification`, defaulting to ``configure.zcml`` (relative to
         the package of the configurator's caller)."""
-
-        # We push our ZCML-defined configuration into an app-local
-        # component registry in order to allow more than one bfg app
-        # to live in the same process space without one unnecessarily
-        # stomping on the other's component registrations (although I
-        # suspect directives that have side effects are going to
-        # fail).  The only way to do that currently is to override
-        # zope.component.getGlobalSiteManager for the duration of the
-        # ZCML includes.  We acquire a lock in case another load_zcml
-        # runs in a different thread simultaneously, in a vain attempt
-        # to prevent mixing of registrations.  There's not much we can
-        # do about non-load_zcml code that tries to use the global
-        # site manager API directly in a different thread while we
-        # hold the lock.  Those registrations will end up in our
-        # application's registry.
-
         package_name, filename = self._split_spec(spec)
         if package_name is None: # absolute filename
             package = self.package
@@ -341,14 +325,10 @@ class Configurator(object):
         lock.acquire()
         manager.push({'registry':self.registry, 'request':None})
         try:
-            getSiteManager.sethook(get_current_registry)
-            zope.component.getGlobalSiteManager = get_current_registry
             xmlconfig.file(filename, package, execute=True)
         finally:
-            zope.component.getGlobalSiteManager = getGlobalSiteManager
             lock.release()
             manager.pop()
-            getSiteManager.reset()
         return self.registry
 
     def set_security_policies(self, authentication, authorization=None):
