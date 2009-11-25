@@ -123,6 +123,9 @@ Internals
 - The ``repoze.bfg.interfaces.ITemplateRendererFactory`` interface was
   removed; it has become unused.
 
+- Instead of depending on the ``martian`` package to do code scanning,
+  we now just use our own scanning routines.
+
 Backwards Incompatibilites
 --------------------------
 
@@ -223,6 +226,12 @@ Deprecations
   it probably ever disappear.  However, using a
   ``repoze.bfg.configuration.Configurator`` class is now the preferred
   way to generate a WSGI application.
+
+Dependencies
+------------
+
+- The dependency on the ``martian`` package has been removed (its
+  functionality is replaced internally).
 
 1.1.1 (2009-11-21)
 ==================

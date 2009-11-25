@@ -39,7 +39,6 @@ install_requires=[
     'zope.deprecation',
     'repoze.zcml',
     'repoze.lru',
-    'martian',
     ]
 
 if sys.version_info[:2] < (2, 6):

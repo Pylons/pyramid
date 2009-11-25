@@ -1541,7 +1541,105 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_renderer('name', renderer)
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
                          renderer)
+
+    def test_scan_integration(self):
+        from zope.interface import alsoProvides
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.view import render_view_to_response
+        import repoze.bfg.tests.grokkedapp as package
+        config = self._makeOne()
+        config.scan(package)
+
+        ctx = DummyContext()
+        req = DummyRequest()
+        alsoProvides(req, IRequest)
+        req.registry = config.registry
+
+        req.method = 'GET'
+        result = render_view_to_response(ctx, req, '')
+        self.assertEqual(result, 'grokked')
+
+        req.method = 'POST'
+        result = render_view_to_response(ctx, req, '')
+        self.assertEqual(result, 'grokked_post')
+
+        result= render_view_to_response(ctx, req, 'grokked_class')
+        self.assertEqual(result, 'grokked_class')
+
+        result= render_view_to_response(ctx, req, 'grokked_instance')
+        self.assertEqual(result, 'grokked_instance')
+
+        result= render_view_to_response(ctx, req, 'oldstyle_grokked_class')
+        self.assertEqual(result, 'oldstyle_grokked_class')
+
+        req.method = 'GET'
+        result = render_view_to_response(ctx, req, 'another')
+        self.assertEqual(result, 'another_grokked')
+
+        req.method = 'POST'
+        result = render_view_to_response(ctx, req, 'another')
+        self.assertEqual(result, 'another_grokked_post')
+
+        result= render_view_to_response(ctx, req, 'another_grokked_class')
+        self.assertEqual(result, 'another_grokked_class')
+
+        result= render_view_to_response(ctx, req, 'another_grokked_instance')
+        self.assertEqual(result, 'another_grokked_instance')
+
+        result= render_view_to_response(ctx, req,
+                                        'another_oldstyle_grokked_class')
+        self.assertEqual(result, 'another_oldstyle_grokked_class')
+
+        result = render_view_to_response(ctx, req, 'stacked1')
+        self.assertEqual(result, 'stacked')
+
+        result = render_view_to_response(ctx, req, 'stacked2')
+        self.assertEqual(result, 'stacked')
+
+        result = render_view_to_response(ctx, req, 'another_stacked1')
+        self.assertEqual(result, 'another_stacked')
+
+        result = render_view_to_response(ctx, req, 'another_stacked2')
+        self.assertEqual(result, 'another_stacked')
+
+        result = render_view_to_response(ctx, req, 'stacked_class1')
+        self.assertEqual(result, 'stacked_class')
+
+        result = render_view_to_response(ctx, req, 'stacked_class2')
+        self.assertEqual(result, 'stacked_class')
+
+        result = render_view_to_response(ctx, req, 'another_stacked_class1')
+        self.assertEqual(result, 'another_stacked_class')
+
+        result = render_view_to_response(ctx, req, 'another_stacked_class2')
+        self.assertEqual(result, 'another_stacked_class')
+
+        self.assertRaises(TypeError,
+                          render_view_to_response, ctx, req, 'basemethod')
+
+        result = render_view_to_response(ctx, req, 'method1')
+        self.assertEqual(result, 'method1')
+
+        result = render_view_to_response(ctx, req, 'method2')
+        self.assertEqual(result, 'method2')
+
+        result = render_view_to_response(ctx, req, 'stacked_method1')
+        self.assertEqual(result, 'stacked_method')
+
+        result = render_view_to_response(ctx, req, 'stacked_method2')
+        self.assertEqual(result, 'stacked_method')
         
+        result = render_view_to_response(ctx, req, 'subpackage_init')
+        self.assertEqual(result, 'subpackage_init')
+        
+        result = render_view_to_response(ctx, req, 'subpackage_notinit')
+        self.assertEqual(result, 'subpackage_notinit')
+
+        result = render_view_to_response(ctx, req, 'subsubpackage_init')
+        self.assertEqual(result, 'subsubpackage_init')
+
+        result = render_view_to_response(ctx, req, 'pod_notinit')
+        self.assertEqual(result, None)
 
 class Test__map_view(unittest.TestCase):
     def setUp(self):
@@ -1856,55 +1954,6 @@ class Test__map_view(unittest.TestCase):
         self.assertEqual(view.__doc__, result.__doc__)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
-
-class TestBFGViewGrokker(unittest.TestCase):
-    def setUp(self):
-        testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def _getTargetClass(self):
-        from repoze.bfg.configuration import BFGViewGrokker
-        return BFGViewGrokker
-
-    def _makeOne(self, *arg, **kw):
-        return self._getTargetClass()(*arg, **kw)
-
-    def test_grok_is_bfg_view(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from zope.interface import Interface
-        from repoze.bfg.configuration import Configurator
-        grokker = self._makeOne()
-        class obj:
-            def __init__(self, context, request):
-                pass
-            def __call__(self):
-                return 'OK'
-        settings = dict(permission='foo', for_=Interface, name='foo.html',
-                        request_type=IRequest, route_name=None,
-                        request_method=None, request_param=None,
-                        containment=None, attr=None, renderer=None,
-                        wrapper=None, xhr=False, header=None,
-                        accept=None)
-        obj.__bfg_view_settings__ = [settings]
-        reg = get_current_registry()
-        config = Configurator(reg)
-        result = grokker.grok('name', obj, _info='', _configurator=config)
-        self.assertEqual(result, True)
-        wrapped = reg.adapters.lookup((Interface, IRequest), IView,
-                                      name='foo.html')
-        self.assertEqual(wrapped(None, None), 'OK')
-
-    def test_grok_is_not_bfg_view(self):
-        grokker = self._makeOne()
-        class obj:
-            pass
-        context = DummyContext()
-        result = grokker.grok('name', obj)
-        self.assertEqual(result, False)
 
 class Test_rendered_response(unittest.TestCase):
     def setUp(self):

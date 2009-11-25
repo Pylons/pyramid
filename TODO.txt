@@ -1,5 +1,3 @@
-- Replace martian with something simpler.
-
 - Decide about creating a "real" request object during testing.setUp
   vs. creating a dummy request.
 

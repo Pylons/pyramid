@@ -601,23 +601,21 @@ class TestZCMLScanDirective(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, context, package, martian):
+    def _callFUT(self, context, package):
         from repoze.bfg.zcml import scan
-        return scan(context, package, martian)
+        return scan(context, package)
 
     def test_it(self):
-        from repoze.bfg.configuration import BFGMultiGrokker
-        martian = DummyMartianModule()
-        module_grokker = DummyModuleGrokker()
+        from repoze.bfg.configuration import Configurator
         dummy_module = DummyModule()
         context = DummyContext()
-        self._callFUT(context, dummy_module, martian)
-        context.actions[-1]['callable']()
-        self.assertEqual(martian.name, 'dummy')
-        multi_grokker = martian.module_grokker.multi_grokker
-        self.assertEqual(multi_grokker.__class__, BFGMultiGrokker)
-        self.assertEqual(martian.info, context.info)
-        self.failUnless(martian.exclude_filter)
+        self._callFUT(context, dummy_module)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action['callable'].im_func, Configurator.scan.im_func)
+        self.assertEqual(action['discriminator'], None)
+        self.assertEqual(action['args'], (dummy_module, None))
 
 class DummyModule:
     __path__ = "foo"

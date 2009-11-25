@@ -42,6 +42,7 @@ from repoze.bfg import chameleon_text
 from repoze.bfg import renderers
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.compat import all
+from repoze.bfg.compat import walk_packages
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
@@ -60,8 +61,6 @@ from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.view import render_view_to_response
 from repoze.bfg.view import static
-
-import martian
 
 DEFAULT_RENDERERS = (
     ('.pt', chameleon_zpt.renderer_factory),
@@ -151,6 +150,7 @@ class Configurator(object):
                  hook_zca=False):
         self.package = package or caller_package()
         self.registry = registry
+        self.hook_zca = hook_zca
         if registry is None:
             registry = Registry(self.package.__name__)
             self.registry = registry
@@ -499,26 +499,36 @@ class Configurator(object):
             self.registry.registerUtility(mapper, IRoutesMapper)
         mapper.connect(path, name, factory, predicates=predicates)
 
-    def scan(self, package=None, _info=u'', martian=martian):
+    def scan(self, package=None, _info=u''):
         """ Scan a Python package and any of its subpackages for
         objects marked with configuration decorators such as
         ``@bfg_view``.  Any decorated object found will influence the
-        current configuration state.  See
+        current configuration state.
 
         The ``package`` argument should be a reference to a Python
         package or module object.  If ``package`` is ``None``, the
         package of the *caller* is used.
         """
-        # martian overrideable only for unit tests
         if package is None:
             package = caller_package()
-        multi_grokker = BFGMultiGrokker()
-        multi_grokker.register(BFGViewGrokker())
-        module_grokker = martian.ModuleGrokker(grokker=multi_grokker)
-        martian.grok_dotted_name(
-            package.__name__, grokker=module_grokker,
-            _info=_info, _configurator=self,
-            exclude_filter=lambda name: name.startswith('.'))
+
+        def register_decorations(name, ob):
+            settings = getattr(ob, '__bfg_view_settings__', None)
+            if settings is not None:
+                for setting in settings:
+                    self.add_view(view=ob, _info=_info, **setting)
+            
+        for name, ob in inspect.getmembers(package):
+            register_decorations(name, ob)
+
+        if hasattr(package, '__path__'): # package, not module
+            results = walk_packages(package.__path__, package.__name__+'.')
+
+            for importer, modname, ispkg in results:
+                __import__(modname)
+                module = sys.modules[modname]
+                for name, ob in inspect.getmembers(module, None):
+                    register_decorations(name, ob)
 
     def add_renderer(self, name, renderer, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`renderer` factory to the current
@@ -683,25 +693,6 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     # this will be == sys.maxint if no predicates
     score = weight / (len(predicates) + 1)
     return score, predicates
-
-class BFGViewMarker(object):
-    pass
-
-class BFGMultiGrokker(martian.core.MultiInstanceOrClassGrokkerBase):
-    def get_bases(self, obj):
-        if hasattr(obj, '__bfg_view_settings__'):
-            return [BFGViewMarker]
-        return []
-
-class BFGViewGrokker(martian.InstanceGrokker):
-    martian.component(BFGViewMarker)
-    def grok(self, name, obj, **kw):
-        config = getattr(obj, '__bfg_view_settings__', [])
-        for settings in config:
-            config = kw['_configurator']
-            info = kw.get('_info', u'')
-            config.add_view(view=obj, _info=info, **settings)
-        return bool(config)
 
 class MultiView(object):
     implements(IMultiView)

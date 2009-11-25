@@ -19,12 +19,6 @@ def wsgiapptest(environ, start_response):
     return '123'
 
 class WGSIAppPlusBFGViewTests(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
     def test_it(self):
         import types
         self.failUnless(wsgiapptest.__bfg_view_settings__)
@@ -35,16 +29,13 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         self.assertEqual(result, '123')
 
     def test_scanned(self):
-        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.zcml import scan
-        context = DummyZCMLContext()
+        from repoze.bfg.configuration import Configurator
         from repoze.bfg.tests import test_integration
-        scan(context, test_integration)
-        actions = context.actions
-        context.actions[-1]['callable']()
-        reg = get_current_registry()
+        config = Configurator()
+        config.scan(test_integration)
+        reg = config.registry
         view = reg.adapters.lookup((INothing, IRequest), IView, name='')
         self.assertEqual(view, wsgiapptest)
 
@@ -87,102 +78,6 @@ class TestFixtureApp(unittest.TestCase):
         context.package = package
         xmlconfig.include(context, 'configure.zcml', package)
         context.execute_actions(clear=False)
-
-class TestGrokkedApp(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def test_it(self):
-        from repoze.bfg.threadlocal import get_current_request
-        from repoze.bfg.view import render_view_to_response
-        from repoze.bfg.zcml import zcml_configure
-        import repoze.bfg.tests.grokkedapp as package
-        
-        actions = zcml_configure('configure.zcml', package)
-        actions.sort()
-        scan_action = actions[0][1]
-        scan_action()
-
-        ctx = DummyContext()
-        req = DummyRequest()
-        req = get_current_request()
-
-        req.method = 'GET'
-        result = render_view_to_response(ctx, req, '')
-        self.assertEqual(result, 'grokked')
-
-        req.method = 'POST'
-        result = render_view_to_response(ctx, req, '')
-        self.assertEqual(result, 'grokked_post')
-
-        result= render_view_to_response(ctx, req, 'grokked_class')
-        self.assertEqual(result, 'grokked_class')
-
-        result= render_view_to_response(ctx, req, 'grokked_instance')
-        self.assertEqual(result, 'grokked_instance')
-
-        result= render_view_to_response(ctx, req, 'oldstyle_grokked_class')
-        self.assertEqual(result, 'oldstyle_grokked_class')
-
-        req.method = 'GET'
-        result = render_view_to_response(ctx, req, 'another')
-        self.assertEqual(result, 'another_grokked')
-
-        req.method = 'POST'
-        result = render_view_to_response(ctx, req, 'another')
-        self.assertEqual(result, 'another_grokked_post')
-
-        result= render_view_to_response(ctx, req, 'another_grokked_class')
-        self.assertEqual(result, 'another_grokked_class')
-
-        result= render_view_to_response(ctx, req, 'another_grokked_instance')
-        self.assertEqual(result, 'another_grokked_instance')
-
-        result= render_view_to_response(ctx, req,
-                                        'another_oldstyle_grokked_class')
-        self.assertEqual(result, 'another_oldstyle_grokked_class')
-
-        result = render_view_to_response(ctx, req, 'stacked1')
-        self.assertEqual(result, 'stacked')
-
-        result = render_view_to_response(ctx, req, 'stacked2')
-        self.assertEqual(result, 'stacked')
-
-        result = render_view_to_response(ctx, req, 'another_stacked1')
-        self.assertEqual(result, 'another_stacked')
-
-        result = render_view_to_response(ctx, req, 'another_stacked2')
-        self.assertEqual(result, 'another_stacked')
-
-        result = render_view_to_response(ctx, req, 'stacked_class1')
-        self.assertEqual(result, 'stacked_class')
-
-        result = render_view_to_response(ctx, req, 'stacked_class2')
-        self.assertEqual(result, 'stacked_class')
-
-        result = render_view_to_response(ctx, req, 'another_stacked_class1')
-        self.assertEqual(result, 'another_stacked_class')
-
-        result = render_view_to_response(ctx, req, 'another_stacked_class2')
-        self.assertEqual(result, 'another_stacked_class')
-
-        self.assertRaises(TypeError,
-                          render_view_to_response, ctx, req, 'basemethod')
-
-        result = render_view_to_response(ctx, req, 'method1')
-        self.assertEqual(result, 'method1')
-
-        result = render_view_to_response(ctx, req, 'method2')
-        self.assertEqual(result, 'method2')
-
-        result = render_view_to_response(ctx, req, 'stacked_method1')
-        self.assertEqual(result, 'stacked_method')
-
-        result = render_view_to_response(ctx, req, 'stacked_method2')
-        self.assertEqual(result, 'stacked_method')
 
 class DummyContext(object):
     pass

@@ -10,8 +10,6 @@ from zope.schema import Int
 from zope.schema import TextLine
 from zope.schema import ASCIILine
 
-import martian
-
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IForbiddenView
@@ -501,13 +499,14 @@ class IScanDirective(Interface):
         required=True,
         )
 
-def scan(_context, package, martian=martian):
-    # martian overrideable only for unit tests
-    def register():
-        reg = get_current_registry()
-        config = Configurator(reg)
-        config.scan(package, _info=_context.info, martian=martian)
-    _context.action(discriminator=None, callable=register)
+def scan(_context, package):
+    reg = get_current_registry()
+    config = Configurator(reg)
+    _context.action(
+        discriminator=None,
+        callable=config.scan,
+        args=(package, _context.info)
+        )
 
 def zcml_configure(name, package):
     """ Given a ZCML filename as ``name`` and a Python package as
