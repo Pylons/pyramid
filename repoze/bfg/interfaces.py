@@ -1,8 +1,6 @@
 from zope.interface import Attribute
 from zope.interface import Interface
 
-from zope.component.interfaces import IObjectEvent
-
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
@@ -135,7 +133,7 @@ class ISettings(Interface):
     """ Runtime settings utility for repoze.bfg; represents the
     deployment settings for the application"""
     
-class IWSGIApplicationCreatedEvent(IObjectEvent):
+class IWSGIApplicationCreatedEvent(Interface):
     """ Event issued after the application has been created and
     configured."""
     app = Attribute(u"Published application")
