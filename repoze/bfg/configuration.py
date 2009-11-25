@@ -6,13 +6,8 @@ import inspect
 
 from webob import Response
 
-import zope.component
-
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration import xmlconfig
-
-from zope.component import getGlobalSiteManager
-from zope.component import getSiteManager
 
 from zope.interface import Interface
 from zope.interface import implementedBy
@@ -140,8 +135,10 @@ class Configurator(object):
     causing ``zope.component`` thread local API functions such as
     ``getUtility`` and ``getMultiAdapter`` to use the
     :mod:`repoze.bfg` registry instead of the global Zope registry
-    during the scope of every :mod:`repoze.bfg` :term:`request`.  By
-    default, this is ``False``. """
+    during the scope of every :mod:`repoze.bfg` :term:`request`.  It
+    typically also means registrations made via ZCML will end up in
+    the :mod:`repoze.bfg` registry instead of the global Zope
+    registry.  By default, this is ``False``. """
 
     def __init__(self, registry=None, package=None, settings=None,
                  root_factory=None, zcml_file=None,
@@ -166,11 +163,12 @@ class Configurator(object):
                                            authorization_policy)
             for name, renderer in renderers:
                 self.add_renderer(name, renderer)
-            if zcml_file is not None:
-                self.load_zcml(zcml_file)
             if hook_zca:
+                from zope.component import getSiteManager
                 getSiteManager.sethook(get_current_registry)
                 self.registry.zca_hooked = True
+            if zcml_file is not None:
+                self.load_zcml(zcml_file)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -300,7 +298,7 @@ class Configurator(object):
         from repoze.bfg.router import Router # avoid circdep
         app = Router(self.registry)
         # We push the registry on to the stack here in case any code
-        # that depends on the registry threadlocal APIis used in
+        # that depends on the registry threadlocal APIs used in
         # listeners subscribed to the WSGIApplicationCreatedEvent.
         manager.push({'registry':self.registry, 'request':None})
         try:
