@@ -1,4 +1,4 @@
-from zope.component import providedBy
+from zope.interface import providedBy
 
 from zope.deprecation import deprecated
 
