@@ -37,6 +37,10 @@ Documentation
 Bug Fixes
 ----------
 
+- When passed ``_query`` is passed to the ``route_url`` function, the
+  URL encoding routine no longer raises an exception because this is a
+  dictionary.
+
 - The ACL authorization policy debugging output when
   ``debug_authorization`` console debugging output was turned on
   wasn't as clear as it could have been when a view execution was
