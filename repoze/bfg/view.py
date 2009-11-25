@@ -17,8 +17,8 @@ from webob.exc import HTTPFound
 
 from paste.urlparser import StaticURLParser
 
-from zope.component import providedBy
 from zope.deprecation import deprecated
+from zope.interface import providedBy
 from zope.interface.advice import getFrameInfo
 
 from repoze.bfg.interfaces import IResponseFactory
