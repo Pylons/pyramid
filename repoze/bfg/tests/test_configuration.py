@@ -43,14 +43,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(NotFound, wrapper, *arg)
 
     def _registerEventListener(self, config, event_iface=None):
-        """ Registers an event listener (aka 'subscriber') listening for
-        events of the type ``event_iface`` and returns a list which is
-        appended to by the subscriber.  When an event is dispatched that
-        matches ``event_iface``, that event will be appended to the list.
-        You can then compare the values in the list to expected event
-        notifications.  This method is useful when testing code that wants
-        to call ``zope.component.event.dispatch`` or
-        ``zope.component.event.objectEventNotify``."""
         if event_iface is None: # pragma: no cover
             from zope.interface import Interface
             event_iface = Interface
@@ -265,6 +257,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.pushed['request'], None)
         self.failUnless(manager.popped)
         self.assertEqual(len(subscriber), 1)
+        self.failUnless(IWSGIApplicationCreatedEvent.providedBy(subscriber[0]))
 
     def test_load_zcml_default(self):
         import repoze.bfg.tests.fixtureapp
