@@ -126,6 +126,10 @@ Internals
 - Instead of depending on the ``martian`` package to do code scanning,
   we now just use our own scanning routines.
 
+- We now no longer have a dependency on ``repoze.zcml`` package;
+  instead, the ``repoze.bfg`` package includes implementations of the
+  ``adapter``, ``subscriber`` and ``utility`` directives.
+
 Backwards Incompatibilites
 --------------------------
 
@@ -218,6 +222,15 @@ Backwards Incompatibilites
     add an attribute to your unit test request object named
     ``registry`` with the result.
 
+- Because the ``repoze.bfg`` package includes implementations of the
+  ``adapter``, ``subscriber`` and ``utility`` ZCML directives, it is
+  now an error to have ``<include package="repoze.zcml"
+  file="meta.zcml"/>`` in the ZCML of a ``repoze.bfg`` application.  A
+  ZCML conflict error will be raised if your ZCML does so.  This
+  shouldn't be an issue for "normal" installations; it has always been
+  the responsibility of the ``repoze.bfg.includes`` ZCML to include
+  this file in the past; it now just doesn't.
+
 Deprecations
 ------------
 
@@ -230,7 +243,10 @@ Deprecations
 Dependencies
 ------------
 
-- The dependency on the ``martian`` package has been removed (its
+- A dependency on the ``martian`` package has been removed (its
+  functionality is replaced internally).
+
+- A dependency on the ``repoze.zcml`` package has been removed (its
   functionality is replaced internally).
 
 1.1.1 (2009-11-21)

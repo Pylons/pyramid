@@ -76,6 +76,24 @@
         handler="repoze.bfg.zcml.renderer"
         />
 
+    <meta:directive
+        name="adapter"
+        schema="repoze.bfg.zcml.IAdapterDirective"
+        handler="repoze.bfg.zcml.adapter"
+        />
+
+    <meta:directive
+        name="subscriber"
+        schema="repoze.bfg.zcml.ISubscriberDirective"
+        handler="repoze.bfg.zcml.subscriber"
+        />
+
+    <meta:directive
+        name="utility"
+        schema="repoze.bfg.zcml.IUtilityDirective"
+        handler="repoze.bfg.zcml.utility"
+        />
+
   </meta:directives>
 
 </configure>

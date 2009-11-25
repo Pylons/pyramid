@@ -6,6 +6,9 @@ import unittest
 
 from repoze.bfg import testing
 
+from zope.interface import Interface
+from zope.interface import implements
+
 class TestViewDirective(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -617,6 +620,269 @@ class TestZCMLScanDirective(unittest.TestCase):
         self.assertEqual(action['discriminator'], None)
         self.assertEqual(action['args'], (dummy_module, None))
 
+
+class TestAdapterDirective(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import adapter
+        return adapter(*arg, **kw)
+
+    def test_for_is_None_no_adaptedBy(self):
+        context = DummyContext()
+        factory = DummyFactory()
+        self.assertRaises(TypeError, self._callFUT, context, [factory],
+                          provides=None, for_=None)
+
+    def test_for_is_None_adaptedBy_still_None(self):
+        context = DummyContext()
+        factory = DummyFactory()
+        factory.__component_adapts__ = None
+        self.assertRaises(TypeError, self._callFUT, context, [factory],
+                      provides=None, for_=None)
+
+    def test_for_is_None_adaptedBy_set(self):
+        from repoze.bfg.zcml import handler
+        context = DummyContext()
+        factory = DummyFactory()
+        factory.__component_adapts__ = (IDummy,)
+        self._callFUT(context, [factory], provides=IFactory, for_=None)
+        self.assertEqual(len(context.actions), 1)
+        regadapt = context.actions[0]
+        self.assertEqual(regadapt['discriminator'],
+                         ('adapter', (IDummy,), IFactory, ''))
+        self.assertEqual(regadapt['callable'],
+                         handler)
+        self.assertEqual(regadapt['args'],
+                         ('registerAdapter', factory, (IDummy,), IFactory,
+                          '', None))
+
+    def test_provides_missing(self):
+        context = DummyContext()
+        factory = DummyFactory()
+        self.assertRaises(TypeError, self._callFUT, context, [factory],
+                          provides=None, for_=(IDummy,))
+
+    def test_provides_obtained_via_implementedBy(self):
+        from repoze.bfg.zcml import handler
+        context = DummyContext()
+        self._callFUT(context, [DummyFactory], for_=(IDummy,))
+        regadapt = context.actions[0]
+        self.assertEqual(regadapt['discriminator'],
+                         ('adapter', (IDummy,), IFactory, ''))
+        self.assertEqual(regadapt['callable'],
+                         handler)
+        self.assertEqual(regadapt['args'],
+                         ('registerAdapter', DummyFactory, (IDummy,), IFactory,
+                          '', None))
+
+    def test_multiple_factories_multiple_for(self):
+        context = DummyContext()
+        factory = DummyFactory()
+        self.assertRaises(ValueError, self._callFUT, context,
+                          [factory, factory],
+                          provides=IFactory,
+                          for_=(IDummy, IDummy))
+
+    def test_no_factories_multiple_for(self):
+        context = DummyContext()
+        factory = DummyFactory()
+        self.assertRaises(ValueError, self._callFUT, context,
+                          factory=[],
+                          provides=IFactory,
+                          for_=(IDummy, IDummy))
+        
+    def test_rolled_up_factories(self):
+        from repoze.bfg.zcml import handler
+        context = DummyContext()
+        factory = DummyFactory()
+        self._callFUT(context,
+                      [factory, factory],
+                      provides=IFactory,
+                      for_=(IDummy,))
+        regadapt = context.actions[0]
+        self.assertEqual(regadapt['discriminator'],
+                         ('adapter', (IDummy,), IFactory, ''))
+        self.assertEqual(regadapt['callable'],
+                         handler)
+        self.assertEqual(len(regadapt['args']), 6)
+        
+
+class TestSubscriberDirective(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import subscriber
+        return subscriber(*arg, **kw)
+
+    def test_no_factory_no_handler(self):
+        context = DummyContext()
+        self.assertRaises(TypeError,
+                          self._callFUT, context, for_=None, factory=None,
+                          handler=None,
+                          provides=None)
+
+    def test_handler_with_provides(self):
+        context = DummyContext()
+        self.assertRaises(TypeError,
+                          self._callFUT, context, for_=None, factory=None,
+                          handler=1, provides=1)
+
+    def test_handler_and_factory(self):
+        context = DummyContext()
+        self.assertRaises(TypeError,
+                          self._callFUT, context, for_=None, factory=1,
+                          handler=1, provides=None)
+
+    def test_no_provides_with_factory(self):
+        context = DummyContext()
+        self.assertRaises(TypeError,
+                          self._callFUT, context, for_=None, factory=1,
+                          handler=None, provides=None)
+
+    def test_adapted_by_as_for_is_None(self):
+        context = DummyContext()
+        factory = DummyFactory()
+        factory.__component_adapts__ = None
+        self.assertRaises(TypeError, self._callFUT, context, for_=None,
+                          factory=factory, handler=None, provides=IFactory)
+        
+    def test_register_with_factory(self):
+        from repoze.bfg.zcml import handler
+        context = DummyContext()
+        factory = DummyFactory()
+        self._callFUT(context, for_=(IDummy,),
+                      factory=factory, handler=None, provides=IFactory)
+        self.assertEqual(len(context.actions), 1)
+        subadapt = context.actions[0]
+        self.assertEqual(subadapt['discriminator'], None)
+        self.assertEqual(subadapt['callable'], handler)
+        self.assertEqual(subadapt['args'],
+                         ('registerSubscriptionAdapter', factory,
+                          (IDummy,), IFactory, u'', None) )
+
+    def test_register_with_handler(self):
+        from repoze.bfg.zcml import handler
+        context = DummyContext()
+        factory = DummyFactory()
+        self._callFUT(context, for_=(IDummy,),
+                      factory=None, handler=factory)
+        self.assertEqual(len(context.actions), 1)
+        subadapt = context.actions[0]
+        self.assertEqual(subadapt['discriminator'], None)
+        self.assertEqual(subadapt['callable'], handler)
+        self.assertEqual(subadapt['args'],
+                         ('registerHandler', factory,
+                          (IDummy,), u'', None) )
+
+class TestUtilityDirective(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import utility
+        return utility(*arg, **kw)
+
+    def test_factory_and_component(self):
+        context = DummyContext()
+        self.assertRaises(TypeError, self._callFUT,
+                          context, factory=1, component=1)
+
+    def test_missing_provides(self):
+        context = DummyContext()
+        self.assertRaises(TypeError, self._callFUT, context, provides=None)
+        
+    def test_provides_from_factory_implements(self):
+        from repoze.bfg.zcml import handler
+        context = DummyContext()
+        self._callFUT(context, factory=DummyFactory)
+        self.assertEqual(len(context.actions), 1)
+        utility = context.actions[0]
+        self.assertEqual(utility['discriminator'], ('utility', IFactory, ''))
+        self.assertEqual(utility['callable'], handler)
+        self.assertEqual(utility['args'],
+                         ('registerUtility', None, IFactory, ''))
+        self.assertEqual(utility['kw'],
+                         {'factory': DummyFactory})
+
+    def test_provides_from_component_provides(self):
+        from repoze.bfg.zcml import handler
+        context = DummyContext()
+        component = DummyFactory()
+        self._callFUT(context, component=component)
+        self.assertEqual(len(context.actions), 1)
+        utility = context.actions[0]
+        self.assertEqual(utility['discriminator'], ('utility', IFactory, ''))
+        self.assertEqual(utility['callable'], handler)
+        self.assertEqual(utility['args'],
+                         ('registerUtility', component, IFactory, ''))
+        self.assertEqual(utility['kw'], {})
+
+class TestLoadZCML(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_it(self):
+        from zope.configuration import xmlconfig
+        import repoze.bfg.includes
+        xmlconfig.file('configure.zcml', package=repoze.bfg.includes)
+
+class TestHandler(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, methodName, *arg, **kw):
+        from repoze.bfg.zcml import handler
+        return handler(methodName, *arg, **kw)
+
+    def test_it(self):
+        def foo():
+            pass
+        from zope.interface import Interface
+        class IWhatever(Interface):
+            pass
+        self._callFUT('registerUtility', foo, IWhatever)
+
+class TestRolledUpFactory(unittest.TestCase):
+    def _callFUT(self, *factories):
+        from repoze.bfg.zcml import _rolledUpFactory
+        return _rolledUpFactory(factories)
+
+    def test_it(self):
+        def foo(ob):
+            return ob
+        factory = self._callFUT(foo, foo)
+        result = factory(True)
+        self.assertEqual(result, True)
+
+class IDummy(Interface):
+    pass
+
+class IFactory(Interface):
+    pass
+
+class DummyFactory(object):
+    implements(IFactory)
+    def __call__(self):
+        return 1
+        
 class DummyModule:
     __path__ = "foo"
     __name__ = "dummy"
@@ -649,7 +915,8 @@ class DummyContext:
         self.actions.append(
             {'discriminator':discriminator,
              'callable':callable,
-             'args':args}
+             'args':args,
+             'kw':kw}
             )
 
     def path(self, path):
@@ -662,10 +929,6 @@ class Dummy:
     pass
 
 class DummyRoute:
-    pass
-
-from zope.interface import Interface
-class IDummy(Interface):
     pass
 
 class DummyRequest:
