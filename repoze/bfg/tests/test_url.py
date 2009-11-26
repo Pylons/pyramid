@@ -167,6 +167,16 @@ class TestRouteUrl(unittest.TestCase):
         mapper.raise_exc = KeyError
         self.assertRaises(KeyError, self._callFUT, 'flub', request, a=1)
 
+    def test_malthe_wiggy_add_your_bug_here(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        mapper = DummyRoutesMapper(result='')
+        from zope.component import getSiteManager
+        sm = getSiteManager()
+        sm.registerUtility(mapper, IRoutesMapper)
+        request = DummyRequest()
+        result = self._callFUT('flub', request, _query=dict(name='some_name'))
+        self.assertEqual(result, 'http://example.com:5432?name=some_name')
+
 class TestStaticUrl(unittest.TestCase):
     def setUp(self):
         cleanUp()
