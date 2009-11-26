@@ -13,9 +13,21 @@ source code that makes up the application.  The behavior of a
 Rules for Building An Extensible Application
 --------------------------------------------
 
-We'll describe the rules that must be obeyed by the developer of a
-:mod:`repoze.bfg` application if he or she wants his application to be
-maximally extensible.
+There's only one rule you need to obey if you want to build a
+maximally extensible :mod:`repoze.bfg` application: you should not use
+any :term:`configuration decoration` or :term:`imperative
+configuration`. This means the application developer should avoid
+relying on :term:`configuration decoration` meant to be detected via
+the a :term:`scan`, and you mustn't configure your :mod:`repoze.bfg`
+application *imperatively* by using any code which configures the
+application through methods of the :term:`Configurator` (except for
+its ``load_zcml`` method).  Instead, should must use :term:`ZCML` for
+the equivalent purposes. :term:`ZCML` declarations that belong to an
+application can be "overridden" by integrators as necessary, but
+decorators and imperative code which perform the same tasks cannot.
+
+In general: use only :term:`ZCML` to configure your application if
+you'd like it to be extensible.
 
 Fundamental Plugpoints
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -27,23 +39,6 @@ declarations made using the ZCML ``<view>`` directive (or the
 ``@bfg_view`` decorator).  Resources are files that are accessed by
 repoze bfg using the :term:`pkg_resources` API such as static files
 and templates.
-
-There's only one rule you need to obey if you want to build a
-maximally extensible :mod:`repoze.bfg` application: you should not use
-any :term:`configuration decoration` or :term:`imperative
-configuration`. This means the application developer should avoid
-relying on :term:`configuration decoration` meant to be detected via
-the ZCML ``<scan>`` directive, and you mustn't configure your
-:mod:`repoze.bfg` application *imperatively* by using any code which
-configures the application through methods of the :term:`Configurator`
-except for its ``load_zcml`` method.  Instead, you must use
-:term:`ZCML` for the equivalent purposes. :term:`ZCML` declarations
-that belong to an application can be "overridden" by integrators as
-necessary, but decorators and imperative code which perform the same
-tasks cannot.
-
-In general: use only :term:`ZCML` to configure your application if
-you'd like it to be extensible.
 
 ZCML Granularity
 ~~~~~~~~~~~~~~~~
@@ -89,10 +84,9 @@ If you've inherited a :mod:`repoze.bfg` application which uses
 one of two things may be true:
 
 - If you just want to *extend* the application, you can write
-  additional ZCML that registers more views or routes, loading the
-  existing views by using the ``scan`` ZCML directive and continuing
-  to use any existing imperative configuration done by the original
-  application.
+  additional ZCML that registers more views or routes, loading any
+  existing ZCML and continuing to use any existing imperative
+  configuration done by the original application.
 
 - If you want to *override* configuration in the application, you
   *may* need to change the source code of the original application.
@@ -107,11 +101,10 @@ one of two things may be true:
 
   If the source of trouble is configuration done imperatively (perhaps
   in the function called during application startup), you'll need to
-  or copying configuration information out of decorator arguments and
-  code which does imperative configuration into equivalent
+  change the code: convert imperative configuration into equivalent
   :term:`ZCML` declarations.
 
-Once this is done, you should be able to extend or modify the
+Once this is done, you should be able to extend or override the
 application like any other (see :ref:`extending_the_application`).
 
 .. _extending_the_application:

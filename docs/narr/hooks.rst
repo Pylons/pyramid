@@ -13,7 +13,27 @@ Changing the Not Found View
 
 When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
 notfound :term:`view`. The view it invokes can be customized through
-application configuration.
+application configuration.  This view can be configured in via
+:term:`imperative configuration` or :term:`ZCML`.
+
+.. topic:: Using Imperative Configuration
+
+   If your application uses :term:`imperative configuration`, you can
+   replace the Not Found view by using the ``set_notfound_view``
+   method of the ``Configurator`` named ``config``:
+
+   .. code-block:: python
+      :linenos:
+
+      import helloworld.views
+      config.set_notfound_view(helloworld.views.notfound_view)
+
+   Replace ``helloworld.views.notfound_view`` with a reference to the
+   Python :term:`view callable` you want to use to represent the Not
+   Found view.
+
+   See :ref:`configuration_module` for more information about other
+   arguments to the ``set_notfound_view`` method.
 
 .. topic:: Using ZCML
 
@@ -68,25 +88,6 @@ application configuration.
 
      .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-.. topic:: Using Imperative Configuration
-
-   If your application uses :term:`imperative configuration`, you can
-   replace the Not Found view by using the ``set_notfound_view``
-   method of the ``Configurator`` named ``config``:
-
-   .. code-block:: python
-      :linenos:
-
-      import helloworld.views
-      config.set_notfound_view(helloworld.views.notfound_view)
-
-   Replace ``helloworld.views.notfound_view`` with a reference to the
-   Python :term:`view callable` you want to use to represent the Not
-   Found view.
-
-   See :ref:`configuration_module` for more information about other
-   arguments to the ``set_notfound_view`` method.
-
 Here's some sample code that implements a minimal NotFound view:
 
 .. code-block:: python
@@ -112,8 +113,27 @@ Changing the Forbidden View
 When :mod:`repoze.bfg` can't authorize execution of a view based on
 the authorization policy in use, it invokes a "forbidden view".  The
 default forbidden response has a 401 status code and is very plain,
-but it can be overridden as necessary using one of the following
-mechanisms:
+but it can be overridden as necessary using either :term:`imperative
+configuration` or :term:`ZCML`:
+
+.. topic:: Using Imperative Configuration
+
+   If your application uses :term:`imperative configuration`, you can
+   replace the Forbidden view by using the ``set_forbidden_view``
+   method of the ``Configurator`` named ``config``:
+
+   .. code-block:: python
+      :linenos:
+
+      import helloworld.views
+      config.set_forbiddden_view(helloworld.views.forbidden_view)
+
+   Replace ``helloworld.views.forbidden_view`` with a reference to the
+   Python :term:`view callable` you want to use to represent the
+   Forbidden view.
+
+   See :ref:`configuration_module` for more information about other
+   arguments to the ``set_forbidden_view`` method.
 
 .. topic:: Using ZCML
 
@@ -169,25 +189,6 @@ mechanisms:
 
      .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-.. topic:: Using Imperative Configuration
-
-   If your application uses :term:`imperative configuration`, you can
-   replace the Forbidden view by using the ``set_forbidden_view``
-   method of the ``Configurator`` named ``config``:
-
-   .. code-block:: python
-      :linenos:
-
-      import helloworld.views
-      config.set_forbiddden_view(helloworld.views.forbidden_view)
-
-   Replace ``helloworld.views.forbidden_view`` with a reference to the
-   Python :term:`view callable` you want to use to represent the
-   Forbidden view.
-
-   See :ref:`configuration_module` for more information about other
-   arguments to the ``set_forbidden_view`` method.
-
 Like any other view, the forbidden view must accept at least a
 ``request`` parameter, or both ``context`` and ``request``.  The
 ``context`` (available as ``request.context`` if you're using the
@@ -218,42 +219,6 @@ Here's some sample code that implements a minimal forbidden view:
    You can influence the status code of Forbidden responses by using
    an alternate forbidden view.  For example, it would make sense to
    return a response with a ``403 Forbidden`` status code.
-
-Changing the response factory
------------------------------
-
-You may change the class used as the "response factory" from within
-the :mod:`repoze.bfg` ``chameleon_zpt``, ``chameleon_genshi``,
-``chameleon_text`` (the ``render_template_to_response`` function used
-within each) and other various places where a Response object is
-constructed by :mod:`repoze.bfg`.  The default "response factory" is
-the class ``webob.Response``.  You may change it by placing the
-following ZCML in your ``configure.zcml`` file.
-
-.. code-block:: xml
-   :linenos:
-
-   <utility provides="repoze.bfg.interfaces.IResponseFactory"
-            component="helloworld.factories.response_factory"/>
-
-Replace ``helloworld.factories.response_factory`` with the Python
-dotted name to the response factory you want to use.  Here's some
-sample code that implements a minimal response factory:
-
-.. code-block:: python
-
-   from webob import Response
-
-   class MyResponse(Response):
-      pass
-
-   def response_factory():
-       return MyResponse
-
-Unlike a request factory, a response factory does not need to return
-an object that implements any particular interface; it simply needs
-have a ``status`` attribute, a ``headerlist`` attribute, and and
-``app_iter`` attribute.
 
 .. _changing_the_traverser:
 
