@@ -34,12 +34,20 @@ Documentation
   ``repoze.bfg`` application configuration imperatively was previously
   much more difficult.
 
+- A narrative documentation chapter entitled "Configuration,
+  Decorations and Code Scanning" explaining ZCML- vs. imperative-
+  vs. decorator-based configuration equivalence.
+
+- The "ZCML Hooks" chapter has been renamed to "Hooks"; it documents
+  how to override hooks now via imperative configuration and ZCML.
+
+- The explanation about how to supply an alternate "response factory"
+  has been removed from the "Hooks" chapter.  This feature may be
+  removed in a later release (it still works now, it's just not
+  documented).
+
 Bug Fixes
 ----------
-
-- When passed ``_query`` is passed to the ``route_url`` function, the
-  URL encoding routine no longer raises an exception because this is a
-  dictionary.
 
 - The ACL authorization policy debugging output when
   ``debug_authorization`` console debugging output was turned on
@@ -49,6 +57,16 @@ Bug Fixes
   lineage.  Now in this case, we report ``<default deny>`` as the ACE
   value and either the root ACL or ``<No ACL found on any object in
   model lineage>`` if no ACL was found.
+
+- When two views were registered with the same ``accept`` argument,
+  but were otherwise registered with the same arguments, if a request
+  entered the application which had an ``Accept`` header that accepted
+  *either* of the media types defined by the set of views registered
+  with predicates that otherwise matched, a more or less "random" one
+  view would "win".  Now, we try harder to use the view callable
+  associated with the view configuration that has the most specific
+  ``accept`` argument.  Thanks to Alberto Valverde for an initial
+  patch.
 
 Internals
 ---------

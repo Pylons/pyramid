@@ -98,10 +98,10 @@ def route_url(route_name, request, *elements, **kw):
     qs = ''
 
     if '_query' in kw:
-        qs = '?' + urlencode(kw.pop('_query'), doseq=True)
+        qs = '?' + urlencode(kw['_query'], doseq=True)
 
     if '_anchor' in kw:
-        anchor = kw.pop('_anchor')
+        anchor = kw['_anchor']
         if isinstance(anchor, unicode):
             anchor = anchor.encode('utf-8')
         anchor = '#' + anchor
