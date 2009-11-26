@@ -440,22 +440,55 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
+    def test_add_view_with_accept_multiview_replaces_existing_view(self):
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        def view(context, request):
+            return 'OK'
+        def view2(context, request):
+            return 'OK2'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (Interface, IRequest), IView, name='')
+        config.add_view(view=view2, accept='text/html')
+        wrapper = self._getViewCallable(config)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual(len(wrapper.views), 1)
+        self.assertEqual(len(wrapper.media_views), 1)
+        self.assertEqual(wrapper(None, None), 'OK')
+        request = DummyRequest()
+        request.accept = DummyAccept('text/html', 'text/html')
+        self.assertEqual(wrapper(None, request), 'OK2')
+
+    def test_add_view_multiview_replaces_existing_view_with___accept__(self):
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        def view(context, request):
+            return 'OK'
+        def view2(context, request):
+            return 'OK2'
+        view.__accept__ = 'text/html'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (Interface, IRequest), IView, name='')
+        config.add_view(view=view2)
+        wrapper = self._getViewCallable(config)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual(len(wrapper.views), 1)
+        self.assertEqual(len(wrapper.media_views), 1)
+        self.assertEqual(wrapper(None, None), 'OK2')
+        request = DummyRequest()
+        request.accept = DummyAccept('text/html')
+        self.assertEqual(wrapper(None, request), 'OK')
+
     def test_add_view_multiview_replaces_multiview(self):
         from zope.interface import Interface
-        from zope.interface import implements
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IMultiView
-        class DummyMultiView:
-            implements(IMultiView)
-            def __init__(self):
-                self.views = []
-                self.name = 'name'
-            def add(self, view, score):
-                self.views.append(view)
-            def __call__(self, context, request):
-                return 'OK1'
-            def __permitted__(self, context, request):
-                """ """
         view = DummyMultiView()
         config = self._makeOne()
         config.registry.registerAdapter(view, (Interface, IRequest),
@@ -464,7 +497,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view(view=view2)
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
-        self.assertEqual(wrapper.views, [view2])
+        self.assertEqual(wrapper.views, [(view2, None)])
         self.assertEqual(wrapper(None, None), 'OK1')
 
     def test_add_view_multiview_call_ordering(self):
@@ -2104,6 +2137,49 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(mv.views, [(100, 'view')])
         mv.add('view2', 99)
         self.assertEqual(mv.views, [(99, 'view2'), (100, 'view')])
+        mv.add('view3', 100, 'text/html')
+        self.assertEqual(mv.media_views['text/html'], [(100, 'view3')])
+        mv.add('view4', 99, 'text/html')
+        self.assertEqual(mv.media_views['text/html'],
+                         [(99, 'view4'), (100, 'view3')])
+        mv.add('view5', 100, 'text/xml')
+        self.assertEqual(mv.media_views['text/xml'], [(100, 'view5')])
+        self.assertEqual(set(mv.accepts), set(['text/xml', 'text/html']))
+        self.assertEqual(mv.views, [(99, 'view2'), (100, 'view')])
+        mv.add('view6', 98, 'text/*')
+        self.assertEqual(mv.views, [(98, 'view6'),(99, 'view2'), (100, 'view')])
+
+    def test_get_views_request_has_no_accept(self):
+        request = DummyRequest()
+        mv = self._makeOne()
+        mv.views = [(99, lambda *arg: None)]
+        self.assertEqual(mv.get_views(request), mv.views)
+
+    def test_get_views_no_self_accepts(self):
+        request = DummyRequest()
+        request.accept = True
+        mv = self._makeOne()
+        mv.accepts = []
+        mv.views = [(99, lambda *arg: None)]
+        self.assertEqual(mv.get_views(request), mv.views)
+
+    def test_get_views(self):
+        request = DummyRequest()
+        request.accept = DummyAccept('text/html')
+        mv = self._makeOne()
+        mv.accepts = ['text/html']
+        mv.views = [(99, lambda *arg: None)]
+        html_views = [(98, lambda *arg: None)]
+        mv.media_views['text/html'] = html_views
+        self.assertEqual(mv.get_views(request), html_views + mv.views)
+
+    def test_get_views_best_match_returns_None(self):
+        request = DummyRequest()
+        request.accept = DummyAccept(None)
+        mv = self._makeOne()
+        mv.accepts = ['text/html']
+        mv.views = [(99, lambda *arg: None)]
+        self.assertEqual(mv.get_views(request), mv.views)
 
     def test_match_not_found(self):
         from repoze.bfg.exceptions import NotFound
@@ -2230,6 +2306,35 @@ class TestMultiView(unittest.TestCase):
         mv.views = [(100, view)]
         response = mv.__call_permissive__(context, request)
         self.assertEqual(response, expected_response)
+
+    def test__call__with_accept_match(self):
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.accept = DummyAccept('text/html', 'text/xml')
+        expected_response = DummyResponse()
+        def view(context, request):
+            return expected_response
+        mv.views = [(100, None)]
+        mv.media_views['text/xml'] = [(100, view)]
+        mv.accepts = ['text/xml']
+        response = mv(context, request)
+        self.assertEqual(response, expected_response)
+
+    def test__call__with_accept_miss(self):
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.accept = DummyAccept('text/plain', 'text/html')
+        expected_response = DummyResponse()
+        def view(context, request):
+            return expected_response
+        mv.views = [(100, view)]
+        mv.media_views['text/xml'] = [(100, None)]
+        mv.accepts = ['text/xml']
+        response = mv(context, request)
+        self.assertEqual(response, expected_response)
+        
 
 class TestRequestOnly(unittest.TestCase):
     def _callFUT(self, arg):
@@ -2442,10 +2547,6 @@ class DummyRequest:
     def get_response(self, app):
         return app
 
-class DummyRootFactory:
-    def __init__(self, root):
-        self.root = root
-
 class DummyContext:
     pass
 
@@ -2520,6 +2621,29 @@ class DummyConfigurator(object):
     def make_wsgi_app(self):
         return self
     
-class DummyGetSiteManager(object):
-    def sethook(self, reg):
-        self.hook = reg
+class DummyAccept(object):
+    def __init__(self, *matches):
+        self.matches = list(matches)
+
+    def best_match(self, offered):
+        if self.matches:
+            for match in self.matches:
+                if match in offered:
+                    self.matches.remove(match)
+                    return match
+    def __contains__(self, val):
+        return val in self.matches
+
+from zope.interface import implements
+from repoze.bfg.interfaces import IMultiView
+class DummyMultiView:
+    implements(IMultiView)
+    def __init__(self):
+        self.views = []
+        self.name = 'name'
+    def add(self, view, score, accept=None):
+        self.views.append((view, accept))
+    def __call__(self, context, request):
+        return 'OK1'
+    def __permitted__(self, context, request):
+        """ """

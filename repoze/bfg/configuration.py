@@ -225,7 +225,7 @@ class Configurator(object):
 
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer_name=None, wrapper_viewname=None,
-                     viewname=None):
+                     viewname=None, accept=None):
         renderer = self._renderer_from_name(renderer_name)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
@@ -238,9 +238,9 @@ class Configurator(object):
         debug_view = _authdebug_view(secured_view, permission, 
                                      authn_policy, authz_policy, settings,
                                      logger)
-        derived_view = _predicate_wrap(debug_view, predicates)
+        predicated_view = _predicate_wrap(debug_view, predicates)
+        derived_view = _accept_wrap(predicated_view, accept)
         return derived_view
-
 
     def _override(self, package, path, override_package, override_prefix,
                   _info=u'', PackageOverrides=PackageOverrides):
@@ -385,7 +385,7 @@ class Configurator(object):
             containment=containment)
 
         derived_view = self._derive_view(view, permission, predicates, attr,
-                                         renderer, wrapper, name)
+                                         renderer, wrapper, name, accept)
         r_for_ = for_
         r_request_type = request_type
         if r_for_ is None:
@@ -413,8 +413,9 @@ class Configurator(object):
                 multiview = old_view
             else:
                 multiview = MultiView(name)
-                multiview.add(old_view, sys.maxint)
-            multiview.add(derived_view, score)
+                old_accept = getattr(old_view, '__accept__', None)
+                multiview.add(old_view, sys.maxint, old_accept)
+            multiview.add(derived_view, score, accept)
             for i in (IView, ISecuredView):
                 # unregister any existing views
                 self.registry.adapters.unregister((r_for_, r_request_type), i,
@@ -677,14 +678,39 @@ class MultiView(object):
 
     def __init__(self, name):
         self.name = name
+        self.media_views = {}
         self.views = []
+        self.accepts = []
 
-    def add(self, view, score):
-        self.views.append((score, view))
-        self.views.sort()
+    def add(self, view, score, accept=None):
+        if accept is None or '*' in accept:
+            self.views.append((score, view))
+            self.views.sort()
+        else:
+            subset = self.media_views.setdefault(accept, [])
+            subset.append((score, view))
+            subset.sort()
+            accepts = set(self.accepts)
+            accepts.add(accept)
+            self.accepts = list(accepts) # dedupe
+
+    def get_views(self, request):
+        if self.accepts and hasattr(request, 'accept'):
+            accepts = self.accepts[:]
+            views = []
+            while accepts:
+                match = request.accept.best_match(accepts)
+                if match is None:
+                    break
+                subset = self.media_views[match]
+                views.extend(subset)
+                accepts.remove(match)
+            views.extend(self.views)
+            return views
+        return self.views
 
     def match(self, context, request):
-        for score, view in self.views:
+        for score, view in self.get_views(request):
             if not hasattr(view, '__predicated__'):
                 return view
             if view.__predicated__(context, request):
@@ -703,7 +729,7 @@ class MultiView(object):
         return view(context, request)
 
     def __call__(self, context, request):
-        for score, view in self.views:
+        for score, view in self.get_views(request):
             try:
                 return view(context, request)
             except NotFound:
@@ -729,6 +755,10 @@ def decorate_view(wrapped_view, original_view):
         pass
     try:
         wrapped_view.__predicated__ = original_view.__predicated__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__accept__ = original_view.__accept__
     except AttributeError:
         pass
     return True
@@ -913,16 +943,16 @@ def _owrap_view(view, viewname, wrapper_viewname):
 def _predicate_wrap(view, predicates):
     if not predicates:
         return view
-    def _wrapped(context, request):
+    def predicate_wrapper(context, request):
         if all((predicate(context, request) for predicate in predicates)):
             return view(context, request)
         raise NotFound('predicate mismatch for view %s' % view)
     def checker(context, request):
         return all((predicate(context, request) for predicate in
                     predicates))
-    _wrapped.__predicated__ = checker
-    decorate_view(_wrapped, view)
-    return _wrapped
+    predicate_wrapper.__predicated__ = checker
+    decorate_view(predicate_wrapper, view)
+    return predicate_wrapper
 
 def _secure_view(view, permission, authn_policy, authz_policy):
     wrapped_view = view
@@ -974,6 +1004,16 @@ def _authdebug_view(view, permission, authn_policy, authz_policy, settings,
         decorate_view(wrapped_view, view)
 
     return wrapped_view
+
+def _accept_wrap(view, accept):
+    # this is a little silly but we don't want to decorate the original
+    # function
+    if accept is None:
+        return view
+    def accept_view(context, request):
+        return view(context, request)
+    accept_view.__accept__ = accept
+    return accept_view
 
 # note that ``options`` is a b/w compat alias for ``settings`` and
 # ``Configurator`` is a testing dep inj

@@ -854,7 +854,7 @@ class TestHandler(unittest.TestCase):
 
     def test_it(self):
         def foo():
-            pass
+            """ """
         from zope.interface import Interface
         class IWhatever(Interface):
             pass
@@ -881,29 +881,12 @@ class IFactory(Interface):
 class DummyFactory(object):
     implements(IFactory)
     def __call__(self):
-        return 1
+        """ """
         
 class DummyModule:
     __path__ = "foo"
     __name__ = "dummy"
     __file__ = ''
-
-class DummyModuleGrokker:
-    def __init__(self, grokker=None):
-        self.multi_grokker = grokker
-        
-class DummyMartianModule:
-    def grok_dotted_name(self, name, grokker, _info, _configurator,
-                         exclude_filter=None):
-        self.name = name
-        self.info = _info
-        self.configurator = _configurator
-        self.exclude_filter = exclude_filter
-        return True
-
-    def ModuleGrokker(self, grokker=None):
-        self.module_grokker = DummyModuleGrokker(grokker)
-        return self.module_grokker
 
 class DummyContext:
     def __init__(self, resolved=DummyModule):
