@@ -140,8 +140,8 @@ class Configurator(object):
             registry.registerUtility(debug_logger, IDebugLogger,
                                      'repoze.bfg.debug') # b /c
             if authentication_policy or authorization_policy:
-                self.set_security_policies(authentication_policy,
-                                           authorization_policy)
+                self._set_security_policies(authentication_policy,
+                                            authorization_policy)
             for name, renderer in renderers:
                 self.add_renderer(name, renderer)
 
@@ -246,6 +246,17 @@ class Configurator(object):
                                          wrapper_viewname=wrapper)
         self.registry.registerUtility(derived_view, iface, '', info=_info)
 
+    def _set_security_policies(self, authentication, authorization=None):
+        if authorization is None:
+            authorization = ACLAuthorizationPolicy() # default
+        if authorization and not authentication:
+            raise ConfigurationError(
+                'If the "authorization" is passed a vallue, '
+                'the "authentication" argument musty also be '
+                'passed a value; authorization requires authentication.')
+        self._set_authentication_policy(authentication)
+        self._set_authorization_policy(authorization)
+
     # API
 
     def add_subscriber(self, subscriber, iface=None):
@@ -303,23 +314,6 @@ class Configurator(object):
             lock.release()
             manager.pop()
         return self.registry
-
-    def set_security_policies(self, authentication, authorization=None):
-        """ Register security policies safely.  The ``authentication``
-        argument represents a :term:`authentication policy`.  The
-        ``authorization`` argument represents a :term:`authorization
-        policy`.  If the ``authorization`` argument is ``None``, a
-        default ``repoze.bfg.authorization.ACLAuthorizationPolicy``
-        will be registered as the authorization policy."""
-        if authorization is None:
-            authorization = ACLAuthorizationPolicy() # default
-        if authorization and not authentication:
-            raise ConfigurationError(
-                'If the "authorization" is passed a vallue, '
-                'the "authentication" argument musty also be '
-                'passed a value; authorization requires authentication.')
-        self._set_authentication_policy(authentication)
-        self._set_authorization_policy(authorization)
 
     def add_view(self, view=None, name="", for_=None, permission=None, 
                  request_type=None, route_name=None, request_method=None,
@@ -870,7 +864,7 @@ class Configurator(object):
         package or module object.  If ``package`` is ``None``, the
         package of the *caller* is used.
         """
-        if package is None:
+        if package is None: # pragma: no cover
             package = caller_package()
 
         def register_decorations(name, ob):
@@ -899,9 +893,12 @@ class Configurator(object):
 
         The ``factory`` argument is Python reference to an
         implementation of a :term:`renderer` factory.
+
+        Note that this function should be called *before* any
+        ``add_view`` invocation that names the renderer name as an argument.
         """
-        iface = IRendererFactory
-        self.registry.registerUtility(factory, iface, name=name, info=_info)
+        self.registry.registerUtility(
+            factory, IRendererFactory, name=name, info=_info)
 
     def override_resource(self, to_override, override_with,
                           _info=u'', _override=None,):

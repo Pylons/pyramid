@@ -22,7 +22,7 @@ def package_name(pkg_or_module):
     function is passed a package, return the dotted Python package
     name of the package itself."""
     if pkg_or_module is None:
-        return '__main___'
+        return '__main__'
     pkg_filename = pkg_or_module.__file__
     pkg_name = pkg_or_module.__name__
     splitted = os.path.split(pkg_filename)

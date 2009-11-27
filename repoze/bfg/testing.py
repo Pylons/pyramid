@@ -588,7 +588,7 @@ def setUp(registry=None, request=None, hook_zca=True):
         try:
             from zope.component import getSiteManager
             getSiteManager.sethook(get_current_registry)
-        except ImportError:
+        except ImportError: # pragma: no cover
             pass
 
 def tearDown(unhook_zca=True):
@@ -611,7 +611,7 @@ def tearDown(unhook_zca=True):
         try:
             from zope.component import getSiteManager
             getSiteManager.reset()
-        except ImportError:
+        except ImportError: # pragma: no cover
             pass
     info = manager.pop()
     manager.clear()

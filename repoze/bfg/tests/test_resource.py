@@ -368,6 +368,14 @@ class Test_resolve_resource_spec(unittest.TestCase):
         self.assertEqual(package_name, 'repoze.bfg.nottests')
         self.assertEqual(filename, 'test_resource.py')
 
+    def test_package_name_is_None(self):
+        pkg = None
+        path = 'test_resource.py'
+        package_name, filename = self._callFUT(path, pkg)
+        self.assertEqual(package_name, None)
+        self.assertEqual(filename, 'test_resource.py')
+        
+
 class TestFileOverride(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.resource import FileOverride

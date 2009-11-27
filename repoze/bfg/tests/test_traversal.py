@@ -865,6 +865,14 @@ class TestVirtualRoot(unittest.TestCase):
         result = self._callFUT(context, request)
         self.assertEqual(result, context)
 
+    def test_default_no_registry_on_request(self):
+        context = DummyContext()
+        request = _makeRequest()
+        del request.registry
+        request.environ['PATH_INFO'] = '/'
+        result = self._callFUT(context, request)
+        self.assertEqual(result, context)
+
 class TraverseTests(unittest.TestCase):
     def setUp(self):
         cleanUp()

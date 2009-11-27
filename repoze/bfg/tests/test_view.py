@@ -56,6 +56,13 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
         result = self._callFUT(context, request, name='notregistered')
         self.assertEqual(result, None)
 
+    def test_call_no_registry_on_request(self):
+        request = self._makeRequest()
+        del request.registry
+        context = self._makeContext()
+        result = self._callFUT(context, request, name='notregistered')
+        self.assertEqual(result, None)
+
     def test_call_view_registered_secure(self):
         request = self._makeRequest()
         context = self._makeContext()

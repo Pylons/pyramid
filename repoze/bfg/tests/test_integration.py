@@ -89,14 +89,3 @@ class DummyRequest:
     def get_response(self, application):
         return application(None, None)
 
-class DummyZCMLContext:
-    def __init__(self):
-        self.actions = []
-        self.info = None
-
-    def action(self, discriminator=None, callable=None, args=None):
-        self.actions.append(
-            {'discriminator':discriminator,
-             'callable':callable,
-             'args':args}
-            )

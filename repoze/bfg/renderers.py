@@ -44,7 +44,7 @@ def template_renderer_factory(spec, impl):
         if renderer is None:
             try:
                 package_name, filename = spec.split(':', 1)
-            except ValueError:
+            except ValueError: # pragma: no cover
                 # unit test or someone passing a relative pathname
                 package_name = caller_package(4).__name__
                 filename = spec

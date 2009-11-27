@@ -551,6 +551,30 @@ class TestResourceDirective(unittest.TestCase):
         self.assertEqual(action['args'], ('a', 'b', None))
 
 
+class TestRendererDirective(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import renderer
+        return renderer(*arg, **kw)
+
+    def test_it(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IRendererFactory
+        context = DummyContext()
+        renderer = lambda *arg, **kw: None
+        self._callFUT(context, renderer, 'r')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = actions[0]
+        self.assertEqual(action['discriminator'], (IRendererFactory, 'r'))
+        reg = get_current_registry()
+        self.failUnless(reg.getUtility(IRendererFactory, 'r'), renderer)
+    
 class TestZCMLConfigure(unittest.TestCase):
     i = 0
     def _callFUT(self, path, package):

@@ -127,6 +127,15 @@ class ModelURLTests(unittest.TestCase):
         result = self._callFUT(root, request)
         self.assertEqual(result, 'http://example.com:5432/')
 
+    def test_no_registry_on_request(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
+        request = DummyRequest()
+        self._registerContextURL(reg)
+        root = DummyContext()
+        result = self._callFUT(root, request)
+        self.assertEqual(result, 'http://example.com/context/')
+
 class TestRouteUrl(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -221,6 +230,19 @@ class TestStaticUrl(unittest.TestCase):
         routes = [DummyRoute('name', factory=factory)]
         mapper = DummyRoutesMapper(result='/1/2/3', routes = routes)
         request.registry.registerUtility(mapper, IRoutesMapper)
+        url = self._callFUT('repoze.bfg.tests:fixtures/minimal.pt', request)
+        self.assertEqual(url, 'http://example.com:5432/1/2/3')
+
+    def test_found_abs_no_registry_on_request(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IRoutesMapper
+        from repoze.bfg.static import StaticRootFactory
+        factory = StaticRootFactory('repoze.bfg.tests:fixtures')
+        routes = [DummyRoute('name', factory=factory)]
+        mapper = DummyRoutesMapper(result='/1/2/3', routes = routes)
+        registry = get_current_registry()
+        registry.registerUtility(mapper, IRoutesMapper)
+        request = DummyRequest()
         url = self._callFUT('repoze.bfg.tests:fixtures/minimal.pt', request)
         self.assertEqual(url, 'http://example.com:5432/1/2/3')
 

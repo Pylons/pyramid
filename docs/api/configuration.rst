@@ -29,4 +29,3 @@
 
      .. automethod:: set_notfound_view(view=None, attr=None, renderer=None, wrapper=None)
 
-     .. automethod:: set_security_policies

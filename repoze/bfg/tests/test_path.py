@@ -129,6 +129,10 @@ class TestPackageName(unittest.TestCase):
         module = DummyPackageOrModule(test_path)
         result = self._callFUT(module)
         self.assertEqual(result, 'repoze.bfg.tests')
+
+    def test_it_None(self):
+        result = self._callFUT(None)
+        self.assertEqual(result, '__main__')
     
 class DummyPackageOrModule:
     def __init__(self, real_package_or_module, raise_exc=None):

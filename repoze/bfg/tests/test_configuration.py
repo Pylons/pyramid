@@ -122,6 +122,12 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.registry.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy, result)
 
+    def test_ctor_authorization_policy_only(self):
+        from zope.configuration.exceptions import ConfigurationError
+        policy = object()
+        config = self.assertRaises(ConfigurationError,
+                                   self._makeOne, authorization_policy=policy)
+
     def test_ctor_no_root_factory(self):
         from repoze.bfg.interfaces import IRootFactory
         config = self._makeOne()
@@ -2575,9 +2581,6 @@ class DummyConfigurator(object):
         self.root_factory = root_factory
         self.package = package
         self.settings = settings
-
-    def hook_zca(self):
-        self.zca_hooked = True
 
     def load_zcml(self, filename):
         self.zcml_file = filename
