@@ -607,8 +607,11 @@ def tearDown(unhook_zca=True):
 
     """
     if unhook_zca:
-        from zope.component import getSiteManager
-        getSiteManager.reset()
+        try:
+            from zope.component import getSiteManager
+            getSiteManager.reset()
+        except ImportError:
+            pass
     info = manager.pop()
     manager.clear()
     if info is not None:
