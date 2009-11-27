@@ -11,30 +11,21 @@ class TestRegistry(unittest.TestCase):
     def test_registerHandler_and_notify(self):
         registry = self._makeOne()
         self.assertEqual(registry.has_listeners, False)
-        from zope.interface import Interface
-        from zope.interface import implements
-        class IFoo(Interface):
-            pass
-        class FooEvent(object):
-            implements(IFoo)
         L = []
         def f(event):
             L.append(event)
-        registry.registerHandler(f, [IFoo])
+        registry.registerHandler(f, [IDummyEvent])
         self.assertEqual(registry.has_listeners, True)
-        event = FooEvent()
+        event = DummyEvent()
         registry.notify(event)
         self.assertEqual(L, [event])
 
-    def test_registerSubscriptionAdapter_and_notify(self):
+    def test_registerSubscriptionAdapter(self):
         registry = self._makeOne()
         self.assertEqual(registry.has_listeners, False)
         from zope.interface import Interface
-        class EventHandler:
-            pass
-        class IFoo(Interface):
-            pass
-        registry.registerSubscriptionAdapter(EventHandler, [IFoo], Interface)
+        registry.registerSubscriptionAdapter(DummyEvent,
+                                             [IDummyEvent], Interface)
         self.assertEqual(registry.has_listeners, True)
 
 class DummyModule:
@@ -42,4 +33,10 @@ class DummyModule:
     __name__ = "dummy"
     __file__ = ''
 
+from zope.interface import Interface
+from zope.interface import implements
+class IDummyEvent(Interface):
+    pass
 
+class DummyEvent(object):
+    implements(IDummyEvent)
