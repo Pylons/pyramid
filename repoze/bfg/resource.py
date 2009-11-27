@@ -4,6 +4,7 @@ import pkg_resources
 from zope.interface import implements
 
 from repoze.bfg.interfaces import IPackageOverrides
+
 from repoze.bfg.threadlocal import get_current_registry
 
 class OverrideProvider(pkg_resources.DefaultProvider):

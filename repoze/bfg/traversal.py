@@ -9,8 +9,8 @@ from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import VH_ROOT_KEY
 
-from repoze.bfg.location import lineage
 from repoze.bfg.encode import url_quote
+from repoze.bfg.location import lineage
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import get_current_registry
 

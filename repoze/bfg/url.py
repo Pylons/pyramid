@@ -11,8 +11,8 @@ from repoze.bfg.encode import urlencode
 from repoze.bfg.path import caller_package
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
-from repoze.bfg.traversal import quote_path_segment
 from repoze.bfg.traversal import TraversalContextURL
+from repoze.bfg.traversal import quote_path_segment
 
 def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named BFG route.

@@ -16,9 +16,9 @@ from zope.interface import implements
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
+from repoze.bfg.interfaces import IDebugLogger
 from repoze.bfg.interfaces import IDefaultRootFactory
 from repoze.bfg.interfaces import IForbiddenView
-from repoze.bfg.interfaces import IDebugLogger
 from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IPackageOverrides
@@ -28,12 +28,12 @@ from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ISecuredView
+from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import IView
 
-from repoze.bfg import chameleon_zpt
 from repoze.bfg import chameleon_text
+from repoze.bfg import chameleon_zpt
 from repoze.bfg import renderers
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.compat import all
@@ -51,8 +51,8 @@ from repoze.bfg.settings import Settings
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.threadlocal import manager
-from repoze.bfg.traversal import find_interface
 from repoze.bfg.traversal import DefaultRootFactory
+from repoze.bfg.traversal import find_interface
 from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.view import render_view_to_response
 from repoze.bfg.view import static

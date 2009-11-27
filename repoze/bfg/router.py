@@ -1,13 +1,13 @@
+from zope.interface import alsoProvides
 from zope.interface import implements
 from zope.interface import providedBy
-from zope.interface import alsoProvides
 
-from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import IDebugLogger
+from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRootFactory
-from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRouteRequest
+from repoze.bfg.interfaces import IRouter
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITraverser

@@ -1,35 +1,35 @@
+from zope.configuration import xmlconfig
+from zope.configuration.config import ConfigurationMachine
 from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalInterface
 from zope.configuration.fields import GlobalObject
 from zope.configuration.fields import Tokens
-from zope.configuration.config import ConfigurationMachine
-from zope.configuration import xmlconfig
 
 from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface import providedBy
 
+from zope.schema import ASCIILine
 from zope.schema import Bool
 from zope.schema import Int
 from zope.schema import TextLine
-from zope.schema import ASCIILine
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRendererFactory
-from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IRouteRequest
+from repoze.bfg.interfaces import IView
 
-from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
-from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import AuthTktAuthenticationPolicy
+from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
+from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.configuration import Configurator
 from repoze.bfg.request import route_request_iface
-from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.static import StaticRootFactory
+from repoze.bfg.threadlocal import get_current_registry
 
 ###################### directives ##########################
 
