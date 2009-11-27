@@ -891,17 +891,17 @@ class Configurator(object):
                 for name, ob in inspect.getmembers(module, None):
                     register_decorations(name, ob)
 
-    def add_renderer(self, name, renderer, _info=u''):
+    def add_renderer(self, name, factory, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`renderer` factory to the current
         configuration state.
 
         The ``name`` argument is the renderer name.
 
-        The ``renderer`` argument is Python reference to an
-        implementation of a :term:`renderer`.
+        The ``factory`` argument is Python reference to an
+        implementation of a :term:`renderer` factory.
         """
         iface = IRendererFactory
-        self.registry.registerUtility(renderer, iface, name=name, info=_info)
+        self.registry.registerUtility(factory, iface, name=name, info=_info)
 
     def override_resource(self, to_override, override_with,
                           _info=u'', _override=None,):
