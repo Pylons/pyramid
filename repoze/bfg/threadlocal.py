@@ -115,8 +115,8 @@ def get_current_request():
     return manager.get()['request']
 
 def get_current_registry(context=None): # context required by getSiteManager API
-    """Return the currently active component registry or the global
-    component registry if no request is currently active.
+    """Return the currently active :term:`application registry` or the
+    global application registry if no request is currently active.
 
     This function should be used *extremely sparingly*, usually only
     in unit testing code.  it's almost always usually a mistake to use
