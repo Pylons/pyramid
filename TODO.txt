@@ -7,3 +7,5 @@
 
 - "Model graph" -> "object graph"?
 
+- Decide if we *really* make the threadlocal stuff into APIs.
+
