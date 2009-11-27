@@ -1,6 +1,6 @@
 .. _threadlocal_module:
 
-:mod:`repoze.bfg.configuration`
+:mod:`repoze.bfg.threadlocal`
 -------------------------------
 
 .. automodule:: repoze.bfg.threadlocal
