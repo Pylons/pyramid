@@ -27,18 +27,18 @@ except IOError:
     README = CHANGES = ''
 
 install_requires=[
-    'setuptools',
     'Chameleon',
-    'sourcecodegen>=0.6.11', # tests fail without this requirement?  (wtf)
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',
     'WebOb',
-    'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
+    'repoze.lru',
+    'setuptools',
+    'sourcecodegen>=0.6.11', # tests fail without this requirement?  (wtf)
     'zope.component >= 3.6.0', # independent of zope.hookable
     'zope.configuration',
     'zope.deprecation',
-    'repoze.lru',
+    'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
     ]
 
 if sys.version_info[:2] < (2, 6):
