@@ -399,7 +399,7 @@ information in the debugger or via print statements when a
 Built-In Authentication Policy Directives
 -----------------------------------------
 
-:mod:`repoze.who` ships with a few "pre-chewed" authentication policy
+:mod:`repoze.bfg` ships with a few "pre-chewed" authentication policy
 implementations that you can make use of within your application.
 
 ``authtktauthenticationpolicy``
