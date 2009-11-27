@@ -1,4 +1,4 @@
-.. _configuration_module:
+.. _threadlocal_module:
 
 :mod:`repoze.bfg.configuration`
 -------------------------------
