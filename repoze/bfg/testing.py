@@ -1,15 +1,37 @@
 import copy
 
+from webob import Response
+
 from zope.configuration.xmlconfig import _clearContext
 
 from zope.deprecation import deprecated
+
 from zope.interface import implements
 from zope.interface import Interface
 
+from repoze.bfg.interfaces import IAuthenticationPolicy
+from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IRoutesMapper
+from repoze.bfg.interfaces import ISecuredView
+from repoze.bfg.interfaces import ISettings
+from repoze.bfg.interfaces import ITemplateRenderer
+from repoze.bfg.interfaces import ITraverser
+from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IViewPermission
 
-from repoze.bfg.threadlocal import manager
+from repoze.bfg.exceptions import Forbidden
+from repoze.bfg.registry import Registry
+from repoze.bfg.security import Allowed
+from repoze.bfg.security import Authenticated
+from repoze.bfg.security import Denied
+from repoze.bfg.security import Everyone
+from repoze.bfg.security import has_permission
+from repoze.bfg.settings import Settings
 from repoze.bfg.threadlocal import get_current_registry
+from repoze.bfg.threadlocal import manager
+from repoze.bfg.traversal import traversal_path
+from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.zcml import zcml_configure # API
 
 zcml_configure # prevent pyflakes from complaining
@@ -30,8 +52,6 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     and so on.
     """
     policy = DummySecurityPolicy(userid, groupids, permissive)
-    from repoze.bfg.interfaces import IAuthorizationPolicy
-    from repoze.bfg.interfaces import IAuthenticationPolicy
     reg = get_current_registry()
     reg.registerUtility(policy, IAuthorizationPolicy)
     reg.registerUtility(policy, IAuthenticationPolicy)
@@ -53,7 +73,6 @@ def registerModels(models):
         def __call__(self, request):
             path = request['PATH_INFO']
             ob = models[path]
-            from repoze.bfg.traversal import traversal_path
             traversed = traversal_path(path)
             return {'context':ob, 'view_name':'','subpath':(),
                     'traversed':traversed, 'virtual_root':ob,
@@ -84,7 +103,6 @@ def registerTemplateRenderer(path, renderer=None):
     used.  This function is useful when testing code that calls the
     ``render_template_to_response`` or any other ``render_template*``
     API of any of the built-in templating systems."""
-    from repoze.bfg.interfaces import ITemplateRenderer
     if renderer is None:
         renderer = DummyTemplateRenderer()
     return registerUtility(renderer, ITemplateRenderer, path)
@@ -106,13 +124,8 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
     execution is attempted.  This function is useful when dealing with
     code that wants to call,
     e.g. ``repoze.bfg.view.render_view_to_response``."""
-    from repoze.bfg.interfaces import IView
-    from repoze.bfg.interfaces import ISecuredView
-    from repoze.bfg.security import has_permission
-    from repoze.bfg.exceptions import Forbidden
     if view is None:
         def view(context, request):
-            from webob import Response
             return Response(result)
     if permission is None:
         return registerAdapter(view, for_, IView, name)
@@ -145,8 +158,6 @@ def registerViewPermission(name, result=True, viewpermission=None,
 
     **This function was deprecated in repoze.bfg 1.1.**
     """
-    from repoze.bfg.security import Allowed
-    from repoze.bfg.security import Denied
     if result is True:
         result = Allowed('message')
     else:
@@ -154,7 +165,6 @@ def registerViewPermission(name, result=True, viewpermission=None,
     if viewpermission is None:
         def viewpermission(context, request):
             return result
-    from repoze.bfg.interfaces import IViewPermission
     return registerAdapter(viewpermission, for_, IViewPermission, name)
 
 deprecated('registerViewPermission',
@@ -222,7 +232,6 @@ def registerSubscriber(subscriber, iface=Interface):
     return subscriber
 
 def registerTraverser(traverser, for_=Interface):
-    from repoze.bfg.interfaces import ITraverser
     return registerAdapter(traverser, for_, ITraverser)
 
 def registerRoute(path, name, factory=None):
@@ -232,7 +241,6 @@ def registerRoute(path, name, factory=None):
 
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
     """
-    from repoze.bfg.interfaces import IRoutesMapper
     reg = get_current_registry()
     mapper = reg.queryUtility(IRoutesMapper)
     if mapper is None:
@@ -261,8 +269,6 @@ def registerRoutesMapper(root_factory=None):
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
 
     """
-    from repoze.bfg.interfaces import IRoutesMapper
-    from repoze.bfg.urldispatch import RoutesMapper
     mapper = RoutesMapper()
     reg = get_current_registry()
     reg.registerUtility(mapper, IRoutesMapper)
@@ -287,8 +293,6 @@ def registerSettings(dictarg=None, **kw):
 
     .. note:: This API is new as of :mod:`repoze.bfg` 1.1.
     """
-    from repoze.bfg.interfaces import ISettings
-    from repoze.bfg.settings import Settings
     reg = get_current_registry()
     settings = reg.queryUtility(ISettings)
     if settings is None:
@@ -316,8 +320,6 @@ class DummySecurityPolicy:
         return self.userid
 
     def effective_principals(self, request):
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
         effective_principals = [Everyone]
         if self.userid:
             effective_principals.append(Authenticated)
@@ -580,7 +582,6 @@ def setUp(registry=None, request=None, hook_zca=True):
     """
     manager.clear()
     if registry is None:
-        from repoze.bfg.registry import Registry
         registry = Registry('testing')
     manager.push({'registry':registry, 'request':request})
     if hook_zca:
