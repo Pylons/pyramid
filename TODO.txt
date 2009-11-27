@@ -9,3 +9,9 @@
 
 - Decide if we *really* make the threadlocal stuff into APIs.
 
+- Turn paths into resource specs in ZCML directives that use
+  context.path.
+
+- Remove ``zcml_configure`` API.
+
+
