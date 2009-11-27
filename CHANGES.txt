@@ -174,34 +174,6 @@ Internals
   instead, the ``repoze.bfg`` package includes implementations of the
   ``adapter``, ``subscriber`` and ``utility`` directives.
 
-Backwards Incompatibilites
---------------------------
-
-- View registration no longer registers a
-  ``repoze.bfg.interfaces.IViewPermission`` adapter (it is no longer
-  checked by the framework; since 1.1, views have been responsible for
-  providing their own security).
-
-- The ``repoze.bfg.router.make_app`` callable no longer accepts the
-  ``authentication_policy`` nor the ``authorization_policy``
-  arguments.  This feature was deprecated in version 1.0 and has been
-  removed.
-
-- Obscure: the machinery which configured views with a
-  ``request_type`` *and* a ``route_name`` would ignore the request
-  interface implied by ``route_name`` registering a view only for the
-  interface implied by ``request_type``.  In the unlikely event that
-  you were trying to use these two features together, the symptom
-  would have been that views that named a ``request_type`` but which
-  were also associated with routes were not found when the route
-  matched.  Now if a view is configured with both a ``request_type``
-  and a ``route_name``, an error is raised.
-
-- The ``route`` ZCML directive now no longer accepts the
-  ``request_type`` or ``view_request_type`` attributes.  These
-  attributes didn't actually work in any useful way (see entry above
-  this one).
-
 - Relating to the following functions:
 
   ``repoze.bfg.view.render_view``
@@ -240,35 +212,40 @@ Backwards Incompatibilites
 
   Each of these functions now expects to be called with a request
   object that has a ``registry`` attribute which represents the
-  current ZCA registry.  Previously these functions used the ZCA
-  threadlocal API to get the current registry.
+  current :mod:`repoze.bfg` registry.  They fall back to obtaining the
+  registry from the threadlocal API.
 
-  This should only cause a problem when passing a custom request
-  object to code which ends up calling these functions in a unit test.
-  Such tests will fail with an AttributeError that might say something
-  like "DummyRequest object has no attribute ``registry``".
+Backwards Incompatibilites
+--------------------------
 
-  To repair unit tests which end up calling these functions but
-  currently pass a non-registry-aware request object, you have two
-  choices:
+- View registration no longer registers a
+  ``repoze.bfg.interfaces.IViewPermission`` adapter (it is no longer
+  checked by the framework; since 1.1, views have been responsible for
+  providing their own security).
 
-  * Use the ``repoze.bfg.threadlocal.get_current_request`` API in a
-    test bounded by the ``repoze.bfg.testing.setUp`` and
-    ``repoze.bfg.testing.tearDown`` functions.  This API will return a
-    ``repoze.bfg.testing.DummyRequest`` that has the current registry
-    (the return value of
-    ``repoze.bfg.threadlocal_get_current_registry`` or
-    ``zope.component.getSiteManager``) as its ``registry`` attribute.
+- The ``repoze.bfg.router.make_app`` callable no longer accepts the
+  ``authentication_policy`` nor the ``authorization_policy``
+  arguments.  This feature was deprecated in version 1.0 and has been
+  removed.
 
-  * Use the ``repoze.bfg.threadlocal.get_current_registry`` API in a
-    test bounded by the ``repoze.bfg.testing.setUp`` and
-    ``repoze.bfg.testing.tearDown`` functions: call this function and
-    add an attribute to your unit test request object named
-    ``registry`` with the result.
+- Obscure: the machinery which configured views with a
+  ``request_type`` *and* a ``route_name`` would ignore the request
+  interface implied by ``route_name`` registering a view only for the
+  interface implied by ``request_type``.  In the unlikely event that
+  you were trying to use these two features together, the symptom
+  would have been that views that named a ``request_type`` but which
+  were also associated with routes were not found when the route
+  matched.  Now if a view is configured with both a ``request_type``
+  and a ``route_name``, an error is raised.
 
-- Because the ``repoze.bfg`` package includes implementations of the
-  ``adapter``, ``subscriber`` and ``utility`` ZCML directives, it is
-  now an error to have ``<include package="repoze.zcml"
+- The ``route`` ZCML directive now no longer accepts the
+  ``request_type`` or ``view_request_type`` attributes.  These
+  attributes didn't actually work in any useful way (see entry above
+  this one).
+
+- Because the ``repoze.bfg`` package now includes implementations of
+  the ``adapter``, ``subscriber`` and ``utility`` ZCML directives, it
+  is now an error to have ``<include package="repoze.zcml"
   file="meta.zcml"/>`` in the ZCML of a ``repoze.bfg`` application.  A
   ZCML conflict error will be raised if your ZCML does so.  This
   shouldn't be an issue for "normal" installations; it has always been
