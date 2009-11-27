@@ -36,18 +36,13 @@ def defaults():
 
 manager = ThreadLocalManager(default=defaults)
 
-## **The below function ``get_current*`` functions are special.  They
-## are not part of the official BFG API, however, they're guaranteed
-## to live here "forever", so they may be relied on in emergencies.
-## However, they should be used extremely sparingly** (read: almost
-## never).
+## **The below function ``get_current*`` functions should be used
+## extremely sparingly.
 
 ## In particular, it's almost always usually a mistake to use
 ## ``get_current_request`` because its usage makes it possible to
-## write code that can be neither easily tested nor scripted.  The
-## author of this function reserves the right to point and laugh at
-## code which uses this function inappropriately.  Inappropriate usage
-## is defined as follows:
+## write code that can be neither easily tested nor scripted.
+## Inappropriate usage is defined as follows:
 
 ## - ``get_current_request`` should never be called within
 ##   :term:`view` code, or code called by view code.  View code
@@ -107,19 +102,27 @@ manager = ThreadLocalManager(default=defaults)
 ## to be executed.  Such scripts should expect this function to
 ## always return ``None``.
 
-## ``get_current_registry`` is mostly non-useful if you use the ZCA
-## API zope.component.getSiteManager will call it for you.
-
 def get_current_request():
     """Return the currently active request or ``None`` if no request
-    is currently active.  This is *not* an official API.
+    is currently active.
+
+    This function should be used *extremely sparingly*, usually only
+    in unit testing code.  it's almost always usually a mistake to use
+    ``get_current_request`` outside a testing context because its
+    usage makes it possible to write code that can be neither easily
+    tested nor scripted.
     """
     return manager.get()['request']
 
 def get_current_registry(context=None): # context required by getSiteManager API
     """Return the currently active component registry or the global
-    component registry if no request is currently active.  This is
-    *not* an official API.
+    component registry if no request is currently active.
+
+    This function should be used *extremely sparingly*, usually only
+    in unit testing code.  it's almost always usually a mistake to use
+    ``get_current_registry`` outside a testing context because its
+    usage makes it possible to write code that can be neither easily
+    tested nor scripted.
     """
     return manager.get()['registry']
 
