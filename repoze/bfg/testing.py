@@ -527,7 +527,7 @@ def setUp(registry=None, request=None, hook_zca=True):
     unit test.
 
     .. note:: The ``setUp`` function is new as of :mod:`repoze.bfg`
-    1.1.
+       1.1.
 
     Use in the ``setUp`` method of unit test code which uses any of
     the ``register*`` functions in ``repoze.bfg.testing`` (such as
