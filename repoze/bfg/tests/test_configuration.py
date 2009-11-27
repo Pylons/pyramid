@@ -1197,6 +1197,14 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(
             config.registry.getUtility(IAuthorizationPolicy), policy)
 
+    def test__renderer_from_name_default_renderer(self):
+        from repoze.bfg.interfaces import IRendererFactory
+        config = self._makeOne()
+        factory = lambda *arg: 'OK'
+        config.registry.registerUtility(factory, IRendererFactory)
+        result = config._renderer_from_name(None)
+        self.assertEqual(result, 'OK')
+
     def test__derive_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
