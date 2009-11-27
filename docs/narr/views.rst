@@ -349,11 +349,6 @@ view
   defaults to a view that returns an empty dictionary (see
   :ref:`views_which_use_a_renderer`).
 
-name
-
-  The *view name*.  Read and understand :ref:`traversal_chapter` to
-  understand the concept of a view name.
-
 permission
 
   The name of a *permission* that the user must possess in order to
@@ -432,6 +427,11 @@ wrapper
 Predicate Attributes
 ####################
 
+name
+
+  The *view name*.  Read the :ref:`traversal_chapter` to understand
+  the concept of a view name.
+
 for
 
   A Python dotted-path name representing the Python class that the
@@ -447,14 +447,12 @@ route_name
   unless you want to perform traversal *after* a route has matched.*
   This value must match the ``name`` of a ``<route>`` declaration (see
   :ref:`urldispatch_chapter`) that must match before this view will be
-  called.  The ``<route>`` declaration specified by ``route_name`` must
-  exist in ZCML before the view that names the route
-  (XML-ordering-wise) .  Note that the ``<route>`` declaration
-  referred to by ``route_name`` usually has a ``*traverse`` token in
-  the value of its ``path`` attribute, representing a part of the path
-  that will be used by traversal against the result of the route's
-  :term:`root factory`.  See :ref:`hybrid_chapter` for more
-  information on using this advanced feature.
+  called.  Note that the ``route`` configuration referred to by
+  ``route_name`` usually has a ``*traverse`` token in the value of its
+  ``path``, representing a part of the path that will be used by
+  traversal against the result of the route's :term:`root factory`.
+  See :ref:`hybrid_chapter` for more information on using this
+  advanced feature.
 
 request_type
 
@@ -1612,20 +1610,32 @@ callable to influence automatically constructed response attributes.
 Adding and Overriding Renderers
 -------------------------------
 
-Additional ZCML declarations can be made which override an existing
-:term:`renderer` or which add a new renderer.  Adding or overriding a
-renderer is accomplished via one or more separate ZCML directives.
+Additional configuration declarations can be made which override an
+existing :term:`renderer` or which add a new renderer.  Adding or
+overriding a renderer is accomplished via :term:`ZCML` or via
+imperative configuration. 
 
 For example, to add a renderer which renders views which have a
 ``renderer`` attribute that is a path that ends in ``.jinja``::
 
-  <renderer
-    name=".jinja"
-    factory="my.package.MyJinja2Renderer"/>
+.. topic:: Via ZCML
 
-The ``factory`` attribute is a dotted Python name that must point to
-an implementation of a renderer.  A renderer implementation is usually
-a class which has the following interface:
+   <renderer
+     name=".jinja"
+     factory="my.package.MyJinja2Renderer"/>
+
+   The ``factory`` attribute is a dotted Python name that must point
+   to an implementation of a :term:`renderer`.
+
+   The ``name`` attribute
+
+.. topic:: Via Imperative Configuration
+
+   from my.package import MyJinja2Renderer
+   config.add_renderer('.jinja', MyJinja2Renderer)
+
+A renderer implementation is usually a class which has the following
+interface:
 
 .. code-block:: python
    :linenos:
@@ -1641,31 +1651,24 @@ a class which has the following interface:
            system value is a dictionary containing available system
            values (e.g. ``view``, ``context``, and ``request``). """
 
-A renderer's ``name`` is the second element of a ``<renderer>`` tag.
 There are essentially two different kinds of ``renderer``
-registrations with respect to the name:
-
-- a ``renderer`` registration which has a ``name`` attribute which
-  has a value that starts with a dot (``.``).
-
-- a ``renderer`` registration which has a ``name`` attribute which
-  has a value that *does not* start with a dot.
+registrations: registrations that use a dot (``.``) in their ``name``
+argument and ones which do not.
 
 Renderer registrations that have a ``name`` attribute which starts
 with a dot are meant to be *wildcard* registrations.  When a ``view``
-configuration is encountered which has a ``renderer`` attribute that
+configuration is encountered which has a ``name`` attribute that
 contains a dot, at startup time, the path is split on its final dot,
 and the second element of the split (the filename extension,
 typically) is used to look up a renderer for the configured view.  The
-renderer's factory is still passed the entire ``renderer`` attribute
-value (not just the extension).
+renderer's factory is still passed the entire ``name`` attribute value
+(not just the extension).
 
 Renderer registrations that have ``name`` attribute which *does not*
 start with a dot are meant to be absolute registrations.  When a
-``view`` configuration is encountered which has a ``renderer``
-attribute that does not contain a dot, the full value of the
-``renderer`` attribute is used to look up the renderer for the
-configured view.
+``view`` configuration is encountered which has a ``name`` argument
+that does not contain a dot, the full value of the ``name`` attribute
+is used to look up the renderer for the configured view.
 
 Here's an example of a renderer registration in ZCML:
 

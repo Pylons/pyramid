@@ -249,7 +249,7 @@ class Configurator(object):
     # API
 
     def add_subscriber(self, subscriber, iface=None):
-        """ Add an event subscriber for the event stream implied by
+        """Add an event subscriber for the event stream implied by
         the supplied ``iface`` interface.  The ``subscriber`` argument
         represents a callable object; it will be called with a single
         object ``event`` whenever :mod:`repoze.bfg` emits an event
@@ -327,7 +327,212 @@ class Configurator(object):
                  renderer=None, wrapper=None, xhr=False, accept=None,
                  header=None, path_info=None, _info=u''):
         """ Add a :term:`view configuration` to the current
-        configuration state."""
+        configuration state.  Arguments to ``add_view`` are broken
+        down below into *predicate* arguments and *non-predicate*
+        arguments.  Predicate arguments narrow the circumstances in
+        which a view will be invoked; non-predicate arguments are
+        informational.
+
+        Non-Predicate Arguments
+
+        view
+
+          The Python dotted-path name to the view callable.  This
+          argument is required unless a ``renderer`` attribute also
+          exists.  If a ``renderer`` argument is passed, this
+          attribute defaults to a view that returns an empty
+          dictionary (see :ref:`views_which_use_a_renderer`).
+
+        permission
+
+          The name of a *permission* that the user must possess in
+          order to call the view.  See :ref:`view_security_section`
+          for more information about view security and permissions.
+
+        attr
+
+          The view machinery defaults to using the ``__call__`` method
+          of the view callable (or the function itself, if the view
+          callable is a function) to obtain a response dictionary.
+          The ``attr`` value allows you to vary the method attribute
+          used to obtain the response.  For example, if your view was
+          a class, and the class has a method named ``index`` and you
+          wanted to use this method instead of the class' ``__call__``
+          method to return the response, you'd say ``attr="index"`` in the
+          view configuration for the view.  This is
+          most useful when the view definition is a class.
+
+        renderer
+
+          This is either a single string term (e.g. ``json``) or a
+          string implying a path or :term:`resource specification`
+          (e.g. ``templates/views.pt``).  If the renderer value is a
+          single term (does not contain a dot ``.``), the specified
+          term will be used to look up a renderer implementation, and
+          that renderer implementation will be used to construct a
+          response from the view return value.  If the renderer term
+          contains a dot (``.``), the specified term will be treated
+          as a path, and the filename extension of the last element in
+          the path will be used to look up the renderer
+          implementation, which will be passed the full path.  The
+          renderer implementation will be used to construct a response
+          from the view return value.
+
+          Note that if the view itself returns a response (see
+          :ref:`the_response`), the specified renderer implementation
+          is never called.
+
+          When the renderer is a path, although a path is usually just
+          a simple relative pathname (e.g. ``templates/foo.pt``,
+          implying that a template named"foo.pt" is in the "templates"
+          directory relative to the directory of *package* of the
+          Configurator), a path can be absolute, starting with a slash
+          on UNIX or a drive letter prefix on Windows.  The path can
+          alternately be a :term:`resource specification` in the form
+          ``some.dotted.package_name:relative/path``, making it
+          possible to address template resources which live in a
+          separate package.
+
+          The ``renderer`` attribute is optional.  If it is not
+          defined, the "null" renderer is assumed (no rendering is performed
+          and the value is passed back to the upstream BFG machinery
+          unmolested).
+
+        wrapper
+
+          The :term:`view name` of another view declared elsewhere in
+          configuration which will receive the response body of this
+          view as the ``request.wrapped_body`` attribute of its own
+          request, and the response returned by this view as the
+          ``request.wrapped_response`` attribute of its own request.
+          Using a wrapper makes it possible to
+          "chain" views together to form a composite response.  The response
+          of the outermost wrapper view will be returned to the user.  The
+          wrapper view will be found as any view is found: see
+          :ref:`view_lookup_ordering`.  The "best" wrapper view will be found
+          based on the lookup ordering: "under the hood" this wrapper view is
+          looked up via ``repoze.bfg.view.render_view_to_response(context,
+          request, 'wrapper_viewname')``. The context and request of a wrapper
+          view is the same context and request of the inner view.  If this
+          attribute is unspecified, no view wrapping is done.
+
+        Predicate Arguments
+
+        name
+
+          The :term:`view name`.  Read the :ref:`traversal_chapter` to
+          understand the concept of a view name.
+
+        for
+
+          An object representing Python class that the :term:`context`
+          must be an instance of, *or* the :term:`interface` that the
+          :term:`context` must provide in order for this view to be
+          found and called.  This predicate is true when the
+          :term:`context` is an instance of the represented class or
+          if the :term:`context` provides the represented interface;
+          it is otherwise false.
+
+        route_name
+
+          *This argument services an advanced feature that isn't often
+          used unless you want to perform traversal *after* a route
+          has matched.* This value must match the ``name`` of a
+          ``<route>`` declaration (see :ref:`urldispatch_chapter`)
+          that must match before this view will be called.  Note that
+          the ``route`` configuration referred to by ``route_name``
+          usually has a ``*traverse`` token in the value of its
+          ``path``, representing a part of the path that will be used
+          by traversal against the result of the route's :term:`root
+          factory`.See :ref:`hybrid_chapter` for more information on
+          using this advanced feature.
+
+        request_type
+
+          This value should be an :term:`interface` that the
+          :term:`request` must provide in order for this view to be
+          found and called.  See :ref:`view_request_types_section` for
+          more information about request types.
+
+        request_method
+
+          This value can either be one of the strings 'GET', 'POST',
+          'PUT', 'DELETE', or 'HEAD' representing an HTTP
+          ``REQUEST_METHOD``.  A view declaration with this argument
+          ensures that the view will only be called when the request's
+          ``method`` (aka ``REQUEST_METHOD``) string matches the
+          supplied value.
+
+        request_param
+
+          This value can be any string.  A view declaration with this
+          argument ensures that the view will only be called when the
+          request has a key in the ``request.params`` dictionary (an
+          HTTP ``GET`` or ``POST`` variable) that has a name which
+          matches the supplied value.  If the value supplied to the
+          attribute has a ``=`` sign in it, e.g. ``request_params="foo=123"``,
+          then the key (``foo``) must both exist in the ``request.params``
+          dictionary, and the value must match the right hand side of the
+          expression (``123``) for the view to "match" the current request.
+
+        containment
+
+          This value should be a reference to a Python class that a
+          graph traversal parent object of the :term:`context` must be
+          an instance of or :term:`interface` that a parent object
+          must provide in order for this view to be found and called.
+          Your models must be"location-aware" to use this feature.  See
+          :ref:`location_aware` for more information about location-awareness.
+
+        xhr
+
+          This value should be either ``True`` or ``False``.  If this
+          value is specified and is ``True``, the :term:`request` must
+          possess an ``HTTP_X_REQUESTED_WITH`` (aka
+          ``X-Requested-With``) header that has the value
+          ``XMLHttpRequest`` for this view to be found and called.
+          This is useful for detecting AJAX requests issued from
+          jQuery, Prototype and other Javascript libraries.
+
+        accept
+
+          The value of this attribute represents a match query for one
+          or more mimetypes in the ``Accept`` HTTP request header.  If
+          this value is specified, it must be in one of the following
+          forms: a mimetype match token in the form ``text/plain``, a
+          wildcard mimetype match token in the form ``text/*`` or a
+          match-all wildcard mimetype match token in the form ``*/*``.
+          If any of the forms matches the ``Accept`` header of the
+          request, this predicate will be true.
+
+        header
+
+          This value represents an HTTP header name or a header
+          name/value pair.  If the value contains a ``:`` (colon), it
+          will be considered a name/value pair
+          (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  The
+          *value* of an attribute that represent a name/value pair
+          should be a regular expression.  If the value does not
+          contain a colon, the entire value will be considered to be
+          the header name (e.g. ``If-Modified-Since``).  If the value
+          evaluates to a header name only without a value, the header
+          specified by the name must be present in the request for
+          this predicate to be true.  If the value evaluates to a
+          header name/value pair, the header specified by the name
+          must be present in the request *and* the regular expression
+          specified as the value must match the header value.  Whether
+          or not the value represents a header name or a header
+          name/value pair, the case of the header name is not
+          significant.
+
+        path_info
+
+          This value represents a regular expression pattern that will
+          be tested against the ``PATH_INFO`` WSGI environment
+          variable.  If the regex matches, this predicate will be
+          true.
+
+        """
 
         if not view:
             if renderer:
@@ -409,7 +614,209 @@ class Configurator(object):
                   view_accept=None, view_xhr=False,
                   view_path_info=None, _info=u''):
         """ Add a :term:`route configuration` to the current
-        configuration state."""
+        configuration state, as well as possibly a :term:`view
+        configuration` to be used to specify a :term:`view callable`
+        that will be invoked when this route matches.  The arguments
+        to this method are divided into *predicate*, *non-predicate*,
+        and *view-related* types.  Predicate arguments narrow the
+        circumstances in which a route will be match a request;
+        non-predicate arguments are informational.  View-related types
+        are used to modify the
+
+
+        Non-Predicate Arguments
+
+        name
+
+          The name of the route, e.g. ``myroute``.  This attribute is
+          required.  It must be unique among all defined routes in a given
+          configuration.
+
+        factory
+
+          A reference to a Python object (often a function) that will
+          generate a :mod:`repoze.bfg` context object when this route
+          matches.  e.g. ``mypackage.models.MyFactoryClass``.  If this
+          argument is not specified, a default root factory will be
+          used.
+
+        Predicate Arguments
+
+        path
+
+          The path of the route e.g. ``ideas/:idea``.  This argument
+          is required.  See :ref:`route_path_pattern_syntax` for
+          information about the syntax of route paths.
+
+        xhr
+
+          This value should be either ``True`` or ``False``.  If this
+          value is specified and is ``True``, the :term:`request` must
+          possess an ``HTTP_X_REQUESTED_WITH`` (aka
+          ``X-Requested-With``) header for this route to match.  This
+          is useful for detecting AJAX requests issued from jQuery,
+          Prototype and other Javascript libraries.  If this predicate
+          returns false, route matching continues.
+
+        request_method
+
+          A string representing an HTTP method name, e.g. ``GET``,
+          ``POST``, ``HEAD``, ``DELETE``, ``PUT``.  If this argument
+          is not specified, this route will match if the request has
+          *any* request method.  If this predicate returns false,
+          route matching continues.
+
+        path_info
+
+          This value represents a regular expression pattern that will
+          be tested against the ``PATH_INFO`` WSGI environment
+          variable.  If the regex matches, this predicate will be
+          true.  If this predicate returns false, route matching
+          continues.
+
+        request_param
+
+          This value can be any string.  A view declaration with this
+          argument ensures that the associated route will only match
+          when the request has a key in the ``request.params``
+          dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
+          name which matches the supplied value.  If the value
+          supplied as the argument has a ``=`` sign in it,
+          e.g. ``request_params="foo=123"``, then the key
+          (``foo``) must both exist in the ``request.params`` dictionary, and
+          the value must match the right hand side of the expression (``123``)
+          for the route to "match" the current request.  If this predicate
+          returns false, route matching continues.
+
+        header
+
+          This value represents an HTTP header name or a header
+          name/value pair.  If the value contains a ``:`` (colon), it
+          will be considered a name/value pair
+          (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  The
+          *value* of such a pair should be a regular expression.  If
+          the value does not contain a colon, the entire value will be
+          considered to be the header name
+          (e.g. ``If-Modified-Since``).  If the value evaluates to a
+          header name only without a value, the header specified by
+          the name must be present in the request for this predicate
+          to be true.  If the value evaluates to a header name/value
+          pair, the header specified by the name must be present in
+          the request *and* the regular expression specified as the
+          value must match the header value.  Whether or not the value
+          represents a header name or a header name/value pair, the
+          case of the header name is not significant.  If this
+          predicate returns false, route matching continues.
+
+        accept
+
+          This value represents a match query for one or more
+          mimetypes in the ``Accept`` HTTP request header.  If this
+          value is specified, it must be in one of the following
+          forms: a mimetype match token in the form ``text/plain``, a
+          wildcard mimetype match token in the form ``text/*`` or a
+          match-all wildcard mimetype match token in the form ``*/*``.
+          If any of the forms matches the ``Accept`` header of the
+          request, this predicate will be true.  If this predicate
+          returns false, route matching continues.
+
+        View-Related Arguments
+
+        view
+
+          A reference to a Python object that will be used as a view
+          callable when this route
+          matches. e.g. ``mypackage.views.my_view``.
+          
+        view_for
+
+          A reference to a class or an :term:`interface` that the
+          :term:`context` of the view should match for the view named
+          by the route to be used.  This argument is only useful if
+          the ``view`` attribute is used.  If this attribute is not
+          specified, the default (``None``) will be used.
+
+          If the ``view`` argument is not provided, this argument has
+          no effect.
+
+          This attribute can also be spelled as ``for_``.
+
+        view_permission
+
+          The permission name required to invoke the view associated
+          with this route.  e.g. ``edit``. (see
+          :ref:`using_security_with_urldispatch` for more information
+          about permissions).
+
+          If the ``view`` attribute is not provided, this argument has
+          no effect.
+
+          This argument can also be spelled as ``permission``.
+
+        view_renderer
+
+          This is either a single string term (e.g. ``json``) or a
+          string implying a path or :term:`resource specification`
+          (e.g. ``templates/views.pt``).  If the renderer value is a
+          single term (does not contain a dot ``.``), the specified
+          term will be used to look up a renderer implementation, and
+          that renderer implementation will be used to construct a
+          response from the view return value.  If the renderer term
+          contains a dot (``.``), the specified term will be treated
+          as a path, and the filename extension of the last element in
+          the path will be used to look up the renderer
+          implementation, which will be passed the full path.  The
+          renderer implementation will be used to construct a response
+          from the view return value.  See
+          :ref:`views_which_use_a_renderer` for more information.
+
+          If the ``view`` argument is not provided, this argument has
+          no effect.
+
+          This argument can also be spelled as ``renderer``.
+
+        view_request_type
+
+          A reference to an :term:`interface` representing a
+          :term:`request type`.  If this argument is not specified,
+          any request type will be considered a match for the view
+          associated with this route.
+
+          If the ``view`` argument is not provided, this argument has
+          no effect.
+
+          This argument can also be spelled as ``request_type``.
+
+        view_containment
+
+          This a reference to a Python object representing the class
+          that a graph traversal parent object of the :term:`context`
+          must be an instance of (or :term:`interface` that a parent
+          object must provide) in order for this view to be found and
+          called.  Your models must be "location-aware" to use this feature.
+          See :ref:`location_aware` for more information about
+          location-awareness.
+
+          If the ``view`` argument is not provided, this argument has no
+          effect.
+
+        view_attr
+
+          The view machinery defaults to using the ``__call__`` method
+          of the view callable (or the function itself, if the view
+          callable is a function) to obtain a response dictionary.
+          The ``attr`` value allows you to vary the method attribute
+          used to obtain the response.  For example, if your view was
+          a class, and the class has a method named ``index`` and you
+          wanted to use this method instead of the class' ``__call__``
+          method to return the response, you'd say ``attr="index"`` in
+          the view configuration for the view.  This is
+          most useful when the view definition is a class.
+
+          If the ``view`` argument is not provided, this argument has no
+          effect.
+
+        """
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
         _, predicates = _make_predicates(xhr=xhr,
@@ -486,14 +893,28 @@ class Configurator(object):
 
     def add_renderer(self, name, renderer, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`renderer` factory to the current
-        configuration state."""
+        configuration state.
+
+        The ``name`` argument is the renderer name.
+
+        The ``renderer`` argument is Python reference to an
+        implementation of a :term:`renderer`.
+        """
         iface = IRendererFactory
         self.registry.registerUtility(renderer, iface, name=name, info=_info)
 
     def override_resource(self, to_override, override_with,
                           _info=u'', _override=None,):
         """ Add a :mod:`repoze.bfg` resource override to the current
-        configuration state.  See :ref:`resources_chapter` for more
+        configuration state.
+
+        ``to_override`` is a :term:`resource specification` to the
+        resource being overridden.
+
+        ``override_with`` is a :term:`resource specification` to the
+        resource that is performing the override.
+
+        See :ref:`resources_chapter` for more
         information about resource overrides."""
         if to_override == override_with:
             raise ConfigurationError('You cannot override a resource with '
@@ -532,17 +953,66 @@ class Configurator(object):
 
     def set_forbidden_view(self, *arg, **kw):
         """ Add a default forbidden view to the current configuration
-        state."""
+        state.
+
+        The ``view`` argument should be a :term:`view callable`.
+
+        The ``attr`` argument should be the attribute of the view
+        callable used to retrieve the response (see the ``add_view``
+        method's ``attr`` argument for a description).
+
+        The ``renderer`` argument should be the name of (or path to) a
+        :term:`renderer` used to generate a response for this view
+        (see the ``add_view`` method's ``renderer`` argument for a
+        description).
+
+        The ``wrapper`` argument should be the name of another view
+        which will wrap this view when rendered (see the ``add_view``
+        method's ``wrapper`` argument for a description).
+
+        See :ref:`changing_the_forbidden_view` for more
+        information."""
         
         return self._system_view(IForbiddenView, *arg, **kw)
 
     def set_notfound_view(self, *arg, **kw):
         """ Add a default not found view to the current configuration
-        state."""
+        state.
+
+        The ``view`` argument should be a :term:`view callable`.
+
+        The ``attr`` argument should be the attribute of the view
+        callable used to retrieve the response (see the ``add_view``
+        method's ``attr`` argument for a description).
+
+        The ``renderer`` argument should be the name of (or path to) a
+        :term:`renderer` used to generate a response for this view
+        (see the ``add_view`` method's ``renderer`` argument for a
+        description).
+
+        The ``wrapper`` argument should be the name of another view
+        which will wrap this view when rendered (see the ``add_view``
+        method's ``wrapper`` argument for a description).
+
+        See :ref:`changing_the_notfound_view` for more
+        information.
+        """
         return self._system_view(INotFoundView, *arg, **kw)
 
     def add_static_view(self, name, path, cache_max_age=3600, _info=u''):
-        """ Add a static view to the current configuration state."""
+        """ Add a view used to render static resources to the current
+        configuration state.
+
+        The ``name`` argument is a string representing :term:`view
+        name` of the view which is registered.
+
+        The ``path`` argument is the path on disk where the static
+        files reside.  This can be an absolute path, a
+        package-relative path, or a :term:`resource specification`.
+
+        See :ref:`static_resources_section` for more information (the
+        ZCML directive just calls this method).
+        """
         spec = self._make_spec(path)
         view = static(spec, cache_max_age=cache_max_age)
         self.add_route(name, "%s*subpath" % name, view=view,

@@ -1,18 +1,7 @@
-- Decide about creating a "real" request object during testing.setUp
-  vs. creating a dummy request.
-
 - Audit the rest of the docs for "view configuration" and "route
   configuration" references, etc.
 
-- Finish Configurator API documentation.
-
-- set_security_policies as API method?
-
-- add set_response_factory or ctor arg and change hooks chapter.
-
-- add set_traverser or ctor arg and change hooks chapter.
-
-- add set_urlgenerator as ctor arg and change hooks chapter?
+- Find ZCML-only docs that deserve imperative-mode analogues.
 
 - Basic WSGI documentation (pipeline / app / server).
 
