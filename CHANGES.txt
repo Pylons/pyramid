@@ -252,6 +252,9 @@ Backwards Incompatibilites
   the responsibility of the ``repoze.bfg.includes`` ZCML to include
   this file in the past; it now just doesn't.
 
+- The ``repoze.bfg.testing.zcml_configure`` API was removed.  Use
+  the ``Configurator.load_zcml`` API instead.
+
 Deprecations
 ------------
 
@@ -260,6 +263,14 @@ Deprecations
   it probably ever disappear.  However, using a
   ``repoze.bfg.configuration.Configurator`` class is now the preferred
   way to generate a WSGI application.
+
+  Note that ``make_app`` calls
+  ``zope.component.getSiteManager.sethook(
+  repoze.bfg.threadlocal.get_current_registry)`` on the caller's
+  behalf, hooking ZCA global API lookups, for backwards compatibility
+  purposes.  If you disuse ``make_app``, your calling code will need
+  to perform this call itself, at least if your application uses the
+  ZCA global API (``getSiteManager``, ``getAdapter``, etc).
 
 Dependencies
 ------------

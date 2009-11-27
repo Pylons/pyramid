@@ -35,8 +35,6 @@
 
   .. autofunction:: cleanUp
 
-  .. autofunction:: zcml_configure
-
   .. autoclass:: DummyModel
      :members:
 
