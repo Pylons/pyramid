@@ -103,11 +103,6 @@ class Configurator(object):
     application.  If it is ``None``, a default root factory will be
     used.
 
-    If ``zcml_file`` is passed, it should be a filename relative to
-    the caller package, an absolute filename, or a :term:`resource
-    specification`.  The file it refers to should contain
-    :term:`ZCML`.  The ZCML represented in this file will be loaded.
-
     If ``authentication_policy`` is passed, it should be an instance
     of an :term:`authentication policy`.
 
@@ -252,33 +247,6 @@ class Configurator(object):
         self.registry.registerUtility(derived_view, iface, '', info=_info)
 
     # API
-
-    def hook_zca(self):
-        """
-        If this method is called, the configurator will run
-        ``zope.component.getSiteManager.sethook(
-        repoze.bfg.threadlocals.get_current_registry)``.  This causes
-        the ``zope.component.getSiteManager`` API to return the
-        :mod:`repoze.bfg` thread local registry.  This has the effect
-        of causing ``zope.component`` thread local API functions such
-        as ``getUtility`` and ``getMultiAdapter`` to use the
-        :mod:`repoze.bfg` registry instead of the global Zope registry
-        during the scope of every :mod:`repoze.bfg` :term:`request`.
-        """
-        from zope.component import getSiteManager
-        getSiteManager.sethook(get_current_registry)
-
-    def unhook_zca(self):
-        """
-        If this method is called, the configurator constructor will
-        run ``zope.component.getSiteManager.reset()``.  This causes
-        the ``zope.component.getSiteManager`` API to return the
-        original registry assigned to it (usually the Zope global
-        registry), effectively undoing the work of the ``hook_zca``
-        method.
-        """
-        from zope.component import getSiteManager
-        getSiteManager.reset()
 
     def add_subscriber(self, subscriber, iface=None):
         """ Add an event subscriber for the event stream implied by
@@ -1023,11 +991,16 @@ def _accept_wrap(view, accept):
     return accept_view
 
 # note that ``options`` is a b/w compat alias for ``settings`` and
-# ``Configurator`` is a testing dep inj
+# ``Configurator`` and getSiteManager is a testing dep inj
 def make_app(root_factory, package=None, filename='configure.zcml',
-             settings=None, options=None, Configurator=Configurator):
+             settings=None, options=None, Configurator=Configurator,
+             getSiteManager=None):
     """ Return a Router object, representing a fully configured
     ``repoze.bfg`` WSGI application.
+
+    .. warning:: Use of this function is deprecated as of
+       :mod:`repoze.bfg` 1.2.  You should instead use a
+       ``Configurator`` as shown in :ref:`configuration_narr`.
 
     ``root_factory`` must be a callable that accepts a :term:`request`
     object and which returns a traversal root object.  The traversal
@@ -1065,7 +1038,9 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     settings = settings or options or {}
     config = Configurator(package=package, settings=settings,
                           root_factory=root_factory)
-    config.hook_zca()
+    if getSiteManager is None:
+        from zope.component import getSiteManager
+    getSiteManager.sethook(get_current_registry)
     zcml_file = settings.get('configure_zcml', filename)
     config.load_zcml(zcml_file)
     return config.make_wsgi_app()

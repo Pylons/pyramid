@@ -28,6 +28,7 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.path import caller_package
 from repoze.bfg.resource import resolve_resource_spec
 from repoze.bfg.static import PackageURLParser
+from repoze.bfg.threadlocal import get_current_registry
 
 # b/c imports
 from repoze.bfg.security import view_execution_permitted
@@ -61,7 +62,10 @@ def render_view_to_response(context, request, name='', secure=True):
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
     provides = map(providedBy, (context, request))
-    reg = request.registry
+    try:
+        reg = request.registry
+    except AttributeError:
+        reg = get_current_registry()
     view = reg.adapters.lookup(provides, IView, name=name)
     if view is None:
         return None

@@ -134,31 +134,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
-    def test_hook_zca(self):
-        from zope.component import getSiteManager
-        from repoze.bfg.threadlocal import get_current_registry
-        try:
-            getSiteManager.reset()
-            config = self._makeOne()
-            config.hook_zca()
-            hooked = getSiteManager.sethook(None)
-            self.assertEqual(hooked, get_current_registry)
-        finally:
-            getSiteManager.reset()
-
-    def test_unhook_zca(self):
-        from zope.component import getSiteManager
-        try:
-            config = self._makeOne()
-            reg = object()
-            hook = lambda *arg: reg
-            hooked = getSiteManager.sethook(hook)
-            self.assertEqual(getSiteManager(), reg)
-            config.unhook_zca()
-            self.assertNotEqual(getSiteManager(), reg)
-        finally:
-            getSiteManager.reset()
-
     def test_add_subscriber_defaults(self):
         from zope.interface import implements
         from zope.interface import Interface
@@ -2488,14 +2463,17 @@ class TestMakeApp(unittest.TestCase):
         return make_app(*arg, **kw)
 
     def test_it(self):
+        from repoze.bfg.threadlocal import get_current_registry
         settings = {'a':1}
         rootfactory = object()
+        gsm = DummyGetSiteManager()
         app = self._callFUT(rootfactory, settings=settings,
-                            Configurator=DummyConfigurator)
+                            Configurator=DummyConfigurator,
+                            getSiteManager=gsm)
         self.assertEqual(app.root_factory, rootfactory)
         self.assertEqual(app.settings, settings)
         self.assertEqual(app.zcml_file, 'configure.zcml')
-        self.assertEqual(app.zca_hooked, True)
+        self.assertEqual(gsm.hook, get_current_registry)
 
     def test_it_options_means_settings(self):
         settings = {'a':1}
@@ -2633,3 +2611,9 @@ class DummyMultiView:
         return 'OK1'
     def __permitted__(self, context, request):
         """ """
+
+class DummyGetSiteManager(object):
+    def sethook(self, hook):
+        self.hook = hook
+        
+    

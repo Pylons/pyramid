@@ -1,27 +1,24 @@
-from repoze.bfg.testing import setUp
-from repoze.bfg.testing import tearDown
 
 import unittest
 
-class TestTestingFunctions(unittest.TestCase):
+class TestBase(unittest.TestCase):
     def setUp(self):
-        setUp()
-        from repoze.bfg.threadlocal import get_current_registry
-        self.registry = get_current_registry()
+        from repoze.bfg.threadlocal import manager
+        from repoze.bfg.registry import Registry
+        manager.clear()
+        registry = Registry('testing')
+        self.registry = registry
+        manager.push({'registry':registry, 'request':None})
         from zope.deprecation import __show__
         __show__.off()
 
     def tearDown(self):
-        tearDown()
+        from repoze.bfg.threadlocal import manager
+        manager.clear()
         from zope.deprecation import __show__
         __show__.on()
 
-    def _makeRequest(self, **extra_environ):
-        from repoze.bfg.threadlocal import get_current_request
-        request = get_current_request()
-        request.environ.update(extra_environ)
-        return request
-
+class Test_registerDummySecurityPolicy(TestBase):
     def test_registerDummySecurityPolicy(self):
         from repoze.bfg import testing
         testing.registerDummySecurityPolicy('user', ('group1', 'group2'),
@@ -36,6 +33,7 @@ class TestTestingFunctions(unittest.TestCase):
         self.assertEqual(ut.groupids, ('group1', 'group2'))
         self.assertEqual(ut.permissive, False)
 
+class Test_registerModels(TestBase):
     def test_registerModels(self):
         ob1 = object()
         ob2 = object()
@@ -62,6 +60,7 @@ class TestTestingFunctions(unittest.TestCase):
         from repoze.bfg.traversal import find_model
         self.assertEqual(find_model(None, '/ob1'), ob1)
 
+class Test_registerTemplateRenderer(TestBase):
     def test_registerTemplateRenderer(self):
         from repoze.bfg import testing
         renderer = testing.registerTemplateRenderer('templates/foo')
@@ -80,36 +79,24 @@ class TestTestingFunctions(unittest.TestCase):
         self.assertRaises(ValueError, render_template_to_response,
                           'templates/foo', foo=1, bar=2)
 
+class Test_registerEventListener(TestBase):
     def test_registerEventListener_single(self):
         from repoze.bfg import testing
-        from zope.interface import implements
-        from zope.interface import Interface
-        class IEvent(Interface):
-            pass
-        class Event:
-            implements(IEvent)
-        L = testing.registerEventListener(IEvent)
-        from zope.component.event import dispatch
-        event = Event()
-        dispatch(event)
+        L = testing.registerEventListener(IDummy)
+        event = DummyEvent()
+        self.registry.notify(event)
         self.assertEqual(len(L), 1)
         self.assertEqual(L[0], event)
-        dispatch(object())
+        self.registry.notify(object())
         self.assertEqual(len(L), 1)
 
     def test_registerEventListener_multiple(self):
         from repoze.bfg import testing
-        from zope.interface import implements
-        from zope.interface import Interface
-        class IEvent(Interface):
-            pass
-        class Event:
-            object = 'foo'
-            implements(IEvent)
-        L = testing.registerEventListener((Interface, IEvent))
-        from zope.component.event import objectEventNotify
-        event = Event()
-        objectEventNotify(event)
+        L = testing.registerEventListener((Interface, IDummy))
+        event = DummyEvent()
+        event.object = 'foo'
+        # the below is the equivalent of z.c.event.objectEventNotify(event)
+        self.registry.subscribers((event.object, event), None)
         self.assertEqual(len(L), 2)
         self.assertEqual(L[0], 'foo')
         self.assertEqual(L[1], event)
@@ -117,21 +104,22 @@ class TestTestingFunctions(unittest.TestCase):
     def test_registerEventListener_defaults(self):
         from repoze.bfg import testing
         L = testing.registerEventListener()
-        from zope.component.event import dispatch
         event = object()
-        dispatch(event)
+        self.registry.notify(event)
         self.assertEqual(L[-1], event)
         event2 = object()
-        dispatch(event2)
+        self.registry.notify(event2)
         self.assertEqual(L[-1], event2)
 
+class Test_registerView(TestBase):
     def test_registerView_defaults(self):
         from repoze.bfg import testing
         view = testing.registerView('moo.html')
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        request = self._makeRequest()
+        request = DummyRequest()
+        request.registry = self.registry
         response = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(view(None, None).body, response.body)
         
@@ -141,7 +129,8 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        request = self._makeRequest()
+        request = DummyRequest()
+        request.registry = self.registry
         response = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(response.body, 'yo')
 
@@ -154,7 +143,8 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        request = self._makeRequest()
+        request = DummyRequest()
+        request.registry = self.registry
         response = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(response.body, '123')
 
@@ -168,7 +158,8 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        request = self._makeRequest()
+        request = DummyRequest()
+        request.registry = self.registry
         self.assertRaises(Forbidden, render_view_to_response,
                           None, request, 'moo.html')
 
@@ -194,7 +185,8 @@ class TestTestingFunctions(unittest.TestCase):
         import types
         self.failUnless(isinstance(view, types.FunctionType))
         from repoze.bfg.view import render_view_to_response
-        request = self._makeRequest()
+        request = DummyRequest()
+        request.registry = self.registry
         result = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(result.app_iter, ['123'])
 
@@ -227,6 +219,7 @@ class TestTestingFunctions(unittest.TestCase):
             (Interface, Interface), IViewPermission, 'moo.html')
         self.assertEqual(result, True)
 
+class Test_registerAdapter(TestBase):
     def test_registerAdapter(self):
         from zope.interface import implements
         from zope.interface import Interface
@@ -251,6 +244,7 @@ class TestTestingFunctions(unittest.TestCase):
         self.assertEqual(adapter.context, for1)
         self.assertEqual(adapter.request, for2)
 
+class Test_registerUtility(TestBase):
     def test_registerUtility(self):
         from zope.interface import implements
         from zope.interface import Interface
@@ -265,34 +259,27 @@ class TestTestingFunctions(unittest.TestCase):
         testing.registerUtility(utility, iface, name='mudge')
         self.assertEqual(self.registry.getUtility(iface, name='mudge')(), 'foo')
 
+class Test_registerRoute(TestBase):
     def test_registerRoute(self):
         from repoze.bfg.url import route_url
         from repoze.bfg.interfaces import IRoutesMapper
         from repoze.bfg.testing import registerRoute
-        class Factory:
-            def __init__(self, environ):
-                """ """
-        class DummyRequest:
-            application_url = 'http://example.com'
-        registerRoute(':pagename', 'home', Factory)
+        registerRoute(':pagename', 'home', DummyFactory)
         mapper = self.registry.getUtility(IRoutesMapper)
         self.assertEqual(len(mapper.routelist), 1)
         request = DummyRequest()
         self.assertEqual(route_url('home', request, pagename='abc'),
                          'http://example.com/abc')
 
+class Test_registerRoutesMapper(TestBase):
     def test_registerRoutesMapper(self):
         from repoze.bfg.interfaces import IRoutesMapper
         from repoze.bfg.testing import registerRoutesMapper
-        class Factory:
-            def __init__(self, environ):
-                """ """
-        class DummyRequest:
-            application_url = 'http://example.com'
         result = registerRoutesMapper()
         mapper = self.registry.getUtility(IRoutesMapper)
         self.assertEqual(result, mapper)
 
+class Test_registerSettings(TestBase):
     def test_registerSettings(self):
         from repoze.bfg.interfaces import ISettings
         from repoze.bfg.testing import registerSettings
@@ -538,52 +525,127 @@ class TestDummyTemplateRenderer(unittest.TestCase):
         result = renderer({'a':1, 'b':2})
         self.assertEqual(result, 'abc')
 
-class TestSetUp(unittest.TestCase):
-    def setUp(self):
-        from zope.component import getSiteManager
-        getSiteManager.reset()
-        
-    def _callFUT(self, ):
+class Test_setUp(unittest.TestCase):
+    def _callFUT(self, **kw):
         from repoze.bfg.testing import setUp
-        return setUp()
+        return setUp(**kw)
 
-    def test_it(self):
-        from zope.component.globalregistry import base
-        from zope.interface import Interface
+    def test_it_defaults(self):
+        from repoze.bfg.threadlocal import manager
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.registry import Registry
         from zope.component import getSiteManager
-        getSiteManager.sethook(lambda *arg: base)
-        class IFoo(Interface):
-            pass
-        def foo():
-            """ """
-        base.registerUtility(foo, IFoo)
-        sm = getSiteManager()
-        self.assertEqual(sm.queryUtility(IFoo), foo)
-        self._callFUT()
-        newsm = getSiteManager()
-        self.assertEqual(newsm.queryUtility(IFoo), None)
+        old = True
+        manager.push(old)
+        try:
+            self._callFUT()
+            current = manager.get()
+            self.failIf(current is old)
+            self.assertEqual(current['registry'].__class__, Registry)
+            self.assertEqual(current['request'], None)
+        finally:
+            result = getSiteManager.sethook(None)
+            self.assertEqual(result, get_current_registry)
+            getSiteManager.reset()
+            manager.clear()
 
-class TestCleanUp(TestSetUp):
-    def _callFUT(self, ):
+    def test_it_with_registry(self):
+        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import manager
+        registry = object()
+        try:
+            self._callFUT(registry=registry)
+            current = manager.get()
+            self.assertEqual(current['registry'], registry)
+        finally:
+            getSiteManager.reset()
+            manager.clear()
+            
+    def test_it_with_request(self):
+        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import manager
+        request = object()
+        try:
+            self._callFUT(request=request)
+            current = manager.get()
+            self.assertEqual(current['request'], request)
+        finally:
+            getSiteManager.reset()
+            manager.clear()
+
+    def test_it_with_hook_zca_false(self):
+        from zope.component import getSiteManager
+        from repoze.bfg.threadlocal import manager
+        registry = object()
+        try:
+            self._callFUT(registry=registry, hook_zca=False)
+            sm = getSiteManager()
+            self.failIf(sm is registry)
+        finally:
+            getSiteManager.reset()
+            manager.clear()
+
+class Test_cleanUp(Test_setUp):
+    def _callFUT(self, *arg, **kw):
         from repoze.bfg.testing import cleanUp
-        return cleanUp()
+        return cleanUp(*arg, **kw)
         
-class TestTearDown(unittest.TestCase):
-    def setUp(self):
-        from zope.component import getSiteManager
-        getSiteManager.reset()
-        
-    def _callFUT(self, ):
+class Test_tearDown(unittest.TestCase):
+    def _callFUT(self, **kw):
         from repoze.bfg.testing import tearDown
-        return tearDown()
+        return tearDown(**kw)
 
-    def test_it(self):
-        from zope.component.globalregistry import base
+    def test_defaults(self):
+        from repoze.bfg.threadlocal import manager
         from zope.component import getSiteManager
-        getSiteManager.sethook(lambda *arg: 'foo')
-        sm = getSiteManager()
-        self.assertEqual(sm, 'foo')
-        self._callFUT()
-        newsm = getSiteManager()
-        self.assertEqual(newsm, base)
+        registry = DummyRegistry()
+        old = {'registry':registry}
+        hook = lambda *arg: None
+        try:
+            getSiteManager.sethook(hook)
+            manager.push(old)
+            self._callFUT()
+            current = manager.get()
+            self.assertNotEqual(current, old)
+            self.assertEqual(registry.inited, 2)
+        finally:
+            result = getSiteManager.sethook(None)
+            self.assertNotEqual(result, hook)
+            getSiteManager.reset()
+            manager.clear()
+
+    def test_unhook_zc_false(self):
+        from repoze.bfg.threadlocal import manager
+        from zope.component import getSiteManager
+        hook = lambda *arg: None
+        try:
+            getSiteManager.sethook(hook)
+            self._callFUT(unhook_zca=False)
+        finally:
+            result = getSiteManager.sethook(None)
+            self.assertEqual(result, hook)
+            getSiteManager.reset()
+            manager.clear()
+
+from zope.interface import Interface
+from zope.interface import implements
+        
+class IDummy(Interface):
+    pass
+
+class DummyEvent:
+    implements(IDummy)
+
+class DummyRequest:
+    application_url = 'http://example.com'
+
+class DummyFactory:
+    def __init__(self, environ):
+        """ """
+
+class DummyRegistry(object):
+    inited = 0
+    __name__ = 'name'
+    def __init__(self, name=''):
+        self.inited = self.inited + 1
         

@@ -1,6 +1,5 @@
 import copy
 
-from zope.component import getSiteManager
 from zope.configuration.xmlconfig import _clearContext
 
 from zope.deprecation import deprecated
@@ -522,53 +521,105 @@ class DummyRequest:
         self.registry = get_current_registry()
         self.__dict__.update(kw)
 
-def setUp():
+def setUp(registry=None, request=None, hook_zca=True):
     """
-    Set up a fresh BFG testing registry.  Use in the ``setUp``
-    method of unit tests that use the ``register*`` methods in the
-    testing module (e.g. if your unit test uses
-    ``repoze.bfg.testing.registerDummySecurityPolicy``).  If you use
-    the ``register*`` functions without calling ``setUp``, unit tests
-    will not be isolated with respect to registrations they perform.
-    Additionally, a *global* component registry will be used, which
-    may have a different API than is expected by BFG itself.
+    Set BFG registry and request thread locals for the duration of a
+    unit test.
 
-    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+    .. note:: The ``setUp`` function is new as of :mod:`repoze.bfg`
+    1.1.
+
+    Use in the ``setUp`` method of unit test code which uses any of
+    the ``register*`` functions in ``repoze.bfg.testing`` (such as
+    ``repoze.bfg.testing.registerDummySecurityPolicy``) or unit test
+    code that uses the ``repoze.bfg.threadlocal.get_current_registry``
+    or ``repoze.bfg.threadlocal.get_current_request`` functions.
+
+    If you use the ``testing.register*`` APIs, or the
+    ``get_current_*`` functions (or call :mod:`repoze.bfg` code that
+    uses these functions) without calling ``setUp``,
+    ``get_current_registry`` will return a *global* :term:`application
+    registry`, which may cause unit tests to not be isolated with
+    respect to registrations they perform.
+
+    If the ``registry`` argument is ``None``, a new empty
+    :term:`application registry` will be created (an instance of
+    ``repoze.bfg.registry.Registry``).  If the argument is not
+    ``None``, the value passed in should be an instance of the
+    :mod:`repoze.bfg.registry.Registry` class or a suitable testing
+    analogue.  After ``setUp`` is finished, the registry returned by
+    the ``repoze.bfg.threadlocal.get_current_request`` function will
+    be the passed (or constructed) registry until
+    ``repoze.bfg.testing.tearDown`` is called (or
+    ``repoze.bfg.testing.setUp`` is called again) .
+
+    .. note:: The ``registry`` argument is new as of :mod:`repoze.bfg`
+       1.2.
+
+    When ``setUp`` is finished, the value of the ``request`` argument
+    to ``setUp`` will be returned by the
+    ``repoze.bfg.threadlocal.get_current_registry`` function until
+    ``repoze.bfg.testing.tearDown`` is called (or
+    ``repoze.bfg.testing.setUp`` is called again) ..
+
+    .. note:: The ``request`` argument is new as of :mod:`repoze.bfg`
+       1.2.
+
+    If ``hook_zca`` is True, ``setUp`` will attempt to perform
+    ``zope.component.getSiteManager.sethook(
+    repoze.bfg.threadlocal.get_current_registry)``, which will cause
+    the :term:`Zope Component Architecture` global API
+    (e.g. ``getSiteManager``, ``getAdapter``, and so on) to use the
+    registry constructed by ``setUp` as the value it returns from
+    ``zope.component.getSiteManager``.  If ``zope.component`` cannot
+    be imported, or if ``hook_zca`` is ``False``, the hook will not be
+    set.
+
+    .. note:: The ``hook_zca`` argument is new as of :mod:`repoze.bfg`
+       1.2.
     """
-    from repoze.bfg.registry import Registry
-    registry = Registry('testing')
     manager.clear()
-    request = DummyRequest()
-    request.registry = registry
+    if registry is None:
+        from repoze.bfg.registry import Registry
+        registry = Registry('testing')
     manager.push({'registry':registry, 'request':request})
-    getSiteManager.sethook(get_current_registry)
+    if hook_zca:
+        try:
+            from zope.component import getSiteManager
+            getSiteManager.sethook(get_current_registry)
+        except ImportError:
+            pass
+
+def tearDown(unhook_zca=True):
+    """Undo the effects ``repoze.bfg.testing.setUp``.  Use this
+    function in the ``tearDown`` of a unit test that uses
+    ``repoze.bfg.testing.setUp`` in its setUp method.
+
+    .. note:: This function is new as of :mod:`repoze.bfg` 1.1.
+
+    If the ``unhook_zca`` argument is ``True`` (the default), call
+    ``zope.component.getSiteManager.reset()``.  This undoes the action
+    of ``repze.bfg.testing.setUp`` called with ``hook_zca=True``.  If
+    ``zope.component`` cannot be imported, ignore the argument.
+
+    .. note:: The ``unhook_zca`` argument is new as of
+       :mod:`repoze.bfg` 1.2.
+
+    """
+    if unhook_zca:
+        from zope.component import getSiteManager
+        getSiteManager.reset()
+    info = manager.pop()
+    manager.clear()
+    if info is not None:
+        reg = info['registry']
+        if hasattr(reg, '__init__') and hasattr(reg, '__name__'):
+            reg.__init__(reg.__name__)
     _clearContext() # XXX why?
 
-def tearDown():
-    """Tear down a previously set up (via
-    ``repoze.bfg.testing.setUp``) testing registry.  Use in the
-    ``tearDown`` method of unit tests that use the ``register*``
-    methods in the testing module (e.g. if your unit test uses
-    ``repoze.bfg.testing.registerDummySecurityPolicy``).  Using
-    ``tearDown`` is effectively optional if you call setUp at the
-    beginning of every test which requires registry isolation.
-
-    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-    """
-    getSiteManager.reset()
-    manager.pop()
-
-def cleanUp():
-    """ Deprecated (as of BFG 1.1) function whichs sets up a new
-    registry for BFG testing registrations.  Use in the ``setUp`` and
-    ``tearDown`` of unit tests that use the ``register*`` methods in
-    the testing module (e.g. if your unit test uses
-    ``repoze.bfg.testing.registerDummySecurityPolicy``).  Use of this
-    function is deprecated in favor of using
-    ``repoze.bfg.testing.setUp`` in the test setUp and
-    ``repoze.bfg.testing.tearDown`` in the test tearDown.  This is
-    currently just an alias for ``repoze.bfg.testing.setUp``.
-    Although this function is effectively deprecated, due to its
+def cleanUp(*arg, **kw):
+    """ ``repoze.bfg.testing.cleanUp`` is an alias for
+    ``repoze.bfg.testing.setUp``.  Although this function is
+    effectively deprecated as of :mod:`repoze.bfg` 1.1, due to its
     extensive production usage, it will never be removed."""
-    setUp()
+    setUp(*arg, **kw)

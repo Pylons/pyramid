@@ -17,8 +17,6 @@
 
      .. automethod:: add_view
 
-     .. automethod:: hook_zca()
-
      .. automethod:: load_zcml(spec)
 
      .. automethod:: make_wsgi_app()
@@ -32,6 +30,3 @@
      .. automethod:: set_notfound_view(view=None, attr=None, renderer=None, wrapper=None)
 
      .. automethod:: set_security_policies
-
-     .. automethod:: unhook_zca()
-

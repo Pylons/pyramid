@@ -9,13 +9,36 @@ Features
   "imperatively" configured applications and traditional
   declaratively-configured applications.
 
-- The ``repoze.bfg.testing.setUp`` function now causes a "dummy"
-  request object to be created (an instance of
-  ``repoze.bfg.testing.DummyRequest``).  The DummyRequest object is
-  available via ``repoze.bfg.threadlocal.get_current_request`` when
-  this API is used in the setUp of a unit test.  Previously this
-  function did not create a request object; it instead assigned
-  ``None`` to the threadlocal request value.
+- The ``repoze.bfg.testing.setUp`` function now accepts three extra
+  optional keyword arguments: ``registry``, ``request`` and
+  ``hook_zca``.
+
+  If the ``registry`` argument is not ``None``, the argument will be
+  treated as the registry that is set as the "current registry" (it
+  will be returned by ``repoze.bfg.threadlocal.get_current_registry``)
+  for the duration of the test.  If the ``registry`` argument is
+  ``None`` (the default), a new registry is created and used for the
+  duration of the test.
+
+  The value of the ``request`` argument is used as the "current
+  request" (it will be returned by
+  ``repoze.bfg.threadlocal.get_current_request``) for the duration of
+  the test; it defaults to ``None``.
+
+  If ``hook_zca`` is ``True`` (the default), the
+  ``zope.component.getSiteManager`` function will be hooked with a
+  function that returns the value of ``registry`` (or the
+  default-created registry if ``registry`` is ``None``) instead of the
+  registry returned by ``zope.component.getGlobalSiteManager``,
+  causing the Zope Component Architecture API (``getSiteManager``,
+  ``getAdapter``, ``getUtility``, and so on) to use the registry we're
+  using for testing instead of the global ZCA registry.
+
+- The ``repoze.bfg.testing.tearDown`` function now accepts an
+  ``unhook_zca`` argument.  If this argument is ``True`` (the
+  default), ``zope.component.getSiteManager.reset()`` will be called,
+  causing the "base" registry to once again start returnining the
+  result of ``zope.component.getSiteManager``.
 
 - The ``run.py`` module in various ``repoze.bfg`` ``paster`` templates
   now use a ``repoze.bfg.configuration.Configurator`` class instead of
