@@ -9,6 +9,36 @@ provides a number of facilities that make unit tests easier to write.
 The facilities become particularly useful when your code calls into
 :mod:`repoze.bfg` -related framework functions.
 
+Test Set Up and Tear Down
+--------------------------
+
+:mod:`repoze.bfg` uses a "global" (actually thread-local) data
+structure to hold on to two items: the current :term:`request` and the
+current :term:`application registry`.  These data structures are
+available via the ``repoze.bfg.threadlocal.get_current_request`` and
+``repoze.bfg.threadlocal.get_current_registry`` functions,
+respectively.
+
+If your code uses these ``get_current_*`` functions (or calls
+:mod:`repoze.bfg` code which uses the ``get_current_*`` functions),
+you will need to use the ``repoze.bfg.testing.setUp`` and
+``repoze.bfg.testing.tearDown`` functions within the ``setUp`` and
+``tearDown`` methods of your unit tests, respectively.
+
+If you don't *know* whether you're calling code that uses these
+functions, a rule of thumb applies: just always use the
+``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``
+functions in the ``setUp`` and ``tearDown`` respectively of unit tests
+that test :mod:`repoze.bfg` application code, unless it's obvious
+you're not calling any :mod:`repoze.bfg` APIs which might make use of
+the any "current" global.
+
+The ``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``
+functions accept various arguments that influence the code run during
+the test.  See the :ref:`testing_module` chapter for information about
+the APIs of ``repoze.bfg.testing.setUp`` and
+``repoze.bfg.testing.tearDown``.
+
 Using the ``repoze.bfg.testing`` API in Unit Tests
 --------------------------------------------------
 

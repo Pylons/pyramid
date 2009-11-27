@@ -69,6 +69,9 @@ Documentation
   removed in a later release (it still works now, it's just not
   documented).
 
+- Add a section entitled "Test Set Up and Tear Down" to the
+  unittesting chapter.
+
 Bug Fixes
 ----------
 
