@@ -570,7 +570,7 @@ def setUp(registry=None, request=None, hook_zca=True):
     repoze.bfg.threadlocal.get_current_registry)``, which will cause
     the :term:`Zope Component Architecture` global API
     (e.g. ``getSiteManager``, ``getAdapter``, and so on) to use the
-    registry constructed by ``setUp` as the value it returns from
+    registry constructed by ``setUp`` as the value it returns from
     ``zope.component.getSiteManager``.  If ``zope.component`` cannot
     be imported, or if ``hook_zca`` is ``False``, the hook will not be
     set.
