@@ -539,8 +539,8 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
    comment at the top.
 
 #. A ``configure.zcml`` is a :term:`ZCML` file which maps view names
-   to model types.  This is also known as the :term:`application
-   registry`.
+   to model types.  Its contents populate the :term:`application
+   registry` when loaded.
 
 #. A ``models.py`` module, which contains :term:`model` code.
 

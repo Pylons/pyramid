@@ -123,7 +123,8 @@ of the below examples produces the same application configuration.
 
       if __name__ == '__main__':
           from repoze.bfg.configuration import Configurator
-          config = Configurator(zcml_file='configure.zcml')
+          config = Configurator()
+          config.load_zcml('configure.zcml')
 
    .. code-block:: xml
       :linenos:
@@ -172,7 +173,8 @@ of the below examples produces the same application configuration.
 
       if __name__ == '__main__':
           from repoze.bfg.configuration import Configurator
-          config = Configurator(zcml_file='configure.zcml')
+          config = Configurator()
+          config.load_zcml('configure.zcml')
 
    .. code-block:: xml
       :linenos:

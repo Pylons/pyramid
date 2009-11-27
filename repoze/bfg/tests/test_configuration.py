@@ -92,20 +92,6 @@ class ConfiguratorTests(unittest.TestCase):
         config = Configurator(package=bfg_pkg)
         self.assertEqual(config.package, bfg_pkg)
 
-    def test_ctor_noreg_zcml_file(self):
-        config = self._makeOne(
-            registry=None,
-            zcml_file='repoze.bfg.tests.fixtureapp:configure.zcml')
-        registry = config.registry
-        from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
-
-    def test_ctor_noreg_zcml_file_routes_in_config(self):
-        from repoze.bfg.interfaces import IRoutesMapper
-        config = self._makeOne(
-            zcml_file='repoze.bfg.tests.routesapp:configure.zcml')
-        self.failUnless(config.registry.getUtility(IRoutesMapper))
-
     def test_ctor_noreg_custom_settings(self):
         from repoze.bfg.interfaces import ISettings
         settings = {'reload_templates':True,
@@ -148,36 +134,28 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
-    def test_ctor_hook_zca_true(self):
-        from zope.component import getSiteManager
-        from repoze.bfg.threadlocal import get_current_registry
-        try:
-            getSiteManager.reset()
-            config = self._makeOne(hook_zca=True)
-            hooked = getSiteManager.sethook(None)
-            self.assertEqual(hooked, get_current_registry)
-        finally:
-            getSiteManager.reset()
-
-    def test_ctor_hook_zca_false(self):
-        from zope.component import getSiteManager
-        from repoze.bfg.threadlocal import get_current_registry
-        try:
-            getSiteManager.reset()
-            config = self._makeOne(hook_zca=False)
-            hooked = getSiteManager.sethook(None)
-            self.failIfEqual(hooked, get_current_registry)
-        finally:
-            getSiteManager.reset()
-
-    def test_ctor_hook_zca_default_false(self):
+    def test_hook_zca(self):
         from zope.component import getSiteManager
         from repoze.bfg.threadlocal import get_current_registry
         try:
             getSiteManager.reset()
             config = self._makeOne()
+            config.hook_zca()
             hooked = getSiteManager.sethook(None)
-            self.failIfEqual(hooked, get_current_registry)
+            self.assertEqual(hooked, get_current_registry)
+        finally:
+            getSiteManager.reset()
+
+    def test_unhook_zca(self):
+        from zope.component import getSiteManager
+        try:
+            config = self._makeOne()
+            reg = object()
+            hook = lambda *arg: reg
+            hooked = getSiteManager.sethook(hook)
+            self.assertEqual(getSiteManager(), reg)
+            config.unhook_zca()
+            self.assertNotEqual(getSiteManager(), reg)
         finally:
             getSiteManager.reset()
 
@@ -266,12 +244,17 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
-    def test_load_zcml_as_resource_spec(self):
+    def test_load_zcml_routesapp(self):
+        from repoze.bfg.interfaces import IRoutesMapper
         config = self._makeOne()
-        registry = config.load_zcml(
-            'repoze.bfg.tests.fixtureapp:configure.zcml')
+        config.load_zcml('repoze.bfg.tests.routesapp:configure.zcml')
+        self.failUnless(config.registry.getUtility(IRoutesMapper))
+
+    def test_load_zcml_fixtureapp(self):
         from repoze.bfg.tests.fixtureapp.models import IFixture
-        self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
+        config = self._makeOne()
+        config.load_zcml('repoze.bfg.tests.fixtureapp:configure.zcml')
+        self.failUnless(config.registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_load_zcml_as_relative_filename(self):
         import repoze.bfg.tests.fixtureapp
@@ -2512,7 +2495,7 @@ class TestMakeApp(unittest.TestCase):
         self.assertEqual(app.root_factory, rootfactory)
         self.assertEqual(app.settings, settings)
         self.assertEqual(app.zcml_file, 'configure.zcml')
-        self.assertEqual(app.hook_zca, True)
+        self.assertEqual(app.zca_hooked, True)
 
     def test_it_options_means_settings(self):
         settings = {'a':1}
@@ -2609,14 +2592,17 @@ class DummySecurityPolicy:
         return self.permitted
 
 class DummyConfigurator(object):
-    def __init__(self, registry=None, package=None,
-                 root_factory=None, zcml_file=None,
-                 settings=None, hook_zca=False):
+    def __init__(self, registry=None, package=None, root_factory=None,
+                 settings=None):
         self.root_factory = root_factory
         self.package = package
-        self.zcml_file = zcml_file
         self.settings = settings
-        self.hook_zca = hook_zca
+
+    def hook_zca(self):
+        self.zca_hooked = True
+
+    def load_zcml(self, filename):
+        self.zcml_file = filename
     
     def make_wsgi_app(self):
         return self

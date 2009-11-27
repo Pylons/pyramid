@@ -126,25 +126,11 @@ class Configurator(object):
     If ``debug_logger`` is not passed, a default debug logger that
     logs to stderr will be used.  If it is passed, it should be an
     instance of a ``logging.Logger`` (PEP 282) class.
-
-    If ``hook_zca`` is ``True``, the configurator constructor will run
-    ``zope.component.getSiteManager.sethook(
-    repoze.bfg.threadlocals.get_current_registry)``.  This causes the
-    ``zope.component.getSiteManager`` API to return the
-    :mod:`repoze.bfg` thread local registry.  This has the effect of
-    causing ``zope.component`` thread local API functions such as
-    ``getUtility`` and ``getMultiAdapter`` to use the
-    :mod:`repoze.bfg` registry instead of the global Zope registry
-    during the scope of every :mod:`repoze.bfg` :term:`request`.  It
-    typically also means registrations made via ZCML will end up in
-    the :mod:`repoze.bfg` registry instead of the global Zope
-    registry.  By default, this is ``False``. """
-
+    """
     def __init__(self, registry=None, package=None, settings=None,
-                 root_factory=None, zcml_file=None,
-                 authentication_policy=None, authorization_policy=None,
-                 renderers=DEFAULT_RENDERERS, debug_logger=None,
-                 hook_zca=False):
+                 root_factory=None, authentication_policy=None,
+                 authorization_policy=None, renderers=DEFAULT_RENDERERS,
+                 debug_logger=None):
         self.package = package or caller_package()
         self.registry = registry
         if registry is None:
@@ -163,12 +149,6 @@ class Configurator(object):
                                            authorization_policy)
             for name, renderer in renderers:
                 self.add_renderer(name, renderer)
-            if hook_zca:
-                from zope.component import getSiteManager
-                getSiteManager.sethook(get_current_registry)
-                self.registry.zca_hooked = True
-            if zcml_file is not None:
-                self.load_zcml(zcml_file)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -272,6 +252,33 @@ class Configurator(object):
         self.registry.registerUtility(derived_view, iface, '', info=_info)
 
     # API
+
+    def hook_zca(self):
+        """
+        If this method is called, the configurator will run
+        ``zope.component.getSiteManager.sethook(
+        repoze.bfg.threadlocals.get_current_registry)``.  This causes
+        the ``zope.component.getSiteManager`` API to return the
+        :mod:`repoze.bfg` thread local registry.  This has the effect
+        of causing ``zope.component`` thread local API functions such
+        as ``getUtility`` and ``getMultiAdapter`` to use the
+        :mod:`repoze.bfg` registry instead of the global Zope registry
+        during the scope of every :mod:`repoze.bfg` :term:`request`.
+        """
+        from zope.component import getSiteManager
+        getSiteManager.sethook(get_current_registry)
+
+    def unhook_zca(self):
+        """
+        If this method is called, the configurator constructor will
+        run ``zope.component.getSiteManager.reset()``.  This causes
+        the ``zope.component.getSiteManager`` API to return the
+        original registry assigned to it (usually the Zope global
+        registry), effectively undoing the work of the ``hook_zca``
+        method.
+        """
+        from zope.component import getSiteManager
+        getSiteManager.reset()
 
     def add_subscriber(self, subscriber, iface=None):
         """ Add an event subscriber for the event stream implied by
@@ -1056,10 +1063,10 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     ``settings`` keyword parameter.
     """
     settings = settings or options or {}
-    zcml_file = settings.get('configure_zcml', filename)
     config = Configurator(package=package, settings=settings,
-                          root_factory=root_factory, zcml_file=zcml_file,
-                          hook_zca=True) # hook_zca for bw compat
-    app = config.make_wsgi_app()
-    return app
+                          root_factory=root_factory)
+    config.hook_zca()
+    zcml_file = settings.get('configure_zcml', filename)
+    config.load_zcml(zcml_file)
+    return config.make_wsgi_app()
 

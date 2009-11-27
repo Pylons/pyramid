@@ -25,8 +25,8 @@ def app(global_config, **settings):
     if db_echo is None:
         db_echo = True
     get_root = appmaker(db_string, db_echo)
+    config = Configurator(settings=settings, root_factory=get_root)
     zcml_file = settings.get('configure_zcml', 'configure.zcml')
-    config = Configurator(settings=settings, root_factory=get_root, 
-                          zcml_file=zcml_file)
+    config.load_zcml(zcml_file)
     return config.make_wsgi_app()
 

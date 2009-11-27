@@ -587,7 +587,8 @@ In a file named ``helloworld.py``:
        return Response('Goodbye world!')
 
    if __name__ == '__main__':
-       config = Configurator(zcml_file='configure.zcml')
+       config = Configurator()
+       config.load_zcml('configure.zcml)
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
@@ -629,26 +630,27 @@ within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
-In our "declarative" code, we've added a ``zcml_file`` argument to the
-``Configurator`` constructor's argument list with the value
-``configure.zcml``, and we've removed the lines which read
-``config.add_view(hello_world)`` and ``config.add_view(goodbye_world,
-name='goodbye')``, so that it now reads as:
+In our "declarative" code, we've added a call to the ``load_zcml``
+method of the ``Configurator`` with the value ``configure.zcml``, and
+we've removed the lines which read ``config.add_view(hello_world)``
+and ``config.add_view(goodbye_world, name='goodbye')``, so that it now
+reads as:
 
 .. code-block:: python
    :linenos:
 
    if __name__ == '__main__':
-       config = Configurator(zcml_file='configure.zcml')
+       config = Configurator()
+       config.load_zcml('configure.zcml')
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
 Everything else is much the same.
 
-The ``zcml_file`` argument to the ``Configurator`` constructor tells
-the configurator to load configuration declarations from the
-``configure.zcml`` file which sits next to ``helloworld.py``.  Let's
-take a look at the ``configure.zcml`` file now:
+The ``config.load_zcml('configure.zcml')`` line tells the configurator
+to load configuration declarations from the ``configure.zcml`` file
+which sits next to ``helloworld.py``.  Let's take a look at the
+``configure.zcml`` file now:
 
 .. code-block:: xml
    :linenos:

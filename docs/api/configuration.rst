@@ -5,7 +5,7 @@
 
 .. automodule:: repoze.bfg.configuration
 
-  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, zcml_file=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, hook_zca=False)
+  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None)
 
      .. automethod:: add_renderer(name, factory)
 
@@ -16,6 +16,8 @@
      .. automethod:: add_subscriber
 
      .. automethod:: add_view
+
+     .. automethod:: hook_zca()
 
      .. automethod:: load_zcml(spec)
 
@@ -30,3 +32,6 @@
      .. automethod:: set_notfound_view(view=None, attr=None, renderer=None, wrapper=None)
 
      .. automethod:: set_security_policies
+
+     .. automethod:: unhook_zca()
+
