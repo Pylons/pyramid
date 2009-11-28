@@ -773,6 +773,7 @@ def path_spec(context, path):
         pp = package_path(package) + os.path.sep
         if abspath.startswith(pp):
             relpath = abspath[len(pp):]
-            return '%s:%s' % (package.__name__, relpath)
+            return '%s:%s' % (package.__name__,
+                              relpath.replace(os.path.sep, '/'))
     return abspath
 
