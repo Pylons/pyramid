@@ -770,7 +770,7 @@ def path_spec(context, path):
         package = context.package
         if getattr(package, '__name__', None) == '__main__':
             return abspath
-        pp = package_path(package) +'/'
+        pp = package_path(package) + os.path.sep
         if abspath.startswith(pp):
             relpath = abspath[len(pp):]
             return '%s:%s' % (package.__name__, relpath)
