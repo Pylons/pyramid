@@ -21,3 +21,4 @@ class Registry(Components, dict):
             # iterating over subscribers assures they get executed
             [ _ for _ in self.subscribers(events, None) ]
 
+global_registry = Registry('global')

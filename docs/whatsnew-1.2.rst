@@ -82,6 +82,65 @@ Minor Miscellaneous Feature Additions
 Backwards Incompatibilites
 --------------------------
 
+- Unit tests which use ``zope.testing.cleanup.cleanUp`` for the
+  purpose of isolating tests from one another may now begin to fail
+  due to lack of isolation between tests.
+
+  Here's why: In repoze.bfg 1.1 and prior, the registry returned by
+  ``repoze.bfg.threadlocal.get_current_registry`` when no other
+  registry had been pushed on to the threadlocal stack was the
+  ``zope.component.globalregistry.base`` global registry (aka the
+  result of ``zope.component.getGlobalSiteManager()``).  In repoze.bfg
+  1.2+, however, the registry returned in this situation is the new
+  module-scope ``repoze.bfg.registry.global_registry`` object.  The
+  ``zope.testing.cleanup.cleanUp`` function clears the
+  ``zope.component.globalregistry.base`` global registry
+  unconditionally.  However, it does not know about the
+  ``repoze.bfg.registry.global_registry`` object, so it does not clear
+  it.
+
+  If you use the ``zope.testing.cleanup.cleanUp`` function in the
+  ``setUp`` of test cases in your unit test suite instead of using the
+  (more correct as of 1.1) ``repoze.bfg.testing.setUp``, you will need
+  to replace all calls to ``zope.testing.cleanup.cleanUp`` with a call
+  to ``repoze.bfg.testing.setUp``.
+
+  If replacing all calls to ``zope.testing.cleanup.cleanUp`` with a
+  call to ``repoze.bfg.testing.setUp`` is infeasible, you can put this
+  bit of code somewhere that is executed exactly **once** (*not* for
+  each test in a test suite; in the `` __init__.py`` of your
+  package would be a reasonable place)::
+
+    import zope.testing.cleanup
+    from repoze.bfg.testing import setUp
+    zope.testing.cleanup.addCleanUp(setUp)
+
+- When there is no "current registry" in the
+  ``repoze.bfg.threadlocal.manager`` threadlocal data structure (this
+  is the case when there is no "current request" or we're not in the
+  midst of a ``r.b.testing.setUp``-bounded unit test), the ``.get``
+  method of the manager returns a data structure containing a *global*
+  registry.  In previous releases, this function returned the global
+  Zope "base" registry: the result of
+  ``zope.component.getGlobalSiteManager``, which is an instance of the
+  ``zope.component.registry.Component`` class.  In this release,
+  however, the global registry returns a globally importable instance
+  of the ``repoze.bfg.registry.Registry`` class.  This registry
+  instance can always be imported as
+  ``repoze.bfg.registry.global_registry``.
+
+  Effectively, this means that when you call
+  ``repoze.bfg.threadlocal.get_current_registry`` when no request or
+  ``setUp`` bounded unit test is in effect, you will always get back
+  the global registry that lives in
+  ``repoze.bfg.registry.global_registry``.  It also means that
+  :mod:`repoze.bfg` APIs that *call* ``get_current_registry`` will use
+  this registry.
+
+  This change was made because :mod:`repoze.bfg` now expects the
+  registry it uses to have a slightly different API than a bare
+  instance of ``zope.component.registry.Components``.
+
 - View registration no longer registers a
   ``repoze.bfg.interfaces.IViewPermission`` adapter (it is no longer
   checked by the framework; since 1.1, views have been responsible for

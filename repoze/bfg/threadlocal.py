@@ -1,6 +1,6 @@
 import threading
 
-from zope.component import getGlobalSiteManager
+from repoze.bfg.registry import global_registry
 
 class ThreadLocalManager(threading.local):
     def __init__(self, default=None):
@@ -31,8 +31,7 @@ class ThreadLocalManager(threading.local):
         self.stack[:] = []
 
 def defaults():
-    reg = getGlobalSiteManager()
-    return {'request':None, 'registry':reg}
+    return {'request':None, 'registry':global_registry}
 
 manager = ThreadLocalManager(default=defaults)
 

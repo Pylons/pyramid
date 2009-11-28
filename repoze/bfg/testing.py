@@ -637,3 +637,4 @@ def cleanUp(*arg, **kw):
     effectively deprecated as of :mod:`repoze.bfg` 1.1, due to its
     extensive production usage, it will never be removed."""
     setUp(*arg, **kw)
+

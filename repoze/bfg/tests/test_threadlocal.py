@@ -90,6 +90,6 @@ class GetCurrentRegistryWithoutTestingRegistry(unittest.TestCase):
         return get_current_registry()
 
     def test_it(self):
-        from zope.component import getGlobalSiteManager
-        self.assertEqual(self._callFUT(), getGlobalSiteManager())
+        from repoze.bfg.registry import global_registry
+        self.assertEqual(self._callFUT(), global_registry)
     
