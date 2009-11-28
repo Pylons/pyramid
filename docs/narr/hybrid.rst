@@ -310,7 +310,7 @@ given request.
 This explanation requires a little "inside baseball" knowledge of how
 :mod:`repoze.bfg` works.  :mod:`repoze.bfg` uses the :term:`Zope
 Component Architecture` under the hood to dispatch a request to a
-:term:`view`.  In Zope Component Architecture-speak, a view is an
+:term:`view`.  In Zope Component Architecture-speak, a view is a
 "multi adapter" registered for a :term:`context` type and a
 :term:`request` type as well as a particular :term:`view name`.  When
 a request is generated and a context is found by the :mod:`repoze.bfg`
