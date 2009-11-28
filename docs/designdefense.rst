@@ -25,12 +25,12 @@ involves.
 Problems
 ++++++++
 
-The API that is commonly used to access data in a ZCA "component
-registry" is not particularly pretty or intuitive, and sometimes it's
-just plain obtuse.  Likewise, the conceptual load on a casual source
-code reader of code that uses the component architecture is somewhat
-high.  Consider a ZCA neophyte reading the code that performs a
-typical "unnamed utility" lookup:
+The "global" API that is commonly used to access data in a ZCA
+"component registry" is not particularly pretty or intuitive, and
+sometimes it's just plain obtuse.  Likewise, the conceptual load on a
+casual source code reader of code that uses the component architecture
+is somewhat high.  Consider a ZCA neophyte reading the code that
+performs a typical "unnamed utility" lookup:
 
 .. code-block:: python
    :linenos:
@@ -57,12 +57,12 @@ for some lookup based on its identity as a marker: it represents an
 object that has the dictionary API, but that's not very important in
 this context.  That's problem number two.
 
-Third of all, what does ``getUtility`` do?  It's performing a lookup
-for the ``ISettings`` "utility" that should return.. well, a utility.
-Note how we've already built up a dependency on the understanding of
-an :term:`interface` and the concept of "utility" to answer this
-question: a bad sign so far.  Note also that the answer is circular, a
-*really* bad sign.
+Third of all, what does the ``getUtility`` function do?  It's
+performing a lookup for the ``ISettings`` "utility" that should
+return.. well, a utility.  Note how we've already built up a
+dependency on the understanding of an :term:`interface` and the
+concept of "utility" to answer this question: a bad sign so far.  Note
+also that the answer is circular, a *really* bad sign.
 
 Fourth, where does ``getUtility`` look to get the data?  Well, the
 "component registry" of course.  What's a component registry?  Problem
@@ -80,10 +80,11 @@ works non-local.
 
 You've now bought in to the fact that there's a registry that is just
 "hanging around".  But how does the registry get populated?  Why,
-:term:`ZCML` of course.  Sometimes.  In this particular case, however,
-the registration of ``ISettings`` is made by the framework itself
-"under the hood": it's not present in any ZCML.  This is extremely
-hard to comprehend.  Problem number six.
+:term:`ZCML` of course.  Sometimes.  Or via imperative code.  In this
+particular case, however, the registration of ``ISettings`` is made by
+the framework itself "under the hood": it's not present in any ZCML
+nor was it performed imperatively.  This is extremely hard to
+comprehend.  Problem number six.
 
 Clearly there's some amount of cognitive load here that needs to be
 borne by a reader of code that extends the :mod:`repoze.bfg` framework
@@ -101,11 +102,11 @@ during the creation of a :mod:`repoze.bfg` application, we've failed
 on some axis.
 
 Instead, the framework hides the presence of the ZCA behind
-special-purpose API functions that *do* use the ZCA API.  Take for
-example the ``repoze.bfg.security.authenticated_userid`` function,
-which returns the userid present in the current request or ``None`` if
-no userid is present in the current request.  The application
-developer calls it like so:
+special-purpose API functions that *do* use the ZCA.  Take for example
+the ``repoze.bfg.security.authenticated_userid`` function, which
+returns the userid present in the current request or ``None`` if no
+userid is present in the current request.  The application developer
+calls it like so:
 
 .. code-block:: python
    :linenos:
@@ -126,7 +127,8 @@ is this:
        ``None`` if there is no authentication policy in effect or there
        is no currently authenticated user. """
 
-       policy = queryUtility(IAuthenticationPolicy)
+       registry = request.registry # the ZCA component registry
+       policy = registry.queryUtility(IAuthenticationPolicy)
        if policy is None:
            return None
        return policy.authenticated_userid(request)
@@ -179,12 +181,12 @@ uses it as easily as any other code.
 
 But we recognize that developers who my want to extend the framework
 are not as comfortable with the :term:`Zope Component Architecture`
-(and ZCML) as the original developers are with it.  So, for the
-purposes of being kind to third-party :mod:`repoze.bfg` framework
-developers in, we've turned the component registry used by
-:mod:`repoze.bfg` into something that is accessible using the plain
-old dictionary API (like the :mod:`repoze.component` API).  For
-example, the snippet of code in the problem section above was:
+API as the original developers are with it.  So, for the purposes of
+being kind to third-party :mod:`repoze.bfg` framework developers in,
+we've turned the component registry used by :mod:`repoze.bfg` into
+something that is accessible using the plain old dictionary API (like
+the :mod:`repoze.component` API).  For example, the snippet of code in
+the problem section above was:
 
 .. code-block:: python
    :linenos:
@@ -218,14 +220,38 @@ in some code that has access to the :term:`request`:
 
 In *this* world, we've reduced the conceptual problem to understanding
 attributes and the dictionary API.  Every Python programmer knows
-these things, even framework programmers.  Future versions of
-:mod:`repoze.bfg` will try to make use of more domain specific APIs
-such as this.  While :mod:`repoze.bfg` still uses some suboptimal
-unnamed utility registrations and other superfluous ZCA API usages,
-future versions of it will where possible disuse these things in favor
-of straight dictionary assignments and lookups, as demonstrated above,
-to be kinder to new framework developers.  We'll continue to seek ways
-to reduce framework developer cognitive load.
+these things, even framework programmers.
+
+We've also made it unnecessary to actually use the ZCA global API
+(functions such as ``zope.component.getUtility``,
+``zope.component.getAdapter``, etc).  Instead of:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.interfaces import IAuthenticationPolicy
+   from zope.component import getUtility
+   policy = getUtility(IAuthenticationPolicy)
+
+:mod:`repoze.bfg` code can do:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.interfaces import IAuthenticationPolicy
+   from repoze.bfg.threadlocal import get_current_registry
+   registry = get_current_registry()
+   policy = registry.getUtility(IAuthenticationPolicy)
+
+While the latter is more verbose, it also arguably makes it more
+obvious what's going on.  All of the :mod:`repoze.bfg` core code uses
+this pattern rather than the ZCA global API.
+
+While :mod:`repoze.bfg` still uses some suboptimal unnamed utility
+registrations, future versions of it will where possible disuse these
+things in favor of straight dictionary assignments and lookups, as
+demonstrated above, to be kinder to new framework developers.  We'll
+continue to seek ways to reduce framework developer cognitive load.
 
 Rationale
 +++++++++
@@ -243,12 +269,13 @@ decision to use the ZCA:
   entirely from Zope.  The ZCA plays an important role in the
   particulars of how this request to view mapping is done.
 
-- Features.  The ZCA essentially provides what can be considered
-  something like a "superdictionary", which allows for more complex
-  lookups than retrieving a value based on a single key.  Some of this
-  lookup capability is very useful for end users, such as being able
-  to register a view that is only found when the context is some class
-  of object, or when the context implements some :term:`interface`.
+- Features.  The ZCA component registry essentially provides what can
+  be considered something like a "superdictionary", which allows for
+  more complex lookups than retrieving a value based on a single key.
+  Some of this lookup capability is very useful for end users, such as
+  being able to register a view that is only found when the context is
+  some class of object, or when the context implements some
+  :term:`interface`.
 
 - Singularity.  There's only one "place" where "application
   configuration" lives in a :mod:`repoze.bfg` application: in a
@@ -259,32 +286,33 @@ decision to use the ZCA:
   :mod:`repoze.bfg` application are capable of running in the same
   process space.
 
-- Composability.  A ZCA registry can be populated imperatively, or
-  there's an existing mechanism to populate a registry via the use of
-  a configuration file (ZCML).  We didn't need to write a frontend
-  from scratch to make use of configuration-file-driven registry
-  population.
+- Composability.  A ZCA component registry can be populated
+  imperatively, or there's an existing mechanism to populate a
+  registry via the use of a configuration file (ZCML).  We didn't need
+  to write a frontend from scratch to make use of
+  configuration-file-driven registry population.
 
 - Pluggability.  Use of the ZCA allows for framework extensibility via
   a well-defined and widely understood plugin architecture.  As long
-  as framework developers and extenders understand the ZCA, it's
-  possible to extend :mod:`repoze.bfg` almost arbitrarily.  For
+  as framework developers and extenders understand the ZCA registry,
+  it's possible to extend :mod:`repoze.bfg` almost arbitrarily.  For
   example, it's relatively easy to build a ZCML directive that
   registers several views "all at once", allowing app developers to
   use that ZCML directive as a "macro" in code that they write.  This
   is somewhat of a differentiating feature from other (non-Zope)
   frameworks.
 
-- Testability.  Judicious use of the ZCA in framework code makes
-  testing that code slightly easier.  Instead of using monkeypatching
-  or other facilities to register mock objects for testing, we inject
-  dependencies via ZCA registrations and then use lookups in the code
-  find our mock objects.
+- Testability.  Judicious use of the ZCA registry in framework code
+  makes testing that code slightly easier.  Instead of using
+  monkeypatching or other facilities to register mock objects for
+  testing, we inject dependencies via ZCA registrations and then use
+  lookups in the code find our mock objects.
 
-- Speed.  The ZCA is very fast for a specific set of complex lookup
-  scenarios that :mod:`repoze.bfg` uses, having been optimized through
-  the years for just these purposes.  The ZCA contains optional C code
-  for this purpose which demonstrably has no (or very few) bugs.
+- Speed.  The ZCA registry is very fast for a specific set of complex
+  lookup scenarios that :mod:`repoze.bfg` uses, having been optimized
+  through the years for just these purposes.  The ZCA registry
+  contains optional C code for this purpose which demonstrably has no
+  (or very few) bugs.
 
 - Ecosystem.  Many existing Zope packages can be used in
   :mod:`repoze.bfg` with few (or no) changes due to our use of the ZCA
@@ -402,16 +430,15 @@ will become something like:
 
    from webob import Response
    from wsgiref import simple_server
-   from repoze.bfg.registry import Registry
-   from repoze.bfg.router import Router
+   from repoze.bfg.configuration import Configurator
 
-   def helloworld_view(request):
-       return Response(hello')
+   def hello_world(request):
+       return Response('Hello world!')
 
    if __name__ == '__main__':
-       reg = Registry()
-       reg.view(helloworld_view)
-       app = Router(reg)
+       config = Configurator()
+       config.add_view(hello_world)
+       app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
 In this mode, no ZCML will be required for end users.  Hopefully this
@@ -421,9 +448,15 @@ feel more comfortable.
 BFG Uses ZCML; ZCML is XML and I Don't Like XML
 -----------------------------------------------
 
-:term:`ZCML` is a configuration language in the XML syntax.  It
-contains elements that are mostly singleton tags that are called
-*declarations*.  For an example:
+:term:`ZCML` is a configuration language in the XML syntax.  Due to
+the "imperative configuration" feature (new in :mod:`repoze.bfg` 1.2),
+you don't need to use ZCML at all if you start a project from scratch.
+But if you really do want to perform declarative configuration,
+perhaps because you want to build an extensible application, you will
+need to use and understand it.
+
+:term:`ZCML` contains elements that are mostly singleton tags that are
+called *declarations*.  For an example:
 
 .. code-block:: xml
    :linenos:
@@ -434,27 +467,25 @@ contains elements that are mostly singleton tags that are called
       name="root"
       />
 
-This declaration associates a :term:`view` with a route pattern.
+This declaration associates a :term:`view` with a route pattern. 
 
-We've tried to make the most common usages of :mod:`repoze.bfg`
-palatable for XML-haters.  For example, the ``bfg_view`` decorator
-function allows you to replace ``<view>`` statements in a ZCML file
-with decorators attached to functions or methods.  In the future,
-:mod:`repoze.bfg` will contain a mode that makes configuration
-completely imperative as described in :ref:`zcml_encouragement`.  In
-version 1.2, no :mod:`repoze.bfg` developer will need to interact with
-ZCML/XML unless they choose to.
+All :mod:`repoze.bfg` declarations are singleton tags, unlike many
+other XML configuration systems.  No XML *values* in ZCML are
+meaningful; it's always just XML tags and attributes.  So in the very
+common case it's not really very much different than an otherwise
+"flat" configuration format like ``.ini``, except a deeloper *can*
+supply a directive that requires nesting, and multiple "sections" can
+exist with the same "name" (e.g. two ``<route>`` declarations) must be
+able to exist simultaneously.
 
-However, currently, there are times when a :mod:`repoze.bfg`
-application developer will be required to interact with ZCML, and thus
-XML.  Alas; it is what it is.  You might think some other
-configuration file format would be better.  But all configuration
-formats suck in one way or another.  I personally don't think any of
-our lives would be markedly better if the format were YAML, JSON, or
-INI.  It's all just plumbing that you mostly cut and paste once you've
-progressed 30 minutes into your first project.  Most of the folks who
-tend to agitate for another configuration file format are folks that
-haven't yet spent that 30 minutes.
+You might think some other configuration file format would be better.
+But all configuration formats suck in one way or another.  I
+personally don't think any of our lives would be markedly better if
+the declarative configuration format used by :mod:`repoze.bfg` were
+YAML, JSON, or INI.  It's all just plumbing that you mostly cut and
+paste once you've progressed 30 minutes into your first project.
+Folks who tend to agitate for another configuration file format are
+folks that haven't yet spent that 30 minutes.
 
 .. _model_traversal_confusion:
 
@@ -762,7 +793,7 @@ BFG Has Too Many Dependencies
 
 This is true.  At the time of this writing, the total number of Python
 package distributions that :mod:`repoze.bfg` depends upon transitively
-is 17 if you use Python 2.6, or 18, if you use Python 2.4 or 2.5.
+is 14 if you use Python 2.6, or 16, if you use Python 2.4 or 2.5.
 This is a lot more than zero dependencies: a metric which various
 Python microframeworks and Django boast.
 
@@ -777,9 +808,8 @@ dependencies, and that much of the functionality of these packages was
 moved into a smaller *number* of packages.
 
 :mod:`repoze.bfg` also has its own direct dependencies, such as
-:mod:`martian`, :term:`Paste`, :term:`Chameleon`, :term:`WebOb` and
-several other repoze packages, and some of these in turn have their
-own transitive dependencies.
+:term:`Paste`, :term:`Chameleon`, and :term:`WebOb`, and some of these
+in turn have their own transitive dependencies.
 
 It should be noted that :mod:`repoze.bfg` is positively lithe compared
 to :term:`Grok`, a different Zope-based framework.  As of this
@@ -915,7 +945,7 @@ a given application for each deployment to override behavior is more
 reasonable.  Much discussion about version control branching and
 merging typically ensues.
 
-It's clear that making *every* application extensible isn't a goal.
+It's clear that making every application extensible isn't required.
 The majority of web applications only have a single deployment, and
 thus needn't be extensible at all.  However, some web applications
 have multiple deployments, and some have *many* deployments.  For
@@ -933,8 +963,10 @@ lifetime of a deployment can be difficult and time consuming, and it's
 often useful to be able to modify an application for a particular
 deployment in a less invasive way.
 
-When you use :mod:`repoze.bfg`, if you follow the set of rules defined
-in :ref:`extending_chapter`, you don't need to *make* your application
+If you don't want to think about :mod:`repoze.bfg` application
+extensibility at all, you needn't.  You can ignore extensibility
+entirely.  However, if you follow the set of rules defined in
+:ref:`extending_chapter`, you don't need to *make* your application
 extensible: any application you write in the framework just *is*
 automatically extensible at a basic level.  The mechanisms that
 deployers use to extend it will be necessarily coarse: typically,

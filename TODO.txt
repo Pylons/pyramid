@@ -11,7 +11,3 @@
 
 - Turn paths into resource specs in ZCML directives that use
   context.path.
-
-- Remove ``zcml_configure`` API.
-
-

@@ -183,8 +183,10 @@ but return a response with the body ``Hello world!``; the
 ``goodbye_world`` view callable returns a response with the body
 ``Goodbye world!``.
 
-Traversal
-~~~~~~~~~
+.. _traversal_intro:
+
+An Introduction to Traversal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you've run the code in this tutorial already, you've actually
 unwittingly configured :mod:`repoze.bfg` to serve an application that

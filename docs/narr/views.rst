@@ -3,22 +3,14 @@
 Views
 =====
 
-A :term:`view` is a callable which is invoked when a request enters
-your application.  The primary job of any :mod:`repoze.bfg`
-application is is to find and call a :term:`view` when a
-:term:`request` reaches it.
+A :term:`view callable` is a callable which is invoked when a request
+enters your application.  The primary job of any :mod:`repoze.bfg`
+application is is to find and call a :term:`view callable` when a
+:term:`request` reaches it.  A :term:`view callable` is referred to,
+in shorthand, as a :term:`view`.
 
-How :mod:`repoze.bfg` invokes a view is somewhat analogous to how
-someone might interactively use an operating system command shell such
-as ``bash`` or ``cmd`` to find some file or directory on a filesystem
-and subsequently operate against that file or directory using a
-program.  In this analogy, if you think of :mod:`repoze.bfg` as the
-person using the command shell, your application's :term:`model` graph
-as the filesystem, :term:`traversal` or :term:`url dispatch` as the
-act of using ``cd`` to find a file or directory on the filesystem to
-operate against, and a :term:`view` callable as a program invoked
-against the type of file or directory found, you'll have a basic
-understanding of how view invocation works in :mod:`repoze.bfg`.
+See :ref:`traversal_intro` for an example of how a view might be found
+as the result of a request.
 
 A view callable may always return a :term:`WebOb` ``Response`` object
 directly.  It may optionally return another arbitrary non-`Response`
@@ -27,10 +19,18 @@ will be converted into a response by the :term:`renderer` associated
 with the :term:`view configuration` for the view.
 
 A view is mapped to one or more URLs by virtue of :term:`view
-configuration`.  View configuration is performed by adding statements
-to your :term:`ZCML` application registry or by attaching
-``@bfg_view`` decorators to Python objects in your application source
-code.  Either mechanism is equivalent.
+configuration`.  View configuration is performed by using the
+``add_view`` method of a :term:`Configurator` object, by adding
+``<view>`` statements to :term:`ZCML` used by your application, or by
+attaching ``@bfg_view`` decorators to Python objects in your
+application source code.  Each of these mechanisms are equivalent.
+
+A view might also be mapped to a URL by virtue of :term:`route
+configuration`.  Route configuration is performed by using the
+``add_route`` method of a :term:`Configurator` object or by adding
+``<route>`` statements to :term:`ZCML` used by your application.  See
+:ref:`urldispatch_chapter` for more information on mapping URLs to
+views using routes.
 
 .. _function_as_view:
 
@@ -558,18 +558,16 @@ path_info
 View Configuration Using the ``@bfg_view`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're allergic to reading and writing :term:`ZCML`, or you're just
-more comfortable defining your view declarations using Python, you may
-use the ``repoze.bfg.view.bfg_view`` decorator to associate your view
-functions with URLs instead of using :term:`ZCML` for the same
-purpose.  ``repoze.bfg.view.bfg_view`` can be used to associate
-``for``, ``name``, ``permission`` and ``request_method``,
-``containment``, ``request_param`` and ``request_type``, ``attr``,
-``renderer``, ``wrapper``, ``xhr``, ``accept``, and ``header``
-information -- as done via the equivalent ZCML -- with a function that
-acts as a :mod:`repoze.bfg` view.  All ZCML attributes (save for the
-``view`` attribute) are available in decorator form and mean precisely
-the same thing.
+For better locality of reference, use the ``repoze.bfg.view.bfg_view``
+decorator to associate your view functions with URLs instead of using
+:term:`ZCML` for the same purpose.  ``repoze.bfg.view.bfg_view`` can
+be used to associate ``for``, ``name``, ``permission`` and
+``request_method``, ``containment``, ``request_param`` and
+``request_type``, ``attr``, ``renderer``, ``wrapper``, ``xhr``,
+``accept``, and ``header`` information -- as done via the equivalent
+ZCML -- with a function that acts as a :mod:`repoze.bfg` view.  All
+ZCML attributes (save for the ``view`` attribute) are available in
+decorator form and mean precisely the same thing.
 
 To make :mod:`repoze.bfg` process your ``@bfg_view`` declarations, you
 *must* do one of the following:
@@ -838,6 +836,13 @@ could be spelled equivalently as the below:
           decorator is new in :mod:`repoze.bfg` version 1.1.
           Previously it could only be used as a class or function
           decorator.
+
+View Configuration Using the ``add_view`` Method of a Configurator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See the ``add_view`` method of a :term:`Configurator` object within
+:ref:`configuration_module` for the arguments to configure a view
+imperatively.
 
 .. _view_lookup_ordering:
 
