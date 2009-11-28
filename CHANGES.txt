@@ -48,6 +48,12 @@ Features
 Documentation
 -------------
 
+- The documentation now uses the "request-only" view calling
+  convention in most examples (as opposed to the ``context, request``
+  convention).  This is a documentation-only change; the ``context,
+  request`` convention is also supported and documented, and will be
+  "forever".
+
 - ``repoze.bfg.configuration`` API documentation has been added.
 
 - A narrative documentation chapter entitled "Creating Your First
