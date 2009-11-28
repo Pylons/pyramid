@@ -45,8 +45,8 @@ The major feature additions of 1.2 are:
   For an introduction to imperative-mode configuration, see
   :ref:`configuration_narr`.
 
-Miscellaneous Minor Feature Additions
---------------------------------------
+Minor Miscellaneous Feature Additions
+-------------------------------------
 
 - The ``repoze.bfg.testing.setUp`` function now accepts three extra
   optional keyword arguments: ``registry``, ``request`` and
@@ -78,61 +78,6 @@ Miscellaneous Minor Feature Additions
   default), ``zope.component.getSiteManager.reset()`` will be called,
   causing the "base" registry to once again start returnining the
   result of ``zope.component.getSiteManager``.
-
-Documentation
--------------
-
-- The documentation now uses the "request-only" view calling
-  convention in most examples (as opposed to the ``context, request``
-  convention).  This is a documentation-only change; the ``context,
-  request`` convention is also supported and documented, and will be
-  "forever".
-
-- ``repoze.bfg.configuration`` API documentation has been added.
-
-- A narrative documentation chapter entitled "Creating Your First
-  ``repoze.bfg`` Application" has been added.  This chapter details
-  usage of the new ``repoze.bfg.configuration.Configurator`` class,
-  and demonstrates a simplified "imperative-mode" configuration; doing
-  ``repoze.bfg`` application configuration imperatively was previously
-  much more difficult.
-
-- A narrative documentation chapter entitled "Configuration,
-  Decorations and Code Scanning" explaining ZCML- vs. imperative-
-  vs. decorator-based configuration equivalence.
-
-- The "ZCML Hooks" chapter has been renamed to "Hooks"; it documents
-  how to override hooks now via imperative configuration and ZCML.
-
-- The explanation about how to supply an alternate "response factory"
-  has been removed from the "Hooks" chapter.  This feature may be
-  removed in a later release (it still works now, it's just not
-  documented).
-
-- Add a section entitled "Test Set Up and Tear Down" to the
-  unittesting chapter.
-
-Bug Fixes
-----------
-
-- The ACL authorization policy debugging output when
-  ``debug_authorization`` console debugging output was turned on
-  wasn't as clear as it could have been when a view execution was
-  denied due to an authorization failure resulting from the set of
-  principals passed never having matched any ACE in any ACL in the
-  lineage.  Now in this case, we report ``<default deny>`` as the ACE
-  value and either the root ACL or ``<No ACL found on any object in
-  model lineage>`` if no ACL was found.
-
-- When two views were registered with the same ``accept`` argument,
-  but were otherwise registered with the same arguments, if a request
-  entered the application which had an ``Accept`` header that accepted
-  *either* of the media types defined by the set of views registered
-  with predicates that otherwise matched, a more or less "random" one
-  view would "win".  Now, we try harder to use the view callable
-  associated with the view configuration that has the most specific
-  ``accept`` argument.  Thanks to Alberto Valverde for an initial
-  patch.
 
 Backwards Incompatibilites
 --------------------------
@@ -174,8 +119,8 @@ Backwards Incompatibilites
 - The ``repoze.bfg.testing.zcml_configure`` API was removed.  Use
   the ``Configurator.load_zcml`` API instead.
 
-Deprecations
-------------
+Deprecations and Behavior Differences
+-------------------------------------
 
 - The ``repoze.bfg.router.make_app`` function is now nominally
   deprecated.  Its import and usage does not throw a warning, nor will
@@ -191,11 +136,45 @@ Deprecations
   to perform this call itself, at least if your application uses the
   ZCA global API (``getSiteManager``, ``getAdapter``, etc).
 
-Dependencies
-------------
+Dependency Changes
+------------------
 
 - A dependency on the ``martian`` package has been removed (its
   functionality is replaced internally).
 
 - A dependency on the ``repoze.zcml`` package has been removed (its
   functionality is replaced internally).
+
+Documentation Enhancements
+--------------------------
+
+- The documentation now uses the "request-only" view calling
+  convention in most examples (as opposed to the ``context, request``
+  convention).  This is a documentation-only change; the ``context,
+  request`` convention is also supported and documented, and will be
+  "forever".
+
+- ``repoze.bfg.configuration`` API documentation has been added.
+
+- A narrative documentation chapter entitled "Creating Your First
+  ``repoze.bfg`` Application" has been added.  This chapter details
+  usage of the new ``repoze.bfg.configuration.Configurator`` class,
+  and demonstrates a simplified "imperative-mode" configuration; doing
+  ``repoze.bfg`` application configuration imperatively was previously
+  much more difficult.
+
+- A narrative documentation chapter entitled "Configuration,
+  Decorations and Code Scanning" explaining ZCML- vs. imperative-
+  vs. decorator-based configuration equivalence.
+
+- The "ZCML Hooks" chapter has been renamed to "Hooks"; it documents
+  how to override hooks now via imperative configuration and ZCML.
+
+- The explanation about how to supply an alternate "response factory"
+  has been removed from the "Hooks" chapter.  This feature may be
+  removed in a later release (it still works now, it's just not
+  documented).
+
+- Add a section entitled "Test Set Up and Tear Down" to the
+  unittesting chapter.
+
