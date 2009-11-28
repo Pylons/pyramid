@@ -21,6 +21,7 @@ under a `BSD-like license <http://repoze.org/license.html>`_.
 .. toctree::
    :maxdepth: 2
 
+   whatsnew-1.2
    whatsnew-1.1
 
 Narrative documentation
