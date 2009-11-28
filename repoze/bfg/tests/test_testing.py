@@ -614,6 +614,23 @@ class Test_tearDown(unittest.TestCase):
             getSiteManager.reset()
             manager.clear()
 
+    def test_registry_cannot_be_inited(self):
+        from repoze.bfg.threadlocal import manager
+        registry = DummyRegistry()
+        def raiseit(name):
+            raise TypeError
+        registry.__init__ = raiseit
+        old = {'registry':registry}
+        hook = lambda *arg: None
+        try:
+            manager.push(old)
+            self._callFUT() # doesn't blow up
+            current = manager.get()
+            self.assertNotEqual(current, old)
+            self.assertEqual(registry.inited, 1)
+        finally:
+            manager.clear()
+
     def test_unhook_zc_false(self):
         from repoze.bfg.threadlocal import manager
         from zope.component import getSiteManager

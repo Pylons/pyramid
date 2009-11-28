@@ -531,7 +531,7 @@ def setUp(registry=None, request=None, hook_zca=True):
     .. note:: The ``setUp`` function is new as of :mod:`repoze.bfg`
        1.1.
 
-    Use this function in the ``setUp`` method of a unit test test case
+    Use this function in the ``setUp`` method of a unittest test case
     which directly or indirectly uses:
 
     - any of the ``register*`` functions in ``repoze.bfg.testing``
@@ -621,7 +621,11 @@ def tearDown(unhook_zca=True):
     if info is not None:
         reg = info['registry']
         if hasattr(reg, '__init__') and hasattr(reg, '__name__'):
-            reg.__init__(reg.__name__)
+            try:
+                reg.__init__(reg.__name__)
+            except TypeError:
+                # maybe somebody's using a registry we don't understand
+                pass
     _clearContext() # XXX why?
 
 def cleanUp(*arg, **kw):
