@@ -896,6 +896,49 @@ class TestRolledUpFactory(unittest.TestCase):
         result = factory(True)
         self.assertEqual(result, True)
 
+class Test_path_spec(unittest.TestCase):
+    def _callFUT(self, context, path):
+        from repoze.bfg.zcml import path_spec
+        return path_spec(context, path)
+
+    def test_no_package_attr(self):
+        context = DummyContext()
+        path = '/thepath'
+        result = self._callFUT(context, path)
+        self.assertEqual(result, path)
+
+    def test_package_attr_None(self):
+        context = DummyContext()
+        context.package = None
+        path = '/thepath'
+        result = self._callFUT(context, path)
+        self.assertEqual(result, path)
+
+    def test_package_path_doesnt_start_with_abspath(self):
+        context = DummyContext()
+        context.package = DummyPackage('repoze.bfg.tests')
+        path = '/thepath'
+        result = self._callFUT(context, path)
+        self.assertEqual(result, path)
+
+    def test_package_path_starts_with_abspath(self):
+        import pkg_resources
+        import os
+        context = DummyContext()
+        package = DummyPackage('repoze.bfg.tests')
+        package_path = pkg_resources.resource_filename('repoze.bfg.tests', '')
+        template_path = os.path.join(package_path, 'templates/foo.pt')
+        context.package = package
+        result = self._callFUT(context, template_path)
+        self.assertEqual(result, 'repoze.bfg.tests:templates/foo.pt')
+
+    def test_package_name_is___main__(self):
+        context = DummyContext()
+        package = DummyPackage('__main__')
+        context.package = package
+        result = self._callFUT(context, '/foo.pt')
+        self.assertEqual(result, '/foo.pt')
+
 class IDummy(Interface):
     pass
 
@@ -952,3 +995,7 @@ class DummyRequest:
     def copy(self):
         return self
 
+class DummyPackage(object):
+    def __init__(self, name):
+        self.__name__ = name
+        

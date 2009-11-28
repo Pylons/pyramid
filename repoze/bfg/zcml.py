@@ -27,6 +27,7 @@ from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.configuration import Configurator
+from repoze.bfg.path import package_path
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
@@ -163,7 +164,7 @@ def view(
         request_type = _context.resolve(request_type)
 
     if renderer and '.' in renderer:
-        renderer = _context.path(renderer)
+        renderer = path_spec(_context, renderer)
 
     def register():
         config = Configurator(reg)
@@ -242,7 +243,7 @@ def route(_context, name, path, view=None, view_for=None,
     view_permission = view_permission or permission
     view_renderer = view_renderer or renderer
     if view_renderer and '.' in view_renderer:
-        view_renderer = _context.path(view_renderer)
+        view_renderer = path_spec(_context, view_renderer)
 
     def register():
         config = Configurator(reg)
@@ -319,7 +320,7 @@ class SystemViewHandler(object):
     def __call__(self, _context, view=None, attr=None, renderer=None,
                  wrapper=None):
         if renderer and '.' in renderer:
-            renderer = _context.path(renderer)
+            renderer = path_spec(_context, renderer)
 
         def register(iface=self.iface):
             reg = get_current_registry()
@@ -480,7 +481,7 @@ class IStaticDirective(Interface):
 def static(_context, name, path, cache_max_age=3600):
     """ Handle ``static`` ZCML directives
     """
-    path = _context.path(path)
+    path = path_spec(_context, path)
     reg = get_current_registry()
     config = Configurator(reg)
 
@@ -752,3 +753,21 @@ def _rolledUpFactory(factories):
     # Store the original factory for documentation
     factory.factory = factories[0]
     return factory
+
+def path_spec(context, path):
+    # Convert an absolute path to a resource in a package to a
+    # resource specification if possible; otherwise return the
+    # absolute path; we prefer registering resource specifications
+    # over absolute paths because these can be overridden by the
+    # resource directive.
+    abspath = context.path(path)
+    if hasattr(context, 'package') and context.package:
+        package = context.package
+        if getattr(package, '__name__', None) == '__main__':
+            return abspath
+        pp = package_path(package) +'/'
+        if abspath.startswith(pp):
+            relpath = abspath[len(pp):]
+            return '%s:%s' % (package.__name__, relpath)
+    return abspath
+
