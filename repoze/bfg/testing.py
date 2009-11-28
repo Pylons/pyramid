@@ -624,7 +624,10 @@ def tearDown(unhook_zca=True):
             try:
                 reg.__init__(reg.__name__)
             except TypeError:
-                # maybe somebody's using a registry we don't understand
+                # calling __init__ is largely for the benefit of
+                # people who want to use the global ZCA registry;
+                # however maybe somebody's using a registry we don't
+                # understand, let's not blow up
                 pass
     _clearContext() # XXX why?
 
