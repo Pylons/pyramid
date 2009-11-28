@@ -13,28 +13,26 @@ requires = [
     'transaction',
     'repoze.tm2',
     'zope.sqlalchemy',
+    'docutils'
     ]
 
 if sys.version_info[:3] < (2,5,0):
     requires.append('pysqlite')
 
 setup(name='tutorial',
-      version='0.1',
+      version='0.0',
       description='tutorial',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
         "Programming Language :: Python",
+        "Framework :: BFG",
         "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Internet :: WWW/HTTP :: WSGI",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
       author='',
       author_email='',
       url='',
-      keywords='web wsgi bfg zope',
+      keywords='web wsgi bfg',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
