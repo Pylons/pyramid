@@ -688,7 +688,7 @@ tag for each document, every ZCML file used by :mod:`repoze.bfg` must
 contain a ``<configure>`` container tag, which acts as the root XML
 tag.  Usually, the start tag of the ``<configure>`` container tag has
 a default namespace associated with it. In the file above, the
-``xmlns="http:/namepaces.repoze.org/bfg"`` attribute of the
+``xmlns="http://namepaces.repoze.org/bfg"`` attribute of the
 ``configure`` start tag names the default XML namespace, which is
 ``http://namespaces.repoze.org/bfg``.  See
 :ref:`word_on_xml_namespaces` for more information about XML
