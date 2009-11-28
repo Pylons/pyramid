@@ -180,12 +180,10 @@ deprecated('registerViewPermission',
 
 def registerUtility(impl, iface=Interface, name=''):
     """ Register a Zope component architecture utility component.
-    This is exposed as a convenience in this package to avoid needing
-    to import the ``registerUtility`` function from ``zope.component``
-    within unit tests that make use of the ZCA.  ``impl`` is the
-    implementation of the utility.  ``iface`` is the interface type
-    ``zope.interface.Interface`` by default.  ``name`` is the empty
-    string by default.  See `The ZCA book
+
+   ``impl`` is the implementation of the utility.  ``iface`` is the
+    interface type ``zope.interface.Interface`` by default.  ``name``
+    is the empty string by default.  See `The ZCA book
     <http://www.muthukadan.net/docs/zca.html>`_ for more information
     about ZCA utilities."""
     reg = get_current_registry()
@@ -194,19 +192,17 @@ def registerUtility(impl, iface=Interface, name=''):
 
 def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     """ Register a Zope component architecture adapter component.
-    This is exposed as a convenience in this package to avoid needing
-    to import the ``registerAdapter`` function from ``zope.component``
-    within unit tests that make use of the ZCA.  ``impl`` is the
-    implementation of the component (often a class).  ``for_`` is the
-    ``for`` interface type ``zope.interface.Interface`` by default. If
-    ``for`` is not a tuple or list, it will be converted to a
-    one-tuple before being passed to underlying ZCA registerAdapter
-    API.  ``name`` is the empty string by default.  ``provides`` is
-    the ZCA provides interface, also ``zope.interface.Interface`` by
-    default.  ``name`` is the name of the adapter, the empty string by
-    default.  See `The ZCA book
-    <http://www.muthukadan.net/docs/zca.html>`_ for more information
-    about ZCA adapters."""
+
+    ``impl`` is the implementation of the component (often a class).
+    ``for_`` is the ``for`` interface type
+    ``zope.interface.Interface`` by default. If ``for`` is not a tuple
+    or list, it will be converted to a one-tuple before being passed
+    to underlying ZCA registerAdapter API.  ``name`` is the empty
+    string by default.  ``provides`` is the ZCA provides interface,
+    also ``zope.interface.Interface`` by default.  ``name`` is the
+    name of the adapter, the empty string by default.  See `The ZCA
+    book <http://www.muthukadan.net/docs/zca.html>`_ for more
+    information about ZCA adapters."""
     reg = get_current_registry()
     if not isinstance(for_, (tuple, list)):
         for_ = (for_,)
@@ -215,14 +211,13 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
 
 def registerSubscriber(subscriber, iface=Interface):
     """ Register a Zope component architecture subscriber component.
-    This is exposed as a convenience in this package to avoid needing
-    to import the ``registerHandler`` function from ``zope.component``
-    within unit tests that make use of the ZCA.  ``subscriber`` is the
-    implementation of the component (often a function).  ``iface`` is
-    the interface type the subscriber will be registered for
-    (``zope.interface.Interface`` by default). If ``iface`` is not a
-    tuple or list, it will be converted to a one-tuple before being
-    passed to underlying zca registerHandler query.  See `The ZCA book
+
+    ``subscriber`` is the implementation of the component (often a
+    function).  ``iface`` is the interface type the subscriber will be
+    registered for (``zope.interface.Interface`` by default). If
+    ``iface`` is not a tuple or list, it will be converted to a
+    one-tuple before being passed to underlying zca registerHandler
+    query.  See `The ZCA book
     <http://www.muthukadan.net/docs/zca.html>`_ for more information
     about ZCA subscribers."""
     reg = get_current_registry()
