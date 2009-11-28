@@ -939,6 +939,11 @@ class Test_path_spec(unittest.TestCase):
         result = self._callFUT(context, '/foo.pt')
         self.assertEqual(result, '/foo.pt')
 
+    def test_path_is_already_resource_spec(self):
+        context = DummyContext()
+        result = self._callFUT(context, 'repoze.bfg.tests:foo.pt')
+        self.assertEqual(result, 'repoze.bfg.tests:foo.pt')
+
 class IDummy(Interface):
     pass
 

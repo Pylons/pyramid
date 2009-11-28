@@ -140,6 +140,76 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
+    def test_setup_registry_custom_settings(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import ISettings
+        settings = {'reload_templates':True,
+                    'mysetting':True}
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(settings=settings)
+        settings = reg.getUtility(ISettings)
+        self.assertEqual(settings['reload_templates'], True)
+        self.assertEqual(settings['debug_authorization'], False)
+        self.assertEqual(settings['mysetting'], True)
+
+    def test_setup_registry_debug_logger_None_default(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IDebugLogger
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry()
+        logger = reg.getUtility(IDebugLogger)
+        self.assertEqual(logger.name, 'repoze.bfg.debug')
+
+    def test_setup_registry_debug_logger_non_None(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IDebugLogger
+        logger = object()
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(debug_logger=logger)
+        result = reg.getUtility(IDebugLogger)
+        self.assertEqual(logger, result)
+
+    def test_setup_registry_authentication_policy(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        policy = object()
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(authentication_policy=policy)
+        result = reg.getUtility(IAuthenticationPolicy)
+        self.assertEqual(policy, result)
+
+    def test_setup_registry_authorization_policy_only(self):
+        from repoze.bfg.registry import Registry
+        from zope.configuration.exceptions import ConfigurationError
+        policy = object()
+        reg = Registry()
+        config = self._makeOne(reg)
+        config = self.assertRaises(ConfigurationError,
+                                   config.setup_registry,
+                                   authorization_policy=policy)
+
+    def test_setup_registry_default_root_factory(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IRootFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry()
+        self.failUnless(reg.getUtility(IRootFactory))
+
+    def test_setup_registry_alternate_renderers(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IRendererFactory
+        renderer = object()
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(renderers=[('yeah', renderer)])
+        self.assertEqual(reg.getUtility(IRendererFactory, 'yeah'),
+                         renderer)
+
     def test_add_subscriber_defaults(self):
         from zope.interface import implements
         from zope.interface import Interface

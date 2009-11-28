@@ -131,19 +131,31 @@ class Configurator(object):
         if registry is None:
             registry = Registry(self.package.__name__)
             self.registry = registry
-            self._set_settings(settings)
-            self._set_root_factory(root_factory)
-            if debug_logger is None:
-                debug_logger = make_stream_logger('repoze.bfg.debug',
-                                                  sys.stderr)
-            registry.registerUtility(debug_logger, IDebugLogger)
-            registry.registerUtility(debug_logger, IDebugLogger,
-                                     'repoze.bfg.debug') # b /c
-            if authentication_policy or authorization_policy:
-                self._set_security_policies(authentication_policy,
-                                            authorization_policy)
-            for name, renderer in renderers:
-                self.add_renderer(name, renderer)
+            self.setup_registry(
+                settings=settings,
+                root_factory=root_factory,
+                authentication_policy=authentication_policy,
+                authorization_policy=authorization_policy,
+                renderers=renderers,
+                debug_logger=debug_logger)
+
+    def setup_registry(self, settings=None, root_factory=None,
+                       authentication_policy=None, authorization_policy=None,
+                       renderers=DEFAULT_RENDERERS, debug_logger=None):
+        self._set_settings(settings)
+        self._set_root_factory(root_factory)
+        if debug_logger is None:
+            debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
+        registry = self.registry
+        registry.registerUtility(debug_logger, IDebugLogger)
+        registry.registerUtility(debug_logger, IDebugLogger,
+                                 'repoze.bfg.debug') # b /c
+        if authentication_policy or authorization_policy:
+            self._set_security_policies(authentication_policy,
+                                        authorization_policy)
+        for name, renderer in renderers:
+            self.add_renderer(name, renderer)
+        
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})

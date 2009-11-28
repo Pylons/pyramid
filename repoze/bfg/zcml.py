@@ -1,3 +1,5 @@
+import os
+
 from zope.configuration import xmlconfig
 from zope.configuration.config import ConfigurationMachine
 from zope.configuration.exceptions import ConfigurationError
@@ -760,6 +762,9 @@ def path_spec(context, path):
     # absolute path; we prefer registering resource specifications
     # over absolute paths because these can be overridden by the
     # resource directive.
+    if ':' in path and not os.path.isabs(path):
+        # it's already a resource specification
+        return path
     abspath = context.path(path)
     if hasattr(context, 'package') and context.package:
         package = context.package
