@@ -960,6 +960,7 @@ class DummyContext:
         self.actions = []
         self.info = None
         self.resolved = resolved
+        self.package = None
 
     def action(self, discriminator, callable=None, args=(), kw={}, order=0):
         self.actions.append(

@@ -167,7 +167,7 @@ def view(
         renderer = path_spec(_context, renderer)
 
     def register():
-        config = Configurator(reg)
+        config = Configurator(reg, package=_context.package)
         config.add_view(
             permission=permission, for_=for_, view=view, name=name,
             request_type=request_type, route_name=route_name,
@@ -246,7 +246,7 @@ def route(_context, name, path, view=None, view_for=None,
         view_renderer = path_spec(_context, view_renderer)
 
     def register():
-        config = Configurator(reg)
+        config = Configurator(reg, package=_context.package)
         config.add_route(
             name,
             path,
@@ -324,7 +324,7 @@ class SystemViewHandler(object):
 
         def register(iface=self.iface):
             reg = get_current_registry()
-            config = Configurator(reg)
+            config = Configurator(reg, package=_context.package)
             config._system_view(iface, view=view, attr=attr, renderer=renderer,
                                 wrapper=wrapper, _info=_context.info)
 
@@ -352,7 +352,7 @@ class IResourceDirective(Interface):
 
 def resource(_context, to_override, override_with):
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = Configurator(reg, package=_context.package)
 
     _context.action(
         discriminator = None,
@@ -372,7 +372,7 @@ def repozewho1authenticationpolicy(_context, identifier_name='auth_tkt',
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = Configurator(reg, package=_context.package)
     config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
@@ -388,7 +388,7 @@ def remoteuserauthenticationpolicy(_context, environ_key='REMOTE_USER',
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = Configurator(reg, package=_context.package)
     config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
@@ -426,7 +426,7 @@ def authtktauthenticationpolicy(_context,
     # authentication policies must be registered eagerly so they can
     # be found by the view registration machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = Configurator(reg, package=_context.package)
     config._set_authentication_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthenticationPolicy)
 
@@ -438,7 +438,7 @@ def aclauthorizationpolicy(_context):
     # authorization policies must be registered eagerly so they can be
     # found by the view registration machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = Configurator(reg, package=_context.package)
     config._set_authorization_policy(policy, _info=_context.info)
     _context.action(discriminator=IAuthorizationPolicy)
 
@@ -455,7 +455,7 @@ def renderer(_context, factory, name=''):
     # renderer factories must be registered eagerly so they can be
     # found by the view machinery
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = Configurator(reg, package=_context.package)
     config.add_renderer(name, factory, _info=_context.info)
     _context.action(discriminator=(IRendererFactory, name))
 
@@ -483,7 +483,7 @@ def static(_context, name, path, cache_max_age=3600):
     """
     path = path_spec(_context, path)
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = Configurator(reg, package=_context.package)
 
     _context.action(
         discriminator = ('route', name, False, None, None, None, None, None),
@@ -506,7 +506,7 @@ class IScanDirective(Interface):
 
 def scan(_context, package):
     reg = get_current_registry()
-    config = Configurator(reg)
+    config = Configurator(reg, package=_context.package)
     _context.action(
         discriminator=None,
         callable=config.scan,
