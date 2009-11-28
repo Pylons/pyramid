@@ -35,7 +35,7 @@ the template from a view like so:
    :linenos:
 
    from repoze.bfg.chameleon_zpt import render_template_to_response
-   def sample_view(context, request):
+   def sample_view(request):
        return render_template_to_response('templates/foo.pt', foo=1, bar=2)
 
 The first argument to ``render_template_to_response`` shown above (and
@@ -68,7 +68,7 @@ string manually as a response body.  Here's an example of using
 
    from repoze.bfg.chameleon_zpt import render_template
    from webob import Response
-   def sample_view(context, request):
+   def sample_view(request):
        result = render_template('templates/foo.pt', foo=1, bar=2)
        response = Response(result)
        response.content_type = 'text/plain'
@@ -81,7 +81,7 @@ changing the content-type and status:
    :linenos:
 
    from repoze.bfg.chameleon_zpt import render_template_to_response
-   def sample_view(context, request):
+   def sample_view(request):
        response = render_template_to_response('templates/foo.pt', foo=1, bar=2)
        response.content_type = 'text/plain'
        response.status_int = 204
@@ -144,7 +144,7 @@ it in to the template being rendered.  For example:
    from repoze.bfg.chameleon_zpt import render_template_to_response
    from repoze.bfg.chameleon_zpt import get_template
 
-   def my_view(context, request):
+   def my_view(request):
        main = get_template('templates/master.pt')
        return render_template_to_response('templates/mytemplate.pt', main=main)
 
@@ -200,7 +200,7 @@ which renders this template:
 
    from repoze.bfg.chameleon_text import render_template_to_response
 
-   def text_view(context, request):
+   def text_view(request):
        return render_template_to_response('templates/text.txt', name='World')
 
 The Chameleon text rendering API is a wholesale mirror of the
@@ -291,9 +291,9 @@ installed, here's an example of using Mako from within a
    from mako.template import Template
    from webob import Response
 
-   def make_view(context, request):
+   def make_view(request):
        template = Template(filename='/templates/template.mak')
-       result = template.render(name=context.name)
+       result = template.render(name=request.params['name'])
        response = Response(result)
        return response
 

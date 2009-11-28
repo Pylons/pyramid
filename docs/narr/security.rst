@@ -92,7 +92,7 @@ module of your project's package
    from models import Blog
 
    @bfg_view(for_=Blog, name='add_entry.html', permission='add')
-   def blog_entry_add_view(context, request):
+   def blog_entry_add_view(request):
        """ Add blog entry code goes here """
        pass
 

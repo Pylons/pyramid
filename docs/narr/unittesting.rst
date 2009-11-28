@@ -49,7 +49,7 @@ to unit test a :mod:`repoze.bfg` view function.
 .. code-block:: python
    :linenos:
 
-   def view_fn(context, request):
+   def view_fn(request):
        from repoze.bfg.chameleon_zpt import render_template_to_response
        if 'say' in request.params:
            return render_template_to_response('templates/submitted.pt',
@@ -88,18 +88,16 @@ unittest TestCase that used the testing API.
        def test_view_fn_not_submitted(self):
            from my.package import view_fn
            renderer = testing.registerTemplateRenderer('templates/show.pt')
-           context = testing.DummyModel()
            request = testing.DummyRequest()
-           response = view_fn(context, request)
+           response = view_fn(request)
            renderer.assert_(say='Hello')
 
        def test_view_fn_submitted(self):
            from my.package import view_fn
            renderer = testing.registerTemplateRenderer('templates/submitted.pt')
-           context = testing.DummyModel()
            request = testing.DummyRequest()
            request.params['say'] = 'Yo'
-           response = view_fn(context, request)
+           response = view_fn(request)
            renderer.assert_(say='Yo')
 
 In the above example, we create a ``MyTest`` test case that inherits
@@ -113,10 +111,9 @@ request.params) have been submitted.  Its first line registers a
 "dummy template renderer" named ``templates/show.pt`` via the
 ``registerTemplateRenderer`` function (a ``repoze.bfg.testing`` API);
 this function returns a DummyTemplateRenderer instance which we hang
-on to for later.  We then create a ``DummyRequest`` object (it
-simulates a WebOb request object), and we create a ``DummyModel``
-context object.  We call the function being tested with the
-manufactured context and request.  When the function is called,
+on to for later.  We then create a ``DummyRequest`` object which
+simulates a WebOb request object).  We call the function being tested
+with the manufactured request.  When the function is called,
 ``render_template_to_response`` will call the "dummy" template
 renderer object instead of the real template renderer object.  When
 the dummy renderer is called, it will set attributes on itself
@@ -199,9 +196,8 @@ environment.
 
        def test_my_view(self):
            from myapp.views import my_view
-           context = testing.DummyModel()
            request = testing.DummyRequest()
-           result = my_view(context, request)
+           result = my_view(request)
            self.assertEqual(result.status, '200 OK')
            body = result.app_iter[0]
            self.failUnless('Welcome to' in body)

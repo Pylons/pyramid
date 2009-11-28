@@ -6,29 +6,34 @@ Views
 A :term:`view callable` is a callable which is invoked when a request
 enters your application.  The primary job of any :mod:`repoze.bfg`
 application is is to find and call a :term:`view callable` when a
-:term:`request` reaches it.  A :term:`view callable` is referred to,
-in shorthand, as a :term:`view`.
+:term:`request` reaches it.  A :term:`view callable` is referred to in
+shorthand as a :term:`view`.
 
-See :ref:`traversal_intro` for an example of how a view might be found
-as the result of a request.
+.. note:: See :ref:`traversal_intro` for an example of how a view
+   might be found as the result of a request.
 
-A view callable may always return a :term:`WebOb` ``Response`` object
-directly.  It may optionally return another arbitrary non-`Response`
-value.  If a view callable returns a non-Response result, the result
-will be converted into a response by the :term:`renderer` associated
-with the :term:`view configuration` for the view.
+Most views accept a single argument: ``request``.  This argument
+represents a WebOb Request object representing the current WSGI
+request.
+
+A view callable may always return a :term:`WebOb` :term:`Response`
+object directly.  It may optionally return another arbitrary
+non-Response value.  If a view callable returns a non-Response result,
+the result will be converted into a response by the :term:`renderer`
+associated with the :term:`view configuration` for the view.
 
 A view is mapped to one or more URLs by virtue of :term:`view
 configuration`.  View configuration is performed by using the
-``add_view`` method of a :term:`Configurator` object, by adding
-``<view>`` statements to :term:`ZCML` used by your application, or by
-attaching ``@bfg_view`` decorators to Python objects in your
-application source code.  Each of these mechanisms are equivalent.
+``add_view`` method of a :term:`Configurator` object, by adding a
+``<view>`` statement to :term:`ZCML` used by your application, or by
+running a :term:`scan` against application source code which has a
+``@bfg_view`` decorator attached to a Python object.  Each of these
+mechanisms are equivalent.
 
 A view might also be mapped to a URL by virtue of :term:`route
 configuration`.  Route configuration is performed by using the
-``add_route`` method of a :term:`Configurator` object or by adding
-``<route>`` statements to :term:`ZCML` used by your application.  See
+``add_route`` method of a :term:`Configurator` object or by adding a
+``<route>`` statement to :term:`ZCML` used by your application.  See
 :ref:`urldispatch_chapter` for more information on mapping URLs to
 views using routes.
 
@@ -38,16 +43,16 @@ Defining a View as a Function
 -----------------------------
 
 The easiest way to define a view is to create a function that accepts
-two arguments: :term:`context`, and :term:`request` and which returns
-a response object.  For example, this is a "hello world" view
-implemented as a function:
+a single argument: :term:`request` and which returns a response
+object.  For example, this is a "hello world" view implemented as a
+function:
 
 .. code-block:: python
    :linenos:
 
    from webob import Response
 
-   def hello_world(context, request):
+   def hello_world(request):
        return Response('Hello world!')
 
 .. _class_as_view:
@@ -60,13 +65,13 @@ Defining a View as a Class
 A view callable may also be a class instead of a function.  When a
 view callable is a class, the calling semantics are slightly different
 than when it is a function or another non-class callable.  When a view
-is a class, the class' ``__init__`` is called with the context and the
-request parameters.  As a result, an instance of the class is created.
+is a class, the class' ``__init__`` is called with the request
+parameter.  As a result, an instance of the class is created.
 Subsequently, that instance's ``__call__`` method is invoked with no
 parameters.  Views defined as classes must have the following traits:
 
-- an ``__init__`` method that accepts a ``context`` and a ``request``
-  as positional arguments.
+- an ``__init__`` method that accepts a ``request`` as its sole
+  positional arguments.
 
 - a ``__call__`` method that accepts no parameters and returns a
   response.
@@ -79,15 +84,14 @@ For example:
    from webob import Response
 
    class MyView(object):
-       def __init__(self, context, request):
-           self.context = context
+       def __init__(self, request):
            self.request = request
 
        def __call__(self):
-           return Response('hello from %r!' % self.context)
+           return Response('hello')
 
-The context and request objects passed to ``__init__`` are the same
-types of objects as described in :ref:`function_as_view`.
+The request object passed to ``__init__`` is the same type of request
+object described in :ref:`function_as_view`.
 
 If you'd like to use a different attribute than ``__call__`` to
 represent the method expected to return a response, you can use an
@@ -96,51 +100,14 @@ represent the method expected to return a response, you can use an
 
 .. _request_only_view_definitions:
 
-Request-Only View Definitions
------------------------------
+Request-And-Context View Definitions
+------------------------------------
 
 View callables may alternately be defined as classes or functions (or
-any callable) that accept only a *request* object, instead of both a
-context and a request.  The following types work as views in this
-style:
-
-#. Functions that accept a single argument ``request``, e.g.::
-
-      from webob import Response
-
-      def view(request):
-          return Response('OK')
-
-#. New-style and old-style classes that have an ``__init__`` method
-   that accepts ``self, request``, e.g.::
-
-      from webob import Response
-
-      class view(object):
-          __init__(self, request):
-              return Response('OK')
-
-#. Arbitrary callables that have a ``__call__`` method that accepts
-   ``self, request``, e.g.::
-
-      from webob import Response
-
-      class View(object):
-          def __call__(self, request):
-              return Response('OK')
-      view = View() # this is the view callable
-
-This style of calling convention is useful for :term:`url dispatch`
-based applications, where the context is seldom used within the view
-code itself.  The view always has access to the context via
-``request.context`` in any case, so it's still available even if you
-use the request-only calling convention.
-
-Arguments Passed to a View
---------------------------
-
+any callable) that accept two positional arguments: a :term:`context`
+as the first argument and a :term:`request` as the second argument.
 The :term:`context` and :term:`request` arguments passed to a view
-function can be defined as follows:
+function defined in this style can be defined as follows:
 
 context
 
@@ -151,6 +118,42 @@ context
 request
 
   A WebOb Request object representing the current WSGI request.
+
+The following types work as views in this style:
+
+#. Functions that accept two arguments: ``context``, and ``request``,
+   e.g.::
+
+      from webob import Response
+
+      def view(context, request):
+          return Response('OK')
+
+#. New-style and old-style classes that have an ``__init__`` method
+   that accepts ``self, context, request``, e.g.::
+
+      from webob import Response
+
+      class view(object):
+          __init__(self, context, request):
+              return Response('OK')
+
+#. Arbitrary callables that have a ``__call__`` method that accepts
+   ``self, context, request``, e.g.::
+
+      from webob import Response
+
+      class View(object):
+          def __call__(self, context, request):
+              return Response('OK')
+      view = View() # this is the view callable
+
+This style of calling convention is useful for :term:`traversal` based
+applications, where the context object is frequently used within the
+view code itself.
+
+No matter which view calling convention is used, the view always has
+access to the context via ``request.context``.
 
 .. _the_response:
 
@@ -296,8 +299,8 @@ You can also declare a *default view* for a model type:
        />
 
 A *default view* has no ``name`` attribute.  When a :term:`context` is
-traversed and there is no *view name* in the request, the *default
-view* is the view that is used.
+found and there is no *view name* associated with the result of
+:term:`traversal`, the *default view* is the view that is used.
 
 You can also declare that a view is good for any model type by using
 the special ``*`` character in the ``for`` attribute:
@@ -629,7 +632,7 @@ An example might reside in a bfg application module ``views.py``:
 
    @bfg_view(name='my_view', request_type='POST', for_=MyModel,
              permission='read')
-   def my_view(context, request):
+   def my_view(request):
        return render_template_to_response('templates/my.pt')
 
 Using this decorator as above replaces the need to add this ZCML to
@@ -720,7 +723,7 @@ All arguments may be omitted.  For example:
    from webob import Response
 
    @bfg_view()
-   def my_view(context, request):
+   def my_view(request):
        """ My view """
        return Response()
 
@@ -743,12 +746,11 @@ applied against a function.  For example:
 
    @bfg_view()
    class MyView(object):
-       def __init__(self, context, request):
-           self.context = context
+       def __init__(self, request):
            self.request = request
 
        def __call__(self):
-           return Response('hello from %s!' % self.context)
+           return Response('hello')
 
 You can use the ``bfg_view`` decorator as a simple callable to
 manually decorate classes in Python 2.5 and below (without the
@@ -761,12 +763,11 @@ decorator syntactic sugar), if you wish:
    from repoze.bfg.view import bfg_view
 
    class MyView(object):
-       def __init__(self, context, request):
-           self.context = context
+       def __init__(self, request):
            self.request = request
 
        def __call__(self):
-           return Response('hello from %s!' % self.context)
+           return Response('hello')
 
    my_view = bfg_view()(MyView)
 
@@ -781,7 +782,7 @@ registration.  For example:
 
     @bfg_view(name='edit')
     @bfg_view(name='change')
-    def edit(context, request):
+    def edit(request):
         pass
 
 This registers the same view under two different names.
@@ -800,13 +801,12 @@ The bfg_view decorator can also be used against class methods:
    from repoze.bfg.view import bfg_view
 
    class MyView(object):
-       def __init__(self, context, request):
-           self.context = context
+       def __init__(self, request):
            self.request = request
 
        @bfg_view(name='hello')
        def amethod(self):
-           return Response('hello from %s!' % self.context)
+           return Response('hello')
 
 When the bfg_view decorator is used against a class method, a view is
 registered for the *class*, so the class constructor must accept
@@ -825,12 +825,11 @@ could be spelled equivalently as the below:
 
    @bfg_view(attr='amethod', name='hello')
    class MyView(object):
-       def __init__(self, context, request):
-           self.context = context
+       def __init__(self, request):
            self.request = request
 
        def amethod(self):
-           return Response('hello from %s!' % self.context)
+           return Response('hello')
 
 .. note:: The ability to use the ``bfg_view`` decorator as a method
           decorator is new in :mod:`repoze.bfg` version 1.1.
@@ -1019,7 +1018,7 @@ representation of the dictionary:
    from repoze.bfg.view import bfg_view
 
    @bfg_view(renderer='string')
-   def hello_world(context, request):
+   def hello_world(request):
        return {'content':'Hello!'}
 
 The body of the response returned by such a view will be a string
@@ -1050,7 +1049,7 @@ view will render the returned dictionary to a JSON serialization:
    from repoze.bfg.view import bfg_view
 
    @bfg_view(renderer='json')
-   def hello_world(context, request):
+   def hello_world(request):
        return {'content':'Hello!'}
 
 The body of the response returned by such a view will be a string
@@ -1208,7 +1207,7 @@ slightly different response.
 
    from webob.exc import HTTPFound
 
-   def myview(context, request):
+   def myview(request):
        return HTTPFound(location='http://example.com')
 
 All exception types from the :mod:`webob.exc` module implement the
@@ -1344,7 +1343,7 @@ ZCML file:
    from repoze.bfg.url import static_url
    from repoze.bfg.chameleon_zpt import render_template_to_response
 
-   def my_view(context, request):
+   def my_view(request):
        css_url = static_url('resources/1/foo.css', request)
        js_url = static_url('resources/2/foo.js', request)
        return render_template_to_response('templates/my_template.pt',
@@ -1484,7 +1483,7 @@ accept a form post from the above form:
 
 .. code-block:: python
 
-   def myview(context, request):
+   def myview(request):
        firstname = request.params['firstname']
        lastname = request.params['lastname']
 
@@ -1494,7 +1493,7 @@ decode already-decoded (``unicode``) values obtained from
 
 .. code-block:: python
 
-   def myview(context, request):
+   def myview(request):
        # the .decode('utf-8') will break below if there are any high-order
        # characters in the firstname or lastname
        firstname = request.params['firstname'].decode('utf-8')
@@ -1695,7 +1694,7 @@ attribute:
    from repoze.bfg.view import bfg_view
 
    @bfg_view(renderer='amf')
-   def myview(context, request):
+   def myview(request):
        return {'Hello':'world'}
 
 By default, when a template extension is unrecognized, an error is

@@ -95,7 +95,7 @@ Here's some sample code that implements a minimal NotFound view:
 
    from webob.exc import HTTPNotFound
 
-   def notfound_view(context, request):
+   def notfound_view(request):
        return HTTPNotFound()
 
 .. note:: When a NotFound view is invoked, it is passed a request.
@@ -203,7 +203,7 @@ Here's some sample code that implements a minimal forbidden view:
 
    from repoze.bfg.chameleon_zpt import render_template_to_response
 
-   def forbidden_view(context, request):
+   def forbidden_view(request):
        return render_template_to_response('templates/login_form.pt')
 
 .. note:: When an forbidden view is invoked, it is passed
