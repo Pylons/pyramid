@@ -13,8 +13,8 @@ shorthand as a :term:`view`.
    might be found as the result of a request.
 
 Most views accept a single argument: ``request``.  This argument
-represents a WebOb Request object representing the current WSGI
-request.
+represents a :term:`WebOb` :term:`Request` object representing the
+current HTTP request.
 
 A view callable may always return a :term:`WebOb` :term:`Response`
 object directly.  It may optionally return another arbitrary
@@ -98,7 +98,7 @@ represent the method expected to return a response, you can use an
 ``attr`` value as part of view configuration.  See
 :ref:`view_configuration`.
 
-.. _request_only_view_definitions:
+.. _request_and_context_view_definitions:
 
 Request-And-Context View Definitions
 ------------------------------------

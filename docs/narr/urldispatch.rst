@@ -377,37 +377,43 @@ The ``mypackage.views`` module referred to above might look like so:
 
    from webob import Response
 
-   def hello_view(context, request):
+   def hello_view(request):
        return Response('Hello!')
 
-In this case the context object passed to the view will be an instance
-of the ``repoze.bfg.urldispatch.DefaultRoutesContext``.  This is the
-type of object created for a context when there is no "factory"
-specified in the ``route`` declaration.  It is a mapping object, a lot
-like a dictionary.
+.. note: the ``context`` attribute of the ``request`` object passed to
+   the above view will be an instance of the
+   ``repoze.bfg.urldispatch.DefaultRoutesContext``.  This is the type
+   of object created for a context when there is no "factory"
+   specified in the ``route`` declaration.  It is a mapping object, a
+   lot like a dictionary.
 
 When using :term:`url dispatch` exclusively in an application (as
 opposed to using both url dispatch and :term:`traversal`), the
-*context* of the view isn't terribly interesting most of the time,
+:term:`context` of the view isn't always terribly interesting,
 particularly if you never use a ``factory`` attribute on your route
-definitions.  For this reason, :mod:`repoze.bfg` supports view
-callables defined with only a ``request`` argument in their argument
-specification.  For example, the below view statement is completely
-equivalent to the above view statement:
+definitions.  However, if you do use a ``factory`` attribute on your
+route definitions, you may be very interested in the :term:`context`
+of the view.  :mod:`repoze.bfg` supports view callables defined with
+two arguments: ``context`` and ``request``.  For example, the below
+view statement is completely equivalent to the above view statement:
 
 .. code-block:: python
    :linenos:
 
    from webob import Response
 
-   def hello_view(request):
+   def hello_view(context, request):
        return Response('Hello!')
+
+The ``context`` passed to this view will be an instance returned by
+the default root factory or an instance returned by the ``factory``
+argument to your route definition.
 
 Even if you use the request-only argument format in view callables,
 you can still get to the ``context`` of the view (if necessary) by
 accessing ``request.context``.
 
-See also: :ref:`request_only_view_definitions`.
+See :ref:`request_and_context_view_definitions` for more information.
 
 Example 2
 ~~~~~~~~~
@@ -474,9 +480,9 @@ An example of using a route with a factory:
     factory=".models.Idea"
     />
 
-The above route will manufacture an ``Idea`` model as a context,
-assuming that ``mypackage.models.Idea`` resolves to a class that
-accepts a request in its ``__init__``.
+The above route will manufacture an ``Idea`` model as a
+:term:`context`, assuming that ``mypackage.models.Idea`` resolves to a
+class that accepts a request in its ``__init__``.
 
 .. note:: Values prefixed with a period (``.``) for the ``factory``
    and ``view`` attributes of a ``route`` (such as ``.models.Idea``
