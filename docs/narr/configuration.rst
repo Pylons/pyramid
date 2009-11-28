@@ -451,13 +451,12 @@ this discussion, the :term:`view name` can be considered the first
 non-empty path segment in the URL: in particular, this view
 configuration will match when the URL is ``/goodbye``.
 
-Since our ``goodbye_world`` view callable returns a Response instance
-with a body of ``Goodbye world!`` in the configuration implied by this
-script, a visit by a user agent to the URL that contains the path info
-``/goodbye`` of the a server running this application will receive the
-greeting ``Goodbye world!`` unless :mod:`repoze.bfg` finds a more
-specific view configuration in its application registry for a given
-request.
+Our ``goodbye_world`` :term:`view callable` returns a Response
+instance with a body of ``Goodbye world!`` in the configuration
+implied by this script.  It is configured as with a :term:`view name`
+predicate of ``goodbye``.  Therefore, a user agent contacting a server
+running this application will receive the greeting ``Goodbye world!``
+when the path info part of the request is ``/goodbye``.
 
 Each invocation of the ``add_view`` method implies a :term:`view
 configuration` registration.  Each :term:`predicate` provided as a
@@ -489,7 +488,7 @@ the best view configuration for any request, the ``goodbye_world``
 view callable will be used when the URL contains path information that
 ends with ``/goodbye``.
 
-WGSI Application Creation
+WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
