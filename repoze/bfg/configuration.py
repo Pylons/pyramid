@@ -155,7 +155,6 @@ class Configurator(object):
                                         authorization_policy)
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
-        
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})

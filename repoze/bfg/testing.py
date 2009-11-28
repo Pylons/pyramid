@@ -526,16 +526,19 @@ class DummyRequest:
 def setUp(registry=None, request=None, hook_zca=True):
     """
     Set BFG registry and request thread locals for the duration of a
-    unit test.
+    single unit test.
 
     .. note:: The ``setUp`` function is new as of :mod:`repoze.bfg`
        1.1.
 
-    Use in the ``setUp`` method of unit test code which uses any of
-    the ``register*`` functions in ``repoze.bfg.testing`` (such as
-    ``repoze.bfg.testing.registerDummySecurityPolicy``) or unit test
-    code that uses the ``repoze.bfg.threadlocal.get_current_registry``
-    or ``repoze.bfg.threadlocal.get_current_request`` functions.
+    Use this function in the ``setUp`` method of a unit test test case
+    which directly or indirectly uses:
+
+    - any of the ``register*`` functions in ``repoze.bfg.testing``
+      (such as ``repoze.bfg.testing.registerModels``)
+
+    - the ``repoze.bfg.threadlocal.get_current_registry`` or
+      ``repoze.bfg.threadlocal.get_current_request`` functions.
 
     If you use the ``testing.register*`` APIs, or the
     ``get_current_*`` functions (or call :mod:`repoze.bfg` code that
