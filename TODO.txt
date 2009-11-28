@@ -7,6 +7,4 @@
 
 - "Model graph" -> "object graph"?
 
-- Decide if we *really* make the threadlocal stuff into APIs.
-
 - Decide on ``unhook_zca`` argument to ``tearDown``.
