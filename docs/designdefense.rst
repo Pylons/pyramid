@@ -9,28 +9,29 @@ describe future steps which will be taken to improve it; in some cases
 we just file the challenge as "noted", as obviously you can't please
 everyone all of the time.
 
-BFG Uses The Zope Component Architecture ("ZCA")
-------------------------------------------------
+BFG Uses A Zope Component Architecture ("ZCA") Registry
+-------------------------------------------------------
 
-:mod:`repoze.bfg` uses the :term:`Zope Component Architecture` (ZCA)
-under the hood.  This is a point of some contention.
-:mod:`repoze.bfg` is of a :term:`Zope` pedigree, so it was natural for
-its developers to use the ZCA at its inception.  However,
-:mod:`repoze.bfg` allegiance to its Zope pedigree is not blind.  We
-understand that using the ZCA has issues and consequences, which we've
-attempted to address as best we can.  Here's an introspection about
-:mod:`repoze.bfg` use of the ZCA, and the trade-offs its usage
+:mod:`repoze.bfg` uses a :term:`Zope Component Architecture` (ZCA)
+"component registry" as its :term:`application registry` under the
+hood.  This is a point of some contention.  :mod:`repoze.bfg` is of a
+:term:`Zope` pedigree, so it was natural for its developers to use a
+ZCA registry at its inception.  However, we understand that using a
+ZCA registry has issues and consequences, which we've attempted to
+address as best we can.  Here's an introspection about
+:mod:`repoze.bfg` use of a ZCA registry, and the trade-offs its usage
 involves.
 
 Problems
 ++++++++
 
-The "global" API that is commonly used to access data in a ZCA
-"component registry" is not particularly pretty or intuitive, and
-sometimes it's just plain obtuse.  Likewise, the conceptual load on a
-casual source code reader of code that uses the component architecture
-is somewhat high.  Consider a ZCA neophyte reading the code that
-performs a typical "unnamed utility" lookup:
+The "global" API that may be used to access data in a ZCA "component
+registry" is not particularly pretty or intuitive, and sometimes it's
+just plain obtuse.  Likewise, the conceptual load on a casual source
+code reader of code that uses the ZCA global API is somewhat high.
+Consider a ZCA neophyte reading the code that performs a typical
+"unnamed utility" lookup using the ``zope.component.getUtility``
+global API:
 
 .. code-block:: python
    :linenos:
@@ -96,17 +97,17 @@ Ameliorations
 +++++++++++++
 
 First, the primary amelioration: :mod:`repoze.bfg` *does not expect
-application developers to understand ZCA concepts or its API*.  If an
-*application* developer needs to understand a ZCA concept or API
+application developers to understand ZCA concepts or any of its APIs*.
+If an *application* developer needs to understand a ZCA concept or API
 during the creation of a :mod:`repoze.bfg` application, we've failed
 on some axis.
 
-Instead, the framework hides the presence of the ZCA behind
-special-purpose API functions that *do* use the ZCA.  Take for example
-the ``repoze.bfg.security.authenticated_userid`` function, which
-returns the userid present in the current request or ``None`` if no
-userid is present in the current request.  The application developer
-calls it like so:
+Instead, the framework hides the presence of the ZCA registry behind
+special-purpose API functions that *do* use ZCA APIs.  Take for
+example the ``repoze.bfg.security.authenticated_userid`` function,
+which returns the userid present in the current request or ``None`` if
+no userid is present in the current request.  The application
+developer calls it like so:
 
 .. code-block:: python
    :linenos:
@@ -133,17 +134,17 @@ is this:
            return None
        return policy.authenticated_userid(request)
 
-Using such wrappers, we strive to always hide the ZCA from application
-developers.  Application developers should just never know about the
-ZCA: they should call a Python function with some object germane to
-the domain as an argument, and it should returns a result.  A
-corollary that follows is that any reader of an application that has
-been written using :mod:`repoze.bfg` needn't understand the ZCA
+Using such wrappers, we strive to always hide the ZCA API from
+application developers.  Application developers should just never know
+about the ZCA API: they should call a Python function with some object
+germane to the domain as an argument, and it should returns a result.
+A corollary that follows is that any reader of an application that has
+been written using :mod:`repoze.bfg` needn't understand the ZCA API
 either.
 
-Hiding the ZCA from application developers and code readers is a form
-of enhancing "domain specificity".  No application developer wants to
-need to understand the minutiae of the mechanics of how a web
+Hiding the ZCA API from application developers and code readers is a
+form of enhancing "domain specificity".  No application developer
+wants to need to understand the minutiae of the mechanics of how a web
 framework does its thing.  People want to deal in concepts that are
 closer to the domain they're working in: for example, web developers
 want to know about *users*, not *utilities*.  :mod:`repoze.bfg` uses
@@ -153,18 +154,21 @@ to end users.
 However, unlike application developers, *framework developers*,
 including people who want to override :mod:`repoze.bfg` functionality
 via preordained framework plugpoints like traversal or view lookup
-*must* understand the ZCA.
+*must* understand the ZCA registry API.
 
 :mod:`repoze.bfg` framework developers were so concerned about
-conceptual load issues of the ZCA API for framework developers that a
-`replacement <http://svn.repoze.org/repoze.component/trunk>`_ named
+conceptual load issues of the ZCA registry API for framework
+developers that a `replacement registry implementation
+<http://svn.repoze.org/repoze.component/trunk>`_ named
 :mod:`repoze.component` was actually developed.  Though this package
-is fully functional and well-tested, and its API is much nicer than
-the ZCA API, work on it was largely abandoned and it is not used in
-:mod:`repoze.bfg`.  We continued to use the ZCA within
-:mod:`repoze.bfg` because it ultimately proved a better fit.
+has a registry implementation which is fully functional and
+well-tested, and its API is much nicer than the ZCA registry API, work
+on it was largely abandoned and it is not used in :mod:`repoze.bfg`.
+We continued to use a ZCA registry within :mod:`repoze.bfg` because it
+ultimately proved a better fit.
 
-.. note:: We continued using ZCA rather than disusing it in favor of
+.. note:: We continued using ZCA registry rather than disusing it in
+   favor of using the registry implementation in
    :mod:`repoze.component` largely because the ZCA concept of
    interfaces provides for use of an interface hierarchy, which is
    useful in a lot of scenarios (such as context type inheritance).
@@ -172,80 +176,83 @@ the ZCA API, work on it was largely abandoned and it is not used in
    that allowed for this functionality seemed like it was just
    reinventing the wheel.
 
-Making framework developers and extenders understand the ZCA is a
-trade-off.  We (the :mod:`repoze.bfg` developers) like the features
-that the ZCA gives us, and we have long-ago borne the weight of
-understanding what it does and how it works.  The authors of
-:mod:`repoze.bfg` understand the ZCA deeply and can read code that
-uses it as easily as any other code.
+Making framework developers and extenders understand the ZCA registry
+API is a trade-off.  We (the :mod:`repoze.bfg` developers) like the
+features that the ZCA registry gives us, and we have long-ago borne
+the weight of understanding what it does and how it works.  The
+authors of :mod:`repoze.bfg` understand the ZCA deeply and can read
+code that uses it as easily as any other code.
 
 But we recognize that developers who my want to extend the framework
-are not as comfortable with the :term:`Zope Component Architecture`
-API as the original developers are with it.  So, for the purposes of
-being kind to third-party :mod:`repoze.bfg` framework developers in,
-we've turned the component registry used by :mod:`repoze.bfg` into
-something that is accessible using the plain old dictionary API (like
-the :mod:`repoze.component` API).  For example, the snippet of code in
-the problem section above was:
+are not as comfortable with the ZCA registry API as the original
+developers are with it.  So, for the purposes of being kind to
+third-party :mod:`repoze.bfg` framework developers in, we've drawn
+some lines in the sand.
 
-.. code-block:: python
-   :linenos:
+#) In all "core" code, We've made use of ZCA global API functions such
+   as ``zope.component.getUtility`` and ``zope.component.getAdapter``
+   the exception instead of the rule.  So instead of:
 
-   from repoze.bfg.interfaces import ISettings
-   from zope.component import getUtility
-   settings = getUtility(ISettings)
+   .. code-block:: python
+      :linenos:
 
-In a better world, we might be able to spell this as:
+      from repoze.bfg.interfaces import IAuthenticationPolicy
+      from zope.component import getUtility
+      policy = getUtility(IAuthenticationPolicy)
 
-.. code-block:: python
-   :linenos:
+   :mod:`repoze.bfg` code will usually do:
 
-   from repoze.bfg.threadlocal import get_registry
+   .. code-block:: python
+      :linenos:
 
-   registry = get_registry()
-   settings = registry['settings']
+      from repoze.bfg.interfaces import IAuthenticationPolicy
+      from repoze.bfg.threadlocal import get_current_registry
+      registry = get_current_registry()
+      policy = registry.getUtility(IAuthenticationPolicy)
 
-In this world, we've removed the need to understand utilities and
-interfaces.  We *haven't* removed the need to understand the concept
-of a *registry*, but for the purposes of this example, it's simply a
-dictionary.  We haven't killed off the concept of a thread local
-either.  Let's kill off thread locals, pretending to want to do this
-in some code that has access to the :term:`request`:
+   While the latter is more verbose, it also arguably makes it more
+   obvious what's going on.  All of the :mod:`repoze.bfg` core code uses
+   this pattern rather than the ZCA global API.
 
-.. code-block:: python
-   :linenos:
+#) We've turned the component registry used by :mod:`repoze.bfg` into
+   something that is accessible using the plain old dictionary API
+   (like the :mod:`repoze.component` API).  For example, the snippet
+   of code in the problem section above was:
 
-   registry = request.registry
-   settings = registry['settings']
+   .. code-block:: python
+      :linenos:
 
-In *this* world, we've reduced the conceptual problem to understanding
-attributes and the dictionary API.  Every Python programmer knows
-these things, even framework programmers.
+      from repoze.bfg.interfaces import ISettings
+      from zope.component import getUtility
+      settings = getUtility(ISettings)
 
-We've also made it unnecessary to actually use the ZCA global API
-(functions such as ``zope.component.getUtility``,
-``zope.component.getAdapter``, etc).  Instead of:
+   In a better world, we might be able to spell this as:
 
-.. code-block:: python
-   :linenos:
+   .. code-block:: python
+      :linenos:
 
-   from repoze.bfg.interfaces import IAuthenticationPolicy
-   from zope.component import getUtility
-   policy = getUtility(IAuthenticationPolicy)
+      from repoze.bfg.threadlocal import get_current_registry
 
-:mod:`repoze.bfg` code can do:
+      registry = get_current_registry()
+      settings = registry['settings']
 
-.. code-block:: python
-   :linenos:
+   In this world, we've removed the need to understand utilities and
+   interfaces, because we've disused them in favor of a plain dictionary
+   lookup.  We *haven't* removed the need to understand the concept of a
+   *registry*, but for the purposes of this example, it's simply a
+   dictionary.  We haven't killed off the concept of a thread local
+   either.  Let's kill off thread locals, pretending to want to do this
+   in some code that has access to the :term:`request`:
 
-   from repoze.bfg.interfaces import IAuthenticationPolicy
-   from repoze.bfg.threadlocal import get_current_registry
-   registry = get_current_registry()
-   policy = registry.getUtility(IAuthenticationPolicy)
+   .. code-block:: python
+      :linenos:
 
-While the latter is more verbose, it also arguably makes it more
-obvious what's going on.  All of the :mod:`repoze.bfg` core code uses
-this pattern rather than the ZCA global API.
+      registry = request.registry
+      settings = registry['settings']
+
+   In *this* world, we've reduced the conceptual problem to understanding
+   attributes and the dictionary API.  Every Python programmer knows
+   these things, even framework programmers.
 
 While :mod:`repoze.bfg` still uses some suboptimal unnamed utility
 registrations, future versions of it will where possible disuse these
@@ -257,17 +264,18 @@ Rationale
 +++++++++
 
 Here are the main rationales involved in the :mod:`repoze.bfg`
-decision to use the ZCA:
+decision to use the ZCA registry:
 
 - Pedigree.  A nontrivial part of the answer to this question is
   "pedigree".  Much of the design of :mod:`repoze.bfg` is stolen
-  directly from :term:`Zope`.  Zope uses the ZCA to do a number of
-  tricks.  :mod:`repoze.bfg` mimics these tricks apishly, and, because
-  the ZCA works well for that set of tricks, :mod:`repoze.bfg` uses it
-  for the same purposes.  For example, the way that :mod:`repoze.bfg`
-  maps a :term:`request` to a :term:`view callable` is lifted almost
-  entirely from Zope.  The ZCA plays an important role in the
-  particulars of how this request to view mapping is done.
+  directly from :term:`Zope`.  Zope uses the ZCA registry to do a
+  number of tricks.  :mod:`repoze.bfg` mimics these tricks, and,
+  because the ZCA registry works well for that set of tricks,
+  :mod:`repoze.bfg` uses it for the same purposes.  For example, the
+  way that :mod:`repoze.bfg` maps a :term:`request` to a :term:`view
+  callable` is lifted almost entirely from Zope.  The ZCA registry
+  plays an important role in the particulars of how this request to
+  view mapping is done.
 
 - Features.  The ZCA component registry essentially provides what can
   be considered something like a "superdictionary", which allows for
@@ -292,15 +300,15 @@ decision to use the ZCA:
   to write a frontend from scratch to make use of
   configuration-file-driven registry population.
 
-- Pluggability.  Use of the ZCA allows for framework extensibility via
-  a well-defined and widely understood plugin architecture.  As long
-  as framework developers and extenders understand the ZCA registry,
-  it's possible to extend :mod:`repoze.bfg` almost arbitrarily.  For
-  example, it's relatively easy to build a ZCML directive that
-  registers several views "all at once", allowing app developers to
-  use that ZCML directive as a "macro" in code that they write.  This
-  is somewhat of a differentiating feature from other (non-Zope)
-  frameworks.
+- Pluggability.  Use of the ZCA registry allows for framework
+  extensibility via a well-defined and widely understood plugin
+  architecture.  As long as framework developers and extenders
+  understand the ZCA registry, it's possible to extend
+  :mod:`repoze.bfg` almost arbitrarily.  For example, it's relatively
+  easy to build a ZCML directive that registers several views "all at
+  once", allowing app developers to use that ZCML directive as a
+  "macro" in code that they write.  This is somewhat of a
+  differentiating feature from other (non-Zope) frameworks.
 
 - Testability.  Judicious use of the ZCA registry in framework code
   makes testing that code slightly easier.  Instead of using
@@ -316,35 +324,36 @@ decision to use the ZCA:
 
 - Ecosystem.  Many existing Zope packages can be used in
   :mod:`repoze.bfg` with few (or no) changes due to our use of the ZCA
-  and :term:`ZCML`.
+  registry and :term:`ZCML`.
 
 Conclusion
 ++++++++++
 
 If you only *develop applications* using :mod:`repoze.bfg`, there's
 not much to complain about here.  You just should never need to
-understand the ZCA or even know about its presence: use documented
-APIs instead.  However, you may be an application developer who
-doesn't read API documentation because it's unmanly. Instead you read
-the raw source code, and because you haven't read the documentation,
-you don't know what functions, classes, and methods even *form* the
-:mod:`repoze.bfg` API.  As a result, you've now written code that uses
-internals and you've pained yourself into a conceptual corner as a
-result of needing to wrestle with some ZCA-using implementation
-detail.  If this is you, it's extremely hard to have a lot of sympathy
-for you.  You'll either need to get familiar with how we're using the
-ZCA or you'll need to use only the documented APIs; that's why we
-document them as APIs.
+understand the ZCA registry or even know about its presence: use
+documented :mod:`repoze.bfg` APIs instead.  However, you may be an
+application developer who doesn't read API documentation because it's
+unmanly. Instead you read the raw source code, and because you haven't
+read the documentation, you don't know what functions, classes, and
+methods even *form* the :mod:`repoze.bfg` API.  As a result, you've
+now written code that uses internals and you've pained yourself into a
+conceptual corner as a result of needing to wrestle with some
+ZCA-using implementation detail.  If this is you, it's extremely hard
+to have a lot of sympathy for you.  You'll either need to get familiar
+with how we're using the ZCA registry or you'll need to use only the
+documented APIs; that's why we document them as APIs.
 
 If you *extend* or *develop* :mod:`repoze.bfg` (create new ZCML
 directives, use some of the more obscure "ZCML hooks" as described in
 :ref:`hooks_chapter`, or work on the :mod:`repoze.bfg` core code), you
 will be faced with needing to understand at least some ZCA concepts.
-The ZCA API is quirky: we've tried to make it at least slightly nicer
-by disusing it for common registrations and lookups such as unnamed
-utilities.  Some places it's used unabashedly, and will be forever.
-We know it's quirky, but it's also useful and fundamentally
-understandable if you take the time to do some reading about it.
+The ZCA registry API is quirky: we've tried to make it at least
+slightly nicer by disusing it for common registrations and lookups
+such as unnamed utilities.  Some places it's used unabashedly, and
+will be forever.  We know it's quirky, but it's also useful and
+fundamentally understandable if you take the time to do some reading
+about it.
 
 BFG Uses Interfaces Too Liberally
 ---------------------------------
