@@ -206,8 +206,8 @@ In :mod:`repoze.bfg` terms, :term:`traversal` is the act of walking
 over a *directed graph* of objects from a :term:`root` object using
 the individual path segments of the "path info" portion of a URL (the
 data following the hostname and port number, but before any query
-strng elements or fragments, for example the ``/a/b/c`` portion of the
-URL ``http://example.com/a/b/c?foo=1``) in order to find a
+string elements or fragments, for example the ``/a/b/c`` portion of
+the URL ``http://example.com/a/b/c?foo=1``) in order to find a
 :term:`context` object and a :term:`view name`.  The combination of
 the :term:`context` object and the :term:`view name` (and, in more
 complex configurations, other :term:`predicate` values) are used to
@@ -417,12 +417,12 @@ argument, the ``name`` predicate with a value of ``''``, meaning that
 we'd like :mod:`repoze.bfg` to invoke the ``hello_world`` view
 callable for any request for the :term:`default view` of an object.
 
-Since our ``hello_world`` view callable returns a Response instance
-with a body of ``Hello world!``` in the configuration implied by this
-script, a user agent to a server running this application will receive
+Our ``hello_world`` :term:`view callable` returns a Response instance
+with a body of ``Hello world!`` in the configuration implied by this
+script.  It is configured as a :term:`default view`.  Therefore, a
+user agent contacting a server running this application will receive
 the greeting ``Hello world!`` when any :term:`default view` is
-invoked, unless :mod:`repoze.bfg` finds a more specific view
-configuration in its application registry for a given request.
+invoked. 
 
 .. sidebar:: View Dispatch and Ordering
 
@@ -441,7 +441,7 @@ configuration in its application registry for a given request.
    most specific callable when a request is dispatched to it.
 
 The line ``config.add_view(goodbye_world, name='goodbye')`` registers
-the ``hello_world`` function as a view callable.  The line calls
+the ``goodbye_world`` function as a view callable.  The line calls
 ``add_view`` with the view callable as the first required positional
 argument, and a :term:`predicate` keyword argument ``name`` with the
 value ``'goodbye'``.  This :term:`view configuration` implies that a
