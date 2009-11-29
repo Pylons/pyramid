@@ -142,6 +142,8 @@ class Configurator(object):
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
                        renderers=DEFAULT_RENDERERS, debug_logger=None):
+        # this is a pseudo-API.. it's not in the docs but is used in the
+        # wild.  It might should go in the docs.
         self._set_settings(settings)
         self._set_root_factory(root_factory)
         if debug_logger is None:
