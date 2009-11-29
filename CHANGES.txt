@@ -15,6 +15,12 @@ Bug Fixes
   is now the preferred predicate argument for associating a view
   configuration with an HTTP request method.
 
+Documentation
+-------------
+
+- Fixed "Startup" narrative documentation chapter; it was explaining
+  "the old way" an application constructor worked.
+
 1.2a1 (2009-11-28)
 ==================
 

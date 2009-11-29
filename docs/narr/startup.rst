@@ -62,7 +62,8 @@ press ``return`` after running ``paster serve MyProject.ini``.
 #. The application's *constructor* (named by the entry point reference
    or dotted Python name on the ``use=`` line) is passed the key/value
    parameters mentioned within the section in which it's defined.  The
-   constructor is meant to return a :term:`router` instance.
+   constructor is meant to return a :term:`router` instance, which is
+   a :term:`WSGI` application.
 
    For ``repoze.bfg`` applications, the constructor will be a function
    named ``app`` in the ``run.py`` file within the :term:`package` in
@@ -95,59 +96,55 @@ press ``return`` after running ``paster serve MyProject.ini``.
    ``{'reload_templates':'true', 'debug_authorization':'false',
    'debug_notfound':'false'}``.
 
-#. The constructor itself is invoked.  A generated :mod:`repoze.bfg`
-   ``app`` function will look like the below.
+#. The PasteDeploy application constructor itself is invoked.  It is
+   represented by the ``app`` function in ``run.py``.  A typical
+   :mod:`repoze.bfg` ``app`` function will look like the below.
 
    .. literalinclude:: MyProject/myproject/run.py
       :linenos:
 
    Note that the ``app`` function imports the ``get_root`` :term:`root
-   factory` function from the ``myproject.models`` Python module.  It
-   then also imports the "bare" ``myproject`` package, and passes
-   ``get_root``, ``myproject``, and the ``settings`` keyword as the
-   ``app`` function's extra keyword arguments to the ``make_app``
-   function of the ``repoze.bfg.router`` module.  ``**settings`` here
-   contains all the options in the ``[app:main]`` section of our .ini
-   file except the "use" option (which is internal to paste).  In this
-   case, ``**settings`` will be something like
-   ``{'reload_templates':'true', 'debug_authorization':'false',
-   'debug_notfound':'false'}``.
+   factory` function from the ``myproject.models`` Python module.
 
-   ``get_root`` is the first argument to ``make_app``, and it is a
-   root factory callable that is invoked on every request to retrieve
-   the application root.  It is not called during startup, only when a
-   request is handled.
+#. The ``app`` function first constructs a :term:`Configurator`,
+   passing ``get_root`` to it as its ``root_factory`` argument, and
+   ``settings`` dictionary captured via the ``**settings`` kwarg as
+   its ``settings`` argument.
 
-   We pass in the bare ``myproject`` package so that the ``make_app``
-   callback knows where to look for the :term:`application registry`
-   file (conventionally named ``configure.zcml``).  ``make_app`` will
-   use the package's path and look for ``configure.zcml`` within that
-   package's filesystem directory.
+   ``get_root`` is a root factory callable that is invoked on every
+   request to retrieve the application root.  It is not called during
+   startup, only when a request is handled.
 
-   If you for some reason need or want to load a different application
-   registry filename for your application, you can pass an optional
-   ``filename=`` parameter to make_app (e.g. ``make_app(get_root,
-   myproject, filename='meta.zcml', settings=settings``).  If the
-   filename is absolute, the ``package`` argument is ignored.
+   ``settings`` dictionary contains all the options in the
+   ``[app:main]`` section of our .ini file except the "use" option
+   (which is internal to paste).  In this case, ``**settings`` will be
+   something like ``{'reload_templates':'true',
+   'debug_authorization':'false', 'debug_notfound':'false'}``.
 
-#. The ``make_app`` function does its work.  It finds and parses the
-   ZCML represented by the application registry file.  If it fails to
-   parse one or more ZCML files, a ``XMLConfigurationError`` is raised
-   (or possibly another error if the ZCML file just doesn't exist).
-   If it succeeds, an :term:`application registry` is created,
-   representing the view registrations (and other registrations) for
-   your application.  A :term:`router` instance is created, and the
-   router is associated with the application registry.  The router
-   represents your application; the settings in the application
-   registry that is created will be used for your application.
+#. The ``app`` function then calls the ``load_zcml`` method of the
+   configurator instance, passing in a ``zcml_file`` value.
+   ``zcml_file`` is the value of the ``configure_zcml`` setting or a
+   default of ``configure.zcml``.  This filename is relative to the
+   run.py file that the ``app`` function lives in.  The ``load_zcml``
+   function processes each :term:`ZCML declaration` in the ZCML file
+   implied by the ``zcml_file`` argument.  If ``load_zcml`` fails to
+   parse the ZCML file (or any file which is included by the ZCML
+   file), a ``XMLConfigurationError`` is raised.  If it succeeds, an
+   :term:`application registry` is populated using all the :term:`ZCML
+   declaration` statements present in the file.
+
+#. The ``make_wsgi_app`` method of the configurator is called.  The
+   result is a :term:`router` instance.  The router is associated with
+   the :term:`application registry` implied by the configurator
+   previously populated by ZCML.  The router is a WSGI application.
 
 #. A ``WSGIApplicationCreatedEvent`` event is emitted (see
    :ref:`events_chapter` for more information about events).
 
 #. Assuming there were no errors, the ``app`` function in
-   ``myproject`` returns the router instance created by ``make_app``
-   back to PasteDeploy.  As far as PasteDeploy is concerned, it is
-   "just another WSGI application".
+   ``myproject`` returns the router instance created by
+   ``make_wsgi_app`` back to PasteDeploy.  As far as PasteDeploy is
+   concerned, it is "just another WSGI application".
 
 #. PasteDeploy starts the WSGI *server* defined within the
    ``[server:main]`` section.  In our case, this is the ``Paste#http``
