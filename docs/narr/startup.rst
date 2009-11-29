@@ -13,7 +13,7 @@ you'll see something much like this show up on the console::
 This chapter explains what happens between the time you press the
 "Return" key on your keyboard after typing ``paster serve
 myproject/MyProject.ini`` and the the time the line ``serving on
-0.0.0:6543 ...`` is output to your console.
+0.0.0.0:6543 ...`` is output to your console.
 
 The Startup Process
 -------------------
