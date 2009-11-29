@@ -10,40 +10,43 @@ documentation additions.
 Major Feature Additions
 -----------------------
 
-The major feature additions of 1.2 are:
+The major feature addition in 1.2 is an :term:`imperative
+configuration` mode.
 
-- An :term:`imperative configuration` mode.  This feature makes
-  :mod:`repoze.bfg` competetive with "microframeworks" such as `Bottle
-  <http://bottle.paws.de/>`_ and `Tornado
-  <http://www.tornadoweb.org/>`_, because it means that
-  :mod:`repoze.bfg` applications can begin life as a single file.
-  Later, the application may evolve into a package, and may start
-  making use of other configuration features, such as :term:`ZCML`.
-  :mod:`repoze.bfg` has a good deal of functionality that
-  microframeworks lack, so this is meant as a a "best of both worlds"
-  feature.
+A :mod:`repoze.bfg` application can now begin its life as a single
+Python file.  Later, the application might evolve into a set of Python
+files in a package.  Even later, it might start making use of other
+configuration features, such as :term:`ZCML` and perhaps a
+:term:`scan`.  But neither the use of a package nor the use of
+non-imperative configuration is required to create a simple
+:mod:`repoze.bfg` application any longer.
 
-  As a result of :term:`imperative configuration`, the simplest
-  possible :mod:`repoze.bfg` application is now:
+:term:`Imperative configuration` makes :mod:`repoze.bfg` competitive
+with "microframeworks" such as `Bottle <http://bottle.paws.de/>`_ and
+`Tornado <http://www.tornadoweb.org/>`_.  :mod:`repoze.bfg` has a good
+deal of functionality that most microframeworks lack, so this is
+hopefully a "best of both worlds" feature.
 
-    .. code-block:: python
-       :linenos:
+The simplest possible :mod:`repoze.bfg` application is now:
 
-       from webob import Response
-       from wsgiref import simple_server
-       from repoze.bfg.configuration import Configurator
+  .. code-block:: python
+     :linenos:
 
-       def hello_world(request):
-           return Response('Hello world!')
+     from webob import Response
+     from wsgiref import simple_server
+     from repoze.bfg.configuration import Configurator
 
-       if __name__ == '__main__':
-           config = Configurator()
-           config.add_view(hello_world)
-           app = config.make_wsgi_app()
-           simple_server.make_server('', 8080, app).serve_forever()
+     def hello_world(request):
+         return Response('Hello world!')
 
-  For an introduction to imperative-mode configuration, see
-  :ref:`configuration_narr`.
+     if __name__ == '__main__':
+         config = Configurator()
+         config.add_view(hello_world)
+         app = config.make_wsgi_app()
+         simple_server.make_server('', 8080, app).serve_forever()
+
+For an introduction to imperative-mode configuration, see
+:ref:`configuration_narr`.
 
 Minor Miscellaneous Feature Additions
 -------------------------------------
@@ -70,14 +73,15 @@ Minor Miscellaneous Feature Additions
   default-created registry if ``registry`` is ``None``) instead of the
   registry returned by ``zope.component.getGlobalSiteManager``,
   causing the Zope Component Architecture API (``getSiteManager``,
-  ``getAdapter``, ``getUtility``, and so on) to use the registry we're
-  using for testing instead of the global ZCA registry.
+  ``getAdapter``, ``getUtility``, and so on) to use the testing
+  registry instead of the global ZCA registry.
 
 - The ``repoze.bfg.testing.tearDown`` function now accepts an
   ``unhook_zca`` argument.  If this argument is ``True`` (the
-  default), ``zope.component.getSiteManager.reset()`` will be called,
-  causing the "base" registry to once again start returnining the
-  result of ``zope.component.getSiteManager``.
+  default), ``zope.component.getSiteManager.reset()`` will be called.
+  This will cause the result of the ``zope.component.getSiteManager``
+  function to be the global ZCA registry (the result of
+  ``zope.component.getGlobalSiteManager``) once again.
 
 Backwards Incompatibilites
 --------------------------
