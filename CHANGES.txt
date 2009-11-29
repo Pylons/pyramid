@@ -4,6 +4,9 @@ Next release
 Bug Fixes
 ---------
 
+- The the long description of this package (as shown on PyPI) was not
+  valid reStructuredText, and so was not renderable.
+
 - Trying to use an HTTP method name string such as ``GET`` as a
   ``request_type`` predicate argument caused a startup time failure
   when it was encountered in imperative configuration or in a
@@ -33,23 +36,20 @@ Features
   deal of functionality that most microframeworks lack, so this is
   hopefully a "best of both worlds" feature.
 
-  The simplest possible ``repoze.bfg`` application is now:
+  The simplest possible ``repoze.bfg`` application is now::
 
-    .. code-block:: python
-       :linenos:
+     from webob import Response
+     from wsgiref import simple_server
+     from repoze.bfg.configuration import Configurator
 
-       from webob import Response
-       from wsgiref import simple_server
-       from repoze.bfg.configuration import Configurator
+     def hello_world(request):
+         return Response('Hello world!')
 
-       def hello_world(request):
-           return Response('Hello world!')
-
-       if __name__ == '__main__':
-           config = Configurator()
-           config.add_view(hello_world)
-           app = config.make_wsgi_app()
-           simple_server.make_server('', 8080, app).serve_forever()
+     if __name__ == '__main__':
+         config = Configurator()
+         config.add_view(hello_world)
+         app = config.make_wsgi_app()
+         simple_server.make_server('', 8080, app).serve_forever()
 
 - A new class now exists: ``repoze.bfg.configuration.Configurator``.
   This class forms the basis for sharing machinery between
@@ -266,7 +266,7 @@ Internals
 
   Each of these functions now expects to be called with a request
   object that has a ``registry`` attribute which represents the
-  current :mod:`repoze.bfg` registry.  They fall back to obtaining the
+  current ``repoze.bfg`` registry.  They fall back to obtaining the
   registry from the threadlocal API.
 
 Backwards Incompatibilites
@@ -325,12 +325,12 @@ Backwards Incompatibilites
   ``setUp`` bounded unit test is in effect, you will always get back
   the global registry that lives in
   ``repoze.bfg.registry.global_registry``.  It also means that
-  :mod:`repoze.bfg` APIs that *call* ``get_current_registry`` will use
+  ``repoze.bfg`` APIs that *call* ``get_current_registry`` will use
   this registry.
 
-  This change was made because :mod:`repoze.bfg` now expects the
-  registry it uses to have a slightly different API than a bare
-  instance of ``zope.component.registry.Components``.
+  This change was made because ``repoze.bfg`` now expects the registry
+  it uses to have a slightly different API than a bare instance of
+  ``zope.component.registry.Components``.
 
 - View registration no longer registers a
   ``repoze.bfg.interfaces.IViewPermission`` adapter (it is no longer
