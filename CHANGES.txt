@@ -250,8 +250,9 @@ Backwards Incompatibilites
   If replacing all calls to ``zope.testing.cleanup.cleanUp`` with a
   call to ``repoze.bfg.testing.setUp`` is infeasible, you can put this
   bit of code somewhere that is executed exactly **once** (*not* for
-  each test in a test suite; in the `` __init__.py`` of your
-  package would be a reasonable place)::
+  each test in a test suite; in the `` __init__.py`` of your package
+  or your package's ``tests`` subpackage would be a reasonable
+  place)::
 
     import zope.testing.cleanup
     from repoze.bfg.testing import setUp
