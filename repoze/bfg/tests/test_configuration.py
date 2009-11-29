@@ -345,6 +345,19 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(ConfigurationError, config.add_view, view, '', None,
                           None, True, True)
 
+    def test_add_view_with_request_type_string(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(view=view, request_type='GET')
+        wrapper = self._getViewCallable(config)
+        request = DummyRequest()
+        request.method = 'POST'
+        self._assertNotFound(wrapper, None, request)
+        request = DummyRequest()
+        request.method = 'GET'
+        result = wrapper(None, request)
+        self.assertEqual(result, 'OK')
+
     def test_add_view_view_callable_None_with_renderer(self):
         config = self._makeOne()
         self._registerRenderer(config, name='dummy')

@@ -547,6 +547,11 @@ class Configurator(object):
                 raise ConfigurationError('"view" was not specified and '
                                          'no "renderer" specified')
 
+        if request_type in ('GET', 'HEAD', 'PUT', 'POST', 'DELETE'):
+            # b/w compat for 1.0
+            request_method = request_type
+            request_type = None
+
         if request_type and route_name:
             raise ConfigurationError(
                 'A view cannot be configured with both the request_type and '
