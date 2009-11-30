@@ -623,7 +623,7 @@ that implements the following interface:
 .. code-block:: python
 
     class IAuthorizationPolicy(object):
-        """ A adapter on context """
+        """ An object representing a BFG authorization policy. """
         def permits(self, context, principals, permission):
             """ Return True if any of the principals is allowed the
             permission in the current context, else return False """

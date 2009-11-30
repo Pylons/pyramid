@@ -209,7 +209,7 @@ class IAuthenticationPolicy(Interface):
         current user on subsequent requests. """
 
 class IAuthorizationPolicy(Interface):
-    """ A adapter on context """
+    """ An object representing a BFG authorization policy. """
     def permits(context, principals, permission):
         """ Return True if any of the principals is allowed the
         permission in the current context, else return False """
