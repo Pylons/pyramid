@@ -38,7 +38,6 @@ class RoutesMapper(object):
 
     def __call__(self, request):
         environ = request.environ
-        registry = request.registry
         try:
             # empty if mounted under a path in mod_wsgi, for example
             path = environ['PATH_INFO'] or '/' 
