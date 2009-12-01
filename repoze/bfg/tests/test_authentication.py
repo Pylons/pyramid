@@ -83,7 +83,6 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_remember_no_plugins(self):
-        authtkt = DummyWhoPlugin()
         request = DummyRequest({})
         policy = self._makeOne()
         result = policy.remember(request, 'fred')
@@ -99,7 +98,6 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(result[1], {'repoze.who.userid':'fred'})
         
     def test_forget_no_plugins(self):
-        authtkt = DummyWhoPlugin()
         request = DummyRequest({})
         policy = self._makeOne()
         result = policy.forget(request)
@@ -159,14 +157,12 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
                          [Everyone, Authenticated, 'fred'])
 
     def test_remember(self):
-        authtkt = DummyWhoPlugin()
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
         result = policy.remember(request, 'fred')
         self.assertEqual(result, [])
         
     def test_forget(self):
-        authtkt = DummyWhoPlugin()
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
         result = policy.forget(request)
@@ -505,7 +501,6 @@ class TestAuthTktCookieHelper(unittest.TestCase):
     def test_remember_max_age(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()
-        userid = unicode('\xc2\xa9', 'utf-8')
         result = plugin.remember(request, 'userid', max_age='500')
         values = self._parseHeaders(result)
         self.assertEqual(len(result), 3)
