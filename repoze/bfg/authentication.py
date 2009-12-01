@@ -408,7 +408,5 @@ class AuthTktCookieHelper(object):
             secure=self.secure)
 
         cookie_value = ticket.cookie_value()
-        cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
-        wild_domain = '.' + cur_domain
         return self._get_cookies(environ, cookie_value, max_age)
     
