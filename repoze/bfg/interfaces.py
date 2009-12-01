@@ -1,8 +1,69 @@
 from zope.interface import Attribute
 from zope.interface import Interface
 
+# public API interfaces
+
+class IAfterTraversal(Interface):
+    """ An event type that is emitted after repoze.bfg completes
+    traversal but before it calls any view code."""
+    request = Attribute('The request object')
+
+class INewRequest(Interface):
+    """ An event type that is emitted whenever repoze.bfg begins to
+    process a new request """
+    request = Attribute('The request object')
+    
+class INewResponse(Interface):
+    """ An event type that is emitted whenever any repoze.bfg view
+    returns a response."""
+    response = Attribute('The response object')
+
+class IWSGIApplicationCreatedEvent(Interface):
+    """ Event issued after the application has been created and
+    configured."""
+    app = Attribute(u"Published application")
+
+# internal interfaces
+
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
+
+class IResponse(Interface):
+    status = Attribute('WSGI status code of response')
+    headerlist = Attribute('List of response headers')
+    app_iter = Attribute('Iterable representing the response body')
+
+class IAuthenticationPolicy(Interface):
+    """ An object representing a BFG authentication policy. """
+    def authenticated_userid(request):
+        """ Return the authenticated userid or ``None`` if no
+        authenticated userid can be found. """
+
+    def effective_principals(request):
+        """ Return a sequence representing the effective principals
+        including the userid and any groups belonged to by the current
+        user, including 'system' groups such as Everyone and
+        Authenticated. """
+
+    def remember(request, principal, **kw):
+        """ Return a set of headers suitable for 'remembering' the
+        principal named ``principal`` when set in a response.  An
+        individual authentication policy and its consumers can decide
+        on the composition and meaning of **kw. """
+    
+    def forget(request):
+        """ Return a set of headers suitable for 'forgetting' the
+        current user on subsequent requests. """
+
+class IAuthorizationPolicy(Interface):
+    """ An object representing a BFG authorization policy. """
+    def permits(context, principals, permission):
+        """ Return True if any of the principals is allowed the
+        permission in the current context, else return False """
+        
+    def principals_allowed_by_permission(context, permission):
+        """ Return a set of principal identifiers allowed by the permission """
+
 
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
@@ -15,11 +76,6 @@ class IResponseFactory(Interface):
         object implementing IResponse, e.g. ``webob.Response``; it
         should accept all the arguments that the webob.Response class
         accepts)"""
-
-class IResponse(Interface):
-    status = Attribute('WSGI status code of response')
-    headerlist = Attribute('List of response headers')
-    app_iter = Attribute('Iterable representing the response body')
 
 class IView(Interface):
     def __call__(context, request):
@@ -114,30 +170,10 @@ class IRouter(Interface):
     registry = Attribute(
         """Component architecture registry local to this application.""")
     
-class IAfterTraversal(Interface):
-    """ An event type that is emitted after repoze.bfg completes
-    traversal but before it calls any view code."""
-    request = Attribute('The request object')
-
-class INewRequest(Interface):
-    """ An event type that is emitted whenever repoze.bfg begins to
-    process a new request """
-    request = Attribute('The request object')
-    
-class INewResponse(Interface):
-    """ An event type that is emitted whenever any repoze.bfg view
-    returns a response."""
-    response = Attribute('The response object')
-
 class ISettings(Interface):
     """ Runtime settings utility for repoze.bfg; represents the
     deployment settings for the application"""
     
-class IWSGIApplicationCreatedEvent(Interface):
-    """ Event issued after the application has been created and
-    configured."""
-    app = Attribute(u"Published application")
-
 # this interface, even if it becomes unused within BFG, is imported by
 # other packages (such as repoze.bfg.traversalwrapper)
 class ILocation(Interface):
@@ -185,37 +221,6 @@ class IContextURL(Interface):
 
     def __call__():
         """ Return a URL that points to the context """
-
-class IAuthenticationPolicy(Interface):
-    """ An object representing a BFG authentication policy. """
-    def authenticated_userid(request):
-        """ Return the authenticated userid or ``None`` if no
-        authenticated userid can be found. """
-
-    def effective_principals(request):
-        """ Return a sequence representing the effective principals
-        including the userid and any groups belonged to by the current
-        user, including 'system' groups such as Everyone and
-        Authenticated. """
-
-    def remember(request, principal, **kw):
-        """ Return a set of headers suitable for 'remembering' the
-        principal named ``principal`` when set in a response.  An
-        individual authentication policy and its consumers can decide
-        on the composition and meaning of **kw. """
-    
-    def forget(request):
-        """ Return a set of headers suitable for 'forgetting' the
-        current user on subsequent requests. """
-
-class IAuthorizationPolicy(Interface):
-    """ An object representing a BFG authorization policy. """
-    def permits(context, principals, permission):
-        """ Return True if any of the principals is allowed the
-        permission in the current context, else return False """
-        
-    def principals_allowed_by_permission(context, permission):
-        """ Return a set of principal identifiers allowed by the permission """
 
 class IPackageOverrides(Interface):
     """ Utility for pkg_resources overrides """
