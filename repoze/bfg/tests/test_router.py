@@ -109,7 +109,6 @@ class TestRouter(unittest.TestCase):
         return environ
 
     def test_root_policy(self):
-        environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
         rootfactory = self._registerRootFactory('abc')
@@ -125,7 +124,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(router.forbidden_view, app)
 
     def test_iforbiddenview_nooverride(self):
-        context = DummyContext()
         router = self._makeOne()
         from repoze.bfg.view import default_forbidden_view
         self.assertEqual(router.forbidden_view, default_forbidden_view)
@@ -139,14 +137,12 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(router.notfound_view, app)
 
     def test_inotfoundview_nooverride(self):
-        context = DummyContext()
         router = self._makeOne()
         from repoze.bfg.view import default_notfound_view
         self.assertEqual(router.notfound_view, default_notfound_view)
 
     def test_call_traverser_default(self):
         environ = self._makeEnviron()
-        context = DummyContext()
         logger = self._registerLogger()
         router = self._makeOne()
         start_response = DummyStartResponse()
@@ -249,7 +245,7 @@ class TestRouter(unittest.TestCase):
         view = DummyView(response)
         environ = self._makeEnviron()
         self._registerView(view, '', None, None)
-        rootfactory = self._registerRootFactory(context)
+        self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -267,7 +263,7 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context, view_name='foo',
                                        subpath=['bar'],
                                        traversed=['context'])
-        rootfactory = self._registerRootFactory(context)
+        self._registerRootFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = DummyView(response)
@@ -294,7 +290,7 @@ class TestRouter(unittest.TestCase):
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context)
-        rootfactory = self._registerRootFactory(context)
+        self._registerRootFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = DummyView(response)
@@ -416,6 +412,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(aftertraversal_events[0].request.environ, environ)
         self.assertEqual(len(response_events), 1)
         self.assertEqual(response_events[0].response, response)
+        self.assertEqual(result, response.app_iter)
 
     def test_call_pushes_and_pops_threadlocal_manager(self):
         context = DummyContext()
@@ -428,7 +425,7 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         router.threadlocal_manager = DummyThreadLocalManager()
-        result = router(environ, start_response)
+        router(environ, start_response)
         self.assertEqual(len(router.threadlocal_manager.pushed), 1)
         self.assertEqual(len(router.threadlocal_manager.popped), 1)
 
@@ -445,7 +442,7 @@ class TestRouter(unittest.TestCase):
         view = DummyView(response)
         environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
         self._registerView(view, '', None, None)
-        rootfactory = self._registerRootFactory(context)
+        self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -486,7 +483,7 @@ class TestRouter(unittest.TestCase):
         view = DummyView(response)
         environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
         self._registerView(view, '', None, None)
-        rootfactory = self._registerRootFactory(context)
+        self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)

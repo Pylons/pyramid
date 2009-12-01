@@ -24,7 +24,6 @@ class TestCallerPath(unittest.TestCase):
         import os
         from repoze.bfg.tests import test_path
         test_path.__bfg_abspath__ = '/foo/bar'
-        here = os.path.abspath(os.path.dirname(__file__))
         result = self._callFUT('a/b/c')
         self.assertEqual(result, os.path.join('/foo/bar', 'a/b/c'))
 
@@ -103,7 +102,7 @@ class TestPackagePath(unittest.TestCase):
     def test_memoization_success(self):
         from repoze.bfg.tests import test_path
         module = DummyPackageOrModule(test_path)
-        result = self._callFUT(module)
+        self._callFUT(module)
         self.assertEqual(module.__bfg_abspath__, module.package_path)
         
     def test_memoization_fail(self):

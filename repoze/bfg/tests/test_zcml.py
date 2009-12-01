@@ -68,8 +68,17 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(perm, None)
 
     def test_with_dotted_renderer(self):
+        from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRendererFactory
+        from repoze.bfg.interfaces import IRequest
         context = DummyContext()
+        reg = get_current_registry()
+        def factory(path):
+            def foo(*arg):
+                return 'OK'
+            return foo
+        reg.registerUtility(factory, IRendererFactory, name='.pt')
         view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IDummy, view=view,
                       renderer='foo/template.pt')
@@ -79,6 +88,9 @@ class TestViewDirective(unittest.TestCase):
                    None, False, None, None, None)
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
+        register()
+        regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        self.assertEqual(regview(None, None).body, 'OK')
 
 class TestNotFoundDirective(unittest.TestCase):
     def setUp(self):
@@ -272,7 +284,6 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
-        regadapt_discriminator = 'authentication_policy'
         self.assertEqual(regadapt['discriminator'], IAuthenticationPolicy)
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
@@ -714,7 +725,6 @@ class TestAdapterDirective(unittest.TestCase):
 
     def test_no_factories_multiple_for(self):
         context = DummyContext()
-        factory = DummyFactory()
         self.assertRaises(ValueError, self._callFUT, context,
                           factory=[],
                           provides=IFactory,

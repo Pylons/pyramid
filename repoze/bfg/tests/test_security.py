@@ -151,7 +151,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
             pass
         context = DummyContext()
         directlyProvides(context, IContext)
-        checker = self._registerSecuredView('', True)
+        self._registerSecuredView('', True)
         request = DummyRequest({})
         directlyProvides(request, IRequest)
         result = self._callFUT(context, request, '')
@@ -290,7 +290,6 @@ class TestRemember(unittest.TestCase):
         return remember(*arg)
 
     def test_no_authentication_policy(self):
-        context = DummyContext()
         request = _makeRequest()
         result = self._callFUT(request, 'me')
         self.assertEqual(result, [])

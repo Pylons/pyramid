@@ -34,7 +34,6 @@ class TestBFGShellCommand(unittest.TestCase):
 
     def test_command_ipython_enabled(self):
         command = self._makeOne()
-        interact = DummyInteractor()
         app = DummyApp()
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)

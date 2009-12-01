@@ -125,8 +125,8 @@ class ConfiguratorTests(unittest.TestCase):
     def test_ctor_authorization_policy_only(self):
         from zope.configuration.exceptions import ConfigurationError
         policy = object()
-        config = self.assertRaises(ConfigurationError,
-                                   self._makeOne, authorization_policy=policy)
+        self.assertRaises(ConfigurationError,
+                          self._makeOne, authorization_policy=policy)
 
     def test_ctor_no_root_factory(self):
         from repoze.bfg.interfaces import IRootFactory
@@ -327,7 +327,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_load_zcml_lock_and_unlock(self):
         config = self._makeOne()
         dummylock = DummyLock()
-        registry = config.load_zcml(
+        config.load_zcml(
             'repoze.bfg.tests.fixtureapp:configure.zcml',
             lock=dummylock)
         self.assertEqual(dummylock.acquired, True)
@@ -818,7 +818,6 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_view(view=view, containment=IDummy)
         wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
         context = DummyContext()
         directlyProvides(context, IDummy)
         self.assertEqual(wrapper(context, None), 'OK')
@@ -828,7 +827,6 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_view(view=view, containment=IDummy)
         wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
         context = DummyContext()
         self._assertNotFound(wrapper, context, None)
 
@@ -875,9 +873,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_route_with_xhr(self):
         config = self._makeOne()
-        view = lambda *arg: 'OK'
         config.add_route('name', 'path', xhr=True)
-        request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -889,9 +885,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_route_with_request_method(self):
         config = self._makeOne()
-        view = lambda *arg: 'OK'
         config.add_route('name', 'path', request_method='GET')
-        request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -903,9 +897,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_route_with_path_info(self):
         config = self._makeOne()
-        view = lambda *arg: 'OK'
         config.add_route('name', 'path', path_info='/foo')
-        request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -917,9 +909,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_route_with_request_param(self):
         config = self._makeOne()
-        view = lambda *arg: 'OK'
         config.add_route('name', 'path', request_param='abc')
-        request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -931,9 +921,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_route_with_header(self):
         config = self._makeOne()
-        view = lambda *arg: 'OK'
         config.add_route('name', 'path', header='Host')
-        request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -945,9 +933,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_route_with_accept(self):
         config = self._makeOne()
-        view = lambda *arg: 'OK'
         config.add_route('name', 'path', accept='text/xml')
-        request_type = self._getRouteRequestIface(config, 'name')
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
@@ -994,7 +980,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_route('name', 'path', view=view, view_request_method='GET')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         request = self._makeRequest(config)
         request.method = 'GET'
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1008,7 +994,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_route('name', 'path', view=view, view_header='Host')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         request = self._makeRequest(config)
         request.headers = {'Host':'abc'}
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1022,7 +1008,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_route('name', 'path', view=view, view_xhr=True)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         request = self._makeRequest(config)
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1036,7 +1022,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_route('name', 'path', view=view, view_path_info='/foo')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         request = self._makeRequest(config)
         request.path_info = '/foo'
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1050,7 +1036,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_route('name', 'path', view=view, view_accept='text/xml')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         request = self._makeRequest(config)
         request.accept = ['text/xml']
         self.assertEqual(wrapper(None, request), 'OK')
@@ -1065,7 +1051,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_route('name', 'path', view=view, view_containment=IDummy)
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         context = DummyContext()
         directlyProvides(context, IDummy)
         self.assertEqual(wrapper(context, None), 'OK')
@@ -1079,7 +1065,7 @@ class ConfiguratorTests(unittest.TestCase):
                          view_renderer='fixtures/minimal.txt')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         self.assertEqual(wrapper(None, None).body, 'Hello!')
 
     def test_add_route_with_view_renderer_alias(self):
@@ -1090,7 +1076,7 @@ class ConfiguratorTests(unittest.TestCase):
                          renderer='fixtures/minimal.txt')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         self.assertEqual(wrapper(None, None).body, 'Hello!')
 
     def test_add_route_with_view_permission(self):
@@ -1104,7 +1090,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_route('name', 'path', view=view, view_permission='edit')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         self.failUnless(hasattr(wrapper, '__call_permissive__'))
 
     def test_add_route_with_view_permission_alias(self):
@@ -1118,7 +1104,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_route('name', 'path', view=view, permission='edit')
         request_type = self._getRouteRequestIface(config, 'name')
         wrapper = self._getViewCallable(config, None, request_type)
-        route = self._assertRoute(config, 'name', 'path')
+        self._assertRoute(config, 'name', 'path')
         self.failUnless(hasattr(wrapper, '__call_permissive__'))
 
     def test__override_not_yet_registered(self):
@@ -1485,7 +1471,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         self._registerSettings(config,
                                debug_authorization=True, reload_templates=True)
-        logger = self._registerLogger(config)
+        self._registerLogger(config)
         self._registerSecurityPolicy(config, False)
         result = config._derive_view(view, permission='view')
         self.assertEqual(view.__module__, result.__module__)
@@ -1582,7 +1568,7 @@ class ConfiguratorTests(unittest.TestCase):
         request.registry = config.registry
         wrapped = config._derive_view(
             inner_view, viewname='inner', wrapper_viewname='owrap')
-        result = self.assertRaises(ValueError, wrapped, None, request)
+        self.assertRaises(ValueError, wrapped, None, request)
 
     def test_override_resource_samename(self):
         from zope.configuration.exceptions import ConfigurationError
@@ -2277,8 +2263,6 @@ class TestMultiView(unittest.TestCase):
         def view(context, request):
             """ """
         mv.views = [(100, view)]
-        context = DummyContext()
-        request = DummyRequest()
         self.assertEqual(mv.__permitted__(None, None), True)
         
     def test_permitted(self):

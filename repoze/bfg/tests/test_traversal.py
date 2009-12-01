@@ -259,7 +259,6 @@ class ModelGraphTraverserTests(unittest.TestCase):
     def test_withroute_nothingfancy(self):
         model = DummyContext()
         traverser = self._makeOne(model)
-        routing_args = ((), {})
         environ = {'bfg.routes.matchdict': {}}
         result = traverser(environ)
         self.assertEqual(result['context'], model)
@@ -340,7 +339,6 @@ class FindInterfaceTests(unittest.TestCase):
         bar.__name__ = 'bar'
         baz.__parent__ = bar
         baz.__name__ = 'baz'
-        request = DummyRequest()
         from zope.interface import directlyProvides
         from zope.interface import Interface
         class IFoo(Interface):
@@ -365,7 +363,6 @@ class FindInterfaceTests(unittest.TestCase):
         bar.__name__ = 'bar'
         baz.__parent__ = bar
         baz.__name__ = 'baz'
-        request = DummyRequest()
         result = self._callFUT(baz, DummyRoot)
         self.assertEqual(result.__name__, 'root')
 

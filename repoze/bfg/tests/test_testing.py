@@ -67,7 +67,7 @@ class Test_registerTemplateRenderer(TestBase):
         from repoze.bfg.testing import DummyTemplateRenderer
         self.failUnless(isinstance(renderer, DummyTemplateRenderer))
         from repoze.bfg.chameleon_zpt import render_template_to_response
-        response = render_template_to_response('templates/foo', foo=1, bar=2)
+        render_template_to_response('templates/foo', foo=1, bar=2)
         self.assertEqual(dict(foo=1, bar=2), renderer._received)
 
     def test_registerTemplateRenderer_explicitrenderer(self):
@@ -194,7 +194,7 @@ class Test_registerView(TestBase):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg import testing
-        view = testing.registerViewPermission('moo.html')
+        testing.registerViewPermission('moo.html')
         result = self.registry.getMultiAdapter(
             (Interface, Interface), IViewPermission, 'moo.html')
         self.assertEqual(result, True)
@@ -203,7 +203,7 @@ class Test_registerView(TestBase):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg import testing
-        view = testing.registerViewPermission('moo.html', result=False)
+        testing.registerViewPermission('moo.html', result=False)
         result = self.registry.getMultiAdapter(
             (Interface, Interface), IViewPermission, 'moo.html')
         self.assertEqual(result, False)
@@ -621,7 +621,6 @@ class Test_tearDown(unittest.TestCase):
             raise TypeError
         registry.__init__ = raiseit
         old = {'registry':registry}
-        hook = lambda *arg: None
         try:
             manager.push(old)
             self._callFUT() # doesn't blow up

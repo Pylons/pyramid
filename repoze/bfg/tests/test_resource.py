@@ -204,7 +204,6 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertRaises(TypeError, self._makeOne, package)
 
     def test_ctor_package_already_has_loader_of_same_type(self):
-        dummy_pkg_resources = DummyPkgResources()
         package = DummyPackage('package')
         package.__loader__ = self._makeOne(package)
         po = self._makeOne(package)
