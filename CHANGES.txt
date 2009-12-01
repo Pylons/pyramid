@@ -1,3 +1,12 @@
+Next Release
+============
+
+Backwards Incompatibilities
+---------------------------
+
+- The ``repoze.bfg.templating`` module has been removed; it had been
+  deprecated in 1.1 and never actually had any APIs in it.
+
 1.2a2 (2009-11-29)
 ==================
 

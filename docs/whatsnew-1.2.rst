@@ -183,6 +183,9 @@ Backwards Incompatibilites
 - The ``repoze.bfg.testing.zcml_configure`` API was removed.  Use
   the ``Configurator.load_zcml`` API instead.
 
+- The ``repoze.bfg.templating`` module has been removed; it had been
+  deprecated in 1.1 and hasn't possessed any APIs since before 1.0.
+
 Deprecations and Behavior Differences
 -------------------------------------
 
