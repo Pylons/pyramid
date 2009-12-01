@@ -146,8 +146,8 @@ class Router(object):
                 headers = list(headers)
                 headers.extend(attrs['global_response_headers'])
             
-            start_response(response.status, headers)
-            return response.app_iter
+            start_response(status, headers)
+            return app_iter
 
         finally:
             manager.pop()
