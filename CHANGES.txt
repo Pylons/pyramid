@@ -1,6 +1,13 @@
 Next Release
 ============
 
+Bug Fixes
+---------
+
+- The ``repoze.bfg.url.route_url`` function inappropriately passed
+  along ``_query`` and/or ``_anchor`` arguments to the
+  ``mapper.generate`` function, resulting in blowups.
+
 Backwards Incompatibilities
 ---------------------------
 

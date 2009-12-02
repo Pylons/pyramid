@@ -92,19 +92,20 @@ def route_url(route_name, request, *elements, **kw):
     except AttributeError:
         reg = get_current_registry() # b/c
     mapper = reg.getUtility(IRoutesMapper)
-    path = mapper.generate(route_name, kw) # raises KeyError if generate fails
 
     anchor = ''
     qs = ''
 
     if '_query' in kw:
-        qs = '?' + urlencode(kw['_query'], doseq=True)
+        qs = '?' + urlencode(kw.pop('_query'), doseq=True)
 
     if '_anchor' in kw:
-        anchor = kw['_anchor']
+        anchor = kw.pop('_anchor')
         if isinstance(anchor, unicode):
             anchor = anchor.encode('utf-8')
         anchor = '#' + anchor
+
+    path = mapper.generate(route_name, kw) # raises KeyError if generate fails
 
     if elements:
         suffix = _join_elements(elements)

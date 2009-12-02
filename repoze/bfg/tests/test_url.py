@@ -176,7 +176,7 @@ class TestRouteUrl(unittest.TestCase):
         mapper.raise_exc = KeyError
         self.assertRaises(KeyError, self._callFUT, 'flub', request, a=1)
 
-    def test_malthe_wiggy_add_your_bug_here(self):
+    def test_generate_doesnt_receive_query_or_anchor(self):
         from repoze.bfg.interfaces import IRoutesMapper
         mapper = DummyRoutesMapper(result='')
         from zope.component import getSiteManager
@@ -184,6 +184,7 @@ class TestRouteUrl(unittest.TestCase):
         sm.registerUtility(mapper, IRoutesMapper)
         request = DummyRequest()
         result = self._callFUT('flub', request, _query=dict(name='some_name'))
+        self.assertEqual(mapper.kw, {}) # shouldnt have anchor/query
         self.assertEqual(result, 'http://example.com:5432?name=some_name')
 
 class TestStaticUrl(unittest.TestCase):
@@ -266,7 +267,8 @@ class DummyRoutesMapper:
     def get_routes(self):
         return self.routes
         
-    def generate(self, *route_args, **newargs):
+    def generate(self, *route_args, **kw):
+        self.kw = kw
         if self.raise_exc:
             raise self.raise_exc
         return self.result
