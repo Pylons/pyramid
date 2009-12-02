@@ -623,7 +623,6 @@ class Configurator(object):
                 view_iface = IView
             self.registry.registerAdapter(derived_view, (for_, request_type),
                                           view_iface, name, info=_info)
-            final_view = derived_view
         else:
             # XXX we could try to be more efficient here and register
             # a non-secured view for a multiview if none of the
@@ -643,16 +642,6 @@ class Configurator(object):
                                                   name=name)
             self.registry.registerAdapter(multiview, (for_, request_type),
                                           IMultiView, name, info=_info)
-            final_view = multiview
-
-        if name == 'edit.html':
-            import pprint
-            pprint.pprint ({'for':r_for_,
-                            'request_type':r_request_type,
-                            'old_view':old_view,
-                            'final_view':final_view,
-                            'numpreds':len(predicates)})
-            print
 
     def add_route(self, name, path, view=None, view_for=None,
                   permission=None, factory=None, for_=None,
