@@ -35,6 +35,10 @@ class TestRoute(unittest.TestCase):
         route = self._makeOne(':path')
         self.assertEqual(route.generate({'path':'abc'}), '/abc')
 
+    def test_generate_with_query(self):
+        route = self._makeOne('foo')
+        self.assertEqual(route.generate({'_query': dict(foo=1)}), '/?foo=1')
+
 class RoutesMapperTests(unittest.TestCase):
     def setUp(self):
         testing.setUp()
