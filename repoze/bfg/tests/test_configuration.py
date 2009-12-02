@@ -547,6 +547,48 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper.views, [(view2, None)])
         self.assertEqual(wrapper(None, None), 'OK1')
 
+    def test_add_view_multiview_context_superclass_then_subclass(self):
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        class ISuper(Interface):
+            pass
+        class ISub(ISuper):
+            pass
+        view = lambda *arg: 'OK'
+        view2 = lambda *arg: 'OK2'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (ISuper, IRequest), IView, name='')
+        config.add_view(view=view2, for_=ISub)
+        wrapper = self._getViewCallable(config, ISuper, IRequest)
+        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertEqual(wrapper(None, None), 'OK')
+        wrapper = self._getViewCallable(config, ISub, IRequest)
+        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertEqual(wrapper(None, None), 'OK2')
+
+    def test_add_view_multiview_request_superclass_then_subclass(self):
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        class ISubRequest(IRequest):
+            pass
+        view = lambda *arg: 'OK'
+        view2 = lambda *arg: 'OK2'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (Interface, IRequest), IView, name='')
+        config.add_view(view=view2, request_type=ISubRequest)
+        wrapper = self._getViewCallable(config, Interface, IRequest)
+        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertEqual(wrapper(None, None), 'OK')
+        wrapper = self._getViewCallable(config, Interface, ISubRequest)
+        self.failIf(IMultiView.providedBy(wrapper))
+        self.assertEqual(wrapper(None, None), 'OK2')
+
     def test_add_view_multiview_call_ordering(self):
         from zope.interface import directlyProvides
         def view1(context, request): return 'view1'

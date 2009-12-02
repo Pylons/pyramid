@@ -586,15 +586,44 @@ class Configurator(object):
             r_for_ = implementedBy(r_for_)
         if not IInterface.providedBy(r_request_type):
             r_request_type = implementedBy(r_request_type)
-        old_view = self.registry.adapters.lookup((r_for_, r_request_type),
-                                                 IView, name=name)
+
+        registered = self.registry.adapters.registered
+
+        # A multiviews is a set of views which are registered for
+        # exactly the same context type/request type/name triad.  Each
+        # consituent view in a multiview differs only by the
+        # predicates which it possesses.
+
+        # To find a previously registered view for a context
+        # type/request type/name triad, we need to use the
+        # ``registered`` method of the adapter registry rather than
+        # ``lookup``.  ``registered`` ignores interface inheritance
+        # for the required and provided arguments, returning only a
+        # view registered previously with the *exact* triad we pass
+        # in.
+
+        # We need to do this three times, because we use three
+        # different interfaces as the ``provided`` interface while
+        # doing registrations, and ``registered`` performs exact
+        # matches on all the arguments it receives.
+        
+        old_view = registered((r_for_, r_request_type), IView, name)
         if old_view is None:
+            old_view = registered((r_for_, r_request_type), ISecuredView, name)
+            if old_view is None:
+                old_view = registered((r_for_, r_request_type), IMultiView,
+                                      name)
+        if old_view is None:
+            # No component was registered for any of our I*View
+            # interfaces exactly; this is the first view for this
+            # triad.  We don't need a multiview.
             if hasattr(derived_view, '__call_permissive__'):
                 view_iface = ISecuredView
             else:
                 view_iface = IView
             self.registry.registerAdapter(derived_view, (for_, request_type),
                                           view_iface, name, info=_info)
+            final_view = derived_view
         else:
             # XXX we could try to be more efficient here and register
             # a non-secured view for a multiview if none of the
@@ -614,6 +643,16 @@ class Configurator(object):
                                                   name=name)
             self.registry.registerAdapter(multiview, (for_, request_type),
                                           IMultiView, name, info=_info)
+            final_view = multiview
+
+        if name == 'edit.html':
+            import pprint
+            pprint.pprint ({'for':r_for_,
+                            'request_type':r_request_type,
+                            'old_view':old_view,
+                            'final_view':final_view,
+                            'numpreds':len(predicates)})
+            print
 
     def add_route(self, name, path, view=None, view_for=None,
                   permission=None, factory=None, for_=None,
