@@ -83,6 +83,13 @@ Minor Miscellaneous Feature Additions
   function to be the global ZCA registry (the result of
   ``zope.component.getGlobalSiteManager``) once again.
 
+- ``repoze.bfg.testing.DummyModel`` now accepts a new constructor
+  keyword argument: ``__provides__``.  If this constructor argument is
+  provided, it should be an interface or a tuple of interfaces.  The
+  resulting model will then provide these interfaces (they will be
+  attached to the constructed model via
+  ``zope.interface.alsoProvides``).
+
 Backwards Incompatibilites
 --------------------------
 

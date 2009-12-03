@@ -8,6 +8,7 @@ from zope.deprecation import deprecated
 
 from zope.interface import implements
 from zope.interface import Interface
+from zope.interface import alsoProvides
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
@@ -387,13 +388,19 @@ class DummyModel:
     to the constructor will be used as the ``__name__`` attribute of
     the model.  the value of ``parent`` will be used as the
     ``__parent__`` attribute of the model. """
-    def __init__(self, __name__=None, __parent__=None, **kw):
+    def __init__(self, __name__=None, __parent__=None, __provides__=None,
+                 **kw):
         """ The he model's ``__name__`` attribute will be set to the
         value of ``__name__``, and the model's ``__parent__``
-        attribute will be set to the value of ``__parent__``.  Any
+        attribute will be set to the value of ``__parent__``.  If
+        ``__provides__`` is specified, it should be an interface
+        object or tuple of interface objects that will be attached to
+        the resulting model via ``zope.interface.alsoProvides``. Any
         extra keywords will be set as direct attributes of the model."""
         self.__name__ = __name__
         self.__parent__ = __parent__
+        if __provides__ is not None:
+            alsoProvides(self, __provides__)
         self.kw = kw
         self.__dict__.update(**kw)
         self.subs = {}

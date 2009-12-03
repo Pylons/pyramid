@@ -1,3 +1,16 @@
+Next release
+============
+
+Features
+--------
+
+- ``repoze.bfg.testing.DummyModel`` now accepts a new constructor
+  keyword argument: ``__provides__``.  If this constructor argument is
+  provided, it should be an interface or a tuple of interfaces.  The
+  resulting model will then provide these interfaces (they will be
+  attached to the constructed model via
+  ``zope.interface.alsoProvides``).
+
 1.2a3 (2009-01-02)
 ==================
 

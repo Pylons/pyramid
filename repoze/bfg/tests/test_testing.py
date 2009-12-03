@@ -402,6 +402,10 @@ class TestDummyModel(unittest.TestCase):
         model = self._makeOne()
         self.assertEqual(model.__nonzero__(), True)
 
+    def test_ctor_with__provides__(self):
+        model = self._makeOne(__provides__=IDummy)
+        self.failUnless(IDummy.providedBy(model))
+
 class TestDummyRequest(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.testing import DummyRequest
