@@ -2,24 +2,23 @@ repoze.bfg
 ==========
 
 ``repoze.bfg`` is a Python web application framework based on WSGI.
-It is inspired by Zope, Pylons, and Django.  See the `repoze.bfg
-website <http://bfg.repoze.org>`_ for more information.
+It is inspired by Zope, Pylons, and Django.
 
-Installation
-------------
+Support and Documentation
+-------------------------
 
-Install using setuptools, e.g. (within a virtualenv)::
+See the `repoze.bfg website <http://bfg.repoze.org>`_ to view
+documentation, report bugs, and obtain support.
 
-  $ easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
+License
+-------
 
-Further Documentation
----------------------
+``repoze.bfg`` is offered under the BSD-derived `Repoze Public License
+<http://repoze.org/license.html>`_.
 
-See the `online documentation <http://docs.repoze.org/bfg>`_ or check
-the ``docs`` directory of any ``repoze.bfg`` distribution package.
+Authors
+-------
 
-Reporting Bugs / Development Versions
--------------------------------------
+``repoze.bfg`` is made available by `Agendaless Consulting
+<http://agendaless.com>`_ and a team of contributors.
 
-Visit http://bugs.repoze.org to report bugs.  Visit
-http://svn.repoze.org to download development or tagged versions.
