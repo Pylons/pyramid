@@ -10,7 +10,7 @@ Bug Fixes
 
 - When two views were registered with differering ``for`` interfaces
   or classes, and the ``for`` of first view registered was a
-  superclass of the second, the ``repoze.bfg` view machinery would
+  superclass of the second, the ``repoze.bfg`` view machinery would
   incorrectly associate the two views with the same "multiview".
   Multiviews are meant to be collections of views that have *exactly*
   the same for/request/viewname values, without taking inheritance
