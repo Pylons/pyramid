@@ -11,6 +11,17 @@ Features
   attached to the constructed model via
   ``zope.interface.alsoProvides``).
 
+Bug Fixes
+---------
+
+- Operation on GAE was broken, presumably because the
+  ``repoze.bfg.configuration`` module began to attempt to import the
+  ``repoze.bfg.chameleon_zpt`` and ``repoze.bfg.chameleon_text``
+  modules, and these cannot be used on non-CPython platforms.  It now
+  tolerates startup time import failures for these modules, and only
+  raise an import error when a template from one of these packages is
+  actually used.
+
 1.2a3 (2009-01-02)
 ==================
 

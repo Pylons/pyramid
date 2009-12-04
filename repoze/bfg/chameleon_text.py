@@ -2,8 +2,20 @@ from webob import Response
 
 from zope.interface import implements
 
-from chameleon.core.template import TemplateFile
-from chameleon.zpt.language import Parser
+try:
+    from chameleon.core.template import TemplateFile
+except ImportError, why: # pragma: no cover
+    # Chameleon doesn't work on non-CPython platforms
+    class TemplateFile(object):
+        def __init__(self, *arg, **kw):
+            raise ImportError(why[0])
+
+try:
+    from chameleon.zpt.language import Parser
+except ImportError: # pragma: no cover
+    # Chameleon doesn't work on non-CPython platforms
+    class Parser(object):
+        pass
 
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer

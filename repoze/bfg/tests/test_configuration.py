@@ -84,6 +84,9 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
         self.failUnless(config.registry.getUtility(IRendererFactory, 'json'))
+        self.failUnless(config.registry.getUtility(IRendererFactory, 'string'))
+        self.failUnless(config.registry.getUtility(IRendererFactory, '.pt'))
+        self.failUnless(config.registry.getUtility(IRendererFactory, '.txt'))
 
     def test_ctor_with_package_registry(self):
         import sys
