@@ -51,9 +51,9 @@ class TestCallerModule(unittest.TestCase):
         self.assertEqual(result, test_path)
 
     def test_it_level_3(self):
-        import unittest
+        from repoze.bfg.tests import test_path
         result = self._callFUT(3)
-        self.assertEqual(result, unittest)
+        self.failIfEqual(result, test_path)
 
 class TestCallerPackage(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
