@@ -196,6 +196,28 @@ Backwards Incompatibilites
 Deprecations and Behavior Differences
 -------------------------------------
 
+- If you disuse the legacy ``repoze.bfg.router.make_app`` function in
+  favor of ``repoze.bfg.configuration.Configurator.make_wsgi_app``,
+  and you also want to use the "global" ZCA API (``getUtility``,
+  ``getAdapter``, ``getSiteManager``, etc), you will need to "hook"
+  the ZCA before calling methods of the configurator using the
+  ``sethook`` method of the ``getSiteManager`` API, e.g.::
+
+    from zope.component import getSiteManager from
+    repoze.bfg.configuration import Configurator from
+    repoze.bfg.threadlocal import get_current_registry
+    from mypackage.models import get_root
+
+    def app(global_config, **settings):
+        config = Configurator(root_factory=get_root, settings=settings)
+        getSiteManager.sethook(get_current_registry)
+        zcml_file = settings.get('configure_zcml', 'configure.zcml')
+        config.load_zcml(zcml_file)
+        return config.make_wsgi_app()
+
+  The ``repoze.bfg.router.make_app`` function does this on your
+  behalf for backward compatibility purposes.
+
 - The ``repoze.bfg.router.make_app`` function is now nominally
   deprecated.  Its import and usage does not throw a warning, nor will
   it probably ever disappear.  However, using a
