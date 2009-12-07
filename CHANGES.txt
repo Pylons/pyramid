@@ -1,5 +1,5 @@
-Next release
-============
+1.2a4 (2009-12-07)
+==================
 
 Features
 --------
@@ -22,7 +22,7 @@ Bug Fixes
   raise an import error when a template from one of these packages is
   actually used.
 
-1.2a3 (2009-01-02)
+1.2a3 (2009-12-02)
 ==================
 
 Bug Fixes
