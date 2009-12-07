@@ -203,9 +203,9 @@ Deprecations and Behavior Differences
   the ZCA before calling methods of the configurator using the
   ``sethook`` method of the ``getSiteManager`` API, e.g.::
 
-    from zope.component import getSiteManager from
-    repoze.bfg.configuration import Configurator from
-    repoze.bfg.threadlocal import get_current_registry
+    from zope.component import getSiteManager
+    from repoze.bfg.configuration import Configurator
+    from repoze.bfg.threadlocal import get_current_registry
     from mypackage.models import get_root
 
     def app(global_config, **settings):
