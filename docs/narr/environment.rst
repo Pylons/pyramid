@@ -1,7 +1,7 @@
 .. _environment_chapter:
 
-Environment and Configuration
-=============================
+Environment Variables and ``.ini`` File Settings
+================================================
 
 :mod:`repoze.bfg` behavior can be configured through a combination of
 operating system environment variables and ``.ini`` configuration file
@@ -47,16 +47,16 @@ application-specific configuration settings.
 | ``BFG_RELOAD_ALL``              |  ``reload_all``             |  Turns all reload_* settings on.       |
 +---------------------------------+-----------------------------+----------------------------------------+
 | ``BFG_CONFIGURE_ZCML``          |  ``configure_zcml``         |  Use the specified filename to load    |
-|                                 |                             |  the :term:`application registry`      |
+|                                 |                             |  the default app :term:`ZCML` file     |
 |                                 |                             |  instead of the filename implied by    |
 |                                 |                             |  ``filename`` value passed to          |
-|                                 |                             |   ``repoze.bfg.router.make_app``.  If  |
+|                                 |                             |  ``repoze.bfg.router.make_app``.  If   |
 |                                 |                             |  this is a relative filename, it will  |
 |                                 |                             |  be considered relative to the         |
 |                                 |                             |  ``package`` passed to ``make_app``    |
 |                                 |                             |  by the application.  It may also      |
-|                                 |                             |  take the form of a resource           |
-|                                 |                             |  "specification" which names both the  |
+|                                 |                             |  take the form of a :term:`resource    |
+|                                 |                             |  specification` which names both the   |
 |                                 |                             |  package name and a package-relative   |
 |                                 |                             |  filename, e.g.                        |
 |                                 |                             |  ``dotted.package.name:path/to.zcml``. |

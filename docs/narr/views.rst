@@ -461,14 +461,13 @@ request_type
 
   This value should be a Python dotted-path string representing the
   :term:`interface` that the :term:`request` must have in order for
-  this view to be found and called.  See
-  :ref:`view_request_types_section` for more information about request
-  types.  For backwards compatibility with :mod:`repoze.bfg` version
-  1.0, this value may also be an HTTP ``REQUEST_METHOD`` string, e.g.
-  ('GET', 'HEAD', 'PUT', 'POST', or 'DELETE').  Passing request method
-  strings as a ``request_type`` is deprecated.  Use the
-  ``request_method`` attribute instead for maximum forward
-  compatibility.
+  this view to be found and called.  The presence of this attribute is
+  largely for backwards compatibility with applications written for
+  :mod:`repoze.bfg` version 1.0.  This value may be an HTTP
+  ``REQUEST_METHOD`` string, e.g.  ('GET', 'HEAD', 'PUT', 'POST', or
+  'DELETE').  Passing request method strings as a ``request_type`` is
+  deprecated.  Use the ``request_method`` attribute instead for
+  maximum forward compatibility.
 
 request_method
 
@@ -1553,21 +1552,6 @@ rendered in a request that has a ``;charset=utf-8`` stanza on its
    ``request.params``, ``request.GET`` or ``request.POST`` are decoded
    to Unicode objects implicitly in :mod:`repoze.bfg`'s default
    configuration.  The keys are still strings.
-
-.. _view_request_types_section:
-
-Custom View Request Types
--------------------------
-
-You can make use of *custom* view request types by attaching an
-:term:`interface` to the request and specifying this interface in the
-``request_type`` parameter as a dotted Python name.  For example, you
-might want to make use of simple "content negotiation", only invoking
-a particular view if the request has a content-type of
-'application/json'.
-
-For information about using interface to specify a request type, see
-:ref:`using_an_event_to_vary_the_request_type`.
 
 .. _response_request_attrs:
 

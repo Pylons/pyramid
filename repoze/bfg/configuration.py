@@ -470,8 +470,9 @@ class Configurator(object):
 
           This value should be an :term:`interface` that the
           :term:`request` must provide in order for this view to be
-          found and called.  See :ref:`view_request_types_section` for
-          more information about request types.
+          found and called.  This value exists only for backwards
+          compatibility purposes: it's usually easier to use another
+          predicate.
 
         request_method
 

@@ -193,24 +193,17 @@ based on a URL.  However, our sample application uses only
 :term:`traversal`.
 
 In :mod:`repoze.bfg` terms, :term:`traversal` is the act of walking
-over a *directed graph* of objects from a :term:`root` object using
-the individual path segments of the "path info" portion of a URL (the
-data following the hostname and port number, but before any query
-string elements or fragments, for example the ``/a/b/c`` portion of
-the URL ``http://example.com/a/b/c?foo=1``) in order to find a
-:term:`context` object and a :term:`view name`.  The combination of
-the :term:`context` object and the :term:`view name` (and, in more
-complex configurations, other :term:`predicate` values) are used to
-find "the right" :term:`view callable`, which will be invoked after
+over an object graph starting from a :term:`root` object in order to
+find a :term:`context` object and a :term:`view name`.  The individual
+path segments of the "path info" portion of a URL (the data following
+the hostname and port number, but before any query string elements or
+fragments, for example the ``/a/b/c`` portion of the URL
+``http://example.com/a/b/c?foo=1``) are used as "steps" during
 traversal.
 
 .. note:: A useful analogy of how :mod:`repoze.bfg` :term:`traversal`
   works is available within the section entitled
   :ref:`traversal_behavior`.  You should probably go read it now.
-
-The object graph of our hello world application is very simple:
-there's exactly one object in our graph; the default :term:`root`
-object.
 
 The results of a :term:`traversal` include a :term:`context` and a
 :term:`view name`.  The :term:`view name` is the *first* URL path
@@ -230,6 +223,15 @@ traversal "ran out" of nodes in the graph before it finished
 exhausting all the path segments implied by the path info of the URL:
 no segments are "left over".  In this case, because the :term:`view
 name` is non-empty, a *non-default* view callable will be invoked.
+
+The combination of the :term:`context` object and the :term:`view
+name` (and, in more complex configurations, other :term:`predicate`
+values) are used to find "the right" :term:`view callable`, which will
+be invoked after traversal.
+
+The object graph of our hello world application is very simple:
+there's exactly one object in our graph; the default :term:`root`
+object.
 
 Apologies for the digression; on with the tutorial.
 

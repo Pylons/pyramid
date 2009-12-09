@@ -18,9 +18,8 @@ for more information about resource overrides.
 
 While there is no analogue to a skin layer search path for locating
 Python code (as opposed to resources), :term:`view` code combined with
-differing :term:`request type` attributes can provide a good deal of
-the same sort of behavior.  See
-:ref:`using_an_event_to_vary_the_request_type` for more information.
+differing :term:`predicate` arguments can provide a good deal of
+the same sort of behavior.
 
 Relatedly, the `repoze.bfg.skins
 <http://svn.repoze.org/repoze.bfg.skins/>`_ package is an attempt to

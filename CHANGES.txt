@@ -15,6 +15,10 @@ Documentation
   configuration into account in more places and uses glossary
   references more liberally.
 
+- Remove explanation of changing the request type in a new request
+  event subscriber, as other predicates are now usually an easier way
+  to get this done.
+
 1.2a4 (2009-12-07)
 ==================
 

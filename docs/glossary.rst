@@ -377,12 +377,10 @@ Glossary
   Request type
     An attribute of a :term:`request` that allows for specialization
     of view invocation based on arbitrary categorization.  The every
-    :term:`request` object that bfg generates and manipulates has one
-    or more :term:`interface` objects attached to it.  The default
-    interface attached to a request object is
-    ``repoze.bfg.interfaces.IRequest``.  See
-    :ref:`using_an_event_to_vary_the_request_type` for more
-    information.
+    :term:`request` object that :mod:`repoze.bfg` generates and
+    manipulates has one or more :term:`interface` objects attached to
+    it.  The default interface attached to a request object is
+    ``repoze.bfg.interfaces.IRequest``.
   repoze.lemonade
     Zope2 CMF-like `data structures and helper facilities
     <http://docs.repoze.org/lemonade>`_ for CA-and-ZODB-based
