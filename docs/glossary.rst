@@ -75,13 +75,16 @@ Glossary
   View Callable
     A "view callable" is a callable Python object which is associated
     with a :term:`view configuration`; it returns a :term:`response`
-    object .  It should accept two values: :term:`context` and
-    :term:`request`.  An alternate calling convention allows a view to
-    be defined as a a callable which only accepts a single ``request``
-    argument.  A view callable is the primary mechanism by which a
-    developer writes user interface code within :mod:`repoze.bfg`.
-    See :ref:`views_chapter` for more information about
-    :mod:`repoze.bfg` view callables.
+    object .  A view callable accepts a single argument: ``request``,
+    which will be an instance of a :term:`request` object.  An
+    alternate calling convention allows a view to be defined as a
+    callable which accepts a pair of arguments: ``context`` and
+    ``request``: this calling convention is useful for traversal-based
+    applications in which the context is always very important.  A
+    view callable is the primary mechanism by which a developer writes
+    user interface code within :mod:`repoze.bfg`.  See
+    :ref:`views_chapter` for more information about :mod:`repoze.bfg`
+    view callables.
   View Configuration
     View configuration is the act of associating a view callable with
     configuration information.  This configuration information helps
