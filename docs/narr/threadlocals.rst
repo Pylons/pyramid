@@ -3,50 +3,88 @@
 Thread Locals
 =============
 
-When a request is processed, :mod:`repoze.bfg` makes two "thread
-local" variables available to the application: a "registry" and a
-"request".
-
 A thread local variable is a variable that appears to be a "global"
 variable to an application which uses it.  However, unlike a true
 global variable, one thread or process serving the application may
 receive a different value than another thread or process when that
 variable is "thread local".
 
-How is this beneficial?  Well, usually it's decidedly **not**.  Using
-a global or a thread local variable in any application usually makes
-it a lot harder to understand for a casual reader.  Use of a thread
-local or a global is usually just a way to avoid passing some value
-around between functions, which is itself usually a very bad idea.
+When a request is processed, :mod:`repoze.bfg` makes two "thread
+local" variables available to the application: a "registry" and a
+"request".
 
-However, for historical reasons, thread local variables are indeed
-consulted by various :mod:`repoze.bfg` API functions.  Two API
-functions exist for this purpose:
-``repoze.bfg.threadlocal.get_current_request`` and
+Why and How :mod:`repoze.bfg` Uses Thread Local Variables
+---------------------------------------------------------
+
+How are thread locals beneficial to :mod:`repoze.bfg` and application
+developers who use :mod:`repoze.bfg`?  Well, usually they're decidedly
+**not**.  Using a global or a thread local variable in any application
+usually makes it a lot harder to understand for a casual reader.  Use
+of a thread local or a global is usually just a way to avoid passing
+some value around between functions, which is itself usually a very
+bad idea, at least if code readability counts as an important concern.
+
+For historical reasons, however, thread local variables are indeed
+consulted by various :mod:`repoze.bfg` API functions.  For example,
+the implementation of the :mod:`repoze.bfg.security` function named
+``authenticated_userid`` retrieves the thread local :term:`application
+registry` as a matter of course to find a :term:`authentication
+policy`.  It uses the ``repoze.bfg.threadlocal.get_current_registry``
+function to retrieve the registry, from which it looks up the
+authentication policy; it then uses the authentication policy to
+retrieve the authenticated user id.  This is how :mod:`repoze.bfg`
+allows arbitrary authentication policies to be "plugged in".
+
+When they need to do so, :mod:`repoze.bfg` internals use two API
+functions to retrieve the :term:`request` and :term:`application
+registry`: ``repoze.bfg.threadlocal.get_current_request`` and
 ``repoze.bfg.threadlocal.get_current_registry``.  The former returns
 the "current" request; the latter returns the "current" registry.
 Both ``get_current_*`` functions retrieve an object from a
-thread-local stack.  These API functions are documented in
+thread-local data structure.  These API functions are documented in
 :ref:`threadlocal_module`.
 
-During normal operations, the thread local stack is managed by a
-:term:`Router` object.  Therefore, when the system is operating
-normally, the very definition of "current" is defined entirely by the
-behavior of a repoze.bfg :term:`Router`.  However, during unit or
-functional testing, the definition of "current" is defined by the
-boundary between calls to the ``repoze.bfg.testing.setUp`` and
-``repoze.bfg.testing.tearDown``.  See :ref:`test_setup_and_teardown`
-for the definitions of these functions.
+These values are thread locals rather than true globals because one
+Python process may be handling multiple simultaneous requests or even
+multiple :mod:`repoze.bfg` applications.  If they were true globals,
+:mod:`repoze.bfg` could not handle multiple simultaneous requests or
+allow more than one BFG application instance to exist in a single
+Python process.
+
+Because one :mod:`repoze.bfg` application is permitted to call
+*another* :mod:`repoze.bfg` application from its own :term:`view` code
+(perhaps as a :term:`WSGI` app with help from the ``wsgiapp2``
+decorator in :ref:`wsgi_module`), these variables are managed in a
+*stack* during normal system operations.  The stack instance itself is
+a `threading.local
+<http://docs.python.org/library/threading.html#threading.local>`_.
+
+During normal operations, the thread locals stack is managed by a
+:term:`Router` object.  At the beginning of a request, the Router
+pushes the application's registry and the request on to the stack.  At
+the end of a request, the stack is popped.  The topmost request and
+registry on the stack are considered "current".  Therefore, when the
+system is operating normally, the very definition of "current" is
+defined entirely by the behavior of a repoze.bfg :term:`Router`.
+
+However, during unit testing, no Router code is ever invoked, and the
+definition of "current" is defined by the boundary between calls to
+the ``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``.
+These functions push and pop the threadlocal stack when the system is
+under test.  See :ref:`test_setup_and_teardown` for the definitions of
+these functions.
 
 Scripts which use :mod:`repoze.bfg` machinery but never actually start
-a WSGI server or receive requests via HTTP (such as scripts which use
-the :mod:`repoze.bfg.scripting`` API) will never cause any Router code
-to be executed.  Such scripts should expect the
-``get_current_request`` function to always return ``None``, and should
-expect the ``get_current_registry`` function to return exactly the
-same :term:`application registry` for every request.
+a WSGI server or receive requests via HTTP such as scripts which use
+the :mod:`repoze.bfg.scripting`` API will never cause any Router code
+to be executed.  However, the :mod:`repoze.bfg.scripting` APIs also
+push some values on to the thread locals stack as a matter of course.
+Such scripts should expect the ``get_current_request`` function to
+always return ``None``, and should expect the ``get_current_registry``
+function to return exactly the same :term:`application registry` for
+every request.
 
-Why You Shouldn't Use These Functions
+Why You Shouldn't Abuse Thread Locals
 -------------------------------------
 
 You probably should almost never use the ``get_current_request`` or
