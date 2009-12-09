@@ -110,7 +110,7 @@ be in ``run.py`` and its ``app`` function:
 #. *Lines 17 - 18*.  We create a :term:`root factory` using the finder.
 
 #. Line *19*.  We construct a :term:`Configurator` with a
-   :term:`root_factory` and the settings keywords parsed by
+   :term:`root factory` and the settings keywords parsed by
    PasteDeploy.  The root factory is named ``get_root``.  We then use
    the ``make_wsgi_app`` method of the :term:`Configurator` to return
    a :term:`WSGI` application.

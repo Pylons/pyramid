@@ -419,20 +419,21 @@ BFG "Encourages Use of ZCML"
 the :term:`Zope Component Architecture` registry that
 :mod:`repoze.bfg` uses as its application configuration.
 
-Quick answer: well, it doesn't *really* encourage the use of ZCML.
-Application developers can use the ``bfg_view`` decorator for the most
-common form of configuration.  But, yes, a :mod:`repoze.bfg`
-application currently does need to possess a ZCML file for it to begin
-executing successfully even if its only contents are a ``<scan>``
-directive that kicks off the location of decorated views.
+Quick answer: well, it doesn't *really* encourage the use of ZCML.  In
+:mod:`repoze.bfg` 1.0 and 1.1, application developers could use
+decorators for the most common form of configuration.  But, yes, a
+:mod:`repoze.bfg` 1.0/1.1 application needed to possess a ZCML file
+for it to begin executing successfully even if its only contents were
+a ``<scan>`` directive that kicked off a scan to find decorated view
+callables.
 
-However, in the interest of completeness and in the spirit of
-providing a lowest common denominator, :mod:`repoze.bfg` 1.2 will
-include a completely imperative mode for all configuration.  You will
-be able to make "single file" apps in this mode, which should help
-people who need to see everything done completely imperatively.  For
-example, the very most basic :mod:`repoze.bfg` "helloworld" program
-will become something like:
+In the interest of completeness and in the spirit of providing a
+lowest common denominator, :mod:`repoze.bfg` 1.2 includes a completely
+imperative mode for all configuration.  You will be able to make
+"single file" apps in this mode, which should help people who need to
+see everything done completely imperatively.  For example, the very
+most basic :mod:`repoze.bfg` "helloworld" program will become
+something like:
 
 .. code-block:: python
    :linenos:
@@ -450,9 +451,9 @@ will become something like:
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
-In this mode, no ZCML will be required for end users.  Hopefully this
-mode will allow people who are used to doing everything imperatively
-feel more comfortable.
+In this mode, no ZCML is required for end users.  Hopefully this mode
+will allow people who are used to doing everything imperatively feel
+more comfortable.
 
 BFG Uses ZCML; ZCML is XML and I Don't Like XML
 -----------------------------------------------
@@ -482,10 +483,11 @@ All :mod:`repoze.bfg` declarations are singleton tags, unlike many
 other XML configuration systems.  No XML *values* in ZCML are
 meaningful; it's always just XML tags and attributes.  So in the very
 common case it's not really very much different than an otherwise
-"flat" configuration format like ``.ini``, except a deeloper *can*
-supply a directive that requires nesting, and multiple "sections" can
-exist with the same "name" (e.g. two ``<route>`` declarations) must be
-able to exist simultaneously.
+"flat" configuration format like ``.ini``, except a developer can
+*create* a directive that requires nesting (none of these exist in
+:mod:`repoze.bfg` itself), and multiple "sections" can exist with the
+same "name" (e.g. two ``<route>`` declarations) must be able to exist
+simultaneously.
 
 You might think some other configuration file format would be better.
 But all configuration formats suck in one way or another.  I
@@ -803,8 +805,8 @@ BFG Has Too Many Dependencies
 This is true.  At the time of this writing, the total number of Python
 package distributions that :mod:`repoze.bfg` depends upon transitively
 is 14 if you use Python 2.6, or 16, if you use Python 2.4 or 2.5.
-This is a lot more than zero dependencies: a metric which various
-Python microframeworks and Django boast.
+This is a lot more than zero package distribution dependencies: a
+metric which various Python microframeworks and Django boast.
 
 The :mod:`zope.component` and :mod:`zope.configuration` packages on
 which :mod:`repoze.bfg` depends have transitive dependencies on
