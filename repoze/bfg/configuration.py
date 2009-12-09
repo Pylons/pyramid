@@ -6,7 +6,6 @@ import inspect
 
 from webob import Response
 
-from zope.configuration.exceptions import ConfigurationError
 from zope.configuration import xmlconfig
 
 from zope.interface import Interface
@@ -41,6 +40,7 @@ from repoze.bfg.compat import walk_packages
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
+from repoze.bfg.exceptions import ConfigurationError
 from repoze.bfg.log import make_stream_logger
 from repoze.bfg.path import caller_package
 from repoze.bfg.registry import Registry
@@ -266,8 +266,8 @@ class Configurator(object):
             authorization = ACLAuthorizationPolicy() # default
         if authorization and not authentication:
             raise ConfigurationError(
-                'If the "authorization" is passed a vallue, '
-                'the "authentication" argument musty also be '
+                'If the "authorization" is passed a value, '
+                'the "authentication" argument must also be '
                 'passed a value; authorization requires authentication.')
         self._set_authentication_policy(authentication)
         self._set_authorization_policy(authorization)

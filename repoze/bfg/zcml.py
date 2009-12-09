@@ -2,7 +2,6 @@ import os
 
 from zope.configuration import xmlconfig
 from zope.configuration.config import ConfigurationMachine
-from zope.configuration.exceptions import ConfigurationError
 from zope.configuration.fields import GlobalInterface
 from zope.configuration.fields import GlobalObject
 from zope.configuration.fields import Tokens
@@ -29,6 +28,7 @@ from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
 from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.configuration import Configurator
+from repoze.bfg.exceptions import ConfigurationError
 from repoze.bfg.path import package_path
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.static import StaticRootFactory

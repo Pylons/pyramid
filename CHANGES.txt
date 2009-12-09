@@ -1,6 +1,13 @@
 Next release
 ============
 
+Internals
+---------
+
+- The exception class representing the error raised by various methods
+  of a ``Configurator`` is now importable as
+  ``repoze.bfg.exceptions.ConfigurationError``.
+
 Documentation
 -------------
 

@@ -1,3 +1,5 @@
+from zope.configuration.exceptions import ConfigurationError as ZCE
+
 class Forbidden(Exception):
     """\
     Raise this exception within :term:`view` code to immediately
@@ -22,3 +24,6 @@ class NotFound(Exception):
     into the WSGI environment under the ``repoze.bfg.message`` key,
     for availability to the Not Found view."""
 
+class ConfigurationError(ZCE):
+    """ Raised when inappropriate input values are supplied to an API
+    method of a :term:`Configurator`"""

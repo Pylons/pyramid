@@ -167,7 +167,7 @@ class TestSystemViewHandler(unittest.TestCase):
 
     def test_no_view_no_renderer(self):
         handler = self._makeOne(IDummy)
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         context = DummyContext()
         handler(context)
         actions = context.actions
@@ -358,7 +358,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(policy.callback, callback)
 
     def test_it_configerror(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         context = DummyContext()
         def callback(identity, request):
             """ """

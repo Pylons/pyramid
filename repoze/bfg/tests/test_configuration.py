@@ -126,7 +126,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(policy, result)
 
     def test_ctor_authorization_policy_only(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         policy = object()
         self.assertRaises(ConfigurationError,
                           self._makeOne, authorization_policy=policy)
@@ -187,7 +187,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_setup_registry_authorization_policy_only(self):
         from repoze.bfg.registry import Registry
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         policy = object()
         reg = Registry()
         config = self._makeOne(reg)
@@ -337,12 +337,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(dummylock.released, True)
 
     def test_add_view_view_callable_None_no_renderer(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.add_view)
 
     def test_add_view_with_request_type_and_route_name(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         config = self._makeOne()
         view = lambda *arg: 'OK'
         self.assertRaises(ConfigurationError, config.add_view, view, '', None,
@@ -797,7 +797,7 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_header_badregex(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
@@ -876,7 +876,7 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, context, None)
 
     def test_add_view_with_path_info_badregex(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
@@ -1229,7 +1229,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
 
     def test__system_view_no_view_no_renderer(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config._system_view, IDummy)
 
@@ -1616,18 +1616,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(ValueError, wrapped, None, request)
 
     def test_override_resource_samename(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_resource,'a', 'a')
 
     def test_override_resource_directory_with_file(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_resource,
                           'a:foo/', 'a:foo.pt')
 
     def test_override_resource_file_with_directory(self):
-        from zope.configuration.exceptions import ConfigurationError
+        from repoze.bfg.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_resource,
                           'a:foo.pt', 'a:foo/')
