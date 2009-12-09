@@ -630,7 +630,7 @@ This singleton (self-closing) tag instructs ZCML to load a ZCML file
 from the Python package with the :term:`dotted Python name`
 ``repoze.bfg.includes``, as specified by its ``package`` attribute.
 This particular ``<include>`` declaration is required because it
-actually allows subseqent declaration tags (such as ``<view>``, which
+actually allows subsequent declaration tags (such as ``<view>``, which
 we'll see shortly) to be recognized.  The ``<include>`` tag
 effectively just includes another ZCML file; this causes its
 declarations to be executed.  In this case, we want to load the
