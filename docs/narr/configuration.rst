@@ -25,14 +25,11 @@ used to create all kinds of web applications.
    required to cede a greater portion of control to code he has not
    authored: code that resides in the framework itself.  You needn't
    use a framework at all to create a web application using Python.  A
-   rich set of libraries exists for the platform which you can snap
-   together to effectively create your own framework.  In practice,
-   however, using an existing framework to create an application is
-   often more practical than rolling your own via a set of libraries
-   if the framework provides a set of facilities and assumptions that
-   fit your application requirements.  :mod:`repoze.bfg` is a
-   framework that fits a large set of assumptions in the domain of web
-   application construction.
+   rich set of libraries already exists for the platform.  In
+   practice, however, using an existing framework to create an
+   application is often more practical than rolling your own via a set
+   of libraries if the framework provides a set of facilities and
+   assumptions that fit your application requirements.
 
 As a framework, the primary job of :mod:`repoze.bfg` is to make it
 easier for a developer to create an arbitrary web application.  Each
@@ -60,13 +57,6 @@ There are a number of different mechanisms you may use to configure
 and *declarative* configuration.  We'll examine both modes in the
 sections which follow.
 
-.. warning::
-
-   If you are using Python 2.4 (as opposed to Python 2.5 or 2.6), you
-   will need to install the ``wsgiref`` package for the examples in
-   this chapter to work.  Use ``easy_install wsgiref`` to get it
-   installed.
-
 .. _helloworld_imperative:
 
 Hello World, Configured Imperatively
@@ -85,7 +75,7 @@ imperatively:
    :linenos:
 
    from webob import Response
-   from wsgiref import simple_server
+   from paste.httpserver import serve
    from repoze.bfg.configuration import Configurator
 
    def hello_world(request):
@@ -99,7 +89,7 @@ imperatively:
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
        app = config.make_wsgi_app()
-       simple_server.make_server('', 8080, app).serve_forever()
+       serve(app)
 
 When this code is inserted into a Python script named
 ``helloworld.py`` and executed by a Python interpreter which has the
@@ -122,7 +112,7 @@ The above script defines the following set of imports:
    :linenos:
 
    from webob import Response
-   from wsgiref import simple_server
+   from paste.httpserver import serve
    from repoze.bfg.configuration import Configurator
 
 :mod:`repoze.bfg` uses the :term:`WebOb` library as the basis for its
@@ -132,9 +122,9 @@ The above script defines the following set of imports:
 
 Like many other Python web frameworks, :mod:`repoze.bfg` uses the
 :term:`WSGI` protocol to connect an application and a web server
-together.  The ``wsgiref.simple_server`` server is used in this
-example as a WSGI server, purely for convenience.  :mod:`repoze.bfg`
-applications can be served by any WSGI server.
+together.  The ``paste.httpserver`` server is used in this example as
+a WSGI server, purely for convenience.  :mod:`repoze.bfg` applications
+can be served by any WSGI server.
 
 The script also imports the ``Configurator`` class from the
 ``repoze.bfg.configuration`` module.  This class is used to configure
@@ -522,17 +512,15 @@ WSGI Application Serving
 .. code-block:: python
    :linenos:
 
-       simple_server.make_server('', 8080, app).serve_forever()
+       serve(app)
 
 Finally, we actually serve the application to requestors by starting
-up a WSGI server.  We happen to use the ``wsgiref.simple_server`` WSGI
-server implementation, telling it to serve the application on TCP port
-8080, and we pass it the ``app`` object (an instance of
-``repoze.bfg.router.Router``) as the application we wish to serve.  We
-then call the ``serve_forever`` method of the result to
-``simple_server.make_server``, causing the server to start listening
-on the TCP port.  It will serve requests forever, or at least until we
-stop it by killing the process which runs it.
+up a WSGI server.  We happen to use the ``paste.httpserver.serve``
+WSGI server runner, using the default TCP port of 8080, and we pass it
+the ``app`` object (an instance of ``repoze.bfg.router.Router``) as
+the application we wish to serve.  This causes the server to start
+listening on the TCP port.  It will serve requests forever, or at
+least until we stop it by killing the process which runs it.
 
 Conclusion
 ~~~~~~~~~~
@@ -577,7 +565,7 @@ In a file named ``helloworld.py``:
    :linenos:
 
    from webob import Response
-   from wsgiref import simple_server
+   from paste.httpserver import serve
    from repoze.bfg.configuration import Configurator
 
    def hello_world(request):
@@ -590,7 +578,7 @@ In a file named ``helloworld.py``:
        config = Configurator()
        config.load_zcml('configure.zcml)
        app = config.make_wsgi_app()
-       simple_server.make_server('', 8080, app).serve_forever()
+       serve(app)
 
 In a file named ``configure.zcml`` in the same directory as the
 previously created ``helloworld.py``:
