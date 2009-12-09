@@ -21,9 +21,9 @@ available via the ``repoze.bfg.threadlocal.get_current_request`` and
 ``repoze.bfg.threadlocal.get_current_registry`` functions,
 respectively.
 
-If your code uses these ``get_current_*`` functions (or calls
-:mod:`repoze.bfg` code which uses the ``get_current_*`` functions),
-you will need to use the ``repoze.bfg.testing.setUp`` and
+If your code uses these ``get_current_*`` functions or calls
+:mod:`repoze.bfg` code which uses the ``get_current_*`` functions, you
+will need to use the ``repoze.bfg.testing.setUp`` and
 ``repoze.bfg.testing.tearDown`` functions within the ``setUp`` and
 ``tearDown`` methods of your unit tests, respectively.
 
@@ -45,8 +45,14 @@ Using the ``repoze.bfg.testing`` API in Unit Tests
 --------------------------------------------------
 
 The ``repoze.bfg.testing`` module provides a number of functions which
-can be used during unit testing.  For example, let's imagine you want
-to unit test a :mod:`repoze.bfg` view function.
+can be used during unit testing.  These functions make
+:term:`configuration declaration` calls to the current
+:term:`application registry`, but typically register a "stub" or
+"dummy" feature in place of the "real" feature that the code would
+call if it was being run normally.
+
+For example, let's imagine you want to unit test a :mod:`repoze.bfg`
+view function.
 
 .. code-block:: python
    :linenos:
@@ -58,21 +64,24 @@ to unit test a :mod:`repoze.bfg` view function.
                                                say=request.params['say'])
        return render_template_to_response('templates/show.pt', say='Hello')
 
-Without invoking any ZCML or using the testing API, an attempt to run
-this view function will result in an error.  When a :mod:`repoze.bfg`
-application starts normally, it will create an application registry
-from the information it finds in the application's ``configure.zcml``
-file.  But if this application registry is not created and populated
-(e.g. with ``view`` declarations in ZCML), like when you invoke
+Without invoking any startup code or using the testing API, an attempt
+to run this view function in a unit test will result in an error.
+When a :mod:`repoze.bfg` application starts normally, it will populate
+a :term:`application registry` using :term:`configuration declaration`
+calls made against a :term:`Configurator` (sometimes deferring to the
+application's ``configure.zcml`` :term:`ZCML` file via ``load_zcml``).
+But if this application registry is not created and populated
+(e.g. with an ``add_view`` :term:`configuration declaration` or
+``view`` declarations in :term:`ZCML`), like when you invoke
 application code via a unit test, :mod:`repoze.bfg` API functions will
 tend to fail.
 
 The testing API provided by ``repoze.bfg`` allows you to simulate
 various application registry registrations for use under a unit
 testing framework without needing to invoke the actual application
-ZCML configuration.  For example, if you wanted to test the above
-``view_fn`` (assuming it lived in ``my.package``), you could write a
-unittest TestCase that used the testing API.
+configuration implied by its ``run.py``.  For example, if you wanted
+to test the above ``view_fn`` (assuming it lived in ``my.package``),
+you could write a unittest TestCase that used the testing API.
 
 .. code-block:: python
    :linenos:
@@ -114,7 +123,7 @@ request.params) have been submitted.  Its first line registers a
 ``registerTemplateRenderer`` function (a ``repoze.bfg.testing`` API);
 this function returns a DummyTemplateRenderer instance which we hang
 on to for later.  We then create a ``DummyRequest`` object which
-simulates a WebOb request object).  We call the function being tested
+simulates a WebOb request object.  We call the function being tested
 with the manufactured request.  When the function is called,
 ``render_template_to_response`` will call the "dummy" template
 renderer object instead of the real template renderer object.  When
@@ -152,7 +161,7 @@ representing "dummy" implementations of a request and a model.
 Creating Integration Tests
 --------------------------
 
-In :mod:`repoze.bfg`, a unit test typically relies on "mock" or
+In :mod:`repoze.bfg`, a *unit test* typically relies on "mock" or
 "dummy" implementations to give the code under test only enough
 context to run.
 
@@ -161,12 +170,13 @@ of a :mod:`repoze.bfg`, integration test, the test logic tests the
 functionality of some code *and* its integration with the rest of the
 :mod:`repoze.bfg` framework.
 
-In :mod:`repoze.bfg`, you create an integration test by *loading its
-ZCML* in the test's setup code.  This causes the entire
-:mod:`repoze.bfg` environment to be set up and torn down as if your
-application was running "for real".  This is a heavy-hammer way of
-making sure that your tests have enough context to run properly, and
-it tests your code's integration with the rest of :mod:`repoze.bfg`.
+In :mod:`repoze.bfg` applications that use :term:`ZCML`, you can
+create an integration test by *loading its ZCML* in the test's setup
+code.  This causes the entire :mod:`repoze.bfg` environment to be set
+up and torn down as if your application was running "for real".  This
+is a heavy-hammer way of making sure that your tests have enough
+context to run properly, and it tests your code's integration with the
+rest of :mod:`repoze.bfg`.
 
 Let's demonstrate this by showing an integration test for a view.  The
 below test assumes that your application's package name is ``myapp``,
@@ -188,9 +198,11 @@ environment.
            registrations your application declares in its configure.zcml
            (including dependent registrations for repoze.bfg itself).
            """
-           testing.setUp()
+           from repoze.bfg.configuration import Configurator
            import myapp
-           testing.zcml_configure('configure.zcml', package=myapp)
+           configurator = Configurator(package=myapp)
+           configurator.load_zcml('myapp:configure.zcml')
+           testing.setUp(registry=configurator.registry)
 
        def tearDown(self):
            """ Clear out the application registry """
@@ -212,8 +224,7 @@ environment.
 Unless you cannot avoid it, you should prefer writing unit tests that
 use the :mod:`repoze.bfg.testing` API to set up the right "mock"
 registrations rather than creating an integration test.  Unit tests
-will run faster (because they don't have to parse and execute ZCML for
-each test) and the result of a unit test is usually easier to make
-assertions about.
+will run faster (because they do less for each test) and the result of
+a unit test is usually easier to make assertions about.
 
 
