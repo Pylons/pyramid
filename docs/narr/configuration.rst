@@ -123,8 +123,9 @@ The above script defines the following set of imports:
 Like many other Python web frameworks, :mod:`repoze.bfg` uses the
 :term:`WSGI` protocol to connect an application and a web server
 together.  The ``paste.httpserver`` server is used in this example as
-a WSGI server, purely for convenience.  :mod:`repoze.bfg` applications
-can be served by any WSGI server.
+a WSGI server, purely for convenience, as ``Paste`` is a dependency of
+:mod:`repoze.bfg` itself; :mod:`repoze.bfg` applications can be served
+by any WSGI server.
 
 The script also imports the ``Configurator`` class from the
 ``repoze.bfg.configuration`` module.  This class is used to configure
