@@ -162,7 +162,7 @@ Configuration
     .. code-block:: python
        :linenos:
 
-       from repoze.bfg.router import make_app
+       from repoze.bfg.configuration import Configurator
        from repoze.zodbconn.finder import PersistentApplicationFinder
        from myapp.models import MyModel
        import transaction
@@ -176,8 +176,8 @@ Configuration
            finder = PersistentApplicationFinder(zodb_uri, appmaker)
            def get_root(request):
                return finder(request.environ)
-           import myapp
-           return make_app(get_root, myapp, settings=settings)
+           config = Configurator(root_factory=get_root, settings=settings)
+           return config.make_wsgi_app()
 
        def appmaker(root):
            if not 'myapp' in root:

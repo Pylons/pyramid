@@ -43,10 +43,10 @@ processing?
    :term:`route` named a ``factory`` argument, this factory is used to
    generate the root object, otherwise a default :term:`root factory`
    is used.  If a root factory argument was passed to the
-   ``repoze.bfg.router.make_app``, that callable is used to generate
-   the root object.  If the root factory argument passed to
-   ``make_app`` is ``None``, a default root factory is used to
-   generate a root.
+   :term:`Configurator` constructor, that callable is used to generate
+   the root object.  If the root factory argument passed to the
+   Configurator constructor is ``None``, a default root factory is
+   used to generate a root.
 
 #. A ``NewRequest`` :term:`event` is sent to any subscribers.
 

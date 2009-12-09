@@ -220,10 +220,10 @@ the name ``main`` as a section name:
     >>> root
     <foo.models.MyModel object at 0x445270>
 
-... note:: You *might* get away without passing
-           ``--plugin=repoze.bfg`` to the bfgshell command; the
-           ``--plugin=repoze.bfg`` option is only required under
-           conditions that are not yet well-understood.
+.. note:: You *might* get away without passing
+          ``--plugin=repoze.bfg`` to the bfgshell command; the
+          ``--plugin=repoze.bfg`` option is only required under
+          conditions that are not yet well-understood.
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_
 installed in the interpreter you use to invoke the ``paster`` command,
@@ -242,10 +242,36 @@ Press "Ctrl-D" to exit the interactive shell.
 
 You should always use a section name argument that refers to the
 actual ``app`` section within the Paste configuration file that points
-at your BFG application *without any middleware wrapping*.  In
-particular, a section name is inappropriate as the second argument to
-"bfgshell" if the configuration section it names is a ``pipeline``
-rather than an ``app``.
+at your :mod:`repoze.bfg` application *without any middleware
+wrapping*.  In particular, a section name is inappropriate as the
+second argument to "bfgshell" if the configuration section it names is
+a ``pipeline`` rather than an ``app``.  For example, if you have the
+following ``.ini`` file content:
+
+.. code-block:: ini
+   :linenos:
+
+   [app:myapp]
+   use = egg:MyProject#app
+   reload_templates = true
+   debug_authorization = false
+   debug_notfound = false
+
+   [pipeline:main]
+   pipeline = egg:repoze.tm2#tm
+              myapp
+
+The command you use to invoke the interactive shell should be:
+
+.. code-block::  bash
+   :linenos:
+
+    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini myapp
+
+If you use ``main`` as the section name argument instead of ``myapp``
+against the above ``.ini`` file, an error will likely occur.  Use the
+most specific reference to the application within the ``.ini`` file
+possible as the section name argument.
 
 Runnning The Project Application
 --------------------------------
@@ -372,8 +398,8 @@ shared by all the applications, servers and :term:`middleware` defined
 within the configuration file.  By default it contains one key
 ``debug``, which is set to ``true``.  This key is used by various
 components to decide whether to act in a "debugging" mode.
-``repoze.bfg`` itself does not do anything with this parameter as of
-this writing, and neither does the generated sample application.
+``repoze.bfg`` itself does not do anything at all with this parameter,
+and neither does any generated sample application.
 
 The ``[app:main]`` section represents configuration for your
 application.  This section name represents the ``main`` application
@@ -563,8 +589,8 @@ particular way.
 ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~
 
-The ``configure.zcml`` represents the :term:`application
-registry`. It looks like so:
+The ``configure.zcml`` contains configuration statements that inform
+the :term:`application registry`. It looks like so:
 
 .. literalinclude:: MyProject/myproject/configure.zcml
    :linenos:

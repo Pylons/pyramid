@@ -81,7 +81,7 @@ system.
 #. Edit ``config.py``
 
    Edit the ``APP_NAME`` and ``APP_ARGS`` settings within
-   ``config.py``.  The APP_NAME must be ``bfgapp.run:make_app``, and
+   ``config.py``.  The ``APP_NAME`` must be ``bfgapp.run:app``, and
    the APP_ARGS must be ``({},)``.  Any other settings in
    ``config.py`` should remain the same.
 
@@ -90,13 +90,6 @@ system.
 
       APP_NAME = 'bfgapp.run:app'
       APP_ARGS = ({},)
-
-   .. warning:: It's very important that the ``APP_NAME`` is
-      ``bfgapp.run:app`` instead of ``bfgapp.run.make_app``.  If you
-      use the latter by mistake, you'll be confused for at least an
-      hour when debugging an error like this: ``IOError: [Errno 2] No
-      such file or directory:
-      '/Users/chrism/projects/bfg_gae/bfgapp2/app/configure.zcml'``.
 
 #.  Edit ``runner.py``
 

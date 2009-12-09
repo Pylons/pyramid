@@ -109,8 +109,9 @@ be in ``run.py`` and its ``app`` function:
 
 #. *Lines 17 - 18*.  We create a :term:`root factory` using the finder.
 
-#. Line *19*.  We use the ``repoze.bfg.router.make_app`` to return a
-   :term:`WSGI` application.  The ``make_app`` function takes the root
-   factory (``get_root``), the *package* representing our application,
-   and the settings keywords parsed by PasteDeploy.
+#. Line *19*.  We construct a :term:`Configurator` with a
+   :term:`root_factory` and the settings keywords parsed by
+   PasteDeploy.  The root factory is named ``get_root``.  We then use
+   the ``make_wsgi_app`` method of the :term:`Configurator` to return
+   a :term:`WSGI` application.
 

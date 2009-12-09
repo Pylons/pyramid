@@ -122,10 +122,9 @@ When the view attached to this route is invoked, :mod:`repoze.bfg`
 will attempt to use :term:`traversal` against the context implied by
 the :term:`root factory` of this route.  The above example isn't very
 useful unless you've defined a custom :term:`root factory` by passing
-it to the ``repoze.bfg.router.make_app`` function, because the
-*default* root factory cannot be traversed (it has no useful
-``__getitem__`` method).  But let's imagine that your root factory
-looks like so:
+it to constructor of a :term:`Configurator` because the *default* root
+factory cannot be traversed (it has no useful ``__getitem__`` method).
+But let's imagine that your root factory looks like so:
 
 .. code-block:: python
 

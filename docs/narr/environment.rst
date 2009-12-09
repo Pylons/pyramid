@@ -50,7 +50,7 @@ application-specific configuration settings.
 |                                 |                             |  the :term:`application registry`      |
 |                                 |                             |  instead of the filename implied by    |
 |                                 |                             |  ``filename`` value passed to          |
-|                                 |                             |  ``repoze.bfg.router.make_app``.  If   |
+|                                 |                             |   ``repoze.bfg.router.make_app``.  If  |
 |                                 |                             |  this is a relative filename, it will  |
 |                                 |                             |  be considered relative to the         |
 |                                 |                             |  ``package`` passed to ``make_app``    |

@@ -41,13 +41,13 @@ before traversal has a chance to find it first.  If a route matches, a
 :term:`context` is generated and :mod:`repoze.bfg` will call the
 :term:`view` specified with the context and the request.  If no route
 matches, :mod:`repoze.bfg` will fail over to calling the :term:`root
-factory` callable passed to the application in it's ``make_app``
-function (usually a traversal function).
+factory` callable passed to the :term:`Configurator` for the
+application (usually a traversal function).
 
 A root factory is not required for purely URL-dispatch-based apps: if
-the root factory callable is passed as ``None`` to the ``make_app``
-function, :mod:`repoze.bfg` will return a ``NotFound`` error to the user's
-browser when no routes match.
+the root factory callable is passed as ``None`` to the
+:term:`Configurator`, :mod:`repoze.bfg` will return a ``NotFound``
+error to the user's browser when no routes match.
 
 .. note:: See :ref:`modelspy_project_section` for an example of a
           simple root factory callable that will use traversal.
@@ -497,9 +497,9 @@ class that accepts a request in its ``__init__``.
    type.
 
 If no route matches in the above configuration, :mod:`repoze.bfg` will
-call the "fallback" :term:`root factory` callable provided to it
-during ``make_app`.  If the "fallback" root factory is None, a
-``NotFound`` error will be raised when no route matches.
+call the "fallback" :term:`root factory` callable provided to the
+:term:`Configurator` constructor.  If the "fallback" root factory is
+None, a ``NotFound`` error will be raised when no route matches.
 
 .. note:: See :ref:`using_model_interfaces` for more information about
           how views are found when interfaces are attached to a

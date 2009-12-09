@@ -29,7 +29,7 @@ return an object which represents the root of the object graph.  All
 usually a *mapping* object (such as a Python dictionary).
 
 .. note:: If a :term:`root factory` is passed to the :mod:`repoze.bfg`
-   "make_app" function as the value ``None``, a default root factory
+   :term:`Configurator` as the value ``None``, a default root factory
    is used.  This is most useful when you're using :term:`URL
    dispatch` and you don't care very much about traversing any
    particular graph to resolve URLs to code.  It is also possible to

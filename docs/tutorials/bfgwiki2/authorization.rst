@@ -25,10 +25,10 @@ security declarations; when we begin to use a custom root factory to
 generate our contexts, we can begin to make use of the declarative
 security features of :mod:`repoze.bfg`.
 
-Let's modify our ``run.py``, passing in a :term:`root factory` as the
-first argument to ``repoze.bfg.router.make_app``.  We'll point it at a
-new class we create inside our ``models.py`` file.  Add the following
-statements to your ``models.py`` file:
+Let's modify our ``run.py``, passing in a :term:`root factory` to our
+:term:`Configurator` constructor.  We'll point it at a new class we
+create inside our ``models.py`` file.  Add the following statements to
+your ``models.py`` file:
 
 .. code-block:: python
 
@@ -58,8 +58,8 @@ See :ref:`assigning_acls` for more information about what an
    :ref:`route_zcml_directive` for more info.
 
 We'll pass the ``RootFactory`` we created in the step above in as the
-first argument to ``make_app``.  When we're done, your application's
-``run.py`` will look like this.
+``root_factory`` argument to a :term:`Configurator`.  When we're done,
+your application's ``run.py`` will look like this.
 
 .. literalinclude:: src/authorization/tutorial/run.py
    :linenos:

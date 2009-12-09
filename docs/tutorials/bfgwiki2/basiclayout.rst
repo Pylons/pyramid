@@ -132,12 +132,12 @@ be in ``run.py`` and its ``app`` function:
 #. Line *25*. We initialize our SQL database using SQLAlchemy, passing
    it the db string.
 
-#. Line *26*.  We use the ``repoze.bfg.router.make_app`` to return a
-   :term:`WSGI` application.  The ``make_app`` function's first
-   parameter is the "root factory", which is used by the
-   :mod:`repoze.bfg` :term:`traversal` mechanism.  Since this is a URL
-   dispatch application, the root factory is ``None``.  The second
-   argument is the *package* representing our application, and the
-   third argument, ``settings`` is passed as a keyword argument.  It
-   contains a dictionary of settings parsed by PasteDeploy.
+#. Line *26*.  We construct a :term:`Configurator`.  The first
+   argument provided to the configurator is the :term:`root factory`,
+   which is used by the :mod:`repoze.bfg` :term:`traversal` mechanism.
+   Since this is a URL dispatch application, the root factory is
+   ``None``.  The second argument ``settings`` is passed as a keyword
+   argument.  It contains a dictionary of settings parsed by
+   PasteDeploy.  We then use the ``make_wsgi_app`` method of the
+   :term:`Configurator` to return a :term:`WSGI` application.
 
