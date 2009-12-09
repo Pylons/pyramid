@@ -66,7 +66,8 @@ setup(name='repoze.bfg',
       namespace_packages = ['repoze', 'repoze.bfg'],
       zip_safe=False,
       install_requires = install_requires,
-      tests_require= install_requires + ['Sphinx', 'docutils', 'coverage'],
+      tests_require= install_requires + ['Sphinx', 'docutils', 'coverage',
+                                         'twill'],
       test_suite="repoze.bfg.tests",
       entry_points = """\
         [paste.paster_create_template]

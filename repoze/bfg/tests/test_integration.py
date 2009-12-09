@@ -7,7 +7,7 @@ from repoze.bfg.view import static
 
 from zope.interface import Interface
 
-from repoze.bfg.testing import cleanUp
+from repoze.bfg import testing
 
 class INothing(Interface):
     pass
@@ -64,20 +64,38 @@ class TestStaticApp(unittest.TestCase):
 
 class TestFixtureApp(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        import sys
+        import twill
+        from repoze.bfg.configuration import Configurator
+        config = Configurator()
+        config.load_zcml('repoze.bfg.tests.fixtureapp:configure.zcml')
+        twill.add_wsgi_intercept('localhost', 6543, config.make_wsgi_app)
+        if sys.platform is 'win32':
+            out = open('nul:', 'wb')
+        else:
+            out = open('/dev/null', 'wb')
+        twill.set_output(out)
+        testing.setUp(registry=config.registry)
 
     def tearDown(self):
-        cleanUp()
+        import twill
+        import twill.commands
+        twill.commands.reset_browser()
+        twill.remove_wsgi_intercept('localhost', 6543)
+        twill.set_output(None)
+        testing.tearDown()
 
-    def test_execute_actions(self):
-        import repoze.bfg.tests.fixtureapp as package
-        from zope.configuration import config
-        from zope.configuration import xmlconfig
-        context = config.ConfigurationMachine()
-        xmlconfig.registerCommonDirectives(context)
-        context.package = package
-        xmlconfig.include(context, 'configure.zcml', package)
-        context.execute_actions(clear=False)
+    def test_it(self):
+        import twill.commands
+        browser = twill.commands.get_browser()
+        browser.go('http://localhost:6543/another.html')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'fixture')
+        browser.go('http://localhost:6543')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'fixture')
+        browser.go('http://localhost:6543/dummyskin.html')
+        self.assertEqual(browser.get_code(), 404)
 
 class DummyContext(object):
     pass

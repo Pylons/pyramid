@@ -4,15 +4,11 @@
 
   <view
       view=".views.fixture_view"
-      for=".models.IFixture"
-      permission="repoze.view"
       />
 
   <view
       view=".views.fixture_view"
-      for=".models.IFixture"
       name="dummyskin.html"
-      permission="repoze.view"
       request_type=".views.IDummy"
       />
 
