@@ -80,7 +80,7 @@ Glossary
     alternate calling convention allows a view to be defined as a
     callable which accepts a pair of arguments: ``context`` and
     ``request``: this calling convention is useful for traversal-based
-    applications in which the context is always very important.  A
+    applications in which a :term:`context` is always very important.  A
     view callable is the primary mechanism by which a developer writes
     user interface code within :mod:`repoze.bfg`.  See
     :ref:`views_chapter` for more information about :mod:`repoze.bfg`
