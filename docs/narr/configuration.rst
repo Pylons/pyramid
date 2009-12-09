@@ -215,7 +215,7 @@ represents the :term:`default view` of a context object.
 The :term:`default view` is found when all path elements in the URL
 are exhausted before :term:`traversal` returns a :term:`context`
 object, causing the :term:`view name` to be ``''`` (the empty string).
-When no path segements are "left over" after traversal, the
+When no path segments are "left over" after traversal, the
 :term:`default view` for the context found is invoked.
 
 If traversal returns a non-empty :term:`view name`, it means that
