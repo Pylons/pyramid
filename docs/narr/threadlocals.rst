@@ -136,7 +136,7 @@ period of time while you deprecate the older API.  So you write a
 "facade" implementation of the new API which calls into the code which
 implements the older API.  Since the new API does not require the
 request, your facade implementation doesn't have local access to the
-request when it needs to pass it into the older API implementaton.
+request when it needs to pass it into the older API implementation.
 After some period of time, the older implementation code is disused
 and the hack that uses ``get_current_request`` is removed.  This would
 be an appropriate place to use the ``get_current_request`` function.
