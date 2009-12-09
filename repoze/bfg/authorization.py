@@ -12,10 +12,10 @@ from repoze.bfg.security import Everyone
 class ACLAuthorizationPolicy(object):
     """ An :term:`authorization policy` which consults an :term:`ACL`
     object attached to a :term:`context` to determine authorization
-    information about a a :term:`principal` or multiple principals.  If
-    the context is part of a :term:`lineage`, the context's parents are
-    consulted for ACL information too.  The following is true about this
-    security policy.
+    information about a a :term:`principal` or multiple principals.
+    If the context is part of a :term:`lineage`, the context's parents
+    are consulted for ACL information too.  The following is true
+    about this security policy.
 
     - When checking whether the 'current' user is permitted (via the
       ``permits`` method), the security policy consults the
@@ -27,14 +27,15 @@ class ACLAuthorizationPolicy(object):
 
       During this processing, if any ``Deny`` ACE is found matching
       any principal in ``principals``, stop processing by returning an
-      ``ACLDenied`` (equals False) immediately.  If any ``Allow`` ACE
-      is found matching any principal, stop processing by returning an
-      ``ACLAllowed`` (equals True) immediately.  If we exhaust the
-      context's lineage, and no ACE has explicitly permitted or denied
-      access, return an ``ACLDenied``.  This differs from the
-      non-inheriting security policy (the ``ACLSecurityPolicy``) by
-      virtue of the fact that it does not stop looking for ACLs in the
-      object lineage after it finds the first one.
+      ``ACLDenied`` (equals ``False``) immediately.  If any ``Allow``
+      ACE is found matching any principal, stop processing by
+      returning an ``ACLAllowed`` (equals ``True``) immediately.  If
+      we exhaust the context's lineage, and no ACE has explicitly
+      permitted or denied access, return an ``ACLDenied``.  This
+      differs from the non-inheriting security policy (the
+      ``ACLSecurityPolicy``) by virtue of the fact that it does not
+      stop looking for ACLs in the object lineage after it finds the
+      first one.
 
     - When computing principals allowed by a permission via the
       ``principals_allowed_by_permission`` method, we compute the set
@@ -92,7 +93,8 @@ class ACLAuthorizationPolicy(object):
     def principals_allowed_by_permission(self, context, permission):
         """ Return the set of principals explicitly granted the
         permission named ``permission`` according to the ACL directly
-        attached to the context context as well as inherited ACLs. """
+        attached to the ``context`` as well as inherited ACLs based on
+        :term:`lineage`."""
         allowed = set()
 
         for location in reversed(list(lineage(context))):

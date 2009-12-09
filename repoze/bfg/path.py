@@ -3,7 +3,6 @@ import pkg_resources
 import sys
 
 def caller_path(path, level=2):
-    """ Return an absolute path """
     if not os.path.isabs(path):
         module = caller_module(level+1)
         prefix = package_path(module)

@@ -15,7 +15,8 @@ from repoze.bfg.traversal import TraversalContextURL
 from repoze.bfg.traversal import quote_path_segment
 
 def route_url(route_name, request, *elements, **kw):
-    """Generates a fully qualified URL for a named BFG route.
+    """Generates a fully qualified URL for a named :mod:`repoze.bfg`
+    :term:`route configuration`.
     
     Use the route's ``name`` as the first positional argument.  Use a
     request object as the second positional argument.  Additional
@@ -23,7 +24,7 @@ def route_url(route_name, request, *elements, **kw):
     after it is generated.
     
     Use keyword arguments to supply values which match any dynamic
-    path elements in the route definition.  Raises a KeyError
+    path elements in the route definition.  Raises a ``KeyError``
     exception if the URL cannot be generated for any reason (not
     enough arguments, for example).
 
@@ -118,22 +119,11 @@ def route_url(route_name, request, *elements, **kw):
 
 def model_url(model, request, *elements, **kw):
     """
-    Generate a string representing the absolute URL of the model (or
-    context) object based on the ``wsgi.url_scheme``, ``HTTP_HOST`` or
-    ``SERVER_NAME`` in the request, plus any ``SCRIPT_NAME``.  If a
-    'virtual root path' is present in the request environment (the
-    value of the WSGI environ key ``HTTP_X_VHM_ROOT``), and the
-    ``model`` was obtained via traversal, the URL path will not
-    include the virtual root prefix (it will be stripped out of the
-    generated URL).  If a ``query`` keyword argument is provided, a
-    query string based on its value will be composed and appended to
-    the generated URL string (see details below).  The overall result
-    of this function is always a UTF-8 encoded string (never unicode).
-
-    .. note:: If the ``model`` used is the result of a traversal, it
-       must be :term:`location`-aware.  The 'model' can also be the
-       context of a URL dispatch; contexts found this way do not need
-       to be location-aware.
+    Generate a string representing the absolute URL of the ``model``
+    object based on the ``wsgi.url_scheme``, ``HTTP_HOST`` or
+    ``SERVER_NAME`` in the ``request``, plus any ``SCRIPT_NAME``.  The
+    overall result of this function is always a UTF-8 encoded string
+    (never unicode).
 
     Examples::
 
@@ -151,7 +141,7 @@ def model_url(model, request, *elements, **kw):
 
         model_url(context, request, 'a.html', anchor='abc') =>
 
-                                   http://example.com/#abc
+                                   http://example.com/a.html#abc
 
     Any positional arguments passed in as ``elements`` must be strings
     or unicode objects.  These will be joined by slashes and appended
@@ -197,6 +187,19 @@ def model_url(model, request, *elements, **kw):
     If both ``anchor`` and ``query`` are specified, the anchor element
     will always follow the query element,
     e.g. ``http://example.com?foo=1#bar``.
+
+    .. note:: If the ``model`` used is the result of a
+             :term:`traversal`, it must be :term:`location`-aware.
+             The ``model`` can also be the context of a :term:`URL
+             dispatch`; contexts found this way do not need to be
+             location-aware.
+
+    .. note:: If a 'virtual root path' is present in the request
+              environment (the value of the WSGI environ key
+              ``HTTP_X_VHM_ROOT``), and the ``model`` was obtained via
+              :term:`traversal`, the URL path will not include the
+              virtual root prefix (it will be stripped off the
+              left hand side of the generated URL).
     """
     try:
         reg = request.registry
@@ -229,9 +232,10 @@ def model_url(model, request, *elements, **kw):
 
 def static_url(path, request, **kw):
     """
-    Generates a fully qualified URL for a static resource.  The
-    resource must live within a location defined via the ``<static>``
-    ZCML directive (see :ref:`static_resources_section`).
+    Generates a fully qualified URL for a static :term:`resource`.
+    The resource must live within a location defined via the
+    ``add_static_view`` :term:`configuration declaration` or the
+    ``<static>`` ZCML directive (see :ref:`static_resources_section`).
 
     Example::
 
@@ -247,7 +251,7 @@ def static_url(path, request, **kw):
     may not be an absolute filesystem path (a ValueError will be
     raised if this function is supplied with an absolute path).
 
-    The ``request`` argument should be a WebOb request.
+    The ``request`` argument should be a :term:`request` object.
 
     The purpose of the ``**kw`` argument is the same as the purpose of
     the ``route_url`` ``**kw`` argument.  See the documentation for
@@ -255,8 +259,8 @@ def static_url(path, request, **kw):
     it.  However, typically, you don't need to pass anything as
     ``*kw`` when generating a static resource URL.
 
-    This function raises a ValueError if a ``<static>`` ZCML
-    definition cannot be found which matches the path specification.
+    This function raises a ValueError if a static view definition
+    cannot be found which matches the path specification.
 
     .. note:: This feature is new in :mod:`repoze.bfg` 1.1.
     """

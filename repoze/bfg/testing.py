@@ -40,17 +40,17 @@ zcml_configure # prevent pyflakes from complaining
 _marker = object()
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
-    """ Registers a dummy ``repoze.bfg`` security policy (actually, a
-    pair of policies: an authorization policy and an authentication
-    policy) using the userid ``userid`` and the group ids
-    ``groupids``.  If ``permissive`` is true, a 'permissive' security
-    policy is registered; this policy allows all access.  If
-    ``permissive`` is false, a nonpermissive security policy is
-    registered; this policy denies all access.  This function is most
-    useful when testing code that uses the ``repoze.bfg.security``
-    APIs named ``has_permission``, ``authenticated_userid``,
-    ``effective_principals``, ``principals_allowed_by_permission``,
-    and so on.
+    """ Registers a a pair of dummy :mod:`repoze.bfg` security
+    policies: an :term:`authorization policy` and an
+    :term:`authentication policy`) using the userid ``userid`` and the
+    group ids ``groupids``.  If ``permissive`` is true, a 'permissive'
+    authorization policy is registered; this policy allows all access.
+    If ``permissive`` is false, a nonpermissive authorization policy
+    is registered; this policy denies all access.  This function is
+    most useful when testing code that uses the
+    ``repoze.bfg.security`` APIs named ``has_permission``,
+    ``authenticated_userid``, ``effective_principals``,
+    ``principals_allowed_by_permission``, and so on.
     """
     policy = DummySecurityPolicy(userid, groupids, permissive)
     reg = get_current_registry()
@@ -58,7 +58,8 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     reg.registerUtility(policy, IAuthenticationPolicy)
 
 def registerModels(models):
-    """ Registers a dictionary of models.  This is most useful for
+    """ Registers a dictionary of models that can be resolved via
+    ``repoze.bfg.traversal.find_model``.  This is most useful for
     testing code that wants to call the
     ``repoze.bfg.traversal.find_model`` API.  The ``find_model`` API
     is called with a path as one of its arguments.  If the dictionary
@@ -83,13 +84,14 @@ def registerModels(models):
     return models
 
 def registerEventListener(event_iface=Interface):
-    """ Registers an event listener (aka 'subscriber') listening for
-    events of the type ``event_iface`` and returns a list which is
-    appended to by the subscriber.  When an event is dispatched that
-    matches ``event_iface``, that event will be appended to the list.
-    You can then compare the values in the list to expected event
-    notifications.  This method is useful when testing code that wants
-    to call ``zope.component.event.dispatch`` or
+    """ Registers an :term:`event` listener (aka :term:`subscriber`)
+    listening for events of the type ``event_iface`` and returns a
+    list which is appended to by the subscriber.  When an event is
+    dispatched that matches ``event_iface``, that event will be
+    appended to the list.  You can then compare the values in the list
+    to expected event notifications.  This method is useful when
+    testing code that wants to call ``registry.notify``,
+    ``zope.component.event.dispatch`` or
     ``zope.component.event.objectEventNotify``."""
     L = []
     def subscriber(*event):
@@ -98,7 +100,7 @@ def registerEventListener(event_iface=Interface):
     return L
 
 def registerTemplateRenderer(path, renderer=None):
-    """ Register a 'template renderer' at ``path`` (usually a relative
+    """ Register a template tenderer at ``path`` (usually a relative
     filename ala ``templates/foo.pt``) and return the renderer object.
     If the ``renderer`` argument is None, a 'dummy' renderer will be
     used.  This function is useful when testing code that calls the
@@ -114,16 +116,16 @@ registerDummyRenderer = registerTemplateRenderer
 
 def registerView(name, result='', view=None, for_=(Interface, Interface),
                  permission=None):
-    """ Registers ``repoze.bfg`` view function under the name
+    """ Registers a :mod:`repoze.bfg` view callable under the name
     ``name``.  The view will return a webob Response object with the
     ``result`` value as its body attribute.  To gain more control, if
     you pass in a non-None ``view``, this view function will be used
     instead of an automatically generated view function (and
-    ``result`` is not used).  To protect the view using a permission,
-    pass in a non-``None`` value as ``permission``.  This permission
-    will be checked by any existing security policy when view
-    execution is attempted.  This function is useful when dealing with
-    code that wants to call,
+    ``result`` is not used).  To protect the view using a
+    :term:`permission`, pass in a non-``None`` value as
+    ``permission``.  This permission will be checked by any existing
+    security policy when view execution is attempted.  This function
+    is useful when dealing with code that wants to call,
     e.g. ``repoze.bfg.view.render_view_to_response``."""
     if view is None:
         def view(context, request):
@@ -144,20 +146,21 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
 
 def registerViewPermission(name, result=True, viewpermission=None,
                            for_=(Interface, Interface)):
-    """ Registers a ``repoze.bfg`` 'view permission' object under
-    the name ``name``.  The view permission return a result
-    denoted by the ``result`` argument.  If ``result`` is True, a
+    """ Registers a :mod:`repoze.bfg` 'view permission' object under
+    the name ``name``.  The view permission return a result denoted by
+    the ``result`` argument.  If ``result`` is True, a
     ``repoze.bfg.security.Allowed`` object is returned; else a
-    ``repoze.bfg.security.Denied`` object is returned.  To gain
-    more control, if you pass in a non-None ``viewpermission``,
-    this view permission object will be used instead of an
-    automatically generated view permission (and ``result`` is not
-    used).  This method is useful when dealing with code that
-    wants to call, e.g. ``repoze.bfg.view.view_execution_permitted``.
-    Note that view permissions are not checked unless a security
-    policy is in effect (see ``registerSecurityPolicy``).
+    ``repoze.bfg.security.Denied`` object is returned.  To gain more
+    control, if you pass in a non-None ``viewpermission``, this view
+    permission object will be used instead of an automatically
+    generated view permission (and ``result`` is not used).  This
+    method is useful when dealing with code that wants to call,
+    e.g. ``repoze.bfg.view.view_execution_permitted``.  Note that view
+    permissions are not checked unless a security policy is in effect
+    (see ``registerSecurityPolicy``).
 
-    **This function was deprecated in repoze.bfg 1.1.**
+    .. warning:: This function was deprecated in repoze.bfg 1.1; it
+                 has no real effect in 1.2+.
     """
     if result is True:
         result = Allowed('message')
@@ -180,19 +183,20 @@ deprecated('registerViewPermission',
            '``permission`` argument.')
 
 def registerUtility(impl, iface=Interface, name=''):
-    """ Register a Zope component architecture utility component.
+    """ Register a utility component.
 
    ``impl`` is the implementation of the utility.  ``iface`` is the
     interface type ``zope.interface.Interface`` by default.  ``name``
-    is the empty string by default.  See `The ZCA book
-    <http://www.muthukadan.net/docs/zca.html>`_ for more information
-    about ZCA utilities."""
+    is the empty string by default.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA utilities."""
     reg = get_current_registry()
     reg.registerUtility(impl, iface, name=name)
     return impl
 
 def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
-    """ Register a Zope component architecture adapter component.
+    """ Register an adapter component.
 
     ``impl`` is the implementation of the component (often a class).
     ``for_`` is the ``for`` interface type
@@ -201,9 +205,10 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     to underlying ZCA registerAdapter API.  ``name`` is the empty
     string by default.  ``provides`` is the ZCA provides interface,
     also ``zope.interface.Interface`` by default.  ``name`` is the
-    name of the adapter, the empty string by default.  See `The ZCA
-    book <http://www.muthukadan.net/docs/zca.html>`_ for more
-    information about ZCA adapters."""
+    name of the adapter, the empty string by default.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA adapters."""
     reg = get_current_registry()
     if not isinstance(for_, (tuple, list)):
         for_ = (for_,)
@@ -211,16 +216,17 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     return impl
 
 def registerSubscriber(subscriber, iface=Interface):
-    """ Register a Zope component architecture subscriber component.
+    """ Register a subscriber component.
 
     ``subscriber`` is the implementation of the component (often a
     function).  ``iface`` is the interface type the subscriber will be
     registered for (``zope.interface.Interface`` by default). If
     ``iface`` is not a tuple or list, it will be converted to a
-    one-tuple before being passed to underlying zca registerHandler
-    query.  See `The ZCA book
-    <http://www.muthukadan.net/docs/zca.html>`_ for more information
-    about ZCA subscribers."""
+    one-tuple before being passed to underlying ZCA registerHandler
+    query.
+
+    See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
+    more information about ZCA subscribers."""
     reg = get_current_registry()
     if not isinstance(iface, (tuple, list)):
         iface = (iface,)
@@ -231,9 +237,10 @@ def registerTraverser(traverser, for_=Interface):
     return registerAdapter(traverser, for_, ITraverser)
 
 def registerRoute(path, name, factory=None):
-    """ Register a new route using a path (e.g. ``:pagename``), a name
-    (e.g. 'home'), and an optional root factory.  This is useful for
-    testing code that calls e.g. ``route_url``.
+    """ Register a new :term:`route` using a path
+    (e.g. ``:pagename``), a name (e.g. 'home'), and an optional root
+    factory.  This is useful for testing code that calls
+    e.g. ``route_url``.
 
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
     """
@@ -338,10 +345,10 @@ class DummySecurityPolicy:
 class DummyTemplateRenderer:
     """
     An instance of this class is returned from
-    ``registerTemplateRenderer``.  It has a helper function (``assert_``)
-    that makes it possible to make an assertion which compares data
-    passed to the renderer by the view function against expected
-    key/value pairs. 
+    ``registerTemplateRenderer``.  It has a helper function
+    (``assert_``) that makes it possible to make an assertion which
+    compares data passed to the renderer by the view function against
+    expected key/value pairs.
     """
 
     def __init__(self, string_response=''):
@@ -467,10 +474,11 @@ class DummyModel:
         return inst
 
 class DummyRequest:
-    """ A dummy request object (imitates a :term:`WebOb` ``Request`` object).
+    """ A dummy request object (imitates a :term:`request` object).
     
-    The ``params``, ``environ``, ``headers``, ``path``, and ``cookies`` 
-    arguments  correspond to their WebOb equivalents.
+    The ``params``, ``environ``, ``headers``, ``path``, and
+    ``cookies`` arguments correspond to their :term`WebOb`
+    equivalents.
 
     The ``post`` argument,  if passed, populates the request's
     ``POST`` attribute, but *not* ``params``, in order to allow testing

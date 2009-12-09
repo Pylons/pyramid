@@ -1,3 +1,13 @@
+Next release
+============
+
+Documentation
+-------------
+
+- General documentation freshening which takes imperative
+  configuration into account in more places and uses glossary
+  references more liberally.
+
 1.2a4 (2009-12-07)
 ==================
 

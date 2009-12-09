@@ -29,7 +29,6 @@ from repoze.bfg.view import default_notfound_view
 make_app # prevent pyflakes from complaining
 
 class Router(object):
-    """ The main repoze.bfg WSGI application. """
     implements(IRouter)
 
     debug_notfound = False
@@ -50,10 +49,11 @@ class Router(object):
 
     def __call__(self, environ, start_response):
         """
-        Accept ``environ`` and ``start_response``; route requests to
-        ``repoze.bfg`` views based on registrations within the
-        application registry; call ``start_response`` and return an
-        iterable.
+        Accept ``environ`` and ``start_response``; create a
+        :term:`request` and route the request to a :mod:`repoze.bfg`
+        view based on introspection of :term:`view configuration`
+        within the application registry; call ``start_response`` and
+        return an iterable.
         """
         registry = self.registry
         has_listeners = registry.has_listeners

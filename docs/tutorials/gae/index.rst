@@ -12,7 +12,7 @@ This tutorial is written in terms of using the command line on a UNIX
 system; it should be possible to perform similar actions on a Windows
 system.
 
-.. note:: :term:`chameleon.zpt` cannot easily be used on Google App
+.. note:: :term:`Chameleon` cannot easily be used on Google App
    Engine due to GAE environment limitations, so the tutorial is
    presented in terms of using :term:`Jinja2` as the templating
    language in the generated BFG application.  It is possible to *use*

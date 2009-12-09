@@ -10,11 +10,12 @@ Glossary
     A ``WebOb`` request object.  See :ref:`webob_chapter` for
     information about request objects.
   Response
-    An object that has three attributes: app_iter (representing an
-    iterable body), headerlist (representing the http headers sent
-    upstream), and status (representing the http status string).  This
-    is the interface defined for ``WebOb`` response objects.  See
-    :ref:`webob_chapter` for information about response objects.
+    An object that has three attributes: ``app_iter`` (representing an
+    iterable body), ``headerlist`` (representing the http headers sent
+    to the user agent), and ``status`` (representing the http status
+    string sent to the user agent).  This is the interface defined for
+    ``WebOb`` response objects.  See :ref:`webob_chapter` for
+    information about response objects.
   Repoze
     "Repoze" is essentially a "brand" of software developed by
     `Agendaless Consulting <http://agendaless.com>`_ and a set of
@@ -37,11 +38,12 @@ Glossary
     Any file contained within a Python :term:`package` which is *not*
     a Python source code file.
   Resource Specification
-    A colon-delimited identifier for a resource.  The colon separates
-    a Python :term:`package` name from a package subpath.  For
-    example, the resource specification ``my.package:static/baz.css``
-    identifies the file named ``baz.css`` in the ``static``
-    subdirectory of the ``my.package`` Python package.
+    A colon-delimited identifier for a :term:`resource`.  The colon
+    separates a Python :term:`package` name from a package subpath.
+    For example, the resource specification
+    ``my.package:static/baz.css`` identifies the file named
+    ``baz.css`` in the ``static`` subdirectory of the ``my.package``
+    Python :term:`package`.
   Package
     A directory on disk which contains an ``__init__.py`` file, making
     it recognizable to Python as a location which can be ``import`` -ed.
@@ -85,10 +87,10 @@ Glossary
     configuration information.  This configuration information helps
     map the view callable to URLs and can influence the response of a
     view callable.  :mod:`repoze.bfg` views can be configured via
-    :term:`ZCML` or by a special ``@bfg_view`` decorator (see
-    :ref:`mapping_views_to_urls_using_a_decorator_section`.).  See
+    :term:`imperative configuration`, :term:`ZCML` or by a special
+    ``@bfg_view`` decorator coupled with a :term:`scan`.  See
     :ref:`views_chapter` for more information about view
-    configuration. 
+    configuration.
   View name
     The "URL name" of a view, e.g ``index.html``.  If a view is
     configured without a name, its name is considered to be the empty
@@ -108,9 +110,10 @@ Glossary
     used, a model is a node in the object graph traversed by the
     system.  When traversal is used, a model instance becomes the
     :term:`context` of a :term:`view`.  If :mod:`url dispatch` is
-    used, a single :term:`context` (which isn't really a model,
-    because it contains no data except security elements) is generated
-    for each request and is used as the context of a view.
+    used, a single :term:`context` is generated for each request and
+    is used as the context of a view: this object is also technically
+    a "model" in :mod:`repoze.bfg` terms, although this terminology
+    can be a bit confusing: see :ref:`model_traversal_confusion`.
   Traversal
     The act of descending "down" a graph of model objects from a root
     model in order to find a :term:`context`.  The :mod:`repoze.bfg`
@@ -129,15 +132,15 @@ Glossary
   URL dispatch
     An alternative to graph traversal as a mechanism for locating a
     :term:`context` for a :term:`view`.  When you use a :term:`route`
-    in your :mod:`repoze.bfg` application via a ``<route>``
-    :term:`ZCML declaration` in ZCML, you are using URL dispatch. See the
+    in your :mod:`repoze.bfg` application via a :term:`route
+    configuration`, you are using URL dispatch. See the
     :ref:`urldispatch_chapter` for more information.
   Context
     An object in the system that is found during :term:`traversal` or
     :term:`URL dispatch` based on URL data; if it's found via
     traversal, it's usually a :term:`model` object that is part of an
     object graph; if it's found via :term:`URL dispatch`, it's a
-    object manufacture on behalf of the route's "factory".  A context
+    object manufactured on behalf of the route's "factory".  A context
     becomes the subject of a :term:`view`, and typically has security
     information attached to it.  See the :ref:`traversal_chapter`
     chapter and the :ref:`urldispatch_chapter` chapter for more
@@ -187,9 +190,7 @@ Glossary
     given the :term:`authentication` information in the request.
   Authentication
     The act of determining that the credentials a user presents during
-    a particular request are "good".  :mod:`repoze.bfg` does not
-    perfom authentication: it leaves it up to an upstream component
-    such as :term:`repoze.who`.  :mod:`repoze.bfg` uses the
+    a particular request are "good".  :mod:`repoze.bfg` uses the
     :term:`authentication` data supplied by the upstream component as
     one input during :term:`authorization`.  Authentication in
     :mod:`repoze.bfg` is performed via an :term:`authentication
@@ -203,13 +204,12 @@ Glossary
     its :term:`authorization policy`.
   Principal
     A *principal* is a string or unicode object representing a user or
-    a user's membership in a group.  It is provided by the
-    :term:`authentication` machinery "upstream", typically (such as
-    :term:`repoze.who`).  For example, if a user had the user id
-    "bob", and Bob was part of two groups named "group foo" and "group
-    bar", the request might have information attached to it that would
-    indictate that Bob was represented by three principals: "bob",
-    "group foo" and "group bar".
+    a user's membership in a group.  It is provided by an
+    :term:`authentication policy`.  For example, if a user had the
+    user id "bob", and Bob was part of two groups named "group foo"
+    and "group bar", the request might have information attached to it
+    that would indictate that Bob was represented by three principals:
+    "bob", "group foo" and "group bar".
   Authorization Policy
     An authorization policy in :mod:`repoze.bfg` terms is a bit of
     code which has an API which determines whether or not the
@@ -274,15 +274,7 @@ Glossary
     the ability to use bracketed (Genshi-style) ``${name}`` syntax,
     even within ZPT.  It is also much faster than the reference
     implementations of both ZPT and Genshi.  :mod:`repoze.bfg` offers
-    Chameleon templating out of the box in ZPT flavor and offers the
-    Genshi flavor as an add on within the
-    :mod:`repoze.bfg.chameleon_genshi` package.
-  chameleon.zpt
-    ``chameleon.zpt`` is the package which provides :term:`ZPT`
-    templating support under the :term:`Chameleon` templating engine.
-  z3c.pt
-    This was the previous name for :term:`Chameleon`, and is now a
-    Zope 3 compatibility package for Chameleon.
+    Chameleon templating out of the box in ZPT and text flavors.
   ZPT
     The `Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_
     templating language.
@@ -307,11 +299,12 @@ Glossary
     which generally resolves to a :term:`root factory` (and then
     ultimately a :term:`view`).  See also :term:`url dispatch`.
   Route Configuration
-    Route configuration is the act of using a :term:`ZCML` ``<route>``
-    statement to associate request parameters with a particular
-    :term:`route` using pattern matching and :term:`route predicate`
-    statements.  See :ref:`urldispatch_chapter` for more information
-    about route configuration.
+    Route configuration is the act of using :term:`imperative
+    configuration` or a :term:`ZCML` ``<route>`` statement to
+    associate request parameters with a particular :term:`route` using
+    pattern matching and :term:`route predicate` statements.  See
+    :ref:`urldispatch_chapter` for more information about route
+    configuration.
   ZCML
     `Zope Configuration Markup Language
     <http://www.muthukadan.net/docs/zca.html#zcml>`_, an XML dialect
@@ -320,8 +313,8 @@ Glossary
     declaration`, but its primary purpose in :mod:`repoze.bfg` is to
     perform :term:`view configuration` and :term:`route configuration`
     within the ``configure.zcml`` file in a :mod:`repoze.bfg`
-    application.  ZCML in a :mod:`repoze.bfg` application represents
-    the application's :term:`application registry`.
+    application.  You can use ZCML as an alternative to
+    :term:`imperative configuration`.
   ZCML Directive
     A ZCML "tag" such as ``<view>`` or ``<route>``.
   ZCML Declaration
@@ -351,51 +344,42 @@ Glossary
     subpath.  See :ref:`star_subpath` for more information.
   Interface
     A `Zope interface <http://pypi.python.org/pypi/zope.interface>`_
-    object.  In :mod:`repoze.bfg`, an interface may be attached to an
-    model object or a request object in order to identify that the
-    object is "of a type".  Interfaces are used internally by
-    :mod:`repoze.bfg` to perform view lookups and other policy
-    lookups.  Interfaces are exposed to application programmers by the
-    ``view`` ZCML directive or the corresponding ``bfg_view``
-    decorator in the form of both the ``for`` attribute and the
-    ``request_type`` attribute.  They may be exposed to application
-    developers when using the :term:`event` system as
-    well. Fundamentally, :mod:`repoze.bfg` programmers can think of an
-    interface as something that they can attach to an object that
-    stamps it with a "type" unrelated to its underlying Python type.
-    Interfaces can also be used to describe the behavior of an object
-    (its methods and attributes), but unless they choose to,
-    :mod:`repoze.bfg` programmers do not need to understand or use
+    object.  In :mod:`repoze.bfg`, an interface may be attached to a
+    :term:`model` object or a :term:`request` object in order to
+    identify that the object is "of a type".  Interfaces are used
+    internally by :mod:`repoze.bfg` to perform view lookups and other
+    policy lookups.  The ability to make use of an interface is
+    exposed to an application programmers during :term:`view
+    configuration` via the ``for`` argument, the ``request_type``
+    argument and the ``containment`` argument.  Interfaces are also
+    exposed to application developers when they make use of the
+    :term:`event` system. Fundamentally, :mod:`repoze.bfg` programmers
+    can think of an interface as something that they can attach to an
+    object that stamps it with a "type" unrelated to its underlying
+    Python type.  Interfaces can also be used to describe the behavior
+    of an object (its methods and attributes), but unless they choose
+    to, :mod:`repoze.bfg` programmers do not need to understand or use
     this feature of interfaces.
   Event
     An object broadcast to zero or more :term:`subscriber` callables
-    during normal system operations.  :mod:`repoze.bfg` emits events
-    during its lifetime routine.  Application code can subscribe to
+    during normal :mod:`repoze.bfg` system operations during the
+    lifetime of an application.  Application code can subscribe to
     these events by using the subscriber functionality described in
-    :ref:`events_chapter`.  Application code can also generate its own
-    events using the ``zope.component.event.dispatch`` function.
-    Application-code generated events may be subscribed to in the same
-    way as system-generated events.
+    :ref:`events_chapter`.
   Subscriber
     A callable which receives an :term:`event`.  A callable becomes a
-    subscriber through an application registry registration.  See
-    :ref:`events_chapter` for more information.
+    subscriber via :term:`imperative configuration` or the
+    ``<subscriber>`` ZCML directive.  See :ref:`events_chapter` for
+    more information.
   Request type
     An attribute of a :term:`request` that allows for specialization
-    of view code based on arbitrary categorization.  The every
+    of view invocation based on arbitrary categorization.  The every
     :term:`request` object that bfg generates and manipulates has one
     or more :term:`interface` objects attached to it.  The default
     interface attached to a request object is
-    ``repoze.bfg.interfaces.IRequest``.  When a user writes view code,
-    and registers a view without specifying a particular request type,
-    the view is assumed to be registered for requests that have
-    ``repoze.bfg.interfaces.IRequest`` attached to them.  However if
-    the view is registered with a different interface as its request
-    type, the view will be invoked only when the request possesses
-    that particular interface.  Application code can cause requests to
-    possess a different interface by adding the interface to the
-    request object within a :term:`subscriber` to the
-    ``repoze.bfg.interfaces.INewRequest`` event type. 
+    ``repoze.bfg.interfaces.IRequest``.  See
+    :ref:`using_an_event_to_vary_the_request_type` for more
+    information.
   repoze.lemonade
     Zope2 CMF-like `data structures and helper facilities
     <http://docs.repoze.org/lemonade>`_ for CA-and-ZODB-based
@@ -419,22 +403,22 @@ Glossary
     application root factory) unless :ref:`vhosting_chapter` is in
     use.
   Lineage
-    An ordered sequence of objects based on a ":term:`location` -aware"
-    context.  The lineage of any given :term:`context` is composed of
-    itself, its parent, its parent's parent, and so on.  The order of
-    the sequence is context-first, then the parent of the context,
-    then its parent's parent, and so on.
+    An ordered sequence of objects based on a ":term:`location`
+    -aware" context.  The lineage of any given :term:`context` is
+    composed of itself, its parent, its parent's parent, and so on.
+    The order of the sequence is context-first, then the parent of the
+    context, then its parent's parent, and so on.  The parent of an
+    object in a lineage is available as its ``__parent__`` attribute.
   Root Factory
     The "root factory" of an :mod:`repoze.bfg` application is called
     on every request sent to the application.  The root factory
     returns the traversal root of an application.  It is
-    conventionally named ``get_root``.  An application must supply a
-    root factory to :mod:`repoze.bfg` within a call to
-    ``repoze.bfg.router.make_app``; however, an application's root
-    factory may be passed to ``make_app`` as ``None``, in which case
-    the application uses a default root object (this pattern is often
-    used in application which use :term:`URL dispatch` for all
-    URL-to-view code mappings).
+    conventionally named ``get_root``.  An application may supply a
+    root factory to :mod:`repoze.bfg` during the construction of a
+    :term:`Configurator`.  If a root factory is not supplied, the
+    application uses a default root object.  Use of the default root
+    object is useful in application which use :term:`URL dispatch` for
+    all URL-to-view code mappings.
   SQLAlchemy
     `SQLAlchemy' <http://www.sqlalchemy.org/>`_ is an object
     relational mapper used in tutorials within this documentation.
@@ -454,22 +438,22 @@ Glossary
     applications (such as applications developed using
     :mod:`repoze.bfg`) to be served using the Apache web server.
   View Predicate
-    An attribute of a ZCML ``view`` directive or an argument to a
-    ``bfg_view`` decorator which implies a value which evaluates to
-    true or false for a given :term:`request`.  All predicates
+    An argument to a :term:`view configuration` which evaluates to
+    ``True`` or ``False`` for a given :term:`request`.  All predicates
     attached to a view configuration must evaluate to true for the
     associated view to be considered as a possible callable for a
     given request.
   Route Predicate
-    An attribute of a ZCML ``route`` directive which implies a value
-    that evaluates to true or false for a given :term:`request`.  All
-    predicates attached to a route configuration must evaluate to true
-    for the associated route to "match" the current request.  If a
-    route does not match the current request, the next route (in
-    definition order) is attempted.
+    An argument to a :term:`route configuration` which implies a value
+    that evaluates to ``True`` or ``False`` for a given
+    :term:`request`.  All predicates attached to a :term:`route
+    configuration` must evaluate to ``True`` for the associated route
+    to "match" the current request.  If a route does not match the
+    current request, the next route (in definition order) is
+    attempted.
   Predicate
-    A test which returns true or false.  Two different types of
-    predicates exist in :mod:`repoze.bfg`: a :term:`view predicate`
+    A test which returns ``True`` or ``False``.  Two different types
+    of predicates exist in :mod:`repoze.bfg`: a :term:`view predicate`
     and a :term:`route predicate`.  View predicates are attached to
     :term:`view configuration` and route predicates are attached to
     :term:`route configuration`.

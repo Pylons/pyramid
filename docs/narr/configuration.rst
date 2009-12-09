@@ -21,18 +21,17 @@ used to create all kinds of web applications.
    libraries to create an application is often initially easier than
    using a framework to create an application, because the developer
    can choose to cede control to library code he has not authored
-   selectively, making the resulting application easier to understand.
-   When using a framework, the developer is typically required to cede
-   a greater portion of control to code he has not authored: code that
-   resides in the framework itself.  You needn't use a framework at
-   all to create a web application using Python.  A rich set of
-   libraries exists for the platform which you can snap together to
-   effectively create your own framework.  In practice, however, using
-   an existing framework to create an application is often more
-   practical than rolling your own via a set of libraries if the
-   framework provides a set of facilities and assumptions that fit
-   your application requirements.  :mod:`repoze.bfg` is a framework
-   that fits a large set of assumptions in the domain of web
+   selectively. When using a framework, the developer is typically
+   required to cede a greater portion of control to code he has not
+   authored: code that resides in the framework itself.  You needn't
+   use a framework at all to create a web application using Python.  A
+   rich set of libraries exists for the platform which you can snap
+   together to effectively create your own framework.  In practice,
+   however, using an existing framework to create an application is
+   often more practical than rolling your own via a set of libraries
+   if the framework provides a set of facilities and assumptions that
+   fit your application requirements.  :mod:`repoze.bfg` is a
+   framework that fits a large set of assumptions in the domain of web
    application construction.
 
 As a framework, the primary job of :mod:`repoze.bfg` is to make it
@@ -51,11 +50,10 @@ instance, it's easy to think of the values implied by a ``.ini`` file
 which is parsed at application startup time as "configuration".
 :mod:`repoze.bfg` extends this pattern all the way out to application
 development, using the term "configuration" to express standardized
-methods the framework makes available to developers which can be used
-to plug code into a deployment of the framework itself.  When you plug
-code into the :mod:`repoze.bfg` framework, you are indeed
-"configuring" :mod:`repoze.bfg` for the purpose of creating a
-particular application deployment.
+methods which can be used to plug code into a deployment of the
+framework itself.  When you plug code into the :mod:`repoze.bfg`
+framework, you are indeed "configuring" :mod:`repoze.bfg` for the
+purpose of creating a particular application deployment.
 
 There are a number of different mechanisms you may use to configure
 :mod:`repoze.bfg` to create an application: *imperative* configuration
@@ -75,9 +73,10 @@ Hello World, Configured Imperatively
 ------------------------------------
 
 Experienced Python programmers may find the "imperative" configuration
-mechanism fits the way they already do things. This is the configuration
-mode in which developers cede the least amount of control to the framework.
-Because of this, it is also the easiest configuration mode to understand.
+mechanism fits the way they already do things. This is the
+configuration mode in which developers cede the least amount of
+control to the framework.  It is often the easiest configuration mode
+to understand.
 
 Here's one of the simplest :mod:`repoze.bfg` applications, configured
 imperatively:

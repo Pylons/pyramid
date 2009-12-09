@@ -170,11 +170,11 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``callback``
 
-       Default: ``None``.  A callback passed the userid and the request,
-       expected to return None if the userid doesn't exist or a sequence
-       of group identifiers (possibly empty) if the user does exist.  If
-       ``callback`` is None, the userid will be assumed to exist with no
-       groups.  Optional.
+       Default: ``None``.  A callback passed the userid and the
+       request, expected to return ``None`` if the userid doesn't
+       exist or a sequence of group identifiers (possibly empty) if
+       the user does exist.  If ``callback`` is ``None``, the userid
+       will be assumed to exist with no groups.  Optional.
 
     ``cookie_name``
 

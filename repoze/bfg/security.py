@@ -60,8 +60,8 @@ def has_permission(permission, context, request):
 
 def authenticated_userid(request):
     """ Return the userid of the currently authenticated user or
-    ``None`` if there is no authentication policy in effect or there
-    is no currently authenticated user. """
+    ``None`` if there is no :term:`authentication policy` in effect or
+    there is no currently authenticated user."""
     try:
         reg = request.registry
     except AttributeError:
@@ -73,11 +73,11 @@ def authenticated_userid(request):
     return policy.authenticated_userid(request)
 
 def effective_principals(request):
-    """ Return the list of 'effective' principal identifiers for the
-    request.  This will include the userid of the currently
-    authenticated user if a user is currently authenticated. If no
-    authentication policy is in effect, this will return an empty
-    sequence."""
+    """ Return the list of 'effective' :term:`principal` identifiers
+    for the ``request``.  This will include the userid of the
+    currently authenticated user if a user is currently
+    authenticated. If no :term:`authentication policy` is in effect,
+    this will return an empty sequence."""
     try:
         reg = request.registry
     except AttributeError:
@@ -89,16 +89,17 @@ def effective_principals(request):
     return policy.effective_principals(request)
 
 def principals_allowed_by_permission(context, permission):
-    """ Provided a context (a model object), and a permission (a
-    string or unicode object), return a sequence of principal ids that
-    possess the permission in the context.  If no authorization policy
-    is in effect, this will return a sequence with the single value
+    """ Provided a ``context`` (a model object), and a ``permission``
+    (a string or unicode object), if a :term:`authorization policy` is
+    in effect, return a sequence of :term:`principal` ids that possess
+    the permission in the ``context``.  If no authorization policy is
+    in effect, this will return a sequence with the single value
     representing ``Everyone`` (the special principal identifier
     representing all principals).
 
-    .. note:: even if an authorization policy *is* in effect, some
-       (exotic) authorization policies may not implement the required
-       machinery for this function; those will cause a
+    .. note:: even if an :term:`authorization policy` is in effect,
+       some (exotic) authorization policies may not implement the
+       required machinery for this function; those will cause a
        ``NotImplementedError`` exception to be raised when this
        function is invoked.
     """
@@ -110,11 +111,11 @@ def principals_allowed_by_permission(context, permission):
 
 def view_execution_permitted(context, request, name=''):
     """ If the view specified by ``context`` and ``name`` is protected
-    by a permission, check the permission associated with the view
-    using the effective authentication/authorization policies and the
-    ``request``.  Return a boolean result.  If no authentication
-    policy is in effect, or if the view is not protected by a
-    permission, return True."""
+    by a :term:`permission`, check the permission associated with the
+    view using the effective authentication/authorization policies and
+    the ``request``.  Return a boolean result.  If no
+    :term:`authorization policy` is in effect, or if the view is not
+    protected by a permission, return True."""
     try:
         reg = request.registry
     except AttributeError:
@@ -141,10 +142,10 @@ def remember(request, principal, **kw):
       response.headerlist.extend(headers)
       return response
 
-    If no authentication policy is in use, this function will always
-    return an empty sequence.  If used, the composition and meaning of
-    ``**kw`` must be agreed upon by the calling code and the effective
-    authentication policy."""
+    If no :term:`authentication policy` is in use, this function will
+    always return an empty sequence.  If used, the composition and
+    meaning of ``**kw`` must be agreed upon by the calling code and
+    the effective authentication policy."""
     try:
         reg = request.registry
     except AttributeError:
@@ -168,8 +169,8 @@ def forget(request):
       response.headerlist.extend(headers)
       return response
 
-    If no authentication policy is in use, this function will always
-    return an empty sequence."""
+    If no :term:`authentication policy` is in use, this function will
+    always return an empty sequence."""
     try:
         reg = request.registry
     except AttributeError:

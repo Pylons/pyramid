@@ -81,8 +81,8 @@ def find_interface(model, class_or_interface):
     Return the first object found in the parent chain of ``model``
     which, a) if ``class_or_interface`` is a Python class object, is
     an instance of the class or any subclass of that class or b) if
-    ``class_or_interface`` is a Zope interface, provides the specified
-    interface.  Return ``None`` if no object providing
+    ``class_or_interface`` is a :term:`interface`, provides the
+    specified interface.  Return ``None`` if no object providing
     ``interface_or_class`` can be found in the parent chain.  The
     ``model`` passed in *must* be :term:`location`-aware.
     """
@@ -149,67 +149,70 @@ def traverse(model, path):
 
     A definition of each value in the returned dictionary:
 
-    - ``context``: The context (a 'model' object) found via traversal
-      or url dispatch.  If the ``path`` passed in is the empty string,
-      the value of the ``model`` argument passed to this function is
-      returned.
+    - ``context``: The :term:`context` (a :term:`model` object) found
+      via traversal or url dispatch.  If the ``path`` passed in is the
+      empty string, the value of the ``model`` argument passed to this
+      function is returned.
 
-    - ``root``: The model object at which traversal begins.  If the
-      ``model`` passed in was found via url dispatch or if the
+    - ``root``: The model object at which :term:`traversal` begins.
+      If the ``model`` passed in was found via url dispatch or if the
       ``path`` passed in was relative (non-absolute), the value of the
       ``model`` argument passed to this function is returned.
 
-    - ``view_name``: The 'view name' found during traversal or url
-      dispatch; if the ``model`` was found via traversal, this is
-      usually a representation of the path segment which directly
-      follows the path to the ``context`` in the ``path``.  The
-      ``view_name`` will be a Unicode object or the empty string.  The
-      ``view_name`` will be the empty string if there is no element
-      which follows the ``context`` path.  An example: if the path
-      passed is ``/foo/bar``, and a context object is found at
-      ``/foo`` (but not at ``/foo/bar``), the 'view name' will be
-      ``u'bar'``.  If the ``model`` was found via urldispatch, the
-      view_name will be the name the route found was registered with.
+    - ``view_name``: The :term:`view name` found during
+      :term:`traversal` or :term:`url dispatch`; if the ``model`` was
+      found via traversal, this is usually a representation of the
+      path segment which directly follows the path to the ``context``
+      in the ``path``.  The ``view_name`` will be a Unicode object or
+      the empty string.  The ``view_name`` will be the empty string if
+      there is no element which follows the ``context`` path.  An
+      example: if the path passed is ``/foo/bar``, and a context
+      object is found at ``/foo`` (but not at ``/foo/bar``), the 'view
+      name' will be ``u'bar'``.  If the ``model`` was found via
+      urldispatch, the view_name will be the name the route found was
+      registered with.
 
-    - ``subpath``: For a ``model`` found via traversal, this is a
-      sequence of path segments found in the ``path`` that follow the
-      ``view_name`` (if any).  Each of these items is a Unicode
+    - ``subpath``: For a ``model`` found via :term:`traversal`, this
+      is a sequence of path segments found in the ``path`` that follow
+      the ``view_name`` (if any).  Each of these items is a Unicode
       object.  If no path segments follow the ``view_name``, the
-      subpath will be the empty list.  An example: if the path passed
-      is ``/foo/bar/baz/buz``, and a context object is found at
+      subpath will be the empty sequence.  An example: if the path
+      passed is ``/foo/bar/baz/buz``, and a context object is found at
       ``/foo`` (but not ``/foo/bar``), the 'view name' will be
-      ``u'bar'`` and the subpath will be ``[u'baz', u'buz']``.  For a
-      ``model`` found via url dispatch, the subpath will be a sequence
-      of values discerned from ``*subpath`` in the route pattern
-      matched or the empty sequence.
+      ``u'bar'`` and the :term:`subpath` will be ``[u'baz', u'buz']``.
+      For a ``model`` found via url dispatch, the subpath will be a
+      sequence of values discerned from ``*subpath`` in the route
+      pattern matched or the empty sequence.
 
     - ``traversed``: The sequence of path elements traversed from the
-      root to find the ``context`` object.  Each of these items is a
-      Unicode object.  If no path segments were traversed to find the
-      ``context`` object (e.g. if the ``path`` provided is the empty
-      string), the ``traversed`` value will be the empty list.  If the
-      ``model`` is a model found via urldispatch, traversed will be
-      None.
+      root to find the ``context`` object during :term:`traversal`.
+      Each of these items is a Unicode object.  If no path segments
+      were traversed to find the ``context`` object (e.g. if the
+      ``path`` provided is the empty string), the ``traversed`` value
+      will be the empty sequence.  If the ``model`` is a model found
+      via :term:`url dispatch`, traversed will be None.
 
     - ``virtual_root``: A model object representing the 'virtual' root
-      of the object graph being traversed.  See
-      :ref:`vhosting_chapter` for a definition of the virtual root
+      of the object graph being traversed during :term:`traversal`.
+      See :ref:`vhosting_chapter` for a definition of the virtual root
       object.  If no virtual hosting is in effect, and the ``path``
       passed in was absolute, the ``virtual_root`` will be the
-      *physical* root object (the object at which traversal begins).
-      If the ``model`` passed in was found via URL dispatch or if the
-      ``path`` passed in was relative, the ``virtual_root`` will
-      always equal the ``root`` object (the model passed in).
+      *physical* root object (the object at which :term:`traversal`
+      begins).  If the ``model`` passed in was found via :term:`URL
+      dispatch` or if the ``path`` passed in was relative, the
+      ``virtual_root`` will always equal the ``root`` object (the
+      model passed in).
 
-    - ``virtual_root_path`` -- If traversal was used to find the
-      ``model``, this will be the sequence of path elements traversed
-      to find the ``virtual_root`` object.  Each of these items is a
-      Unicode object.  If no path segments were traversed to find the
-      ``virtual_root`` object (e.g. if virtual hosting is not in
-      effect), the ``traversed`` value will be the empty list.  If url
-      dispatch was used to find the ``model``, this will be None.
+    - ``virtual_root_path`` -- If :term:`traversal` was used to find
+      the ``model``, this will be the sequence of path elements
+      traversed to find the ``virtual_root`` object.  Each of these
+      items is a Unicode object.  If no path segments were traversed
+      to find the ``virtual_root`` object (e.g. if virtual hosting is
+      not in effect), the ``traversed`` value will be the empty list.
+      If url dispatch was used to find the ``model``, this will be
+      None.
 
-    If the path cannot be resolved, a KeyError will be raised.
+    If the path cannot be resolved, a ``KeyError`` will be raised.
 
     Rules for passing a *string* as the ``path`` argument: if the
     first character in the path string is the with the ``/``
@@ -244,14 +247,14 @@ def traverse(model, path):
     Explanation of the conversion of ``path`` segment values to
     Unicode during traversal: Each segment is URL-unquoted, and
     decoded into Unicode. Each segment is assumed to be encoded using
-    the UTF-8 encoding (or a subset, such as ASCII); a TypeError is
-    raised if a segment cannot be decoded.  If a segment name is empty
-    or if it is ``.``, it is ignored.  If a segment name is ``..``,
-    the previous segment is deleted, and the ``..`` is ignored.  As a
-    result of this process, the return values ``view_name``, each
-    element in the ``subpath``, each element in ``traversed``, and
-    each element in the ``virtual_root_path`` will be Unicode as
-    opposed to a string, and will be URL-decoded.
+    the UTF-8 encoding (or a subset, such as ASCII); a ``TypeError``
+    is raised if a segment cannot be decoded.  If a segment name is
+    empty or if it is ``.``, it is ignored.  If a segment name is
+    ``..``, the previous segment is deleted, and the ``..`` is
+    ignored.  As a result of this process, the return values
+    ``view_name``, each element in the ``subpath``, each element in
+    ``traversed``, and each element in the ``virtual_root_path`` will
+    be Unicode as opposed to a string, and will be URL-decoded.
     """
 
     if hasattr(path, '__iter__'):
@@ -279,8 +282,8 @@ def traverse(model, path):
 def model_path_tuple(model, *elements):
     """
     Return a tuple representing the absolute physical path of the
-    model object based on its position in the model graph, e.g ``('',
-    'foo', 'bar')``.  Any positional arguments passed in as
+    ``model`` object based on its position in an object graph, e.g
+    ``('', 'foo', 'bar')``.  Any positional arguments passed in as
     ``elements`` will be appended as elements in the tuple
     representing the the model path.  For instance, if the model's
     path is ``('', 'foo', 'bar')`` and elements equals ``('a', 'b')``,
@@ -324,11 +327,12 @@ def _model_path_list(model, *elements):
 
 def virtual_root(model, request):
     """
-    Provided any model and a request object, return the model object
-    representing the 'virtual root' of the current request.  Using a
-    virtual root in a traversal-based :mod:`repoze.bfg` application
-    permits rooting, for example, the object at the traversal path
-    ``/cms`` at ``http://example.com/`` instead of rooting it at
+    Provided any :term:`model` and a :term:`request` object, return
+    the model object representing the :term:`virtual root` of the
+    current :term:`request`.  Using a virtual root in a
+    :term:`traversal` -based :mod:`repoze.bfg` application permits
+    rooting, for example, the object at the traversal path ``/cms`` at
+    ``http://example.com/`` instead of rooting it at
     ``http://example.com/cms/``.
 
     If the ``model`` passed in is a context obtained via
@@ -336,9 +340,9 @@ def virtual_root(model, request):
     WSGI environment, the value of this key will be treated as a
     'virtual root path': the :func:`repoze.bfg.traversal.find_model`
     API will be used to find the virtual root object using this path;
-    if the object is found, it will found will be returned.  If the
-    ``%s`` key is is not present in the WSGI environment, the physical
-    :term:`root` of the graph will be returned instead.
+    if the object is found, it will be returned.  If the
+    ``HTTP_X_VHM_ROOT`` key is is not present in the WSGI environment,
+    the physical :term:`root` of the graph will be returned instead.
 
     Virtual roots are not useful at all in applications that use
     :term:`URL dispatch`. Contexts obtained via URL dispatch don't
@@ -595,13 +599,14 @@ class TraversalContextURL(object):
             return find_root(self.context)
         
     def __call__(self):
-        """ Generate a URL based on the lineage of a model obtained
-        via traversal.  If any model in the context lineage has a
-        unicode name, it will be converted to a UTF-8 string before
-        being attached to the URL.  If a ``HTTP_X_VHM_ROOT`` key is
-        present in the WSGI environment, its value will be treated as
-        a 'virtual root path': the path of the URL generated by this
-        will be left-stripped of this virtual root path value.
+        """ Generate a URL based on the :term:`lineage` of a
+        :term:`model` object obtained via :term:`traversal`.  If any
+        model in the context lineage has a Unicode name, it will be
+        converted to a UTF-8 string before being attached to the URL.
+        If a ``HTTP_X_VHM_ROOT`` key is present in the WSGI
+        environment, its value will be treated as a 'virtual root
+        path': the path of the URL generated by this will be
+        left-stripped of this virtual root path value.
         """
         path = model_path(self.context)
         if path != '/':

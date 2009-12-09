@@ -8,7 +8,7 @@ def wsgiapp(wrapped):
     WSGI environment *are not* performed before the application is
     invoked.
 
-    E.g.::
+    E.g., the following in a ``views.py`` module::
 
       @wsgiapp
       def hello_world(environ, start_response):
@@ -17,13 +17,17 @@ def wsgiapp(wrapped):
                                      ('Content-Length', len(body)) ] )
           return [body]
 
-    Allows the following view declaration to be made::
+    Allows the following ZCML view declaration to be made::
 
        <view
           view=".views.hello_world"
           name="hello_world.txt"
-          context="*"
         />
+
+    Or the following :term:`Configurator` ``add_view`` method call::
+
+        from views import hello_world
+        config.add_view(hello_world, name='hello_world.txt')
 
     The wsgiapp decorator will convert the result of the WSGI
     application to a Response and return it to repoze.bfg as if the
@@ -41,7 +45,7 @@ def wsgiapp2(wrapped):
     WSGI environment *are* performed before the application is
     invoked.
 
-    E.g.::
+    E.g. the following in a ``views.py`` module::
 
       @wsgiapp2
       def hello_world(environ, start_response):
@@ -50,13 +54,17 @@ def wsgiapp2(wrapped):
                                      ('Content-Length', len(body)) ] )
           return [body]
 
-    Allows the following view declaration to be made::
+    Allows the following ZCML view declaration to be made::
 
        <view
           view=".views.hello_world"
           name="hello_world.txt"
-          context="*"
         />
+
+    Or the following :term:`Configurator` ``add_view`` method call::
+
+        from views import hello_world
+        config.add_view(hello_world, name='hello_world.txt')
 
     The wsgiapp2 decorator will convert the result of the WSGI
     application to a Response and return it to repoze.bfg as if the

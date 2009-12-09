@@ -28,6 +28,10 @@ class IWSGIApplicationCreatedEvent(Interface):
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
+class IRouteRequest(Interface):
+    """ *internal only* interface used as in a utility lookup to find
+    route-specific interfaces.  Not an API."""
+
 class IResponse(Interface):
     status = Attribute('WSGI status code of response')
     headerlist = Attribute('List of response headers')
@@ -65,10 +69,6 @@ class IAuthorizationPolicy(Interface):
         """ Return a set of principal identifiers allowed by the permission """
 
 
-class IRouteRequest(Interface):
-    """ *internal only* interface used as in a utility lookup to find
-    route-specific interfaces.  Not an API."""
-
 class IResponseFactory(Interface):
     """ A utility which generates a response factory """
     def __call__():
@@ -102,15 +102,15 @@ class IMultiView(ISecuredView):
         """ Add a view to the multiview. """
 
 class IRootFactory(Interface):
-    def __call__(environ):
-        """ Return a root object based on the WSGI environ """
+    def __call__(request):
+        """ Return a root object based on the request """
 
 class IDefaultRootFactory(Interface):
-    def __call__(environ):
+    def __call__(request):
         """ Return the *default* root object for an application """
 
 class ITraverser(Interface):
-    def __call__(environ):
+    def __call__(request):
         """ Return a dictionary with (at least) the keys ``root``,
         ``context``, ``view_name``, ``subpath``, ``traversed``,
         ``virtual_root``, and ``virtual_root_path``.  These values are
@@ -143,7 +143,7 @@ class IRenderer(Interface):
         unicode object useful as a response body).  Values computed by
         the system are passed by the system in the ``system``
         parameter, which is a dictionary.  Keys in the dictionary
-        include: ``view`` (the view object that returned the value),
+        include: ``view`` (the view callable that returned the value),
         ``renderer_name`` (the template name or simple name of the
         renderer), ``context`` (the context object passed to the
         view), and ``request`` (the request object passed to the
@@ -172,7 +172,8 @@ class IRouter(Interface):
     
 class ISettings(Interface):
     """ Runtime settings utility for repoze.bfg; represents the
-    deployment settings for the application"""
+    deployment settings for the application.  Implements a mapping
+    interface."""
     
 # this interface, even if it becomes unused within BFG, is imported by
 # other packages (such as repoze.bfg.traversalwrapper)
@@ -188,7 +189,20 @@ ILogger = IDebugLogger # b/c
 
 class IRoutesMapper(Interface):
     """ Interface representing a Routes ``Mapper`` object """
-    
+    def get_routes():
+        """ Return a sequence of Route objects registered in the mapper."""
+
+    def connect(path, name, factory=None, predicates=()):
+        """ Add a new route. """
+
+    def generate(name, kw):
+        """ Generate a URL using the route named ``name`` with the
+        keywords implied by kw"""
+
+    def __call__(request):
+        """ Return a matchdict for the request; the ``route`` key will
+        either be a Route object or ``None`` if no route matched."""
+
 class IForbiddenView(Interface):
     """ A utility which returns an IResponse as the result of the
     denial of a view invocation by a security policy."""

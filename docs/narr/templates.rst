@@ -16,10 +16,9 @@ Like :term:`Zope`, :mod:`repoze.bfg` uses Zope Page Templates
 (:term:`ZPT`) as its default and best-supported templating
 language. However, :mod:`repoze.bfg` uses a different implementation
 of the :term:`ZPT` specification than Zope does: the :term:`Chameleon`
-:term:`chameleon.zpt` templating engine. This templating engine
-complies largely with the `Zope Page Template
-<http://wiki.zope.org/ZPT/FrontPage>`_ template specification, however
-it is significantly faster.
+templating engine. This templating engine complies largely with the
+`Zope Page Template <http://wiki.zope.org/ZPT/FrontPage>`_ template
+specification, however it is significantly faster.
 
 .. note:: The language definition documentation for Chameleon
    ZPT-style templates is available from `the Chameleon website
@@ -27,7 +26,7 @@ it is significantly faster.
    <http://chameleon.repoze.org/docs/latest/>`_ for the Chameleon ZPT
    language specification.
 
-Given that there is a :term:`chameleon.zpt` template named ``foo.pt``
+Given that there is a :term:`Chameleon` ZPT template named ``foo.pt``
 in a directory in your application named ``templates``, you can render
 the template from a view like so:
 
@@ -90,7 +89,7 @@ changing the content-type and status:
 A Sample Template
 ~~~~~~~~~~~~~~~~~
 
-Here's what a simple :term:`chameleon.zpt` template used under
+Here's what a simple :term:`Chameleon` ZPT template used under
 :mod:`repoze.bfg` might look like:
 
 .. code-block:: xml
@@ -113,7 +112,7 @@ Here's what a simple :term:`chameleon.zpt` template used under
     </html>
 
 Note the use of :term:`Genshi` -style ``${replacements}`` above.  This
-is one of the ways that :term:`chameleon.zpt` differs from standard
+is one of the ways that :term:`Chameleon` ZPT differs from standard
 ZPT.  The above template expects to find a ``project`` key in the set
 of keywords passed in to it via ``render_template`` or
 ``render_template_to_response``. Typical ZPT attribute-based syntax
@@ -124,9 +123,9 @@ Using ZPT Macros in :mod:`repoze.bfg`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Unlike Zope "browser views", :mod:`repoze.bfg` doesn't make any names
-(such as ``context`` or ``view``) available to :term:`chameleon.zpt`
-templates by default.  Instead, it expects you to pass all the names
-you need into the template.
+(such as ``context`` or ``view``) available to :term:`Chameleon` ZPT
+templates by default unless a :term:`renderer` is used.  Instead, it
+expects you to pass all the names you need into the template.
 
 One of the common needs in ZPT-based template is to one template's
 "macros" from within a different template.  In Zope, this is typically

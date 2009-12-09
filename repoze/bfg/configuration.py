@@ -75,11 +75,11 @@ class Configurator(object):
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :mod:`repoze.bfg.registry.Registry`
     class representing the registry to configure.  If ``registry`` is
-    ``None``, the configurator will create a Registry instance itself;
-    it will also perform some default configuration that would not
-    otherwise be done.  After construction, the configurator may be
-    used to add configuration to the registry.  The overall state of a
-    registry is called the 'configuration state'.
+    ``None``, the configurator will create a ``Registry`` instance
+    itself; it will also perform some default configuration that would
+    not otherwise be done.  After construction, the configurator may
+    be used to add configuration to the registry.  The overall state
+    of a registry is called the 'configuration state'.
 
     .. warning:: If a ``registry`` is passed to the Configurator
        constructor, all other constructor arguments except ``package``
@@ -109,9 +109,9 @@ class Configurator(object):
     If ``authorization_policy`` is passed, it should be an instance
     of an :term:`authorization policy`.
 
-    .. note:: A ``ConfigurationError`` will be raised if an
-       authorization policy is supplied without authentication policy
-       also being supplied (authorization requires authentication).
+    .. note:: A ``ConfigurationError`` will be raised when an
+       authorization policy is supplied without also supplying an
+       authentication policy (authorization requires authentication).
 
     If ``renderers`` is passed, it should be a list of tuples
     representing a set of :term:`renderer` factories which should be
@@ -120,7 +120,9 @@ class Configurator(object):
 
     If ``debug_logger`` is not passed, a default debug logger that
     logs to stderr will be used.  If it is passed, it should be an
-    instance of a ``logging.Logger`` (PEP 282) class.
+    instance of the ``logging.Logger`` (PEP 282) standard library
+    class.  The debug logger is used by :mod:`repoze.bfg` itself to
+    log warnings and authorization debugging information.
     """
     def __init__(self, registry=None, package=None, settings=None,
                  root_factory=None, authentication_policy=None,
@@ -250,9 +252,9 @@ class Configurator(object):
                 def view(context, request):
                     return {}
             else:
-                raise ConfigurationError('"view" attribute was not '
-                                         'specified and no renderer '
-                                         'specified')
+                raise ConfigurationError(
+                    '"view" argument was not specified and no renderer '
+                    'specified')
 
         derived_view = self._derive_view(view, attr=attr,
                                          renderer_name=renderer,
@@ -273,14 +275,15 @@ class Configurator(object):
     # API
 
     def add_subscriber(self, subscriber, iface=None):
-        """Add an event subscriber for the event stream implied by
-        the supplied ``iface`` interface.  The ``subscriber`` argument
-        represents a callable object; it will be called with a single
-        object ``event`` whenever :mod:`repoze.bfg` emits an event
-        associated with the ``iface``.  Using the default ``iface``
-        value, ``None`` will cause the subscriber to be registered for
-        all event types. See :ref:`events_chapter` for more
-        information about events and subscribers."""
+        """Add an event :term:`subscriber` for the event stream
+        implied by the supplied ``iface`` interface.  The
+        ``subscriber`` argument represents a callable object; it will
+        be called with a single object ``event`` whenever
+        :mod:`repoze.bfg` emits an :term:`event` associated with the
+        ``iface``.  Using the default ``iface`` value, ``None`` will
+        cause the subscriber to be registered for all event types. See
+        :ref:`events_chapter` for more information about events and
+        subscribers."""
         if iface is None:
             iface = (Interface,)
         if not isinstance(iface, (tuple, list)):
@@ -337,33 +340,36 @@ class Configurator(object):
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
         arguments.  Predicate arguments narrow the circumstances in
-        which a view will be invoked; non-predicate arguments are
+        which the view callable will be invoked when a request is
+        presented to :mod:`repoze.bfg`; non-predicate arguments are
         informational.
 
         Non-Predicate Arguments
 
         view
 
-          The Python dotted-path name to the view callable.  This
-          argument is required unless a ``renderer`` attribute also
-          exists.  If a ``renderer`` argument is passed, this
-          attribute defaults to a view that returns an empty
-          dictionary (see :ref:`views_which_use_a_renderer`).
+          A reference to a :term:`view callable`.  This argument is
+          required unless a ``renderer`` argument also exists.  If a
+          ``renderer`` argument is passed, and a ``view`` argument is
+          not provided, the view callable defaults to a callable that
+          returns an empty dictionary (see
+          :ref:`views_which_use_a_renderer`).
 
         permission
 
-          The name of a *permission* that the user must possess in
-          order to call the view.  See :ref:`view_security_section`
-          for more information about view security and permissions.
+          The name of a :term:`permission` that the user must possess
+          in order to invoke the :term:`view callable`.  See
+          :ref:`view_security_section` for more information about view
+          security and permissions.
 
         attr
 
           The view machinery defaults to using the ``__call__`` method
-          of the view callable (or the function itself, if the view
-          callable is a function) to obtain a response dictionary.
-          The ``attr`` value allows you to vary the method attribute
-          used to obtain the response.  For example, if your view was
-          a class, and the class has a method named ``index`` and you
+          of the :term:`view callable` (or the function itself, if the
+          view callable is a function) to obtain a response.  The
+          ``attr`` value allows you to vary the method attribute used
+          to obtain the response.  For example, if your view was a
+          class, and the class has a method named ``index`` and you
           wanted to use this method instead of the class' ``__call__``
           method to return the response, you'd say ``attr="index"`` in the
           view configuration for the view.  This is
@@ -373,55 +379,58 @@ class Configurator(object):
 
           This is either a single string term (e.g. ``json``) or a
           string implying a path or :term:`resource specification`
-          (e.g. ``templates/views.pt``).  If the renderer value is a
-          single term (does not contain a dot ``.``), the specified
-          term will be used to look up a renderer implementation, and
-          that renderer implementation will be used to construct a
-          response from the view return value.  If the renderer term
-          contains a dot (``.``), the specified term will be treated
-          as a path, and the filename extension of the last element in
-          the path will be used to look up the renderer
-          implementation, which will be passed the full path.  The
-          renderer implementation will be used to construct a response
-          from the view return value.
+          (e.g. ``templates/views.pt``) naming a :term:`renderer`
+          implementation.  If the ``renderer`` value does not contain
+          a dot ``.``, the specified string will be used to look up a
+          renderer implementation, and that renderer implementation
+          will be used to construct a response from the view return
+          value.  If the ``renderer`` value contains a dot (``.``),
+          the specified term will be treated as a path, and the
+          filename extension of the last element in the path will be
+          used to look up the renderer implementation, which will be
+          passed the full path.  The renderer implementation will be
+          used to construct a :term:`response` from the view return
+          value.
 
-          Note that if the view itself returns a response (see
+          Note that if the view itself returns a :term:`response` (see
           :ref:`the_response`), the specified renderer implementation
           is never called.
 
           When the renderer is a path, although a path is usually just
           a simple relative pathname (e.g. ``templates/foo.pt``,
           implying that a template named"foo.pt" is in the "templates"
-          directory relative to the directory of *package* of the
-          Configurator), a path can be absolute, starting with a slash
-          on UNIX or a drive letter prefix on Windows.  The path can
-          alternately be a :term:`resource specification` in the form
+          directory relative to the directory of the current
+          :term:`package` of the Configurator), a path can be
+          absolute, starting with a slash on UNIX or a drive letter
+          prefix on Windows.  The path can alternately be a
+          :term:`resource specification` in the form
           ``some.dotted.package_name:relative/path``, making it
           possible to address template resources which live in a
           separate package.
 
           The ``renderer`` attribute is optional.  If it is not
-          defined, the "null" renderer is assumed (no rendering is performed
-          and the value is passed back to the upstream BFG machinery
-          unmolested).
+          defined, the "null" renderer is assumed (no rendering is
+          performed and the value is passed back to the upstream BFG
+          machinery unmolested).
 
         wrapper
 
-          The :term:`view name` of another view declared elsewhere in
-          configuration which will receive the response body of this
+          The :term:`view name` of a different :term:`view
+          configuration` which will receive the response body of this
           view as the ``request.wrapped_body`` attribute of its own
-          request, and the response returned by this view as the
-          ``request.wrapped_response`` attribute of its own request.
-          Using a wrapper makes it possible to
-          "chain" views together to form a composite response.  The response
-          of the outermost wrapper view will be returned to the user.  The
-          wrapper view will be found as any view is found: see
-          :ref:`view_lookup_ordering`.  The "best" wrapper view will be found
-          based on the lookup ordering: "under the hood" this wrapper view is
-          looked up via ``repoze.bfg.view.render_view_to_response(context,
-          request, 'wrapper_viewname')``. The context and request of a wrapper
-          view is the same context and request of the inner view.  If this
-          attribute is unspecified, no view wrapping is done.
+          :term:`request`, and the :term:`response` returned by this
+          view as the ``request.wrapped_response`` attribute of its
+          own request.  Using a wrapper makes it possible to "chain"
+          views together to form a composite response.  The response
+          of the outermost wrapper view will be returned to the user.
+          The wrapper view will be found as any view is found: see
+          :ref:`view_lookup_ordering`.  The "best" wrapper view will
+          be found based on the lookup ordering: "under the hood" this
+          wrapper view is looked up via
+          ``repoze.bfg.view.render_view_to_response(context, request,
+          'wrapper_viewname')``. The context and request of a wrapper
+          view is the same context and request of the inner view.  If
+          this attribute is unspecified, no view wrapping is done.
 
         Predicate Arguments
 
@@ -442,17 +451,20 @@ class Configurator(object):
 
         route_name
 
-          *This argument services an advanced feature that isn't often
-          used unless you want to perform traversal *after* a route
-          has matched.* This value must match the ``name`` of a
-          ``<route>`` declaration (see :ref:`urldispatch_chapter`)
+          This value must match the ``name`` of a :term:`route
+          configuration` declaration (see :ref:`urldispatch_chapter`)
           that must match before this view will be called.  Note that
           the ``route`` configuration referred to by ``route_name``
           usually has a ``*traverse`` token in the value of its
           ``path``, representing a part of the path that will be used
           by traversal against the result of the route's :term:`root
-          factory`.See :ref:`hybrid_chapter` for more information on
-          using this advanced feature.
+          factory`.
+
+          .. warning:: Using this argument services an advanced
+             feature that isn't often used unless you want to perform
+             traversal *after* a route has matched. See
+             :ref:`hybrid_chapter` for more information on using this
+             advanced feature.
 
         request_type
 
@@ -474,22 +486,23 @@ class Configurator(object):
 
           This value can be any string.  A view declaration with this
           argument ensures that the view will only be called when the
-          request has a key in the ``request.params`` dictionary (an
-          HTTP ``GET`` or ``POST`` variable) that has a name which
-          matches the supplied value.  If the value supplied to the
-          attribute has a ``=`` sign in it, e.g. ``request_params="foo=123"``,
-          then the key (``foo``) must both exist in the ``request.params``
-          dictionary, and the value must match the right hand side of the
-          expression (``123``) for the view to "match" the current request.
+          :term:`request` has a key in the ``request.params``
+          dictionary (an HTTP ``GET`` or ``POST`` variable) that has a
+          name which matches the supplied value.  If the value
+          supplied has a ``=`` sign in it,
+          e.g. ``request_params="foo=123"``, then the key (``foo``)
+          must both exist in the ``request.params`` dictionary, *and*
+          the value must match the right hand side of the expression
+          (``123``) for the view to "match" the current request.
 
         containment
 
-          This value should be a reference to a Python class that a
-          graph traversal parent object of the :term:`context` must be
-          an instance of or :term:`interface` that a parent object
-          must provide in order for this view to be found and called.
-          Your models must be"location-aware" to use this feature.  See
-          :ref:`location_aware` for more information about location-awareness.
+          This value should be a reference to a Python class or
+          :term:`interface` that a parent object in the
+          :term:`lineage` must provide in order for this view to be
+          found and called.  Your models must be"location-aware" to
+          use this feature.  See :ref:`location_aware` for more
+          information about location-awareness.
 
         xhr
 
@@ -503,7 +516,7 @@ class Configurator(object):
 
         accept
 
-          The value of this attribute represents a match query for one
+          The value of this argument represents a match query for one
           or more mimetypes in the ``Accept`` HTTP request header.  If
           this value is specified, it must be in one of the following
           forms: a mimetype match token in the form ``text/plain``, a
@@ -518,27 +531,25 @@ class Configurator(object):
           name/value pair.  If the value contains a ``:`` (colon), it
           will be considered a name/value pair
           (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  The
-          *value* of an attribute that represent a name/value pair
-          should be a regular expression.  If the value does not
-          contain a colon, the entire value will be considered to be
-          the header name (e.g. ``If-Modified-Since``).  If the value
-          evaluates to a header name only without a value, the header
-          specified by the name must be present in the request for
-          this predicate to be true.  If the value evaluates to a
-          header name/value pair, the header specified by the name
-          must be present in the request *and* the regular expression
-          specified as the value must match the header value.  Whether
-          or not the value represents a header name or a header
-          name/value pair, the case of the header name is not
-          significant.
+          value portion should be a regular expression.  If the value
+          does not contain a colon, the entire value will be
+          considered to be the header name
+          (e.g. ``If-Modified-Since``).  If the value evaluates to a
+          header name only without a value, the header specified by
+          the name must be present in the request for this predicate
+          to be true.  If the value evaluates to a header name/value
+          pair, the header specified by the name must be present in
+          the request *and* the regular expression specified as the
+          value must match the header value.  Whether or not the value
+          represents a header name or a header name/value pair, the
+          case of the header name is not significant.
 
         path_info
 
           This value represents a regular expression pattern that will
           be tested against the ``PATH_INFO`` WSGI environment
           variable.  If the regex matches, this predicate will be
-          true.
-
+          ``True``.
         """
 
         if not view:
@@ -658,11 +669,9 @@ class Configurator(object):
         configuration` to be used to specify a :term:`view callable`
         that will be invoked when this route matches.  The arguments
         to this method are divided into *predicate*, *non-predicate*,
-        and *view-related* types.  Predicate arguments narrow the
-        circumstances in which a route will be match a request;
-        non-predicate arguments are informational.  View-related types
-        are used to modify the
-
+        and *view-related* types.  :term:`Route predicate` arguments
+        narrow the circumstances in which a route will be match a
+        request; non-predicate arguments are informational.
 
         Non-Predicate Arguments
 
@@ -670,15 +679,15 @@ class Configurator(object):
 
           The name of the route, e.g. ``myroute``.  This attribute is
           required.  It must be unique among all defined routes in a given
-          configuration.
+          application.
 
         factory
 
-          A reference to a Python object (often a function) that will
-          generate a :mod:`repoze.bfg` context object when this route
-          matches.  e.g. ``mypackage.models.MyFactoryClass``.  If this
-          argument is not specified, a default root factory will be
-          used.
+          A reference to a Python object (often a function or a class)
+          that will generate a :mod:`repoze.bfg` :term:`context`
+          object when this route matches. For example,
+          ``mypackage.models.MyFactoryClass``.  If this argument is
+          not specified, a default root factory will be used.
 
         Predicate Arguments
 
@@ -686,7 +695,8 @@ class Configurator(object):
 
           The path of the route e.g. ``ideas/:idea``.  This argument
           is required.  See :ref:`route_path_pattern_syntax` for
-          information about the syntax of route paths.
+          information about the syntax of route paths.  If the path
+          doesn't match the current URL, route matching continues.
 
         xhr
 
@@ -696,23 +706,23 @@ class Configurator(object):
           ``X-Requested-With``) header for this route to match.  This
           is useful for detecting AJAX requests issued from jQuery,
           Prototype and other Javascript libraries.  If this predicate
-          returns false, route matching continues.
+          returns ``False``, route matching continues.
 
         request_method
 
           A string representing an HTTP method name, e.g. ``GET``,
           ``POST``, ``HEAD``, ``DELETE``, ``PUT``.  If this argument
           is not specified, this route will match if the request has
-          *any* request method.  If this predicate returns false,
+          *any* request method.  If this predicate returns ``False``,
           route matching continues.
 
         path_info
 
           This value represents a regular expression pattern that will
           be tested against the ``PATH_INFO`` WSGI environment
-          variable.  If the regex matches, this predicate will be
-          true.  If this predicate returns false, route matching
-          continues.
+          variable.  If the regex matches, this predicate will return
+          ``True``.  If this predicate returns ``False``, route
+          matching continues.
 
         request_param
 
@@ -726,17 +736,17 @@ class Configurator(object):
           (``foo``) must both exist in the ``request.params`` dictionary, and
           the value must match the right hand side of the expression (``123``)
           for the route to "match" the current request.  If this predicate
-          returns false, route matching continues.
+          returns ``False``, route matching continues.
 
         header
 
-          This value represents an HTTP header name or a header
-          name/value pair.  If the value contains a ``:`` (colon), it
-          will be considered a name/value pair
-          (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  The
-          *value* of such a pair should be a regular expression.  If
-          the value does not contain a colon, the entire value will be
-          considered to be the header name
+          This argument represents an HTTP header name or a header
+          name/value pair.  If the argument contains a ``:`` (colon),
+          it will be considered a name/value pair
+          (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  If
+          the value contains a colon, the value portion should be a
+          regular expression.  If the value does not contain a colon,
+          the entire value will be considered to be the header name
           (e.g. ``If-Modified-Since``).  If the value evaluates to a
           header name only without a value, the header specified by
           the name must be present in the request for this predicate
@@ -746,7 +756,7 @@ class Configurator(object):
           value must match the header value.  Whether or not the value
           represents a header name or a header name/value pair, the
           case of the header name is not significant.  If this
-          predicate returns false, route matching continues.
+          predicate returns ``False``, route matching continues.
 
         accept
 
@@ -758,7 +768,7 @@ class Configurator(object):
           match-all wildcard mimetype match token in the form ``*/*``.
           If any of the forms matches the ``Accept`` header of the
           request, this predicate will be true.  If this predicate
-          returns false, route matching continues.
+          returns ``False``, route matching continues.
 
         View-Related Arguments
 
@@ -829,12 +839,12 @@ class Configurator(object):
 
         view_containment
 
-          This a reference to a Python object representing the class
-          that a graph traversal parent object of the :term:`context`
-          must be an instance of (or :term:`interface` that a parent
-          object must provide) in order for this view to be found and
-          called.  Your models must be "location-aware" to use this feature.
-          See :ref:`location_aware` for more information about
+          This value should be a reference to a Python class or
+          :term:`interface` that a parent object in the
+          :term:`lineage` must provide in order for the view related
+          to this route to be found and called.  Your models must be
+          'location-aware' to use this feature.  See
+          :ref:`location_aware` for more information about
           location-awareness.
 
           If the ``view`` argument is not provided, this argument has no
@@ -902,7 +912,7 @@ class Configurator(object):
 
     def scan(self, package=None, _info=u''):
         """ Scan a Python package and any of its subpackages for
-        objects marked with configuration decorators such as
+        objects marked with :term:`configuration decoration` such as
         ``@bfg_view``.  Any decorated object found will influence the
         current configuration state.
 

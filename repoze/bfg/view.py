@@ -50,14 +50,15 @@ deprecated('NotFound',
 _marker = object()
 
 def render_view_to_response(context, request, name='', secure=True):
-    """ Render the view named ``name`` against the specified
-    ``context`` and ``request`` to an object implementing
-    ``repoze.bfg.interfaces.IResponse`` or ``None`` if no such view
-    exists.  This function will return ``None`` if a corresponding
-    view cannot be found.  If ``secure`` is ``True``, and the view is
-    protected by a permission, the permission will be checked before
-    calling the view function.  If the permission check disallows view
-    execution (based on the current security policy), a
+    """ Render the view with the :term:`view name` ``name`` against
+    the specified ``context`` and ``request`` and return a
+    :term:`response` object or ``None`` if no such view exists.
+
+    This function will return ``None`` if a corresponding view cannot
+    be found.  If ``secure`` is ``True``, and the view is protected by
+    a permission, the permission will be checked before calling the
+    view function.  If the permission check disallows view execution
+    (based on the current security policy), a
     ``repoze.bfg.exceptions.Forbidden`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
@@ -83,18 +84,20 @@ def render_view_to_response(context, request, name='', secure=True):
 def render_view_to_iterable(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
     ``context`` and ``request``, and return an iterable representing
-    the view response's ``app_iter`` (see the interface named
-    ``repoze.bfg.interfaces.IResponse``).  This function will return
-    ``None`` if a corresponding view cannot be found.  Additionally,
-    this function will raise a ``ValueError`` if a view function is
-    found and called but the view does not return an object which
-    implements ``repoze.bfg.interfaces.IResponse``.  You can usually
+    the view response's ``app_iter`` (see :ref:`the_response`).
+
+    This function will return ``None`` if a corresponding view cannot
+    be found.  Additionally, this function will raise a ``ValueError``
+    if a view function is found and called but the view function's
+    result does not have an ``app_iter`` attribute.  You can usually
     get the string representation of the return value of this function
     by calling ``''.join(iterable)``, or just use ``render_view``
-    instead.  If ``secure`` is ``True``, and the view is protected by
-    a permission, the permission will be checked before calling the
-    view function.  If the permission check disallows view execution
-    (based on the current security policy), a
+    instead.
+
+    If ``secure`` is ``True``, and the view is protected by a
+    permission, the permission will be checked before the view
+    function is invoked.  If the permission check disallows view
+    execution (based on the current :term:`authentication policy`), a
     ``repoze.bfg.exceptions.Forbidden`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
@@ -106,16 +109,16 @@ def render_view_to_iterable(context, request, name='', secure=True):
 def render_view(context, request, name='', secure=True):
     """ Render the view named ``name`` against the specified
     ``context`` and ``request``, and unwind the the view response's
-    ``app_iter`` (see the interface named
-    ``repoze.bfg.interfaces.IResponse``) into a single string.  This
+    ``app_iter`` (see :ref:`the_response`) into a single string.  This
     function will return ``None`` if a corresponding view cannot be
     found.  Additionally, this function will raise a ``ValueError`` if
     a view function is found and called but the view does not return
     an object which implements ``repoze.bfg.interfaces.IResponse``.
+
     If ``secure`` is ``True``, and the view is protected by a
-    permission, the permission will be checked before calling the view
-    function.  If the permission check disallows view execution (based
-    on the current security policy), a
+    permission, the permission will be checked before the view is
+    invoked.  If the permission check disallows view execution (based
+    on the current :term:`authorization policy`), a
     ``repoze.bfg.exceptions.Forbidden`` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
     If ``secure`` is ``False``, no permission checking is done."""
@@ -125,11 +128,12 @@ def render_view(context, request, name='', secure=True):
     return ''.join(iterable)
 
 def is_response(ob):
-    """ Return True if ``ob`` implements the
-    ``repoze.bfg.interfaces.IResponse`` interface, False if not.  Note
-    that this isn't actually a true Zope interface check, it's a
-    duck-typing check, as response objects are not obligated to
-    actually implement a Zope interface."""
+    """ Return ``True`` if ``ob`` implements the interface implied by
+    :ref:`the_response`. ``False`` if not.
+
+    .. note:: this isn't a true interface check (in Zope terms), it's a
+        duck-typing check, as response objects are not obligated to
+        actually implement a Zope interface."""
     # response objects aren't obligated to implement a Zope interface,
     # so we do it the hard way
     if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
@@ -141,39 +145,40 @@ def is_response(ob):
     return False
 
 class static(object):
-    """ An instance of this class is a callable which can act as a BFG
-    view; this view will serve static files from a directory on disk
-    based on the ``root_dir`` you provide to its constructor.
+    """ An instance of this class is a callable which can act as a
+    :mod:`repoze.bfg` :term:`view callable`; this view will serve
+    static files from a directory on disk based on the ``root_dir``
+    you provide to its constructor.
 
     The directory may contain subdirectories (recursively); the static
     view implementation will descend into these directories as
     necessary based on the components of the URL in order to resolve a
     path into a response.
 
-    You may pass an absolute or relative filesystem path to the
-    directory containing static files directory to the constructor as
-    the ``root_dir`` argument.
+    You may pass an absolute or relative filesystem path or a
+    :term:`resource specification` representing the directory
+    containing static files as the ``root_dir`` argument to this
+    class' constructor.
 
-    If the path is relative, and the ``package`` argument is ``None``,
-    it will be considered relative to the directory in which the
-    Python file which calls ``static`` resides.  If the ``package``
-    name argument is provided, and a relative ``root_dir`` is
-    provided, the ``root_dir`` will be considered relative to the
-    Python package specified by ``package_name`` (a dotted path to a
-    Python package).
+    If the ``root_dir`` path is relative, and the ``package_name``
+    argument is ``None``, ``root_dir`` will be considered relative to
+    the directory in which the Python file which *calls* ``static``
+    resides.  If the ``package_name`` name argument is provided, and a
+    relative ``root_dir`` is provided, the ``root_dir`` will be
+    considered relative to the Python :term:`package` specified by
+    ``package_name`` (a dotted path to a Python package).
 
-    ``cache_max_age`` influences the Expires and Max-Age response
-    headers returned by the view (default is 3600 seconds or five
-    minutes).  ``level`` influences how relative directories are
-    resolved (the number of hops in the call stack), not used very
-    often.
+    ``cache_max_age`` influences the ``Expires`` and ``Max-Age``
+    response headers returned by the view (default is 3600 seconds or
+    five minutes).
 
-    .. note:: If the ``root_dir`` is relative to a package, the BFG
-       ``resource`` ZCML directive can be used to override resources
-       within the named ``root_dir`` package-relative directory.
-       However, if the ``root_dir`` is absolute, the ``resource``
-       directive will not be able to override the resources it
-       contains.
+    .. note:: If the ``root_dir`` is relative to a :term:`package`, or
+         is a :term:`resource specification` the BFG ``resource`` ZCML
+         directive or :term:`Configurator` method can be used to
+         override resources within the named ``root_dir``
+         package-relative directory.  However, if the ``root_dir`` is
+         absolute, the ``resource`` directive will not be able to
+         override the resources it contains.
     """
     def __init__(self, root_dir, cache_max_age=3600, package_name=None):
         # package_name is for bw compat; it is preferred to pass in a
@@ -200,31 +205,41 @@ class static(object):
         return request_copy.get_response(self.app)
 
 class bfg_view(object):
-    """ Function or class decorator which allows Python code to make
-    view registrations instead of using ZCML for the same purpose.
+    """ A function, class or method :term:`decorator` which allows a
+    developer to create view registrations nearer to a :term:`view
+    callable` definition than use of :term:`ZCML` or :term:`imperative
+    configuration` to do the same.
 
-    E.g. in the module ``views.py``::
+    For example, this code in a module ``views.py``::
 
-      from models import IMyModel
-      from repoze.bfg.interfaces import IRequest
+      from models import MyModel
 
-      @bfg_view(name='my_view', request_type=IRequest, for_=IMyModel,
-                permission='read', route_name='site1'))
+      @bfg_view(name='my_view', for_=MyModel, permission='read',
+                route_name='site1')
       def my_view(context, request):
-          return render_template_to_response('templates/my.pt')
+          return 'OK'
 
-    Equates to the ZCML::
+    Might replace the following call to the ``add_view`` method of a
+    :term:`Configurator`::
+
+       import views
+       import models
+       config.add_view(views.my_view, for_=models.MyModel, name='my_view',
+                       permission='read', 'route_name='site1')
+
+    Or might relpace the following ZCML ``view`` declaration::
 
       <view
-       for='.models.IMyModel'
+       for='.models.MyModel'
        view='.views.my_view'
        name='my_view'
        permission='read'
        route_name='site1'
        />
 
-    The following arguments are supported: ``for_``, ``permission``,
-    ``name``, ``request_type``, ``route_name``, ``request_method``,
+    The following arguments are supported as arguments to
+    ``bfg_view``: ``for_``, ``permission``, ``name``,
+    ``request_type``, ``route_name``, ``request_method``,
     ``request_param``, ``containment``, ``xhr``, ``accept``,
     ``header`` and ``path_info``.
 
@@ -251,10 +266,10 @@ class bfg_view(object):
     ``repoze.bfg.interfaces.IRequest`` is used, implying the standard
     request interface type.
 
-    If ``route_name`` is not supplied, the view declaration is
+    If ``route_name`` is not supplied, the view configuration is
     considered to be made against a URL that doesn't match any defined
     :term:`route`.  The use of a ``route_name`` is an advanced
-    feature, useful only if you're using :term:`url dispatch`.
+    feature, useful only if you're also using :term:`url dispatch`.
 
     If ``request_method`` is not supplied, this view will match a
     request with any HTTP ``REQUEST_METHOD``
@@ -276,10 +291,11 @@ class bfg_view(object):
     current request.
 
     If ``containment`` is not supplied, this view will be called when
-    the context of the request has any location lineage.  If
-    ``containment`` *is* supplied, it must be a class or :term:`interface`,
-    denoting that the view 'matches' the current request only if any graph
-    lineage node possesses this class or interface.
+    the context of the request has any (or no) :term:`lineage`.  If
+    ``containment`` *is* supplied, it must be a class or
+    :term:`interface`, denoting that the view 'matches' the current
+    request only if any graph :term:`lineage` node possesses this
+    class or interface.
 
     If ``xhr`` is specified, it must be a boolean value.  If the value
     is ``True``, the view will only be invoked if the request's
@@ -314,12 +330,10 @@ class bfg_view(object):
             ...
 
     Such a registration implies that the view name will be
-    ``my_view``, registered for models with the
-    ``zope.interface.Interface`` interface, using no permission,
-    registered against requests which implement the default IRequest
-    interface when no urldispatch route matches, with any
-    REQUEST_METHOD, any set of request.params values, in any lineage
-    containment.
+    ``my_view``, registered for any :term:`context` object, using no
+    permission, registered against all non-URL-dispatch-based
+    requests, with any ``REQUEST_METHOD``, any set of request.params
+    values, without respect to any object in the :term:`lineage`.
 
     The ``bfg_view`` decorator can also be used as a class decorator
     in Python 2.6 and better (Python 2.5 and below do not support
@@ -336,8 +350,8 @@ class bfg_view(object):
             def __call__(self):
                 return Response('hello from %s!' % self.context)
 
-    In Python 2.5 and below, the bfg_view decorator can still be used
-    against a class, although not in decorator form::
+    In Python 2.5 and below, the ``bfg_view`` decorator can still be
+    used against a class, although not in decorator form::
 
         from webob import Response
         from repoze.bfg.view import bfg_view
@@ -399,10 +413,16 @@ class bfg_view(object):
                  method decorator is new in :mod:`repoze.bfg` version
                  1.1.
 
-    To make use of any bfg_view declaration, you *must* insert the
-    following boilerplate into your application registry's ZCML::
+    To make use of any bfg_view declaration, you must perform a
+    :term:`scan`.  To do so, either insert the following boilerplate
+    into your application registry's ZCML::
     
       <scan package="."/>
+
+    Or, if you don't use ZCML, use the ``scan`` method of a
+    :term:`Configurator`::
+
+      config.scan()
     """
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
@@ -486,11 +506,17 @@ def append_slash_notfound_view(context, request):
     data information (turning it into a GET), so you shouldn't rely on
     this to redirect POST requests.
 
-    Add the following to your application's ``configure.zcml`` to use
-    this view as the Not Found view::
+    If you use ZCML, add the following to your application's
+    ``configure.zcml`` to use this view as the Not Found view::
 
       <notfound
          view="repoze.bfg.view.append_slash_notfound_view"/>
+
+    Or use the ``notfound`` method of a :term:`Configurator` if you
+    don't use ZCML::
+
+      from repoze.bfg.view import append_slash_notfound_view
+      config.notfound(append_slash_notfound_view)
 
     See also :ref:`changing_the_notfound_view`.
 
