@@ -86,14 +86,14 @@ Glossary
     :ref:`views_chapter` for more information about :mod:`repoze.bfg`
     view callables.
   View Configuration
-    View configuration is the act of associating a view callable with
-    configuration information.  This configuration information helps
-    map the view callable to URLs and can influence the response of a
-    view callable.  :mod:`repoze.bfg` views can be configured via
-    :term:`imperative configuration`, :term:`ZCML` or by a special
-    ``@bfg_view`` decorator coupled with a :term:`scan`.  See
-    :ref:`views_chapter` for more information about view
-    configuration.
+    View configuration is the act of associating a :term:`view
+    callable` with configuration information.  This configuration
+    information helps map a given :term:`request` to a particular view
+    callable and it can influence the response of a view callable.
+    :mod:`repoze.bfg` views can be configured via :term:`imperative
+    configuration`, :term:`ZCML` or by a special ``@bfg_view``
+    decorator coupled with a :term:`scan`.  See :ref:`views_chapter`
+    for more information about view configuration.
   View name
     The "URL name" of a view, e.g ``index.html``.  If a view is
     configured without a name, its name is considered to be the empty
