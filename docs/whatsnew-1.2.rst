@@ -274,3 +274,10 @@ Documentation Enhancements
 - Add a section entitled "Test Set Up and Tear Down" to the
   unittesting chapter.
 
+- Remove explanation of changing the request type in a new request
+  event subscriber in the "Events" narrative documentation chapter, as
+  other predicates are now usually an easier way to get this done.
+
+- Added "Thread Locals" narrative chapter to documentation, and added
+  a API chapter documenting the ``repoze.bfg.threadlocals`` module.
+

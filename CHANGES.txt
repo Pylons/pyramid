@@ -19,6 +19,9 @@ Documentation
   event subscriber, as other predicates are now usually an easier way
   to get this done.
 
+- Added "Thread Locals" narrative chapter to documentation, and added
+  a API chapter documenting the ``repoze.bfg.threadlocals`` module.
+
 1.2a4 (2009-12-07)
 ==================
 

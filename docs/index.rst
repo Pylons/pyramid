@@ -56,6 +56,7 @@ Narrative documentation in chapter form explaining how to use
    narr/extending
    narr/resources
    narr/router
+   narr/threadlocals
    glossary
 
 API documentation

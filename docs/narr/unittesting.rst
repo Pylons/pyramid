@@ -9,6 +9,8 @@ provides a number of facilities that make unit tests easier to write.
 The facilities become particularly useful when your code calls into
 :mod:`repoze.bfg` -related framework functions.
 
+.. _test_setup_and_teardown:
+
 Test Set Up and Tear Down
 --------------------------
 
