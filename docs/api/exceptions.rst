@@ -9,3 +9,5 @@
 
   .. autoclass:: NotFound
 
+  .. autoclass:: ConfigurationError
+
