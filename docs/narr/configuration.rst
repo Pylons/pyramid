@@ -204,77 +204,13 @@ complex configurations, other :term:`predicate` values) are used to
 find "the right" :term:`view callable`, which will be invoked after
 traversal.
 
+.. note:: A useful analogy of how :mod:`repoze.bfg` :term:`traversal`
+  works is available within the section entitled
+  :ref:`traversal_behavior`.  You should probably go read it now.
+
 The object graph of our hello world application is very simple:
 there's exactly one object in our graph; the default :term:`root`
 object.
-
-We need to use an analogy to clarify how traversal works on an
-arbitrary object graph.  Let's imagine an inexperienced UNIX computer
-user, wishing only to use the command line to find a file and to
-invoke the ``cat`` command against that file.  Because he is
-inexperienced, the only commands he knows how to use are ``cd``, which
-changes the current directory and ``cat``, which prints the contents
-of a file.  And because he is inexperienced, he doesn't understand
-that ``cat`` can take an absolute path specification as an argument,
-so he doesn't know that you can issue a single command command ``cat
-/an/absolute/path`` to get the desired result.  Instead, this user
-believes he must issue the ``cd`` command, starting from the root, for
-each intermediate path segment, *even the path segment that represents
-the file itself*.  Once he gets an error (because you cannot
-succesfully ``cd`` into a file), he knows he has reached the file he
-wants, and he will be able to execute ``cat`` against the resulting
-path segment.
-
-This inexperienced user's attempt to execute ``cat`` against the file
-named ``/fiz/buz/myfile`` might be to issue the following set of UNIX
-commands:
-
-.. code-block::  bash
-   :linenos:
-
-   cd /
-   cd fiz
-   cd buz
-   cd myfile
-
-The user now know he has found a *file*, because the ``cd`` command
-issues an error when he executed ``cd myfile``.  Now he knows that he
-can run the ``cat`` command:
-
-.. code-block::  bash
-   :linenos:
-
-   cat myfile
-
-The contents of ``myfile`` are now printed on the user's behalf.
-
-:mod:`repoze.bfg` is very much like this inexperienced UNIX user as it
-uses :term:`traversal` against an object graph.  In this analogy, we
-can map the ``cat`` program to the :mod:`repoze.bfg` concept of a
-:term:`view callable`: it is a program that can be run against some
-:term:`context`.  The file being operated on in this analogy is the
-:term:`context` object; the context is the "last object found" in a
-traversal.  The directory structure is the object graph being
-traversed.  The act of progressively changing directories to find the
-file as well as the handling of a ``cd`` error as a stop condition is
-analogous to :term:`traversal`.
-
-Here's an image that depicts the :mod:`repoze.bfg` traversal process
-graphically as a flowchart:
-
-.. image:: modelgraphtraverser.png
-
-The object graph is traversed, beginning at a root object, represented
-by the root URL (``/``); if there are further path segments in the
-path info of the request being processed, the root object's
-``__getitem__`` is called with the next path segment, and it is
-expected to return another graph object.  The resulting object's
-``__getitem__`` is called with the very next path segment, and it is
-expected to return another graph object.  This happens *ad infinitum*
-until all path segments are exhausted.  If at any point during
-traversal any node in the graph doesn't *have* a ``__getitem__``
-method, or if the ``__getitem__`` of a node raises a ``KeyError``,
-traversal ends immediately, and the node becomes the :term:`context`.
 
 The results of a :term:`traversal` include a :term:`context` and a
 :term:`view name`.  The :term:`view name` is the *first* URL path
@@ -295,12 +231,7 @@ exhausting all the path segments implied by the path info of the URL:
 no segments are "left over".  In this case, because the :term:`view
 name` is non-empty, a *non-default* view callable will be invoked.
 
-Apologies that this digression was required; on with the chapter.
-
-.. note:: 
-
-   For more in-depth information about traversal-related concepts, see
-   :ref:`traversal_chapter`.
+Apologies for the digression; on with the tutorial.
 
 Relating Traversal to the Hello World Application
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

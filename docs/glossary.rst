@@ -159,7 +159,7 @@ Glossary
     A file with replaceable parts that is capable of representing some
     text, XML, or HTML when rendered.
   Location
-    The path to an object in a model graph.  See :ref:`location_aware`
+    The path to an object in an object graph.  See :ref:`location_aware`
     for more information about how to make a model object *location-aware*.
   Principal
     A user id or group id.

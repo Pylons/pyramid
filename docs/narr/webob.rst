@@ -310,3 +310,10 @@ key/value pairs will show up.  Similarly ``request.GET.keys()``
 returns ``['pref', 'pref']``.  Multidict is a view on a list of
 tuples; all the keys are ordered, and all the values are ordered.
 
+Special :mod:`repoze.bfg` Attributes Added to the Request
+---------------------------------------------------------
+
+:mod:`repoze.bfg` adds special attributes to a request as the result
+of :term:`traversal`.  See :ref:`traversal_related_side_effects` for a
+list of attributes added to the request by :mod:`repoze.bfg` itself.
+

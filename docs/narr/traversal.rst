@@ -4,27 +4,27 @@ Traversal
 =========
 
 When :term:`traversal` is used within a :mod:`repoze.bfg` application,
-the :mod:`repoze.bfg` *Router* parses the URL associated with the
-request.  It splits the URL into individual path segments.  Based on
-these path segments, :mod:`repoze.bfg` traverses a *model graph* in
-order to find a :term:`context`.  It then attempts to find a
+the :mod:`repoze.bfg` :term:`router` parses the URL associated with
+the request.  It splits the URL into individual path segments.  Based
+on these path segments, :mod:`repoze.bfg` traverses an *object graph*
+in order to find a :term:`context`.  It then attempts to find a
 :term:`view` based on the *type* of the context (specified by its
-Python class type or any :term:`interface` attached to it).  If
+Python class or any :term:`interface` attached to it).  If
 :mod:`repoze.bfg` finds a :term:`view` for the context, it calls it
 and returns a response to the user.
 
-The Model Graph
----------------
+The Object Graph
+----------------
 
 When your application uses :term:`traversal` to resolve URLs to code,
-your application must supply a *model graph* to :mod:`repoze.bfg`.
+your application must supply an *object graph* to :mod:`repoze.bfg`.
 
 Users interact with your :mod:`repoze.bfg` -based application via a
-*router*, which is just a fancy :term:`WSGI` application.  At system
-startup time, the router is configured with a callback known as a
-:term:`root factory`, supplied by the application developer.  The root
-factory is passed a :term:`request` object and it is expected to
-return an object which represents the root of the model graph.  All
+:term:`router`, which is just a fancy :term:`WSGI` application.  At
+system startup time, the router is configured with a callback known as
+a :term:`root factory`, supplied by the application developer.  The
+root factory is passed a :term:`request` object and it is expected to
+return an object which represents the root of the object graph.  All
 :term:`traversal` will begin at this root object.  The root object is
 usually a *mapping* object (such as a Python dictionary).
 
@@ -50,21 +50,90 @@ usually a *mapping* object (such as a Python dictionary).
     environment, so code expecting the argument to be a dictionary
     will continue to work.
 
-Items contained within the object graph are analogous to the concept
-of :term:`model` objects used by many other frameworks (and
+Items contained within the object graph are sometimes analogous to the
+concept of :term:`model` objects used by many other frameworks (and
 :mod:`repoze.bfg` refers to them as models, as well).  They are
 typically instances of Python classes.
 
-The model graph consists of *container* nodes and *leaf* nodes.  There
-is only one difference between a *container* node and a *leaf* node:
-*container* nodes possess a ``__getitem__`` method while *leaf* nodes
-do not.  The ``__getitem__`` method was chosen as the signifying
+.. _traversal_behavior:
+
+:mod:`repoze.bfg` Traversal Behavior
+-------------------------------------
+
+We need to use an analogy to clarify how :mod:`repoze.bfg` traversal
+works against an arbitrary object graph.
+
+Let's imagine an inexperienced UNIX computer user, wishing only to use
+the command line to find a file and to invoke the ``cat`` command
+against that file.  Because he is inexperienced, the only commands he
+knows how to use are ``cd``, which changes the current directory and
+``cat``, which prints the contents of a file.  And because he is
+inexperienced, he doesn't understand that ``cat`` can take an absolute
+path specification as an argument, so he doesn't know that you can
+issue a single command command ``cat /an/absolute/path`` to get the
+desired result.  Instead, this user believes he must issue the ``cd``
+command, starting from the root, for each intermediate path segment,
+*even the path segment that represents the file itself*.  Once he gets
+an error (because you cannot succesfully ``cd`` into a file), he knows
+he has reached the file he wants, and he will be able to execute
+``cat`` against the resulting path segment.
+
+This inexperienced user's attempt to execute ``cat`` against the file
+named ``/fiz/buz/myfile`` might be to issue the following set of UNIX
+commands:
+
+.. code-block::  bash
+   :linenos:
+
+   cd /
+   cd fiz
+   cd buz
+   cd myfile
+
+The user now know he has found a *file*, because the ``cd`` command
+issues an error when he executed ``cd myfile``.  Now he knows that he
+can run the ``cat`` command:
+
+.. code-block::  bash
+   :linenos:
+
+   cat myfile
+
+The contents of ``myfile`` are now printed on the user's behalf.
+
+:mod:`repoze.bfg` is very much like this inexperienced UNIX user as it
+uses :term:`traversal` against an object graph.  In this analogy, we
+can map the ``cat`` program to the :mod:`repoze.bfg` concept of a
+:term:`view callable`: it is a program that can be run against some
+:term:`context`.  The file being operated on in this analogy is the
+:term:`context` object; the context is the "last node found" in a
+traversal.  The directory structure is the object graph being
+traversed.  The act of progressively changing directories to find the
+file as well as the handling of a ``cd`` error as a stop condition is
+analogous to :term:`traversal`.
+
+The object graph is traversed, beginning at a root object, represented
+by the root URL (``/``); if there are further path segments in the
+path info of the request being processed, the root object's
+``__getitem__`` is called with the next path segment, and it is
+expected to return another graph object.  The resulting object's
+``__getitem__`` is called with the very next path segment, and it is
+expected to return another graph object.  This happens *ad infinitum*
+until all path segments are exhausted.  If at any point during
+traversal any node in the graph doesn't *have* a ``__getitem__``
+method, or if the ``__getitem__`` of a node raises a ``KeyError``,
+traversal ends immediately, and the node becomes the :term:`context`.
+
+The object graph consists of *container* nodes and *leaf* nodes.
+There is only one difference between a *container* node and a *leaf*
+node: *container* nodes possess a ``__getitem__`` method while *leaf*
+nodes do not.  The ``__getitem__`` method was chosen as the signifying
 difference between the two types of nodes because the presence of this
 method is how Python itself typically determines whether an object is
 "containerish" or not.
 
-A container node is presumed to be willing to return a child node or
-raise a ``KeyError`` based on a name passed to its ``__getitem__``.
+Each container node is presumed to be willing to return a child node
+or raise a ``KeyError`` based on a name passed to its ``__getitem__``.
 
 No leaf-level instance is required to have a ``__getitem__``.  If
 leaf-level instances happen to have a ``__getitem__`` (through some
@@ -74,7 +143,7 @@ disuse them and think up another strategy.
 
 Usually, the traversal root is a *container* node, and as such it
 contains other nodes.  However, it doesn't *need* to be a container.
-Your model graph can be as shallow or as deep as you require.
+Your object graph can be as shallow or as deep as you require.
 
 Traversal "stops" when :mod:`repoze.bfg` either reaches a leaf level
 model instance in your object graph or when the path segments implied
@@ -97,8 +166,8 @@ code to execute:
     is represented by a WSGI environment and a ``start_response``
     callable.
 
-#.  The router creates a :term:`WebOb` request object based on the
-    WSGI environment.
+#.  The router creates a :term:`request` object based on the WSGI
+    environment.
 
 #.  The :term:`root factory` is called with the :term:`request`.  It
     returns a :term:`root` object.
@@ -133,10 +202,10 @@ code to execute:
 #.  When traversal ends for any of the reasons in the previous step,
     the the last object found during traversal is deemed to be the
     :term:`context`.  If the path has been exhausted when traversal
-    ends, the "view name" is deemed to be the empty string (``''``).
-    However, if the path was *not* exhausted before traversal
-    terminated, the first remaining path element is treated as the
-    view name.
+    ends, the :term:`view name` is deemed to be the empty string
+    (``''``).  However, if the path was *not* exhausted before
+    traversal terminated, the first remaining path element is treated
+    as the view name.
 
     Any subsequent path elements after the view name are deemed the
     :term:`subpath`.  The subpath is always a sequence of path
@@ -151,39 +220,26 @@ code to execute:
     the context is "object ``a``", the view name is ``b`` and the
     subpath is ``('c',)``.
 
-#.  If a :term:`authentication policy` is configured, the router
+#.  If a :term:`authorization policy` is configured, the router
     performs a permission lookup.  If a permission declaration is
     found for the view name and context implied by the current
-    request, an :term:`authorization policy` is consulted to see if
-    the "current user" (all determined by the the authentication
-    policy) can perform the action.  If he can, processing continues.
-    If he cannot, the ``forbidden`` view is called (see
-    :ref:`changing_the_forbidden_view`).
+    request, the :term:`authorization policy` is consulted to see if
+    the "current user" (as determined by the the active
+    :term:`authentication policy`) can perform the action.  If he can,
+    processing continues.  If he cannot, the ``forbidden`` view is
+    called (see :ref:`changing_the_forbidden_view`).
 
 #.  Armed with the context, the view name, and the subpath, the router
     performs a view lookup.  It attempts to look up a view from the
-    :mod:`repoze.bfg` :term:`application registry` using the view name
-    and the context.  If a view function is found, it is called with
-    the context and the request.  It returns a response, which is fed
-    back upstream.  If a view is not found, the ``notfound`` view is
-    called (see :ref:`changing_the_notfound_view`).
+    :mod:`repoze.bfg` :term:`application registry` using the view
+    name, the context, and the request.  If a view function is found,
+    it is called with the context and the request.  It returns a
+    response, which is fed back upstream.  If a view is not found, the
+    ``notfound`` view is called (see
+    :ref:`changing_the_notfound_view`).
 
 In either case, the result is returned upstream via the :term:`WSGI`
 protocol.
-
-.. _debug_notfound_section:
-
-``NotFound`` Errors
--------------------
-
-It's useful to be able to debug ``NotFound`` errors when they occur
-unexpectedly due to an application registry misconfiguration.  To
-debug these errors, use the ``BFG_DEBUG_NOTFOUND`` environment
-variable or the ``debug_notfound`` configuration file setting.
-Details of why a view was not found will be printed to ``stderr``, and
-the browser representation of the error will include the same
-information.  See :ref:`environment_chapter` for more information
-about how and where to set these values.
 
 A Traversal Example
 -------------------
@@ -223,20 +279,19 @@ error condition.  It signifies that:
 
 Because it's the "context", :mod:`repoze.bfg` examines "bar" to find
 out what "type" it is. Let's say it finds that the context is an
-``IBar`` type (because "bar" happens to have an attribute attached to
-it that indicates it's an ``IBar``).
+``Bar`` type (because "bar" happens to be an instance of the class
+``Bar``).
 
 Using the "view name" ("baz") and the type, it asks the
-:term:`application registry` (configured separately, via
-``configure.zcml``) this question:
+:term:`application registry` this question:
 
 - Please find me a :term:`view` with the name "baz" that can be used
-  for the type ``IBar``.
+  for the class ``Bar``.
 
 Let's say it finds no matching view type.  It then returns the result
-of the ``notfound`` view.  The request ends.  Everyone is sad.
+of the ``notfound`` view.  The request ends.
 
-But!  For this graph::
+However, for this graph::
 
   /--
      |
@@ -273,15 +328,15 @@ signify an error condition.  It signifies that:
 - the :term:`subpath` is an empty sequence ( ``()`` ).
 
 Because it's the "context", :mod:`repoze.bfg` examines "biz" to find
-out what "type" it is. Let's say it finds that the context an ``IBiz``
-type (because "biz" happens to have an attribute attached to it that
-happens indicates it's an ``IBiz``).
+out what "type" it is. Let's say it finds that the context is a
+``Biz`` type (because "biz" is an instance of the Python class
+``Biz``).
 
 Using the "view name" ("buz.txt") and the type, it asks the
 :term:`application registry` this question:
 
 - Please find me a :term:`view` with the name "buz.txt" that can be
-  used for type ``IBiz``.
+  used for class ``Biz``.
 
 Let's say that question is answered "here you go, here's a bit of code
 that is willing to deal with that case", and returns a :term:`view`.
@@ -298,10 +353,13 @@ There are two special cases:
   that equals the empty string.
 
 - If any path segment element begins with the special characters
-  ``@@`` (think of them as goggles), that segment is considered the
-  "view name" immediately and traversal stops there.  This allows you
-  to address views that may have the same names as model instance
-  names in the graph unambiguously.
+  ``@@`` (think of them as goggles), the value of that segment minus
+  the goggle characters is considered the :term:`view name`
+  immediately and traversal stops there.  This allows you to address
+  views that may have the same names as model instance names in the
+  graph unambiguously.
+
+.. _traversal_related_side_effects:
 
 Traversal-Related Side Effects
 ------------------------------
@@ -342,7 +400,21 @@ will be a sequence representing the ordered set of names that were
 used to traverse to the virtual root object.  See
 :ref:`vhosting_chapter` for more information about virtual roots.
 
-Unicode and Traversal
+.. _debug_notfound_section:
+
+``NotFound`` Errors
+-------------------
+
+It's useful to be able to debug ``NotFound`` errors when they occur
+unexpectedly due to an application registry misconfiguration.  To
+debug these errors, use the ``BFG_DEBUG_NOTFOUND`` environment
+variable or the ``debug_notfound`` configuration file setting.
+Details of why a view was not found will be printed to ``stderr``, and
+the browser representation of the error will include the same
+information.  See :ref:`environment_chapter` for more information
+about how and where to set these values.
+
+Traversal and Unicode
 ---------------------
 
 The traversal machinery by default attempts to first URL-unquote and
