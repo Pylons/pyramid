@@ -26,7 +26,8 @@ functions exist for this purpose:
 ``repoze.bfg.threadlocal.get_current_registry``.  The former returns
 the "current" request; the latter returns the "current" registry.
 Both ``get_current_*`` functions retrieve an object from a
-thread-local stack.
+thread-local stack.  These API functions are documented in
+:ref:`threadlocal_module`.
 
 During normal operations, the thread local stack is managed by a
 :term:`Router` object.  Therefore, when the system is operating
