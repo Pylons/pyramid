@@ -1,5 +1,5 @@
-Next release
-============
+1.2a5 (2009-12-10)
+==================
 
 Features
 --------
@@ -48,7 +48,6 @@ Dependencies
   ``setup.py`` ``tests_require`` argument (Twill will only be
   downloaded when :mod:`repoze.bfg` ``setup.py test`` or ``setup.py
   nosetests`` is invoked).
-
 
 1.2a4 (2009-12-07)
 ==================
