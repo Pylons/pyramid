@@ -42,7 +42,8 @@ class TestRouter(unittest.TestCase):
 
     def _registerTraverserFactory(self, context, view_name='', subpath=None,
                                   traversed=None, virtual_root=None,
-                                  virtual_root_path=None, **kw):
+                                  virtual_root_path=None, raise_error=None,
+                                  **kw):
         from repoze.bfg.interfaces import ITraverser
 
         if virtual_root is None:
@@ -59,6 +60,8 @@ class TestRouter(unittest.TestCase):
                 self.root = root
 
             def __call__(self, request):
+                if raise_error:
+                    raise raise_error
                 values = {'root':self.root,
                           'context':context,
                           'view_name':view_name,
@@ -503,6 +506,44 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.matchdict, routing_args)
         self.failUnless(req_iface.providedBy(request))
         self.failUnless(IFoo.providedBy(request))
+
+    def test_root_factory_raises_notfound(self):
+        from repoze.bfg.interfaces import IRootFactory
+        from repoze.bfg.exceptions import NotFound
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        def rootfactory(request):
+            raise NotFound('from root factory')
+        self.registry.registerUtility(rootfactory, IRootFactory)
+        class IContext(Interface):
+            pass
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        app_iter = router(environ, start_response)
+        self.assertEqual(start_response.status, '404 Not Found')
+        self.failUnless('from root factory' in app_iter[0])
+
+    def test_root_factory_raises_forbidden(self):
+        from repoze.bfg.interfaces import IRootFactory
+        from repoze.bfg.exceptions import Forbidden
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        def rootfactory(request):
+            raise Forbidden('from root factory')
+        self.registry.registerUtility(rootfactory, IRootFactory)
+        class IContext(Interface):
+            pass
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        app_iter = router(environ, start_response)
+        self.assertEqual(start_response.status, '401 Unauthorized')
+        self.failUnless('from root factory' in app_iter[0])
 
 class DummyContext:
     pass

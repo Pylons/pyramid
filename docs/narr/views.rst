@@ -1154,6 +1154,192 @@ Views with use a Chameleon renderer can vary response attributes by
 attaching properties to the request.  See
 :ref:`response_request_attrs`.
 
+.. _response_request_attrs:
+
+Varying Attributes of Rendered Responses
+----------------------------------------
+
+Before a response that is constructed as the result of the use of a
+:term:`renderer` is returned to BFG, several attributes of the request
+are examined which have the potential to influence response behavior.
+
+View callables that don't directly return a response should set these
+values on the ``request`` object via ``setattr`` within the view
+callable to influence automatically constructed response attributes.
+
+``response_content_type``
+
+  Defines the content-type of the resulting response,
+  e.g. ``text/xml``.
+
+``response_headerlist``
+
+  A sequence of tuples describing cookie values that should be set in
+  the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
+  'foo')]``.
+
+``response_status``
+
+  A WSGI-style status code (e.g. ``200 OK``) describing the status of
+  the response.
+
+``response_charset``
+
+  The character set (e.g. ``UTF-8``) of the response.
+
+``response_cache_for``
+
+  A value in seconds which will influence ``Cache-Control`` and
+  ``Expires`` headers in the returned response.  The same can also be
+  achieved by returning various values in the ``response_headerlist``,
+  this is purely a convenience.
+
+.. _adding_and_overriding_renderers:
+
+Adding and Overriding Renderers
+-------------------------------
+
+Additional configuration declarations can be made which override an
+existing :term:`renderer` or which add a new renderer.  Adding or
+overriding a renderer is accomplished via :term:`ZCML` or via
+imperative configuration. 
+
+For example, to add a renderer which renders views which have a
+``renderer`` attribute that is a path that ends in ``.jinja2``:
+
+.. topic:: Via ZCML
+
+   .. code-block:: xml
+      :linenos:
+
+      <renderer
+        name=".jinja2"
+        factory="my.package.MyJinja2Renderer"/>
+
+   The ``factory`` attribute is a dotted Python name that must point
+   to an implementation of a :term:`renderer`.
+
+   The ``name`` attribute is the renderer name.
+
+.. topic:: Via Imperative Configuration
+
+   .. code-block:: python
+      :linenos:
+
+      from my.package import MyJinja2Renderer
+      config.add_renderer('.jinja2', MyJinja2Renderer)
+
+   The first argument is the renderer name.
+
+   The second argument is a reference to an to an implementation of a
+   :term:`renderer`.
+
+A renderer implementation is usually a class which has the following
+interface:
+
+.. code-block:: python
+   :linenos:
+
+   class RendererFactory:
+       def __init__(self, name):
+           """ Constructor: ``name`` may be a path """
+
+       def __call__(self, value, system): """ Call a the renderer
+           implementation with the value and the system value passed
+           in as arguments and return the result (a string or unicode
+           object).  The value is the return value of a view.  The
+           system value is a dictionary containing available system
+           values (e.g. ``view``, ``context``, and ``request``). """
+
+There are essentially two different kinds of ``renderer``
+registrations: registrations that use a dot (``.``) in their ``name``
+argument and ones which do not.
+
+Renderer registrations that have a ``name`` attribute which starts
+with a dot are meant to be *wildcard* registrations.  When a ``view``
+configuration is encountered which has a ``name`` attribute that
+contains a dot, at startup time, the path is split on its final dot,
+and the second element of the split (the filename extension,
+typically) is used to look up a renderer for the configured view.  The
+renderer's factory is still passed the entire ``name`` attribute value
+(not just the extension).
+
+Renderer registrations that have ``name`` attribute which *does not*
+start with a dot are meant to be absolute registrations.  When a
+``view`` configuration is encountered which has a ``name`` argument
+that does not contain a dot, the full value of the ``name`` attribute
+is used to look up the renderer for the configured view.
+
+Here's an example of a renderer registration in ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+     name="amf"
+     factory="my.package.MyAMFRenderer"/>
+
+Adding the above ZCML to your application will allow you to use the
+``my.package.MyAMFRenderer`` renderer implementation in ``view``
+configurations by referring to it as ``amf`` in the ``renderer``
+attribute:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(renderer='amf')
+   def myview(request):
+       return {'Hello':'world'}
+
+By default, when a template extension is unrecognized, an error is
+thrown at rendering time.  You can associate more than one filename
+extension with the same renderer implementation as necessary if you
+need to use a different file extension for the same kinds of
+templates.  For example, to associate the ``.zpt`` extension with the
+Chameleon page template renderer factory, use:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".zpt"
+      factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
+
+To override the default mapping in which files with a ``.pt``
+extension are rendered via a Chameleon ZPT page template renderer, use
+a variation on the following in your application's ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".pt"
+      factory="my.package.pt_renderer"/>
+
+To override the default mapping in which files with a ``.txt``
+extension are rendered via a Chameleon text template renderer, use a
+variation on the following in your application's ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".txt"
+      factory="my.package.text_renderer"/>
+
+To associate a *default* renderer with *all* view configurations (even
+ones which do not possess a ``renderer`` attribute), use a variation
+on the following (ie. omit the ``name`` attribute to the renderer
+tag):
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      factory="repoze.bfg.renderers.json_renderer_factory"/>
+
 .. _view_security_section:
 
 View Security
@@ -1426,6 +1612,31 @@ In this case, ``.models.Root`` refers to the class of which your
    ``/static/foo.js``.  See :ref:`traversal_chapter` for information
    about "goggles" (``@@``).
 
+Special Exceptions
+------------------
+
+Usually when a Python exception is raised within view code,
+:mod:`repoze.bfg` allows the exception to propagate all the way out to
+the :term:`WSGI` server which invoked the application.
+
+However, for convenience, two special exceptions exist which are
+always handled by :mod:`repoze.bfg` itself.  These are
+``repoze.bfg.exceptions.NotFound`` and
+``repoze.bfg.exceptions.Forbidden``.  Both is an exception classe
+which accept a single positional constructor argument: a message.
+
+If ``repoze.bfg.exceptions.NotFound`` is raised within view code, the
+result of the :term:`Not Found View` will be returned to the user
+agent which performed the request.
+
+If ``repoze.bfg.exceptions.Forbidden`` is raised within view code, the
+result of the :term:`Forbidden View` will be returned to the user
+agent which performed the request.
+
+In all cases, the message provided to the exception constructor is
+made available to the view which :mod:`repoze.bfg` invokes as
+``request.environ['repoze.bfg.message']``.
+
 Using Views to Handle Form Submissions (Unicode and Character Set Issues)
 -------------------------------------------------------------------------
 
@@ -1553,188 +1764,3 @@ rendered in a request that has a ``;charset=utf-8`` stanza on its
    to Unicode objects implicitly in :mod:`repoze.bfg`'s default
    configuration.  The keys are still strings.
 
-.. _response_request_attrs:
-
-Varying Attributes of Rendered Responses
-----------------------------------------
-
-Before a response that is constructed as the result of the use of a
-:term:`renderer` is returned to BFG, several attributes of the request
-are examined which have the potential to influence response behavior.
-
-View callables that don't directly return a response should set these
-values on the ``request`` object via ``setattr`` within the view
-callable to influence automatically constructed response attributes.
-
-``response_content_type``
-
-  Defines the content-type of the resulting response,
-  e.g. ``text/xml``.
-
-``response_headerlist``
-
-  A sequence of tuples describing cookie values that should be set in
-  the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
-  'foo')]``.
-
-``response_status``
-
-  A WSGI-style status code (e.g. ``200 OK``) describing the status of
-  the response.
-
-``response_charset``
-
-  The character set (e.g. ``UTF-8``) of the response.
-
-``response_cache_for``
-
-  A value in seconds which will influence ``Cache-Control`` and
-  ``Expires`` headers in the returned response.  The same can also be
-  achieved by returning various values in the ``response_headerlist``,
-  this is purely a convenience.
-
-.. _adding_and_overriding_renderers:
-
-Adding and Overriding Renderers
--------------------------------
-
-Additional configuration declarations can be made which override an
-existing :term:`renderer` or which add a new renderer.  Adding or
-overriding a renderer is accomplished via :term:`ZCML` or via
-imperative configuration. 
-
-For example, to add a renderer which renders views which have a
-``renderer`` attribute that is a path that ends in ``.jinja2``:
-
-.. topic:: Via ZCML
-
-   .. code-block:: xml
-      :linenos:
-
-      <renderer
-        name=".jinja2"
-        factory="my.package.MyJinja2Renderer"/>
-
-   The ``factory`` attribute is a dotted Python name that must point
-   to an implementation of a :term:`renderer`.
-
-   The ``name`` attribute is the renderer name.
-
-.. topic:: Via Imperative Configuration
-
-   .. code-block:: python
-      :linenos:
-
-      from my.package import MyJinja2Renderer
-      config.add_renderer('.jinja2', MyJinja2Renderer)
-
-   The first argument is the renderer name.
-
-   The second argument is a reference to an to an implementation of a
-   :term:`renderer`.
-
-A renderer implementation is usually a class which has the following
-interface:
-
-.. code-block:: python
-   :linenos:
-
-   class RendererFactory:
-       def __init__(self, name):
-           """ Constructor: ``name`` may be a path """
-
-       def __call__(self, value, system): """ Call a the renderer
-           implementation with the value and the system value passed
-           in as arguments and return the result (a string or unicode
-           object).  The value is the return value of a view.  The
-           system value is a dictionary containing available system
-           values (e.g. ``view``, ``context``, and ``request``). """
-
-There are essentially two different kinds of ``renderer``
-registrations: registrations that use a dot (``.``) in their ``name``
-argument and ones which do not.
-
-Renderer registrations that have a ``name`` attribute which starts
-with a dot are meant to be *wildcard* registrations.  When a ``view``
-configuration is encountered which has a ``name`` attribute that
-contains a dot, at startup time, the path is split on its final dot,
-and the second element of the split (the filename extension,
-typically) is used to look up a renderer for the configured view.  The
-renderer's factory is still passed the entire ``name`` attribute value
-(not just the extension).
-
-Renderer registrations that have ``name`` attribute which *does not*
-start with a dot are meant to be absolute registrations.  When a
-``view`` configuration is encountered which has a ``name`` argument
-that does not contain a dot, the full value of the ``name`` attribute
-is used to look up the renderer for the configured view.
-
-Here's an example of a renderer registration in ZCML:
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-     name="amf"
-     factory="my.package.MyAMFRenderer"/>
-
-Adding the above ZCML to your application will allow you to use the
-``my.package.MyAMFRenderer`` renderer implementation in ``view``
-configurations by referring to it as ``amf`` in the ``renderer``
-attribute:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.view import bfg_view
-
-   @bfg_view(renderer='amf')
-   def myview(request):
-       return {'Hello':'world'}
-
-By default, when a template extension is unrecognized, an error is
-thrown at rendering time.  You can associate more than one filename
-extension with the same renderer implementation as necessary if you
-need to use a different file extension for the same kinds of
-templates.  For example, to associate the ``.zpt`` extension with the
-Chameleon page template renderer factory, use:
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      name=".zpt"
-      factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
-
-To override the default mapping in which files with a ``.pt``
-extension are rendered via a Chameleon ZPT page template renderer, use
-a variation on the following in your application's ZCML:
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      name=".pt"
-      factory="my.package.pt_renderer"/>
-
-To override the default mapping in which files with a ``.txt``
-extension are rendered via a Chameleon text template renderer, use a
-variation on the following in your application's ZCML:
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      name=".txt"
-      factory="my.package.text_renderer"/>
-
-To associate a *default* renderer with *all* view configurations (even
-ones which do not possess a ``renderer`` attribute), use a variation
-on the following (ie. omit the ``name`` attribute to the renderer
-tag):
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      factory="repoze.bfg.renderers.json_renderer_factory"/>

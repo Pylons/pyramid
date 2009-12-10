@@ -90,6 +90,17 @@ Minor Miscellaneous Feature Additions
   attached to the constructed model via
   ``zope.interface.alsoProvides``).
 
+- When the ``repoze.bfg.exceptions.NotFound`` or
+  ``repoze.bfg.exceptions.Forbidden`` error is raised from within a
+  custom :term:`root factory` or the factory of a :term:`route`, the
+  appropriate response is sent to the requesting user agent (the
+  result of the notfound view or the forbidden view, respectively).
+  When these errors are raised from within a root factory, the
+  :term:`context` passed to the notfound or forbidden view will be
+  ``None``.  Also, the request will not be decorated with
+  ``view_name``, ``subpath``, ``context``, etc. as would normally be
+  the case if traversal had been allowed to take place.
+
 Backwards Incompatibilites
 --------------------------
 
@@ -281,3 +292,7 @@ Documentation Enhancements
 - Added "Thread Locals" narrative chapter to documentation, and added
   a API chapter documenting the ``repoze.bfg.threadlocals`` module.
 
+- Added a "Special Exceptions" section to the "Views" narrative
+  documentation chapter explaining the effect of raising
+  ``repoze.bfg.exceptions.NotFound`` and
+  ``repoze.bfg.exceptions.Forbidden`` from within view code.

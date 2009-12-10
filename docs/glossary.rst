@@ -490,3 +490,22 @@ Glossary
     The configuration mode in which you use Python to call methods on
     a :term:`Configurator` in order to add each :term:`configuration
     declaration` required by your application.
+  Not Found View
+     The :term:`view callable` invoked by :mod:`repoze.bfg` when the
+     developer explicitly raises a
+     ``repoze.bfg.exceptions.NotFound`` exception from within
+     :term:`view` code or :term:`root factory` code, or when the
+     current request doesn't match any :term:`view configuration`.
+     :mod:`repoze.bfg` provides a default implementation of a not
+     found view; it can be overridden.  See
+     :ref:`changing_the_notfound_view`.
+  Forbidden View
+     The :term:`view callable` invoked by :mod:`repoze.bfg` when the
+     developer explicitly raises a
+     ``repoze.bfg.exceptions.Forbidden`` exception from within
+     :term:`view` code or :term:`root factory` code, or when the the
+     :term:`view configuration` and :term:`authorization policy` found
+     for a request disallows a particular view invocation.
+     :mod:`repoze.bfg` provides a default implementation of a
+     forbidden view; it can be overridden.  See
+     :ref:`changing_the_forbidden_view`.

@@ -65,71 +65,73 @@ class Router(object):
         try:
             # setup
             request = Request(environ)
+            context = None
             threadlocals['request'] = request
             attrs = request.__dict__
             attrs['registry'] = registry
             has_listeners and registry.notify(NewRequest(request))
+            
+            try:
+                # root resolution
+                root_factory = self.root_factory
+                if self.routes_mapper is not None:
+                    info = self.routes_mapper(request)
+                    match, route = info['match'], info['route']
+                    if route is not None:
+                        environ['wsgiorg.routing_args'] = ((), match)
+                        environ['bfg.routes.route'] = route
+                        environ['bfg.routes.matchdict'] = match
+                        request.matchdict = match
+                        iface = registry.queryUtility(IRouteRequest,
+                                                      name=route.name)
+                        if iface is not None:
+                            alsoProvides(request, iface)
+                        root_factory = route.factory or self.root_factory
 
-            # root resolution
-            root_factory = self.root_factory
-            if self.routes_mapper is not None:
-                info = self.routes_mapper(request)
-                match, route = info['match'], info['route']
-                if route is not None:
-                    environ['wsgiorg.routing_args'] = ((), match)
-                    environ['bfg.routes.route'] = route
-                    environ['bfg.routes.matchdict'] = match
-                    request.matchdict = match
-                    iface = registry.queryUtility(IRouteRequest,
-                                                  name=route.name)
-                    if iface is not None:
-                        alsoProvides(request, iface)
-                    root_factory = route.factory or self.root_factory
-                
-            root = root_factory(request)
-            attrs['root'] = root
+                root = root_factory(request)
+                attrs['root'] = root
 
-            # view lookup
-            traverser = registry.adapters.queryAdapter(root, ITraverser)
-            if traverser is None:
-                traverser = ModelGraphTraverser(root)
-            tdict = traverser(request)
-            context, view_name, subpath, traversed, vroot, vroot_path = (
-                tdict['context'], tdict['view_name'], tdict['subpath'],
-                tdict['traversed'], tdict['virtual_root'],
-                tdict['virtual_root_path'])
-            attrs.update(tdict)
-            has_listeners and registry.notify(AfterTraversal(request))
-            provides = map(providedBy, (context, request))
-            view_callable = registry.adapters.lookup(
-                provides, IView, name=view_name, default=None)
+                # view lookup
+                traverser = registry.adapters.queryAdapter(root, ITraverser)
+                if traverser is None:
+                    traverser = ModelGraphTraverser(root)
+                tdict = traverser(request)
+                context, view_name, subpath, traversed, vroot, vroot_path = (
+                    tdict['context'], tdict['view_name'], tdict['subpath'],
+                    tdict['traversed'], tdict['virtual_root'],
+                    tdict['virtual_root_path'])
+                attrs.update(tdict)
+                has_listeners and registry.notify(AfterTraversal(request))
+                provides = map(providedBy, (context, request))
+                view_callable = registry.adapters.lookup(
+                    provides, IView, name=view_name, default=None)
 
-            # view execution
-            if view_callable is None:
-                if self.debug_notfound:
-                    msg = (
-                        'debug_notfound of url %s; path_info: %r, context: %r, '
-                        'view_name: %r, subpath: %r, traversed: %r, '
-                        'root: %r, vroot: %r,  vroot_path: %r' % (
-                        request.url, request.path_info, context, view_name,
-                        subpath, traversed, root, vroot, vroot_path)
-                        )
-                    logger and logger.debug(msg)
-                else:
-                    msg = request.path_info
-                environ['repoze.bfg.message'] = msg
-                response = self.notfound_view(context, request)
-            else:
-                try:
-                    response = view_callable(context, request)
-                except Forbidden, why:
-                    msg = why[0]
-                    environ['repoze.bfg.message'] = msg
-                    response = self.forbidden_view(context, request)
-                except NotFound, why:
-                    msg = why[0]
+                # view execution
+                if view_callable is None:
+                    if self.debug_notfound:
+                        msg = (
+                            'debug_notfound of url %s; path_info: %r, context: %r, '
+                            'view_name: %r, subpath: %r, traversed: %r, '
+                            'root: %r, vroot: %r,  vroot_path: %r' % (
+                            request.url, request.path_info, context, view_name,
+                            subpath, traversed, root, vroot, vroot_path)
+                            )
+                        logger and logger.debug(msg)
+                    else:
+                        msg = request.path_info
                     environ['repoze.bfg.message'] = msg
                     response = self.notfound_view(context, request)
+                else:
+                    response = view_callable(context, request)
+
+            except Forbidden, why:
+                msg = why[0]
+                environ['repoze.bfg.message'] = msg
+                response = self.forbidden_view(context, request)
+            except NotFound, why:
+                msg = why[0]
+                environ['repoze.bfg.message'] = msg
+                response = self.notfound_view(context, request)
 
             # response handling
             has_listeners and registry.notify(NewResponse(response))
