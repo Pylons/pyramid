@@ -1604,23 +1604,34 @@ overriding a renderer is accomplished via :term:`ZCML` or via
 imperative configuration. 
 
 For example, to add a renderer which renders views which have a
-``renderer`` attribute that is a path that ends in ``.jinja``::
+``renderer`` attribute that is a path that ends in ``.jinja2``:
 
 .. topic:: Via ZCML
 
-   <renderer
-     name=".jinja"
-     factory="my.package.MyJinja2Renderer"/>
+   .. code-block:: xml
+      :linenos:
+
+      <renderer
+        name=".jinja2"
+        factory="my.package.MyJinja2Renderer"/>
 
    The ``factory`` attribute is a dotted Python name that must point
    to an implementation of a :term:`renderer`.
 
-   The ``name`` attribute
+   The ``name`` attribute is the renderer name.
 
 .. topic:: Via Imperative Configuration
 
-   from my.package import MyJinja2Renderer
-   config.add_renderer('.jinja', MyJinja2Renderer)
+   .. code-block:: python
+      :linenos:
+
+      from my.package import MyJinja2Renderer
+      config.add_renderer('.jinja2', MyJinja2Renderer)
+
+   The first argument is the renderer name.
+
+   The second argument is a reference to an to an implementation of a
+   :term:`renderer`.
 
 A renderer implementation is usually a class which has the following
 interface:
