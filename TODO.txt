@@ -1,10 +1,9 @@
 - Audit the rest of the docs for "view configuration" and "route
   configuration" references, etc.
 
-- Find ZCML-only docs that deserve imperative-mode analogues.
-
 - Basic WSGI documentation (pipeline / app / server).
 
-- "Model graph" -> "object graph"?
-
 - Decide on ``unhook_zca`` argument to ``tearDown``.
+
+- Push the testing API towards use of a Configurator.
+
