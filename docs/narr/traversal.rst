@@ -74,7 +74,7 @@ issue a single command command ``cat /an/absolute/path`` to get the
 desired result.  Instead, this user believes he must issue the ``cd``
 command, starting from the root, for each intermediate path segment,
 *even the path segment that represents the file itself*.  Once he gets
-an error (because you cannot succesfully ``cd`` into a file), he knows
+an error (because you cannot successfully ``cd`` into a file), he knows
 he has reached the file he wants, and he will be able to execute
 ``cat`` against the resulting path segment.
 
