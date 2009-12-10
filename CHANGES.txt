@@ -46,7 +46,7 @@ Dependencies
 
 - A new dependency on the ``twill`` package was added to the
   ``setup.py`` ``tests_require`` argument (Twill will only be
-  downloaded when :mod:`repoze.bfg` ``setup.py test`` or ``setup.py
+  downloaded when ``repoze.bfg`` ``setup.py test`` or ``setup.py
   nosetests`` is invoked).
 
 1.2a4 (2009-12-07)
