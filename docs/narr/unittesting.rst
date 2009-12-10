@@ -3,11 +3,53 @@
 Unit and Integration Testing
 ============================
 
-The suggested mechanism for unit testing :mod:`repoze.bfg`
-applications is the Python ``unittest`` module.  :mod:`repoze.bfg`
-provides a number of facilities that make unit tests easier to write.
-The facilities become particularly useful when your code calls into
-:mod:`repoze.bfg` -related framework functions.
+*Unit testing* is the act of testing a "unit" in your application.  In
+this context, a "unit" is often a function or a method of a class
+instance.  The unit is also referred to as a "unit under test".  The
+goal of a single unit test is to test **only** some permutation of the
+"unit under test".  If you write a unit test that aims to verify the
+result of a particular codepath through a Python function, you need
+only be concerned about testing the code that *lives in the function
+body itself*.  If the function accepts a parameter that represents a
+complex application "domain object" (such a a model, a database
+connection, or an SMTP server), the argument provided to this function
+during a unit test *need not be* and likely *should not be* a "real"
+implementation object.  For example, although a particular function
+implementation may accept an argument that represents an SMTP server
+object, and the function may call a method of this object when the
+system is operating normally that would result in an email being sent,
+a unit test of this codepath of the function does *not* need to test
+that an email is actually sent.  It just needs to make sure that the
+function calls the method of the object provided as an argument that
+*would* send an email if the argument happened to be the "real"
+implementation of an SMTP server object.
+
+An *integration test*, on the other hand, is a different form of
+testing in which the interaction between two or more "units" is
+explicitly tested.  Integration tests verify that the components of
+your application work together.  You *might* make sure that an email
+was actually sent in an integration test.
+
+It is often considered best practice to write both types of tests for
+any given codebase.  Unit testing often provides the opportunity to
+obtain better "coverage": it's usually possible to supply a unit under
+test with arguments and/or an environment which causes *all* of its
+potential codepaths to be executed.  This is usually not as easy to do
+with a set of integration tests, but integration testing provides a
+measure of assurance that your "units" work together, as they will be
+expected to when your application is run in production.
+
+The suggested mechanism for unit and integration testing of a
+:mod:`repoze.bfg` application is the Python ``unittest`` module.
+Although this module is named ``unittest``, it is actually capable of
+driving both unit and integration tests.  A good ``unittest`` tutorial
+is available within `Dive Into Python
+<http://diveintopython.org/unit_testing/index.html>`_ by Mark Pilgrim.
+
+:mod:`repoze.bfg` provides a number of facilities that make unit and
+integration tests easier to write.  The facilities become particularly
+useful when your code calls into :mod:`repoze.bfg` -related framework
+functions.
 
 .. _test_setup_and_teardown:
 
@@ -19,13 +61,32 @@ structure to hold on to two items: the current :term:`request` and the
 current :term:`application registry`.  These data structures are
 available via the ``repoze.bfg.threadlocal.get_current_request`` and
 ``repoze.bfg.threadlocal.get_current_registry`` functions,
-respectively.
+respectively.  See :ref:`threadlocals_chapter` for information about
+these functions and the data structures they return.
 
 If your code uses these ``get_current_*`` functions or calls
 :mod:`repoze.bfg` code which uses the ``get_current_*`` functions, you
 will need to use the ``repoze.bfg.testing.setUp`` and
 ``repoze.bfg.testing.tearDown`` functions within the ``setUp`` and
 ``tearDown`` methods of your unit tests, respectively.
+
+The ``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``
+functions allow you to supply a unit test with an environment that has
+a default registry and a default request for the duration of a single
+test.  Here's an example of using both:
+
+.. code-block:: python
+   :linenos:
+
+   import unittest
+   from repoze.bfg import testing
+
+   class MyTest(unittest.TestCase):
+       def setUp(self):
+           testing.setUp()
+
+       def tearDown(self):
+           testing.tearDown()
 
 If you don't *know* whether you're calling code that uses these
 functions, a rule of thumb applies: just always use the

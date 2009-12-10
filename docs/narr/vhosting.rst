@@ -70,7 +70,7 @@ Virtual Root Support
 applications.  These are explained below.
 
 Virtual root support is useful when you'd like to host some model in a
-:mod:`repoze.bfg` model graph as an application under a URL pathname
+:mod:`repoze.bfg` object graph as an application under a URL pathname
 that does not include the model path itself.  For example, you might
 want to serve the object at the traversal path ``/cms`` as an
 application reachable via ``http://example.com/`` (as opposed to

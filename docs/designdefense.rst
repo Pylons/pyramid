@@ -630,7 +630,7 @@ I'll argue that URL dispatch is ultimately useful, even if you want to
 use traversal as well.  You can actually *combine* URL dispatch and
 traversal in :mod:`repoze.bfg` (see :ref:`hybrid_chapter`).  One
 example of such a usage: if you want to emulate something like Zope
-2's "Zope Management Interface" UI on top of your model graph (or any
+2's "Zope Management Interface" UI on top of your object graph (or any
 administrative interface), you can register a route like ``<route
 name="manage" path="manage/*traverse"/>`` and then associate
 "management" views in your code by using the ``route_name`` argument
@@ -749,11 +749,11 @@ have no equivalent core feature.
 We consider this an important feature for a particular class of
 applications (CMS-style applications, which the authors are often
 commissioned to write) that usually use :term:`traversal` against a
-persistent model graph.  The model graph contains security
+persistent object graph.  The object graph contains security
 declarations as :term:`ACL` objects.
 
 Having context-sensitive declarative security for individual objects
-in the model graph is simply required for this class of application.
+in the object graph is simply required for this class of application.
 Other frameworks save for Zope just do not have this feature.  This is
 the one of the primary reasons that :mod:`repoze.bfg` was actually
 written.

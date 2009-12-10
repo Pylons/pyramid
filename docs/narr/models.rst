@@ -191,9 +191,9 @@ In order for :mod:`repoze.bfg` location, security, URL-generation, and
 traversal functions (such as the functions exposed in
 :ref:`location_module`, :ref:`traversal_module`, and :ref:`url_module`
 as well as certain functions in :ref:`security_module` ) to work
-properly against a instances in a model graph, all nodes in the graph
-must be "location-aware".  This means they must have two attributes:
-``__parent__`` and ``__name__``.
+properly against a instances in an object graph, all nodes in the
+graph must be "location-aware".  This means they must have two
+attributes: ``__parent__`` and ``__name__``.
 
 The ``__parent__`` attribute should be a reference to the node's
 parent model instance in the graph.  The ``__name__`` attribute should
@@ -238,10 +238,10 @@ more information about how a model instance becomes the context.
 
 The APIs provided by :ref:`traversal_module` are used against model
 instances.  These functions can be used to find the "path" of a model,
-find the URL of a model, the root model in a model graph, and so on.
+find the URL of a model, the root model in an object graph, and so on.
 
 The APIs provided by :ref:`location_module` are used against model
-instances.  These can be used to walk down a model graph, or
+instances.  These can be used to walk down an object graph, or
 conveniently locate one object "inside" another.
 
 Some APIs in :ref:`security_module` accept a model object as a

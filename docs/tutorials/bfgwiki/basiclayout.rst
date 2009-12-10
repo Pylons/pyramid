@@ -57,7 +57,7 @@ Content Models with ``models.py``
 ---------------------------------
 
 :mod:`repoze.bfg` often uses the word *model* when talking about
-content resources arranged in a hierarchical *model graph*.  The
+content resources arranged in a hierarchical *object graph*.  The
 ``models.py`` file is where the ``bfg_zodb`` Paster template put the
 classes that implement our models.
 

@@ -697,7 +697,7 @@ behavior.
 
 #. Line 6 is a "root factory" function that will be called by the
    :mod:`repoze.bfg` *Router* for each request when it wants to find
-   the root of the model graph.  Conventionally this is called
+   the root of the object graph.  Conventionally this is called
    ``get_root``.
 
 In a "real" application, the root object would not be such a simple
