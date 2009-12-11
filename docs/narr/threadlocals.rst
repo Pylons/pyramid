@@ -89,7 +89,7 @@ Why You Shouldn't Abuse Thread Locals
 
 You probably should almost never use the ``get_current_request`` or
 ``get_current_registry`` functions, except perhaps in tests.  In
-particular, it's almost always usually a mistake to use
+particular, it's almost always a mistake to use
 ``get_current_request`` or ``get_current_registry`` in application
 code because its usage makes it possible to write code that can be
 neither easily tested nor scripted.  Inappropriate usage is defined as
@@ -118,7 +118,7 @@ follows:
   lead to sadness later.
 
 - Neither ``get_current_request`` nor ``get_current_registry`` should
-  never be called within application-specific forks of third-party
+  ever be called within application-specific forks of third-party
   library code.  The library you've forked almost certainly has
   nothing to do with :mod:`repoze.bfg`, and making it dependent on
   repoze.bfg (rather than making your :mod:`repoze.bfg` application
