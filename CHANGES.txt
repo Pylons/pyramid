@@ -1,3 +1,15 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- When a route with the same name as a previously registered route was
+  added, the old route was not removed from the mapper's routelist.
+  Symptom: the old registered route would be used (and possibly
+  matched) during route lookup when it should not have had a chance to
+  ever be used.
+
 1.2a5 (2009-12-10)
 ==================
 

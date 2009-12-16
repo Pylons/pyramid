@@ -28,6 +28,9 @@ class RoutesMapper(object):
         return self.routelist
 
     def connect(self, path, name, factory=None, predicates=()):
+        if name in self.routes:
+            oldroute = self.routes[name]
+            self.routelist.remove(oldroute)
         route = Route(path, name, factory, predicates)
         self.routelist.append(route)
         self.routes[name] = route

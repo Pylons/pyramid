@@ -67,6 +67,17 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['match'], None)
         self.assertEqual(result['route'], None)
 
+    def test_connect_name_exists_removes_old(self):
+        mapper = self._makeOne()
+        mapper.connect('archives/:action/:article', 'foo')
+        mapper.connect('archives/:action/:article2', 'foo')
+        self.assertEqual(len(mapper.routelist), 1)
+        self.assertEqual(len(mapper.routes), 1)
+        self.assertEqual(mapper.routes['foo'].path,
+                         'archives/:action/:article2')
+        self.assertEqual(mapper.routelist[0].path,
+                         'archives/:action/:article2')
+
     def test_route_matches(self):
         mapper = self._makeOne()
         mapper.connect('archives/:action/:article', 'foo')
