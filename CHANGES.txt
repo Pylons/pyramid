@@ -4,10 +4,10 @@ Next release
 Bug Fixes
 ---------
 
-- When Chameleon page or text templates were added imperatively (via
-  ``Configurator.add_view`` or some derivative), they too-eagerly
-  attempted to look up the ``reload_templates`` setting via
-  ``get_settings``, meaning they were always registered in
+- When Chameleon page or text templates used as renderers were added
+  imperatively (via ``Configurator.add_view`` or some derivative),
+  they too-eagerly attempted to look up the ``reload_templates``
+  setting via ``get_settings``, meaning they were always registered in
   non-auto-reload-mode (the default).  Each now waits until its
   respective ``template`` attribute is accessed to look up the value.
 
