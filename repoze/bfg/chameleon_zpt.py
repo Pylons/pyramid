@@ -26,10 +26,8 @@ class ZPTTemplateRenderer(object):
     def __init__(self, path):
         self.path = path
 
-    @reify
+    @reify # avoid looking up reload_templates before manager pushed
     def template(self):
-        # delay template creation until (hopefully) settings have been
-        # registered
         settings = get_settings()
         auto_reload = settings and settings['reload_templates']
         return PageTemplateFile(self.path, auto_reload=auto_reload)
