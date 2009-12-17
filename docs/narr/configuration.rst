@@ -86,8 +86,10 @@ imperatively:
 
    if __name__ == '__main__':
        config = Configurator()
+       config.begin()
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
+       config.end()
        app = config.make_wsgi_app()
        serve(app)
 
@@ -274,12 +276,17 @@ imports and function definitions is placed within the confines of an
 
    if __name__ == '__main__':
        config = Configurator()
+       config.begin()
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
+       config.end()
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
-Let's break this down this piece-by-piece:
+Let's break this down this piece-by-piece.
+
+Configurator Construction
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
    :linenos:
@@ -314,6 +321,27 @@ this particular :mod:`repoze.bfg` application.
    configure an application registry.  The underlying application
    registry object being configured by a ``Configurator`` is available
    as its ``registry`` attribute.
+
+Beginning Configuration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+   :linenos:
+
+       config.begin()
+
+The ``begin`` method of a Configurator tells the the system that
+application configuration has begun.  In particular, this causes the
+:term:`application registry` associated with this configurator to
+become the "current" application registry, meaning that code which
+attempts to use the application registry :term:`thread local` will
+obtain the registry associated with the configurator.  This is an
+explicit step because it's sometimes convenient to use a configurator
+without causing the registry associated with the configurator to
+become "current".
+
+Adding Configuration
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
    :linenos:
@@ -411,6 +439,22 @@ the best view configuration for any request, the ``goodbye_world``
 view callable will be used when the URL contains path information that
 ends with ``/goodbye``.
 
+Ending Configuration
+~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+   :linenos:
+
+       config.end()
+
+The ``end`` method of a Configurator tells the the system that
+application configuration has ended.  It is the inverse of
+``config.begin``.  In particular, this causes the :term:`application
+registry` associated with this configurator to no longer be the
+"current" application registry, meaning that code which attempts to
+use the application registry :term:`thread local` will no longer
+obtain the registry associated with the configurator.
+
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -419,13 +463,14 @@ WSGI Application Creation
 
        app = config.make_wsgi_app()
 
-After configuring views, the script creates a WSGI *application* via
-the ``config.make_wsgi_app`` method.  A call to ``make_wsgi_app``
-implies that all configuration is finished (meaning all method calls
-to the configurator which set up views, and various other
-configuration settings have been performed).  The ``make_wsgi_app``
-method returns a :term:`WSGI` application object that can be used by
-any WSGI server to present an application to a requestor.
+After configuring views and ending configuration, the script creates a
+WSGI *application* via the ``config.make_wsgi_app`` method.  A call to
+``make_wsgi_app`` implies that all configuration is finished (meaning
+all method calls to the configurator which set up views, and various
+other configuration settings have been performed).  The
+``make_wsgi_app`` method returns a :term:`WSGI` application object
+that can be used by any WSGI server to present an application to a
+requestor.
 
 The :mod:`repoze.bfg` application object, in particular, is an
 instance of the ``repoze.bfg.router.Router`` class.  It has a
@@ -510,7 +555,9 @@ In a file named ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
+       config.begin()
        config.load_zcml('configure.zcml)
+       config.end()
        app = config.make_wsgi_app()
        serve(app)
 
@@ -547,8 +594,10 @@ within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
    if __name__ == '__main__':
        config = Configurator()
+       config.begin()
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
+       config.end()
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
@@ -563,7 +612,9 @@ reads as:
 
    if __name__ == '__main__':
        config = Configurator()
+       config.begin()
        config.load_zcml('configure.zcml')
+       config.end()
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 

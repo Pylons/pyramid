@@ -21,6 +21,7 @@ from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 
+from repoze.bfg.configuration import Configurator
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.registry import Registry
 from repoze.bfg.security import Allowed
@@ -592,17 +593,22 @@ def setUp(registry=None, request=None, hook_zca=True):
 
     .. note:: The ``hook_zca`` argument is new as of :mod:`repoze.bfg`
        1.2.
+
+    .. warning:: Although this method of tearing a test setup down
+                 will never disappear, after :mod:`repoze.bfg` 1.2a6,
+                 using the ``begin`` and ``end`` methods of a
+                 ``Configurator`` are prefered to using
+                 ``repoze.bfg.testing.setUp`` and
+                 ``repoze.bfg.testing.tearDown``.  See
+                 :ref:`unittesting_chapter` for more information.
     """
     manager.clear()
     if registry is None:
         registry = Registry('testing')
-    manager.push({'registry':registry, 'request':request})
+    config = Configurator(registry=registry)
+    config.begin(request=request)
     if hook_zca:
-        try:
-            from zope.component import getSiteManager
-            getSiteManager.sethook(get_current_registry)
-        except ImportError: # pragma: no cover
-            pass
+        hook_zca_api()
 
 def tearDown(unhook_zca=True):
     """Undo the effects ``repoze.bfg.testing.setUp``.  Use this
@@ -619,20 +625,24 @@ def tearDown(unhook_zca=True):
     .. note:: The ``unhook_zca`` argument is new as of
        :mod:`repoze.bfg` 1.2.
 
+    .. warning:: Although this method of tearing a test setup down
+                 will never disappear, after :mod:`repoze.bfg` 1.2a6,
+                 using the ``begin`` and ``end`` methods of a
+                 ``Configurator`` are prefered to using
+                 ``repoze.bfg.testing.setUp`` and
+                 ``repoze.bfg.testing.tearDown``.  See
+                 :ref:`unittesting_chapter` for more information.
+
     """
     if unhook_zca:
-        try:
-            from zope.component import getSiteManager
-            getSiteManager.reset()
-        except ImportError: # pragma: no cover
-            pass
+        unhook_zca_api()
     info = manager.pop()
     manager.clear()
     if info is not None:
-        reg = info['registry']
-        if hasattr(reg, '__init__') and hasattr(reg, '__name__'):
+        registry = info['registry']
+        if hasattr(registry, '__init__') and hasattr(registry, '__name__'):
             try:
-                reg.__init__(reg.__name__)
+                registry.__init__(registry.__name__)
             except TypeError:
                 # calling __init__ is largely for the benefit of
                 # people who want to use the global ZCA registry;
@@ -648,3 +658,17 @@ def cleanUp(*arg, **kw):
     extensive production usage, it will never be removed."""
     setUp(*arg, **kw)
 
+def hook_zca_api():
+    try:
+        from zope.component import getSiteManager
+        getSiteManager.sethook(get_current_registry)
+    except ImportError: # pragma: no cover
+        pass
+    
+def unhook_zca_api():
+    try:
+        from zope.component import getSiteManager
+        getSiteManager.reset()
+    except ImportError: # pragma: no cover
+        pass
+    

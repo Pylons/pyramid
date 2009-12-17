@@ -125,11 +125,17 @@ class Router(object):
                     response = view_callable(context, request)
 
             except Forbidden, why:
-                msg = why[0]
+                try:
+                    msg = why[0]
+                except (IndexError, TypeError):
+                    msg = ''
                 environ['repoze.bfg.message'] = msg
                 response = self.forbidden_view(context, request)
             except NotFound, why:
-                msg = why[0]
+                try:
+                    msg = why[0]
+                except (IndexError, TypeError):
+                    msg = ''
                 environ['repoze.bfg.message'] = msg
                 response = self.notfound_view(context, request)
 

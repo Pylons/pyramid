@@ -23,5 +23,7 @@ def app(global_config, **settings):
         raise ValueError("No 'db_string' value in application configuration.")
     initialize_sql(db_string)
     config = Configurator(settings=settings)
+    config.begin()
     config.load_zcml('configure.zcml')
+    config.end()
     return config.make_wsgi_app()

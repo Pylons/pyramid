@@ -1,5 +1,6 @@
 import unittest
 
+from repoze.bfg.configuration import Configurator
 from repoze.bfg import testing
 
 class PageModelTests(unittest.TestCase):
@@ -49,10 +50,11 @@ class AppmakerTests(unittest.TestCase):
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
+        self.config = Configurator()
+        self.config.begin()
 
     def tearDown(self):
-        testing.tearDown()
+        self.config.end()
 
     def test_my_view(self):
         from tutorial.views import my_view

@@ -70,7 +70,7 @@ class TestFixtureApp(unittest.TestCase):
         config = Configurator()
         config.load_zcml('repoze.bfg.tests.fixtureapp:configure.zcml')
         twill.add_wsgi_intercept('localhost', 6543, config.make_wsgi_app)
-        if sys.platform is 'win32':
+        if sys.platform is 'win32': # pragma: no cover
             out = open('nul:', 'wb')
         else:
             out = open('/dev/null', 'wb')

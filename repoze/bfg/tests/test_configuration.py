@@ -88,6 +88,36 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(config.registry.getUtility(IRendererFactory, '.pt'))
         self.failUnless(config.registry.getUtility(IRendererFactory, '.txt'))
 
+    def test_begin(self):
+        from repoze.bfg.configuration import Configurator
+        config = Configurator()
+        manager = DummyThreadLocalManager()
+        config.manager = manager
+        config.begin()
+        self.assertEqual(manager.pushed,
+                         {'registry':config.registry, 'request':None})
+        self.assertEqual(manager.popped, False)
+
+    def test_begin_with_request(self):
+        from repoze.bfg.configuration import Configurator
+        config = Configurator()
+        request = object()
+        manager = DummyThreadLocalManager()
+        config.manager = manager
+        config.begin(request=request)
+        self.assertEqual(manager.pushed,
+                         {'registry':config.registry, 'request':request})
+        self.assertEqual(manager.popped, False)
+
+    def test_end(self):
+        from repoze.bfg.configuration import Configurator
+        config = Configurator()
+        manager = DummyThreadLocalManager()
+        config.manager = manager
+        config.end()
+        self.assertEqual(manager.pushed, None)
+        self.assertEqual(manager.popped, True)
+
     def test_ctor_with_package_registry(self):
         import sys
         from repoze.bfg.configuration import Configurator
@@ -274,16 +304,12 @@ class ConfiguratorTests(unittest.TestCase):
     def test_make_wsgi_app(self):
         from repoze.bfg.router import Router
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
-        class ThreadLocalManager(object):
-            def push(self, d):
-                self.pushed = d
-            def pop(self):
-                self.popped = True
-        manager = ThreadLocalManager()
+        manager = DummyThreadLocalManager()
         config = self._makeOne()
         subscriber = self._registerEventListener(config,
                                                  IWSGIApplicationCreatedEvent)
-        app = config.make_wsgi_app(manager=manager)
+        config.manager = manager
+        app = config.make_wsgi_app()
         self.assertEqual(app.__class__, Router)
         self.assertEqual(manager.pushed['registry'], config.registry)
         self.assertEqual(manager.pushed['request'], None)
@@ -2702,6 +2728,12 @@ class DummyConfigurator(object):
         self.package = package
         self.settings = settings
 
+    def begin(self):
+        self.begun = True
+
+    def end(self):
+        self.ended = True
+
     def load_zcml(self, filename):
         self.zcml_file = filename
     
@@ -2738,5 +2770,11 @@ class DummyMultiView:
 class DummyGetSiteManager(object):
     def sethook(self, hook):
         self.hook = hook
-        
     
+class DummyThreadLocalManager(object):
+    pushed = None
+    popped = False
+    def push(self, d):
+        self.pushed = d
+    def pop(self):
+        self.popped = True

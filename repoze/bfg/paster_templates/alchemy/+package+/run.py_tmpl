@@ -18,6 +18,7 @@ def app(global_config, **settings):
     
     It is usually called by the PasteDeploy framework during ``paster serve``.
     """
+    zcml_file = settings.get('configure_zcml', 'configure.zcml')
     db_string = settings.get('db_string')
     if db_string is None:
         raise ValueError("No 'db_string' in application configuration.")
@@ -26,7 +27,8 @@ def app(global_config, **settings):
         db_echo = True
     get_root = appmaker(db_string, db_echo)
     config = Configurator(settings=settings, root_factory=get_root)
-    zcml_file = settings.get('configure_zcml', 'configure.zcml')
+    config.begin()
     config.load_zcml(zcml_file)
+    config.end()
     return config.make_wsgi_app()
 

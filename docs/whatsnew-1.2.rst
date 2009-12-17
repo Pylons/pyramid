@@ -41,7 +41,9 @@ The simplest possible :mod:`repoze.bfg` application is now:
 
      if __name__ == '__main__':
          config = Configurator()
+         config.begin()
          config.add_view(hello_world)
+         config.end()
          app = config.make_wsgi_app()
          simple_server.make_server('', 8080, app).serve_forever()
 
@@ -141,10 +143,11 @@ Backwards Incompatibilites
 - When there is no "current registry" in the
   ``repoze.bfg.threadlocal.manager`` threadlocal data structure (this
   is the case when there is no "current request" or we're not in the
-  midst of a ``r.b.testing.setUp``-bounded unit test), the ``.get``
-  method of the manager returns a data structure containing a *global*
-  registry.  In previous releases, this function returned the global
-  Zope "base" registry: the result of
+  midst of a ``r.b.testing.setUp`` or
+  ``r.b.configuration.Configurator.begin`` bounded unit test), the
+  ``.get`` method of the manager returns a data structure containing a
+  *global* registry.  In previous releases, this function returned the
+  global Zope "base" registry: the result of
   ``zope.component.getGlobalSiteManager``, which is an instance of the
   ``zope.component.registry.Component`` class.  In this release,
   however, the global registry returns a globally importable instance
@@ -153,8 +156,8 @@ Backwards Incompatibilites
   ``repoze.bfg.registry.global_registry``.
 
   Effectively, this means that when you call
-  ``repoze.bfg.threadlocal.get_current_registry`` when no request or
-  ``setUp`` bounded unit test is in effect, you will always get back
+  ``repoze.bfg.threadlocal.get_current_registry`` when no "real"
+  request or bounded unit test is in effect, you will always get back
   the global registry that lives in
   ``repoze.bfg.registry.global_registry``.  It also means that
   :mod:`repoze.bfg` APIs that *call* ``get_current_registry`` will use

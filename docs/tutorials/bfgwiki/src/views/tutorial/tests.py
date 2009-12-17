@@ -94,7 +94,7 @@ class AddPageTests(unittest.TestCase):
         request = testing.DummyRequest({'form.submitted':True,
                                         'body':'Hello yo!'})
         request.subpath = ['AnotherPage']
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         page = context['AnotherPage']
         self.assertEqual(page.data, 'Hello yo!')
         self.assertEqual(page.__name__, 'AnotherPage')

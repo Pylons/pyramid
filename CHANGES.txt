@@ -1,8 +1,63 @@
 Next release
 ============
 
+Features
+--------
+
+- The ``Configurator`` object now has two new methods: ``begin`` and
+  ``end``.  The ``begin`` method is meant to be called before any
+  "configuration" begins (e.g. before ``add_view``, et. al are
+  called).  The ``end`` method is meant to be called after all
+  "configuration" is complete.
+
+  Previously, before there was imperative configuration at all (1.1
+  and prior), configuration begin and end was invariably implied by
+  the process of loading a ZCML file.  When a ZCML load happened, the
+  threadlocal data structure containing the request and registry was
+  modified before the load, and torn down after the load, making sure
+  that all framework code that needed ``get_current_registry`` for the
+  duration of the ZCML load was satisfied.
+
+  Some API methods called during imperative configuration, (such as
+  ``Configurator.add_view`` when a renderer is involved) end up for
+  historical reasons calling ``get_current_registry``.  However, in
+  1.2a5 and below, the Configurator supplied no functionality that
+  allowed people to make sure that ``get_current_registry`` returned
+  the registry implied by the configurator being used.  ``begin`` now
+  serves this purpose.  Inversely, ``end`` pops the thread local
+  stack, undoing the actions of ``begin``.
+
+  We make this boundary explicit to reduce the potential for confusion
+  when the configurator is used in different circumstances (e.g. in
+  unit tests and app code vs. just in initial app setup).
+
+  Existing code written for 1.2a1-1.2a5 which does not call ``begin``
+  or ``end`` continues to work in the same manner it did before.  It
+  is however suggested that this code be changed to call ``begin`` and
+  ``end`` to reduce the potential for confusion in the future.
+
+- All ``paster`` templates which generate an application skeleton now
+  make use of the new ``begin`` and ``end`` methods of the
+  Configurator they use in their respective copies of ``run.py`` and
+  ``tests.py``.
+
+Documentation
+-------------
+
+- All documentation that makes use of a ``Configurator`` object to do
+  application setup and test setup now makes use of the new ``begin``
+  and ``end`` methods of the configurator.
+
 Bug Fixes
 ---------
+
+- When a ``repoze.bfg.exceptions.NotFound`` or
+  ``repoze.bfg.exceptions.Forbidden`` *class* (as opposed to instance)
+  was raised as an exception within a root factory (or route root
+  factory), the exception would not be caught properly by the
+  ``repoze.bfg.`` Router and it would propagate to up the call stack,
+  as opposed to rendering the not found view or the forbidden view as
+  would have been expected.
 
 - When Chameleon page or text templates used as renderers were added
   imperatively (via ``Configurator.add_view`` or some derivative),

@@ -43,7 +43,7 @@ class TextTemplateRenderer(object):
     def __init__(self, path):
         self.path = path
 
-    @reify
+    @reify # avoid looking up reload_templates before manager pushed
     def template(self):
         settings = get_settings()
         auto_reload = settings and settings['reload_templates']

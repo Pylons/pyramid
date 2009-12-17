@@ -158,6 +158,62 @@ class TestRouter(unittest.TestCase):
         self.failIf('debug_notfound' in result[0])
         self.assertEqual(len(logger.messages), 0)
 
+    def test_traverser_raises_notfound_class(self):
+        from repoze.bfg.exceptions import NotFound
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context, raise_error=NotFound)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '404 Not Found')
+        self.failUnless('<code></code>' in result[0], result)
+
+    def test_traverser_raises_notfound_instance(self):
+        from repoze.bfg.exceptions import NotFound
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context, raise_error=NotFound('foo'))
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '404 Not Found')
+        self.failUnless('<code>foo</code>' in result[0], result)
+
+    def test_traverser_raises_forbidden_class(self):
+        from repoze.bfg.exceptions import Forbidden
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context, raise_error=Forbidden)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '401 Unauthorized')
+        self.failUnless('<code></code>' in result[0], result)
+
+    def test_traverser_raises_forbidden_instance(self):
+        from repoze.bfg.exceptions import Forbidden
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context, raise_error=Forbidden('foo'))
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        headers = start_response.headers
+        self.assertEqual(len(headers), 2)
+        status = start_response.status
+        self.assertEqual(status, '401 Unauthorized')
+        self.failUnless('<code>foo</code>' in result[0], result)
+
     def test_call_no_view_registered_no_isettings(self):
         environ = self._makeEnviron()
         context = DummyContext()

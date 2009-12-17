@@ -1,13 +1,15 @@
 import unittest
 
+from repoze.bfg.configuration import Configurator
 from repoze.bfg import testing
 
 class ViewTests(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
+        self.config = Configurator()
+        self.config.begin()
 
     def tearDown(self):
-        testing.tearDown()
+        self.config.end()
 
     def test_my_view(self):
         from {{package}}.views import my_view

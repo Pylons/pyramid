@@ -509,3 +509,15 @@ Glossary
      :mod:`repoze.bfg` provides a default implementation of a
      forbidden view; it can be overridden.  See
      :ref:`changing_the_forbidden_view`.
+  Thread Local
+     A thread-local variable is one which is essentially a global
+     variable in terms of how it is accessed and treated, however,
+     each `thread
+     <http://en.wikipedia.org/wiki/Thread_(computer_science)>` used by
+     the application may have a different value for this same "global"
+     variable.  :mod:`repoze.bfg` uses a small number of thread local
+     variables, as described in :ref:`threadlocals_chapter`. See also
+     the `threading.local documentation
+     <http://docs.python.org/library/threading.html#threading.local>`
+     for more information.
+

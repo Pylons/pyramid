@@ -69,10 +69,11 @@ defined entirely by the behavior of a repoze.bfg :term:`Router`.
 
 However, during unit testing, no Router code is ever invoked, and the
 definition of "current" is defined by the boundary between calls to
-the ``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``.
-These functions push and pop the threadlocal stack when the system is
-under test.  See :ref:`test_setup_and_teardown` for the definitions of
-these functions.
+the ``begin`` and ``end`` methods of a :term:`Configurator` (or,
+pre-1.2a6, between calls to the ``repoze.bfg.testing.setUp`` and
+``repoze.bfg.testing.tearDown`` functions).  These functions push and
+pop the threadlocal stack when the system is under test.  See
+:ref:`test_setup_and_teardown` for the definitions of these functions.
 
 Scripts which use :mod:`repoze.bfg` machinery but never actually start
 a WSGI server or receive requests via HTTP such as scripts which use
@@ -142,7 +143,8 @@ and the hack that uses ``get_current_request`` is removed.  This would
 be an appropriate place to use the ``get_current_request`` function.
 
 Use of the ``get_current_registry`` function should be limited to
-testing scenarios.  The registry created by
-``repoze.bfg.testing.setUp`` when you do not pass one in is available
+testing scenarios.  The registry made current by use of a
+Configurator's ``begin`` method during a test (or pre-1.2a6, via
+``repoze.bfg.testing.setUp``) when you do not pass one in is available
 to you via this API.
 

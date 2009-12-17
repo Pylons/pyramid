@@ -1,4 +1,6 @@
 import unittest
+
+from repoze.bfg.configuration import Configurator
 from repoze.bfg import testing
 
 def _initTestingDB():
@@ -11,21 +13,22 @@ def _initTestingDB():
     Base.metadata.create_all(engine)
     return DBSession
 
-def _registerRoutes():
-    testing.registerRoute(':pagename', 'view_page')
-    testing.registerRoute(':pagename/edit_page', 'edit_page')
-    testing.registerRoute('add_page/:pagename', 'add_page')
+def _registerRoutes(config):
+    config.add_route('view_page', ':pagename')
+    config.add_route('edit_page', ':pagename/edit_page')
+    config.add_route('add_page', 'add_page/:pagename')
 
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
+        self.config = Configurator()
+        self.config.begin()
 
     def tearDown(self):
-        testing.tearDown()
+        self.config.end()
         
     def test_it(self):
         from tutorial.views import view_wiki
-        testing.registerRoute(':pagename', 'view_page')
+        self.config.add_route('view_page', ':pagename')
         request = testing.DummyRequest()
         response = view_wiki(request)
         self.assertEqual(response.location, 'http://example.com/FrontPage')
@@ -33,11 +36,12 @@ class ViewWikiTests(unittest.TestCase):
 class ViewPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        testing.setUp()
+        self.config = Configurator()
+        self.config.begin()
 
     def tearDown(self):
         self.session.remove()
-        testing.tearDown()
+        self.config.end()
         
     def _callFUT(self, request):
         from tutorial.views import view_page
@@ -49,7 +53,7 @@ class ViewPageTests(unittest.TestCase):
         request.matchdict['pagename'] = 'IDoExist'
         page = Page('IDoExist', 'Hello CruelWorld IDoExist')
         self.session.add(page)
-        _registerRoutes()
+        _registerRoutes(self.config)
         info = self._callFUT(request)
         self.assertEqual(info['page'], page)
         self.assertEqual(
@@ -67,18 +71,19 @@ class ViewPageTests(unittest.TestCase):
 class AddPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        testing.setUp()
+        self.config = Configurator()
+        self.config.begin()
 
     def tearDown(self):
         self.session.remove()
-        testing.tearDown()
+        self.config.end()
 
     def _callFUT(self, request):
         from tutorial.views import add_page
         return add_page(request)
 
     def test_it_notsubmitted(self):
-        _registerRoutes()
+        _registerRoutes(self.config)
         request = testing.DummyRequest()
         request.matchdict = {'pagename':'AnotherPage'}
         info = self._callFUT(request)
@@ -88,22 +93,23 @@ class AddPageTests(unittest.TestCase):
         
     def test_it_submitted(self):
         from tutorial.models import Page
-        _registerRoutes()
+        _registerRoutes(self.config)
         request = testing.DummyRequest({'form.submitted':True,
                                         'body':'Hello yo!'})
         request.matchdict = {'pagename':'AnotherPage'}
-        response = self._callFUT(request)
+        self._callFUT(request)
         page = self.session.query(Page).filter_by(name='AnotherPage').one()
         self.assertEqual(page.data, 'Hello yo!')
 
 class EditPageTests(unittest.TestCase):
     def setUp(self):
         self.session = _initTestingDB()
-        testing.setUp()
+        self.config = Configurator()
+        self.config.begin()
 
     def tearDown(self):
         self.session.remove()
-        testing.tearDown()
+        self.config.end()
 
     def _callFUT(self, request):
         from tutorial.views import edit_page
@@ -111,7 +117,7 @@ class EditPageTests(unittest.TestCase):
 
     def test_it_notsubmitted(self):
         from tutorial.models import Page
-        _registerRoutes()
+        _registerRoutes(self.config)
         request = testing.DummyRequest()
         request.matchdict = {'pagename':'abc'}
         page = Page('abc', 'hello')
@@ -122,7 +128,7 @@ class EditPageTests(unittest.TestCase):
         
     def test_it_submitted(self):
         from tutorial.models import Page
-        _registerRoutes()
+        _registerRoutes(self.config)
         request = testing.DummyRequest({'form.submitted':True,
                                         'body':'Hello yo!'})
         request.matchdict = {'pagename':'abc'}

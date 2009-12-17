@@ -56,7 +56,7 @@ functions.
 Test Set Up and Tear Down
 --------------------------
 
-:mod:`repoze.bfg` uses a "global" (actually thread-local) data
+:mod:`repoze.bfg` uses a "global" (actually :term:`thread local`) data
 structure to hold on to two items: the current :term:`request` and the
 current :term:`application registry`.  These data structures are
 available via the ``repoze.bfg.threadlocal.get_current_request`` and
@@ -65,42 +65,84 @@ respectively.  See :ref:`threadlocals_chapter` for information about
 these functions and the data structures they return.
 
 If your code uses these ``get_current_*`` functions or calls
-:mod:`repoze.bfg` code which uses the ``get_current_*`` functions, you
-will need to use the ``repoze.bfg.testing.setUp`` and
-``repoze.bfg.testing.tearDown`` functions within the ``setUp`` and
-``tearDown`` methods of your unit tests, respectively.
+:mod:`repoze.bfg` code which uses ``get_current_*`` functions, you
+will need to construct at :term:`Configurator` and call its ``begin``
+method within the ``setUp`` method of your unit test and call the same
+configurator's ``end`` method within the ``tearDown`` method of your
+unit test.
 
-The ``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``
-functions allow you to supply a unit test with an environment that has
-a default registry and a default request for the duration of a single
-test.  Here's an example of using both:
+The use of a Configurator and its ``begin`` and ``end`` methods allows
+you to supply each unit test method in a test case with an environment
+that has a isolated registry and an isolated request for the duration
+of a single test.  Here's an example of using this feature:
 
 .. code-block:: python
    :linenos:
 
    import unittest
-   from repoze.bfg import testing
+   from repoze.bfg.configuration import Configurator
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           testing.setUp()
+           self.config = Configurator()
+           self.config.begin()
 
        def tearDown(self):
-           testing.tearDown()
+           self.config.end()
 
-If you don't *know* whether you're calling code that uses these
-functions, a rule of thumb applies: just always use the
-``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``
-functions in the ``setUp`` and ``tearDown`` respectively of unit tests
-that test :mod:`repoze.bfg` application code, unless it's obvious
-you're not calling any :mod:`repoze.bfg` APIs which might make use of
-the any "current" global.
+The above will make sure that
+``repoze.bfg.threadlocal.get_current_registry`` will return the
+:term:`application registry` associated with the ``config``
+Configurator instance when ``get_current_registry`` is called in a
+test case method attached to ``MyTest``.  Each test case method
+attached to ``MyTest`` will use an isolated registry.
 
-The ``repoze.bfg.testing.setUp`` and ``repoze.bfg.testing.tearDown``
-functions accept various arguments that influence the code run during
-the test.  See the :ref:`testing_module` chapter for information about
-the APIs of ``repoze.bfg.testing.setUp`` and
-``repoze.bfg.testing.tearDown``.
+The ``begin`` method of a Configurator accepts various arguments that
+influence the code run during the test.  See the
+:ref:`configuration_module` chapter for information about the API of a
+:term:`Configurator`, including its ``begin`` and ``end`` methods.
+
+If you also want to make ``repoze.bfg.get_current_registry`` return
+something other than ``None`` during the course of a single test, you
+can pass a :term:`request` object into the ``begin`` method of the
+Configurator within the ``setUp`` method of your test:
+
+.. code-block:: python
+   :linenos:
+
+   import unittest
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.request import Request
+
+   class MyTest(unittest.TestCase):
+       def setUp(self):
+           self.config = Configurator()
+           request = Request()
+           self.config.begin(request=request)
+
+       def tearDown(self):
+           self.config.end()
+
+If you pass a term:`Request` object into the ``begin`` method of the
+configurator within your test case's ``setUp``, any test method
+attached to the ``MyTest`` test case that directly or indirectly calls
+``get_current_request`` will receive the request you passed into the
+``begin`` method.  Otherwise, during testing, ``get_current_request``
+will return ``None``.
+
+What?
+~~~~~
+
+Thread local data structures are always a bit confusing, especially
+when used by frameworks.  Sorry.  So here's a rule of thumb: if you
+don't *know* whether you're calling code that uses the
+``get_current_registry`` or ``get_current_request`` functions, or you
+don't care about any of this, but you still want to write test code,
+just always create a configurator instance and call its ``begin``
+method within the ``setUp`` of a unit test, then subsequently call its
+``end`` method in the test's ``tearDown``.  This won't really hurt
+anything if the application you're testing does not call any
+``get_current*`` function.
 
 Using the ``repoze.bfg.testing`` API in Unit Tests
 --------------------------------------------------
@@ -148,14 +190,16 @@ you could write a unittest TestCase that used the testing API.
    :linenos:
 
    import unittest
+   from repoze.bfg.configuration import Configurator
    from repoze.bfg import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
-           testing.setUp()
+           self.config = Configurator()
+           self.config.begin()
 
        def tearDown(self):
-           testing.tearDown()
+           self.config.end()
        
        def test_view_fn_not_submitted(self):
            from my.package import view_fn
@@ -204,12 +248,12 @@ assertion.  We assert at the end of this that the renderer's ``say``
 attribute is ``Yo``, as this is what is expected of the view function
 in the branch it's testing.
 
-Note that the test calls the ``repoze.bfg.testing.setUp`` function in
-its ``setUp`` method and the ``repoze.bfg.testing.tearDown`` function
-in its ``tearDown`` method.  Use of this pattern is required to
-perform cleanup between the test runs.  If you use any of the testing
-API, be sure to call ``repoze.bfg.testing.setUp`` in the test setup
-and ``repoze.bfg.testing.tearDown`` in the test teardown.
+Note that the test calls the ``begin`` method of a
+:term:`Configurator` in its ``setUp`` method and the ``end`` method of
+the same in its ``tearDown`` method.  If you use any of the
+``repoze.bfg.testing`` APIs, be sure to use this pattern in your test
+setUp and tearDown; these methods make sure you're using a "fresh"
+:term:`application registry` per test run.
 
 See the :ref:`testing_module` chapter for the entire :mod:`repoze.bfg`
 -specific testing API.  This chapter describes APIs for registering a
@@ -251,6 +295,7 @@ environment.
 
    import unittest
 
+   from repoze.bfg.configuration import Configurator
    from repoze.bfg import testing
 
    class ViewIntegrationTests(unittest.TestCase):
@@ -259,15 +304,14 @@ environment.
            registrations your application declares in its configure.zcml
            (including dependent registrations for repoze.bfg itself).
            """
-           from repoze.bfg.configuration import Configurator
            import myapp
-           configurator = Configurator(package=myapp)
-           configurator.load_zcml('myapp:configure.zcml')
-           testing.setUp(registry=configurator.registry)
+           self.config = Configurator(package=myapp)
+           self.config.begin()
+           self.config.load_zcml('myapp:configure.zcml')
 
        def tearDown(self):
            """ Clear out the application registry """
-           testing.tearDown()
+           self.config.end()
 
        def test_my_view(self):
            from myapp.views import my_view

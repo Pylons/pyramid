@@ -1,4 +1,5 @@
 import unittest
+from repoze.bfg.configuration import Configurator
 from repoze.bfg import testing
 
 def _initTestingDB():
@@ -8,11 +9,12 @@ def _initTestingDB():
 
 class TestMyView(unittest.TestCase):
     def setUp(self):
-        testing.setUp()
+        self.config = Configurator()
+        self.config.begin()
         _initTestingDB()
 
     def tearDown(self):
-        testing.tearDown()
+        self.config.end()
 
     def test_it(self):
         from tutorial.views import my_view

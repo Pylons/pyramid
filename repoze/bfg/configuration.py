@@ -124,6 +124,7 @@ class Configurator(object):
     class.  The debug logger is used by :mod:`repoze.bfg` itself to
     log warnings and authorization debugging information.
     """
+    manager = manager # for testing injection
     def __init__(self, registry=None, package=None, settings=None,
                  root_factory=None, authentication_policy=None,
                  authorization_policy=None, renderers=DEFAULT_RENDERERS,
@@ -274,6 +275,22 @@ class Configurator(object):
 
     # API
 
+    def begin(self, request=None):
+        """ Indicate that application or test configuration has begun.
+        This pushes a dictionary containing the registry implied by
+        this configurator and the :term:`request` implied by
+        ``request`` on to the :term:`thread local` stack consulted by
+        various ``repoze.bfg.threadlocal`` API functions."""
+        self.manager.push({'registry':self.registry, 'request':request})
+
+    def end(self):
+        """ Indicate that application or test configuration has ended.
+        This pops the last value pushed on to the :term:`thread local`
+        stack (usually by the ``begin`` method) and returns that
+        value.
+        """
+        return self.manager.pop()
+
     def add_subscriber(self, subscriber, iface=None):
         """Add an event :term:`subscriber` for the event stream
         implied by the supplied ``iface`` interface.  The
@@ -291,7 +308,7 @@ class Configurator(object):
         self.registry.registerHandler(subscriber, iface)
         return subscriber
 
-    def make_wsgi_app(self, manager=manager):
+    def make_wsgi_app(self):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
         the current configuration state and sends a
         ``repoze.bfg.interfaces.WSGIApplicationCreatedEvent`` event to
@@ -302,11 +319,11 @@ class Configurator(object):
         # We push the registry on to the stack here in case any code
         # that depends on the registry threadlocal APIs used in
         # listeners subscribed to the WSGIApplicationCreatedEvent.
-        manager.push({'registry':self.registry, 'request':None})
+        self.manager.push({'registry':self.registry, 'request':None})
         try:
             self.registry.notify(WSGIApplicationCreatedEvent(app))
         finally:
-            manager.pop()
+            self.manager.pop()
         return app
 
     def load_zcml(self, spec='configure.zcml', lock=threading.Lock()):
@@ -323,12 +340,12 @@ class Configurator(object):
             package = sys.modules[package_name]
 
         lock.acquire()
-        manager.push({'registry':self.registry, 'request':None})
+        self.manager.push({'registry':self.registry, 'request':None})
         try:
             xmlconfig.file(filename, package, execute=True)
         finally:
             lock.release()
-            manager.pop()
+            self.manager.pop()
         return self.registry
 
     def add_view(self, view=None, name="", for_=None, permission=None, 
@@ -1560,12 +1577,14 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     ``settings`` keyword parameter.
     """
     settings = settings or options or {}
+    zcml_file = settings.get('configure_zcml', filename)
     config = Configurator(package=package, settings=settings,
                           root_factory=root_factory)
     if getSiteManager is None:
         from zope.component import getSiteManager
     getSiteManager.sethook(get_current_registry)
-    zcml_file = settings.get('configure_zcml', filename)
+    config.begin()
     config.load_zcml(zcml_file)
+    config.end()
     return config.make_wsgi_app()
 

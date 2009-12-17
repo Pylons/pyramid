@@ -7,6 +7,10 @@
 
   .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None)
 
+     .. automethod:: begin
+
+     .. automethod:: end
+
      .. automethod:: add_renderer(name, factory)
 
      .. automethod:: add_route
