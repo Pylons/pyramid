@@ -13,6 +13,7 @@ except ImportError, why: # pragma: no cover
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
 
+from repoze.bfg.decorator import reify
 from repoze.bfg.renderers import template_renderer_factory
 from repoze.bfg.settings import get_settings
 from repoze.bfg.threadlocal import get_current_registry
@@ -23,9 +24,15 @@ def renderer_factory(path):
 class ZPTTemplateRenderer(object):
     implements(ITemplateRenderer)
     def __init__(self, path):
+        self.path = path
+
+    @reify
+    def template(self):
+        # delay template creation until (hopefully) settings have been
+        # registered
         settings = get_settings()
         auto_reload = settings and settings['reload_templates']
-        self.template = PageTemplateFile(path, auto_reload=auto_reload)
+        return PageTemplateFile(self.path, auto_reload=auto_reload)
 
     def implementation(self):
         return self.template

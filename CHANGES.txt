@@ -4,6 +4,13 @@ Next release
 Bug Fixes
 ---------
 
+- When Chameleon page or text templates were added imperatively (via
+  ``Configurator.add_view`` or some derivative), they too-eagerly
+  attempted to look up the ``reload_templates`` setting via
+  ``get_settings``, meaning they were always registered in
+  non-auto-reload-mode (the default).  Each now waits until its
+  respective ``template`` attribute is accessed to look up the value.
+
 - When a route with the same name as a previously registered route was
   added, the old route was not removed from the mapper's routelist.
   Symptom: the old registered route would be used (and possibly

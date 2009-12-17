@@ -48,6 +48,13 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(result,
                      '<div xmlns="http://www.w3.org/1999/xhtml">\n</div>')
 
+    def test_template_reified(self):
+        minimal = self._getTemplatePath('minimal.pt')
+        instance = self._makeOne(minimal)
+        self.failIf('template' in instance.__dict__)
+        template  = instance.template
+        self.assertEqual(template, instance.__dict__['template'])
+
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.pt')
         instance = self._makeOne(minimal)

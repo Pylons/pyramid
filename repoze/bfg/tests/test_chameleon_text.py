@@ -47,6 +47,13 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         from repoze.bfg.interfaces import ITemplateRenderer
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
+    def test_template_reified(self):
+        minimal = self._getTemplatePath('minimal.txt')
+        instance = self._makeOne(minimal)
+        self.failIf('template' in instance.__dict__)
+        template  = instance.template
+        self.assertEqual(template, instance.__dict__['template'])
+
     def test_call(self):
         minimal = self._getTemplatePath('minimal.txt')
         instance = self._makeOne(minimal)
