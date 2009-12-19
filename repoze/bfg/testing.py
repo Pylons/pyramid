@@ -93,7 +93,8 @@ def registerEventListener(event_iface=Interface):
     to expected event notifications.  This method is useful when
     testing code that wants to call ``registry.notify``,
     ``zope.component.event.dispatch`` or
-    ``zope.component.event.objectEventNotify``."""
+    ``zope.component.event.objectEventNotify``.
+    """
     L = []
     def subscriber(*event):
         L.extend(event)
@@ -127,7 +128,12 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
     ``permission``.  This permission will be checked by any existing
     security policy when view execution is attempted.  This function
     is useful when dealing with code that wants to call,
-    e.g. ``repoze.bfg.view.render_view_to_response``."""
+    e.g. ``repoze.bfg.view.render_view_to_response``.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``add_view`` method of a
+       :term:`Configurator` in your unit and integration tests.
+    """
     if view is None:
         def view(context, request):
             return Response(result)
@@ -191,7 +197,12 @@ def registerUtility(impl, iface=Interface, name=''):
     is the empty string by default.
 
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
-    more information about ZCA utilities."""
+    more information about ZCA utilities.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``add_utility`` method of a
+       :term:`Configurator` in your unit and integration tests.
+    """
     reg = get_current_registry()
     reg.registerUtility(impl, iface, name=name)
     return impl
@@ -209,7 +220,12 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     name of the adapter, the empty string by default.
 
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
-    more information about ZCA adapters."""
+    more information about ZCA adapters.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``add_adapter`` method of a
+       :term:`Configurator` in your unit and integration tests.
+    """
     reg = get_current_registry()
     if not isinstance(for_, (tuple, list)):
         for_ = (for_,)
@@ -227,7 +243,12 @@ def registerSubscriber(subscriber, iface=Interface):
     query.
 
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
-    more information about ZCA subscribers."""
+    more information about ZCA subscribers.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``add_subscriber`` method of a
+       :term:`Configurator` in your unit and integration tests.
+    """
     reg = get_current_registry()
     if not isinstance(iface, (tuple, list)):
         iface = (iface,)
@@ -244,6 +265,10 @@ def registerRoute(path, name, factory=None):
     e.g. ``route_url``.
 
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``add_route`` method of a
+       :term:`Configurator` in your unit and integration tests.
     """
     reg = get_current_registry()
     mapper = reg.queryUtility(IRoutesMapper)
@@ -271,7 +296,6 @@ def registerRoutesMapper(root_factory=None):
     ``repoze.bfg.testing.registerRoute``.
 
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
-
     """
     mapper = RoutesMapper()
     reg = get_current_registry()

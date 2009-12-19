@@ -10,7 +10,6 @@ from zope.configuration import xmlconfig
 
 from zope.interface import Interface
 from zope.interface import implementedBy
-from zope.interface import providedBy
 from zope.interface.interfaces import IInterface
 from zope.interface import implements
 

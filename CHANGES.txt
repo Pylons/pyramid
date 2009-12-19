@@ -7,9 +7,9 @@ Features
 - Add two new APIs to the ``repoze.bfg.configuration.Configurator``
   class: ``add_adapter`` and ``add_utility``.  These, respectively,
   perform the same functions as the ``registerAdapter`` and
-  ``registerUtility`` functions of a ZCA registry.  They were added to
-  allow for a more consistent testing API for applications that make
-  use of the ZCA directly.
+  ``registerUtility`` functions of the configurator's underlying ZCA
+  registry.  They were added to allow for a more consistent testing
+  API for applications that make use of the ZCA directly.
 
 - Add a ``custom_predicates`` argument to the ``Configurator``
   ``add_view`` method, the ``bfg_view`` decorator and the attribute
