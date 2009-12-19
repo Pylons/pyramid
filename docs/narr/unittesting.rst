@@ -112,12 +112,12 @@ Configurator within the ``setUp`` method of your test:
 
    import unittest
    from repoze.bfg.configuration import Configurator
-   from repoze.bfg.request import Request
+   from repoze.bfg import testing
 
    class MyTest(unittest.TestCase):
        def setUp(self):
            self.config = Configurator()
-           request = Request()
+           request = testing.DummyRequest()
            self.config.begin(request=request)
 
        def tearDown(self):
@@ -128,7 +128,10 @@ configurator within your test case's ``setUp``, any test method
 attached to the ``MyTest`` test case that directly or indirectly calls
 ``get_current_request`` will receive the request you passed into the
 ``begin`` method.  Otherwise, during testing, ``get_current_request``
-will return ``None``.
+will return ``None``.  We use a "dummy" request implementation
+supplied by ``repoze.bfg.testing.DummyRequest`` because it's easier to
+construct than a "real" :mod:`repoze.bfg` request object.  See
+:ref:`testing_module` for documentation about a DummyRequest.
 
 What?
 ~~~~~
@@ -144,14 +147,14 @@ method within the ``setUp`` of a unit test, then subsequently call its
 anything if the application you're testing does not call any
 ``get_current*`` function.
 
-Using the ``repoze.bfg.testing`` API in Unit Tests
---------------------------------------------------
+Using the ``Configurator`` and ``repoze.bfg.testing`` APIs in Unit Tests
+------------------------------------------------------------------------
 
-The ``repoze.bfg.testing`` module provides a number of functions which
-can be used during unit testing.  These functions make
-:term:`configuration declaration` calls to the current
-:term:`application registry`, but typically register a "stub" or
-"dummy" feature in place of the "real" feature that the code would
+The ``Configurator`` API and the ``repoze.bfg.testing`` module
+provide a number of functions which can be used during unit testing.
+These functions make :term:`configuration declaration` calls to the
+current :term:`application registry`, but typically register a "stub"
+or "dummy" feature in place of the "real" feature that the code would
 call if it was being run normally.
 
 For example, let's imagine you want to unit test a :mod:`repoze.bfg`
@@ -203,14 +206,14 @@ you could write a unittest TestCase that used the testing API.
        
        def test_view_fn_not_submitted(self):
            from my.package import view_fn
-           renderer = testing.registerTemplateRenderer('templates/show.pt')
+           renderer = self.config.testing_add_template('templates/show.pt')
            request = testing.DummyRequest()
            response = view_fn(request)
            renderer.assert_(say='Hello')
 
        def test_view_fn_submitted(self):
            from my.package import view_fn
-           renderer = testing.registerTemplateRenderer('templates/submitted.pt')
+           renderer = self.config.testing_add_template('templates/submitted.pt')
            request = testing.DummyRequest()
            request.params['say'] = 'Yo'
            response = view_fn(request)
@@ -225,10 +228,14 @@ The first test method, ``test_view_fn_not_submitted`` tests the
 ``view_fn`` function in the case that no "form" values (represented by
 request.params) have been submitted.  Its first line registers a
 "dummy template renderer" named ``templates/show.pt`` via the
-``registerTemplateRenderer`` function (a ``repoze.bfg.testing`` API);
-this function returns a DummyTemplateRenderer instance which we hang
-on to for later.  We then create a ``DummyRequest`` object which
-simulates a WebOb request object.  We call the function being tested
+``testing_add_template`` method of a :term:`Configurator`; this method
+returns a ``DummyTemplateRenderer`` instance which we hang on to for
+later.
+
+We then create a ``DummyRequest`` object which simulates a WebOb
+request object using the ``repoze.bfg.testing.DummyRequest`` API.  A
+``DummyRequest`` is a request object that requires less setup than a
+"real" :mod:`repoze.bfg` request.  We call the function being tested
 with the manufactured request.  When the function is called,
 ``render_template_to_response`` will call the "dummy" template
 renderer object instead of the real template renderer object.  When
@@ -251,15 +258,18 @@ in the branch it's testing.
 Note that the test calls the ``begin`` method of a
 :term:`Configurator` in its ``setUp`` method and the ``end`` method of
 the same in its ``tearDown`` method.  If you use any of the
-``repoze.bfg.testing`` APIs, be sure to use this pattern in your test
-setUp and tearDown; these methods make sure you're using a "fresh"
-:term:`application registry` per test run.
+``Configurator`` APIs during testing, be sure to use this pattern in
+your test setUp and tearDown; these methods make sure you're using a
+"fresh" :term:`application registry` per test run.
 
 See the :ref:`testing_module` chapter for the entire :mod:`repoze.bfg`
 -specific testing API.  This chapter describes APIs for registering a
 security policy, registering models at paths, registering event
 listeners, registering views and view permissions, and classes
 representing "dummy" implementations of a request and a model.
+
+See also the various methods of the :term:`Configurator` documented in
+:ref:`configuration_module` that begin with the ``testing_`` prefix.
 
 .. _integration_tests:
 
@@ -327,7 +337,7 @@ environment.
                                                    str(len(body))))
 
 Unless you cannot avoid it, you should prefer writing unit tests that
-use the :mod:`repoze.bfg.testing` API to set up the right "mock"
+use the :term:`Configurator` API to set up the right "mock"
 registrations rather than creating an integration test.  Unit tests
 will run faster (because they do less for each test) and the result of
 a unit test is usually easier to make assertions about.
