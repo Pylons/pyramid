@@ -363,7 +363,7 @@ In this `TOPP Engineering blog entry
 Ian Bicking asserts that the way :mod:`repoze.bfg` uses a Zope
 interface to represent an HTTP request method adds too much
 indirection for not enough gain.  We agreed in general, and for this
-reason, :mod:`repoze.bfg` version 1.1 adds :term:`view predicate` and
+reason, :mod:`repoze.bfg` version 1.1 added :term:`view predicate` and
 :term:`route predicate` modifiers to view configuration.  Predicates
 are request-specific (or :term:`context` -specific) matching narrowers
 which don't use interfaces.  Instead, each predicate uses a
@@ -407,8 +407,8 @@ For more information about predicates, see
 Many "prebaked" predicates exist.  However, use of only "prebaked"
 predicates, however, doesn't entirely meet Ian's criterion.  He would
 like to be able to match a request using a lambda or another function
-which interrogates the request imperatively.  In 1.2, we acommodate
-this by allowing people to define "custom" view predicates:
+which interrogates the request imperatively.  In version 1.2, we
+acommodate this by allowing people to define "custom" view predicates:
 
 .. code-block:: python
    :linenos:
