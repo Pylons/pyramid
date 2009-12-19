@@ -926,6 +926,32 @@ class ConfiguratorTests(unittest.TestCase):
         request.path_info = '/'
         self._assertNotFound(wrapper, None, request)
 
+    def test_add_view_with_custom_predicates_match(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        def pred1(context, request):
+            return True
+        def pred2(context, request):
+            return True
+        predicates = (pred1, pred2)
+        config.add_view(view=view, custom_predicates=predicates)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_with_custom_predicates_nomatch(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        def pred1(context, request):
+            return True
+        def pred2(context, request):
+            return False
+        predicates = (pred1, pred2)
+        config.add_view(view=view, custom_predicates=predicates)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        self._assertNotFound(wrapper, None, request)
+
     def _assertRoute(self, config, name, path, num_predicates=0):
         from repoze.bfg.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -989,6 +1015,14 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         request.params = {}
         self.assertEqual(predicate(None, request), False)
+
+    def test_add_route_with_custom_predicates(self):
+        config = self._makeOne()
+        def pred1(context, request): pass
+        def pred2(context, request): pass
+        config.add_route('name', 'path', custom_predicates=(pred1, pred2))
+        route = self._assertRoute(config, 'name', 'path', 2)
+        self.assertEqual(route.predicates, [pred1, pred2])
 
     def test_add_route_with_header(self):
         config = self._makeOne()

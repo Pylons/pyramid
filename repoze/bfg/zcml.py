@@ -134,6 +134,15 @@ class IViewDirective(Interface):
         description=(u'Accepts a regular expression.'),
         required = False)
 
+    custom_predicates = Tokens(
+        title=u"One or more custom dotted names to custom predicate callables",
+        description=(u"A list of dotted name references to callables that "
+                     "will be used as predicates for this view configuration"),
+        required=False,
+        value_type=GlobalObject()
+        )
+
+
 def view(
     _context,
     permission=None,
@@ -152,6 +161,7 @@ def view(
     accept=None,
     header=None,
     path_info=None,
+    custom_predicates=(),
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
@@ -176,12 +186,18 @@ def view(
             request_method=request_method, request_param=request_param,
             containment=containment, attr=attr, renderer=renderer,
             wrapper=wrapper, xhr=xhr, accept=accept, header=header,
-            path_info=path_info, _info=_context.info)
+            path_info=path_info, custom_predicates=custom_predicates,
+            _info=_context.info)
+
+    discriminator = ['view', for_, name, request_type, IView, containment,
+                     request_param, request_method, route_name, attr,
+                     xhr, accept, header, path_info]
+
+    discriminator.extend(sorted(custom_predicates))
+    discriminator = tuple(discriminator)
 
     _context.action(
-        discriminator = ('view', for_, name, request_type, IView, containment,
-                         request_param, request_method, route_name, attr,
-                         xhr, accept, header, path_info),
+        discriminator = discriminator,
         callable = register,
         )
 
@@ -223,11 +239,18 @@ class IRouteDirective(Interface):
     accept = TextLine(title=u'accept', required=False)
     xhr = Bool(title=u'xhr', required=False)
     path_info = TextLine(title=u'path_info', required=False)
+    custom_predicates = Tokens(
+        title=u"One or more custom dotted names to custom predicate callables",
+        description=(u"A list of dotted name references to callables that "
+                     "will be used as predicates for this view configuration"),
+        required=False,
+        value_type=GlobalObject()
+        )
 
 def route(_context, name, path, view=None, view_for=None,
           permission=None, factory=None, for_=None,
           header=None, xhr=False, accept=None, path_info=None,
-          request_method=None, request_param=None, 
+          request_method=None, request_param=None, custom_predicates=(),
           view_permission=None, view_request_method=None,
           view_request_param=None, view_containment=None, view_attr=None,
           renderer=None, view_renderer=None, view_header=None, 
@@ -259,6 +282,7 @@ def route(_context, name, path, view=None, view_for=None,
             path_info=path_info,
             request_method=request_method,
             request_param=request_param,
+            custom_predicates=custom_predicates,
             view=view,
             view_for=view_for,
             view_permission=view_permission,
@@ -273,10 +297,14 @@ def route(_context, name, path, view=None, view_for=None,
             view_path_info=view_path_info,
             _info=_context.info
             )
+
+    discriminator = ['route', name, xhr, request_method, path_info,
+                     request_param, header, accept]
+    discriminator.extend(sorted(custom_predicates))
+    discriminator = tuple(discriminator)
         
     _context.action(
-        discriminator = ('route', name, xhr, request_method, path_info,
-                         request_param, header, accept),
+        discriminator=discriminator,
         callable = register,
         )
 

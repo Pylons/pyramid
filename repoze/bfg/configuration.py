@@ -352,7 +352,7 @@ class Configurator(object):
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
-                 header=None, path_info=None, _info=u''):
+                 header=None, path_info=None, custom_predicates=(), _info=u''):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -568,7 +568,20 @@ class Configurator(object):
           be tested against the ``PATH_INFO`` WSGI environment
           variable.  If the regex matches, this predicate will be
           ``True``.
-        """
+
+        custom_predicates
+
+          This value should be a sequence of references to custom
+          predicate callables.  Use custom predicates when no set of
+          predefined predicates do what you need.  Custom predicates
+          can be combined with predefined predicates as necessary.
+          Each custom predicate callable should accept two arguments:
+          ``context`` and ``request`` and should return either
+          ``True`` or ``False`` after doing arbitrary evaluation of
+          the context and/or the request.  If all callables return
+          ``True``, the associated view callable will be considered
+          viable for a given request.
+          """
 
         if not view:
             if renderer:
@@ -603,7 +616,7 @@ class Configurator(object):
         score, predicates = _make_predicates(
             xhr=xhr, request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
-            containment=containment)
+            containment=containment, custom=custom_predicates)
 
         derived_view = self._derive_view(view, permission, predicates, attr,
                                          renderer, wrapper, name, accept)
@@ -675,7 +688,8 @@ class Configurator(object):
     def add_route(self, name, path, view=None, view_for=None,
                   permission=None, factory=None, for_=None,
                   header=None, xhr=False, accept=None, path_info=None,
-                  request_method=None, request_param=None, 
+                  request_method=None, request_param=None,
+                  custom_predicates=(),
                   view_permission=None, view_request_method=None,
                   view_request_param=None,
                   view_containment=None, view_attr=None,
@@ -788,6 +802,20 @@ class Configurator(object):
           request, this predicate will be true.  If this predicate
           returns ``False``, route matching continues.
 
+        custom_predicates
+
+          This value should be a sequence of references to custom
+          predicate callables.  Use custom predicates when no set of
+          predefined predicates does what you need.  Custom predicates
+          can be combined with predefined predicates as necessary.
+          Each custom predicate callable should accept two arguments:
+          ``context`` and ``request`` and should return either
+          ``True`` or ``False`` after doing arbitrary evaluation of
+          the context and/or the request.  If all callables return
+          ``True``, the associated route will be considered viable for
+          a given request.  If any custom predicate returns ``False``,
+          route matching continues.
+
         View-Related Arguments
 
         view
@@ -892,7 +920,9 @@ class Configurator(object):
                                          path_info=path_info,
                                          request_param=request_param,
                                          header=header,
-                                         accept=accept)
+                                         accept=accept,
+                                         custom=custom_predicates)
+        
 
         request_iface = self.registry.queryUtility(IRouteRequest, name=name)
         if request_iface is None:
@@ -1093,7 +1123,7 @@ class Configurator(object):
 
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
-                     containment=None):
+                     containment=None, custom=()):
     # Predicates are added to the predicate list in (presumed)
     # computation expense order.  All predicates associated with a
     # view must evaluate true for the view to "match" a request.
@@ -1123,16 +1153,21 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     predicates = []
     weight = sys.maxint
 
+    if custom:
+        for predicate in custom:
+            weight = weight - 1
+            predicates.append(predicate)
+
     if xhr:
         def xhr_predicate(context, request):
             return request.is_xhr
-        weight = weight - 10
+        weight = weight - 20
         predicates.append(xhr_predicate)
 
     if request_method is not None:
         def request_method_predicate(context, request):
             return request.method == request_method
-        weight = weight - 20
+        weight = weight - 30
         predicates.append(request_method_predicate)
 
     if path_info is not None:
@@ -1142,7 +1177,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             raise ConfigurationError(why[0])
         def path_info_predicate(context, request):
             return path_info_val.match(request.path_info) is not None
-        weight = weight - 30
+        weight = weight - 40
         predicates.append(path_info_predicate)
 
     if request_param is not None:
@@ -1153,7 +1188,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             if request_param_val is None:
                 return request_param in request.params
             return request.params.get(request_param) == request_param_val
-        weight = weight - 40
+        weight = weight - 50
         predicates.append(request_param_predicate)
 
     if header is not None:
@@ -1170,13 +1205,13 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
                 return header_name in request.headers
             val = request.headers.get(header_name)
             return header_val.match(val) is not None
-        weight = weight - 50
+        weight = weight - 60
         predicates.append(header_predicate)
 
     if accept is not None:
         def accept_predicate(context, request):
             return accept in request.accept
-        weight = weight - 60
+        weight = weight - 70
         predicates.append(accept_predicate)
 
     if containment is not None:

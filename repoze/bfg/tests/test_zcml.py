@@ -92,6 +92,31 @@ class TestViewDirective(unittest.TestCase):
         regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
         self.assertEqual(regview(None, None).body, 'OK')
 
+    def test_with_custom_predicates(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        reg = get_current_registry()
+        view = lambda *arg: 'OK'
+        def pred1(context, request):
+            return True
+        def pred2(context, request):
+            return True
+        preds = (pred1, pred2)
+        self._callFUT(context, 'repoze.view', IDummy, view=view,
+                      custom_predicates=preds)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        discrim = ('view', IDummy, '', None, IView, None, None, None, None,
+                   None, False, None, None, None)
+        discrim = discrim + tuple(sorted(preds))
+        self.assertEqual(actions[0]['discriminator'], discrim)
+        register = actions[0]['callable']
+        register()
+        regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        self.assertEqual(regview(None, None), 'OK')
+
 class TestNotFoundDirective(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -489,6 +514,24 @@ class TestRouteDirective(unittest.TestCase):
         request = DummyRequest()
         result = wrapped(None, request)
         self.assertEqual(result.body, 'OK')
+
+    def test_with_custom_predicates(self):
+        def pred1(context, request): pass
+        def pred2(context, request): pass
+        preds = tuple(sorted([pred1, pred2]))
+
+        context = DummyContext()
+        self._callFUT(context, 'name', 'path', custom_predicates=(pred1, pred2))
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        route_action = actions[0]
+        route_action['callable']()
+        route_discriminator = route_action['discriminator']
+        self.assertEqual(
+            route_discriminator,
+            ('route', 'name', False, None, None, None, None,None) + preds)
+        self._assertRoute('name', 'path', 2)
 
 class TestStaticDirective(unittest.TestCase):
     def setUp(self):

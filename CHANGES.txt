@@ -1,3 +1,30 @@
+Next release
+============
+
+Features
+--------
+
+- Add a ``custom_predicates`` argument to the ``Configurator``
+  ``add_view`` method, the ``bfg_view`` decorator and the attribute
+  list of the ZCML ``view`` directive.  If ``custom_predicates`` is
+  specified, it must be a sequence of predicate callables (a predicate
+  callable accepts two arguments: ``context`` and ``request`` and
+  returns ``True`` or ``False``).  The associated view callable will
+  only be invoked if all custom predicates return ``True``.  Use one
+  or more custom predicates when no existing predefined predicate is
+  useful.  Predefined and custom predicates can be mixed freely.
+
+- Add a ``custom_predicates`` argument to the ``Configurator``
+  ``add_route`` and the attribute list of the ZCML ``route``
+  directive.  If ``custom_predicates`` is specified, it must be a
+  sequence of predicate callables (a predicate callable accepts two
+  arguments: ``context`` and ``request`` and returns ``True`` or
+  ``False``).  The associated route will match will only be invoked if
+  all custom predicates return ``True``, else route matching
+  continues.  Use one or more custom predicates when no existing
+  predefined predicate is useful.  Predefined and custom predicates
+  can be mixed freely.
+
 1.2a6 (2009-12-18)
 ==================
 

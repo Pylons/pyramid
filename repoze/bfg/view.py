@@ -322,6 +322,12 @@ class bfg_view(object):
     expression. The view will only be invoked if the ``PATH_INFO``
     WSGI environment variable matches the expression.
 
+    If ``custom_predicates`` is specified, it must be a sequence of
+    :term:`predicate` callables (a predicate callable accepts two
+    arguments: ``context`` and ``request`` and returns ``True`` or
+    ``False``).  The view will only be invoked if all custom
+    predicates return ``True``.
+
     Any individual or all parameters can be omitted.  The simplest
     bfg_view declaration then becomes::
 
@@ -427,7 +433,8 @@ class bfg_view(object):
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
                  containment=None, attr=None, renderer=None, wrapper=None,
-                 xhr=False, accept=None, header=None, path_info=None):
+                 xhr=False, accept=None, header=None, path_info=None,
+                 custom_predicates=()):
         self.name = name
         self.request_type = request_type
         self.for_ = for_
@@ -443,6 +450,7 @@ class bfg_view(object):
         self.accept = accept
         self.header = header
         self.path_info = path_info
+        self.custom_predicates = custom_predicates
 
     def __call__(self, wrapped):
         setting = self.__dict__.copy()

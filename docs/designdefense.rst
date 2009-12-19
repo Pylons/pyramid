@@ -404,11 +404,27 @@ request method was ``POST`` and that the remote user agent passed
 For more information about predicates, see
 :ref:`view_predicates_in_1dot1` and :ref:`route_predicates_in_1dot1`.
 
-Many "prebaked" predicates exist.  Use of only "prebaked" predicates,
-however, doesn't entirely meet Ian's criterion.  He would like to be
-able to match a request using a lambda or another function which
-interrogates the request imperatively.  This may become a feature in a
-later release.
+Many "prebaked" predicates exist.  However, use of only "prebaked"
+predicates, however, doesn't entirely meet Ian's criterion.  He would
+like to be able to match a request using a lambda or another function
+which interrogates the request imperatively.  In 1.2, we acommodate
+this by allowing people to define "custom" view predicates:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+   from webob import Response
+
+   def subpath(context, request):
+       return request.subpath and request.subpath[0] == 'abc'
+
+   @bfg_view(custom_predicates=(subpath,)))
+   def aview(request):
+       return Response('OK')
+
+The above view will only match when the first element of the request's
+:term:`subpath` is ``abc``.
 
 .. _zcml_encouragement:
 

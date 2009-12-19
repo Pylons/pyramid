@@ -361,6 +361,13 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.assertEqual(settings[0]['attr'], 'foo')
         self.assertEqual(settings[1]['attr'], 'bar')
 
+    def test_with_custom_predicates(self):
+        decorator = self._makeOne(custom_predicates=(1,))
+        def foo(context, request): return 'OK'
+        decorated = decorator(foo)
+        settings = decorated.__bfg_view_settings__
+        self.assertEqual(settings[0]['custom_predicates'], (1,))
+
 class TestDefaultForbiddenView(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
         from repoze.bfg.view import default_forbidden_view
