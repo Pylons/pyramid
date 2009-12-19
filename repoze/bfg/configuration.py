@@ -29,6 +29,8 @@ from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import ISettings
+from repoze.bfg.interfaces import ITemplateRenderer
+from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg import chameleon_text
@@ -51,6 +53,7 @@ from repoze.bfg.settings import Settings
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.threadlocal import manager
+from repoze.bfg.traversal import traversal_path
 from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.urldispatch import RoutesMapper
@@ -1183,6 +1186,86 @@ class Configurator(object):
                        view_for=StaticRootFactory,
                        factory=StaticRootFactory(spec),
                        _info=_info)
+    # testing API
+
+    def testing_securitypolicy(self, userid=None, groupids=(),
+                               permissive=True):
+        """Unit/integration testing helper: registers a a pair of
+        dummy :mod:`repoze.bfg` security policies: an
+        :term:`authorization policy` and an :term:`authentication
+        policy`) using the userid ``userid`` and the group ids
+        ``groupids``.  If ``permissive`` is true, a 'permissive'
+        authorization policy is registered; this policy allows all
+        access.  If ``permissive`` is false, a nonpermissive
+        authorization policy is registered; this policy denies all
+        access.  This function is most useful when testing code that
+        uses the ``repoze.bfg.security`` APIs named
+        ``has_permission``, ``authenticated_userid``,
+        ``effective_principals`` and
+        ``principals_allowed_by_permission``.
+        """
+        from repoze.bfg.testing import DummySecurityPolicy
+        policy = DummySecurityPolicy(userid, groupids, permissive)
+        self.registry.registerUtility(policy, IAuthorizationPolicy)
+        self.registry.registerUtility(policy, IAuthenticationPolicy)
+
+    def testing_models(self, models):
+        """Unit/integration testing helper: registers a dictionary of
+        models that can be resolved via
+        ``repoze.bfg.traversal.find_model``.  This is most useful for
+        testing code that wants to call the
+        ``repoze.bfg.traversal.find_model`` API.  The ``find_model``
+        API is called with a path as one of its arguments.  If the
+        dictionary you register when calling this method contains that
+        path as a string key (e.g. ``/foo/bar`` or ``foo/bar``), the
+        corresponding value will be returned to ``find_model`` (and
+        thus to your code) when ``find_model`` is called with an
+        equivalent path string or tuple."""
+        class DummyTraverserFactory:
+            def __init__(self, context):
+                self.context = context
+
+            def __call__(self, request):
+                path = request['PATH_INFO']
+                ob = models[path]
+                traversed = traversal_path(path)
+                return {'context':ob, 'view_name':'','subpath':(),
+                        'traversed':traversed, 'virtual_root':ob,
+                        'virtual_root_path':(), 'root':ob}
+        self.registry.registerAdapter(DummyTraverserFactory, (Interface,),
+                                      ITraverser)
+        return models
+
+    def testing_add_subscriber(self, event_iface=Interface):
+        """Unit/integration testing helper: Registers a
+        :term:`subscriber` listening for events of the type
+        ``event_iface`` and returns a list which is appended to by the
+        subscriber.  When an event is dispatched that matches
+        ``event_iface``, that event will be appended to the list.  You
+        can then compare the values in the list to expected event
+        notifications.  This method is useful when testing code that
+        wants to call ``registry.notify``,
+        ``zope.component.event.dispatch`` or
+        ``zope.component.event.objectEventNotify``.
+        """
+        L = []
+        def subscriber(*event):
+            L.extend(event)
+        self.add_subscriber(subscriber, event_iface)
+        return L
+
+    def testing_add_template(self, path, renderer=None):
+        """ Register a template tenderer at ``path`` (usually a relative
+        filename ala ``templates/foo.pt``) and return the renderer object.
+        If the ``renderer`` argument is None, a 'dummy' renderer will be
+        used.  This function is useful when testing code that calls the
+        ``render_template_to_response`` or any other ``render_template*``
+        API of any of the built-in templating systems."""
+        from repoze.bfg.testing import DummyTemplateRenderer
+        if renderer is None:
+            renderer = DummyTemplateRenderer()
+        self.registry.registerUtility(renderer, ITemplateRenderer, path)
+        return renderer
 
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,

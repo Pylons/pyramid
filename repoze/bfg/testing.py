@@ -10,14 +10,10 @@ from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import alsoProvides
 
-from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import ITemplateRenderer
-from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 
@@ -32,7 +28,6 @@ from repoze.bfg.security import has_permission
 from repoze.bfg.settings import Settings
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.threadlocal import manager
-from repoze.bfg.traversal import traversal_path
 from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.zcml import zcml_configure # API
 
@@ -52,11 +47,15 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     ``repoze.bfg.security`` APIs named ``has_permission``,
     ``authenticated_userid``, ``effective_principals``,
     ``principals_allowed_by_permission``, and so on.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``testing_securitypolicy`` method of a
+       :term:`Configurator` in your unit and integration tests.
     """
-    policy = DummySecurityPolicy(userid, groupids, permissive)
-    reg = get_current_registry()
-    reg.registerUtility(policy, IAuthorizationPolicy)
-    reg.registerUtility(policy, IAuthenticationPolicy)
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    return config.testing_securitypolicy(userid=userid, groupids=groupids,
+                                         permissive=permissive)
 
 def registerModels(models):
     """ Registers a dictionary of models that can be resolved via
@@ -68,21 +67,15 @@ def registerModels(models):
     string key (e.g. ``/foo/bar`` or ``foo/bar``), the corresponding
     value will be returned to ``find_model`` (and thus to your code)
     when ``find_model`` is called with an equivalent path string or
-    tuple."""
-    class DummyTraverserFactory:
-        def __init__(self, context):
-            self.context = context
+    tuple.
 
-        def __call__(self, request):
-            path = request['PATH_INFO']
-            ob = models[path]
-            traversed = traversal_path(path)
-            return {'context':ob, 'view_name':'','subpath':(),
-                    'traversed':traversed, 'virtual_root':ob,
-                    'virtual_root_path':(), 'root':ob}
-
-    registerTraverser(DummyTraverserFactory)
-    return models
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``testing_models`` method of a
+       :term:`Configurator` in your unit and integration tests.
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    return config.testing_models(models)
 
 def registerEventListener(event_iface=Interface):
     """ Registers an :term:`event` listener (aka :term:`subscriber`)
@@ -94,12 +87,14 @@ def registerEventListener(event_iface=Interface):
     testing code that wants to call ``registry.notify``,
     ``zope.component.event.dispatch`` or
     ``zope.component.event.objectEventNotify``.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``testing_add_subscriber`` method of a
+       :term:`Configurator` in your unit and integration tests.
     """
-    L = []
-    def subscriber(*event):
-        L.extend(event)
-    registerSubscriber(subscriber, event_iface)
-    return L
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    return config.testing_add_subscriber(event_iface)
 
 def registerTemplateRenderer(path, renderer=None):
     """ Register a template tenderer at ``path`` (usually a relative
@@ -107,10 +102,16 @@ def registerTemplateRenderer(path, renderer=None):
     If the ``renderer`` argument is None, a 'dummy' renderer will be
     used.  This function is useful when testing code that calls the
     ``render_template_to_response`` or any other ``render_template*``
-    API of any of the built-in templating systems."""
-    if renderer is None:
-        renderer = DummyTemplateRenderer()
-    return registerUtility(renderer, ITemplateRenderer, path)
+    API of any of the built-in templating systems.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``testing_add_template`` method of a
+       :term:`Configurator` in your unit and integration tests.
+
+    """
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    return config.testing_add_template(path, renderer)
 
 # registerDummyRenderer is a deprecated alias that should never be removed
 # (far too much usage in the wild)
@@ -249,14 +250,9 @@ def registerSubscriber(subscriber, iface=Interface):
        Instead use the ``add_subscriber`` method of a
        :term:`Configurator` in your unit and integration tests.
     """
-    reg = get_current_registry()
-    if not isinstance(iface, (tuple, list)):
-        iface = (iface,)
-    reg.registerHandler(subscriber, iface)
-    return subscriber
-
-def registerTraverser(traverser, for_=Interface):
-    return registerAdapter(traverser, for_, ITraverser)
+    registry = get_current_registry()
+    config = Configurator(registry)
+    return config.add_subscriber(subscriber, iface=iface)
 
 def registerRoute(path, name, factory=None):
     """ Register a new :term:`route` using a path
@@ -296,6 +292,11 @@ def registerRoutesMapper(root_factory=None):
     ``repoze.bfg.testing.registerRoute``.
 
     .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
+
+    .. warning:: This API is not useful in :mod:`repoze.bfg` 1.2 or better
+                 because a route mapper is no longer required to be
+                 present for successful operation of the system without
+                 any routes present.
     """
     mapper = RoutesMapper()
     reg = get_current_registry()

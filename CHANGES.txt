@@ -4,6 +4,18 @@ Next release
 Features
 --------
 
+- Add four new testing-related APIs to the
+  ``repoze.bfg.configuration.Configurator`` class:
+  ``testing_securitypolicy``, ``testing_models``,
+  ``testing_add_subscriber``, and ``testing_add_template``.  These
+  were added in order to provide more direct access to the
+  functionality of the ``repoze.bfg.testing`` APIs named
+  ``registerDummySecurityPolicy``, ``registerModels``,
+  ``registerEventListener``, and ``registerTemplateRenderer`` when a
+  configurator is used.  The ``testing`` APIs named are nominally
+  deprecated (although they will likely remain around "forever", as
+  they are in heavy use in the wild).
+
 - Add a new API to the ``repoze.bfg.configuration.Configurator``
   class: ``add_settings``.  This API can be used to add "settings"
   (information returned within via the
@@ -45,6 +57,18 @@ Internal
 - Cause the ``adapter``, ``utility``, and ``subscriber`` ZCML
   directives to use a ``Configurator`` instance and associated
   configurator APIs rather than a ZCA registry directly.
+
+- Remove the ``repoze.bfg.testing.registerTraverser`` function.  This
+  function was never an API.
+
+Documenation
+------------
+
+- Doc-deprecated most helper functions in the ``repoze.bfg.testing``
+  module.  These helper functions likely won't be removed any time
+  soon, nor will they generate a warning any time soon, due to their
+  heavy use in the wild, but equivalent behavior exists in methods of
+  a Configurator.
 
 1.2a6 (2009-12-18)
 ==================

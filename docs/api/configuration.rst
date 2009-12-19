@@ -11,6 +11,8 @@
 
      .. automethod:: end
 
+     .. automethod:: add_adapter
+
      .. automethod:: add_renderer(name, factory)
 
      .. automethod:: add_route
@@ -20,6 +22,8 @@
      .. automethod:: add_settings
 
      .. automethod:: add_subscriber
+
+     .. automethod:: add_utility
 
      .. automethod:: add_view
 
@@ -35,7 +39,10 @@
 
      .. automethod:: set_notfound_view(view=None, attr=None, renderer=None, wrapper=None)
 
-     .. automethod:: add_adapter
+     .. automethod:: testing_securitypolicy
 
-     .. automethod:: add_utility
+     .. automethod:: testing_models
 
+     .. automethod:: testing_add_subscriber
+
+     .. automethod:: testing_add_template

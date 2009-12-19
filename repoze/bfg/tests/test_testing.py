@@ -221,28 +221,32 @@ class Test_registerView(TestBase):
 
 class Test_registerAdapter(TestBase):
     def test_registerAdapter(self):
-        from zope.interface import implements
         from zope.interface import Interface
         class provides(Interface):
             pass
         class Provider:
-            implements(provides)
-            def __init__(self, context, request):
-                self.context = context
-                self.request = request
+            pass
         class for_(Interface):
             pass
-        class For_:
-            implements(for_)
-        for1 = For_()
-        for2 = For_()
         from repoze.bfg import testing
         testing.registerAdapter(Provider, (for_, for_), provides, name='foo')
-        adapter = self.registry.getMultiAdapter(
-            (for1, for2), provides, name='foo')
-        self.failUnless(isinstance(adapter, Provider))
-        self.assertEqual(adapter.context, for1)
-        self.assertEqual(adapter.request, for2)
+        adapter = self.registry.adapters.lookup(
+            (for_, for_), provides, name='foo')
+        self.assertEqual(adapter, Provider)
+
+    def test_registerAdapter_notlist(self):
+        from zope.interface import Interface
+        class provides(Interface):
+            pass
+        class Provider:
+            pass
+        class for_(Interface):
+            pass
+        from repoze.bfg import testing
+        testing.registerAdapter(Provider, for_, provides, name='foo')
+        adapter = self.registry.adapters.lookup(
+            (for_,), provides, name='foo')
+        self.assertEqual(adapter, Provider)
 
 class Test_registerUtility(TestBase):
     def test_registerUtility(self):
@@ -258,6 +262,20 @@ class Test_registerUtility(TestBase):
         from repoze.bfg import testing
         testing.registerUtility(utility, iface, name='mudge')
         self.assertEqual(self.registry.getUtility(iface, name='mudge')(), 'foo')
+
+class Test_registerSubscriber(TestBase):
+    def test_it(self):
+        from repoze.bfg import testing
+        L = []
+        def subscriber(event):
+            L.append(event)
+        testing.registerSubscriber(subscriber, iface=IDummy)
+        event = DummyEvent()
+        self.registry.notify(event)
+        self.assertEqual(len(L), 1)
+        self.assertEqual(L[0], event)
+        self.registry.notify(object())
+        self.assertEqual(len(L), 1)
 
 class Test_registerRoute(TestBase):
     def test_registerRoute(self):

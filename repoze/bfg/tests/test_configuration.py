@@ -1864,6 +1864,81 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.registry.queryUtility(IDummy, name='foo')
         self.assertEqual(result, 'OK')
 
+    def test_testing_securitypolicy(self):
+        from repoze.bfg.testing import DummySecurityPolicy
+        config = self._makeOne()
+        config.testing_securitypolicy('user', ('group1', 'group2'),
+                                      permissive=False)
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        ut = config.registry.getUtility(IAuthenticationPolicy)
+        self.failUnless(isinstance(ut, DummySecurityPolicy))
+        ut = config.registry.getUtility(IAuthorizationPolicy)
+        self.assertEqual(ut.userid, 'user')
+        self.assertEqual(ut.groupids, ('group1', 'group2'))
+        self.assertEqual(ut.permissive, False)
+
+    def test_testing_models(self):
+        from repoze.bfg.traversal import find_model
+        from repoze.bfg.interfaces import ITraverser
+        ob1 = object()
+        ob2 = object()
+        models = {'/ob1':ob1, '/ob2':ob2}
+        config = self._makeOne()
+        config.testing_models(models)
+        adapter = config.registry.getAdapter(None, ITraverser)
+        result = adapter({'PATH_INFO':'/ob1'})
+        self.assertEqual(result['context'], ob1)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], (u'ob1',))
+        self.assertEqual(result['virtual_root'], ob1)
+        self.assertEqual(result['virtual_root_path'], ())
+        result = adapter({'PATH_INFO':'/ob2'})
+        self.assertEqual(result['context'], ob2)
+        self.assertEqual(result['view_name'], '')
+        self.assertEqual(result['subpath'], ())
+        self.assertEqual(result['traversed'], (u'ob2',))
+        self.assertEqual(result['virtual_root'], ob2)
+        self.assertEqual(result['virtual_root_path'], ())
+        self.assertRaises(KeyError, adapter, {'PATH_INFO':'/ob3'})
+        try:
+            config.begin()
+            self.assertEqual(find_model(None, '/ob1'), ob1)
+        finally:
+            config.end()
+
+    def test_testing_add_subscriber_single(self):
+        config = self._makeOne()
+        L = config.testing_add_subscriber(IDummy)
+        event = DummyEvent()
+        config.registry.notify(event)
+        self.assertEqual(len(L), 1)
+        self.assertEqual(L[0], event)
+        config.registry.notify(object())
+        self.assertEqual(len(L), 1)
+
+    def test_testing_add_subscriber_multiple(self):
+        config = self._makeOne()
+        L = config.testing_add_subscriber((Interface, IDummy))
+        event = DummyEvent()
+        event.object = 'foo'
+        # the below is the equivalent of z.c.event.objectEventNotify(event)
+        config.registry.subscribers((event.object, event), None)
+        self.assertEqual(len(L), 2)
+        self.assertEqual(L[0], 'foo')
+        self.assertEqual(L[1], event)
+        
+    def test_testing_add_subscriber_defaults(self):
+        config = self._makeOne()
+        L = config.testing_add_subscriber()
+        event = object()
+        config.registry.notify(event)
+        self.assertEqual(L[-1], event)
+        event2 = object()
+        config.registry.notify(event2)
+        self.assertEqual(L[-1], event2)
+
 class Test__map_view(unittest.TestCase):
     def setUp(self):
         from repoze.bfg.registry import Registry
@@ -2872,3 +2947,6 @@ class DummyFactory(object):
     def __call__(self):
         """ """
         
+class DummyEvent:
+    implements(IDummy)
+
