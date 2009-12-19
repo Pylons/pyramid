@@ -581,6 +581,8 @@ class Configurator(object):
           the context and/or the request.  If all callables return
           ``True``, the associated view callable will be considered
           viable for a given request.
+
+          .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
           """
 
         if not view:
@@ -817,6 +819,8 @@ class Configurator(object):
           route matching continues.  Note that the value ``context``
           will always be ``None`` when passed to a custom route
           predicate.
+
+          .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
 
         View-Related Arguments
 
