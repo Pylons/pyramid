@@ -448,14 +448,14 @@ lowest common denominator, :mod:`repoze.bfg` 1.2 includes a completely
 imperative mode for all configuration.  You will be able to make
 "single file" apps in this mode, which should help people who need to
 see everything done completely imperatively.  For example, the very
-most basic :mod:`repoze.bfg` "helloworld" program will become
+most basic :mod:`repoze.bfg` "helloworld" program has become
 something like:
 
 .. code-block:: python
    :linenos:
 
    from webob import Response
-   from wsgiref import simple_server
+   from paste.httpserver import serve
    from repoze.bfg.configuration import Configurator
 
    def hello_world(request):
@@ -463,9 +463,11 @@ something like:
 
    if __name__ == '__main__':
        config = Configurator()
+       config.begin()
        config.add_view(hello_world)
+       config.end()
        app = config.make_wsgi_app()
-       simple_server.make_server('', 8080, app).serve_forever()
+       serve(app)
 
 In this mode, no ZCML is required for end users.  Hopefully this mode
 will allow people who are used to doing everything imperatively feel
