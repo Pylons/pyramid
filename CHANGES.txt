@@ -21,9 +21,10 @@ Features
   arguments: ``context`` and ``request`` and returns ``True`` or
   ``False``).  The associated route will match will only be invoked if
   all custom predicates return ``True``, else route matching
-  continues.  Use one or more custom predicates when no existing
-  predefined predicate is useful.  Predefined and custom predicates
-  can be mixed freely.
+  continues.  Note that the value ``context`` will always be ``None``
+  when passed to a custom route predicate.  Use one or more custom
+  predicates when no existing predefined predicate is useful.
+  Predefined and custom predicates can be mixed freely.
 
 1.2a6 (2009-12-18)
 ==================

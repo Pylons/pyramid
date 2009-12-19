@@ -555,6 +555,22 @@ path_info
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
+custom_predicates
+
+  This value should be a sequence of references to custom predicate
+  callables (e.g. ``dotted.name.one dotted.name.two``, if used in
+  ZCML; Python dotted names to callables separated by spaces).  Use
+  custom predicates when no set of predefined predicates do what you
+  need.  Custom predicates can be combined with predefined predicates
+  as necessary.  Each custom predicate callable should accept two
+  arguments: ``context`` and ``request`` and should return either
+  ``True`` or ``False`` after doing arbitrary evaluation of the
+  context and/or the request.  If all callables return ``True``, the
+  associated view callable will be considered viable for a given
+  request.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
+
 .. _mapping_views_to_urls_using_a_decorator_section:
 
 View Configuration Using the ``@bfg_view`` Decorator

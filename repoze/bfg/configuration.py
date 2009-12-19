@@ -814,7 +814,9 @@ class Configurator(object):
           the context and/or the request.  If all callables return
           ``True``, the associated route will be considered viable for
           a given request.  If any custom predicate returns ``False``,
-          route matching continues.
+          route matching continues.  Note that the value ``context``
+          will always be ``None`` when passed to a custom route
+          predicate.
 
         View-Related Arguments
 

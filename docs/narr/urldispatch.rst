@@ -163,6 +163,22 @@ accept
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
+custom_predicates
+
+  This value should be a sequence of references to custom predicate
+  callables.  Use custom predicates when no set of predefined
+  predicates does what you need.  Custom predicates can be combined
+  with predefined predicates as necessary.  Each custom predicate
+  callable should accept two arguments: ``context`` and ``request``
+  and should return either ``True`` or ``False`` after doing arbitrary
+  evaluation of the context and/or the request.  If all callables
+  return ``True``, the associated route will be considered viable for
+  a given request.  If any custom predicate returns ``False``, route
+  matching continues.  Note that the value ``context`` will always be
+  ``None`` when passed to a custom route predicate.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
+
 view_for
 
   The Python dotted-path name to a class or an interface that the
