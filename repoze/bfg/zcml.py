@@ -543,66 +543,6 @@ def scan(_context, package):
         args=(package, _context.info)
         )
 
-def zcml_configure(name, package):
-    """ Given a ZCML filename as ``name`` and a Python package as
-    ``package`` which the filename should be relative to, load the
-    ZCML into the current ZCML registry.
-
-    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-    """
-    context = ConfigurationMachine()
-    xmlconfig.registerCommonDirectives(context)
-    context.package = package
-    xmlconfig.include(context, name, package)
-    context.execute_actions(clear=False) # the raison d'etre
-    return context.actions
-
-file_configure = zcml_configure # backwards compat (>0.8.1)
-
-def handler(methodName, *args, **kwargs):
-    registry = get_current_registry()
-    method = getattr(registry, methodName)
-    method(*args, **kwargs)
-
-def adapter(_context, factory, provides=None, for_=None, name=''):
-
-    if for_ is None:
-        if len(factory) == 1:
-            for_ = getattr(factory[0], '__component_adapts__', None)
-
-        if for_ is None:
-            raise TypeError("No for attribute was provided and can't "
-                            "determine what the factory adapts.")
-
-    for_ = tuple(for_)
-
-    if provides is None:
-        if len(factory) == 1:
-            p = list(implementedBy(factory[0]))
-            if len(p) == 1:
-                provides = p[0]
-
-        if provides is None:
-            raise TypeError("Missing 'provides' attribute")
-
-    # Generate a single factory from multiple factories:
-    factories = factory
-    if len(factories) == 1:
-        factory = factories[0]
-    elif len(factories) < 1:
-        raise ValueError("No factory specified")
-    elif len(factories) > 1 and len(for_) != 1:
-        raise ValueError("Can't use multiple factories and multiple for")
-    else:
-        factory = _rolledUpFactory(factories)
-
-    _context.action(
-        discriminator = ('adapter', for_, provides, name),
-        callable = handler,
-        args = ('registerAdapter',
-                factory, for_, provides, name, _context.info),
-        )
-
 class IAdapterDirective(Interface):
     """
     Register an adapter
@@ -640,44 +580,45 @@ class IAdapterDirective(Interface):
         required=False,
         )
 
-_handler = handler
-def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
-    if factory is None:
-        if handler is None:
-            raise TypeError("No factory or handler provided")
-        if provides is not None:
-            raise TypeError("Cannot use handler with provides")
-        factory = handler
-    else:
-        if handler is not None:
-            raise TypeError("Cannot use handler with factory")
-        if provides is None:
-            raise TypeError(
-                "You must specify a provided interface when registering "
-                "a factory")
-
+def adapter(_context, factory, provides=None, for_=None, name=''):
     if for_ is None:
-        for_ = getattr(factory, '__component_adapts__', None)
+        if len(factory) == 1:
+            for_ = getattr(factory[0], '__component_adapts__', None)
+
         if for_ is None:
-            raise TypeError("No for attribute was provided and can't "
-                            "determine what the factory (or handler) adapts.")
+            raise TypeError("No for argument was provided and can't "
+                            "determine what the factory adapts.")
 
     for_ = tuple(for_)
 
-    if handler is not None:
-        _context.action(
-            discriminator = None,
-            callable = _handler,
-            args = ('registerHandler',
-                    handler, for_, u'', _context.info),
-            )
+    if provides is None:
+        if len(factory) == 1:
+            p = list(implementedBy(factory[0]))
+            if len(p) == 1:
+                provides = p[0]
+
+        if provides is None:
+            raise TypeError("Missing 'provided' argument")
+
+    # Generate a single factory from multiple factories:
+    factories = factory
+    if len(factories) == 1:
+        factory = factories[0]
+    elif len(factories) < 1:
+        raise ValueError("No factory specified")
+    elif len(factories) > 1 and len(for_) != 1:
+        raise ValueError("Can't use multiple factories and multiple "
+                         "for")
     else:
-        _context.action(
-            discriminator = None,
-            callable = _handler,
-            args = ('registerSubscriptionAdapter',
-                    factory, for_, provides, u'', _context.info),
-            )
+        factory = _rolledUpFactory(factories)
+    
+    reg = get_current_registry()
+    config = Configurator(reg, package=_context.package)
+    _context.action(
+        discriminator = ('adapter', for_, provides, name),
+        callable = config.add_adapter,
+        args = (factory, for_, provides, name, _context.info),
+        )
 
 class ISubscriberDirective(Interface):
     """
@@ -712,33 +653,44 @@ class ISubscriberDirective(Interface):
           ),
         )
 
-def utility(_context, provides=None, component=None, factory=None, name=''):
-    if factory and component:
-        raise TypeError("Can't specify factory and component.")
-
-    if provides is None:
-        if factory:
-            provides = list(implementedBy(factory))
-        else:
-            provides = list(providedBy(component))
-        if len(provides) == 1:
-            provides = provides[0]
-        else:
-            raise TypeError("Missing 'provides' attribute")
-
-    if factory:
-        kw = dict(factory=factory)
+def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
+    if factory is None:
+        if handler is None:
+            raise TypeError("No factory or handler provided")
+        if provides is not None:
+            raise TypeError("Cannot use handler with provides")
+        factory = handler
     else:
-        # older component registries don't accept factory as a kwarg,
-        # so if we don't need it, we don't pass it
-        kw = {}
+        if handler is not None:
+            raise TypeError("Cannot use handler with factory")
+        if provides is None:
+            raise TypeError(
+                "You must specify a provided interface when registering "
+                "a factory")
 
-    _context.action(
-        discriminator = ('utility', provides, name),
-        callable = handler,
-        args = ('registerUtility', component, provides, name),
-        kw = kw,
-        )
+    if for_ is None:
+        for_ = getattr(factory, '__component_adapts__', None)
+        if for_ is None:
+            raise TypeError("No for attribute was provided and can't "
+                            "determine what the factory (or handler) adapts.")
+
+    for_ = tuple(for_)
+
+    reg = get_current_registry()
+    config = Configurator(reg, _context.package)
+
+    if handler is not None:
+        _context.action(
+            discriminator = None,
+            callable = config.add_subscriber,
+            args = (handler, for_, _context.info),
+            )
+    else:
+        _context.action(
+            discriminator = None,
+            callable = config.add_subscription_adapter,
+            args = (factory, for_, provides, _context.info),
+            )
 
 class IUtilityDirective(Interface):
     """Register a utility."""
@@ -775,14 +727,27 @@ class IUtilityDirective(Interface):
         required=False,
         )
 
-def _rolledUpFactory(factories):
-    def factory(ob):
-        for f in factories:
-            ob = f(ob)
-        return ob
-    # Store the original factory for documentation
-    factory.factory = factories[0]
-    return factory
+def utility(_context, provides=None, component=None, factory=None, name=''):
+    if factory and component:
+        raise TypeError("Can't specify factory and component.")
+
+    if provides is None:
+        if factory:
+            provides = list(implementedBy(factory))
+        else:
+            provides = list(providedBy(component))
+        if len(provides) == 1:
+            provides = provides[0]
+        else:
+            raise TypeError("Missing 'provides' attribute")
+
+    reg = get_current_registry()
+    config = Configurator(reg, package=_context.package)
+    _context.action(
+        discriminator = ('utility', provides, name),
+        callable = config.add_utility,
+        args = (component, provides, name, _context.info, factory),
+        )
 
 def path_spec(context, path):
     # Convert an absolute path to a resource in a package to a
@@ -804,4 +769,29 @@ def path_spec(context, path):
             return '%s:%s' % (package.__name__,
                               relpath.replace(os.path.sep, '/'))
     return abspath
+
+def zcml_configure(name, package):
+    """ Given a ZCML filename as ``name`` and a Python package as
+    ``package`` which the filename should be relative to, load the
+    ZCML into the current ZCML registry.
+
+    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+    """
+    context = ConfigurationMachine()
+    xmlconfig.registerCommonDirectives(context)
+    context.package = package
+    xmlconfig.include(context, name, package)
+    context.execute_actions(clear=False) # the raison d'etre
+    return context.actions
+
+file_configure = zcml_configure # backwards compat (>0.8.1)
+
+def _rolledUpFactory(factories):
+    def factory(ob):
+        for f in factories:
+            ob = f(ob)
+        return ob
+    # Store the original factory for documentation
+    factory.factory = factories[0]
+    return factory
 

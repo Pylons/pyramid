@@ -33,3 +33,7 @@
 
      .. automethod:: set_notfound_view(view=None, attr=None, renderer=None, wrapper=None)
 
+     .. automethod:: add_adapter
+
+     .. automethod:: add_utility
+
