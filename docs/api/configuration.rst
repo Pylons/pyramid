@@ -17,6 +17,8 @@
 
      .. automethod:: add_static_view(name, path, cache_max_age=3600)
 
+     .. automethod:: add_settings
+
      .. automethod:: add_subscriber
 
      .. automethod:: add_view

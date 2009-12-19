@@ -320,6 +320,10 @@ def registerSettings(dictarg=None, **kw):
     return values from it.
 
     .. note:: This API is new as of :mod:`repoze.bfg` 1.1.
+
+    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+       Instead use the ``add_settings`` method of a
+       :term:`Configurator` in your unit and integration tests.
     """
     reg = get_current_registry()
     settings = reg.queryUtility(ISettings)

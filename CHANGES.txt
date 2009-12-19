@@ -4,6 +4,12 @@ Next release
 Features
 --------
 
+- Add a new API to the ``repoze.bfg.configuration.Configurator``
+  class: ``add_settings``.  This API can be used to add "settings"
+  (information returned within via the
+  ``repoze.bfg.settings.get_settings`` API) after the configurator has
+  been initially set up.  This is most useful for testing purposes.
+
 - Add two new APIs to the ``repoze.bfg.configuration.Configurator``
   class: ``add_adapter`` and ``add_utility``.  These, respectively,
   perform the same functions as the ``registerAdapter`` and

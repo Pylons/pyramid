@@ -164,6 +164,7 @@ class Configurator(object):
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
         self.registry.registerUtility(settings, ISettings)
+        return settings
 
     def _set_root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
@@ -307,6 +308,17 @@ class Configurator(object):
             iface = (iface,)
         self.registry.registerHandler(subscriber, iface, info=info)
         return subscriber
+
+    def add_settings(self, settings):
+        """ Add additional settings (beyond the ones passed in as
+        ``settings`` to the constructor of this object) to the
+        dictionarylike object returned from
+        ``repoze.bfg.settings.get_settings()``.  The ``settings``
+        argument should be a dictionarylike object."""
+        utility = self.registry.queryUtility(ISettings)
+        if utility is None:
+            utility = self._set_settings(settings)
+        utility.update(settings)
 
     def add_subscription_adapter(self, factory, required=None, provided=None,
                                  info=u''):

@@ -243,6 +243,26 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
+    def test_add_settings_settings_already_registered(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import ISettings
+        reg = Registry()
+        config = self._makeOne(reg)
+        config._set_settings({'a':1})
+        config.add_settings({'b':2})
+        settings = reg.getUtility(ISettings)
+        self.assertEqual(settings['a'], 1)
+        self.assertEqual(settings['b'], 2)
+
+    def test_add_settings_settings_not_yet_registered(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import ISettings
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.add_settings({'a':1})
+        settings = reg.getUtility(ISettings)
+        self.assertEqual(settings['a'], 1)
+
     def test_add_subscriber_defaults(self):
         from zope.interface import implements
         from zope.interface import Interface
