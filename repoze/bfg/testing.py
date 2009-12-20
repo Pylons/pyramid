@@ -269,10 +269,8 @@ def registerRoute(path, name, factory=None):
        :term:`Configurator` in your unit and integration tests.
     """
     reg = get_current_registry()
-    mapper = reg.queryUtility(IRoutesMapper)
-    if mapper is None:
-        mapper = registerRoutesMapper(factory)
-    mapper.connect(path, name, factory)
+    config = Configurator(registry=reg)
+    return config.add_route(name, path, factory=factory)
 
 def registerRoutesMapper(root_factory=None):
     """ Register a new routes mapper using the provided
