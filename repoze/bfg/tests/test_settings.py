@@ -7,8 +7,6 @@ class TestSettings(unittest.TestCase):
         return Settings
 
     def _makeOne(self, d=None, environ=None):
-        if d is None:
-            d = {}
         if environ is None:
             environ = {}
         klass = self._getTargetClass()
@@ -21,6 +19,14 @@ class TestSettings(unittest.TestCase):
     def test_getattr_raises_attribute_error(self):
         settings = self._makeOne()
         self.assertRaises(AttributeError, settings.__getattr__, 'mykey')
+
+    def test_noargs(self):
+        settings = self._makeOne()
+        self.assertEqual(settings['debug_authorization'], False)
+        self.assertEqual(settings['debug_notfound'], False)
+        self.assertEqual(settings['reload_templates'], False)
+        self.assertEqual(settings['reload_resources'], False)
+        self.assertEqual(settings['configure_zcml'], '')
 
     def test_reload_templates(self):
         settings = self._makeOne({})

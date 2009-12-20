@@ -326,14 +326,9 @@ def registerSettings(dictarg=None, **kw):
        Instead use the ``add_settings`` method of a
        :term:`Configurator` in your unit and integration tests.
     """
-    reg = get_current_registry()
-    settings = reg.queryUtility(ISettings)
-    if settings is None:
-        settings = Settings()
-        reg.registerUtility(settings, ISettings)
-    if dictarg is not None:
-        settings.update(dictarg)
-    settings.update(kw)
+    registry = get_current_registry()
+    config = Configurator(registry=registry)
+    config.add_settings(dictarg, **kw)
 
 class DummyRootFactory(object):
     __parent__ = None

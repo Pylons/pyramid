@@ -1,3 +1,11 @@
+Next release
+============
+
+Features
+--------
+
+- Add a ``**kw`` arg to the ``Configurator.add_settings`` API.
+
 1.2a7 (2009-12-20)
 ==================
 

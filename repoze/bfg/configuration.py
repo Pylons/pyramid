@@ -312,16 +312,21 @@ class Configurator(object):
         self.registry.registerHandler(subscriber, iface, info=info)
         return subscriber
 
-    def add_settings(self, settings):
+    def add_settings(self, settings=None, **kw):
         """ Add additional settings (beyond the ones passed in as
         ``settings`` to the constructor of this object) to the
         dictionarylike object returned from
         ``repoze.bfg.settings.get_settings()``.  The ``settings``
-        argument should be a dictionarylike object."""
+        argument should be a dictionarylike object or ``None``.
+        Arbitrary ``kw`` arguments can be passed in to augment the
+        settings dict."""
+        if settings is None:
+            settings = {}
         utility = self.registry.queryUtility(ISettings)
         if utility is None:
             utility = self._set_settings(settings)
         utility.update(settings)
+        utility.update(kw)
 
     def make_wsgi_app(self):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
