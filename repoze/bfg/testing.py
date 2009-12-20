@@ -201,8 +201,9 @@ def registerUtility(impl, iface=Interface, name=''):
     more information about ZCA utilities.
 
     .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
-       Instead use the ``add_utility`` method of a
-       :term:`Configurator` in your unit and integration tests.
+       Instead use the ``registerUtility`` method of the ``registry``
+       attribute of a :term:`Configurator` in your unit and
+       integration tests.
     """
     reg = get_current_registry()
     reg.registerUtility(impl, iface, name=name)
@@ -224,8 +225,9 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     more information about ZCA adapters.
 
     .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
-       Instead use the ``add_adapter`` method of a
-       :term:`Configurator` in your unit and integration tests.
+       Instead use the ``registerAdapter`` method of the ``registry``
+       attribute of a :term:`Configurator` in your unit and integration
+       tests.
     """
     reg = get_current_registry()
     if not isinstance(for_, (tuple, list)):
