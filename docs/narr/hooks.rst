@@ -3,7 +3,7 @@
 Using Hooks
 ===========
 
-"hooks" can be used to influence the behavior of the
+"Hooks" can be used to influence the behavior of the
 :mod:`repoze.bfg` framework in various ways.
 
 .. _changing_the_notfound_view:
