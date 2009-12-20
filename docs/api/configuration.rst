@@ -11,8 +11,6 @@
 
      .. automethod:: end
 
-     .. automethod:: add_adapter
-
      .. automethod:: add_renderer(name, factory)
 
      .. automethod:: add_route
@@ -22,8 +20,6 @@
      .. automethod:: add_settings
 
      .. automethod:: add_subscriber
-
-     .. automethod:: add_utility
 
      .. automethod:: add_view
 

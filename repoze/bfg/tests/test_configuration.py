@@ -1833,37 +1833,6 @@ class ConfiguratorTests(unittest.TestCase):
         result = render_view_to_response(ctx, req, 'pod_notinit')
         self.assertEqual(result, None)
 
-    def test_add_subscription_adapter(self):
-        config = self._makeOne()
-        def factory(abc): pass
-        config.add_subscription_adapter(factory, (IDummy,), IDummy,
-                                        info='info')
-        adapters = config.registry.registeredSubscriptionAdapters()
-        self.assertEqual(list(adapters)[0].factory, factory)
-
-    def test_add_adapter(self):
-        config = self._makeOne()
-        def factory(abc): return 'OK'
-        config.add_adapter(factory, (IDummy,), IDummy, name='foo',
-                           info='info')
-        result = config.registry.adapters.lookup((IDummy,), IDummy, name='foo')
-        self.assertEqual(result(None), 'OK')
-        
-    def test_add_utility_no_factory(self):
-        config = self._makeOne()
-        def component(): pass
-        config.add_utility(component, IDummy, name='foo', info='info')
-        result = config.registry.queryUtility(IDummy, name='foo')
-        self.assertEqual(result, component)
-
-    def test_add_utility_with_factory(self):
-        config = self._makeOne()
-        def factory(): return 'OK'
-        config.add_utility(None, IDummy, name='foo', info='info',
-                           factory=factory)
-        result = config.registry.queryUtility(IDummy, name='foo')
-        self.assertEqual(result, 'OK')
-
     def test_testing_securitypolicy(self):
         from repoze.bfg.testing import DummySecurityPolicy
         config = self._makeOne()

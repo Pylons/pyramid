@@ -724,7 +724,7 @@ class TestAdapterDirective(unittest.TestCase):
                       provides=None, for_=None)
 
     def test_for_is_None_adaptedBy_set(self):
-        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.registry import Registry
         context = DummyContext()
         factory = DummyFactory()
         factory.__component_adapts__ = (IDummy,)
@@ -734,7 +734,7 @@ class TestAdapterDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'],
                          ('adapter', (IDummy,), IFactory, ''))
         self.assertEqual(regadapt['callable'].im_func,
-                         Configurator.add_adapter.im_func)
+                         Registry.registerAdapter.im_func)
         self.assertEqual(regadapt['args'],
                          (factory, (IDummy,), IFactory, '', None))
 
@@ -745,14 +745,14 @@ class TestAdapterDirective(unittest.TestCase):
                           provides=None, for_=(IDummy,))
 
     def test_provides_obtained_via_implementedBy(self):
-        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.registry import Registry
         context = DummyContext()
         self._callFUT(context, [DummyFactory], for_=(IDummy,))
         regadapt = context.actions[0]
         self.assertEqual(regadapt['discriminator'],
                          ('adapter', (IDummy,), IFactory, ''))
         self.assertEqual(regadapt['callable'].im_func,
-                         Configurator.add_adapter.im_func)
+                         Registry.registerAdapter.im_func)
         self.assertEqual(regadapt['args'],
                          (DummyFactory, (IDummy,), IFactory, '', None))
 
@@ -772,7 +772,7 @@ class TestAdapterDirective(unittest.TestCase):
                           for_=(IDummy, IDummy))
         
     def test_rolled_up_factories(self):
-        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.registry import Registry
         context = DummyContext()
         factory = DummyFactory()
         self._callFUT(context,
@@ -783,7 +783,7 @@ class TestAdapterDirective(unittest.TestCase):
         self.assertEqual(regadapt['discriminator'],
                          ('adapter', (IDummy,), IFactory, ''))
         self.assertEqual(regadapt['callable'].im_func,
-                         Configurator.add_adapter.im_func)
+                         Registry.registerAdapter.im_func)
         self.assertEqual(regadapt['args'][0].__module__, 'repoze.bfg.zcml')
 
 class TestSubscriberDirective(unittest.TestCase):
@@ -830,7 +830,7 @@ class TestSubscriberDirective(unittest.TestCase):
                           factory=factory, handler=None, provides=IFactory)
         
     def test_register_with_factory(self):
-        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.registry import Registry
         context = DummyContext()
         factory = DummyFactory()
         self._callFUT(context, for_=(IDummy,),
@@ -839,9 +839,9 @@ class TestSubscriberDirective(unittest.TestCase):
         subadapt = context.actions[0]
         self.assertEqual(subadapt['discriminator'], None)
         self.assertEqual(subadapt['callable'].im_func,
-                         Configurator.add_subscription_adapter.im_func)
+                         Registry.registerSubscriptionAdapter.im_func)
         self.assertEqual(subadapt['args'],
-                         (factory, (IDummy,), IFactory, None) )
+                         (factory, (IDummy,), IFactory, None, None) )
 
     def test_register_with_handler(self):
         from repoze.bfg.configuration import Configurator
@@ -877,19 +877,19 @@ class TestUtilityDirective(unittest.TestCase):
         self.assertRaises(TypeError, self._callFUT, context, provides=None)
         
     def test_provides_from_factory_implements(self):
-        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.registry import Registry
         context = DummyContext()
         self._callFUT(context, factory=DummyFactory)
         self.assertEqual(len(context.actions), 1)
         utility = context.actions[0]
         self.assertEqual(utility['discriminator'], ('utility', IFactory, ''))
         self.assertEqual(utility['callable'].im_func,
-                         Configurator.add_utility.im_func)
-        self.assertEqual(utility['args'],
-                         (None, IFactory, '', None, DummyFactory))
+                         Registry.registerUtility.im_func)
+        self.assertEqual(utility['args'], (None, IFactory, '', None))
+        self.assertEqual(utility['kw'], {'factory':DummyFactory})
 
     def test_provides_from_component_provides(self):
-        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.registry import Registry
         context = DummyContext()
         component = DummyFactory()
         self._callFUT(context, component=component)
@@ -897,9 +897,9 @@ class TestUtilityDirective(unittest.TestCase):
         utility = context.actions[0]
         self.assertEqual(utility['discriminator'], ('utility', IFactory, ''))
         self.assertEqual(utility['callable'].im_func,
-                         Configurator.add_utility.im_func)
-        self.assertEqual(utility['args'],
-                         (component, IFactory, '', None, None))
+                         Registry.registerUtility.im_func)
+        self.assertEqual(utility['args'], (component, IFactory, '', None))
+        self.assertEqual(utility['kw'], {})
 
 class TestLoadZCML(unittest.TestCase):
     def setUp(self):

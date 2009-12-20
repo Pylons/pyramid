@@ -612,11 +612,10 @@ def adapter(_context, factory, provides=None, for_=None, name=''):
     else:
         factory = _rolledUpFactory(factories)
     
-    reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    registry = get_current_registry()
     _context.action(
         discriminator = ('adapter', for_, provides, name),
-        callable = config.add_adapter,
+        callable = registry.registerAdapter,
         args = (factory, for_, provides, name, _context.info),
         )
 
@@ -676,8 +675,8 @@ def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
 
     for_ = tuple(for_)
 
-    reg = get_current_registry()
-    config = Configurator(reg, _context.package)
+    registry = get_current_registry()
+    config = Configurator(registry=registry, package=_context.package)
 
     if handler is not None:
         _context.action(
@@ -688,8 +687,8 @@ def subscriber(_context, for_=None, factory=None, handler=None, provides=None):
     else:
         _context.action(
             discriminator = None,
-            callable = config.add_subscription_adapter,
-            args = (factory, for_, provides, _context.info),
+            callable = registry.registerSubscriptionAdapter,
+            args = (factory, for_, provides, None, _context.info),
             )
 
 class IUtilityDirective(Interface):
@@ -741,12 +740,19 @@ def utility(_context, provides=None, component=None, factory=None, name=''):
         else:
             raise TypeError("Missing 'provides' attribute")
 
-    reg = get_current_registry()
-    config = Configurator(reg, package=_context.package)
+    if factory:
+        kw = dict(factory=factory)
+    else:
+        # older component registries don't accept factory as a kwarg,
+        # so if we don't need it, we don't pass it
+        kw = {}
+
+    registry = get_current_registry()
     _context.action(
         discriminator = ('utility', provides, name),
-        callable = config.add_utility,
-        args = (component, provides, name, _context.info, factory),
+        callable = registry.registerUtility,
+        args = (component, provides, name, _context.info),
+        kw = kw,
         )
 
 def path_spec(context, path):

@@ -323,51 +323,6 @@ class Configurator(object):
             utility = self._set_settings(settings)
         utility.update(settings)
 
-    def add_subscription_adapter(self, factory, required=None, provided=None,
-                                 info=u''):
-        """Add a Zope Component Architecture subscription adapter.
-        What is a subscription adapter, you ask?  I have no idea
-        either.  This is currently only here to support the
-        ``subscriber`` ZCML directive.  This is not a published API
-        until I figure out why I would need a subscription adapter."""
-        self.registry.registerSubscriptionAdapter(factory, required=required,
-                                                  provided=provided, info=info)
-
-    def add_adapter(self, factory, required=None, provided=None, name='',
-                    info=u''):
-        """Add a :term:`Zope Component Architecture` adapter.  Use of
-        this method is the equivalent of using an ``adapter``
-        :term:`ZCML declaration` or the ``registerAdapter`` method of
-        a ZCA registry.
-
-       .. note:: This method is not useful unless you use :term:`Zope
-          Component Architecture` APIs in your :mod:`repoze.bfg`
-          application directly.
-        """
-        self.registry.registerAdapter(factory, required=required,
-                                      provided=provided, name=name, info=info)
-
-    def add_utility(self, component=None, provided=None, name=u'', info=u'',
-                    factory=None):
-        """Add a :term:`Zope Component Architecture` utility.  Use of
-        this method is the equivalent of using a ``utility``
-        :term:`ZCML declaration` or the ``registerUtility`` method of
-        a ZCA registry.
-
-       .. note:: This method is not useful unless you use :term:`Zope
-          Component Architecture` APIs in your :mod:`repoze.bfg`
-          application directly.
-        """
-        if factory:
-            kw = dict(factory=factory)
-        else:
-            # older component registries don't accept factory as a kwarg,
-            # so if we don't need it, we don't pass it
-            kw = {}
-        self.registry.registerUtility(
-            component=component, provided=provided, name=name, info=info,
-            **kw)
-
     def make_wsgi_app(self):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
         the current configuration state and sends a
