@@ -47,10 +47,6 @@ Features
 Internal
 --------
 
-- Cause the ``adapter``, ``utility``, and ``subscriber`` ZCML
-  directives to use a ``Configurator`` instance and associated
-  configurator APIs rather than a ZCA registry directly.
-
 - Remove the ``repoze.bfg.testing.registerTraverser`` function.  This
   function was never an API.
 
