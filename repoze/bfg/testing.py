@@ -13,7 +13,6 @@ from zope.interface import alsoProvides
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
-from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewPermission
 
@@ -25,7 +24,6 @@ from repoze.bfg.security import Authenticated
 from repoze.bfg.security import Denied
 from repoze.bfg.security import Everyone
 from repoze.bfg.security import has_permission
-from repoze.bfg.settings import Settings
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.urldispatch import RoutesMapper
