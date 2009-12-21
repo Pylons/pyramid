@@ -1323,7 +1323,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if containment is not None:
         def containment_predicate(context, request):
             return find_interface(context, containment) is not None
-        weight = weight - 70
+        weight = weight - 80
         predicates.append(containment_predicate)
 
     # this will be == sys.maxint if no predicates
