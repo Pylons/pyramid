@@ -135,17 +135,19 @@ itself available to the rendered template by passing template in which
 the macro is defined (or even the macro itself) into the rendered
 template.  To make a macro available to the rendered template, you can
 retrieve a different template using the ``get_template`` API, and pass
-it in to the template being rendered.  For example:
+it in to the template being rendered.  For example, using a
+:term:`view configuration` via a ``@bfg_view`` decorator that uses a
+:term:`renderer`:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import render_template_to_response
    from repoze.bfg.chameleon_zpt import get_template
 
+   @bfg_view(renderer='templates/mytemplate.pt')
    def my_view(request):
        main = get_template('templates/master.pt')
-       return render_template_to_response('templates/mytemplate.pt', main=main)
+       return {'main':main}
 
 Where ``templates/master.pt`` might look like so:
 
