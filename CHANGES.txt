@@ -6,6 +6,19 @@ Features
 
 - Add a ``**kw`` arg to the ``Configurator.add_settings`` API.
 
+Bug Fixes
+---------
+
+- The ``json`` renderer failed to set the response content type to
+  ``application/json``.  It now does, by setting
+  ``request.response_content_type`` unless this attribute is already
+  set.
+
+- The ``string`` renderer failed to set the response content type to
+  ``text/plain``.  It now does, by setting
+  ``request.response_content_type`` unless this attribute is already
+  set.
+
 1.2a7 (2009-12-20)
 ==================
 

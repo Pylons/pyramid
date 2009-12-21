@@ -12,6 +12,10 @@ from repoze.bfg.threadlocal import get_current_registry
 
 def json_renderer_factory(name):
     def _render(value, system):
+        request = system.get('request')
+        if request is not None:
+            if not hasattr(request, 'response_content_type'):
+                request.response_content_type = 'application/json'
         return json.dumps(value)
     return _render
 
@@ -19,6 +23,10 @@ def string_renderer_factory(name):
     def _render(value, system):
         if not isinstance(value, basestring):
             value = str(value)
+        request = system.get('request')
+        if request is not None:
+            if not hasattr(request, 'response_content_type'):
+                request.response_content_type = 'text/plain'
         return value
     return _render
 

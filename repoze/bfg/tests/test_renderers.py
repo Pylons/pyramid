@@ -150,6 +150,19 @@ class Test_json_renderer_factory(unittest.TestCase):
         result = renderer({'a':1}, {})
         self.assertEqual(result, '{"a": 1}')
 
+    def test_with_request_content_type_notset(self):
+        request = testing.DummyRequest()
+        renderer = self._callFUT(None)
+        renderer({'a':1}, {'request':request})
+        self.assertEqual(request.response_content_type, 'application/json')
+
+    def test_with_request_content_type_set(self):
+        request = testing.DummyRequest()
+        request.response_content_type = 'text/mishmash'
+        renderer = self._callFUT(None)
+        renderer({'a':1}, {'request':request})
+        self.assertEqual(request.response_content_type, 'text/mishmash')
+
 class Test_string_renderer_factory(unittest.TestCase):
     def _callFUT(self, name):
         from repoze.bfg.renderers import string_renderer_factory
@@ -172,6 +185,19 @@ class Test_string_renderer_factory(unittest.TestCase):
         value = None
         result = renderer(value, {})
         self.assertEqual(result, 'None')
+
+    def test_with_request_content_type_notset(self):
+        request = testing.DummyRequest()
+        renderer = self._callFUT(None)
+        renderer(None, {'request':request})
+        self.assertEqual(request.response_content_type, 'text/plain')
+
+    def test_with_request_content_type_set(self):
+        request = testing.DummyRequest()
+        request.response_content_type = 'text/mishmash'
+        renderer = self._callFUT(None)
+        renderer(None, {'request':request})
+        self.assertEqual(request.response_content_type, 'text/mishmash')
 
 class DummyFactory:
     def __init__(self, renderer):
