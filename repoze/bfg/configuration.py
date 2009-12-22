@@ -284,7 +284,7 @@ class Configurator(object):
         This pushes a dictionary containing the registry implied by
         this configurator and the :term:`request` implied by
         ``request`` on to the :term:`thread local` stack consulted by
-        various :mod`repoze.bfg.threadlocal` API functions."""
+        various :mod:`repoze.bfg.threadlocal` API functions."""
         self.manager.push({'registry':self.registry, 'request':request})
 
     def end(self):
