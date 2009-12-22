@@ -19,8 +19,9 @@ application configuration.  This view can be configured in via
 .. topic:: Using Imperative Configuration
 
    If your application uses :term:`imperative configuration`, you can
-   replace the Not Found view by using the ``set_notfound_view``
-   method of the ``Configurator`` named ``config``:
+   replace the Not Found view by using the
+   :meth:`repoze.bfg.configuration.Configurator.set_notfound_view`
+   method:
 
    .. code-block:: python
       :linenos:
@@ -31,9 +32,6 @@ application configuration.  This view can be configured in via
    Replace ``helloworld.views.notfound_view`` with a reference to the
    Python :term:`view callable` you want to use to represent the Not
    Found view.
-
-   See :ref:`configuration_module` for more information about other
-   arguments to the ``set_notfound_view`` method.
 
 .. topic:: Using ZCML
 
@@ -98,12 +96,13 @@ Here's some sample code that implements a minimal NotFound view:
    def notfound_view(request):
        return HTTPNotFound()
 
-.. note:: When a NotFound view is invoked, it is passed a request.
-   The ``environ`` attribute of the request is the WSGI environment.
-   Within the WSGI environ will be a key named ``repoze.bfg.message``
-   that has a value explaining why the not found error was raised.
-   This error will be different when the ``debug_notfound``
-   environment setting is true than it is when it is false.
+.. note:: When a NotFound view is invoked, it is passed a
+   :term:`request`.  The ``environ`` attribute of the request is the
+   WSGI environment.  Within the WSGI environ will be a key named
+   ``repoze.bfg.message`` that has a value explaining why the not
+   found error was raised.  This error will be different when the
+   ``debug_notfound`` environment setting is true than it is when it
+   is false.
 
 .. _changing_the_forbidden_view:
 
@@ -119,8 +118,9 @@ configuration` or :term:`ZCML`:
 .. topic:: Using Imperative Configuration
 
    If your application uses :term:`imperative configuration`, you can
-   replace the Forbidden view by using the ``set_forbidden_view``
-   method of the ``Configurator`` named ``config``:
+   replace the Forbidden view by using the
+   :meth:`repoze.bfg.configuration.Configurator.set_forbidden_view`
+   method:
 
    .. code-block:: python
       :linenos:
@@ -131,9 +131,6 @@ configuration` or :term:`ZCML`:
    Replace ``helloworld.views.forbidden_view`` with a reference to the
    Python :term:`view callable` you want to use to represent the
    Forbidden view.
-
-   See :ref:`configuration_module` for more information about other
-   arguments to the ``set_forbidden_view`` method.
 
 .. topic:: Using ZCML
 
@@ -206,12 +203,12 @@ Here's some sample code that implements a minimal forbidden view:
    def forbidden_view(request):
        return render_template_to_response('templates/login_form.pt')
 
-.. note:: When an forbidden view is invoked, it is passed
-   the request as the second argument.  An attribute of the request is
-   ``environ``, which is the WSGI environment.  Within the WSGI
-   environ will be a key named ``repoze.bfg.message`` that has a value
-   explaining why the current view invocation was forbidden.  This
-   error will be different when the ``debug_authorization``
+.. note:: When a forbidden view is invoked, it is passed the
+   :term:`request` as the second argument.  An attribute of the
+   request is ``environ``, which is the WSGI environment.  Within the
+   WSGI environ will be a key named ``repoze.bfg.message`` that has a
+   value explaining why the current view invocation was forbidden.
+   This error will be different when the ``debug_authorization``
    environment setting is true than it is when it is false.
 
 .. warning:: the default forbidden view sends a response with a ``401
@@ -319,13 +316,14 @@ Changing How :mod:`repoze.bfg.url.model_url` Generates a URL
 
 When you add a traverser as described in
 :ref:`changing_the_traverser`, it's often convenient to continue to
-use the ``repoze.bfg.url.model_url`` API.  However, since the way
+use the :func:`repoze.bfg.url.model_url` API.  However, since the way
 traversal is done will have been modified, the URLs it generates by
 default may be incorrect.
 
-If you've added a traverser, you can change how ``model_url``
-generates a URL for a specific type of :term:`context` by adding an
-adapter stanza for ``IContextURL`` to your application's
+If you've added a traverser, you can change how
+:func:`repoze.bfg.url.model_url` generates a URL for a specific type
+of :term:`context` by adding an adapter stanza for
+:class:`repoze.bfg.interfaces.IContextURL` to your application's
 ``configure.zcml``:
 
 .. code-block:: xml
@@ -338,14 +336,14 @@ adapter stanza for ``IContextURL`` to your application's
       />
 
 In the above example, the ``myapp.traversal.URLGenerator`` class will
-be used to provide services to ``model_url`` any time the
-:term:`context` passed to ``model_url`` is of class
+be used to provide services to :func:`repoze.bfg.url.model_url` any
+time the :term:`context` passed to ``model_url`` is of class
 ``myapp.models.MyRoot``.  The asterisk following represents the type
 of interface that must be possessed by the :term:`request` (in this
 case, any interface, represented by asterisk).
 
 The API that must be implemented by a class that provides
-``IContextURL`` is as follows:
+:class:`repoze.bfg.interfaces.IContextURL` is as follows:
 
 .. code-block:: python
   :linenos:
@@ -364,6 +362,7 @@ The API that must be implemented by a class that provides
            """ Return a URL that points to the context """
 
 The default context URL generator is available for perusal as the
-class ``TraversalContextURL`` in the `traversal module
+class :class:`repoze.bfg.traversal.TraversalContextURL` in the
+`traversal module
 <http://svn.repoze.org/repoze.bfg/trunk/repoze/bfg/traversal.py>`_ of
 the :term:`Repoze` Subversion repository.
