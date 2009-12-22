@@ -1163,7 +1163,7 @@ class Configurator(object):
         :func:`repoze.bfg.security.has_permission`,
         :func:`repoze.bfg.security.authenticated_userid`,
         :func:`repoze.bfg.security.effective_principals` and
-        `:func:`repoze.bfg.security.principals_allowed_by_permission`.
+        :func:`repoze.bfg.security.principals_allowed_by_permission`.
         """
         from repoze.bfg.testing import DummySecurityPolicy
         policy = DummySecurityPolicy(userid, groupids, permissive)
