@@ -601,9 +601,9 @@ the :term:`application registry`. It looks like so:
    namespace.  Add-on packages may require other namespaces.
 
 #. Line 4 initializes :mod:`repoze.bfg`-specific configuration
-   directives by including the ``repoze.bfg.includes`` package.  This
-   causes all of the ZCML within the ``configure.zcml`` of the
-   ``repoze.bfg.includes`` package (which can be found in the main
+   directives by including the :mod:`repoze.bfg.includes` package.
+   This causes all of the ZCML within the ``configure.zcml`` of the
+   :mod:`repoze.bfg.includes` package (which can be found in the main
    :mod:`repoze.bfg` sources) to be "included" in this configuration
    file's scope.  Effectively this means that we can use (for this
    example) the ``view`` and ``static`` directives which follow later
@@ -611,16 +611,16 @@ the :term:`application registry`. It looks like so:
 
 #. Lines 6-10 register a "default view" (a view that has no ``name``
    attribute).  It is ``for`` model objects that are instances of the
-   ``MyModel`` class.  The ``view`` attribute points at a Python
-   function that does all the work for this view.  Note that the
-   values of both the ``for`` attribute and the ``view`` attribute
-   begin with a single period.  Names that begin with a period are
-   "shortcuts" which point at files relative to the :term:`package` in
-   which the ``configure.zcml`` file lives.  In this case, since the
-   ``configure.zcml`` file lives within the ``myproject`` package, the
-   shortcut ``.models.MyModel`` could also be spelled
-   ``myproject.models.MyModel`` (forming a full Python dotted-path
-   name to the ``MyModel`` class).  Likewise the shortcut
+   :class:`myproject.models.MyModel` class.  The ``view`` attribute
+   points at a Python function that does all the work for this view.
+   Note that the values of both the ``for`` attribute and the ``view``
+   attribute begin with a single period.  Names that begin with a
+   period are "shortcuts" which point at files relative to the
+   :term:`package` in which the ``configure.zcml`` file lives.  In
+   this case, since the ``configure.zcml`` file lives within the
+   :mod:`myproject` package, the shortcut ``.models.MyModel`` could
+   also be spelled ``myproject.models.MyModel`` (forming a full Python
+   dotted-path name to the ``MyModel`` class).  Likewise the shortcut
    ``.views.my_view`` could be replaced with
    ``myproject.views.my_view``.
 
@@ -651,7 +651,8 @@ in the model, and the response given back to a browser.
 
 Lines 1-2 provide the ``my_view`` that was registered as the view.
 ``configure.zcml`` said that the default URL for instances that are of
-the class ``MyModel`` should run this ``my_view`` function.
+the class :class:`myproject.models.MyModel` should run this
+:func:`myproject.views.my_view` function.
 
 The function is handed two pieces of information: the :term:`context`
 and the :term:`request`.  The *context* is the term :term:`model`
@@ -704,8 +705,8 @@ In a "real" application, the root object would not be such a simple
 object.  Instead, it would be an object that could access some
 persistent data store, such as a database.  :mod:`repoze.bfg` doesn't
 make any assumption about which sort of datastore you'll want to use,
-so the sample application uses an instance of ``MyModel`` to represent
-the root.
+so the sample application uses an instance of
+:class:`myproject.models.MyModel` to represent the root.
 
 ``run.py``
 ~~~~~~~~~~
@@ -718,7 +719,7 @@ without the PasteDeploy configuration file:
 .. literalinclude:: MyProject/myproject/run.py
    :linenos:
 
-#. Line 1 imports the ``Configurator`` class from
+#. Line 1 imports the :term:`Configurator` class from
    :mod:`repoze.bfg.configuration` that we use later.
 
 #. Line 2 imports the ``get_root`` function from
