@@ -76,7 +76,7 @@ class Configurator(object):
     ``authorization_policy``, ``renderers`` and ``debug_logger``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
-    must be an instance of the :mod:`repoze.bfg.registry.Registry`
+    must be an instance of the :class:`repoze.bfg.registry.Registry`
     class representing the registry to configure.  If ``registry`` is
     ``None``, the configurator will create a ``Registry`` instance
     itself; it will also perform some default configuration that would
@@ -99,7 +99,7 @@ class Configurator(object):
     If the ``settings`` argument is passed, it should be a Python
     dictionary representing the deployment settings for this
     application.  These are later retrievable using the
-    ``repoze.bfg.settings.get_settings`` API.
+    :func:`repoze.bfg.settings.get_settings` API.
 
     If the ``root_factory`` argument is passed, it should be an object
     representing the default :term:`root factory` for your
@@ -284,7 +284,7 @@ class Configurator(object):
         This pushes a dictionary containing the registry implied by
         this configurator and the :term:`request` implied by
         ``request`` on to the :term:`thread local` stack consulted by
-        various ``repoze.bfg.threadlocal`` API functions."""
+        various :mod`repoze.bfg.threadlocal` API functions."""
         self.manager.push({'registry':self.registry, 'request':request})
 
     def end(self):
@@ -316,7 +316,7 @@ class Configurator(object):
         """ Add additional settings (beyond the ones passed in as
         ``settings`` to the constructor of this object) to the
         dictionarylike object returned from
-        ``repoze.bfg.settings.get_settings()``.  The ``settings``
+        :func:`repoze.bfg.settings.get_settings`.  The ``settings``
         argument should be a dictionarylike object or ``None``.
         Arbitrary ``kw`` arguments can be passed in to augment the
         settings dict."""
@@ -331,8 +331,8 @@ class Configurator(object):
     def make_wsgi_app(self):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
         the current configuration state and sends a
-        ``repoze.bfg.interfaces.WSGIApplicationCreatedEvent`` event to
-        all listeners."""
+        :class:`repoze.bfg.interfaces.IWSGIApplicationCreatedEvent`
+        event to all listeners."""
         # manager in arglist for testing dep injection only
         from repoze.bfg.router import Router # avoid circdep
         app = Router(self.registry)
@@ -473,7 +473,7 @@ class Configurator(object):
 
         name
 
-          The :term:`view name`.  Read the :ref:`traversal_chapter` to
+          The :term:`view name`.  Read :ref:`traversal_chapter` to
           understand the concept of a view name.
 
         for
@@ -538,7 +538,7 @@ class Configurator(object):
           This value should be a reference to a Python class or
           :term:`interface` that a parent object in the
           :term:`lineage` must provide in order for this view to be
-          found and called.  Your models must be"location-aware" to
+          found and called.  Your models must be "location-aware" to
           use this feature.  See :ref:`location_aware` for more
           information about location-awareness.
 
@@ -987,8 +987,8 @@ class Configurator(object):
     def scan(self, package=None, _info=u''):
         """ Scan a Python package and any of its subpackages for
         objects marked with :term:`configuration decoration` such as
-        ``@bfg_view``.  Any decorated object found will influence the
-        current configuration state.
+        :class:`repoze.bfg.view.bfg_view`.  Any decorated object found
+        will influence the current configuration state.
 
         The ``package`` argument should be a reference to a Python
         package or module object.  If ``package`` is ``None``, the
@@ -1159,10 +1159,11 @@ class Configurator(object):
         access.  If ``permissive`` is false, a nonpermissive
         authorization policy is registered; this policy denies all
         access.  This function is most useful when testing code that
-        uses the ``repoze.bfg.security`` APIs named
-        ``has_permission``, ``authenticated_userid``,
-        ``effective_principals`` and
-        ``principals_allowed_by_permission``.
+        uses the APIs named
+        :func:`repoze.bfg.security.has_permission`,
+        :func:`repoze.bfg.security.authenticated_userid`,
+        :func:`repoze.bfg.security.effective_principals` and
+        `:func:`repoze.bfg.security.principals_allowed_by_permission`.
         """
         from repoze.bfg.testing import DummySecurityPolicy
         policy = DummySecurityPolicy(userid, groupids, permissive)
@@ -1172,15 +1173,15 @@ class Configurator(object):
     def testing_models(self, models):
         """Unit/integration testing helper: registers a dictionary of
         models that can be resolved via
-        ``repoze.bfg.traversal.find_model``.  This is most useful for
-        testing code that wants to call the
-        ``repoze.bfg.traversal.find_model`` API.  The ``find_model``
-        API is called with a path as one of its arguments.  If the
-        dictionary you register when calling this method contains that
-        path as a string key (e.g. ``/foo/bar`` or ``foo/bar``), the
-        corresponding value will be returned to ``find_model`` (and
-        thus to your code) when ``find_model`` is called with an
-        equivalent path string or tuple."""
+        :func:`repoze.bfg.traversal.find_model`.  This is most useful
+        for testing code that wants to call the
+        :func:`repoze.bfg.traversal.find_model` API.  The
+        ``find_model`` API is called with a path as one of its
+        arguments.  If the dictionary you register when calling this
+        method contains that path as a string key (e.g. ``/foo/bar``
+        or ``foo/bar``), the corresponding value will be returned to
+        ``find_model`` (and thus to your code) when ``find_model`` is
+        called with an equivalent path string or tuple."""
         class DummyTraverserFactory:
             def __init__(self, context):
                 self.context = context
@@ -1204,9 +1205,9 @@ class Configurator(object):
         ``event_iface``, that event will be appended to the list.  You
         can then compare the values in the list to expected event
         notifications.  This method is useful when testing code that
-        wants to call ``registry.notify``,
-        ``zope.component.event.dispatch`` or
-        ``zope.component.event.objectEventNotify``.
+        wants to call :meth:`repoze.bfg.registry.Registry.notify`,
+        :func:`zope.component.event.dispatch` or
+        :func:`zope.component.event.objectEventNotify`.
         """
         L = []
         def subscriber(*event):

@@ -7,11 +7,11 @@ The majority of the logic in any web application is completely
 application-specific.  For example, the body of a web page served by
 one web application might be a representation of the contents of an
 accounting ledger, while the content of of a web page served by
-another might be a listing of songs.  These applications obviously may
-not serve the same set of customers.  However, both the ledger-serving
-and song-serving applications can be written using :mod:`repoze.bfg`,
-because :mod:`repoze.bfg` is a very general *framework* which can be
-used to create all kinds of web applications.
+another might be a listing of songs.  These applications obviously
+will not serve the same set of customers.  However, both the
+ledger-serving and song-serving applications can be written using
+:mod:`repoze.bfg`, because :mod:`repoze.bfg` is a very general
+*framework* which can be used to create all kinds of web applications.
 
 .. sidebar:: Frameworks vs. Libraries
 
@@ -119,15 +119,15 @@ The above script defines the following set of imports:
 
 :mod:`repoze.bfg` uses the :term:`WebOb` library as the basis for its
 :term:`request` and :term:`response` objects.  The script uses the
-``webob.Response`` class later in the script to create a
+:class:`webob.Response` class later in the script to create a
 :term:`response` object.
 
 Like many other Python web frameworks, :mod:`repoze.bfg` uses the
 :term:`WSGI` protocol to connect an application and a web server
-together.  The ``paste.httpserver`` server is used in this example as
-a WSGI server, purely for convenience, as ``Paste`` is a dependency of
-:mod:`repoze.bfg` itself; :mod:`repoze.bfg` applications can be served
-by any WSGI server.
+together.  The :mod:`paste.httpserver` server is used in this example
+as a WSGI server, purely for convenience, as ``Paste`` is a dependency
+of :mod:`repoze.bfg` itself; :mod:`repoze.bfg` applications can be
+served by any WSGI server.
 
 The script also imports the ``Configurator`` class from the
 ``repoze.bfg.configuration`` module.  This class is used to configure
@@ -151,7 +151,7 @@ one named ``hello_world`` and one named ``goodbye_world``.
        return Response('Goodbye world!')
 
 Both functions accepts a single argument (``request``), and each
-returns an instance of the ``webob.Response`` class.  In the
+returns an instance of the :class:`webob.Response` class.  In the
 ``hello_world`` function, the string ``'Hello world!'`` is passed to
 the ``Response`` constructor as the *body* of the response.  In the
 ``goodbye_world`` function, the string ``'Goodbye world!'`` is passed.
@@ -307,20 +307,21 @@ if this module is imported; the code within the ``if`` block should
 only be run during a direct script execution.
 
 The ``config = Configurator()`` line above creates an instance of the
-``repoze.bfg.configuration.Configurator`` class.  The resulting
+:class:`repoze.bfg.configuration.Configurator` class.  The resulting
 ``config`` object represents an API which the script uses to configure
 this particular :mod:`repoze.bfg` application.
 
 .. note::
 
-   An instance of the ``Configurator`` class is a *wrapper* object
-   which mutates an :term:`application registry` as its methods are
-   called.  An application registry represents the configuration state
-   of a :mod:`repoze.bfg` application.  The ``Configurator`` is not
-   itself an :term:`application registry`, it is a mechanism used to
-   configure an application registry.  The underlying application
-   registry object being configured by a ``Configurator`` is available
-   as its ``registry`` attribute.
+   An instance of the :class:`repoze.bfg.configuration.Configurator`
+   class is a *wrapper* object which mutates an :term:`application
+   registry` as its methods are called.  An application registry
+   represents the configuration state of a :mod:`repoze.bfg`
+   application.  The ``Configurator`` is not itself an
+   :term:`application registry`, it is a mechanism used to configure
+   an application registry.  The underlying application registry
+   object being configured by a ``Configurator`` is available as its
+   ``registry`` attribute.
 
 Beginning Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -330,15 +331,15 @@ Beginning Configuration
 
        config.begin()
 
-The ``begin`` method of a Configurator tells the the system that
-application configuration has begun.  In particular, this causes the
-:term:`application registry` associated with this configurator to
-become the "current" application registry, meaning that code which
-attempts to use the application registry :term:`thread local` will
-obtain the registry associated with the configurator.  This is an
-explicit step because it's sometimes convenient to use a configurator
-without causing the registry associated with the configurator to
-become "current".
+The :meth:`repoze.bfg.configuration.Configurator.begin` method tells
+the the system that application configuration has begun.  In
+particular, this causes the :term:`application registry` associated
+with this configurator to become the "current" application registry,
+meaning that code which attempts to use the application registry
+:term:`thread local` will obtain the registry associated with the
+configurator.  This is an explicit step because it's sometimes
+convenient to use a configurator without causing the registry
+associated with the configurator to become "current".
 
 Adding Configuration
 ~~~~~~~~~~~~~~~~~~~~
@@ -349,14 +350,15 @@ Adding Configuration
        config.add_view(hello_world)
        config.add_view(goodbye_world, name='goodbye')
 
-Each of these lines calls the ``add_view`` method of the
-``Configurator`` API.  The ``add_view`` method of a configurator
-registers a :term:`view configuration` within the :term:`application
-registry`.  A :term:`view configuration` represents a :term:`view
-callable` which must be invoked when a set of circumstances related to
-the :term:`request` is true.  This "set of circumstances" is provided
-as one or more keyword arguments to the ``add_view`` method, otherwise
-known as :term:`predicate` arguments.
+Each of these lines calls the
+:meth:`repoze.bfg.configuration.Configurator.add_view` method.  The
+``add_view`` method of a configurator registers a :term:`view
+configuration` within the :term:`application registry`.  A :term:`view
+configuration` represents a :term:`view callable` which must be
+invoked when a set of circumstances related to the :term:`request` is
+true.  This "set of circumstances" is provided as one or more keyword
+arguments to the ``add_view`` method, otherwise known as
+:term:`predicate` arguments.
 
 The line ``config.add_view(hello_world)`` registers the
 ``hello_world`` function as a view callable.  The ``add_view`` method
@@ -386,8 +388,9 @@ invoked.
    it through a relatively-ordered series of URL path matches.  We're
    not really concerned about the finer details of :term:`URL
    dispatch` right now.  It's just useful to use for demonstrative
-   purposes: the ordering of calls to ``Configurator.add_view`` is
-   never very important.  We can register ``goodbye_world`` first and
+   purposes: the ordering of calls to
+   :meth:`repoze.bfg.configuration.Configurator.add_view`` is never
+   very important.  We can register ``goodbye_world`` first and
    ``hello_world`` second; :mod:`repoze.bfg` will still give us the
    most specific callable when a request is dispatched to it.
 
@@ -447,13 +450,14 @@ Ending Configuration
 
        config.end()
 
-The ``end`` method of a Configurator tells the the system that
-application configuration has ended.  It is the inverse of
-``config.begin``.  In particular, this causes the :term:`application
-registry` associated with this configurator to no longer be the
-"current" application registry, meaning that code which attempts to
-use the application registry :term:`thread local` will no longer
-obtain the registry associated with the configurator.
+The :meth:`repoze.bfg.configuration.Configurator.end` method tells the
+the system that application configuration has ended.  It is the
+inverse of :meth:`repoze.bfg.configuration.Configurator.begin`.  In
+particular, this causes the :term:`application registry` associated
+with this configurator to no longer be the "current" application
+registry, meaning that code which attempts to use the application
+registry :term:`thread local` will no longer obtain the registry
+associated with the configurator.
 
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -464,16 +468,17 @@ WSGI Application Creation
        app = config.make_wsgi_app()
 
 After configuring views and ending configuration, the script creates a
-WSGI *application* via the ``config.make_wsgi_app`` method.  A call to
-``make_wsgi_app`` implies that all configuration is finished (meaning
-all method calls to the configurator which set up views, and various
-other configuration settings have been performed).  The
+WSGI *application* via the
+:meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method.  A
+call to ``make_wsgi_app`` implies that all configuration is finished
+(meaning all method calls to the configurator which set up views, and
+various other configuration settings have been performed).  The
 ``make_wsgi_app`` method returns a :term:`WSGI` application object
 that can be used by any WSGI server to present an application to a
 requestor.
 
 The :mod:`repoze.bfg` application object, in particular, is an
-instance of the ``repoze.bfg.router.Router`` class.  It has a
+instance of the :class:`repoze.bfg.router.Router` class.  It has a
 reference to the :term:`application registry` which resulted from
 method calls to the configurator used to configure it.  The Router
 consults the registry to obey the policy choices made by a single
@@ -494,12 +499,13 @@ WSGI Application Serving
        serve(app)
 
 Finally, we actually serve the application to requestors by starting
-up a WSGI server.  We happen to use the ``paste.httpserver.serve``
+up a WSGI server.  We happen to use the :func:`paste.httpserver.serve`
 WSGI server runner, using the default TCP port of 8080, and we pass it
-the ``app`` object (an instance of ``repoze.bfg.router.Router``) as
-the application we wish to serve.  This causes the server to start
-listening on the TCP port.  It will serve requests forever, or at
-least until we stop it by killing the process which runs it.
+the ``app`` object (an instance of the
+:class:`repoze.bfg.router.Router` class) as the application we wish to
+serve.  This causes the server to start listening on the TCP port.  It
+will serve requests forever, or at least until we stop it by killing
+the process which runs it.
 
 Conclusion
 ~~~~~~~~~~
@@ -601,11 +607,11 @@ within the ``if __name__ == '__main__'`` section of ``helloworld.py``:
        app = config.make_wsgi_app()
        simple_server.make_server('', 8080, app).serve_forever()
 
-In our "declarative" code, we've added a call to the ``load_zcml``
-method of the ``Configurator`` with the value ``configure.zcml``, and
-we've removed the lines which read ``config.add_view(hello_world)``
-and ``config.add_view(goodbye_world, name='goodbye')``, so that it now
-reads as:
+In our "declarative" code, we've added a call to the
+:meth:`repoze.bfg.configuration.Configurator.load_zcml` method with
+the value ``configure.zcml``, and we've removed the lines which read
+``config.add_view(hello_world)`` and ``config.add_view(goodbye_world,
+name='goodbye')``, so that it now reads as:
 
 .. code-block:: python
    :linenos:
@@ -679,16 +685,16 @@ The ``configure.zcml`` ZCML file contains this bit of XML within the
 
 This singleton (self-closing) tag instructs ZCML to load a ZCML file
 from the Python package with the :term:`dotted Python name`
-``repoze.bfg.includes``, as specified by its ``package`` attribute.
+:mod:`repoze.bfg.includes`, as specified by its ``package`` attribute.
 This particular ``<include>`` declaration is required because it
 actually allows subsequent declaration tags (such as ``<view>``, which
 we'll see shortly) to be recognized.  The ``<include>`` tag
 effectively just includes another ZCML file; this causes its
 declarations to be executed.  In this case, we want to load the
 declarations from the file named ``configure.zcml`` within the
-``repoze.bfg.includes`` Python package.  We know we want to load the
-``configure.zcml`` from this package because ``configure.zcml`` is the
-default value for another attribute of the ``<include>`` tag named
+:mod:`repoze.bfg.includes` Python package.  We know we want to load
+the ``configure.zcml`` from this package because ``configure.zcml`` is
+the default value for another attribute of the ``<include>`` tag named
 ``file``.  We could have spelled the include tag more verbosely, but
 equivalently as:
 
@@ -700,13 +706,13 @@ equivalently as:
 
 The ``<include>`` tag that includes the ZCML statements implied by the
 ``configure.zcml`` file from the Python package named
-``repoze.bfg.includes`` is basically required to come before any other
-named declaration in an application's ``configure.zcml``.  If it is
-not included, subsequent declaration tags will fail to be recognized,
-and the configuration system will generate a traceback.  However, the
-``<include package="repoze.bfg.includes"/>`` tag needs to exist only
-in a "top-level" ZCML file, it needn't also exist in ZCML files
-*included by* a top-level ZCML file.
+:mod:`repoze.bfg.includes` is basically required to come before any
+other named declaration in an application's ``configure.zcml``.  If it
+is not included, subsequent declaration tags will fail to be
+recognized, and the configuration system will generate a traceback.
+However, the ``<include package="repoze.bfg.includes"/>`` tag needs to
+exist only in a "top-level" ZCML file, it needn't also exist in ZCML
+files *included by* a top-level ZCML file.
 
 The ``<view>`` Tag
 ~~~~~~~~~~~~~~~~~~
@@ -751,16 +757,16 @@ configurations imperatively, we saw this code:
        config.add_view(goodbye_world, name='goodbye')
 
 Each ``<view>`` declaration tag encountered in a ZCML file effectively
-invokes the ``add_view`` method of the ``Configurator`` object on the
-behalf of the developer.  Various attributes can be specified on the
-``<view>`` tag which influence the :term:`view configuration` it
-creates.
+invokes the :meth:`repoze.bfg.configuration.Configurator.add_view`
+method on the behalf of the developer.  Various attributes can be
+specified on the ``<view>`` tag which influence the :term:`view
+configuration` it creates.
 
-Since the relative ordering of calls to ``Configuration.add_view``
-doesn't matter (see the sidebar above entitled *View Dispatch and
-Ordering*), the relative order of ``<view>`` tags in ZCML doesn't
-matter either.  The following ZCML orderings are completely
-equivalent:
+Since the relative ordering of calls to
+:meth:`repoze.bfg.configuration.Configurator.add_view` doesn't matter
+(see the sidebar above entitled *View Dispatch and Ordering*), the
+relative order of ``<view>`` tags in ZCML doesn't matter either.  The
+following ZCML orderings are completely equivalent:
 
 .. topic:: Hello Before Goodbye
 
@@ -793,8 +799,8 @@ equivalent:
 The ``<view>`` tag is an example of a :mod:`repoze.bfg` declaration
 tag.  Other such tags include ``<route>``, ``<scan>``, ``<notfound>``,
 ``<forbidden>``, and others.  Each of these tags is effectively a
-"macro" which calls methods on the ``Configurator`` object on your
-behalf.
+"macro" which calls methods on the
+:class:`repoze.bfg.configuration.Configurator` object on your behalf.
 
 ZCML Conflict Detection
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -823,9 +829,9 @@ start.  For example, the following ZCML file has two conflicting
     </configure>
 
 If you try to use this ZCML file as the source of ZCML for an
-application, a ``ConfigurationError`` will be raised when you attempt
-to start the application with information about which tags might have
-conflicted.
+application, a :data:`repoze.bfg.exceptions.ConfigurationError` will
+be raised when you attempt to start the application with information
+about which tags might have conflicted.
 
 .. _word_on_xml_namespaces:
 
@@ -880,19 +886,20 @@ Conclusions
 
 .. sidebar::  Which Configuration Mode Should I Use?
 
-  We recommend declarative configuration (ZMCL), because it's the more
-  traditional form of configuration used by Zope-based systems, it can
-  be overridden and extended by third party deployers, and there are
-  more examples for it "in the wild".  However, imperative mode
-  configuration can be simpler to understand.
+  We recommend declarative configuration (:term:`ZCML`), because it's
+  the more traditional form of configuration used by Zope-based
+  systems, it can be overridden and extended by third party deployers,
+  and there are more examples for it "in the wild".  However,
+  imperative mode configuration can be simpler to understand.
 
 :mod:`repoze.bfg` allows an application to perform configuration tasks
 either imperatively or declaratively.  You can choose the mode that
 best fits your brain as necessary.
 
-For more information about the API of the ``Configurator`` object, see
-:ref:`configuration_module`.  The equivalent ZCML declaration tags are
-introduced in narrative documentation chapters as necessary.
+For more information about the API of a ``Configurator`` object, see
+:class:`repoze.bfg.configuration.Configurator` .  The equivalent ZCML
+declaration tags are introduced in narrative documentation chapters as
+necessary.
 
 For more information about :term:`traversal`, see
 :ref:`traversal_chapter`.
