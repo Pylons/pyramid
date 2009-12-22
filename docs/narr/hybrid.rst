@@ -94,11 +94,11 @@ code just won't have any ``<route>`` declarations.  Instead, its ZCML
      />
 
 "Under the hood", the above view statements register a view using the
-:term:`context` interface ``None``, the ``IRequest`` :term:`request
-type` with a :term:`view name` matching the name= argument.  The
-"foobar" view above will match the URL ``/a/b/c/foobar`` or
-``/foobar``, etc, assuming that no view is named "a", "b", or "c"
-during traversal.
+:term:`context` interface ``None``, the
+:class:`repoze.bfg.interfaces.IRequest` :term:`request type` with a
+:term:`view name` matching the name= argument.  The "foobar" view
+above will match the URL ``/a/b/c/foobar`` or ``/foobar``, etc,
+assuming that no view is named "a", "b", or "c" during traversal.
 
 Hybrid Applications
 -------------------
@@ -122,9 +122,10 @@ When the view attached to this route is invoked, :mod:`repoze.bfg`
 will attempt to use :term:`traversal` against the context implied by
 the :term:`root factory` of this route.  The above example isn't very
 useful unless you've defined a custom :term:`root factory` by passing
-it to constructor of a :term:`Configurator` because the *default* root
-factory cannot be traversed (it has no useful ``__getitem__`` method).
-But let's imagine that your root factory looks like so:
+it to constructor of a :class:`repoze.bfg.configuration.Configurator`
+because the *default* root factory cannot be traversed (it has no
+useful ``__getitem__`` method).  But let's imagine that your root
+factory looks like so:
 
 .. code-block:: python
 
@@ -164,10 +165,11 @@ pattern will be used to traverse the graph.  For example, if the URL
 requested by a user was ``http://example.com/one/two/a/b/c``, and the
 above route was matched (some other route might match before this one
 does), the traversal path used against the root would be ``a/b/c``.
-BFG will attempt to traverse a graph through the edges "a", "b", and
-"c".  In our above example, that would imply that the *context* of the
-view would be the ``Traversable`` object we've named "c" in our bogus
-graph, using the ``.views.home`` view as the view callable.
+:mod:`repoze.bfg` will attempt to traverse a graph through the edges
+"a", "b", and "c".  In our above example, that would imply that the
+*context* of the view would be the ``Traversable`` object we've named
+"c" in our bogus graph, using the ``.views.home`` view as the view
+callable.
 
 We can also define extra views that match a route:
 
@@ -191,8 +193,8 @@ that the view should *only be invoked when the route matches*.
 
 Views declared *after* the route declaration may have a ``route_name``
 attribute which refers to the value of the ``<route>`` declaration's
-``name`` attribute ("home").  The ``<view>`` declaration above names
-a different view and (more importantly) a different :term`view name`.
+``name`` attribute ("home").  The ``<view>`` declaration above names a
+different view and (more importantly) a different :term:`view name`.
 It's :term:`view name` will be looked for during traversal.  So if our
 URL is "http://example.com/one/two/a/another", the ``.views.another``
 view will be called.
@@ -223,8 +225,9 @@ Using ``*subpath`` in a Route Path
 
 There are certain (extremely rare) cases when you'd like to influence
 the traversal :term:`subpath` when a route matches without actually
-performing traversal.  For instance, the ``repoze.bfg.wsgi.wsgiapp2``
-decorator and the ``repoze.bfg.view.static`` helper attempt to compute
+performing traversal.  For instance, the
+:func:`repoze.bfg.wsgi.wsgiapp2` decorator and the
+:class:`repoze.bfg.view.static` helper attempt to compute
 ``PATH_INFO`` from the request's subpath, so it's useful to be able to
 influence this value.  When ``*subpath`` exists in a path pattern, no
 path is actually traversed, but the traversal algorithm will return a
@@ -241,8 +244,8 @@ like this:
     />
 
 Where ``.views.static_view`` is an instance of
-``repoze.bfg.view.static``.  This effectively tells the static helper
-to traverse everything in the subpath as a filename.
+:class:`repoze.bfg.view.static`.  This effectively tells the static
+helper to traverse everything in the subpath as a filename.
 
 Corner Cases
 ------------
@@ -351,9 +354,9 @@ What it all boils down to is: if a request that matches a route
 resolves to a view you don't expect it to, use the ``view_for``
 attribute of the ``route`` statement (*or* the ``for`` attribute of
 the ZCML statement that also has a ``route_name`` *or* the equivalent
-``for_`` parameter to the ``@bfg_view`` decorator that also has a
-``route_name`` parameter) to name the specific context interface you
-want the route-related view to match.
+``for_`` parameter to the :class:`repoze.bfg.view.bfg_view` decorator
+that also has a ``route_name`` parameter) to name the specific context
+interface you want the route-related view to match.
 
 Yes, that was as painful for me to write as it was for you to read.
 
@@ -379,10 +382,10 @@ generate a "conflict" error at startup time.
      view=".views.another"
      />
 
-This is because the "view" attribute of the ``<route>`` statement
+This is because the ``view`` attribute of the ``<route>`` statement
 above is an *implicit* default view when that route matches.
-``<route>`` declarations don't *need* to supply a view attribute.
-For example, this ``<route>`` statement:
+``<route>`` declarations don't *need* to supply a view attribute.  For
+example, this ``<route>`` statement:
 
 .. code-block:: xml
 
