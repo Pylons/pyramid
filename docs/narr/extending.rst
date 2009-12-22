@@ -21,10 +21,11 @@ relying on :term:`configuration decoration` meant to be detected via
 the a :term:`scan`, and you mustn't configure your :mod:`repoze.bfg`
 application *imperatively* by using any code which configures the
 application through methods of the :term:`Configurator` (except for
-its ``load_zcml`` method).  Instead, should must use :term:`ZCML` for
-the equivalent purposes. :term:`ZCML` declarations that belong to an
-application can be "overridden" by integrators as necessary, but
-decorators and imperative code which perform the same tasks cannot.
+the :meth:`repoze.bfg.configuration.Configurator.load_zcml` method).
+Instead, should must use :term:`ZCML` for the equivalent
+purposes. :term:`ZCML` declarations that belong to an application can
+be "overridden" by integrators as necessary, but decorators and
+imperative code which perform the same tasks cannot.
 
 In general: use only :term:`ZCML` to configure your application if
 you'd like it to be extensible.
@@ -80,8 +81,8 @@ Extending an Application Which Possesses Configuration Decorators Or Which Does 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you've inherited a :mod:`repoze.bfg` application which uses
-``@bfg_view`` decorators or which performs configuration imperatively,
-one of two things may be true:
+:class:`repoze.bfg.view.bfg_view` decorators or which performs
+configuration imperatively, one of two things may be true:
 
 - If you just want to *extend* the application, you can write
   additional ZCML that registers more views or routes, loading any
@@ -91,13 +92,13 @@ one of two things may be true:
 - If you want to *override* configuration in the application, you
   *may* need to change the source code of the original application.
 
-  If the only source of trouble is the existence of ``@bfg_view``
-  decorators, you can just omit the ``<scan>`` directive in the
-  application ZCML.  This will cause the decorators to do nothing.  At
-  this point, you will need to convert all the configuration done in
-  decorators into equivalent :term:`ZCML` and add that ZCML to an a
-  separate Python package as described in
-  :ref:`extending_the_application`.
+  If the only source of trouble is the existence of
+  :class:`repoze.bfg.view.bfg_view` decorators, you can just omit the
+  ``<scan>`` directive in the application ZCML.  This will cause the
+  decorators to do nothing.  At this point, you will need to convert
+  all the configuration done in decorators into equivalent
+  :term:`ZCML` and add that ZCML to an a separate Python package as
+  described in :ref:`extending_the_application`.
 
   If the source of trouble is configuration done imperatively (perhaps
   in the function called during application startup), you'll need to
