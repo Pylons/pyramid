@@ -560,9 +560,10 @@ class Test_setUp(unittest.TestCase):
         old = True
         manager.push(old)
         try:
-            self._callFUT()
+            config = self._callFUT()
             current = manager.get()
             self.failIf(current is old)
+            self.assertEqual(config.registry, current['registry'])
             self.assertEqual(current['registry'].__class__, Registry)
             self.assertEqual(current['request'], None)
         finally:

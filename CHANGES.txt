@@ -32,6 +32,13 @@ Documentation
   ``repoze.bfg.authorization``, and ``repoze.bfg.interfaces`` modules
   to API documentation.
 
+Deprecations
+------------
+
+- The ``repoze.bfg.testing.registerRoutesMapper`` API (added in an
+  early 1.2 alpha) was deprecated.  Its import now generates a
+  deprecation warning.
+
 1.2a7 (2009-12-20)
 ==================
 

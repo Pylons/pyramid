@@ -344,13 +344,26 @@ class Configurator(object):
         return subscriber
 
     def add_settings(self, settings=None, **kw):
-        """ Add additional settings beyond the ones passed in as
-        ``settings`` to the constructor of this object to the
-        dictionarylike object which is returned from
-        :func:`repoze.bfg.settings.get_settings` API.  The
-        ``settings`` argument should be a dictionarylike object or
-        ``None``.  Arbitrary ``kw`` arguments can be passed in to
-        augment the settings dict."""
+        """Augment the ``settings`` argument passed in to the
+        Configurator constructor with one or more 'setting' key/value
+        pairs.  A setting is a single key/value pair in the
+        dictionary-ish object returned from the API
+        :func:`repoze.bfg.settings.get_settings`.
+
+        You may pass a dictionary::
+
+           config.add_settings({'external_uri':'http://example.com'})
+
+        Or a set of key/value pairs::
+    
+           config.add_settings(external_uri='http://example.com')
+
+        This function is useful when you need to test code that
+        calls the :func:`repoze.bfg.settings.get_settings` API and which
+        uses return values from that API.
+
+        .. note:: This method is new as of :mod:`repoze.bfg` 1.2.
+        """
         if settings is None:
             settings = {}
         utility = self.registry.queryUtility(ISettings)
@@ -1188,19 +1201,30 @@ class Configurator(object):
 
     def testing_securitypolicy(self, userid=None, groupids=(),
                                permissive=True):
-        """Unit/integration testing helper: registers a a pair of
-        dummy :mod:`repoze.bfg` security policies: an
-        :term:`authorization policy` and an :term:`authentication
-        policy`) using the userid ``userid`` and the group ids
-        ``groupids``.  If ``permissive`` is true, a 'permissive'
-        authorization policy is registered; this policy allows all
-        access.  If ``permissive`` is false, a nonpermissive
-        authorization policy is registered; this policy denies all
-        access.  This function is most useful when testing code that
-        uses the APIs named
-        :func:`repoze.bfg.security.has_permission`,
+        """Unit/integration testing helper: Registers a pair of faux
+        :mod:`repoze.bfg` security policies: a :term:`authentication
+        policy` and a :term:`authorization policy`.
+
+        The behavior of the registered :term:`authorization policy`
+        depends on the ``permissive`` argument.  If ``permissive`` is
+        true, a permissive :term:`authorization policy` is registered;
+        this policy allows all access.  If ``permissive`` is false, a
+        nonpermissive :term:`authorization policy` is registered; this
+        policy denies all access.
+
+        The behavior of the registered :term:`authentication policy`
+        depends on the values provided for the ``userid`` and
+        ``groupids`` argument.  The authentication policy will return
+        the userid identifier implied by the ``userid`` argument and
+        the group ids implied by the ``groupids`` argument when the
+        :func:`repoze.bfg.security.authenticated_userid` or
+        :func:`repoze.bfg.security.effective_principals` APIs are
+        used.
+
+        This function is most useful when testing code that uses
+        the APIs named :func:`repoze.bfg.security.has_permission`,
         :func:`repoze.bfg.security.authenticated_userid`,
-        :func:`repoze.bfg.security.effective_principals` and
+        :func:`repoze.bfg.security.effective_principals`, and
         :func:`repoze.bfg.security.principals_allowed_by_permission`.
         """
         from repoze.bfg.testing import DummySecurityPolicy
@@ -1210,16 +1234,18 @@ class Configurator(object):
 
     def testing_models(self, models):
         """Unit/integration testing helper: registers a dictionary of
-        models that can be resolved via
-        :func:`repoze.bfg.traversal.find_model`.  This is most useful
-        for testing code that wants to call the
-        :func:`repoze.bfg.traversal.find_model` API.  The
-        ``find_model`` API is called with a path as one of its
-        arguments.  If the dictionary you register when calling this
-        method contains that path as a string key (e.g. ``/foo/bar``
-        or ``foo/bar``), the corresponding value will be returned to
-        ``find_model`` (and thus to your code) when ``find_model`` is
-        called with an equivalent path string or tuple."""
+        :term:`model` objects that can be resolved via the
+        :func:`repoze.bfg.traversal.find_model` API.
+
+        The :func:`repoze.bfg.traversal.find_model` API is called with
+        a path as one of its arguments.  If the dictionary you
+        register when calling this method contains that path as a
+        string key (e.g. ``/foo/bar`` or ``foo/bar``), the
+        corresponding value will be returned to ``find_model`` (and
+        thus to your code) when
+        :func:`repoze.bfg.traversal.find_model` is called with an
+        equivalent path string or tuple.
+        """
         class DummyTraverserFactory:
             def __init__(self, context):
                 self.context = context
@@ -1235,17 +1261,23 @@ class Configurator(object):
                                       ITraverser)
         return models
 
-    def testing_add_subscriber(self, event_iface=Interface):
+    def testing_add_subscriber(self, event_iface=None):
         """Unit/integration testing helper: Registers a
-        :term:`subscriber` listening for events of the type
-        ``event_iface`` and returns a list which is appended to by the
-        subscriber.  When an event is dispatched that matches
-        ``event_iface``, that event will be appended to the list.  You
-        can then compare the values in the list to expected event
-        notifications.  This method is useful when testing code that
-        wants to call :meth:`repoze.bfg.registry.Registry.notify`,
+        :term:`subscriber` which listens for events of the type
+        ``event_iface``.  This method returns a list object which is
+        appended to by the subscriber whenever an event is captured.
+
+        When an event is dispatched that matches the value implied by
+        the ``event_iface`` argument, that event will be appended to
+        the list.  You can then compare the values in the list to
+        expected event notifications.  This method is useful when
+        testing code that wants to call
+        :meth:`repoze.bfg.registry.Registry.notify`,
         :func:`zope.component.event.dispatch` or
         :func:`zope.component.event.objectEventNotify`.
+
+        The default value of ``event_iface`` (``None``) implies a
+        subscriber registered for *any* kind of event.
         """
         L = []
         def subscriber(*event):
@@ -1254,14 +1286,19 @@ class Configurator(object):
         return L
 
     def testing_add_template(self, path, renderer=None):
-        """ Register a template tenderer at ``path`` (usually a
-        relative filename ala ``templates/foo.pt``) and return the
-        renderer object.  If the ``renderer`` argument is None, a
-        'dummy' renderer will be used.  This function is useful when
-        testing code that calls the ``render_template_to_response`` or
-        any other ``render_template*`` API of any of the built-in
-        templating systems (see :mod:`repoze.bfg.chameleon_zpt` and
-        :mod:`repoze.bfg.chameleon_text`)."""
+        """Unit/integration testing helper: register a template
+        tenderer at ``path`` (usually a relative filename ala
+        ``templates/foo.pt``) and return the renderer object.  If the
+        ``renderer`` argument is None, a 'dummy' renderer will be
+        used.  This function is useful when testing code that calls
+        the
+        :func:`repoze.bfg.chameleon_zpt.render_template_to_response`
+        function or
+        :func:`repoze.bfg.chameleon_text.render_template_to_response`
+        function or any other ``render_template*`` API of any built-in
+        templating system (see :mod:`repoze.bfg.chameleon_zpt` and
+        :mod:`repoze.bfg.chameleon_text`).
+        """
         from repoze.bfg.testing import DummyTemplateRenderer
         if renderer is None:
             renderer = DummyTemplateRenderer()
