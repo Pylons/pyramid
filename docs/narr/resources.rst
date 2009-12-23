@@ -34,14 +34,16 @@ Understanding Resources
 -----------------------
 
 Let's imagine you've created a :mod:`repoze.bfg` application that uses
-a :term:`Chameleon` template via the ``render_template_to_response``
-API.  For example, the application might address the resource named
+a :term:`Chameleon` ZPT template via the
+:func:`repoze.bfg.chameleon_zpt.render_template_to_response` API.  For
+example, the application might address the resource named
 ``templates/some_template.pt`` using that API within a ``views.py``
 file inside a ``myapp`` package:
 
 .. code-block:: python
    :linenos:
 
+   from repoze.bfg.chameleon_zpt import render_template_to_response
    render_template_to_response('templates/some_template.pt')
 
 "Under the hood", when this API is called, :mod:`repoze.bfg` attempts
@@ -139,10 +141,97 @@ hammer" way to do the same thing is explained in
 replace a :term:`view` wholesale rather than resources that might be
 used by a view.
 
+.. _override_resource:
+
+The :meth:`repoze.bfg.configuration.Configurator.override_resource` API
+-----------------------------------------------------------------------
+
+An individual call to
+:meth:`repoze.bfg.configuration.Configurator.override_resource` can
+override a single resource.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   config.override_resource(
+            to_override='some.package:templates/mytemplate.pt',
+            override_with='another.package:othertemplates/anothertemplate.pt')
+
+The string value passed to both ``to_override`` and ``override_with``
+attached to a resource directive is called a "specification".  The
+colon separator in a specification separates the *package name* from
+the *resource name*.  The colon and the following resource name are
+optional.  If they are not specified, the override attempts to resolve
+every lookup into a package from the directory of another package.
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   config.override_resource(to_override='some.package',
+                            override_with='another.package')
+
+Individual subdirectories within a package can also be overridden:
+
+.. code-block:: python
+   :linenos:
+
+   config.override_resource(to_override='some.package:templates/',
+                            override_with='another.package:othertemplates/')
+
+
+If you wish to override a directory with another directory, you *must*
+make sure to attach the slash to the end of both the ``to_override``
+specification and the ``override_with`` specification.  If you fail to
+attach a slash to the end of a specification that points a directory,
+you will get unexpected results.
+
+You cannot override a directory specification with a file
+specification, and vice versa: a startup error will occur if you try.
+You cannot override a resource with itself: a startup error will occur
+if you try.
+
+Only individual *package* resources may be overridden.  Overrides will
+not traverse through subpackages within an overridden package.  This
+means that if you want to override resources for both
+``some.package:templates``, and ``some.package.views:templates``, you
+will need to register two overrides.
+
+The package name in a specification may start with a dot, meaning that
+the package is relative to the package in which the configuration
+construction file resides (or the ``package`` argument to the
+:class:`repoze.bfg.configuration.Configurator` class construction).
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   config.override_resource(to_override='.subpackage:templates/',
+                            override_with='another.package:templates/')
+
+Multiple ``override_resource`` statements which name a shared
+``to_override`` but a different ``override_with`` specification can be
+"stacked" to form a search path.  The first resource that exists in
+the search path will be used; if no resource exists in the override
+path, the original resource is used.
+
+Resource overrides can actually override resources other than
+templates and static files.  Any software which uses the
+:func:`pkg_resources.get_resource_filename`,
+:func:`pkg_resources.get_resource_stream` or
+:func:`pkg_resources.get_resource_string` APIs will obtain an
+overridden file when an override is used.
+
 .. _resource_directive:
 
 The ``resource`` ZCML Directive
 -------------------------------
+
+Instead of using
+:meth:`repoze.bfg.configuration.Configurator.override_resource` during
+:term:`imperative configuration`, an equivalent can be used to perform
+all the tasks described above within :term:`ZCML`.  The ZCML
+``resource`` tag is a frontend to using ``override_resource``.
 
 An individual :mod:`repoze.bfg` ``resource`` ZCML statement can
 override a single resource.  For example:
@@ -187,17 +276,6 @@ specification and the ``override_with`` specification.  If you fail to
 attach a slash to the end of a specification that points a directory,
 you will get unexpected results.
 
-You cannot override a directory specification with a file
-specification, and vice versa (a startup error will occur if you try).
-You cannot override a resource with itself (a startup error will occur
-if you try).
-
-Only individual *package* resources may be overridden.  Overrides will
-not traverse through subpackages within an overridden package.  This
-means that if you want to override resources for both
-``some.package:templates``, and ``some.package.views:templates``, you
-will need to register two overrides.
-
 The package name in a specification may start with a dot, meaning that
 the package is relative to the package in which the ZCML file resides.
 For example:
@@ -210,14 +288,3 @@ For example:
       override_with="another.package:templates/"
      />
 
-Multiple ``resource`` statements which name a shared ``to_override``
-but a different ``override_with`` specification can be "stacked" to
-form a search path.  The first resource that exists in the search path
-will be used; if no resource exists in the override path, the original
-resource is used.
-
-Resource overrides can actually override resources other than
-templates and static files.  Any software which uses the
-``pkg_resources`` ``get_resource_filename``, ``get_resource_stream``
-or ``get_resource_string`` APIs will obtain an overridden file when an
-override is used.
