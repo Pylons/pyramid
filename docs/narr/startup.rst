@@ -4,7 +4,9 @@ Startup
 =======
 
 When you cause :mod:`repoze.bfg` to start up in a console window,
-you'll see something much like this show up on the console::
+you'll see something much like this show up on the console:
+
+.. code-block:: bash
 
   $ paster serve myproject/MyProject.ini
   Starting server in PID 16601.
@@ -65,11 +67,11 @@ press ``return`` after running ``paster serve MyProject.ini``.
    constructor is meant to return a :term:`router` instance, which is
    a :term:`WSGI` application.
 
-   For ``repoze.bfg`` applications, the constructor will be a function
-   named ``app`` in the ``run.py`` file within the :term:`package` in
-   which your application lives.  If this function succeeds, it will
-   return a :mod:`repoze.bfg` :term:`router` instance.  Here's the
-   contents of an example ``run.py`` module:
+   For :mod:`repoze.bfg` applications, the constructor will be a
+   function named ``app`` in the ``run.py`` file within the
+   :term:`package` in which your application lives.  If this function
+   succeeds, it will return a :mod:`repoze.bfg` :term:`router`
+   instance.  Here's the contents of an example ``run.py`` module:
 
    .. literalinclude:: MyProject/myproject/run.py
       :linenos:
@@ -106,8 +108,9 @@ press ``return`` after running ``paster serve MyProject.ini``.
    Note that the ``app`` function imports the ``get_root`` :term:`root
    factory` function from the ``myproject.models`` Python module.
 
-#. The ``app`` function first constructs a :term:`Configurator`,
-   passing ``get_root`` to it as its ``root_factory`` argument, and
+#. The ``app`` function first constructs a
+   :class:`repoze.bfg.configuration.Configurator` instance, passing
+   ``get_root`` to it as its ``root_factory`` argument, and
    ``settings`` dictionary captured via the ``**settings`` kwarg as
    its ``settings`` argument.
 
@@ -121,25 +124,28 @@ press ``return`` after running ``paster serve MyProject.ini``.
    something like ``{'reload_templates':'true',
    'debug_authorization':'false', 'debug_notfound':'false'}``.
 
-#. The ``app`` function then calls the ``load_zcml`` method of the
-   configurator instance, passing in a ``zcml_file`` value.
-   ``zcml_file`` is the value of the ``configure_zcml`` setting or a
-   default of ``configure.zcml``.  This filename is relative to the
-   run.py file that the ``app`` function lives in.  The ``load_zcml``
-   function processes each :term:`ZCML declaration` in the ZCML file
-   implied by the ``zcml_file`` argument.  If ``load_zcml`` fails to
-   parse the ZCML file (or any file which is included by the ZCML
-   file), a ``XMLConfigurationError`` is raised.  If it succeeds, an
-   :term:`application registry` is populated using all the :term:`ZCML
-   declaration` statements present in the file.
+#. The ``app`` function then calls the
+   :meth:`repoze.bfg.configuration.Configurator.load_zcml` method,
+   passing in a ``zcml_file`` value.  ``zcml_file`` is the value of
+   the ``configure_zcml`` setting or a default of ``configure.zcml``.
+   This filename is relative to the run.py file that the ``app``
+   function lives in.  The ``load_zcml`` function processes each
+   :term:`ZCML declaration` in the ZCML file implied by the
+   ``zcml_file`` argument.  If ``load_zcml`` fails to parse the ZCML
+   file (or any file which is included by the ZCML file), a
+   ``XMLConfigurationError`` is raised and processing ends.  If it
+   succeeds, an :term:`application registry` is populated using all
+   the :term:`ZCML declaration` statements present in the file.
 
-#. The ``make_wsgi_app`` method of the configurator is called.  The
-   result is a :term:`router` instance.  The router is associated with
-   the :term:`application registry` implied by the configurator
-   previously populated by ZCML.  The router is a WSGI application.
+#. The :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app`
+   method is called.  The result is a :term:`router` instance.  The
+   router is associated with the :term:`application registry` implied
+   by the configurator previously populated by ZCML.  The router is a
+   WSGI application.
 
-#. A ``WSGIApplicationCreatedEvent`` event is emitted (see
-   :ref:`events_chapter` for more information about events).
+#. A :class:`repoze.bfg.interfaces.WSGIApplicationCreatedEvent` event
+   is emitted (see :ref:`events_chapter` for more information about
+   events).
 
 #. Assuming there were no errors, the ``app`` function in
    ``myproject`` returns the router instance created by
