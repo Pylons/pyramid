@@ -44,26 +44,25 @@ class CallbackAuthenticationPolicy(object):
 
 
 class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A BFG authentication policy which obtains data from the
-    repoze.who 1.X WSGI 'API' (the ``repoze.who.identity`` key in the
-    WSGI environment).
+    """ A :mod:`repoze.bfg` :term:`authentication policy` which
+    obtains data from the :mod:`repoze.who` 1.X WSGI 'API' (the
+    ``repoze.who.identity`` key in the WSGI environment).
 
     Constructor Arguments
 
     ``identifier_name``
 
-       Default: ``auth_tkt``.  The who plugin name that performs
-       remember/forget.  Optional.
+       Default: ``auth_tkt``.  The :mod:`repoze.who` plugin name that
+       performs remember/forget.  Optional.
 
     ``callback``
 
-        Default: ``None``.  A callback passed the repoze.who identity
-        and the request, expected to return None if the user
-        represented by the identity doesn't exist or a sequence of
-        group identifiers (possibly empty) if the user does exist.  If
-        ``callback`` is None, the userid will be assumed to exist with
-        no groups.
-
+        Default: ``None``.  A callback passed the :mod:`repoze.who`
+        identity and the :term:`request`, expected to return ``None``
+        if the user represented by the identity doesn't exist or a
+        sequence of group identifiers (possibly empty) if the user
+        does exist.  If ``callback`` is None, the userid will be
+        assumed to exist with no groups.
     """
     implements(IAuthenticationPolicy)
 
@@ -124,8 +123,8 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identifier.forget(request.environ, identity)
 
 class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A BFG authentication policy which obtains data from the
-    REMOTE_USER WSGI envvar.
+    """ A :mod:`repoze.bfg` :term:`authentication policy` which
+    obtains data from the ``REMOTE_USER`` WSGI environment variable.
 
     Constructor Arguments
 
@@ -158,8 +157,8 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         return []
 
 class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A BFG authentication policy which obtains data from an
-    auth_tkt cookie.
+    """ A :mod:`repoze.bfg` :term:`authentication policy` which
+    obtains data from an :class:`paste.auth.auth_tkt` cookie.
 
     Constructor Arguments
 
@@ -216,16 +215,16 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``max_age``
 
-      Default: ``None``.  The max age of the auth_tkt cookie, in
-      seconds.  This differs from ``timeout`` inasmuch as ``timeout``
-      represents the lifetime of the ticket contained in the cookie,
-      while this value represents the lifetime of the cookie itself.
-      When this value is set, the cookie's ``Max-Age`` and ``Expires``
-      settings will be set, allowing the auth_tkt cookie to last
-      between browser sessions.  It is typically nonsenical to set
-      this to a value that is lower than ``timeout`` or
-      ``reissue_time``, although it is not explicitly prevented.
-      Optional.
+       Default: ``None``.  The max age of the auth_tkt cookie, in
+       seconds.  This differs from ``timeout`` inasmuch as ``timeout``
+       represents the lifetime of the ticket contained in the cookie,
+       while this value represents the lifetime of the cookie itself.
+       When this value is set, the cookie's ``Max-Age`` and
+       ``Expires`` settings will be set, allowing the auth_tkt cookie
+       to last between browser sessions.  It is typically nonsenical
+       to set this to a value that is lower than ``timeout`` or
+       ``reissue_time``, although it is not explicitly prevented.
+       Optional.
     """
     implements(IAuthenticationPolicy)
     def __init__(self,
