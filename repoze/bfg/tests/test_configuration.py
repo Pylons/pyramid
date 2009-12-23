@@ -1908,6 +1908,21 @@ class ConfiguratorTests(unittest.TestCase):
         config.registry.notify(event2)
         self.assertEqual(L[-1], event2)
 
+    def test_hook_zca(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        gsm = DummyGetSiteManager()
+        config = self._makeOne()
+        config.hook_zca(getSiteManager=gsm)
+        self.assertEqual(gsm.hook, get_current_registry)
+        
+    def test_unhook_zca(self):
+        gsm = DummyGetSiteManager()
+        config = self._makeOne()
+        config.unhook_zca(getSiteManager=gsm)
+        self.assertEqual(gsm.unhooked, True)
+
+
+
 class Test__map_view(unittest.TestCase):
     def setUp(self):
         from repoze.bfg.registry import Registry
@@ -2744,17 +2759,14 @@ class TestMakeApp(unittest.TestCase):
         return make_app(*arg, **kw)
 
     def test_it(self):
-        from repoze.bfg.threadlocal import get_current_registry
         settings = {'a':1}
         rootfactory = object()
-        gsm = DummyGetSiteManager()
         app = self._callFUT(rootfactory, settings=settings,
-                            Configurator=DummyConfigurator,
-                            getSiteManager=gsm)
+                            Configurator=DummyConfigurator)
         self.assertEqual(app.root_factory, rootfactory)
         self.assertEqual(app.settings, settings)
         self.assertEqual(app.zcml_file, 'configure.zcml')
-        self.assertEqual(gsm.hook, get_current_registry)
+        self.assertEqual(app.zca_hooked, True)
 
     def test_it_options_means_settings(self):
         settings = {'a':1}
@@ -2778,7 +2790,6 @@ class TestMakeApp(unittest.TestCase):
         app = self._callFUT(rootfactory, filename='1.zcml', settings=settings,
                             Configurator=DummyConfigurator)
         self.assertEqual(app.zcml_file, '2.zcml')
-
 
 class DummyRequest:
     subpath = ()
@@ -2857,8 +2868,9 @@ class DummyConfigurator(object):
         self.package = package
         self.settings = settings
 
-    def begin(self):
+    def begin(self, request=None):
         self.begun = True
+        self.request = request
 
     def end(self):
         self.ended = True
@@ -2868,6 +2880,9 @@ class DummyConfigurator(object):
     
     def make_wsgi_app(self):
         return self
+
+    def hook_zca(self):
+        self.zca_hooked = True
     
 class DummyAccept(object):
     def __init__(self, *matches):
@@ -2899,6 +2914,8 @@ class DummyMultiView:
 class DummyGetSiteManager(object):
     def sethook(self, hook):
         self.hook = hook
+    def reset(self):
+        self.unhooked = True
     
 class DummyThreadLocalManager(object):
     pushed = None

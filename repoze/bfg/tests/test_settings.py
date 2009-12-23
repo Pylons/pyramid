@@ -1,5 +1,4 @@
 import unittest
-from repoze.bfg.testing import cleanUp
 
 class TestSettings(unittest.TestCase):
     def _getTargetClass(self):
@@ -148,10 +147,14 @@ class TestSettings(unittest.TestCase):
 
 class TestGetSettings(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.registry import Registry
+        registry = Registry('testing')
+        self.config = Configurator(registry=registry)
+        self.config.begin()
 
     def tearDown(self):
-        cleanUp()
+        self.config.end()
         
     def _callFUT(self):
         from repoze.bfg.settings import get_settings
@@ -162,9 +165,7 @@ class TestGetSettings(unittest.TestCase):
 
     def test_it_withsettings(self):
         from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.threadlocal import get_current_registry
-        reg = get_current_registry()
         settings = {'a':1}
-        reg.registerUtility(settings, ISettings)
+        self.config.registry.registerUtility(settings, ISettings)
         self.assertEqual(self._callFUT(), settings)
 

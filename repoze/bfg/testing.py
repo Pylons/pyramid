@@ -628,9 +628,8 @@ def setUp(registry=None, request=None, hook_zca=True):
     if registry is None:
         registry = Registry('testing')
     config = Configurator(registry=registry)
+    hook_zca and config.hook_zca()
     config.begin(request=request)
-    if hook_zca:
-        hook_zca_api()
 
 def tearDown(unhook_zca=True):
     """Undo the effects ``repoze.bfg.testing.setUp``.  Use this
@@ -657,7 +656,11 @@ def tearDown(unhook_zca=True):
 
     """
     if unhook_zca:
-        unhook_zca_api()
+        try:
+            from zope.component import getSiteManager
+            getSiteManager.reset()
+        except ImportError: # pragma: no cover
+            pass
     info = manager.pop()
     manager.clear()
     if info is not None:
@@ -680,17 +683,3 @@ def cleanUp(*arg, **kw):
     extensive production usage, it will never be removed."""
     setUp(*arg, **kw)
 
-def hook_zca_api():
-    try:
-        from zope.component import getSiteManager
-        getSiteManager.sethook(get_current_registry)
-    except ImportError: # pragma: no cover
-        pass
-    
-def unhook_zca_api():
-    try:
-        from zope.component import getSiteManager
-        getSiteManager.reset()
-    except ImportError: # pragma: no cover
-        pass
-    

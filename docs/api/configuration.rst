@@ -16,6 +16,10 @@
 
      .. automethod:: end
 
+     .. automethod:: hook_zca()
+
+     .. automethod:: unhook_zca()
+
      .. automethod:: add_renderer(name, factory)
 
      .. automethod:: add_route
@@ -47,3 +51,4 @@
      .. automethod:: testing_add_subscriber
 
      .. automethod:: testing_add_template
+

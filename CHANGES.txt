@@ -6,6 +6,9 @@ Features
 
 - Add a ``**kw`` arg to the ``Configurator.add_settings`` API.
 
+- Add ``hook_zca`` and ``unhook_zca`` methods to the ``Configurator``
+  API.
+
 Bug Fixes
 ---------
 

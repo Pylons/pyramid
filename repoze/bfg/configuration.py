@@ -70,31 +70,34 @@ DEFAULT_RENDERERS = (
 class Configurator(object):
     """
     A Configurator is used to configure a :mod:`repoze.bfg`
-    :term:`application registry`.  The Configurator accepts a number
-    of arguments: ``registry``, ``package``, ``settings``,
-    ``root_factory``, ``zcml_file``, ``authentication_policy``,
-    ``authorization_policy``, ``renderers`` and ``debug_logger``.
+    :term:`application registry`.
+
+    The Configurator accepts a number of arguments: ``registry``,
+    ``package``, ``settings``, ``root_factory``, ``zcml_file``,
+    ``authentication_policy``, ``authorization_policy``, ``renderers``
+    and ``debug_logger``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :class:`repoze.bfg.registry.Registry`
     class representing the registry to configure.  If ``registry`` is
-    ``None``, the configurator will create a ``Registry`` instance
-    itself; it will also perform some default configuration that would
-    not otherwise be done.  After construction, the configurator may
-    be used to add configuration to the registry.  The overall state
-    of a registry is called the 'configuration state'.
+    ``None``, the configurator will create a
+    :class`repoze.bfg.registry.Registry` instance itself; it will also
+    perform some default configuration that would not otherwise be
+    done.  After construction, the configurator may be used to add
+    configuration to the registry.  The overall state of a registry is
+    called the 'configuration state'.
 
     .. warning:: If a ``registry`` is passed to the Configurator
        constructor, all other constructor arguments except ``package``
        are ignored.
 
     If the ``package`` argument is passed, it must be a reference to a
-    Python package (e.g. ``sys.modules['thepackage']``).  This value
-    is used as a basis to convert relative paths passed to various
-    configuration methods, such as methods which accept a ``renderer``
-    argument, into absolute paths.  If ``None`` is passed (the
-    default), the package is assumed to be the Python package in which
-    the *caller* of the ``Configurator`` constructor lives.
+    Python :term:`package` (e.g. ``sys.modules['thepackage']``).  This
+    value is used as a basis to convert relative paths passed to
+    various configuration methods, such as methods which accept a
+    ``renderer`` argument, into absolute paths.  If ``None`` is passed
+    (the default), the package is assumed to be the Python package in
+    which the *caller* of the ``Configurator`` constructor lives.
 
     If the ``settings`` argument is passed, it should be a Python
     dictionary representing the deployment settings for this
@@ -123,10 +126,10 @@ class Configurator(object):
 
     If ``debug_logger`` is not passed, a default debug logger that
     logs to stderr will be used.  If it is passed, it should be an
-    instance of the ``logging.Logger`` (PEP 282) standard library
+    instance of the :class:`logging.Logger` (PEP 282) standard library
     class.  The debug logger is used by :mod:`repoze.bfg` itself to
-    log warnings and authorization debugging information.
-    """
+    log warnings and authorization debugging information.  """
+    
     manager = manager # for testing injection
     def __init__(self, registry=None, package=None, settings=None,
                  root_factory=None, authentication_policy=None,
@@ -279,12 +282,40 @@ class Configurator(object):
 
     # API
 
+    # getSiteManager is a unit testing dep injection
+    def hook_zca(self, getSiteManager=None):
+        """ Call :func:`zope.component.getSiteManager.sethook` with
+        the argument
+        :data:`repoze.bfg.threadlocal.get_current_registry`, causing
+        the :term:`Zope Component Architecture` 'global' APIs such as
+        :func:`zope.component.getSiteManager`,
+        :func:`zope.component.getAdapter` and others to use the
+        :mod:`repoze.bfg` :term:`application registry` rather than the
+        Zope 'global' registry.  If :mod:`zope.component` cannot be
+        imported, this method will raise an :exc:`ImportError`."""
+        if getSiteManager is None:
+            from zope.component import getSiteManager
+        getSiteManager.sethook(get_current_registry)
+
+    # getSiteManager is a unit testing dep injection
+    def unhook_zca(self, getSiteManager=None):
+        """ Call :func:`zope.component.getSiteManager.reset` to undo
+        the action of
+        :meth:`repoze.bfg.configuration.Configurator.hook_zca`.  If
+        :mod:`zope.component` cannot be imported, this method will
+        raise an :exc:`ImportError`."""
+        if getSiteManager is None: # pragma: no cover
+            from zope.component import getSiteManager
+        getSiteManager.reset()
+
     def begin(self, request=None):
         """ Indicate that application or test configuration has begun.
-        This pushes a dictionary containing the registry implied by
-        this configurator and the :term:`request` implied by
-        ``request`` on to the :term:`thread local` stack consulted by
-        various :mod:`repoze.bfg.threadlocal` API functions."""
+        This pushes a dictionary containing the :term:`application
+        registry` implied by ``registry`` attribute of this
+        configurator and the :term:`request` implied by the
+        ``request`` argument on to the :term:`thread local` stack
+        consulted by various :mod:`repoze.bfg.threadlocal` API
+        functions."""
         self.manager.push({'registry':self.registry, 'request':request})
 
     def end(self):
@@ -313,13 +344,13 @@ class Configurator(object):
         return subscriber
 
     def add_settings(self, settings=None, **kw):
-        """ Add additional settings (beyond the ones passed in as
-        ``settings`` to the constructor of this object) to the
-        dictionarylike object returned from
-        :func:`repoze.bfg.settings.get_settings`.  The ``settings``
-        argument should be a dictionarylike object or ``None``.
-        Arbitrary ``kw`` arguments can be passed in to augment the
-        settings dict."""
+        """ Add additional settings beyond the ones passed in as
+        ``settings`` to the constructor of this object to the
+        dictionarylike object which is returned from
+        :func:`repoze.bfg.settings.get_settings` API.  The
+        ``settings`` argument should be a dictionarylike object or
+        ``None``.  Arbitrary ``kw`` arguments can be passed in to
+        augment the settings dict."""
         if settings is None:
             settings = {}
         utility = self.registry.queryUtility(ISettings)
@@ -435,9 +466,9 @@ class Configurator(object):
 
           When the renderer is a path, although a path is usually just
           a simple relative pathname (e.g. ``templates/foo.pt``,
-          implying that a template named"foo.pt" is in the "templates"
-          directory relative to the directory of the current
-          :term:`package` of the Configurator), a path can be
+          implying that a template named "foo.pt" is in the
+          "templates" directory relative to the directory of the
+          current :term:`package` of the Configurator), a path can be
           absolute, starting with a slash on UNIX or a drive letter
           prefix on Windows.  The path can alternately be a
           :term:`resource specification` in the form
@@ -494,8 +525,8 @@ class Configurator(object):
           the ``route`` configuration referred to by ``route_name``
           usually has a ``*traverse`` token in the value of its
           ``path``, representing a part of the path that will be used
-          by traversal against the result of the route's :term:`root
-          factory`.
+          by :term:`traversal` against the result of the route's
+          :term:`root factory`.
 
           .. warning:: Using this argument services an advanced
              feature that isn't often used unless you want to perform
@@ -508,17 +539,16 @@ class Configurator(object):
           This value should be an :term:`interface` that the
           :term:`request` must provide in order for this view to be
           found and called.  This value exists only for backwards
-          compatibility purposes: it's usually easier to use another
-          predicate.
+          compatibility purposes.
 
         request_method
 
-          This value can either be one of the strings 'GET', 'POST',
-          'PUT', 'DELETE', or 'HEAD' representing an HTTP
-          ``REQUEST_METHOD``.  A view declaration with this argument
-          ensures that the view will only be called when the request's
-          ``method`` (aka ``REQUEST_METHOD``) string matches the
-          supplied value.
+          This value can either be one of the strings ``GET``,
+          ``POST``, ``PUT``, ``DELETE``, or ``HEAD`` representing an
+          HTTP ``REQUEST_METHOD``.  A view declaration with this
+          argument ensures that the view will only be called when the
+          request's ``method`` attribute (aka the ``REQUEST_METHOD`` of
+          the WSGI environment) string matches the supplied value.
 
         request_param
 
@@ -538,15 +568,16 @@ class Configurator(object):
           This value should be a reference to a Python class or
           :term:`interface` that a parent object in the
           :term:`lineage` must provide in order for this view to be
-          found and called.  Your models must be "location-aware" to
-          use this feature.  See :ref:`location_aware` for more
-          information about location-awareness.
+          found and called.  The nodes in your object graph must be
+          "location-aware" to use this feature.  See
+          :ref:`location_aware` for more information about
+          location-awareness.
 
         xhr
 
           This value should be either ``True`` or ``False``.  If this
-          value is specified and is ``True``, the :term:`request` must
-          possess an ``HTTP_X_REQUESTED_WITH`` (aka
+          value is specified and is ``True``, the :term:`request`
+          must possess an ``HTTP_X_REQUESTED_WITH`` (aka
           ``X-Requested-With``) header that has the value
           ``XMLHttpRequest`` for this view to be found and called.
           This is useful for detecting AJAX requests issued from
@@ -991,8 +1022,8 @@ class Configurator(object):
         will influence the current configuration state.
 
         The ``package`` argument should be a reference to a Python
-        package or module object.  If ``package`` is ``None``, the
-        package of the *caller* is used.
+        :term:`package` or module object.  If ``package`` is ``None``,
+        the package of the *caller* is used.
         """
         if package is None: # pragma: no cover
             package = caller_package()
@@ -1024,8 +1055,12 @@ class Configurator(object):
         The ``factory`` argument is Python reference to an
         implementation of a :term:`renderer` factory.
 
-        Note that this function should be called *before* any
-        ``add_view`` invocation that names the renderer name as an argument.
+        Note that this function must be called *before* any
+        ``add_view`` invocation that names the renderer name as an
+        argument.  As a result, it's usually a better idea to pass
+        globally used renderers into the ``Configurator`` constructor
+        in the sequence of renderers passed as ``renderer`` than it is
+        to use this method.
         """
         self.registry.registerUtility(
             factory, IRendererFactory, name=name, info=_info)
@@ -1090,8 +1125,10 @@ class Configurator(object):
 
         The ``renderer`` argument should be the name of (or path to) a
         :term:`renderer` used to generate a response for this view
-        (see the ``add_view`` method's ``renderer`` argument for a
-        description).
+        (see the
+        :meth:`repoze.bfg.configuration.Configurator.add_view`
+        method's ``renderer`` argument for information about how a
+        configurator relates to a renderer).
 
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
@@ -1114,8 +1151,10 @@ class Configurator(object):
 
         The ``renderer`` argument should be the name of (or path to) a
         :term:`renderer` used to generate a response for this view
-        (see the ``add_view`` method's ``renderer`` argument for a
-        description).
+        (see the
+        :meth:`repoze.bfg.configuration.Configurator.add_view`
+        method's ``renderer`` argument for information about how a
+        configurator relates to a renderer).
 
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
@@ -1137,8 +1176,7 @@ class Configurator(object):
         files reside.  This can be an absolute path, a
         package-relative path, or a :term:`resource specification`.
 
-        See :ref:`static_resources_section` for more information (the
-        ZCML directive just calls this method).
+        See :ref:`static_resources_section` for more information.
         """
         spec = self._make_spec(path)
         view = static(spec, cache_max_age=cache_max_age)
@@ -1216,12 +1254,14 @@ class Configurator(object):
         return L
 
     def testing_add_template(self, path, renderer=None):
-        """ Register a template tenderer at ``path`` (usually a relative
-        filename ala ``templates/foo.pt``) and return the renderer object.
-        If the ``renderer`` argument is None, a 'dummy' renderer will be
-        used.  This function is useful when testing code that calls the
-        ``render_template_to_response`` or any other ``render_template*``
-        API of any of the built-in templating systems."""
+        """ Register a template tenderer at ``path`` (usually a
+        relative filename ala ``templates/foo.pt``) and return the
+        renderer object.  If the ``renderer`` argument is None, a
+        'dummy' renderer will be used.  This function is useful when
+        testing code that calls the ``render_template_to_response`` or
+        any other ``render_template*`` API of any of the built-in
+        templating systems (see :mod:`repoze.bfg.chameleon_zpt` and
+        :mod:`repoze.bfg.chameleon_text`)."""
         from repoze.bfg.testing import DummyTemplateRenderer
         if renderer is None:
             renderer = DummyTemplateRenderer()
@@ -1674,16 +1714,17 @@ def _accept_wrap(view, accept):
     return accept_view
 
 # note that ``options`` is a b/w compat alias for ``settings`` and
-# ``Configurator`` and getSiteManager is a testing dep inj
+# ``Configurator`` and ``getSiteManager`` are testing dep injs
 def make_app(root_factory, package=None, filename='configure.zcml',
-             settings=None, options=None, Configurator=Configurator,
-             getSiteManager=None):
+             settings=None, options=None, Configurator=Configurator):
     """ Return a Router object, representing a fully configured
-    ``repoze.bfg`` WSGI application.
+    :mod:`repoze.bfg` WSGI application.
 
     .. warning:: Use of this function is deprecated as of
        :mod:`repoze.bfg` 1.2.  You should instead use a
-       ``Configurator`` as shown in :ref:`configuration_narr`.
+       :class:`repoze.bfg.configuration.Configurator` instance to
+       perform startup configuration as shown in
+       :ref:`configuration_narr`.
 
     ``root_factory`` must be a callable that accepts a :term:`request`
     object and which returns a traversal root object.  The traversal
@@ -1692,21 +1733,21 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     ``None``, in which case a 'default default' traversal root is
     used.
 
-    ``package`` is a Python module representing the application's
-    package.  It is optional, defaulting to ``None``.  ``package`` may
-    be ``None``.  If ``package`` is ``None``, the ``filename`` passed
-    or the value in the ``options`` dictionary named
-    ``configure_zcml`` must be a) absolute pathname to a ZCML file
-    that represents the application's configuration *or* b) a
-    'specification' in the form
-    ``dotted.package.name:relative/file/path.zcml``.
+    ``package`` is a Python :term:`package` or module representing the
+    application's package.  It is optional, defaulting to ``None``.
+    ``package`` may be ``None``.  If ``package`` is ``None``, the
+    ``filename`` passed or the value in the ``options`` dictionary
+    named ``configure_zcml`` must be a) absolute pathname to a
+    :term:`ZCML` file that represents the application's configuration
+    *or* b) a :term:`resource specification` to a :term:`ZCML` file in
+    the form ``dotted.package.name:relative/file/path.zcml``.
 
     ``filename`` is the filesystem path to a ZCML file (optionally
     relative to the package path) that should be parsed to create the
     application registry.  It defaults to ``configure.zcml``.  It can
-    also be a 'specification' in the form
+    also be a ;term:`resource specification` in the form
     ``dotted_package_name:relatve/file/path.zcml``. Note that if any
-    value for ``configure_zcml`` is passed within the ``options``
+    value for ``configure_zcml`` is passed within the ``settings``
     dictionary, the value passed as ``filename`` will be ignored,
     replaced with the ``configure_zcml`` value.
 
@@ -1722,9 +1763,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     zcml_file = settings.get('configure_zcml', filename)
     config = Configurator(package=package, settings=settings,
                           root_factory=root_factory)
-    if getSiteManager is None:
-        from zope.component import getSiteManager
-    getSiteManager.sethook(get_current_registry)
+    config.hook_zca()
     config.begin()
     config.load_zcml(zcml_file)
     config.end()
