@@ -86,7 +86,8 @@ processing?
    function.  The view function's response is a :term:`response`
    object.
 
-#. A ``NewResponse`` :term:`event` is sent to any subscribers.
+#. A :class:`repoze.bfg.interfaces.INewResponse` :term:`event` is sent
+   to any subscribers.
 
 #. The response object's ``app_iter``, ``status``, and ``headerlist``
    attributes are used to generate a WSGI response.  The response is
