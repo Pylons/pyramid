@@ -37,30 +37,33 @@ the template from a view like so:
    def sample_view(request):
        return render_template_to_response('templates/foo.pt', foo=1, bar=2)
 
-The first argument to ``render_template_to_response`` shown above (and
-its sister function ``render_template``, not shown, which just returns
-a string body) is the template *path*.  In the example above, the path
-``templates/foo.pt`` is *relative*.  Relative to what, you ask?
-Relative to the directory in which the ``views.py`` file which names
-it lives, which is usually the :mod:`repoze.bfg` application's
-:term:`package` directory.
+The first argument to
+:func:`repoze.bfg.chameleon_zpt.render_template_to_response` shown
+above (and its sister function
+:func:`repoze.bfg.chameleon_zpt.render_template`, not shown, which
+just returns a string body) is the template *path*.  In the example
+above, the path ``templates/foo.pt`` is *relative*.  Relative to what,
+you ask?  Relative to the directory in which the ``views.py`` file
+which names it lives, which is usually the :mod:`repoze.bfg`
+application's :term:`package` directory.
 
 Although a path is usually just a simple relative pathname, a path
-passed to ``render_template_to_response`` can be absolute, starting
-with a slash on UNIX or a drive letter prefix on Windows.  The path
-can alternately be a :term:`resource` "specification" in the form
-``some.dotted.package_name:relative/path``, making it possible to
-address template resources which live in another package.
+passed to :func:`repoze.bfg.chameleon_zpt.render_template_to_response`
+can be absolute, starting with a slash on UNIX or a drive letter
+prefix on Windows.  The path can alternately be a :term:`resource
+specification` in the form ``some.dotted.package_name:relative/path``,
+making it possible to address template resources which live in another
+package.
 
-``render_template_to_response`` always returns a Response object which
-has a *status code* of ``200 OK`` and a *content-type* of
-``text-html``.  If you need more control over the status code and
-content-type, either set attributes on the response that this function
-returns or use the ``render_template`` function instead (see
-:ref:`chameleon_zpt_module` for the details), which also renders a ZPT
-template but returns a string instead of a Response.  You can use the
-string manually as a response body.  Here's an example of using
-``render_template``:
+:func:`repoze.bfg.chameleon_zpt.render_template_to_response` always
+returns a :term:`Response` object which has a *status code* of ``200
+OK`` and a *content-type* of ``text-html``.  If you need more control
+over the status code and content-type, either set attributes on the
+response that this function returns or use the ``render_template``
+function instead (see :ref:`chameleon_zpt_module` for the details),
+which also renders a ZPT template but returns a string instead of a
+Response.  You can use the string manually as a response body.  Here's
+an example of using :func:`repoze.bfg.chameleon_zpt.render_template`:
 
 .. code-block:: python
    :linenos:
@@ -73,7 +76,8 @@ string manually as a response body.  Here's an example of using
        response.content_type = 'text/plain'
        return response
 
-Here's an example of using ``render_template_to_response`` but
+Here's an example of using
+:func:`repoze.bfg.chameleon_zt.render_template_to_response` but
 changing the content-type and status:
 
 .. code-block:: python
@@ -86,8 +90,59 @@ changing the content-type and status:
        response.status_int = 204
        return response
 
+Templates Used as Renderers
+---------------------------
+
+Instead of using the various ``render_template_*`` APIs directly
+within a view function to render a specific template, you can
+associate a template (at least one written in a built-in templating
+language) with a view indirectly by specifying it as a
+:term:`renderer`.
+
+To do so, return a *dictionary* from the view code, and specify the
+template :term:`resource specification` as the ``renderer`` argument
+or attribute to the :term:`view configuration` of the view you're
+trying to render using that template.  The items returned by the view
+in the dictionary will be made available to the template as top-level
+names.
+
+The association of a template as a renderer for a :term:`view
+configuration` makes it possible to replace code within a :term:`view
+callable` that handles the rendering of a template.  For example, we
+can replace the call to
+:func:`repoze.bfg.chameleon_zpt.render_template_to_response` in the
+below view callable.
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.chameleon_zpt import render_template_to_response
+   def my_view(request):
+       return render_template_to_response('templates/foo.pt', foo=1, bar=2)
+
+Instead, using a :class:`repoze.bfg.view.bfg_view` decorator to
+specify a :term:`view configuration`, a template renderer for the view
+can be specified like so:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(renderer='templates/foo.pt')
+   def my_view(request):
+       return {'foo':1, 'bar':2}
+
+Unlike when the various ``render_template_*`` APIs are used, when a
+template :term:`renderer` is used to render the result of a view
+callable, several names are passed into the template as top-level
+names by default, including ``context`` and ``request``.  Similar
+renderer configuration can be done imperatively and via :term:`ZCML`.
+See :ref:`views_which_use_a_renderer`.  See also
+:ref:`built_in_renderers`.
+
 A Sample Template
-~~~~~~~~~~~~~~~~~
+-----------------
 
 Here's what a simple :term:`Chameleon` ZPT template used under
 :mod:`repoze.bfg` might look like:
@@ -114,16 +169,17 @@ Here's what a simple :term:`Chameleon` ZPT template used under
 Note the use of :term:`Genshi` -style ``${replacements}`` above.  This
 is one of the ways that :term:`Chameleon` ZPT differs from standard
 ZPT.  The above template expects to find a ``project`` key in the set
-of keywords passed in to it via ``render_template`` or
-``render_template_to_response``. Typical ZPT attribute-based syntax
-(e.g. ``tal:content`` and ``tal:replace``) also works in these
-templates.
+of keywords passed in to it via
+:func:`repoze.bfg.chameleon_zpt.render_template` or
+:func:`repoze.bfg.render_template_to_response`. Typical ZPT
+attribute-based syntax (e.g. ``tal:content`` and ``tal:replace``) also
+works in these templates.
 
 Using ZPT Macros in :mod:`repoze.bfg`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 Unlike Zope "browser views", :mod:`repoze.bfg` doesn't make any names
-(such as ``context`` or ``view``) available to :term:`Chameleon` ZPT
+such as ``context`` or ``view`` available to :term:`Chameleon` ZPT
 templates by default unless a :term:`renderer` is used.  Instead, it
 expects you to pass all the names you need into the template.
 
@@ -132,17 +188,19 @@ One of the common needs in ZPT-based template is to one template's
 handled by retrieving the template from the ``context``.  To do the
 same thing in :mod:`repoze.bfg`, you need to make the macro template
 itself available to the rendered template by passing template in which
-the macro is defined (or even the macro itself) into the rendered
+the macro is defined (or even the macro itself) *into* the rendered
 template.  To make a macro available to the rendered template, you can
-retrieve a different template using the ``get_template`` API, and pass
-it in to the template being rendered.  For example, using a
-:term:`view configuration` via a ``@bfg_view`` decorator that uses a
-:term:`renderer`:
+retrieve a different template using the
+:func:`repoze.bfg.chameleon_zpt.get_template` API, and pass it in to
+the template being rendered.  For example, using a :term:`view
+configuration` via a :class:`repoze.bfg.view.bfg_view` decorator that
+uses a :term:`renderer`:
 
 .. code-block:: python
    :linenos:
 
    from repoze.bfg.chameleon_zpt import get_template
+   from repoze.bfg.view import bfg_view
 
    @bfg_view(renderer='templates/mytemplate.pt')
    def my_view(request):
@@ -208,6 +266,9 @@ The Chameleon text rendering API is a wholesale mirror of the
 Chameleon text ZPT rendering API, it's just imported from another
 place; see :ref:`chameleon_text_module` for the API description.
 
+A Chameleon text template can also be used as a :term:`renderer`.  See
+:ref:`built_in_renderers` for more information.
+
 Side Effects of Rendering a Chameleon Template
 ----------------------------------------------
 
@@ -220,8 +281,10 @@ When using ``chameleon.core`` version 1.0b33 and higher or the
 ``Chameleon`` (uppercase-C) package, this filename is
 ``<template_name>.py``.  If you see "strange" ``.py`` or ``.cache``
 files showing up in your ``templates`` directory, it is due to this
-feature.  If you're using a version control system such as Subversion,
-you should cause it to ignore these files.  Here's the contents of my
+feature.
+
+If you're using a version control system such as Subversion, you
+should cause it to ignore these files.  Here's the contents of my
 ``svn propedit svn:ignore .`` in each of my ``templates`` directories.
 (Note that I always name my Chameleon ZPT template files with a
 ``.pt`` extension, so that this pattern works):
@@ -251,8 +314,8 @@ In order to turn on automatic reloading of templates, you can use an
 environment variable setting or a configuration file setting.
 
 To use an environment variable, start your application under a shell
-using the ``BFG_RELOAD_TEMPLATES`` environment variable set to ``1``,
-For example::
+using the ``BFG_RELOAD_TEMPLATES`` operating system environment
+variable set to ``1``, For example::
 
   $ BFG_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
 
@@ -268,23 +331,23 @@ application's configuration section, e.g.::
 -----------------------------------------------
 
 See `the internationalization chapter
-<http://chameleon.repoze.org/docs/latest/i18n.html>`_ of the
-Chameleon documentation for information about supporting
-internationalized units of text within Chameleon templates.
+<http://chameleon.repoze.org/docs/latest/i18n.html>`_ of the Chameleon
+documentation for information about supporting internationalized units
+of text within :term:`Chameleon` templates.
 
 Templating with other Templating Languages
 ------------------------------------------
 
-Because :term:`view` functions are typically the only code in
+Because :term:`view callable` functions are typically the only code in
 :mod:`repoze.bfg` that need to know anything about templates, and
 because view functions are very simple Python, you can use whatever
 templating system you're most comfortable with within
 :mod:`repoze.bfg`.  Install the templating system, import its API
 functions into your views module, use those APIs to generate a string,
-then return that string as the body of a :term:`WebOb` ``Response``
-object.  Assuming you have `Mako <http://www.makotemplates.org/>`_
-installed, here's an example of using Mako from within a
-:mod:`repoze.bfg` :term:`view`:
+then return that string as the body of a :term:`WebOb`
+:term:`Response` object.  Assuming you have `Mako
+<http://www.makotemplates.org/>`_ installed, here's an example of
+using Mako from within a :mod:`repoze.bfg` :term:`view`:
 
 .. code-block:: python
    :linenos:
@@ -306,7 +369,9 @@ Note that if you use third-party templating languages without
 cooperating BFG bindings, the auto-template-reload strategy explained
 in :ref:`reload_templates_section` will not be available, nor will the
 template resource overriding capability explained in
-:ref:`overriding_resources_section` be available.
+:ref:`overriding_resources_section` be available, nor will it be
+possible to use any template using that language as a
+:term:`renderer`.
 
 .. _available_template_system_bindings:
 
@@ -329,7 +394,7 @@ repository at `http://svn.repoze.org/repoze.bfg.jinja2
 <http://svn.repoze.org/repoze.bfg.jinja2>`_.
 
 Courtesy of Carlos de la Guardia, bindings for the Zope
-``zope.pagetemplate`` package ("old TAL") are available from
+:mod:`zope.pagetemplate` package ("old TAL") are available from
 `http://svn.repoze.org/repoze.bfg.zopepagetemplate/
 <http://svn.repoze.org/repoze.bfg.zopepagetemplate/>`_.
 

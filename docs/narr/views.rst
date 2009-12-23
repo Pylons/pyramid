@@ -1002,7 +1002,7 @@ view registered for the context's class will "win".
 See :term:`Interface` in the glossary to find more information about
 interfaces.
 
-.. _built_in_renders:
+.. _built_in_renderers:
 
 Built-In Renderers
 ------------------
