@@ -9,22 +9,65 @@ represented by credentials in the :term:`request` does not have an
 appropriate level of access with respect to a specific
 :term:`context`.
 
-Authorization is enabled by modifying your :term:`application
-registry` (aka ``configure.zcml``).
+Authorization is enabled by modifying your application to include a
+:term:`authentication policy` and :term:`authorization policy`.
 
-Enabling an Authorization Policy
---------------------------------
+Enabling an Authorization Policy Imperatively
+---------------------------------------------
 
 By default, :mod:`repoze.bfg` enables no authorization policy.  All
 views are accessible by completely anonymous users.
 
-However, if you modify the :term:`application registry` file in your
-application's package (usually named ``configure.zcml``), you can
-enable an authorization policy.
+However, if you use the ``authorization_policy`` argument to the
+constructor of the :class:`repoze.bfg.configuration.Configurator`
+class, you can enable an authorization policy.
 
-You must also enable a a :term:`authentication policy` in order to
+You must also enable an :term:`authentication policy` in order to
 enable the an authorization policy (this is because authorization, in
-general, depends upon authentication).
+general, depends upon authentication).  Use the
+``authorization_policy`` argument to the
+:class:`repoze.bfg.configuration.Configurator` class during
+application setup to specify an authentication policy.
+
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.authentication import AuthTktAutenticationPolicy
+   from repoze.bfg.authorization import ACLAuthorizationPolicy
+   authentication_policy = AuthTktAuthenticationPolicy('seekrit')
+   authorization_policy = ACLAuthorizationPolicy()
+   config = Configurator(authentication_policy=authentication_policy,
+                         authorization_policy=authorization_policy)
+
+The above configuration enables a policy which compares the value of
+an "auth ticket" cookie passed in the request's environment which
+contains a reference to a single :term:`principal` against the
+principals present in any :term:`ACL` found in model data when
+attempting to call some :term:`view`.
+
+While it is possible to mix and match different authentication and
+authorization policies, it is an error to pass an authentication
+policy without the an authorization policy or vice versa to a
+:term:`Configurator` constructor.
+
+See also the :mod:`repoze.bfg.authorization` and
+:mod:`repoze.bfg.authentication` modules for alternate implementations
+of authorization and authentication policies.  
+
+It is also possible to construct your own custom authentication policy
+or authorization policy: see :ref:`creating_an_authentication_policy`
+and :ref:`creating_an_authorization_policy`.
+
+Enabling an Authorization Policy Via ZCML
+-----------------------------------------
+
+If you'd rather use :term:`ZCML` to specify an authorization policy
+than imperative configuration, modify the ZCML file loaded by your
+application (usually named ``configure.zcml``) to enable an
+authorization one.
 
 For example, to enable a policy which compares the value of an "auth
 ticket" cookie passed in the request's environment which contains a
@@ -48,20 +91,16 @@ this:
     </configure>
 
 "Under the hood", these statements cause an instance of the class
-``repoze.bfg.authentication.AuthTktAuthenticationPolicy`` to be
+:class:`repoze.bfg.authentication.AuthTktAuthenticationPolicy` to be
 injected as the :term:`authentication policy` used by this application
 and an instance of the class
-``repoze.bfg.authorization.ACLAuthorizationPolicy`` to be injected as
-the :term:`authorization policy` used by this application.
+:class:`repoze.bfg.authorization.ACLAuthorizationPolicy` to be
+injected as the :term:`authorization policy` used by this application.
 
-:mod:`repoze.bfg` ships with a few pre-chewed authentication and
-authorization policies that should prove useful.  See
+:mod:`repoze.bfg` ships with a number of authorization and
+authentication policy ZCML directives that should prove useful.  See
 :ref:`authentication_policies_directives_section` and
 :ref:`authorization_policies_directives_section` for more information.
-
-It is also possible to construct your own custom authentication policy
-or authorization policy: see :ref:`creating_an_authentication_policy`
-and :ref:`creating_an_authorization_policy`.
 
 Protecting Views with Permissions
 ---------------------------------
@@ -202,7 +241,8 @@ ACE, as below.
 A principal is usually a user id, however it also may be a group id if
 your authentication system provides group information and the
 effective :term:`authentication policy` policy is written to respect
-group information.  For example, the ``RepozeWho1AuthenicationPolicy``
+group information.  For example, the
+:class:`repoze.bfg.authentication.RepozeWho1AuthenicationPolicy`
 enabled by the ``repozewho1authenticationpolicy`` ZCML directive
 respects group information if you configure it with a ``callback``.
 See :ref:`authentication_policies_directives_section` for more
@@ -250,16 +290,16 @@ Special Principal Names
 
 Special principal names exist in the :mod:`repoze.bfg.security`
 module.  They can be imported for use in your own code to populate
-ACLs, e.g. ``from repoze.bfg.security import Everyone``.
+ACLs, e.g. :data:`repoze.bfg.security.Everyone`.
 
-``Everyone``
+:data:`repoze.bfg.security.Everyone`
 
   Literally, everyone, no matter what.  This object is actually a
   string "under the hood" (``system.Everyone``).  Every user "is" the
   principal named Everyone during every request, even if a security
   policy is not in use.
 
-``Authenticated``
+:data:`repoze.bfg.security.Authenticated`
 
   Any user with credentials as determined by the current security
   policy.  You might think of it as any user that is "logged in".
@@ -274,7 +314,7 @@ module.  These can be imported for use in ACLs.
 
 .. _all_permissions:
 
-``ALL_PERMISSIONS``
+:data:`repoze.bfg.security.ALL_PERMISSIONS`
 
   An object representing, literally, *all* permissions.  Useful in an
   ACL like so: ``(Allow, 'fred', ALL_PERMISSIONS)``.  The
@@ -287,11 +327,12 @@ Special ACEs
 ------------
 
 A convenience :term:`ACE` is defined within the
-:mod:`repoze.bfg.security` module named ``DENY_ALL``.  It equals the
-following:
+:mod:`repoze.bfg.security` module named
+:data:`repoze.bfg.security.DENY_ALL`.  It equals the following:
 
 .. code-block:: python
 
+   from repoze.bfg.security import ALL_PERMISSIONS
    (Deny, Everyone, ALL_PERMISSIONS)
 
 This ACE is often used as the *last* ACE of an ACL to explicitly cause
@@ -322,9 +363,9 @@ Location-Awareness
 ------------------
 
 In order to allow the security machinery to perform ACL inheritance,
-model objects must provide *location-awareness*.  Providing
-location-awareness means two things: the root object in the graph must
-have a ``_name__`` attribute and a ``__parent__`` attribute.
+model objects must provide :term:`location` -awareness.  Providing
+*location-awareness* means two things: the root object in the graph
+must have a ``_name__`` attribute and a ``__parent__`` attribute.
 
 .. code-block:: python
    :linenos:
@@ -382,25 +423,30 @@ also contain security debugging information in its body.
 Debugging Imperative Authorization Failures
 -------------------------------------------
 
-The ``has_permission`` API (see :ref:`security_module`) is used to
-check security within view functions imperatively.  It returns
-instances of objects that are effectively booleans.  But these objects
-are not raw ``True`` or ``False`` objects, and have information
-attached to them about why the permission was allowed or denied.  The
-object will be one of ``ACLAllowed``, ``ACLDenied``, ``Allowed``, and
-``Denied``, documented in :ref:`security_module`.  At very minimum
-these objects will have a ``msg`` attribute, which is a string
-indicating why permission was denied or allowed.  Introspecting this
-information in the debugger or via print statements when a
-``has_permission`` fails is often useful.
+The :func:`repoze.bfg.security.has_permission` API is used to check
+security within view functions imperatively.  It returns instances of
+objects that are effectively booleans.  But these objects are not raw
+``True`` or ``False`` objects, and have information attached to them
+about why the permission was allowed or denied.  The object will be
+one of :data:`repoze.bfg.security.ACLAllowed`,
+:data:`repoze.bfg.security.ACLDenied`,
+:data:`repoze.bfg.security.Allowed`, or
+:data:`repoze.bfg.security.Denied`, as documented in
+:ref:`security_module`.  At very minimum these objects will have a
+``msg`` attribute, which is a string indicating why permission was
+denied or allowed.  Introspecting this information in the debugger or
+via print statements when a call to
+:func:`repoze.bfg.security.has_permission` fails is often useful.
 
 .. _authentication_policies_directives_section:
 
-Built-In Authentication Policy Directives
------------------------------------------
+Built-In Authentication Policy ZCML Directives
+----------------------------------------------
 
-:mod:`repoze.bfg` ships with a few "pre-chewed" authentication policy
-implementations that you can make use of within your application.
+Instead of configuring an authentication policy and authorization
+policy imperatively, :mod:`repoze.bfg` ships with a few "pre-chewed"
+authentication policy ZCML directives that you can make use of within
+your application.
 
 ``authtktauthenticationpolicy``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -535,8 +581,8 @@ will be assumed to exist with no groups.   It defaults to ``None``.
 
 .. _authorization_policies_directives_section:
 
-Built-In Authorization Policy Directives
-----------------------------------------
+Built-In Authorization Policy ZCML Directives
+---------------------------------------------
 
 ``aclauthorizationpolicy``
 
@@ -559,12 +605,11 @@ Creating Your Own Authentication Policy
 ---------------------------------------
 
 :mod:`repoze.bfg` ships with a number of useful out-of-the-box
-security policies (see
-:ref:`authentication_policies_directives_section`).  However, creating
-your own authentication policy is often necessary when you want to
-control the "horizontal and vertical" of how your users authenticate.
-Doing so is matter of creating an instance of something that
-implements the following interface:
+security policies (see :mod:`repoze.bfg.authentication`).  However,
+creating your own authentication policy is often necessary when you
+want to control the "horizontal and vertical" of how your users
+authenticate.  Doing so is matter of creating an instance of something
+that implements the following interface:
 
 .. code-block:: python
 
@@ -590,13 +635,9 @@ implements the following interface:
            """ Return a set of headers suitable for 'forgetting' the
            current user on subsequent requests. """
 
-You will then need to create a ZCML directive which allows you to use
-the authentication policy within a ZCML file.  See the
-``repoze.bfg.zcml`` module in the :mod:`repoze.bfg` source code for
-examples of how to create a directive.  Authorization policy ZCML
-directives should use the ZCML discriminator value
-"authentication_policy" in their actions to allow for conflict
-detection.
+After you do so, you can pass an instance of such a class into the
+:class:`repoze.bfg.configuration.Configurator` class at configuration
+time as ``authentication_policy`` to use it.
 
 .. _creating_an_authorization_policy:
 
@@ -605,20 +646,23 @@ Creating Your Own Authorization Policy
 
 An authentication policy the policy that allows or denies access after
 a user has been authenticated.  By default, :mod:`repoze.bfg` will use
-the ``repoze.bfg.authorization.ACLAuthorizationPolicy`` if an
+the :class:`repoze.bfg.authorization.ACLAuthorizationPolicy` if an
 authentication policy is activated and an authorization policy isn't
-otherwise specified.  In some cases, it's useful to be able to use a
-different authentication policy than the
-``repoze.bfg.authorization.ACLAuthorizationPolicy``.  For example, it
-might be desirable to construct an alternate authorization policy
-which allows the application to use an authorization mechanism that
-does not involve :term:`ACL` objects.
+otherwise specified.
+
+In some cases, it's useful to be able to use a different
+authentication policy than the
+:class:`repoze.bfg.authorization.ACLAuthorizationPolicy`.  For
+example, it might be desirable to construct an alternate authorization
+policy which allows the application to use an authorization mechanism
+that does not involve :term:`ACL` objects.
 
 :mod:`repoze.bfg` ships with only its single default
-``ACLAuthorizationPolicy``, so you'll need to create your own if you'd
-like to use a different one.  Creating and using your own
-authorization policy is a matter of creating an instance of an object
-that implements the following interface:
+:class:`repoze.bfg.authorization.ACLAuthorizationPolicy`, so you'll
+need to create your own if you'd like to use a different one.
+Creating and using your own authorization policy is a matter of
+creating an instance of an object that implements the following
+interface:
 
 .. code-block:: python
 
@@ -632,11 +676,6 @@ that implements the following interface:
             """ Return a set of principal identifiers allowed by the 
                 permission """
 
-You will then need to create a ZCML directive which allows you to use
-the authorization policy within a ZCML file.  See the
-``repoze.bfg.zcml`` module in the :mod:`repoze.bfg` source for
-examples of how to create a directive.  Authorization policy ZCML
-directives should use the ZCML discriminator value
-"authorization_policy" in their actions to allow for conflict
-detection.
-
+After you do so, you can pass an instance of such a class into the
+:class:`repoze.bfg.configuration.Configurator` class at configuration
+time as ``authorization_policy`` to use it.

@@ -67,11 +67,14 @@ Per-module :mod:`repoze.bfg` API documentation.
 .. toctree::
    :maxdepth: 2
 
+   api/authorization
+   api/authentication
    api/chameleon_text
    api/chameleon_zpt
    api/configuration
    api/events
    api/exceptions
+   api/interfaces
    api/location
    api/paster
    api/router
