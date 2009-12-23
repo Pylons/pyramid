@@ -19,6 +19,16 @@ Bug Fixes
   ``request.response_content_type`` unless this attribute is already
   set.
 
+Documentation
+-------------
+
+- General documentation improvements by using better Sphinx roles such
+  as "class", "func", "meth", and so on.
+
+- Added the ``repoze.bfg.authentication``,
+  ``repoze.bfg.authorization``, and ``repoze.bfg.interfaces`` modules
+  to API documentation.
+
 1.2a7 (2009-12-20)
 ==================
 

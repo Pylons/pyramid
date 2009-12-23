@@ -5,5 +5,5 @@
 
 - Decide on ``unhook_zca`` argument to ``tearDown``.
 
-- Push the testing API towards use of a Configurator.
+- Hook the ZCA in ``Configurator.begin``.
 
