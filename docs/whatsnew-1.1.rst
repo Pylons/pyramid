@@ -278,7 +278,7 @@ language to render a dictionary to a response.  For example:
    def my_view(context, request):
        return {'abc':123}
 
-See :ref:`built_in_renders` for the available built-in renderers.
+See :ref:`built_in_renderers` for the available built-in renderers.
 
 If the ``view`` callable associated with a ``view`` directive returns
 a Response object (an object with the attributes ``status``,

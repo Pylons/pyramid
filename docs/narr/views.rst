@@ -224,7 +224,7 @@ the ``renderer`` attribute.  For example, this ZCML associates the
 There is a ``json`` renderer, which renders view return values to a
 :term:`JSON` serialization.  Other built-in renderers include
 renderers which use the :term:`Chameleon` templating language to
-render a dictionary to a response.  See :ref:`built_in_renders` for
+render a dictionary to a response.  See :ref:`built_in_renderers` for
 the available built-in renderers.
 
 If the ``view`` callable associated with a ``view`` directive returns
