@@ -143,8 +143,8 @@ used by a view.
 
 .. _override_resource:
 
-The :meth:`repoze.bfg.configuration.Configurator.override_resource` API
------------------------------------------------------------------------
+The ``override_resource`` API
+-----------------------------
 
 An individual call to
 :meth:`repoze.bfg.configuration.Configurator.override_resource` can
