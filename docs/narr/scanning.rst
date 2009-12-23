@@ -12,15 +12,16 @@ For example:
 - A ``<view>`` :term:`ZCML declaration` adds a :term:`view
   configuration` to the current :term:`application registry`.
 
-- A call to the ``add_view`` method of a :term:`Configurator` ZCML
-  adds a :term:`view configuration` to the current :term:`application
-  registry`.
+- A call to the :meth:`repoze.bfg.configuration.Configurator.add_view`
+  method adds a :term:`view configuration` to the current
+  :term:`application registry`.
 
-- the ``@bfg_view`` :term:`decorator` adds :term:`configuration
-  decoration` to the function or method it decorates.  This particular
-  decoration can result in a :term:`view configuration` to be added to
-  the current :term:`application registry` if the package the code
-  lives in is run through a :term:`scan`.
+- the :class:`repoze.bfg.view.bfg_view` :term:`decorator` adds
+  :term:`configuration decoration` to the function or method it
+  decorates.  This particular decoration can result in a :term:`view
+  configuration` to be added to the current :term:`application
+  registry` if the package the code lives in is run through a
+  :term:`scan`.
 
 Decorations and Code Scanning
 -----------------------------
@@ -37,11 +38,11 @@ decoration within application code must be found through a process
 known as *scanning*.
 
 :mod:`repoze.bfg` is willing to :term:`scan` a module or a package and
-its subpackages for decorations when the ``scan`` method of a
-:term:`Configurator` is invoked: scanning implies searching for
-configuration declarations in a package and its subpackages.
-:term:`ZCML` can also invoke a :term:`scan` via its ``<scan>``
-directive.
+its subpackages for decorations when the
+:meth:`repoze.bfg.configuration.Configurator.scan` method is invoked:
+scanning implies searching for configuration declarations in a package
+and its subpackages.  :term:`ZCML` can also invoke a :term:`scan` via
+its ``<scan>`` directive.
 
 The scanning machinery imports each module and subpackage in a package
 or module recursively, looking for special attributes attached to
@@ -60,16 +61,17 @@ attached to a function or instance method:
    def hello(request):
        return Response('Hello')
 
-The ``@bfg_view`` decorator above simply adds an attribute to the
-``hello`` function, making it available for a :term:`scan` to find it
-later.
+The :class:`repoze.bfg.view.bfg_view` decorator above simply adds an
+attribute to the ``hello`` function, making it available for a
+:term:`scan` to find it later.
 
 Once scanning is invoked, and :term:`configuration decoration` is
-found by the scanner, a set of calls are made to a :term:`Configurator`
-on behalf of the developer: these calls represent the intent of the
-configuration decoration.  In the example above, this is best
-represented as the scanner translating the arguments to ``@bfg_view``
-into a call to the ``add_view`` method of a :term:`Configurator`,
+found by the scanner, a set of calls are made to a
+:term:`Configurator` on behalf of the developer: these calls represent
+the intent of the configuration decoration.  In the example above,
+this is best represented as the scanner translating the arguments to
+:class:`repoze.bfg.view..bfg_view` into a call to the
+:meth:`repoze.bfg.configuration.Configurator.add_view` method,
 effectively:
 
 .. code-block:: python
@@ -78,9 +80,9 @@ effectively:
    config.add_view(hello, name='hello', request_method='GET')
 
 Scanning for :term:`configuration decoration` is performed via the
-``scan`` method of a :term:`Configurator` or via a ``<scan>``
-:term:`ZCML declaration`.  See :ref:`config_mode_equivalence` for
-examples.
+:meth:`repoze.bfg.configuration.Configurator.scan` method or via a
+``<scan>`` :term:`ZCML declaration`.  See
+:ref:`config_mode_equivalence` for examples.
 
 .. _config_mode_equivalence:
 
