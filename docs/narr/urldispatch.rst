@@ -6,10 +6,14 @@ URL Dispatch
 It is common for :mod:`repoze.bfg` developers to rely on
 :term:`traversal` to map URLs to code.  However, :mod:`repoze.bfg` can
 also map URLs to code via :term:`URL dispatch`.  The presence of
-``<route>`` statements in ZCML are a sign that you're using URL
-dispatch.  Using ``<route>`` statements in ZCML allows you to
-declaratively map URLs to code.  The syntax of the pattern matching
-language used by :mod:`repoze.bfg` is close to that of :term:`Routes`.
+``<route>`` statements in a :term:`ZCML` file used by your application
+or the presence of calls to the
+:meth:`repoze.bfg.configuration.Configurator.add_route` method in
+imperative configuration within your application is a sign that you're
+using URL dispatch.  Using the ``add_route`` configurator method or
+``<route>`` statements in ZCML allows you to declaratively map URLs to
+code.  The syntax of the pattern matching language used by
+:mod:`repoze.bfg` is close to that of :term:`Routes`.
 
 It often makes a lot of sense to use :term:`URL dispatch` instead of
 :term:`traversal` in an application that has no natural hierarchy.
@@ -31,22 +35,19 @@ To allow for URL dispatch to be used, the :mod:`repoze.bfg` framework
 allows you to inject ``route`` ZCML directives into your application's
 ``configure.zcml`` file.
 
-When any ``route`` ZCML directive is present in an application's
-``configure.zcml``, "under the hood" :mod:`repoze.bfg` wraps the
-:term:`root factory` in a special ``RoutesRootFactory`` instance.  The
-wrapper instance then acts as the effective root factory.  When it
-acts as a root factory, it is willing to check the requested URL
-against a *routes map* to find a :term:`context` and a :term:`view`
-before traversal has a chance to find it first.  If a route matches, a
-:term:`context` is generated and :mod:`repoze.bfg` will call the
-:term:`view` specified with the context and the request.  If no route
-matches, :mod:`repoze.bfg` will fail over to calling the :term:`root
-factory` callable passed to the :term:`Configurator` for the
-application (usually a traversal function).
+The mod:`repoze.bfg` :term:`Router` checks an incoming request against
+a *routes map* to find a :term:`context` and a :term:`view callable`
+before :term:`traversal` has a chance to find these things first.  If
+a route matches, a :term:`context` is generated and :mod:`repoze.bfg`
+will call the :term:`view callable` found due to the context and the
+request.  If no route matches, :mod:`repoze.bfg` will fail over to
+calling the :term:`root factory` callable passed to the
+:term:`Configurator` for the application (usually a traversal
+function).
 
 A root factory is not required for purely URL-dispatch-based apps: if
 the root factory callable is passed as ``None`` to the
-:term:`Configurator`, :mod:`repoze.bfg` will return a ``NotFound``
+:term:`Configurator`, :mod:`repoze.bfg` will return a :exc:`NotFound`
 error to the user's browser when no routes match.
 
 .. note:: See :ref:`modelspy_project_section` for an example of a
@@ -54,8 +55,33 @@ error to the user's browser when no routes match.
 
 .. _route_zcml_directive:
 
+The ``add_route`` Configurator Method
+-------------------------------------
+
+The :meth:`repoze.bfg.configuration.Configurator.add_route` method
+adds a single :term:`route configuration` to the :term:`application
+registry`.  Here's an example:
+
+.. code-block:: python
+   :linenos:
+
+   config.add_route('myroute', '/prefix/:one/:two')
+
+See the :meth:`repoze.bfg.configuration.Configurator.add_route` API
+documentation for more information and options for adding a route
+imperatively.
+
+.. note:: The documentation that follows in this chapter assumes that
+   :term:`ZCML` will be used to perform route configuration; all
+   attributes of the ``<route>`` ZCML directive have analogues which
+   can be supplied as arguments to the
+   :meth:`repoze.bfg.configuration.Configurator.add_route` API.
+
 The ``route`` ZCML Directive
 ----------------------------
+
+Instead of using the imperative method of adding a route, you can use
+:term:`ZCML` for the same purpose.
 
 The ``route`` ZCML directive has these possible attributes.  All
 attributes are optional unless the description names them as required.
@@ -272,11 +298,11 @@ The Matchdict
 -------------
 
 The main purpose of a route is to match (nor not match) the
-``PATH_INFO`` provided during a request against a URL path pattern.
-When this URL path pattern is matched, a dictionary is placed on the
-request named ``matchdict`` with the values that match patterns in the
-``path`` element.  If the URL pattern does not match, no matchdict is
-generated.
+``PATH_INFO`` present in the WSGI environment provided during a
+request against a URL path pattern.  When this URL path pattern is
+matched, a dictionary is placed on the request named ``matchdict``
+with the values that match patterns in the ``path`` element.  If the
+URL pattern does not match, no matchdict is generated.
 
 .. _route_path_pattern_syntax:
 
@@ -398,10 +424,10 @@ The ``mypackage.views`` module referred to above might look like so:
 
 .. note: the ``context`` attribute of the ``request`` object passed to
    the above view will be an instance of the
-   ``repoze.bfg.urldispatch.DefaultRoutesContext``.  This is the type
-   of object created for a context when there is no "factory"
-   specified in the ``route`` declaration.  It is a mapping object, a
-   lot like a dictionary.
+   :class:`repoze.bfg.urldispatch.DefaultRoutesContext` class.  This
+   is the type of object created for a context when there is no
+   "factory" specified in the ``route`` declaration.  It is a mapping
+   object, a lot like a dictionary.
 
 When using :term:`url dispatch` exclusively in an application (as
 opposed to using both url dispatch and :term:`traversal`), the
@@ -515,7 +541,7 @@ class that accepts a request in its ``__init__``.
 If no route matches in the above configuration, :mod:`repoze.bfg` will
 call the "fallback" :term:`root factory` callable provided to the
 :term:`Configurator` constructor.  If the "fallback" root factory is
-None, a ``NotFound`` error will be raised when no route matches.
+None, a :exc:`NotFound` error will be raised when no route matches.
 
 .. note:: See :ref:`using_model_interfaces` for more information about
           how views are found when interfaces are attached to a
@@ -607,7 +633,7 @@ Or provide the literal string ``/`` as the path:
 Generating Route URLs
 ---------------------
 
-Use the :mod:`repoze.bfg.url.route_url` function to generate URLs
+Use the :func:`repoze.bfg.url.route_url` function to generate URLs
 based on route paths.  For example, if you've configured a route in
 ZCML with the ``name`` "foo" and the ``path`` ":a/:b/:c", you might do
 this.
@@ -620,17 +646,17 @@ this.
 This would return something like the string
 ``http://example.com/1/2/3`` (at least if the current protocol and
 hostname implied ``http:/example.com``).  See the
-:mod:`repoze.bfg.url.route_url` API documentation for more
+:func:`repoze.bfg.url.route_url` API documentation for more
 information.
 
 Redirecting to Slash-Appended Routes
 ------------------------------------
 
 For behavior like Django's ``APPEND_SLASH=True``, use the
-``repoze.bfg.view.append_slash_notfound_view`` view as the Not Found
-view in your application.  When this view is the Not Found view
-(indicating that no view was found), and any routes have been defined
-in the configuration of your application, if the value of
+:func:`repoze.bfg.view.append_slash_notfound_view` view as the
+:term:`Not Found view` in your application.  When this view is the Not
+Found view (indicating that no view was found), and any routes have
+been defined in the configuration of your application, if the value of
 ``PATH_INFO`` does not already end in a slash, and if the value of
 ``PATH_INFO`` *plus* a slash matches any route's path, do an HTTP
 redirect to the slash-appended ``PATH_INFO``.
@@ -699,9 +725,10 @@ is not open to you.
 Instead of putting this cleanup logic in the root factory, however,
 you can cause a subscriber to be fired when a new request is detected;
 the subscriber can do this work.  For example, let's say you have a
-``mypackage`` BFG package that uses SQLAlchemy, and you'd like the
-current SQLAlchemy database session to be removed after each request.
-Put the following in the ``mypackage.run`` module:
+``mypackage`` :mod:`repoze.bfg` application package that uses
+SQLAlchemy, and you'd like the current SQLAlchemy database session to
+be removed after each request.  Put the following in the
+``mypackage.run`` module:
 
 .. code-block:: python
 
