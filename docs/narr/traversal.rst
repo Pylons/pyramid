@@ -29,12 +29,12 @@ return an object which represents the root of the object graph.  All
 usually a *mapping* object (such as a Python dictionary).
 
 .. note:: If a :term:`root factory` is passed to the :mod:`repoze.bfg`
-   :term:`Configurator` as the value ``None``, a default root factory
-   is used.  This is most useful when you're using :term:`URL
-   dispatch` and you don't care very much about traversing any
-   particular graph to resolve URLs to code.  It is also possible to
-   use traversal and URL dispatch together.  When both a root factory
-   (and therefore traversal) *and* "routes" declarations (and
+   :term:`Configurator` constructor as the value ``None``, a *default*
+   root factory is used.  This is most useful when you're using
+   :term:`URL dispatch` and you don't care very much about traversing
+   any particular graph to resolve URLs to code.  It is also possible
+   to use traversal and URL dispatch together.  When both a root
+   factory (and therefore traversal) *and* "routes" declarations (and
    therefore url dispatch) are used, the url dispatch routes are
    checked first, and if none match, :mod:`repoze.bfg` will fall back
    to using traversal to attempt to map the request to a view.  If the
@@ -42,18 +42,18 @@ usually a *mapping* object (such as a Python dictionary).
    matched, it is also possible to do traversal *after* a route has
    been matched.  See :ref:`hybrid_chapter` for more information.
 
-.. warning:: In BFG 1.0 and prior versions, the root factory was
-    passed a term WSGI *environment* object (a dictionary) while in
-    BFG 1.1+ it is passed a request object.  For backwards
-    compatibility purposes, the request object passed to the root
-    factory has a dictionary-like interface that emulates the WSGI
-    environment, so code expecting the argument to be a dictionary
-    will continue to work.
+.. warning:: In :mod:`repoze.bfg` 1.0 and prior versions, the root
+   factory was passed a term WSGI *environment* object (a dictionary)
+   while in :mod:`repoze.bfg` 1.1+ it is passed a :term:`request`
+   object.  For backwards compatibility purposes, the request object
+   passed to the root factory has a dictionary-like interface that
+   emulates the WSGI environment, so code expecting the argument to be
+   a dictionary will continue to work.
 
 Items contained within the object graph are sometimes analogous to the
 concept of :term:`model` objects used by many other frameworks (and
-:mod:`repoze.bfg` refers to them as models, as well).  They are
-typically instances of Python classes.
+:mod:`repoze.bfg` APIs often refers to them as "models", as well).
+They are typically instances of Python classes.
 
 .. _traversal_behavior:
 
@@ -121,7 +121,7 @@ expected to return another graph object.  The resulting object's
 expected to return another graph object.  This happens *ad infinitum*
 until all path segments are exhausted.  If at any point during
 traversal any node in the graph doesn't *have* a ``__getitem__``
-method, or if the ``__getitem__`` of a node raises a ``KeyError``,
+method, or if the ``__getitem__`` of a node raises a :exc:`KeyError`,
 traversal ends immediately, and the node becomes the :term:`context`.
 
 The object graph consists of *container* nodes and *leaf* nodes.
@@ -172,14 +172,15 @@ code to execute:
 #.  The :term:`root factory` is called with the :term:`request`.  It
     returns a :term:`root` object.
 
-#.  The router uses the request's ``PATH_INFO`` information to
-    determine the path segments to traverse.  The leading slash is
+#.  The router uses the WSGI environment's ``PATH_INFO`` information
+    to determine the path segments to traverse.  The leading slash is
     stripped off ``PATH_INFO``, and the remaining path segments are
     split on the slash character to form a traversal sequence, so a
     request with a ``PATH_INFO`` variable of ``/a/b/c`` maps to the
     traversal sequence ``[u'a', u'b', u'c']``.  Note that each of the
     path segments in the sequence is converted to Unicode using the
-    UTF-8 decoding (if the decoding fails, a ``TypeError`` is raised).
+    UTF-8 decoding (if the decoding fails, a :exc:`TypeError` is
+    raised).
 
 #.  :term:`Traversal` begins at the root object returned by the root
     factory.  For the traversal sequence ``[u'a', u'b', u'c']``, the
@@ -192,12 +193,12 @@ code to execute:
     for the name ``c``, and may return "object ``c``".
 
 #.  Traversal ends when a) the entire path is exhausted or b) when any
-    graph element raises a ``KeyError`` from its ``__getitem__`` or c)
-    when any non-final path element traversal does not have a
-    ``__getitem__`` method (resulting in a ``NameError``) or d) when
-    any path element is prefixed with the set of characters ``@@``
-    (indicating that the characters following the ``@@`` token should
-    be treated as a "view name").
+    graph element raises a :exc:`KeyError` from its ``__getitem__`` or
+    c) when any non-final path element traversal does not have a
+    ``__getitem__`` method (resulting in a :exc:`NameError`) or d)
+    when any path element is prefixed with the set of characters
+    ``@@`` (indicating that the characters following the ``@@`` token
+    should be treated as a :term:`view name`).
 
 #.  When traversal ends for any of the reasons in the previous step,
     the the last object found during traversal is deemed to be the
@@ -226,16 +227,16 @@ code to execute:
     request, the :term:`authorization policy` is consulted to see if
     the "current user" (as determined by the the active
     :term:`authentication policy`) can perform the action.  If he can,
-    processing continues.  If he cannot, the ``forbidden`` view is
-    called (see :ref:`changing_the_forbidden_view`).
+    processing continues.  If he cannot, the :term:`forbidden view` is
+    called (see also :ref:`changing_the_forbidden_view`).
 
 #.  Armed with the context, the view name, and the subpath, the router
     performs a view lookup.  It attempts to look up a view from the
-    :mod:`repoze.bfg` :term:`application registry` using the view
-    name, the context, and the request.  If a view function is found,
-    it is called with the context and the request.  It returns a
-    response, which is fed back upstream.  If a view is not found, the
-    ``notfound`` view is called (see
+    :mod:`repoze.bfg` :term:`application registry` using the
+    :term:`view name`, the :term:`context`, and the :term:`request`.
+    If a view function is found, it is called with the context and the
+    request.  It returns a response, which is fed back upstream.  If a
+    view is not found, the :term:`not found view` is called (see
     :ref:`changing_the_notfound_view`).
 
 In either case, the result is returned upstream via the :term:`WSGI`
@@ -258,19 +259,20 @@ traversing the following graph::
 
 Here's what happens:
 
-- :mod:`repoze.bfg` traverses the root, and attempts to find foo,
+- :mod:`repoze.bfg` traverses the root, and attempts to find "foo",
   which it finds.
 
-- :mod:`repoze.bfg` traverses foo, and attempts to find bar, which it
-  finds.
+- :mod:`repoze.bfg` traverses "foo", and attempts to find "bar", which
+  it finds.
 
-- :mod:`repoze.bfg` traverses bar, and attempts to find baz, which it
-  does not find ('bar' raises a ``KeyError`` when asked for baz).
+- :mod:`repoze.bfg` traverses bar, and attempts to find "baz", which
+  it does not find ("bar" raises a :exc:`KeyError` when asked for
+  "baz").
 
 The fact that it does not find "baz" at this point does not signify an
 error condition.  It signifies that:
 
-- the :term:`context` is bar (the context is the last item found
+- the :term:`context` is "bar" (the context is the last item found
   during traversal).
 
 - the :term:`view name` is ``baz``
@@ -282,14 +284,15 @@ out what "type" it is. Let's say it finds that the context is an
 ``Bar`` type (because "bar" happens to be an instance of the class
 ``Bar``).
 
-Using the "view name" ("baz") and the type, it asks the
+Using the :term:`view name` (``baz``) and the type, it asks the
 :term:`application registry` this question:
 
-- Please find me a :term:`view` with the name "baz" that can be used
-  for the class ``Bar``.
+- Please find me a :term:`view callable` registered using a
+  :term:`view configuration` with the name "baz" that can be used for
+  the class ``Bar``.
 
 Let's say it finds no matching view type.  It then returns the result
-of the ``notfound`` view.  The request ends.
+of the :term:`not found view`.  The request ends.
 
 However, for this graph::
 
@@ -305,22 +308,22 @@ However, for this graph::
 
 The user asks for ``http://example.com/foo/bar/baz/biz/buz.txt``
 
-- :mod:`repoze.bfg` traverses foo, and attempts to find bar, which it
-  finds.
+- :mod:`repoze.bfg` traverses "foo", and attempts to find "bar", which
+  it finds.
 
-- :mod:`repoze.bfg` traverses bar, and attempts to find baz, which it
-  finds.
+- :mod:`repoze.bfg` traverses "bar", and attempts to find "baz", which
+  it finds.
 
-- :mod:`repoze.bfg` traverses baz, and attempts to find biz, which it
-  finds.
+- :mod:`repoze.bfg` traverses "baz", and attempts to find "biz", which
+  it finds.
 
-- :mod:`repoze.bfg` traverses biz, and attempts to find "buz.txt"
+- :mod:`repoze.bfg` traverses "biz", and attempts to find "buz.txt"
   which it does not find.
 
 The fact that it does not find "buz.txt" at this point does not
 signify an error condition.  It signifies that:
 
-- the :term:`context` is biz (the context is the last item found
+- the :term:`context` is "biz" (the context is the last item found
   during traversal).
 
 - the :term:`view name` is "buz.txt"
@@ -332,23 +335,24 @@ out what "type" it is. Let's say it finds that the context is a
 ``Biz`` type (because "biz" is an instance of the Python class
 ``Biz``).
 
-Using the "view name" ("buz.txt") and the type, it asks the
+Using the :term:`view name` (``buz.txt``) and the type, it asks the
 :term:`application registry` this question:
 
-- Please find me a :term:`view` with the name "buz.txt" that can be
-  used for class ``Biz``.
+- Please find me a :term:`view callable` registered with a :term:`view
+  configuration` with the name ``buz.txt`` that can be used for class
+  ``Biz``.
 
 Let's say that question is answered "here you go, here's a bit of code
-that is willing to deal with that case", and returns a :term:`view`.
-It is passed the "biz" object as the "context" and the current
-:term:`WebOb` :term:`request` as the "request".  It returns a
-:term:`response`.
+that is willing to deal with that case", and returns a :term:`view
+callable`.  The view callable is passed the "biz" object as the
+"context" and the current :term:`WebOb` :term:`request` as the
+"request".  It returns a :term:`response`.
 
 There are two special cases:
 
 - During traversal you will often end up with a :term:`view name` that
   is the empty string.  This indicates that :mod:`repoze.bfg` should
-  look up the *default view*.  The default view is a view that is
+  look up the :term:`default view`.  The default view is a view that is
   registered with no name or a view which is registered with a name
   that equals the empty string.
 
@@ -402,17 +406,17 @@ used to traverse to the virtual root object.  See
 
 .. _debug_notfound_section:
 
-``NotFound`` Errors
--------------------
+:exc:`NotFound` Errors
+----------------------
 
-It's useful to be able to debug ``NotFound`` errors when they occur
-unexpectedly due to an application registry misconfiguration.  To
-debug these errors, use the ``BFG_DEBUG_NOTFOUND`` environment
-variable or the ``debug_notfound`` configuration file setting.
-Details of why a view was not found will be printed to ``stderr``, and
-the browser representation of the error will include the same
-information.  See :ref:`environment_chapter` for more information
-about how and where to set these values.
+It's useful to be able to debug :exc:`NotFound` error responses when
+they occur unexpectedly due to an application registry
+misconfiguration.  To debug these errors, use the
+``BFG_DEBUG_NOTFOUND`` environment variable or the ``debug_notfound``
+configuration file setting.  Details of why a view was not found will
+be printed to ``stderr``, and the browser representation of the error
+will include the same information.  See :ref:`environment_chapter` for
+more information about how and where to set these values.
 
 Traversal and Unicode
 ---------------------
@@ -427,4 +431,3 @@ in ``PATH_INFO`` is not decodeable using the UTF-8 decoding, a
 TypeError is raised.  A segment will be fully URL-unquoted and
 UTF8-decoded before it is passed it to the ``__getitem__`` of any
 model object during traversal.
-
