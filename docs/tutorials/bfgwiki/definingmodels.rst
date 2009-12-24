@@ -2,7 +2,7 @@
 Defining Models
 ===============
 
-The first change we'll make to our bone-stock paster-generated
+The first change we'll make to our bone-stock ``paster`` -generated
 application will be to define a number of :term:`model` constructors.
 For this application, which will be a Wiki, we will need two kinds of
 model constructors: a "Wiki" model constructor, and a "Page" model
@@ -16,12 +16,12 @@ Deleting the Database
 
 We're going to remove the ``MyModel`` Python model class from our
 ``models.py`` file.  Since this class is referred to within our
-persistent storage (within ``Data.fs``), we'll have strange things
-happen the next time we want to visit the application in a browser.
-Remove the ``Data.fs`` from the ``tutorial`` directory before
-proceeding any further.  It's always fine to do this as long as you
-don't care about the content of the database; the database itself will
-be recreated as necessary.
+persistent storage (represented on disk as a file named ``Data.fs``),
+we'll have strange things happen the next time we want to visit the
+application in a browser.  Remove the ``Data.fs`` from the
+``tutorial`` directory before proceeding any further.  It's always
+fine to do this as long as you don't care about the content of the
+database; the database itself will be recreated as necessary.
 
 Adding Model Classes
 --------------------
@@ -41,38 +41,40 @@ and we're not going to use it.
 
 Then, we'll add a ``Wiki`` class.  Because this is a ZODB application,
 this class should inherit from
-``persistent.mapping.PersistentMapping``.  We want it to inherit from
-the ``PersistentMapping`` class because our Wiki class will be a
-mapping of wiki page names to ``Page`` objects.  The
-``PersistentMapping`` class provides our class with mapping behavior,
-and makes sure that our Wiki page is stored as a "first-class"
-persistent object in our ZODB database.
+:class:`persistent.mapping.PersistentMapping`.  We want it to inherit
+from the :class:`persistent.mapping.PersistentMapping` class because
+our Wiki class will be a mapping of wiki page names to ``Page``
+objects.  The :class:`persistent.mapping.PersistentMapping` class
+provides our class with mapping behavior, and makes sure that our Wiki
+page is stored as a "first-class" persistent object in our ZODB
+database.
 
 Our ``Wiki`` class should also have a ``__name__`` attribute set to
 ``None`` at class scope, and should have a ``__parent__`` attribute
-set to None at class scope as well.  If a model has a ``__parent__``
-attribute of ``None`` in a traversal-based :mod:`repoze.bfg`
-application, it means that it's the :term:`root` model.  The
-``__name__`` of the root model is always ``None``.
+set to ``None`` at class scope as well.  If a model has a
+``__parent__`` attribute of ``None`` in a traversal-based
+:mod:`repoze.bfg` application, it means that it's the :term:`root`
+model.  The ``__name__`` of the root model is also always ``None``.
 
-Then we'll add a ``Page`` class.  This class should inherit from
-``persistent.Persistent``.  We'll also give it an ``__init__`` method
-that accepts a single parameter named ``data``.  This parameter will
-contain the :term:`ReStructuredText` body representing the wiki page
-content.  Note that ``Page`` objects don't have an initial
-``__name__`` or ``__parent__`` attribute.  All objects in a traversal
-graph must have a ``__name__`` and a ``__parent__`` attribute.  We
-don't specify these here because both ``__name__`` and ``__parent__``
-will be set by by a :term:`view` function when a Page is added to our
-Wiki mapping.
+Then we'll add a ``Page`` class.  This class should inherit from the
+:class:`persistent.Persistent` class.  We'll also give it an
+``__init__`` method that accepts a single parameter named ``data``.
+This parameter will contain the :term:`ReStructuredText` body
+representing the wiki page content.  Note that ``Page`` objects don't
+have an initial ``__name__`` or ``__parent__`` attribute.  All objects
+in a traversal graph must have a ``__name__`` and a ``__parent__``
+attribute.  We don't specify these here because both ``__name__`` and
+``__parent__`` will be set by by a :term:`view` function when a Page
+is added to our Wiki mapping.
 
 Add an Appmaker
 ---------------
 
 We're using a mini-framework callable named
-``repoze.zodbconn.finder.PersistentApplicationFinder`` in our
-application (see "run.py").  A ``PersistentApplicationFinder`` accepts
-a ZODB URL as well as an "appmaker" callback.  This callback typically
+:class:`repoze.zodbconn.finder.PersistentApplicationFinder` in our
+application (see ``run.py``).  A
+:class:`repoze.zodbconn.finder.PersistentApplicationFinder` accepts a
+ZODB URL as well as an "appmaker" callback.  This callback typically
 lives in the ``models.py`` file.
 
 We want to change the appmaker function in our ``models.py`` file so
@@ -98,12 +100,10 @@ separate test class for each model class, and we'll write a test class
 for the ``appmaker``.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided
-as a result of the ``bfg_zodb`` project generator but we'll disuse the
-``ViewIntegrationTests`` class.  The ``ViewIntegrationTests`` class is
-too "heavy-hammer" for our tastes.  We'll add three test classes: one
-for the ``Page`` model named ``PageModelTests``, one for the ``Wiki``
-model named ``WikiModelTests``, and one for the appmaker named
-``AppmakerTests``.
+as a result of the ``bfg_zodb`` project generator.  We'll add three
+test classes: one for the ``Page`` model named ``PageModelTests``, one
+for the ``Wiki`` model named ``WikiModelTests``, and one for the
+appmaker named ``AppmakerTests``.
 
 When we're done changing ``tests.py``, it will look something like so:
 

@@ -2,16 +2,17 @@
 Background
 ==========
 
-This version of the BFG wiki tutorial presents a :mod:`repoze.bfg`
-application that uses technologies which will be familiar to someone
-with :term:`Zope` experience.  It uses :term:`ZODB` as a persistence
-mechanism and :term:`traversal` to map URLs to code.  It can also be
-followed by people without any prior Python web framework experience.
+This version of the :mod:`repoze.bfg` wiki tutorial presents a
+:mod:`repoze.bfg` application that uses technologies which will be
+familiar to someone with :term:`Zope` experience.  It uses
+:term:`ZODB` as a persistence mechanism and :term:`traversal` to map
+URLs to code.  It can also be followed by people without any prior
+Python web framework experience.
 
 To code along with this tutorial, the developer will need a UNIX
 machine with development tools (Mac OS X with XCode, any Linux or BSD
 variant, etc) *or* he will need a Windows system of any kind.
 
-This tutorial is known to work under :mod:`repoze.bfg` version 1.1a5.
+This tutorial targets :mod:`repoze.bfg` version 1.2.
 
 Have fun!

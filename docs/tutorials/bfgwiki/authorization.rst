@@ -23,12 +23,13 @@ Changing ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We'll change our ``configure.zcml`` file to enable an
-``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
-enable declarative security checking.  We'll also add a ``forbidden``
-stanza.  This configures our login view to show up when
-:mod:`repoze.bfg` detects that a view invocation can not be
-authorized.  When you're done, your ``configure.zcml`` will look like
-so:
+:class:`repoze.bfg.authentication.AuthTktAuthenticationPolicy` and an
+:class:`repoze.bfg.authorization.ACLAuthorizationPolicy` to enable
+declarative security checking.  We'll also add a ``forbidden`` stanza,
+which species a :term:`forbidden view`.  This configures our login
+view to show up when :mod:`repoze.bfg` detects that a view invocation
+can not be authorized.  When you're done, your ``configure.zcml`` will
+look like so:
 
 .. literalinclude:: src/authorization/tutorial/configure.zcml
    :linenos:
@@ -39,19 +40,20 @@ Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Add a ``security.py`` module within your package (in the same
-directory as "run.py", "views.py", etc) with the following content:
-The groupfinder defined here is an authorization policy "callback"; it
-is a be a callable that accepts a userid and a request.  If the userid
-exists in the system, the callback will return a sequence of group
-identifiers (or an empty sequence if the user isn't a member of any
-groups).  If the userid *does not* exist in the system, the callback
-will return ``None``.  We'll use "dummy" data to represent user and
-groups sources.  When we're done, your application's ``security.py``
-will look like this.
+directory as ``run.py``, ``views.py``, etc) with the following
+content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
    :language: python
+
+The ``groupfinder`` function defined here is an authorization policy
+"callback"; it is a a callable that accepts a userid and a request.
+If the userid exists in the set of users known by the system, the
+callback will return a sequence of group identifiers (or an empty
+sequence if the user isn't a member of any groups).  If the userid
+*does not* exist in the system, the callback will return ``None``.
+We'll use "dummy" data to represent user and groups sources.
 
 Adding Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -123,8 +125,8 @@ class="main_content">`` div:
 Giving Our Root Model Object an ACL
 -----------------------------------
 
-We need to give our root model object an ACL.  This ACL will be
-sufficient to provide enough information to the :mod:`repoze.bfg`
+We need to give our root model object an :term:`ACL`.  This ACL will
+be sufficient to provide enough information to the :mod:`repoze.bfg`
 security machinery to challenge a user who doesn't have appropriate
 credentials when he attempts to invoke the ``add_page`` or
 ``edit_page`` views.
@@ -163,29 +165,32 @@ Adding ``permission`` Declarations to our ``bfg_view`` Decorators
 -----------------------------------------------------------------
 
 To protect each of our views with a particular permission, we need to
-pass a ``permission`` argument to each of our ``bfg_view`` decorators.
-To do so, within ``views.py``:
+pass a ``permission`` argument to each of our
+:class:`repoze.bfg.view.bfg_view` decorators.  To do so, within
+``views.py``:
 
-- We add ``permission='view'`` to the ``bfg_view`` decorator attached
-  to the ``view_wiki`` view function. This makes the assertion that
-  only users who possess the effective ``view`` permission at the time
-  of the request may invoke this view.  We've granted ``Everyone`` the
-  view permission at the root model via its ACL, so everyone will be
-  able to invoke the ``view_wiki`` view.
+- We add ``permission='view'`` to the decorator attached to the
+  ``view_wiki`` view function. This makes the assertion that only
+  users who possess the effective ``view`` permission at the time of
+  the request may invoke this view.  We've granted
+  :data:`repoze.bfg.security.Everyone` the view permission at the root
+  model via its ACL, so everyone will be able to invoke the
+  ``view_wiki`` view.
 
-- We add ``permission='view'`` to the ``bfg_view`` decorator attached
-  to the ``view_page`` view function.  This makes the assertion that
-  only users who possess the effective ``view`` permission at the time
-  of the request may invoke this view.  We've granted ``Everyone`` the
-  view permission at the root model via its ACL, so everyone will be
-  able to invoke the ``view_page`` view.
+- We add ``permission='view'`` to the decorator attached to the
+  ``view_page`` view function.  This makes the assertion that only
+  users who possess the effective ``view`` permission at the time of
+  the request may invoke this view.  We've granted
+  :data:`repoze.bfg.security.Everyone` the view permission at the root
+  model via its ACL, so everyone will be able to invoke the
+  ``view_page`` view.
 
-- We add ``permission='edit'`` to the ``bfg_view`` decorator attached
-  to the ``add_page`` view function.  This makes the assertion that
-  only users who possess the effective ``view`` permission at the time
-  of the request may invoke this view.  We've granted ``editor`` the
-  view permission at the root model via its ACL, so only the user
-  named ``editor`` will able to invoke the ``add_page`` view.
+- We add ``permission='edit'`` to the decorator attached to the
+  ``add_page`` view function.  This makes the assertion that only
+  users who possess the effective ``view`` permission at the time of
+  the request may invoke this view.  We've granted the``editor``
+  principal the view permission at the root model via its ACL, so only
+  the user named ``editor`` will able to invoke the ``add_page`` view.
 
 - We add ``permission='edit'`` to the ``bfg_view`` decorator attached
   to the ``edit_page`` view function.  This makes the assertion that
@@ -197,8 +202,8 @@ To do so, within ``views.py``:
 Viewing the Application in a Browser
 ------------------------------------
 
-Once we've set up the WSGI pipeline properly, we can finally examine
-our application in a browser.  The views we'll try are as follows:
+We can finally examine our application in a browser.  The views we'll
+try are as follows:
 
 - Visiting `http://localhost:6543/ <http://localhost:6543/>`_ in a
   browser invokes the ``view_wiki`` view.  This always redirects to
@@ -208,8 +213,8 @@ our application in a browser.  The views we'll try are as follows:
 - Visiting `http://localhost:6543/FrontPage/
   <http://localhost:6543/FrontPage/>`_ in a browser invokes the
   ``view_page`` view of the front page page object.  This is because
-  it's the *default view* (a view without a ``name``) for Page
-  objects.  It is executable by any user.
+  it's the :term:`default view` (a view without a ``name``) for
+  ``Page`` objects.  It is executable by any user.
 
 - Visiting `http://localhost:6543/FrontPage/edit_page
   <http://localhost:6543/FrontPage/edit_page>`_ in a browser invokes

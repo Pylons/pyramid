@@ -16,12 +16,13 @@ to using view decorators.
 Adding View Decorators
 ======================
 
-We're going to import the ``bfg_view`` callable from the
-``repoze.bfg.view`` module.  This callable can be used as a function
-decorator.  We'll use it to decorate our ``view_wiki``, ``view_page``,
+We're going to import the :class:`repoze.bfg.view.bfg_view` callable.
+This callable can be used as a function, class, or method decorator.
+We'll use it to decorate our ``view_wiki``, ``view_page``,
 ``add_page`` and ``edit_page`` view functions.
 
-The ``bfg_view`` callable accepts a number of arguments:
+The :class:`repoze.bfg.view.bfg_view` callable accepts a number of
+arguments:
 
 ``for_``
 
@@ -50,9 +51,9 @@ The decorator above the ``view_wiki`` function will be:
    @bfg_view(for_=Wiki)
 
 This indicates that the view is "for" the Wiki class and has the
-*empty* view_name (indicating the default view).  After injecting this
-decorator, we can now *remove* the following from our
-``configure.zcml`` file:
+*empty* view_name (indicating the :term:`default view` for the Wiki
+class).  After injecting this decorator, we can now *remove* the
+following from our ``configure.zcml`` file:
 
 .. code-block:: xml
    :linenos:
@@ -75,9 +76,9 @@ The decorator above the ``view_page`` function will be:
    @bfg_view(for_=Page, renderer='templates/view.pt')
 
 This indicates that the view is "for" the Page class and has the
-*empty* view_name (indicating the default view).  After injecting this
-decorator, we can now *remove* the following from our
-``configure.zcml`` file:
+*empty* view_name (indicating the :term:`default view` for the Page
+class).  After injecting this decorator, we can now *remove* the
+following from our ``configure.zcml`` file:
 
 .. code-block:: xml
    :linenos:
@@ -146,14 +147,15 @@ Adding a Scan Directive
 =======================
 
 In order for our decorators to be recognized, we must add a bit of
-boilerplate to our ``configure.zcml`` file.  Add the following tag
-anywhere beneath the ``<include package="repoze.bfg.includes">`` tag
-but before the ending ``</configure>`` tag within ``configure.zcml``:
+boilerplate to our ``configure.zcml`` file which tells
+:mod:`repoze.bfg` to kick off a :term:`scan` at startup time.  Add the
+following tag anywhere beneath the ``<include
+package="repoze.bfg.includes">`` tag but before the ending
+``</configure>`` tag within ``configure.zcml``:
 
 .. code-block:: xml
    :linenos:
 
-   <include package="repoze.bfg.includes" />
    <scan package="."/>
 
 Viewing the Result of Our Edits to ``views.py``

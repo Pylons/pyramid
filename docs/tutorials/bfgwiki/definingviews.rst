@@ -2,15 +2,17 @@
 Defining Views
 ==============
 
-Views in BFG are typically simple Python functions that accept two
-parameters: :term:`context`, and :term:`request`.  A view is assumed
-to return a :term:`response` object.
+A :term:`view callable` in a traversal-based :mod:`repoze.bfg`
+applications is typically a simple Python function that accepts two
+parameters: :term:`context`, and :term:`request`.  A view callable is
+assumed to return a :term:`response` object.
 
 .. note:: A :mod:`repoze.bfg` view can also be defined as callable
    which accepts *one* arguments: a :term:`request`.  You'll see this
-   two-argument pattern used in other :mod:`repoze.bfg` tutorials and
+   one-argument pattern used in other :mod:`repoze.bfg` tutorials and
    applications.  Either calling convention will work in any
-   :mod:`repoze.bfg` application.  In :term:`traversal` based
+   :mod:`repoze.bfg` application; the calling conventions can be used
+   interchangeably as necessary.  In :term:`traversal` based
    applications, such as this tutorial, the context is used frequently
    within the body of a view method, so it makes sense to use the
    two-argument syntax in this application.  However, in :term:`url
@@ -19,15 +21,19 @@ to return a :term:`response` object.
    URL-dispatch-only, it's common to define views as callables that
    accept only a request to avoid the visual "noise".
 
+We're going to define several :term:`view callable` functions then
+wire them into :mod:`repoze.bfg` using some :term:`view
+configuration` via :term:`ZCML`.
+
 Adding View Functions
 =====================
 
-We're going to add four :term:`view` functions to our ``views.py``
-module.  One view (named ``view_wiki``) will display the wiki itself
-(it will answer on the root URL), another named ``view_page`` will
-display an individual page, another named ``add_page`` will allow a
-page to be added, and a final view named ``edit_page`` will allow a
-page to be edited.
+We're going to add four :term:`view callable` functions to our
+``views.py`` module.  One view (named ``view_wiki``) will display the
+wiki itself (it will answer on the root URL), another named
+``view_page`` will display an individual page, another named
+``add_page`` will allow a page to be added, and a final view named
+``edit_page`` will allow a page to be edited.
 
 .. note::
 
@@ -38,28 +44,29 @@ page to be edited.
   your application package named ``views``), but this is only by
   convention.
 
-
 The ``view_wiki`` view function
 -------------------------------
 
-The ``view_wiki`` function will respond as the default view of a
-``Wiki`` model object.  It always redirects to the ``Page`` object
-named "FrontPage".  It returns an instance of the
-``webob.exc.HTTPFound`` class (instances of which implement the WebOb
-:term:`response` interface), and the ``repoze.bfg.model_url`` API.
-``model_url`` constructs a URL to the ``FrontPage`` page
-(e.g. ``http://localhost:6543/FrontPage``), and uses it as the
+The ``view_wiki`` function will be configured to respond as the
+default view of a ``Wiki`` model object.  It always redirects to the
+``Page`` object named "FrontPage".  It returns an instance of the
+:class:`webob.exc.HTTPFound` class (instances of which implement the
+WebOb :term:`response` interface), and the
+:func:`repoze.bfg.url.model_url` API.
+:func:`repoze.bfg.url.model_url` constructs a URL to the ``FrontPage``
+page (e.g. ``http://localhost:6543/FrontPage``), and uses it as the
 "location" of the HTTPFound response, forming an HTTP redirect.
 
 The ``view_page`` view function
 -------------------------------
 
-The ``view_page`` function will respond as the default view of a
-``Page`` object.  The ``view_page`` function renders the
-:term:`ReStructuredText` body of a page (stored as the ``data``
-attribute of the context, which will be a Page object) as HTML.  Then
-it substitutes an HTML anchor for each *WikiWord* reference in the
-rendered HTML using a compiled regular expression.
+The ``view_page`` function will be configured to respond as the
+default view of a ``Page`` object.  The ``view_page`` function renders
+the :term:`ReStructuredText` body of a page (stored as the ``data``
+attribute of the context passed to the view; the context will be a
+Page object) as HTML.  Then it substitutes an HTML anchor for each
+*WikiWord* reference in the rendered HTML using a compiled regular
+expression.
 
 The curried function named ``check`` is used as the first argument to
 ``wikiwords.sub``, indicating that it should be called to provide a
@@ -81,17 +88,19 @@ and return it.
 
 The arguments we wrap into a dictionary include ``page``, ``content``,
 and ``edit_url``.  As a result, the *template* associated with this
-view will be able to use these names to perform various rendering
-tasks.  The template associated with this view will be a template
-which lives in ``templates/view.pt``, which we'll associate with this
-view via the ``configure.zcml`` file.
+view callable will be able to use these names to perform various
+rendering tasks.  The template associated with this view callable will
+be a template which lives in ``templates/view.pt``, which we'll
+associate with this view via the :term:`view configuration` which
+lives in the ``configure.zcml`` file.
 
-Note the contrast between this view and the ``view_wiki`` view.  In
-the ``view_wiki`` view, we return a *response* object.  In this view,
-we return a *dictionary*.  It is *always* fine to return a response
-object from a :mod:`repoze.bfg` view.  Returning a dictionary is
-allowed only when there is a ``renderer`` associated with the view in
-the view configuration.
+Note the contrast between this view callable and the ``view_wiki``
+view callable.  In the ``view_wiki`` view callable, we return a
+:term:`response` object.  In the ``view_page`` view callable, we
+return a *dictionary*.  It is *always* fine to return a
+:term:`response` object from a :mod:`repoze.bfg` view.  Returning a
+dictionary is allowed only when there is a :term:`renderer` associated
+with the view callable in the view configuration.
 
 The ``add_page`` view function
 ------------------------------
@@ -103,33 +112,34 @@ this view.  It also acts as a handler for the form that is generated
 when we want to add a page object.  The ``context`` of the
 ``add_page`` view is always a Wiki object (*not* a Page object).
 
-The request :term:`subpath` in BFG is the sequence of names that are
-found *after* the view name in the URL segments given to BFG as the
-result of a request.  If our add view is invoked via,
+The request :term:`subpath` in :mod:`repoze.bfg` is the sequence of
+names that are found *after* the view name in the URL segments given
+in the ``PATH_INFO`` of the WSGI request as the result of
+:term:`traversal`.  If our add view is invoked via,
 e.g. ``http://localhost:6543/add_page/SomeName``, the :term:`subpath`
-will be ``['SomeName']``.
+will be a tuple: ``('SomeName',)``.
 
 The add view takes the zeroth element of the subpath (the wiki page
 name), and aliases it to the name attribute in order to know the name
 of the page we're trying to add.
 
 If the view rendering is *not* a result of a form submission (if the
-expression ``'form.submitted' in request.params`` is False), the view
-renders a template.  To do so, it generates a "save url" which the
-template use as the form post URL during rendering.  We're lazy here,
-so we're trying to use the same template (``templates/edit.pt``) for
-the add view as well as the page edit view, so we create a dummy Page
-object in order to satisfy the edit form's desire to have *some* page
-object exposed as ``page``, and we'll render the template to a
-response.
+expression ``'form.submitted' in request.params`` is ``False``), the
+view renders a template.  To do so, it generates a "save url" which
+the template use as the form post URL during rendering.  We're lazy
+here, so we're trying to use the same template (``templates/edit.pt``)
+for the add view as well as the page edit view.  To do so, we create a
+dummy Page object in order to satisfy the edit form's desire to have
+*some* page object exposed as ``page``, and we'll render the template
+to a response.
 
 If the view rendering *is* a result of a form submission (if the
-expression ``'form.submitted' in request.params`` is True), we scrape
-the page body from the form data, create a Page object using the name
-in the subpath and the page body, and save it into "our context" (the
-wiki) using the ``__setitem__`` method of the context. We then
-redirect back to the ``view_page`` view (the default view for a page)
-for the newly created page.
+expression ``'form.submitted' in request.params`` is ``True``), we
+scrape the page body from the form data, create a Page object using
+the name in the subpath and the page body, and save it into "our
+context" (the wiki) using the ``__setitem__`` method of the
+context. We then redirect back to the ``view_page`` view (the default
+view for a page) for the newly created page.
 
 The ``edit_page`` view function
 -------------------------------
@@ -141,15 +151,16 @@ of the ``edit_page`` view will *always* be a Page object (never a Wiki
 object).
 
 If the view execution is *not* a result of a form submission (if the
-expression ``'form.submitted' in request.params`` is False), the view
-simply renders the edit form, passing the request, the page object,
-and a save_url which will be used as the action of the generated form.
+expression ``'form.submitted' in request.params`` is ``False``), the
+view simply renders the edit form, passing the request, the page
+object, and a save_url which will be used as the action of the
+generated form.
 
 If the view execution *is* a result of a form submission (if the
-expression ``'form.submitted' in request.params`` is True), the view
-grabs the ``body`` element of the request parameter and sets it as the
-``data`` attribute of the page context.  It then redirects to the
-default view of the context (the page), which will always be the
+expression ``'form.submitted' in request.params`` is ``True``), the
+view grabs the ``body`` element of the request parameter and sets it
+as the ``data`` attribute of the page context.  It then redirects to
+the default view of the context (the page), which will always be the
 ``view_page`` view.
 
 Viewing the Result of Our Edits to ``views.py``
@@ -165,11 +176,11 @@ like this:
 Adding Templates
 ================
 
-The views we've added all reference a :term:`template`.  Each template
-is a :term:`Chameleon` template.  The default templating system in
-:mod:`repoze.bfg` is a variant of :term:`ZPT` provided by Chameleon.
-These templates will live in the ``templates`` directory of our
-tutorial package.
+Most view callables we've added expected to be rendered via a
+:term:`template`.  Each template is a :term:`Chameleon` template.  The
+default templating system in :mod:`repoze.bfg` is a variant of
+:term:`ZPT` provided by Chameleon.  These templates will live in the
+``templates`` directory of our tutorial package.
 
 The ``view.pt`` Template
 ------------------------
@@ -229,9 +240,10 @@ our package's ``templates/static`` directory:
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/style.css`` by virtue of the
-``static_view`` view we've defined in the ``views.py`` file.  Any
-number and type of static resources can be placed in this directory
-(or subdirectories) and are just referred to by URL within templates.
+``static`` directive we've defined in the ``configure.zcml`` file.
+Any number and type of static resources can be placed in this
+directory (or subdirectories) and are just referred to by URL within
+templates.
 
 Testing the Views
 =================
@@ -284,8 +296,9 @@ Mapping Views to URLs in ``configure.zcml``
 ===========================================
 
 The ``configure.zcml`` file contains ``view`` declarations which serve
-to map URLs (via :term:`traversal`) to view functions.  You'll need to
-add four ``view`` declarations to ``configure.zcml``.
+to map URLs (via :term:`traversal`) to view functions.  This is also
+known as :term:`view configuration`.  You'll need to add four ``view``
+declarations to ``configure.zcml``.
 
 #. Add a declaration which maps the "Wiki" class in our ``models.py``
    file to the view named ``view_wiki`` in our ``views.py`` file with
@@ -347,19 +360,19 @@ concerned the pipeline *is* our application.  Simpler configurations
 don't use a pipeline: instead they expose a single WSGI application as
 "main".  Our setup is more complicated, so we use a pipeline.
 
-"egg:repoze.zodbconn#closer" is at the "top" of the pipeline.  This is
-a piece of middleware which closes the ZODB connection opened by the
-PersistentApplicationFinder at the end of the request.
+``egg:repoze.zodbconn#closer`` is at the "top" of the pipeline.  This
+is a piece of middleware which closes the ZODB connection opened by
+the PersistentApplicationFinder at the end of the request.
 
-"egg:repoze.tm#tm" is the second piece of middleware in the pipeline.
-This commits a transaction near the end of the request unless there's
-an exception raised.
+``egg:repoze.tm#tm`` is the second piece of middleware in the
+pipeline.  This commits a transaction near the end of the request
+unless there's an exception raised.
 
 Adding an Element to the Pipeline
 ---------------------------------
 
-Let's add a piece of middleware to the WSGI pipeline.
-"egg:Paste#evalerror" middleware which displays debuggable errors in
+Let's add a piece of middleware to the WSGI pipeline:
+``egg:Paste#evalerror`` middleware which displays debuggable errors in
 the browser while you're developing (not recommended for deployment).
 Let's insert evalerror into the pipeline right below
 "egg:repoze.zodbconn#closer", making our resulting ``tutorial.ini``
