@@ -36,13 +36,15 @@ DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
 
 def has_permission(permission, context, request):
     """ Provided a permission (a string or unicode object), a context
-    (a model instance) and a request object, return an instance of
-    ``Allowed`` if the permission is granted in this context to the
-    user implied by the request. Return an instance of ``Denied`` if
-    this permission is not granted in this context to this user.  This
-    function delegates to the current authentication and authorization
-    policies.  Return ``Allowed`` unconditionally if no authentication
-    policy has been configured in this application."""
+    (a :term:`model` instance) and a request object, return an
+    instance of :data:`repoze.bfg.security.Allowed` if the permission
+    is granted in this context to the user implied by the
+    request. Return an instance of :mod:`repoze.bfg.security.Denied`
+    if this permission is not granted in this context to this user.
+    This function delegates to the current authentication and
+    authorization policies.  Return
+    :data:`repoze.bfg.security.Allowed` unconditionally if no
+    authentication policy has been configured in this application."""
     try:
         reg = request.registry
     except AttributeError:
@@ -94,13 +96,13 @@ def principals_allowed_by_permission(context, permission):
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
     in effect, this will return a sequence with the single value
-    representing ``Everyone`` (the special principal identifier
-    representing all principals).
+    :mod:`repoze.bfg.security.Everyone` (the special principal
+    identifier representing all principals).
 
     .. note:: even if an :term:`authorization policy` is in effect,
        some (exotic) authorization policies may not implement the
        required machinery for this function; those will cause a
-       ``NotImplementedError`` exception to be raised when this
+       :exc:`NotImplementedError` exception to be raised when this
        function is invoked.
     """
     reg = get_current_registry()
@@ -115,7 +117,7 @@ def view_execution_permitted(context, request, name=''):
     view using the effective authentication/authorization policies and
     the ``request``.  Return a boolean result.  If no
     :term:`authorization policy` is in effect, or if the view is not
-    protected by a permission, return True."""
+    protected by a permission, return ``True``."""
     try:
         reg = request.registry
     except AttributeError:
@@ -132,10 +134,10 @@ def remember(request, principal, **kw):
     """ Return a sequence of header tuples (e.g. ``[('Set-Cookie',
     'foo=abc')]``) suitable for 'remembering' a set of credentials
     implied by the data passed as ``principal`` and ``*kw`` using the
-    current authentication policy.  Common usage might look like so
-    within the body of a view function (``response`` is assumed to be
-    an WebOb-style response object computed previously by the view
-    code)::
+    current :term:`authentication policy`.  Common usage might look
+    like so within the body of a view function (``response`` is
+    assumed to be an :term:`WebOb` -style :term:`response` object
+    computed previously by the view code)::
 
       from repoze.bfg.security import remember
       headers = remember(request, 'chrism', password='123', max_age='86400')
@@ -161,8 +163,8 @@ def forget(request):
     'foo=abc')]``) suitable for 'forgetting' the set of credentials
     possessed by the currently authenticated user.  A common usage
     might look like so within the body of a view function
-    (``response`` is assumed to be an WebOb-style response object
-    computed previously by the view code)::
+    (``response`` is assumed to be an :term:`WebOb` -style
+    :term:`response` object computed previously by the view code)::
 
       from repoze.bfg.security import forget
       headers = forget(request)
@@ -202,18 +204,18 @@ class PermitsResult(int):
 
 class Denied(PermitsResult):
     """ An instance of ``Denied`` is returned when a security-related
-    API or other ``repoze.bfg`` code denies an action unlrelated to an
-    ACL check.  It evaluates equal to all boolean false types.  It has
-    an attribute named ``msg`` describing the circumstances for the
-    deny."""
+    API or other :mod:`repoze.bfg` code denies an action unlrelated to
+    an ACL check.  It evaluates equal to all boolean false types.  It
+    has an attribute named ``msg`` describing the circumstances for
+    the deny."""
     boolval = 0
 
 class Allowed(PermitsResult):
     """ An instance of ``Allowed`` is returned when a security-related
-    API or other ``repoze.bfg`` code allows an action unrelated to an
-    ACL check.  It evaluates equal to all boolean true types.  It has
-    an attribute named ``msg`` describing the circumstances for the
-    allow."""
+    API or other :mod:`repoze.bfg` code allows an action unrelated to
+    an ACL check.  It evaluates equal to all boolean true types.  It
+    has an attribute named ``msg`` describing the circumstances for
+    the allow."""
     boolval = 1
 
 class ACLPermitsResult(int):
@@ -256,7 +258,7 @@ class ACLDenied(ACLPermitsResult):
     boolval = 0
 
 class ACLAllowed(ACLPermitsResult):
-    """ An instance of ``ACLDenied`` represents that a security check
+    """ An instance of ``ACLAllowed`` represents that a security check
     made explicitly against ACL was allowed.  It evaluates equal to
     all boolean true types.  It also has attributes which indicate
     which acl, ace, permission, principals, and context were involved

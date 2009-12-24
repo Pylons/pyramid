@@ -31,11 +31,12 @@ def inside(model1, model2):
 def lineage(model):
     """
     Return a generator representing the :term:`lineage` of the
-    ``model``.  The generator first returns ``model`` unconditionally.
-    Then, if ``model`` supplies a ``__parent__`` attribute, return the
-    object represented by ``model.__parent__``.  If *that* object has
-    a ``__parent__`` attribute, return that object's parent, and so
-    on, until the object being inspected either has no ``__parent__``
+    :term:`model` object implied by the ``model`` argument.  The
+    generator first returns ``model`` unconditionally.  Then, if
+    ``model`` supplies a ``__parent__`` attribute, return the object
+    represented by ``model.__parent__``.  If *that* object has a
+    ``__parent__`` attribute, return that object's parent, and so on,
+    until the object being inspected either has no ``__parent__``
     attribute or which has a ``__parent__`` attribute of ``None``.
     For example, if the object tree is::
 

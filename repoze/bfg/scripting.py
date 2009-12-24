@@ -2,13 +2,13 @@ from repoze.bfg.request import Request
 
 def get_root(app, request=None):
     """ Return a tuple composed of ``(root, closer)`` when provided a
-    ``repoze.bfg.router.Router`` instance as the ``app`` argument.
-    The ``root`` returned is the application root object.  The
-    ``closer`` returned is a callable (accepting no arguments) that
-    should be called when your scripting application is finished using
-    the root.  If ``request`` is not None, it is used as the request
-    passed to the :mod:`repoze.bfg` application root factory.  A
-    request is constructed and passed to the root factory if
+    :class:`repoze.bfg.router.Router` instance as the ``app``
+    argument.  The ``root`` returned is the application root object.
+    The ``closer`` returned is a callable (accepting no arguments)
+    that should be called when your scripting application is finished
+    using the root.  If ``request`` is not None, it is used as the
+    request passed to the :mod:`repoze.bfg` application root factory.
+    A request is constructed and passed to the root factory if
     ``request`` is None."""
     registry = app.registry
     if request is None:

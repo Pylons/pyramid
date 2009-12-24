@@ -44,7 +44,7 @@ def get_app(config_file, name, loadapp=loadapp):
     return app
 
 class BFGShellCommand(Command):
-    """Open an interactive shell with a repoze.bfg app loaded.
+    """Open an interactive shell with a :mod:`repoze.bfg` app loaded.
 
     This command accepts two positional arguments:
 

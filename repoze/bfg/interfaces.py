@@ -4,23 +4,24 @@ from zope.interface import Interface
 # public API interfaces
 
 class IAfterTraversal(Interface):
-    """ An event type that is emitted after repoze.bfg completes
-    traversal but before it calls any view code."""
+    """ An event type that is emitted after :mod:`repoze.bfg`
+    completes traversal but before it calls any view code."""
     request = Attribute('The request object')
 
 class INewRequest(Interface):
-    """ An event type that is emitted whenever repoze.bfg begins to
-    process a new request """
+    """ An event type that is emitted whenever :mod:`repoze.bfg`
+    begins to process a new request"""
     request = Attribute('The request object')
     
 class INewResponse(Interface):
-    """ An event type that is emitted whenever any repoze.bfg view
-    returns a response."""
+    """ An event type that is emitted whenever any :mod:`repoze.bfg`
+    view returns a response."""
     response = Attribute('The response object')
 
 class IWSGIApplicationCreatedEvent(Interface):
-    """ Event issued after the application has been created and
-    configured."""
+    """ Event issued when the
+    :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method
+    is called."""
     app = Attribute(u"Published application")
 
 # internal interfaces

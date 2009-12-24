@@ -9,7 +9,7 @@ from repoze.bfg.threadlocal import get_current_registry
 class Settings(dict):
     """ Deployment settings.  Update application settings (usually
     from PasteDeploy keywords) with framework-specific key/value pairs
-    (e.g. find 'BFG_DEBUG_AUTHORIZATION' in os.environ and jam into
+    (e.g. find ``BFG_DEBUG_AUTHORIZATION`` in os.environ and jam into
     keyword args)."""
     implements(ISettings)
     # _environ_ is dep inj for testing
@@ -57,11 +57,12 @@ def get_settings():
     """
     Return a 'settings' object for the current application.  A
     'settings' object is a dictionary-like object that contains
-    key/value pairs based on the dictionary passed as the ``options``
-    argument to the ``repoze.bfg.router.make_app`` API.
+    key/value pairs based on the dictionary passed as the ``settings``
+    argument to the :class:`repoze.bfg.configuration.Configurator`
+    constructor or the :func:`repoze.bfg.router.make_app` API.
 
-    For backwards compatibility, dictionary keys can also be looked up
-    as attributes of the settings object.
+    .. note:: For backwards compatibility, dictionary keys can also be
+       looked up as attributes of the settings object.
     """
     reg = get_current_registry()
     return reg.queryUtility(ISettings)

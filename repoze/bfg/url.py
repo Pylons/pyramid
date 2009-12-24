@@ -24,7 +24,7 @@ def route_url(route_name, request, *elements, **kw):
     after it is generated.
     
     Use keyword arguments to supply values which match any dynamic
-    path elements in the route definition.  Raises a ``KeyError``
+    path elements in the route definition.  Raises a :exc:`KeyError`
     exception if the URL cannot be generated for any reason (not
     enough arguments, for example).
 
@@ -52,21 +52,21 @@ def route_url(route_name, request, *elements, **kw):
 
     If a keyword argument ``_query`` is present, it will used to
     compose a query string that will be tacked on to the end of the
-    URL.  The value of ``_query`` must be a sequence of two-tuples *or*
-    a data structure with an ``.items()`` method that returns a
+    URL.  The value of ``_query`` must be a sequence of two-tuples
+    *or* a data structure with an ``.items()`` method that returns a
     sequence of two-tuples (presumably a dictionary).  This data
     structure will be turned into a query string per the documentation
-    of ``repoze.url.urlencode`` function.  After the query data is
-    turned into a query string, a leading ``?`` is prepended, and the
-    the resulting string is appended to the generated URL.
+    of :func:`repoze.bfg.encode.urlencode` function.  After the query
+    data is turned into a query string, a leading ``?`` is prepended,
+    and the the resulting string is appended to the generated URL.
 
     .. note:: Python data structures that are passed as ``_query``
               which are sequences or dictionaries are turned into a
               string under the same rules as when run through
-              urllib.urlencode with the ``doseq`` argument equal to
-              ``True``.  This means that sequences can be passed as
-              values, and a k=v pair will be placed into the query
-              string for each value.
+              :func:`urllib.urlencode` with the ``doseq`` argument
+              equal to ``True``.  This means that sequences can be
+              passed as values, and a k=v pair will be placed into the
+              query string for each value.
 
     If a keyword argument ``_anchor`` is present, its string
     representation will be used as a named anchor in the generated URL
@@ -84,9 +84,9 @@ def route_url(route_name, request, *elements, **kw):
     element will always follow the query element,
     e.g. ``http://example.com?foo=1#bar``.
 
-    This function raises a ``KeyError`` if the URL cannot be generated
-    due to missing replacement names.  Extra replacement names are
-    ignored.
+    This function raises a :exc:`KeyError` if the URL cannot be
+    generated due to missing replacement names.  Extra replacement
+    names are ignored.
     """
     try:
         reg = request.registry
@@ -123,7 +123,7 @@ def model_url(model, request, *elements, **kw):
     object based on the ``wsgi.url_scheme``, ``HTTP_HOST`` or
     ``SERVER_NAME`` in the ``request``, plus any ``SCRIPT_NAME``.  The
     overall result of this function is always a UTF-8 encoded string
-    (never unicode).
+    (never Unicode).
 
     Examples::
 
@@ -144,9 +144,9 @@ def model_url(model, request, *elements, **kw):
                                    http://example.com/a.html#abc
 
     Any positional arguments passed in as ``elements`` must be strings
-    or unicode objects.  These will be joined by slashes and appended
+    or Unicode objects.  These will be joined by slashes and appended
     to the generated model URL.  Each of the elements passed in is
-    URL-quoted before being appended; if any element is unicode, it
+    URL-quoted before being appended; if any element is Unicode, it
     will converted to a UTF-8 bytestring before being URL-quoted.
 
     .. warning:: if no ``elements`` arguments are specified, the model
@@ -167,10 +167,10 @@ def model_url(model, request, *elements, **kw):
     .. note:: Python data structures that are passed as ``query``
               which are sequences or dictionaries are turned into a
               string under the same rules as when run through
-              urllib.urlencode with the ``doseq`` argument equal to
-              ``True``.  This means that sequences can be passed as
-              values, and a k=v pair will be placed into the query
-              string for each value.
+              :func:`urllib.urlencode` with the ``doseq`` argument
+              equal to ``True``.  This means that sequences can be
+              passed as values, and a k=v pair will be placed into the
+              query string for each value.
 
     If a keyword argument ``anchor`` is present, its string
     representation will be used as a named anchor in the generated URL
@@ -234,8 +234,9 @@ def static_url(path, request, **kw):
     """
     Generates a fully qualified URL for a static :term:`resource`.
     The resource must live within a location defined via the
-    ``add_static_view`` :term:`configuration declaration` or the
-    ``<static>`` ZCML directive (see :ref:`static_resources_section`).
+    :meth:`repoze.bfg.configuration.Configurator.add_static_view`
+    :term:`configuration declaration` or the ``<static>`` ZCML
+    directive (see :ref:`static_resources_section`).
 
     Example::
 
@@ -248,19 +249,19 @@ def static_url(path, request, **kw):
     a URL should be generated for.  The ``path`` may be either a
     relative path (e.g. ``static/foo.css``) or a :term:`resource
     specification` (e.g. ``mypackage:static/foo.css``).  A ``path``
-    may not be an absolute filesystem path (a ValueError will be
-    raised if this function is supplied with an absolute path).
+    may not be an absolute filesystem path (a :exc:`ValueError` will
+    be raised if this function is supplied with an absolute path).
 
     The ``request`` argument should be a :term:`request` object.
 
     The purpose of the ``**kw`` argument is the same as the purpose of
-    the ``route_url`` ``**kw`` argument.  See the documentation for
-    that function to understand the arguments which you can provide to
-    it.  However, typically, you don't need to pass anything as
-    ``*kw`` when generating a static resource URL.
+    the :func:`repoze.bfg.url.route_url` ``**kw`` argument.  See the
+    documentation for that function to understand the arguments which
+    you can provide to it.  However, typically, you don't need to pass
+    anything as ``*kw`` when generating a static resource URL.
 
-    This function raises a ValueError if a static view definition
-    cannot be found which matches the path specification.
+    This function raises a :exc:`ValueError` if a static view
+    definition cannot be found which matches the path specification.
 
     .. note:: This feature is new in :mod:`repoze.bfg` 1.1.
     """
