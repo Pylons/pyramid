@@ -6,11 +6,11 @@ Request and Response Objects
 :mod:`repoze.bfg` uses the :term:`WebOb` package to supply
 :term:`request` and :term:`response` object implementations.  The
 :term:`request` object that is passed to a :mod:`repoze.bfg`
-:term:`view` is an instance of the :mod:`webob.Request` class.  The
-:term:`response` returned from a :mod:`repoze.bfg` :term:`view`
-:term:`renderer` is an instance of the :mod:`webob.Response` class.
-Users can also return an instance of :mod:`webob.Response` directly
-from a view as necessary.
+:term:`view` is an instance of the :class:`repoze.bfg.Request` class,
+which is a subclass of :class:`webob.Request`.  The :term:`response`
+returned from a :mod:`repoze.bfg` :term:`view` :term:`renderer` is an
+instance of the :mod:`webob.Response` class.  Users can also return an
+instance of :mod:`webob.Response` directly from a view as necessary.
 
 WebOb is a project separate from :mod:`repoze.bfg` with a separate set
 of authors and a fully separate `set of documentation
@@ -20,7 +20,9 @@ of authors and a fully separate `set of documentation
    request and response objects provided by :term:`WebOb`.  See the
    `reference documentation
    <http://pythonpaste.org/webob/reference.html>`_ for more detailed
-   API reference information.
+   API reference information.  All methods in the :term:`WebOb`
+   documentation work against :mod:`repoze.bfg` requests and
+   responses.
 
 WebOb provides objects for HTTP requests and responses.  Specifically
 it does this by wrapping the `WSGI <http://wsgi.org>`_ request
