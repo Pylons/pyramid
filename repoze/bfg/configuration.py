@@ -81,9 +81,9 @@ class Configurator(object):
     must be an instance of the :class:`repoze.bfg.registry.Registry`
     class representing the registry to configure.  If ``registry`` is
     ``None``, the configurator will create a
-    :class`repoze.bfg.registry.Registry` instance itself; it will also
-    perform some default configuration that would not otherwise be
-    done.  After construction, the configurator may be used to add
+    :class:`repoze.bfg.registry.Registry` instance itself; it will
+    also perform some default configuration that would not otherwise
+    be done.  After construction, the configurator may be used to add
     configuration to the registry.  The overall state of a registry is
     called the 'configuration state'.
 
@@ -151,8 +151,23 @@ class Configurator(object):
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
                        renderers=DEFAULT_RENDERERS, debug_logger=None):
-        # this is a pseudo-API.. it's not in the docs but is used in the
-        # wild.  It might should go in the docs.
+        """ When you pass a non-``None`` ``registry`` argument to the
+        :term:`Configurator` constructor, no initial 'setup' is
+        performed against the registry.  This is because the registry
+        you pass in may have already been initialized for use under
+        :mod:`repoze.bfg` via a different configurator.  However, in
+        some circumstances, such as when you want to use the Zope
+        'global` registry instead of a registry created as a result of
+        the Configurator constructor, or when you want to reset the
+        initial setup of a registry, you *do* want to explicitly
+        initialize the registry associated with a Configurator for use
+        under :mod:`repoze.bfg.  Use ``setup_registry`` to do this
+        initialization.
+
+        ``setup_registry`` configures settings, a root factory,
+        security policies, renderers, and a debug logger using the
+        configurator's current registry, as per the descriptions in
+        the Configurator constructor."""
         self._set_settings(settings)
         self._set_root_factory(root_factory)
         if debug_logger is None:

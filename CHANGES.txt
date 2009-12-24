@@ -1,3 +1,13 @@
+Next release
+============
+
+Documentation
+-------------
+
+- Document the previously existing (but non-API)
+  ``repoze.bfg.configuration.Configurator.setup_registry`` method as
+  an official API of a ``Configurator``.
+
 1.2a8 (2009-12-24)
 ==================
 
