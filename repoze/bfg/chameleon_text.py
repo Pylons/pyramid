@@ -61,29 +61,39 @@ class TextTemplateRenderer(object):
         return result
 
 def get_renderer(path):
-    """ Return a callable ``ITemplateRenderer`` object representing a
-    ``Chameleon`` text template at the package-relative path (may also
-    be absolute)."""
+    """ Return a callable object which can be used to render a
+    :term:`Chameleon` text template using the template implied by the
+    ``path`` argument.  The ``path`` argument may be a
+    package-relative path, an absolute path, or a :term:`resource
+    specification`."""
     return renderer_factory(path)
 
 def get_template(path):
-    """ Return a ``Chameleon`` text template at the package-relative
-    path (may also be absolute)."""
+    """ Return the underyling object representing a :term:`Chameleon`
+    text template using the template implied by the ``path`` argument.
+    The ``path`` argument may be a package-relative path, an absolute
+    path, or a :term:`resource specification`."""
     renderer = renderer_factory(path)
     return renderer.implementation()
 
 def render_template(path, **kw):
-    """ Render a ``chameleon`` text template at the package-relative
-    path (may also be absolute) using the kwargs in ``*kw`` as
-    top-level names and return a string."""
+    """ Render a :term:`Chameleon` text template using the template
+    implied by the ``path`` argument.  The ``path`` argument may be a
+    package-relative path, an absolute path, or a :term:`resource
+    specification`.  The arguments in ``*kw`` are passed as top-level
+    names to the template, and so may be used within the template
+    itself.  Returns a string."""
     renderer = renderer_factory(path)
     return renderer(kw, {})
 
 def render_template_to_response(path, **kw):
-    """ Render a ``chameleon`` text template at the package-relative
-    path (may also be absolute) using the kwargs in ``*kw`` as
-    top-level names and return a Response object with the body as the
-    template result."""
+    """ Render a :term:`Chameleon` text template using the template
+    implied by the ``path`` argument.  The ``path`` argument may be a
+    package-relative path, an absolute path, or a :term:`resource
+    specification`.  The arguments in ``*kw`` are passed as top-level
+    names to the template, and so may be used within the template
+    itself.  Returns a :term:`Response` object with the body as the
+    template result.."""
     renderer = renderer_factory(path)
     result = renderer(kw, {})
     reg = get_current_registry()
