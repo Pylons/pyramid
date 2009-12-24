@@ -491,8 +491,8 @@ class Configurator(object):
 
           The ``renderer`` attribute is optional.  If it is not
           defined, the "null" renderer is assumed (no rendering is
-          performed and the value is passed back to the upstream BFG
-          machinery unmolested).
+          performed and the value is passed back to the upstream
+          :mod:`repoze.bfg` machinery unmolested).
 
         wrapper
 

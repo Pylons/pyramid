@@ -539,11 +539,12 @@ def append_slash_notfound_view(context, request):
       <notfound
          view="repoze.bfg.view.append_slash_notfound_view"/>
 
-    Or use the :meth:`repoze.bfg.configuration.Configurator.notfound`
+    Or use the
+    :meth:`repoze.bfg.configuration.Configurator.set_notfound_view`
     method if you don't use ZCML::
 
       from repoze.bfg.view import append_slash_notfound_view
-      config.notfound(append_slash_notfound_view)
+      config.set_notfound_view(append_slash_notfound_view)
 
     See also :ref:`changing_the_notfound_view`.
 
