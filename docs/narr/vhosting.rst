@@ -21,9 +21,10 @@ If you use the ``urlmap`` composite application "in front" of a
 :mod:`repoze.bfg` application or if you use :term:`mod_wsgi` to serve
 up a :mod:`repoze.bfg` application, nothing special needs to be done
 within the application for URLs to be generated that contain the
-prefix spelled by the package config.  ``urlmap`` and ``mod_wsgi`` and
-manipulate the WSGI environment in such a way that the ``PATH_INFO``
-and ``SCRIPT_NAME`` variables are correct for some given prefix.
+prefix spelled by the package config.  :mod:`paste.urlmap` and
+:term:`mod_wsgi` and manipulate the WSGI environment in such a way
+that the ``PATH_INFO`` and ``SCRIPT_NAME`` variables are correct for
+some given prefix.
 
 .. note:: If you're using an Apache server to proxy to a Paste
    ``urlmap`` composite, you may have to use the `ProxyPreserveHost
@@ -82,7 +83,7 @@ that is the absolute pathname to the model object in the traversal
 graph that should behave as the "root" model.  As a result, the
 traversal machinery will respect this value during traversal
 (prepending it to the PATH_INFO before traversal starts), and the
-``repoze.bfg.url.model_url`` API will generate the "correct"
+:func:`repoze.bfg.url.model_url` API will generate the "correct"
 virtually-rooted URLs.
 
 An example of an Apache ``mod_proxy`` configuration that will host the
@@ -107,8 +108,8 @@ is below:
    <http://httpd.apache.org/docs/2.2/mod/mod_headers.html>`_ module be
    available in the Apache environment you're using.
 
-For a :mod:`repoze.bfg` application running under ``mod_wsgi``, the
-same can be achieved using ``SetEnv``:
+For a :mod:`repoze.bfg` application running under :term:`mod_wsgi`,
+the same can be achieved using ``SetEnv``:
 
 .. code-block:: apache
    :linenos:
@@ -124,9 +125,9 @@ Further Documentation and Examples
 ----------------------------------
 
 The API documentation in :ref:`traversal_module` documents a
-``repoze.bfg.traversal.virtual_root`` API.  When called, it returns
-the virtual root object (or the physical root object if no virtual
-root has been specified).
+:func:`repoze.bfg.traversal.virtual_root` API.  When called, it
+returns the virtual root object (or the physical root object if no
+virtual root has been specified).
 
 :ref:`modwsgi_tutorial` has detailed information about using
 :term:`mod_wsgi` to serve :mod:`repoze.bfg` applications.
