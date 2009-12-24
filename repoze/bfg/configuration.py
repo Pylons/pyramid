@@ -161,7 +161,7 @@ class Configurator(object):
         the Configurator constructor, or when you want to reset the
         initial setup of a registry, you *do* want to explicitly
         initialize the registry associated with a Configurator for use
-        under :mod:`repoze.bfg.  Use ``setup_registry`` to do this
+        under :mod:`repoze.bfg`.  Use ``setup_registry`` to do this
         initialization.
 
         ``setup_registry`` configures settings, a root factory,
