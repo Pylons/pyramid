@@ -1,5 +1,5 @@
-Next release
-============
+1.2a8 (2009-12-24)
+==================
 
 Features
 --------
@@ -8,6 +8,10 @@ Features
 
 - Add ``hook_zca`` and ``unhook_zca`` methods to the ``Configurator``
   API.
+
+- The ``repoze.bfg.testing.setUp`` method now returns a
+  ``Configurator`` instance which can be used to do further
+  configuration during unit tests.
 
 Bug Fixes
 ---------
@@ -26,7 +30,15 @@ Documentation
 -------------
 
 - General documentation improvements by using better Sphinx roles such
-  as "class", "func", "meth", and so on.
+  as "class", "func", "meth", and so on.  This means that there are
+  many more hyperlinks pointing to API documentation for API
+  definitions in all narrative, tutorial, and API documentation
+  elements.
+
+- Added a description of imperative configuration in various places
+  which only described ZCML configuration.
+
+- A syntactical refreshing of various tutorials.
 
 - Added the ``repoze.bfg.authentication``,
   ``repoze.bfg.authorization``, and ``repoze.bfg.interfaces`` modules
