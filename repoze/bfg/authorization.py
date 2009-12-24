@@ -39,11 +39,11 @@ class ACLAuthorizationPolicy(object):
       :class:`repoze.bfg.security.ACLDenied` (equals ``False``).
 
     - When computing principals allowed by a permission via the
-      ``principals_allowed_by_permission``` method, we compute the set
-      of principals that are explicitly granted the ``permission`` in
-      the provided ``context``.  We do this by walking 'up' the object
-      graph *from the root* to the context.  During this walking
-      process, if we find an explicit
+      :func:`repoze.bfg.security.principals_allowed_by_permission`
+      method, we compute the set of principals that are explicitly
+      granted the ``permission`` in the provided ``context``.  We do
+      this by walking 'up' the object graph *from the root* to the
+      context.  During this walking process, if we find an explicit
       :data:`repoze.bfg.security.Allow` ACE for a principal that
       matches the ``permission``, the principal is included in the
       allow list.  However, if later in the walking process that
