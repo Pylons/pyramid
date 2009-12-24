@@ -143,7 +143,7 @@ function within the file named ``run.py``:
    argument.  It contains a dictionary of settings parsed by
    PasteDeploy.
 
-# *Lines 26-29*.  We then load a ZCML file to do application
+#. *Lines 26-29*.  We then load a ZCML file to do application
    configuration, and use the
    :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
