@@ -12,7 +12,7 @@ shorthand as a :term:`view`.
 .. note:: See :ref:`traversal_intro` for an example of how a view
    might be found as the result of a request.
 
-Most views accept a single argument: ``request``.  This argument
+Most views accept a single argument named ``request``.  This argument
 represents a :term:`WebOb` :term:`Request` object representing the
 current HTTP request.
 
@@ -24,18 +24,19 @@ associated with the :term:`view configuration` for the view.
 
 A view is mapped to one or more URLs by virtue of :term:`view
 configuration`.  View configuration is performed by using the
-``add_view`` method of a :term:`Configurator` object, by adding a
-``<view>`` statement to :term:`ZCML` used by your application, or by
-running a :term:`scan` against application source code which has a
-``@bfg_view`` decorator attached to a Python object.  Each of these
-mechanisms are equivalent.
+:meth:`repoze.bfg.configuration.Configurator.add_view` method, by
+adding a ``<view>`` statement to :term:`ZCML` used by your
+application, or by running a :term:`scan` against application source
+code which has a :class:`repoze.bfg.view.bfg_view` decorator attached
+to a Python object.  Each of these mechanisms are equivalent to the
+other.
 
 A view might also be mapped to a URL by virtue of :term:`route
 configuration`.  Route configuration is performed by using the
-``add_route`` method of a :term:`Configurator` object or by adding a
-``<route>`` statement to :term:`ZCML` used by your application.  See
-:ref:`urldispatch_chapter` for more information on mapping URLs to
-views using routes.
+:meth:`repoze.bfg.configuration.Configurator.add_route` method or by
+adding a ``<route>`` statement to :term:`ZCML` used by your
+application.  See :ref:`urldispatch_chapter` for more information on
+mapping URLs to views using routes.
 
 .. _function_as_view:
 
@@ -43,9 +44,9 @@ Defining a View as a Function
 -----------------------------
 
 The easiest way to define a view is to create a function that accepts
-a single argument: :term:`request` and which returns a response
-object.  For example, this is a "hello world" view implemented as a
-function:
+a single argument named ``request`` and which returns a
+:term:`Response` object.  For example, this is a "hello world" view
+implemented as a function:
 
 .. code-block:: python
    :linenos:
@@ -71,9 +72,10 @@ Subsequently, that instance's ``__call__`` method is invoked with no
 parameters.  Views defined as classes must have the following traits:
 
 - an ``__init__`` method that accepts a ``request`` as its sole
-  positional arguments.
+  positional argument (or two arguments: ``request`` and ``context``,
+  as per :ref:`request_and_context_view_definitions`).
 
-- a ``__call__`` method that accepts no parameters and returns a
+- a ``__call__`` method that accepts no parameters and which returns a
   response.
 
 For example:
@@ -117,7 +119,8 @@ context
 
 request
 
-  A WebOb Request object representing the current WSGI request.
+  A :term:`WebOb` Request object representing the current WSGI
+  request.
 
 The following types work as views in this style:
 
@@ -130,7 +133,7 @@ The following types work as views in this style:
           return Response('OK')
 
 #. New-style and old-style classes that have an ``__init__`` method
-   that accepts ``self, context, request``, e.g.::
+   that accepts ``context, request``, e.g.::
 
       from webob import Response
 
@@ -139,7 +142,7 @@ The following types work as views in this style:
               return Response('OK')
 
 #. Arbitrary callables that have a ``__call__`` method that accepts
-   ``self, context, request``, e.g.::
+   ``context, request``, e.g.::
 
       from webob import Response
 
@@ -161,10 +164,10 @@ View Responses
 --------------
 
 A view callable may always return an object that implements the
-:term:`WebOb` ``Response`` interface.  The easiest way to return
+:term:`WebOb` :term:`Response` interface.  The easiest way to return
 something that implements this interface is to return a
-``webob.Response`` object.  But any object that has the following
-attributes will work:
+:class:`webob.Response` object instance directly.  But any object that
+has the following attributes will work:
 
 status
 
@@ -185,11 +188,11 @@ app_iter
   other sort of iterable.
 
 If a view happens to return something to the :mod:`repoze.bfg`
-:term:`router` which does not implement this interface, BFG will
-attempt to use an associated :term:`renderer` to construct a response.
-The associated renderer can be varied for a view by changing the
-``renderer`` attribute in the view's configuration.  See
-:ref:`views_which_use_a_renderer`.
+:term:`router` which does not implement this interface,
+:mod:`repoze.bfg` will attempt to use an associated :term:`renderer`
+to construct a response.  The associated renderer can be varied for a
+view by changing the ``renderer`` attribute in the view's
+configuration.  See :ref:`views_which_use_a_renderer`.
 
 .. _views_which_use_a_renderer:
 
@@ -200,14 +203,15 @@ Writing Views Which Use a Renderer
 
 Views needn't always return a WebOb Response object.  Instead, they
 may return an arbitrary Python object, with the expectation that a
-:term:`renderer` will convert that object into a response on behalf of
-the developer.  Some renderers use a templating system; other
-renderers use object serialization techniques.
+:term:`renderer` will convert that object into a response instance on
+behalf of the developer.  Some renderers use a templating system;
+other renderers use object serialization techniques.
 
-If you do not define a ``renderer`` attribute in view configuration
-for a view, no renderer is associated with the view.  In such a
-configuration, an error is raised when a view does not return an
-object which implements :term:`Response` interface.
+If you do not define a ``renderer`` attribute in :term:`view
+configuration` for an associated :term:`view callable`, no renderer is
+associated with the view.  In such a configuration, an error is raised
+when a view does not return an object which implements
+:term:`Response` interface.
 
 View configuration can vary the renderer associated with a view via
 the ``renderer`` attribute.  For example, this ZCML associates the
@@ -227,12 +231,13 @@ renderers which use the :term:`Chameleon` templating language to
 render a dictionary to a response.  See :ref:`built_in_renderers` for
 the available built-in renderers.
 
-If the ``view`` callable associated with a ``view`` directive returns
-a Response object (an object with the attributes ``status``,
-``headerlist`` and ``app_iter``), any renderer associated with the
-``view`` declaration is ignored, and the response is passed back to
-BFG unmolested.  For example, if your view callable returns an
-``HTTPFound`` response, no renderer will be employed.
+If the :term:`view callable` associated with a :term:`view
+configuration` returns a Response object directly (an object with the
+attributes ``status``, ``headerlist`` and ``app_iter``), any renderer
+associated with the view configuration is ignored, and the response is
+passed back to :mod:`repoze.bfg` unmolested.  For example, if your
+view callable returns an instance of the :class:`webob.exc.HTTPFound`
+class as a response, no renderer will be employed.
 
 .. code-block:: python
    :linenos:
@@ -248,18 +253,20 @@ ZCML directive (see :ref:`adding_and_overriding_renderers`).
 View Configuration: Mapping Views to URLs
 -----------------------------------------
 
-View "configuration" may be performed in one of two ways: by adding
-declarations to your :term:`application registry` (ZCML) or by using
-the ``@bfg_view`` decorator.  Both methods are explained below.
+:term:`View configuration` may be performed in one of three ways: by
+using the :meth:`repoze.bfg.configuration.Configurator.add_view`
+method, by adding ``view`` declarations using :term:`ZCML` or by using
+the :class:`repoze.bfg.view.bfg_view` decorator.  Each method is
+explained below.
 
 .. _mapping_views_to_urls_using_zcml_section:
 
 View Configuration Via ZCML
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may associate a view with a URL by adding information to your
-:term:`application registry` via :term:`ZCML` in your
-``configure.zcml`` file using a ``view`` declaration.
+You may associate a view with a URL by adding ``view`` declarations
+via :term:`ZCML` in a ``configure.zcml`` file.  An example of a view
+declaration in ZCML is as follows:
 
 .. code-block:: xml
    :linenos:
@@ -576,19 +583,21 @@ custom_predicates
 View Configuration Using the ``@bfg_view`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For better locality of reference, use the ``repoze.bfg.view.bfg_view``
-decorator to associate your view functions with URLs instead of using
-:term:`ZCML` for the same purpose.  ``repoze.bfg.view.bfg_view`` can
-be used to associate ``for``, ``name``, ``permission`` and
-``request_method``, ``containment``, ``request_param`` and
-``request_type``, ``attr``, ``renderer``, ``wrapper``, ``xhr``,
-``accept``, and ``header`` information -- as done via the equivalent
-ZCML -- with a function that acts as a :mod:`repoze.bfg` view.  All
-ZCML attributes (save for the ``view`` attribute) are available in
-decorator form and mean precisely the same thing.
+For better locality of reference, use the
+:class:`repoze.bfg.view.bfg_view` decorator to associate your view
+functions with URLs instead of using :term:`ZCML` for the same
+purpose.  :class:`repoze.bfg.view.bfg_view` can be used to associate
+``for``, ``name``, ``permission`` and ``request_method``,
+``containment``, ``request_param`` and ``request_type``, ``attr``,
+``renderer``, ``wrapper``, ``xhr``, ``accept``, and ``header``
+information -- as done via the equivalent ZCML -- with a function that
+acts as a :mod:`repoze.bfg` view.  All ZCML attributes (save for the
+``view`` attribute) are available in decorator form and mean precisely
+the same thing.
 
-To make :mod:`repoze.bfg` process your ``@bfg_view`` declarations, you
-*must* do one of the following:
+To make :mod:`repoze.bfg` process your
+:class:`repoze.bfg.view.bfg_view` declarations, you *must* do one of
+the following:
 
 - If you are using :term:`ZCML`, insert the following boilerplate into
   your application's ``configure.zcml``:
@@ -598,8 +607,8 @@ To make :mod:`repoze.bfg` process your ``@bfg_view`` declarations, you
 
       <scan package="."/>
 
-- If you are using :term:`imperative configuration`, use the ``scan``
-  method of the ``Configurator`` object:
+- If you are using :term:`imperative configuration`, use the
+  :meth:`repoze.bfg.configuration.Configurator.scan` method:
 
   .. code-block:: python
      :linenos:
@@ -607,19 +616,20 @@ To make :mod:`repoze.bfg` process your ``@bfg_view`` declarations, you
       config.scan()
 
 .. note:: See :ref:`configuration_module` for additional API arguments
-   to the ``Configurator.scan`` method.  For example, the ``scan``
-   method allows you to supply a ``package`` argument to better
-   control exactly *which* code will be scanned.  This is the same
-   value implied by the ``package`` attribute of the ZCML ``<scan>``
-   directive.
+   to the :meth:`repoze.bfg.configuration.Configurator.scan` method.
+   For example, the ``scan`` method allows you to supply a ``package``
+   argument to better control exactly *which* code will be scanned.
+   This is the same value implied by the ``package`` attribute of the
+   ZCML ``<scan>`` directive.
 
 Please see :ref:`scanning_chapter` for more information about what
 happens when code is scanned for configuration declarations resulting
-from use of decorators like ``@bfg_view``.
+from use of decorators like :class:`repoze.bfg.view.bfg_view`.
 
-After you do so, you will not need to use any other ZCML to configure
-:mod:`repoze.bfg` view declarations.  Instead, you will be able to use
-the ``@bfg_view`` decorator to do this work.
+After you do so, you will not need to use ZCML or imperative
+configuration to configure :mod:`repoze.bfg` view declarations.
+Instead, you will be able to use the :class:`repoze.bfg.view.bfg_view`
+decorator to do this work.
 
 .. warning:: using this feature tends to slows down application
    startup slightly, as more work is performed at application startup
@@ -633,8 +643,9 @@ the ``@bfg_view`` decorator to do this work.
 The ``bfg_view`` Decorator
 ++++++++++++++++++++++++++
 
-``repoze.bfg.view.bfg_view`` is a decorator which allows Python code
-to make view registrations instead of using ZCML for the same purpose.
+:class:`repoze.bfg.view.bfg_view` is a decorator which allows Python
+code to make view registrations instead of using ZCML for the same
+purpose.
 
 An example might reside in a bfg application module ``views.py``:
 
@@ -645,7 +656,7 @@ An example might reside in a bfg application module ``views.py``:
    from repoze.bfg.view import bfg_view
    from repoze.bfg.chameleon_zpt import render_template_to_response
 
-   @bfg_view(name='my_view', request_type='POST', for_=MyModel,
+   @bfg_view(name='my_view', request_method='POST', for_=MyModel,
              permission='read')
    def my_view(request):
        return render_template_to_response('templates/my.pt')
@@ -661,12 +672,21 @@ your application registry:
     view=".views.my_view"
     name="my_view"
     permission="read"
-    request_type="POST"
+    request_method="POST"
     />
 
-All arguments to ``bfg_view`` are optional.  Every argument to
-``bfg_view`` matches the meaning of the same-named attribute in ZCML
-view configuration described in :ref:`the_view_zcml_directive`.  
+Or replaces the need to add this imperative configuration stanza:
+
+.. code-block:: python
+   :linenos:
+
+    config.add_view(name='my_view', request_method='POST', for_=MyModel,
+                    permission='read')
+
+All arguments to :class:`repoze.bfg.view.bfg_view` are optional.
+Every argument to :class:`repoze.bfg.view.bfg_view` matches the
+meaning of the same-named attribute in ZCML view configuration
+described in :ref:`the_view_zcml_directive`.
 
 If ``name`` is not supplied, the empty string is used (implying
 the default view).
@@ -683,7 +703,7 @@ implying any request type.  Otherwise, this should be a class or
 interface.
 
 If ``for_`` is not supplied, the interface
-``zope.interface.Interface`` (which matches any model) is used.
+:class:`zope.interface.Interface` (which matches any model) is used.
 ``for_`` can also name a class, like its ZCML brother.
 
 If ``permission`` is not supplied, no permission is registered for
@@ -726,9 +746,10 @@ HTTP header exists with any value in the request.  See the description
 of ``header`` in :ref:`the_view_zcml_directive` for information about
 the allowable composition and matching behavior of this value.
 
-View lookup ordering for views registered with the ``bfg_view``
-decorator is the same as for those registered via ZCML.  See
-:ref:`view_lookup_ordering` for more information.
+View lookup ordering for views registered with the
+:class:`repoze.bfg.view.bfg_view` decorator is the same as for those
+registered via ZCML.  See :ref:`view_lookup_ordering` for more
+information.
 
 All arguments may be omitted.  For example:
 
@@ -747,11 +768,12 @@ name will be ``my_view``, registered ``for_`` any model type, using no
 permission, registered against requests with any request method /
 request type / request param / route name / containment.
 
-If your view callable is a class, the ``bfg_view`` decorator can also
-be used as a class decorator in Python 2.6 and better (Python 2.5 and
-below do not support class decorators).  All the arguments to the
-decorator are the same when applied against a class as when they are
-applied against a function.  For example:
+If your view callable is a class, the
+:class:`repoze.bfg.view.bfg_view` decorator can also be used as a
+class decorator in Python 2.6 and better (Python 2.5 and below do not
+support class decorators).  All the arguments to the decorator are the
+same when applied against a class as when they are applied against a
+function.  For example:
 
 .. code-block:: python
    :linenos:
@@ -767,9 +789,9 @@ applied against a function.  For example:
        def __call__(self):
            return Response('hello')
 
-You can use the ``bfg_view`` decorator as a simple callable to
-manually decorate classes in Python 2.5 and below (without the
-decorator syntactic sugar), if you wish:
+You can use the :class:`repoze.bfg.view.bfg_view` decorator as a
+simple callable to manually decorate classes in Python 2.5 and below
+(without the decorator syntactic sugar), if you wish:
 
 .. code-block:: python
    :linenos:
@@ -786,9 +808,9 @@ decorator syntactic sugar), if you wish:
 
    my_view = bfg_view()(MyView)
 
-More than one ``bfg_view`` decorator can be stacked on top of any
-number of others.  Each decorator creates a separate view
-registration.  For example:
+More than one :class:`repoze.bfg.view.bfg_view` decorator can be
+stacked on top of any number of others.  Each decorator creates a
+separate view registration.  For example:
 
 .. code-block:: python
    :linenos:
@@ -802,12 +824,12 @@ registration.  For example:
 
 This registers the same view under two different names.
 
-.. note:: ``bfg_view`` decorator stacking is a feature new in
-   :mod:`repoze.bfg` 1.1.  Previously, these decorators could not be
-   stacked without the effect of the "upper" decorator cancelling the
-   effect of the the decorator "beneath" it.
+.. note:: :class:`repoze.bfg.view.bfg_view` decorator stacking is a
+   feature new in :mod:`repoze.bfg` 1.1.  Previously, these decorators
+   could not be stacked without the effect of the "upper" decorator
+   cancelling the effect of the the decorator "beneath" it.
 
-The bfg_view decorator can also be used against class methods:
+The decorator can also be used against class methods:
 
 .. code-block:: python
    :linenos:
@@ -823,7 +845,7 @@ The bfg_view decorator can also be used against class methods:
        def amethod(self):
            return Response('hello')
 
-When the bfg_view decorator is used against a class method, a view is
+When the decorator is used against a class method, a view is
 registered for the *class*, so the class constructor must accept
 either ``request`` or ``context, request``.  The method which is
 decorated must return a response (or rely on a :term:`renderer` to
@@ -846,17 +868,17 @@ could be spelled equivalently as the below:
        def amethod(self):
            return Response('hello')
 
-.. note:: The ability to use the ``bfg_view`` decorator as a method
-          decorator is new in :mod:`repoze.bfg` version 1.1.
-          Previously it could only be used as a class or function
-          decorator.
+.. note:: The ability to use the :class:`repoze.bfg.view.bfg_view`
+          decorator as a method decorator is new in :mod:`repoze.bfg`
+          version 1.1.  Previously it could only be used as a class or
+          function decorator.
 
 View Configuration Using the ``add_view`` Method of a Configurator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-See the ``add_view`` method of a :term:`Configurator` object within
-:ref:`configuration_module` for the arguments to configure a view
-imperatively.
+See the :meth:`repoze.bfg.configuration.Configurator.add_view` method
+within :ref:`configuration_module` for the arguments to configure a
+view imperatively.
 
 .. _view_lookup_ordering:
 
@@ -896,9 +918,10 @@ The value of the ``permission`` attribute represents the permission
 that must be possessed by the user to invoke any found view.  When a
 view is found that matches all predicates, but the invoking user does
 not possess the permission implied by any associated ``permission`` in
-the current context, processing stops, and an ``Forbidden`` error
-is raised, usually resulting in a "forbidden" view being shown to the
-invoking user.  No further view narrowing or view lookup is done.
+the current context, processing stops, and an
+:exc:`repoze.bfg.exception.Forbidden` error is raised, usually
+resulting in the :term:`forbidden view` being shown to the invoking
+user.  No further view narrowing or view lookup is done.
 
 .. note:: 
 
@@ -935,8 +958,8 @@ dispatch, you must create an interface and mark up your model classes
 or instances with interface declarations that refer to this interface.
 
 To attach an interface to a model *class*, you define the interface
-and use the ``zope.interface.implements`` function to associate the
-interface with the class.
+and use the :func:`zope.interface.implements` function to associate
+the interface with the class.
 
 .. code-block:: python
    :linenos:
@@ -951,9 +974,9 @@ interface with the class.
        implements(IHello)
 
 To attach an interface to a model *instance*, you define the interface
-and use the ``zope.interface.alsoProvides`` function to associate the
-interface with the instance.  This function mutates the instance in
-such a way that the interface is attached to it.
+and use the :func:`zope.interface.alsoProvides` function to associate
+the interface with the instance.  This function mutates the instance
+in such a way that the interface is attached to it.
 
 .. code-block:: python
    :linenos:
@@ -1076,7 +1099,7 @@ representing the JSON serialization of the return value:
    '{"content": "Hello!"}'
 
 The return value needn't be a dictionary, but the return value must
-contain values renderable by ``simplejson.dumps``.
+contain values renderable by :func:`simplejson.dumps`.
 
 You can configure a view to use the JSON renderer in ZCML by naming
 ``json`` as the ``renderer`` attribute of a view configuration, e.g.:
@@ -1111,7 +1134,7 @@ information about ZPT templates.
 If the ``renderer`` attribute of a view configuration is an absolute
 path, a source-file relative path, or a :term:`resource specification`
 which has a final path element with a filename extension of ``.txt``,
-the Chameleon text renderer is used.  See
+the :term:`Chameleon` text renderer is used.  See
 :ref:`chameleon_zpt_templates` for more information about Chameleon
 text templates.
 
@@ -1124,8 +1147,8 @@ must return a Response object or a Python *dictionary*.  If the view
 callable with an associated template returns a Python dictionary, the
 named template will be passed the dictionary as its keyword arguments,
 and the template renderer implementation will return the resulting
-rendered template in a response to the user.  If the view returns
-anything but a dictionary, an error will be raised.
+rendered template in a response to the user.  If the view callable
+returns anything but a dictionary, an error will be raised.
 
 Before passing keywords to the template, the keywords derived from the
 dictionary returned by the view are augmented.  The callable object
@@ -1176,8 +1199,9 @@ Varying Attributes of Rendered Responses
 ----------------------------------------
 
 Before a response that is constructed as the result of the use of a
-:term:`renderer` is returned to BFG, several attributes of the request
-are examined which have the potential to influence response behavior.
+:term:`renderer` is returned to :mod:`repoze.bfg`, several attributes
+of the request are examined which have the potential to influence
+response behavior.
 
 View callables that don't directly return a response should set these
 values on the ``request`` object via ``setattr`` within the view
@@ -1232,8 +1256,8 @@ For example, to add a renderer which renders views which have a
         name=".jinja2"
         factory="my.package.MyJinja2Renderer"/>
 
-   The ``factory`` attribute is a dotted Python name that must point
-   to an implementation of a :term:`renderer`.
+   The ``factory`` attribute is a :term:`dotted Python name` that must
+   point to an implementation of a :term:`renderer`.
 
    The ``name`` attribute is the renderer name.
 
@@ -1361,12 +1385,12 @@ tag):
 View Security
 -------------
 
-If a :term:`authentication policy` (and a :term:`authorization
-policy`) is active, any :term:`permission` attached to a ``view``
-declaration will be consulted to ensure that the currently
-authenticated user possesses that permission against the context
-before the view function is actually called.  Here's an example of
-specifying a permission in a ``view`` declaration:
+If a :term:`authorization policy` is active, any :term:`permission`
+attached to a :term:`view configuration` found during view lookup will
+be consulted to ensure that the currently authenticated user possesses
+that permission against the context before the view function is
+actually called.  Here's an example of specifying a permission in a
+view declaration in ZCML:
 
 .. code-block:: xml
    :linenos:
@@ -1382,7 +1406,7 @@ When an authentication policy is enabled, this view will be protected
 with the ``add`` permission.  The view will *not be called* if the
 user does not possess the ``add`` permission relative to the current
 :term:`context` and an authorization policy is enabled.  Instead the
-``forbidden`` view result will be returned to the client (see
+:term:`forbidden view` result will be returned to the client (see
 :ref:`changing_the_forbidden_view`).
 
 .. note::
@@ -1392,7 +1416,7 @@ user does not possess the ``add`` permission relative to the current
 
 .. note::
 
-   Packages such as :term:`repoze.who` are capable of intercepting an
+   Packages such as :term:`repoze.who` are capable of intercepting a
    ``Forbidden`` response and displaying a form that asks a user to
    authenticate.  Use this kind of package to ask the user for
    authentication credentials.
@@ -1412,22 +1436,27 @@ slightly different response.
        return HTTPFound(location='http://example.com')
 
 All exception types from the :mod:`webob.exc` module implement the
-Webob ``Response`` interface; any can be returned as the response from
-a view.  See :term:`WebOb` for the documentation for this module; it
-includes other response types for Unauthorized, etc.
+Webob :term:`Response` interface; any can be returned as the response
+from a view.  See :term:`WebOb` for the documentation for this module;
+it includes other response types for ``Unauthorized``, etc.
 
 .. _static_resources_section:
 
 Serving Static Resources Using a ZCML Directive
 -----------------------------------------------
 
-Using the ``static`` ZCML directive is the preferred way to serve
-static resources (such as JavaScript and CSS files) within a
-:mod:`repoze.bfg` application. This directive makes static files
-available at a name relative to the application root URL,
-e.g. ``/static``.
+Use of the ``static`` ZCML directive or the
+:meth:`repoze.bfg.configuration.configurator.add_static_view` method
+is the preferred way to serve static resources (such as JavaScript and
+CSS files) within a :mod:`repoze.bfg` application. These mechanisms
+makes static files available at a name relative to the application
+root URL, e.g. ``/static``.
 
-The directive can accept three attributes:
+Use of the imperative configuration method
+:meth:`repoze.bfg.configuration.configurator.add_static_view` is
+completely equivalent to using ZCML for the same purpose.
+
+The ZCML directive can accept three attributes:
 
 name
 
@@ -1450,9 +1479,9 @@ cache_max_age
   ``Cache-Control`` headers, when any static file is served from this
   directive.  This defaults to 3600 (5 minutes).
 
-Here's an example of a ``static`` directive that will serve files up
-``/static`` URL from the ``/var/www/static`` directory of the computer
-which runs the :mod:`repoze.bfg` application.
+Here's an example of a ``static`` ZCML directive that will serve files
+up ``/static`` URL from the ``/var/www/static`` directory of the
+computer which runs the :mod:`repoze.bfg` application.
 
 .. code-block:: xml
    :linenos:
@@ -1503,11 +1532,12 @@ these will be resolved by the static view as you would expect.
 Generating Static Resource URLs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a ``<static>`` directive is used to register a static resource
-directory, a special helper API named ``repoze.bfg.static_url`` can be
-used to generate the appropriate URL for a package resource that lives
-in one of the directories named by the ``<static>`` directive's
-``path`` attribute.
+When a ``<static>`` ZCML directive or a call to
+:meth:`repoze.bfg.configuration.configurator.add_static_view` is used
+to register a static resource directory, a special helper API named
+:func:`repoze.bfg.static_url` can be used to generate the appropriate
+URL for a package resource that lives in one of the directories named
+by the static registration ``path`` attribute.
 
 For example, let's assume you create a set of ``static`` declarations
 in ZCML like so:
@@ -1533,10 +1563,10 @@ visits a URL which begins with ``/static1``, and the resources in the
 begins with ``/static2``.
 
 You needn't generate the URLs to static resources "by hand" in such a
-configuration.  Instead, use the ``repoze.bfg.url.static_url`` API to
-generate them for you.  For example, let's imagine that the following
-code lives in a module that shares the same directory as the above
-ZCML file:
+configuration.  Instead, use the :func:`repoze.bfg.url.static_url` API
+to generate them for you.  For example, let's imagine that the
+following code lives in a module that shares the same directory as the
+above ZCML file:
 
 .. code-block:: python
    :linenos:
@@ -1556,15 +1586,13 @@ If the request "application URL" of the running system is
 ``http://example.com/static1/foo.css``.  The ``js_url`` generated
 above would be ``'http://example.com/static2/foo.js``.
 
-One benefit of using the ``static_url`` function rather than
-constructing static URLs "by hand" is that if you need to change the
-``name`` of a static URL declaration in ZCML, the generated URLs will
-continue to resolve properly after the rename.
+One benefit of using the :func:`repoze.bfg.url.static_url` function
+rather than constructing static URLs "by hand" is that if you need to
+change the ``name`` of a static URL declaration in ZCML, the generated
+URLs will continue to resolve properly after the rename.
 
-See :ref:`url_module` for detailed information about inputs and
-outputs of the ``static_url`` function.
-
-.. note:: The ``static_url`` API is new in :mod:`repoze.bfg` 1.1.
+.. note:: The :func:`repoze.bfg.url.static_url` API is new in
+   :mod:`repoze.bfg` 1.1.
 
 Serving Static Resources Using a View
 -------------------------------------
@@ -1574,7 +1602,7 @@ you register manually.  For example, you may want static resources to
 only be available when the ``context`` of the view is of a particular
 type, or when the request is of a particular type.
 
-The :mod:`repoze.bfg.view` ``static`` helper class is used to perform
+The :class:`repoze.bfg.view.static` helper class is used to perform
 this task. This class creates a callable that is capable acting as a
 :mod:`repoze.bfg` view which serves static resources from a directory.
 For instance, to serve files within a directory located on your
@@ -1589,17 +1617,21 @@ in your application root as below.
    from repoze.bfg.view import static
    static_view = static('/path/to/static/dir')
 
-.. note:: the argument to ``static`` can also be a relative pathname,
-   e.g. ``my/static`` (meaning relative to the Python package of the
-   module in which the view is being defined).  It can also be a
-   package-relative path (e.g. ``anotherpackage:some/subdirectory``)
-   or it can be a "here-relative" path (e.g. ``some/subdirectory``).
-   If the path is "here-relative", it is relative to the package of
-   the module in which the static view is defined.
+.. note:: the argument to :class:`repoze.bfg.view.static` can also be
+   a relative pathname, e.g. ``my/static`` (meaning relative to the
+   Python package of the module in which the view is being defined).
+   It can also be a :term:`resource specification`
+   (e.g. ``anotherpackage:some/subdirectory``) or it can be a
+   "here-relative" path (e.g. ``some/subdirectory``).  If the path is
+   "here-relative", it is relative to the package of the module in
+   which the static view is defined.
  
-Subsequently, wire this view up to be accessible as ``/static`` using
-ZCML in your application's ``configure.zcml`` against either the class
-or interface that represents your root object.
+Subsequently, you may wire this view up to be accessible as
+``/static`` using either the
+:mod:`repoze.bfg.configuration.Configurator.add_view` method or the
+``<view>`` ZCML directive in your application's ``configure.zcml``
+against either the class or interface that represents your root
+object.  For example (ZCML):
 
 .. code-block:: xml
    :linenos:
@@ -1637,16 +1669,16 @@ the :term:`WSGI` server which invoked the application.
 
 However, for convenience, two special exceptions exist which are
 always handled by :mod:`repoze.bfg` itself.  These are
-``repoze.bfg.exceptions.NotFound`` and
-``repoze.bfg.exceptions.Forbidden``.  Both is an exception classe
-which accept a single positional constructor argument: a message.
+:exc:`repoze.bfg.exceptions.NotFound` and
+:exc:`repoze.bfg.exceptions.Forbidden`.  Both is an exception class
+which accepts a single positional constructor argument: a ``message``.
 
-If ``repoze.bfg.exceptions.NotFound`` is raised within view code, the
-result of the :term:`Not Found View` will be returned to the user
+If :exc:`repoze.bfg.exceptions.NotFound` is raised within view code,
+the result of the :term:`Not Found View` will be returned to the user
 agent which performed the request.
 
-If ``repoze.bfg.exceptions.Forbidden`` is raised within view code, the
-result of the :term:`Forbidden View` will be returned to the user
+If :exc:`repoze.bfg.exceptions.Forbidden` is raised within view code,
+the result of the :term:`Forbidden View` will be returned to the user
 agent which performed the request.
 
 In all cases, the message provided to the exception constructor is
@@ -1745,15 +1777,15 @@ will throw an error when it can't decode some high-order character
 encoded in another character set within form data e.g. when
 ``request.params['somename']`` is accessed.
 
-If you are using the ``webob.Response`` class to generate a response,
-or if you use the ``render_template_*`` templating APIs, the UTF-8
-charset is set automatically as the default via the ``Content-Type``
-header.  If you return a ``Content-Type`` header without an explicit
-charset, a WebOb request will add a ``;charset=utf-8`` trailer to the
-``Content-Type`` header value for you for response content types that
-are textual (e.g. ``text/html``, ``application/xml``, etc) as it is
-rendered.  If you are using your own response object, you will need to
-ensure you do this yourself.
+If you are using the :class:`webob.Response` class to generate a
+response, or if you use the ``render_template_*`` templating APIs, the
+UTF-8 charset is set automatically as the default via the
+``Content-Type`` header.  If you return a ``Content-Type`` header
+without an explicit charset, a WebOb request will add a
+``;charset=utf-8`` trailer to the ``Content-Type`` header value for
+you for response content types that are textual (e.g. ``text/html``,
+``application/xml``, etc) as it is rendered.  If you are using your
+own response object, you will need to ensure you do this yourself.
 
 To avoid implicit form submission value decoding, so that the values
 returned from ``request.params``, ``request.GET`` and ``request.POST``
