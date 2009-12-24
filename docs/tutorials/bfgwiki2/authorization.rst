@@ -6,9 +6,9 @@ Adding Authorization
 
 Our application currently allows anyone with access to the server to
 view, edit, and add pages to our wiki.  For purposes of demonstration
-we'll change our application to allow people whom possess a specific
-username (`editor`) to add and edit wiki pages but we'll continue
-allowing anyone with access to the server to view pages.
+we'll change our application to allow only people whom possess a
+specific username (`editor`) to add and edit wiki pages but we'll
+continue allowing anyone with access to the server to view pages.
 :mod:`repoze.bfg` provides facilities for *authorization* and
 *authentication*.  We'll make use of both features to provide security
 to our application.
@@ -42,15 +42,16 @@ your ``models.py`` file:
 
 The ``RootFactory`` class we've just added will be used by
 :mod:`repoze.bfg` to construct a ``context`` object.  The context is
-attached to our request as the ``context`` attribute.
+attached to the request object passed to our view callables as the
+``context`` attribute.
 
 All of our context objects will possess an ``__acl__`` attribute that
-allows "Everyone" (a special principal) to view all pages, while
-allowing only a user named ``editor`` to edit and add pages.  The
-``__acl__`` attribute attached to a context is interpreted specially
-by :mod:`repoze.bfg` as an access control list during view execution.
-See :ref:`assigning_acls` for more information about what an
-:term:`ACL` represents.
+allows :data:`repoze.bfg.security.Everyone` (a special principal) to
+view all pages, while allowing only a user named ``editor`` to edit
+and add pages.  The ``__acl__`` attribute attached to a context is
+interpreted specially by :mod:`repoze.bfg` as an access control list
+during view callable execution.  See :ref:`assigning_acls` for more
+information about what an :term:`ACL` represents.
 
 .. note: Although we don't use the functionality here, the ``factory``
    used to create route contexts may differ per-route as opposed to
@@ -65,29 +66,31 @@ your application's ``run.py`` will look like this.
    :linenos:
    :language: python
 
-Configuring a ``repoze.bfg`` Authentication Policy
---------------------------------------------------
+Configuring a ``repoze.bfg`` Authorization Policy
+-------------------------------------------------
 
 For any :mod:`repoze.bfg` application to perform authorization, we
 need to add a ``security.py`` module and we'll need to change our
-:term:`application registry` to add an :term:`authentication policy`
-and an :term:`authorization policy`.
+``configure.zcml`` file to add an :term:`authentication policy` and an
+:term:`authorization policy`.
 
 Changing ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We'll change our ``configure.zcml`` file to enable an
-``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
-enable declarative security checking.  We'll also change
-``configure.zcml`` to add a ``forbidden`` stanza which points at our
-login view.  This configures our newly created login view to show up when
-:mod:`repoze.bfg` detects that a view invocation can not be authorized. 
-Also, we'll add ``view_permission`` attributes with the value ``edit`` to
-the ``edit_page`` and ``add_page`` routes.  This indicates that the views
-which these routes reference cannot be invoked without the
-authenticated user possessing the ``edit`` permission with respect to
-the current context.  When you're done, your ``configure.zcml`` will
-look like so
+:class:`repoze.bfg.authentication.AuthTktAuthenticationPolicy` and an
+:class:`repoze.bfg.authorization.ACLAuthorizationPolicy` to enable
+declarative security checking.  We'll also change ``configure.zcml``
+to add a ``forbidden`` stanza which points at our ``login``
+:term:`view callable`, also known as a :term:`forbidden view`.  This
+configures our newly created login view to show up when
+:mod:`repoze.bfg` detects that a view invocation can not be
+authorized.  Also, we'll add ``view_permission`` attributes with the
+value ``edit`` to the ``edit_page`` and ``add_page`` route
+declarations.  This indicates that the view callables which these
+routes reference cannot be invoked without the authenticated user
+possessing the ``edit`` permission with respect to the current
+context.  When you're done, your ``configure.zcml`` will look like so
 
 .. literalinclude:: src/authorization/tutorial/configure.zcml
    :linenos:
@@ -98,14 +101,14 @@ Adding ``security.py``
 
 Add a ``security.py`` module within your package (in the same
 directory as "run.py", "views.py", etc) with the following content:
-The groupfinder defined here is an authorization policy "callback"; it
-is a a callable that accepts a userid and a request.  If the userid
-exists in the system, the callback will return a sequence of group
-identifiers (or an empty sequence if the user isn't a member of any
-groups).  If the userid *does not* exist in the system, the callback
-will return ``None``.  We'll use "dummy" data to represent user and
-groups sources.  When we're done, your application's ``security.py``
-will look like this.
+The groupfinder defined here is an :term:`authentication policy`
+"callback"; it is a a callable that accepts a userid and a request.
+If the userid exists in the system, the callback will return a
+sequence of group identifiers (or an empty sequence if the user isn't
+a member of any groups).  If the userid *does not* exist in the
+system, the callback will return ``None``.  We'll use "dummy" data to
+represent user and groups sources.  When we're done, your
+application's ``security.py`` will look like this.
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
@@ -114,16 +117,17 @@ will look like this.
 Adding Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll add a ``login`` view which renders a login form and processes
-the post from the login form, checking credentials.
+We'll add a ``login`` view callable which renders a login form and
+processes the post from the login form, checking credentials.
 
-We'll also add a ``logout`` view to our application and provide a link
-to it.  This view will clear the credentials of the logged in user and
-redirect back to the front page.
+We'll also add a ``logout`` view callable to our application and
+provide a link to it.  This view will clear the credentials of the
+logged in user and redirect back to the front page.
 
 We'll add a different file (for presentation convenience) to add login
-and logout views.  Add a file named ``login.py`` to your application
-(in the same directory as ``views.py``) with the following content:
+and logout view callables.  Add a file named ``login.py`` to your
+application (in the same directory as ``views.py``) with the following
+content:
 
 .. literalinclude:: src/authorization/tutorial/login.py
    :linenos:
@@ -133,8 +137,8 @@ Changing Existing Views
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Then we need to change each of our ``view_page``, ``edit_page`` and
-``add_page`` views in ``views.py`` to pass a "logged in" parameter
-into its template.  We'll add something like this to each view body:
+``add_page`` views in ``views.py`` to pass a "logged in" parameter to
+its template.  We'll add something like this to each view body:
 
 .. code-block:: python
    :linenos:
@@ -180,8 +184,8 @@ class="main_content">`` div:
 Viewing the Application in a Browser
 ------------------------------------
 
-Once we've set up the WSGI pipeline properly, we can finally examine
-our application in a browser.  The views we'll try are as follows:
+We can finally examine our application in a browser.  The views we'll
+try are as follows:
 
 - Visiting `http://localhost:6543/ <http://localhost:6543/>`_ in a
   browser invokes the ``view_wiki`` view.  This always redirects to
