@@ -243,7 +243,9 @@ class as a response, no renderer will be employed.
    :linenos:
 
    from webob.exc import HTTPFound
-   return HTTPFound(location='http://example.com') # renderer avoided
+
+   def view(request):
+       return HTTPFound(location='http://example.com') # renderer avoided
 
 Additional renderers can be added to the system as necessary via a
 ZCML directive (see :ref:`adding_and_overriding_renderers`).
@@ -680,8 +682,8 @@ Or replaces the need to add this imperative configuration stanza:
 .. code-block:: python
    :linenos:
 
-    config.add_view(name='my_view', request_method='POST', for_=MyModel,
-                    permission='read')
+   config.add_view(name='my_view', request_method='POST', for_=MyModel,
+                   permission='read')
 
 All arguments to :class:`repoze.bfg.view.bfg_view` are optional.
 Every argument to :class:`repoze.bfg.view.bfg_view` matches the
@@ -815,12 +817,12 @@ separate view registration.  For example:
 .. code-block:: python
    :linenos:
 
-    from repoze.bfg.view import bfg_view
+   from repoze.bfg.view import bfg_view
 
-    @bfg_view(name='edit')
-    @bfg_view(name='change')
-    def edit(request):
-        pass
+   @bfg_view(name='edit')
+   @bfg_view(name='change')
+   def edit(request):
+       pass
 
 This registers the same view under two different names.
 
@@ -856,6 +858,7 @@ implied by the decorator being used against the ``amethod`` method
 could be spelled equivalently as the below:
 
 .. code-block:: python
+   :linenos:
 
    from webob import Response
    from repoze.bfg.view import bfg_view
