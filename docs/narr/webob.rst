@@ -278,12 +278,14 @@ Python 2.5.  To get an exception object use ``response.exception``.
 You can use this like:
 
 .. code-block:: python
+   :linenos:
 
-    try:
-        ... stuff ...
-        raise HTTPNotFound('No such resource').exception
-    except HTTPException, e:
-        return e(environ, start_response)
+   def aview(request):
+       try:
+           # ... stuff ...
+           raise HTTPNotFound('No such resource').exception
+       except HTTPException, e:
+           return e(environ, start_response)
 
 The exceptions are still WSGI applications, but you cannot set
 attributes like ``content_type``, ``charset``, etc. on these exception
