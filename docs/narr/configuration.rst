@@ -329,7 +329,7 @@ Beginning Configuration
 .. code-block:: python
    :linenos:
 
-       config.begin()
+   config.begin()
 
 The :meth:`repoze.bfg.configuration.Configurator.begin` method tells
 the the system that application configuration has begun.  In
@@ -347,8 +347,8 @@ Adding Configuration
 .. code-block:: python
    :linenos:
 
-       config.add_view(hello_world)
-       config.add_view(goodbye_world, name='goodbye')
+   config.add_view(hello_world)
+   config.add_view(goodbye_world, name='goodbye')
 
 Each of these lines calls the
 :meth:`repoze.bfg.configuration.Configurator.add_view` method.  The
@@ -448,7 +448,7 @@ Ending Configuration
 .. code-block:: python
    :linenos:
 
-       config.end()
+   config.end()
 
 The :meth:`repoze.bfg.configuration.Configurator.end` method tells the
 the system that application configuration has ended.  It is the
@@ -465,7 +465,7 @@ WSGI Application Creation
 .. code-block:: python
    :linenos:
 
-       app = config.make_wsgi_app()
+   app = config.make_wsgi_app()
 
 After configuring views and ending configuration, the script creates a
 WSGI *application* via the
@@ -496,7 +496,7 @@ WSGI Application Serving
 .. code-block:: python
    :linenos:
 
-       serve(app)
+   serve(app)
 
 Finally, we actually serve the application to requestors by starting
 up a WSGI server.  We happen to use the :func:`paste.httpserver.serve`
@@ -562,7 +562,7 @@ In a file named ``helloworld.py``:
    if __name__ == '__main__':
        config = Configurator()
        config.begin()
-       config.load_zcml('configure.zcml)
+       config.load_zcml('configure.zcml')
        config.end()
        app = config.make_wsgi_app()
        serve(app)
@@ -753,8 +753,8 @@ configurations imperatively, we saw this code:
 .. code-block:: python
    :linenos:
 
-       config.add_view(hello_world)
-       config.add_view(goodbye_world, name='goodbye')
+   config.add_view(hello_world)
+   config.add_view(goodbye_world, name='goodbye')
 
 Each ``<view>`` declaration tag encountered in a ZCML file effectively
 invokes the :meth:`repoze.bfg.configuration.Configurator.add_view`
