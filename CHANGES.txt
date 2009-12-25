@@ -8,6 +8,8 @@ Documentation
   ``repoze.bfg.configuration.Configurator.setup_registry`` method as
   an official API of a ``Configurator``.
 
+- Fix syntax errors in various documentation code blocks.
+
 1.2a8 (2009-12-24)
 ==================
 
