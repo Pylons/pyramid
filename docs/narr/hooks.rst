@@ -348,18 +348,18 @@ The API that must be implemented by a class that provides
 .. code-block:: python
   :linenos:
 
-   class IContextURL(Interface):
-       """ An adapter which deals with URLs related to a context.
-       """
-       def __init__(self, context, request):
-           """ Accept the context and request """
+  class IContextURL(Interface):
+      """ An adapter which deals with URLs related to a context.
+      """
+      def __init__(self, context, request):
+          """ Accept the context and request """
 
-       def virtual_root(self):
-           """ Return the virtual root object related to a request and the
-           current context"""
+      def virtual_root(self):
+          """ Return the virtual root object related to a request and the
+          current context"""
 
-       def __call__(self):
-           """ Return a URL that points to the context """
+      def __call__(self):
+          """ Return a URL that points to the context """
 
 The default context URL generator is available for perusal as the
 class :class:`repoze.bfg.traversal.TraversalContextURL` in the
