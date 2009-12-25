@@ -112,8 +112,8 @@ developer calls it like so:
 .. code-block:: python
    :linenos:
 
-    from repoze.bfg.security import authenticated_userid
-    userid = authenticated_userid(request)
+   from repoze.bfg.security import authenticated_userid
+   userid = authenticated_userid(request)
 
 He now has the current user id.
 
@@ -419,7 +419,7 @@ acommodate this by allowing people to define "custom" view predicates:
    def subpath(context, request):
        return request.subpath and request.subpath[0] == 'abc'
 
-   @bfg_view(custom_predicates=(subpath,)))
+   @bfg_view(custom_predicates=(subpath,))
    def aview(request):
        return Response('OK')
 
