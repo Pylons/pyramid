@@ -465,12 +465,12 @@ the same view callable:
 .. code-block:: python
    :linenos:
 
-    from repoze.bfg.view import bfg_view
+   from repoze.bfg.view import bfg_view
 
-    @bfg_view(name='edit')
-    @bfg_view(name='change')
-    def edit(context, request):
-        pass
+   @bfg_view(name='edit')
+   @bfg_view(name='change')
+   def edit(context, request):
+       pass
 
 This makes it possible to associate more than one view configuration
 with a single callable without requiring any ZCML.
@@ -488,17 +488,17 @@ used against a class method:
 .. code-block:: python
    :linenos:
 
-    from webob import Response
-    from repoze.bfg.view import bfg_view
+   from webob import Response
+   from repoze.bfg.view import bfg_view
 
-    class MyView(object):
-        def __init__(self, context, request):
-            self.context = context
-            self.request = request
+   class MyView(object):
+       def __init__(self, context, request):
+           self.context = context
+           self.request = request
 
-        @bfg_view(name='hello')
-        def amethod(self):
-            return Response('hello from %s!' % self.context)
+       @bfg_view(name='hello')
+       def amethod(self):
+           return Response('hello from %s!' % self.context)
 
 When the bfg_view decorator is used against a class method, a view is
 registered for the *class* (it's a "class view" where the "attr"
