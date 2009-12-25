@@ -91,39 +91,43 @@ system.
       APP_NAME = 'bfgapp.run:app'
       APP_ARGS = ({},)
 
-#.  Edit ``runner.py``
+#. Edit ``runner.py``
 
-    To prevent errors for ``import site``, add this code stanza before
-    ``import site`` in app/runner.py:
+   To prevent errors for ``import site``, add this code stanza before
+   ``import site`` in app/runner.py:
 
-    .. code-block:: python
-       :linenos:
+   .. code-block:: python
+      :linenos:
 
-       import sys
-       sys.path = [path for path in sys.path if 'site-packages' not in path]
-       import site
+      import sys
+      sys.path = [path for path in sys.path if 'site-packages' not in path]
+      import site
 
-    You will also need to comment out the line that starts with
-    ``assert sys.path`` in the file.
+   You will also need to comment out the line that starts with
+   ``assert sys.path`` in the file.
 
-    .. code-block:: python
-       :linenos:
+   .. code-block:: python
+      :linenos:
 
-       # comment the sys.path assertion out
-       # assert sys.path[:len(cur_sys_path)] == cur_sys_path, (
-       #   "addsitedir() caused entries to be prepended to sys.path")
+      # comment the sys.path assertion out
+      # assert sys.path[:len(cur_sys_path)] == cur_sys_path, (
+      #   "addsitedir() caused entries to be prepended to sys.path")
 
 #. Run the application.  ``dev_appserver.py`` is typically installed
    by the SDK in the global path but you need to be sure to run it
    with Python 2.5 (or whatever version of Python your GAE SDK
    expects).
 
-   .. code-block:: python
+   .. code-block:: bash
+      :linenos:
 
       $ cd ../..
       $ python2.5 /usr/local/bin/dev_appserver.py bfgapp/app/
 
-   Startup success looks something like this::
+   Startup success looks something like this:
+
+   .. code-block:: text
+      :linenos:
 
       [chrism@vitaminf bfg_gae]$ python2.5 /usr/local/bin/dev_appserver.py bfgapp/app/INFO     2009-05-03 22:23:13,887 appengine_rpc.py:157] Server: appengine.google.com
       INFO     2009-05-03 22:23:13,898 appcfg.py:320] Checking for updates to the SDK.
@@ -160,13 +164,15 @@ system.
 #. Edit the application's ID in ``app.yaml`` to match the application
    name you created during GAE account setup.
 
-   .. code-block:: python
+   .. code-block:: yaml
+      :linenos:
 
       application: mycoolbfgapp
 
 #. Upload the application
 
-   .. code-block:: python
+   .. code-block:: bash
+      :linenos:
 
       $ python2.5 /usr/local/bin/appcfg.py update bfgapp/app
 
@@ -174,7 +180,8 @@ system.
    when invoking this command.  If you do, however, it will look like
    so:
 
-   .. code-block:: python
+   .. code-block:: text
+      :linenos:
 
        HTTPError: HTTP Error 400: Bad Request
        Rolling back the update.
@@ -186,36 +193,39 @@ system.
    this by zipping libraries. You can use ``pip`` to create zipfiles
    from packages.  See :ref:`pip_zip` for more information about this.
 
-   A successful upload looks like so::
+   A successful upload looks like so:
 
-    [chrism@vitaminf bfgapp]$ python2.5 /usr/local/bin/appcfg.py update ../bfgapp/app/
-    Scanning files on local disk.
-    Scanned 500 files.
-    Scanned 1000 files.
-    Initiating update.
-    Cloning 761 application files.
-    Cloned 100 files.
-    Cloned 200 files.
-    Cloned 300 files.
-    Cloned 400 files.
-    Cloned 500 files.
-    Cloned 600 files.
-    Cloned 700 files.
-    Uploading 12 files.
-    Deploying new version.
-    Checking if new version is ready to serve.
-    Will check again in 1 seconds.
-    Checking if new version is ready to serve.
-    Will check again in 2 seconds.
-    Checking if new version is ready to serve.
-    Will check again in 4 seconds.
-    Checking if new version is ready to serve.
-    Will check again in 8 seconds.
-    Checking if new version is ready to serve.
-    Will check again in 16 seconds.
-    Checking if new version is ready to serve.
-    Closing update: new version is ready to start serving.
-    Uploading index definitions.
+   .. code-block:: text
+      :linenos:
+
+      [chrism@vitaminf bfgapp]$ python2.5 /usr/local/bin/appcfg.py update ../bfgapp/app/
+      Scanning files on local disk.
+      Scanned 500 files.
+      Scanned 1000 files.
+      Initiating update.
+      Cloning 761 application files.
+      Cloned 100 files.
+      Cloned 200 files.
+      Cloned 300 files.
+      Cloned 400 files.
+      Cloned 500 files.
+      Cloned 600 files.
+      Cloned 700 files.
+      Uploading 12 files.
+      Deploying new version.
+      Checking if new version is ready to serve.
+      Will check again in 1 seconds.
+      Checking if new version is ready to serve.
+      Will check again in 2 seconds.
+      Checking if new version is ready to serve.
+      Will check again in 4 seconds.
+      Checking if new version is ready to serve.
+      Will check again in 8 seconds.
+      Checking if new version is ready to serve.
+      Will check again in 16 seconds.
+      Checking if new version is ready to serve.
+      Closing update: new version is ready to start serving.
+      Uploading index definitions.
 
 #. Visit "<yourapp>.appspot.com" in a browser.
 
@@ -230,14 +240,16 @@ application's virtualenv.
 
 First, see which packages are available for zipping:
 
-.. code-block:: python
+.. code-block:: bash
+   :linenos:
 
   $ bin/pip zip -l
 
 This shows your zipped packages (by default, none) and your unzipped
 packages. You can zip a package like so:
 
-.. code-block:: python 
+.. code-block:: bash
+   :linenos:
 
   $ bin/pip zip pytz-2009g-py2.5.egg
 
