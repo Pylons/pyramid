@@ -97,8 +97,8 @@ interface (as opposed to its class).  To do so, use the
            self.author = author
            self.created = datetime.datetime.now()
 
-   entry = BlogEntry()
-   directlyProvides(IBlogEntry, entry)
+   entry = BlogEntry('title', 'body', 'author')
+   directlyProvides(entry, IBlogEntry)
 
 If a model object already has instance-level interface declarations
 that you don't want to disturb, use the
@@ -124,9 +124,9 @@ that you don't want to disturb, use the
            self.author = author
            self.created = datetime.datetime.now()
 
-   entry = BlogEntry()
-   directlyProvides(IBlogEntry1, entry)
-   alsoProvides(IBlogEntry2, entry)
+   entry = BlogEntry('title', 'body', 'author')
+   directlyProvides(entry, IBlogEntry1)
+   alsoProvides(entry, IBlogEntry2)
 
 See the :ref:`views_chapter` for more information about why providing
 models with an interface can be an interesting thing to do with regard

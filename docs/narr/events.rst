@@ -115,6 +115,7 @@ file:
 Or imperatively via the
 :meth:`repoze.bfg.configuration.Configurator.add_subscriber` method:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

@@ -45,6 +45,7 @@ The ``view_wiki`` view function
 
 The decorator above the ``view_wiki`` function will be:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -70,6 +71,7 @@ The ``view_page`` view function
 
 The decorator above the ``view_page`` function will be:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -96,6 +98,7 @@ The ``add_page`` view function
 
 The decorator above the ``add_page`` function will be:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -122,6 +125,7 @@ The ``edit_page`` view function
 
 The decorator above the ``edit_page`` function will be:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -194,7 +198,6 @@ On UNIX:
 On Windows:
 
 .. code-block:: bat
-
 
   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
 

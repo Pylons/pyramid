@@ -30,9 +30,10 @@ registry" is not particularly pretty or intuitive, and sometimes it's
 just plain obtuse.  Likewise, the conceptual load on a casual source
 code reader of code that uses the ZCA global API is somewhat high.
 Consider a ZCA neophyte reading the code that performs a typical
-"unnamed utility" lookup using the ``zope.component.getUtility``
+"unnamed utility" lookup using the :func:`zope.component.getUtility`
 global API:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -109,6 +110,7 @@ which returns the userid present in the current request or ``None`` if
 no userid is present in the current request.  The application
 developer calls it like so:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -695,8 +697,11 @@ associated "urlconf" such as ``r'^polls/(?P<poll_id>\d+)/$``:
 Zope, likewise allows you to add arbitrary keyword and positional
 arguments to any method of a model object found via traversal:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
+
+   from persistent import Persistent
 
    class MyZopeObject(Persistent):
         def aview(self, a, b, c=None):
@@ -1093,6 +1098,7 @@ instance:
 Some folks understandably don't want to think about the submodule
 organization, and would rather be able to do:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

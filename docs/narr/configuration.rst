@@ -326,6 +326,7 @@ this particular :mod:`repoze.bfg` application.
 Beginning Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -344,6 +345,7 @@ associated with the configurator to become "current".
 Adding Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -445,6 +447,7 @@ ends with ``/goodbye``.
 Ending Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -462,6 +465,7 @@ associated with the configurator.
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -493,6 +497,7 @@ when it visits the URL with the path info ``/goodbye``.
 WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -750,6 +755,7 @@ just spelling things differently, using XML instead of Python.
 In our previously defined application, in which we added view
 configurations imperatively, we saw this code:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

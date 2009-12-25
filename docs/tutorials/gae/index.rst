@@ -186,7 +186,7 @@ system.
        HTTPError: HTTP Error 400: Bad Request
        Rolling back the update.
        Error 400: --- begin server output ---
-       Max number of files and blobs is 1000.
+       Max number of files and blobs is 3000.
        --- end server output ---
 
    If you do experience this error, you will be able to get around
@@ -243,7 +243,7 @@ First, see which packages are available for zipping:
 .. code-block:: bash
    :linenos:
 
-  $ bin/pip zip -l
+   $ bin/pip zip -l
 
 This shows your zipped packages (by default, none) and your unzipped
 packages. You can zip a package like so:
@@ -251,7 +251,7 @@ packages. You can zip a package like so:
 .. code-block:: bash
    :linenos:
 
-  $ bin/pip zip pytz-2009g-py2.5.egg
+   $ bin/pip zip pytz-2009g-py2.5.egg
 
 Note that it requires the whole egg file name.  For a BFG app, the
 following packages are good candidates to be zipped.

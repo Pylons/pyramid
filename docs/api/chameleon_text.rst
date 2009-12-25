@@ -22,9 +22,10 @@ view file, use the ``as`` feature of the Python import statement,
 e.g.:
 
 .. code-block:: python
+   :linenos:
 
-  from repoze.chameleon_zpt import render_template as zpt_render
-  from repoze.chameleon_text import render_template as text_render
+   from repoze.bfg.chameleon_zpt import render_template as zpt_render
+   from repoze.bfg.chameleon_text import render_template as text_render
 
 
 

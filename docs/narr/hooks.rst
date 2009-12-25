@@ -348,6 +348,8 @@ The API that must be implemented by a class that provides
 .. code-block:: python
   :linenos:
 
+  from zope.interface import Interface
+
   class IContextURL(Interface):
       """ An adapter which deals with URLs related to a context.
       """

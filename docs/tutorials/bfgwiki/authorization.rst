@@ -80,15 +80,18 @@ Then we need to change each of our ``view_page``, ``edit_page`` and
 ``add_page`` views in ``views.py`` to pass a "logged in" parameter
 into its template.  We'll add something like this to each view body:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
+   from repoze.bfg.security import authenticated_userid
    logged_in = authenticated_userid(request)
 
 We'll then change the return value of each view that has an associated
 ``renderer`` to pass the `resulting `logged_in`` value to the
-template, e.g.:
+template.  For example:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

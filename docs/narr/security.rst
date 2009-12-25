@@ -31,11 +31,12 @@ application setup to specify an authentication policy.
 
 For example:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
    from repoze.bfg.configuration import Configurator
-   from repoze.bfg.authentication import AuthTktAutenticationPolicy
+   from repoze.bfg.authentication import AuthTktAuthenticationPolicy
    from repoze.bfg.authorization import ACLAuthorizationPolicy
    authentication_policy = AuthTktAuthenticationPolicy('seekrit')
    authorization_policy = ACLAuthorizationPolicy()
@@ -124,6 +125,7 @@ The equivalent view registration including the 'add' permission name
 may be performed via the ``bfg_view`` decorator within the "views"
 module of your project's package
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

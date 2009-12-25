@@ -349,6 +349,7 @@ then return that string as the body of a :term:`WebOb`
 <http://www.makotemplates.org/>`_ installed, here's an example of
 using Mako from within a :mod:`repoze.bfg` :term:`view`:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

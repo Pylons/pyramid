@@ -140,18 +140,21 @@ Then we need to change each of our ``view_page``, ``edit_page`` and
 ``add_page`` views in ``views.py`` to pass a "logged in" parameter to
 its template.  We'll add something like this to each view body:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
+   from repoze.bfg.security import authenticated_userid
    logged_in = authenticated_userid(request)
 
 We'll then change the return value of these views to pass the
 `resulting `logged_in`` value to the template, e.g.:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
-   return dict(page = page,
+   return dict(page = context,
                content = content,
                logged_in = logged_in,
                edit_url = edit_url)

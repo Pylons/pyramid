@@ -74,6 +74,7 @@ this is best represented as the scanner translating the arguments to
 :meth:`repoze.bfg.configuration.Configurator.add_view` method,
 effectively:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

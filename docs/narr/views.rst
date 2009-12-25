@@ -651,6 +651,7 @@ purpose.
 
 An example might reside in a bfg application module ``views.py``:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -659,9 +660,9 @@ An example might reside in a bfg application module ``views.py``:
    from repoze.bfg.chameleon_zpt import render_template_to_response
 
    @bfg_view(name='my_view', request_method='POST', for_=MyModel,
-             permission='read')
+             permission='read', renderer='templates/my.pt')
    def my_view(request):
-       return render_template_to_response('templates/my.pt')
+       return {'a':1}
 
 Using this decorator as above replaces the need to add this ZCML to
 your application registry:
@@ -675,10 +676,12 @@ your application registry:
     name="my_view"
     permission="read"
     request_method="POST"
+    renderer="templates/my.pt"
     />
 
 Or replaces the need to add this imperative configuration stanza:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -759,6 +762,7 @@ All arguments may be omitted.  For example:
    :linenos:
 
    from webob import Response
+   from repoze.bfg.view import bfg_view
 
    @bfg_view()
    def my_view(request):
@@ -1614,6 +1618,7 @@ filesystem at ``/path/to/static/dir`` mounted at the URL path
 :mod:`repoze.bfg.view` 's ``static`` class inside a ``static.py`` file
 in your application root as below.
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

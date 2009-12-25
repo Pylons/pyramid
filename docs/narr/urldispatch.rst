@@ -62,6 +62,7 @@ The :meth:`repoze.bfg.configuration.Configurator.add_route` method
 adds a single :term:`route configuration` to the :term:`application
 registry`.  Here's an example:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -638,6 +639,7 @@ based on route paths.  For example, if you've configured a route in
 ZCML with the ``name`` "foo" and the ``path`` ":a/:b/:c", you might do
 this.
 
+.. ignore-next-block
 .. code-block:: python
 
    from repoze.bfg.url import route_url
@@ -730,6 +732,7 @@ SQLAlchemy, and you'd like the current SQLAlchemy database session to
 be removed after each request.  Put the following in the
 ``mypackage.run`` module:
 
+.. ignore-next-block
 .. code-block:: python
 
     from mypackage.sql import DBSession

@@ -59,6 +59,7 @@ name` could be spelled via a ``@bfg_view`` decorator with a different
 ``for_`` parameter.  The view ultimately chosen would be based on the
 :term:`context` type based on the ``for_`` attribute like so:
 
+.. ignore-next-block
 .. code-block:: python
 
    from webob import Response
@@ -90,6 +91,7 @@ implies that the view will be called when the class or interface
 mentioned as ``containment`` is present with respect to any instance
 in the :term:`lineage` of the context:
 
+.. ignore-next-block
 .. code-block:: python
 
    from webob import Response
@@ -400,6 +402,7 @@ You can generate a URL to a resource which lives within the
 ``templates/static`` subdirectory using the ``static_url`` API like
 so:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 

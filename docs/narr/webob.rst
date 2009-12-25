@@ -263,6 +263,7 @@ the error.  For instance, ``webob.exc.HTTPNotFound``.  It subclasses
 ``Response``, so you can manipulate the instances in the same way.  A
 typical example is:
 
+.. ignore-next-block
 .. code-block:: python
 
     from webob.exc import HTTPNotFound

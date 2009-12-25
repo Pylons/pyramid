@@ -40,6 +40,7 @@ example, the application might address the resource named
 ``templates/some_template.pt`` using that API within a ``views.py``
 file inside a ``myapp`` package:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -150,6 +151,7 @@ An individual call to
 :meth:`repoze.bfg.configuration.Configurator.override_resource` can
 override a single resource.  For example:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -165,6 +167,7 @@ optional.  If they are not specified, the override attempts to resolve
 every lookup into a package from the directory of another package.
 For example:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -173,6 +176,7 @@ For example:
 
 Individual subdirectories within a package can also be overridden:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
@@ -203,6 +207,7 @@ construction file resides (or the ``package`` argument to the
 :class:`repoze.bfg.configuration.Configurator` class construction).
 For example:
 
+.. ignore-next-block
 .. code-block:: python
    :linenos:
 
