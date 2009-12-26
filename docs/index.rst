@@ -88,6 +88,16 @@ Per-module :mod:`repoze.bfg` API documentation.
    api/view
    api/wsgi
 
+ZCML Directives
+===============
+
+Documentation for each :mod:`repoze.bfg` :term:`ZCML directive`.
+
+.. toctree::
+   :maxdepth: 2
+
+   zcml
+
 Tutorials
 =========
 

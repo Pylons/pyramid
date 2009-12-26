@@ -227,7 +227,7 @@ templates and static files.  Any software which uses the
 :func:`pkg_resources.get_resource_string` APIs will obtain an
 overridden file when an override is used.
 
-.. _resource_directive:
+.. _resource_zcml_directive:
 
 The ``resource`` ZCML Directive
 -------------------------------
@@ -293,3 +293,4 @@ For example:
       override_with="another.package:templates/"
      />
 
+See also :ref:`resource_directive`.

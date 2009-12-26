@@ -323,9 +323,9 @@ class bfg_view(object):
     If ``accept`` is specified, it must be a mimetype value.  If
     ``accept`` is specified, the view will only be invoked if the
     ``Accept`` HTTP header matches the value requested.  See the
-    description of ``accept`` in :ref:`the_view_zcml_directive` for
-    information about the allowable composition and matching behavior
-    of this value.
+    description of ``accept`` in :ref:`view_directive` for information
+    about the allowable composition and matching behavior of this
+    value.
 
     If ``header`` is specified, it must be a header name or a
     ``headername:headervalue`` pair.  If ``header`` is specified, and
@@ -333,9 +333,9 @@ class bfg_view(object):
     matches the value requested.  If ``header`` is specified without a
     value (a bare header name only), the view will only be invoked if
     the HTTP header exists with any value in the request.  See the
-    description of ``header`` in :ref:`the_view_zcml_directive` for
-    information about the allowable composition and matching behavior
-    of this value.
+    description of ``header`` in :ref:`view_directive` for information
+    about the allowable composition and matching behavior of this
+    value.
 
     If ``path_info`` is specified, it must be a regular
     expression. The view will only be invoked if the ``PATH_INFO``
@@ -443,6 +443,9 @@ class bfg_view(object):
     into your application registry's ZCML::
     
       <scan package="."/>
+
+    See :ref:`scan_directive` for more information about the ZCML
+    ``scan`` directive.
 
     Or, if you don't use ZCML, use the
     :meth:`repoze.bfg.configuration.Configurator.scan` method::

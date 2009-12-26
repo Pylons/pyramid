@@ -521,6 +521,8 @@ a good deal of what's going on "under the hood" when we configure a
 :mod:`repoze.bfg` application imperatively.  However, another mode of
 configuration exists named *declarative* configuration.
 
+.. _helloworld_declarative:
+
 Hello World, Configured Declaratively
 -------------------------------------
 
@@ -663,19 +665,16 @@ The ``configure.zcml`` ZCML file contains this bit of XML:
    :linenos:
 
     <configure xmlns="http://namespaces.repoze.org/bfg">
-       ... body ...
+       <!-- other directives -->
     </configure>
 
 Because :term:`ZCML` is XML, and because XML requires a single root
 tag for each document, every ZCML file used by :mod:`repoze.bfg` must
-contain a ``<configure>`` container tag, which acts as the root XML
-tag.  Usually, the start tag of the ``<configure>`` container tag has
-a default namespace associated with it. In the file above, the
-``xmlns="http://namepaces.repoze.org/bfg"`` attribute of the
-``configure`` start tag names the default XML namespace, which is
-``http://namespaces.repoze.org/bfg``.  See
-:ref:`word_on_xml_namespaces` for more information about XML
-namespaces.
+contain a ``configure`` container directive, which acts as the root
+XML tag.  It is a "container" directive because its only job is to
+contain other directives.
+
+See also :ref:`configure_directive` and :ref:`word_on_xml_namespaces`.
 
 The ``<include>`` Tag
 ~~~~~~~~~~~~~~~~~~~~~
@@ -718,6 +717,8 @@ recognized, and the configuration system will generate a traceback.
 However, the ``<include package="repoze.bfg.includes"/>`` tag needs to
 exist only in a "top-level" ZCML file, it needn't also exist in ZCML
 files *included by* a top-level ZCML file.
+
+See also :ref:`include_directive`.
 
 The ``<view>`` Tag
 ~~~~~~~~~~~~~~~~~~
@@ -838,54 +839,6 @@ If you try to use this ZCML file as the source of ZCML for an
 application, a :data:`repoze.bfg.exceptions.ConfigurationError` will
 be raised when you attempt to start the application with information
 about which tags might have conflicted.
-
-.. _word_on_xml_namespaces:
-
-A Word On XML Namespaces
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Using the ``http://namespaces.repoze.org/bfg`` namespace as the
-default XML namespace isn't strictly necessary; you can use a
-different default namespace as the default.  However, if you do, the
-declaration tags which are defined by :mod:`repoze.bfg` such as the
-``<view>`` declaration tag will need to be defined in such a way that
-the XML parser that :mod:`repoze.bfg` uses knows which namespace the
-:mod:`repoze.bfg` tags are associated with.  For example, the
-following files are all completely equivalent:
-
-.. topic:: Use of A Non-Default XML Namespace
-
-  .. code-block:: xml
-     :linenos:
-
-      <configure xmlns="http://namespaces.zope.org/zope"
-                 xmlns:bfg="http://namespaces.repoze.org/bfg">
-
-        <include package="repoze.bfg.includes" />
-
-        <bfg:view
-           view="helloworld.hello_world"
-           />
-
-      </configure>
-
-.. topic:: Use of A Per-Tag XML Namespace Without A Default XML Namespace
-
-  .. code-block:: xml
-     :linenos:
-
-      <configure>
-
-        <include package="repoze.bfg.includes" />
-
-        <view xmlns="http://namespaces.repoze.org/bfg"
-           view="helloworld.hello_world"
-           />
-
-      </configure>
-
-For more information about XML namespaces, see `this older, but simple
-XML.com article <http://www.xml.com/pub/a/1999/01/namespaces.html>`_.
 
 Conclusions
 -----------

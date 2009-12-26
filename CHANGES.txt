@@ -10,6 +10,10 @@ Documentation
 
 - Fix syntax errors in various documentation code blocks.
 
+- Created new top-level documentation section: "ZCML Directives".
+  This section contains detailed ZCML directive information, some of
+  which was removed from various narrative chapters.
+
 1.2a8 (2009-12-24)
 ==================
 

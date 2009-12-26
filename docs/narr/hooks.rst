@@ -12,9 +12,10 @@ Changing the Not Found View
 ---------------------------
 
 When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
-notfound :term:`view`. The view it invokes can be customized through
-application configuration.  This view can be configured in via
-:term:`imperative configuration` or :term:`ZCML`.
+:term:`not found view`, which is a :term:`view callable`. The view it
+invokes can be customized through application configuration.  This
+view can be configured in via :term:`imperative configuration` or
+:term:`ZCML`.
 
 .. topic:: Using Imperative Configuration
 
@@ -48,43 +49,8 @@ application configuration.  This view can be configured in via
    Replace ``helloworld.views.notfound_view`` with the Python dotted name
    to the notfound view you want to use.
 
-   Other available attributes of the ``notfound`` ZCML directive are as
-   follows:
-
-   attr
-
-     The attribute of the view callable to use if ``__call__`` is not
-     correct (has the same meaning as in the context of
-     :ref:`the_view_zcml_directive`; see the description of ``attr``
-     there).
-
-     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-   renderer
-
-     This is either a single string term (e.g. ``json``) or a string
-     implying a path or :term:`resource specification`
-     (e.g. ``templates/views.pt``) used when the view returns a
-     non-:term:`response` object.  This attribute has the same meaning as
-     it would in the context of :ref:`the_view_zcml_directive`; see the
-     description of ``renderer`` there).
-
-     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-   wrapper
-
-     The :term:`view name` (*not* an object dotted name) of another view
-     declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
-     which will receive the response body of this view as the
-     ``request.wrapped_body`` attribute of its own request, and the
-     response returned by this view as the ``request.wrapped_response``
-     attribute of its own request.  This attribute has the same meaning
-     as it would in the context of :ref:`the_view_zcml_directive`; see
-     the description of ``wrapper`` there).  Note that the wrapper view
-     *should not* be protected by any permission; behavior is undefined
-     if it does.
-
-     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+   Other attributes of the ``notfound`` directive are documented at
+   :ref:`notfound_directive`.
 
 Here's some sample code that implements a minimal NotFound view:
 
@@ -110,10 +76,10 @@ Changing the Forbidden View
 ---------------------------
 
 When :mod:`repoze.bfg` can't authorize execution of a view based on
-the authorization policy in use, it invokes a "forbidden view".  The
-default forbidden response has a 401 status code and is very plain,
-but it can be overridden as necessary using either :term:`imperative
-configuration` or :term:`ZCML`:
+the :term:`authorization policy` in use, it invokes a :term:`forbidden
+view`.  The default forbidden response has a 401 status code and is
+very plain, but it can be overridden as necessary using either
+:term:`imperative configuration` or :term:`ZCML`:
 
 .. topic:: Using Imperative Configuration
 
@@ -148,43 +114,8 @@ configuration` or :term:`ZCML`:
    Replace ``helloworld.views.forbidden_view`` with the Python
    dotted name to the forbidden view you want to use.
 
-   Other available attributes of the ``forbidden`` ZCML directive are as
-   follows:
-
-   attr
-
-     The attribute of the view callable to use if ``__call__`` is not
-     correct (has the same meaning as in the context of
-     :ref:`the_view_zcml_directive`; see the description of ``attr``
-     there).
-
-     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-   renderer
-
-     This is either a single string term (e.g. ``json``) or a string
-     implying a path or :term:`resource specification`
-     (e.g. ``templates/views.pt``) used when the view returns a
-     non-:term:`response` object.  This attribute has the same meaning as
-     it would in the context of :ref:`the_view_zcml_directive`; see the
-     description of ``renderer`` there).
-
-     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
-   wrapper
-
-     The :term:`view name` (*not* an object dotted name) of another view
-     declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
-     which will receive the response body of this view as the
-     ``request.wrapped_body`` attribute of its own request, and the
-     response returned by this view as the ``request.wrapped_response``
-     attribute of its own request.  This attribute has the same meaning
-     as it would in the context of :ref:`the_view_zcml_directive`; see
-     the description of ``wrapper`` there).  Note that the wrapper view
-     *should not* be protected by any permission; behavior is undefined
-     if it does.
-
-     .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+   Other attributes of the ``forbidden`` directive are documented at
+   :ref:`forbidden_directive`.
 
 Like any other view, the forbidden view must accept at least a
 ``request`` parameter, or both ``context`` and ``request``.  The

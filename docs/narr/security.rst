@@ -473,55 +473,8 @@ An example of its usage, with all attributes fully expanded:
     max_age="31536000"
     />
 
-The ``secret`` is a string that will be used to encrypt the data
-stored by the cookie.  It is required and has no default.
-
-The ``callback`` is a Python dotted name to a function passed the
-string representing the userid stored in the cookie and the request as
-positional arguments.  The callback is expected to return None if the
-user represented by the string doesn't exist or a sequence of group
-identifiers (possibly empty) if the user does exist.  If ``callback``
-is None, the userid will be assumed to exist with no groups.  It
-defaults to ``None``.
-
-The ``cookie_name`` is the name used for the cookie that contains the
-user information.  It defaults to ``repoze.bfg.auth_tkt``.
-
-``secure`` is a boolean value.  If it's set to "true", the cookie will
-only be sent back by the browser over a secure (HTTPS) connection.
-It defaults to "false".
-
-``include_ip`` is a boolean value.  If it's set to true, the
-requesting IP address is made part of the authentication data in the
-cookie; if the IP encoded in the cookie differs from the IP of the
-requesting user agent, the cookie is considered invalid.  It defaults
-to "false".
-
-``timeout`` is an integer value.  It represents the maximum age in
-seconds which the auth_tkt ticket will be considered valid.  If
-``timeout`` is specified, and ``reissue_time`` is also specified,
-``reissue_time`` must be a smaller value than ``timeout``.  It
-defaults to ``None``, meaning that the ticket will be considered valid
-forever.
-
-``reissue_time`` is an integer value.  If ``reissue_time`` is
-specified, when we encounter a cookie that is older than the reissue
-time (in seconds), but younger that the ``timeout``, a new cookie will
-be issued.  It defaults to ``None``, meaning that authentication
-cookies are never reissued.  A value of ``0`` means reissue a cookie
-in the response to every request that requires authentication.
-
-``max_age`` is the maximum age of the auth_tkt *cookie*, in seconds.
-This differs from ``timeout`` inasmuch as ``timeout`` represents the
-lifetime of the ticket contained in the cookie, while this value
-represents the lifetime of the cookie itself.  When this value is set,
-the cookie's ``Max-Age`` and ``Expires`` settings will be set,
-allowing the auth_tkt cookie to last between browser sessions.  It is
-typically nonsensical to set this to a value that is lower than
-``timeout`` or ``reissue_time``, although it is not explicitly
-prevented.  It defaults to ``None``, meaning (on all major browser
-platforms) that auth_tkt cookies will last for the lifetime of the
-user's browser session.
+See :ref:`authtktauthenticationpolicy_directive` for details about
+this directive.
 
 ``remoteuserauthenticationpolicy``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -540,16 +493,8 @@ An example of its usage, with all attributes fully expanded:
     callback=".somemodule.somefunc"
     />
 
-The ``environ_key`` is the name that will be used to obtain the remote
-user value from the WSGI environment.  It defaults to ``REMOTE_USER``.
-
-The ``callback`` is a Python dotted name to a function passed the
-string representing the remote user and the request as positional
-arguments.  The callback is expected to return None if the user
-represented by the string doesn't exist or a sequence of group
-identifiers (possibly empty) if the user does exist.  If ``callback``
-is None, the userid will be assumed to exist with no groups.  It
-defaults to ``None``.
+See :ref:`remoteuserauthenticationpolicy_directive` for detailed
+information.
 
 ``repozewho1authenticationpolicy``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -568,18 +513,8 @@ An example of its usage, with all attributes fully expanded:
     callback=".somemodule.somefunc"
     />
 
-The ``identifier_name`` controls the name used to look up the
-:term:`repoze.who` "identifier" plugin within
-``request.environ['repoze.who.plugins']`` which is used by this policy to
-"remember" and "forget" credentials.  It defaults to ``auth_tkt``.
-
-The ``callback`` is a Python dotted name to a function passed the
-repoze.who identity and the request as positional arguments.  The
-callback is expected to return None if the user represented by the
-identity doesn't exist or a sequence of group identifiers (possibly
-empty) if the user does exist.  If ``callback`` is None, the userid
-will be assumed to exist with no groups.   It defaults to ``None``.
-
+See :ref:`repozewho1authenticationpolicy_directive` for detailed
+information.
 
 .. _authorization_policies_directives_section:
 
@@ -600,6 +535,8 @@ An example of its usage, with all attributes fully expanded:
 
 In other words, it has no configuration attributes; its existence in a
 ``configure.zcml`` file enables it.
+
+See :ref:`aclauthorizationpolicy_directive` for detailed information.
 
 .. _creating_an_authentication_policy:
 

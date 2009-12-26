@@ -490,6 +490,9 @@ Glossary
     The configuration mode in which you use Python to call methods on
     a :term:`Configurator` in order to add each :term:`configuration
     declaration` required by your application.
+  Declarative Configuration
+    The configuration mode in which you use :term:`ZCML` to make
+    a set of :term:`configuration declaration` statements.
   Not Found View
      The :term:`view callable` invoked by :mod:`repoze.bfg` when the
      developer explicitly raises a

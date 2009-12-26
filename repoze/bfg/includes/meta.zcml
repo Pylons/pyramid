@@ -47,6 +47,12 @@
         />
 
     <meta:directive
+        name="renderer"
+        schema="repoze.bfg.zcml.IRendererDirective"
+        handler="repoze.bfg.zcml.renderer"
+        />
+
+    <meta:directive
         name="repozewho1authenticationpolicy"
         schema="repoze.bfg.zcml.IRepozeWho1AuthenticationPolicyDirective"
         handler="repoze.bfg.zcml.repozewho1authenticationpolicy"
@@ -68,12 +74,6 @@
         name="aclauthorizationpolicy"
         schema="repoze.bfg.zcml.IACLAuthorizationPolicyDirective"
         handler="repoze.bfg.zcml.aclauthorizationpolicy"
-        />
-
-    <meta:directive
-        name="renderer"
-        schema="repoze.bfg.zcml.IRendererDirective"
-        handler="repoze.bfg.zcml.renderer"
         />
 
     <meta:directive

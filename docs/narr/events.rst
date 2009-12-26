@@ -65,14 +65,6 @@ registry` by either of the following methods:
          handler=".subscribers.mysubscriber"
        />
 
-   The *subscriber* :term:`ZCML directive` takes two attributes:
-   ``for``, and ``handler``.  The value of ``for`` is the interface
-   the subscriber is registered for.  Registering a subscriber for a
-   specific interface limits the event types that the subscriber will
-   receive to those specified by the interface. The value of
-   ``handler`` is a Python dotted-name path to the subscriber
-   function.
-
 Each of the above examples implies that every time the
 :mod:`repoze.bfg` framework emits an event object that supplies an
 :class:`repoze.bfg.interfaces.INewRequest` interface, the
@@ -112,7 +104,9 @@ file:
       handler=".subscribers.handle_new_response"
     />
 
-Or imperatively via the
+See also :ref:`subscriber_directive`.
+
+Subscribers may also be configured imperatively via the
 :meth:`repoze.bfg.configuration.Configurator.add_subscriber` method:
 
 .. ignore-next-block
