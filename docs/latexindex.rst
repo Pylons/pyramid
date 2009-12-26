@@ -1,8 +1,8 @@
 .. _index:
 
-@@@@@@@@@@
-repoze.bfg
-@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+The :mod:`repoze.bfg` Web Framework
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 :mod:`repoze.bfg` is a Python web application framework.  It is
 inspired by :term:`Zope`, :term:`Pylons`, and :term:`Django`.  It uses

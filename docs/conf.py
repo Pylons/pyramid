@@ -166,9 +166,9 @@ latex_font_size = '10pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('latexindex', 'repozebfg.tex', 'repoze.bfg Documentation', 'Chris McDonough',
-   'manual'),
-]
+  ('latexindex', 'repoze.bfg.tex', 'The repoze.bfg Web Framework',
+   'Chris McDonough', 'manual'),
+    ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
