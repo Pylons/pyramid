@@ -76,7 +76,6 @@ effectively:
 
 .. ignore-next-block
 .. code-block:: python
-   :linenos:
 
    config.add_view(hello, name='hello', request_method='GET')
 

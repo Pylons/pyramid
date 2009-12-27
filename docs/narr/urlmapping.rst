@@ -38,10 +38,12 @@ item "below" ``members`` in the URL represents a member in the system.
 You just match everything "below" ``members`` to a particular view.
 
 For example, you might configure a :term:`route` to match against the
-following URL patterns::
+following URL patterns:
 
-  archives/:year/:month/:day
-  members/:membername
+.. code-block:: text
+
+   archives/:year/:month/:day
+   members/:membername
 
 In this configuration, there are exactly two types of URLs that will
 match views in your application: ones that start with ``/archives``
@@ -50,10 +52,12 @@ day.  And ones that start with ``/members`` which are followed by a
 path segment containing a member's name.  This is very simple.
 
 :term:`URL dispatch` is not very good, however, at inferring the
-difference between sets of URLs such as::
+difference between sets of URLs such as:
 
-       http://example.com/members/Chris/document
-       http://example.com/members/Chris/stuff/page
+.. code-block:: text
+
+   http://example.com/members/Chris/document
+   http://example.com/members/Chris/stuff/page
 
 ...wherein you'd like the ``document`` in the first URL to represent a
 PDF document, and ``/stuff/page`` in the second to represent an

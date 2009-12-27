@@ -8,20 +8,20 @@ by Chris McDonough
 Copyright ©2008-2010, Agendaless Consulting.
 
 All rights reserved.  This material may be copied or distributed only
-subject to the terms and conditions set forth in the Creative Commons
+subject to the terms and conditions set forth in the `Creative Commons
 Attribution-Noncommercial-No Derivative Works 3.0 United States
-License as described by
-http://creativecommons.org/licenses/by-nc-nd/3.0/us/ .  You must give
-the original author credit.  You may not use this work for commercial
-purposes.  You may not alter, transform, or build upon this work. 
+License <http://creativecommons.org/licenses/by-nc-nd/3.0/us/>`_.  You
+must give the original author credit.  You may not use this work for
+commercial purposes.  You may not alter, transform, or build upon this
+work.
 
 .. note::
 
-   While the :mod:`repoze.bfg` *documentation* is offered under the
-   Creative Commons Attribution-Nonconmmercial-No Derivate Works 3.0
+   While the :mod:`repoze.bfg` documentation is offered under the
+   Creative Commons Attribution-Nonconmmercial-No Derivative Works 3.0
    United States License, the :mod:`repoze.bfg` *software* is offered
-   under the less restrictive (BSD-like) license described at
-   http://repoze.org/license.html .
+   under a `less restrictive (BSD-like) license
+   <http://repoze.org/license.html>`_ .
 
 **Trademarks**
 
@@ -43,7 +43,7 @@ with respect to the use of the information contained herein.
 **Contacting The Publisher**
 
 Please send documentation licensing inquiries and other business
-communications to ``webmaster@agendaless.com``.  Please send software
-and other technical queries to the ``repoze-dev`` mailing list
-described at http://lists.repoze.org/listinfo/repoze-dev .
-
+communications to `Agendaless Consulting
+<mailto:webmaster@agendaless.com>`_.  Please send software and other
+technical queries to the `repoze-dev maillist
+<http://lists.repoze.org/listinfo/repoze-dev>`_.

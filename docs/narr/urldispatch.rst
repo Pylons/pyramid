@@ -62,13 +62,8 @@ registry`.  Here's an example:
 
 .. ignore-next-block
 .. code-block:: python
-   :linenos:
 
    config.add_route('myroute', '/prefix/:one/:two')
-
-See the :meth:`repoze.bfg.configuration.Configurator.add_route` API
-documentation for more information and options for adding a route
-imperatively.
 
 Configuring a Route via ZCML
 ----------------------------
@@ -109,13 +104,17 @@ The path pattern syntax is simple.
 
 The path may start with a slash character.  If the path does not start
 with a slash character, an implicit slash will be prepended to it at
-matching time.  For example, the following paths are equivalent::
+matching time.  For example, the following paths are equivalent:
 
-    :foo/bar/baz
+.. code-block:: text
 
-and::
+   :foo/bar/baz
 
-     /:foo/bar/baz
+and:
+
+.. code-block:: text
+
+   /:foo/bar/baz
 
 A path segment (an individual item between ``/`` characters in the
 path) may either be a literal string (e.g. ``foo``) *or* it may
@@ -123,17 +122,23 @@ segment replacement marker (e.g. ``:foo``).  A segment replacement
 marker is in the format ``:name``, where this means "accept any
 characters up to the next slash and use this as the ``name`` matchdict
 value."  For example, the following pattern defines one literal
-segment ("foo") and two dynamic segments ("baz", and "bar")::
+segment ("foo") and two dynamic segments ("baz", and "bar"):
 
-    foo/:baz/:bar
+.. code-block:: text
+
+   foo/:baz/:bar
 
 The above pattern will match these URLs, generating the following
-matchdicts::
+matchdicts:
+
+.. code-block:: text
 
    foo/1/2        -> {'baz':u'1', 'bar':u'2'}
    foo/abc/def    -> {'baz':u'abc', 'bar':u'2'}
 
-It will not match the following patterns however::
+It will not match the following patterns however:
+
+.. code-block:: text
 
    foo/1/2/        -> No match (trailing slash)
    bar/abc/def     -> First segment literal mismatch
@@ -141,28 +146,38 @@ It will not match the following patterns however::
 Note that values representing path segments matched with a
 ``:segment`` match will be url-unquoted and decoded from UTF-8 into
 Unicode within the matchdict.  So for instance, the following
-pattern::
+pattern:
 
-    foo/:bar
+.. code-block:: text
 
-When matching the following URL::
+   foo/:bar
 
-    foo/La%20Pe%C3%B1a
+When matching the following URL:
+
+.. code-block:: text
+
+   foo/La%20Pe%C3%B1a
 
 The matchdict will look like so (the value is URL-decoded / UTF-8
-decoded)::
+decoded):
 
-  {'bar':u'La Pe\xf1a'}
+.. code-block:: text
+
+   {'bar':u'La Pe\xf1a'}
 
 If the pattern has a ``*`` in it, the name which follows it is
 considered a "remainder match".  A remainder match *must* come at the
 end of the path pattern.  Unlike segment replacement markers, it does
-not need to be preceded by a slash.  For example::
+not need to be preceded by a slash.  For example:
 
-    foo/:baz/:bar*traverse
+.. code-block:: text
+
+   foo/:baz/:bar*traverse
 
 The above pattern will match these URLs, generating the following
-matchdicts::
+matchdicts:
+
+.. code-block:: text
 
    foo/1/2/               -> {'baz':1, 'bar':2, 'traverse':()}
    foo/abc/def/a/b/c      -> {'baz':abc, 'bar':2, 'traverse':('a', 'b', 'c')}
@@ -171,17 +186,23 @@ Note that when a ``*stararg`` remainder match is matched, the value
 put into the matchdict is turned into a tuple of path segments
 representing the remainder of the path.  These path segments are
 url-unquoted and decoded from UTF-8 into Unicode.  For example, for
-the following pattern::
+the following pattern:
 
-    foo/*traverse
+.. code-block:: text
 
-When matching the following path::
+   foo/*traverse
 
-    /foo/La%20Pe%C3%B1a/a/b/c
+When matching the following path:
 
-Will generate the following matchdict::
+.. code-block:: text
 
-  {'traverse':(u'La Pe\xf1a', u'a', u'b', u'c')}
+   /foo/La%20Pe%C3%B1a/a/b/c
+
+Will generate the following matchdict:
+
+.. code-block:: text
+
+   {'traverse':(u'La Pe\xf1a', u'a', u'b', u'c')}
 
 ``<route>`` Statement Examples
 ------------------------------
@@ -283,8 +304,7 @@ might add to your ``configure.zcml``:
 The above configuration will allow :mod:`repoze.bfg` to service URLs
 in these forms:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    /ideas/<ideaname>
    /users/<username>
@@ -436,6 +456,7 @@ this.
 
 .. ignore-next-block
 .. code-block:: python
+   :linenos:
 
    from repoze.bfg.url import route_url
    url = route_url('foo', request, a='1', b='2', c='3')
@@ -529,6 +550,7 @@ be removed after each request.  Put the following in the
 
 .. ignore-next-block
 .. code-block:: python
+   :linenos:
 
     from mypackage.sql import DBSession
 

@@ -117,7 +117,8 @@ Preparation, Windows
 
    .. code-block:: bat
 
-     c:\bigfntut> Scripts\easy_install -i http://dist.repoze.org/bfgsite/simple docutils repoze.tm repoze.zodbconn repoze.who nose coverage
+     c:\bigfntut> Scripts\easy_install -i http://dist.repoze.org/bfgsite/simple \
+              docutils repoze.tm repoze.zodbconn repoze.who nose coverage
 
 .. _making_a_project:
 
@@ -228,7 +229,8 @@ On Windows:
 
 .. code-block:: bat
 
-  c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial --cover-erase --with-coverage
+  c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+       --cover-erase --with-coverage
 
 Looks like the code in the ``bfg_zodb`` template for ZODB projects is
 missing some test coverage, particularly in the file named

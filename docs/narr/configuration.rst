@@ -766,9 +766,9 @@ configuration` it creates.
 
 Since the relative ordering of calls to
 :meth:`repoze.bfg.configuration.Configurator.add_view` doesn't matter
-(see the sidebar above entitled *View Dispatch and Ordering*), the
-relative order of ``<view>`` tags in ZCML doesn't matter either.  The
-following ZCML orderings are completely equivalent:
+(see the sidebar entitled *View Dispatch and Ordering*), the relative
+order of ``<view>`` tags in ZCML doesn't matter either.  The following
+ZCML orderings are completely equivalent:
 
 .. topic:: Hello Before Goodbye
 

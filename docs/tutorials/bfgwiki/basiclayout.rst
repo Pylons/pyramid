@@ -109,7 +109,7 @@ function within the file named ``run.py``:
    dictionary passed to our ``app`` function.  This will be a URI
    (something like ``file:///path/to/Data.fs``).
 
-#. Line *14*. We create a "finder" object using the
+#. *Line 14*. We create a "finder" object using the
    :class:`repoze.zodbconn.finder.PersistentApplicationFinder` helper
    class, passing it the ZODB URI and the "appmaker" we've imported
    from ``models.py``.
@@ -117,18 +117,18 @@ function within the file named ``run.py``:
 #. *Lines 15 - 16*.  We create a :term:`root factory` which uses the
    finder to return a ZODB root object.
 
-#. Line *17*.  We construct a :term:`Configurator` with a :term:`root
+#. *Line 17*.  We construct a :term:`Configurator` with a :term:`root
    factory` and the settings keywords parsed by PasteDeploy.  The root
    factory is named ``get_root``.
 
-# *Lines 18-20*.  Begin configuration using the
+#. *Lines 18-20*.  Begin configuration using the
    :meth:`repoze.bfg.configuration.Configurator.begin` method, load
    the ``configure.zcml`` file from our package using the
    :meth:`repoze.bfg.configuration.Configurator.load_zcml` method, and
    end configuration using the
    :meth:`repoze.bfg.configuration.Configurator.end` method.
 
-# *Line 21*.  Use the
+#. *Line 21*.  Use the
    :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
 

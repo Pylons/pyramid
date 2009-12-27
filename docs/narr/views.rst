@@ -125,7 +125,10 @@ request
 The following types work as views in this style:
 
 #. Functions that accept two arguments: ``context``, and ``request``,
-   e.g.::
+   e.g.:
+
+   .. code-block:: python
+      :linenos:
 
       from webob import Response
 
@@ -133,7 +136,10 @@ The following types work as views in this style:
           return Response('OK')
 
 #. New-style and old-style classes that have an ``__init__`` method
-   that accepts ``context, request``, e.g.::
+   that accepts ``context, request``, e.g.:
+
+   .. code-block:: python
+      :linenos:
 
       from webob import Response
 
@@ -142,7 +148,10 @@ The following types work as views in this style:
               return Response('OK')
 
 #. Arbitrary callables that have a ``__call__`` method that accepts
-   ``context, request``, e.g.::
+   ``context, request``, e.g.:
+
+   .. code-block:: python
+      :linenos:
 
       from webob import Response
 
@@ -358,7 +367,6 @@ the following:
   your application's ``configure.zcml``:
 
   .. code-block:: xml
-     :linenos:
 
       <scan package="."/>
 
@@ -366,7 +374,6 @@ the following:
   :meth:`repoze.bfg.configuration.Configurator.scan` method:
 
   .. code-block:: python
-     :linenos:
 
       config.scan()
 
@@ -436,7 +443,6 @@ Or replaces the need to add this imperative configuration stanza:
 
 .. ignore-next-block
 .. code-block:: python
-   :linenos:
 
    config.add_view(name='my_view', request_method='POST', for_=MyModel,
                    permission='read')
@@ -1461,6 +1467,7 @@ a browser client, and its ``action`` points at some :mod:`repoze.bfg`
 view code:
 
 .. code-block:: xml
+   :linenos:
 
    <html xmlns="http://www.w3.org/1999/xhtml">
      <head>
@@ -1483,6 +1490,7 @@ expect that the values returned by ``request.params`` will be of type
 accept a form post from the above form:
 
 .. code-block:: python
+   :linenos:
 
    def myview(request):
        firstname = request.params['firstname']
@@ -1493,6 +1501,7 @@ decode already-decoded (``unicode``) values obtained from
 ``request.params``:
 
 .. code-block:: python
+   :linenos:
 
    def myview(request):
        # the .decode('utf-8') will break below if there are any high-order

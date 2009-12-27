@@ -6,7 +6,7 @@ Startup
 When you cause :mod:`repoze.bfg` to start up in a console window,
 you'll see something much like this show up on the console:
 
-.. code-block:: bash
+.. code-block:: text
 
   $ paster serve myproject/MyProject.ini
   Starting server in PID 16601.

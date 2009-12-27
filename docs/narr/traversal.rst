@@ -82,8 +82,7 @@ This inexperienced user's attempt to execute ``cat`` against the file
 named ``/fiz/buz/myfile`` might be to issue the following set of UNIX
 commands:
 
-.. code-block::  bash
-   :linenos:
+.. code-block::  text
 
    cd /
    cd fiz
@@ -94,8 +93,7 @@ The user now know he has found a *file*, because the ``cd`` command
 issues an error when he executed ``cd myfile``.  Now he knows that he
 can run the ``cat`` command:
 
-.. code-block::  bash
-   :linenos:
+.. code-block::  text
 
    cat myfile
 

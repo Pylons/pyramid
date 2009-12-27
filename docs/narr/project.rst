@@ -29,8 +29,7 @@ To start a :mod:`repoze.bfg` :term:`project`, use the ``paster
 create`` facility using the interpreter from the virtualenv
 (``bfgenv``) directory you created in :ref:`installing_chapter`.
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ bin/paster create -t bfg_starter
 
@@ -39,8 +38,7 @@ project.  You should use a string without spaces and with only letters
 in it.  Here's sample output from a run of ``paster create`` for a
 project we name ``MyProject``:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ bin/paster create -t bfg_starter
    Selected and implied templates:
@@ -128,15 +126,13 @@ the project directory.  The file named ``setup.py`` will be in the
 root of the paster-generated project directory.  The ``python`` you're
 invoking should be the one from your virtualenv.
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ ../bin/python setup.py develop
 
 Elided output from a run of this command is shown below:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ ../bin/python setup.py develop
    ...
@@ -152,15 +148,13 @@ Running The Tests For Your Application
 To run unit tests for your application, you should invoke them like
 so:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ ../bin/python setup.py test -q
 
 Here's sample output from a test run:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ python setup.py test -q
    running test
@@ -209,21 +203,18 @@ section within the ``.ini`` file.  For example, if your application
 If so, you can use the following command to invoke a debug shell using
 the name ``main`` as a section name:
 
-.. code-block::  bash
-   :linenos:
+.. code-block::  text
 
-    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
 
-    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
-    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
-    Type "help" for more information. "root" is the BFG app root object.
-    >>> root
-    <foo.models.MyModel object at 0x445270>
+   Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
+   [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
+   Type "help" for more information. "root" is the BFG app root object.
+   >>> root
+   <foo.models.MyModel object at 0x445270>
 
 .. note:: You *might* get away without passing
-          ``--plugin=repoze.bfg`` to the bfgshell command; the
-          ``--plugin=repoze.bfg`` option is only required under
-          conditions that are not yet well-understood.
+          ``--plugin=repoze.bfg`` to the bfgshell command.
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_
 installed in the interpreter you use to invoke the ``paster`` command,
@@ -233,10 +224,9 @@ happen, even if you have IPython installed, you can pass the
 ``--disable-ipython`` flag to the ``bfgshell`` command to use a
 standard Python interpreter shell unconditionally.
 
-.. code-block::  bash
-   :linenos:
+.. code-block::  text
 
-    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
 
 Press "Ctrl-D" to exit the interactive shell.
 
@@ -263,10 +253,9 @@ following ``.ini`` file content:
 
 The command you use to invoke the interactive shell should be:
 
-.. code-block::  bash
-   :linenos:
+.. code-block::  text
 
-    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini myapp
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini myapp
 
 If you use ``main`` as the section name argument instead of ``myapp``
 against the above ``.ini`` file, an error will likely occur.  Use the
@@ -290,15 +279,13 @@ the generated ``MyProject.ini`` configuration file:
    webserver, as exception and debugging output will be sent to the
    console.
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ ../bin/paster serve MyProject.ini
 
 Here's sample output from a run:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ paster serve MyProject.ini
    Starting server in PID 16601.

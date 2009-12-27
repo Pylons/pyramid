@@ -53,16 +53,16 @@ object:
     The request method, e.g., ``'GET'``, ``'POST'``
 
 ``req.GET``:
-    A `dictionary-like object`_ with all the variables in the query
+    A :term:`multidict` with all the variables in the query
     string.
 
 ``req.POST``:
-    A `dictionary-like object`_ with all the variables in the request
+    A :term:`multidict` with all the variables in the request
     body.  This only has variables if the request was a ``POST`` and
     it is a form submission.  
 
 ``req.params``:
-    A `dictionary-like object`_ with a combination of everything in
+    A :term:`multidict` with a combination of everything in
     ``req.GET`` and ``req.POST``.
 
 ``req.body``:
@@ -84,8 +84,6 @@ object:
     These are set by products like `Routes
     <http://routes.groovie.org/>`_ and `Selector
     <http://lukearno.com/projects/selector/>`_.
-
-.. _`dictionary-like object`: #multidict
 
 Also, for standard HTTP request headers there are usually attributes,
 for instance: ``req.accept_language``, ``req.content_length``,
@@ -171,8 +169,8 @@ WSGI):
 
 ``response.headerlist``:
     A list of all the headers, like ``[('Content-Type',
-    'text/html')]``.  There's a case-insensitive `dictionary-like
-    object`_ in ``response.headers`` that also allows you to access
+    'text/html')]``.  There's a case-insensitive :term:`multidict`
+    in ``response.headers`` that also allows you to access
     these same headers.
 
 ``response.app_iter``:

@@ -84,7 +84,6 @@ same system, to install a Python 2.5 interpreter from *source*, use
 the following commands:
 
 .. code-block:: text
-   :linenos:
 
    [chrism@vitaminf ~]$ cd ~
    [chrism@vitaminf ~]$ mkdir tmp
@@ -128,7 +127,6 @@ setuptools`` within the Python interpreter you'd like to run
 :mod:`repoze.bfg` under:
 
 .. code-block:: text
-   :linenos:
 
    [chrism@vitaminf bfg]$ python
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
@@ -195,7 +193,6 @@ can actually create a virtual environment.  To do so, invoke the
 following:
 
 .. code-block:: text
-   :linenos:
 
    $ virtualenv --no-site-packages bfgenv
    New python executable in bfgenv/bin/python
@@ -225,7 +222,6 @@ After you've got your ``bfgenv`` virtualenv installed, you may install
 virtualenv (``bfgenv``) directory:
 
 .. code-block:: text
-   :linenos:
 
    $ bin/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
 

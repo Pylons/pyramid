@@ -309,7 +309,7 @@ Predicate Attributes
 ``route_name``
 
   *This attribute services an advanced feature that isn't often used
-  unless you want to perform traversal *after* a route has matched.*
+  unless you want to perform traversal after a route has matched.*
   This value must match the ``name`` of a ``<route>`` declaration (see
   :ref:`urldispatch_chapter`) that must match before this view will be
   called.  Note that the ``route`` configuration referred to by

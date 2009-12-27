@@ -606,3 +606,10 @@ Glossary
       the `threading.local documentation
       <http://docs.python.org/library/threading.html#threading.local>`
       for more information.
+
+   Multidict
+     An ordered dictionary that can have multiple values for each
+     key. Adds the methods ``getall``, ``getone``, ``mixed``, and
+     ``add`` to the normal dictionary interface.  See
+     http://pythonpaste.org/webob/class-webob.multidict.MultiDict.html
+

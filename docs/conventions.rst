@@ -1,8 +1,6 @@
 Typographical Conventions
 =========================
 
-The following typographical conventions are used within this guide.
-
 Literals, filenames and function arguments are presented using the
 following style:
 
@@ -18,31 +16,31 @@ related to a topic or concept are presented in the following style:
 Notes, which represent additional information related to a topic or
 concept are presented in the following style:
 
-.. note::
+  .. note::
 
-   This is a note.
-
-We present Python class names using the following style:
-
-  :class:`Python.class.name`
+     This is a note.
 
 We present Python method names using the following style:
 
-  :meth:`Python.method_name`.
+  :meth:`Python.method_name`
 
-We present Python module names using the following style:
+We present Python class names, module names, attributes and global
+variables using the following style:
 
-  :mod:`Python.module.name`.
+  :class:`Python.class.name`
 
-We present Python attributes and global variables using the following
+References to glossary terms are presented using the following style:
+
+  :term:`Repoze`
+
+URLs are presented using the following style:
+
+  `Repoze <http://repoze.org>`_
+
+References to sections and chapters are presented using the following
 style:
 
-  :data:`Python.attribute`.
-
-References ot glossary terms and other document sections are presented
-using the following style:
-
-  :term:`Repoze`.
+  :ref:`traversal_chapter`
 
 Python code blocks are presented in the following style:
 
