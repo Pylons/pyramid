@@ -1355,9 +1355,9 @@ this task. This class creates a callable that is capable acting as a
 :mod:`repoze.bfg` view which serves static resources from a directory.
 For instance, to serve files within a directory located on your
 filesystem at ``/path/to/static/dir`` mounted at the URL path
-``/static`` in your application, create an instance of
-:mod:`repoze.bfg.view` 's ``static`` class inside a ``static.py`` file
-in your application root as below.
+``/static`` in your application, create an instance of the
+:class:`repoze.bfg.view.static` class inside a ``static.py`` file in
+your application root as below.
 
 .. ignore-next-block
 .. code-block:: python

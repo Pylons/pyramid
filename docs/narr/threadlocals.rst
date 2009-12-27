@@ -95,61 +95,58 @@ You probably should almost never use the
 :func:`repoze.bfg.threadlocal.get_current_request` or
 :func:`repoze.bfg.threadlocal.get_current_registry` functions, except
 perhaps in tests.  In particular, it's almost always a mistake to use
-:func:`repoze.bfg.threadlocal.get_current_request` or
-:func:`repoze.bfg.threadlocal.get_current_registry` in application
+``get_current_request`` or ``get_current_registry`` in application
 code because its usage makes it possible to write code that can be
 neither easily tested nor scripted.  Inappropriate usage is defined as
 follows:
 
-- :func:`repoze.bfg.threadlocal.get_current_request` should never be
-  called within the body of a :term:`view callable`, or within code
-  called by a view callable.  View callables already have access to
-  the request (it's passed in to each as ``request``).
+- ``get_current_request`` should never be called within the body of a
+  :term:`view callable`, or within code called by a view callable.
+  View callables already have access to the request (it's passed in to
+  each as ``request``).
 
-- :func:`repoze.bfg.threadlocal.get_current_request` should never be
-  called in :term:`model` code.  Model code should never require any
-  access to the request; if your model code requires access to a
-  request object, you've almost certainly factored something wrong,
-  and you should change your code rather than using this function.
+- ``get_current_request`` should never be called in :term:`model`
+  code.  Model code should never require any access to the request; if
+  your model code requires access to a request object, you've almost
+  certainly factored something wrong, and you should change your code
+  rather than using this function.
 
-- :func:`repoze.bfg.threadlocal.get_current_request` function should
-  never be called because it's "easier" or "more elegant" to think
-  about calling it than to pass a request through a series of function
-  calls when creating some API design.  Your application should
-  instead almost certainly pass data derived from the request around
-  rather than relying on being able to call this function to obtain
-  the request in places that actually have no business knowing about
-  it.  Parameters are *meant* to be passed around as function
-  arguments, this is why they exist.  Don't try to "save typing" or
-  create "nicer APIs" by using this function in the place where a
-  request is required; this will only lead to sadness later.
+- ``get_current_request`` function should never be called because it's
+  "easier" or "more elegant" to think about calling it than to pass a
+  request through a series of function calls when creating some API
+  design.  Your application should instead almost certainly pass data
+  derived from the request around rather than relying on being able to
+  call this function to obtain the request in places that actually
+  have no business knowing about it.  Parameters are *meant* to be
+  passed around as function arguments, this is why they exist.  Don't
+  try to "save typing" or create "nicer APIs" by using this function
+  in the place where a request is required; this will only lead to
+  sadness later.
 
-- Neither :func:`repoze.bfg.threadlocal.get_current_request` nor
-  :func:`repoze.bfg.threadlocal.get_current_registry` should ever be
-  called within application-specific forks of third-party library
-  code.  The library you've forked almost certainly has nothing to do
-  with :mod:`repoze.bfg`, and making it dependent on repoze.bfg
-  (rather than making your :mod:`repoze.bfg` application depend upon
-  it) means you're forming a dependency in the wrong direction.
+- Neither ``get_current_request`` nor ``get_current_registry`` should
+  ever be called within application-specific forks of third-party
+  library code.  The library you've forked almost certainly has
+  nothing to do with :mod:`repoze.bfg`, and making it dependent on
+  repoze.bfg (rather than making your :mod:`repoze.bfg` application
+  depend upon it) means you're forming a dependency in the wrong
+  direction.
 
 Use of the :func:`repoze.bfg.threadlocal.get_current_request` function
 in application code *is* still useful in very limited circumstances.
-As a rule of thumb, usage of
-:func:`repoze.bfg.threadlocal.get_current_request` is useful **within
-code which is meant to eventually be removed**.  For instance, you may
-find yourself wanting to deprecate some API that expects to be passed
-a request object in favor of one that does not expect to be passed a
-request object.  But you need to keep implementations of the old API
-working for some period of time while you deprecate the older API.  So
-you write a "facade" implementation of the new API which calls into
-the code which implements the older API.  Since the new API does not
-require the request, your facade implementation doesn't have local
-access to the request when it needs to pass it into the older API
-implementation.  After some period of time, the older implementation
-code is disused and the hack that uses
-:func:`repoze.bfg.threadlocal.get_current_request` is removed.  This
-would be an appropriate place to use the
-:func:`repoze.bfg.threadlocal.get_current_request` function.
+As a rule of thumb, usage of ``get_current_request`` is useful
+**within code which is meant to eventually be removed**.  For
+instance, you may find yourself wanting to deprecate some API that
+expects to be passed a request object in favor of one that does not
+expect to be passed a request object.  But you need to keep
+implementations of the old API working for some period of time while
+you deprecate the older API.  So you write a "facade" implementation
+of the new API which calls into the code which implements the older
+API.  Since the new API does not require the request, your facade
+implementation doesn't have local access to the request when it needs
+to pass it into the older API implementation.  After some period of
+time, the older implementation code is disused and the hack that uses
+``get_current_request`` is removed.  This would be an appropriate
+place to use the ``get_current_request``.
 
 Use of the :func:`repoze.bfg.threadlocal.get_current_registry`
 function should be limited to testing scenarios.  The registry made

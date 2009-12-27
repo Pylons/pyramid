@@ -27,7 +27,7 @@ We present Python method names using the following style:
 We present Python class names, module names, attributes and global
 variables using the following style:
 
-  :class:`Python.class.name`
+  :class:`Python.class_module_or_attribute.name`
 
 References to glossary terms are presented using the following style:
 
