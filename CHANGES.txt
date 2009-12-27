@@ -1,6 +1,18 @@
 Next release
 ============
 
+Documentation Licensing
+-----------------------
+
+- The *documentation* (the result of ``make <html|latex|htmlhelp>``
+  within the ``docs`` directory) in this release is now offered under
+  the Creative Commons Attribution-Noncommercial-No Derivative Works
+  3.0 United States License as described by
+  http://creativecommons.org/licenses/by-nc-nd/3.0/us/ .  This is only
+  a licensing change for the documentation; the ``repoze.bfg``
+  software continues to be offered under the Repoze Public License
+  at http://repoze.org/license.html (BSD-like).
+
 Documentation
 -------------
 
@@ -13,6 +25,11 @@ Documentation
 - Created new top-level documentation section: "ZCML Directives".
   This section contains detailed ZCML directive information, some of
   which was removed from various narrative chapters.
+
+- The LaTeX rendering of the documentation has been improved.
+
+- Added a "Fore-Matter" section with author, copyright, and licensing
+  information.
 
 1.2a8 (2009-12-24)
 ==================

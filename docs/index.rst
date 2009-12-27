@@ -1,8 +1,8 @@
 .. _index:
 
-===========
-repoze.bfg
-===========
+========================================
+The repoze.bfg Web Application Framework
+========================================
 
 :mod:`repoze.bfg` is a Python web application framework.  It is
 inspired by :term:`Zope`, :term:`Pylons`, and :term:`Django`.  It uses
@@ -14,6 +14,15 @@ responses.
 <http://repoze.org>`_ project by `Agendaless Consulting
 <http://agendaless.com>`_ and other contributors.  It is licensed
 under a `BSD-like license <http://repoze.org/license.html>`_.
+
+Fore-Matter
+===========
+
+.. toctree::
+   :maxdepth: 1
+
+   copyright.rst
+   conventions.rst
 
 "What's New" Documents
 ======================
@@ -57,7 +66,6 @@ Narrative documentation in chapter form explaining how to use
    narr/resources
    narr/router
    narr/threadlocals
-   glossary
 
 API documentation
 =================
@@ -94,66 +102,26 @@ ZCML Directives
 Documentation for each :mod:`repoze.bfg` :term:`ZCML directive`.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    zcml
 
 Tutorials
 =========
 
-ZODB + traversal Wiki tutorial, demonstrating how to build a
-:term:`traversal` based application using :term:`ZODB` and
-:term:`authentication`.  Good for people with prior Zope experience
-(or no experience at all).
+Detailed tutorials explaining how to use :mod:`repoze.bfg` to build
+and various types of applications and how to deploy :mod:`repoze.bfg`
+applications to various platforms.
 
 .. toctree::
    :maxdepth: 2
 
    tutorials/bfgwiki/index.rst
-
-SQLAlchemy + url dispatch Wiki tutorial, demonstrating how to build a
-:term:`url dispatch` based application using :term:`SQLAlchemy` and
-:term:`authentication`.  Good for people with prior Pylons experience
-(or no experience at all).
-
-.. toctree::
-   :maxdepth: 2
-
    tutorials/bfgwiki2/index.rst
-
-:mod:`repoze.bfg` for Zope CMF Developers
-
-.. toctree::
-   :maxdepth: 2
-
    tutorials/cmf/index.rst
-
-:mod:`repoze.bfg` on Google's App Engine
-
-.. toctree::
-   :maxdepth: 2
-
    tutorials/gae/index.rst
-
-:mod:`repoze.bfg` under :term:`mod_wsgi`
-
-.. toctree::
-   :maxdepth: 2
-
    tutorials/modwsgi/index.rst
-
-Using ZODB's :term:`ZEO` with :mod:`repoze.bfg`
-
-.. toctree::
-   :maxdepth: 2
-
    tutorials/zeo/index.rst
-
-Using ZODB Sessions in :mod:`repoze.bfg`
-
-.. toctree::
-   :maxdepth: 2
-
    tutorials/zodbsessions/index.rst
 
 Detailed Change History
@@ -241,11 +209,9 @@ via Subversion, use this command::
 To find out how to become a contributor to :mod:`repoze.bfg`, please
 see the `contributor's page <http://repoze.org/contributing.html>`_.
 
-Indices and tables
+Index and Glossary
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 * :ref:`glossary`
-
+* :ref:`genindex`
+* :ref:`search`

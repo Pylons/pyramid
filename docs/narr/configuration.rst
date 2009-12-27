@@ -204,8 +204,8 @@ fragments, for example the ``/a/b/c`` portion of the URL
 traversal.
 
 .. note:: A useful analogy of how :mod:`repoze.bfg` :term:`traversal`
-  works is available within the section entitled
-  :ref:`traversal_behavior`.  You should probably go read it now.
+  works is available within the chapter section entitled
+  :ref:`traversal_behavior`.
 
 The results of a :term:`traversal` include a :term:`context` and a
 :term:`view name`.  The :term:`view name` is the *first* URL path
@@ -234,8 +234,6 @@ be invoked after traversal.
 The object graph of our hello world application is very simple:
 there's exactly one object in our graph; the default :term:`root`
 object.
-
-Apologies for the digression; on with the tutorial.
 
 Relating Traversal to the Hello World Application
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -328,7 +326,6 @@ Beginning Configuration
 
 .. ignore-next-block
 .. code-block:: python
-   :linenos:
 
    config.begin()
 
@@ -449,7 +446,6 @@ Ending Configuration
 
 .. ignore-next-block
 .. code-block:: python
-   :linenos:
 
    config.end()
 
@@ -467,7 +463,6 @@ WSGI Application Creation
 
 .. ignore-next-block
 .. code-block:: python
-   :linenos:
 
    app = config.make_wsgi_app()
 
@@ -499,7 +494,6 @@ WSGI Application Serving
 
 .. ignore-next-block
 .. code-block:: python
-   :linenos:
 
    serve(app)
 
@@ -580,20 +574,20 @@ previously created ``helloworld.py``:
 .. code-block:: xml
    :linenos:
 
-    <configure xmlns="http://namespaces.repoze.org/bfg">
+   <configure xmlns="http://namespaces.repoze.org/bfg">
 
-      <include package="repoze.bfg.includes" />
+     <include package="repoze.bfg.includes" />
 
-      <view
-         view="helloworld.hello_world"
-         />
+     <view
+        view="helloworld.hello_world"
+        />
 
-      <view
-         name="goodbye"
-         view="helloworld.goodbye_world"
-         />
+     <view
+       name="goodbye"
+       view="helloworld.goodbye_world"
+       />
 
-    </configure>
+   </configure>
 
 This pair of files forms an application functionally equivalent to the
 application we created earlier.  Let's examine the differences between
@@ -641,7 +635,7 @@ which sits next to ``helloworld.py``.  Let's take a look at the
 .. code-block:: xml
    :linenos:
 
-    <configure xmlns="http://namespaces.repoze.org/bfg">
+   <configure xmlns="http://namespaces.repoze.org/bfg">
 
       <include package="repoze.bfg.includes" />
 
@@ -654,7 +648,7 @@ which sits next to ``helloworld.py``.  Let's take a look at the
          view="helloworld.goodbye_world"
          />
 
-    </configure>
+   </configure>
 
 The ``<configure>`` Tag
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -665,7 +659,9 @@ The ``configure.zcml`` ZCML file contains this bit of XML:
    :linenos:
 
     <configure xmlns="http://namespaces.repoze.org/bfg">
+
        <!-- other directives -->
+
     </configure>
 
 Because :term:`ZCML` is XML, and because XML requires a single root
@@ -683,9 +679,8 @@ The ``configure.zcml`` ZCML file contains this bit of XML within the
 ``<configure>`` root tag:
 
 .. code-block:: xml
-   :linenos:
 
-      <include package="repoze.bfg.includes" />
+   <include package="repoze.bfg.includes" />
 
 This singleton (self-closing) tag instructs ZCML to load a ZCML file
 from the Python package with the :term:`dotted Python name`
@@ -705,8 +700,8 @@ equivalently as:
 .. code-block:: xml
    :linenos:
 
-      <include package="repoze.bfg.includes" 
-               file="configure.zcml"/>
+   <include package="repoze.bfg.includes" 
+            file="configure.zcml"/>
 
 The ``<include>`` tag that includes the ZCML statements implied by the
 ``configure.zcml`` file from the Python package named
@@ -729,14 +724,14 @@ The ``configure.zcml`` ZCML file contains these bits of XML *after* the
 .. code-block:: xml
    :linenos:
 
-      <view
-         view="helloworld.hello_world"
-         />
+   <view
+     view="helloworld.hello_world"
+     />
 
-      <view
-         name="goodbye"
-         view="helloworld.goodbye_world"
-         />
+   <view
+     name="goodbye"
+     view="helloworld.goodbye_world"
+     />
 
 These ``<view>`` declaration tags direct :mod:`repoze.bfg` to create
 two :term:`view configuration` registrations.  The first ``<view>``
@@ -780,28 +775,28 @@ following ZCML orderings are completely equivalent:
   .. code-block:: xml
      :linenos:
 
-        <view
-           view="helloworld.hello_world"
-           />
+     <view
+       view="helloworld.hello_world"
+       />
 
-        <view
-           name="goodbye"
-           view="helloworld.goodbye_world"
-           />
+     <view
+       name="goodbye"
+       view="helloworld.goodbye_world"
+       />
 
 .. topic:: Goodbye Before Hello
 
   .. code-block:: xml
      :linenos:
 
-        <view
-           name="goodbye"
-           view="helloworld.goodbye_world"
-           />
+     <view
+       name="goodbye"
+       view="helloworld.goodbye_world"
+       />
 
-        <view
-           view="helloworld.hello_world"
-           />
+     <view
+       view="helloworld.hello_world"
+       />
 
 The ``<view>`` tag is an example of a :mod:`repoze.bfg` declaration
 tag.  Other such tags include ``<route>``, ``<scan>``, ``<notfound>``,
@@ -826,12 +821,12 @@ start.  For example, the following ZCML file has two conflicting
       <include package="repoze.bfg.includes" />
 
       <view
-         view="helloworld.hello_world"
-         />
+        view="helloworld.hello_world"
+        />
 
       <view
-         view="helloworld.hello_world"
-         />
+        view="helloworld.hello_world"
+        />
 
     </configure>
 

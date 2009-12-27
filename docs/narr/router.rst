@@ -1,9 +1,7 @@
 .. _router_chapter:
 
-How :mod:`repoze.bfg` Processes A Request
-=========================================
-
-.. image:: router.png
+Request Processing
+==================
 
 Once a :mod:`repoze.bfg` application is up and running, it is ready to
 accept requests and return responses.
@@ -93,9 +91,12 @@ processing?
    attributes are used to generate a WSGI response.  The response is
    sent back to the upstream WSGI server.
 
+.. image:: router.png
+
 This is a very high-level overview that leaves out various details.
 For more detail about subsystems invoked by the BFG router (like
 traversal, URL dispatch, views, and events), see
 :ref:`url_mapping_chapter`, :ref:`traversal_chapter`,
 :ref:`urldispatch_chapter`, :ref:`views_chapter`, and
 :ref:`events_chapter`.
+
