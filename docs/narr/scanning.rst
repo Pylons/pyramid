@@ -23,6 +23,10 @@ For example:
   registry` if the package the code lives in is run through a
   :term:`scan`.
 
+.. index::
+   single: decorator
+   single: scan
+
 Decorations and Code Scanning
 -----------------------------
 
@@ -83,6 +87,12 @@ Scanning for :term:`configuration decoration` is performed via the
 :meth:`repoze.bfg.configuration.Configurator.scan` method or via a
 ``<scan>`` :term:`ZCML declaration`.  See
 :ref:`config_mode_equivalence` for examples.
+
+.. index::
+   pair: configuration mode; equivalence
+   single: add_view
+   single: bfg_view
+   pair: ZCML directive; view
 
 .. _config_mode_equivalence:
 

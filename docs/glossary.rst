@@ -6,11 +6,11 @@ Glossary
 .. glossary::
    :sorted:
 
-   Request
+   request
      A ``WebOb`` request object.  See :ref:`webob_chapter` for
      information about request objects.
 
-   Response
+   response
      An object that has three attributes: ``app_iter`` (representing an
      iterable body), ``headerlist`` (representing the http headers sent
      to the user agent), and ``status`` (representing the http status
@@ -26,7 +26,7 @@ Glossary
      The software developed "under the brand" is available in a
      `Subversion repository <http://svn.repoze.org>`_.
 
-   Setuptools
+   setuptools
      `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
      builds on Python's ``distutils`` to provide easier building,
      distribution, and installation of libraries and applications.
@@ -39,11 +39,11 @@ Glossary
      a resource file.  See also `PkgResources
      <http://peak.telecommunity.com/DevCenter/PkgResources>`_
 
-   Resource
+   resource
      Any file contained within a Python :term:`package` which is *not*
      a Python source code file.
 
-   Resource Specification
+   resource specification
      A colon-delimited identifier for a :term:`resource`.  The colon
      separates a Python :term:`package` name from a package subpath.
      For example, the resource specification
@@ -51,30 +51,30 @@ Glossary
      ``baz.css`` in the ``static`` subdirectory of the ``my.package``
      Python :term:`package`.
 
-   Package
+   package
      A directory on disk which contains an ``__init__.py`` file, making
      it recognizable to Python as a location which can be ``import`` -ed.
 
-   Project
+   project
      (Setuptools/distutils terminology). A directory on disk which
      contains a ``setup.py`` file and one or more Python packages.  The
      ``setup.py`` file contains code that allows the package(s) to be
      installed, distributed, and tested.
 
-   Distribution
+   distribution
      (Setuptools/distutils terminology).  A file representing an
      installable library or application.  Distributions are usually
      files that have the suffix of ``.egg``, ``.tar.gz``, or ``.zip``.
      Distributions are the target of Setuptools commands such as
      ``easy_install``.
 
-   Entry Point
+   entry point
      A :term:`setuptools` indirection, defined within a setuptools
      :term:`distribution` setup.py.  It is usually a name which refers
      to a function somewhere in a package which is held by the
      distribution.
 
-   Dotted Python name
+   dotted Python name
      A reference to a Python object by name using a string, in the form
      ``path.to.modulename:attributename``.  Often used in Paste and
      setuptools configurations.  A variant is used in dotted names
@@ -82,10 +82,10 @@ Glossary
      "view" directive's "view" attribute): the colon (``:``) is not
      used; in its place is a dot.
 
-   View
+   view
      Common vernacular for a :term:`view callable`.
 
-   View Callable
+   view callable
      A "view callable" is a callable Python object which is associated
      with a :term:`view configuration`; it returns a :term:`response`
      object .  A view callable accepts a single argument: ``request``,
@@ -99,7 +99,7 @@ Glossary
      :ref:`views_chapter` for more information about :mod:`repoze.bfg`
      view callables.
 
-   View Configuration
+   view configuration
      View configuration is the act of associating a :term:`view
      callable` with configuration information.  This configuration
      information helps map a given :term:`request` to a particular view
@@ -109,7 +109,7 @@ Glossary
      decorator coupled with a :term:`scan`.  See :ref:`views_chapter`
      for more information about view configuration.
 
-   View name
+   view name
      The "URL name" of a view, e.g ``index.html``.  If a view is
      configured without a name, its name is considered to be the empty
      string (which implies the :term:`default view`).
@@ -120,13 +120,13 @@ Glossary
      when :term:`traversal` exhausts the path elements in the PATH_INFO
      of a request before it returns a :term:`context`.
 
-   Virtualenv
+   virtualenv
      An isolated Python environment.  Allows you to control which
      packages are used on a particular project by cloning your main
      Python.  `virtualenv <http://pypi.python.org/pypi/virtualenv>`_
      was created by Ian Bicking.
 
-   Model
+   model
      An object representing data in the system.  If :mod:`traversal` is
      used, a model is a node in the object graph traversed by the
      system.  When traversal is used, a model instance becomes the
@@ -136,7 +136,7 @@ Glossary
      a "model" in :mod:`repoze.bfg` terms, although this terminology
      can be a bit confusing: see :ref:`model_traversal_confusion`.
 
-   Traversal
+   traversal
      The act of descending "down" a graph of model objects from a root
      model in order to find a :term:`context`.  The :mod:`repoze.bfg`
      :term:`router` performs traversal of model objects when a
@@ -146,7 +146,7 @@ Glossary
      combined *with* URL dispatch.  See :ref:`hybrid_chapter` for more
      information about combining traversal and URL dispatch (advanced).
 
-   Router
+   router
      The :term:`WSGI` application created when you start a
      :mod:`repoze.bfg` application.  The router intercepts requests,
      invokes traversal and/or URL dispatch, calls view functions, and
@@ -160,7 +160,7 @@ Glossary
      configuration`, you are using URL dispatch. See the
      :ref:`urldispatch_chapter` for more information.
 
-   Context
+   context
      An object in the system that is found during :term:`traversal` or
      :term:`URL dispatch` based on URL data; if it's found via
      traversal, it's usually a :term:`model` object that is part of an
@@ -171,7 +171,7 @@ Glossary
      chapter and the :ref:`urldispatch_chapter` chapter for more
      information about how a URL is resolved to a context.
 
-   Application registry
+   application registry
      A registry of configuration information consulted by
      :mod:`repoze.bfg` while servicing an appliation.  An application
      registry maps model types to views, as well as housing other
@@ -179,15 +179,15 @@ Glossary
      :mod:`repoze.bfg` application has one (and only one) application
      registry.
 
-   Template
+   template
      A file with replaceable parts that is capable of representing some
      text, XML, or HTML when rendered.
 
-   Location
+   location
      The path to an object in an object graph.  See :ref:`location_aware`
      for more information about how to make a model object *location-aware*.
 
-   Permission
+   permission
      A string or unicode object that represents an action being taken
      against a context.  A permission is associated with a view name
      and a model type by the developer.  Models are decorated with
@@ -218,7 +218,7 @@ Glossary
      policy to determine wither a particular request can be fulfilled
      given the :term:`authentication` information in the request.
 
-   Authentication
+   authentication
      The act of determining that the credentials a user presents during
      a particular request are "good".  :mod:`repoze.bfg` uses the
      :term:`authentication` data supplied by the upstream component as
@@ -226,7 +226,7 @@ Glossary
      :mod:`repoze.bfg` is performed via an :term:`authentication
      policy`.
 
-   Authorization
+   authorization
      The act of determining whether a user can perform a specific
      action.  In bfg terms, this means determining whether, for a given
      context, any :term:`principal` (or principals) associated with the
@@ -234,7 +234,7 @@ Glossary
      to continue.  Authorization in :mod:`repoze.bfg` is performed via
      its :term:`authorization policy`.
 
-   Principal
+   principal
      A *principal* is a string or unicode object representing a userid
      or a group id.  It is provided by an :term:`authentication
      policy`.  For example, if a user had the user id "bob", and Bob
@@ -243,14 +243,14 @@ Glossary
      indictate that Bob was represented by three principals: "bob",
      "group foo" and "group bar".
 
-   Authorization Policy
+   authorization policy
      An authorization policy in :mod:`repoze.bfg` terms is a bit of
      code which has an API which determines whether or not the
      principals associated with the request can perform an action
      associated with a permission, based on the information found on the
      :term:`context`.
 
-   Authentication Policy
+   authentication policy
      An authentication policy in :mod:`repoze.bfg` terms is a bit of
      code which has an API which determines the current
      :term:`principal` (or principals) associated with a request.
@@ -261,7 +261,7 @@ Glossary
      similar to the concept of Java Servlets.  ``repoze.bfg`` requires
      that your application be served as a WSGI application.
 
-   Middleware
+   middleware
      *Middleware* is a :term:`WSGI` concept.  It is a WSGI component
      that acts both as a server and an application.  Interesting uses
      for middleware exist, such as caching, content-transport
@@ -269,7 +269,7 @@ Glossary
      or `PyPI <http://python.org/pypi>`_ to find middleware for your
      application.
 
-   Pipeline
+   pipeline
      The :term:`Paste` term for a single configuration of a WSGI
      server, a WSGI application, with a set of middleware in-between.
 
@@ -344,12 +344,12 @@ Glossary
      inspired by the Routes syntax (which was inspired by Ruby On
      Rails pattern syntax).
 
-   Route
+   route
      A single pattern matched by the :term:`url dispatch` subsystem,
      which generally resolves to a :term:`root factory` (and then
      ultimately a :term:`view`).  See also :term:`url dispatch`.
 
-   Route Configuration
+   route configuration
      Route configuration is the act of using :term:`imperative
      configuration` or a :term:`ZCML` ``<route>`` statement to
      associate request parameters with a particular :term:`route` using
@@ -368,10 +368,10 @@ Glossary
      application.  You can use ZCML as an alternative to
      :term:`imperative configuration`.
 
-   ZCML Directive
+   ZCML directive
      A ZCML "tag" such as ``<view>`` or ``<route>``.
 
-   ZCML Declaration
+   ZCML declaration
      The concrete use of a :term:`ZCML directive` within a ZCML file.
 
    Zope Component Architecture
@@ -382,18 +382,18 @@ Glossary
      :mod:`repoze.bfg` uses the ZCA "under the hood" to perform view
      dispatching and other application configuration tasks.
 
-   ReStructuredText
+   reStructuredText
      A `plain text format <http://docutils.sourceforge.net/rst.html>`_
      that is the defacto standard for descriptive text shipped in
      :term:`distribution` files, and Python docstrings.  This
      documentation is authored in ReStructuredText format.
 
-   Root
+   root
      The object at which :term:`traversal` begins when
      :mod:`repoze.bfg` searches for a :term:`context` (for :term:`URL
      Dispatch`, the root is *always* the context).
 
-   Subpath
+   subpath
      A list of element "left over" after the :term:`router` has
      performed a successful traversal to a view.  The subpath is a
      sequence of strings, e.g. ``['left', 'over', 'names']``.  Within
@@ -401,7 +401,7 @@ Glossary
      can use ``*subpath`` in the route pattern to influence the
      subpath.  See :ref:`star_subpath` for more information.
 
-   Interface
+   interface
      A `Zope interface <http://pypi.python.org/pypi/zope.interface>`_
      object.  In :mod:`repoze.bfg`, an interface may be attached to a
      :term:`model` object or a :term:`request` object in order to
@@ -420,20 +420,20 @@ Glossary
      to, :mod:`repoze.bfg` programmers do not need to understand or use
      this feature of interfaces.
 
-   Event
+   event
      An object broadcast to zero or more :term:`subscriber` callables
      during normal :mod:`repoze.bfg` system operations during the
      lifetime of an application.  Application code can subscribe to
      these events by using the subscriber functionality described in
      :ref:`events_chapter`.
 
-   Subscriber
+   subscriber
      A callable which receives an :term:`event`.  A callable becomes a
      subscriber via :term:`imperative configuration` or the
      ``<subscriber>`` ZCML directive.  See :ref:`events_chapter` for
      more information.
 
-   Request type
+   request type
      An attribute of a :term:`request` that allows for specialization
      of view invocation based on arbitrary categorization.  The every
      :term:`request` object that :mod:`repoze.bfg` generates and
@@ -462,13 +462,13 @@ Glossary
      <http://docs.repoze.org/workflow>`_ .  It can be used by
      :mod:`repoze.bfg` to form a workflow system.
 
-   Virtual root
+   virtual root
      A model object representing the "virtual" root of a request; this
      is typically the physical root object (the object returned by the
      application root factory) unless :ref:`vhosting_chapter` is in
      use.
 
-   Lineage
+   lineage
      An ordered sequence of objects based on a ":term:`location`
      -aware" context.  The lineage of any given :term:`context` is
      composed of itself, its parent, its parent's parent, and so on.
@@ -476,7 +476,7 @@ Glossary
      context, then its parent's parent, and so on.  The parent of an
      object in a lineage is available as its ``__parent__`` attribute.
 
-   Root Factory
+   root factory
      The "root factory" of an :mod:`repoze.bfg` application is called
      on every request sent to the application.  The root factory
      returns the traversal root of an application.  It is
@@ -495,7 +495,7 @@ Glossary
      `JavaScript Object Notation <http://www.json.org/>`_ is a data
      serialization format.
 
-   Renderer
+   renderer
      A registered serializer that can be configured via :term:`view
      configuration` which converts a non-:term:`Response` return values
      from a :term:`view` into a string (and ultimately a response).
@@ -509,14 +509,14 @@ Glossary
      applications (such as applications developed using
      :mod:`repoze.bfg`) to be served using the Apache web server.
 
-   View Predicate
+   view predicate
      An argument to a :term:`view configuration` which evaluates to
      ``True`` or ``False`` for a given :term:`request`.  All predicates
      attached to a view configuration must evaluate to true for the
      associated view to be considered as a possible callable for a
      given request.
 
-   Route Predicate
+   route predicate
      An argument to a :term:`route configuration` which implies a value
      that evaluates to ``True`` or ``False`` for a given
      :term:`request`.  All predicates attached to a :term:`route
@@ -525,21 +525,21 @@ Glossary
      current request, the next route (in definition order) is
      attempted.
 
-   Predicate
+   predicate
      A test which returns ``True`` or ``False``.  Two different types
      of predicates exist in :mod:`repoze.bfg`: a :term:`view predicate`
      and a :term:`route predicate`.  View predicates are attached to
      :term:`view configuration` and route predicates are attached to
      :term:`route configuration`.
 
-   Decorator
+   decorator
      A wrapper around a Python function or class which accepts the
      function or class as its first argument and which returns an
      arbitrary object.  :mod:`repoze.bfg` provides several decorators,
      used for configuration and return value modification purposes.  See
      also `PEP 318 <http://www.python.org/dev/peps/pep-0318/>`_.
 
-   Configuration Declaration
+   configuration declaration
      An individual method call made to an instance of a
      :mod:`repoze.bfg` :term:`Configurator` object which performs an
      arbitrary action, such as registering a :term:`view configuration`
@@ -550,31 +550,31 @@ Glossary
      of configuration declarations might be performed by a :term:`scan`
      of code in a package.
 
-   Configuration Decoration
+   configuration decoration
      Metadata implying one or more :term:`configuration declaration`
      invocations.  Often set by configuration Python :term:`decorator`
      attributes, such as ``repoze.bfg.view.bfg_view``, aka ``@bfg_view``.
 
-   Scan
+   scan
      The term used by :mod:`repoze.bfg` to define the process of
      importing and examining all code in a Python package or module for
      :term:`configuration decoration`.
 
-   Configurator
+   configurator
      An object used to do :term:`configuration declaration` within an
      application.  The most common configurator is an instance of the
      ``repoze.bfg.configuration.Configurator`` class.
 
-   Imperative Configuration
+   imperative configuration
      The configuration mode in which you use Python to call methods on
      a :term:`Configurator` in order to add each :term:`configuration
      declaration` required by your application.
 
-   Declarative Configuration
+   declarative configuration
      The configuration mode in which you use :term:`ZCML` to make
      a set of :term:`configuration declaration` statements.
 
-   Not Found View
+   Not Found view
       The :term:`view callable` invoked by :mod:`repoze.bfg` when the
       developer explicitly raises a
       ``repoze.bfg.exceptions.NotFound`` exception from within
@@ -584,7 +584,7 @@ Glossary
       found view; it can be overridden.  See
       :ref:`changing_the_notfound_view`.
 
-   Forbidden View
+   Forbidden view
       The :term:`view callable` invoked by :mod:`repoze.bfg` when the
       developer explicitly raises a
       ``repoze.bfg.exceptions.Forbidden`` exception from within
@@ -595,7 +595,7 @@ Glossary
       forbidden view; it can be overridden.  See
       :ref:`changing_the_forbidden_view`.
 
-   Thread Local
+   thread local
       A thread-local variable is one which is essentially a global
       variable in terms of how it is accessed and treated, however,
       each `thread
@@ -607,7 +607,7 @@ Glossary
       <http://docs.python.org/library/threading.html#threading.local>`
       for more information.
 
-   Multidict
+   multidict
      An ordered dictionary that can have multiple values for each
      key. Adds the methods ``getall``, ``getone``, ``mixed``, and
      ``add`` to the normal dictionary interface.  See

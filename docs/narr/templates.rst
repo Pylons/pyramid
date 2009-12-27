@@ -7,6 +7,9 @@ information that is static.  :mod:`repoze.bfg` offers a number of ways
 to perform templating tasks "out of the box", and provides alternative
 templating language support via add-on "bindings" packages.
 
+.. index::
+   triple: Chameleon; ZPT; templates
+
 .. _chameleon_zpt_templates:
 
 Templating With :term:`Chameleon` ZPT Page Templates
@@ -90,6 +93,10 @@ changing the content-type and status:
        response.status_int = 204
        return response
 
+.. index::
+   single: templates used as renderers
+   pair: renderers; template
+
 Templates Used as Renderers
 ---------------------------
 
@@ -141,6 +148,9 @@ renderer configuration can be done imperatively and via :term:`ZCML`.
 See :ref:`views_which_use_a_renderer`.  See also
 :ref:`built_in_renderers`.
 
+.. index::
+   single: sample template
+
 A Sample Template
 -----------------
 
@@ -174,6 +184,9 @@ of keywords passed in to it via
 :func:`repoze.bfg.render_template_to_response`. Typical ZPT
 attribute-based syntax (e.g. ``tal:content`` and ``tal:replace``) also
 works in these templates.
+
+.. index::
+   single: ZPT macros
 
 Using ZPT Macros in :mod:`repoze.bfg`
 -------------------------------------
@@ -235,6 +248,9 @@ And ``templates/mytemplate.pt`` might look like so:
       </span>
     </html>
 
+.. index::
+   pair: Chameleon; text templates
+
 .. _chameleon_text_templates:
 
 Templating with :term:`Chameleon` Text Templates
@@ -269,6 +285,9 @@ place; see :ref:`chameleon_text_module` for the API description.
 A Chameleon text template can also be used as a :term:`renderer`.  See
 :ref:`built_in_renderers` for more information.
 
+.. index::
+   pair: template renderer; side effects
+
 Side Effects of Rendering a Chameleon Template
 ----------------------------------------------
 
@@ -294,6 +313,9 @@ should cause it to ignore these files.  Here's the contents of my
 
    *.cache
    *.pt.py
+
+.. index::
+   pair: template; automatic reloading
 
 .. _reload_templates_section:
 
@@ -327,6 +349,9 @@ application's configuration section, e.g.::
   use = egg:MyProject#app
   reload_templates = true
 
+.. index::
+   pair: template; internationalization
+
 :term:`Chameleon` Template Internationalization
 -----------------------------------------------
 
@@ -334,6 +359,9 @@ See `the internationalization chapter
 <http://chameleon.repoze.org/docs/latest/i18n.html>`_ of the Chameleon
 documentation for information about supporting internationalized units
 of text within :term:`Chameleon` templates.
+
+.. index::
+   single: other templating languages
 
 Templating with other Templating Languages
 ------------------------------------------
@@ -373,6 +401,11 @@ template resource overriding capability explained in
 :ref:`overriding_resources_section` be available, nor will it be
 possible to use any template using that language as a
 :term:`renderer`.
+
+.. index::
+   single: template system bindings
+   single: Jinja2
+   single: Genshi
 
 .. _available_template_system_bindings:
 

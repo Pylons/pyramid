@@ -36,6 +36,9 @@ document.  The `reference documentation
 <http://pythonpaste.org/webob/reference.html>`_ shows many examples of
 creating requests.
 
+.. index::
+   single: request object
+
 Request
 ~~~~~~~
 
@@ -155,6 +158,9 @@ If it is set, then ``req.POST``, ``req.GET``, ``req.params``, and
 corresponding ``req.str_*`` (like ``req.str_POST``) that is always
 ``str`` and never unicode.
 
+.. index::
+   single: response object
+
 Response
 ~~~~~~~~
 
@@ -222,6 +228,9 @@ Here's the highlights:
     ``conditional_response=True`` when instantiating (or set that
     attribute later).  It can also do HEAD and Range requests.
 
+.. index::
+   pair: response; headers
+
 Headers
 +++++++
 
@@ -249,7 +258,10 @@ The status defaults to ``'200 OK'``.  The content_type does not
 default to anything, though if you subclass ``Response`` and set
 ``default_content_type`` you can override this behavior.
 
-Exceptions
+.. index::
+   pair: WebOb; exceptions
+
+xceptions
 ++++++++++
 
 To facilitate error responses like 404 Not Found, the module
@@ -289,6 +301,9 @@ You can use this like:
 The exceptions are still WSGI applications, but you cannot set
 attributes like ``content_type``, ``charset``, etc. on these exception
 objects.
+
+.. index::
+   pair: WebOb; multidict
 
 Multidict
 +++++++++

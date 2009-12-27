@@ -1,3 +1,6 @@
+.. index::
+   single: resources
+
 .. _resources_chapter:
 
 Resources
@@ -70,6 +73,10 @@ Package names often contain dots.  For example, ``repoze.bfg`` is a
 package.  Resource names usually look a lot like relative UNIX file
 paths.
 
+.. index::
+   single: overriding resources
+   pair: overriding; resources
+
 .. _overriding_resources_section:
 
 Overriding Resources
@@ -141,6 +148,9 @@ hammer" way to do the same thing is explained in
 :ref:`extending_chapter`.  The heavier hammer way allows you to
 replace a :term:`view` wholesale rather than resources that might be
 used by a view.
+
+.. index::
+   single: override_resource
 
 .. _override_resource:
 
@@ -226,6 +236,9 @@ templates and static files.  Any software which uses the
 :func:`pkg_resources.get_resource_stream` or
 :func:`pkg_resources.get_resource_string` APIs will obtain an
 overridden file when an override is used.
+
+.. index::
+   pair: ZCML directive; resource
 
 .. _resource_zcml_directive:
 

@@ -38,6 +38,11 @@ adding a ``<route>`` statement to :term:`ZCML` used by your
 application.  See :ref:`urldispatch_chapter` for more information on
 mapping URLs to views using routes.
 
+.. index::
+   pair: view; calling convention
+   single: view function
+   pair: view; function
+
 .. _function_as_view:
 
 Defining a View as a Function
@@ -55,6 +60,11 @@ implemented as a function:
 
    def hello_world(request):
        return Response('Hello world!')
+
+.. index::
+   pair: view; calling convention
+   single: view class
+   pair: view; class
 
 .. _class_as_view:
 
@@ -99,6 +109,9 @@ If you'd like to use a different attribute than ``__call__`` to
 represent the method expected to return a response, you can use an
 ``attr`` value as part of view configuration.  See
 :ref:`view_configuration`.
+
+.. index::
+   pair: view; calling convention
 
 .. _request_and_context_view_definitions:
 
@@ -167,6 +180,9 @@ view code itself.
 No matter which view calling convention is used, the view always has
 access to the context via ``request.context``.
 
+.. index::
+   pair: view; response
+
 .. _the_response:
 
 View Responses
@@ -202,6 +218,10 @@ If a view happens to return something to the :mod:`repoze.bfg`
 to construct a response.  The associated renderer can be varied for a
 view by changing the ``renderer`` attribute in the view's
 configuration.  See :ref:`views_which_use_a_renderer`.
+
+.. index::
+   single: renderer
+   pair: view; renderer
 
 .. _views_which_use_a_renderer:
 
@@ -259,6 +279,10 @@ class as a response, no renderer will be employed.
 Additional renderers can be added to the system as necessary via a
 ZCML directive (see :ref:`adding_and_overriding_renderers`).
 
+.. index::
+   single: view configuration
+   pair: view; configuration
+
 .. _view_configuration:
 
 View Configuration: Mapping Views to URLs
@@ -269,6 +293,9 @@ using the :meth:`repoze.bfg.configuration.Configurator.add_view`
 method, by adding ``view`` declarations using :term:`ZCML` or by using
 the :class:`repoze.bfg.view.bfg_view` decorator.  Each method is
 explained below.
+
+.. index::
+   triple: zcml; view; configuration
 
 .. _mapping_views_to_urls_using_zcml_section:
 
@@ -341,6 +368,9 @@ class.  In this case, the rules described in :ref:`class_as_view`
 apply for the class which is named.
 
 See :ref:`view_directive` for complete ZCML directive documentation.
+
+.. index::
+   triple: view; bfg_view; decorator
 
 .. _mapping_views_to_urls_using_a_decorator_section:
 
@@ -638,12 +668,19 @@ could be spelled equivalently as the below:
           version 1.1.  Previously it could only be used as a class or
           function decorator.
 
+.. index::
+   single: add_view
+   triple: imperative; adding; view
+
 View Configuration Using the ``add_view`` Method of a Configurator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See the :meth:`repoze.bfg.configuration.Configurator.add_view` method
 within :ref:`configuration_module` for the arguments to configure a
 view imperatively.
+
+.. index::
+   pair: view; lookup ordering
 
 .. _view_lookup_ordering:
 
@@ -702,6 +739,9 @@ to convert non-response return values from a view.
 
 The value of the ``attr`` attribute represents the attribute name
 looked up on the view object to return a response.
+
+.. index::
+   pair: model; interfaces
 
 .. _using_model_interfaces:
 
@@ -790,6 +830,9 @@ view registered for the context's class will "win".
 See :term:`Interface` in the glossary to find more information about
 interfaces.
 
+.. index::
+   pair: renderers; built-in
+
 .. _built_in_renderers:
 
 Built-In Renderers
@@ -798,6 +841,9 @@ Built-In Renderers
 Several built-in "renderers" exist in :mod:`repoze.bfg`.  These
 renderers can be used in the ``renderer`` attribute of view
 configurations.
+
+.. index::
+   pair: renderer; string
 
 ``string``: String Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -831,6 +877,9 @@ representing the ``str()`` serialization of the return value:
    :linenos:
 
    {'content': 'Hello!'}
+
+.. index::
+   pair: renderer; JSON
 
 ``json``: JSON Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -882,6 +931,9 @@ You can configure a view to use the JSON renderer in ZCML by naming
 Views which use the JSON renderer can vary non-body response
 attributes by attaching properties to the request.  See
 :ref:`response_request_attrs`.
+
+.. index::
+   pair: renderer; chameleon
 
 .. _chameleon_template_renderers:
 
@@ -958,6 +1010,11 @@ Views with use a Chameleon renderer can vary response attributes by
 attaching properties to the request.  See
 :ref:`response_request_attrs`.
 
+.. index::
+   pair: renderer; response attributes
+   pair: renderer; changing headers
+   triple: headers; changing; renderer
+
 .. _response_request_attrs:
 
 Varying Attributes of Rendered Responses
@@ -998,6 +1055,9 @@ callable to influence automatically constructed response attributes.
   ``Expires`` headers in the returned response.  The same can also be
   achieved by returning various values in the ``response_headerlist``,
   this is purely a convenience.
+
+.. index::
+   pair: renderers; adding
 
 .. _adding_and_overriding_renderers:
 
@@ -1147,6 +1207,9 @@ tag):
 
 See also :ref:`renderer_directive`.
 
+.. index::
+   pair: view; security
+
 .. _view_security_section:
 
 View Security
@@ -1188,6 +1251,9 @@ user does not possess the ``add`` permission relative to the current
    authenticate.  Use this kind of package to ask the user for
    authentication credentials.
 
+.. index::
+   pair: view; http redirect
+
 Using a View to Do A HTTP Redirect
 ----------------------------------
 
@@ -1206,6 +1272,9 @@ All exception types from the :mod:`webob.exc` module implement the
 Webob :term:`Response` interface; any can be returned as the response
 from a view.  See :term:`WebOb` for the documentation for this module;
 it includes other response types for ``Unauthorized``, etc.
+
+.. index::
+   triple: view; zcml; static resource
 
 .. _static_resources_section:
 
@@ -1275,6 +1344,9 @@ See :ref:`static_directive` for detailed information.
 .. note:: The ``<static>`` ZCML directive is new in :mod:`repoze.bfg`
    1.1.
 
+.. index::
+   pair: generating; static resource
+
 .. _generating_static_resource_urls:
 
 Generating Static Resource URLs
@@ -1341,6 +1413,9 @@ URLs will continue to resolve properly after the rename.
 
 .. note:: The :func:`repoze.bfg.url.static_url` API is new in
    :mod:`repoze.bfg` 1.1.
+
+.. index::
+   pair: view; static resource
 
 Serving Static Resources Using a View
 -------------------------------------
@@ -1409,6 +1484,9 @@ In this case, ``.models.Root`` refers to the class of which your
    ``/static/foo.js``.  See :ref:`traversal_chapter` for information
    about "goggles" (``@@``).
 
+.. index::
+   triple: exceptions; special; view
+
 Special Exceptions
 ------------------
 
@@ -1433,6 +1511,9 @@ agent which performed the request.
 In all cases, the message provided to the exception constructor is
 made available to the view which :mod:`repoze.bfg` invokes as
 ``request.environ['repoze.bfg.message']``.
+
+.. index::
+   triple: view; forms; unicode
 
 Using Views to Handle Form Submissions (Unicode and Character Set Issues)
 -------------------------------------------------------------------------

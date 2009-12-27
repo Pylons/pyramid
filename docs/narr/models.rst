@@ -8,6 +8,9 @@ traverse when :term:`traversal` is used.  A model instance is also
 generated as a result of :term:`url dispatch`.  A model instance is
 exposed to :term:`view` code as the :term:`context` of a view.
 
+.. index::
+   pair: model; constructor
+
 Defining a Model Constructor
 ----------------------------
 
@@ -29,6 +32,9 @@ It is a class which, when instantiated, becomes a model instance.
 A model constructor may be essentially any Python object which is
 callable, and which returns a model instance.  In the above example,
 the ``BlogEntry`` class can be "called", returning a model instance.
+
+.. index::
+   pair: model; interfaces
 
 Model Instances Which Implement Interfaces
 ------------------------------------------
@@ -132,6 +138,13 @@ See the :ref:`views_chapter` for more information about why providing
 models with an interface can be an interesting thing to do with regard
 to :term:`view` lookup.
 
+.. index::
+   single: model graph
+   single: traversal graph
+   single: object graph
+   single: container nodes
+   single: leaf nodes
+
 Defining a Graph of Model Instances for Traversal
 -------------------------------------------------
 
@@ -155,6 +168,9 @@ policy on model instance nodes in the graph:
 
 See :ref:`traversal_chapter` for more information about how traversal
 works against model instances.
+
+.. index::
+   pair: location-aware; model
 
 .. _location_aware:
 
@@ -229,6 +245,8 @@ and so on.
    to every path and URL generated (as opposed to a single leading
    slash or empty tuple element).
 
+.. index::
+   pair: model; API functions
 
 :mod:`repoze.bfg` API Functions That Act Against Models
 -------------------------------------------------------

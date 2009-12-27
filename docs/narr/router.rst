@@ -1,3 +1,7 @@
+.. index::
+   single: request processing
+   single: request
+
 .. _router_chapter:
 
 Request Processing

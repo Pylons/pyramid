@@ -29,6 +29,9 @@ potentially heterogeneous items, or if you need to attach
 "instance-level" security (akin to "row-level" security in relational
 parlance) declarations to :term:`model` instances.
 
+.. index::
+   triple: differences; URL dispatch; traversal
+
 Differences Between Traversal and URL Dispatch
 ----------------------------------------------
 

@@ -57,6 +57,9 @@ There are a number of different mechanisms you may use to configure
 and *declarative* configuration.  We'll examine both modes in the
 sections which follow.
 
+.. index::
+   pair: imperative; helloworld
+
 .. _helloworld_imperative:
 
 Hello World, Configured Imperatively
@@ -175,6 +178,9 @@ but return a response with the body ``Hello world!``; the
 ``goodbye_world`` view callable returns a response with the body
 ``Goodbye world!``.
 
+.. index::
+   pair: traversal; introduction
+
 .. _traversal_intro:
 
 An Introduction to Traversal
@@ -258,6 +264,10 @@ callable).  Due to this set of circumstances, you can consider the
 sole possible URL that will resolve to the ``goodbye_world`` in this
 application the URL ``'/goodbye'`` because it is the only URL that
 will resolve to the :term:`view name` of ``goodbye``.
+
+.. index::
+   pair: imperative; configuration
+   single: Configurator
 
 .. _helloworld_imperative_appconfig:
 
@@ -458,6 +468,11 @@ registry, meaning that code which attempts to use the application
 registry :term:`thread local` will no longer obtain the registry
 associated with the configurator.
 
+.. index::
+   single: make_wsgi_app
+   pair: WSGI; application
+   triple: WSGI; application; creation
+
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -514,6 +529,10 @@ Our hello world application is one of the simplest possible
 a good deal of what's going on "under the hood" when we configure a
 :mod:`repoze.bfg` application imperatively.  However, another mode of
 configuration exists named *declarative* configuration.
+
+.. index::
+   pair: helloworld; declarative
+   single: helloworld
 
 .. _helloworld_declarative:
 
@@ -803,6 +822,9 @@ tag.  Other such tags include ``<route>``, ``<scan>``, ``<notfound>``,
 ``<forbidden>``, and others.  Each of these tags is effectively a
 "macro" which calls methods on the
 :class:`repoze.bfg.configuration.Configurator` object on your behalf.
+
+.. index::
+   pair: ZCML; conflict detection
 
 ZCML Conflict Detection
 ~~~~~~~~~~~~~~~~~~~~~~~

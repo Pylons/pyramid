@@ -6,6 +6,9 @@ Using Hooks
 "Hooks" can be used to influence the behavior of the
 :mod:`repoze.bfg` framework in various ways.
 
+.. index::
+   pair: not found view; changing
+
 .. _changing_the_notfound_view:
 
 Changing the Not Found View
@@ -69,6 +72,9 @@ Here's some sample code that implements a minimal NotFound view:
    found error was raised.  This error will be different when the
    ``debug_notfound`` environment setting is true than it is when it
    is false.
+
+.. index::
+   pair: forbidden view; changing
 
 .. _changing_the_forbidden_view:
 
@@ -147,6 +153,9 @@ Here's some sample code that implements a minimal forbidden view:
    You can influence the status code of Forbidden responses by using
    an alternate forbidden view.  For example, it would make sense to
    return a response with a ``403 Forbidden`` status code.
+
+.. index::
+   pair: traverser; changing
 
 .. _changing_the_traverser:
 
@@ -241,6 +250,9 @@ Example implementations of alternate traversers can be found "in the
 wild" within `repoze.bfg.traversalwrapper
 <http://pypi.python.org/pypi/repoze.bfg.traversalwrapper>`_ and
 `repoze.bfg.metatg <http://svn.repoze.org/repoze.bfg.metatg/trunk/>`_.
+
+.. index::
+   pair: url generator; changing
 
 Changing How :mod:`repoze.bfg.url.model_url` Generates a URL
 ------------------------------------------------------------

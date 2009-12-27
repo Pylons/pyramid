@@ -20,6 +20,9 @@ extended with new code and an application that lives inside a package
 can be distributed more easily than one which does not live within a
 package.
 
+.. index::
+   pair: project; creating
+
 .. _creating_a_project:
 
 Creating the Project
@@ -99,6 +102,10 @@ application's Python code and templates.
    name during ``paster create`` by adding the project name to the
    command line, e.g. ``paster create -t bfg_starter MyProject``.
 
+.. index::
+   single: paster templates
+   single: project templates
+
 .. _additional_paster_templates:
 
 Additional Paster Templates
@@ -142,6 +149,9 @@ This will install your application's :term:`package` into the
 interpreter so it can be found and run as a :term:`WSGI` application
 inside a WSGI server.
 
+.. index::
+   pair: running; tests
+
 Running The Tests For Your Application
 --------------------------------------
 
@@ -175,6 +185,9 @@ Here's sample output from a test run:
 
 The tests are found in the ``tests.py`` module in your ``paster
 create`` -generated project.  One sample test exists.
+
+.. index::
+   single: interactive shell
 
 The Interactive Shell
 ---------------------
@@ -311,6 +324,9 @@ something in your browser like what is displayed below:
 That's the page shown by default when you visit an unmodified ``paster
 create``-generated application.
 
+.. index::
+   single: project structure
+
 The Project Structure
 ---------------------
 
@@ -361,6 +377,10 @@ describe, run, and test your application.
    file.
 
 We won't describe the ``CHANGES.txt`` or ``README.txt`` files.
+
+.. index::
+   single: PasteDeploy
+   single: ini file
 
 .. _MyProject_ini:
 
@@ -466,6 +486,9 @@ See the :term:`PasteDeploy` documentation for more information about
 other types of things you can put into this ``.ini`` file, such as
 other applications, :term:`middleware` and alternate servers.
 
+.. index::
+   single: setup.py
+
 ``setup.py``
 ~~~~~~~~~~~~
 
@@ -541,6 +564,9 @@ tarball to other people who want to use your application.
    you rerun ``setup.py sdist``, all files checked into the version
    control system will be included in the tarball.
 
+.. index::
+   single: package
+
 The ``myproject`` :term:`Package`
 ---------------------------------
 
@@ -572,6 +598,9 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
 These are purely conventions established by the ``paster`` template:
 :mod:`repoze.bfg` doesn't insist that you name things in any
 particular way.
+
+.. index::
+   single: configure.zcml
 
 ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~
@@ -626,6 +655,9 @@ the :term:`application registry`. It looks like so:
 
 #. Line 17 ends the ``configure`` root tag.
 
+.. index::
+   single: views.py
+
 ``views.py``
 ~~~~~~~~~~~~
 
@@ -667,6 +699,9 @@ views, renderers, and templates relate and cooperate.
    set your project's ``reload_templates`` to ``false`` to increase
    the speed at which templates may be rendered.
 
+.. index::
+   single: models.py
+
 .. _modelspy_project_section:
 
 ``models.py``
@@ -694,6 +729,9 @@ persistent data store, such as a database.  :mod:`repoze.bfg` doesn't
 make any assumption about which sort of datastore you'll want to use,
 so the sample application uses an instance of
 :class:`myproject.models.MyModel` to represent the root.
+
+.. index::
+   single: run.py
 
 ``run.py``
 ~~~~~~~~~~
@@ -738,6 +776,9 @@ renderers.
 
 This directory contains static resources which support the
 ``mytemplate.pt`` template.  It includes CSS and images.
+
+.. index::
+   single: tests.py
 
 ``tests.py``
 ~~~~~~~~~~~~

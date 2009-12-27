@@ -1,3 +1,7 @@
+.. index::
+   single: unit testing
+   single: integration testing
+
 .. _unittesting_chapter:
 
 Unit and Integration Testing
@@ -50,6 +54,11 @@ tutorial is available within `Dive Into Python
 integration tests easier to write.  The facilities become particularly
 useful when your code calls into :mod:`repoze.bfg` -related framework
 functions.
+
+.. index::
+   pair: test; setup
+   pair: test; tear down
+   single: unittest
 
 .. _test_setup_and_teardown:
 
@@ -150,6 +159,10 @@ method within the ``setUp`` of a unit test, then subsequently call its
 ``end`` method in the test's ``tearDown``.  This won't really hurt
 anything if the application you're testing does not call any
 ``get_current*`` function.
+
+.. index::
+   single: repoze.bfg.testing
+   pair: Configurator; testing
 
 Using the ``Configurator`` and ``repoze.bfg.testing`` APIs in Unit Tests
 ------------------------------------------------------------------------
@@ -281,6 +294,9 @@ representing "dummy" implementations of a request and a model.
 
 See also the various methods of the :term:`Configurator` documented in
 :ref:`configuration_module` that begin with the ``testing_`` prefix.
+
+.. index::
+   pair: creating; integration tests
 
 .. _integration_tests:
 

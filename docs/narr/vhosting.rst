@@ -3,6 +3,9 @@
 Virtual Hosting
 ===============
 
+.. index::
+   pair: virtual hosting; URL prefix
+
 Hosting an Application Under a URL Prefix
 -----------------------------------------
 
@@ -62,6 +65,9 @@ setting in a :term:`mod_wsgi` configuration does the work for you:
 
 In the above configuration, we root a :mod:`repoze.bfg` application at
 ``/bfgapp`` within the Apache configuration.
+
+.. index::
+   pair: virtual hosting; virtual root
 
 Virtual Root Support
 --------------------

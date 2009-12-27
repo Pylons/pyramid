@@ -1,3 +1,6 @@
+.. index::
+   single: url dispatch
+
 .. _urldispatch_chapter:
 
 URL Dispatch
@@ -53,6 +56,9 @@ error to the user's browser when no routes match.
 .. note:: See :ref:`modelspy_project_section` for an example of a
           simple root factory callable that will use traversal.
 
+.. index::
+   single: add_route
+
 The ``add_route`` Configurator Method
 -------------------------------------
 
@@ -64,6 +70,9 @@ registry`.  Here's an example:
 .. code-block:: python
 
    config.add_route('myroute', '/prefix/:one/:two')
+
+.. index::
+   single: ZCML directive; route
 
 Configuring a Route via ZCML
 ----------------------------
@@ -85,6 +94,9 @@ documentation.
 .. note:: The documentation that follows in this chapter assumes that
    :term:`ZCML` will be used to perform route configuration.
 
+.. index::
+   pair: URL dispatch; matchdict
+
 The Matchdict
 -------------
 
@@ -94,6 +106,9 @@ request against a URL path pattern.  When this URL path pattern is
 matched, a dictionary is placed on the request named ``matchdict``
 with the values that match patterns in the ``path`` element.  If the
 URL pattern does not match, no matchdict is generated.
+
+.. index::
+   pair: URL dispatch; path pattern syntax
 
 .. _route_path_pattern_syntax:
 
@@ -203,6 +218,9 @@ Will generate the following matchdict:
 .. code-block:: text
 
    {'traverse':(u'La Pe\xf1a', u'a', u'b', u'c')}
+
+.. index::
+   triple: ZCML directive; route; examples
 
 ``<route>`` Statement Examples
 ------------------------------
@@ -419,6 +437,9 @@ In this case in particular, when a user visits
 Article class and it will have an ``article`` attribute with the value
 of ``something``.
 
+.. index::
+   pair: URL dispatch; catching root URL
+
 Catching the Root URL
 ---------------------
 
@@ -446,6 +467,9 @@ Or provide the literal string ``/`` as the path:
        view=".views.root_view"
        />
 
+.. index::
+   pair: URL dispatch; generating route URLs
+
 Generating Route URLs
 ---------------------
 
@@ -466,6 +490,9 @@ This would return something like the string
 hostname implied ``http:/example.com``).  See the
 :func:`repoze.bfg.url.route_url` API documentation for more
 information.
+
+.. index::
+   pair: URL dispatch; slash-redirecting
 
 Redirecting to Slash-Appended Routes
 ------------------------------------
@@ -573,6 +600,9 @@ Then in the ``configure.zcml`` of your package, inject the following:
 
 This will cause the DBSession to be removed whenever the WSGI
 environment is destroyed (usually at the end of every request).
+
+.. index::
+   pair: URL dispatch; security
 
 .. _using_security_with_urldispatch:
 

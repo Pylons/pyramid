@@ -61,6 +61,9 @@ A Sense of Fun
   Developing a :mod:`repoze.bfg` application should not feel foreign
   or "enterprisey".  We like to keep things down-to-earth.
 
+.. index::
+   single: similarities to other frameworks
+
 Similarities to Other Web Frameworks
 ------------------------------------
 
@@ -112,6 +115,9 @@ would be by Django.
 The skeleton code generator of :mod:`repoze.bfg` generates a directory
 layout very similar to the directory layout suggested by the `Django
 Book <http://www.djangobook.com/>`_ .  
+
+.. index::
+   single: differences from other frameworks
 
 Differences from Other Web Frameworks
 -------------------------------------

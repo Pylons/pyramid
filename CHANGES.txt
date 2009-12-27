@@ -16,6 +16,8 @@ Documentation Licensing
 Documentation
 -------------
 
+- Added manual index entries to generated index.
+
 - Document the previously existing (but non-API)
   ``repoze.bfg.configuration.Configurator.setup_registry`` method as
   an official API of a ``Configurator``.

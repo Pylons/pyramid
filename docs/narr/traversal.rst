@@ -13,6 +13,11 @@ Python class or any :term:`interface` attached to it).  If
 :mod:`repoze.bfg` finds a :term:`view` for the context, it calls it
 and returns a response to the user.
 
+.. index::
+   single: object graph
+   single: traversal graph
+   single: model graph
+
 The Object Graph
 ----------------
 
@@ -54,6 +59,9 @@ Items contained within the object graph are sometimes analogous to the
 concept of :term:`model` objects used by many other frameworks (and
 :mod:`repoze.bfg` APIs often refers to them as "models", as well).
 They are typically instances of Python classes.
+
+.. index::
+   single: traversal behavior
 
 .. _traversal_behavior:
 
@@ -240,6 +248,9 @@ code to execute:
 In either case, the result is returned upstream via the :term:`WSGI`
 protocol.
 
+.. index::
+   pair: traversal; example
+
 A Traversal Example
 -------------------
 
@@ -361,6 +372,9 @@ There are two special cases:
   views that may have the same names as model instance names in the
   graph unambiguously.
 
+.. index::
+   pair: traversal; side-effects
+
 .. _traversal_related_side_effects:
 
 Traversal-Related Side Effects
@@ -402,6 +416,9 @@ will be a sequence representing the ordered set of names that were
 used to traverse to the virtual root object.  See
 :ref:`vhosting_chapter` for more information about virtual roots.
 
+.. index::
+   pair: debugging; not found errors
+
 .. _debug_notfound_section:
 
 :exc:`NotFound` Errors
@@ -415,6 +432,9 @@ configuration file setting.  Details of why a view was not found will
 be printed to ``stderr``, and the browser representation of the error
 will include the same information.  See :ref:`environment_chapter` for
 more information about how and where to set these values.
+
+.. index::
+   pair: traversal; unicode
 
 Traversal and Unicode
 ---------------------

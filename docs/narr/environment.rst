@@ -1,3 +1,20 @@
+.. index::
+   single: environment variables
+   single: settings
+   single: reload
+   single: configure.zcml
+   single: configure_zcml
+   single: debug_authorization
+   single: reload_resources
+   single: debug_notfound
+   single: debug_all
+   single: reload_all
+   pair: debug; settings
+   pair: reload; settings
+   pair: environment; variables
+   pair: ini file; settings
+   pair: PasteDeploy; settings
+  
 .. _environment_chapter:
 
 Environment Variables and ``.ini`` File Settings
@@ -106,6 +123,9 @@ with ``reload_``). on in one fell swoop, you can use
 ``reload_all=true`` in the config file.  Note that this does not
 effect settings that do not start with ``reload_*`` such as
 ``debug_notfound``.
+
+.. index:: 
+   pair: reload_templates; reload_resources
 
 Understanding the Distinction Between ``reload_templates`` and ``reload_resources``
 -----------------------------------------------------------------------------------

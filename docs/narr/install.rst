@@ -3,6 +3,9 @@
 Installing :mod:`repoze.bfg`
 ============================
 
+.. index::
+   pair: install; preparation
+
 Before You Install
 ------------------
 
@@ -112,6 +115,9 @@ executable and accept the defaults during the installation process.
 You may also need to download and install the `Python for Windows
 extensions <http://sourceforge.net/projects/pywin32/files/>`_.
 
+.. index::
+   pair: installing; UNIX
+
 Installing :mod:`repoze.bfg` on a UNIX System
 ---------------------------------------------
 
@@ -165,6 +171,9 @@ the script.  To remediate this, you may need to do:
 
    $ sudo python ez_setup.py
 
+.. index::
+   pair: installing; virtualenv
+
 Installing the ``virtualenv`` Package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -184,6 +193,9 @@ to install it as your system's administrative user.  For example:
 .. code-block:: text
 
    $ sudo easy_install virtualenv
+
+.. index::
+   pair: creating; virtualenv
 
 Creating the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -227,6 +239,9 @@ virtualenv (``bfgenv``) directory:
 
 This command will take longer than the previous ones to complete, as it
 downloads and installs a number of dependencies.
+
+.. index::
+   pair: installing; Windows
 
 Installing :mod:`repoze.bfg` on a Windows System
 -------------------------------------------------
@@ -276,6 +291,9 @@ Installing :mod:`repoze.bfg` on a Windows System
    .. code-block:: text
 
       c:\bfgenv> Scripts\easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
+
+.. index::
+   pair: installing; Google App Engine
 
 Installing :mod:`repoze.bfg` on Google App Engine
 -------------------------------------------------

@@ -17,6 +17,9 @@ This chapter explains what happens between the time you press the
 myproject/MyProject.ini`` and the the time the line ``serving on
 0.0.0.0:6543 ...`` is output to your console.
 
+.. index::
+   single: startup process
+
 The Startup Process
 -------------------
 

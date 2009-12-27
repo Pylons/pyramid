@@ -1,3 +1,8 @@
+.. index::
+   single: thread local variables
+   single: get_current_request
+   single: get_current_registry
+
 .. _threadlocals_chapter:
 
 Thread Locals

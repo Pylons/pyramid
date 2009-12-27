@@ -100,6 +100,9 @@ code just won't have any ``<route>`` declarations.  Instead, its ZCML
 above will match the URL ``/a/b/c/foobar`` or ``/foobar``, etc,
 assuming that no view is named "a", "b", or "c" during traversal.
 
+.. index::
+   single: hybrid mode application
+
 Hybrid Applications
 -------------------
 
@@ -199,6 +202,10 @@ It's :term:`view name` will be looked for during traversal.  So if our
 URL is "http://example.com/one/two/a/another", the ``.views.another``
 view will be called.
 
+.. index::
+   pair: route; factory
+   single: route factory
+
 Route Factories
 ---------------
 
@@ -217,6 +224,9 @@ factory`) instead of the *default* root factory.
 In this way, each route can use a different factory, making it
 possible to traverse different graphs based on some routing parameter
 within the same application.
+
+.. index::
+   pair: subpath; route
 
 .. _star_subpath:
 
@@ -452,6 +462,9 @@ you must the special ``*traverse`` token to the route's "path"., e.g.:
      view=".views.bazbuz"
      route_name="abc"
      />
+
+.. index::
+   pair: route; ordering
 
 Route Ordering
 ~~~~~~~~~~~~~~

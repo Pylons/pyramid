@@ -10,6 +10,9 @@ source code that makes up the application.  The behavior of a
 :mod:`repoze.bfg` application that obeys these constraints can be
 *overridden* or *extended* without modification.
 
+.. index::
+   triple: building; extensible; application
+
 Rules for Building An Extensible Application
 --------------------------------------------
 
@@ -41,6 +44,9 @@ declarations made using the ZCML ``<view>`` directive (or the
 repoze bfg using the :term:`pkg_resources` API such as static files
 and templates.
 
+.. index::
+   pair: ZCML; granularity
+
 ZCML Granularity
 ~~~~~~~~~~~~~~~~
 
@@ -69,6 +75,9 @@ Granularizing ZCML is not strictly required.  An extender can always
 disuse *all* your ZCML, choosing instead to copy and paste it into his
 own package, if necessary.  However, doing so is considerate, and
 allows for the best reusability.
+
+.. index::
+   pair: extending existing; application
 
 Extending an Existing Application
 ---------------------------------
@@ -163,6 +172,9 @@ something like this:
   ``configure.zcml`` file.  See :ref:`environment_chapter` for more
   information about this setting.
 
+.. index::
+   pair: overriding; views
+
 .. _overriding_views:
 
 Overriding Views
@@ -188,6 +200,9 @@ A similar pattern can be used to *extend* the application with
 existing model type and make sure the URLs it implies are available on
 some other page rendering.
 
+.. index::
+   pair: overriding; routes
+
 .. _overriding_routes:
 
 Overriding Routes
@@ -202,6 +217,9 @@ declarations when performing an override.  Typically, this means
 and changing them as necessary.  Then disinclude any ZCML from the
 original application which contains the original declarations.
 
+.. index::
+   pair: overriding; resources
+
 .. _overriding_resources:
 
 Overriding Resources
@@ -215,6 +233,9 @@ chapter describes in detail how to override package resources with
 other resources by using :term:`ZCML` ``<resource>`` declarations.  Add
 such ``<resource>`` declarations to your override package's
 ``configure.zcml`` to perform overrides.
+
+.. index::
+   pair: ZCML; inclusion
 
 Dealing With ZCML Inclusions
 ----------------------------

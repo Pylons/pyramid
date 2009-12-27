@@ -1,3 +1,11 @@
+.. index::
+   single: event
+   single: events
+   single: subscriber
+   single: INewRequest
+   single: INewResponse
+   pair: subscriber; ZCML directive
+
 .. _events_chapter:
 
 Using Events

@@ -12,6 +12,9 @@ appropriate level of access with respect to a specific
 Authorization is enabled by modifying your application to include a
 :term:`authentication policy` and :term:`authorization policy`.
 
+.. index::
+   pair: enabling; authorization policy
+
 Enabling an Authorization Policy Imperatively
 ---------------------------------------------
 
@@ -62,6 +65,9 @@ It is also possible to construct your own custom authentication policy
 or authorization policy: see :ref:`creating_an_authentication_policy`
 and :ref:`creating_an_authorization_policy`.
 
+.. index::
+   triple: enabling; authorization policy; via ZCML
+
 Enabling an Authorization Policy Via ZCML
 -----------------------------------------
 
@@ -102,6 +108,10 @@ injected as the :term:`authorization policy` used by this application.
 authentication policy ZCML directives that should prove useful.  See
 :ref:`authentication_policies_directives_section` and
 :ref:`authorization_policies_directives_section` for more information.
+
+.. index::
+   single: permissions
+   single: protecting views
 
 Protecting Views with Permissions
 ---------------------------------
@@ -145,6 +155,9 @@ normal application operations, the user will need to possess the
 Permission names are usually just strings.  They hold no special
 significance to the system.  You can name permissions whatever you
 like.
+
+.. index::
+   pair: assigning; ACL
 
 .. _assigning_acls:
 
@@ -200,6 +213,9 @@ model itself, the effect is the same.  It is useful to decorate
 individual model instances with an ACL (as opposed to just decorating
 their class) in applications such as "CMS" systems where fine-grained
 access is required on an object-by-object basis.
+
+.. index::
+   single: ACE
 
 Elements of an ACL
 ------------------
@@ -287,6 +303,10 @@ view permission.  On the other hand, if you have an ACL like this:
 The authorization policy will deny Everyone the view permission, even
 though later in the ACL is an ACE that allows everyone.
 
+.. index::
+   single: prinicpal
+   pair: special; principal names
+
 Special Principal Names
 -----------------------
 
@@ -308,6 +328,9 @@ ACLs, e.g. :data:`repoze.bfg.security.Everyone`.
   This object is actually a string "under the hood"
   (``system.Authenticated``).
 
+.. index::
+   pair: special; permission names
+
 Special Permissions
 -------------------
 
@@ -324,6 +347,9 @@ module.  These can be imported for use in ACLs.
   ``__contains__`` method that always returns True, which, for all
   known authorization policies, has the effect of indicating that a
   given principal "has" any permission asked for by the system.
+
+.. index::
+   pair: special; ACE
 
 Special ACEs
 ------------
@@ -352,6 +378,9 @@ authorization policy is in effect might look like so:
 
    __acl__ = [ (Allow, 'fred', 'view'), DENY_ALL ]
 
+.. index::
+   single: ACL inheritance
+
 ACL Inheritance
 ---------------
 
@@ -360,6 +389,9 @@ object does not have an ACL when it is the context, its *parent* is
 consulted for an ACL.  If that object does not have an ACL, *its*
 parent is consulted for an ACL, ad infinitum, until we've reached the
 root and there are no more parents left.
+
+.. index::
+   pair: location-aware; security
 
 Location-Awareness
 ------------------
@@ -384,6 +416,9 @@ root object's ``__parent__`` is ``None``.
 See :ref:`location_module` for documentations of functions which use
 location-awareness.  See also :ref:`location_aware`.
 
+.. index::
+   pair: forbidden view; changing
+
 Changing the Forbidden View
 ---------------------------
 
@@ -393,6 +428,9 @@ of the box", this forbidden view is very plain.  See
 :ref:`changing_the_forbidden_view` within :ref:`hooks_chapter` for
 instructions on how to create a custom forbidden view and arrange for
 it to be called when view authorization is denied.
+
+.. index::
+   pair: debugging; authorization failures
 
 .. _debug_authorization_section:
 
@@ -439,6 +477,9 @@ one of :data:`repoze.bfg.security.ACLAllowed`,
 denied or allowed.  Introspecting this information in the debugger or
 via print statements when a call to
 :func:`repoze.bfg.security.has_permission` fails is often useful.
+
+.. index::
+   pair: ZCML directive; authentication policy
 
 .. _authentication_policies_directives_section:
 
@@ -516,6 +557,9 @@ An example of its usage, with all attributes fully expanded:
 See :ref:`repozewho1authenticationpolicy_directive` for detailed
 information.
 
+.. index::
+   pair: ZCML directive; authorization policy
+
 .. _authorization_policies_directives_section:
 
 Built-In Authorization Policy ZCML Directives
@@ -537,6 +581,9 @@ In other words, it has no configuration attributes; its existence in a
 ``configure.zcml`` file enables it.
 
 See :ref:`aclauthorizationpolicy_directive` for detailed information.
+
+.. index::
+   pair: creating; authentication policy
 
 .. _creating_an_authentication_policy:
 
@@ -577,6 +624,9 @@ that implements the following interface:
 After you do so, you can pass an instance of such a class into the
 :class:`repoze.bfg.configuration.Configurator` class at configuration
 time as ``authentication_policy`` to use it.
+
+.. index::
+   pair: creating; authorization policy
 
 .. _creating_an_authorization_policy:
 
