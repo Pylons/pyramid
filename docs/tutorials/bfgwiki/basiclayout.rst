@@ -110,9 +110,8 @@ function within the file named ``run.py``:
    (something like ``file:///path/to/Data.fs``).
 
 #. *Line 14*. We create a "finder" object using the
-   ``repoze.zodbconn.finder.PersistentApplicationFinder`` helper
-   class, passing it the ZODB URI and the "appmaker" we've imported
-   from ``models.py``.
+   ``PersistentApplicationFinder`` helper class, passing it the ZODB
+   URI and the "appmaker" we've imported from ``models.py``.
 
 #. *Lines 15 - 16*.  We create a :term:`root factory` which uses the
    finder to return a ZODB root object.

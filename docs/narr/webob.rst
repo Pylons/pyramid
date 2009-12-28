@@ -103,19 +103,19 @@ URLs
 
 In addition to these attributes, there are several ways to get the URL
 of the request.  I'll show various values for an example URL
-``http://localhost/app-root/doc?article_id=10``, where the application
-is mounted at ``http://localhost/app-root``.
+``http://localhost/app/?id=10``, where the application is mounted at
+``http://localhost/app``.
 
 ``req.url``:
     The full request URL, with query string, e.g.,
-    ``'http://localhost/app-root/doc?article_id=10'``
+    ``http://localhost/app/?id=10``
 
 ``req.application_url``:
     The URL of the application (just the SCRIPT_NAME portion of the
-    path, not PATH_INFO).  E.g., ``'http://localhost/app-root'``
+    path, not PATH_INFO).  E.g., ``http://localhost/app``
 
 ``req.host_url``:
-    The URL with the host, e.g., ``'http://localhost'``
+    The URL with the host, e.g., ``http://localhost``
 
 ``req.relative_url(url, to_application=False)``:
     Gives a URL, relative to the current URL.  If ``to_application``
@@ -207,7 +207,9 @@ Here's the highlights:
     This optional attribute can point to the request object associated
     with this response object.
 
-``response.set_cookie(key, value, max_age=None, path='/', domain=None, secure=None, httponly=False, version=None, comment=None)``:
+``response.set_cookie(key, value, max_age=None, path='/', 
+     domain=None, secure=None, httponly=False, 
+     version=None, comment=None)``:
     Set a cookie.  The keyword arguments control the various cookie
     parameters.  The ``max_age`` argument is the length for the cookie
     to live in seconds (you may also use a timedelta object).  The

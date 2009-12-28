@@ -200,13 +200,7 @@ Running
        [chrism@snowpro myapp]$ ../bin/runzeo -C zeo.conf 
        ------
        2009-09-19T13:48:41 INFO ZEO.runzeo (9910) created PID file './zeo.pid'
-       ------
-       2009-09-19T13:48:41 INFO ZEO.runzeo (9910) opening storage '1' using BlobStorage
-       ------
-       2009-09-19T13:48:41 WARNING ZODB.FileStorage Ignoring index for ./myapp.db
-       ------
-       2009-09-19T13:48:41 INFO ZEO.StorageServer (9910) StorageServer created RW with storages: 1:RW:./myapp.db
-       ------
+       # ... more output ...
        2009-09-19T13:48:41 INFO ZEO.zrpc (9910) listening on ./zeo.sock
 
 #.  While the ZEO server is running, start the application server:
@@ -228,7 +222,8 @@ Running
     .. code-block:: text
        :linenos:
 
-       [chrism@snowpro sess]$ ../bin/paster --plugin=repoze.bfg bfgshell myapp.ini myapp
+       [chrism@snowpro sess]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+              myapp.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin
        Type "help" for more information. "root" is the BFG app root object.

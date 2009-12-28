@@ -114,8 +114,8 @@ file:
 
 See also :ref:`subscriber_directive`.
 
-Subscribers may also be configured imperatively via the
-:meth:`repoze.bfg.configuration.Configurator.add_subscriber` method:
+The :meth:`repoze.bfg.configuration.Configurator.add_subscriber`
+method can be used to perform the same job:
 
 .. ignore-next-block
 .. code-block:: python

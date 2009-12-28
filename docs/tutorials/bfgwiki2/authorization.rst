@@ -78,12 +78,11 @@ Changing ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We'll change our ``configure.zcml`` file to enable an
-:class:`repoze.bfg.authentication.AuthTktAuthenticationPolicy` and an
-:class:`repoze.bfg.authorization.ACLAuthorizationPolicy` to enable
-declarative security checking.  We'll also change ``configure.zcml``
-to add a ``forbidden`` stanza which points at our ``login``
-:term:`view callable`, also known as a :term:`forbidden view`.  This
-configures our newly created login view to show up when
+``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
+enable declarative security checking.  We'll also change
+``configure.zcml`` to add a ``forbidden`` stanza which points at our
+``login`` :term:`view callable`, also known as a :term:`forbidden
+view`.  This configures our newly created login view to show up when
 :mod:`repoze.bfg` detects that a view invocation can not be
 authorized.  Also, we'll add ``view_permission`` attributes with the
 value ``edit`` to the ``edit_page`` and ``add_page`` route

@@ -124,13 +124,10 @@ system.
 
    .. code-block:: text
 
-      [chrism@vitaminf bfg_gae]$ python2.5 /usr/local/bin/dev_appserver.py bfgapp/app/INFO     2009-05-03 22:23:13,887 appengine_rpc.py:157] Server: appengine.google.com
-      INFO     2009-05-03 22:23:13,898 appcfg.py:320] Checking for updates to the SDK.
-      INFO     2009-05-03 22:23:14,034 appcfg.py:334] The SDK is up to date.
-      WARNING  2009-05-03 22:23:14,035 datastore_file_stub.py:368] Could not read datastore data from /var/folders/dB/dByJ-qkiE6igZD4Yrm+nMk+++TI/-Tmp-/dev_appserver.datastore
-      WARNING  2009-05-03 22:23:14,035 datastore_file_stub.py:368] Could not read datastore data from /var/folders/dB/dByJ-qkiE6igZD4Yrm+nMk+++TI/-Tmp-/dev_appserver.datastore.history
-      WARNING  2009-05-03 22:23:14,045 dev_appserver.py:3240] Could not initialize images API; you are likely missing the Python "PIL" module. ImportError: No module named _imaging
-      INFO     2009-05-03 22:23:14,050 dev_appserver_main.py:463] Running application bfgapp on port 8080: http://localhost:8080
+      [chrism@vitaminf bfg_gae]$ python2.5 /usr/local/bin/dev_appserver.py \
+              bfgapp/app/
+      INFO     2009-05-03 22:23:13,887 appengine_rpc.py:157] # ... more... 
+      Running application bfgapp on port 8080: http://localhost:8080
 
    You may need to run "Make Symlinks" from the Google App Engine
    Launcher GUI application if your system doesn't already have the
@@ -189,36 +186,17 @@ system.
 
    .. code-block:: text
 
-      [chrism@vitaminf bfgapp]$ python2.5 /usr/local/bin/appcfg.py update ../bfgapp/app/
+      [chrism@vitaminf bfgapp]$ python2.5 /usr/local/bin/appcfg.py update \
+                ../bfgapp/app/
       Scanning files on local disk.
       Scanned 500 files.
-      Scanned 1000 files.
-      Initiating update.
-      Cloning 761 application files.
-      Cloned 100 files.
-      Cloned 200 files.
-      Cloned 300 files.
-      Cloned 400 files.
-      Cloned 500 files.
-      Cloned 600 files.
-      Cloned 700 files.
-      Uploading 12 files.
-      Deploying new version.
-      Checking if new version is ready to serve.
-      Will check again in 1 seconds.
-      Checking if new version is ready to serve.
-      Will check again in 2 seconds.
-      Checking if new version is ready to serve.
-      Will check again in 4 seconds.
-      Checking if new version is ready to serve.
-      Will check again in 8 seconds.
-      Checking if new version is ready to serve.
+      # ... more output ...
       Will check again in 16 seconds.
       Checking if new version is ready to serve.
       Closing update: new version is ready to start serving.
       Uploading index definitions.
 
-#. Visit "<yourapp>.appspot.com" in a browser.
+#. Visit ``http://<yourapp>.appspot.com`` in a browser.
 
 .. _pip_zip:
 

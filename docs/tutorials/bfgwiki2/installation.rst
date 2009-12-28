@@ -251,8 +251,8 @@ On Windows:
 
 .. code-block:: text
 
-   c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial --cover-erase \
-         --with-coverage
+   c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+         --cover-erase --with-coverage
 
 Looks like our package's ``models`` module doesn't quite have 100%
 test coverage.

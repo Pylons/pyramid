@@ -226,6 +226,7 @@ _PREAMBLE = r"""
   \renewcommand{\footrulewidth}{0pt}% not footer line
   \fancyfoot[C]{\thepage}% like fancy style
 }
+\sloppy
 """
 
 latex_elements = {

@@ -218,8 +218,8 @@ the name ``main`` as a section name:
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
-
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+         MyProject.ini main
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
    Type "help" for more information. "root" is the BFG app root object.
@@ -239,7 +239,8 @@ standard Python interpreter shell unconditionally.
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini main
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+         MyProject.ini main
 
 Press "Ctrl-D" to exit the interactive shell.
 
@@ -268,7 +269,8 @@ The command you use to invoke the interactive shell should be:
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell MyProject.ini myapp
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+         MyProject.ini myapp
 
 If you use ``main`` as the section name argument instead of ``myapp``
 against the above ``.ini`` file, an error will likely occur.  Use the

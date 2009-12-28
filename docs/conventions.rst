@@ -59,3 +59,11 @@ Blocks of XML markup are presented in the following style:
        <!-- ... more XML .. -->
      </root>
 
+When a command that should be typed on one line is too long to fit on
+a page, the backslash ``\`` is used to indicate that the following
+printed line should actually be part of the command:
+
+  .. code-block:: text
+
+     c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
+           --cover-erase --with-coverage
