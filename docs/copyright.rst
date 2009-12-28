@@ -5,7 +5,7 @@ Copyright and Trademarks
 
 by Chris McDonough
 
-Copyright ©2008-2010, Agendaless Consulting.
+Copyright © 2008-2010, Agendaless Consulting.
 
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons

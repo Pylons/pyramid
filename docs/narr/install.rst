@@ -235,7 +235,8 @@ virtualenv (``bfgenv``) directory:
 
 .. code-block:: text
 
-   $ bin/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
+   $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple \
+         repoze.bfg
 
 This command will take longer than the previous ones to complete, as it
 downloads and installs a number of dependencies.
@@ -285,12 +286,13 @@ Installing :mod:`repoze.bfg` on a Windows System
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "1.1" index to get BFG
-   and its direct dependencies installed:
+#. Use ``easy_install`` and point to the :mod:`repoze.bfg` "current"
+   index to get BFG and its direct dependencies installed:
 
    .. code-block:: text
 
-      c:\bfgenv> Scripts\easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
+      c:\bfgenv> Scripts\easy_install -i \
+           http://dist.repoze.org/bfg/current/simple repoze.bfg
 
 .. index::
    pair: installing; Google App Engine

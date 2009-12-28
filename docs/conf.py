@@ -194,10 +194,60 @@ latex_use_modindex = False
 
 ## \usepackage[bindingoffset=1cm,textheight=22cm,hdivide={2cm,*,2cm},vdivide={*,22cm,*}]{geometry}
 
+## _PREAMBLE = r"""\usepackage[bindingoffset=0.45in,textheight=7.25in,hdivide={0.5in,*,0.75in},vdivide={1in,7.25in,1in},papersize={7.5in,9.25in}]{geometry}"""
 
-_PREAMBLE = r"""\usepackage[bindingoffset=0.45in,textheight=7.25in,hdivide={0.5in,*,0.75in},vdivide={1in,7.25in,1in},papersize={7.5in,9.25in}]{geometry}"""
+_PREAMBLE = r"""
+\usepackage[]{geometry}
+\geometry{bindingoffset=0.45in,textheight=7.25in,hdivide={0.5in,*,0.75in},vdivide={1in,7.25in,1in},papersize={7.5in,9.25in}}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    filecolor=black,
+    urlcolor=black
+}
+
+\pagestyle{fancy}
+
+\renewcommand{\chaptermark}[1]%
+{\markboth{\MakeUppercase{\thechapter.\ #1}}{}}
+\renewcommand{\sectionmark}[1]%
+{\markright{\MakeUppercase{\thesection.\ #1}}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\fancyhead[LO]{\rightmark}
+\fancyhead[RE]{\leftmark}
+
+\fancypagestyle{plain}{
+  \fancyhf{} % empty header and footer
+  \renewcommand{\headrulewidth}{0pt} % ho header line
+  \renewcommand{\footrulewidth}{0pt}% not footer line
+  \fancyfoot[C]{\thepage}% like fancy style
+}
+"""
 
 latex_elements = {
-    'preamble':_PREAMBLE, # omit for letter size
-#    'fncychap':r'\usepackage[Sonny]{fncychap}',
-    }
+    'preamble': _PREAMBLE,
+    'wrapperclass':'book',
+}
+
+from docutils import nodes
+
+def frontmatter(name, arguments, options, content, lineno,
+                content_offset, block_text, state, state_machine):
+    return [nodes.raw('', '\\frontmatter\n', format='latex')]
+
+def mainmatter(name, arguments, options, content, lineno,
+               content_offset, block_text, state, state_machine):
+    return [nodes.raw('', '\\mainmatter\n', format='latex')]
+
+def backmatter(name, arguments, options, content, lineno,
+              content_offset, block_text, state, state_machine):
+    return [nodes.raw('', '\\backmatter\n', format='latex')]
+
+def setup(app):
+    app.add_directive('frontmatter', frontmatter, 1, (0, 0, 0))
+    app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
+    app.add_directive('backmatter', backmatter, 1, (0, 0, 0))

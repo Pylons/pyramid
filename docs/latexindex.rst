@@ -4,8 +4,10 @@
 The :mod:`repoze.bfg` Web Application Framework
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-Fore-matter
-@@@@@@@@@@@
+.. frontmatter::
+
+Front Matter
+@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
@@ -13,6 +15,8 @@ Fore-matter
    copyright.rst
    thanks.rst
    conventions.rst
+
+.. mainmatter::
 
 Narrative Documentation
 @@@@@@@@@@@@@@@@@@@@@@@
@@ -93,6 +97,8 @@ ZCML Directives
 
    zcml
 
+.. backmatter::
+
 Glossary and Index
 @@@@@@@@@@@@@@@@@@
 
@@ -100,6 +106,3 @@ Glossary and Index
   :maxdepth: 1
 
   glossary
-
-* :ref:`genindex`
-

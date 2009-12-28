@@ -74,7 +74,7 @@ found by the scanner, a set of calls are made to a
 :term:`Configurator` on behalf of the developer: these calls represent
 the intent of the configuration decoration.  In the example above,
 this is best represented as the scanner translating the arguments to
-:class:`repoze.bfg.view..bfg_view` into a call to the
+:class:`repoze.bfg.view.bfg_view` into a call to the
 :meth:`repoze.bfg.configuration.Configurator.add_view` method,
 effectively:
 
