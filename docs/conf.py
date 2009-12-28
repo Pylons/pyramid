@@ -252,3 +252,26 @@ def setup(app):
     app.add_directive('frontmatter', frontmatter, 1, (0, 0, 0))
     app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
     app.add_directive('backmatter', backmatter, 1, (0, 0, 0))
+
+# ugh
+
+from sphinx.writers.latex import LaTeXTranslator
+
+def visit_literal(self, node):
+        self.no_contractions += 1
+        content = self.encode(node.astext().strip())
+        self.no_contractions -= 1
+        if self.in_title:
+            self.body.append(r'\texttt{%s}' % content)
+        elif node.has_key('role') and node['role'] == 'samp':
+            self.body.append(r'\samp{%s}' % content)
+        else:
+            # XXX special treatment of overlong ``repoze.bfg.foo``
+            # literals.
+            if 'repoze.bfg.' in content:
+                content = content.replace('repoze.bfg.', '')
+            self.body.append(r'\code{%s}' % content)
+        raise nodes.SkipNode
+    
+LaTeXTranslator.visit_literal = visit_literal
+

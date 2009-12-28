@@ -207,13 +207,12 @@ Here's the highlights:
     This optional attribute can point to the request object associated
     with this response object.
 
-``response.set_cookie(key, value, max_age=None, path='/', 
-     domain=None, secure=None, httponly=False, 
-     version=None, comment=None)``:
-    Set a cookie.  The keyword arguments control the various cookie
+``response.set_cookie(key, value, max_age=None, path='/', ...)``: Set
+    a cookie.  The keyword arguments control the various cookie
     parameters.  The ``max_age`` argument is the length for the cookie
     to live in seconds (you may also use a timedelta object).  The
-    `Expires`` key will also be set based on the value of ``max_age``.
+    ``Expires`` key will also be set based on the value of
+    ``max_age``.
 
 ``response.delete_cookie(key, path='/', domain=None)``:
     Delete a cookie from the client.  This sets ``max_age`` to 0 and

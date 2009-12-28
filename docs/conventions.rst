@@ -67,3 +67,19 @@ printed line should actually be part of the command:
 
      c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
            --cover-erase --with-coverage
+
+In printed versions of this book, Python modules classes, methods,
+functions, and attributes that are part of the :mod:`repoze.bfg`
+module are referenced in paragraph text.  These are contracted to omit
+the ``repoze.bfg`` prefix to reduce redundancy and increase
+readability.  Therefore, where you might expect:
+
+  .. code-block:: text
+
+     repoze.bfg.configuration.Configurator.add_view (pp. XXX)
+
+Instead a contracted version will be rendered:
+
+  .. code-block:: text
+
+     configuration.Configurator.add_view (pp. XXX)
