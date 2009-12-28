@@ -646,12 +646,11 @@ example, it might be desirable to construct an alternate authorization
 policy which allows the application to use an authorization mechanism
 that does not involve :term:`ACL` objects.
 
-:mod:`repoze.bfg` ships with only its single default
-:class:`repoze.bfg.authorization.ACLAuthorizationPolicy`, so you'll
-need to create your own if you'd like to use a different one.
-Creating and using your own authorization policy is a matter of
-creating an instance of an object that implements the following
-interface:
+:mod:`repoze.bfg` ships with only a single default authorization
+policy, so you'll need to create your own if you'd like to use a
+different one.  Creating and using your own authorization policy is a
+matter of creating an instance of an object that implements the
+following interface:
 
 .. code-block:: python
 

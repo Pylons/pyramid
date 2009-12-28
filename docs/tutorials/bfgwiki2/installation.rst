@@ -31,27 +31,27 @@ Preparation, UNIX
    <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
    the ``python`` interpreter of your Python 2.5 installation:
 
-   .. code-block:: bash
+   .. code-block:: text
 
-    $ /path/to/my/Python-2.5/bin/python ez_setup.py
+      $ /path/to/my/Python-2.5/bin/python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
-   .. code-block:: bash
+   .. code-block:: text
 
-    $ /path/to/my/Python-2.5/bin/easy_install virtualenv
+      $ /path/to/my/Python-2.5/bin/easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
-   .. code-block:: bash
+   .. code-block:: text
 
-     $ path/to/my/Python-25/bin/virtualenv --no-site-packages bigfntut
+      $ path/to/my/Python-25/bin/virtualenv --no-site-packages bigfntut
 
 #. Switch to the ``bigfntut`` directory:
 
-   .. code-block:: bash
+   .. code-block:: text
 
-     $ cd bigfntut
+      $ cd bigfntut
 
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
@@ -59,15 +59,16 @@ Preparation, UNIX
 #. Use ``easy_install`` and point to the BFG "1.1" index to get
    :mod:`repoze.bfg` and its direct dependencies installed:
 
-   .. code-block:: bash
+   .. code-block:: text
 
-     $ bin/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
+      $ bin/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
-   .. code-block:: bash
+   .. code-block:: text
 
-     $ bin/easy_install docutils nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
+      $ bin/easy_install docutils nose coverage zope.sqlalchemy SQLAlchemy \
+                repoze.tm2
 
 Preparation, Windows
 --------------------
@@ -81,27 +82,27 @@ Preparation, Windows
    the ``python`` interpreter of your Python 2.5 installation using a
    command prompt:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-    c:\> c:\Python25\python ez_setup.py
+      c:\> c:\Python25\python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-    c:\> c:\Python25\Scripts\easy_install virtualenv
+      c:\> c:\Python25\Scripts\easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-     c:\> c:\Python25\Scripts\virtualenv --no-site-packages bigfntut
+      c:\> c:\Python25\Scripts\virtualenv --no-site-packages bigfntut
 
 #. Switch to the ``bigfntut`` directory:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-     c:\> cd bigfntut
+      c:\> cd bigfntut
 
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
@@ -109,15 +110,17 @@ Preparation, Windows
 #. Use ``easy_install`` and point to the BFG "1.1" index to get
    :mod:`repoze.bfg` and its direct dependencies installed:
 
-   .. code-block:: bat
+   .. code-block:: text
 
-     c:\bigfntut> Scripts/easy_install -i http://dist.repoze.org/bfg/1.1/simple repoze.bfg
+      c:\bigfntut> Scripts/easy_install -i http://dist.repoze.org/bfg/1.1/simple \
+                repoze.bfg
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
-   .. code-block:: bat
+   .. code-block:: text
 
-     c:\bigfntut> Scripts\easy_install -i docutils nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
+      c:\bigfntut> Scripts\easy_install -i docutils nose coverage zope.sqlalchemy \
+                SQLAlchemy repoze.tm2
 
 
 .. _sql_making_a_project:
@@ -135,13 +138,13 @@ The below instructions assume your current working directory is the
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
-  $ bin/paster create -t bfg_routesalchemy tutorial
+   $ bin/paster create -t bfg_routesalchemy tutorial
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
    c:\bigfntut> Scripts\paster create -t bfg_routesalchemy tutorial
 
@@ -162,17 +165,17 @@ directory you created in :ref:`sql_making_a_project`, and run the
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
-  $ cd tutorial
-  $ ../bin/python setup.py develop
+   $ cd tutorial
+   $ ../bin/python setup.py develop
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  C:\bigfntut> cd tutorial
-  C:\bigfntut\tutorial> ..\Scripts\python setup.py develop
+   c:\bigfntut> cd tutorial
+   c:\bigfntut\tutorial> ..\Scripts\python setup.py develop
 
 .. _sql_running_tests:
 
@@ -184,15 +187,15 @@ the tests for the project.
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
-  $ ../bin/python setup.py test -q
+   $ ../bin/python setup.py test -q
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
+   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
 
 Starting the Application
 ========================
@@ -201,15 +204,15 @@ Start the application.
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
-  $ ../bin/paster serve tutorial.ini --reload
+   $ ../bin/paster serve tutorial.ini --reload
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  c:\bifgfntut\tutorial> ..\Scripts\paster serve tutorial.ini --reload
+   c:\bifgfntut\tutorial> ..\Scripts\paster serve tutorial.ini --reload
 
 Exposing Test Coverage Information
 ==================================
@@ -225,30 +228,31 @@ other packages into our ``virtualenv``: ``nose`` and ``coverage``:
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
-  $ ../bin/easy_install nose coverage
+   $ ../bin/easy_install nose coverage
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  c:\bfgfntut\tutorial> ..\Scripts\easy_install nose coverage
+   c:\bfgfntut\tutorial> ..\Scripts\easy_install nose coverage
 
 Once ``nose`` and ``coverage`` are installed, we can actually run the
 coverage tests.
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
-  $ ../bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
+   $ ../bin/nosetests --cover-package=tutorial --cover-erase --with-coverage
 
 On Windows:
 
-.. code-block:: bat
+.. code-block:: text
 
-  c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial --cover-erase --with-coverage
+   c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial --cover-erase \
+         --with-coverage
 
 Looks like our package's ``models`` module doesn't quite have 100%
 test coverage.
@@ -256,8 +260,8 @@ test coverage.
 Visit the Application in a Browser
 ==================================
 
-In a browser, visit `http://localhost:6543/ <http://localhost:6543>`_.
-You will see the generated application's default page.
+In a browser, visit ``http://localhost:6543/``.  You will see the
+generated application's default page.
 
 Decisions the ``bfg_routesalchemy`` Template Has Made For You
 =============================================================

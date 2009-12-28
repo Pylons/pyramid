@@ -90,9 +90,9 @@ Here is the source for ``models.py``:
    class.
 
 #. *Line 33*.  We map our ``models_table`` table to our Models class
-    here.  This makes an association between the ``Model`` class and
-    the ``models`` table in the database, as far as SQLAlchemy is
-    concerned.
+   here.  This makes an association between the ``Model`` class and
+   the ``models`` table in the database, as far as SQLAlchemy is
+   concerned.
 
 #. *Lines 35-40*.  A function named ``populate`` which adds a single
    model instance into our SQL storage and commits a transaction.

@@ -182,7 +182,9 @@ class="main_content">`` div:
 .. code-block:: xml
    :linenos:
 
-   <span tal:condition="logged_in"><a href="${request.application_url}/logout">Logout</a></span>
+   <span tal:condition="logged_in">
+      <a href="${request.application_url}/logout">Logout</a>
+   </span>
 
 Viewing the Application in a Browser
 ------------------------------------
@@ -190,30 +192,26 @@ Viewing the Application in a Browser
 We can finally examine our application in a browser.  The views we'll
 try are as follows:
 
-- Visiting `http://localhost:6543/ <http://localhost:6543/>`_ in a
-  browser invokes the ``view_wiki`` view.  This always redirects to
-  the ``view_page`` view of the FrontPage page object.  It is
-  executable by any user.
+- Visiting ``http://localhost:6543/`` in a browser invokes the
+  ``view_wiki`` view.  This always redirects to the ``view_page`` view
+  of the FrontPage page object.  It is executable by any user.
 
-- Visiting `http://localhost:6543/FrontPage
-  <http://localhost:6543/FrontPage>`_ in a browser invokes the
-  ``view_page`` view of the FrontPage page object.
+- Visiting ``http://localhost:6543/FrontPage`` in a browser invokes
+  the ``view_page`` view of the FrontPage page object.
 
-- Visiting `http://localhost:6543/FrontPage/edit_page
-  <http://localhost:6543/FrontPage/edit_page>`_ in a browser invokes
-  the edit view for the FrontPage object.  It is executable by only
+- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
+  invokes the edit view for the FrontPage object.  It is executable by
+  only the ``editor`` user.  If a different user (or the anonymous
+  user) invokes it, a login form will be displayed.  Supplying the
+  credentials with the username ``editor``, password ``editor`` will
+  display the edit page form.
+
+- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
+  browser invokes the add view for a page.  It is executable by only
   the ``editor`` user.  If a different user (or the anonymous user)
   invokes it, a login form will be displayed.  Supplying the
   credentials with the username ``editor``, password ``editor`` will
   display the edit page form.
-
-- Visiting `http://localhost:6543/add_page/SomePageName
-  <http://localhost:6543/add_page/SomePageName>`_ in a browser invokes
-  the add view for a page.  It is executable by only the ``editor``
-  user.  If a different user (or the anonymous user) invokes it, a
-  login form will be displayed.  Supplying the credentials with the
-  username ``editor``, password ``editor`` will display the edit page
-  form.
 
 Seeing Our Changes To ``views.py`` and our Templates
 ----------------------------------------------------

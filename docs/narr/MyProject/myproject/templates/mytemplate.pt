@@ -7,7 +7,8 @@
 <title>${project} Application</title>
 <meta name="keywords" content="python web application" />
 <meta name="description" content="repoze.bfg web application" />
-<link href="${request.application_url}/static/default.css" rel="stylesheet" type="text/css" />
+<link href="${request.application_url}/static/default.css" rel="stylesheet" 
+      type="text/css" />
 </head>
 <body>
 <!-- start header -->

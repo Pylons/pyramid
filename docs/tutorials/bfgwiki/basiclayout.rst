@@ -110,7 +110,7 @@ function within the file named ``run.py``:
    (something like ``file:///path/to/Data.fs``).
 
 #. *Line 14*. We create a "finder" object using the
-   :class:`repoze.zodbconn.finder.PersistentApplicationFinder` helper
+   ``repoze.zodbconn.finder.PersistentApplicationFinder`` helper
    class, passing it the ZODB URI and the "appmaker" we've imported
    from ``models.py``.
 
@@ -121,9 +121,9 @@ function within the file named ``run.py``:
    factory` and the settings keywords parsed by PasteDeploy.  The root
    factory is named ``get_root``.
 
-#. *Lines 18-20*.  Begin configuration using the
-   :meth:`repoze.bfg.configuration.Configurator.begin` method, load
-   the ``configure.zcml`` file from our package using the
+#. *Lines 18-20*.  Begin configuration using the ``begin`` method of
+   the :meth:`repoze.bfg.configuration.Configurator` class, load the
+   ``configure.zcml`` file from our package using the
    :meth:`repoze.bfg.configuration.Configurator.load_zcml` method, and
    end configuration using the
    :meth:`repoze.bfg.configuration.Configurator.end` method.

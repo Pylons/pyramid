@@ -261,7 +261,7 @@ default to anything, though if you subclass ``Response`` and set
 .. index::
    pair: WebOb; exceptions
 
-xceptions
+Exceptions
 ++++++++++
 
 To facilitate error responses like 404 Not Found, the module

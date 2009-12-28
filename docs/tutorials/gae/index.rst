@@ -26,19 +26,19 @@ system.
 #. Use Subversion to check out the source code for
    ``appengine-monkey``.
 
-   .. code-block:: bash
-      :linenos:
+   .. code-block:: text
 
-      $ svn co http://appengine-monkey.googlecode.com/svn/trunk/ appengine-monkey
+      $ svn co http://appengine-monkey.googlecode.com/svn/trunk/ \
+          appengine-monkey
 
 #. Use ``appengine_homedir.py`` script in ``appengine-monkey`` to
    create a :term:`virtualenv` for your application.
 
-   .. code-block:: bash
-      :linenos:
+   .. code-block:: text
  
       $ export GAE_PATH=/usr/local/google_appengine
-      $ python2.5 /path/to/appengine-monkey/appengine-homedir.py --gae $GAE_PATH bfgapp
+      $ python2.5 /path/to/appengine-monkey/appengine-homedir.py --gae \
+        $GAE_PATH bfgapp
 
    Note that ``$GAE_PATH`` should be the path where you have unpacked
    the App Engine SDK.  (On Mac OS X at least,
@@ -52,11 +52,11 @@ system.
 
 #. Install :mod:`repoze.bfg.jinja2` into the virtualenv
 
-   .. code-block:: bash
-      :linenos:
+   .. code-block:: text
 
       $ cd bfgapp/
-      $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple/ repoze.bfg.jinja2
+      $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple/ \
+             repoze.bfg.jinja2
 
    This will install :mod:`repoze.bfg` in the environment.
 
@@ -68,8 +68,7 @@ system.
    the ``bfgapp`` virtualenv director you created in the third step
    above:
 
-   .. code-block:: bash
-      :linenos:
+   .. code-block:: text
 
       $ cd app
       $ rm -rf bfgapp
@@ -86,7 +85,6 @@ system.
    ``config.py`` should remain the same.
 
    .. code-block:: python
-      :linenos:
 
       APP_NAME = 'bfgapp.run:app'
       APP_ARGS = ({},)
@@ -97,7 +95,6 @@ system.
    ``import site`` in app/runner.py:
 
    .. code-block:: python
-      :linenos:
 
       import sys
       sys.path = [path for path in sys.path if 'site-packages' not in path]
@@ -107,7 +104,6 @@ system.
    ``assert sys.path`` in the file.
 
    .. code-block:: python
-      :linenos:
 
       # comment the sys.path assertion out
       # assert sys.path[:len(cur_sys_path)] == cur_sys_path, (
@@ -118,7 +114,7 @@ system.
    with Python 2.5 (or whatever version of Python your GAE SDK
    expects).
 
-   .. code-block:: bash
+   .. code-block:: text
       :linenos:
 
       $ cd ../..
@@ -127,7 +123,6 @@ system.
    Startup success looks something like this:
 
    .. code-block:: text
-      :linenos:
 
       [chrism@vitaminf bfg_gae]$ python2.5 /usr/local/bin/dev_appserver.py bfgapp/app/INFO     2009-05-03 22:23:13,887 appengine_rpc.py:157] Server: appengine.google.com
       INFO     2009-05-03 22:23:13,898 appcfg.py:320] Checking for updates to the SDK.
@@ -165,14 +160,12 @@ system.
    name you created during GAE account setup.
 
    .. code-block:: yaml
-      :linenos:
 
       application: mycoolbfgapp
 
 #. Upload the application
 
-   .. code-block:: bash
-      :linenos:
+   .. code-block:: text
 
       $ python2.5 /usr/local/bin/appcfg.py update bfgapp/app
 
@@ -181,7 +174,6 @@ system.
    so:
 
    .. code-block:: text
-      :linenos:
 
        HTTPError: HTTP Error 400: Bad Request
        Rolling back the update.
@@ -196,7 +188,6 @@ system.
    A successful upload looks like so:
 
    .. code-block:: text
-      :linenos:
 
       [chrism@vitaminf bfgapp]$ python2.5 /usr/local/bin/appcfg.py update ../bfgapp/app/
       Scanning files on local disk.
@@ -240,16 +231,14 @@ application's virtualenv.
 
 First, see which packages are available for zipping:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ bin/pip zip -l
 
 This shows your zipped packages (by default, none) and your unzipped
 packages. You can zip a package like so:
 
-.. code-block:: bash
-   :linenos:
+.. code-block:: text
 
    $ bin/pip zip pytz-2009g-py2.5.egg
 

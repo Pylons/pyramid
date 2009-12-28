@@ -613,3 +613,6 @@ Glossary
      ``add`` to the normal dictionary interface.  See
      http://pythonpaste.org/webob/class-webob.multidict.MultiDict.html
 
+   PyPI
+     `The Python Package Index <http://pypi.python.org/pypi>`_, a
+     collection of software available for Python.

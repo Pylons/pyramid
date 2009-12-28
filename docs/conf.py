@@ -185,3 +185,19 @@ latex_use_parts = True
 
 # If false, no module index is generated.
 latex_use_modindex = False
+
+## Say, for a moment that you have a twoside document that needs a 3cm
+## inner margin to allow for binding and at least two centimetres the
+## rest of the way around. You've been using the a4wide package up until
+## now, because you like the amount of text it places on the
+## page. Perhaps try something like this in your preamble:
+
+## \usepackage[bindingoffset=1cm,textheight=22cm,hdivide={2cm,*,2cm},vdivide={*,22cm,*}]{geometry}
+
+
+_PREAMBLE = r"""\usepackage[bindingoffset=0.45in,textheight=7.25in,hdivide={0.5in,*,0.75in},vdivide={1in,7.25in,1in},papersize={7.5in,9.25in}]{geometry}"""
+
+latex_elements = {
+    'preamble':_PREAMBLE, # omit for letter size
+#    'fncychap':r'\usepackage[Sonny]{fncychap}',
+    }

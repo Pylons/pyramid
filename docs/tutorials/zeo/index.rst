@@ -71,8 +71,7 @@ Configuration
    ``main``, rename this section to ``myapp`` (e.g. ``app:main`` ->
    ``app:myapp``).  Add a key to it named ``zodb_uri``, e.g.
 
-   .. code-block:: python
-      :linenos:
+   .. code-block:: ini
 
       [app:myapp]
       use = egg:myapp#app
@@ -86,8 +85,7 @@ Configuration
    Put the names ``connector``, ``egg:repoze.retry#retry``, and
    ``egg:repoze.tm2#tm`` to the top of the pipeline.
 
-   .. code-block:: python
-      :linenos:
+   .. code-block:: ini
 
       [pipeline:main]
       pipeline = 
@@ -98,7 +96,6 @@ Configuration
    When you're finished, your ``.ini`` file might look like so:
 
    .. code-block:: ini
-      :linenos:
 
       [DEFAULT]
       debug = true
@@ -125,23 +122,25 @@ Configuration
    ``.ini`` files.
 
 #. Add a ``zeo.conf`` file to your package with the following
-   contents::
+   contents:
 
-    %define INSTANCE .
+   .. code-block:: text
 
-    <zeo>
-      address $INSTANCE/zeo.sock
-      read-only false
-      invalidation-queue-size 100
-      pid-filename $INSTANCE/zeo.pid
-    </zeo>
+      %define INSTANCE .
 
-    <blobstorage 1>
-      <filestorage>
-        path $INSTANCE/myapp.db
-      </filestorage>
-      blob-dir $INSTANCE/blobs
-    </blobstorage>
+      <zeo>
+        address $INSTANCE/zeo.sock
+        read-only false
+        invalidation-queue-size 100
+        pid-filename $INSTANCE/zeo.pid
+      </zeo>
+
+      <blobstorage 1>
+        <filestorage>
+          path $INSTANCE/myapp.db
+        </filestorage>
+        blob-dir $INSTANCE/blobs
+      </blobstorage>
 
 #.  For the purposes of this tutorial we'll assume that you want your
     :mod:`repoze.bfg` application's :term:`root` object to be a
@@ -149,7 +148,6 @@ Configuration
     ``models.py`` file to look like the below:
 
     .. code-block:: python
-       :linenos:
 
        from repoze.folder import Folder
 
@@ -160,7 +158,6 @@ Configuration
     below:
 
     .. code-block:: python
-       :linenos:
 
        from repoze.bfg.configuration import Configurator
        from repoze.zodbconn.finder import PersistentApplicationFinder
@@ -191,14 +188,13 @@ Running
 #.  Start the ZEO server in a terminal with the current directory set
     to the package directory:
 
-    .. code-block:: bash
-       :linenos:
+    .. code-block:: text
 
        ../bin/runzeo -C zeo.conf
 
     You should see something like this, as a result:
 
-    .. code-block:: bash
+    .. code-block:: text
        :linenos:
 
        [chrism@snowpro myapp]$ ../bin/runzeo -C zeo.conf 
@@ -215,7 +211,7 @@ Running
 
 #.  While the ZEO server is running, start the application server:
 
-    .. code-block:: python
+    .. code-block:: text
        :linenos:
 
        [chrism@snowpro myapp]$ ../bin/paster serve myapp.ini 
@@ -229,7 +225,7 @@ Running
     application's HTTP server is running) by using the ``bfgshell``
     command in a third terminal window:
 
-    .. code-block:: bash
+    .. code-block:: text
        :linenos:
 
        [chrism@snowpro sess]$ ../bin/paster --plugin=repoze.bfg bfgshell myapp.ini myapp

@@ -71,11 +71,10 @@ Add an Appmaker
 ---------------
 
 We're using a mini-framework callable named
-:class:`repoze.zodbconn.finder.PersistentApplicationFinder` in our
-application (see ``run.py``).  A
-:class:`repoze.zodbconn.finder.PersistentApplicationFinder` accepts a
-ZODB URL as well as an "appmaker" callback.  This callback typically
-lives in the ``models.py`` file.
+``repoze.zodbconn.finder.PersistentApplicationFinder`` in our
+application (see ``run.py``).  A ``PersistentApplicationFinder``
+accepts a ZODB URL as well as an "appmaker" callback.  This callback
+typically lives in the ``models.py`` file.
 
 We want to change the appmaker function in our ``models.py`` file so
 that our application root is a Wiki instance, and we'll also slot a
@@ -120,19 +119,19 @@ directory is the "tutorial" distribution directory:
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
   $ ../bin/python setup.py test -q
 
 On Windows:
 
-.. code-block:: bash
+.. code-block::  text
 
-  c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
+   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
 
 The expected output is something like this:
 
-.. code-block:: bash
+.. code-block:: text
 
   .....
   ----------------------------------------------------------------------

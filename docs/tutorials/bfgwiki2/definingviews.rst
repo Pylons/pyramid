@@ -335,21 +335,18 @@ Viewing the Application in a Browser
 Once we've set up the WSGI pipeline properly, we can finally examine
 our application in a browser.  The views we'll try are as follows:
 
-- Visiting `http://localhost:6543/ <http://localhost:6543/>`_ in a
-  browser invokes the ``view_wiki`` view.  This always redirects to
-  the ``view_page`` view of the FrontPage page object.
+- Visiting ``http://localhost:6543`` in a browser invokes the
+  ``view_wiki`` view.  This always redirects to the ``view_page`` view
+  of the FrontPage page object.
 
-- Visiting `http://localhost:6543/FrontPage
-  <http://localhost:6543/FrontPage>`_ in a browser invokes the
-  ``view_page`` view of the front page page object.
+- Visiting ``http://localhost:6543/FrontPage`` in a browser invokes
+  the ``view_page`` view of the front page page object.
 
-- Visiting `http://localhost:6543/FrontPage/edit_page
-  <http://localhost:6543/FrontPage/edit_page>`_ in a browser invokes
-  the edit view for the front page object.
+- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
+  invokes the edit view for the front page object.
 
-- Visiting `http://localhost:6543/add_page/SomePageName
-  <http://localhost:6543/add_page/SomePageName>`_ in a browser invokes
-  the add view for a page.
+- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
+  browser invokes the add view for a page.
 
 Try generating an error within the body of a view by adding code to
 the top of it that generates an exception (e.g. ``raise
@@ -370,14 +367,14 @@ module to look like this:
 
 We can then run the tests using something like:
 
-.. code-block:: bash
+.. code-block:: text
    :linenos:
 
-   $ python setup.py test -q
+    $ python setup.py test -q
 
 The expected output is something like:
 
-.. code-block:: bash
+.. code-block:: text
    :linenos:
 
    running test

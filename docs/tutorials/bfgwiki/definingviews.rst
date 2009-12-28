@@ -271,26 +271,25 @@ directory is the "tutorial" distribution directory:
 
 On UNIX:
 
-.. code-block:: bash
+.. code-block:: text
 
-  $ ../bin/python setup.py test -q
+   $ ../bin/python setup.py test -q
 
 On Windows:
 
-.. code-block:: bash
+.. code-block:: text
 
-
-  c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
+   c:\bigfntut\tutorial> ..\Scripts\python setup.py test -q
 
 The expected result looks something like:
 
-.. code-block:: bash
+.. code-block:: text
 
-  .........
-  ----------------------------------------------------------------------
-  Ran 9 tests in 0.203s
-
-  OK
+   .........
+   ----------------------------------------------------------------------
+   Ran 9 tests in 0.203s
+   
+   OK
 
 Mapping Views to URLs in ``configure.zcml``
 ===========================================
@@ -388,27 +387,25 @@ Viewing the Application in a Browser
 Once we've set up the WSGI pipeline properly, we can finally examine
 our application in a browser.  The views we'll try are as follows:
 
-- Visiting `http://localhost:6543/ <http://localhost:6543/>`_ in a
-  browser invokes the ``view_wiki`` view.  This always redirects to
-  the ``view_page`` view of the FrontPage page object.
+- Visiting ``http://localhost:6543/`` in a browser invokes the
+  ``view_wiki`` view.  This always redirects to the ``view_page`` view
+  of the FrontPage page object.
 
-- Visiting `http://localhost:6543/FrontPage/
-  <http://localhost:6543/FrontPage/>`_ in a browser invokes the
-  ``view_page`` view of the front page page object.  This is because
-  it's the *default view* (a view without a ``name``) for Page objects.
+- Visiting ``http://localhost:6543/FrontPage/`` in a browser invokes
+  the ``view_page`` view of the front page page object.  This is
+  because it's the *default view* (a view without a ``name``) for Page
+  objects.
 
-- Visiting `http://localhost:6543/FrontPage/edit_page
-  <http://localhost:6543/FrontPage/edit_page>`_ in a browser invokes
-  the edit view for the front page object.
+- Visiting ``http://localhost:6543/FrontPage/edit_page`` in a browser
+  invokes the edit view for the front page object.
 
-- Visiting `http://localhost:6543/add_page/SomePageName
-  <http://localhost:6543/add_page/SomePageName>`_ in a browser invokes
-  the add view for a page.
+- Visiting ``http://localhost:6543/add_page/SomePageName`` in a
+  browser invokes the add view for a page.
 
-- To generate an error, visit `http://localhost:6543/add_page
-  <http://localhost:6543/add_page>`_ which will generate an
-  ``IndexError`` for the expression ``request.subpath[0]``.  You'll
-  see an interactive traceback facility provided by evalerror.
+- To generate an error, visit ``http://localhost:6543/add_page`` which
+  will generate an ``IndexError`` for the expression
+  ``request.subpath[0]``.  You'll see an interactive traceback
+  facility provided by evalerror.
 
 
 

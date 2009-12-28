@@ -400,8 +400,8 @@ the following:
 
       <scan package="."/>
 
-- If you are using :term:`imperative configuration`, use the
-  :meth:`repoze.bfg.configuration.Configurator.scan` method:
+- If you are using :term:`imperative configuration`, use the ``scan``
+  method of a :class:`repoze.bfg.configuration.Configurator`:
 
   .. code-block:: python
 
@@ -1288,8 +1288,7 @@ CSS files) within a :mod:`repoze.bfg` application. These mechanisms
 makes static files available at a name relative to the application
 root URL, e.g. ``/static``.
 
-Use of the imperative configuration method
-:meth:`repoze.bfg.configuration.configurator.add_static_view` is
+Use of the ``add_static_view`` imperative configuration method is
 completely equivalent to using ZCML for the same purpose.
 
 Here's an example of a ``static`` ZCML directive that will serve files
@@ -1341,8 +1340,8 @@ these will be resolved by the static view as you would expect.
 
 See :ref:`static_directive` for detailed information.
 
-.. note:: The ``<static>`` ZCML directive is new in :mod:`repoze.bfg`
-   1.1.
+.. note:: The :ref:`static_directive` ZCML directive is new in
+   :mod:`repoze.bfg` 1.1.
 
 .. index::
    pair: generating; static resource
@@ -1352,9 +1351,10 @@ See :ref:`static_directive` for detailed information.
 Generating Static Resource URLs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a ``<static>`` ZCML directive or a call to
-:meth:`repoze.bfg.configuration.configurator.add_static_view` is used
-to register a static resource directory, a special helper API named
+When a ref::`static_directive` ZCML directive or a call to the
+``add_static_view`` method of a
+:class:`repoze.bfg.configuration.Configurator` is used to register a
+static resource directory, a special helper API named
 :func:`repoze.bfg.static_url` can be used to generate the appropriate
 URL for a package resource that lives in one of the directories named
 by the static registration ``path`` attribute.

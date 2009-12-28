@@ -417,15 +417,17 @@ bindings.  It lives in the Repoze Subversion repository at
 `http://svn.repoze.org/repoze.bfg.xslt
 <http://svn.repoze.org/repoze.bfg.xslt>`_.
 
-:mod:`repoze.bfg.chameleon_genshi` package is an add-on which provides
+:mod:`repoze.bfg.chameleon_genshi` is an add-on which provides
 Chameleon Genshi-style template support.  It lives in the Repoze
-Subversion repository at `http://svn.repoze.org/repoze.bfg.chameleon_genshi
+Subversion repository at
+`http://svn.repoze.org/repoze.bfg.chameleon_genshi
 <http://svn.repoze.org/repoze.bfg.chameleon_genshi>`_.
 
 Jinja2 template bindings are available for :mod:`repoze.bfg` in the
 :mod:`repoze.bfg.jinja2` package.  It lives in the Repoze Subversion
 repository at `http://svn.repoze.org/repoze.bfg.jinja2
-<http://svn.repoze.org/repoze.bfg.jinja2>`_.
+<http://svn.repoze.org/repoze.bfg.jinja2>`_; it is also available from
+:term:`PyPI`.
 
 Courtesy of Carlos de la Guardia, bindings for the Zope
 :mod:`zope.pagetemplate` package ("old TAL") are available from

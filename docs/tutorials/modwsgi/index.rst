@@ -33,8 +33,7 @@ commands and files.
 #.  Install :term:`virtualenv` into the Python which mod_wsgi will
     run using the ``easy_install`` program.
 
-    .. code-block:: bash
-       :linenos:
+    .. code-block:: text
 
        $ sudo /usr/bin/easy_install-2.6 virtualenv
 
@@ -43,8 +42,7 @@ commands and files.
 #.  Create a :term:`virtualenv` which we'll use to install our
     application.
 
-    .. code-block:: bash
-       :linenos:
+    .. code-block:: text
 
        $ cd ~
        $ mkdir -p /projects/modwsgi
@@ -53,8 +51,7 @@ commands and files.
 
 #.  Install :mod:`repoze.bfg` into the newly created virtualenv:
 
-    .. code-block:: bash
-       :linenos:
+    .. code-block:: text
 
        $ cd ~/projects/modwsgi/env
        $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
@@ -65,8 +62,7 @@ commands and files.
     :mod:`repoze.bfg` application as necessary if you already have
     one.
 
-    .. code-block:: bash
-       :linenos:
+    .. code-block:: text
 
        $ cd ~/projects/modwsgi/env
        $ bin/paster create -t bfg_starter myapp
@@ -76,11 +72,11 @@ commands and files.
 #.  Within the virtualenv directory (``~/projects/modwsgi/env``),
     create a script named ``bfg.wsgi``.  Give it these contents:
 
-    .. code-block:: bash
-       :linenos:
+    .. code-block:: python
 
        from repoze.bfg.paster import get_app
-       application = get_app('/Users/chrism/projects/modwsgi/env/myapp/myapp.ini', 'main')
+       application = get_app(
+         '/Users/chrism/projects/modwsgi/env/myapp/myapp.ini', 'main')
 
     The first argument to ``get_app`` is the project Paste
     configuration file name.  The second is the name of the section
@@ -90,8 +86,7 @@ commands and files.
 
 #.  Make the ``bfg.wsgi`` script executable.
 
-    .. code-block:: bash
-       :linenos:
+    .. code-block:: text
 
        $ cd ~/projects/modwsgi/env
        $ chmod 755 bfg.wsgi
@@ -101,7 +96,6 @@ commands and files.
     system while installing Apache, so this stuff went in there.
 
     .. code-block:: apache
-       :linenos:
 
        # Use only 1 Python sub-interpreter.  Multiple sub-interpreters
        # play badly with C extensions.
@@ -119,10 +113,9 @@ commands and files.
  
 #.  Restart Apache
 
-    .. code-block:: bash
-       :linenos:
+    .. code-block:: text
 
-        $ sudo /usr/sbin/apachectl restart
+       $ sudo /usr/sbin/apachectl restart
 
 #.  Visit ``http://localhost/myapp`` in a browser.  You should see the
     sample application rendered in your browser.

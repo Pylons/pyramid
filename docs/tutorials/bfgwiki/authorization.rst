@@ -23,13 +23,12 @@ Changing ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We'll change our ``configure.zcml`` file to enable an
-:class:`repoze.bfg.authentication.AuthTktAuthenticationPolicy` and an
-:class:`repoze.bfg.authorization.ACLAuthorizationPolicy` to enable
-declarative security checking.  We'll also add a ``forbidden`` stanza,
-which species a :term:`forbidden view`.  This configures our login
-view to show up when :mod:`repoze.bfg` detects that a view invocation
-can not be authorized.  When you're done, your ``configure.zcml`` will
-look like so:
+``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
+enable declarative security checking.  We'll also add a ``forbidden``
+stanza, which species a :term:`forbidden view`.  This configures our
+login view to show up when :mod:`repoze.bfg` detects that a view
+invocation can not be authorized.  When you're done, your
+``configure.zcml`` will look like so:
 
 .. literalinclude:: src/authorization/tutorial/configure.zcml
    :linenos:
@@ -123,7 +122,9 @@ class="main_content">`` div:
 .. code-block:: xml
    :linenos:
 
-   <span tal:condition="logged_in"><a href="${request.application_url}/logout">Logout</a></span>
+   <span tal:condition="logged_in">
+      <a href="${request.application_url}/logout">Logout</a>
+   </span>
 
 Giving Our Root Model Object an ACL
 -----------------------------------
