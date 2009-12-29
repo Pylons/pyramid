@@ -86,8 +86,9 @@ class AddPageTests(unittest.TestCase):
         request.subpath = ['AnotherPage']
         info = self._callFUT(context, request)
         self.assertEqual(info['page'].data,'')
-        self.assertEqual(info['save_url'],
-                         model_url(context, request, 'add_page', 'AnotherPage'))
+        self.assertEqual(
+            info['save_url'],
+            model_url(context, request, 'add_page', 'AnotherPage'))
         
     def test_it_submitted(self):
         context = testing.DummyModel()

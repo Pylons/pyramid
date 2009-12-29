@@ -50,8 +50,8 @@
 	  <h2><code>repoze.bfg</code> links</h2>
 	  <ul>
 	    <li><a
-	    href="http://static.repoze.org/bfgdocs/#narrative-documentation">Narrative
-	    Documentation</a>
+	    href="http://static.repoze.org/bfgdocs/#narrative-documentation"
+            >Narrative Documentation</a>
             </li>
 	    <li>
               <a
@@ -69,13 +69,13 @@
             </li>
 	    <li>
               <a
-              href="http://static.repoze.org/bfgdocs/#sample-applications">Sample
-              Applications</a>
+              href="http://static.repoze.org/bfgdocs/#sample-applications"
+              >Sample Applications</a>
             </li>
 	    <li>
               <a
-              href="http://static.repoze.org/bfgdocs/#support-and-development">Support
-              and Development</a>
+              href="http://static.repoze.org/bfgdocs/#support-and-development"
+              >Support and Development</a>
             </li>
 	    <li>
               <a

@@ -13,6 +13,8 @@
 
 import sys, os
 
+book = os.environ.get('book')
+
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
@@ -83,8 +85,7 @@ add_module_names = False
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
-
+pygments_style = book and 'bw' or 'sphinx'
 
 # Options for HTML output
 # -----------------------
@@ -206,6 +207,7 @@ _PREAMBLE = r"""
     filecolor=black,
     urlcolor=black
 }
+\fvset{frame=single,xleftmargin=9pt,numbersep=4pt}
 
 \pagestyle{fancy}
 
@@ -253,7 +255,7 @@ def setup(app):
     app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
     app.add_directive('backmatter', backmatter, 1, (0, 0, 0))
 
-# ugh
+# strip "repoze.bfg." from all inline literals
 
 from sphinx.writers.latex import LaTeXTranslator
 
@@ -275,3 +277,14 @@ def visit_literal(self, node):
     
 LaTeXTranslator.visit_literal = visit_literal
 
+# turn off all line numbers in latex formatting
+
+## from pygments.formatters import LatexFormatter
+## from sphinx.highlighting import PygmentsBridge
+
+## class NoLinenosLatexFormatter(LatexFormatter):
+##     def __init__(self, **options):
+##         LatexFormatter.__init__(self, **options)
+##         self.linenos = False
+
+## PygmentsBridge.latex_formatter = NoLinenosLatexFormatter

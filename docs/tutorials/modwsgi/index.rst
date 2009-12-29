@@ -54,7 +54,8 @@ commands and files.
     .. code-block:: text
 
        $ cd ~/projects/modwsgi/env
-       $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple repoze.bfg
+       $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple \
+            repoze.bfg
     
 #.  Create and install your :mod:`repoze.bfg` application.  For the
     purposes of this tutorial, we'll just be using the ``bfg_starter``

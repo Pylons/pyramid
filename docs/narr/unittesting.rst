@@ -231,7 +231,8 @@ used the testing API.
 
        def test_view_fn_submitted(self):
            from my.package import view_fn
-           renderer = self.config.testing_add_template('templates/submitted.pt')
+           renderer = self.config.testing_add_template(
+                                          'templates/submitted.pt')
            request = testing.DummyRequest()
            request.params['say'] = 'Yo'
            response = view_fn(request)

@@ -2,8 +2,6 @@
    single: environment variables
    single: settings
    single: reload
-   single: configure.zcml
-   single: configure_zcml
    single: debug_authorization
    single: reload_resources
    single: debug_notfound
@@ -36,53 +34,92 @@ setting names documented in this chapter are reserved for
 :mod:`repoze.bfg` use.  You should not use them to indicate
 application-specific configuration settings.
 
-+---------------------------------+-----------------------------+----------------------------------------+
-| Environment Variable Name       | Config File Setting Name    |       Further Information              |
-+=================================+=============================+========================================+
-| ``BFG_RELOAD_TEMPLATES``        |  ``reload_templates``       |  Reload templates without restart      |
-|                                 |                             |  when true                             |
-|                                 |                             |  See also:                             |
-|                                 |                             |  :ref:`reload_templates_section`       |
-+---------------------------------+-----------------------------+----------------------------------------+
-| ``BFG_RELOAD_RESOURCES``        |  ``reload_resources``       |  Don't cache any resource file data    |
-|                                 |                             |  when true                             |
-|                                 |                             |  See also:                             |
-|                                 |                             |  :ref:`overriding_resources_section`   |
-+---------------------------------+-----------------------------+----------------------------------------+
-| ``BFG_DEBUG_AUTHORIZATION``     |  ``debug_authorization``    |  Print view authorization failure &    |
-|                                 |                             |  success info to stderr when true      |
-|                                 |                             |  See also:                             |
-|                                 |                             |  :ref:`debug_authorization_section`    | 
-+---------------------------------+-----------------------------+----------------------------------------+
-| ``BFG_DEBUG_NOTFOUND``          |  ``debug_notfound``         |  Print view-related NotFound debug     |
-|                                 |                             |  messages to stderr when true          |
-|                                 |                             |  See also:                             |
-|                                 |                             |  :ref:`debug_notfound_section`         |
-+---------------------------------+-----------------------------+----------------------------------------+
-| ``BFG_DEBUG_ALL``               |  ``debug_all``              |  Turns all debug_* settings on.        |
-+---------------------------------+-----------------------------+----------------------------------------+
-| ``BFG_RELOAD_ALL``              |  ``reload_all``             |  Turns all reload_* settings on.       |
-+---------------------------------+-----------------------------+----------------------------------------+
-| ``BFG_CONFIGURE_ZCML``          |  ``configure_zcml``         |  Use the specified filename to load    |
-|                                 |                             |  the default app :term:`ZCML` file     |
-|                                 |                             |  instead of the filename implied by    |
-|                                 |                             |  ``filename`` value passed to          |
-|                                 |                             |  ``repoze.bfg.router.make_app``.  If   |
-|                                 |                             |  this is a relative filename, it will  |
-|                                 |                             |  be considered relative to the         |
-|                                 |                             |  ``package`` passed to ``make_app``    |
-|                                 |                             |  by the application.  It may also      |
-|                                 |                             |  take the form of a :term:`resource    |
-|                                 |                             |  specification` which names both the   |
-|                                 |                             |  package name and a package-relative   |
-|                                 |                             |  filename, e.g.                        |
-|                                 |                             |  ``dotted.package.name:path/to.zcml``. |
-|                                 |                             |  If it is a resource specification,    |
-|                                 |                             |  both the  *package* and the           |
-|                                 |                             |  *filename* passed  to ``make_app``    |
-|                                 |                             |  are overridden with the implied       |
-|                                 |                             |  values.                               |
-+---------------------------------+-----------------------------+----------------------------------------+
+Reloading Templates
+~~~~~~~~~~~~~~~~~~~
+
+When this value is true, reload templates without a restart.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``BFG_RELOAD_TEMPLATES``        |  ``reload_templates``       |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
+
+Reloading Resources
+~~~~~~~~~~~~~~~~~~~
+
+Don't cache any resource file data when this value is true.  See
+also :ref:`overriding_resources_section`.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``BFG_RELOAD_RESOURCES``        |  ``reload_resources``       |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
+
+Debugging Authorization
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Print view authorization failure and success information to stderr
+when this value is true.  See also :ref:`debug_authorization_section`.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``BFG_DEBUG_AUTHORIZATION``     |  ``debug_authorization``    |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             | 
++---------------------------------+-----------------------------+
+
+Debugging Not Found Errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Print view-related ``NotFound`` debug messages to stderr
+when this value is true.  See also :ref:`debug_notfound_section`.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``BFG_DEBUG_NOTFOUND``          |  ``debug_notfound``         |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
+
+Debugging All
+~~~~~~~~~~~~~
+
+Turns on all ``debug*`` settings.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``BFG_DEBUG_ALL``               |  ``debug_all``              |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
+
+Reload All
+~~~~~~~~~~
+
+Turns on all ``reload*`` settings.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``BFG_RELOAD_ALL``              |  ``reload_all``             |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
 
 Examples
 --------
@@ -92,7 +129,9 @@ there is a section representing your application named ``[app:main]``
 within the file that represents your :mod:`repoze.bfg` application.
 The configuration file settings documented in the above "Config File
 Setting Name" column would go in the ``[app:main]`` section.  Here's
-an example of such a section::
+an example of such a section:
+
+.. code-block:: ini
 
   [app:main]
   use = egg:MyProject#app
@@ -101,9 +140,12 @@ an example of such a section::
 
 You can also use environment variables to accomplish the same purpose
 for settings documented as such.  For example, you might start your
-:mod:`repoze.bfg` application using the following command line::
+:mod:`repoze.bfg` application using the following command line:
 
-  BFG_DEBUG_AUTHORIZATION=1 BFG_RELOAD_TEMPLATES=1 bin/paster serve MyProject.ini
+.. code-block:: python
+
+  $ BFG_DEBUG_AUTHORIZATION=1 BFG_RELOAD_TEMPLATES=1 bin/paster serve \
+         MyProject.ini
 
 If you started your application this way, your :mod:`repoze.bfg`
 application would behave in the same manner as if you had placed the

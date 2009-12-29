@@ -124,7 +124,8 @@ class EditPageTests(unittest.TestCase):
         self.session.add(page)
         info = self._callFUT(request)
         self.assertEqual(info['page'], page)
-        self.assertEqual(info['save_url'], 'http://example.com/abc/edit_page')
+        self.assertEqual(info['save_url'],
+                         'http://example.com/abc/edit_page')
         
     def test_it_submitted(self):
         from tutorial.models import Page

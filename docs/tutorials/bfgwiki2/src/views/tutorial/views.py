@@ -33,7 +33,8 @@ def view_page(request):
 
     content = publish_parts(page.data, writer_name='html')['html_body']
     content = wikiwords.sub(check, content)
-    edit_url = route_url('edit_page', request, pagename=matchdict['pagename'])
+    edit_url = route_url('edit_page', request,
+                         pagename=matchdict['pagename'])
     return dict(page=page, content=content, edit_url=edit_url)
 
 def add_page(request):

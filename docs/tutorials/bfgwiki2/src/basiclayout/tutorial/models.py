@@ -15,7 +15,8 @@ from sqlalchemy.orm import mapper
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+DBSession = scoped_session(
+    sessionmaker(extension=ZopeTransactionExtension()))
 
 metadata = MetaData()
 

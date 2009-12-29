@@ -17,9 +17,10 @@
 <div class="main_content">
   <div style="float:right; width: 10em;"> Viewing
     <span tal:replace="page.__name__">Page Name Goes Here</span> <br/>
-    You can return to the <a href="${request.application_url}">FrontPage</a>.
-   <span tal:condition="logged_in"><a href="${request.application_url}/logout">
-         Logout</a></span>
+    You can return to the <a href="${request.application_url}"
+          >FrontPage</a>.
+   <span tal:condition="logged_in"><a 
+         href="${request.application_url}/logout">Logout</a></span>
   </div>
 
   <div>

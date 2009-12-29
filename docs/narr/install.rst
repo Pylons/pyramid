@@ -93,7 +93,8 @@ the following commands:
    [chrism@vitaminf ~]$ mkdir opt
    [chrism@vitaminf ~]$ cd tmp
    [chrism@vitaminf tmp]$ cd tmp
-   [chrism@vitaminf tmp]$ wget http://python.org/ftp/python/2.5.4/Python-2.5.4.tgz
+   [chrism@vitaminf tmp]$ wget \
+          http://python.org/ftp/python/2.5.4/Python-2.5.4.tgz
    [chrism@vitaminf tmp]$ tar xvzf Python-2.5.4.tgz
    [chrism@vitaminf tmp]$ cd Python-2.5.4
    [chrism@vitaminf Python-2.5.4]$ ./configure --prefix=$HOME/opt/Python-2.5.4

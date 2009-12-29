@@ -51,12 +51,14 @@ Preparation, UNIX
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "1.2" index to get
-   :mod:`repoze.bfg` and its direct dependencies installed:
+#. Use ``easy_install`` and point to the :mod:`repoze.bfg` "current"
+   index to get :mod:`repoze.bfg` and its direct dependencies
+   installed:
 
    .. code-block:: bash
 
-     $ bin/easy_install -i http://dist.repoze.org/bfg/1.2/simple repoze.bfg
+     $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple \
+                repoze.bfg
 
 #. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
    ``repoze.zodbconn``, ``repoze.who``, ``nose`` and ``coverage`` from
@@ -104,13 +106,14 @@ Preparation, Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "1.2" index to get
-   :mod:`repoze.bfg` and its direct dependencies installed:
+#. Use ``easy_install`` and point to the :mod:`repoze.bfg` "current"
+   index to get :mod:`repoze.bfg` and its direct dependencies
+   installed:
 
    .. code-block:: bat
 
-     c:\bigfntut> Scripts/easy_install -i http://dist.repoze.org/bfg/1.2/simple \
-                   repoze.bfg
+     c:\bigfntut> Scripts/easy_install -i \
+            http://dist.repoze.org/bfg/current/simple repoze.bfg
 
 #. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
    ``repoze.zodbconn``, ``repoze.who``, ``nose`` and ``coverage`` from
@@ -118,7 +121,8 @@ Preparation, Windows
 
    .. code-block:: bat
 
-     c:\bigfntut> Scripts\easy_install -i http://dist.repoze.org/bfgsite/simple \
+     c:\bigfntut> Scripts\easy_install -i \
+                  http://dist.repoze.org/bfgsite/simple \
                   docutils repoze.tm repoze.zodbconn repoze.who nose coverage
 
 .. _making_a_project:
