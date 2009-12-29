@@ -54,32 +54,7 @@ project we name ``MyProject``:
      project:  MyProject
    Creating template bfg
    Creating directory ./MyProject
-     Recursing into +package+
-       Creating ./MyProject/myproject/
-       Copying __init__.py to ./MyProject/myproject/__init__.py
-       Copying configure.zcml to ./MyProject/myproject/configure.zcml
-       Copying models.py to ./MyProject/myproject/models.py
-       Copying run.py_tmpl to ./MyProject/myproject/run.py
-       Recursing into templates
-         Creating ./MyProject/myproject/templates/
-         Copying mytemplate.pt to ./MyProject/myproject/templates/mytemplate.pt
-         Recursing into static
-           Creating ./MyProject/myproject/templates/static/
-           Copying default.css to ./MyProject/myproject/templates/static/default.css
-           Recursing into images
-             Creating ./MyProject/myproject/templates/static/images/
-             Copying img01.gif to ./MyProject/myproject/templates/static/images/img01.gif
-             Copying img02.gif to ./MyProject/myproject/templates/static/images/img02.gif
-             Copying img03.gif to ./MyProject/myproject/templates/static/images/img03.gif
-             Copying img04.gif to ./MyProject/myproject/templates/static/images/img04.gif
-             Copying spacer.gif to ./MyProject/myproject/templates/static/images/spacer.gif
-           Copying templatelicense.txt to ./MyProject/myproject/templates/static/templatelicense.txt
-       Copying tests.py_tmpl to ./MyProject/myproject/tests.py
-       Copying views.py_tmpl to ./MyProject/myproject/views.py
-     Copying +project+.ini_tmpl to ./MyProject/MyProject.ini
-     Copying CHANGES.txt_tmpl to ./MyProject/CHANGES.txt
-     Copying README.txt_tmpl to ./MyProject/README.txt
-     Copying setup.py_tmpl to ./MyProject/setup.py
+   # ... more output ...
    Running /Users/chrism/projects/repoze/bfg/bin/python setup.py egg_info
 
 As a result of invoking ``paster create``, a project is created in a
