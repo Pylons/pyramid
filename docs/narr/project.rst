@@ -4,7 +4,7 @@ Creating a :mod:`repoze.bfg` Project
 ====================================
 
 While it's possible to create a :mod:`repoze.bfg` application
-completely manually, it's usfeul to be able to create a "skeleton"
+completely manually, it's useful to be able to create a "skeleton"
 :mod:`repoze.bfg` application using an application skeleton generator.
 "Skeleton" projects can be created using the ``paster create`` command
 in conjunction with :term:`Paste` templates.  Various project

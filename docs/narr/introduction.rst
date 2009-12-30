@@ -55,7 +55,7 @@ Familiarity
 Trustability
   :mod:`repoze.bfg` is developed conservatively and tested
   exhaustively.  *If it ain't tested, it's broke.* Every release of
-  :mod:`repoze.bfg` has 100% unit test converage.
+  :mod:`repoze.bfg` has 100% statement coverage via unit tests.
 
 A Sense of Fun
   Developing a :mod:`repoze.bfg` application should not feel foreign

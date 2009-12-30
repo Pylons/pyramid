@@ -173,7 +173,7 @@ Glossary
 
    application registry
      A registry of configuration information consulted by
-     :mod:`repoze.bfg` while servicing an appliation.  An application
+     :mod:`repoze.bfg` while servicing an application.  An application
      registry maps model types to views, as well as housing other
      application-specific component registrations.  Every
      :mod:`repoze.bfg` application has one (and only one) application
@@ -240,7 +240,7 @@ Glossary
      policy`.  For example, if a user had the user id "bob", and Bob
      was part of two groups named "group foo" and "group bar", the
      request might have information attached to it that would
-     indictate that Bob was represented by three principals: "bob",
+     indicate that Bob was represented by three principals: "bob",
      "group foo" and "group bar".
 
    authorization policy

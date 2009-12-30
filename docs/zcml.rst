@@ -45,7 +45,7 @@ A Word On XML Namespaces
 
 Usually, the start tag of the ``<configure>`` container tag has a
 default *XML namespace* associated with it. This is usually
-``http://namepaces.repoze.org/bfg``, named by the ``xmlns`` attribute
+``http://namespaces.repoze.org/bfg``, named by the ``xmlns`` attribute
 of the ``configure`` start tag.
 
 Using the ``http://namespaces.repoze.org/bfg`` namespace as the
@@ -1015,7 +1015,7 @@ See also :ref:`resource_zcml_directive`.
 
 Use of the ``static`` ZCML directive or allows you to serve static
 resources (such as JavaScript and CSS files) within a
-:mod:`repoze.bfg` application. Theis mechanism makes static files
+:mod:`repoze.bfg` application. This mechanism makes static files
 available at a name relative to the application root URL.
 
 Attributes
