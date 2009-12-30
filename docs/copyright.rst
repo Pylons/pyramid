@@ -9,6 +9,8 @@ Copyright © 2008-2010, Agendaless Consulting.
 
 ISBN-13: 978-0-615-34537-6
 
+First publishing: 2010
+
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
 Attribution-Noncommercial-Share Alike 3.0 United States License

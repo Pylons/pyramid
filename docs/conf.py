@@ -228,6 +228,20 @@ _PREAMBLE = r"""
   \renewcommand{\footrulewidth}{0pt}% not footer line
   \fancyfoot[C]{\thepage}% like fancy style
 }
+
+\makeatletter
+\def\@subtitle{\relax}
+\newcommand{\subtitle}[1]{\gdef\@subtitle{#1}}
+\renewcommand{\maketitle}{
+  \begin{titlepage}
+    {\rm\Huge\@title\par}
+    {\em\large\py@release\releaseinfo\par}
+    \if\@subtitle\relax\else\large\@subtitle\par\fi
+    {\large\@author\par}
+  \end{titlepage}
+}
+\makeatother
+
 \sloppy
 """
 
@@ -235,6 +249,8 @@ latex_elements = {
     'preamble': _PREAMBLE,
     'wrapperclass':'book',
     'date':'',
+    'releasename':'Version',
+    'title':r'The repoze.bfg Web Application \newline Framework',
 }
 
 from docutils import nodes
