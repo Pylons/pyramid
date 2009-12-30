@@ -242,6 +242,39 @@ _PREAMBLE = r"""
 }
 \makeatother
 
+% Redefine these colors to your liking in the preamble.
+\definecolor{TitleColor}{rgb}{0,0,0}
+\definecolor{InnerLinkColor}{rgb}{0.208,0.374,0.486}
+\definecolor{OuterLinkColor}{rgb}{0.216,0.439,0.388}
+% Redefine these colors to something not white if you want to have colored
+% background and border for code examples.
+\definecolor{VerbatimColor}{rgb}{1,1,1}
+\definecolor{VerbatimBorderColor}{rgb}{1,1,1}
+
+\makeatletter
+% Notices / Admonitions
+%
+\newcommand{\py@veryheavybox}{
+  \setlength{\fboxrule}{2pt}
+  \setlength{\fboxsep}{7pt}
+  \setlength{\py@noticelength}{\linewidth}
+  \addtolength{\py@noticelength}{-2\fboxsep}
+  \addtolength{\py@noticelength}{-2\fboxrule}
+  \setlength{\shadowsize}{3pt}
+  \Sbox
+  \minipage{\py@noticelength}
+}
+\newcommand{\py@endveryheavybox}{
+  \endminipage
+  \endSbox
+  \fbox{\TheSbox}
+}
+\renewcommand{\py@noticestart@warning}{\py@veryheavybox}
+\renewcommand{\py@noticeend@warning}{\py@endveryheavybox}
+\renewcommand{\py@noticestart@note}{\py@heavybox}
+\renewcommand{\py@noticeend@note}{\py@endheavybox}
+\makeatother
+
 \sloppy
 """
 

@@ -259,6 +259,10 @@ Once the project is installed for development, you can run the
 application it represents using the ``paster serve`` command against
 the generated ``MyProject.ini`` configuration file:
 
+.. code-block:: text
+
+   $ ../bin/paster serve MyProject.ini
+
 .. sidebar:: Using ``mod_wsgi``
 
    You can also use :term:`mod_wsgi` to serve your :mod:`repoze.bfg`
@@ -268,10 +272,6 @@ the generated ``MyProject.ini`` configuration file:
    usually easier to develop an application using the ``paster serve``
    webserver, as exception and debugging output will be sent to the
    console.
-
-.. code-block:: text
-
-   $ ../bin/paster serve MyProject.ini
 
 Here's sample output from a run:
 
