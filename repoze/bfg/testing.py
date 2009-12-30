@@ -213,7 +213,7 @@ deprecated('registerViewPermission',
 def registerUtility(impl, iface=Interface, name=''):
     """ Register a ZCA utility component.
 
-   The ``impl`` argument specifies the implementation of the utility.
+    The ``impl`` argument specifies the implementation of the utility.
     The ``iface`` argument specifies the :term:`interface` which will
     be later required to look up the utility
     (:class:`zope.interface.Interface`, by default).  The ``name``
