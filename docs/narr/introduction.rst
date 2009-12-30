@@ -174,3 +174,16 @@ relational database.  :mod:`repoze.bfg` makes no such assumption; it
 allows you to use a relational database but doesn't encourage or
 discourage an application developer about such a decision.
 
+What Is Repoze?
+---------------
+
+:term:`Repoze` is a collection of software written by `Agendaless
+Consulting <http://agendaless.com>`_ and other contributors.  The
+general `Repoze website <http://repoze.org>`_ describes the Repoze
+"brand" in more detail.
+
+Software authored that uses this brand is generally placed into a
+``repoze`` namespace package.  For example, both :mod:`repoze.bfg` and
+:mod:`repoze.who` are a subprojects of the more general Repoze
+project.  These packages have nothing to do with each other, save for
+the fact that they are authored by the same people.
