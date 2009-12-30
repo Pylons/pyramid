@@ -149,7 +149,7 @@ matchdicts:
 .. code-block:: text
 
    foo/1/2        -> {'baz':u'1', 'bar':u'2'}
-   foo/abc/def    -> {'baz':u'abc', 'bar':u'2'}
+   foo/abc/def    -> {'baz':u'abc', 'bar':u'def'}
 
 It will not match the following patterns however:
 
@@ -195,7 +195,7 @@ matchdicts:
 .. code-block:: text
 
    foo/1/2/               -> {'baz':1, 'bar':2, 'traverse':()}
-   foo/abc/def/a/b/c      -> {'baz':abc, 'bar':2, 'traverse':('a', 'b', 'c')}
+   foo/abc/def/a/b/c      -> {'baz':abc, 'bar':def, 'traverse':('a', 'b', 'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value
 put into the matchdict is turned into a tuple of path segments
