@@ -219,8 +219,8 @@ _PREAMBLE = r"""
 \renewcommand{\footrulewidth}{0pt}
 \fancyhf{}
 \fancyfoot[C]{\thepage}
-\fancyhead[LO]{\rightmark}
-\fancyhead[RE]{\leftmark}
+\fancyhead[RO]{\rightmark}
+\fancyhead[LE]{\leftmark}
 
 \fancypagestyle{plain}{
   \fancyhf{} % empty header and footer
