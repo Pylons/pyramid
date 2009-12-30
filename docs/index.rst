@@ -201,7 +201,7 @@ IRC channel <irc://irc.freenode.net/#repoze>`_.
 
 Browse and check out tagged and trunk versions of :mod:`repoze.bfg`
 via the `Repoze Subversion repository
-<http://http://svn.repoze.org/repoze.bfg/>`_.  To check out the trunk
+<http://svn.repoze.org/repoze.bfg/>`_.  To check out the trunk
 via Subversion, use this command::
 
   svn co http://svn.repoze.org/repoze.bfg/trunk repoze.bfg
