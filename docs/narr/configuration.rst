@@ -4,8 +4,8 @@ Creating Your First :mod:`repoze.bfg` Application
 =================================================
 
 The majority of the logic in any web application is completely
-application-specific.  For example, the body of a web page served by
-one web application might be a representation of the contents of an
+application-specific.  For example, the content of a web page served
+by one web application might be a representation of the contents of an
 accounting ledger, while the content of of a web page served by
 another might be a listing of songs.  These applications obviously
 will not serve the same set of customers.  However, both the
@@ -98,13 +98,13 @@ imperatively:
 
 When this code is inserted into a Python script named
 ``helloworld.py`` and executed by a Python interpreter which has the
-:mod:`repoze.bfg` software installed, this code starts an HTTP server
-on port 8080.  When visited by a user agent on the root URL (``/``),
-the server will simply serve up the text "Hello world!" with the HTTP
-response values ``200 OK`` as a response code and a ``Content-Type``
-header value of ``text/plain``.  But for reasons we'll better
-understand shortly, when visited by a user agent on the URL
-``/goodbye``, the server will serve up "Goodbye world!".
+:mod:`repoze.bfg` software installed, an HTTP server is started on
+port 8080.  When port 8080 is visited by a user agent on the root URL
+(``/``), the server will simply serve up the text "Hello world!" with
+the HTTP response values ``200 OK`` as a response code and a
+``Content-Type`` header value of ``text/plain``.  But for reasons
+we'll better understand shortly, when visited by a user agent on the
+URL ``/goodbye``, the server will serve up "Goodbye world!".
 
 Let's examine this program piece-by-piece.
 
