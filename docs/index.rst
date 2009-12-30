@@ -49,8 +49,6 @@ Narrative documentation in chapter form explaining how to use
    narr/project
    narr/startup
    narr/urlmapping
-   narr/traversal
-   narr/urldispatch
    narr/views
    narr/webob
    narr/templates

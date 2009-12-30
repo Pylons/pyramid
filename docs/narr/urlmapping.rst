@@ -1,7 +1,11 @@
+.. index::
+   triple: differences; URL dispatch; traversal
+   pair: mapping; URLs
+
 .. _url_mapping_chapter:
 
 Mapping URLs to Code
-====================
+--------------------
 
 Many popular web frameworks today use :term:`URL dispatch` to
 associate a particular URL with a bit of code.  In these systems, the
@@ -21,19 +25,13 @@ dispatch, you know every URL that your application might generate or
 respond to, and all the URL matching elements are listed in a single
 place.
 
-Like :term:`Zope`, :mod:`repoze.bfg`, in contrast to URL dispatch, can
-also map URLs to code slightly differently, by using using object
-graph :term:`traversal`.  Graph-traversal based dispatching is useful
-if you like your URLs to represent an arbitrary hierarchy of
-potentially heterogeneous items, or if you need to attach
-"instance-level" security (akin to "row-level" security in relational
-parlance) declarations to :term:`model` instances.
-
-.. index::
-   triple: differences; URL dispatch; traversal
-
-Differences Between Traversal and URL Dispatch
-----------------------------------------------
+Like :term:`Zope`, :mod:`repoze.bfg` can also map URLs to code
+slightly differently, by using using object graph :term:`traversal`.
+Graph-traversal based dispatching is useful if you like your URLs to
+represent an arbitrary hierarchy of potentially heterogeneous items,
+or if you need to attach "instance-level" security (akin to
+"row-level" security in relational parlance) declarations to
+:term:`model` instances.
 
 :term:`URL dispatch` can easily handle URLs such as
 ``http://example.com/members/Chris``, where it's assumed that each
@@ -90,12 +88,16 @@ to code in terms of traversing the graph.  (How's *that* for
 self-referential! ;-) ) 
 
 In essence, the choice to use graph traversal vs. URL dispatch is
-largely religious in some sense.  Graph traversal dispatch probably
-just doesn't make any sense when you possess completely "square" data
-stored in a relational database.  However, when you have a
-hierarchical data store, it can provide advantages over using
-URL-based dispatch.
+largely religious.  Graph traversal dispatch probably just doesn't
+make any sense when you possess completely "square" data stored in a
+relational database.  However, when you have a hierarchical data
+store, it can provide advantages over using URL-based dispatch.
 
 :mod:`repoze.bfg` provides support for both approaches.  You can use
 either as you see fit.
 
+.. toctree::
+   :maxdepth: 2
+
+   traversal
+   urldispatch

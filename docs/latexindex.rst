@@ -29,10 +29,7 @@ Narrative Documentation
    narr/configuration
    narr/scanning
    narr/project
-   narr/startup
    narr/urlmapping
-   narr/traversal
-   narr/urldispatch
    narr/views
    narr/webob
    narr/templates
@@ -47,6 +44,7 @@ Narrative Documentation
    narr/extending
    narr/resources
    narr/router
+   narr/startup
    narr/threadlocals
 
 Tutorials
