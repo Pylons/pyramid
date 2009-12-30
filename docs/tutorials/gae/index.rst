@@ -109,6 +109,15 @@ system.
       # assert sys.path[:len(cur_sys_path)] == cur_sys_path, (
       #   "addsitedir() caused entries to be prepended to sys.path")
 
+   For GAE development environment 1.3.0 or better, you will also need
+   the following somewhere near the top of the ``runner.py`` file to
+   fix a compatibility issue with ``appengine-monkey``:
+
+   .. code-block:: python
+
+      import os
+      os.mkdir = None
+
 #. Run the application.  ``dev_appserver.py`` is typically installed
    by the SDK in the global path but you need to be sure to run it
    with Python 2.5 (or whatever version of Python your GAE SDK
