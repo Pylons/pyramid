@@ -7,20 +7,23 @@ by Chris McDonough
 
 Copyright © 2008-2010, Agendaless Consulting.
 
+ISBN-13: 978-0-615-34537-6
+
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
-Attribution-Noncommercial-No Derivative Works 3.0 United States
-License <http://creativecommons.org/licenses/by-nc-nd/3.0/us/>`_.  You
-must give the original author credit.  You may not use this work for
-commercial purposes.  You may not alter, transform, or build upon this
-work.
+Attribution-Noncommercial-Share Alike 3.0 United States License
+<http://creativecommons.org/licenses/by-nc-sa/3.0/us/>`_.  You must
+give the original author credit.  You may not use this work for
+commercial purposes.  If you alter, transform, or build upon this
+work, you may distribute the resulting work only under the same or
+similar license to this one.
 
 .. note::
 
    While the :mod:`repoze.bfg` documentation is offered under the
-   Creative Commons Attribution-Nonconmmercial-No Derivative Works 3.0
-   United States License, the :mod:`repoze.bfg` *software* is offered
-   under a `less restrictive (BSD-like) license
+   Creative Commons Attribution-Nonconmmercial-Share Alike 3.0 United
+   States License, the :mod:`repoze.bfg` *software* is offered under a
+   `less restrictive (BSD-like) license
    <http://repoze.org/license.html>`_ .
 
 **Trademarks**
@@ -29,6 +32,15 @@ All terms mentioned in this book that are known to be trademarks or
 service marks have been appropriately capitalized.  However, use of a
 term in this book should not be regarded as affecting the validity of
 any trademark or service mark.
+
+**Attributions**
+
+Cover Designer:
+   `Electrosoup <http://www.electrosoup.co.uk>`_.
+
+Used with permission:
+   The :ref:`webob_chapter` chapter is adapted, with permission, from
+   documentation originally written by Ian Bicking.
 
 **Warning and Disclaimer**
 
@@ -42,8 +54,14 @@ with respect to the use of the information contained herein.
 
 **Contacting The Publisher**
 
-Please send documentation licensing inquiries and other business
-communications to `Agendaless Consulting
+Please send documentation licensing inquiries, translation inquiries,
+and other business communications to `Agendaless Consulting
 <mailto:webmaster@agendaless.com>`_.  Please send software and other
 technical queries to the `repoze-dev maillist
 <http://lists.repoze.org/listinfo/repoze-dev>`_.
+
+**Source Code**
+
+The source code for this book is available within the
+:mod:`repoze.bfg` software distribution, always available via
+http://bfg.repoze.org.

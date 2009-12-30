@@ -1,7 +1,13 @@
+.. index::
+   pair:  ian; bicking
+
 .. _webob_chapter:
 
 Request and Response Objects
 ============================
+
+.. note:: This chapter is adapted from a portion of the :term:`WebOb`
+   documentation, originally written by Ian Bicking.
 
 :mod:`repoze.bfg` uses the :term:`WebOb` package to supply
 :term:`request` and :term:`response` object implementations.  The
@@ -98,6 +104,9 @@ instance, ``req.if_modified_since`` returns a `datetime
 `Request reference
 <http://pythonpaste.org/webob/class-webob.Request.html>`_.
 
+.. index::
+   pair: request; URL
+
 URLs
 ++++
 
@@ -121,6 +130,10 @@ of the request.  I'll show various values for an example URL
     Gives a URL, relative to the current URL.  If ``to_application``
     is True, then resolves it relative to ``req.application_url``.
 
+
+.. index::
+   pair: request; methods
+
 Methods
 +++++++
 
@@ -140,6 +153,9 @@ only a few you'll use often:
     This method calls the given WSGI application with this request,
     and returns a `Response`_ object.  You can also use this for
     subrequests or testing.
+
+.. index::
+   pair: request; unicode
 
 Unicode
 +++++++
@@ -242,6 +258,9 @@ properties.  These are parsed, so you can do things like
 The details are available in the `extracted Response documentation
 <http://pythonpaste.org/webob/class-webob.Response.html>`_.
 
+.. index::
+   pair: response; creating
+
 Instantiating the Response
 ++++++++++++++++++++++++++
 
@@ -328,6 +347,9 @@ something like ``[('pref', 'red'), ('pref', 'blue')]``.  All the
 key/value pairs will show up.  Similarly ``request.GET.keys()``
 returns ``['pref', 'pref']``.  Multidict is a view on a list of
 tuples; all the keys are ordered, and all the values are ordered.
+
+.. index::
+   triple: response; attributes; special
 
 Special :mod:`repoze.bfg` Attributes Added to the Request
 ---------------------------------------------------------
