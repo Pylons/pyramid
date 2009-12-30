@@ -221,7 +221,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        while this value represents the lifetime of the cookie itself.
        When this value is set, the cookie's ``Max-Age`` and
        ``Expires`` settings will be set, allowing the auth_tkt cookie
-       to last between browser sessions.  It is typically nonsenical
+       to last between browser sessions.  It is typically nonsensical
        to set this to a value that is lower than ``timeout`` or
        ``reissue_time``, although it is not explicitly prevented.
        Optional.

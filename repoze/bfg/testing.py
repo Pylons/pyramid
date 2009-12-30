@@ -109,7 +109,7 @@ def registerEventListener(event_iface=None):
 
     .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
        Instead use the
-       :meth:`repoze.bfg.configuration.Cofigurator.testing_add_subscriber`
+       :meth:`repoze.bfg.configuration.Configurator.testing_add_subscriber`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
@@ -117,7 +117,7 @@ def registerEventListener(event_iface=None):
     return config.testing_add_subscriber(event_iface)
 
 def registerTemplateRenderer(path, renderer=None):
-    """ Register a template tenderer at ``path`` (usually a relative
+    """ Register a template renderer at ``path`` (usually a relative
     filename ala ``templates/foo.pt``) and return the renderer object.
     If the ``renderer`` argument is None, a 'dummy' renderer will be
     used.  This function is useful when testing code that calls the
@@ -226,7 +226,7 @@ def registerUtility(impl, iface=Interface, name=''):
     .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
        Instead use the :meth:`repoze.bfg.Registry.registerUtility`
        method.  The ``registry`` attribute of a :term:`Configurator`
-       in your unit and integration tests is an intstance of the
+       in your unit and integration tests is an instance of the
        :class:`repoze.bfg.Registry` class.
     """
     reg = get_current_registry()
@@ -256,7 +256,7 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
        Instead use the :meth:`repoze.bfg.Registry.registerAdapter`
        method.  The ``registry`` attribute of a :term:`Configurator`
-       in your unit and integration tests is an intstance of the
+       in your unit and integration tests is an instance of the
        :class:`repoze.bfg.Registry` class.
     """
     reg = get_current_registry()
@@ -519,7 +519,7 @@ class DummyModel:
         ``__parent__`` arguments are passed, use these values to
         override the existing ``__name__`` or ``__parent__`` of the
         model.  If any extra keyword args are passed in via the ``kw``
-        aargument, use these keywords to add to or override existing
+        argument, use these keywords to add to or override existing
         model keywords (attributes)."""
         oldkw = self.kw.copy()
         oldkw.update(kw)
@@ -664,7 +664,7 @@ def setUp(registry=None, request=None, hook_zca=True):
     .. warning:: Although this method of setting up a test registry
                  will never disappear, after :mod:`repoze.bfg` 1.2a6,
                  using the ``begin`` and ``end`` methods of a
-                 ``Configurator`` are prefered to using
+                 ``Configurator`` are preferred to using
                  ``repoze.bfg.testing.setUp`` and
                  ``repoze.bfg.testing.tearDown``.  See
                  :ref:`unittesting_chapter` for more information.
@@ -696,7 +696,7 @@ def tearDown(unhook_zca=True):
     .. warning:: Although this method of tearing a test setup down
                  will never disappear, after :mod:`repoze.bfg` 1.2a6,
                  using the ``begin`` and ``end`` methods of a
-                 ``Configurator`` are prefered to using
+                 ``Configurator`` are preferred to using
                  ``repoze.bfg.testing.setUp`` and
                  ``repoze.bfg.testing.tearDown``.  See
                  :ref:`unittesting_chapter` for more information.

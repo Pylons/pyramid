@@ -246,7 +246,7 @@ class bfg_view(object):
        config.add_view(views.my_view, for_=models.MyModel, name='my_view',
                        permission='read', 'route_name='site1')
 
-    Or might relpace the following ZCML ``view`` declaration::
+    Or might replace the following ZCML ``view`` declaration::
 
       <view
        for='.models.MyModel'
@@ -302,7 +302,7 @@ class bfg_view(object):
     encountered.  If the value is present, it must be a string.  If
     the value supplied to the parameter has no ``=`` sign in it, it
     implies that the key must exist in the ``request.params``
-    dictionary for this view to'match' the current request.  If the value
+    dictionary for this view to 'match' the current request.  If the value
     supplied to the parameter has a ``=`` sign in it, e.g.
     ``request_params="foo=123"``, then the key (``foo``) must both exist
     in the ``request.params`` dictionary, and the value must match the

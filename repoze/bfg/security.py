@@ -204,7 +204,7 @@ class PermitsResult(int):
 
 class Denied(PermitsResult):
     """ An instance of ``Denied`` is returned when a security-related
-    API or other :mod:`repoze.bfg` code denies an action unlrelated to
+    API or other :mod:`repoze.bfg` code denies an action unrelated to
     an ACL check.  It evaluates equal to all boolean false types.  It
     has an attribute named ``msg`` describing the circumstances for
     the deny."""

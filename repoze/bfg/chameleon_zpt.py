@@ -52,7 +52,7 @@ def get_renderer(path):
     return renderer_factory(path)
 
 def get_template(path):
-    """ Return the underyling object representing a :term:`Chameleon`
+    """ Return the underlying object representing a :term:`Chameleon`
     ZPT template using the template implied by the ``path`` argument.
     The ``path`` argument may be a package-relative path, an absolute
     path, or a :term:`resource specification`."""

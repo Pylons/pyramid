@@ -353,7 +353,7 @@ def virtual_root(model, request):
     is both its own physical and virtual root).  However if this API
     is called with a ``model`` argument which is a context obtained
     via URL dispatch, the model passed in will be returned
-    unconditonally."""
+    unconditionally."""
     try:
         reg = request.registry
     except AttributeError:

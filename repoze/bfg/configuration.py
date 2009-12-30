@@ -1302,7 +1302,7 @@ class Configurator(object):
 
     def testing_add_template(self, path, renderer=None):
         """Unit/integration testing helper: register a template
-        tenderer at ``path`` (usually a relative filename ala
+        renderer at ``path`` (usually a relative filename ala
         ``templates/foo.pt``) and return the renderer object.  If the
         ``renderer`` argument is None, a 'dummy' renderer will be
         used.  This function is useful when testing code that calls
@@ -1798,7 +1798,7 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     relative to the package path) that should be parsed to create the
     application registry.  It defaults to ``configure.zcml``.  It can
     also be a ;term:`resource specification` in the form
-    ``dotted_package_name:relatve/file/path.zcml``. Note that if any
+    ``dotted_package_name:relative/file/path.zcml``. Note that if any
     value for ``configure_zcml`` is passed within the ``settings``
     dictionary, the value passed as ``filename`` will be ignored,
     replaced with the ``configure_zcml`` value.
