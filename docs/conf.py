@@ -13,7 +13,7 @@
 
 import sys, os
 
-book = os.environ.get('book')
+book = os.environ.get('BOOK')
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
@@ -234,6 +234,7 @@ _PREAMBLE = r"""
 latex_elements = {
     'preamble': _PREAMBLE,
     'wrapperclass':'book',
+    'date':'',
 }
 
 from docutils import nodes
