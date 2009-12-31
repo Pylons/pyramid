@@ -616,3 +616,7 @@ Glossary
    PyPI
      `The Python Package Index <http://pypi.python.org/pypi>`_, a
      collection of software available for Python.
+
+   Agendaless Consulting
+     A consulting organization formed by Paul Everitt, Tres Seaver,
+     and Chris McDonough.  See also http://agendaless.com .

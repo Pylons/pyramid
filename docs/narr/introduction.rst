@@ -1,3 +1,9 @@
+.. index::
+   single: Agendaless Consulting
+   single: Pylons
+   single: Django
+   single: Zope
+
 :mod:`repoze.bfg` Introduction
 ==============================
 
@@ -5,12 +11,10 @@
 It is inspired by :term:`Zope`, :term:`Pylons`, and :term:`Django`.
 It uses the :term:`WSGI` protocol to handle requests and responses.
 
-:mod:`repoze.bfg` is written by Agendaless Consulting and a community
-of contributors.  It is developed primarily by people who come from
-the world of :term:`Zope` but for whom Zope as a web application
-development platform has lost some of its attraction.  Its authors
-also have experience developing applications using many other web
-frameworks.
+:mod:`repoze.bfg` is written by :term:`Agendaless Consulting` and a
+community of contributors.  It is developed primarily by people who
+come from the world of :term:`Zope`.  Its authors also have experience
+developing applications using many other web frameworks.
 
 The first release of :mod:`repoze.bfg` was made in July of 2008.
 Since its first release, it has undergone many improvements, and has
@@ -19,14 +23,16 @@ attributes:
 
 Simplicity
   :mod:`repoze.bfg` attempts to be a *"pay only for what you eat"*
-  framework in which you can be productive quickly with partial
-  knowledge.  We contrast this with *"pay up front for what anyone
-  might eventually want to eat"* frameworks, which tend to expect you
-  to understand a great many concepts and technologies fully before
-  you can be truly productive.  :mod:`repoze.bfg` doesn't force you to
-  use any particular technology to produce an application, and we try
-  to keep the core set of concepts you need to understand to a
-  minimum.
+  framework in which you can be productive quickly with only partial
+  knowledge.  Some other frameworks tend to expect you to understand a
+  great many concepts and technologies fully before you can be truly
+  productive.  :mod:`repoze.bfg` doesn't force you to use any
+  particular technology to produce an application, and we try to keep
+  the core set of concepts you need to understand to a minimum.
+
+A Sense of Fun
+  Developing a :mod:`repoze.bfg` application should not feel
+  "enterprisey".  We like to keep things down-to-earth.
 
 Minimalism
   :mod:`repoze.bfg` provides only the very basics: *URL to code
@@ -57,12 +63,13 @@ Trustability
   exhaustively.  *If it ain't tested, it's broke.* Every release of
   :mod:`repoze.bfg` has 100% statement coverage via unit tests.
 
-A Sense of Fun
-  Developing a :mod:`repoze.bfg` application should not feel foreign
-  or "enterprisey".  We like to keep things down-to-earth.
-
 .. index::
    single: similarities to other frameworks
+   single: Grok
+   single: Zope
+   single: Pylons
+   single: Django
+   single: MVC
 
 Similarities to Other Web Frameworks
 ------------------------------------
@@ -114,10 +121,15 @@ would be by Django.
 
 The skeleton code generator of :mod:`repoze.bfg` generates a directory
 layout very similar to the directory layout suggested by the `Django
-Book <http://www.djangobook.com/>`_ .  
+Book <http://www.djangobook.com/>`_ .
 
 .. index::
    single: differences from other frameworks
+   single: Grok
+   single: Zope
+   single: Pylons
+   single: Django
+   single: control inversion
 
 Differences from Other Web Frameworks
 -------------------------------------
@@ -173,6 +185,11 @@ tends to assume that you want to store your application's data in a
 relational database.  :mod:`repoze.bfg` makes no such assumption; it
 allows you to use a relational database but doesn't encourage or
 discourage an application developer about such a decision.
+
+.. index::
+   single: Repoze
+   single: Agendaless Consulting
+   pair: repoze; namespace package
 
 What Is Repoze?
 ---------------

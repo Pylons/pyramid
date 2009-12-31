@@ -1,56 +1,59 @@
+.. index::
+   single: frameworks vs. libraries
+   single: framework
+
 .. _configuration_narr:
 
 Creating Your First :mod:`repoze.bfg` Application
 =================================================
 
-The majority of the logic in any web application is completely
+Most of the logic in a web application is completely
 application-specific.  For example, the content of a web page served
 by one web application might be a representation of the contents of an
 accounting ledger, while the content of of a web page served by
-another might be a listing of songs.  These applications obviously
-will not serve the same set of customers.  However, both the
+another might be a listing of songs.  These applications probably
+won't serve the same set of customers.  However, both the
 ledger-serving and song-serving applications can be written using
 :mod:`repoze.bfg`, because :mod:`repoze.bfg` is a very general
 *framework* which can be used to create all kinds of web applications.
+As a framework, the primary job of :mod:`repoze.bfg` is to make it
+easier for a developer to create an arbitrary web application.
 
 .. sidebar:: Frameworks vs. Libraries
 
    A *framework* differs from a *library* in one very important way:
    library code is always *called* by code that you write, while a
    framework always *calls* code that you write.  Using a set of
-   libraries to create an application is often initially easier than
-   using a framework to create an application, because the developer
-   can choose to cede control to library code he has not authored
-   selectively. When using a framework, the developer is typically
-   required to cede a greater portion of control to code he has not
-   authored: code that resides in the framework itself.  You needn't
-   use a framework at all to create a web application using Python.  A
-   rich set of libraries already exists for the platform.  In
-   practice, however, using an existing framework to create an
-   application is often more practical than rolling your own via a set
-   of libraries if the framework provides a set of facilities and
-   assumptions that fit your application requirements.
+   libraries to create an application is usually easier than using a
+   framework initially, because you can choose to cede control to
+   library code you have not authored very selectively. But when you
+   use a framework, you are required to cede a greater portion of
+   control to code you have not authored: code that resides in the
+   framework itself.  You needn't use a framework at all to create a
+   web application using Python.  A rich set of libraries already
+   exists for the platform.  In practice, however, using a framework
+   to create an application is often more practical than rolling your
+   own via a set of libraries if the framework provides a set of
+   facilities that fits your application requirements.
 
-As a framework, the primary job of :mod:`repoze.bfg` is to make it
-easier for a developer to create an arbitrary web application.  Each
-deployment of an application written using :mod:`repoze.bfg` implies a
-specific *configuration* of the framework itself.  For example, a
-song-serving application might plug code into the framework that
-manages songs, while the ledger- serving application might plug in
-code that manages accounting information.  :mod:`repoze.bfg` refers to
-the way in which code is plugged in to it for a specific deployment as
-"configuration".
+Each deployment of an application written using :mod:`repoze.bfg`
+implies a specific *configuration* of the framework itself.  For
+example, a song-serving application might plug code into the framework
+that manages songs, while the ledger- serving application might plug
+in code that manages accounting information.  :mod:`repoze.bfg` refers
+to the way in which code is plugged in to it for a specific
+application as "configuration".
 
 Most people understand "configuration" as coarse knobs that inform the
 high-level operation of a specific application deployment.  For
 instance, it's easy to think of the values implied by a ``.ini`` file
 which is parsed at application startup time as "configuration".
-:mod:`repoze.bfg` extends this pattern all the way out to application
-development, using the term "configuration" to express standardized
-methods which can be used to plug code into a deployment of the
-framework itself.  When you plug code into the :mod:`repoze.bfg`
-framework, you are indeed "configuring" :mod:`repoze.bfg` for the
-purpose of creating a particular application deployment.
+:mod:`repoze.bfg` extends this pattern out to application development,
+using the term "configuration" to express standardized ways that code
+gets plugged into a deployment of the framework itself.  When you plug
+code into the :mod:`repoze.bfg` framework, you are "configuring"
+:mod:`repoze.bfg` for the purpose of creating a particular application
+deployment.
 
 There are a number of different mechanisms you may use to configure
 :mod:`repoze.bfg` to create an application: *imperative* configuration
@@ -67,7 +70,7 @@ Hello World, Configured Imperatively
 
 Experienced Python programmers may find the "imperative" configuration
 mechanism fits the way they already do things. This is the
-configuration mode in which developers cede the least amount of
+configuration mode in which a developer cedes the least amount of
 control to the framework.  It is often the easiest configuration mode
 to understand.
 
