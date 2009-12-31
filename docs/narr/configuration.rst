@@ -68,11 +68,11 @@ sections which follow.
 Hello World, Configured Imperatively
 ------------------------------------
 
-Experienced Python programmers may find the "imperative" configuration
-mechanism fits the way they already do things. This is the
-configuration mode in which a developer cedes the least amount of
-control to the framework.  It is often the easiest configuration mode
-to understand.
+Experienced Python programmers might find that "imperative"
+configuration is easiest to use. This is the configuration mode in
+which a developer cedes the least amount of control to the framework;
+it's "imperative" because you express the configuration directly in
+Python code.
 
 Here's one of the simplest :mod:`repoze.bfg` applications, configured
 imperatively:
@@ -131,9 +131,9 @@ The above script defines the following set of imports:
 Like many other Python web frameworks, :mod:`repoze.bfg` uses the
 :term:`WSGI` protocol to connect an application and a web server
 together.  The :mod:`paste.httpserver` server is used in this example
-as a WSGI server, purely for convenience, as ``Paste`` is a dependency
-of :mod:`repoze.bfg` itself; :mod:`repoze.bfg` applications can be
-served by any WSGI server.
+as a WSGI server for convenience, as ``Paste`` is a dependency of
+:mod:`repoze.bfg` itself.  However, :mod:`repoze.bfg` applications can
+be served by any WSGI server.
 
 The script also imports the ``Configurator`` class from the
 ``repoze.bfg.configuration`` module.  This class is used to configure
@@ -156,11 +156,11 @@ one named ``hello_world`` and one named ``goodbye_world``.
    def goodbye_world(request):
        return Response('Goodbye world!')
 
-Both functions accepts a single argument (``request``), and each
-returns an instance of the :class:`webob.Response` class.  In the
-``hello_world`` function, the string ``'Hello world!'`` is passed to
-the ``Response`` constructor as the *body* of the response.  In the
-``goodbye_world`` function, the string ``'Goodbye world!'`` is passed.
+Each function accepts a single argument (``request``) and returns an
+instance of the :class:`webob.Response` class.  In the ``hello_world``
+function, the string ``'Hello world!'`` is passed to the ``Response``
+constructor as the *body* of the response.  In the ``goodbye_world``
+function, the string ``'Goodbye world!'`` is passed.
 
 Each of these functions is known as a :term:`view callable`.  View
 callables in a "real" :mod:`repoze.bfg` application are often
@@ -189,10 +189,10 @@ but return a response with the body ``Hello world!``; the
 An Introduction to Traversal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you've run the code in this tutorial already, you've actually
-unwittingly configured :mod:`repoze.bfg` to serve an application that
-relies on :term:`traversal`.  A full explanation of how
-:mod:`repoze.bfg` locates "the right" :term:`view callable` for a
+If you've run the code listed in :ref`helloworld_imperative` already,
+you've unwittingly configured :mod:`repoze.bfg` to serve an
+application that relies on :term:`traversal`.  A full explanation of
+how :mod:`repoze.bfg` locates "the right" :term:`view callable` for a
 given request requires some explanation of :term:`traversal`.
 
 Traversal is part of a mechanism used by :mod:`repoze.bfg` to map the
@@ -205,11 +205,17 @@ based on a URL.  However, our sample application uses only
 
 In :mod:`repoze.bfg` terms, :term:`traversal` is the act of walking
 over an object graph starting from a :term:`root` object in order to
-find a :term:`context` object and a :term:`view name`.  The individual
-path segments of the "path info" portion of a URL (the data following
-the hostname and port number, but before any query string elements or
-fragments, for example the ``/a/b/c`` portion of the URL
-``http://example.com/a/b/c?foo=1``) are used as "steps" during
+find a :term:`context` object and a :term:`view name`.  Once a context
+and a view name are found, these two bits of information, plus other
+information from the request are used to look up a :term:`view
+callable`.  :mod:`repoze.bfg` bothers to do traversal only because the
+information returned from traversal allows a view callable to be
+found.
+
+The individual path segments of the "path info" portion of a URL (the
+data following the hostname and port number, but before any query
+string elements or fragments, for example the ``/a/b/c`` portion of
+the URL ``http://example.com/a/b/c?foo=1``) are used as "steps" during
 traversal.
 
 .. note:: A useful analogy of how :mod:`repoze.bfg` :term:`traversal`
@@ -218,7 +224,7 @@ traversal.
 
 The results of a :term:`traversal` include a :term:`context` and a
 :term:`view name`.  The :term:`view name` is the *first* URL path
-segment in the set of path segments "left over" during
+segment in the set of path segments "left over" in the results of
 :term:`traversal`.  This will either be the empty string (``''``) or a
 non-empty string (one of the path segment strings).  The empty string
 represents the :term:`default view` of a context object.
