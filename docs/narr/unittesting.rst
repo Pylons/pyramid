@@ -135,7 +135,7 @@ Configurator within the ``setUp`` method of your test:
        def tearDown(self):
            self.config.end()
 
-If you pass a term:`request` object into the ``begin`` method of the
+If you pass a :term:`request` object into the ``begin`` method of the
 configurator within your test case's ``setUp``, any test method
 attached to the ``MyTest`` test case that directly or indirectly calls
 :func:`repoze.bfg.threadlocal.get_current_request` will receive the
