@@ -204,3 +204,33 @@ Software authored that uses this brand is generally placed into a
 :mod:`repoze.who` are a subprojects of the more general Repoze
 project.  These packages have nothing to do with each other, save for
 the fact that they are authored by the same people.
+
+.. index::
+   single: repoze.zope2
+   single: zope 3
+
+How Does Repoze Relate to "BFG"?
+--------------------------------
+
+The Repoze brand existed before :mod:`repoze.bfg`.  One of the first
+packages developed as part of the Repoze brand was a package named
+:mod:`repoze.zope2`.  This was a package that allowed Zope 2
+applications to run under a :term:`WSGI` server without modification.
+
+During the development of the :mod:`repoze.zope2` package, I found
+that replicating the Zope 2 "publisher" (the machinery that maps URLs
+to code) was very time-consuming and fiddly.  Zope 2 had evolved over
+many years, and emulating all of its edge cases was extremely
+difficult.  I finished the package, and it emulates the normal Zope 2
+publisher pretty well, but during the process, I decided that in the
+long term, creating a simpler, legacy-free publisher would be a more
+reasonable idea than continuing to use the Zope publisher.  This
+publisher became what is now :mod:`repoze.bfg`.
+
+Before I started :mod:`repoze.bfg`, I considered the using Zope 3
+application server machinery, but it turned out that it had become
+even more indirect than the Zope 2 machinery it aimed to replace.  I
+also considered using Django, or Pylons, but neither of those
+frameworks offer much along the axes of traversal, contextual
+declarative security, or application extensibility; these were
+features I had become accustomed to as a Zope developer.
