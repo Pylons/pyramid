@@ -229,8 +229,9 @@ publisher became what is now :mod:`repoze.bfg`.
 
 Before I started :mod:`repoze.bfg`, I considered the using Zope 3
 application server machinery, but it turned out that it had become
-even more indirect than the Zope 2 machinery it aimed to replace.  I
-also considered using Django, or Pylons, but neither of those
-frameworks offer much along the axes of traversal, contextual
-declarative security, or application extensibility; these were
-features I had become accustomed to as a Zope developer.
+more indirect than the Zope 2 machinery it aimed to replace, which
+didn't fulfill the goal of simplification.  I also considered using
+Django, or Pylons, but neither of those frameworks offer much along
+the axes of traversal, contextual declarative security, or application
+extensibility; these were features I had become accustomed to as a
+Zope developer.
