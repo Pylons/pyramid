@@ -148,40 +148,6 @@ class Configurator(object):
                 renderers=renderers,
                 debug_logger=debug_logger)
 
-    def setup_registry(self, settings=None, root_factory=None,
-                       authentication_policy=None, authorization_policy=None,
-                       renderers=DEFAULT_RENDERERS, debug_logger=None):
-        """ When you pass a non-``None`` ``registry`` argument to the
-        :term:`Configurator` constructor, no initial 'setup' is
-        performed against the registry.  This is because the registry
-        you pass in may have already been initialized for use under
-        :mod:`repoze.bfg` via a different configurator.  However, in
-        some circumstances, such as when you want to use the Zope
-        'global` registry instead of a registry created as a result of
-        the Configurator constructor, or when you want to reset the
-        initial setup of a registry, you *do* want to explicitly
-        initialize the registry associated with a Configurator for use
-        under :mod:`repoze.bfg`.  Use ``setup_registry`` to do this
-        initialization.
-
-        ``setup_registry`` configures settings, a root factory,
-        security policies, renderers, and a debug logger using the
-        configurator's current registry, as per the descriptions in
-        the Configurator constructor."""
-        self._set_settings(settings)
-        self._set_root_factory(root_factory)
-        if debug_logger is None:
-            debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
-        registry = self.registry
-        registry.registerUtility(debug_logger, IDebugLogger)
-        registry.registerUtility(debug_logger, IDebugLogger,
-                                 'repoze.bfg.debug') # b /c
-        if authentication_policy or authorization_policy:
-            self._set_security_policies(authentication_policy,
-                                        authorization_policy)
-        for name, renderer in renderers:
-            self.add_renderer(name, renderer)
-
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
         self.registry.registerUtility(settings, ISettings)
@@ -296,6 +262,40 @@ class Configurator(object):
         self._set_authorization_policy(authorization)
 
     # API
+
+    def setup_registry(self, settings=None, root_factory=None,
+                       authentication_policy=None, authorization_policy=None,
+                       renderers=DEFAULT_RENDERERS, debug_logger=None):
+        """ When you pass a non-``None`` ``registry`` argument to the
+        :term:`Configurator` constructor, no initial 'setup' is
+        performed against the registry.  This is because the registry
+        you pass in may have already been initialized for use under
+        :mod:`repoze.bfg` via a different configurator.  However, in
+        some circumstances, such as when you want to use the Zope
+        'global` registry instead of a registry created as a result of
+        the Configurator constructor, or when you want to reset the
+        initial setup of a registry, you *do* want to explicitly
+        initialize the registry associated with a Configurator for use
+        under :mod:`repoze.bfg`.  Use ``setup_registry`` to do this
+        initialization.
+
+        ``setup_registry`` configures settings, a root factory,
+        security policies, renderers, and a debug logger using the
+        configurator's current registry, as per the descriptions in
+        the Configurator constructor."""
+        self._set_settings(settings)
+        self._set_root_factory(root_factory)
+        if debug_logger is None:
+            debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
+        registry = self.registry
+        registry.registerUtility(debug_logger, IDebugLogger)
+        registry.registerUtility(debug_logger, IDebugLogger,
+                                 'repoze.bfg.debug') # b /c
+        if authentication_policy or authorization_policy:
+            self._set_security_policies(authentication_policy,
+                                        authorization_policy)
+        for name, renderer in renderers:
+            self.add_renderer(name, renderer)
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -729,13 +729,14 @@ class Configurator(object):
         # different interfaces as the ``provided`` interface while
         # doing registrations, and ``registered`` performs exact
         # matches on all the arguments it receives.
+
+        old_view = None
+
+        for view_type in (IView, ISecuredView, IMultiView):
+            old_view = registered((r_for_, r_request_type), view_type, name)
+            if old_view is not None:
+                break
         
-        old_view = registered((r_for_, r_request_type), IView, name)
-        if old_view is None:
-            old_view = registered((r_for_, r_request_type), ISecuredView, name)
-            if old_view is None:
-                old_view = registered((r_for_, r_request_type), IMultiView,
-                                      name)
         if old_view is None:
             # No component was registered for any of our I*View
             # interfaces exactly; this is the first view for this
@@ -759,10 +760,10 @@ class Configurator(object):
                 old_accept = getattr(old_view, '__accept__', None)
                 multiview.add(old_view, sys.maxint, old_accept)
             multiview.add(derived_view, score, accept)
-            for i in (IView, ISecuredView):
+            for view_type in (IView, ISecuredView):
                 # unregister any existing views
-                self.registry.adapters.unregister((r_for_, r_request_type), i,
-                                                  name=name)
+                self.registry.adapters.unregister(
+                    (r_for_, r_request_type), view_type, name=name)
             self.registry.registerAdapter(multiview, (for_, request_type),
                                           IMultiView, name, info=_info)
 

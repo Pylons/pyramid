@@ -536,6 +536,20 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
+    def test_add_view_multiview_replaces_existing_securedview(self):
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import ISecuredView
+        from repoze.bfg.interfaces import IMultiView
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (Interface, IRequest), ISecuredView, name='')
+        config.add_view(view=view)
+        wrapper = self._getViewCallable(config)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual(wrapper(None, None), 'OK')
+
     def test_add_view_with_accept_multiview_replaces_existing_view(self):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
