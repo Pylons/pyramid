@@ -6,3 +6,7 @@
 - Decide on ``unhook_zca`` argument to ``tearDown``.
 
 - Get rid of ITraverser hook in favor of IViewLookup.
+
+- Add "context" as an alias for "for" in ZCML and imperative config
+  bits.
+
