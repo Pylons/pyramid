@@ -603,12 +603,13 @@ the :term:`application registry`. It looks like so:
    in this file.
 
 #. Lines 6-10 register a "default view" (a view that has no ``name``
-   attribute).  It is ``for`` model objects that are instances of the
+   attribute).  It is registered so that it will be found when the
+   :term:`context` of the request is an instance of the
    :class:`myproject.models.MyModel` class.  The ``view`` attribute
    points at a Python function that does all the work for this view.
-   Note that the values of both the ``for`` attribute and the ``view``
-   attribute begin with a single period.  Names that begin with a
-   period are "shortcuts" which point at files relative to the
+   Note that the values of both the ``context`` attribute and the
+   ``view`` attribute begin with a single period.  Names that begin
+   with a period are "shortcuts" which point at files relative to the
    :term:`package` in which the ``configure.zcml`` file lives.  In
    this case, since the ``configure.zcml`` file lives within the
    :mod:`myproject` package, the shortcut ``.models.MyModel`` could

@@ -289,7 +289,7 @@ class TestBFGViewDecorator(unittest.TestCase):
         decorator = self._makeOne()
         self.assertEqual(decorator.name, '')
         self.assertEqual(decorator.request_type, None)
-        self.assertEqual(decorator.for_, None)
+        self.assertEqual(decorator.context, None)
         self.assertEqual(decorator.permission, None)
         
     def test_create_nondefaults(self):
@@ -297,7 +297,7 @@ class TestBFGViewDecorator(unittest.TestCase):
                                   permission='foo')
         self.assertEqual(decorator.name, None)
         self.assertEqual(decorator.request_type, None)
-        self.assertEqual(decorator.for_, None)
+        self.assertEqual(decorator.context, None)
         self.assertEqual(decorator.permission, 'foo')
         
     def test_call_function(self):
@@ -308,7 +308,7 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.failUnless(wrapped is foo)
         settings = wrapped.__bfg_view_settings__[0]
         self.assertEqual(settings['permission'], None)
-        self.assertEqual(settings['for_'], None)
+        self.assertEqual(settings['context'], None)
         self.assertEqual(settings['request_type'], None)
 
     def test_call_oldstyle_class(self):
@@ -319,7 +319,7 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.failUnless(wrapped is foo)
         settings = wrapped.__bfg_view_settings__[0]
         self.assertEqual(settings['permission'], None)
-        self.assertEqual(settings['for_'], None)
+        self.assertEqual(settings['context'], None)
         self.assertEqual(settings['request_type'], None)
 
     def test_call_newstyle_class(self):
@@ -330,7 +330,7 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.failUnless(wrapped is foo)
         settings = wrapped.__bfg_view_settings__[0]
         self.assertEqual(settings['permission'], None)
-        self.assertEqual(settings['for_'], None)
+        self.assertEqual(settings['context'], None)
         self.assertEqual(settings['request_type'], None)
 
     def test_stacking(self):

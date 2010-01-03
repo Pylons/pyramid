@@ -11,11 +11,11 @@ from tutorial.models import Wiki
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@bfg_view(for_=Wiki)
+@bfg_view(context=Wiki)
 def view_wiki(context, request):
     return HTTPFound(location = model_url(context, request, 'FrontPage'))
 
-@bfg_view(for_=Page, renderer='templates/view.pt')
+@bfg_view(context=Page, renderer='templates/view.pt')
 def view_page(context, request):
     wiki = context.__parent__
 
@@ -34,7 +34,7 @@ def view_page(context, request):
     edit_url = model_url(context, request, 'edit_page')
     return dict(page = context, content = content, edit_url = edit_url)
     
-@bfg_view(for_=Wiki, name='add_page', renderer='templates/edit.pt')
+@bfg_view(context=Wiki, name='add_page', renderer='templates/edit.pt')
 def add_page(context, request):
     name = request.subpath[0]
     if 'form.submitted' in request.params:
@@ -50,7 +50,7 @@ def add_page(context, request):
     page.__parent__ = context
     return dict(page = page, save_url = save_url)
     
-@bfg_view(for_=Page, name='edit_page', renderer='templates/edit.pt')
+@bfg_view(context=Page, name='edit_page', renderer='templates/edit.pt')
 def edit_page(context, request):
     if 'form.submitted' in request.params:
         context.data = request.params['body']

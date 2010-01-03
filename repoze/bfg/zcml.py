@@ -37,8 +37,14 @@ from repoze.bfg.threadlocal import get_current_registry
 ###################### directives ##########################
 
 class IViewDirective(Interface):
-    for_ = GlobalObject(
+    context = GlobalObject(
         title=u"The interface or class this view is for.",
+        required=False
+        )
+
+    for_ = GlobalObject(
+        title=(u"The interface or class this view is for (alternate spelling "
+               "of ``context``)."),
         required=False
         )
 
@@ -162,6 +168,7 @@ def view(
     header=None,
     path_info=None,
     custom_predicates=(),
+    context=None,
     cacheable=True, # not used, here for b/w compat < 0.8
     ):
 
@@ -178,10 +185,12 @@ def view(
     if renderer and '.' in renderer:
         renderer = path_spec(_context, renderer)
 
+    context = context or for_
+
     def register():
         config = Configurator(reg, package=_context.package)
         config.add_view(
-            permission=permission, for_=for_, view=view, name=name,
+            permission=permission, context=context, view=view, name=name,
             request_type=request_type, route_name=route_name,
             request_method=request_method, request_param=request_param,
             containment=containment, attr=attr, renderer=renderer,
@@ -189,7 +198,7 @@ def view(
             path_info=path_info, custom_predicates=custom_predicates,
             _info=_context.info)
 
-    discriminator = ['view', for_, name, request_type, IView, containment,
+    discriminator = ['view', context, name, request_type, IView, containment,
                      request_param, request_method, route_name, attr,
                      xhr, accept, header, path_info]
 
@@ -211,9 +220,10 @@ class IRouteDirective(Interface):
     factory = GlobalObject(title=u'context factory', required=False)
     view = GlobalObject(title=u'view', required=False)
 
-    view_for = GlobalObject(title=u'view_for', required=False)
-    # alias for view_for
+    view_context = GlobalObject(title=u'view_context', required=False)
+    # aliases for view_context
     for_ = GlobalObject(title=u'for', required=False)
+    view_for = GlobalObject(title=u'view_for', required=False)
 
     view_permission = TextLine(title=u'view_permission', required=False)
     # alias for view_permission
@@ -255,7 +265,7 @@ def route(_context, name, path, view=None, view_for=None,
           view_request_param=None, view_containment=None, view_attr=None,
           renderer=None, view_renderer=None, view_header=None, 
           view_accept=None, view_xhr=False,
-          view_path_info=None):
+          view_path_info=None, view_context=None):
     """ Handle ``route`` ZCML directives
     """
     # the strange ordering of the request kw args above is for b/w
@@ -264,7 +274,9 @@ def route(_context, name, path, view=None, view_for=None,
     # in the routelist will be tried
     reg = get_current_registry()
 
-    view_for = view_for or for_
+    if view_context is None:
+        view_context = view_for or for_
+
     view_permission = view_permission or permission
     view_renderer = view_renderer or renderer
     if view_renderer and '.' in view_renderer:
@@ -284,7 +296,7 @@ def route(_context, name, path, view=None, view_for=None,
             request_param=request_param,
             custom_predicates=custom_predicates,
             view=view,
-            view_for=view_for,
+            view_context=view_context,
             view_permission=view_permission,
             view_request_method=view_request_method,
             view_request_param=view_request_param,
@@ -315,7 +327,7 @@ def route(_context, name, path, view=None, view_for=None,
             reg.registerUtility(request_iface, IRouteRequest, name=name)
         _context.action(
             discriminator = (
-                'view', view_for, '', request_iface, IView,
+                'view', view_context, '', request_iface, IView,
                 view_containment, view_request_param, view_request_method,
                 name, view_attr, view_xhr, view_accept, view_header,
                 view_path_info),

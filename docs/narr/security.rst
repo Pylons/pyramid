@@ -125,7 +125,7 @@ when invoked against a ``Blog`` context with the ``add`` permission:
    :linenos:
 
    <view
-       for=".models.Blog"
+       context=".models.Blog"
        view=".views.blog_entry_add_view"
        name="add_entry.html"
        permission="add"
@@ -142,7 +142,7 @@ module of your project's package
    from repoze.bfg.view import bfg_view
    from models import Blog
 
-   @bfg_view(for_=Blog, name='add_entry.html', permission='add')
+   @bfg_view(context=Blog, name='add_entry.html', permission='add')
    def blog_entry_add_view(request):
        """ Add blog entry code goes here """
        pass

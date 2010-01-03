@@ -9,7 +9,7 @@ from repoze.bfg.security import forget
 from tutorial.models import Wiki
 from tutorial.security import USERS
 
-@bfg_view(for_=Wiki, name='login', renderer='templates/login.pt')
+@bfg_view(context=Wiki, name='login', renderer='templates/login.pt')
 def login(context, request):
     login_url = model_url(context, request, 'login')
     referrer = request.url
@@ -36,7 +36,7 @@ def login(context, request):
         password = password,
         )
     
-@bfg_view(for_=Wiki, name='logout')
+@bfg_view(context=Wiki, name='logout')
 def logout(context, request):
     headers = forget(request)
     return HTTPFound(location = model_url(context, request),

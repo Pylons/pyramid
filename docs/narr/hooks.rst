@@ -225,11 +225,11 @@ a class that implements the following interface:
 
 More than one traversal algorithm can be active at the same time.  For
 instance, if your :term:`root factory` returns more than one type of
-object conditionally, you could claim that an alternate traverser is
-``for`` only one particular class or interface.  When the root factory
-returned an object that implemented that class or interface, a custom
-traverser would be used.  Otherwise, the default traverser would be
-used.  For example:
+object conditionally, you could claim that an alternate traverser
+adapter is ``for`` only one particular class or interface.  When the
+root factory returned an object that implemented that class or
+interface, a custom traverser would be used.  Otherwise, the default
+traverser would be used.  For example:
 
 .. code-block:: xml
    :linenos:

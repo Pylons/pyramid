@@ -492,7 +492,26 @@ class ConfiguratorTests(unittest.TestCase):
         result = wrapper(None, None)
         self.assertEqual(result, 'OK')
 
+    def test_add_view_context_as_class(self):
+        from zope.interface import implementedBy
+        view = lambda *arg: 'OK'
+        class Foo:
+            pass
+        config = self._makeOne()
+        config.add_view(context=Foo, view=view)
+        foo = implementedBy(Foo)
+        wrapper = self._getViewCallable(config, foo)
+        self.assertEqual(wrapper, view)
+
+    def test_add_view_context_as_iface(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(context=IDummy, view=view)
+        wrapper = self._getViewCallable(config, IDummy)
+        self.assertEqual(wrapper, view)
+
     def test_add_view_for_as_class(self):
+        # ``for_`` is older spelling for ``context``
         from zope.interface import implementedBy
         view = lambda *arg: 'OK'
         class Foo:
@@ -504,9 +523,20 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper, view)
 
     def test_add_view_for_as_iface(self):
+        # ``for_`` is older spelling for ``context``
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(for_=IDummy, view=view)
+        wrapper = self._getViewCallable(config, IDummy)
+        self.assertEqual(wrapper, view)
+
+    def test_add_view_context_trumps_for(self):
+        # ``for_`` is older spelling for ``context``
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        class Foo:
+            pass
+        config.add_view(context=IDummy, for_=Foo, view=view)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
@@ -1091,6 +1121,17 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, None), 'OK')
         self._assertRoute(config, 'name', 'path')
 
+    def test_add_route_with_view_context(self):
+        config = self._makeOne()
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_context=IDummy)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, IDummy, request_type)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(config, IOther, request_type)
+        self.assertEqual(wrapper, None)
+
     def test_add_route_with_view_for(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
@@ -1102,7 +1143,7 @@ class ConfiguratorTests(unittest.TestCase):
         wrapper = self._getViewCallable(config, IOther, request_type)
         self.assertEqual(wrapper, None)
 
-    def test_add_route_with_view_for_alias(self):
+    def test_add_route_with_for_(self):
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.add_route('name', 'path', view=view, for_=IDummy)

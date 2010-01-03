@@ -1,6 +1,44 @@
 Next release
 ============
 
+Features
+--------
+
+- The ``Configurator.add_view`` method now accepts an argument named
+  ``context``.  This is an alias for the older argument named
+  ``for_``; it is preferred over ``for_``, but ``for_`` will continue
+  to be supported "forever".
+
+- The ``view`` ZCML directive now accepts an attribute named
+  ``context``.  This is an alias for the older attribute named
+  ``for``; it is preferred over ``for``, but ``for`` will continue to
+  be supported "forever".
+
+- The ``Configurator.add_route`` method now accepts an argument named
+  ``view_context``.  This is an alias for the older argument named
+  ``view_for``; it is preferred over ``view_for``, but ``view_for``
+  will continue to be supported "forever".
+
+- The ``route`` ZCML directive now accepts an attribute named
+  ``view_context``.  This is an alias for the older attribute named
+  ``view_for``; it is preferred over ``view_for``, but ``view_for``
+  will continue to be supported "forever".
+
+Documentation and Paster Templates
+----------------------------------
+
+- All uses of the ``Configurator.add_view`` method that used its
+  ``for_`` argument now use the ``context``argument instead.
+
+- All uses of the ``Configurator.add_route`` method that used its
+  ``view_for`` argument now use the ``view_context``argument instead.
+
+- All uses of the ``view`` ZCML directive that used its ``for``
+  attribute now use the ``context`` attribute instead.
+
+- All uses of the ``route`` ZCML directive that used its ``view_for``
+  attribute now use the ``view_context`` attribute instead.
+
 Documentation Licensing
 -----------------------
 

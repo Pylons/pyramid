@@ -655,9 +655,9 @@ administrative interface), you can register a route like ``<route
 name="manage" path="manage/*traverse"/>`` and then associate
 "management" views in your code by using the ``route_name`` argument
 to a ``view`` configuration, e.g. ``<view view=".some.callable"
-for=".some.Model" route_name="manage"/>``.  If you wire things up this
-way someone then walks up to for example, ``/manage/ob1/ob2``, they
-might be presented with a management interface, but walking up to
+context=".some.Model" route_name="manage"/>``.  If you wire things up
+this way someone then walks up to for example, ``/manage/ob1/ob2``,
+they might be presented with a management interface, but walking up to
 ``/ob1/ob2`` would present them with the default object view.  There
 are other tricks you can pull in these hybrid configurations if you're
 clever (and maybe masochistic) too.

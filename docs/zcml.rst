@@ -297,14 +297,16 @@ Predicate Attributes
   The *view name*.  Read the :ref:`traversal_chapter` to understand
   the concept of a view name.
 
-``for``
+``context``
 
   A :term:`dotted Python name` representing the Python class that the
   :term:`context` must be an instance of, *or* the :term:`interface`
   that the :term:`context` must provide in order for this view to be
   found and called.  This predicate is true when the :term:`context`
   is an instance of the represented class or if the :term:`context`
-  provides the represented interface; it is otherwise false.
+  provides the represented interface; it is otherwise false.  An
+  alternate name for this attribute is ``for`` (this is an older
+  spelling).
 
 ``route_name``
 
@@ -443,7 +445,7 @@ Examples
      :linenos:
 
         <view
-           for=".models.MyModel"
+           context=".models.MyModel"
            view=".views.hello_world"
          />
 
@@ -453,7 +455,7 @@ Examples
      :linenos:
 
         <view
-           for=".models.MyModel"
+           context=".models.MyModel"
            view=".views.hello_world_post"
            request_method="POST"
          />
@@ -602,7 +604,7 @@ Attributes
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
 
-``view_for``
+``view_context``
 
   The :term:`dotted Python name` to a class or an interface that the
   :term:`context` of the view should match for the view named by the
@@ -613,7 +615,8 @@ Attributes
   If the ``view`` attribute is not provided, this attribute has no
   effect.
 
-  This attribute can also be spelled as ``for``.
+  This attribute can also be spelled as ``view_for`` or ``for_``;
+  these are valid older spellings.
 
 ``view_permission``
 

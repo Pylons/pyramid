@@ -117,6 +117,27 @@ class TestViewDirective(unittest.TestCase):
         regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
         self.assertEqual(regview(None, None), 'OK')
 
+    def test_context_trumps_for(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        reg = get_current_registry()
+        view = lambda *arg: 'OK'
+        class Foo:
+            pass
+        self._callFUT(context, 'repoze.view', for_=Foo, view=view,
+                      context=IDummy)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        discrim = ('view', IDummy, '', None, IView, None, None, None, None,
+                   None, False, None, None, None)
+        self.assertEqual(actions[0]['discriminator'], discrim)
+        register = actions[0]['callable']
+        register()
+        regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        self.assertEqual(regview(None, None), 'OK')
+
 class TestNotFoundDirective(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -473,6 +494,63 @@ class TestRouteDirective(unittest.TestCase):
                    'name', None, False, None, None, None)
         self.assertEqual(view_discriminator, discrim)
         wrapped = reg.adapters.lookup((Interface, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+    def test_with_view_and_view_context(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        context = DummyContext()
+        view = lambda *arg: 'OK'
+        self._callFUT(context, 'name', 'path', view=view, view_context=IDummy)
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        route_action = actions[0]
+        route_action['callable']()
+        route_discriminator = route_action['discriminator']
+        self.assertEqual(route_discriminator,
+                         ('route', 'name', False, None, None, None, None,None))
+        self._assertRoute('name', 'path')
+
+        view_action = actions[1]
+        reg = get_current_registry()
+        request_type = reg.getUtility(IRouteRequest, 'name')
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', IDummy, '', request_type, IView, None, None, None,
+                   'name', None, False, None, None, None)
+        self.assertEqual(view_discriminator, discrim)
+        wrapped = reg.adapters.lookup((IDummy, request_type), IView, name='')
+        self.failUnless(wrapped)
+
+    def test_with_view_context_trumps_view_for(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRouteRequest
+        context = DummyContext()
+        view = lambda *arg: 'OK'
+        class Foo:
+            pass
+        self._callFUT(context, 'name', 'path', view=view, view_context=IDummy,
+                      view_for=Foo)
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        route_action = actions[0]
+        route_action['callable']()
+        route_discriminator = route_action['discriminator']
+        self.assertEqual(route_discriminator,
+                         ('route', 'name', False, None, None, None, None,None))
+        self._assertRoute('name', 'path')
+
+        view_action = actions[1]
+        reg = get_current_registry()
+        request_type = reg.getUtility(IRouteRequest, 'name')
+        view_discriminator = view_action['discriminator']
+        discrim = ('view', IDummy, '', request_type, IView, None, None, None,
+                   'name', None, False, None, None, None)
+        self.assertEqual(view_discriminator, discrim)
+        wrapped = reg.adapters.lookup((IDummy, request_type), IView, name='')
         self.failUnless(wrapped)
 
     def test_with_dotted_renderer(self):

@@ -233,7 +233,7 @@ class bfg_view(object):
 
       from models import MyModel
 
-      @bfg_view(name='my_view', for_=MyModel, permission='read',
+      @bfg_view(name='my_view', context=MyModel, permission='read',
                 route_name='site1')
       def my_view(context, request):
           return 'OK'
@@ -243,7 +243,7 @@ class bfg_view(object):
 
        import views
        import models
-       config.add_view(views.my_view, for_=models.MyModel, name='my_view',
+       config.add_view(views.my_view, context=models.MyModel, name='my_view',
                        permission='read', 'route_name='site1')
 
     Or might replace the following ZCML ``view`` declaration::
@@ -257,13 +257,14 @@ class bfg_view(object):
        />
 
     The following arguments are supported as arguments to
-    ``bfg_view``: ``for_``, ``permission``, ``name``,
+    ``bfg_view``: ``context``, ``permission``, ``name``,
     ``request_type``, ``route_name``, ``request_method``,
     ``request_param``, ``containment``, ``xhr``, ``accept``,
     ``header`` and ``path_info``.
 
-    If ``for_`` is not supplied, the interface
-    ``zope.interface.Interface`` (matching any context) is used.
+    If ``context`` is not supplied, the interface
+    ``zope.interface.Interface`` (matching any context) is used.  An alias
+    for ``context`` is ``for_``.
 
     If ``permission`` is not supplied, no permission is registered for
     this view (it's accessible by any caller).
@@ -456,10 +457,10 @@ class bfg_view(object):
                  route_name=None, request_method=None, request_param=None,
                  containment=None, attr=None, renderer=None, wrapper=None,
                  xhr=False, accept=None, header=None, path_info=None,
-                 custom_predicates=()):
+                 custom_predicates=(), context=None):
         self.name = name
         self.request_type = request_type
-        self.for_ = for_
+        self.context = context or for_
         self.permission = permission
         self.route_name = route_name
         self.request_method = request_method

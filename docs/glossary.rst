@@ -409,16 +409,16 @@ Glossary
      internally by :mod:`repoze.bfg` to perform view lookups and other
      policy lookups.  The ability to make use of an interface is
      exposed to an application programmers during :term:`view
-     configuration` via the ``for`` argument, the ``request_type``
+     configuration` via the ``context`` argument, the ``request_type``
      argument and the ``containment`` argument.  Interfaces are also
      exposed to application developers when they make use of the
-     :term:`event` system. Fundamentally, :mod:`repoze.bfg` programmers
-     can think of an interface as something that they can attach to an
-     object that stamps it with a "type" unrelated to its underlying
-     Python type.  Interfaces can also be used to describe the behavior
-     of an object (its methods and attributes), but unless they choose
-     to, :mod:`repoze.bfg` programmers do not need to understand or use
-     this feature of interfaces.
+     :term:`event` system. Fundamentally, :mod:`repoze.bfg`
+     programmers can think of an interface as something that they can
+     attach to an object that stamps it with a "type" unrelated to its
+     underlying Python type.  Interfaces can also be used to describe
+     the behavior of an object (its methods and attributes), but
+     unless they choose to, :mod:`repoze.bfg` programmers do not need
+     to understand or use this feature of interfaces.
 
    event
      An object broadcast to zero or more :term:`subscriber` callables

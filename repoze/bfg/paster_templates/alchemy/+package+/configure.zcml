@@ -4,13 +4,13 @@
   <include package="repoze.bfg.includes" />
 
   <view
-     for=".models.MyApp"
+     context=".models.MyApp"
      view=".views.view_root"
      renderer="templates/root.pt"
      />
 
   <view
-     for=".models.MyModel"
+     context=".models.MyModel"
      view=".views.view_model"
      renderer="templates/model.pt"
      />

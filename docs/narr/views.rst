@@ -310,7 +310,7 @@ declaration in ZCML is as follows:
    :linenos:
 
    <view
-       for=".models.Hello"
+       context=".models.Hello"
        view=".views.hello_world"
        name="hello.html"
        />
@@ -320,18 +320,18 @@ The above maps the ``.views.hello_world`` view function to
 Python class represented by ``.models.Hello`` when the *view name* is
 ``hello.html``.
 
-.. note:: Values prefixed with a period (``.``) for the ``for`` and
-   ``view`` attributes of a ``view`` (such as those above) mean
+.. note:: Values prefixed with a period (``.``) for the ``context``
+   and ``view`` attributes of a ``view`` (such as those above) mean
    "relative to the Python package directory in which this
-   :term:`ZCML` file is stored".  So if the above ``view``
-   declaration was made inside a ``configure.zcml`` file that lived in
-   the ``hello`` package, you could replace the relative
-   ``.models.Hello`` with the absolute ``hello.models.Hello``;
-   likewise you could replace the relative ``.views.hello_world`` with
-   the absolute ``hello.views.hello_world``.  Either the relative or
-   absolute form is functionally equivalent.  It's often useful to use
-   the relative form, in case your package's name changes.  It's also
-   shorter to type.
+   :term:`ZCML` file is stored".  So if the above ``view`` declaration
+   was made inside a ``configure.zcml`` file that lived in the
+   ``hello`` package, you could replace the relative ``.models.Hello``
+   with the absolute ``hello.models.Hello``; likewise you could
+   replace the relative ``.views.hello_world`` with the absolute
+   ``hello.views.hello_world``.  Either the relative or absolute form
+   is functionally equivalent.  It's often useful to use the relative
+   form, in case your package's name changes.  It's also shorter to
+   type.
 
 You can also declare a *default view* for a model type:
 
@@ -339,7 +339,7 @@ You can also declare a *default view* for a model type:
    :linenos:
 
    <view
-       for=".models.Hello"
+       context=".models.Hello"
        view=".views.hello_world"
        />
 
@@ -348,13 +348,13 @@ found and there is no *view name* associated with the result of
 :term:`traversal`, the *default view* is the view that is used.
 
 You can also declare that a view is good for any model type by using
-the special ``*`` character in the ``for`` attribute:
+the special ``*`` character in the ``context`` attribute:
 
 .. code-block:: xml
    :linenos:
 
    <view
-       for="*"
+       context="*"
        view=".views.hello_world"
        name="hello.html"
        />
@@ -381,7 +381,7 @@ For better locality of reference, use the
 :class:`repoze.bfg.view.bfg_view` decorator to associate your view
 functions with URLs instead of using :term:`ZCML` for the same
 purpose.  :class:`repoze.bfg.view.bfg_view` can be used to associate
-``for``, ``name``, ``permission`` and ``request_method``,
+``context``, ``name``, ``permission`` and ``request_method``,
 ``containment``, ``request_param`` and ``request_type``, ``attr``,
 ``renderer``, ``wrapper``, ``xhr``, ``accept``, and ``header``
 information -- as done via the equivalent ZCML -- with a function that
@@ -449,7 +449,7 @@ An example might reside in a bfg application module ``views.py``:
    from repoze.bfg.view import bfg_view
    from repoze.bfg.chameleon_zpt import render_template_to_response
 
-   @bfg_view(name='my_view', request_method='POST', for_=MyModel,
+   @bfg_view(name='my_view', request_method='POST', context=MyModel,
              permission='read', renderer='templates/my.pt')
    def my_view(request):
        return {'a':1}
@@ -461,7 +461,7 @@ your application registry:
    :linenos:
 
    <view
-    for=".models.MyModel"
+    context=".models.MyModel"
     view=".views.my_view"
     name="my_view"
     permission="read"
@@ -474,7 +474,7 @@ Or replaces the need to add this imperative configuration stanza:
 .. ignore-next-block
 .. code-block:: python
 
-   config.add_view(name='my_view', request_method='POST', for_=MyModel,
+   config.add_view(name='my_view', request_method='POST', context=MyModel,
                    permission='read')
 
 All arguments to :class:`repoze.bfg.view.bfg_view` are optional.
@@ -496,9 +496,10 @@ If ``request_type`` is not supplied, the value ``None`` is used,
 implying any request type.  Otherwise, this should be a class or
 interface.
 
-If ``for_`` is not supplied, the interface
+If ``context`` is not supplied, the interface
 :class:`zope.interface.Interface` (which matches any model) is used.
-``for_`` can also name a class, like its ZCML brother.
+``context`` can also name a class, like its ZCML brother.  An alias for
+``context`` is ``for_`` (``for_`` is an older spelling).
 
 If ``permission`` is not supplied, no permission is registered for
 this view (it's accessible by any caller).
@@ -558,9 +559,10 @@ All arguments may be omitted.  For example:
        return Response()
 
 Such a registration as the one directly above implies that the view
-name will be ``my_view``, registered ``for_`` any model type, using no
-permission, registered against requests with any request method /
-request type / request param / route name / containment.
+name will be ``my_view``, registered with a ``context`` argument that
+matches any model type, using no permission, registered against
+requests with any request method / request type / request param /
+route name / containment.
 
 If your view callable is a class, the
 :class:`repoze.bfg.view.bfg_view` decorator can also be used as a
@@ -748,15 +750,15 @@ looked up on the view object to return a response.
 Using Model Interfaces
 ----------------------
 
-Instead of registering your views ``for`` a Python model *class*, you
-can optionally register a view for an :term:`interface`.  Since an
-interface can be attached arbitrarily to any model instance (as
-opposed to its identity being implied by only its class), associating
-a view with an interface can provide more flexibility for sharing a
-single view between two or more different implementations of a model
-type.  For example, if two model object instances of different Python
-class types share the same interface, you can use the same view
-against each of them.
+Instead of registering your views with a ``context`` that names a
+Python model *class*, you can optionally register a view for an
+:term:`interface`.  Since an interface can be attached arbitrarily to
+any model instance (as opposed to its identity being implied by only
+its class), associating a view with an interface can provide more
+flexibility for sharing a single view between two or more different
+implementations of a model type.  For example, if two model object
+instances of different Python class types share the same interface,
+you can use the same view against each of them.
 
 In order to make use of interfaces in your application during view
 dispatch, you must create an interface and mark up your model classes
@@ -812,7 +814,7 @@ this interface.
    :linenos:
 
    <view
-       for=".models.IHello"
+       context=".models.IHello"
        view=".views.hello_world"
        name="hello.html"
        />
@@ -922,7 +924,7 @@ You can configure a view to use the JSON renderer in ZCML by naming
    :linenos:
 
    <view
-       for=".models.Hello"
+       context=".models.Hello"
        view=".views.hello_world"
        name="hello"
        renderer="json"
@@ -987,7 +989,7 @@ renderer:
    :linenos:
 
    <view
-       for=".models.Hello"
+       context=".models.Hello"
        view=".views.hello_world"
        name="hello"
        renderer="templates/foo.pt"
@@ -1000,7 +1002,7 @@ renderer:
    :linenos:
 
    <view
-       for=".models.Hello"
+       context=".models.Hello"
        view=".views.hello_world"
        name="hello"
        renderer="templates/foo.txt"
@@ -1226,7 +1228,7 @@ view declaration in ZCML:
    :linenos:
 
    <view
-       for=".models.IBlog"
+       context=".models.IBlog"
        view=".views.add_entry"
        name="add.html"
        permission="add"
@@ -1461,7 +1463,7 @@ object.  For example (ZCML):
    :linenos:
 
     <view
-      for=".models.Root"
+      context=".models.Root"
       view=".static.static_view"
       name="static"
     />   
@@ -1469,11 +1471,11 @@ object.  For example (ZCML):
 In this case, ``.models.Root`` refers to the class of which your
 :mod:`repoze.bfg` application's root object is an instance.
 
-.. note:: You can also give a ``for`` of ``*`` if you want the name
-   ``static`` to be accessible as the static view against any model.
-   This will also allow ``/static/foo.js`` to work, but it will allow
-   for ``/anything/static/foo.js`` too, as long as ``anything`` itself
-   is resolvable.
+.. note:: You can also give a ``context`` of ``*`` if you want the
+   name ``static`` to be accessible as the static view against any
+   model.  This will also allow ``/static/foo.js`` to work, but it
+   will allow for ``/anything/static/foo.js`` too, as long as
+   ``anything`` itself is resolvable.
 
 .. note:: To ensure that model objects contained in the root don't
    "shadow" your static view (model objects take precedence during

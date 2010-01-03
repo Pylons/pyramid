@@ -431,7 +431,8 @@ class Configurator(object):
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
-                 header=None, path_info=None, custom_predicates=(), _info=u''):
+                 header=None, path_info=None, custom_predicates=(),
+                 context=None, _info=u''):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -535,7 +536,7 @@ class Configurator(object):
           The :term:`view name`.  Read :ref:`traversal_chapter` to
           understand the concept of a view name.
 
-        for
+        context
 
           An object representing Python class that the :term:`context`
           must be an instance of, *or* the :term:`interface` that the
@@ -543,7 +544,9 @@ class Configurator(object):
           found and called.  This predicate is true when the
           :term:`context` is an instance of the represented class or
           if the :term:`context` provides the represented interface;
-          it is otherwise false.
+          it is otherwise false.  This argument may also be provided
+          to ``add_view`` as ``for_`` (an older, still-supported
+          spelling).
 
         route_name
 
@@ -701,12 +704,16 @@ class Configurator(object):
 
         derived_view = self._derive_view(view, permission, predicates, attr,
                                          renderer, wrapper, name, accept)
-        r_for_ = for_
+
+        if context is None:
+            context = for_
+
+        r_context = context
         r_request_type = request_type
-        if r_for_ is None:
-            r_for_ = Interface
-        if not IInterface.providedBy(r_for_):
-            r_for_ = implementedBy(r_for_)
+        if r_context is None:
+            r_context = Interface
+        if not IInterface.providedBy(r_context):
+            r_context = implementedBy(r_context)
         if not IInterface.providedBy(r_request_type):
             r_request_type = implementedBy(r_request_type)
 
@@ -733,7 +740,7 @@ class Configurator(object):
         old_view = None
 
         for view_type in (IView, ISecuredView, IMultiView):
-            old_view = registered((r_for_, r_request_type), view_type, name)
+            old_view = registered((r_context, r_request_type), view_type, name)
             if old_view is not None:
                 break
         
@@ -745,7 +752,7 @@ class Configurator(object):
                 view_iface = ISecuredView
             else:
                 view_iface = IView
-            self.registry.registerAdapter(derived_view, (for_, request_type),
+            self.registry.registerAdapter(derived_view, (context, request_type),
                                           view_iface, name, info=_info)
         else:
             # XXX we could try to be more efficient here and register
@@ -763,8 +770,8 @@ class Configurator(object):
             for view_type in (IView, ISecuredView):
                 # unregister any existing views
                 self.registry.adapters.unregister(
-                    (r_for_, r_request_type), view_type, name=name)
-            self.registry.registerAdapter(multiview, (for_, request_type),
+                    (r_context, r_request_type), view_type, name=name)
+            self.registry.registerAdapter(multiview, (context, request_type),
                                           IMultiView, name, info=_info)
 
     def add_route(self, name, path, view=None, view_for=None,
@@ -777,7 +784,8 @@ class Configurator(object):
                   view_containment=None, view_attr=None,
                   renderer=None, view_renderer=None, view_header=None, 
                   view_accept=None, view_xhr=False,
-                  view_path_info=None, _info=u''):
+                  view_path_info=None, view_context=None,
+                  _info=u''):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
         configuration` to be used to specify a :term:`view callable`
@@ -910,7 +918,7 @@ class Configurator(object):
           callable when this route
           matches. e.g. ``mypackage.views.my_view``.
           
-        view_for
+        view_context
 
           A reference to a class or an :term:`interface` that the
           :term:`context` of the view should match for the view named
@@ -921,7 +929,7 @@ class Configurator(object):
           If the ``view`` argument is not provided, this argument has
           no effect.
 
-          This attribute can also be spelled as ``for_``.
+          This attribute can also be spelled as ``for_`` or ``view_for``.
 
         view_permission
 
@@ -1017,12 +1025,15 @@ class Configurator(object):
                 request_iface, IRouteRequest, name=name)
 
         if view:
-            view_for = view_for or for_
+            if view_context is None:
+                view_context = view_for
+                if view_context is None:
+                    view_context = for_
             view_permission = view_permission or permission
             view_renderer = view_renderer or renderer
             self.add_view(
                 permission=view_permission,
-                for_=view_for,
+                context=view_context,
                 view=view,
                 name='',
                 route_name=name, 

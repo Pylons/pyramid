@@ -181,7 +181,7 @@ Overriding Views
 ~~~~~~~~~~~~~~~~~
 
 The ZCML ``<view>`` declarations you make which *override* application
-behavior will usually have the same ``for`` and ``name`` (and
+behavior will usually have the same ``context`` and ``name`` (and
 :term:`predicate` attributes, if used) as the original.  These
 ``<view>`` declarations will point at "new" view code.  The new view
 code itself will usually be cut-n-paste copies of view callables from
@@ -190,7 +190,7 @@ the original application with slight tweaks.  For example:
 .. code-block:: xml
    :linenos:
 
-    <view for="theoriginalapplication.models.SomeModel"
+    <view context="theoriginalapplication.models.SomeModel"
           name="theview"
           view=".views.a_view_that_does_something_slightly_different"
      />

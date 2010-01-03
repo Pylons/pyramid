@@ -9,25 +9,25 @@
     />
 
   <view
-     for=".models.Wiki"
+     context=".models.Wiki"
      view=".views.view_wiki"
      />
 
   <view
-     for=".models.Wiki"
+     context=".models.Wiki"
      name="add_page"
      view=".views.add_page"
      renderer="templates/edit.pt"
      />
 
   <view
-     for=".models.Page"
+     context=".models.Page"
      view=".views.view_page"
      renderer="templates/view.pt"
      />
 
   <view
-     for=".models.Page"
+     context=".models.Page"
      name="edit_page"
      view=".views.edit_page"
      renderer="templates/edit.pt"

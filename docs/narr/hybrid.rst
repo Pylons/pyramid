@@ -361,12 +361,13 @@ then both the request type and the context type are "more specific"
 for the view registration).
 
 What it all boils down to is: if a request that matches a route
-resolves to a view you don't expect it to, use the ``view_for``
-attribute of the ``route`` statement (*or* the ``for`` attribute of
-the ZCML statement that also has a ``route_name`` *or* the equivalent
-``for_`` parameter to the :class:`repoze.bfg.view.bfg_view` decorator
-that also has a ``route_name`` parameter) to name the specific context
-interface you want the route-related view to match.
+resolves to a view you don't expect it to, use the ``view_context``
+attribute of the ``route`` statement (*or* the ``context`` attribute
+of the ZCML statement that also has a ``route_name`` *or* the
+equivalent ``context`` parameter to the
+:class:`repoze.bfg.view.bfg_view` decorator that also has a
+``route_name`` parameter) to name the specific context interface you
+want the route-related view to match.
 
 Yes, that was as painful for me to write as it was for you to read.
 
