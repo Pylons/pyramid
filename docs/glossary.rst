@@ -450,7 +450,8 @@ Glossary
      An indexing and search facility (fielded and full-text) based on
      `zope.index <http://pypi.python.org/pypi/zope.index>`_.  See `the
      documentation <http://docs.repoze.org/catalog>`_ for more
-     information.
+     information.  A tutorial for its usage in :mod:`repoze.bfg`
+     exists in :ref:`catalog_tutorial`.
 
    repoze.who
      `Authentication middleware <http://docs.repoze.org/who>`_ for

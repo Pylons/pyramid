@@ -30,10 +30,10 @@ Documentation and Paster Templates
 - LaTeX rendering tweaks.
 
 - All uses of the ``Configurator.add_view`` method that used its
-  ``for_`` argument now use the ``context``argument instead.
+  ``for_`` argument now use the ``context`` argument instead.
 
 - All uses of the ``Configurator.add_route`` method that used its
-  ``view_for`` argument now use the ``view_context``argument instead.
+  ``view_for`` argument now use the ``view_context`` argument instead.
 
 - All uses of the ``view`` ZCML directive that used its ``for``
   attribute now use the ``context`` attribute instead.

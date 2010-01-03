@@ -5,7 +5,9 @@ Copyright and Trademarks
 
 by Chris McDonough
 
-Copyright © 2008-2010, Agendaless Consulting.
+.. |copy|   unicode:: U+000A9 .. COPYRIGHT SIGN
+
+Copyright |copy| 2008-2010, Agendaless Consulting.
 
 ISBN-13: 978-0-615-34537-6
 

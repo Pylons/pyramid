@@ -14,20 +14,21 @@ it assumes you want to use a persistent ZODB object as your
 be an attribute of this root object.  It is further assumed that you
 want the application to be based on :term:`traversal`.
 
-#. Follow the :ref:`zodb_with_zeo` tutorial to get a system set up with
-   ZODB and ZEO.  When you are finished, come back here.
+#. Follow the :ref:`zodb_with_zeo` tutorial to get a system set up
+   with ZODB and ZEO.  When you are finished, come back here.
 
 #. Install the :mod:`repoze.catalog` software within your application's
    environment:
 
    .. code-block:: text
    
-   $ easy_install repoze.catalog
+      $ easy_install repoze.catalog
 
 #. Change your ZODB application's ``models.py`` file to look like the
    below:
 
    .. code-block:: python
+      :linenos:
 
        from repoze.folder import Folder
        from repoze.catalog.catalog import Catalog
@@ -74,6 +75,7 @@ want the application to be based on :term:`traversal`.
    something like the below:
 
    .. code-block:: python
+      :linenos:
 
        from myapp.models import Site
 
@@ -88,7 +90,6 @@ want the application to be based on :term:`traversal`.
     command in a terminal window:
 
     .. code-block:: text
-       :linenos:
 
        [chrism@snowpro sess]$ ../bin/paster --plugin=repoze.bfg bfgshell \
               myapp.ini myapp
@@ -106,28 +107,29 @@ want the application to be based on :term:`traversal`.
        >>> root.catalog.search(title='title')
        (1, IFSet([-787959756]))
 
-#.  Add other indexes required by your application to the catalog
-    within the ``update_indexes`` method of the ``Site`` object.
-    Whenever an index is added or removed, invoke the
-    ``update_indexes`` method of the site (the root object) from a
-    script or from within a ``bfgshell`` session to update the set of
-    indexes used by your application.
+As you need them, add other indexes required by your application to
+the catalog by modifying the ``update_indexes`` method of the ``Site``
+object.  Whenever an index is added or removed, invoke the
+``update_indexes`` method of the site (the root object) from a script
+or from within a ``bfgshell`` session to update the set of indexes
+used by your application.
+
+In :term:`view` code, you should be able to get a hold of the root
+object via the :func:`repoze.bfg.traversal.find_root` API.  The
+``catalog`` attribute of that root object will represent the catalog
+previously added.
 
 Read the :mod:`repoze.catalog` `documentation
 <http://docs.repoze.org/catalog>`_ for further information about other
 types of indexes to add, using the document map, and how to issue
 queries using the catalog query API.
 
-Note that in :term:`view` code, you should be able to get a hold of
-the root object via the :func:`repoze.bfg.traversal.find_root` API.
-The ``catalog`` attribute of that root object will represent the
-catalog previously added.
-
 .. note::
 
    The :mod:`repoze.folder` implementation sends events that can be
-   intercepted with a :term:`subscriber` when documents are added and
+   intercepted by a :term:`subscriber` when objects are added and
    removed from a folder.  It is often useful to hook these events for
-   the purpose of mutating the catalog when a new document is added or
-   removed.  See the `repoze.folder documentation
-   <http://docs.repoze.org/folder>`_ for more information.
+   the purpose of mutating the catalog when a new documentlike object
+   is added or removed.  See the `repoze.folder documentation
+   <http://docs.repoze.org/folder>`_ for more information about the
+   events it sends.
