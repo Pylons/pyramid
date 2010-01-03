@@ -59,6 +59,7 @@ Tutorials
    tutorials/modwsgi/index.rst
    tutorials/zeo/index.rst
    tutorials/zodbsessions/index.rst
+   tutorials/catalog/index.rst
 
 API documentation
 @@@@@@@@@@@@@@@@@

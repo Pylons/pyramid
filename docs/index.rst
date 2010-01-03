@@ -121,6 +121,7 @@ applications to various platforms.
    tutorials/modwsgi/index.rst
    tutorials/zeo/index.rst
    tutorials/zodbsessions/index.rst
+   tutorials/catalog/index.rst
 
 Detailed Change History
 =======================
