@@ -39,6 +39,9 @@ Documentation and Paster Templates
 - All uses of the ``route`` ZCML directive that used its ``view_for``
   attribute now use the ``view_context`` attribute instead.
 
+- Add a (minimal) tutorial dealing with use of ``repoze.catalog`` in a
+  ``repoze.bfg`` application.
+
 Documentation Licensing
 -----------------------
 
