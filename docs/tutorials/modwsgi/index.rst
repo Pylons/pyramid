@@ -45,15 +45,15 @@ commands and files.
     .. code-block:: text
 
        $ cd ~
-       $ mkdir -p /projects/modwsgi
-       $ cd projects/modwsgi
+       $ mkdir modwsgi
+       $ cd modwsgi
        $ /usr/local/bin/virtualenv --no-site-packages env
 
 #.  Install :mod:`repoze.bfg` into the newly created virtualenv:
 
     .. code-block:: text
 
-       $ cd ~/projects/modwsgi/env
+       $ cd ~/modwsgi/env
        $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple \
             repoze.bfg
     
@@ -65,19 +65,19 @@ commands and files.
 
     .. code-block:: text
 
-       $ cd ~/projects/modwsgi/env
+       $ cd ~/modwsgi/env
        $ bin/paster create -t bfg_starter myapp
        $ cd myapp
        $ ../bin/python setup.py install
 
-#.  Within the virtualenv directory (``~/projects/modwsgi/env``),
-    create a script named ``bfg.wsgi``.  Give it these contents:
+#.  Within the virtualenv directory (``~/modwsgi/env``), create a
+    script named ``bfg.wsgi``.  Give it these contents:
 
     .. code-block:: python
 
        from repoze.bfg.paster import get_app
        application = get_app(
-         '/Users/chrism/projects/modwsgi/env/myapp/myapp.ini', 'main')
+         '/Users/chrism/modwsgi/env/myapp/myapp.ini', 'main')
 
     The first argument to ``get_app`` is the project Paste
     configuration file name.  The second is the name of the section
@@ -89,7 +89,7 @@ commands and files.
 
     .. code-block:: text
 
-       $ cd ~/projects/modwsgi/env
+       $ cd ~/modwsgi/env
        $ chmod 755 bfg.wsgi
 
 #.  Edit your Apache configuration and add some stuff.  I happened to
@@ -103,10 +103,10 @@ commands and files.
        WSGIApplicationGroup %{GLOBAL}
        WSGIPassAuthorization On
        WSGIDaemonProcess bfg user=chrism group=staff processes=1 threads=4 \
-         python-path=/Users/chrism/projects/modwsgi/env/lib/python2.6/site-packages
-       WSGIScriptAlias /myapp /Users/chrism/projects/modwsgi/env/bfg.wsgi
+          python-path=/Users/chrism/modwsgi/env/lib/python2.6/site-packages
+       WSGIScriptAlias /myapp /Users/chrism/modwsgi/env/bfg.wsgi
 
-       <Directory /Users/chrism/projects/modwsgi/env>
+       <Directory /Users/chrism/modwsgi/env>
          WSGIProcessGroup bfg
          Order allow, deny
          Allow from all
