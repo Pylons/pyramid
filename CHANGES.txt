@@ -27,6 +27,8 @@ Features
 Documentation and Paster Templates
 ----------------------------------
 
+- LaTeX rendering tweaks.
+
 - All uses of the ``Configurator.add_view`` method that used its
   ``for_`` argument now use the ``context``argument instead.
 
@@ -52,11 +54,6 @@ Documentation Licensing
   only a documentation licensing change; the ``repoze.bfg`` software
   continues to be offered under the Repoze Public License at
   http://repoze.org/license.html (BSD-like).
-
-Documentation
--------------
-
-- LaTeX rendering tweaks.
 
 1.2a9 (2009-12-27)
 ==================
