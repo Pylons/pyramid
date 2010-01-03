@@ -138,6 +138,26 @@ class TestViewDirective(unittest.TestCase):
         regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
         self.assertEqual(regview(None, None), 'OK')
 
+    def test_with_for(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IRequest
+        context = DummyContext()
+        reg = get_current_registry()
+        view = lambda *arg: 'OK'
+        class Foo:
+            pass
+        self._callFUT(context, 'repoze.view', for_=IDummy, view=view)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        discrim = ('view', IDummy, '', None, IView, None, None, None, None,
+                   None, False, None, None, None)
+        self.assertEqual(actions[0]['discriminator'], discrim)
+        register = actions[0]['callable']
+        register()
+        regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        self.assertEqual(regview(None, None), 'OK')
+
 class TestNotFoundDirective(unittest.TestCase):
     def setUp(self):
         testing.setUp()
