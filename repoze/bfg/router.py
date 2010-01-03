@@ -63,7 +63,7 @@ class Router(object):
         manager.push(threadlocals)
 
         try:
-            # setup
+            # create the request
             request = Request(environ)
             context = None
             threadlocals['request'] = request
@@ -72,7 +72,7 @@ class Router(object):
             has_listeners and registry.notify(NewRequest(request))
             
             try:
-                # root resolution
+                # find the root
                 root_factory = self.root_factory
                 if self.routes_mapper is not None:
                     info = self.routes_mapper(request)
@@ -91,8 +91,9 @@ class Router(object):
                 root = root_factory(request)
                 attrs['root'] = root
 
-                # view lookup
-                traverser = registry.adapters.queryAdapter(root, ITraverser)
+                # find a view callable
+                adapters = registry.adapters
+                traverser = adapters.queryAdapter(root, ITraverser)
                 if traverser is None:
                     traverser = ModelGraphTraverser(root)
                 tdict = traverser(request)
@@ -103,16 +104,17 @@ class Router(object):
                 attrs.update(tdict)
                 has_listeners and registry.notify(AfterTraversal(request))
                 provides = map(providedBy, (context, request))
-                view_callable = registry.adapters.lookup(
+                view_callable = adapters.lookup(
                     provides, IView, name=view_name, default=None)
 
-                # view execution
+                # invoke the view callable
                 if view_callable is None:
                     if self.debug_notfound:
                         msg = (
-                            'debug_notfound of url %s; path_info: %r, context: %r, '
-                            'view_name: %r, subpath: %r, traversed: %r, '
-                            'root: %r, vroot: %r,  vroot_path: %r' % (
+                            'debug_notfound of url %s; path_info: %r, '
+                            'context: %r, view_name: %r, subpath: %r, '
+                            'traversed: %r, root: %r, vroot: %r, '
+                            'vroot_path: %r' % (
                             request.url, request.path_info, context, view_name,
                             subpath, traversed, root, vroot, vroot_path)
                             )
@@ -124,6 +126,7 @@ class Router(object):
                 else:
                     response = view_callable(context, request)
 
+            # handle exceptions raised during root finding and view lookup
             except Forbidden, why:
                 try:
                     msg = why[0]
@@ -139,7 +142,7 @@ class Router(object):
                 environ['repoze.bfg.message'] = msg
                 response = self.notfound_view(context, request)
 
-            # response handling
+            # process the response
             has_listeners and registry.notify(NewResponse(response))
             try:
                 headers = response.headerlist
