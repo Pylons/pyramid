@@ -80,7 +80,7 @@ an example of using :func:`repoze.bfg.chameleon_zpt.render_template`:
        return response
 
 Here's an example of using
-:func:`repoze.bfg.chameleon_zt.render_template_to_response` but
+:func:`repoze.bfg.chameleon_zpt.render_template_to_response` but
 changing the content-type and status:
 
 .. code-block:: python
