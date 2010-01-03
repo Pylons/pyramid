@@ -269,11 +269,27 @@ _PREAMBLE = r"""
   \endSbox
   \fbox{\TheSbox}
 }
-\renewcommand{\py@noticestart@warning}{\py@veryheavybox}
-\renewcommand{\py@noticeend@warning}{\py@endveryheavybox}
+\renewcommand{\py@noticestart@warning}{\py@heavybox}
+\renewcommand{\py@noticeend@warning}{\py@endheavybox}
 \renewcommand{\py@noticestart@note}{\py@heavybox}
 \renewcommand{\py@noticeend@note}{\py@endheavybox}
 \makeatother
+
+\usepackage{ifthen}
+% Keep a copy of the original notice environment
+\let\origbeginnotice\notice
+\let\origendnotice\endnotice
+
+% Redefine the notice environment so we can add our own code to it
+\renewenvironment{notice}[2]{%
+  \origbeginnotice{#1}{}% equivalent to original \begin{notice}{#1}{#2}
+  % load graphics
+  \ifthenelse{\equal{#1}{warning}}{\includegraphics{exclaim.png}}{}
+  \ifthenelse{\equal{#1}{note}}{\includegraphics{info.png}}{}
+  % etc.
+}{%
+  \origendnotice% equivalent to original \end{notice}
+}
 
 \sloppy
 """
