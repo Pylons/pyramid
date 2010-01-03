@@ -355,10 +355,10 @@ hood" for views that match a route use the (very weakly binding)
 is found has a specific interface, and a global view statement is
 registered against this interface as its context interface, it's
 likely that the *global* view will match *before* the view that is
-attached to the route unless the ``view_for`` attribute is used on the
-``route`` registration to match the "correct" interface first (because
-then both the request type and the context type are "more specific"
-for the view registration).
+attached to the route unless the ``view_context`` attribute is used on
+the ``route`` registration to match the "correct" interface first
+(because then both the request type and the context type are "more
+specific" for the view registration).
 
 What it all boils down to is: if a request that matches a route
 resolves to a view you don't expect it to, use the ``view_context``
