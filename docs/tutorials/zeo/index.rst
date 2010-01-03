@@ -154,6 +154,12 @@ Configuration
        class MyModel(Folder):
            pass
 
+       def appmaker(root):
+           if not 'myapp' in root:
+               root['myapp'] = MyModel()
+               transaction.commit()
+           return root['myapp']
+
 #.  Change your application's ``run.py`` to look something like the
     below:
 
@@ -161,7 +167,7 @@ Configuration
 
        from repoze.bfg.configuration import Configurator
        from repoze.zodbconn.finder import PersistentApplicationFinder
-       from myapp.models import MyModel
+       from myapp.models import appmaker
        import transaction
 
        def app(global_config, **settings):
@@ -175,12 +181,6 @@ Configuration
                return finder(request.environ)
            config = Configurator(root_factory=get_root, settings=settings)
            return config.make_wsgi_app()
-
-       def appmaker(root):
-           if not 'myapp' in root:
-               root['myapp'] = MyModel()
-               transaction.commit()
-           return root['myapp']
 
 Running
 -------

@@ -71,14 +71,6 @@ want the application to be based on :term:`traversal`.
                    if name not in indexes:
                        del catalog[name]
 
-#. Change the ``appmaker`` in your application's ``run.py`` to look
-   something like the below:
-
-   .. code-block:: python
-      :linenos:
-
-       from myapp.models import Site
-
        def appmaker(root):
            if not 'site' in root:
                root['site'] = Site()
