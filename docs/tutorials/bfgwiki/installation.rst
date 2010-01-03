@@ -122,8 +122,8 @@ Preparation, Windows
    .. code-block:: bat
 
      c:\bigfntut> Scripts\easy_install -i \
-                  http://dist.repoze.org/bfgsite/simple \
-                  docutils repoze.tm repoze.zodbconn repoze.who nose coverage
+           http://dist.repoze.org/bfgsite/simple docutils repoze.tm \
+           repoze.zodbconn repoze.who nose coverage
 
 .. _making_a_project:
 

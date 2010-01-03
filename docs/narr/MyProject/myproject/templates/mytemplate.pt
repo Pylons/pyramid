@@ -50,7 +50,7 @@
 	  <h2><code>repoze.bfg</code> links</h2>
 	  <ul>
 	    <li><a
-	href="http://static.repoze.org/bfgdocs/#narrative-documentation"
+        href="http://static.repoze.org/bfgdocs/#narrative-documentation"
             >Narrative Documentation</a>
             </li>
 	    <li>
