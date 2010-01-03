@@ -304,7 +304,7 @@ The authorization policy will deny Everyone the view permission, even
 though later in the ACL is an ACE that allows everyone.
 
 .. index::
-   single: prinicpal
+   single: principal
    pair: special; principal names
 
 Special Principal Names

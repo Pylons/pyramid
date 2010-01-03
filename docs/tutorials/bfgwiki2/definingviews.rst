@@ -63,7 +63,7 @@ display the wiki itself (it will answer on the root URL), another
 named ``view_page`` will display an individual page, another named
 ``add_page`` will allow a page to be added, and a final view callable
 named ``edit_page`` will allow a page to be edited.  We'll describe
-each one briefly and show the resulting ``views.py`` file afterwards.
+each one briefly and show the resulting ``views.py`` file afterward.
 
 .. note::
 
