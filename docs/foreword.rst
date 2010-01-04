@@ -4,8 +4,9 @@ Foreword
 .. sidebar::  A Foreword By Paul Everitt
 
    Paul Everitt is a principal at :term:`Agendaless Consulting`.
-   Before this, he held the title of XXX at *Digital Creations*, which
-   ultimately became *Zope Corporation*.
+   Before his time at Agendaless, he was the co-founder of *Digital
+   Creations*, which later became *Zope Corporation*.  He has been
+   a widely respected member of the Python community since 1994.
 
 Fortunate.
 
