@@ -31,7 +31,7 @@ install_requires=[
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',
-    'WebOb',
+    'WebOb>=0.9.6', # tests fail with earlier versions
     'repoze.lru',
     'setuptools',
     'sourcecodegen>=0.6.11', # tests fail without this requirement?  (wtf)

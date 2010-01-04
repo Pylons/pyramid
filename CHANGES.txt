@@ -1,3 +1,12 @@
+After 1.2a10 (unreleased)
+=========================
+
+Bugs Fixed
+----------
+
+- Updated dependency on ``WebOb`` to require a version which supports
+  features now used in tests.
+
 1.2a10 (2010-01-04)
 ===================
 
