@@ -384,7 +384,7 @@ using Mako from within a :mod:`repoze.bfg` :term:`view`:
    from mako.template import Template
    from webob import Response
 
-   def make_view(request):
+   def mako_view(request):
        template = Template(filename='/templates/template.mak')
        result = template.render(name=request.params['name'])
        response = Response(result)
