@@ -15,6 +15,7 @@ Front Matter
    copyright.rst
    thanks.rst
    conventions.rst
+   foreword.rst
 
 .. mainmatter::
 
