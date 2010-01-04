@@ -12,6 +12,22 @@ appropriate level of access with respect to a specific
 Authorization is enabled by modifying your application to include a
 :term:`authentication policy` and :term:`authorization policy`.
 
+.. warning::
+
+   Various systems exist for adding authentication and authorization
+   to arbitrary web frameworks.  Two of these, :mod:`repoze.who` and
+   :mod:`repoze.what` are even written under the same Repoze "flag" as
+   :mod:`repoze.bfg`!  However, neither :mod:`repoze.who` nor
+   :mod:`repoze.what` is required to add authorization or
+   authentication to a :mod:`repoze.bfg` application.  In fact, unless
+   you have very specific requirements that include some sort of
+   "single sign on" or you need to integrate authorization across
+   multiple non-BFG Python applications, you can safely ignore the
+   existence of both :mod:`repoze.who` and :mod:`repoze.what`.  These
+   packages exist mostly to make it possible to add authentication and
+   authorization to *other* web frameworks, such as Pylons; they are
+   not generally useful within :mod:`repoze.bfg` applications.
+
 .. index::
    pair: enabling; authorization policy
 
