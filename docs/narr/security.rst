@@ -22,11 +22,15 @@ Authorization is enabled by modifying your application to include a
    authentication to a :mod:`repoze.bfg` application.  In fact, unless
    you have very specific requirements that include some sort of
    "single sign on" or you need to integrate authorization across
-   multiple non-BFG Python applications, you can safely ignore the
-   existence of both :mod:`repoze.who` and :mod:`repoze.what`.  These
-   packages exist mostly to make it possible to add authentication and
-   authorization to *other* web frameworks, such as Pylons; they are
-   not generally useful within :mod:`repoze.bfg` applications.
+   multiple non-:mod:`repoze.bfg` Python applications, you can
+   probably safely ignore the existence of both :mod:`repoze.who` and
+   :mod:`repoze.what`.  Those packages are useful when adding
+   authentication and authorization to a web framework such as Pylons
+   which has no built-in authentication or authorization machinery.
+   Because :mod:`repoze.bfg` already has facilities for authentication
+   and authorization built in, the use of :mod:`repoze.who` or
+   :mod:`repoze.what` is not required within :mod:`repoze.bfg`
+   applications.
 
 .. index::
    pair: enabling; authorization policy
