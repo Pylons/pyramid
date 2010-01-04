@@ -1,8 +1,12 @@
-After 1.2a10 (unreleased)
-=========================
+Next Release
+============
 
-Bugs Fixed
-----------
+Bug Fixes
+---------
+
+- Make ``paster bfgshell`` and ``paster create -t bfg_xxx`` work on
+  Jython (fix minor incompatibility with treatment of ``__doc__`` at
+  the class level).
 
 - Updated dependency on ``WebOb`` to require a version which supports
   features now used in tests.

@@ -65,7 +65,6 @@ class BFGShellCommand(Command):
 
     """
     summary = "Open an interactive shell with a repoze.bfg app loaded"
-    usage = '\n' + __doc__
 
     min_args = 2
     max_args = 2
@@ -81,6 +80,12 @@ class BFGShellCommand(Command):
     loadapp = (loadapp,) # for testing
     IPShell = IPShell # for testing
     verbose = 3
+
+    def __init__(self, *arg, **kw):
+        # needs to be in constructor to support Jython (used to be at class
+        # scope as ``usage = '\n' + __doc__``.
+        self.usage = '\n' + self.__doc__
+        Command.__init__(self, *arg, **kw)
 
     def command(self):
         cprt =('Type "help" for more information. "root" is the BFG app '
