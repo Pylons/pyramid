@@ -14,9 +14,10 @@ def handle_teardown(event):
     environ['tutorial.sasession'] = Cleanup(DBSession.remove)
 
 def app(global_config, **settings):
-    """ This function returns a repoze.bfg.router.Router object.
+    """ This function returns a WSGI application.
     
-    It is usually called by the PasteDeploy framework during ``paster serve``.
+    It is usually called by the PasteDeploy framework during 
+    ``paster serve``.
     """
     db_string = settings.get('db_string')
     if db_string is None:

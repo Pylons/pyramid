@@ -14,9 +14,10 @@ def handle_teardown(event):
     environ['{{package}}.sasession'] = Cleanup(DBSession.remove)
 
 def app(global_config, **settings):
-    """ This function returns a ``repoze.bfg`` WSGI application.
+    """ This function returns a WSGI application.
     
-    It is usually called by the PasteDeploy framework during ``paster serve``.
+    It is usually called by the PasteDeploy framework during 
+    ``paster serve``.
     """
     zcml_file = settings.get('configure_zcml', 'configure.zcml')
     db_string = settings.get('db_string')

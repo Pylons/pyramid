@@ -4,9 +4,10 @@ from repoze.zodbconn.finder import PersistentApplicationFinder
 from tutorial.models import appmaker
 
 def app(global_config, **settings):
-    """ This function returns a ``repoze.bfg`` WSGI application.
+    """ This function returns a WSGI application.
     
-    It is usually called by the PasteDeploy framework during ``paster serve``.
+    It is usually called by the PasteDeploy framework during 
+    ``paster serve``.
     """
     zodb_uri = settings.get('zodb_uri')
     if zodb_uri is None:
