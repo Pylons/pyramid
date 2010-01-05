@@ -300,6 +300,7 @@ latex_elements = {
     'date':'',
     'releasename':'Version',
     'title':r'The repoze.bfg Web Application \newline Framework',
+#    'pointsize':'12pt', # uncomment for 12pt version
 }
 
 from docutils import nodes
