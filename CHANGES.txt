@@ -11,6 +11,15 @@ Bug Fixes
 - Updated dependency on ``WebOb`` to require a version which supports
   features now used in tests.
 
+Features
+--------
+
+- Show the derived abspath of template resource specifications in the
+  traceback when a renderer template cannot be found.
+
+- Show the original traceback when a Chameleon template cannot be
+  rendered due to a platform incompatibility.
+
 1.2a10 (2010-01-04)
 ===================
 

@@ -1,14 +1,17 @@
+import sys
+
 from webob import Response
 
 from zope.interface import implements
 
 try:
     from chameleon.core.template import TemplateFile
-except ImportError, why: # pragma: no cover
+except ImportError: # pragma: no cover
+    exc_class, exc, tb = sys.exc_info()
     # Chameleon doesn't work on non-CPython platforms
     class TemplateFile(object):
         def __init__(self, *arg, **kw):
-            raise ImportError(why[0])
+            raise ImportError, exc, tb
 
 try:
     from chameleon.zpt.language import Parser

@@ -1,14 +1,17 @@
+import sys
+
 from webob import Response
 
 from zope.interface import implements
 
 try:
     from chameleon.zpt.template import PageTemplateFile
-except ImportError, why: # pragma: no cover
+except ImportError: # pragma: no cover
+    exc_class, exc, tb = sys.exc_info()
     # Chameleon doesn't work on non-CPython platforms
     class PageTemplateFile(object):
         def __init__(self, *arg, **kw):
-            raise ImportError(why[0])
+            raise ImportError, exc, tb
 
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer

@@ -46,19 +46,17 @@ def template_renderer_factory(spec, impl):
         # spec is a package:relpath resource spec
         renderer = reg.queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
-            # service unit tests by trying the relative path string as
-            # the utility name directly
-            renderer = reg.queryUtility(ITemplateRenderer, name=spec)
-        if renderer is None:
             try:
                 package_name, filename = spec.split(':', 1)
             except ValueError: # pragma: no cover
-                # unit test or someone passing a relative pathname
+                # unit test or somehow we were passed a relative pathname;
+                # this should die
                 package_name = caller_package(4).__name__
                 filename = spec
-            if not pkg_resources.resource_exists(package_name, filename):
-                raise ValueError('Missing template resource: %s' % spec)
             abspath = pkg_resources.resource_filename(package_name, filename)
+            if not pkg_resources.resource_exists(package_name, filename):
+                raise ValueError(
+                    'Missing template resource: %s (%s)' % (spec, abspath))
             renderer = impl(abspath)
             if not _reload_resources():
                 # cache the template
