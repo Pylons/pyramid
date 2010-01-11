@@ -25,32 +25,31 @@ processing?
 
 #. A :term:`request` object is created based on the WSGI environment.
 
-#. To service :term:`url dispatch`, the :mod:`repoze.bfg`
-   :term:`router` calls a :term:`URL dispatch` "root factory wrapper"
-   callable, which acts as a :term:`root factory`.  The job of the
-   mapper is to examine the ``PATH_INFO`` implied by the request to
-   determine whether any user-defined :term:`route` matches the
-   current WSGI environment.  The :term:`router` passes the request as
-   an argument to the mapper.
+#. A :class:`repoze.bfg.interfaces.INewRequest` :term:`event` is sent
+   to any subscribers.
+
+#. If any :term:`route` has been defined within application
+   configuration, the :mod:`repoze.bfg` :term:`router` calls a
+   :term:`URL dispatch` "route mapper."  The job of the mapper is to
+   examine the ``PATH_INFO`` implied by the request to determine
+   whether any user-defined :term:`route` matches the current WSGI
+   environment.  The :term:`router` passes the request as an argument
+   to the mapper.
 
 #. If any route matches, the WSGI environment is mutated; a
    ``bfg.routes.route`` key and a ``bfg.routes.matchdict`` are added
    to the WSGI environment, and an attribute named ``matchdict`` is
-   added to the request.  If a route *doesn't* match, neither of these
-   keys is added to the WSGI environment and the request object is not
-   mutated.
+   added to the request.  A root object associated with the route
+   found is also generated.  If a the :term:`route configuration`
+   which matched has an associated a ``factory`` argument, this
+   factory is used to generate the root object, otherwise a default
+   :term:`root factory` is used.
 
-#. Regardless of whether any route matched or not, the :term:`URL
-   dispatch` mapper returns a root object.  If a particular
-   :term:`route` named a ``factory`` argument, this factory is used to
-   generate the root object, otherwise a default :term:`root factory`
-   is used.  If a root factory argument was passed to the
-   :term:`Configurator` constructor, that callable is used to generate
-   the root object.  If the root factory argument passed to the
-   Configurator constructor is ``None``, a default root factory is
-   used to generate a root.
-
-#. A ``NewRequest`` :term:`event` is sent to any subscribers.
+#. If a route match was *not* found, and a ``root_factory`` argument
+   was passed to the :term:`Configurator` constructor, that callable
+   is used to generate the root object.  If the ``root_factory``
+   argument passed to the Configurator constructor is ``None``, a
+   default root factory is used to generate a root object.
 
 #. The :mod:`repoze.bfg` router calls a "traverser" function with the
    root object and the request.  The traverser function attempts to
@@ -67,26 +66,29 @@ processing?
    they can be accessed via e.g. ``request.context`` within
    :term:`view` code.
 
-#. If an :term:`authorization policy` is in use, :mod:`repoze.bfg`
-   passes the context, the request, and the view_name to a function
-   which determines whether the view being asked for can be executed
-   by the requesting user, based on credential information in the
-   request and security information attached to the context.  If it
-   returns True, :mod:`repoze.bfg` allows processing to continue.  If
-   it returns False, it uses a "forbidden" view callable to generate a
-   response, and returns that response.
+#. A :class:`repoze.bfg.interfaces.IAfterTraversal` :term:`event` is
+   sent to any subscribers.
 
-#. If view execution is determined to be allowed, :mod:`repoze.bfg`
-   looks up a :term:`view` callable using the context, the request,
-   and the view name.  If a view callable doesn't exist for this
-   combination of objects (based on the type of the context, the type
-   of the request, and the value of the view name), :mod:`repoze.bfg`
-   uses a "not found" view callable to generate a response, and
-   returns that response.
+#. :mod:`repoze.bfg` looks up a :term:`view` callable using the
+   context, the request, and the view name.  If a view callable
+   doesn't exist for this combination of objects (based on the type of
+   the context, the type of the request, and the value of the view
+   name, and any :term:`predicate` attributes applied to the view
+   configuration), :mod:`repoze.bfg` uses a "not found" view callable
+   to generate a response, and returns that response.
 
 #. If a view callable was found, :mod:`repoze.bfg` calls the view
-   function.  The view function's response is a :term:`response`
-   object.
+   function.
+
+#. If an :term:`authorization policy` is in use, and the view was
+   protected by a :term:`permission`, :mod:`repoze.bfg` passes the
+   context, the request, and the view_name to a function which
+   determines whether the view being asked for can be executed by the
+   requesting user, based on credential information in the request and
+   security information attached to the context.  If it returns
+   ``True``, :mod:`repoze.bfg` calls the view callable to obtain a
+   response.  If it returns ``False``, it uses a :term:`forbidden
+   view` callable to generate a response.
 
 #. A :class:`repoze.bfg.interfaces.INewResponse` :term:`event` is sent
    to any subscribers.
@@ -98,8 +100,8 @@ processing?
 .. image:: router.png
 
 This is a very high-level overview that leaves out various details.
-For more detail about subsystems invoked by the BFG router (like
-traversal, URL dispatch, views, and events), see
+For more detail about subsystems invoked by the BFG router such as
+traversal, URL dispatch, views, and event processing, see
 :ref:`url_mapping_chapter`, :ref:`traversal_chapter`,
 :ref:`urldispatch_chapter`, :ref:`views_chapter`, and
 :ref:`events_chapter`.

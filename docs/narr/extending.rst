@@ -4,11 +4,10 @@ Extending An Existing :mod:`repoze.bfg` Application
 ===================================================
 
 If the developer of a :mod:`repoze.bfg` application has obeyed certain
-constraints while building the application, a third party should be able to
-change the behavior of that application without needing to modify the actual
-source code that makes up the application.  The behavior of a
-:mod:`repoze.bfg` application that obeys these constraints can be
-*overridden* or *extended* without modification.
+constraints while building that application, a third party should be
+able to change its behavior without needing to modify its source code.
+The behavior of a :mod:`repoze.bfg` application that obeys certain
+constraints can be *overridden* or *extended* without modification.
 
 .. index::
    triple: building; extensible; application
@@ -25,13 +24,13 @@ the a :term:`scan`, and you mustn't configure your :mod:`repoze.bfg`
 application *imperatively* by using any code which configures the
 application through methods of the :term:`Configurator` (except for
 the :meth:`repoze.bfg.configuration.Configurator.load_zcml` method).
-Instead, should must use :term:`ZCML` for the equivalent
+
+Instead, must always use :term:`ZCML` for the equivalent
 purposes. :term:`ZCML` declarations that belong to an application can
 be "overridden" by integrators as necessary, but decorators and
-imperative code which perform the same tasks cannot.
-
-In general: use only :term:`ZCML` to configure your application if
-you'd like it to be extensible.
+imperative code which perform the same tasks cannot.  Use only
+:term:`ZCML` to configure your application if you'd like it to be
+extensible.
 
 Fundamental Plugpoints
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -50,16 +49,16 @@ and templates.
 ZCML Granularity
 ~~~~~~~~~~~~~~~~
 
-It's also extremely helpful to third party application "extenders"
-(aka "integrators") if the :term:`ZCML` that composes the
-configuration for an application is broken up into separate files
-which do very specific things.  These more specific ZCML files can be
-reintegrated within the application's main ``configure.zcml`` via
-``<include file="otherfile.zcml"/>`` declarations.  When ZCML files
-contain sets of specific declarations, an integrator can avoid
-including any ZCML he does not want by including only ZCML files which
-contain the declarations he needs.  He is not forced to "accept
-everything" or "use nothing".
+It's extremely helpful to third party application "extenders" (aka
+"integrators") if the :term:`ZCML` that composes the configuration for
+an application is broken up into separate files which do very specific
+things.  These more specific ZCML files can be reintegrated within the
+application's main ``configure.zcml`` via ``<include
+file="otherfile.zcml"/>`` declarations.  When ZCML files contain sets
+of specific declarations, an integrator can avoid including any ZCML
+he does not want by including only ZCML files which contain the
+declarations he needs.  He is not forced to "accept everything" or
+"use nothing".
 
 For example, it's often useful to put all ``<route>`` declarations in
 a separate ZCML file, as ``<route>`` statements have a relative
@@ -102,17 +101,19 @@ configuration imperatively, one of two things may be true:
   *may* need to change the source code of the original application.
 
   If the only source of trouble is the existence of
-  :class:`repoze.bfg.view.bfg_view` decorators, you can just omit the
-  ``<scan>`` directive in the application ZCML.  This will cause the
-  decorators to do nothing.  At this point, you will need to convert
-  all the configuration done in decorators into equivalent
-  :term:`ZCML` and add that ZCML to an a separate Python package as
-  described in :ref:`extending_the_application`.
+  :class:`repoze.bfg.view.bfg_view` decorators, you can just prevent a
+  :term:`scan` from happening (by omitting the ``<scan>`` declaration
+  from ZCML or omitting any call to the
+  :meth:`repoze.bfg.configuration.Configurator.scan` method).  This
+  will cause the decorators to do nothing.  At this point, you will
+  need to convert all the configuration done in decorators into
+  equivalent :term:`ZCML` and add that ZCML to an a separate Python
+  package as described in :ref:`extending_the_application`.
 
-  If the source of trouble is configuration done imperatively (perhaps
-  in the function called during application startup), you'll need to
-  change the code: convert imperative configuration into equivalent
-  :term:`ZCML` declarations.
+  If the source of trouble is configuration done imperatively in a
+  function called during application startup, you'll need to change
+  the code: convert imperative configuration statements into
+  equivalent :term:`ZCML` declarations.
 
 Once this is done, you should be able to extend or override the
 application like any other (see :ref:`extending_the_application`).
@@ -157,7 +158,8 @@ something like this:
 
 - Create an ``overrides.zcml`` file within the new package.  The
   statements in the ``overrides.zcml`` file will override any ZCML
-  statements made within the original application (such as views).
+  statements made within the original application (such as view
+  declarations).
 
 - Create Python files containing views and other overridden elements,
   such as templates and static resources as necessary, and wire these

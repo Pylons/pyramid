@@ -30,19 +30,6 @@ file to infer settings and starts a server listening on a port.  For
 the purposes of this discussion, we'll assume that you are using this
 command to run your :mod:`repoze.bfg` application.
 
-.. sidebar:: Using :mod:`repoze.bfg` Without ``paster``
-
-   ``paster serve`` is by no means the only way to start up and serve
-   a :mod:`repoze.bfg` application.  Any :term:`WSGI` server is
-   capable of running a :mod:`repoze.bfg` application, and some WSGI
-   servers (such as :term:`mod_wsgi`) don't require the
-   :term:`PasteDeploy` framework's ``paster serve`` command to do
-   server process management.  Each :term:`WSGI` server has its own
-   documentation about how it creates a process to run an application,
-   and there are many of them, so we cannot provide the details for
-   each here.  But the concepts are largely the same, whatever server
-   you happen to use.
-
 Here's a high-level time-ordered overview of what happens when you
 press ``return`` after running ``paster serve MyProject.ini``.
 
@@ -53,16 +40,20 @@ press ``return`` after running ``paster serve MyProject.ini``.
    information contained within the ``MyProject.ini`` file.
 
 #. The PasteDeploy framework finds a section named either
-   ``[app:main]`` or ``[pipeline:main]`` in the ``.ini`` file.  This
-   section represents the configuration of a :term:`WSGI` application
-   that will be served.  If you're using a simple application (e.g. an
-   ``[app:main]`` section of a default-generated :mod:`repoze.bfg`
-   project), the application :term:`entry point` or :term:`dotted
-   Python name` will be named on the ``use=`` line within the
-   section's configuration.  If, instead of a simple application,
-   you're using a WSGI :term:`pipeline` (e.g. a ``[pipeline:main]``
-   section), the application named on the "last" element will refer to
-   your :mod:`repoze.bfg` application.
+   ``[app:main]``, ``[pipeline:main]``, or ``[composite::main]`` in
+   the ``.ini`` file.  This section represents the configuration of a
+   :term:`WSGI` application that will be served.  If you're using a
+   simple application (e.g. an ``[app:main]`` section of a
+   default-generated :mod:`repoze.bfg` project), the application
+   :term:`entry point` or :term:`dotted Python name` will be named on
+   the ``use=`` line within the section's configuration.  If, instead
+   of a simple application, you're using a WSGI :term:`pipeline`
+   (e.g. a ``[pipeline:main]`` section), the application named on the
+   "last" element will refer to your :mod:`repoze.bfg` application.
+   If instead of a simple application or a pipeline, you're using a
+   Paste "composite" (e.g. ``[composite:main]``), refer to the
+   documentation for that particular composite to understand how to
+   make it refer to your :mod:`repoze.bfg` application.
 
 #. The application's *constructor* (named by the entry point reference
    or dotted Python name on the ``use=`` line) is passed the key/value

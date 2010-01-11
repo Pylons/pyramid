@@ -3,22 +3,63 @@
 Creating a :mod:`repoze.bfg` Project
 ====================================
 
-While it's possible to create a :mod:`repoze.bfg` application
-completely manually, it's useful to be able to create a "skeleton"
-:mod:`repoze.bfg` application using an application skeleton generator.
-"Skeleton" projects can be created using the ``paster create`` command
-in conjunction with :term:`Paste` templates.  Various project
-templates that come with :mod:`repoze.bfg` make different
-configuration assumptions about what type of application you're trying
-to construct.
+It's possible to create a :mod:`repoze.bfg` application completely
+manually, but it's usually more convenient to use a template to
+generate a basic :mod:`repoze.bfg` application structure.
 
-All existing project templates make the assumption that you want your
-code to live in a Python :term:`package`.  Even if your application is
-extremely simple, it is useful to place code that drives the
-application within a package, because a package is more easily
-extended with new code and an application that lives inside a package
-can be distributed more easily than one which does not live within a
-package.
+:mod:`repoze.bfg` comes with templates that you can use to generate a
+project.  Each template makes different configuration assumptions
+about what type of application you're trying to construct.
+
+These templates are rendered using the :term:`PasteDeploy` ``paster``
+script, and so therefore they are often referred to as "paster
+templates".
+
+.. index::
+   single: paster templates
+   single: bfg_starter
+   single: bfg_zodb
+   single: bfg_alchemy
+   single: bfg_routesalchemy
+
+.. _additional_paster_templates:
+
+Paster Templates Included with :mod:`repoze.bfg`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The convenience ``paster`` templates included with :mod:`repoze.bfg`
+differ from each other on two axes:
+
+- the persistence mechanism they offer (no persistence mechanism,
+  :term:`ZODB`, or :term:`SQLAlchemy`).
+
+- the mechanism they use to map URLs to code (:term:`traversal` or
+  :term:`URL dispatch`).
+
+The included templates are these:
+
+``bfg_starter``
+  URL mapping via :term:`traversal` and no persistence mechanism.
+
+``bfg_zodb``
+  URL mapping via :term:`traversal` and persistence via :term:`ZODB`
+
+``bfg_routesalchemy`` 
+  URL mapping via :term:`URL dispatch` and persistence via
+  :term:`SQLAlchemy`
+
+``bfg_alchemy``
+  URL mapping via :term:`traversal` and persistence va
+  :term:`SQLAlchemy`
+
+All existing project templates use :term:`ZCML` instead of
+:term:`imperative configuration`.  All existing project templates also
+make the assumption that you want your code to live in a Python
+:term:`package`.  Even if your application is extremely simple, it is
+useful to place code that drives the application within a package,
+because a package is more easily extended with new code and an
+application that lives inside a package can be distributed more easily
+than one which does not live within a package.
 
 .. index::
    pair: project; creating
@@ -28,13 +69,26 @@ package.
 Creating the Project
 --------------------
 
-To start a :mod:`repoze.bfg` :term:`project`, use the ``paster
-create`` facility using the interpreter from the virtualenv
-(``bfgenv``) directory you created in :ref:`installing_chapter`.
+In in :ref:`installing_chapter`, you created a virtual Python
+environment via the ``virtualenv`` command.  To start a
+:mod:`repoze.bfg` :term:`project`, use the ``paster`` facility
+installed within the virtualenv.  In :ref:`installing_chapter` we
+called the virtualenv directory ``bfgenv``; the following command
+assumes that our current working directory is that directory.
+
+We'll choose the ``bfg_starter`` template for this purpose.
 
 .. code-block:: text
 
    $ bin/paster create -t bfg_starter
+
+The above command uses the ``paster`` command to create a project
+using the ``bfg_starter`` template.  The ``create`` version of paster
+invokes the creation of a project from a template.  To use a different
+template, such as ``bfg_routesalchemy``, you'd just change the last
+argument.  For example:
+
+   $ bin/paster create -t bfg_routesalchemy
 
 ``paster create`` will ask you a single question: the *name* of the
 project.  You should use a string without spaces and with only letters
@@ -57,15 +111,21 @@ project we name ``MyProject``:
    # ... more output ...
    Running /Users/chrism/projects/repoze/bfg/bin/python setup.py egg_info
 
-As a result of invoking ``paster create``, a project is created in a
-directory named ``MyProject``.  That directory is a :term:`setuptools`
-:term:`project` directory from which a Python setuptools
+.. note:: You can skip the interrogative question about a project
+   name during ``paster create`` by adding the project name to the
+   command line, e.g. ``paster create -t bfg_starter MyProject``.
+
+As a result of invoking the ``paster create`` command above, a project
+is created in a directory named ``MyProject``.  That directory is a
+:term:`setuptools` :term:`project` directory from which a setuptools
 :term:`distribution` can be created.  The ``setup.py`` file in that
 directory can be used to distribute your application, or install your
-application for deployment or development. A sample
-:term:`PasteDeploy` ``.ini`` file named ``MyProject.ini`` will also be
-created in the project directory.  You will use the ``paster serve``
-command against this ``.ini`` file to run your application.
+application for deployment or development.
+
+A sample :term:`PasteDeploy` ``.ini`` file named ``MyProject.ini``
+will also be created in the project directory.  You will use the
+``paster serve`` command against this ``.ini`` file to run your
+application.
 
 The ``MyProject`` project directory contains an additional
 subdirectory named ``myproject`` (note the case difference)
@@ -73,31 +133,9 @@ representing a Python :term:`package` which holds very simple
 :mod:`repoze.bfg` sample code.  This is where you'll edit your
 application's Python code and templates.
 
-.. note:: You can skip the interrogative question about a project
-   name during ``paster create`` by adding the project name to the
-   command line, e.g. ``paster create -t bfg_starter MyProject``.
-
 .. index::
-   single: paster templates
-   single: project templates
-
-.. _additional_paster_templates:
-
-Additional Paster Templates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Convenience :term:`Paste` templates for projects which will depend on
-:term:`ZODB` or `SQLAlchemy <http://www.sqlalchemy.org/>`_ also exist.
-
-- Use ``paster create -t bfg_zodb`` to create a project that depends on
-  ZODB.
-
-- Use ``paster create -t bfg_routesalchemy`` to create a project that
-  depends on SQLAlchemy and :term:`URL dispatch` (no :term:`traversal`).
-
-- Use ``paster create -t bfg_alchemy`` to create a project that
-  depends on SQLAlchemy but *not* :term:`URL dispatch` (uses only
-  :term:`traversal`).
+   single: setup.py develop
+   single: development install
 
 Installing your Newly Created Project for Development
 -----------------------------------------------------
@@ -106,7 +144,8 @@ Using the interpreter from the :term:`virtualenv` you create during
 :ref:`installing_chapter`, invoke the following command when inside
 the project directory.  The file named ``setup.py`` will be in the
 root of the paster-generated project directory.  The ``python`` you're
-invoking should be the one from your virtualenv.
+invoking should be the one that lives in the ``bin`` directory of your
+virtual Python environment.
 
 .. code-block:: text
 
@@ -120,9 +159,9 @@ Elided output from a run of this command is shown below:
    ...
    Finished processing dependencies for MyProject==0.1
 
-This will install your application's :term:`package` into the
-interpreter so it can be found and run as a :term:`WSGI` application
-inside a WSGI server.
+This will install the :term:`distribution` representing your
+application's into the interpreter's library set so it can be found
+and run by :term:`PasteDeploy` via ``paster serve``.
 
 .. index::
    pair: running; tests
@@ -130,8 +169,8 @@ inside a WSGI server.
 Running The Tests For Your Application
 --------------------------------------
 
-To run unit tests for your application, you should invoke them like
-so:
+To run unit tests for your application, you should invoke them using
+the ``python`` that lives in the ``bin`` directory of your virtualenv:
 
 .. code-block:: text
 
@@ -158,20 +197,23 @@ Here's sample output from a test run:
 
    OK
 
-The tests are found in the ``tests.py`` module in your ``paster
-create`` -generated project.  One sample test exists.
+The tests themselves are found in the ``tests.py`` module in your
+``paster create`` -generated project.  Within a project generated by
+the ``bfg_starter`` template, a single sample test exists.
 
 .. index::
    single: interactive shell
+   single: IPython
+   single: paster bfgshell
 
 The Interactive Shell
 ---------------------
 
 Once you've installed your program for development using ``setup.py
-develop``, you can use an interactive shell to examine your
-:mod:`repoze.bfg` application :term:`model` objects from a Python
-prompt.  To do so, use the ``paster`` shell command with the
-``bfgshell`` argument:
+develop``, you can use an interactive Python shell to examine your
+:mod:`repoze.bfg` application :term:`model` and :term:`view` objects
+from a Python prompt.  To do so, use the ``paster`` shell command with
+the ``bfgshell`` argument:
 
 The first argument to ``bfgshell`` is the path to your application's
 ``.ini`` file.  The second is the section name inside the ``.ini``
@@ -217,8 +259,6 @@ standard Python interpreter shell unconditionally.
    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell \
          MyProject.ini main
 
-Press "Ctrl-D" to exit the interactive shell.
-
 You should always use a section name argument that refers to the
 actual ``app`` section within the Paste configuration file that points
 at your :mod:`repoze.bfg` application *without any middleware
@@ -252,54 +292,100 @@ against the above ``.ini`` file, an error will likely occur.  Use the
 most specific reference to the application within the ``.ini`` file
 possible as the section name argument.
 
+Press "Ctrl-D" to exit the interactive shell.
+
+.. index::
+   single: running an application
+   single: paster serve
+   single: reload
+   single: startup
+   single: mod_wsgi
+
 Runnning The Project Application
 --------------------------------
 
-Once the project is installed for development, you can run the
+Once a project is installed for development, you can run the
 application it represents using the ``paster serve`` command against
-the generated ``MyProject.ini`` configuration file:
+the generated configuration file.  In our case, this file is named
+``MyProject.ini``:
 
 .. code-block:: text
 
    $ ../bin/paster serve MyProject.ini
 
-.. sidebar:: Using ``mod_wsgi``
-
-   You can also use :term:`mod_wsgi` to serve your :mod:`repoze.bfg`
-   application using the Apache web server rather than the
-   "pure-Python" server that is started as a result of ``paster
-   serve``.  See :ref:`modwsgi_tutorial` for details.  However, it is
-   usually easier to develop an application using the ``paster serve``
-   webserver, as exception and debugging output will be sent to the
-   console.
-
-Here's sample output from a run:
+Here's sample output from a run of ``paster serve``:
 
 .. code-block:: text
 
-   $ paster serve MyProject.ini
+   $ ../bin/paster serve MyProject.ini
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
 By default, generated :mod:`repoze.bfg` applications will listen on
-port 6543.
+TCP port 6543.
 
-.. note:: During development, it's often useful to run ``paster
-   serve`` using its ``--reload`` option.  When any Python module your
-   project uses, changes, it will restart the server, which makes
-   development easier, as changes to Python code under
-   :mod:`repoze.bfg` is not put into effect until the server restarts.
+During development, it's often useful to run ``paster serve`` using
+its ``--reload`` option.  When ``--reload`` is passed to ``paster
+serve``, changes to any Python module your project uses will cause the
+server to restart.  This typically makes development easier, as
+changes to Python code made within a :mod:`repoze.bfg` application is
+not put into effect until the server restarts.
+
+For example:
+
+.. code-block:: text
+
+   $ ../bin/paster serve MyProject.ini --reload
+   Starting subprocess with file monitor
+   Starting server in PID 16601.
+   serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
+
+For more detailed information about the startup process, see
+:ref:`startup_chapter`.  For more information about environment
+variables and configuration file settings that influence startup and
+runtime behavior, see :ref:`environment_chapter`.
+
+.. topic:: Disusing ``paster serve`` and Using Alternate Servers
+
+   The code generated by :mod:`repoze.bfg` ``paster`` templates
+   assumes that you will be using the ``paster serve`` command to
+   start your application while you do development.  However, ``paster
+   serve`` is by no means the only way to start up and serve a
+   :mod:`repoze.bfg` application.  As we saw in
+   :ref:`configuration_narr`, ``paster serve`` needn't be invoked at
+   all to run a :mod:`repoze.bfg` application.  The use of ``paster
+   serve`` to run a :mod:`repoze.bfg` application is purely
+   conventional based on the output of its ``paster`` templates.
+
+   Any :term:`WSGI` server is capable of running a :mod:`repoze.bfg`
+   application.  Some WSGI servers don't require the
+   :term:`PasteDeploy` framework's ``paster serve`` command to do
+   server process management at all.  Each :term:`WSGI` server has its
+   own documentation about how it creates a process to run an
+   application, and there are many of them, so we cannot provide the
+   details for each here.  But the concepts are largely the same,
+   whatever server you happen to use.
+
+   One popular production alternative to a ``paster``-invoked server
+   is :term:`mod_wsgi`.  can also use :term:`mod_wsgi` to serve your
+   :mod:`repoze.bfg` application using the Apache web server rather
+   than any "pure-Python" server that is started as a result of
+   ``paster serve``.  See :ref:`modwsgi_tutorial` for details.
+   However, it is usually easier to *develop* an application using a
+   ``paster serve`` -invoked webserver, as exception and debugging
+   output will be sent to the console.
 
 Viewing the Application
 -----------------------
 
-Visit ``http://localhost:6543/`` in your browser.  You will see
-something in your browser like what is displayed below:
+Once your application is running via ``paster serve``, you may visit
+``http://localhost:6543/`` in your browser.  You will see something in
+your browser like what is displayed below:
 
 .. image:: project.png
 
 That's the page shown by default when you visit an unmodified ``paster
-create``-generated application.
+create`` -generated ``bfg_starter`` application.
 
 .. index::
    single: project structure
@@ -307,13 +393,15 @@ create``-generated application.
 The Project Structure
 ---------------------
 
-Our generated :mod:`repoze.bfg` application is a setuptools
-:term:`project` (named ``MyProject``), which contains a Python
-:term:`package` (which is *also* named ``myproject``, but lowercased;
-the paster template generates a project which contains a package that
-shares its name except for case).
+Our generated :mod:`repoze.bfg` ``bfg_starter`` application is a
+setuptools :term:`project` (named ``MyProject``), which contains a
+Python :term:`package` (which is *also* named ``myproject``, but
+lowercased; the paster template generates a project which contains a
+package that shares its name except for case).  All :mod:`repoze.bfg`
+``paster`` -generated projects share a similar structure.
 
-The ``MyProject`` project has the following directory structure::
+The ``MyProject`` project we've generated has the following directory
+structure::
 
   MyProject/
   |-- CHANGES.txt
@@ -353,8 +441,6 @@ describe, run, and test your application.
    application.  It is a standard :term:`setuptools` ``setup.py``
    file.
 
-We won't describe the ``CHANGES.txt`` or ``README.txt`` files.
-
 .. index::
    single: PasteDeploy
    single: ini file
@@ -366,8 +452,8 @@ We won't describe the ``CHANGES.txt`` or ``README.txt`` files.
 
 The ``MyProject.ini`` file is a :term:`PasteDeploy` configuration
 file.  Its purpose is to specify an application to run when you invoke
-``paster serve`` when you start an application, as well as the
-deployment settings provided to that application.
+``paster serve``, as well as the deployment settings provided to that
+application.
 
 The generated ``MyProject.ini`` file looks like so:
 
@@ -383,7 +469,7 @@ within the configuration file.  By default it contains one key
 ``debug``, which is set to ``true``.  This key is used by various
 components to decide whether to act in a "debugging" mode.
 ``repoze.bfg`` itself does not do anything at all with this parameter,
-and neither does any generated sample application.
+and neither does any template-generated application.
 
 The ``[app:main]`` section represents configuration for your
 application.  This section name represents the ``main`` application
@@ -399,7 +485,7 @@ indicates that this is an entry point *URI* specifier, where the
 "scheme" is "egg"; there are no other schemes currently, so the
 ``egg:`` prefix is arguably not very useful).
 
-.. note::
+.. sidebar::  ``setuptools`` Entry Points and PasteDeploy ``.ini`` Files
 
    This part of configuration can be confusing so let's try to clear
    things up a bit.  Take a look at the generated ``setup.py`` file
@@ -433,10 +519,10 @@ module).  You can provide startup-time configuration parameters to
 your application by requiring more settings in this section.
 
 The ``reload_templates`` setting in the ``[app:main]`` section is a
-:mod:`repoze.bfg`-specific setting which is passed into the framework.
-If it exists, and is ``true``, :term:`Chameleon` template changes will
-not require an application restart to be detected.  See
-:ref:`reload_templates_section` for more information.
+:mod:`repoze.bfg` -specific setting which is passed into the
+framework.  If it exists, and its value is ``true``, :term:`Chameleon`
+template changes will not require an application restart to be
+detected.  See :ref:`reload_templates_section` for more information.
 
 .. warning:: The ``reload_templates`` option should be turned off for
    production applications, as template rendering is slowed when it is
@@ -454,10 +540,10 @@ new thread for each request.
 
 .. note::
 
-  In general, :mod:`repoze.bfg` applications should be
-  threading-aware.  It is not required that a :mod:`repoze.bfg`
-  application be nonblocking as all application code will run in its
-  own thread, provided by the server you're using.
+  In general, :mod:`repoze.bfg` applications generated from ``paster
+  templates`` should be threading-aware.  It is not required that a
+  :mod:`repoze.bfg` application be nonblocking as all application code
+  will run in its own thread, provided by the server you're using.
 
 See the :term:`PasteDeploy` documentation for more information about
 other types of things you can put into this ``.ini`` file, such as
@@ -493,9 +579,9 @@ on the command line.
 Within the arguments to this function call, information about your
 application is kept.  While it's beyond the scope of this
 documentation to explain everything about setuptools setup files, we'll
-provide a whirlwind tour of what exists in this file here.
+provide a whirlwind tour of what exists in this file in this section.
 
-Your application's name (this can be any string) is specified in the
+Your application's name can be any string; it is specified in the
 ``name`` field.  The version number is specified in the ``version``
 value.  A short description is provided in the ``description`` field.
 The ``long_description`` is conventionally the content of the README
@@ -521,9 +607,11 @@ represents our project's application.
 Usually you only need to think about the contents of the ``setup.py``
 file when distributing your application to other people, or when
 versioning your application for your own use.  For fun, you can try
-this command now::
+this command now:
 
-  python setup.py sdist
+.. code-block:: python
+
+   $ python setup.py sdist
 
 This will create a tarball of your application in a ``dist``
 subdirectory named ``MyProject-0.1.tar.gz``.  You can send this
@@ -593,7 +681,7 @@ the :term:`application registry`. It looks like so:
    language.  ``http://namespaces.repoze.org/bfg`` is the default XML
    namespace.  Add-on packages may require other namespaces.
 
-#. Line 4 initializes :mod:`repoze.bfg`-specific configuration
+#. Line 4 initializes :mod:`repoze.bfg` -specific configuration
    directives by including the :mod:`repoze.bfg.includes` package.
    This causes all of the ZCML within the ``configure.zcml`` of the
    :mod:`repoze.bfg.includes` package (which can be found in the main
@@ -606,15 +694,16 @@ the :term:`application registry`. It looks like so:
    attribute).  It is registered so that it will be found when the
    :term:`context` of the request is an instance of the
    :class:`myproject.models.MyModel` class.  The ``view`` attribute
-   points at a Python function that does all the work for this view.
-   Note that the values of both the ``context`` attribute and the
-   ``view`` attribute begin with a single period.  Names that begin
-   with a period are "shortcuts" which point at files relative to the
-   :term:`package` in which the ``configure.zcml`` file lives.  In
-   this case, since the ``configure.zcml`` file lives within the
-   :mod:`myproject` package, the shortcut ``.models.MyModel`` could
-   also be spelled ``myproject.models.MyModel`` (forming a full Python
-   dotted-path name to the ``MyModel`` class).  Likewise the shortcut
+   points at a Python function that does all the work for this view,
+   also known as a :term:`view callable`.  Note that the values of
+   both the ``context`` attribute and the ``view`` attribute begin
+   with a single period.  Names that begin with a period are
+   "shortcuts" which point at files relative to the :term:`package` in
+   which the ``configure.zcml`` file lives.  In this case, since the
+   ``configure.zcml`` file lives within the :mod:`myproject` package,
+   the shortcut ``.models.MyModel`` could also be spelled
+   ``myproject.models.MyModel`` (forming a full Python dotted-path
+   name to the ``MyModel`` class).  Likewise the shortcut
    ``.views.my_view`` could be replaced with
    ``myproject.views.my_view``.
 
@@ -640,29 +729,29 @@ the :term:`application registry`. It looks like so:
 ~~~~~~~~~~~~
 
 Much of the heavy lifting in a :mod:`repoze.bfg` application comes in
-the form of *views*.  A :term:`view` is the bridge between the content
-in the model, and the response given back to a browser.
+the form of *view callables*.  A :term:`view callable` is the bridge
+between the content in the model, and the response given back to a
+browser.
 
 .. literalinclude:: MyProject/myproject/views.py
    :linenos:
 
-Lines 1-2 provide the ``my_view`` that was registered as the view.
-``configure.zcml`` said that the default URL for instances that are of
-the class :class:`myproject.models.MyModel` should run this
-:func:`myproject.views.my_view` function.
+Lines 1-2 provide the ``my_view`` that was registered as the view
+callable.  ``configure.zcml`` said that the default URL for instances
+that are of the class :class:`myproject.models.MyModel` should run
+this :func:`myproject.views.my_view` function.
 
-The function is handed two pieces of information: the :term:`context`
-and the :term:`request`.  The *context* is the term :term:`model`
-found via :term:`traversal` (or via :term:`URL dispatch`).  The
-*request* is an instance of the :term:`WebOb` ``Request`` class
-representing the browser's request to our server.
+This view callable function is handed a single piece of information:
+the the :term:`request`.  The *request* is an instance of the
+:term:`WebOb` ``Request`` class representing the browser's request to
+our server.
 
 This view returns a dictionary.  When this view is invoked, a
-:term:`renderer` renders the dictionary returned by the view, and
-returns the result as the :term:`response`.  This view is configured
-to invoke a renderer which uses a :term:`Chameleon` ZPT template
-(``templates/my_template.pt``, as specified in the ``configure.zcml``
-file).
+:term:`renderer` converts the dictionary returned by the view into
+HTML, and returns the result as the :term:`response`.  This view is
+configured to invoke a renderer which uses a :term:`Chameleon` ZPT
+template (``templates/my_template.pt``, as specified in the
+``configure.zcml`` file).
 
 See :ref:`views_which_use_a_renderer` for more information about how
 views, renderers, and templates relate and cooperate.
@@ -715,9 +804,8 @@ so the sample application uses an instance of
 ~~~~~~~~~~
 
 We need a small Python module that configures our application and
-advertises itself to our :term:`PasteDeploy` ``.ini`` file.  For
-convenience, we also make it possible to run this module directory
-without the PasteDeploy configuration file:
+advertises itself to our :term:`PasteDeploy` ``.ini`` file.  This is
+the file named ``run.py``:
 
 .. literalinclude:: MyProject/myproject/run.py
    :linenos:
@@ -736,18 +824,16 @@ without the PasteDeploy configuration file:
 ``templates/mytemplate.pt``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The single :term:`Chameleon` template in the project looks like so:
-
-.. literalinclude:: MyProject/myproject/templates/mytemplate.pt
-   :linenos:
-   :language: xml
-
-It displays a default page when rendered.  It is referenced by the
-``view`` declaration's ``renderer`` attribute in the
-``configure.zcml`` file.  Templates are accessed and used by view
-declarations and sometimes by view functions themselves.  See
+The single :term:`Chameleon` template exists in the project.  Its
+contents are too long to show here, but it displays a default page
+when rendered.  It is referenced by the ``view`` declaration's
+``renderer`` attribute in the ``configure.zcml`` file.  See
 :ref:`views_which_use_a_renderer` for more information about
 renderers.
+
+Templates are accessed and used by view configurations and sometimes
+by view functions themselves.  See :ref:`templates_used_directly` and
+:ref:`templates_used_as_renderers`.
 
 ``templates/static``
 ~~~~~~~~~~~~~~~~~~~~

@@ -13,11 +13,10 @@ Using Events
 
 An *event* is an object broadcast by the :mod:`repoze.bfg` framework
 at interesting points during the lifetime of an application.  You
-don't need to use, know about, or care about events in order to create
-most :mod:`repoze.bfg` applications, but they can be useful when you
-want to perform slightly advanced operations.  For example,
-subscribing to an event can allow you to "skin" a site slightly
-differently based on the hostname used to reach the site.
+don't need to use events in order to create most :mod:`repoze.bfg`
+applications, but they can be useful when you want to perform slightly
+advanced operations.  For example, subscribing to an event can allow
+you to run some code as the result of every new request.
 
 Events in :mod:`repoze.bfg` are always broadcast by the framework.
 However, they only become useful when you register a *subscriber*.  A
@@ -34,8 +33,10 @@ when it's called.
 
 The mere existence of a subscriber function, however, is not
 sufficient to arrange for it to be called.  To arrange for the
-subscriber to be called, you'll need to change your :term:`application
-registry` by either of the following methods:
+subscriber to be called, you'll need to use the
+:meth:`repoze.bfg.configurator.Configurator.add_subscriber` method to
+register the subscriber imperatively, or you'll need to use ZCML for
+the same purpose:
 
 .. topic:: Configuring an Event Listener Imperatively
 
@@ -50,6 +51,9 @@ registry` by either of the following methods:
       from repoze.bfg.interfaces import INewRequest
 
       from subscribers import mysubscriber
+
+      # "config" below is assumed to be an instance of a 
+      # repoze.bfg.configuration.Configurator object
 
       config.add_subscriber(mysubscriber, INewRequest)
 
@@ -73,7 +77,9 @@ registry` by either of the following methods:
          handler=".subscribers.mysubscriber"
        />
 
-Each of the above examples implies that every time the
+   See also :ref:`subscriber_directive`.
+
+Either of the above registration examples implies that every time the
 :mod:`repoze.bfg` framework emits an event object that supplies an
 :class:`repoze.bfg.interfaces.INewRequest` interface, the
 ``mysubscriber`` function will be called with an *event* object.
@@ -83,8 +89,18 @@ As you can see, a subscription is made in terms of an
 be an object that possesses an interface.  The interface itself
 provides documentation of what attributes of the event are available.
 
-For example, if you create event listener functions in a
-``subscribers.py`` file in your application like so:
+The return value of a subscriber function is ignored.  Subscribers to
+the same event type are not guaranteed to be called in any particular
+order relative to each another.
+
+All the concrete :mod:`repoze.bfg` event types are documented in the
+:ref:`events_module` API documentation.
+
+An Example
+----------
+
+If you create event listener functions in a ``subscribers.py`` file in
+your application like so:
 
 .. code-block:: python
    :linenos:
@@ -96,8 +112,8 @@ For example, if you create event listener functions in a
        print 'response', event.response
 
 You may configure these functions to be called at the appropriate
-times by adding the following to your application's ``configure.zcml``
-file:
+times by adding the following ZCML to your application's
+``configure.zcml`` file:
 
 .. code-block:: xml
    :linenos:
@@ -112,10 +128,9 @@ file:
       handler=".subscribers.handle_new_response"
     />
 
-See also :ref:`subscriber_directive`.
-
-The :meth:`repoze.bfg.configuration.Configurator.add_subscriber`
-method can be used to perform the same job:
+If you're not using ZCML, the
+:meth:`repoze.bfg.configuration.Configurator.add_subscriber` method
+can alternately be used to perform the same job:
 
 .. ignore-next-block
 .. code-block:: python
@@ -127,36 +142,27 @@ method can be used to perform the same job:
    from subscribers import handle_new_request
    from subscribers import handle_new_response
 
+   # "config" below is assumed to be an instance of a 
+   # repoze.bfg.configuration.Configurator object
+
    config.add_subscriber(handle_new_request, INewRequest)
    config.add_subscriber(handle_new_response, INewResponse)
 
-This causes the functions as to be registered as event subscribers
-within the :term:`application registry` .  Under this configuration,
-when the application is run, each time a new request or response is
-detected, a message will be printed to the console.
+Either mechanism causes the functions in ``subscribers.py`` to be
+registered as event subscribers.  Under this configuration, when the
+application is run, each time a new request or response is detected, a
+message will be printed to the console.
 
-.. sidebar:: The ``INewResponse`` Event vs. Middleware
+Each of our subscriber functions accepts an ``event`` object and
+prints an attribute of the event object.  This begs the question: how
+can we know which attributes a particular event has?
 
-   Postprocessing a response is usually better handled in a WSGI
-   :term:`middleware` component than in subscriber code that is called
-   by a :class:`repoze.bfg.interfaces.INewResponse` event.  The
-   :class:`repoze.bfg.interfaces.INewResponse` event exists almost
-   purely for symmetry with the
-   :class:`repoze.bfg.interfaces.INewRequest` event.
-
-We know that :class:`repoze.bfg.interfaces.INewRequest` events have a
-``request`` attribute, which is a :term:`WebOb` request, because the
-interface defined at :class:`repoze.bfg.interfaces.INewRequest` says
-it must.  Likewise, we know that
-:class:`repoze.bfg.interfaces.INewResponse` events have a ``response``
-attribute, which is a response object constructed by your application,
+We know that :class:`repoze.bfg.interfaces.INewRequest` event objects
+have a ``request`` attribute, which is a :term:`request` object,
 because the interface defined at
+:class:`repoze.bfg.interfaces.INewRequest` says it must.  Likewise, we
+know that :class:`repoze.bfg.interfaces.INewResponse` events have a
+``response`` attribute, which is a response object constructed by your
+application, because the interface defined at
 :class:`repoze.bfg.interfaces.INewResponse` says it must.
-
-The return value of a subscriber function is ignored.  Subscribers to
-the same event type are not guaranteed to be called in any particular
-order relative to one another.
-
-All other concrete event types are documented in the
-:ref:`events_module` API documentation.
 

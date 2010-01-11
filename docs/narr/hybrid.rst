@@ -5,47 +5,32 @@ Combining Traversal and URL Dispatch
 
 :mod:`repoze.bfg` makes an honest attempt to unify the (largely
 incompatible) concepts of :term:`traversal` and :term:`url dispatch`.
+
 When you write *most* :mod:`repoze.bfg` applications, you'll be using
 either one or the other concept, but not both, to resolve URLs to
-:term:`view` callables.
-
-However, for some problems, it's useful to use both traversal *and*
-URL dispatch within the same application.  :mod:`repoze.bfg` makes
-this possible.
-
-Reasoning about a "hybrid" URL dispatch + traversal model can be
-difficult because the combination of the two concepts seems to fall
-outside the sweet spot of `the magical number seven plus or minus 2
-<http://en.wikipedia.org/wiki/The_Magical_Number_Seven,_Plus_or_Minus_Two>`_.
-To reason successfully about using URL dispatch and traversal
-together, you need to understand 1) URL pattern matching, 2) root
-factories and 3) the traversal algorithm, and the interactions between
-all of them.  Therefore, use of this pattern is not recommended unless
-you *really* need to use it.
+:term:`view` callables.  However, for some problems, it's useful to
+use both traversal *and* URL dispatch within the same application.
+:mod:`repoze.bfg` makes this possible via *hybrid* applications.
 
 .. warning:: Creating applications that use hybrid-mode features of
    :mod:`repoze.bfg` is a advanced topic that exposes non-trivial
-   corner cases; you may need to understand more deeply how
-   :mod:`repoze.bfg` works to understand the concepts discussed in
-   this chapter.  To that end, it's useful to read
-   :ref:`router_chapter` to get a more holistic understanding of
-   what's happening "under the hood" to use this feature.
+   corner cases.  Don't use it unless you must.
 
 The Schism
 ----------
 
-BFG, when used according to the currently published tutorials in its
-documentation is sort of a dual-mode framework.  The tutorials explain
-how to create an application terms of using either :term:`url
-dispatch` *or* :term:`traversal`.  It's useful to examine that pattern
-in order to understand the schism between the two.
+:mod:`repoze.bfg`, especially when used according to the tutorials in
+its documentation is sort of a "dual-mode" framework.  The tutorials
+explain how to create an application in terms of using either
+:term:`url dispatch` *or* :term:`traversal`.  But not both.  It's
+useful to examine that pattern in order to understand the schism
+between the two.
 
 URL Dispatch Only
 ~~~~~~~~~~~~~~~~~
 
 An application that uses :term:`url dispatch` exclusively to map URLs
-to code will usually exclusively have declarations like this within
-their ``configure.zcml`` file:
+to code will often have declarations like this within :term:`ZCML`:
 
 .. code-block:: xml
 
@@ -61,25 +46,38 @@ their ``configure.zcml`` file:
      view=".views.bazbuz"
      />
 
-In other words, each route typically corresponds with a single view
-function, and when the route is matched during a request, the view
-attached to it is invoked.  Typically, applications that use only URL
-dispatch won't have any ``<view>`` statements in the
-``configure.zcml``.
+In other words, each :term:`route` typically corresponds with a single
+view callable, and when that route is matched during a request, the
+view callable attached to it is invoked.
 
-"Under the hood", these ``<route>`` statements register a view for
-each route for the context :term:`interface` ``None`` (implying any
-context) and a route-statement-specific (dynamically-constructed)
-:term:`request type` using the empty string as the :term:`view name`
-(implying the default view).  This ensures that the named view will
-only be called when the route it's attached to actually matches.
+"Under the hood", these ``<route>`` declarations register a view for
+each route.  This view is registered for the following context/request
+type/name triad:
+
+- the context :term:`interface` ``None``, implying any context.
+
+- A :term:`request type` interface that inherits from
+  :class:`repoze.bfg.interfaces.IRequest` *and* a
+  dynamically-constructed route-statement-specific :term:`interface`.
+
+- the empty string as the :term:`view name`, implying the default
+  view.
+
+This usually ensures that the named view will only be called when the
+route it's attached to actually matches.
+
+Typically, applications that use only URL dispatch won't have any
+``<view>`` directives in ZCML and will not have any calls to
+:meth:`repoze.bfg.configuration.Configurator.add_view` in their
+startup code.
 
 Traversal Only
 ~~~~~~~~~~~~~~
 
-In application that uses :term:`traversal` exclusively to map URLs to
-code just won't have any ``<route>`` declarations.  Instead, its ZCML
-(or bfg_view decorators) will imply declarations that look like this:
+An application that uses :term:`traversal` exclusively to map URLs to
+code just won't have any ``<route>`` declarations or calls to the
+:meth:`repoze.bfg.configuration.Configurator.add_route`.  Instead, its
+view configuration will imply declarations that look like this:
 
 .. code-block:: xml
 
@@ -94,11 +92,18 @@ code just won't have any ``<route>`` declarations.  Instead, its ZCML
      />
 
 "Under the hood", the above view statements register a view using the
-:term:`context` interface ``None``, the
-:class:`repoze.bfg.interfaces.IRequest` :term:`request type` with a
-:term:`view name` matching the name= argument.  The "foobar" view
-above will match the URL ``/a/b/c/foobar`` or ``/foobar``, etc,
-assuming that no view is named "a", "b", or "c" during traversal.
+following context/request/name triad:
+
+- The :term:`context` interface ``None``
+
+- the the :class:`repoze.bfg.interfaces.IRequest` :term:`request type`
+  interface
+
+- a :term:`view name` matching the ``name=`` argument.
+
+The ``.views.foobar`` view callable above will be called when the URL
+``/a/b/c/foobar`` or ``/foobar``, etc, assuming that no view is named
+``a``, ``b``, or ``c`` during traversal.
 
 .. index::
    single: hybrid mode application
@@ -106,12 +111,46 @@ assuming that no view is named "a", "b", or "c" during traversal.
 Hybrid Applications
 -------------------
 
-We've seen how the current crop of tutorials explain that you can use
-*either* traversal or url dispatch to create a :mod:`repoze.bfg`
-application.  However, it is possible to combine the competing
-concepts of traversal and url dispatch to resolve URLs to code within
-the same application by using a ``<route>`` declaration that contains
-the special token ``*traverse`` in its path.
+So far we've seen that *either* traversal or url dispatch to create a
+:mod:`repoze.bfg` application.  However, it is possible to combine the
+competing concepts of traversal and url dispatch to resolve URLs to
+code within the same application.
+
+Reasoning about a "hybrid" URL dispatch + traversal model can be
+difficult because the combination of the two concepts seems to fall
+outside the sweet spot of `the magical number seven plus or minus 2
+<http://en.wikipedia.org/wiki/The_Magical_Number_Seven,_Plus_or_Minus_Two>`_.
+To reason successfully about using URL dispatch and traversal
+together, you need to understand 1) URL pattern matching, 2) root
+factories and 3) the traversal algorithm, and the interactions between
+all of them.  Therefore, use of this pattern is not recommended unless
+you *really* need to use it.
+
+Understanding how hybrid mode works requires a little "inside
+baseball" knowledge of how :mod:`repoze.bfg` works.  No matter whether
+:term:`traversal` or :term:`URL dispatch` is used, :mod:`repoze.bfg`
+uses the :term:`Zope Component Architecture` under the hood to
+dispatch a request to a :term:`view callable`.  In Zope Component
+Architecture-speak, a view callable is a "multi adapter" registered
+for a :term:`context` type and a :term:`request` type as well as a
+particular :term:`view name`, aka a "triad".  When a request is
+generated and a :term:`router` performs its logic, it locates these
+three values.  These three values are fed to the :term:`application
+registry` as a query to find "the best" view callable.
+
+.. note:: To understand this process more deeply, it may be useful to
+   read :ref:`router_chapter`.
+
+To "turn on" hybrid mode, use a :term:`route configuration` that
+includes a ``path`` argument that contains a special dynamic part:
+either ``*traverse`` or ``*subpath``.
+
+Using ``*traverse`` In a Route Path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To create a hybrid application, combine traversal and URL dispatch by
+using a ``<route>`` declaration that contains the special token
+``*traverse`` in its path.
 
 .. code-block:: xml
 
@@ -148,8 +187,7 @@ factory looks like so:
 We've defined a bogus graph here that can be traversed, and a
 root_factory method that returns the root of the graph.  Because the
 Traversable object we've defined has a ``__getitem__`` method that
-does something (sort of) useful (see :ref:`traversal_chapter` for more
-info about how traversal works), using traversal against the root
+does something nominally useful, using traversal against the root
 implied by a route statement becomes a not-completely-insane thing to
 do.  So for this route:
 
@@ -169,10 +207,10 @@ requested by a user was ``http://example.com/one/two/a/b/c``, and the
 above route was matched (some other route might match before this one
 does), the traversal path used against the root would be ``a/b/c``.
 :mod:`repoze.bfg` will attempt to traverse a graph through the edges
-"a", "b", and "c".  In our above example, that would imply that the
-*context* of the view would be the ``Traversable`` object we've named
-"c" in our bogus graph, using the ``.views.home`` view as the view
-callable.
+``a``, ``b``, and ``c``.  In our above example, that would imply that
+the *context* of the view would be the ``Traversable`` object we've
+named ``c`` in our bogus graph, using the ``.views.home`` view as the
+view callable.
 
 We can also define extra views that match a route:
 
@@ -203,35 +241,12 @@ URL is "http://example.com/one/two/a/another", the ``.views.another``
 view will be called.
 
 .. index::
-   pair: route; factory
-   single: route factory
-
-Route Factories
----------------
-
-A "route" declaration can mention a "factory".  When a factory is
-attached to a route, it is used to generate a root (it's a :term:`root
-factory`) instead of the *default* root factory.
-
-.. code-block:: xml
-
-   <route
-    factory=".models.root_factory"
-    path="/abc/*traverse"
-    name="abc"
-    />
-
-In this way, each route can use a different factory, making it
-possible to traverse different graphs based on some routing parameter
-within the same application.
-
-.. index::
    pair: subpath; route
 
 .. _star_subpath:
 
 Using ``*subpath`` in a Route Path
-----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are certain (extremely rare) cases when you'd like to influence
 the traversal :term:`subpath` when a route matches without actually
@@ -312,22 +327,12 @@ view name to be "bazbuz", the ``.views.bazbuz`` view will be used.
 However, if the "abc" route matches, and traversal finds the view name
 to be "bazbuz", the ``.views.bazbuz2`` view will be used.
 
-``context`` Type (aka "for") Registrations Bind More Tightly Than ``request``  Type Registrations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``context`` Type Registrations Bind More Tightly Than ``request``  Type Registrations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This corner case is only interesting if you are using a hybrid
 application and you believe the "wrong" view is being called for a
 given request.
-
-This explanation requires a little "inside baseball" knowledge of how
-:mod:`repoze.bfg` works.  :mod:`repoze.bfg` uses the :term:`Zope
-Component Architecture` under the hood to dispatch a request to a
-:term:`view`.  In Zope Component Architecture-speak, a view is a
-"multi adapter" registered for a :term:`context` type and a
-:term:`request` type as well as a particular :term:`view name`.  When
-a request is generated and a context is found by the :mod:`repoze.bfg`
-:term:`router`, it uses these two values, along with the :term:`view
-name` to try to locate a view callable.
 
 A view is registered for a ``route`` either as its default view via
 the ``view=`` attribute of a ``route`` declaration in ZCML *or* as a
@@ -463,16 +468,4 @@ you must the special ``*traverse`` token to the route's "path"., e.g.:
      view=".views.bazbuz"
      route_name="abc"
      />
-
-.. index::
-   pair: route; ordering
-
-Route Ordering
-~~~~~~~~~~~~~~
-
-One other thing to look out for: ``<route>`` statements need to be
-ordered relative to each other; view statements don't.  ``<route>``
-statement ordering is very important, because routes are evaluated in
-a specific order, unlike traversal, which depends on emergent behavior
-rather than an ordered list of directives.
 

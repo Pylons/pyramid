@@ -3,29 +3,50 @@
    single: Pylons
    single: Django
    single: Zope
+   single: frameworks vs. libraries
+   single: framework
 
 :mod:`repoze.bfg` Introduction
 ==============================
 
-:mod:`repoze.bfg` is an open source Python web application framework.
-It is inspired by :term:`Zope`, :term:`Pylons`, and :term:`Django`.
-It uses the :term:`WSGI` protocol to handle requests and responses.
+Most of the logic in a web application is completely
+application-specific.  For example, the content of a web page served
+by one web application might be a representation of the contents of an
+accounting ledger, while the content of of a web page served by
+another might be a listing of songs.  These applications probably
+won't serve the same set of customers.  However, both the
+ledger-serving and song-serving applications can be written using
+:mod:`repoze.bfg` because it is a very general open source Python web
+*framework*.  As a framework, the primary job of :mod:`repoze.bfg` is
+to make it easier for a developer to create arbitrary web
+applications.
 
-:mod:`repoze.bfg` is written by :term:`Agendaless Consulting` and a
-community of contributors.  It is developed primarily by people who
-come from the world of :term:`Zope`.  Its authors also have experience
-developing applications using many other web frameworks.
+.. sidebar:: Frameworks vs. Libraries
+
+   A *framework* differs from a *library* in one very important way:
+   library code is always *called* by code that you write, while a
+   framework always *calls* code that you write.  Using a set of
+   libraries to create an application is usually easier than using a
+   framework initially, because you can choose to cede control to
+   library code you have not authored very selectively. But when you
+   use a framework, you are required to cede a greater portion of
+   control to code you have not authored: code that resides in the
+   framework itself.  You needn't use a framework at all to create a
+   web application using Python.  A rich set of libraries already
+   exists for the platform.  In practice, however, using a framework
+   to create an application is often more practical than rolling your
+   own via a set of libraries if the framework provides a set of
+   facilities that fits your application requirements.
 
 The first release of :mod:`repoze.bfg` was made in July of 2008.
-Since its first release, it has undergone many improvements, and has
-gained features steadily.  Still, it strives to maintain the following
-attributes:
+Since its first release, we've tried to ensure that BFG maintains the
+following attributes:
 
 Simplicity
   :mod:`repoze.bfg` attempts to be a *"pay only for what you eat"*
-  framework in which you can be productive quickly with only partial
-  knowledge.  Some other frameworks tend to expect you to understand a
-  great many concepts and technologies fully before you can be truly
+  framework which delivers results even if you have only partial
+  knowledge.  Other frameworks may expect you to understand a great
+  many concepts and technologies fully before you can be truly
   productive.  :mod:`repoze.bfg` doesn't force you to use any
   particular technology to produce an application, and we try to keep
   the core set of concepts you need to understand to a minimum.
@@ -63,108 +84,65 @@ Trustability
   exhaustively.  *If it ain't tested, it's broke.* Every release of
   :mod:`repoze.bfg` has 100% statement coverage via unit tests.
 
+Openness
+  Like :term:`Python`, the :mod:`repoze.bfg` software is distributed
+  under a `permissive open source license
+  <http://repoze.org/license.html>`_.
+
+This book usually refers to the framework by its full package name,
+:mod:`repoze.bfg`.  However, it is often referred to colloquially as
+just "BFG" (the "repoze-dot" dropped) in conversation.
+
 .. index::
-   single: similarities to other frameworks
-   single: Grok
+   single: repoze.bfg and other frameworks
    single: Zope
    single: Pylons
    single: Django
    single: MVC
 
-Similarities to Other Web Frameworks
-------------------------------------
+:mod:`repoze.bfg` and Other Web Frameworks
+------------------------------------------
 
 :mod:`repoze.bfg` was inspired by :term:`Zope`, :term:`Pylons` and
-:term:`Django`.
+:term:`Django`.  As a result, :mod:`repoze.bfg` borrows several
+concepts and features from each, combining them into a unique web
+framework.
 
-.. sidebar:: Django's Authors Explain Why It Doesn't Use "MVC" Terminology
-
-   Django appears to be a MVC framework, but you call the Controller
-   the "view", and the View the "template". How come you don't use the
-   standard names?  Well, the standard names are debatable.  In our
-   interpretation of MVC, the "view" describes the data that gets
-   presented to the user. It's not necessarily how the data looks, but
-   which data is presented. The view describes which data you see, not
-   how you see it. It's a subtle distinction.  So, in our case, a
-   "view" is the Python callback function for a particular URL,
-   because that callback function describes which data is presented.
-   Furthermore, it's sensible to separate content from presentation -
-   which is where templates come in. In Django, a "view" describes
-   which data is presented, but a view normally delegates to a
-   template, which describes how the data is presented.
-
-The :mod:`repoze.bfg` concept of :term:`traversal` is inspired by
-:term:`Zope`.  Additionally, :mod:`repoze.bfg` uses a :term:`Zope
-Component Architecture` :term:`application registry` internally, as
-does Zope 2, Zope 3, and :term:`Grok`.  Like Zope, :mod:`repoze.bfg`
-allows you to create applications which do not need to be forked or
-otherwise modified in order to be extended or overridden by a third
-party developer.
+Features such as :term:`traversal` and easy extensibility trace their
+origins back to :term:`Zope`.  Like Zope applications,
+:mod:`repoze.bfg` applications can be easily extended.  If you obey
+certain constraints, the application you produce can be reused,
+modified, re-integrated, or extended by third-party developers without
+modification to the original application itself: no fork of the
+application is required.
 
 The :mod:`repoze.bfg` concept of :term:`URL dispatch` is inspired by
 the :term:`Routes` system used by :term:`Pylons`.  Like Pylons,
 :mod:`repoze.bfg` is mostly policy-free.  It makes no assertions about
 which database you should use, and its built-in templating facilities
-are only for convenience.  In essence, it only supplies a mechanism to
-map URLs to :term:`view` code, along with a convention for calling
-those views.  You are free to use third-party components in your
-application that fit your needs.  Also like Pylons, :mod:`repoze.bfg`
-is dependent upon :term:`WSGI`.
+are included only for convenience.  In essence, it only supplies a
+mechanism to map URLs to :term:`view` code, along with a set of
+conventions for calling those views.  You are free to use third-party
+components that fit your needs in your applications.
 
-The Django docs explain that Django is not an "MVC"
-("model/view/controller") framework in their `FAQ
-<http://www.djangoproject.com/documentation/faq/>`_.  The sidebar in
-this section describes the Django authors' take on why "MVC"
-terminology doesn't match the web very well.  The concepts of
-:term:`view` and :term:`model` are used by :mod:`repoze.bfg` as they
-would be by Django.
+Insofar as the term `model-view-controller
+<http://en.wikipedia.org/wiki/Model–view–controller>`_ has been
+claimed to represent a class of web frameworks, :mod:`repoze.bfg`
+generally fits into this class.  The concepts of :term:`view` and
+:term:`model` are used by :mod:`repoze.bfg` as they would be by
+Django.
 
-The skeleton code generator of :mod:`repoze.bfg` generates a directory
-layout very similar to the directory layout suggested by the `Django
-Book <http://www.djangobook.com/>`_ .
+.. sidebar:: You Say BFG is MVC, But Where's The Controller?
 
-.. index::
-   single: differences from other frameworks
-   single: Grok
-   single: Zope
-   single: Pylons
-   single: Django
-   single: control inversion
-
-Differences from Other Web Frameworks
--------------------------------------
-
-Like :term:`Zope`, the :mod:`repoze.bfg` framework imposes more
-*control inversion* upon application developers than other Python
-frameworks such as :term:`Pylons`.  For example :mod:`repoze.bfg`
-allows you to explicitly resolve a URL to a :term:`context` object
-before invoking a :term:`view`.  Pylons and other Python "MVC"
-frameworks have no such intermediate step; they resolve a URL directly
-to a "controller".  Another example: using the :mod:`repoze.bfg`
-security subsystem assumes that you're willing to attach an
-:term:`ACL` to a :term:`context` object; the ACL is checked by the
-framework itself instead of by user code, and access is permitted or
-denied by the framework itself rather than by user code.  Such a task
-would typically be performed by user-space decorators in other Python
-web frameworks.
-
-Like Zope, but unlike :term:`Pylons` applications or most
-:term:`Django` applications, when you build a :mod:`repoze.bfg`
-application, if you obey certain constraints, the application you
-produce can be reused, modified, re-integrated, or extended by
-third-party developers without modification to the original
-application itself.  See :ref:`extending_chapter` for more information
-about extending or modifying an existing :mod:`repoze.bfg`
-application.
-
-:mod:`repoze.bfg` uses a :term:`Zope Component Architecture`
-:term:`application registry` under the hood.  However, while a Zope
-application developer tends to need to understand concepts such as
-"adapters", "utilities", and "interfaces" to create a non-trivial
-application, a :mod:`repoze.bfg` application developer isn't required
-to understand any of these concepts.  :mod:`repoze.bfg` hides all
-interaction with the component architecture registry behind
-special-purpose API functions.
+   The :mod:`repoze.bfg` authors believe that the MVC pattern just
+   doesn't really fit the web very well. In a :mod:`repoze.bfg`
+   application, there are models, which store data, and views, which
+   present the data stored in models.  However, no facility provided
+   by the framework actually maps to the concept of a "controller".
+   So :mod:`repoze.bfg` is actually an "MV" framework rather than an
+   "MVC" framework.  "MVC", however, is close enough as a general
+   classification moniker for purposes of comparison with other web
+   frameworks.
 
 Like :term:`Pylons`, but unlike :term:`Zope`, a :mod:`repoze.bfg`
 application developer may use completely imperative code to perform
@@ -175,16 +153,15 @@ are used for this purpose.  :mod:`repoze.bfg` *supports* :term:`ZCML`
 and supports decorator-based configuration, but does not require
 either. See :ref:`configuration_narr` for more information.
 
-Also unlike :term:`Zope` and unlike other "full-featured" frameworks
-such as :term:`Django`, :mod:`repoze.bfg` makes no assumptions about
-which persistence mechanisms you should use to build an application.
-Zope applications are typically reliant on :term:`ZODB`;
-:mod:`repoze.bfg` allows you to build :term:`ZODB` applications, but
-it has no reliance on the ZODB package.  Likewise, :term:`Django`
-tends to assume that you want to store your application's data in a
-relational database.  :mod:`repoze.bfg` makes no such assumption; it
-allows you to use a relational database but doesn't encourage or
-discourage an application developer about such a decision.
+Also unlike :term:`Zope` and unlike other "full-stack" frameworks such
+as :term:`Django`, :mod:`repoze.bfg` makes no assumptions about which
+persistence mechanisms you should use to build an application.  Zope
+applications are typically reliant on :term:`ZODB`; :mod:`repoze.bfg`
+allows you to build :term:`ZODB` applications, but it has no reliance
+on the ZODB package.  Likewise, :term:`Django` tends to assume that
+you want to store your application's data in a relational database.
+:mod:`repoze.bfg` makes no such assumption; it allows you to use a
+relational database but doesn't encourage or discourage the decision.
 
 .. index::
    single: Repoze
@@ -194,44 +171,22 @@ discourage an application developer about such a decision.
 What Is Repoze?
 ---------------
 
-:term:`Repoze` is a collection of software written by `Agendaless
-Consulting <http://agendaless.com>`_ and other contributors.  The
-general `Repoze website <http://repoze.org>`_ describes the Repoze
-"brand" in more detail.
-
-Software authored that uses this brand is generally placed into a
-``repoze`` namespace package.  For example, both :mod:`repoze.bfg` and
-:mod:`repoze.who` are a subprojects of the more general Repoze
-project.  These packages have nothing to do with each other, save for
-the fact that they are authored by the same people.
+:mod:`repoze.bfg` is a member of the collection of software published
+under the :term:`Repoze` "brand".  :term:`Repoze` software is written
+by :term:`Agendaless Consulting` and a community of contributors.  The
+`Repoze website <http://repoze.org>`_ describes the Repoze brand in
+more detail.  Software authored that uses this brand is usually placed
+into a ``repoze`` namespace package.  This namespace consists of a
+number of packages.  Each package is useful in isolation.  The
+``repoze`` namespace package represents that the software is written
+by a notional community rather than representing a collection of
+software that is meant to be used as a unit.  For example, even though
+``repoze.bfg`` shares the same namespace as another popular Repoze
+package, ``repoze.who``, these two packages are otherwise unrelated
+and can be used separately.
 
 .. index::
    single: repoze.zope2
-   single: zope 3
+   single: Zope 3
+   single: Zope 2
 
-How Does Repoze Relate to "BFG"?
---------------------------------
-
-The Repoze brand existed before :mod:`repoze.bfg`.  One of the first
-packages developed as part of the Repoze brand was a package named
-:mod:`repoze.zope2`.  This was a package that allowed Zope 2
-applications to run under a :term:`WSGI` server without modification.
-
-During the development of the :mod:`repoze.zope2` package, I found
-that replicating the Zope 2 "publisher" (the machinery that maps URLs
-to code) was very time-consuming and fiddly.  Zope 2 had evolved over
-many years, and emulating all of its edge cases was extremely
-difficult.  I finished the package, and it emulates the normal Zope 2
-publisher pretty well, but during the process, I decided that in the
-long term, creating a simpler, legacy-free publisher would be a more
-reasonable idea than continuing to use the Zope publisher.  This
-publisher became what is now :mod:`repoze.bfg`.
-
-Before I started :mod:`repoze.bfg`, I considered the using Zope 3
-application server machinery, but it turned out that it had become
-more indirect than the Zope 2 machinery it aimed to replace, which
-didn't fulfill the goal of simplification.  I also considered using
-Django, or Pylons, but neither of those frameworks offer much along
-the axes of traversal, contextual declarative security, or application
-extensibility; these were features I had become accustomed to as a
-Zope developer.

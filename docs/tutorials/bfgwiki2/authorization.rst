@@ -13,6 +13,10 @@ continue allowing anyone with access to the server to view pages.
 *authentication*.  We'll make use of both features to provide security
 to our application.
 
+The source code for this tutorial stage can be browsed at
+`docs.repoze.org
+<http://docs.repoze.org/bfgwiki2-1.2/authorization>`_.
+
 Adding A Root Factory
 ---------------------
 

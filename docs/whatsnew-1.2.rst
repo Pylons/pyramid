@@ -279,10 +279,6 @@ Documentation Enhancements
   configuration; doing :mod:`repoze.bfg` application configuration
   imperatively was previously much more difficult.
 
-- A narrative documentation chapter entitled "Configuration,
-  Decorations and Code Scanning" (:ref:`scanning_chapter`) explaining
-  ZCML- vs. imperative- vs. decorator-based configuration equivalence.
-
 - The "ZCML Hooks" chapter has been renamed to "Hooks"
   (:ref:`hooks_chapter`); it documents how to override hooks now via
   imperative configuration and ZCML.

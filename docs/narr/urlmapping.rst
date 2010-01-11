@@ -7,23 +7,13 @@
 Mapping URLs to Code
 --------------------
 
-Many popular web frameworks today use :term:`URL dispatch` to
-associate a particular URL with a bit of code.  In these systems, the
-bit of code associated with a URL is known somewhat ambiguously as a
-"controller" or :term:`view` depending upon the particular vocabulary
-religion to which you subscribe.  Such systems allow the developer to
-create "urlconfs" or "routes" to controller/view Python code using
-pattern matching against URL components.  Examples: `Django's URL
-dispatcher
-<http://www.djangoproject.com/documentation/url_dispatch/>`_ and the
-:term:`Routes` URL mapping system.
-
 :mod:`repoze.bfg` supports :term:`URL dispatch` via a subsystem that
-was inspired by :term:`Routes`.  :term:`URL dispatch` is convenient
-and straightforward.  When you limit your application to using URL
-dispatch, you know every URL that your application might generate or
-respond to, and all the URL matching elements are listed in a single
-place.
+was inspired by the :term:`Routes` system used by :term:`Pylons`.
+:term:`URL dispatch` is convenient and straightforward: an incoming
+URL is checked against a list of potential matches in a predefined
+order.  Each potential match often maps directly to a :term:`view
+callable`.  When a match is found, it usually means that a particular
+:term:`view callable` is invoked.
 
 Like :term:`Zope`, :mod:`repoze.bfg` can also map URLs to code
 slightly differently, by using using object graph :term:`traversal`.
@@ -31,7 +21,8 @@ Graph-traversal based dispatching is useful if you like your URLs to
 represent an arbitrary hierarchy of potentially heterogeneous items,
 or if you need to attach "instance-level" security (akin to
 "row-level" security in relational parlance) declarations to
-:term:`model` instances.
+:term:`model` instances.  Traversal is slightly more complex than URL
+dispatch, but it is also a bit more powerful.
 
 :term:`URL dispatch` can easily handle URLs such as
 ``http://example.com/members/Chris``, where it's assumed that each
@@ -50,7 +41,10 @@ In this configuration, there are exactly two types of URLs that will
 match views in your application: ones that start with ``/archives``
 and have subsequent path elements that represent a year, month, and
 day.  And ones that start with ``/members`` which are followed by a
-path segment containing a member's name.  This is very simple.
+path segment containing a member's name.  This is very simple.  When
+you limit your application to using URL dispatch, you know every URL
+that your application might generate or respond to, and all the URL
+matching elements are listed in a single place.
 
 :term:`URL dispatch` is not very good, however, at inferring the
 difference between sets of URLs such as:
@@ -68,12 +62,12 @@ URL-dispatch based systems, and some assertions just aren't possible.
 For example, URL-dispatch based systems don't deal very well with URLs
 that represent arbitrary-depth hierarchies.
 
-Graph :term:`traversal` works well for these types of "ambiguous" URLs
-and for URLs that represent arbitrary-depth hierarchies.  When
-traversal is used, each URL segment represents a single traversal step
-through an edge of a graph.  So a URL like
-``http://example.com/a/b/c`` can be thought of as a graph traversal on
-the ``example.com`` site through the edges ``a``, ``b``, and ``c``.
+:term:`traversal` works well for these types of "ambiguous" URLs and
+for URLs that represent arbitrary-depth hierarchies.  When traversal
+is used, each URL segment represents a single traversal step through
+an edge of a graph.  So a URL like ``http://example.com/a/b/c`` can be
+thought of as a graph traversal on the ``example.com`` site through
+the edges ``a``, ``b``, and ``c``.
 
 If you're willing to treat your application models as a graph that can
 be traversed, it also becomes easy to provide "row-level security" (in
@@ -101,3 +95,4 @@ either as you see fit.
 
    traversal
    urldispatch
+   hybrid

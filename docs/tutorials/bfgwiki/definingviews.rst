@@ -25,6 +25,9 @@ We're going to define several :term:`view callable` functions then
 wire them into :mod:`repoze.bfg` using some :term:`view
 configuration` via :term:`ZCML`.
 
+The source code for this tutorial stage can be browsed at
+`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.2/views>`_.
+
 Adding View Functions
 =====================
 
@@ -232,11 +235,10 @@ Static Resources
 
 Our templates name a single static resource named ``style.css``.  We
 need to create this and place it in a file named ``style.css`` within
-our package's ``templates/static`` directory:
-
-.. literalinclude:: src/views/tutorial/templates/static/style.css
-   :linenos:
-   :language: css
+our package's ``templates/static`` directory.  This file is a little
+too long to replicate within the body of this guide, however it is
+available `online
+<http://docs.repoze.org/bfgwiki-1.2/views/tutorial/templates/static/style.css>`_.
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/style.css`` by virtue of the

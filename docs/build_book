@@ -1,0 +1,4 @@
+#!/bin/sh
+BOOK=1 make clean latex
+cd .build/latex
+make all

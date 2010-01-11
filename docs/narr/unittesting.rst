@@ -7,25 +7,27 @@
 Unit and Integration Testing
 ============================
 
-*Unit testing* is the act of testing a "unit" in your application.  In
-this context, a "unit" is often a function or a method of a class
-instance.  The unit is also referred to as a "unit under test".  The
-goal of a single unit test is to test **only** some permutation of the
-"unit under test".  If you write a unit test that aims to verify the
-result of a particular codepath through a Python function, you need
-only be concerned about testing the code that *lives in the function
-body itself*.  If the function accepts a parameter that represents a
-complex application "domain object" (such a a model, a database
-connection, or an SMTP server), the argument provided to this function
-during a unit test *need not be* and likely *should not be* a "real"
-implementation object.  For example, although a particular function
-implementation may accept an argument that represents an SMTP server
-object, and the function may call a method of this object when the
-system is operating normally that would result in an email being sent,
-a unit test of this codepath of the function does *not* need to test
-that an email is actually sent.  It just needs to make sure that the
-function calls the method of the object provided as an argument that
-*would* send an email if the argument happened to be the "real"
+*Unit testing* is, not surprisingly, the act of testing a "unit" in
+your application.  In this context, a "unit" is often a function or a
+method of a class instance.  The unit is also referred to as a "unit
+under test".
+
+The goal of a single unit test is to test **only** some permutation of
+the "unit under test".  If you write a unit test that aims to verify
+the result of a particular codepath through a Python function, you
+need only be concerned about testing the code that *lives in the
+function body itself*.  If the function accepts a parameter that
+represents a complex application "domain object" (such a a model, a
+database connection, or an SMTP server), the argument provided to this
+function during a unit test *need not be* and likely *should not be* a
+"real" implementation object.  For example, although a particular
+function implementation may accept an argument that represents an SMTP
+server object, and the function may call a method of this object when
+the system is operating normally that would result in an email being
+sent, a unit test of this codepath of the function does *not* need to
+test that an email is actually sent.  It just needs to make sure that
+the function calls the method of the object provided as an argument
+that *would* send an email if the argument happened to be the "real"
 implementation of an SMTP server object.
 
 An *integration test*, on the other hand, is a different form of
@@ -149,8 +151,8 @@ What?
 ~~~~~
 
 Thread local data structures are always a bit confusing, especially
-when used by frameworks.  Sorry.  So here's a rule of thumb: if you
-don't *know* whether you're calling code that uses the
+when they're used by frameworks.  Sorry.  So here's a rule of thumb:
+if you don't *know* whether you're calling code that uses the
 :func:`repoze.bfg.threadlocal.get_current_registry` or
 :func:`repoze.bfg.threadlocal.get_current_request` functions, or you
 don't care about any of this, but you still want to write test code,

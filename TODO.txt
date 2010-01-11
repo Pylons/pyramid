@@ -1,10 +1,24 @@
-- Audit the rest of the docs for "view configuration" and "route
-  configuration" references, etc.
-
-- Basic WSGI documentation (pipeline / app / server).
-
 - Decide on ``unhook_zca`` argument to ``tearDown``.
 
 - Get rid of ITraverser hook in favor of IViewLookup.
 
 - Named notfound views.
+
+- Review:
+
+  [ ] Traversal
+
+  [ ] URL dispatch
+
+  [ ] Combining Traversal and URL Dispatch
+
+  [ ] Views
+
+- Review tutorials.
+
+- Review index.
+
+- Review API docs.
+
+- Basic WSGI documentation (pipeline / app / server).
+

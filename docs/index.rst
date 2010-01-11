@@ -45,7 +45,7 @@ Narrative documentation in chapter form explaining how to use
    narr/introduction
    narr/install
    narr/configuration
-   narr/scanning
+   narr/firstapp
    narr/project
    narr/startup
    narr/urlmapping

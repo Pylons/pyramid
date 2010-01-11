@@ -621,3 +621,18 @@ Glossary
    Agendaless Consulting
      A consulting organization formed by Paul Everitt, Tres Seaver,
      and Chris McDonough.  See also http://agendaless.com .
+
+   Jython
+     A `Python implementation <http://www.jython.org/>` written for
+     the Java Virtual Machine.
+
+   Python
+     The `programming language <http://python.org>` in which
+     :mod:`repoze.bfg` is written.
+
+   CPython
+     The C implementation of the Python language.  This is the
+     reference implementation that most people refer to as simply
+     "Python"; :term:`Jython`, Google's App Engine, and `PyPy
+     <http://codespeak.net/pypy/dist/pypy/doc/>`_ are examples of
+     non-C based Python implementations.

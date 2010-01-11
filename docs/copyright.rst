@@ -1,5 +1,5 @@
-Copyright and Trademarks
-========================
+Copyright, Trademarks, and Attributions
+=======================================
 
 *The repoze.bfg Web Application Framework*
 
@@ -11,7 +11,7 @@ Copyright |copy| 2008-2010, Agendaless Consulting.
 
 ISBN-13: 978-0-615-34537-6
 
-First publishing: 2010
+First print publishing: 2010
 
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
@@ -30,23 +30,10 @@ similar license to this one.
    `less restrictive (BSD-like) license
    <http://repoze.org/license.html>`_ .
 
-**Trademarks**
-
 All terms mentioned in this book that are known to be trademarks or
 service marks have been appropriately capitalized.  However, use of a
 term in this book should not be regarded as affecting the validity of
 any trademark or service mark.
-
-**Attributions**
-
-Cover Designer:
-   `Electrosoup <http://www.electrosoup.co.uk>`_.
-
-Used with permission:
-   The :ref:`webob_chapter` chapter is adapted, with permission, from
-   documentation originally written by Ian Bicking.
-
-**Warning and Disclaimer**
 
 Every effort has been made to make this book as complete and as
 accurate as possible, but no warranty or fitness is implied.  The
@@ -56,7 +43,24 @@ person or entity with respect to any loss or damages arising from the
 information contained in this book.  No patent liability is assumed
 with respect to the use of the information contained herein.
 
-**Contacting The Publisher**
+Attributions
+------------
+
+Technical Reviewer:
+  Andrew Sawyers
+
+Cover Designer:
+   `Electrosoup <http://www.electrosoup.co.uk>`_.
+
+Used with permission:
+   The :ref:`webob_chapter` chapter is adapted, with permission, from
+   documentation originally written by Ian Bicking.
+
+Foreword:
+  Paul Everitt
+
+Contacting The Publisher
+------------------------
 
 Please send documentation licensing inquiries, translation inquiries,
 and other business communications to `Agendaless Consulting
@@ -64,7 +68,8 @@ and other business communications to `Agendaless Consulting
 technical queries to the `repoze-dev maillist
 <http://lists.repoze.org/listinfo/repoze-dev>`_.
 
-**Source Code**
+Source Code
+-----------
 
 The source code for this book is available within the
 :mod:`repoze.bfg` software distribution, always available via

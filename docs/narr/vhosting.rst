@@ -3,16 +3,24 @@
 Virtual Hosting
 ===============
 
+"Virtual hosting" is, loosely, the act of serving a :mod:`repoze.bfg`
+application or a portion of a :mod:`repoze.bfg` application under a
+URL space that it does not "naturally" inhabit.
+
+:mod:`repoze.bfg` provides facilities for serving an application under
+a URL "prefix", as well as serving a *portion* of a :term:`traversal`
+based application under a root URL.
+
 .. index::
    pair: virtual hosting; URL prefix
 
 Hosting an Application Under a URL Prefix
 -----------------------------------------
 
-:mod:`repoze.bfg` supports a traditional form of virtual hosting
-whereby you can host a :mod:`repoze.bfg` application as a "subset" of
-some other site (e.g. under ``http://example.com/mybfgapplication/``
-as opposed to under ``http://example.com/``).
+:mod:`repoze.bfg` supports a common form of virtual hosting whereby
+you can host a :mod:`repoze.bfg` application as a "subset" of some
+other site (e.g. under ``http://example.com/mybfgapplication/`` as
+opposed to under ``http://example.com/``).
 
 If you use a "pure Python" environment, this functionality is provided
 by Paste's `urlmap <http://pythonpaste.org/modules/urlmap.html>`_
@@ -23,20 +31,10 @@ hosting translation for you "under the hood".
 If you use the ``urlmap`` composite application "in front" of a
 :mod:`repoze.bfg` application or if you use :term:`mod_wsgi` to serve
 up a :mod:`repoze.bfg` application, nothing special needs to be done
-within the application for URLs to be generated that contain the
-prefix spelled by the package config.  :mod:`paste.urlmap` and
-:term:`mod_wsgi` and manipulate the WSGI environment in such a way
-that the ``PATH_INFO`` and ``SCRIPT_NAME`` variables are correct for
-some given prefix.
-
-.. note:: If you're using an Apache server to proxy to a Paste
-   ``urlmap`` composite, you may have to use the `ProxyPreserveHost
-   <http://httpd.apache.org/docs/2.2/mod/mod_proxy.html#proxypreservehost>`_
-   directive to pass the original ``HTTP_HOST`` header along to the
-   application, so URLs get generated properly.  As of this writing
-   the ``urlmap`` composite does not seem to respect the
-   ``HTTP_X_FORWARDED_HOST`` parameter, which will contain the
-   original host header even if ``HTTP_HOST`` is incorrect.
+within the application for URLs to be generated that contain a
+prefix. :mod:`paste.urlmap` and :term:`mod_wsgi` and manipulate the
+:term:`WSGI` environment in such a way that the ``PATH_INFO`` and
+``SCRIPT_NAME`` variables are correct for some given prefix.
 
 Here's an example of a PasteDeploy configuration snippet that includes
 a ``urlmap`` composite.
@@ -54,9 +52,19 @@ This "roots" the :mod:`repoze.bfg` application at the prefix
 ``/bfgapp`` and serves up the composite as the "main" application in
 the file.
 
+.. note:: If you're using an Apache server to proxy to a Paste
+   ``urlmap`` composite, you may have to use the `ProxyPreserveHost
+   <http://httpd.apache.org/docs/2.2/mod/mod_proxy.html#proxypreservehost>`_
+   directive to pass the original ``HTTP_HOST`` header along to the
+   application, so URLs get generated properly.  As of this writing
+   the ``urlmap`` composite does not seem to respect the
+   ``HTTP_X_FORWARDED_HOST`` parameter, which will contain the
+   original host header even if ``HTTP_HOST`` is incorrect.
+
 If you use :term:`mod_wsgi`, you do not need to use a ``composite``
-application in your .ini file.  The ``WSGIScriptAlias`` configuration
-setting in a :term:`mod_wsgi` configuration does the work for you:
+application in your ``.ini`` file.  The ``WSGIScriptAlias``
+configuration setting in a :term:`mod_wsgi` configuration does the
+work for you:
 
 .. code-block:: apache
    :linenos:
@@ -74,7 +82,7 @@ Virtual Root Support
 
 :mod:`repoze.bfg` also supports "virtual roots", which can be used in
 :term:`traversal` -based (but not :term:`URL dispatch` -based)
-applications.  These are explained below.
+applications.
 
 Virtual root support is useful when you'd like to host some model in a
 :mod:`repoze.bfg` object graph as an application under a URL pathname

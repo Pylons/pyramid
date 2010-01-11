@@ -6,6 +6,9 @@ The first change we'll make to our stock paster-generated application
 will be to define a :term:`model` constructor representing a wiki
 page.  We'll do this inside our ``models.py`` file.
 
+The source code for this tutorial stage can be browsed at
+`docs.repoze.org <http://docs.repoze.org/bfgwiki2-1.2/models>`_.
+
 Making Edits to ``models.py``
 -----------------------------
 

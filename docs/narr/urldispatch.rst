@@ -38,13 +38,13 @@ To allow for URL dispatch to be used, the :mod:`repoze.bfg` framework
 allows you to inject ``route`` ZCML directives into your application's
 ``configure.zcml`` file.
 
-The mod:`repoze.bfg` :term:`Router` checks an incoming request against
-a *routes map* to find a :term:`context` and a :term:`view callable`
-before :term:`traversal` has a chance to find these things first.  If
-a route matches, a :term:`context` is generated and :mod:`repoze.bfg`
-will call the :term:`view callable` found due to the context and the
-request.  If no route matches, :mod:`repoze.bfg` will fail over to
-calling the :term:`root factory` callable passed to the
+The :mod:`repoze.bfg` :term:`Router` checks an incoming request
+against a *routes map* to find a :term:`context` and a :term:`view
+callable` before :term:`traversal` has a chance to find these things
+first.  If a route matches, a :term:`context` is generated and
+:mod:`repoze.bfg` will call the :term:`view callable` found due to the
+context and the request.  If no route matches, :mod:`repoze.bfg` will
+fail over to calling the :term:`root factory` callable passed to the
 :term:`Configurator` for the application (usually a traversal
 function).
 
@@ -59,8 +59,8 @@ error to the user's browser when no routes match.
 .. index::
    single: add_route
 
-The ``add_route`` Configurator Method
--------------------------------------
+Configuring a Route via The ``add_route`` Configurator Method
+-------------------------------------------------------------
 
 The :meth:`repoze.bfg.configuration.Configurator.add_route` method
 adds a single :term:`route configuration` to the :term:`application
@@ -93,6 +93,48 @@ documentation.
 
 .. note:: The documentation that follows in this chapter assumes that
    :term:`ZCML` will be used to perform route configuration.
+
+.. index::
+   pair: route; ordering
+
+Route Ordering
+--------------
+
+ZCMl ``<route>`` declaration ordering and the ordering of calls to
+:mod:`repoze.bfg.configuration.Configurator.add_route` is very
+important, because routes are evaluated in a specific order.  The
+order that routes are evaluated is the order in which they are added
+to the application at startup time.  For ZCML, the order that routes
+are evaluated is the order in which they appear in the ZCML relative
+to each other.
+
+This is unlike traversal, which depends on emergent behavior rather
+than an ordered list of declarations.
+
+.. index::
+   pair: route; factory
+   single: route factory
+
+Route Factories
+---------------
+
+A "route" declaration can mention a "factory".  When a factory is
+attached to a route, it is used to generate a root (it's a :term:`root
+factory`) instead of the *default* root factory.  This object will be
+used as the :term:`context` of the view callable the route represents.
+
+.. code-block:: xml
+
+   <route
+    path="/abc"
+    name="abc"
+    view=".views.theview"
+    factory=".models.root_factory"
+    />
+
+In this way, each route can use a different factory, making it
+possible to supply a different :term:`context` object to the view
+related to each route.
 
 .. index::
    pair: URL dispatch; matchdict

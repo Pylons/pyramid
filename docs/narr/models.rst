@@ -2,11 +2,51 @@ Models
 ======
 
 A :term:`model` class is typically a simple Python class defined in a
-module.  These classes are termed model *constructors*.  Model
-*instances* make up the graph that :mod:`repoze.bfg` is willing to
-traverse when :term:`traversal` is used.  A model instance is also
-generated as a result of :term:`url dispatch`.  A model instance is
-exposed to :term:`view` code as the :term:`context` of a view.
+module.  References to these classes and instances of such classes are
+omnipresent in :mod:`repoze.bfg`:
+
+- Model instances make up the graph that :mod:`repoze.bfg` is
+  willing to walk over when :term:`traversal` is used.
+
+- The ``context`` and ``containment`` arguments to
+  :meth:`repoze.bfg.configuration.Configurator.add_vew` often
+  reference a model class.
+
+- A :term:`root factory` returns a model instance.
+
+- A model instance is generated as a result of :term:`url dispatch`
+  (see the ``factory`` argument to
+  :meth:`repoze.bfg.configuration.Configurator.add_route`).
+
+- A model instance is exposed to :term:`view` code as the
+  :term:`context` of a view.
+
+Model objects typically store data and offer methods related to
+mutating that data.
+
+.. note::
+
+   A terminology overlap confuses people who write applications that
+   always use ORM packages such as SQLAlchemy, which has a very
+   different notion of the definition of a "model".  When using the API
+   of common ORM packages, its conception of "model" is almost
+   certainly not the same conception of "model" used by
+   :mod:`repoze.bfg`.  In particular, it can be unnatural to think of
+   :mod:`repoze.bfg` model objects as "models" if you develop your
+   application using :term:`traversal` and a relational database.  When
+   you develop such applications, the object graph *might* be composed
+   completely of "model" objects (as defined by the ORM) but it also
+   might not be.  The things that :mod:`repoze.bfg` refers to as
+   "models" in such an application may instead just be stand-ins that
+   perform a query and generate some wrapper *for* an ORM "model" or
+   set of ORM models.  This naming overlap is slightly unfortunate.
+   However, many :mod:`repoze.bfg` applications (especially ones which
+   use :term:`ZODB`) do indeed traverse a graph full of literal model
+   nodes.  Each node in the graph is a separate persistent object that
+   is stored within a database.  This was the use case considered when
+   coming up with the "model" terminology.  However, if we had it to do
+   all over again, we'd probably call these objects something
+   different to avoid confusion.
 
 .. index::
    pair: model; constructor
@@ -15,7 +55,8 @@ Defining a Model Constructor
 ----------------------------
 
 An example of a model constructor, ``BlogEntry`` is presented below.
-It is a class which, when instantiated, becomes a model instance.
+It is implemente as a class which, when instantiated, becomes a model
+instance.
 
 .. code-block:: python
    :linenos:
@@ -36,15 +77,22 @@ the ``BlogEntry`` class can be "called", returning a model instance.
 .. index::
    pair: model; interfaces
 
+.. _models_which_implement_interfaces:
+
 Model Instances Which Implement Interfaces
 ------------------------------------------
 
-Model instances can *optionally* be made to implement an
-:term:`interface`.  This makes it possible to register views against
-the interface itself instead of the *class* within :term:`view`
-statements within the :term:`application registry`.  If your
-application is simple enough that you see no reason to want to do
-this, you can skip reading this section of the chapter.
+Model instances can optionally be made to implement an
+:term:`interface`.  An interface is used to tag a model object with a
+"type" that can later be referred to within :term:`view
+configuration`.
+
+Specifying an interface instead of a class as the ``context`` or
+``containment`` arguments within :term:`view configuration` statements
+effectively makes it possible to use a single view callable for more
+than one class of object.  If your application is simple enough that
+you see no reason to want to do this, you can skip reading this
+section of the chapter.
 
 For example, here's some code which describes a blog entry which also
 declares that the blog entry implements an :term:`interface`.
@@ -73,13 +121,11 @@ constructor (above as the class ``BlogEntry``), and an
 statement at class scope using the ``IBlogEntry`` interface as its
 sole argument).
 
-An interface simply tags the model object with a "type" that can be
-referred to within the :term:`application registry`.  A model object
-can implement zero or more interfaces.  The interface must be an
-instance of a class that inherits from
-:class:`zope.interface.Interface`.
+The interface object used must be an instance of a class that inherits
+from :class:`zope.interface.Interface`.
 
-You specify that a model *implements* an interface by using the
+A model class may *implement* zero or more interfaces.  You specify
+that a model implements an interface by using the
 :func:`zope.interface.implements` function at class scope.  The above
 ``BlogEntry`` model implements the ``IBlogEntry`` interface.
 
@@ -106,9 +152,11 @@ interface (as opposed to its class).  To do so, use the
    entry = BlogEntry('title', 'body', 'author')
    directlyProvides(entry, IBlogEntry)
 
-If a model object already has instance-level interface declarations
-that you don't want to disturb, use the
-:func:`zope.interface.alsoProvides` function:
+:func:`zope.interface.directlyProvides` will replace any existing
+interface that was previously provided by an instance.  If a model
+object already has instance-level interface declarations that you
+don't want to replace, use the :func:`zope.interface.alsoProvides`
+function:
 
 .. code-block:: python
    :linenos:
@@ -134,9 +182,12 @@ that you don't want to disturb, use the
    directlyProvides(entry, IBlogEntry1)
    alsoProvides(entry, IBlogEntry2)
 
-See the :ref:`views_chapter` for more information about why providing
-models with an interface can be an interesting thing to do with regard
-to :term:`view` lookup.
+:func:`zope.interface.alsoProvides` will augment the set of interfaces
+directly provided by an instance instead of overwriting them like
+:func:`zope.interface.directlyProvides` does.
+
+For more information about how model interfaces can be used by view
+configuration, see :ref:`using_model_interfaces`.
 
 .. index::
    single: model graph
@@ -150,10 +201,10 @@ Defining a Graph of Model Instances for Traversal
 
 When :term:`traversal` is used (as opposed to a purely :term:`url
 dispatch` based application), mod:`repoze.bfg` expects to be able to
-traverse a graph of model instances.  Traversal begins at a root
-model, and descends into the graph recursively via each found model's
-``__getitem__`` method.  :mod:`repoze.bfg` imposes the following
-policy on model instance nodes in the graph:
+traverse a graph composed of model instances.  Traversal begins at a
+root model, and descends into the graph recursively via each found
+model's ``__getitem__`` method.  :mod:`repoze.bfg` imposes the
+following policy on model instance nodes in the graph:
 
 - Nodes which contain other nodes (aka "container" nodes) must supply
   a ``__getitem__`` method which is willing to resolve a unicode name

@@ -13,9 +13,9 @@ Front Matter
    :maxdepth: 1
 
    copyright.rst
-   thanks.rst
    conventions.rst
    foreword.rst
+   authorintro.rst
 
 .. mainmatter::
 
@@ -28,7 +28,7 @@ Narrative Documentation
    narr/introduction
    narr/install
    narr/configuration
-   narr/scanning
+   narr/firstapp
    narr/project
    narr/urlmapping
    narr/views
@@ -36,7 +36,6 @@ Narrative Documentation
    narr/templates
    narr/models
    narr/security
-   narr/hybrid
    narr/vhosting
    narr/events
    narr/environment

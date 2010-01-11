@@ -211,24 +211,29 @@ _PREAMBLE = r"""
 
 \pagestyle{fancy}
 
+% header and footer styles
 \renewcommand{\chaptermark}[1]%
-{\markboth{\MakeUppercase{\thechapter.\ #1}}{}}
+  {\markboth{\MakeUppercase{\thechapter.\ #1}}{}
+  }
 \renewcommand{\sectionmark}[1]%
-{\markright{\MakeUppercase{\thesection.\ #1}}}
-\renewcommand{\headrulewidth}{0.5pt}
+  {\markright{\MakeUppercase{\thesection.\ #1}}
+  }
+
+% defaults for fancy style
+\renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 \fancyhf{}
 \fancyfoot[C]{\thepage}
-\fancyhead[RO]{\rightmark}
-\fancyhead[LE]{\leftmark}
 
+% plain style
 \fancypagestyle{plain}{
-  \fancyhf{} % empty header and footer
   \renewcommand{\headrulewidth}{0pt} % ho header line
-  \renewcommand{\footrulewidth}{0pt}% not footer line
-  \fancyfoot[C]{\thepage}% like fancy style
+  \renewcommand{\footrulewidth}{0pt}% no footer line
+  \fancyhf{} % empty header and footer
+  \fancyfoot[C]{\thepage}
 }
 
+% title page styles
 \makeatletter
 \def\@subtitle{\relax}
 \newcommand{\subtitle}[1]{\gdef\@subtitle{#1}}
@@ -242,7 +247,7 @@ _PREAMBLE = r"""
 }
 \makeatother
 
-% Redefine these colors to your liking in the preamble.
+% Redefine link and title colors
 \definecolor{TitleColor}{rgb}{0,0,0}
 \definecolor{InnerLinkColor}{rgb}{0.208,0.374,0.486}
 \definecolor{OuterLinkColor}{rgb}{0.216,0.439,0.388}
@@ -252,29 +257,13 @@ _PREAMBLE = r"""
 \definecolor{VerbatimBorderColor}{rgb}{1,1,1}
 
 \makeatletter
-% Notices / Admonitions
-%
-\newcommand{\py@veryheavybox}{
-  \setlength{\fboxrule}{2pt}
-  \setlength{\fboxsep}{7pt}
-  \setlength{\py@noticelength}{\linewidth}
-  \addtolength{\py@noticelength}{-2\fboxsep}
-  \addtolength{\py@noticelength}{-2\fboxrule}
-  \setlength{\shadowsize}{3pt}
-  \Sbox
-  \minipage{\py@noticelength}
-}
-\newcommand{\py@endveryheavybox}{
-  \endminipage
-  \endSbox
-  \fbox{\TheSbox}
-}
 \renewcommand{\py@noticestart@warning}{\py@heavybox}
 \renewcommand{\py@noticeend@warning}{\py@endheavybox}
 \renewcommand{\py@noticestart@note}{\py@heavybox}
 \renewcommand{\py@noticeend@note}{\py@endheavybox}
 \makeatother
 
+% icons in note and warning boxes
 \usepackage{ifthen}
 % Keep a copy of the original notice environment
 \let\origbeginnotice\notice
@@ -291,7 +280,20 @@ _PREAMBLE = r"""
   \origendnotice% equivalent to original \end{notice}
 }
 
+% try to prevent code-block boxes from splitting across pages
 \sloppy
+\widowpenalty=300
+\clubpenalty=300
+\setlength{\parskip}{3ex plus 2ex minus 2ex}
+
+% suppress page numbers on pages showing part title
+\makeatletter
+\let\sv@endpart\@endpart
+\def\@endpart{\thispagestyle{empty}\sv@endpart}
+\makeatother
+
+% prevent page numbers in TOC (reset to fancy by frontmatter directive)
+\pagestyle{empty}
 """
 
 latex_elements = {
@@ -305,17 +307,58 @@ latex_elements = {
 
 from docutils import nodes
 
+# secnumdepth counter reset to 2 causes numbering in related matter;
+# reset to -1 causes chapters to not be numbered, reset to -2 causes
+# parts to not be numbered.
+
+#part	      -1
+#chapter       0
+#section       1
+#subsection    2
+#subsubsection 3
+#paragraph     4
+#subparagraph  5
+
 def frontmatter(name, arguments, options, content, lineno,
                 content_offset, block_text, state, state_machine):
-    return [nodes.raw('', '\\frontmatter\n', format='latex')]
+    return [nodes.raw(
+        '',
+        r"""
+\frontmatter
+% prevent part/chapter/section numbering
+\setcounter{secnumdepth}{-2}
+% suppress headers
+\pagestyle{plain}
+% reset page counter
+\setcounter{page}{1}
+% suppress first toc pagenum
+\addtocontents{toc}{\protect\thispagestyle{empty}} 
+""",
+        format='latex')]
 
 def mainmatter(name, arguments, options, content, lineno,
                content_offset, block_text, state, state_machine):
-    return [nodes.raw('', '\\mainmatter\n', format='latex')]
+    return [nodes.raw(
+        '',
+        r"""
+\mainmatter
+% allow part/chapter/section numbering
+\setcounter{secnumdepth}{2}
+% get headers back
+\pagestyle{fancy} 
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+\fancyhead[RO]{\rightmark}
+\fancyhead[LE]{\leftmark}
+""",
+        format='latex')]
 
 def backmatter(name, arguments, options, content, lineno,
               content_offset, block_text, state, state_machine):
-    return [nodes.raw('', '\\backmatter\n', format='latex')]
+    return [nodes.raw('', '\\backmatter\n\\setcounter{secnumdepth}{-1}\n',
+                      format='latex')]
 
 def setup(app):
     app.add_directive('frontmatter', frontmatter, 1, (0, 0, 0))

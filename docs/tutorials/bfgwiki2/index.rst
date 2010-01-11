@@ -8,7 +8,9 @@ This tutorial introduces a :term:`SQLAlchemy` and :term:`url dispatch`
 Python.  When the tutorial is finished, the developer will have
 created a basic Wiki application with authentication.
 
-Contents:
+For cut and paste purposes, the source code for all stages of this
+tutorial can be browsed at `docs.repoze.org
+<http://docs.repoze.org/bfgwiki2-1.2>`_.
 
 .. toctree::
    :maxdepth: 2

@@ -20,7 +20,17 @@ class NewResponse(object):
     whenever any :mod:`repoze.bfg` view returns a :term:`response`.
     The instance has an attribute, ``response``, which is the response
     object returned by the view.  This class implements the
-    :class:`repoze.bfg.interfaces.INewResponse` interface."""
+    :class:`repoze.bfg.interfaces.INewResponse` interface.
+
+    .. note::
+
+       Postprocessing a response is usually better handled in a WSGI
+       :term:`middleware` component than in subscriber code that is
+       called by a :class:`repoze.bfg.interfaces.INewResponse` event.
+       The :class:`repoze.bfg.interfaces.INewResponse` event exists
+       almost purely for symmetry with the
+       :class:`repoze.bfg.interfaces.INewRequest` event.
+    """
     implements(INewResponse)
     def __init__(self, response):
         self.response = response

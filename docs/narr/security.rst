@@ -6,11 +6,35 @@ Security
 :mod:`repoze.bfg` provides an optional declarative authorization
 system that prevents a :term:`view` from being invoked when the user
 represented by credentials in the :term:`request` does not have an
-appropriate level of access with respect to a specific
-:term:`context`.
+appropriate level of access within a particular :term:`context`.
+Here's how it works at a high level:
+
+- A :term:`request` is generated when a user visits our application.
+
+- Based on the request, a :term:`context` is located.  Exactly how a
+  context is located depends whether you are using :term:`traversal`
+  or :term:`URL dispatch`, but in either case, one is found.  See
+  :ref:`url_mapping_chapter` for more information.
+
+- A :term:`view callable` is located using the the context as well as
+  other attributes of the request.
+
+- If an :term:`authorization policy` is in effect and the :term:`view
+  configuration` associated with the view callable that was found has
+  a :term:`permission` associated with it, the authorization policy is
+  passed the context: it will either allow or deny access.
+
+- If access is allowed, the view callable is invoked.
+
+- If access is denied, view callable is not invoked; instead the
+  :term:`forbidden view` is invoked.
 
 Authorization is enabled by modifying your application to include a
 :term:`authentication policy` and :term:`authorization policy`.
+:mod:`repoze.bfg` comes with a variety of implementations of these
+policies.  To provide maximal flexibility, :mod:`repoze.bfg` also
+allows you to create custom authentication policies and authorization
+policies.
 
 .. warning::
 
@@ -35,19 +59,30 @@ Authorization is enabled by modifying your application to include a
 .. index::
    pair: enabling; authorization policy
 
-Enabling an Authorization Policy Imperatively
----------------------------------------------
+Enabling an Authorization Policy
+--------------------------------
 
 By default, :mod:`repoze.bfg` enables no authorization policy.  All
-views are accessible by completely anonymous users.
+views are accessible by completely anonymous users.  In order to begin
+protecting views from execution based on security settings, you need
+to enable an authorization policy.
 
-However, if you use the ``authorization_policy`` argument to the
-constructor of the :class:`repoze.bfg.configuration.Configurator`
-class, you can enable an authorization policy.
+You can enable an authorization policy imperatively, or declaratively
+via ZCML.
+
+.. index::
+   triple: enabling; authorization policy; imperatively
+
+Enabling an Authorization Policy Imperatively
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Passing an ``authorization_policy`` argument to the constructor of the
+:class:`repoze.bfg.configuration.Configurator` class enables an
+authorization policy.
 
 You must also enable an :term:`authentication policy` in order to
-enable the an authorization policy (this is because authorization, in
-general, depends upon authentication).  Use the
+enable the an authorization policy.  This is because authorization, in
+general, depends upon authentication.  Use the
 ``authorization_policy`` argument to the
 :class:`repoze.bfg.configuration.Configurator` class during
 application setup to specify an authentication policy.
@@ -81,20 +116,16 @@ See also the :mod:`repoze.bfg.authorization` and
 :mod:`repoze.bfg.authentication` modules for alternate implementations
 of authorization and authentication policies.  
 
-It is also possible to construct your own custom authentication policy
-or authorization policy: see :ref:`creating_an_authentication_policy`
-and :ref:`creating_an_authorization_policy`.
-
 .. index::
    triple: enabling; authorization policy; via ZCML
 
 Enabling an Authorization Policy Via ZCML
------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you'd rather use :term:`ZCML` to specify an authorization policy
 than imperative configuration, modify the ZCML file loaded by your
 application (usually named ``configure.zcml``) to enable an
-authorization one.
+authorization policy.
 
 For example, to enable a policy which compares the value of an "auth
 ticket" cookie passed in the request's environment which contains a
@@ -136,10 +167,15 @@ authentication policy ZCML directives that should prove useful.  See
 Protecting Views with Permissions
 ---------------------------------
 
-You declaratively protect a particular view using a :term:`permission`
-name via the ``configure.zcml`` application registry.  For example,
-the following declaration protects the view named ``add_entry.html``
-when invoked against a ``Blog`` context with the ``add`` permission:
+To protect a :term:`view callable` from invocation based on a user's
+security settings in a :term:`context`, you must pass a
+:term:`permission` to :term:`view configuration`.  Permissions are
+usually just strings, and they have no required composition: you can
+name permissions whatever you like.
+
+For example, the following declaration protects the view named
+``add_entry.html`` when invoked against a ``Blog`` context with the
+``add`` permission:
 
 .. code-block:: xml
    :linenos:
@@ -151,9 +187,8 @@ when invoked against a ``Blog`` context with the ``add`` permission:
        permission="add"
        />
 
-The equivalent view registration including the 'add' permission name
-may be performed via the ``bfg_view`` decorator within the "views"
-module of your project's package
+The equivalent view registration including the ``add`` permission name
+may be performed via the ``@bfg_view`` decorator:
 
 .. ignore-next-block
 .. code-block:: python
@@ -167,30 +202,40 @@ module of your project's package
        """ Add blog entry code goes here """
        pass
 
-If an authorization policy is in place when this view is found during
-normal application operations, the user will need to possess the
-``add`` permission against the context to be able to invoke the
-``blog_entry_add_view`` view.
+Or an the same thing can be done using the
+:meth:`repoze.bfg.configuration.Configurator.add_view` method:
 
-Permission names are usually just strings.  They hold no special
-significance to the system.  You can name permissions whatever you
-like.
+.. ignore-next-block
+.. code-block:: python
+   :linenos:
+
+   config.add_view(blog_entry_add_view,
+                   context=Blog, name='add_entry.html', permission='add')
+
+As a result of any of these various view configuration statements, if
+an authorization policy is in place when the view callable is found
+during normal application operations, the requesting user will need to
+possess the ``add`` permission against the :term:`context` to be able
+to invoke the ``blog_entry_add_view`` view.  If he does not, the
+:term:`Forbidden view` will be invoked.
 
 .. index::
-   pair: assigning; ACL
+   single: ACL
+   single: access control list
 
 .. _assigning_acls:
 
 Assigning ACLs to your Model Objects
 ------------------------------------
 
-When :mod:`repoze.bfg` determines whether a user possesses a
-particular permission in a :term:`context`, it examines the
-:term:`ACL` associated with the context.  An ACL is associated with a
-context by virtue of the ``__acl__`` attribute of the model object
-representing the context.  This attribute can be defined on the model
-*instance* (if you need instance-level security), or it can be defined
-on the model *class* (if you just need type-level security).
+When the default :mod:`repoze.bfg` :term:`authorization policy`
+determines whether a user possesses a particular permission in a
+:term:`context`, it examines the :term:`ACL` associated with the
+context.  An ACL is associated with a context by virtue of the
+``__acl__`` attribute of the model object representing the
+:term:`context`.  This attribute can be defined on the model
+*instance* if you need instance-level security, or it can be defined
+on the model *class* if you just need type-level security.
 
 For example, an ACL might be attached to model for a blog via its
 class:
@@ -236,6 +281,7 @@ access is required on an object-by-object basis.
 
 .. index::
    single: ACE
+   single: access control entry
 
 Elements of an ACL
 ------------------
@@ -254,10 +300,67 @@ Here's an example ACL:
            (Allow, 'group:editors', 'edit'),
            ]
 
-The example ACL indicates that the ``Everyone`` principal (a special
-system-defined principal indicating, literally, everyone) is allowed
+The example ACL indicates that the
+:data:`repoze.bfg.security.Everyone` principal -- a special
+system-defined principal indicating, literally, everyone -- is allowed
 to view the blog, the ``group:editors`` principal is allowed to add to
 and edit the blog.
+
+Each elements of an ACL is an :term:`ACE` or access control entry.
+For example, in the above code block, there are three ACEs: ``(Allow,
+Everyone, 'view')``, ``(Allow, 'group:editors', 'add')``, and
+``(Allow, 'group:editors', 'edit')``.
+
+The first element of any ACE is either
+:data:`repoze.bfg.security.Allow`, or
+:data:`repoze.bfg.security.Deny`, representing the action to take when
+the ACE matches.  The second element is a :term:`principal`.  The
+third argument is a permission or sequence of permission names.
+
+A principal is usually a user id, however it also may be a group id if
+your authentication system provides group information and the
+effective :term:`authentication policy` policy is written to respect
+group information.  For example, the
+:class:`repoze.bfg.authentication.RepozeWho1AuthenicationPolicy`
+enabled by the ``repozewho1authenticationpolicy`` ZCML directive
+respects group information if you configure it with a ``callback``.
+See :ref:`authentication_policies_directives_section` for more
+information about the ``callback`` attribute.
+
+Each ACE in an ACL is processed by an authorization policy *in the
+order dictated by the ACL*.  So if you have an ACL like this:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
+   from repoze.bfg.security import Deny
+
+   __acl__ = [
+       (Allow, Everyone, 'view'),
+       (Deny, Everyone, 'view'),
+       ]
+
+The default authorization policy will *allow* everyone the view
+permission, even though later in the ACL you have an ACE that denies
+everyone the view permission.  On the other hand, if you have an ACL
+like this:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.security import Everyone
+   from repoze.bfg.security import Allow
+   from repoze.bfg.security import Deny
+
+   __acl__ = [
+       (Deny, Everyone, 'view'),
+       (Allow, Everyone, 'view'),
+       ]
+
+The authorization policy will deny everyone the view permission, even
+though later in the ACL is an ACE that allows everyone.
 
 The third argument in an ACE can also be a sequence of permission
 names instead of a single permission name.  So instead of creating
@@ -276,52 +379,6 @@ ACE, as below.
        (Allow, 'group:editors', ('add', 'edit')),
        ]
 
-A principal is usually a user id, however it also may be a group id if
-your authentication system provides group information and the
-effective :term:`authentication policy` policy is written to respect
-group information.  For example, the
-:class:`repoze.bfg.authentication.RepozeWho1AuthenicationPolicy`
-enabled by the ``repozewho1authenticationpolicy`` ZCML directive
-respects group information if you configure it with a ``callback``.
-See :ref:`authentication_policies_directives_section` for more
-information about the ``callback`` attribute.
-
-Each tuple within an ACL structure is known as a :term:`ACE`, which
-stands for "access control entry".  For example, in the above ACL,
-``(Allow, Everyone, 'view')`` is an ACE.  Each ACE in an ACL is
-processed by an authorization policy *in the order dictated by the
-ACL*.  So if you have an ACL like this:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.security import Everyone
-   from repoze.bfg.security import Allow
-   from repoze.bfg.security import Deny
-
-   __acl__ = [
-       (Allow, Everyone, 'view'),
-       (Deny, Everyone, 'view'),
-       ]
-
-The authorization policy will *allow* everyone the view permission,
-even though later in the ACL you have an ACE that denies everyone the
-view permission.  On the other hand, if you have an ACL like this:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.security import Everyone
-   from repoze.bfg.security import Allow
-   from repoze.bfg.security import Deny
-
-   __acl__ = [
-       (Deny, Everyone, 'view'),
-       (Allow, Everyone, 'view'),
-       ]
-
-The authorization policy will deny Everyone the view permission, even
-though later in the ACL is an ACE that allows everyone.
 
 .. index::
    single: principal
@@ -364,7 +421,7 @@ module.  These can be imported for use in ACLs.
   An object representing, literally, *all* permissions.  Useful in an
   ACL like so: ``(Allow, 'fred', ALL_PERMISSIONS)``.  The
   ``ALL_PERMISSIONS`` object is actually a stand-in object that has a
-  ``__contains__`` method that always returns True, which, for all
+  ``__contains__`` method that always returns ``True``, which, for all
   known authorization policies, has the effect of indicating that a
   given principal "has" any permission asked for by the system.
 
@@ -374,16 +431,9 @@ module.  These can be imported for use in ACLs.
 Special ACEs
 ------------
 
-A convenience :term:`ACE` is defined within the
-:mod:`repoze.bfg.security` module named
-:data:`repoze.bfg.security.DENY_ALL`.  It equals the following:
-
-.. code-block:: python
-
-   from repoze.bfg.security import ALL_PERMISSIONS
-   (Deny, Everyone, ALL_PERMISSIONS)
-
-This ACE is often used as the *last* ACE of an ACL to explicitly cause
+A convenience :term:`ACE` is defined representing a deny to everyone
+of all permissions in :data:`repoze.bfg.security.DENY_ALL`.  This ACE
+is often used as the *last* ACE of an ACL to explicitly cause
 inheriting authorization policies to "stop looking up the traversal
 tree" (effectively breaking any inheritance).  For example, an ACL
 which allows *only* ``fred`` the view permission in a particular
@@ -398,23 +448,26 @@ authorization policy is in effect might look like so:
 
    __acl__ = [ (Allow, 'fred', 'view'), DENY_ALL ]
 
+"Under the hood", the :data:`repoze.bfg.security.DENY_ALL` ACE equals
+the following:
+
+.. code-block:: python
+
+   from repoze.bfg.security import ALL_PERMISSIONS
+   (Deny, Everyone, ALL_PERMISSIONS)
+
 .. index::
    single: ACL inheritance
+   pair: location-aware; security
 
-ACL Inheritance
----------------
+ACL Inheritance and Location-Awareness
+--------------------------------------
 
 While the default :term:`authorization policy` is in place, if a model
 object does not have an ACL when it is the context, its *parent* is
 consulted for an ACL.  If that object does not have an ACL, *its*
 parent is consulted for an ACL, ad infinitum, until we've reached the
 root and there are no more parents left.
-
-.. index::
-   pair: location-aware; security
-
-Location-Awareness
-------------------
 
 In order to allow the security machinery to perform ACL inheritance,
 model objects must provide :term:`location` -awareness.  Providing

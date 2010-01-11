@@ -197,10 +197,10 @@ changing the content of an overridden resource directory for templates
 without restarting the server after every change.  Subsequent requests
 for the same template file may return different filenames based on the
 current state of overridden resource directories. Setting
-``reload_resources`` to ``True`` effects performance *dramatically*
-(slowing things down by an order of magnitude for each template
-rendering) but it's convenient when moving files around in overridden
-resource directories. ``reload_resources`` makes the system *very
-slow* when templates are in use.  Never set ``reload_resources`` to
-``True`` on a production system.
+``reload_resources`` to ``True`` effects performance *dramatically*,
+slowing things down by an order of magnitude for each template
+rendering.  However, it's convenient to enable when moving files
+around in overridden resource directories. ``reload_resources`` makes
+the system *very slow* when templates are in use.  Never set
+``reload_resources`` to ``True`` on a production system.
 

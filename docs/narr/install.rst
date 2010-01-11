@@ -10,31 +10,24 @@ Before You Install
 ------------------
 
 You will need `Python <http://python.org>`_ version 2.4 or better to
-run :mod:`repoze.bfg`.  It has been tested under Python 2.4.6, Python
-2.5.4 and Python 2.6.2, and Python 2.7a1.  Development of
-:mod:`repoze.bfg` is currently done primarily under Python 2.4 and
-Python 2.5.  :mod:`repoze.bfg` does *not* run under any version of
-Python before 2.4, and does *not* run under Python 3.X.
+run :mod:`repoze.bfg`.  
 
-.. sidebar:: You Don't Need A Compiler
+.. sidebar:: Python Versions
 
-   Installation of :mod:`repoze.bfg` does not require the compilation
-   of any C code, so as long as you have a Python interpreter that
-   meets the requirements mentioned, you do not need to have
-   development tools installed on the target machine to install
-   :mod:`repoze.bfg`.
+    :mod:`repoze.bfg` has been tested under Python 2.4.6, Python 2.5.4
+    and Python 2.6.2, and Python 2.7a1.  To ensure backwards
+    compatibility, development of :mod:`repoze.bfg` is currently done
+    primarily under Python 2.4 and Python 2.5.  :mod:`repoze.bfg` does
+    *not* run under any version of Python before 2.4, and does *not*
+    run under Python 3.X.
 
-:mod:`repoze.bfg` is known to run properly on all popular Unix-like
-systems such as Linux, MacOS X, and FreeBSD.  :mod:`repoze.bfg` is
-also known to run on Windows systems.  However, none of its developers
-use Windows as a primary development platform.  It is also known to
-run on Google's App Engine.
+:mod:`repoze.bfg` is known to run on all popular Unix-like systems
+such as Linux, MacOS X, and FreeBSD as well as on Windows platforms.
+It is also known to run on Google's App Engine and :term:`Jython`.
 
-.. note:: If you'd like to help us make sure :mod:`repoze.bfg` runs on
-   your favorite alternate platform, we'd love to hear from you.
-   Please contact us via the `repoze.dev maillist
-   <http://lists.repoze.org/listinfo/repoze-dev>`_ if you'd like to
-   contribute.
+:mod:`repoze.bfg` installation does not require the compilation of any
+C code, so you need only a Python interpreter that meets the
+requirements mentioned.
 
 If You Don't Yet Have A Python Interpreter (UNIX)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,10 +60,10 @@ Source Compile Method
 
 It's useful to use a Python interpreter that *isn't* the "system"
 Python interpreter to develop your software.  The authors of
-:mod:`repoze.bfg` never use the system Python for development
-purposes; always a self-compiled one.  Compiling Python is easy, and
-often the "system" Python is compiled with options that aren't optimal
-for web development.
+:mod:`repoze.bfg` tend not to use the system Python for development
+purposes; always a self-compiled one.  Compiling Python is usually
+easy, and often the "system" Python is compiled with options that
+aren't optimal for web development.
 
 To compile software on your UNIX system, typically you need
 development tools.  Often these can be installed via the package
@@ -97,7 +90,8 @@ the following commands:
           http://python.org/ftp/python/2.5.4/Python-2.5.4.tgz
    [chrism@vitaminf tmp]$ tar xvzf Python-2.5.4.tgz
    [chrism@vitaminf tmp]$ cd Python-2.5.4
-   [chrism@vitaminf Python-2.5.4]$ ./configure --prefix=$HOME/opt/Python-2.5.4
+   [chrism@vitaminf Python-2.5.4]$ ./configure \
+           --prefix=$HOME/opt/Python-2.5.4
    [chrism@vitaminf Python-2.5.4]$ make; make install
 
 Once these steps are performed, the Python interpreter will be
@@ -119,14 +113,17 @@ extensions <http://sourceforge.net/projects/pywin32/files/>`_.
 .. index::
    pair: installing; UNIX
 
+.. _installing_unix:
+
 Installing :mod:`repoze.bfg` on a UNIX System
 ---------------------------------------------
 
-It is advisable to install :mod:`repoze.bfg` into a :term:`virtualenv`
-in order to obtain isolation from any "system" packages you've got
-installed in your Python version (and likewise, to prevent
-:mod:`repoze.bfg` from globally installing versions of packages that
-are not compatible with your system Python).
+It is best practice to install :mod:`repoze.bfg` into a
+:term:`virtualenv` in order to obtain isolation from any "system"
+packages you've got installed in your Python version. Using a
+virtualenv will also prevent :mod:`repoze.bfg` from globally
+installing versions of packages that are not compatible with your
+system Python.
 
 To set up a virtualenv to install :mod:`repoze.bfg` within, first
 ensure that :term:`setuptools` is installed.  Invoke ``import
@@ -161,7 +158,7 @@ using the Python interpreter you want to install setuptools into.
 
 .. code-block:: text
 
-   $ sudo python ez_setup.py
+   $ python ez_setup.py
 
 Once this command is invoked, setuptools should be installed on your
 system.  If the command fails due to permission errors, you may need
@@ -202,7 +199,7 @@ Creating the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the :term:`virtualenv` package is installed in your Python, you
-can actually create a virtual environment.  To do so, invoke the
+can then create a virtual environment.  To do so, invoke the
 following:
 
 .. code-block:: text
@@ -244,6 +241,8 @@ downloads and installs a number of dependencies.
 
 .. index::
    pair: installing; Windows
+
+.. _installing_windows:
 
 Installing :mod:`repoze.bfg` on a Windows System
 -------------------------------------------------
@@ -303,6 +302,40 @@ Installing :mod:`repoze.bfg` on Google App Engine
 
 :ref:`appengine_tutorial` documents the steps required to install a
 :mod:`repoze.bfg` application on Google App Engine.
+
+Installing :mod:`repoze.bfg` on Jython
+--------------------------------------
+
+:mod:`repoze.bfg` is known to work under :term:`Jython` version 2.5.1.
+Install :term:`Jython`, and then follow the installation steps for
+:mod:`repoze.bfg` on your platform described in one of the sections
+entitled :ref:`installing_unix` or :ref:`installing_windows` above,
+replacing the ``python`` command with ``jython`` as necessary.  The
+steps are exactly the same except you should use the ``jython``
+command name instead of the ``python`` command name.
+
+One caveat exists to using :mod:`repoze.bfg` under Jython: the
+:term:`Chameleon` templating engine, which is the default templating
+engine for :mod:`repoze.bfg` does not work on non-CPython platforms.
+
+The :mod:`repoze.bfg.jinja2` distribution provides templating for
+:mod:`repoze.bfg` using the :term:`Jinja2` templating system.  You may
+install it like so using the ``easy_install`` command for Jython:
+
+.. code-block:: python
+
+   $ easy_install repoze.bfg.jinja2
+
+Once this is done, you can use this command to get started with a
+:mod:`repoze.bfg` sample application that uses the Jinja2 templating
+engine:
+
+.. code-block:: python
+
+   $ paster create -t bfg_jinja2_starter
+
+See the chapter entitled :ref:`project_narr` for more information
+about the ``paster create`` command.
 
 What Gets Installed
 ~~~~~~~~~~~~~~~~~~~

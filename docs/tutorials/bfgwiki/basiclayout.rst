@@ -7,6 +7,9 @@ but they provide a good orientation for the high-level patterns common
 to most :term:`traversal` -based :mod:`repoze.bfg` (and :term:`ZODB`
 based) projects.
 
+The source code for this tutorial stage can be browsed at
+`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.2/basiclayout>`_.
+
 ``__init__.py``
 ---------------
 
