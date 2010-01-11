@@ -23,6 +23,11 @@ Features
 - Show the original traceback when a Chameleon template cannot be
   rendered due to a platform incompatibility.
 
+Documentation
+-------------
+
+- Major rework in preparation for book publication.
+
 1.2a10 (2010-01-04)
 ===================
 
