@@ -1,8 +1,46 @@
 Author Introduction
 ===================
 
-This is the "author introduction", wherein, I, the author put stuff
-that goes nowhere else.
+Welcome to "The :mod:`repoze.bfg` Web Application Framework".  In this
+introduction, I'll describe the audience for this book, I'll provide
+some context regarding the genesis of :mod:`repoze.bfg`, and I'll
+thank some important people.
+
+I hope you enjoy both this book and the software it documents.  I've
+had a blast writing both.
+
+Audience
+--------
+
+This book is aimed primarily at a reader that has the following
+attributes:
+
+- At least a moderate amount of :term:`Python` experience.
+
+- A familiarity with web protocols such as HTTP and CGI.
+
+If you fit into both of these categories, you're in the direct target
+audience for this book.  But don't worry, even if you have no
+experience with Python or the web, both are easy to pick up "on the
+fly".
+
+Python is an *excellent* language in which to write applications;
+becoming productive in Python is almost mind-blowingly easy.  If you
+already have experience in another language such as Java, Visual
+Basic, Perl, Ruby, or even C/C++, learning Python will be a snap; it
+should take you no longer than a couple of days to become modestly
+productive.  If you don't have previous programming experience, it
+will be slightly harder, and it will take a little longer, but you'd
+be hard-pressed to find a better "first language."
+
+Web technology familiarity is assumed in various places within the
+book.  For example, the book describes various interactions in terms
+of the HTTP protocol, but it does not describe how the HTTP protocol
+works in detail.  Like any good framework, though, :mod:`repoze.bfg`
+shields you from needing to know the gory details of web protocols
+such as HTTP, and you can usually skip such descriptions without
+becoming "blocked," although you may lack some fundamental
+understanding of how it works "under the hood" as a result.
 
 The Genesis of :mod:`repoze.bfg`
 --------------------------------
@@ -12,7 +50,7 @@ using :term:`Zope`.  Zope provided me with a lot of mileage: it wasn't
 until almost a decade of succesfully creating applications using Zope
 that I decided to write a different web framework.  Although
 :mod:`repoze.bfg` takes inspiration from a variety of web frameworks,
-it owes more of its design ethos to Zope than any other.
+it owes more of its core design to Zope than any other.
 
 The "Repoze" brand existed before :mod:`repoze.bfg`.  One of the first
 packages developed as part of the Repoze brand was a package named
@@ -45,10 +83,18 @@ continuing to use any Zope publisher or living with the limitations
 and unfamiliarities of a different framework.  The result is what is
 now :mod:`repoze.bfg`.
 
+It is immodest to say so, but I believe :mod:`repoze.bfg` has turned
+out to be the very best Python web framework available today, bar
+none.  It combines all the "good parts" from other web frameworks into
+a cohesive whole that is reliable, down-to-earth, flexible, speedy,
+and well-documented.
+
 Thanks
 ------
 
-This book is dedicated to my grandmother, Dorothy Phillips.
+This book is dedicated to my grandmother, Dorothy Phillips, who gave
+me my first typewriter, and my mother, Donelle Duffy, who bought me my
+first computer (a VIC-20).
 
 Thanks to the following people for providing expertise, resources, and
 software.  Without the help of these folks, neither this book nor the
@@ -61,4 +107,3 @@ Institute, and Todd Koym of Environmental Health Sciences.
 Special thanks to Guido van Rossum and Tim Peters for Python.
 
 Special thanks also to Tricia for putting up with me.
-
