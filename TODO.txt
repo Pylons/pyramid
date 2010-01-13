@@ -4,8 +4,6 @@
 
 - Named notfound views.
 
-- Get rid of references to repoze.bfg.router.Router.
-
 - Describe what level of Python experience you need to understand the
   book.
 

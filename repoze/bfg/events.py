@@ -53,8 +53,8 @@ class WSGIApplicationCreatedEvent(object):
     """ An instance of this class is emitted as an :term:`event` when
     the :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` is
     called.  The instance has an attribute, ``app``, which is an
-    instance of the :class:`repoze.bfg.router.Router` class that will
-    handle WSGI requests.  This class implements the
+    instance of the :term:`router` that will handle WSGI requests.
+    This class implements the
     :class:`repoze.bfg.interfaces.IWSGIApplicationCreatedEvent`
     interface."""
     implements(IWSGIApplicationCreatedEvent)

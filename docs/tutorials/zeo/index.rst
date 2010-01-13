@@ -171,9 +171,11 @@ Configuration
        import transaction
 
        def app(global_config, **settings):
-           """ This function returns a repoze.bfg.router.Router object.  It
-           is usually called by the PasteDeploy framework during ``paster
-           serve``"""
+           """ This function returns a ``repoze.bfg`` WSGI 
+           application.
+
+           It is usually called by the PasteDeploy framework during
+           ``paster serve``"""
            # paster app config callback
            zodb_uri = settings['zodb_uri']
            finder = PersistentApplicationFinder(zodb_uri, appmaker)
