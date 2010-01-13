@@ -4,6 +4,15 @@
 
 - Named notfound views.
 
+- Get rid of references to repoze.bfg.router.Router.
+
+- Use traversal after_end rather than __del__ of an object added to
+  the environ in sqlalchemy templates / tutorial to do cleanup of SA
+  session.
+
+- Describe what level of Python experience you need to understand the
+  book.
+
 - Review:
 
   [ ] Traversal

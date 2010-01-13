@@ -7,88 +7,89 @@
 Mapping URLs to Code
 --------------------
 
-:mod:`repoze.bfg` supports :term:`URL dispatch` via a subsystem that
-was inspired by the :term:`Routes` system used by :term:`Pylons`.
+:mod:`repoze.bfg` supports two methods by which a URL can be mapped to
+code: :term:`URL dispatch` and :term:`traversal`.
+
+.. note::
+
+   The :mod:`repoze.bfg` support for :term:`URL dispatch` was inspired
+   by the :term:`Routes` system used by :term:`Pylons`.
+   :mod:`repoze.bfg` support for :term:`traversal` was inspired by
+   :term:`Zope`.
+
 :term:`URL dispatch` is convenient and straightforward: an incoming
 URL is checked against a list of potential matches in a predefined
-order.  Each potential match often maps directly to a :term:`view
-callable`.  When a match is found, it usually means that a particular
-:term:`view callable` is invoked.
-
-Like :term:`Zope`, :mod:`repoze.bfg` can also map URLs to code
-slightly differently, by using using object graph :term:`traversal`.
-Graph-traversal based dispatching is useful if you like your URLs to
-represent an arbitrary hierarchy of potentially heterogeneous items,
-or if you need to attach "instance-level" security (akin to
-"row-level" security in relational parlance) declarations to
-:term:`model` instances.  Traversal is slightly more complex than URL
-dispatch, but it is also a bit more powerful.
+order.  When a match is found, it means that a particular :term:`view
+callable` will be invoked.
 
 :term:`URL dispatch` can easily handle URLs such as
 ``http://example.com/members/Chris``, where it's assumed that each
 item "below" ``members`` in the URL represents a member in the system.
-You just match everything "below" ``members`` to a particular view.
-
-For example, you might configure a :term:`route` to match against the
-following URL patterns:
+You just match everything "below" ``members`` to a particular
+:term:`view callable`.  For example, you might configure URL dispatch
+within :mod:`repoze.bfg` to match against the following URL patterns:
 
 .. code-block:: text
 
-   archives/:year/:month/:day
    members/:membername
+   archives/:year/:month/:day
 
-In this configuration, there are exactly two types of URLs that will
-match views in your application: ones that start with ``/archives``
-and have subsequent path elements that represent a year, month, and
-day.  And ones that start with ``/members`` which are followed by a
-path segment containing a member's name.  This is very simple.  When
-you limit your application to using URL dispatch, you know every URL
-that your application might generate or respond to, and all the URL
-matching elements are listed in a single place.
+In this configuration, there will be exactly two types of URLs that
+will be meaningful to your application: URLs that start with
+``/members`` which are followed by a path segment containing a
+member's name.  And URLs that start with ``/archives`` and have
+subsequent path elements that represent a year, month, and day.  Each
+route pattern will be mapped to a specific :term:`view callable`.
 
-:term:`URL dispatch` is not very good, however, at inferring the
-difference between sets of URLs such as:
+URL dispatch is very straightforward.  When you limit your application
+to using URL dispatch, you know every URL that your application might
+generate or respond to, and all the URL matching elements are listed
+in a single place.
+
+URL dispatch is not very good, however, at inferring the difference
+between sets of URLs such as these:
 
 .. code-block:: text
 
    http://example.com/members/Chris/document
    http://example.com/members/Chris/stuff/page
 
-...wherein you'd like the ``document`` in the first URL to represent a
+If you'd like the ``document`` in the first URL above to represent a
 PDF document, and ``/stuff/page`` in the second to represent an
-*OpenOffice* document in a "stuff" folder.  It takes more pattern
-matching assertions to be able to make URLs like these work in
-URL-dispatch based systems, and some assertions just aren't possible.
-For example, URL-dispatch based systems don't deal very well with URLs
-that represent arbitrary-depth hierarchies.
+OpenOffice document in a "stuff" folder, it's hard to express this
+using URL dispatch.  It takes more pattern matching assertions to be
+able to make hierarchies like these work in URL-dispatch based
+systems, and some assertions just aren't possible.  Essentially,
+URL-dispatch based systems just don't deal very well with URLs that
+represent arbitrary-depth hierarchies.
 
-:term:`traversal` works well for these types of "ambiguous" URLs and
-for URLs that represent arbitrary-depth hierarchies.  When traversal
-is used, each URL segment represents a single traversal step through
-an edge of a graph.  So a URL like ``http://example.com/a/b/c`` can be
-thought of as a graph traversal on the ``example.com`` site through
-the edges ``a``, ``b``, and ``c``.
+However, the other URL mapping mode supported by :mod:`repoze.bfg`,
+named :term:`traversal`, *does* work well for URLs that represent
+arbitrary-depth hierarchies.  When traversal is used, each URL segment
+represents a single traversal step through an edge of a graph, so a
+URL like ``http://example.com/a/b/c`` can be thought of as a graph
+traversal on the ``example.com`` site through the edges ``a``, ``b``,
+and ``c``.  Since the path segments that compose a URL are addressed
+separately, it becomes very easy to form URLs that represent arbitrary
+depth hierarchies in a system that uses traversal.
 
-If you're willing to treat your application models as a graph that can
-be traversed, it also becomes easy to provide "row-level security" (in
-common relational parlance): you just attach a security declaration to
-each instance in the graph.  This is not as easy in frameworks that
-use URL-based dispatch.
-
-Graph traversal is materially more complex than URL-based dispatch,
-however, if only because it requires the construction and maintenance
-of a graph, and it requires the developer to think about mapping URLs
-to code in terms of traversing the graph.  (How's *that* for
-self-referential! ;-) ) 
+When you're willing to treat your application models as a graph that
+can be traversed, it also becomes easy to provide "instance-level
+security": you just attach a security declaration to each instance in
+the graph.  This is not nearly as easy to do when using URL dispatch.
 
 In essence, the choice to use graph traversal vs. URL dispatch is
 largely religious.  Graph traversal dispatch probably just doesn't
 make any sense when you possess completely "square" data stored in a
-relational database.  However, when you have a hierarchical data
-store, it can provide advantages over using URL-based dispatch.
+relational database because it requires the construction and
+maintenance of a graph and requires that the developer think about
+mapping URLs to code in terms of traversing that graph.  However, when
+you have a hierarchical data store, using traversal can provide
+significant advantages over using URL-based dispatch.
 
-:mod:`repoze.bfg` provides support for both approaches.  You can use
-either as you see fit.
+Since :mod:`repoze.bfg` provides support for both approaches, you can
+use either as you see fit; you can even combine them together if
+necessary.
 
 .. toctree::
    :maxdepth: 2

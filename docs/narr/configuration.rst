@@ -15,11 +15,11 @@ accounting information.  :mod:`repoze.bfg` refers to the way in which
 code is plugged in to it for a specific application as
 "configuration".
 
-Most people understand "configuration" as coarse knobs that inform the
-high-level operation of a specific application deployment.  For
+Most people understand "configuration" as coarse settings that inform
+the high-level operation of a specific application deployment.  For
 instance, it's easy to think of the values implied by a ``.ini`` file
 which is parsed at application startup time as "configuration".
-:mod:`repoze.bfg` extends this pattern out to application development,
+:mod:`repoze.bfg` extends this pattern to application development,
 using the term "configuration" to express standardized ways that code
 gets plugged into a deployment of the framework itself.  When you plug
 code into the :mod:`repoze.bfg` framework, you are "configuring"
@@ -44,7 +44,7 @@ configuration "imperatively" fits their brain best. This is the
 configuration mode in which a developer cedes the least amount of
 control to the framework; it's "imperative" because you express the
 configuration directly in Python code, and you have the full power of
-Python at your disposal as you perform configuration statements.
+Python at your disposal as you issue configuration statements.
 
 Here's one of the simplest :mod:`repoze.bfg` applications, configured
 imperatively:
@@ -65,7 +65,7 @@ imperatively:
        config.add_view(hello_world)
        config.end()
        app = config.make_wsgi_app()
-       serve(app)
+       serve(app, host='0.0.0.0')
 
 We won't talk much about what this application does yet.  Just note
 that the "configuration' statements take place underneath the ``if
@@ -90,12 +90,6 @@ A :mod:`repoze.bfg` application can be alternatively be configured
 format named :term:`ZCML` (Zope Configuration Markup Language), an XML
 dialect.
 
-Declarative configuration mode is the configuration mode in which
-developers cede the most amount of control to the framework itself.
-Because application developers cede more control to the framework, it
-is also sometimes harder to understand than purely imperative
-configuration.
-
 A :mod:`repoze.bfg` application configured declaratively requires not
 one, but two files: a Python file and a :term:`ZCML` file.
 
@@ -117,7 +111,7 @@ In a file named ``helloworld.py``:
        config.load_zcml('configure.zcml')
        config.end()
        app = config.make_wsgi_app()
-       serve(app)
+       serve(app, host='0.0.0.0')
 
 In a file named ``configure.zcml`` in the same directory as the
 previously created ``helloworld.py``:
@@ -137,9 +131,8 @@ previously created ``helloworld.py``:
 
 This pair of files forms an application functionally equivalent to the
 application we created earlier in :ref:`imperative_configuration`.
-
-Let's examine the differences between the code listing in
-:ref:`imperative_configuration` and the code above.
+Let's examine the differences between that code listing and the code
+above.
 
 In :ref:`imperative_configuration`, we had the following lines within
 the ``if __name__ == '__main__'`` section of ``helloworld.py``:
@@ -153,7 +146,7 @@ the ``if __name__ == '__main__'`` section of ``helloworld.py``:
        config.add_view(hello_world)
        config.end()
        app = config.make_wsgi_app()
-       serve(app)
+       serve(app, host='0.0.0.0')
 
 In our "declarative" code, we've removed the call to ``add_view`` and
 replaced it with a call to the
@@ -169,7 +162,7 @@ it now reads as:
        config.load_zcml('configure.zcml')
        config.end()
        app = config.make_wsgi_app()
-       serve(app)
+       serve(app, host='0.0.0.0')
 
 Everything else is much the same.
 
@@ -219,15 +212,18 @@ and imperative configuration are functionally equivalent.
 Using declarative configuration has a number of benefits, the primary
 benefit being that applications configured declaratively can be
 *overridden* and *extended* by third parties without requiring the
-third party to change application code.
+third party to change application code.  If you want to build a
+framework or an extensible application, using declarative
+configuration is a good idea.  Declarative configuration has a down
+side: you can't use plain-old-Python syntax you probably already know
+and understand to configure your application; instead you need to use
+:term:`ZCML`.
 
 .. note::
 
    See :ref:`extending_chapter` for a discussion of extending and
    overriding :mod:`repoze.bfg` applications.
 
-If you want to build a framework or an extensible application, using
-ZCML is a good idea.
 
 .. index::
    pair: ZCML; conflict detection
@@ -294,15 +290,15 @@ to code that is referred to by the declaration itself.  For example:
    def hello(request):
        return Response('Hello')
 
-The :class:`repoze.bfg.view.bfg_view` decorator above adds an
-attribute to the ``hello`` function, making it available for a
-:term:`scan` to find it later.
-
 The mere existence of configuration decoration doesn't cause any
 configuration registration to be made.  Before they have any effect on
 the configuration of a :mod:`repoze.bfg` application, a configuration
 decoration within application code must be found through a process
-known as *scanning*.
+known as a :term:`scan`.
+
+The :class:`repoze.bfg.view.bfg_view` decorator above adds an
+attribute to the ``hello`` function, making it available for a
+:term:`scan` to find it later.
 
 :mod:`repoze.bfg` is willing to :term:`scan` a module or a package and
 its subpackages for decorations when the
@@ -330,7 +326,7 @@ and its subpackages.  For example:
           config.scan()
           config.end()
           app = config.make_wsgi_app()
-          serve(app)
+          serve(app, host='0.0.0.0')
 
 :term:`ZCML` can also invoke a :term:`scan` via its ``<scan>``
 directive.  If a ZCML file is processed that contains a scan
@@ -358,7 +354,7 @@ directive, the package the ZCML file points to is scanned.
           config.load_zcml('configure.zcml')
           config.end()
           app = config.make_wsgi_app()
-          serve(app)
+          serve(app, host='0.0.0.0')
 
    .. code-block:: xml
       :linenos:
@@ -377,7 +373,7 @@ or module recursively, looking for special attributes attached to
 objects defined within a module.  These special attributes are
 typically attached to code via the use of a :term:`decorator`.  For
 example, the :class:`repoze.bfg.view.bfg_view` decorator can be
-attached to a function or instance method:
+attached to a function or instance method.
 
 Once scanning is invoked, and :term:`configuration decoration` is
 found by the scanner, a set of calls are made to a

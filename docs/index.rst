@@ -4,19 +4,14 @@
 The repoze.bfg Web Application Framework
 ========================================
 
-:mod:`repoze.bfg` is a Python web application framework.  It is
-inspired by :term:`Zope`, :term:`Pylons`, and :term:`Django`.  It uses
-various Zope-related libraries internally to do much of its work.
-:mod:`repoze.bfg` uses the WSGI protocol to handle request and
-responses.
-
-:mod:`repoze.bfg` is developed as part of the `Repoze
+:mod:`repoze.bfg` is a small, fast, down-to-earth Python web
+application framework.  It is developed as part of the `Repoze
 <http://repoze.org>`_ project by `Agendaless Consulting
 <http://agendaless.com>`_ and other contributors.  It is licensed
 under a `BSD-like license <http://repoze.org/license.html>`_.
 
-Fore-Matter
-===========
+Front Matter
+============
 
 .. toctree::
    :maxdepth: 1
