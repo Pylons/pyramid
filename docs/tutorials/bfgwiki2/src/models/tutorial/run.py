@@ -1,17 +1,17 @@
+import transaction
+
 from repoze.bfg.configuration import Configurator
+from repoze.tm import after_end
+from repoze.tm import isActive
 
 from tutorial.models import DBSession
 from tutorial.models import initialize_sql
 
-class Cleanup:
-    def __init__(self, cleaner):
-        self.cleaner = cleaner
-    def __del__(self):
-        self.cleaner()
-
 def handle_teardown(event):
     environ = event.request.environ
-    environ['tutorial.sasession'] = Cleanup(DBSession.remove)
+    if isActive(environ):
+        t = transaction.get()
+        after_end.register(DBSession.remove, t)
 
 def app(global_config, **settings):
     """ This function returns a WSGI application.
@@ -21,7 +21,8 @@ def app(global_config, **settings):
     """
     db_string = settings.get('db_string')
     if db_string is None:
-        raise ValueError("No 'db_string' value in application configuration.")
+        raise ValueError("No 'db_string' value in application "
+                         "configuration.")
     initialize_sql(db_string)
     config = Configurator(settings=settings)
     config.begin()

@@ -1,6 +1,16 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- In ``bfg_routesalchemy``, ``bfg_alchemy`` and ``bfgwiki2`` tutorial,
+  clean up the SQLAlchemy connection by registering a
+  ``repoze.tm.after_end`` callback instead of relying on a ``__del__``
+  method of a ``Cleanup`` class added to the WSFI environment.  The
+  ``__del__`` strategy was fragile and caused problems in the wild.
+  Thanks to Daniel Holth for testing.
+
 Documentation
 -------------
 

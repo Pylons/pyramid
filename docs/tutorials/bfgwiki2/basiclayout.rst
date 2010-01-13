@@ -119,26 +119,21 @@ function within the file named ``run.py``:
       :linenos:
       :language: py
 
-#. *Lines 1-4*. Imports to support later code.
+#. *Lines 1-8*. Imports to support later code.
 
-#. *Lines 6-10*.  We define a ``Cleanup`` class which has a
-   ``__del__`` method (the method called at Python object
-   destruction), which calls a function.
+#. *Lines 10-14*.  An event :term:`subscriber` which performs cleanup
+   at transaction boundaries.  As a result of registering this event
+   subscriber, after the current transaction is committed or aborted,
+   our database connection will be removed.
 
-#. *Lines 12-14*.  An event :term:`subscriber` which adds a
-   ``Cleanup`` instance to the WSGI environment as
-   ``tutorial.sasession``.  As a result of registering this event
-   subscriber, when the WSGI environment is cleaned up, our database
-   connection will be removed.
-
-#. *Lines 21-23*. Get the database configuration string from the
+#. *Lines 22-25*. Get the database configuration string from the
    ``tutorial.ini`` file's ``[app:sql]`` section.  This will be a URI
    (something like ``sqlite://``).
 
-#. Line *24*. We initialize our SQL database using SQLAlchemy, passing
+#. Line *26*. We initialize our SQL database using SQLAlchemy, passing
    it the db string.
 
-#. *Line 25*.  We construct a :term:`Configurator`.  The first
+#. *Line 27*.  We construct a :term:`Configurator`.  The first
    argument provided to the configurator is the :term:`root factory`,
    which is used by the :mod:`repoze.bfg` :term:`traversal` mechanism.
    Since this is a URL dispatch application, the root factory is
@@ -146,7 +141,7 @@ function within the file named ``run.py``:
    argument.  It contains a dictionary of settings parsed by
    PasteDeploy.
 
-#. *Lines 26-29*.  We then load a ZCML file to do application
+#. *Lines 28-31*.  We then load a ZCML file to do application
    configuration, and use the
    :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
