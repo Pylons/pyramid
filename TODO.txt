@@ -2,9 +2,6 @@
 
 - Named notfound views.
 
-- Describe what level of Python experience you need to understand the
-  book.
-
 - Review:
 
   [ ] Traversal
