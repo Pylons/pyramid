@@ -93,8 +93,8 @@ Thanks
 ------
 
 This book is dedicated to my grandmother, Dorothy Phillips, who gave
-me my first typewriter, and my mother, Donelle Duffy, who bought me my
-first computer (a VIC-20).
+me my first typewriter (a Royal), and my mother, Donelle Duffy, who
+bought me my first computer (a VIC-20).
 
 Thanks to the following people for providing expertise, resources, and
 software.  Without the help of these folks, neither this book nor the
