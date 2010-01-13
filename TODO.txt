@@ -1,7 +1,5 @@
 - Decide on ``unhook_zca`` argument to ``tearDown``.
 
-- Get rid of ITraverser hook in favor of IViewLookup.
-
 - Named notfound views.
 
 - Describe what level of Python experience you need to understand the
