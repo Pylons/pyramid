@@ -42,21 +42,27 @@ such as HTTP, and you can usually skip such descriptions without
 becoming "blocked," although you may lack some fundamental
 understanding of how it works "under the hood" as a result.
 
+.. index::
+   single: repoze.zope2
+   single: Zope 3
+   single: Zope 2
+
 The Genesis of :mod:`repoze.bfg`
 --------------------------------
 
 I wrote :mod:`repoze.bfg` after many years of writing applications
 using :term:`Zope`.  Zope provided me with a lot of mileage: it wasn't
-until almost a decade of succesfully creating applications using Zope
+until almost a decade of succesfully creating applications using it
 that I decided to write a different web framework.  Although
 :mod:`repoze.bfg` takes inspiration from a variety of web frameworks,
 it owes more of its core design to Zope than any other.
 
-The "Repoze" brand existed before :mod:`repoze.bfg`.  One of the first
-packages developed as part of the Repoze brand was a package named
-:mod:`repoze.zope2`.  This was a package that allowed Zope 2
-applications to run under a :term:`WSGI` server without modification.
-Zope 2 did not have reasonable WSGI support at the time.
+The Repoze "brand" existed before :mod:`repoze.bfg` was created.  One
+of the first packages developed as part of the Repoze brand was a
+package named :mod:`repoze.zope2`.  This was a package that allowed
+Zope 2 applications to run under a :term:`WSGI` server without
+modification.  Zope 2 did not have reasonable WSGI support at the
+time.
 
 During the development of the :mod:`repoze.zope2` package, I found
 that replicating the Zope 2 "publisher" -- the machinery that maps
@@ -76,12 +82,11 @@ frameworks offer much along the axes of traversal, contextual
 declarative security, or application extensibility; these were
 features I had become accustomed to as a Zope developer.
 
-I decided that in the long term, creating a simpler, legacy-free
-framework that retained features I had become accustomed to when
-developing Zope applications was a more reasonable idea than
-continuing to use any Zope publisher or living with the limitations
-and unfamiliarities of a different framework.  The result is what is
-now :mod:`repoze.bfg`.
+I decided that in the long term, creating a simpler framework that
+retained features I had become accustomed to when developing Zope
+applications was a more reasonable idea than continuing to use any
+Zope publisher or living with the limitations and unfamiliarities of a
+different framework.  The result is what is now :mod:`repoze.bfg`.
 
 It is immodest to say so, but I believe :mod:`repoze.bfg` has turned
 out to be the very best Python web framework available today, bar

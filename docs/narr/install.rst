@@ -14,12 +14,12 @@ run :mod:`repoze.bfg`.
 
 .. sidebar:: Python Versions
 
-    :mod:`repoze.bfg` has been tested under Python 2.4.6, Python 2.5.4
-    and Python 2.6.2, and Python 2.7a1.  To ensure backwards
-    compatibility, development of :mod:`repoze.bfg` is currently done
-    primarily under Python 2.4 and Python 2.5.  :mod:`repoze.bfg` does
-    *not* run under any version of Python before 2.4, and does *not*
-    run under Python 3.X.
+    As of this writing, :mod:`repoze.bfg` has been tested under Python
+    2.4.6, Python 2.5.4 and Python 2.6.2, and Python 2.7a1.  To ensure
+    backwards compatibility, development of :mod:`repoze.bfg` is
+    currently done primarily under Python 2.4 and Python 2.5.
+    :mod:`repoze.bfg` does not run under any version of Python before
+    2.4, and does not yet run under Python 3.X.
 
 :mod:`repoze.bfg` is known to run on all popular Unix-like systems
 such as Linux, MacOS X, and FreeBSD as well as on Windows platforms.
@@ -45,15 +45,15 @@ system's package manager is slightly different, but the "flavor" of
 them is usually the same.
 
 For example, on an Ubuntu Linux system, to use the system package
-manager to install a Python 2.5 interpreter, use the following
+manager to install a Python 2.6 interpreter, use the following
 command:
 
 .. code-block:: text
 
-   $ sudo apt-get install python2.5-dev
+   $ sudo apt-get install python2.6-dev
 
 Once these steps are performed, the Python interpreter will usually be
-invokable via ``python2.5`` from a shell prompt.
+invokable via ``python2.6`` from a shell prompt.
 
 Source Compile Method
 +++++++++++++++++++++
@@ -73,10 +73,11 @@ manager.  For example, this works to do so on an Ubuntu Linux system:
 
    $ sudo apt-get install build-essential
 
-On Mac OS X, installing XCode has much the same effect.
+On Mac OS X, installing `XCode
+<http://developer.apple.com/tools/xcode/>`_ has much the same effect.
 
 Once you've got development tools installed on your system, On the
-same system, to install a Python 2.5 interpreter from *source*, use
+same system, to install a Python 2.6 interpreter from *source*, use
 the following commands:
 
 .. code-block:: text
@@ -87,23 +88,23 @@ the following commands:
    [chrism@vitaminf ~]$ cd tmp
    [chrism@vitaminf tmp]$ cd tmp
    [chrism@vitaminf tmp]$ wget \
-          http://python.org/ftp/python/2.5.4/Python-2.5.4.tgz
-   [chrism@vitaminf tmp]$ tar xvzf Python-2.5.4.tgz
-   [chrism@vitaminf tmp]$ cd Python-2.5.4
-   [chrism@vitaminf Python-2.5.4]$ ./configure \
-           --prefix=$HOME/opt/Python-2.5.4
-   [chrism@vitaminf Python-2.5.4]$ make; make install
+          http://www.python.org/ftp/python/2.6.4/Python-2.6.4.tgz
+   [chrism@vitaminf tmp]$ tar xvzf Python-2.6.4.tgz
+   [chrism@vitaminf tmp]$ cd Python-2.6.4
+   [chrism@vitaminf Python-2.6.4]$ ./configure \
+           --prefix=$HOME/opt/Python-2.6.4
+   [chrism@vitaminf Python-2.6.4]$ make; make install
 
 Once these steps are performed, the Python interpreter will be
-invokable via ``$HOME/opt/Python-2.5.4/bin/python`` from a shell
+invokable via ``$HOME/opt/Python-2.6.4/bin/python`` from a shell
 prompt.
 
 If You Don't Yet Have A Python Interpreter (Windows)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your Windows system doesn't have a Python interpreter, you'll need
-to install it by downloading a Python 2.4, 2.5 or 2.6-series
-interpreter executable from `python.org's download section
+to install it by downloading a Python 2.6-series interpreter
+executable from `python.org's download section
 <http://python.org/download/>`_ (the files labeled "Windows
 Installer").  Once you've downloaded it, double click on the
 executable and accept the defaults during the installation process.
@@ -118,14 +119,14 @@ extensions <http://sourceforge.net/projects/pywin32/files/>`_.
 Installing :mod:`repoze.bfg` on a UNIX System
 ---------------------------------------------
 
-It is best practice to install :mod:`repoze.bfg` into a
-:term:`virtualenv` in order to obtain isolation from any "system"
-packages you've got installed in your Python version. Using a
-virtualenv will also prevent :mod:`repoze.bfg` from globally
-installing versions of packages that are not compatible with your
-system Python.
+It is best practice to install :mod:`repoze.bfg` into a "virtual"
+Python environment in order to obtain isolation from any "system"
+packages you've got installed in your Python version.  This can be
+done by using the :term:`virtualenv` package.  Using a virtualenv will
+also prevent :mod:`repoze.bfg` from globally installing versions of
+packages that are not compatible with your system Python.
 
-To set up a virtualenv to install :mod:`repoze.bfg` within, first
+To set up a virtualenv in which to install :mod:`repoze.bfg`, first
 ensure that :term:`setuptools` is installed.  Invoke ``import
 setuptools`` within the Python interpreter you'd like to run
 :mod:`repoze.bfg` under:
@@ -138,14 +139,16 @@ setuptools`` within the Python interpreter you'd like to run
    Type "help", "copyright", "credits" or "license" for more information.
    >>> import setuptools
 
-If ``import setuptools`` does not raise an ``ImportError``, it means
-that setuptools is already installed into your Python interpreter.  If
-``import setuptools`` fails, you will need to install setuptools
-manually.
+If running ``import setuptools`` does not raise an ``ImportError``, it
+means that setuptools is already installed into your Python
+interpreter.  If ``import setuptools`` fails, you will need to install
+setuptools manually.  Note that above we're using a Python 2.4-series
+interpreter on Mac OS X; your output may differ if you're using a
+later Python version or a different platform.
 
 If you are using a "system" Python (one installed by your OS
 distributor or a 3rd-party packager such as Fink or MacPorts), you can
-usually install a setuptools package using your system's package
+usually install the setuptools package by using your system's package
 manager.  If you cannot do this, or if you're using a self-installed
 version of Python, you will need to install setuptools "by hand".
 Installing setuptools "by hand" is always a reasonable thing to do,
@@ -154,7 +157,8 @@ setuptools for installation.
 
 To install setuptools by hand, first download `ez_setup.py
 <http://peak.telecommunity.com/dist/ez_setup.py>`_ then invoke it
-using the Python interpreter you want to install setuptools into.
+using the Python interpreter into which you want to install
+setuptools.
 
 .. code-block:: text
 
@@ -247,35 +251,35 @@ downloads and installs a number of dependencies.
 Installing :mod:`repoze.bfg` on a Windows System
 -------------------------------------------------
 
-#. Install, or find `Python 2.5
-   <http://python.org/download/releases/2.5.4/>`_ for your system.
+#. Install, or find `Python 2.6
+   <http://python.org/download/releases/2.6.4/>`_ for your system.
 
 #. Install the `Python for Windows extensions
    <http://sourceforge.net/projects/pywin32/files/>`_.  Make sure to
-   pick the right download for Python 2.5 and install it using the
+   pick the right download for Python 2.6 and install it using the
    same Python installation from the previous step.
 
 #. Install latest :term:`setuptools` distribution into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
    <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.5 installation using a
+   the ``python`` interpreter of your Python 2.6 installation using a
    command prompt:
 
    .. code-block:: text
 
-      c:\> c:\Python25\python ez_setup.py
+      c:\> c:\Python26\python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
    .. code-block:: text
 
-      c:\> c:\Python25\Scripts\easy_install virtualenv
+      c:\> c:\Python26\Scripts\easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
    .. code-block:: text
 
-      c:\> c:\Python25\Scripts\virtualenv --no-site-packages bfgenv
+      c:\> c:\Python26\Scripts\virtualenv --no-site-packages bfgenv
 
 #. Switch to the ``bfgenv`` directory:
 
@@ -286,8 +290,8 @@ Installing :mod:`repoze.bfg` on a Windows System
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the :mod:`repoze.bfg` "current"
-   index to get BFG and its direct dependencies installed:
+#. Use ``easy_install`` pointed at the "current" index to get
+   :mod:`repoze.bfg` and its direct dependencies installed:
 
    .. code-block:: text
 
@@ -318,7 +322,7 @@ One caveat exists to using :mod:`repoze.bfg` under Jython: the
 :term:`Chameleon` templating engine, which is the default templating
 engine for :mod:`repoze.bfg` does not work on non-CPython platforms.
 
-The :mod:`repoze.bfg.jinja2` distribution provides templating for
+The ``repoze.bfg.jinja2`` distribution provides templating for
 :mod:`repoze.bfg` using the :term:`Jinja2` templating system.  You may
 install it like so using the ``easy_install`` command for Jython:
 

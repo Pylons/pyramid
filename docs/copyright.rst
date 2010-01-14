@@ -9,6 +9,8 @@ by Chris McDonough
 
 Copyright |copy| 2008-2010, Agendaless Consulting.
 
+ISBN-10: 0615345379
+
 ISBN-13: 978-0-615-34537-6
 
 First print publishing: 2010

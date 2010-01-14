@@ -39,17 +39,17 @@ applications.
    facilities that fits your application requirements.
 
 The first release of :mod:`repoze.bfg` was made in July of 2008.
-Since its first release, we've tried to ensure that BFG maintains the
+Since its first release, we've tried to ensure that it maintains the
 following attributes:
 
 Simplicity
   :mod:`repoze.bfg` attempts to be a *"pay only for what you eat"*
   framework which delivers results even if you have only partial
-  knowledge.  Other frameworks may expect you to understand a great
-  many concepts and technologies fully before you can be truly
-  productive.  :mod:`repoze.bfg` doesn't force you to use any
-  particular technology to produce an application, and we try to keep
-  the core set of concepts you need to understand to a minimum.
+  knowledge.  Other frameworks may expect you to understand many
+  concepts and technologies fully before you can be truly productive.
+  :mod:`repoze.bfg` doesn't force you to use any particular technology
+  to produce an application, and we try to keep the core set of
+  concepts you need to understand to a minimum.
 
 A Sense of Fun
   Developing a :mod:`repoze.bfg` application should not feel
@@ -92,6 +92,28 @@ Openness
 This book usually refers to the framework by its full package name,
 :mod:`repoze.bfg`.  However, it is often referred to colloquially as
 just "BFG" (the "repoze-dot" dropped) in conversation.
+
+.. index::
+   single: Repoze
+   single: Agendaless Consulting
+   pair: repoze; namespace package
+
+What Is Repoze?
+---------------
+
+:mod:`repoze.bfg` is a member of the collection of software published
+under the :term:`Repoze` "brand".  :term:`Repoze` software is written
+by :term:`Agendaless Consulting` and a community of contributors.  The
+`Repoze website <http://repoze.org>`_ describes the Repoze brand in
+more detail.  Software authored that uses this brand is usually placed
+into a ``repoze`` namespace package.  This namespace consists of a
+number of packages.  Each package is useful in isolation.  The
+``repoze`` namespace package represents that the software is written
+by a notional community rather than representing a collection of
+software that is meant to be used as a unit.  For example, even though
+``repoze.bfg`` shares the same namespace as another popular Repoze
+package, ``repoze.who``, these two packages are otherwise unrelated
+and can be used separately.
 
 .. index::
    single: repoze.bfg and other frameworks
@@ -148,10 +170,11 @@ Like :term:`Pylons`, but unlike :term:`Zope`, a :mod:`repoze.bfg`
 application developer may use completely imperative code to perform
 common framework configuration tasks such as adding a view or a route.
 In Zope, :term:`ZCML` is typically required for similar purposes.  In
-:term:`Grok`, :term:`decorator` objects and class-level declarations
-are used for this purpose.  :mod:`repoze.bfg` *supports* :term:`ZCML`
-and supports decorator-based configuration, but does not require
-either. See :ref:`configuration_narr` for more information.
+:term:`Grok`, a Zope-based web framework, :term:`decorator` objects
+and class-level declarations are used for this purpose.
+:mod:`repoze.bfg` *supports* :term:`ZCML` and supports decorator-based
+configuration, but does not require either. See
+:ref:`configuration_narr` for more information.
 
 Also unlike :term:`Zope` and unlike other "full-stack" frameworks such
 as :term:`Django`, :mod:`repoze.bfg` makes no assumptions about which
@@ -162,31 +185,4 @@ on the ZODB package.  Likewise, :term:`Django` tends to assume that
 you want to store your application's data in a relational database.
 :mod:`repoze.bfg` makes no such assumption; it allows you to use a
 relational database but doesn't encourage or discourage the decision.
-
-.. index::
-   single: Repoze
-   single: Agendaless Consulting
-   pair: repoze; namespace package
-
-What Is Repoze?
----------------
-
-:mod:`repoze.bfg` is a member of the collection of software published
-under the :term:`Repoze` "brand".  :term:`Repoze` software is written
-by :term:`Agendaless Consulting` and a community of contributors.  The
-`Repoze website <http://repoze.org>`_ describes the Repoze brand in
-more detail.  Software authored that uses this brand is usually placed
-into a ``repoze`` namespace package.  This namespace consists of a
-number of packages.  Each package is useful in isolation.  The
-``repoze`` namespace package represents that the software is written
-by a notional community rather than representing a collection of
-software that is meant to be used as a unit.  For example, even though
-``repoze.bfg`` shares the same namespace as another popular Repoze
-package, ``repoze.who``, these two packages are otherwise unrelated
-and can be used separately.
-
-.. index::
-   single: repoze.zope2
-   single: Zope 3
-   single: Zope 2
 
