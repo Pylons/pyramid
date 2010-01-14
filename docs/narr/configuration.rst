@@ -214,10 +214,10 @@ benefit being that applications configured declaratively can be
 *overridden* and *extended* by third parties without requiring the
 third party to change application code.  If you want to build a
 framework or an extensible application, using declarative
-configuration is a good idea.  Declarative configuration has a down
-side: you can't use plain-old-Python syntax you probably already know
-and understand to configure your application; instead you need to use
-:term:`ZCML`.
+configuration is a good idea.  Declarative configuration has an
+obvious downside: you can't use plain-old-Python syntax you probably
+already know and understand to configure your application; instead you
+need to use :term:`ZCML`.
 
 .. note::
 
