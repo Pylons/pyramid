@@ -70,9 +70,12 @@ and other business communications to `Agendaless Consulting
 technical queries to the `repoze-dev maillist
 <http://lists.repoze.org/listinfo/repoze-dev>`_.
 
-Source Code
------------
+HTML Version and Source Code
+----------------------------
 
-The source code for this book is available within the
-:mod:`repoze.bfg` software distribution, always available via
+An HTML version of this book is freely available via
 http://bfg.repoze.org.
+
+The source code for the examples used in this book are available
+within the :mod:`repoze.bfg` software distribution, always available
+via http://bfg.repoze.org.
