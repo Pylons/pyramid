@@ -42,7 +42,7 @@ application developer, and invokes it.  A view callable returns a
    into a single step.  In these systems, a URL can map *directly* to
    a view callable.  This makes them simpler to understand than
    systems which use distinct subsystems to locate a context and find
-   a view.  However, explicitly using context finding step provides
+   a view.  However, explicitly using a context finding step provides
    extra flexibility.  For example, it makes it possible to protect
    your application with declarative context-sensitive instance-level
    :term:`authorization`, which is not well-supported in frameworks

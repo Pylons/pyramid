@@ -109,6 +109,6 @@ Simon Oram of Electrosoup, Ian Bicking of the Open Planning Project,
 Jim Fulton of Zope Corporation, Tom Moroz of the Open Society
 Institute, and Todd Koym of Environmental Health Sciences.
 
-Special thanks to Guido van Rossum and Tim Peters for Python.
+Thanks to Guido van Rossum and Tim Peters for Python.
 
-Special thanks also to Tricia for putting up with me.
+Special thanks to Tricia for putting up with me.
