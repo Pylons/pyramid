@@ -521,9 +521,9 @@ class Configurator(object):
           views together to form a composite response.  The response
           of the outermost wrapper view will be returned to the user.
           The wrapper view will be found as any view is found: see
-          :ref:`view_lookup_ordering`.  The "best" wrapper view will
-          be found based on the lookup ordering: "under the hood" this
-          wrapper view is looked up via
+          :ref:`view_lookup`.  The "best" wrapper view will be found
+          based on the lookup ordering: "under the hood" this wrapper
+          view is looked up via
           ``repoze.bfg.view.render_view_to_response(context, request,
           'wrapper_viewname')``. The context and request of a wrapper
           view is the same context and request of the inner view.  If

@@ -11,23 +11,32 @@ Here's how it works at a high level:
 
 - A :term:`request` is generated when a user visits our application.
 
-- Based on the request, a :term:`context` is located.  Exactly how a
-  context is located depends whether you are using :term:`traversal`
-  or :term:`URL dispatch`, but in either case, one is found.  See
-  :ref:`url_mapping_chapter` for more information.
+- Based on the request, a :term:`context` is located through
+  :term:`context finding`.  A context is located differently depending
+  on whether the application uses :term:`traversal` or :term:`URL
+  dispatch`, but a context is ultimately found in either case.  See
+  :ref:`urlmapping_chapter` for more information about context
+  finding.
 
-- A :term:`view callable` is located using the the context as well as
-  other attributes of the request.
+- A :term:`view callable` is located by :term:`view lookup` using the
+  the context as well as other attributes of the request.
+
+- If an :term:`authentication policy` is in effect, it is passed the
+  request; it returns some number of :term:`principal` identifiers.
 
 - If an :term:`authorization policy` is in effect and the :term:`view
   configuration` associated with the view callable that was found has
   a :term:`permission` associated with it, the authorization policy is
-  passed the context: it will either allow or deny access.
+  passed the :term:`context`, some number of :term:`principal`
+  identifiers returned by the authentication policy, and the
+  :term:`permission` associated with the view; it will allow or deny
+  access.
 
-- If access is allowed, the view callable is invoked.
+- If the authorization policy allows access, the view callable is
+  invoked.
 
-- If access is denied, view callable is not invoked; instead the
-  :term:`forbidden view` is invoked.
+- If the authorization policy denies access, the view callable is not
+  invoked; instead the :term:`forbidden view` is invoked.
 
 Authorization is enabled by modifying your application to include a
 :term:`authentication policy` and :term:`authorization policy`.

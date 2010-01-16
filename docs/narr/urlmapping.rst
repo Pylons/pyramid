@@ -2,25 +2,71 @@
    triple: differences; URL dispatch; traversal
    pair: mapping; URLs
 
-.. _url_mapping_chapter:
+.. _urlmapping_chapter:
 
 Mapping URLs to Code
 --------------------
 
-:mod:`repoze.bfg` supports two methods by which a URL can be mapped to
-code: :term:`URL dispatch` and :term:`traversal`.
+In order for a web application to perform any useful action, it needs
+some way of finding and invoking code written by the application
+developer based on parameters present in the :term:`request`.
 
-.. note::
+:mod:`repoze.bfg` uses two separate but cooperating subsystems to
+ultimately find and invoke code written by the application developer:
+:term:`context finding` and :term:`view lookup` .
 
-   The :mod:`repoze.bfg` support for :term:`URL dispatch` was inspired
-   by the :term:`Routes` system used by :term:`Pylons`.
-   :mod:`repoze.bfg` support for :term:`traversal` was inspired by
-   :term:`Zope`.
+- A :mod:`repoze.bfg` "context finding" subsystem is given a
+  :term:`request`; it is responsible for finding a :term:`context`
+  object and a :term:`view name` based on information present in the
+  request.
 
-:term:`URL dispatch` is convenient and straightforward: an incoming
-URL is checked against a list of potential matches in a predefined
-order.  When a match is found, it means that a particular :term:`view
-callable` will be invoked.
+- The :mod:`repoze.bfg` view lookup subsystem is provided with a
+  :term:`request`, a :term:`context` and a :term:`view name`, and is
+  responsible for finding and invoking a :term:`view callable`.  A
+  view callable is a specific bit of code that receives the
+  :term:`request` and which returns a :term:`response`, written and
+  registered by the application developer.
+
+These two subsystems are are used by :mod:`repoze.bfg` serially: a
+:term:`context finding` subsystem does its job, then the result of
+context finding is passed to the :term:`view lookup` subsystem.  The
+view lookup system finds a :term:`view callable` written by an
+application developer, and invokes it.  A view callable returns a
+:term:`response`.  The response is returned to the requesting user.
+
+.. sidebar::  What Good is A Context Finding Subsystem?
+
+   Many other web frameworks such as :term:`Pylons` or :term:`Django`
+   actually collapse the two steps of context finding and view lookup
+   into a single step.  In such systems, a URL maps *directly* to a
+   view callable.  These systems possess no analogue to a
+   context finding subsystem: they are "context-free".  This makes
+   them simpler to understand than systems which use "context".
+   However, using an explicit context finding step provides extra
+   flexibility.  For example, it makes it possible to protect your
+   application with declarative context-sensitive instance-level
+   :term:`authorization`, which is not well supported in frameworks
+   that do not provide a notion of a context.  See the
+   :ref:`security_chapter` for more information.
+
+There are two separate context finding subsystems in
+:mod:`repoze.bfg`: :term:`traversal` and :term:`URL dispatch`.  The
+subsystems are documented within this chapter.  They can be used
+separately or they can be combined.
+
+There is only one view lookup subsystem present in :mod:`repoze.bfg`.
+It is not documented in this chapter.  Instead, it is documented
+within :ref:`views_chapter`.
+
+.. toctree::
+   :maxdepth: 2
+
+   traversal
+   urldispatch
+   hybrid
+
+Should I Use Traversal or URL Dispatch for Context Finding?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :term:`URL dispatch` can easily handle URLs such as
 ``http://example.com/members/Chris``, where it's assumed that each
@@ -78,22 +124,16 @@ can be traversed, it also becomes easy to provide "instance-level
 security": you just attach a security declaration to each instance in
 the graph.  This is not nearly as easy to do when using URL dispatch.
 
-In essence, the choice to use graph traversal vs. URL dispatch is
-largely religious.  Graph traversal dispatch probably just doesn't
-make any sense when you possess completely "square" data stored in a
-relational database because it requires the construction and
-maintenance of a graph and requires that the developer think about
-mapping URLs to code in terms of traversing that graph.  However, when
-you have a hierarchical data store, using traversal can provide
-significant advantages over using URL-based dispatch.
+In essence, the choice to use traversal vs. URL dispatch is largely
+religious.  Traversal dispatch probably just doesn't make any sense
+when you possess completely "square" data stored in a relational
+database because it requires the construction and maintenance of a
+graph and requires that the developer think about mapping URLs to code
+in terms of traversing that graph.  However, when you have a
+hierarchical data store, using traversal can provide significant
+advantages over using URL-based dispatch.
 
 Since :mod:`repoze.bfg` provides support for both approaches, you can
 use either as you see fit; you can even combine them together if
 necessary.
 
-.. toctree::
-   :maxdepth: 2
-
-   traversal
-   urldispatch
-   hybrid

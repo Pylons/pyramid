@@ -3,63 +3,56 @@
 Views
 =====
 
-Views do the "heavy lifting" within almost every :mod:`repoze.bfg`
-application.  The primary job of any :mod:`repoze.bfg` application is
-is to find and call a :term:`view callable` when a :term:`request`
-reaches it.  A :term:`view callable` is a callable which is invoked
-when a request enters your application.
+The primary job of any :mod:`repoze.bfg` application is is to find and
+call a :term:`view callable` when a :term:`request` reaches the
+application.  A :term:`view callable` is invoked when a request enters
+your application: it "does something", then returns a response.  All
+view callables are written by you, the application developer.
 
-A :term:`view callable` is mapped to one or more URLs by virtue of
-:term:`view configuration`.  View configuration is performed in one of
-three ways:
-
-- by using the :meth:`repoze.bfg.configuration.Configurator.add_view`
-  method.
-
-- by adding a ``<view>`` declaration to :term:`ZCML` used by your
-  application (see :ref:`view_directive`).
-
-- by running a :term:`scan` against application source code which has
-  a :class:`repoze.bfg.view.bfg_view` decorator attached to a Python
-  object.
-
-Each of these mechanisms is completely equivalent to the other.
-
-A view might also be mapped to a URL by virtue of :term:`route
-configuration`.  Route configuration is performed in one of the
-following two ways:
-
-- by using the :meth:`repoze.bfg.configuration.Configurator.add_route`
-  method
-
-- by adding a ``<route>`` declaration to :term:`ZCML` used by
-  your application.
-
-See :ref:`urldispatch_chapter` for more information on mapping URLs to
-views using routes.
-
-However a view callable is configured to be called, most view
-callables accept a single argument named ``request``.  This argument
-represents a :term:`WebOb` :term:`Request` object representing the
-current HTTP request.
-
-A view callable may always return a :term:`WebOb` :term:`Response`
-object directly.  It may optionally return another arbitrary
-non-Response value.  If a view callable returns a non-Response result,
-the result must be converted into a response by the :term:`renderer`
-associated with the :term:`view configuration` for the view.
+The :ref:`urlmapping_chapter` describes how a :term:`context` and a
+:term:`view name` are computed using information from the
+:term:`request` via the process of :term:`context finding`.  But
+neither the context nor the view name found very useful unless those
+elements can eventually be mapped to a :term:`view callable`.
 
 .. note:: 
 
-   A :term:`view callable` is referred to in conversational shorthand
-   as a :term:`view`; in this documentation we need to be more
-   precise, however, due to the difference between view
+   A :term:`view callable` is oten referred to in conversational
+   shorthand as a :term:`view`; in this documentation we need to be
+   more precise, however, due to the difference between view
    *configuration* and the code that implements a view *callable*.
 
-.. note::
+The job of actually locating and invoking the "best" :term:`view
+callable` is the job of the :term:`view lookup` subsystem.  The view
+lookup subsystem compares information found via
+:term:`context finding` against :term:`view configuration` statements
+made by the developer to choose "the best" view callable for a
+specific circumstance.
 
-   See :ref:`traversal_intro` for an example of how a view might be
-   found as the result of a request.
+Provided within this chapter is documentation of the process of
+creating view callables, documentation about performing view
+configuration, and a detailed explanation of view lookup.
+
+View Callables
+--------------
+
+No matter how a view callable is eventually found, all view callables
+used by :mod:`repoze.bfg` must be constructed in the same way, and
+must return the same kind of return value.
+
+Most view callables accept a single argument named ``request``.  This
+argument represents a :term:`WebOb` :term:`Request` object as
+represented to :mod:`repoze.bfg` by the upstream :term:`WSGI` server.
+
+A view callable may always return a :term:`WebOb` :term:`Response`
+object directly.  It may optionally return another arbitrary
+non-Response value: if a view callable returns a non-Response result,
+the result must be converted into a response by the :term:`renderer`
+associated with the :term:`view configuration` for the view.
+
+View callables can be functions, instances, or classes.  View
+callables can optionally be defined with an alternate calling
+convention.
 
 .. index::
    pair: view; calling convention
@@ -69,7 +62,7 @@ associated with the :term:`view configuration` for the view.
 .. _function_as_view:
 
 Defining a View Callable as a Function
---------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The easiest way to define a view callable is to create a function that
 accepts a single argument named ``request`` and which returns a
@@ -91,8 +84,8 @@ callable implemented as a function:
 
 .. _class_as_view:
 
-Defining a View Callable as a Class 
------------------------------------
+Defining a View Callable as a Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note:: This feature is new as of :mod:`repoze.bfg` 0.8.1.
 
@@ -139,7 +132,7 @@ represent the method expected to return a response, you can use an
 .. _request_and_context_view_definitions:
 
 Request-And-Context View Callable Definitions
----------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Usually, view callables are defined to accept only a single argument:
 ``request``.  However, view callables may alternately be defined as
@@ -210,7 +203,7 @@ has access to the context via ``request.context``.
 .. _the_response:
 
 View Callable Responses
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 A view callable may always return an object that implements the
 :term:`WebOb` :term:`Response` interface.  The easiest way to return
@@ -241,13 +234,35 @@ view by changing the ``renderer`` attribute in the view's
 configuration.  See :ref:`views_which_use_a_renderer`.
 
 .. index::
+   pair: view; http redirect
+
+Using a View Callable to Do A HTTP Redirect
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can issue an HTTP redirect from within a view by returning a
+particular kind of response.
+
+.. code-block:: python
+   :linenos:
+
+   from webob.exc import HTTPFound
+
+   def myview(request):
+       return HTTPFound(location='http://example.com')
+
+All exception types from the :mod:`webob.exc` module implement the
+Webob :term:`Response` interface; any can be returned as the response
+from a view.  See :term:`WebOb` for the documentation for this module;
+it includes other response types for ``Unauthorized``, etc.
+
+.. index::
    single: renderer
    pair: view; renderer
 
 .. _views_which_use_a_renderer:
 
 Writing View Callables Which Use a Renderer
--------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note:: This feature is new as of :mod:`repoze.bfg` 1.1
 
@@ -306,31 +321,607 @@ Additional renderers can be added to the system as necessary via a
 ZCML directive (see :ref:`adding_and_overriding_renderers`).
 
 .. index::
+   pair: renderers; built-in
+
+.. _built_in_renderers:
+
+Built-In Renderers
+~~~~~~~~~~~~~~~~~~
+
+Several built-in "renderers" exist in :mod:`repoze.bfg`.  These
+renderers can be used in the ``renderer`` attribute of view
+configurations.
+
+.. index::
+   pair: renderer; string
+
+``string``: String Renderer
++++++++++++++++++++++++++++
+
+The ``string`` renderer is a renderer which renders a view callable
+result to a string.  If a view callable returns a non-Response object,
+and the ``string`` renderer is associated in that view's
+configuration, the result will be to run the object through the Python
+``str`` function to generate a string.  Note that if a Unicode object
+is returned, it is not ``str()`` -ified.
+
+Here's an example of a view that returns a dictionary.  If the
+``string`` renderer is specified in the configuration for this view,
+the view will render the returned dictionary to the ``str()``
+representation of the dictionary:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(renderer='string')
+   def hello_world(request):
+       return {'content':'Hello!'}
+
+The body of the response returned by such a view will be a string
+representing the ``str()`` serialization of the return value:
+
+.. code-block: python
+   :linenos:
+
+   {'content': 'Hello!'}
+
+Views which use the string renderer can vary non-body response
+attributes by attaching properties to the request.  See
+:ref:`response_request_attrs`.
+
+.. index::
+   pair: renderer; JSON
+
+``json``: JSON Renderer
++++++++++++++++++++++++
+
+The ``json`` renderer is a renderer which renders view callable
+results to :term:`JSON`.  If a view callable returns a non-Response
+object it is called.  It passes the return value through the
+``simplejson.dumps`` function, and wraps the result in a response
+object.
+
+Here's an example of a view that returns a dictionary.  If the
+``json`` renderer is specified in the configuration for this view, the
+view will render the returned dictionary to a JSON serialization:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(renderer='json')
+   def hello_world(request):
+       return {'content':'Hello!'}
+
+The body of the response returned by such a view will be a string
+representing the JSON serialization of the return value:
+
+.. code-block: python
+   :linenos:
+
+   '{"content": "Hello!"}'
+
+The return value needn't be a dictionary, but the return value must
+contain values renderable by :func:`json.dumps`.
+
+You can configure a view to use the JSON renderer in ZCML by naming
+``json`` as the ``renderer`` attribute of a view configuration, e.g.:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       name="hello"
+       renderer="json"
+       />
+
+Views which use the JSON renderer can vary non-body response
+attributes by attaching properties to the request.  See
+:ref:`response_request_attrs`.
+
+.. index::
+   pair: renderer; chameleon
+
+.. _chameleon_template_renderers:
+
+``*.pt`` or ``*.txt``: Chameleon Template Renderers
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Two built-in renderers exist for :term:`Chameleon` templates.
+
+If the ``renderer`` attribute of a view configuration is an absolute
+path, a relative path or :term:`resource specification` which has a
+final path element with a filename extension of ``.pt``, the Chameleon
+ZPT renderer is used.  See :ref:`chameleon_zpt_templates` for more
+information about ZPT templates.
+
+If the ``renderer`` attribute of a view configuration is an absolute
+path, a source-file relative path, or a :term:`resource specification`
+which has a final path element with a filename extension of ``.txt``,
+the :term:`Chameleon` text renderer is used.  See
+:ref:`chameleon_zpt_templates` for more information about Chameleon
+text templates.
+
+The behavior of these renderers is the same, except for the engine
+used to render the template.
+
+When a ``renderer`` attribute that names a Chameleon template path
+(e.g. ``templates/foo.pt`` or ``templates/foo.txt``) is used, the view
+must return a Response object or a Python *dictionary*.  If the view
+callable with an associated template returns a Python dictionary, the
+named template will be passed the dictionary as its keyword arguments,
+and the template renderer implementation will return the resulting
+rendered template in a response to the user.  If the view callable
+returns anything but a dictionary, an error will be raised.
+
+Before passing keywords to the template, the keywords derived from the
+dictionary returned by the view are augmented.  The callable object
+-- whatever object was used to define the ``view`` -- will be
+automatically inserted into the set of keyword arguments passed to the
+template as the ``view`` keyword.  If the view callable was a class,
+the ``view`` keyword will be an instance of that class.  Also inserted
+into the keywords passed to the template are ``renderer_name`` (the
+name of the renderer, which may be a full path or a package-relative
+name, typically the full string used in the ``renderer`` attribute of
+the directive), ``context`` (the context of the view used to render
+the template), and ``request`` (the request passed to the view used to
+render the template).
+
+Here's an example view configuration which uses a Chameleon ZPT
+renderer:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       name="hello"
+       renderer="templates/foo.pt"
+       />
+
+Here's an example view configuration which uses a Chameleon text
+renderer:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       name="hello"
+       renderer="templates/foo.txt"
+       />
+
+Views with use a Chameleon renderer can vary response attributes by
+attaching properties to the request.  See
+:ref:`response_request_attrs`.
+
+.. index::
+   pair: renderer; response attributes
+   pair: renderer; changing headers
+   triple: headers; changing; renderer
+
+.. _response_request_attrs:
+
+Varying Attributes of Rendered Responses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before a response that is constructed as the result of the use of a
+:term:`renderer` is returned to :mod:`repoze.bfg`, several attributes
+of the request are examined which have the potential to influence
+response behavior.
+
+View callables that don't directly return a response should set these
+values on the ``request`` object via ``setattr`` within the view
+callable to influence automatically constructed response attributes.
+
+``response_content_type``
+
+  Defines the content-type of the resulting response,
+  e.g. ``text/xml``.
+
+``response_headerlist``
+
+  A sequence of tuples describing cookie values that should be set in
+  the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
+  'foo')]``.
+
+``response_status``
+
+  A WSGI-style status code (e.g. ``200 OK``) describing the status of
+  the response.
+
+``response_charset``
+
+  The character set (e.g. ``UTF-8``) of the response.
+
+``response_cache_for``
+
+  A value in seconds which will influence ``Cache-Control`` and
+  ``Expires`` headers in the returned response.  The same can also be
+  achieved by returning various values in the ``response_headerlist``,
+  this is purely a convenience.
+
+.. index::
+   pair: renderers; adding
+
+.. _adding_and_overriding_renderers:
+
+Adding and Overriding Renderers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Additional configuration declarations can be made which override an
+existing :term:`renderer` or which add a new renderer.  Adding or
+overriding a renderer is accomplished via :term:`ZCML` or via
+imperative configuration. 
+
+For example, to add a renderer which renders views which have a
+``renderer`` attribute that is a path that ends in ``.jinja2``:
+
+.. topic:: Via ZCML
+
+   .. code-block:: xml
+      :linenos:
+
+      <renderer
+        name=".jinja2"
+        factory="my.package.MyJinja2Renderer"/>
+
+   The ``factory`` attribute is a :term:`dotted Python name` that must
+   point to an implementation of a :term:`renderer`.
+
+   The ``name`` attribute is the renderer name.
+
+.. topic:: Via Imperative Configuration
+
+   .. code-block:: python
+      :linenos:
+
+      from my.package import MyJinja2Renderer
+      config.add_renderer('.jinja2', MyJinja2Renderer)
+
+   The first argument is the renderer name.
+
+   The second argument is a reference to an to an implementation of a
+   :term:`renderer`.
+
+A renderer implementation is usually a class which has the following
+interface:
+
+.. code-block:: python
+   :linenos:
+
+   class RendererFactory:
+       def __init__(self, name):
+           """ Constructor: ``name`` may be a path """
+
+       def __call__(self, value, system): """ Call a the renderer
+           implementation with the value and the system value passed
+           in as arguments and return the result (a string or unicode
+           object).  The value is the return value of a view.  The
+           system value is a dictionary containing available system
+           values (e.g. ``view``, ``context``, and ``request``). """
+
+There are essentially two different kinds of ``renderer``
+registrations: registrations that use a dot (``.``) in their ``name``
+argument and ones which do not.
+
+Renderer registrations that have a ``name`` attribute which starts
+with a dot are meant to be *wildcard* registrations.  When a ``view``
+configuration is encountered which has a ``name`` attribute that
+contains a dot, at startup time, the path is split on its final dot,
+and the second element of the split (the filename extension,
+typically) is used to look up a renderer for the configured view.  The
+renderer's factory is still passed the entire ``name`` attribute value
+(not just the extension).
+
+Renderer registrations that have ``name`` attribute which *does not*
+start with a dot are meant to be absolute registrations.  When a
+``view`` configuration is encountered which has a ``name`` argument
+that does not contain a dot, the full value of the ``name`` attribute
+is used to look up the renderer for the configured view.
+
+Here's an example of a renderer registration in ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+     name="amf"
+     factory="my.package.MyAMFRenderer"/>
+
+Adding the above ZCML to your application will allow you to use the
+``my.package.MyAMFRenderer`` renderer implementation in ``view``
+configurations by referring to it as ``amf`` in the ``renderer``
+attribute:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(renderer='amf')
+   def myview(request):
+       return {'Hello':'world'}
+
+By default, when a template extension is unrecognized, an error is
+thrown at rendering time.  You can associate more than one filename
+extension with the same renderer implementation as necessary if you
+need to use a different file extension for the same kinds of
+templates.  For example, to associate the ``.zpt`` extension with the
+Chameleon page template renderer factory, use:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".zpt"
+      factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
+
+To override the default mapping in which files with a ``.pt``
+extension are rendered via a Chameleon ZPT page template renderer, use
+a variation on the following in your application's ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".pt"
+      factory="my.package.pt_renderer"/>
+
+To override the default mapping in which files with a ``.txt``
+extension are rendered via a Chameleon text template renderer, use a
+variation on the following in your application's ZCML:
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      name=".txt"
+      factory="my.package.text_renderer"/>
+
+To associate a *default* renderer with *all* view configurations (even
+ones which do not possess a ``renderer`` attribute), use a variation
+on the following (ie. omit the ``name`` attribute to the renderer
+tag):
+
+.. code-block:: xml
+   :linenos:
+
+   <renderer
+      factory="repoze.bfg.renderers.json_renderer_factory"/>
+
+See also :ref:`renderer_directive`.
+
+.. index::
+   triple: exceptions; special; view
+
+Using Special Exceptions In View Callables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Usually when a Python exception is raised within a view callable,
+:mod:`repoze.bfg` allows the exception to propagate all the way out to
+the :term:`WSGI` server which invoked the application.
+
+However, for convenience, two special exceptions exist which are
+always handled by :mod:`repoze.bfg` itself.  These are
+:exc:`repoze.bfg.exceptions.NotFound` and
+:exc:`repoze.bfg.exceptions.Forbidden`.  Both is an exception class
+which accepts a single positional constructor argument: a ``message``.
+
+If :exc:`repoze.bfg.exceptions.NotFound` is raised within view code,
+the result of the :term:`Not Found View` will be returned to the user
+agent which performed the request.
+
+If :exc:`repoze.bfg.exceptions.Forbidden` is raised within view code,
+the result of the :term:`Forbidden View` will be returned to the user
+agent which performed the request.
+
+In all cases, the message provided to the exception constructor is
+made available to the view which :mod:`repoze.bfg` invokes as
+``request.environ['repoze.bfg.message']``.
+
+.. index::
+   triple: view; forms; unicode
+
+Handling Form Submissions in View Callables (Unicode and Character Set Issues)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most web applications need to accept form submissions from web
+browsers and various other clients.  In :mod:`repoze.bfg`, form
+submission handling logic is always part of a :term:`view`.  For a
+general overview of how to handle form submission data using the
+:term:`WebOb` API, see `"Query and POST variables" within the WebOb
+documentation
+<http://pythonpaste.org/webob/reference.html#query-post-variables>`_.
+:mod:`repoze.bfg` defers to WebOb for its request and response
+implementations, and handling form submission data is a property of
+the request implementation.  Understanding WebOb's request API is the
+key to understanding how to process form submission data.
+
+There are some defaults that you need to be aware of when trying to
+handle form submission data in a :mod:`repoze.bfg` view.  Because
+having high-order (non-ASCII) characters in data contained within form
+submissions is exceedingly common, and because the UTF-8 encoding is
+the most common encoding used on the web for non-ASCII character data,
+and because working and storing Unicode values is much saner than
+working with and storing bytestrings, :mod:`repoze.bfg` configures the
+:term:`WebOb` request machinery to attempt to decode form submission
+values into Unicode from the UTF-8 character set implicitly.  This
+implicit decoding happens when view code obtains form field values via
+the :term:`WebOb` ``request.params``, ``request.GET``, or
+``request.POST`` APIs.
+
+For example, let's assume that the following form page is served up to
+a browser client, and its ``action`` points at some :mod:`repoze.bfg`
+view code:
+
+.. code-block:: xml
+   :linenos:
+
+   <html xmlns="http://www.w3.org/1999/xhtml">
+     <head>
+       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+     </head>
+     <form method="POST" action="myview">
+       <div>
+         <input type="text" name="firstname"/>
+       </div> 
+       <div>
+         <input type="text" name="lastname"/>
+       </div>
+       <input type="submit" value="Submit"/>
+     </form>
+   </html>
+
+The ``myview`` view code in the :mod:`repoze.bfg` application *must*
+expect that the values returned by ``request.params`` will be of type
+``unicode``, as opposed to type ``str``. The following will work to
+accept a form post from the above form:
+
+.. code-block:: python
+   :linenos:
+
+   def myview(request):
+       firstname = request.params['firstname']
+       lastname = request.params['lastname']
+
+But the following ``myview`` view code *may not* work, as it tries to
+decode already-decoded (``unicode``) values obtained from
+``request.params``:
+
+.. code-block:: python
+   :linenos:
+
+   def myview(request):
+       # the .decode('utf-8') will break below if there are any high-order
+       # characters in the firstname or lastname
+       firstname = request.params['firstname'].decode('utf-8')
+       lastname = request.params['lastname'].decode('utf-8')
+
+For implicit decoding to work reliably, you must ensure that every
+form you render that posts to a :mod:`repoze.bfg` view is rendered via
+a response that has a ``;charset=UTF-8`` in its ``Content-Type``
+header; or, as in the form above, with a ``meta http-equiv`` tag that
+implies that the charset is UTF-8 within the HTML ``head`` of the page
+containing the form.  This must be done explicitly because all known
+browser clients assume that they should encode form data in the
+character set implied by ``Content-Type`` value of the response
+containing the form when subsequently submitting that form; there is
+no other generally accepted way to tell browser clients which charset
+to use to encode form data.  If you do not specify an encoding
+explicitly, the browser client will choose to encode form data in its
+default character set before submitting it.  The browser client may
+have a non-UTF-8 default encoding.  If such a request is handled by
+your view code, when the form submission data is encoded in a non-UTF8
+charset, eventually the WebOb request code accessed within your view
+will throw an error when it can't decode some high-order character
+encoded in another character set within form data e.g. when
+``request.params['somename']`` is accessed.
+
+If you are using the :class:`webob.Response` class to generate a
+response, or if you use the ``render_template_*`` templating APIs, the
+UTF-8 charset is set automatically as the default via the
+``Content-Type`` header.  If you return a ``Content-Type`` header
+without an explicit charset, a WebOb request will add a
+``;charset=utf-8`` trailer to the ``Content-Type`` header value for
+you for response content types that are textual (e.g. ``text/html``,
+``application/xml``, etc) as it is rendered.  If you are using your
+own response object, you will need to ensure you do this yourself.
+
+To avoid implicit form submission value decoding, so that the values
+returned from ``request.params``, ``request.GET`` and ``request.POST``
+are returned as bytestrings rather than Unicode, add the following to
+your application's ``configure.zcml``::
+
+    <subscriber for="repoze.bfg.interfaces.INewRequest"
+                handler="repoze.bfg.request.make_request_ascii"/>
+
+You can then control form post data decoding "by hand" as necessary.
+For example, when this subscriber is active, the second example above
+will work unconditionally as long as you ensure that your forms are
+rendered in a request that has a ``;charset=utf-8`` stanza on its
+``Content-Type`` header.
+
+.. note:: The behavior that form values are decoded from UTF-8 to
+   Unicode implicitly was introduced in :mod:`repoze.bfg` 0.7.0.
+   Previous versions of :mod:`repoze.bfg` performed no implicit
+   decoding of form values (the default was to treat values as
+   bytestrings).
+
+.. note:: Only the *values* of request params obtained via
+   ``request.params``, ``request.GET`` or ``request.POST`` are decoded
+   to Unicode objects implicitly in :mod:`repoze.bfg`'s default
+   configuration.  The keys are still strings.
+
+
+
+.. index::
    single: view configuration
    pair: view; configuration
 
 .. _view_configuration:
 
-View Configuration: Mapping View Callables to URLs
---------------------------------------------------
+View Configuration
+------------------
 
-:term:`View configuration` may be performed in one of three ways: by
-using the :meth:`repoze.bfg.configuration.Configurator.add_view`
-method, by adding ``view`` declarations using :term:`ZCML` or by using
-the :class:`repoze.bfg.view.bfg_view` decorator.  Each method is
-explained below.
+A developer makes a :term:`view callable` available for use within a
+:mod:`repoze.bfg` application via :term:`view configuration`.  A view
+configuration associates a view callable with a set of statements
+about the set of circumstances which must be true for the view
+callable to be invoked.
+
+A view configuration statement is made about information present in
+the :term:`context` and in the :term:`request`, as well as the
+:term:`view name`.  These three pieces of information are known,
+collectively, as a :term:`triad`.
+
+View configuration is performed in one of three ways:
+
+- by adding a ``<view>`` declaration to :term:`ZCML` used by your
+  application (see :ref:`mapping_views_using_zcml_section` and
+  :ref:`view_directive`).
+
+- by running a :term:`scan` against application source code which has
+  a :class:`repoze.bfg.view.bfg_view` decorator attached to a Python
+  object (see :class:`repoze.bfg.view.bfg_view` and
+  :ref:`mapping_views_using_a_decorator_section`).
+
+- by using the :meth:`repoze.bfg.configuration.Configurator.add_view`
+  method (see :meth:`repoze.bfg.configuration.Configurator.add_view`
+  and :ref:`mapping_views_using_imperative_config_section`).
+
+Each of these mechanisms is completely equivalent to the other.
+
+A view might also be mapped to a URL by virtue of :term:`route
+configuration`.  Route configuration is performed in one of the
+following two ways:
+
+- by using the :meth:`repoze.bfg.configuration.Configurator.add_route`
+  method.
+
+- by adding a ``<route>`` declaration to :term:`ZCML` used by
+  your application.
 
 .. index::
    triple: zcml; view; configuration
 
-.. _mapping_views_to_urls_using_zcml_section:
+.. _mapping_views_using_zcml_section:
 
 View Configuration Via ZCML
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may associate a view with a URL by adding ``view`` declarations
-via :term:`ZCML` in a ``configure.zcml`` file.  An example of a view
-declaration in ZCML is as follows:
+You may associate a view with a URL by adding :ref:`view_directive`
+declarations via :term:`ZCML` in a ``configure.zcml`` file.  An
+example of a view declaration in ZCML is as follows:
 
 .. code-block:: xml
    :linenos:
@@ -342,9 +933,12 @@ declaration in ZCML is as follows:
        />
 
 The above maps the ``.views.hello_world`` view callable function to
-:term:`context` objects which are instances (or subclasses) of the
-Python class represented by ``.models.Hello`` when the *view name* is
-``hello.html``.
+the following set of :term:`context finding` results:
+
+- A :term:`context` object which is an instance (or subclass) of the
+  Python class represented by ``.models.Hello``
+
+- A :term:`view name` equalling ``hello.html``.
 
 .. note:: Values prefixed with a period (``.``) for the ``context``
    and ``view`` attributes of a ``view`` declaration (such as those
@@ -370,12 +964,25 @@ You can also declare a *default view callable* for a model type:
        />
 
 A *default view callable* simply has no ``name`` attribute.  When a
-:term:`context` is found and there is no *view name* associated with
-the result of :term:`traversal`, the *default view callable* is the
-view callable that is used.
+:term:`context` is found and there is no :term:`view name` associated
+with the result of :term:`context finding`, the *default view
+callable* is the view callable that is used.
 
-You can also declare that a view callable is good for any model type
-by using the special ``*`` character in the ``context`` attribute:
+A default view callable can alternately be defined by using the empty
+string as its ``name`` attribute:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       name=""
+       />
+
+You may also declare that a view callable is good for any context type
+by using the special ``*`` character as the value of the ``context``
+attribute:
 
 .. code-block:: xml
    :linenos:
@@ -386,9 +993,9 @@ by using the special ``*`` character in the ``context`` attribute:
        name="hello.html"
        />
 
-This indicates that when :mod:`repoze.bfg` identifies that the *view
-name* is ``hello.html`` against *any* :term:`context`, the
-``.views.hello_world`` view callable will be called.
+This indicates that when :mod:`repoze.bfg` identifies that the
+:term:`view name` is ``hello.html`` and the context is of any type,
+the ``.views.hello_world`` view callable will be invoked.
 
 A ZCML ``view`` declaration's ``view`` attribute can also name a
 class.  In this case, the rules described in :ref:`class_as_view`
@@ -399,7 +1006,7 @@ See :ref:`view_directive` for complete ZCML directive documentation.
 .. index::
    triple: view; bfg_view; decorator
 
-.. _mapping_views_to_urls_using_a_decorator_section:
+.. _mapping_views_using_a_decorator_section:
 
 View Configuration Using the ``@bfg_view`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -718,6 +1325,8 @@ could be spelled equivalently as the below:
    single: add_view
    triple: imperative; adding; view
 
+.. _mapping_views_using_imperative_config_section:
+
 View Configuration Using the ``add_view`` Method of a Configurator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -740,73 +1349,12 @@ example:
    config.add_view(hello_world, name='hello.html')
 
 .. index::
-   pair: view; lookup ordering
-
-.. _view_lookup_ordering:
-
-View Lookup Ordering
---------------------
-
-Many attributes of view configuration can be thought of like
-"narrowers" or "predicates".  In general, the greater number of
-attributes possessed by a view's configuration, the more specific the
-circumstances need to be before the registered view callable will be
-invoked.
-
-For any given request, a view with five predicates will always be
-found and evaluated before a view with two, for example.  All
-predicates must match for the associated view to be called.
-
-This does not mean however, that :mod:`repoze.bfg` "stops looking"
-when it finds a view registration with predicates that don't match.
-If one set of view predicates does not match, the "next most specific"
-view (if any) view is consulted for predicates, and so on, until a
-view is found, or no view can be matched up with the request.  The
-first view with a set of predicates all of which match the request
-environment will be invoked.
-
-If no view can be found which has predicates which allow it to be
-matched up with the request, :mod:`repoze.bfg` will return an error to
-the user's browser, representing a "not found" (404) page.  See
-:ref:`changing_the_notfound_view` for more information about changing
-the default notfound view.
-
-There are a several exceptions to the the rule which says that view
-configuration attributes represent "narrowings".  Several attributes
-of the ``view`` directive are *not* narrowing predicates.  These are
-``permission``, ``name``, ``renderer``, and ``attr``.
-
-The value of the ``permission`` attribute represents the permission
-that must be possessed by the user to invoke any found view.  When a
-view is found that matches all predicates, but the invoking user does
-not possess the permission implied by any associated ``permission`` in
-the current context, processing stops, and an
-:exc:`repoze.bfg.exception.Forbidden` error is raised, usually
-resulting in the :term:`forbidden view` being shown to the invoking
-user.  No further view narrowing or view lookup is done.
-
-.. note:: 
-
-   See :ref:`changing_the_forbidden_view` for more information about
-   changing the default forbidden view.
-
-The value of the ``name`` attribute represents a direct match of the
-view name returned via traversal.  It is part of initial view lookup
-rather than a predicate/narrower.
-
-The value of the ``renderer`` attribute represents the renderer used
-to convert non-response return values from a view.
-
-The value of the ``attr`` attribute represents the attribute name
-looked up on the view object to return a response.
-
-.. index::
    pair: model; interfaces
 
 .. _using_model_interfaces:
 
 Using Model Interfaces In View Configuration
---------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of registering your views with a ``context`` that names a
 Python model *class* as a context, you can optionally register a view
@@ -893,400 +1441,19 @@ within view configuration, see
 :ref:`models_which_implement_interfaces`.
 
 .. index::
-   pair: renderers; built-in
-
-.. _built_in_renderers:
-
-Built-In Renderers
-------------------
-
-Several built-in "renderers" exist in :mod:`repoze.bfg`.  These
-renderers can be used in the ``renderer`` attribute of view
-configurations.
-
-.. index::
-   pair: renderer; string
-
-``string``: String Renderer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``string`` renderer is a renderer which renders a view callable
-result to a string.  If a view callable returns a non-Response object,
-and the ``string`` renderer is associated in that view's
-configuration, the result will be to run the object through the Python
-``str`` function to generate a string.  Note that if a Unicode object
-is returned, it is not ``str()`` -ified.
-
-Here's an example of a view that returns a dictionary.  If the
-``string`` renderer is specified in the configuration for this view,
-the view will render the returned dictionary to the ``str()``
-representation of the dictionary:
-
-.. code-block:: python
-   :linenos:
-
-   from webob import Response
-   from repoze.bfg.view import bfg_view
-
-   @bfg_view(renderer='string')
-   def hello_world(request):
-       return {'content':'Hello!'}
-
-The body of the response returned by such a view will be a string
-representing the ``str()`` serialization of the return value:
-
-.. code-block: python
-   :linenos:
-
-   {'content': 'Hello!'}
-
-Views which use the string renderer can vary non-body response
-attributes by attaching properties to the request.  See
-:ref:`response_request_attrs`.
-
-.. index::
-   pair: renderer; JSON
-
-``json``: JSON Renderer
-~~~~~~~~~~~~~~~~~~~~~~~
-
-The ``json`` renderer is a renderer which renders view callable
-results to :term:`JSON`.  If a view callable returns a non-Response
-object it is called.  It passes the return value through the
-``simplejson.dumps`` function, and wraps the result in a response
-object.
-
-Here's an example of a view that returns a dictionary.  If the
-``json`` renderer is specified in the configuration for this view, the
-view will render the returned dictionary to a JSON serialization:
-
-.. code-block:: python
-   :linenos:
-
-   from webob import Response
-   from repoze.bfg.view import bfg_view
-
-   @bfg_view(renderer='json')
-   def hello_world(request):
-       return {'content':'Hello!'}
-
-The body of the response returned by such a view will be a string
-representing the JSON serialization of the return value:
-
-.. code-block: python
-   :linenos:
-
-   '{"content": "Hello!"}'
-
-The return value needn't be a dictionary, but the return value must
-contain values renderable by :func:`json.dumps`.
-
-You can configure a view to use the JSON renderer in ZCML by naming
-``json`` as the ``renderer`` attribute of a view configuration, e.g.:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello"
-       renderer="json"
-       />
-
-Views which use the JSON renderer can vary non-body response
-attributes by attaching properties to the request.  See
-:ref:`response_request_attrs`.
-
-.. index::
-   pair: renderer; chameleon
-
-.. _chameleon_template_renderers:
-
-``*.pt`` or ``*.txt``: Chameleon Template Renderers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Two built-in renderers exist for :term:`Chameleon` templates.
-
-If the ``renderer`` attribute of a view configuration is an absolute
-path, a relative path or :term:`resource specification` which has a
-final path element with a filename extension of ``.pt``, the Chameleon
-ZPT renderer is used.  See :ref:`chameleon_zpt_templates` for more
-information about ZPT templates.
-
-If the ``renderer`` attribute of a view configuration is an absolute
-path, a source-file relative path, or a :term:`resource specification`
-which has a final path element with a filename extension of ``.txt``,
-the :term:`Chameleon` text renderer is used.  See
-:ref:`chameleon_zpt_templates` for more information about Chameleon
-text templates.
-
-The behavior of these renderers is the same, except for the engine
-used to render the template.
-
-When a ``renderer`` attribute that names a Chameleon template path
-(e.g. ``templates/foo.pt`` or ``templates/foo.txt``) is used, the view
-must return a Response object or a Python *dictionary*.  If the view
-callable with an associated template returns a Python dictionary, the
-named template will be passed the dictionary as its keyword arguments,
-and the template renderer implementation will return the resulting
-rendered template in a response to the user.  If the view callable
-returns anything but a dictionary, an error will be raised.
-
-Before passing keywords to the template, the keywords derived from the
-dictionary returned by the view are augmented.  The callable object
--- whatever object was used to define the ``view`` -- will be
-automatically inserted into the set of keyword arguments passed to the
-template as the ``view`` keyword.  If the view callable was a class,
-the ``view`` keyword will be an instance of that class.  Also inserted
-into the keywords passed to the template are ``renderer_name`` (the
-name of the renderer, which may be a full path or a package-relative
-name, typically the full string used in the ``renderer`` attribute of
-the directive), ``context`` (the context of the view used to render
-the template), and ``request`` (the request passed to the view used to
-render the template).
-
-Here's an example view configuration which uses a Chameleon ZPT
-renderer:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello"
-       renderer="templates/foo.pt"
-       />
-
-Here's an example view configuration which uses a Chameleon text
-renderer:
-
-.. code-block:: xml
-   :linenos:
-
-   <view
-       context=".models.Hello"
-       view=".views.hello_world"
-       name="hello"
-       renderer="templates/foo.txt"
-       />
-
-Views with use a Chameleon renderer can vary response attributes by
-attaching properties to the request.  See
-:ref:`response_request_attrs`.
-
-.. index::
-   pair: renderer; response attributes
-   pair: renderer; changing headers
-   triple: headers; changing; renderer
-
-.. _response_request_attrs:
-
-Varying Attributes of Rendered Responses
-----------------------------------------
-
-Before a response that is constructed as the result of the use of a
-:term:`renderer` is returned to :mod:`repoze.bfg`, several attributes
-of the request are examined which have the potential to influence
-response behavior.
-
-View callables that don't directly return a response should set these
-values on the ``request`` object via ``setattr`` within the view
-callable to influence automatically constructed response attributes.
-
-``response_content_type``
-
-  Defines the content-type of the resulting response,
-  e.g. ``text/xml``.
-
-``response_headerlist``
-
-  A sequence of tuples describing cookie values that should be set in
-  the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
-  'foo')]``.
-
-``response_status``
-
-  A WSGI-style status code (e.g. ``200 OK``) describing the status of
-  the response.
-
-``response_charset``
-
-  The character set (e.g. ``UTF-8``) of the response.
-
-``response_cache_for``
-
-  A value in seconds which will influence ``Cache-Control`` and
-  ``Expires`` headers in the returned response.  The same can also be
-  achieved by returning various values in the ``response_headerlist``,
-  this is purely a convenience.
-
-.. index::
-   pair: renderers; adding
-
-.. _adding_and_overriding_renderers:
-
-Adding and Overriding Renderers
--------------------------------
-
-Additional configuration declarations can be made which override an
-existing :term:`renderer` or which add a new renderer.  Adding or
-overriding a renderer is accomplished via :term:`ZCML` or via
-imperative configuration. 
-
-For example, to add a renderer which renders views which have a
-``renderer`` attribute that is a path that ends in ``.jinja2``:
-
-.. topic:: Via ZCML
-
-   .. code-block:: xml
-      :linenos:
-
-      <renderer
-        name=".jinja2"
-        factory="my.package.MyJinja2Renderer"/>
-
-   The ``factory`` attribute is a :term:`dotted Python name` that must
-   point to an implementation of a :term:`renderer`.
-
-   The ``name`` attribute is the renderer name.
-
-.. topic:: Via Imperative Configuration
-
-   .. code-block:: python
-      :linenos:
-
-      from my.package import MyJinja2Renderer
-      config.add_renderer('.jinja2', MyJinja2Renderer)
-
-   The first argument is the renderer name.
-
-   The second argument is a reference to an to an implementation of a
-   :term:`renderer`.
-
-A renderer implementation is usually a class which has the following
-interface:
-
-.. code-block:: python
-   :linenos:
-
-   class RendererFactory:
-       def __init__(self, name):
-           """ Constructor: ``name`` may be a path """
-
-       def __call__(self, value, system): """ Call a the renderer
-           implementation with the value and the system value passed
-           in as arguments and return the result (a string or unicode
-           object).  The value is the return value of a view.  The
-           system value is a dictionary containing available system
-           values (e.g. ``view``, ``context``, and ``request``). """
-
-There are essentially two different kinds of ``renderer``
-registrations: registrations that use a dot (``.``) in their ``name``
-argument and ones which do not.
-
-Renderer registrations that have a ``name`` attribute which starts
-with a dot are meant to be *wildcard* registrations.  When a ``view``
-configuration is encountered which has a ``name`` attribute that
-contains a dot, at startup time, the path is split on its final dot,
-and the second element of the split (the filename extension,
-typically) is used to look up a renderer for the configured view.  The
-renderer's factory is still passed the entire ``name`` attribute value
-(not just the extension).
-
-Renderer registrations that have ``name`` attribute which *does not*
-start with a dot are meant to be absolute registrations.  When a
-``view`` configuration is encountered which has a ``name`` argument
-that does not contain a dot, the full value of the ``name`` attribute
-is used to look up the renderer for the configured view.
-
-Here's an example of a renderer registration in ZCML:
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-     name="amf"
-     factory="my.package.MyAMFRenderer"/>
-
-Adding the above ZCML to your application will allow you to use the
-``my.package.MyAMFRenderer`` renderer implementation in ``view``
-configurations by referring to it as ``amf`` in the ``renderer``
-attribute:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.view import bfg_view
-
-   @bfg_view(renderer='amf')
-   def myview(request):
-       return {'Hello':'world'}
-
-By default, when a template extension is unrecognized, an error is
-thrown at rendering time.  You can associate more than one filename
-extension with the same renderer implementation as necessary if you
-need to use a different file extension for the same kinds of
-templates.  For example, to associate the ``.zpt`` extension with the
-Chameleon page template renderer factory, use:
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      name=".zpt"
-      factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
-
-To override the default mapping in which files with a ``.pt``
-extension are rendered via a Chameleon ZPT page template renderer, use
-a variation on the following in your application's ZCML:
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      name=".pt"
-      factory="my.package.pt_renderer"/>
-
-To override the default mapping in which files with a ``.txt``
-extension are rendered via a Chameleon text template renderer, use a
-variation on the following in your application's ZCML:
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      name=".txt"
-      factory="my.package.text_renderer"/>
-
-To associate a *default* renderer with *all* view configurations (even
-ones which do not possess a ``renderer`` attribute), use a variation
-on the following (ie. omit the ``name`` attribute to the renderer
-tag):
-
-.. code-block:: xml
-   :linenos:
-
-   <renderer
-      factory="repoze.bfg.renderers.json_renderer_factory"/>
-
-See also :ref:`renderer_directive`.
-
-.. index::
    pair: view; security
 
 .. _view_security_section:
 
-View Security
--------------
+Configuring View Security
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If a :term:`authorization policy` is active, any :term:`permission`
 attached to a :term:`view configuration` found during view lookup will
 be consulted to ensure that the currently authenticated user possesses
 that permission against the context before the view function is
 actually called.  Here's an example of specifying a permission in a
-view declaration in ZCML:
+view configuration declaration in ZCML:
 
 .. code-block:: xml
    :linenos:
@@ -1311,402 +1478,83 @@ user does not possess the ``add`` permission relative to the current
    an authentication policy.
 
 .. index::
-   pair: view; http redirect
-
-Using a View Callable to Do A HTTP Redirect
--------------------------------------------
-
-You can issue an HTTP redirect from within a view by returning a
-slightly different response.
-
-.. code-block:: python
-   :linenos:
-
-   from webob.exc import HTTPFound
-
-   def myview(request):
-       return HTTPFound(location='http://example.com')
-
-All exception types from the :mod:`webob.exc` module implement the
-Webob :term:`Response` interface; any can be returned as the response
-from a view.  See :term:`WebOb` for the documentation for this module;
-it includes other response types for ``Unauthorized``, etc.
-
-.. index::
-   triple: view; zcml; static resource
-   single: add_static_view
-
-.. _static_resources_section:
-
-Serving Static Resources Using a ZCML Directive
------------------------------------------------
-
-Use of the ``static`` ZCML directive or the
-:meth:`repoze.bfg.configuration.configurator.add_static_view` method
-is the preferred way to serve static resources (such as JavaScript and
-CSS files) within a :mod:`repoze.bfg` application. These mechanisms
-makes static files available at a name relative to the application
-root URL, e.g. ``/static``.
-
-Use of the ``add_static_view`` imperative configuration method is
-completely equivalent to using ZCML for the same purpose.
-
-Here's an example of a ``static`` ZCML directive that will serve files
-up ``/static`` URL from the ``/var/www/static`` directory of the
-computer which runs the :mod:`repoze.bfg` application.
-
-.. code-block:: xml
-   :linenos:
-
-   <static
-      name="static"
-      path="/var/www/static"
-      />
-
-Here's an example of a ``static`` directive that will serve files up
-``/static`` URL from the ``a/b/c/static`` directory of the Python
-package named ``some_package``.
-
-.. code-block:: xml
-   :linenos:
-
-   <static
-      name="static"
-      path="some_package:a/b/c/static"
-      />
-
-Here's an example of a ``static`` directive that will serve files up
-under the ``/static`` URL from the ``static`` directory of the Python
-package in which the ``configure.zcml`` file lives.
-
-.. code-block:: xml
-   :linenos:
-
-   <static
-      name="static"
-      path="static"
-      />
-
-When you place your static files on filesystem in the directory
-represented as the ``path`` of the directive you, you should be able
-to view the static files in this directory via a browser at URLs
-prefixed with the directive's ``name``.  For instance if the
-``static`` directive's ``name`` is ``static`` and the static
-directive's ``path`` is ``/path/to/static``,
-``http://localhost:6543/static/foo.js`` may return the file
-``/path/to/static/dir/foo.js``.  The static directory may contain
-subdirectories recursively, and any subdirectories may hold files;
-these will be resolved by the static view as you would expect.
-
-See :ref:`static_directive` for detailed information.
-
-.. note:: The :ref:`static_directive` ZCML directive is new in
-   :mod:`repoze.bfg` 1.1.
-
-.. note:: The
-   :meth:`repoze.bfg.configuration.Configurator.add_static_view`
-   method offers an imperative equivalent to the ``static`` ZCML
-   directive.
-
-.. index::
-   triple: generating; static resource; urls
-
-.. _generating_static_resource_urls:
-
-Generating Static Resource URLs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When a ref::`static_directive` ZCML directive or a call to the
-``add_static_view`` method of a
-:class:`repoze.bfg.configuration.Configurator` is used to register a
-static resource directory, a special helper API named
-:func:`repoze.bfg.static_url` can be used to generate the appropriate
-URL for a package resource that lives in one of the directories named
-by the static registration ``path`` attribute.
-
-For example, let's assume you create a set of ``static`` declarations
-in ZCML like so:
-
-.. code-block:: xml
-   :linenos:
-
-   <static
-      name="static1"
-      path="resources/1"
-      />
-
-   <static
-      name="static2"
-      path="resources/2"
-      />
-
-These declarations create URL-accessible directories which have URLs
-which begin, respectively, with ``/static1`` and ``/static2``.  The
-resources in the ``resources/1`` directory are consulted when a user
-visits a URL which begins with ``/static1``, and the resources in the
-``resources/2`` directory are consulted when a user visits a URL which
-begins with ``/static2``.
-
-You needn't generate the URLs to static resources "by hand" in such a
-configuration.  Instead, use the :func:`repoze.bfg.url.static_url` API
-to generate them for you.  For example, let's imagine that the
-following code lives in a module that shares the same directory as the
-above ZCML file:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.url import static_url
-   from repoze.bfg.chameleon_zpt import render_template_to_response
-
-   def my_view(request):
-       css_url = static_url('resources/1/foo.css', request)
-       js_url = static_url('resources/2/foo.js', request)
-       return render_template_to_response('templates/my_template.pt',
-                                          css_url = css_url,
-                                          js_url = js_url)
-
-If the request "application URL" of the running system is
-``http://example.com``, the ``css_url`` generated above would be:
-``http://example.com/static1/foo.css``.  The ``js_url`` generated
-above would be ``'http://example.com/static2/foo.js``.
-
-One benefit of using the :func:`repoze.bfg.url.static_url` function
-rather than constructing static URLs "by hand" is that if you need to
-change the ``name`` of a static URL declaration in ZCML, the generated
-URLs will continue to resolve properly after the rename.
-
-.. note:: The :func:`repoze.bfg.url.static_url` API is new in
-   :mod:`repoze.bfg` 1.1.
-
-.. index::
-   pair: view; static resource
-
-Serving Static Resources Using a View Callable
-----------------------------------------------
-
-For more flexibility, static resources can be served by a view which
-you register manually.  For example, you may want static resources to
-only be available when the ``context`` of the view is of a particular
-type, or when the request is of a particular type.
-
-The :class:`repoze.bfg.view.static` helper class is used to perform
-this task. This class creates a callable that is capable acting as a
-:mod:`repoze.bfg` view which serves static resources from a directory.
-For instance, to serve files within a directory located on your
-filesystem at ``/path/to/static/dir`` mounted at the URL path
-``/static`` in your application, create an instance of the
-:class:`repoze.bfg.view.static` class inside a ``static.py`` file in
-your application root as below.
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.view import static
-   static_view = static('/path/to/static/dir')
-
-.. note:: the argument to :class:`repoze.bfg.view.static` can also be
-   a relative pathname, e.g. ``my/static`` (meaning relative to the
-   Python package of the module in which the view is being defined).
-   It can also be a :term:`resource specification`
-   (e.g. ``anotherpackage:some/subdirectory``) or it can be a
-   "here-relative" path (e.g. ``some/subdirectory``).  If the path is
-   "here-relative", it is relative to the package of the module in
-   which the static view is defined.
- 
-Subsequently, you may wire this view up to be accessible as
-``/static`` using either the
-:mod:`repoze.bfg.configuration.Configurator.add_view` method or the
-``<view>`` ZCML directive in your application's ``configure.zcml``
-against either the class or interface that represents your root
-object.  For example (ZCML):
-
-.. code-block:: xml
-   :linenos:
-
-    <view
-      context=".models.Root"
-      view=".static.static_view"
-      name="static"
-    />   
-
-In this case, ``.models.Root`` refers to the class of which your
-:mod:`repoze.bfg` application's root object is an instance.
-
-.. note:: You can also give a ``context`` of ``*`` if you want the
-   name ``static`` to be accessible as the static view against any
-   model.  This will also allow ``/static/foo.js`` to work, but it
-   will allow for ``/anything/static/foo.js`` too, as long as
-   ``anything`` itself is resolvable.
-
-.. note:: To ensure that model objects contained in the root don't
-   "shadow" your static view (model objects take precedence during
-   traversal), or to ensure that your root object's ``__getitem__`` is
-   never called when a static resource is requested, you can refer to
-   your static resources as registered above in URLs as,
-   e.g. ``/@@static/foo.js``.  This is completely equivalent to
-   ``/static/foo.js``.  See :ref:`traversal_chapter` for information
-   about "goggles" (``@@``).
-
-.. index::
-   triple: exceptions; special; view
-
-Special Exceptions
-------------------
-
-Usually when a Python exception is raised within view code,
-:mod:`repoze.bfg` allows the exception to propagate all the way out to
-the :term:`WSGI` server which invoked the application.
-
-However, for convenience, two special exceptions exist which are
-always handled by :mod:`repoze.bfg` itself.  These are
-:exc:`repoze.bfg.exceptions.NotFound` and
-:exc:`repoze.bfg.exceptions.Forbidden`.  Both is an exception class
-which accepts a single positional constructor argument: a ``message``.
-
-If :exc:`repoze.bfg.exceptions.NotFound` is raised within view code,
-the result of the :term:`Not Found View` will be returned to the user
-agent which performed the request.
-
-If :exc:`repoze.bfg.exceptions.Forbidden` is raised within view code,
-the result of the :term:`Forbidden View` will be returned to the user
-agent which performed the request.
-
-In all cases, the message provided to the exception constructor is
-made available to the view which :mod:`repoze.bfg` invokes as
-``request.environ['repoze.bfg.message']``.
-
-.. index::
-   triple: view; forms; unicode
-
-Using Views to Handle Form Submissions (Unicode and Character Set Issues)
--------------------------------------------------------------------------
-
-Most web applications need to accept form submissions from web
-browsers and various other clients.  In :mod:`repoze.bfg`, form
-submission handling logic is always part of a :term:`view`.  For a
-general overview of how to handle form submission data using the
-:term:`WebOb` API, see `"Query and POST variables" within the WebOb
-documentation
-<http://pythonpaste.org/webob/reference.html#query-post-variables>`_.
-:mod:`repoze.bfg` defers to WebOb for its request and response
-implementations, and handling form submission data is a property of
-the request implementation.  Understanding WebOb's request API is the
-key to understanding how to process form submission data.
-
-There are some defaults that you need to be aware of when trying to
-handle form submission data in a :mod:`repoze.bfg` view.  Because
-having high-order (non-ASCII) characters in data contained within form
-submissions is exceedingly common, and because the UTF-8 encoding is
-the most common encoding used on the web for non-ASCII character data,
-and because working and storing Unicode values is much saner than
-working with and storing bytestrings, :mod:`repoze.bfg` configures the
-:term:`WebOb` request machinery to attempt to decode form submission
-values into Unicode from the UTF-8 character set implicitly.  This
-implicit decoding happens when view code obtains form field values via
-the :term:`WebOb` ``request.params``, ``request.GET``, or
-``request.POST`` APIs.
-
-For example, let's assume that the following form page is served up to
-a browser client, and its ``action`` points at some :mod:`repoze.bfg`
-view code:
-
-.. code-block:: xml
-   :linenos:
-
-   <html xmlns="http://www.w3.org/1999/xhtml">
-     <head>
-       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-     </head>
-     <form method="POST" action="myview">
-       <div>
-         <input type="text" name="firstname"/>
-       </div> 
-       <div>
-         <input type="text" name="lastname"/>
-       </div>
-       <input type="submit" value="Submit"/>
-     </form>
-   </html>
-
-The ``myview`` view code in the :mod:`repoze.bfg` application *must*
-expect that the values returned by ``request.params`` will be of type
-``unicode``, as opposed to type ``str``. The following will work to
-accept a form post from the above form:
-
-.. code-block:: python
-   :linenos:
-
-   def myview(request):
-       firstname = request.params['firstname']
-       lastname = request.params['lastname']
-
-But the following ``myview`` view code *may not* work, as it tries to
-decode already-decoded (``unicode``) values obtained from
-``request.params``:
-
-.. code-block:: python
-   :linenos:
-
-   def myview(request):
-       # the .decode('utf-8') will break below if there are any high-order
-       # characters in the firstname or lastname
-       firstname = request.params['firstname'].decode('utf-8')
-       lastname = request.params['lastname'].decode('utf-8')
-
-For implicit decoding to work reliably, you must ensure that every
-form you render that posts to a :mod:`repoze.bfg` view is rendered via
-a response that has a ``;charset=UTF-8`` in its ``Content-Type``
-header; or, as in the form above, with a ``meta http-equiv`` tag that
-implies that the charset is UTF-8 within the HTML ``head`` of the page
-containing the form.  This must be done explicitly because all known
-browser clients assume that they should encode form data in the
-character set implied by ``Content-Type`` value of the response
-containing the form when subsequently submitting that form; there is
-no other generally accepted way to tell browser clients which charset
-to use to encode form data.  If you do not specify an encoding
-explicitly, the browser client will choose to encode form data in its
-default character set before submitting it.  The browser client may
-have a non-UTF-8 default encoding.  If such a request is handled by
-your view code, when the form submission data is encoded in a non-UTF8
-charset, eventually the WebOb request code accessed within your view
-will throw an error when it can't decode some high-order character
-encoded in another character set within form data e.g. when
-``request.params['somename']`` is accessed.
-
-If you are using the :class:`webob.Response` class to generate a
-response, or if you use the ``render_template_*`` templating APIs, the
-UTF-8 charset is set automatically as the default via the
-``Content-Type`` header.  If you return a ``Content-Type`` header
-without an explicit charset, a WebOb request will add a
-``;charset=utf-8`` trailer to the ``Content-Type`` header value for
-you for response content types that are textual (e.g. ``text/html``,
-``application/xml``, etc) as it is rendered.  If you are using your
-own response object, you will need to ensure you do this yourself.
-
-To avoid implicit form submission value decoding, so that the values
-returned from ``request.params``, ``request.GET`` and ``request.POST``
-are returned as bytestrings rather than Unicode, add the following to
-your application's ``configure.zcml``::
-
-    <subscriber for="repoze.bfg.interfaces.INewRequest"
-                handler="repoze.bfg.request.make_request_ascii"/>
-
-You can then control form post data decoding "by hand" as necessary.
-For example, when this subscriber is active, the second example above
-will work unconditionally as long as you ensure that your forms are
-rendered in a request that has a ``;charset=utf-8`` stanza on its
-``Content-Type`` header.
-
-.. note:: The behavior that form values are decoded from UTF-8 to
-   Unicode implicitly was introduced in :mod:`repoze.bfg` 0.7.0.
-   Previous versions of :mod:`repoze.bfg` performed no implicit
-   decoding of form values (the default was to treat values as
-   bytestrings).
-
-.. note:: Only the *values* of request params obtained via
-   ``request.params``, ``request.GET`` or ``request.POST`` are decoded
-   to Unicode objects implicitly in :mod:`repoze.bfg`'s default
-   configuration.  The keys are still strings.
+   pair: view; lookup
+
+.. _view_lookup:
+
+View Lookup
+-----------
+
+:term:`View lookup` is the :mod:`repoze.bfg` subsystem responsible for
+finding an invoking a :term:`view callable`.  The view lookup
+subsystem is passed a :term:`context`, a :term:`view name`, and the
+:term:`request` object.  These three bits of information are referred
+to within this chapter as a :term:`triad`.
+
+Many attributes of view configuration can be thought of like
+"narrowers" or "predicates".  In general, the greater number of
+attributes possessed by a view's configuration, the more specific the
+circumstances need to be before the registered view callable will be
+invoked.
+
+For any given request, a view with five predicates will always be
+found and evaluated before a view with two, for example.  All
+predicates must match for the associated view to be called.
+
+This does not mean however, that :mod:`repoze.bfg` "stops looking"
+when it finds a view registration with predicates that don't match.
+If one set of view predicates does not match, the "next most specific"
+view (if any) view is consulted for predicates, and so on, until a
+view is found, or no view can be matched up with the request.  The
+first view with a set of predicates all of which match the request
+environment will be invoked.
+
+If no view can be found which has predicates which allow it to be
+matched up with the request, :mod:`repoze.bfg` will return an error to
+the user's browser, representing a "not found" (404) page.  See
+:ref:`changing_the_notfound_view` for more information about changing
+the default notfound view.
+
+There are a several exceptions to the the rule which says that view
+configuration attributes represent "narrowings".  Several attributes
+of the ``view`` directive are *not* narrowing predicates.  These are
+``permission``, ``name``, ``renderer``, and ``attr``.
+
+The value of the ``permission`` attribute represents the permission
+that must be possessed by the user to invoke any found view.  When a
+view is found that matches all predicates, but the invoking user does
+not possess the permission implied by any associated ``permission`` in
+the current context, processing stops, and an
+:exc:`repoze.bfg.exception.Forbidden` error is raised, usually
+resulting in the :term:`forbidden view` being shown to the invoking
+user.  No further view narrowing or view lookup is done.
+
+.. note:: 
+
+   See :ref:`changing_the_forbidden_view` for more information about
+   changing the default forbidden view.
+
+The value of the ``name`` attribute represents a direct match of the
+view name returned via traversal.  It is part of initial view lookup
+rather than a predicate/narrower.
+
+The value of the ``renderer`` attribute represents the renderer used
+to convert non-response return values from a view.
+
+The value of the ``attr`` attribute represents the attribute name
+looked up on the view object to return a response.
+
+.. _debug_notfound_section:
+
+:exc:`NotFound` Errors
+~~~~~~~~~~~~~~~~~~~~~~
+
+It's useful to be able to debug :exc:`NotFound` error responses when
+they occur unexpectedly due to an application registry
+misconfiguration.  To debug these errors, use the
+``BFG_DEBUG_NOTFOUND`` environment variable or the ``debug_notfound``
+configuration file setting.  Details of why a view was not found will
+be printed to ``stderr``, and the browser representation of the error
+will include the same information.  See :ref:`environment_chapter` for
+more information about how and where to set these values.
 

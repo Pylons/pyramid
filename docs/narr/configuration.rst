@@ -1,7 +1,7 @@
-.. _configuration_narr:
-
 .. index::
    single: application configuration
+
+.. _configuration_narr:
 
 Application Configuration 
 =========================

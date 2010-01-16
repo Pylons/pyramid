@@ -32,6 +32,7 @@ Narrative Documentation
    narr/project
    narr/urlmapping
    narr/views
+   narr/static
    narr/webob
    narr/templates
    narr/models

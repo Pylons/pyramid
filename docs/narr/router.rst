@@ -102,7 +102,7 @@ processing?
 This is a very high-level overview that leaves out various details.
 For more detail about subsystems invoked by the BFG router such as
 traversal, URL dispatch, views, and event processing, see
-:ref:`url_mapping_chapter`, :ref:`traversal_chapter`,
+:ref:`urlmapping_chapter`, :ref:`traversal_chapter`,
 :ref:`urldispatch_chapter`, :ref:`views_chapter`, and
 :ref:`events_chapter`.
 

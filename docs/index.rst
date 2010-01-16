@@ -45,6 +45,7 @@ Narrative documentation in chapter form explaining how to use
    narr/startup
    narr/urlmapping
    narr/views
+   narr/static
    narr/webob
    narr/templates
    narr/models

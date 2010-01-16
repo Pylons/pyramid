@@ -3,15 +3,53 @@
 Traversal
 =========
 
-When :term:`traversal` is used within a :mod:`repoze.bfg` application,
-the :mod:`repoze.bfg` :term:`router` parses the URL associated with
-the request.  It splits the URL into individual path segments.  Based
-on these path segments, :mod:`repoze.bfg` traverses an *object graph*
-in order to find a :term:`context`.  It then attempts to find a
-:term:`view` based on the *type* of the context (specified by its
-Python class or any :term:`interface` attached to it).  If
-:mod:`repoze.bfg` finds a :term:`view` for the context, it calls it
-and returns a response to the user.
+:term:`traversal` is a :term:`context finding` mechanism that is used
+by :mod:`repoze.bfg`. :term:`traversal` is the act of finding a
+:term:`context` and a :term:`view name` by walking over an *object
+graph*, starting from a :term:`root` object, using a :term:`request`
+object as a source of path information.
+
+In this chapter, we'll provide a high-level overview of traversal,
+explain the concept of an *object graph*,
+
+.. index::
+   pair: traversal; high-level overview
+
+A High-Level Overview of Traversal Mechanics
+--------------------------------------------
+
+:term:`Traversal` is dependent on information in a :term:`request`
+object.  The :term:`request` object contains URL path information in
+the ``PATH_INFO`` portion of the :term:`WSGI` environment.  The
+``PATH_INFO`` portion of the WSGI environment is the URL data in a
+request following the hostname and port number, but before any query
+string elements or fragments, for example the ``/a/b/c`` portion of
+the URL ``http://example.com/a/b/c?foo=1``.
+
+Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of
+path segments.  For example, the ``PATH_INFO`` string ``/a/b/c`` is
+treated as the sequence ``['a', 'b', 'c']``.  Traversal pops the first
+element (``a``) from the path segment sequence and attempts to use it
+as a lookup key into an object graph supplied by an application.  If
+that succeeeds, the :term:`context` temporarily becomes the object
+found via that lookup.  Then the next segment (``b``) is popped from
+the sequence, and the object graph is queried for that segment; if
+that lookup succeeds, the :term:`context` becomes that object.  This
+process continues until the path segment sequence is exhausted or any
+lookup for a name in the sequence fails.  In either case, a
+:term:`context` is found.
+
+The results of a :term:`traversal` also include a :term:`view name`.
+The :term:`view name` is the *first* URL path segment in the set of
+``PATH_INFO`` segments "left over" in the path segment list popped by
+the traversal process.
+
+The combination of the :term:`context` object and the :term:`view
+name` found via traversal is used later in the same request by a
+separate :mod:`repoze.bfg` subsystem -- the "view lookup" subsystem --
+to find a :term:`view callable` later within the same request.  How
+:mod:`repoze.bfg` performs view lookup is explained within the
+:ref:`views_chapter` chapter.
 
 .. index::
    single: object graph
@@ -54,6 +92,52 @@ usually a *mapping* object (such as a Python dictionary).
    passed to the root factory has a dictionary-like interface that
    emulates the WSGI environment, so code expecting the argument to be
    a dictionary will continue to work.
+
+.. sidebar:: Emulating the Default Root Factory
+
+   For purposes of understanding the default root factory better,
+   we'll note that you can emulate the default root factory by using
+   this code as an explicit root factory in your application setup:
+
+   .. code-block:: python
+      :linenos:
+
+      class Root(object):
+          def __init__(self, request):
+              pass
+
+      config = Configurator(root_factory=Root)
+
+   The default root factory is just a really stupid object that has no
+   behavior or state.
+
+Using :term:`traversal` against an application that uses the object
+graph supplied by the default root object is not very interesting,
+because the default root object has no children.  In a more complex
+:mod:`repoze.bfg` application, a root factory would be supplied which
+would return an object that had children capable of being traversed,
+and therefore there might be many :term:`context` objects to which
+URLs might resolve, depending on the URL path.  However, in this toy
+application, there's exactly one object in our object graph; the
+default root object.  Therefore, there can only ever be one context:
+the :term:`root` object itself.
+
+We have only a single :term:`default view` registered (the
+registration for the ``hello_world`` view callable).  Due to this set
+of circumstances, you can consider the sole possible URL that will
+resolve to a :term:`default view` in this application the root URL
+``'/'``.  It is the only URL that will resolve to the :term:`view
+name` of ``''`` (the empty string) when the default object graph is
+traversed.
+
+We have only a single view registered for the :term:`view name`
+``goodbye`` (the registration for the ``goodbye_world`` view
+callable).  Due to this set of circumstances, you can consider the
+sole possible URL that will resolve to the ``goodbye_world`` in this
+application the URL ``'/goodbye'`` because it is the only URL that
+will result in the :term:`view name` of ``goodbye`` when the default
+object graph is traversed.
+
 
 Items contained within the object graph are sometimes analogous to the
 concept of :term:`model` objects used by many other frameworks (and
@@ -373,65 +457,7 @@ There are two special cases:
   graph unambiguously.
 
 .. index::
-   pair: traversal; side-effects
-
-.. _traversal_related_side_effects:
-
-Traversal-Related Side Effects
-------------------------------
-
-The :term:`subpath` will always be available to a view as a the
-``subpath`` attribute of the :term:`request` object.  It will be a
-sequence containing zero or more elements (which will be Unicode
-objects).
-
-The :term:`view name` will always be available to a view as the
-``view_name`` attribute of the :term:`request` object.  It will be a
-single string (possibly the empty string if we're rendering a default
-view).
-
-The :term:`root` will always be available to a view as the ``root``
-attribute of the :term:`request` object.  It will be the model object
-at which traversal started (the root).
-
-The :term:`context` will always be available to a view as the
-``context`` attribute of the :term:`request` object.  It will be the
-context object implied by the current request.
-
-The "traversal path" will always be available to a view as the
-``traversed`` attribute of the :term:`request` object.  It will be a
-sequence representing the ordered set of names that were used to
-traverse to the :term:`context`, not including the view name or
-subpath.  If there is a virtual root associated with request, the
-virtual root path is included within the traversal path.
-
-The :term:`virtual root` will always be available to a view as the
-``virtual_root`` attribute of the :term:`request` object.  It will be
-the virtual root object implied by the current request.  See
-:ref:`vhosting_chapter` for more information about virtual roots.
-
-The :term:`virtual root` *path* will always be available to a view as
-the ``virtual_root_path`` attribute of the :term:`request` object.  It
-will be a sequence representing the ordered set of names that were
-used to traverse to the virtual root object.  See
-:ref:`vhosting_chapter` for more information about virtual roots.
-
-.. index::
    pair: debugging; not found errors
-
-.. _debug_notfound_section:
-
-:exc:`NotFound` Errors
-----------------------
-
-It's useful to be able to debug :exc:`NotFound` error responses when
-they occur unexpectedly due to an application registry
-misconfiguration.  To debug these errors, use the
-``BFG_DEBUG_NOTFOUND`` environment variable or the ``debug_notfound``
-configuration file setting.  Details of why a view was not found will
-be printed to ``stderr``, and the browser representation of the error
-will include the same information.  See :ref:`environment_chapter` for
-more information about how and where to set these values.
 
 .. index::
    pair: traversal; unicode
@@ -449,3 +475,10 @@ in ``PATH_INFO`` is not decodeable using the UTF-8 decoding, a
 TypeError is raised.  A segment will be fully URL-unquoted and
 UTF8-decoded before it is passed it to the ``__getitem__`` of any
 model object during traversal.
+
+References
+----------
+
+For a contextual example of how :term:`traversal` can be used to
+create a :mod:`repoze.bfg` application, see the
+:ref:`bfg_wiki_tutorial`.

@@ -193,9 +193,8 @@ evaluation to true or false when view lookup is performed.
 
 *All* predicates named in a view configuration must evaluate to true
 in order for the view callable it names to be considered "invokable"
-for a given request.  See :ref:`view_lookup_ordering` for a
-description of how a view configuration matches (or doesn't match)
-during a request.
+for a given request.  See :ref:`view_lookup` for a description of how
+a view configuration matches (or doesn't match) during a request.
 
 The possible attributes of the ``view`` ZCML directive are described
 below.  They are divided into predicate and non-predicate categories.
@@ -280,12 +279,12 @@ Non-Predicate Attributes
   "chain" views together to form a composite response.  The response
   of the outermost wrapper view will be returned to the user.  The
   wrapper view will be found as any view is found: see
-  :ref:`view_lookup_ordering`.  The "best" wrapper view will be found
-  based on the lookup ordering: "under the hood" this wrapper view is
-  looked up via ``repoze.bfg.view.render_view_to_response(context,
-  request, 'wrapper_viewname')``. The context and request of a wrapper
-  view is the same context and request of the inner view.  If this
-  attribute is unspecified, no view wrapping is done.
+  :ref:`view_lookup`.  The "best" wrapper view will be found based on
+  the lookup ordering: "under the hood" this wrapper view is looked up
+  via ``repoze.bfg.view.render_view_to_response(context, request,
+  'wrapper_viewname')``. The context and request of a wrapper view is
+  the same context and request of the inner view.  If this attribute
+  is unspecified, no view wrapping is done.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
@@ -944,7 +943,7 @@ the same job as the ``scan`` ZCML directive.
 See Also
 ~~~~~~~~
 
-See also :ref:`mapping_views_to_urls_using_a_decorator_section`.
+See also :ref:`mapping_views_using_a_decorator_section`.
 
 .. _resource_directive:
 

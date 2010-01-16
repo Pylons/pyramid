@@ -1,5 +1,6 @@
 .. index::
    pair:  ian; bicking
+   single: WebOb
 
 .. _webob_chapter:
 
@@ -44,6 +45,7 @@ creating requests.
 
 .. index::
    single: request object
+   single: request attributes; standard
 
 Request
 ~~~~~~~
@@ -105,7 +107,70 @@ instance, ``req.if_modified_since`` returns a `datetime
 <http://pythonpaste.org/webob/class-webob.Request.html>`_.
 
 .. index::
-   pair: request; URL
+   pair: request attributes; special
+
+Special Attributes Added to the Request by :mod:`repoze.bfg`
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+In addition to the standard :term:`WebOb` attributes,
+:mod:`repoze.bfg` adds the following special attributes to every
+request.
+
+``req.subpath``
+
+  The traversal :term:`subpath` will be available as the ``subpath``
+  attribute of the :term:`request` object.  It will be a sequence
+  containing zero or more elements (which will be Unicode objects).
+  See :ref:`traversal_chapter` for information about the subpath.
+
+``req.view_name``
+
+  The :term:`view name` will be available as the ``view_name``
+  attribute of the :term:`request` object.  It will be a single string
+  (possibly the empty string if we're rendering a default view).
+  See :ref:`traversal_chapter` for information about view names.
+
+``req.root``
+
+  The :term:`root` object will be available as the ``root`` attribute
+  of the :term:`request` object.  It will be the model object at which
+  traversal started (the root).  See :ref:`traversal_chapter` for
+  information about root objects.
+
+``req.context``
+
+  The :term:`context` will be available as the ``context`` attribute
+  of the :term:`request` object.  It will be the context object
+  implied by the current request.  See :ref:`traversal_chapter` for
+  information about context objects.
+
+``req.traversed``
+
+  The "traversal path" will be as the ``traversed`` attribute of the
+  :term:`request` object.  It will be a sequence representing the
+  ordered set of names that were used to traverse to the
+  :term:`context`, not including the view name or subpath.  If there
+  is a virtual root associated with request, the virtual root path is
+  included within the traversal path.  See :ref:`traversal_chapter`
+  for more information.
+
+``req.virtual_root``
+
+  The :term:`virtual root` will be available as the ``virtual_root``
+  attribute of the :term:`request` object.  It will be the virtual
+  root object implied by the current request.  See
+  :ref:`vhosting_chapter` for more information about virtual roots.
+
+``req.virtual_root_path``
+
+  The :term:`virtual root` *path* will be available as the
+  ``virtual_root_path`` attribute of the :term:`request` object.  It
+  will be a sequence representing the ordered set of names that were
+  used to traverse to the virtual root object.  See
+  :ref:`vhosting_chapter` for more information about virtual roots.
+
+.. index::
+   pair: request; URLs
 
 URLs
 ++++
@@ -129,7 +194,6 @@ of the request.  I'll show various values for an example URL
 ``req.relative_url(url, to_application=False)``:
     Gives a URL, relative to the current URL.  If ``to_application``
     is True, then resolves it relative to ``req.application_url``.
-
 
 .. index::
    pair: request; methods
@@ -279,7 +343,7 @@ default to anything, though if you subclass ``Response`` and set
 ``default_content_type`` you can override this behavior.
 
 .. index::
-   pair: WebOb; exceptions
+   pair: response; exceptions
 
 Exceptions
 ++++++++++
@@ -311,12 +375,15 @@ You can use this like:
 .. code-block:: python
    :linenos:
 
+   from webob.exc import HTTPException
+   from webob.exc import HTTPNotFound
+
    def aview(request):
        try:
            # ... stuff ...
            raise HTTPNotFound('No such resource').exception
        except HTTPException, e:
-           return e(environ, start_response)
+           return request.get_response(e)
 
 The exceptions are still WSGI applications, but you cannot set
 attributes like ``content_type``, ``charset``, etc. on these exception
@@ -326,7 +393,7 @@ objects.
    pair: WebOb; multidict
 
 Multidict
-+++++++++
+~~~~~~~~~
 
 Several parts of WebOb use a "multidict"; this is a dictionary where a
 key can have multiple values.  The quintessential example is a query
@@ -347,14 +414,4 @@ something like ``[('pref', 'red'), ('pref', 'blue')]``.  All the
 key/value pairs will show up.  Similarly ``request.GET.keys()``
 returns ``['pref', 'pref']``.  Multidict is a view on a list of
 tuples; all the keys are ordered, and all the values are ordered.
-
-.. index::
-   triple: response; attributes; special
-
-Special :mod:`repoze.bfg` Attributes Added to the Request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-:mod:`repoze.bfg` adds special attributes to a request as the result
-of :term:`traversal`.  See :ref:`traversal_related_side_effects` for a
-list of attributes added to the request by :mod:`repoze.bfg` itself.
 

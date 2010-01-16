@@ -1,104 +1,27 @@
-.. _configuration_narr:
+.. _firstapp_chapter:
 
 Creating Your First :mod:`repoze.bfg` Application
 =================================================
 
 We will walk through the creation of a tiny :mod:`repoze.bfg`
-application in this chapter and explain in more detail how the
-application works.
-
-But before we dive into the code, a short introduction to
-:term:`traversal` is required.
-
-.. index::
-   pair: traversal; introduction
-
-.. _traversal_intro:
-
-An Introduction to Traversal
-----------------------------
-
-In order for a web application to perform any useful action, it needs
-some way of finding and invoking code based on parameters present in
-the :term:`request`.  :term:`traversal` is a mechanism that plays a
-part in finding code when a request enters the system.
-
-:term:`traversal` is the act of finding a :term:`context` and a
-:term:`view name` by walking over a graph of objects starting from a
-:term:`root` object, using the :term:`request` object as a source of
-path information.
-
-:term:`view` code is the code in an application that responds to a
-request.  Traversal doesn't actually locate :term:`view` code by
-itself: it only locates a :term:`context` and a :term:`view name`.
-But the combination of the :term:`context` object and the :term:`view
-name` found via traversal is used by a separate :mod:`repoze.bfg`
-subsystem (the "view lookup" subsystem) to find a :term:`view
-callable` later in the same request.  A view callable is a specific
-bit of code that receives a :term:`request` and which returns a
-:term:`response`.
+application in this chapter.  After we're done with creating it, we'll
+explain in more detail how the application works.
 
 .. note::
 
-   Another distinct mode known as :term:`URL dispatch` can alternately
-   be used to find a view callable based on a URL.  However, the
-   application we're going to write uses only :term:`traversal`.
-
-The ``PATH_INFO`` portion of a URL is the data following the hostname
-and port number, but before any query string elements or fragments,
-for example the ``/a/b/c`` portion of the URL
-``http://example.com/a/b/c?foo=1``. 
-
-Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of
-path segments.  For example, the ``PATH_INFO`` string ``/a/b/c`` is
-treated as the sequence ``['a', 'b', 'c']``.  Traversal pops the first
-element (``a``) from the segment sequence and attempts to use it as a
-lookup key into an *object graph* supplied by our application.  If
-that succeeeds, the :term:`context` temporarily becomes the object
-found via that lookup.  Then the next segment (``b``) is popped from
-the sequence, and the object graph is queried for that segment; if
-that lookup succeeds, the :term:`context` becomes that object.  This
-process continues until the path segment sequence is exhausted or any
-lookup for a name in the sequence fails.
-
-As we previously mentioned, the results of a :term:`traversal` include
-a :term:`context` and a :term:`view name`.  The :term:`view name` is
-the *first* URL path segment in the set of ``PATH_INFO`` segments
-"left over" in the path segment list popped by :term:`traversal`.  It
-will be the empty string (``''``) if no segments remain.  The
-circumstance where the :term:`view name` is the empty string
-represents that the :term:`default view` for a :term:`context` should
-be invoked.
-
-If the :term:`view name` is *not* the empty string, it means that
-traversal "ran out" of nodes in the *object graph* before it finished
-exhausting all the path segments implied by the URL path segments.  In
-this case, because the :term:`view name` is non-empty, a *non-default*
-view callable will be invoked.
-
-This description of traversal is not comprehensive: it's tailored
-towards understand the sample application we're about to create; we'll
-cover traversal in more detail in the :term:`traversal_chapter`.
-
-.. note::
-
-   A detailed analogy of how :mod:`repoze.bfg` :term:`traversal` works
-   is available within the chapter section entitled
-   :ref:`traversal_behavior`.  If you're a "theory-first" person, you
-   might choose to read this to augment your understanding of
-   traversal while diving into the code that follows, but it's not
-   necessary if you're willing to "go with the flow".
-
-.. index::
-   single: helloworld
+   If you're a "theory-first" kind of person, you might choose to read
+   :ref:`urlmapping_chapter` and :ref:`views_chapter` to augment your
+   understanding before diving into the code that follows, but it's
+   not necessary if -- like many programmers -- you're willing to "go
+   with the flow".
 
 .. _helloworld_imperative:
 
 Hello World, Goodbye World (Imperative)
 ---------------------------------------
 
-Here's one of the simplest :mod:`repoze.bfg` applications, configured
-imperatively:
+Here's one of the very simplest :mod:`repoze.bfg` applications,
+configured imperatively:
 
 .. code-block:: python
    :linenos:
@@ -124,49 +47,12 @@ imperatively:
 
 When this code is inserted into a Python script named
 ``helloworld.py`` and executed by a Python interpreter which has the
-:mod:`repoze.bfg` software installed, an HTTP server is started on
-port 8080.  When port 8080 is visited by a user agent on the root URL
-(``/``), the server will simply serve up the text "Hello world!" with
-the HTTP response values ``200 OK`` as a response code and a
-``Content-Type`` header value of ``text/plain``.  But for reasons
-we'll better understand shortly, when visited by a user agent on the
-URL ``/goodbye``, the server will serve up "Goodbye world!"
+:mod:`repoze.bfg` software installed, an HTTP server is started on TCP
+port 8080.  When port 8080 is visited by a browser on the root URL
+(``/``), the server will simply serve up the text "Hello world!"  When
+visited by a browser on the URL ``/goodbye``, the server will serve up
+the text "Goodbye world!"
  
-Our application's :term:`root` object is the *default* root object
-used when one isn't otherwise specified in application configuration.
-The default root object has no children.  
-
-.. note::
-
-   In a "real" traversal-based :mod:`repoze.bfg` application, we'd
-   pass a ``root_factory`` to the ``Configurator`` object's
-   constructor, which would provide our application with a custom root
-   object instead of using the :mod:`repoze.bfg` default root object.
-   Supplying a custom ``root_factory`` is how you provide a custom
-   *object graph* to :mod:`repoze.bfg`.  However, because our
-   application is so simple, we don't need a custom root object here.
-
-In a more complex :mod:`repoze.bfg` application there will be many
-:term:`context` objects to which URLs might resolve.  However, in this
-toy application, effectively there is only ever one context: the
-:term:`root` object.  This is because the object graph of our hello
-world application is very simple: there's exactly one object in our
-graph; the default root object.
-
-We have only a single :term:`default view` registered (the
-registration for the ``hello_world`` view callable).  Due to this set
-of circumstances, you can consider the sole possible URL that will
-resolve to a :term:`default view` in this application the root URL
-``'/'``.  It is the only URL that will resolve to the :term:`view
-name` of ``''`` (the empty string).
-
-We have only a single view registered for the :term:`view name`
-``goodbye`` (the registration for the ``goodbye_world`` view
-callable).  Due to this set of circumstances, you can consider the
-sole possible URL that will resolve to the ``goodbye_world`` in this
-application the URL ``'/goodbye'`` because it is the only URL that
-will result in the :term:`view name` of ``goodbye`` after traversal.
-
 Now that we have a rudimentary understanding of what the application
 does, let's examine it piece-by-piece.
 
@@ -199,8 +85,8 @@ The script also imports the ``Configurator`` class from the
 class provides methods which help configure various parts of
 :mod:`repoze.bfg` for a given application deployment.
 
-View Declaration
-~~~~~~~~~~~~~~~~
+View Callable Declarations
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The above script, beneath its set of imports, defines two functions:
 one named ``hello_world`` and one named ``goodbye_world``.
@@ -214,30 +100,32 @@ one named ``hello_world`` and one named ``goodbye_world``.
    def goodbye_world(request):
        return Response('Goodbye world!')
 
-Each function accepts a single argument (``request``) and returns an
-instance of the :class:`webob.Response` class.  In the ``hello_world``
-function, the string ``'Hello world!'`` is passed to the ``Response``
-constructor as the *body* of the response.  In the ``goodbye_world``
-function, the string ``'Goodbye world!'`` is passed.
+These functions don't really do anything very interesting.  Both
+functions accept a single argument (``request``).  The ``hello_world``
+function does nothing but return a response instance with the body
+``Hello world!``.  The ``goodbye_world`` function returns a response
+instance with the body ``Goodbye world!``.
 
 Each of these functions is known as a :term:`view callable`.  View
-callables in a "real" :mod:`repoze.bfg` application are often
-functions which accept a :term:`request` and return a
-:term:`response`.  A view callable can be represented via another type
-of object, like a class or an instance, but for our purposes here, a
-function serves us well.
+callables in a :mod:`repoze.bfg` application accept a single argument,
+``request`` and are expected to return a :term:`response` object.  A
+view callable doesn't need to be a function; it can be represented via
+another type of object, like a class or an instance, but for our
+purposes here, a function serves us well.
 
-A view callable is called with a :term:`request` object, which is a
-representation of an HTTP request sent by a remote user agent.  A view
-callable is required to return a :term:`response` object because a
-response object has all the information necessary to formulate an
-actual HTTP response; this object is then converted to text and sent
-back to the requesting user agent.
+A view callable is always called with a :term:`request` object.  A
+request object is a representation of an HTTP request sent to
+:mod:`repoze.bfg` via the active :term:`WSGI` server.
 
-The ``hello_world`` view callable defined by the script does nothing
-but return a response with the body ``Hello world!``; the
-``goodbye_world`` view callable returns a response with the body
-``Goodbye world!``.
+A view callable is required to return a :term:`response` object
+because a response object has all the information necessary to
+formulate an actual HTTP response; this object is then converted to
+text and sent back to the requesting browser.  To return a response,
+each view callable creates an instance of the :class:`webob.Response`
+class.  In the ``hello_world`` function, the string ``'Hello world!'``
+is passed to the ``Response`` constructor as the *body* of the
+response.  In the ``goodbye_world`` function, the string ``'Goodbye
+world!'`` is passed.
 
 .. index::
    pair: imperative; configuration
@@ -291,19 +179,9 @@ only be run during a direct script execution.
 The ``config = Configurator()`` line above creates an instance of the
 :class:`repoze.bfg.configuration.Configurator` class.  The resulting
 ``config`` object represents an API which the script uses to configure
-this particular :mod:`repoze.bfg` application.
-
-.. note::
-
-   An instance of the :class:`repoze.bfg.configuration.Configurator`
-   class is a *wrapper* object which mutates an :term:`application
-   registry` as its methods are called.  An application registry
-   represents the configuration state of a :mod:`repoze.bfg`
-   application.  The ``Configurator`` is not itself an
-   :term:`application registry`, it is a mechanism used to configure
-   an application registry.  The underlying application registry
-   object being configured by a ``Configurator`` is available as its
-   ``registry`` attribute.
+this particular :mod:`repoze.bfg` application.  Methods called on the
+Configurator will cause registrations to be made in a
+:term:`application registry` associated with the application.
 
 Beginning Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -344,64 +222,37 @@ Each of these lines calls the
 :meth:`repoze.bfg.configuration.Configurator.add_view` method.  The
 ``add_view`` method of a configurator registers a :term:`view
 configuration` within the :term:`application registry`.  A :term:`view
-configuration` represents a :term:`view callable` which must be
-invoked when a set of circumstances related to the :term:`request` is
-true.  This "set of circumstances" is provided as one or more keyword
-arguments to the ``add_view`` method, otherwise known as
-:term:`predicate` arguments.
+configuration` represents a set of circumstances related to the
+:term:`request` that will cause a specific :term:`view callable` to be
+invoked.  This "set of circumstances" is provided as one or more
+keyword arguments to the ``add_view`` method.  Each of these keyword
+arguments is known as a view configuration :term:`predicate`.
 
 The line ``config.add_view(hello_world)`` registers the
 ``hello_world`` function as a view callable.  The ``add_view`` method
 of a Configurator must be called with a view callable object as its
-first argument, so the first argument passed is ``hello_world``
-function we'd like to use as a view callable.  However, this line
-calls ``add_view`` with a single default :term:`predicate` argument,
-the ``name`` predicate with a value of the empty string (``''``),
-meaning that we'd like :mod:`repoze.bfg` to invoke the ``hello_world``
-view callable for any request for the :term:`default view` of an
-object.
-
-Our ``hello_world`` :term:`view callable` returns a Response instance
-with a body of ``Hello world!`` in the configuration implied by this
-script.  It is configured as a :term:`default view`.  Therefore, a
-user agent contacting a server running this application will receive
-the greeting ``Hello world!`` when any :term:`default view` is
-invoked. 
-
-.. sidebar:: View Dispatch and Ordering
-
-   When :term:`traversal` is used, :mod:`repoze.bfg` chooses the most
-   specific view callable based *only* on view :term:`predicate`
-   applicability.  This is unlike :term:`URL dispatch`, another
-   dispatch mode of :mod:`repoze.bfg` (and similar schemes used by
-   other frameworks, like :term:`Pylons` and :term:`Django`) which
-   first uses an ordered routing lookup to resolve the request to a
-   view callable by running it through a relatively-ordered series of
-   URL path matches.  We're not really concerned about the finer
-   details of :term:`URL dispatch` right now.  It's just useful to use
-   for comparative purposes: the ordering of calls to
-   :meth:`repoze.bfg.configuration.Configurator.add_view` is never
-   very important.  We can register ``goodbye_world`` first and
-   ``hello_world`` second; :mod:`repoze.bfg` will still give us the
-   most specific callable when a request is dispatched to it.
+first argument, so the first argument passed is the ``hello_world``
+function.  This line calls ``add_view`` with a *default* value for the
+:term:`predicate` argument, named ``name``.  The ``name`` predicate
+defaults to a value equalling the empty string (``''``).  This means
+that we're instructing :mod:`repoze.bfg` to invoke the ``hello_world``
+view callable when the :term:`view name` is the empty string.  We'll
+learn in later chapters what a :term:`view name` is, and under which
+circumstances a request will have a view name that is the empty
+string; in this particular application, it means that the
+``hello_world`` view callable will be invoked when the root URL ``/``
+is visted by a browser.
 
 The line ``config.add_view(goodbye_world, name='goodbye')`` registers
 the ``goodbye_world`` function as a view callable.  The line calls
 ``add_view`` with the view callable as the first required positional
 argument, and a :term:`predicate` keyword argument ``name`` with the
-value ``'goodbye'``.  This :term:`view configuration` implies that a
-request with a :term:`view name` of ``goodbye`` should cause the
-``goodbye_world`` view callable to be invoked.  For the purposes of
-this discussion, the :term:`view name` can be considered the first
-non-empty path segment in the URL: in particular, this view
-configuration will match when the URL is ``/goodbye``.
-
-Our ``goodbye_world`` :term:`view callable` returns a Response
-instance with a body of ``Goodbye world!`` in the configuration
-implied by this script.  It is configured as with a :term:`view name`
-predicate of ``goodbye``.  Therefore, a user agent contacting a server
-running this application will receive the greeting ``Goodbye world!``
-when the path info part of the request is ``/goodbye``.
+value ``'goodbye'``.  The ``name`` argument supplied in this
+:term:`view configuration` implies that only a request that has a
+:term:`view name` of ``goodbye`` should cause the ``goodbye_world``
+view callable to be invoked.  In this particular application, this
+means that the ``goodbye_world`` view callable will be invoked when
+the URL ``/goodbye`` is visted by a browser.
 
 Each invocation of the ``add_view`` method implies a :term:`view
 configuration` registration.  Each :term:`predicate` provided as a
@@ -414,24 +265,13 @@ request, however, the view callable with the *most specific* view
 configuration (the view configuration that matches the most specific
 set of predicates) is always invoked.
 
-Earlier we explained that the server would return ``Hello world!`` if
-you visited the *root* (``/``) URL.  However, actually, because the
-view configuration registration for the ``hello_world`` view callable
-has no :term:`predicate` arguments, the ``hello_world`` view callable
-is applicable for the :term:`default view` of any :term:`context`
-resulting from a request.  This isn't all that interesting in this
-application, because we always only have *one* potential context (the
-root object): it is the only object in the graph.
-
-We've also registered a view configuration for another circumstance:
-the ``goodbye_world`` view callable has a ``name`` predicate of
-``goodbye``, meaning that it will match for requests that have the
-:term:`view name` ``goodbye`` unlike the ``hello_world`` view
-configuration registration, which will only match the default view
-(view name ``''``) of a request.  Because :mod:`repoze.bfg` chooses
-the best view configuration for any request, the ``goodbye_world``
-view callable will be used when the URL contains path information that
-ends with ``/goodbye``.
+In this application, :mod:`repoze.bfg` chooses the most specific view
+callable based only on view :term:`predicate` applicability.  The
+ordering of calls to
+:meth:`repoze.bfg.configuration.Configurator.add_view` is never very
+important.  We can register ``goodbye_world`` first and
+``hello_world`` second; :mod:`repoze.bfg` will still give us the most
+specific callable when a request is dispatched to it.
 
 Ending Configuration
 ~~~~~~~~~~~~~~~~~~~~
@@ -484,12 +324,9 @@ It has a reference to the :term:`application registry` which resulted
 from method calls to the configurator used to configure it.  The
 router consults the registry to obey the policy choices made by a
 single application.  These policy choices were informed by method
-calls to the ``Configurator`` made earlier; in our case, the only
-policy choices made were implied by two calls to the ``add_view``
-method, telling our application that it should effectively serve up
-the ``hello_world`` view callable to any user agent when it visits the
-root URL, and the ``goodbye_world`` view callable to any user agent
-when it visits the URL with the path info ``/goodbye``.
+calls to the :term:`Configurator` made earlier; in our case, the only
+policy choices made were implied by two calls to its ``add_view``
+method.
 
 WSGI Application Serving
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -519,9 +356,8 @@ Conclusion
 
 Our hello world application is one of the simplest possible
 :mod:`repoze.bfg` applications, configured "imperatively".  We can see
-a good deal of what's going on "under the hood" when we configure a
-:mod:`repoze.bfg` application imperatively.  However, another mode of
-configuration exists named *declarative* configuration.
+that it's configured imperatively because the full power of Python is
+available to us as we perform configuration tasks.
 
 .. index::
    pair: helloworld; declarative
@@ -532,11 +368,12 @@ configuration exists named *declarative* configuration.
 Hello World, Goodbye World (Declarative)
 ----------------------------------------
 
-:mod:`repoze.bfg` can be configured for the same "hello world"
-application "declaratively", if so desired, as described in
-:ref:`declarative_configuration`.
+Another almost entirely equivalent mode of application configuration
+exists named *declarative* configuration.  :mod:`repoze.bfg` can be
+configured for the same "hello world" application "declaratively", if
+so desired.
 
-Create a file named ``helloworld.py``:
+To do so, first, create a file named ``helloworld.py``:
 
 .. code-block:: python
    :linenos:
@@ -559,8 +396,8 @@ Create a file named ``helloworld.py``:
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
-Create a file named ``configure.zcml`` in the same directory as the
-previously created ``helloworld.py``:
+Then create a file named ``configure.zcml`` in the same directory as
+the previously created ``helloworld.py``:
 
 .. code-block:: xml
    :linenos:
@@ -764,7 +601,7 @@ configuration` it creates.
 Since the relative ordering of calls to
 :meth:`repoze.bfg.configuration.Configurator.add_view` doesn't matter
 (see the sidebar entitled *View Dispatch and Ordering* within
-:ref:`adding_configuration), the relative order of ``<view>`` tags in
+:ref:`adding_configuration`), the relative order of ``<view>`` tags in
 ZCML doesn't matter either.  The following ZCML orderings are
 completely equivalent:
 
@@ -797,18 +634,16 @@ completely equivalent:
        />
 
 We've now configured a :mod:`repoze.bfg` helloworld application
-declaratively.
+declaratively.  More information about this mode of configuration is
+available in :ref:`declarative_configuration` and within
+:ref:`zcml_directives`.
 
 References
 ----------
 
-For more information about the API of a ``Configurator`` object, see
-:class:`repoze.bfg.configuration.Configurator` .  The equivalent ZCML
-declaration tags are introduced in narrative documentation chapters as
-necessary.
-
-For more information about :term:`traversal`, see
-:ref:`traversal_chapter`.
+For more information about the API of a :term:`Configurator` object,
+see :class:`repoze.bfg.configuration.Configurator` .  The equivalent
+ZCML declaration tags are introduced in :ref:`zcml_directives`.
 
 For more information about :term:`view configuration`, see
 :ref:`views_chapter`.

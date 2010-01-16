@@ -636,3 +636,20 @@ Glossary
      "Python"; :term:`Jython`, Google's App Engine, and `PyPy
      <http://codespeak.net/pypy/dist/pypy/doc/>`_ are examples of
      non-C based Python implementations.
+
+   View Lookup
+     The act of finding and invoking the "best" :term:`view callable`
+     given a :term:`request`, a :term:`context`, and a :term:`view
+     name`.
+
+   Context Finding
+     The act of locating a :term:`context` and a :term:`view name`
+     given a :term:`request`.  :term:`Traversal` and :term:`URL
+     dispatch` are the context finding subsystems used by
+     :mod:`repoze.bfg`.
+
+   Triad
+     The three bits of information used by :term:`view lookup` to find
+     "the best" view callable for a given circumstance: a
+     :term:`context` type, a :term:`view name` and a :term:`request`.
+
