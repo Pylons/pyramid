@@ -4,6 +4,8 @@
 
 - Review:
 
+  [ ] Traversal
+
   [ ] Combining Traversal and URL Dispatch
 
   [ ] Views
