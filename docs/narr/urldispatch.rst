@@ -857,7 +857,6 @@ See :ref:`request_and_context_view_definitions` for more information.
 References
 ----------
 
-For a contextual example of how :term:`URL dispatch` can be used to
-create a :mod:`repoze.bfg` application, see the
-:ref:`bfg_sql_wiki_tutorial`.
+A tutorial showing how :term:`URL dispatch` can be used to create a
+:mod:`repoze.bfg` application exists in :ref:`bfg_sql_wiki_tutorial`.
 

@@ -10,7 +10,8 @@ graph*, starting from a :term:`root` object, using a :term:`request`
 object as a source of path information.
 
 In this chapter, we'll provide a high-level overview of traversal,
-explain the concept of an *object graph*,
+explain the concept of an *object graph*, and show how traversal might
+be used within an application.
 
 .. index::
    pair: traversal; high-level overview
@@ -62,28 +63,39 @@ The Object Graph
 When your application uses :term:`traversal` to resolve URLs to code,
 your application must supply an *object graph* to :mod:`repoze.bfg`.
 
-Users interact with your :mod:`repoze.bfg` -based application via a
-:term:`router`, which is just a fancy :term:`WSGI` application.  At
-system startup time, the router is configured with a callback known as
-a :term:`root factory`, supplied by the application developer.  The
-root factory is passed a :term:`request` object and it is expected to
-return an object which represents the root of the object graph.  All
-:term:`traversal` will begin at this root object.  The root object is
-usually a *mapping* object (such as a Python dictionary).
+At system startup time, the :mod:`repoze.bfg` :term:`Router` is
+configured with a callback known as a :term:`root factory`, supplied
+by the application developer as the ``root_factory`` argument to a
+:term:`Configurator`.
 
-.. note:: If a :term:`root factory` is passed to the :mod:`repoze.bfg`
-   :term:`Configurator` constructor as the value ``None``, a *default*
-   root factory is used.  This is most useful when you're using
-   :term:`URL dispatch` and you don't care very much about traversing
-   any particular graph to resolve URLs to code.  It is also possible
-   to use traversal and URL dispatch together.  When both a root
-   factory (and therefore traversal) *and* "routes" declarations (and
-   therefore url dispatch) are used, the url dispatch routes are
-   checked first, and if none match, :mod:`repoze.bfg` will fall back
-   to using traversal to attempt to map the request to a view.  If the
-   name ``*traverse`` is in a route's ``path`` pattern, when it is
-   matched, it is also possible to do traversal *after* a route has
-   been matched.  See :ref:`hybrid_chapter` for more information.
+Here's an example of a simple root factory:
+
+.. code-block:: python
+   :linenos:
+
+   class Root(dict):
+       def __init__(self, request):
+           pass
+
+Here's an example of using this root factory within startup
+configuration, by passing it to an instance of a :term:`Configurator`
+named ``config``:
+
+   config = Configurator(root_factory=Root)
+
+Making a declaration like this at startup means that your
+:mod:`repoze.bfg` application will call the root factory (in this
+case, the class ``Root``) to generate a root object whenever a request
+enters the application.  Usually a root factory for a traversal-based
+application will be more complicated than the above ``Root`` object;
+in particular it may be associated with a database connection or
+another persistence mechanism.
+
+A root factory is passed a :term:`request` object and it is expected
+to return an object which represents the root of the object graph.
+All :term:`traversal` will begin at this root object.  The root object
+is usually a *mapping* object (such as a Python dictionary, or at
+least a class which has many of the same methods as a dictionary).
 
 .. warning:: In :mod:`repoze.bfg` 1.0 and prior versions, the root
    factory was passed a term WSGI *environment* object (a dictionary)
@@ -92,6 +104,10 @@ usually a *mapping* object (such as a Python dictionary).
    passed to the root factory has a dictionary-like interface that
    emulates the WSGI environment, so code expecting the argument to be
    a dictionary will continue to work.
+
+If a :term:`root factory` is passed to the :mod:`repoze.bfg`
+:term:`Configurator` constructor as the value ``None``, a *default*
+root factory is used.
 
 .. sidebar:: Emulating the Default Root Factory
 
@@ -109,35 +125,10 @@ usually a *mapping* object (such as a Python dictionary).
       config = Configurator(root_factory=Root)
 
    The default root factory is just a really stupid object that has no
-   behavior or state.
-
-Using :term:`traversal` against an application that uses the object
-graph supplied by the default root object is not very interesting,
-because the default root object has no children.  In a more complex
-:mod:`repoze.bfg` application, a root factory would be supplied which
-would return an object that had children capable of being traversed,
-and therefore there might be many :term:`context` objects to which
-URLs might resolve, depending on the URL path.  However, in this toy
-application, there's exactly one object in our object graph; the
-default root object.  Therefore, there can only ever be one context:
-the :term:`root` object itself.
-
-We have only a single :term:`default view` registered (the
-registration for the ``hello_world`` view callable).  Due to this set
-of circumstances, you can consider the sole possible URL that will
-resolve to a :term:`default view` in this application the root URL
-``'/'``.  It is the only URL that will resolve to the :term:`view
-name` of ``''`` (the empty string) when the default object graph is
-traversed.
-
-We have only a single view registered for the :term:`view name`
-``goodbye`` (the registration for the ``goodbye_world`` view
-callable).  Due to this set of circumstances, you can consider the
-sole possible URL that will resolve to the ``goodbye_world`` in this
-application the URL ``'/goodbye'`` because it is the only URL that
-will result in the :term:`view name` of ``goodbye`` when the default
-object graph is traversed.
-
+   behavior or state.  Using :term:`traversal` against an application
+   that uses the object graph supplied by the default root object is
+   not very interesting, because the default root object has no
+   children.
 
 Items contained within the object graph are sometimes analogous to the
 concept of :term:`model` objects used by many other frameworks (and
@@ -479,6 +470,5 @@ model object during traversal.
 References
 ----------
 
-For a contextual example of how :term:`traversal` can be used to
-create a :mod:`repoze.bfg` application, see the
-:ref:`bfg_wiki_tutorial`.
+A tutorial showing how :term:`traversal` can be used to create a
+:mod:`repoze.bfg` application exists in :ref:`bfg_wiki_tutorial`.

@@ -36,18 +36,17 @@ application developer, and invokes it.  A view callable returns a
 
 .. sidebar::  What Good is A Context Finding Subsystem?
 
-   Many other web frameworks such as :term:`Pylons` or :term:`Django`
+   The :term:`URL dispatch` mode of :mod:`repoze.bfg` as well as many
+   other web frameworks such as :term:`Pylons` or :term:`Django`
    actually collapse the two steps of context finding and view lookup
-   into a single step.  In such systems, a URL maps *directly* to a
-   view callable.  These systems possess no analogue to a
-   context finding subsystem: they are "context-free".  This makes
-   them simpler to understand than systems which use "context".
-   However, using an explicit context finding step provides extra
-   flexibility.  For example, it makes it possible to protect your
-   application with declarative context-sensitive instance-level
-   :term:`authorization`, which is not well supported in frameworks
-   that do not provide a notion of a context.  See the
-   :ref:`security_chapter` for more information.
+   into a single step.  In these systems, a URL can map *directly* to
+   a view callable.  This makes them simpler to understand than
+   systems which use distinct subsystems to locate a context and find
+   a view.  However, explicitly using context finding step provides
+   extra flexibility.  For example, it makes it possible to protect
+   your application with declarative context-sensitive instance-level
+   :term:`authorization`, which is not well-supported in frameworks
+   that do not provide a notion of a context.
 
 There are two separate context finding subsystems in
 :mod:`repoze.bfg`: :term:`traversal` and :term:`URL dispatch`.  The
@@ -55,7 +54,7 @@ subsystems are documented within this chapter.  They can be used
 separately or they can be combined.
 
 There is only one view lookup subsystem present in :mod:`repoze.bfg`.
-It is not documented in this chapter.  Instead, it is documented
+It is not documented within this chapter.  Instead, it is documented
 within :ref:`views_chapter`.
 
 .. toctree::
