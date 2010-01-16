@@ -1544,6 +1544,9 @@ to convert non-response return values from a view.
 The value of the ``attr`` attribute represents the attribute name
 looked up on the view object to return a response.
 
+.. index::
+   pair: debugging; not found errors
+
 .. _debug_notfound_section:
 
 :exc:`NotFound` Errors

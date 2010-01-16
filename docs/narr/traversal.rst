@@ -10,8 +10,8 @@ graph*, starting from a :term:`root` object, using a :term:`request`
 object as a source of path information.
 
 In this chapter, we'll provide a high-level overview of traversal,
-explain the concept of an *object graph*, and show how traversal might
-be used within an application.
+we'll explain the concept of an *object graph*, and we'll show how
+traversal might be used within an application.
 
 .. index::
    pair: traversal; high-level overview
@@ -47,10 +47,10 @@ the traversal process.
 
 The combination of the :term:`context` object and the :term:`view
 name` found via traversal is used later in the same request by a
-separate :mod:`repoze.bfg` subsystem -- the "view lookup" subsystem --
-to find a :term:`view callable` later within the same request.  How
-:mod:`repoze.bfg` performs view lookup is explained within the
-:ref:`views_chapter` chapter.
+separate :mod:`repoze.bfg` subsystem -- the :term:`view lookup`
+subsystem -- to find a :term:`view callable` later within the same
+request.  How :mod:`repoze.bfg` performs view lookup is explained
+within the :ref:`views_chapter` chapter.
 
 .. index::
    single: object graph
@@ -81,6 +81,9 @@ Here's an example of using this root factory within startup
 configuration, by passing it to an instance of a :term:`Configurator`
 named ``config``:
 
+.. code-block:: python
+   :linenos:
+
    config = Configurator(root_factory=Root)
 
 Making a declaration like this at startup means that your
@@ -94,8 +97,7 @@ another persistence mechanism.
 A root factory is passed a :term:`request` object and it is expected
 to return an object which represents the root of the object graph.
 All :term:`traversal` will begin at this root object.  The root object
-is usually a *mapping* object (such as a Python dictionary, or at
-least a class which has many of the same methods as a dictionary).
+is often an instance of a class which has a ``__getitem__`` method.
 
 .. warning:: In :mod:`repoze.bfg` 1.0 and prior versions, the root
    factory was passed a term WSGI *environment* object (a dictionary)
@@ -128,7 +130,8 @@ root factory is used.
    behavior or state.  Using :term:`traversal` against an application
    that uses the object graph supplied by the default root object is
    not very interesting, because the default root object has no
-   children.
+   children.  Its availability is more useful when you're developing
+   an application using :term:`URL dispatch`.
 
 Items contained within the object graph are sometimes analogous to the
 concept of :term:`model` objects used by many other frameworks (and
@@ -136,12 +139,32 @@ concept of :term:`model` objects used by many other frameworks (and
 They are typically instances of Python classes.
 
 .. index::
-   single: traversal behavior
+   single: traversal; algorithm
 
 .. _traversal_behavior:
 
-:mod:`repoze.bfg` Traversal Behavior
--------------------------------------
+The :mod:`repoze.bfg` Traversal Algorithm
+-----------------------------------------
+
+This section will attempt to explain the :mod:`repoze.bfg` traversal
+algorithm.  We'll provide an an analogy, a diagram of how the
+traversal algorithm works, and some example traversal scenarios that
+might aid in understanding how the traversal algorithm operates
+against a specific object graph.
+
+The :ref:`views_chapter` chapter discusses :term:`view lookup` in
+detail, and it is the canonical source for information about views.
+Technically, :term:`traversal` is a :mod:`repoze.bfg` subsystem that
+is separated from traversal entirely.  However, we'll describe the
+fundamental behavior of view lookup in the examples in the next few
+sections to give you an idea of how traversal and view lookup
+cooperate, because they are always used cooperatively.
+
+.. index::
+   single: traversal analogy
+
+An Analogy
+~~~~~~~~~~
 
 We need to use an analogy to clarify how :mod:`repoze.bfg` traversal
 works against an arbitrary object graph.
@@ -186,12 +209,12 @@ The contents of ``myfile`` are now printed on the user's behalf.
 uses :term:`traversal` against an object graph.  In this analogy, we
 can map the ``cat`` program to the :mod:`repoze.bfg` concept of a
 :term:`view callable`: it is a program that can be run against some
-:term:`context`.  The file being operated on in this analogy is the
-:term:`context` object; the context is the "last node found" in a
-traversal.  The directory structure is the object graph being
-traversed.  The act of progressively changing directories to find the
-file as well as the handling of a ``cd`` error as a stop condition is
-analogous to :term:`traversal`.
+:term:`context` as the result of :term:`view lookup`.  The file being
+operated on in this analogy is the :term:`context` object; the context
+is the "last node found" in a traversal.  The directory structure is
+the object graph being traversed.  The act of progressively changing
+directories to find the file as well as the handling of a ``cd`` error
+as a stop condition is analogous to :term:`traversal`.
 
 The object graph is traversed, beginning at a root object, represented
 by the root URL (``/``); if there are further path segments in the
@@ -231,18 +254,22 @@ model instance in your object graph or when the path segments implied
 by the URL "run out".  The object that traversal "stops on" becomes
 the :term:`context`.
 
+.. index::
+   pair: traversal; unicode
+   pair: traversal; algorithm
+
 .. _how_bfg_traverses:
 
-How :mod:`repoze.bfg` Processes a Request Using Traversal
----------------------------------------------------------
+The Algorithm
+~~~~~~~~~~~~~
 
-When a user requests a page from your :mod:`repoze.bfg` -powered
+When a user requests a page from your :mod:`traversal` -powered
 application, the system uses this algorithm to determine which Python
 code to execute:
 
 #.  The request for the page is presented to the :mod:`repoze.bfg`
     :term:`router` in terms of a standard :term:`WSGI` request, which
-    is represented by a WSGI environment and a ``start_response``
+    is represented by a WSGI environment and a WSGI ``start_response``
     callable.
 
 #.  The router creates a :term:`request` object based on the WSGI
@@ -258,8 +285,8 @@ code to execute:
     request with a ``PATH_INFO`` variable of ``/a/b/c`` maps to the
     traversal sequence ``[u'a', u'b', u'c']``.  Note that each of the
     path segments in the sequence is converted to Unicode using the
-    UTF-8 decoding (if the decoding fails, a :exc:`TypeError` is
-    raised).
+    UTF-8 decoding; if the decoding fails, a :exc:`TypeError` is
+    raised.
 
 #.  :term:`Traversal` begins at the root object returned by the root
     factory.  For the traversal sequence ``[u'a', u'b', u'c']``, the
@@ -300,34 +327,50 @@ code to execute:
     the context is "object ``a``", the view name is ``b`` and the
     subpath is ``('c',)``.
 
-#.  If a :term:`authorization policy` is configured, the router
-    performs a permission lookup.  If a permission declaration is
-    found for the view name and context implied by the current
-    request, the :term:`authorization policy` is consulted to see if
-    the "current user" (as determined by the the active
-    :term:`authentication policy`) can perform the action.  If he can,
-    processing continues.  If he cannot, the :term:`forbidden view` is
-    called (see also :ref:`changing_the_forbidden_view`).
+Once :term:`context` and :term:`view name` and associated attributes
+such as the :term:`subpath` are located, the job of :term:`traversal`
+is finished.  It passes the back the information it obtained to its
+caller, the :mod:`repoze.bfg` :term:`Router`, which subsequently
+invokes :term:`view lookup` with the context and view name
+information.
 
-#.  Armed with the context, the view name, and the subpath, the router
-    performs a view lookup.  It attempts to look up a view from the
-    :mod:`repoze.bfg` :term:`application registry` using the
-    :term:`view name`, the :term:`context`, and the :term:`request`.
-    If a view function is found, it is called with the context and the
-    request.  It returns a response, which is fed back upstream.  If a
-    view is not found, the :term:`not found view` is called (see
-    :ref:`changing_the_notfound_view`).
+Note well that the traversal machinery by default attempts to first
+URL-unquote and then Unicode-decode each path element in ``PATH_INFO``
+from its natural byte string (``str`` type) representation.  URL
+unquoting is performed using the Python standard library
+``urllib.unquote`` function.  Conversion from a URL-decoded string
+into Unicode is attempted using the UTF-8 encoding.  If any
+URL-unquoted path segment in ``PATH_INFO`` is not decodeable using the
+UTF-8 decoding, a :exc:`TypeError` is raised.  A segment will be fully
+URL-unquoted and UTF8-decoded before it is passed it to the
+``__getitem__`` of any model object during traversal.
 
-In either case, the result is returned upstream via the :term:`WSGI`
-protocol.
+The standard traversal algorithm exposes two special cases:
+
+- You will often end up with a :term:`view name` that is the empty
+  string as the result of a particular traversal.  This indicates that
+  the view lookup machinery should look up the :term:`default view`.
+  The default view is a view that is registered with no name or a view
+  which is registered with a name that equals the empty string.
+
+- If any path segment element begins with the special characters
+  ``@@`` (think of them as goggles), the value of that segment minus
+  the goggle characters is considered the :term:`view name`
+  immediately and traversal stops there.  This allows you to address
+  views that may have the same names as model instance names in the
+  graph unambiguously.
 
 .. image:: modelgraphtraverser.png
 
 .. index::
    pair: traversal; example
 
-A Traversal Example
--------------------
+Traversal Examples
+~~~~~~~~~~~~~~~~~~
+
+No one can be expected to understand the traversal algorithm by
+analogy and description alone, so let's examine some traversal
+scenarios that use concrete URLs and object graph compositions.
 
 Let's pretend the user asks for
 ``http://example.com/foo/bar/baz/biz/buz.txt``. Let's pretend that the
@@ -343,15 +386,14 @@ traversing the following graph::
 
 Here's what happens:
 
-- :mod:`repoze.bfg` traverses the root, and attempts to find "foo",
+- :mod:`traversal` traverses the root, and attempts to find "foo",
   which it finds.
 
-- :mod:`repoze.bfg` traverses "foo", and attempts to find "bar", which
+- :mod:`traversal` traverses "foo", and attempts to find "bar", which
   it finds.
 
-- :mod:`repoze.bfg` traverses bar, and attempts to find "baz", which
-  it does not find ("bar" raises a :exc:`KeyError` when asked for
-  "baz").
+- :mod:`traversal` traverses bar, and attempts to find "baz", which it
+  does not find ("bar" raises a :exc:`KeyError` when asked for "baz").
 
 The fact that it does not find "baz" at this point does not signify an
 error condition.  It signifies that:
@@ -363,20 +405,21 @@ error condition.  It signifies that:
 
 - the :term:`subpath` is ``('biz', 'buz.txt')``
 
-Because it's the "context", :mod:`repoze.bfg` examines "bar" to find
-out what "type" it is. Let's say it finds that the context is an
-``Bar`` type (because "bar" happens to be an instance of the class
-``Bar``).
+At this point, traversal has ended, and :term:`view lookup` begins.
 
-Using the :term:`view name` (``baz``) and the type, it asks the
-:term:`application registry` this question:
+Because it's the "context", the view lookup machinery examines "bar"
+to find out what "type" it is. Let's say it finds that the context is
+an ``Bar`` type (because "bar" happens to be an instance of the class
+``Bar``).  Using the :term:`view name` (``baz``) and the type, view
+lookup asks the :term:`application registry` this question:
 
 - Please find me a :term:`view callable` registered using a
   :term:`view configuration` with the name "baz" that can be used for
   the class ``Bar``.
 
-Let's say it finds no matching view type.  It then returns the result
-of the :term:`not found view`.  The request ends.
+Let's say that view lookup finds no matching view type.  In this
+circumstance, the :mod:`repoze.bfg` :term:`router` returns the result
+of the :term:`not found view` and the request ends.
 
 However, for this graph::
 
@@ -392,16 +435,16 @@ However, for this graph::
 
 The user asks for ``http://example.com/foo/bar/baz/biz/buz.txt``
 
-- :mod:`repoze.bfg` traverses "foo", and attempts to find "bar", which
+- :mod:`traversal` traverses "foo", and attempts to find "bar", which
   it finds.
 
-- :mod:`repoze.bfg` traverses "bar", and attempts to find "baz", which
+- :mod:`traversal` traverses "bar", and attempts to find "baz", which
   it finds.
 
-- :mod:`repoze.bfg` traverses "baz", and attempts to find "biz", which
+- :mod:`traversal` traverses "baz", and attempts to find "biz", which
   it finds.
 
-- :mod:`repoze.bfg` traverses "biz", and attempts to find "buz.txt"
+- :mod:`traversal` traverses "biz", and attempts to find "buz.txt"
   which it does not find.
 
 The fact that it does not find "buz.txt" at this point does not
@@ -414,61 +457,46 @@ signify an error condition.  It signifies that:
 
 - the :term:`subpath` is an empty sequence ( ``()`` ).
 
-Because it's the "context", :mod:`repoze.bfg` examines "biz" to find
-out what "type" it is. Let's say it finds that the context is a
-``Biz`` type (because "biz" is an instance of the Python class
-``Biz``).
+At this point, traversal has ended, and :term:`view lookup` begins.
 
-Using the :term:`view name` (``buz.txt``) and the type, it asks the
-:term:`application registry` this question:
+Because it's the "context", the view lookup machinery examines "biz"
+to find out what "type" it is. Let's say it finds that the context is
+a ``Biz`` type (because "biz" is an instance of the Python class
+``Biz``).  Using the :term:`view name` (``buz.txt``) and the type,
+view lookup asks the :term:`application registry` this question:
 
 - Please find me a :term:`view callable` registered with a :term:`view
   configuration` with the name ``buz.txt`` that can be used for class
   ``Biz``.
 
-Let's say that question is answered "here you go, here's a bit of code
-that is willing to deal with that case", and returns a :term:`view
-callable`.  The view callable is passed the "biz" object as the
-"context" and the current :term:`WebOb` :term:`request` as the
-"request".  It returns a :term:`response`.
+Let's say that question is answered by the application registry with
+the equivalent of "here you go, here's a bit of code that is willing
+to deal with that case"; the application registry returns a
+:term:`view callable`.  The view callable is then called with the
+current :term:`WebOb` :term:`request` as the sole argument:
+``request``; it is expected to return a response.
 
-There are two special cases:
+.. sidebar:: The Example View Callables Accept Only a Request; How Do I Access the Context?
 
-- During traversal you will often end up with a :term:`view name` that
-  is the empty string.  This indicates that :mod:`repoze.bfg` should
-  look up the :term:`default view`.  The default view is a view that is
-  registered with no name or a view which is registered with a name
-  that equals the empty string.
-
-- If any path segment element begins with the special characters
-  ``@@`` (think of them as goggles), the value of that segment minus
-  the goggle characters is considered the :term:`view name`
-  immediately and traversal stops there.  This allows you to address
-  views that may have the same names as model instance names in the
-  graph unambiguously.
-
-.. index::
-   pair: debugging; not found errors
-
-.. index::
-   pair: traversal; unicode
-
-Traversal and Unicode
----------------------
-
-The traversal machinery by default attempts to first URL-unquote and
-then Unicode-decode each path element in ``PATH_INFO`` from its
-natural byte string (``str`` type) representation.  URL unquoting is
-performed using the Python standard library ``urllib.unquote``
-function.  Conversion from a URL-decoded string into Unicode is
-attempted using the UTF-8 encoding.  If any URL-unquoted path segment
-in ``PATH_INFO`` is not decodeable using the UTF-8 decoding, a
-TypeError is raised.  A segment will be fully URL-unquoted and
-UTF8-decoded before it is passed it to the ``__getitem__`` of any
-model object during traversal.
+   Most of the examples in this book assume that a view callable is
+   typically passed only a :term:`request` object.  Sometimes your
+   view callables need access to the :term:`context`, especially when
+   you use :term:`traversal`.  You might use a supported alternate
+   view callable argument list in your view callables such as the
+   ``(context, request)`` calling convention described in
+   :ref:`request_and_context_view_definitions`.  But you don't need to
+   if you don't want to.  In view callables that accept only a
+   request, the :term:`context` found by traversal is available as the
+   ``context`` attribute of the request object.  The :term:`view name`
+   is available as the ``view_name`` attribute of the request object.
+   Other :mod:`repoze.bfg` -speficic request attributes are also
+   available as described in :ref:`special_request_attributes`.
 
 References
 ----------
 
 A tutorial showing how :term:`traversal` can be used to create a
 :mod:`repoze.bfg` application exists in :ref:`bfg_wiki_tutorial`.
+
+See the :ref:`views_chapter` chapter for detailed information about
+:term:`view lookup`.

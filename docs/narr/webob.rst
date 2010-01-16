@@ -109,6 +109,8 @@ instance, ``req.if_modified_since`` returns a `datetime
 .. index::
    pair: request attributes; special
 
+.. _special_request_attributes:
+
 Special Attributes Added to the Request by :mod:`repoze.bfg`
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
