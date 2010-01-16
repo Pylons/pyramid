@@ -16,8 +16,8 @@ traversal might be used within an application.
 .. index::
    pair: traversal; high-level overview
 
-A High-Level Overview of Traversal Mechanics
---------------------------------------------
+A High-Level Overview of Traversal
+----------------------------------
 
 :term:`Traversal` is dependent on information in a :term:`request`
 object.  The :term:`request` object contains URL path information in
