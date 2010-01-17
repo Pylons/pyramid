@@ -4,11 +4,16 @@
 
 - Review:
 
-  [ ] Traversal
-
   [ ] Combining Traversal and URL Dispatch
 
   [ ] Views
+
+- Add a "route predicates" section where "Route Configuration"
+  (urldispatch.rst) is; also expand "Route Matching" section wrt
+  predicates.
+
+- Add an example of URL match ordering when routes compete to the
+  urldispatch chapter.
 
 - Review tutorials.
 
