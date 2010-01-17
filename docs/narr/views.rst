@@ -557,6 +557,20 @@ callable to influence associated response attributes.
   achieved by returning various values in the ``response_headerlist``,
   this is purely a convenience.
 
+For example, if you need to change the response status from within a
+view callable that uses a renderer, assign the ``response_status``
+attribute to the request before returning a result:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(name='gone')
+   def myview(request):
+       request.response_status = '404 Not Found'
+       return {'URL':request.URL}
+
 .. index::
    pair: renderers; adding
 

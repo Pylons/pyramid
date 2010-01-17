@@ -15,8 +15,6 @@
 - Add an example of URL match ordering when routes compete to the
   urldispatch chapter.
 
-- Add an example of varying the attributes of a renderered response (7.1.8).
-
 - Review tutorials.
 
 - Review index.
