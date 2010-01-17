@@ -1,16 +1,17 @@
-Author Introduction
-===================
+=====================
+ Author Introduction
+=====================
 
 Welcome to "The :mod:`repoze.bfg` Web Application Framework".  In this
-introduction, I'll describe this book, I'll provide some context
-regarding the genesis of :mod:`repoze.bfg`, and I'll thank some
-important people.
+introduction, I'll describe the audience for this book, I'll describe
+the book content, I'll provide some context regarding the genesis of
+:mod:`repoze.bfg`, and I'll thank some important people.
 
 I hope you enjoy both this book and the software it documents.  I've
 had a blast writing both.
 
 Audience
---------
+========
 
 This book is aimed primarily at a reader that has the following
 attributes:
@@ -44,17 +45,36 @@ structures. As a result, you can usually avoid becoming "blocked"
 while you read this book even if you don't yet deeply understand web
 technologies.
 
-Book Style
-----------
+.. index::
+   single: book content overview
 
-This book is not the kind of book that imposes upon the reader by
-describing concepts in terms of a single manufactured sample
-application; in particular, its narrative does not build a small
-application into a larger one as the book progresses.  As a result,
-you should be able to get useful information out of the book if you
-neglect to read it from cover-to-cover, if you read it out-of-order,
-or when you need only a reminder about a particular topic while you're
-developing an application.
+Book Content
+============
+
+This book is divided into three major parts: a narrative documentation
+part, a tutorial part, and an API documentation part.
+
+Narrative Documentation
+
+  This is documentation which describes :mod:`repoze.bfg` concepts in
+  narrative form, written in a largely conversational tone.  Each
+  narrative documentation chapter describes an isolated
+  :mod:`repoze.bfg` concept.  You should be able to get useful
+  information out of the narrative chapters if you read them
+  out-of-order, or when you need only a reminder about a particular
+  topic while you're developing an application.
+
+Tutorials
+
+  Each tutorial builds a sample application or implements a concept
+  and describes the concept in terms of the example.  You should read
+  the tutorials if you want a guided tour of :mod:`repoze.bfg`.
+
+Reference
+
+  The API documentation is reference material related to the
+  :mod:`repoze.bfg` API.  Use it while you're developing a
+  :mod:`repoze.bfg` application.
 
 .. index::
    single: repoze.zope2
@@ -62,7 +82,7 @@ developing an application.
    single: Zope 2
 
 The Genesis of :mod:`repoze.bfg`
---------------------------------
+================================
 
 I wrote :mod:`repoze.bfg` after many years of writing applications
 using :term:`Zope`.  Zope provided me with a lot of mileage: it wasn't
@@ -109,7 +129,7 @@ a cohesive whole that is reliable, down-to-earth, flexible, speedy,
 and well-documented.
 
 Thanks
-------
+======
 
 This book is dedicated to my grandmother, Dorothy Phillips, who gave
 me my first typewriter (a Royal), and my mother, Donelle Duffy, who

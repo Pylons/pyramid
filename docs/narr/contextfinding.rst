@@ -24,9 +24,9 @@ finding` and :term:`view lookup`.
   the :mod:`repoze.bfg` view lookup subsystem is provided with a
   :term:`request`, a :term:`context` and a :term:`view name`.  It is
   then responsible for finding and invoking a :term:`view callable`.
-  A view callable is a specific bit of code that receives the
-  :term:`request` and which returns a :term:`response`, written and
-  registered by the application developer.
+  A view callable is a specific bit of code written and registered by
+  the application developer which receives the :term:`request` and
+  which returns a :term:`response`.
 
 These two subsystems are are used by :mod:`repoze.bfg` serially:
 first, a :term:`context finding` subsystem does its job.  Then the

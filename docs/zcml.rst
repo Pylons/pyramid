@@ -1,7 +1,7 @@
 .. _zcml_directives:
 
 ZCML Directives
-----------------
+===============
 
 :term:`ZCML` is an XML dialect that may be used by a :mod:`repoze.bfg`
 application to perform :term:`declarative configuration`.  Each

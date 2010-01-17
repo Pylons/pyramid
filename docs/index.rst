@@ -61,45 +61,6 @@ Narrative documentation in chapter form explaining how to use
    narr/router
    narr/threadlocals
 
-API documentation
-=================
-
-Per-module :mod:`repoze.bfg` API documentation.
-
-.. toctree::
-   :maxdepth: 2
-
-   api/authorization
-   api/authentication
-   api/chameleon_text
-   api/chameleon_zpt
-   api/configuration
-   api/events
-   api/exceptions
-   api/interfaces
-   api/location
-   api/paster
-   api/router
-   api/scripting
-   api/security
-   api/settings
-   api/testing
-   api/threadlocal
-   api/traversal
-   api/url
-   api/view
-   api/wsgi
-
-ZCML Directives
-===============
-
-Documentation for each :mod:`repoze.bfg` :term:`ZCML directive`.
-
-.. toctree::
-   :maxdepth: 1
-
-   zcml
-
 Tutorials
 =========
 
@@ -118,6 +79,18 @@ applications to various platforms.
    tutorials/zeo/index.rst
    tutorials/zodbsessions/index.rst
    tutorials/catalog/index.rst
+
+Reference Material
+==================
+
+Reference material includes API documentation and documentation of
+every :mod:`repoze.bfg` :term:`ZCML directive`.
+
+.. toctree::
+   :maxdepth: 2
+
+   api
+   zcml
 
 Detailed Change History
 =======================

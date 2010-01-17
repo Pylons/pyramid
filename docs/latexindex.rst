@@ -62,39 +62,13 @@ Tutorials
    tutorials/zodbsessions/index.rst
    tutorials/catalog/index.rst
 
-API documentation
-@@@@@@@@@@@@@@@@@
-
-.. toctree::
-   :maxdepth: 2
-
-   api/authorization
-   api/authentication
-   api/chameleon_text
-   api/chameleon_zpt
-   api/configuration
-   api/events
-   api/exceptions
-   api/interfaces
-   api/location
-   api/paster
-   api/router
-   api/scripting
-   api/security
-   api/settings
-   api/testing
-   api/threadlocal
-   api/traversal
-   api/url
-   api/view
-   api/wsgi
-
-ZCML Directives
-@@@@@@@@@@@@@@@@
+Reference material
+@@@@@@@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
 
+   api
    zcml
 
 .. backmatter::
