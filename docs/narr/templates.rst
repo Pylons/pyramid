@@ -521,8 +521,3 @@ repository at `http://svn.repoze.org/repoze.bfg.jinja2
 <http://svn.repoze.org/repoze.bfg.jinja2>`_; it is also available from
 :term:`PyPI`.
 
-Courtesy of Carlos de la Guardia, bindings for the Zope
-:mod:`zope.pagetemplate` package ("old TAL") are available from
-`http://svn.repoze.org/repoze.bfg.zopepagetemplate/
-<http://svn.repoze.org/repoze.bfg.zopepagetemplate/>`_.
-

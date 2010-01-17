@@ -155,7 +155,7 @@ used by a view.
 .. _override_resource:
 
 The ``override_resource`` API
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An individual call to
 :meth:`repoze.bfg.configuration.Configurator.override_resource` can
@@ -243,7 +243,7 @@ overridden file when an override is used.
 .. _resource_zcml_directive:
 
 The ``resource`` ZCML Directive
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of using
 :meth:`repoze.bfg.configuration.Configurator.override_resource` during

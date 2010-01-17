@@ -342,7 +342,7 @@ See the chapter entitled :ref:`project_narr` for more information
 about the ``paster create`` command.
 
 What Gets Installed
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
 various Chameleon libraries, WebOb, Paste, PasteScript, and

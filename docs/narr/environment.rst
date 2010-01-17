@@ -35,7 +35,7 @@ setting names documented in this chapter are reserved for
 application-specific configuration settings.
 
 Reloading Templates
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 When this value is true, reload templates without a restart.
 
@@ -49,7 +49,7 @@ When this value is true, reload templates without a restart.
 +---------------------------------+-----------------------------+
 
 Reloading Resources
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Don't cache any resource file data when this value is true.  See
 also :ref:`overriding_resources_section`.
@@ -64,7 +64,7 @@ also :ref:`overriding_resources_section`.
 +---------------------------------+-----------------------------+
 
 Debugging Authorization
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Print view authorization failure and success information to stderr
 when this value is true.  See also :ref:`debug_authorization_section`.
@@ -79,7 +79,7 @@ when this value is true.  See also :ref:`debug_authorization_section`.
 +---------------------------------+-----------------------------+
 
 Debugging Not Found Errors
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 Print view-related ``NotFound`` debug messages to stderr
 when this value is true.  See also :ref:`debug_notfound_section`.
@@ -94,7 +94,7 @@ when this value is true.  See also :ref:`debug_notfound_section`.
 +---------------------------------+-----------------------------+
 
 Debugging All
-~~~~~~~~~~~~~
+-------------
 
 Turns on all ``debug*`` settings.
 
@@ -107,8 +107,8 @@ Turns on all ``debug*`` settings.
 |                                 |                             |
 +---------------------------------+-----------------------------+
 
-Reload All
-~~~~~~~~~~
+Reloading All
+-------------
 
 Turns on all ``reload*`` settings.
 

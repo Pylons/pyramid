@@ -25,7 +25,7 @@ templates".
 .. _additional_paster_templates:
 
 Paster Templates Included with :mod:`repoze.bfg`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 The convenience ``paster`` templates included with :mod:`repoze.bfg`
 differ from each other on two axes:

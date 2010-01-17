@@ -51,9 +51,7 @@ technologies.
 Book Content
 ============
 
-This book is divided into four major parts: a narrative documentation
-part, a tutorial part, an API reference part, and a ZCML directive
-reference part.
+This book is divided into four major parts:
 
 :ref:`narrative_documentation`
 
@@ -139,9 +137,9 @@ and well-documented.
 Thanks
 ======
 
-This book is dedicated to my grandmother, Dorothy Phillips, who gave
-me my first typewriter (a Royal), and my mother, Donelle Duffy, who
-bought me my first computer (a VIC-20).
+This book is dedicated to my grandmother, who gave me my first
+typewriter (a Royal), and my mother, who bought me my first computer
+(a VIC-20).
 
 Thanks to the following people for providing expertise, resources, and
 software.  Without the help of these folks, neither this book nor the
