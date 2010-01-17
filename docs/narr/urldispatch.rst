@@ -171,7 +171,7 @@ we'll explain how it *does* work in the following section.  You can
 skip it if you're uninterested.
 
 Route View Callable Registration and Lookup Details
-+++++++++++++++++++++++++++++++++++++++++++++++++++
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 When a ``view`` attribute is attached to a route configuration,
 :mod:`repoze.bfg` ensures that a :term:`view configuration` is
@@ -409,35 +409,29 @@ Other arguments are ``name`` and ``factory``.  These are required
 arguments but represent neither a predicate nor view configuration
 information.
 
-Non-Predicate Arguments
-+++++++++++++++++++++++
+**Non-Predicate Arguments**
 
 ``name``
-
   The name of the route, e.g. ``myroute``.  This attribute is
   required.  It must be unique among all defined routes in a given
   application.
 
 ``factory``
-
   A reference to a Python object (often a function or a class) that
   will generate a :mod:`repoze.bfg` :term:`context` object when this
   route matches. For example, ``mypackage.models.MyFactoryClass``.  If
   this argument is not specified, the traversal root factory will be
   used.
 
-Predicate Arguments
-+++++++++++++++++++
+**Predicate Arguments**
 
 ``path``
-
   The path of the route e.g. ``ideas/:idea``.  This argument is
   required.  See :ref:`route_path_pattern_syntax` for information
   about the syntax of route paths.  If the path doesn't match the
   current URL, route matching continues.
 
 ``xhr``
-
   This value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`request` must possess an
   ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header for this
@@ -446,21 +440,18 @@ Predicate Arguments
   predicate returns ``False``, route matching continues.
 
 ``request_method``
-
   A string representing an HTTP method name, e.g. ``GET``, ``POST``,
   ``HEAD``, ``DELETE``, ``PUT``.  If this argument is not specified,
   this route will match if the request has *any* request method.  If
   this predicate returns ``False``, route matching continues.
 
 ``path_info``
-
   This value represents a regular expression pattern that will be
   tested against the ``PATH_INFO`` WSGI environment variable.  If the
   regex matches, this predicate will return ``True``.  If this
   predicate returns ``False``, route matching continues.
 
 ``request_param``
-
   This value can be any string.  A view declaration with this argument
   ensures that the associated route will only match when the request
   has a key in the ``request.params`` dictionary (an HTTP ``GET`` or
@@ -473,7 +464,6 @@ Predicate Arguments
   route matching continues.
 
 ``header``
-
   This argument represents an HTTP header name or a header name/value
   pair.  If the argument contains a ``:`` (colon), it will be
   considered a name/value pair (e.g. ``User-Agent:Mozilla/.*`` or
@@ -492,7 +482,6 @@ Predicate Arguments
   continues.
 
 ``accept``
-
   This value represents a match query for one or more mimetypes in the
   ``Accept`` HTTP request header.  If this value is specified, it must
   be in one of the following forms: a mimetype match token in the form
@@ -503,7 +492,6 @@ Predicate Arguments
   ``False``, route matching continues.
 
 ``custom_predicates``
-
   This value should be a sequence of references to custom predicate
   callables.  Use custom predicates when no set of predefined
   predicates does what you need.  Custom predicates can be combined
@@ -516,16 +504,13 @@ Predicate Arguments
   matching continues.  Note that the value ``context`` will always be
   ``None`` when passed to a custom route predicate.
 
-View-Related Arguments
-++++++++++++++++++++++
+**View-Related Arguments**
 
 ``view``
-
   A reference to a Python object that will be used as a view callable
   when this route matches. e.g. ``mypackage.views.my_view``.
   
 ``view_context``
-
   A reference to a class or an :term:`interface` that the
   :term:`context` of the view should match for the view named by the
   route to be used.  This argument is only useful if the ``view``
@@ -538,7 +523,6 @@ View-Related Arguments
   This attribute can also be spelled as ``for_`` or ``view_for``.
 
 ``view_permission``
-
   The permission name required to invoke the view associated with this
   route.  e.g. ``edit``. (see :ref:`using_security_with_urldispatch`
   for more information about permissions).
@@ -549,7 +533,6 @@ View-Related Arguments
   This argument can also be spelled as ``permission``.
 
 ``view_renderer``
-
   This is either a single string term (e.g. ``json``) or a string
   implying a path or :term:`resource specification`
   (e.g. ``templates/views.pt``).  If the renderer value is a single
@@ -570,7 +553,6 @@ View-Related Arguments
   This argument can also be spelled as ``renderer``.
 
 ``view_request_type``
-
   A reference to an :term:`interface` representing a :term:`request
   type`.  If this argument is not specified, any request type will be
   considered a match for the view associated with this route.
@@ -581,7 +563,6 @@ View-Related Arguments
   This argument can also be spelled as ``request_type``.
 
 ``view_containment``
-
   This value should be a reference to a Python class or
   :term:`interface` that a parent object in the :term:`lineage` must
   provide in order for the view related to this route to be found and
@@ -593,7 +574,6 @@ View-Related Arguments
   effect.
 
 ``view_attr``
-
   The view machinery defaults to using the ``__call__`` method of the
   view callable (or the function itself, if the view callable is a
   function) to obtain a response dictionary.  The ``attr`` value

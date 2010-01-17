@@ -636,14 +636,14 @@ completely equivalent:
 We've now configured a :mod:`repoze.bfg` helloworld application
 declaratively.  More information about this mode of configuration is
 available in :ref:`declarative_configuration` and within
-:ref:`zcml_directives`.
+:ref:`zcml_reference`.
 
 References
 ----------
 
 For more information about the API of a :term:`Configurator` object,
 see :class:`repoze.bfg.configuration.Configurator` .  The equivalent
-ZCML declaration tags are introduced in :ref:`zcml_directives`.
+ZCML declaration tags are introduced in :ref:`zcml_reference`.
 
 For more information about :term:`view configuration`, see
 :ref:`views_chapter`.

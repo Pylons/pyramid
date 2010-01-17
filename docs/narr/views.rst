@@ -531,27 +531,22 @@ values on the ``request`` object via ``setattr`` within the view
 callable to influence associated response attributes.
 
 ``response_content_type``
-
   Defines the content-type of the resulting response,
   e.g. ``text/xml``.
 
 ``response_headerlist``
-
   A sequence of tuples describing cookie values that should be set in
   the response, e.g. ``[('Set-Cookie', 'abc=123'), ('X-My-Header',
   'foo')]``.
 
 ``response_status``
-
   A WSGI-style status code (e.g. ``200 OK``) describing the status of
   the response.
 
 ``response_charset``
-
   The character set (e.g. ``UTF-8``) of the response.
 
 ``response_cache_for``
-
   A value in seconds which will influence ``Cache-Control`` and
   ``Expires`` headers in the returned response.  The same can also be
   achieved by returning various values in the ``response_headerlist``,
@@ -969,8 +964,6 @@ rendered in a request that has a ``;charset=utf-8`` stanza on its
    to Unicode objects implicitly in :mod:`repoze.bfg`'s default
    configuration.  The keys are still strings.
 
-
-
 .. index::
    single: view configuration
    pair: view; configuration
@@ -1042,7 +1035,6 @@ Non-Predicate Arguments
 +++++++++++++++++++++++
 
 ``permission``
-
   The name of a :term:`permission` that the user must possess in order
   to invoke the :term:`view callable`.  See
   :ref:`view_security_section` for more information about view
@@ -1052,7 +1044,6 @@ Non-Predicate Arguments
   this view (it's accessible by any caller).
 
 ``attr``
-
   The view machinery defaults to using the ``__call__`` method of the
   :term:`view callable` (or the function itself, if the view callable
   is a function) to obtain a response.  The ``attr`` value allows you
@@ -1068,7 +1059,6 @@ Non-Predicate Arguments
   attribute if the view is a class).
 
 ``renderer``
-
   This is either a single string term (e.g. ``json``) or a string
   implying a path or :term:`resource specification`
   (e.g. ``templates/views.pt``) naming a :term:`renderer`
@@ -1101,7 +1091,6 @@ Non-Predicate Arguments
   implementation is never called.
 
 ``wrapper``
-
   The :term:`view name` of a different :term:`view configuration`
   which will receive the response body of this view as the
   ``request.wrapped_body`` attribute of its own :term:`request`, and
@@ -1123,7 +1112,6 @@ Predicate Arguments
 +++++++++++++++++++
 
 ``name``
-
   The :term:`view name` required to match this view callable.  Read
   :ref:`traversal_chapter` to understand the concept of a view name.
 
@@ -1131,7 +1119,6 @@ Predicate Arguments
   default view).
 
 ``context``
-
   An object representing Python class that the :term:`context` must be
   an instance of, *or* the :term:`interface` that the :term:`context`
   must provide in order for this view to be found and called.  This
@@ -1143,7 +1130,6 @@ Predicate Arguments
   any model, is used.
 
 ``route_name``
-
   If ``route_name`` is supplied, the view callable will be invoked
   only when the named route has matched.
 
@@ -1160,7 +1146,6 @@ Predicate Arguments
   request object that does not indicate it matched a route.
 
 ``request_type``
-
   This value should be an :term:`interface` that the :term:`request`
   must provide in order for this view to be found and called.
 
@@ -1170,7 +1155,6 @@ Predicate Arguments
   *This is an advanced feature, not often used by "civilians"*.
 
 ``request_method``
-
   This value can either be one of the strings ``GET``, ``POST``,
   ``PUT``, ``DELETE``, or ``HEAD`` representing an HTTP
   ``REQUEST_METHOD``.  A view declaration with this argument ensures
@@ -1183,7 +1167,6 @@ Predicate Arguments
   environment.
 
 ``request_param``
-
   This value can be any string.  A view declaration with this argument
   ensures that the view will only be called when the :term:`request`
   has a key in the ``request.params`` dictionary (an HTTP ``GET`` or
@@ -1200,7 +1183,6 @@ Predicate Arguments
   dictionary.
 
 ``containment``
-
   This value should be a reference to a Python class or
   term:`interface` that a parent object in the :term:`lineage` must
   provide in order for this view to be found and called.  The nodes in
@@ -1214,7 +1196,6 @@ Predicate Arguments
   location-awareness.
 
 ``xhr``
-
   This value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`WSGI` environment must possess
   an ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header that
@@ -1227,7 +1208,6 @@ Predicate Arguments
   to invoke the associated view callable.
 
 ``accept``
-
   The value of this argument represents a match query for one or more
   mimetypes in the ``Accept`` HTTP request header.  If this value is
   specified, it must be in one of the following forms: a mimetype
@@ -1241,7 +1221,6 @@ Predicate Arguments
   the associated view callable.
 
 ``header``
-
   This value represents an HTTP header name or a header name/value
   pair.
 
@@ -1268,7 +1247,6 @@ Predicate Arguments
   whether or not to invoke the associated view callable.
 
 ``path_info``
-
   This value represents a regular expression pattern that will be
   tested against the ``PATH_INFO`` WSGI environment variable to decide
   whether or not to call the associated view callable.  If the regex
@@ -1279,7 +1257,6 @@ Predicate Arguments
   associated view callable.
 
 ``custom_predicates``
-
   If ``custom_predicates`` is specified, it must be a sequence of
   references to custom predicate callables.  Use custom predicates
   when no set of predefined predicates do what you need.  Custom
@@ -1838,35 +1815,6 @@ matched up with the request, :mod:`repoze.bfg` will return an error to
 the user's browser, representing a "not found" (404) page.  See
 :ref:`changing_the_notfound_view` for more information about changing
 the default notfound view.
-
-There are a several exceptions to the the rule which says that view
-configuration attributes represent "narrowings".  Several attributes
-of the ``view`` directive are *not* narrowing predicates.  These are
-``permission``, ``name``, ``renderer``, and ``attr``.
-
-The value of the ``permission`` attribute represents the permission
-that must be possessed by the user to invoke any found view.  When a
-view is found that matches all predicates, but the invoking user does
-not possess the permission implied by any associated ``permission`` in
-the current context, processing stops, and an
-:exc:`repoze.bfg.exception.Forbidden` error is raised, usually
-resulting in the :term:`forbidden view` being shown to the invoking
-user.  No further view narrowing or view lookup is done.
-
-.. note:: 
-
-   See :ref:`changing_the_forbidden_view` for more information about
-   changing the default forbidden view.
-
-The value of the ``name`` attribute represents a direct match of the
-view name returned via traversal.  It is part of initial view lookup
-rather than a predicate/narrower.
-
-The value of the ``renderer`` attribute represents the renderer used
-to convert non-response return values from a view.
-
-The value of the ``attr`` attribute represents the attribute name
-looked up on the view object to return a response.
 
 .. index::
    pair: debugging; not found errors
