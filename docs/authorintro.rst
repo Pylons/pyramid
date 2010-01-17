@@ -52,7 +52,7 @@ Book Content
 ============
 
 This book is divided into three major parts: a narrative documentation
-part, a tutorial part, and an API documentation part.
+part, a tutorial part, and a reference part.
 
 Narrative Documentation
 
@@ -66,14 +66,16 @@ Narrative Documentation
 
 Tutorials
 
-  Each tutorial builds a sample application or implements a concept
-  and describes the concept in terms of the example.  You should read
-  the tutorials if you want a guided tour of :mod:`repoze.bfg`.
+  Each tutorial builds a sample application or implements a set of
+  concepts with a sample; it then describes the application or
+  concepts in terms of the sample.  You should read the tutorials if
+  you want a guided tour of :mod:`repoze.bfg`.
 
 Reference
 
-  The API documentation is reference material related to the
-  :mod:`repoze.bfg` API.  Use it while you're developing a
+  Two parts form the reference section: the API documentation and
+  :term:`ZCML` directive documentation.  These parts provide
+  convenient reference material related to developing a
   :mod:`repoze.bfg` application.
 
 .. index::

@@ -23,7 +23,7 @@ Narrative Documentation
 @@@@@@@@@@@@@@@@@@@@@@@
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    narr/introduction
    narr/install
@@ -52,7 +52,7 @@ Tutorials
 @@@@@@@@@
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    tutorials/bfgwiki/index.rst
    tutorials/bfgwiki2/index.rst
@@ -62,14 +62,57 @@ Tutorials
    tutorials/zodbsessions/index.rst
    tutorials/catalog/index.rst
 
-Reference material
-@@@@@@@@@@@@@@@@@@
+API Documentation
+@@@@@@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
 
-   api
-   zcml
+   api/authorization
+   api/authentication
+   api/chameleon_text
+   api/chameleon_zpt
+   api/configuration
+   api/events
+   api/exceptions
+   api/interfaces
+   api/location
+   api/paster
+   api/router
+   api/scripting
+   api/security
+   api/settings
+   api/testing
+   api/threadlocal
+   api/traversal
+   api/url
+   api/view
+   api/wsgi
+
+
+ZCML Directives
+@@@@@@@@@@@@@@@@
+
+.. toctree::
+   :maxdepth: 1
+
+   zcml/aclauthorizationpolicy
+   zcml/adapter
+   zcml/authtktauthenticationpolicy
+   zcml/configure
+   zcml/forbidden
+   zcml/include
+   zcml/notfound
+   zcml/remoteuserauthenticationpolicy
+   zcml/renderer
+   zcml/repozewho1authenticatiohnpolicy
+   zcml/resource
+   zcml/route
+   zcml/scan
+   zcml/static
+   zcml/subscriber
+   zcml/utility
+   zcml/view
 
 .. backmatter::
 
