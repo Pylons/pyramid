@@ -2,9 +2,9 @@ Author Introduction
 ===================
 
 Welcome to "The :mod:`repoze.bfg` Web Application Framework".  In this
-introduction, I'll describe the audience for this book, I'll provide
-some context regarding the genesis of :mod:`repoze.bfg`, and I'll
-thank some important people.
+introduction, I'll describe this book, I'll provide some context
+regarding the genesis of :mod:`repoze.bfg`, and I'll thank some
+important people.
 
 I hope you enjoy both this book and the software it documents.  I've
 had a blast writing both.
@@ -47,14 +47,14 @@ technologies.
 Book Style
 ----------
 
-This book is *not* the kind of book that manufactures a context and
-imposes it on the reader by describing concepts in terms of a single
-progressively-modified sample application; its narrative *doesn't*
-build a small application into a larger one as the book progresses.
-As a result, you should be able to read a chapter in relative
-isolation without reading the previous chapters, and you should be
-able to get useful information out of the book even if you don't read
-it from cover-to-cover.
+This book is not the kind of book that imposes upon the reader by
+describing concepts in terms of a single manufactured sample
+application; in particular, its narrative does not build a small
+application into a larger one as the book progresses.  As a result,
+you should be able to get useful information out of the book if you
+neglect to read it from cover-to-cover, if you read it out-of-order,
+or when you need only a reminder about a particular topic while you're
+developing an application.
 
 .. index::
    single: repoze.zope2
