@@ -4,9 +4,9 @@
 
 - Review:
 
-  [ ] Combining Traversal and URL Dispatch
-
   [ ] Views
+
+  [ ] Static Resources
 
 - Add a "route predicates" section where "Route Configuration"
   (urldispatch.rst) is; also expand "Route Matching" section wrt
