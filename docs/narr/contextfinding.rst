@@ -1,38 +1,40 @@
 .. index::
-   triple: differences; URL dispatch; traversal
-   pair: mapping; URLs
+   pair: finding; context
 
-.. _urlmapping_chapter:
+.. _contextfinding_chapter:
 
-Mapping URLs to Code
---------------------
+Context Finding
+---------------
 
-In order for a web application to perform any useful action, it needs
-some way of finding and invoking code written by the application
-developer based on parameters present in the :term:`request`.
+In order for a web application to perform any useful action, the web
+framework must provide a mechanism to find and invoke code written by
+the application developer based on parameters present in the
+:term:`request`.
 
-:mod:`repoze.bfg` uses two separate but cooperating subsystems to
-ultimately find and invoke code written by the application developer:
-:term:`context finding` and :term:`view lookup` .
+:mod:`repoze.bfg` uses two separate but cooperating subsystems to find
+and invoke code written by the application developer: :term:`context
+finding` and :term:`view lookup`.
 
-- A :mod:`repoze.bfg` "context finding" subsystem is given a
+- A :mod:`repoze.bfg` :term:`context finding` subsystem is given a
   :term:`request`; it is responsible for finding a :term:`context`
   object and a :term:`view name` based on information present in the
   request.
 
-- The :mod:`repoze.bfg` view lookup subsystem is provided with a
-  :term:`request`, a :term:`context` and a :term:`view name`, and is
-  responsible for finding and invoking a :term:`view callable`.  A
-  view callable is a specific bit of code that receives the
+- Using the context and view name provided by :term:`context finding`,
+  the :mod:`repoze.bfg` view lookup subsystem is provided with a
+  :term:`request`, a :term:`context` and a :term:`view name`.  It is
+  then responsible for finding and invoking a :term:`view callable`.
+  A view callable is a specific bit of code that receives the
   :term:`request` and which returns a :term:`response`, written and
   registered by the application developer.
 
-These two subsystems are are used by :mod:`repoze.bfg` serially: a
-:term:`context finding` subsystem does its job, then the result of
-context finding is passed to the :term:`view lookup` subsystem.  The
-view lookup system finds a :term:`view callable` written by an
-application developer, and invokes it.  A view callable returns a
-:term:`response`.  The response is returned to the requesting user.
+These two subsystems are are used by :mod:`repoze.bfg` serially:
+first, a :term:`context finding` subsystem does its job.  Then the
+result of context finding is passed to the :term:`view lookup`
+subsystem.  The view lookup system finds a :term:`view callable`
+written by an application developer, and invokes it.  A view callable
+returns a :term:`response`.  The response is returned to the
+requesting user.
 
 .. sidebar::  What Good is A Context Finding Subsystem?
 
@@ -42,20 +44,21 @@ application developer, and invokes it.  A view callable returns a
    into a single step.  In these systems, a URL can map *directly* to
    a view callable.  This makes them simpler to understand than
    systems which use distinct subsystems to locate a context and find
-   a view.  However, explicitly using a context finding step provides
-   extra flexibility.  For example, it makes it possible to protect
-   your application with declarative context-sensitive instance-level
+   a view.  However, explicitly finding a context provides extra
+   flexibility.  For example, it makes it possible to protect your
+   application with declarative context-sensitive instance-level
    :term:`authorization`, which is not well-supported in frameworks
    that do not provide a notion of a context.
 
-There are two separate context finding subsystems in
-:mod:`repoze.bfg`: :term:`traversal` and :term:`URL dispatch`.  The
-subsystems are documented within this chapter.  They can be used
-separately or they can be combined.
+This chapter documents :term:`context finding`.  There are two
+separate :term:`context finding` subsystems in :mod:`repoze.bfg`:
+:term:`traversal` and :term:`URL dispatch`.  The subsystems are
+documented within this chapter.  They can be used separately or they
+can be combined.
 
-There is only one view lookup subsystem present in :mod:`repoze.bfg`.
-It is not documented within this chapter.  Instead, it is documented
-within :ref:`views_chapter`.
+There is only one :term:`view lookup` subsystem present in
+:mod:`repoze.bfg`.  Where appropriate, within this chapter, we
+describe how view lookup interacts with context finding.
 
 .. toctree::
    :maxdepth: 2

@@ -163,9 +163,9 @@ Changing the Traverser
 ----------------------
 
 The default :term:`traversal` algorithm that BFG uses is explained in
-:ref:`how_bfg_traverses`.  Though it is rarely necessary, this default
-algorithm can be swapped out selectively for a different traversal
-pattern via configuration.
+:ref:`traversal_algorithm`.  Though it is rarely necessary, this
+default algorithm can be swapped out selectively for a different
+traversal pattern via configuration.
 
 Use an ``adapter`` stanza in your application's ``configure.zcml`` to
 change the default traverser:

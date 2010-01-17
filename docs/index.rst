@@ -43,7 +43,7 @@ Narrative documentation in chapter form explaining how to use
    narr/firstapp
    narr/project
    narr/startup
-   narr/urlmapping
+   narr/contextfinding
    narr/views
    narr/static
    narr/webob

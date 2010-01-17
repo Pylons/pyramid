@@ -14,8 +14,8 @@ application-specific.  For example, the content of a web page served
 by one web application might be a representation of the contents of an
 accounting ledger, while the content of of a web page served by
 another might be a listing of songs.  These applications probably
-won't serve the same set of customers.  However, both the
-ledger-serving and song-serving applications can be written using
+won't serve the same set of customers.  However, both a ledger-serving
+application and a song-serving application might be written using
 :mod:`repoze.bfg` because it is a very general open source Python web
 *framework*.  As a framework, the primary job of :mod:`repoze.bfg` is
 to make it easier for a developer to create arbitrary web
@@ -90,8 +90,8 @@ Openness
   <http://repoze.org/license.html>`_.
 
 This book usually refers to the framework by its full package name,
-:mod:`repoze.bfg`.  However, it is often referred to colloquially as
-just "BFG" (the "repoze-dot" dropped) in conversation.
+:mod:`repoze.bfg`.  However, it is often referred to as just "BFG"
+(the "repoze-dot" dropped) in conversation.
 
 .. index::
    single: Repoze
@@ -181,7 +181,7 @@ as :term:`Django`, :mod:`repoze.bfg` makes no assumptions about which
 persistence mechanisms you should use to build an application.  Zope
 applications are typically reliant on :term:`ZODB`; :mod:`repoze.bfg`
 allows you to build :term:`ZODB` applications, but it has no reliance
-on the ZODB package.  Likewise, :term:`Django` tends to assume that
+on the ZODB software.  Likewise, :term:`Django` tends to assume that
 you want to store your application's data in a relational database.
 :mod:`repoze.bfg` makes no such assumption; it allows you to use a
 relational database but doesn't encourage or discourage the decision.

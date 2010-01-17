@@ -10,10 +10,10 @@ explain in more detail how the application works.
 .. note::
 
    If you're a "theory-first" kind of person, you might choose to read
-   :ref:`urlmapping_chapter` and :ref:`views_chapter` to augment your
-   understanding before diving into the code that follows, but it's
-   not necessary if -- like many programmers -- you're willing to "go
-   with the flow".
+   :ref:`contextfinding_chapter` and :ref:`views_chapter` to augment
+   your understanding before diving into the code that follows, but
+   it's not necessary if -- like many programmers -- you're willing to
+   "go with the flow".
 
 .. _helloworld_imperative:
 

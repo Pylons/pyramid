@@ -15,7 +15,7 @@ Here's how it works at a high level:
   :term:`context finding`.  A context is located differently depending
   on whether the application uses :term:`traversal` or :term:`URL
   dispatch`, but a context is ultimately found in either case.  See
-  :ref:`urlmapping_chapter` for more information about context
+  :ref:`contextfinding_chapter` for more information about context
   finding.
 
 - A :term:`view callable` is located by :term:`view lookup` using the

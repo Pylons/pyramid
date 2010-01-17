@@ -30,7 +30,7 @@ Narrative Documentation
    narr/configuration
    narr/firstapp
    narr/project
-   narr/urlmapping
+   narr/contextfinding
    narr/views
    narr/static
    narr/webob

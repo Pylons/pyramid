@@ -105,6 +105,8 @@ Here is the source for ``models.py``:
    object.  It also calls the ``populate`` function, to do initial
    database population.
 
+.. _sql_tm2_cleanup:
+
 App Startup with ``run.py``
 ---------------------------
 

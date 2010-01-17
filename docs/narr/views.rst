@@ -4,30 +4,32 @@ Views
 =====
 
 The primary job of any :mod:`repoze.bfg` application is is to find and
-call a :term:`view callable` when a :term:`request` reaches the
-application.  A :term:`view callable` is invoked when a request enters
-your application: it "does something", then returns a response.  All
-view callables are written by you, the application developer.
+invoke a :term:`view callable` when a :term:`request` reaches the
+application.  View callables are bits of code written by you -- the
+application developer -- which do something interesting in response to
+a request made to your application.
 
-The :ref:`urlmapping_chapter` describes how a :term:`context` and a
-:term:`view name` are computed using information from the
-:term:`request` via the process of :term:`context finding`.  But
-neither the context nor the view name found very useful unless those
-elements can eventually be mapped to a :term:`view callable`.
-
-.. note:: 
-
-   A :term:`view callable` is oten referred to in conversational
-   shorthand as a :term:`view`; in this documentation we need to be
-   more precise, however, due to the difference between view
-   *configuration* and the code that implements a view *callable*.
+The :ref:`contextfinding_chapter` describes how a :term:`context` and
+a :term:`view name` are computed using information from the
+:term:`request`.  But neither the context nor the view name found are
+very useful unless those elements can eventually be mapped to a
+:term:`view callable`.
 
 The job of actually locating and invoking the "best" :term:`view
 callable` is the job of the :term:`view lookup` subsystem.  The view
-lookup subsystem compares information found via
-:term:`context finding` against :term:`view configuration` statements
-made by the developer to choose "the best" view callable for a
-specific circumstance.
+lookup subsystem compares information supplied by :term:`context
+finding` against :term:`view configuration` statements made by the
+developer to choose the most appropriate view callable for a specific
+request.
+
+.. note:: 
+
+   A :mod:`repoze.bfg` :term:`view callable` is oten referred to in
+   conversational shorthand as a :term:`view`.  In this documentation,
+   however, we need to use less ambiguous terminology because there is
+   a significant difference between view *configuration*, the code
+   that implements a view *callable*, and the process of view
+   *lookup*.
 
 Provided within this chapter is documentation of the process of
 creating view callables, documentation about performing view
@@ -870,8 +872,8 @@ rendered in a request that has a ``;charset=utf-8`` stanza on its
 
 .. _view_configuration:
 
-View Configuration
-------------------
+View Configuration: Mapping a Context to a View
+-----------------------------------------------
 
 A developer makes a :term:`view callable` available for use within a
 :mod:`repoze.bfg` application via :term:`view configuration`.  A view
@@ -1482,8 +1484,8 @@ user does not possess the ``add`` permission relative to the current
 
 .. _view_lookup:
 
-View Lookup
------------
+View Lookup and Invocation
+--------------------------
 
 :term:`View lookup` is the :mod:`repoze.bfg` subsystem responsible for
 finding an invoking a :term:`view callable`.  The view lookup

@@ -34,13 +34,15 @@ will be slightly harder, and it will take a little longer, but you'd
 be hard-pressed to find a better "first language."
 
 Web technology familiarity is assumed in various places within the
-book.  For example, the book describes various interactions in terms
-of the HTTP protocol, but it does not describe how the HTTP protocol
-works in detail.  Like any good framework, though, :mod:`repoze.bfg`
-shields you from needing to know the gory details of web protocols
-such as HTTP, and you can usually skip such descriptions without
-becoming "blocked," although you may lack some fundamental
-understanding of how it works "under the hood" as a result.
+book.  For example, the book doesn't try to define common web-related
+concepts like "URL" or "query string."  Likewise, the book describes
+various interactions in terms of the HTTP protocol, but it does not
+describe how the HTTP protocol works in detail.  Like any good web
+framework, though, :mod:`repoze.bfg` shields you from needing to know
+most of the gory details of web protocols and low-level data
+structures. As a result, you can usually avoid becoming "blocked"
+while you read this book even if you don't yet deeply understand web
+technologies.
 
 .. index::
    single: repoze.zope2
