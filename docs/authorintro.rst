@@ -44,6 +44,18 @@ structures. As a result, you can usually avoid becoming "blocked"
 while you read this book even if you don't yet deeply understand web
 technologies.
 
+Book Style
+----------
+
+This book is *not* the kind of book that manufactures a context and
+imposes it on the reader by describing concepts in terms of a single
+progressively-modified sample application; its narrative *doesn't*
+build a small application into a larger one as the book progresses.
+As a result, you should be able to read a chapter in relative
+isolation without reading the previous chapters, and you should be
+able to get useful information out of the book even if you don't read
+it from cover-to-cover.
+
 .. index::
    single: repoze.zope2
    single: Zope 3
