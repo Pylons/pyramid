@@ -51,10 +51,11 @@ technologies.
 Book Content
 ============
 
-This book is divided into three major parts: a narrative documentation
-part, a tutorial part, and a reference part.
+This book is divided into four major parts: a narrative documentation
+part, a tutorial part, an API reference part, and a ZCML directive
+reference part.
 
-Narrative Documentation
+:ref:`narrative_documentation`
 
   This is documentation which describes :mod:`repoze.bfg` concepts in
   narrative form, written in a largely conversational tone.  Each
@@ -64,19 +65,24 @@ Narrative Documentation
   out-of-order, or when you need only a reminder about a particular
   topic while you're developing an application.
 
-Tutorials
+:ref:`tutorials`
 
   Each tutorial builds a sample application or implements a set of
   concepts with a sample; it then describes the application or
   concepts in terms of the sample.  You should read the tutorials if
   you want a guided tour of :mod:`repoze.bfg`.
 
-Reference
+:ref:`api_reference`
 
-  Two parts form the reference section: the API documentation and
-  :term:`ZCML` directive documentation.  These parts provide
-  convenient reference material related to developing a
-  :mod:`repoze.bfg` application.
+  Comprehensive reference material for every public API exposed by
+  :mod:`repoze.bfg`.  The API documentation is organized
+  alphabetically by module name.
+
+:ref:`zcml_reference`
+
+  Comprehensive reference material for every :term:`ZCML directive`
+  provided by :mod:`repoze.bfg`.  The ZCML directive documentation is
+  organized alphabetically by directive name.
 
 .. index::
    single: repoze.zope2

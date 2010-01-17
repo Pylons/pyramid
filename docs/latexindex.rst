@@ -19,6 +19,8 @@ Front Matter
 
 .. mainmatter::
 
+.. _narrative_documentation:
+
 Narrative Documentation
 @@@@@@@@@@@@@@@@@@@@@@@
 
@@ -48,6 +50,8 @@ Narrative Documentation
    narr/startup
    narr/threadlocals
 
+.. _tutorials:
+
 Tutorials
 @@@@@@@@@
 
@@ -62,8 +66,10 @@ Tutorials
    tutorials/zodbsessions/index.rst
    tutorials/catalog/index.rst
 
-API Documentation
-@@@@@@@@@@@@@@@@@
+.. _api_reference:
+
+API Reference
+@@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
@@ -89,9 +95,10 @@ API Documentation
    api/view
    api/wsgi
 
+.. _zcml_reference:
 
-ZCML Directives
-@@@@@@@@@@@@@@@@
+ZCML Directive Reference
+@@@@@@@@@@@@@@@@@@@@@@@@
 
 .. toctree::
    :maxdepth: 1
