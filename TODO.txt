@@ -2,11 +2,11 @@
 
 - Named notfound views.
 
-- Review:
+- Expand/review:
 
-  [ ] Views
+  [ ] View Configuration Parameters
 
-  [ ] Static Resources
+  [ ] View Lookup and Invocation
 
 - Add a "route predicates" section where "Route Configuration"
   (urldispatch.rst) is; also expand "Route Matching" section wrt
@@ -14,6 +14,8 @@
 
 - Add an example of URL match ordering when routes compete to the
   urldispatch chapter.
+
+- Add an example of varying the attributes of a renderered response (7.1.8).
 
 - Review tutorials.
 

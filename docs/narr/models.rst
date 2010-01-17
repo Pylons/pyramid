@@ -200,7 +200,7 @@ Defining a Graph of Model Instances for Traversal
 -------------------------------------------------
 
 When :term:`traversal` is used (as opposed to a purely :term:`url
-dispatch` based application), mod:`repoze.bfg` expects to be able to
+dispatch` based application), :mod:`repoze.bfg` expects to be able to
 traverse a graph composed of model instances.  Traversal begins at a
 root model, and descends into the graph recursively via each found
 model's ``__getitem__`` method.  :mod:`repoze.bfg` imposes the

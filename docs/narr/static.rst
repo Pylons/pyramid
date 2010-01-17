@@ -16,13 +16,10 @@ Serving Static Resources Using a ZCML Directive
 
 Use of the ``static`` ZCML directive or the
 :meth:`repoze.bfg.configuration.configurator.add_static_view` method
-is the preferred way to serve static resources (such as JavaScript and
-CSS files) within a :mod:`repoze.bfg` application. These mechanisms
-makes static files available at a name relative to the application
-root URL, e.g. ``/static``.
-
-Use of the ``add_static_view`` imperative configuration method is
-completely equivalent to using ZCML for the same purpose.
+is the preferred way to instruct :mod:`repoze.bfg` to serve static
+resources such as JavaScript and CSS files. These mechanisms makes
+static files available at a name relative to the application root URL,
+e.g. ``/static``.
 
 Here's an example of a ``static`` ZCML directive that will serve files
 up ``/static`` URL from the ``/var/www/static`` directory of the
@@ -66,20 +63,21 @@ to view the static files in this directory via a browser at URLs
 prefixed with the directive's ``name``.  For instance if the
 ``static`` directive's ``name`` is ``static`` and the static
 directive's ``path`` is ``/path/to/static``,
-``http://localhost:6543/static/foo.js`` may return the file
+``http://localhost:6543/static/foo.js`` will return the file
 ``/path/to/static/dir/foo.js``.  The static directory may contain
 subdirectories recursively, and any subdirectories may hold files;
 these will be resolved by the static view as you would expect.
 
-See :ref:`static_directive` for detailed information.
+See :ref:`static_directive` for detailed information about the
+``static`` ZCML directive.
 
 .. note:: The :ref:`static_directive` ZCML directive is new in
    :mod:`repoze.bfg` 1.1.
 
-.. note:: The
-   :meth:`repoze.bfg.configuration.Configurator.add_static_view`
-   method offers an imperative equivalent to the ``static`` ZCML
-   directive.
+The :meth:`repoze.bfg.configuration.Configurator.add_static_view`
+method offers an imperative equivalent to the ``static`` ZCML
+directive.  Use of the ``add_static_view`` imperative configuration
+method is completely equivalent to using ZCML for the same purpose.
 
 .. index::
    triple: generating; static resource; urls
@@ -89,7 +87,7 @@ See :ref:`static_directive` for detailed information.
 Generating Static Resource URLs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a ref::`static_directive` ZCML directive or a call to the
+When a :ref:`static_directive` ZCML directive or a call to the
 ``add_static_view`` method of a
 :class:`repoze.bfg.configuration.Configurator` is used to register a
 static resource directory, a special helper API named
@@ -142,7 +140,7 @@ above ZCML file:
 If the request "application URL" of the running system is
 ``http://example.com``, the ``css_url`` generated above would be:
 ``http://example.com/static1/foo.css``.  The ``js_url`` generated
-above would be ``'http://example.com/static2/foo.js``.
+above would be ``http://example.com/static2/foo.js``.
 
 One benefit of using the :func:`repoze.bfg.url.static_url` function
 rather than constructing static URLs "by hand" is that if you need to
@@ -208,17 +206,23 @@ object.  For example (ZCML):
 In this case, ``.models.Root`` refers to the class of which your
 :mod:`repoze.bfg` application's root object is an instance.
 
-.. note:: You can also give a ``context`` of ``*`` if you want the
-   name ``static`` to be accessible as the static view against any
-   model.  This will also allow ``/static/foo.js`` to work, but it
-   will allow for ``/anything/static/foo.js`` too, as long as
-   ``anything`` itself is resolvable.
+You can also provide a ``context`` of ``*`` if you want the name
+``static`` to be accessible as the static view against any model.
+This will also allow ``/static/foo.js`` to work, but it will allow for
+``/anything/static/foo.js`` too, as long as ``anything`` itself is
+resolvable.
 
-.. note:: To ensure that model objects contained in the root don't
-   "shadow" your static view (model objects take precedence during
-   traversal), or to ensure that your root object's ``__getitem__`` is
-   never called when a static resource is requested, you can refer to
-   your static resources as registered above in URLs as,
+Note that you cannot use the :func:`repoze.bfg.static_url` API to
+generate URLs against resources made accessible by registering a
+custom static view.
+
+.. warning::
+
+   To ensure that model objects contained in the root don't "shadow"
+   your static view (model objects take precedence during traversal),
+   or to ensure that your root object's ``__getitem__`` is never
+   called when a static resource is requested, you can refer to your
+   static resources as registered above in URLs as,
    e.g. ``/@@static/foo.js``.  This is completely equivalent to
    ``/static/foo.js``.  See :ref:`traversal_chapter` for information
    about "goggles" (``@@``).

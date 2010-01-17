@@ -497,12 +497,17 @@ Glossary
      serialization format.
 
    renderer
-     A registered serializer that can be configured via :term:`view
-     configuration` which converts a non-:term:`Response` return values
-     from a :term:`view` into a string (and ultimately a response).
-     Using a renderer can make writing views that require templating or
-     other serialization less tedious.  See
+
+     A serializer that can be referrred to via :term:`view
+     configuration` which converts a non-:term:`Response` return
+     values from a :term:`view` into a string (and ultimately a
+     response).  Using a renderer can make writing views that require
+     templating or other serialization less tedious.  See
      :ref:`views_which_use_a_renderer` for more information.
+
+   renderer factory
+     A factory which creates a :term:`renderer`.  See
+     :ref:`adding_and_overriding_renderers` for more information.
 
    mod_wsgi
      `mod_wsgi <http://code.google.com/p/modwsgi/>`_ is an Apache

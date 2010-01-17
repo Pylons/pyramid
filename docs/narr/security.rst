@@ -173,6 +173,8 @@ authentication policy ZCML directives that should prove useful.  See
    single: permissions
    single: protecting views
 
+.. _protecting_views:
+
 Protecting Views with Permissions
 ---------------------------------
 
