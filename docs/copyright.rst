@@ -1,7 +1,7 @@
 Copyright, Trademarks, and Attributions
 =======================================
 
-*The repoze.bfg Web Application Framework*
+*The repoze.bfg Web Application Framework, Version 1.2*
 
 by Chris McDonough
 
@@ -13,7 +13,7 @@ ISBN-10: 0615345379
 
 ISBN-13: 978-0-615-34537-6
 
-First print publishing: 2010
+First print publishing: January, 2010
 
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
@@ -48,18 +48,18 @@ with respect to the use of the information contained herein.
 Attributions
 ------------
 
+Foreword:
+  Paul Everitt
+
 Technical Reviewer:
   Andrew Sawyers
 
 Cover Designer:
-   `Electrosoup <http://www.electrosoup.co.uk>`_.
+   Nat Hardwick of `Electrosoup <http://www.electrosoup.co.uk>`_.
 
 Used with permission:
    The :ref:`webob_chapter` chapter is adapted, with permission, from
    documentation originally written by Ian Bicking.
-
-Foreword:
-  Paul Everitt
 
 Contacting The Publisher
 ------------------------
@@ -79,3 +79,9 @@ http://bfg.repoze.org.
 The source code for the examples used in this book are available
 within the :mod:`repoze.bfg` software distribution, always available
 via http://bfg.repoze.org.
+
+Errata
+------
+
+Errata for this book will be placed at http://bfg.repoze.org/book_errata.
+

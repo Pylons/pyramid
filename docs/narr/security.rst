@@ -1,3 +1,6 @@
+.. index::
+   single: security
+
 .. _security_chapter:
 
 Security
@@ -19,7 +22,7 @@ Here's how it works at a high level:
   finding.
 
 - A :term:`view callable` is located by :term:`view lookup` using the
-  the context as well as other attributes of the request.
+  context as well as other attributes of the request.
 
 - If an :term:`authentication policy` is in effect, it is passed the
   request; it returns some number of :term:`principal` identifiers.
@@ -66,7 +69,7 @@ policies.
    applications.
 
 .. index::
-   pair: enabling; authorization policy
+   single: authorization policy
 
 Enabling an Authorization Policy
 --------------------------------
@@ -78,9 +81,6 @@ to enable an authorization policy.
 
 You can enable an authorization policy imperatively, or declaratively
 via ZCML.
-
-.. index::
-   triple: enabling; authorization policy; imperatively
 
 Enabling an Authorization Policy Imperatively
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -124,9 +124,6 @@ policy without the an authorization policy or vice versa to a
 See also the :mod:`repoze.bfg.authorization` and
 :mod:`repoze.bfg.authentication` modules for alternate implementations
 of authorization and authentication policies.  
-
-.. index::
-   triple: enabling; authorization policy; via ZCML
 
 Enabling an Authorization Policy Via ZCML
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -393,7 +390,7 @@ ACE, as below.
 
 .. index::
    single: principal
-   pair: special; principal names
+   single: principal names
 
 Special Principal Names
 -----------------------
@@ -417,7 +414,8 @@ ACLs, e.g. :data:`repoze.bfg.security.Everyone`.
   (``system.Authenticated``).
 
 .. index::
-   pair: special; permission names
+   single: permission names
+   single: special permission names
 
 Special Permissions
 -------------------
@@ -437,7 +435,8 @@ module.  These can be imported for use in ACLs.
   given principal "has" any permission asked for by the system.
 
 .. index::
-   pair: special; ACE
+   single: special ACE
+   single: ACE (special)
 
 Special ACEs
 ------------
@@ -501,7 +500,7 @@ See :ref:`location_module` for documentations of functions which use
 location-awareness.  See also :ref:`location_aware`.
 
 .. index::
-   pair: forbidden view; changing
+   single: forbidden view
 
 Changing the Forbidden View
 ---------------------------
@@ -514,7 +513,7 @@ instructions on how to create a custom forbidden view and arrange for
 it to be called when view authorization is denied.
 
 .. index::
-   pair: debugging; authorization failures
+   single: debugging authorization failures
 
 .. _debug_authorization_section:
 
@@ -667,7 +666,7 @@ In other words, it has no configuration attributes; its existence in a
 See :ref:`aclauthorizationpolicy_directive` for detailed information.
 
 .. index::
-   pair: creating; authentication policy
+   single: authentication policy (creating)
 
 .. _creating_an_authentication_policy:
 
@@ -710,7 +709,7 @@ After you do so, you can pass an instance of such a class into the
 time as ``authentication_policy`` to use it.
 
 .. index::
-   pair: creating; authorization policy
+   single: authorization policy (creating)
 
 .. _creating_an_authorization_policy:
 

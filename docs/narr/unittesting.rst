@@ -17,7 +17,7 @@ the "unit under test".  If you write a unit test that aims to verify
 the result of a particular codepath through a Python function, you
 need only be concerned about testing the code that *lives in the
 function body itself*.  If the function accepts a parameter that
-represents a complex application "domain object" (such a a model, a
+represents a complex application "domain object" (such as a model, a
 database connection, or an SMTP server), the argument provided to this
 function during a unit test *need not be* and likely *should not be* a
 "real" implementation object.  For example, although a particular
@@ -58,8 +58,8 @@ useful when your code calls into :mod:`repoze.bfg` -related framework
 functions.
 
 .. index::
-   pair: test; setup
-   pair: test; tear down
+   single: test setup
+   single: test tear down
    single: unittest
 
 .. _test_setup_and_teardown:
@@ -164,7 +164,7 @@ anything if the application you're testing does not call any
 
 .. index::
    single: repoze.bfg.testing
-   pair: Configurator; testing
+   single: Configurator testing API
 
 Using the ``Configurator`` and ``repoze.bfg.testing`` APIs in Unit Tests
 ------------------------------------------------------------------------
@@ -299,7 +299,7 @@ See also the various methods of the :term:`Configurator` documented in
 :ref:`configuration_module` that begin with the ``testing_`` prefix.
 
 .. index::
-   pair: creating; integration tests
+   single: integration tests
 
 .. _integration_tests:
 

@@ -1,6 +1,5 @@
 .. index::
    single: event
-   single: events
    single: subscriber
    single: INewRequest
    single: INewResponse

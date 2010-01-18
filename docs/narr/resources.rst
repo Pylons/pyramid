@@ -74,7 +74,6 @@ package.  Resource names usually look a lot like relative UNIX file
 paths.
 
 .. index::
-   single: overriding resources
    pair: overriding; resources
 
 .. _overriding_resources_section:

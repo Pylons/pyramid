@@ -7,7 +7,7 @@ Using Hooks
 :mod:`repoze.bfg` framework in various ways.
 
 .. index::
-   pair: not found view; changing
+   single: not found view
 
 .. _changing_the_notfound_view:
 
@@ -74,7 +74,7 @@ Here's some sample code that implements a minimal NotFound view:
    is false.
 
 .. index::
-   pair: forbidden view; changing
+   single: forbidden view
 
 .. _changing_the_forbidden_view:
 
@@ -155,7 +155,7 @@ Here's some sample code that implements a minimal forbidden view:
    return a response with a ``403 Forbidden`` status code.
 
 .. index::
-   pair: traverser; changing
+   single: traverser
 
 .. _changing_the_traverser:
 
@@ -252,7 +252,7 @@ wild" within `repoze.bfg.traversalwrapper
 `repoze.bfg.metatg <http://svn.repoze.org/repoze.bfg.metatg/trunk/>`_.
 
 .. index::
-   pair: url generator; changing
+   single: url generator
 
 Changing How :mod:`repoze.bfg.url.model_url` Generates a URL
 ------------------------------------------------------------

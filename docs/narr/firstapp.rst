@@ -4,7 +4,7 @@ Creating Your First :mod:`repoze.bfg` Application
 =================================================
 
 We will walk through the creation of a tiny :mod:`repoze.bfg`
-application in this chapter.  After we're done with creating it, we'll
+application in this chapter.  After we're finished creating it, we'll
 explain in more detail how the application works.
 
 .. note::
@@ -76,8 +76,8 @@ The above script defines the following set of imports:
 Like many other Python web frameworks, :mod:`repoze.bfg` uses the
 :term:`WSGI` protocol to connect an application and a web server
 together.  The :mod:`paste.httpserver` server is used in this example
-as a WSGI server for convenience, as ``Paste`` is a dependency of
-:mod:`repoze.bfg` itself.
+as a WSGI server for convenience, as the ``paste`` package is a
+dependency of :mod:`repoze.bfg` itself.
 
 The script also imports the ``Configurator`` class from the
 ``repoze.bfg.configuration`` module.  This class is used to configure
@@ -100,11 +100,11 @@ one named ``hello_world`` and one named ``goodbye_world``.
    def goodbye_world(request):
        return Response('Goodbye world!')
 
-These functions don't really do anything very interesting.  Both
-functions accept a single argument (``request``).  The ``hello_world``
-function does nothing but return a response instance with the body
-``Hello world!``.  The ``goodbye_world`` function returns a response
-instance with the body ``Goodbye world!``.
+These functions don't do anything very taxing.  Both functions accept
+a single argument (``request``).  The ``hello_world`` function does
+nothing but return a response instance with the body ``Hello world!``.
+The ``goodbye_world`` function returns a response instance with the
+body ``Goodbye world!``.
 
 Each of these functions is known as a :term:`view callable`.  View
 callables in a :mod:`repoze.bfg` application accept a single argument,
@@ -120,16 +120,17 @@ request object is a representation of an HTTP request sent to
 A view callable is required to return a :term:`response` object
 because a response object has all the information necessary to
 formulate an actual HTTP response; this object is then converted to
-text and sent back to the requesting browser.  To return a response,
-each view callable creates an instance of the :class:`webob.Response`
-class.  In the ``hello_world`` function, the string ``'Hello world!'``
-is passed to the ``Response`` constructor as the *body* of the
-response.  In the ``goodbye_world`` function, the string ``'Goodbye
-world!'`` is passed.
+text by the upstream :term:`WSGI` server and sent back to the
+requesting browser.  To return a response, each view callable creates
+an instance of the :class:`webob.Response` class.  In the
+``hello_world`` function, the string ``'Hello world!'`` is passed to
+the ``Response`` constructor as the *body* of the response.  In the
+``goodbye_world`` function, the string ``'Goodbye world!'`` is passed.
 
 .. index::
-   pair: imperative; configuration
+   single: imperative configuration
    single: Configurator
+   single: helloworld (imperative)
 
 .. _helloworld_imperative_appconfig:
 
@@ -164,17 +165,21 @@ Configurator Construction
    if __name__ == '__main__':
        config = Configurator()
 
-The ``if __name__ == '__main__':`` line above represents a Python
-idiom: the code inside this if clause is not invoked unless the script
-is run directly from the command line via, for example, ``python
-helloworld.py`` where the file named ``helloworld.py`` contains the
-entire script body.  ``helloworld.py`` in this case is a Python
-*module*.  Using the ``if`` clause is necessary (or at least "best
-practice") because code in any Python module may be imported by
-another Python module.  By using this idiom, the script is indicating
-that it does not want the code within the ``if`` statement to execute
-if this module is imported; the code within the ``if`` block should
-only be run during a direct script execution.
+The ``if __name__ == '__main__':`` line in the code sample above
+represents a Python idiom: the code inside this if clause is not
+invoked unless the script containing this code is run directly from
+the command line. For example, if the file named ``helloworld.py``
+contains the entire script body, the code within the ``if`` statement
+will only be invoked when ``python helloworld.py`` is executed from
+the operating system command line.
+
+``helloworld.py`` in this case is a Python *module*.  Using the ``if``
+clause is necessary -- or at least best practice -- because code in
+any Python module may be imported by another Python module.  By using
+this idiom, the script is indicating that it does not want the code
+within the ``if`` statement to execute if this module is imported; the
+code within the ``if`` block should only be run during a direct script
+execution.
 
 The ``config = Configurator()`` line above creates an instance of the
 :class:`repoze.bfg.configuration.Configurator` class.  The resulting
@@ -192,14 +197,14 @@ Beginning Configuration
    config.begin()
 
 The :meth:`repoze.bfg.configuration.Configurator.begin` method tells
-the the system that application configuration has begun.  In
-particular, this causes the :term:`application registry` associated
-with this configurator to become the "current" application registry,
-meaning that code which attempts to use the application registry
-:term:`thread local` will obtain the registry associated with the
-configurator.  This is an explicit step because it's sometimes
-convenient to use a configurator without causing the registry
-associated with the configurator to become "current".
+the system that application configuration has begun.  In particular,
+this causes the :term:`application registry` associated with this
+configurator to become the "current" application registry, meaning
+that code which attempts to use the application registry :term:`thread
+local` will obtain the registry associated with the configurator.
+This is an explicit step because it's sometimes convenient to use a
+configurator without causing the registry associated with the
+configurator to become "current".
 
 .. note::
 
@@ -282,13 +287,13 @@ Ending Configuration
    config.end()
 
 The :meth:`repoze.bfg.configuration.Configurator.end` method tells the
-the system that application configuration has ended.  It is the
-inverse of :meth:`repoze.bfg.configuration.Configurator.begin`.  In
-particular, this causes the :term:`application registry` associated
-with this configurator to no longer be the "current" application
-registry, meaning that code which attempts to use the application
-registry :term:`thread local` will no longer obtain the registry
-associated with the configurator.
+system that application configuration has ended.  It is the inverse of
+:meth:`repoze.bfg.configuration.Configurator.begin`.  In particular,
+this causes the :term:`application registry` associated with this
+configurator to no longer be the "current" application registry,
+meaning that code which attempts to use the application registry
+:term:`thread local` will no longer obtain the registry associated
+with the configurator.
 
 .. note::
 
@@ -297,8 +302,7 @@ associated with the configurator.
 
 .. index::
    single: make_wsgi_app
-   pair: WSGI; application
-   triple: WSGI; application; creation
+   single: WSGI application
 
 WSGI Application Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -316,14 +320,17 @@ call to ``make_wsgi_app`` implies that all configuration is finished
 various other configuration settings have been performed).  The
 ``make_wsgi_app`` method returns a :term:`WSGI` application object
 that can be used by any WSGI server to present an application to a
-requestor.
+requestor.  :term:`WSGI` is a protocol that allows servers to talk to
+Python applications.  We don't discuss :term:`WSGI` in any depth
+within this book, however, you can learn more about it by visiting
+`wsgi.org <http://wsgi.org>`_.
 
 The :mod:`repoze.bfg` application object, in particular, is an
 instance of a class representing a :mod:`repoze.bfg` :term:`router`.
 It has a reference to the :term:`application registry` which resulted
 from method calls to the configurator used to configure it.  The
-router consults the registry to obey the policy choices made by a
-single application.  These policy choices were informed by method
+:term:`router` consults the registry to obey the policy choices made
+by a single application.  These policy choices were informed by method
 calls to the :term:`Configurator` made earlier; in our case, the only
 policy choices made were implied by two calls to its ``add_view``
 method.
@@ -360,8 +367,7 @@ that it's configured imperatively because the full power of Python is
 available to us as we perform configuration tasks.
 
 .. index::
-   pair: helloworld; declarative
-   single: helloworld
+   single: helloworld (declarative)
 
 .. _helloworld_declarative:
 
@@ -516,15 +522,15 @@ The ``configure.zcml`` ZCML file contains this bit of XML within the
 
    <include package="repoze.bfg.includes" />
 
-This singleton (self-closing) tag instructs ZCML to load a ZCML file
+This self-closing tag instructs :mod:`repoze.bfg` to load a ZCML file
 from the Python package with the :term:`dotted Python name`
-:mod:`repoze.bfg.includes`, as specified by its ``package`` attribute.
+``repoze.bfg.includes``, as specified by its ``package`` attribute.
 This particular ``<include>`` declaration is required because it
 actually allows subsequent declaration tags (such as ``<view>``, which
 we'll see shortly) to be recognized.  The ``<include>`` tag
-effectively just includes another ZCML file; this causes its
-declarations to be executed.  In this case, we want to load the
-declarations from the file named ``configure.zcml`` within the
+effectively just includes another ZCML file, causing its declarations
+to be executed.  In this case, we want to load the declarations from
+the file named ``configure.zcml`` within the
 :mod:`repoze.bfg.includes` Python package.  We know we want to load
 the ``configure.zcml`` from this package because ``configure.zcml`` is
 the default value for another attribute of the ``<include>`` tag named

@@ -51,7 +51,7 @@ _marker = object()
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
-    configuration` that matches the the :term:`view name` ``name``
+    configuration` that matches the :term:`view name` ``name``
     registered against the specified ``context`` and ``request`` and
     return a :term:`response` object.  This function will return
     ``None`` if a corresponding :term:`view callable` cannot be found
@@ -88,7 +88,7 @@ def render_view_to_response(context, request, name='', secure=True):
 
 def render_view_to_iterable(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
-    configuration` that matches the the :term:`view name` ``name``
+    configuration` that matches the :term:`view name` ``name``
     registered against the specified ``context`` and ``request`` and
     return an iterable object which represents the body of a response.
     This function will return ``None`` if a corresponding :term:`view
@@ -119,9 +119,9 @@ def render_view_to_iterable(context, request, name='', secure=True):
 
 def render_view(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
-    configuration` that matches the the :term:`view name` ``name``
+    configuration` that matches the :term:`view name` ``name``
     registered against the specified ``context`` and ``request`` and
-    and unwind the the view response's ``app_iter`` (see
+    and unwind the view response's ``app_iter`` (see
     :ref:`the_response`) into a single string.  This function will
     return ``None`` if a corresponding :term:`view callable` cannot be
     found (when no :term:`view configuration` matches the combination

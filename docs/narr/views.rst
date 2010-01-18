@@ -28,8 +28,8 @@ The job of actually locating and invoking the "best" :term:`view
 callable` is the job of the :term:`view lookup` subsystem.  The view
 lookup subsystem compares information supplied by :term:`context
 finding` against :term:`view configuration` statements made by the
-developer to choose the most appropriate view callable for a specific
-request.
+developer stored in the :term:`application registry` to choose the
+most appropriate view callable for a specific request.
 
 This chapter provides documentation detailing the process of creating
 view callables, documentation about performing view configuration, and
@@ -57,9 +57,8 @@ callables can optionally be defined with an alternate calling
 convention.
 
 .. index::
-   pair: view; calling convention
+   single: view calling convention
    single: view function
-   pair: view; function
 
 .. _function_as_view:
 
@@ -80,9 +79,8 @@ callable implemented as a function:
        return Response('Hello world!')
 
 .. index::
-   pair: view; calling convention
+   single: view calling convention
    single: view class
-   pair: view; class
 
 .. _class_as_view:
 
@@ -101,8 +99,9 @@ with no parameters.  Views defined as classes must have the following
 traits:
 
 - an ``__init__`` method that accepts a ``request`` as its sole
-  positional argument (or two arguments: ``request`` and ``context``,
-  as per :ref:`request_and_context_view_definitions`).
+  positional argument or an ``__init__`` method that accepts two
+  arguments: ``request`` and ``context`` as per
+  :ref:`request_and_context_view_definitions`.
 
 - a ``__call__`` method that accepts no parameters and which returns a
   response.
@@ -127,10 +126,10 @@ object described in :ref:`function_as_view`.
 If you'd like to use a different attribute than ``__call__`` to
 represent the method expected to return a response, you can use an
 ``attr`` value as part of view configuration.  See
-:ref:`view_configuration`.
+:ref:`view_configuration_parameters`.
 
 .. index::
-   pair: view; calling convention
+   single: view calling convention
 
 .. _request_and_context_view_definitions:
 
@@ -201,7 +200,8 @@ No matter which view calling convention is used, the view code always
 has access to the context via ``request.context``.
 
 .. index::
-   pair: view; response
+   single: view response
+   single: response
 
 .. _the_response:
 
@@ -237,7 +237,8 @@ can be varied by changing the ``renderer`` attribute in the view's
 configuration.  See :ref:`views_which_use_a_renderer`.
 
 .. index::
-   pair: view; http redirect
+   single: view http redirect
+   single: http redirect (from a view)
 
 Using a View Callable to Do A HTTP Redirect
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -256,11 +257,12 @@ particular kind of response.
 All exception types from the :mod:`webob.exc` module implement the
 Webob :term:`Response` interface; any can be returned as the response
 from a view.  See :term:`WebOb` for the documentation for this module;
-it includes other response types for ``Unauthorized``, etc.
+it includes other response types that imply other HTTP response codes,
+such as ``401 Unauthorized``.
 
 .. index::
    single: renderer
-   pair: view; renderer
+   single: view renderer
 
 .. _views_which_use_a_renderer:
 
@@ -301,8 +303,7 @@ which renders view return values to a :term:`JSON` serialization.
 
 Other built-in renderers include renderers which use the
 :term:`Chameleon` templating language to render a dictionary to a
-response.  See :ref:`built_in_renderers` for the available built-in
-renderers.
+response.
 
 If the :term:`view callable` associated with a :term:`view
 configuration` returns a Response object directly (an object with the
@@ -328,7 +329,8 @@ Additional renderers can be added to the system as necessary via a
 ZCML directive (see :ref:`adding_and_overriding_renderers`).
 
 .. index::
-   pair: renderers; built-in
+   single: renderers (built-in)
+   single: built-in renderers
 
 .. _built_in_renderers:
 
@@ -466,7 +468,8 @@ callable with an associated template returns a Python dictionary, the
 named template will be passed the dictionary as its keyword arguments,
 and the template renderer implementation will return the resulting
 rendered template in a response to the user.  If the view callable
-returns anything but a dictionary, an error will be raised.
+returns anything but a Response object or a dictionary, an error will
+be raised.
 
 Before passing keywords to the template, the keywords derived from the
 dictionary returned by the view are augmented.  The callable object
@@ -512,9 +515,8 @@ attaching properties to the request.  See
 :ref:`response_request_attrs`.
 
 .. index::
-   pair: renderer; response attributes
-   pair: renderer; changing headers
-   triple: headers; changing; renderer
+   single: response headers (from a renderer)
+   single: renderer response headers
 
 .. _response_request_attrs:
 
@@ -561,13 +563,13 @@ attribute to the request before returning a result:
 
    from repoze.bfg.view import bfg_view
 
-   @bfg_view(name='gone')
+   @bfg_view(name='gone', renderer='templates/gone.pt')
    def myview(request):
        request.response_status = '404 Not Found'
        return {'URL':request.URL}
 
 .. index::
-   pair: renderers; adding
+   single: renderer (adding)
 
 .. _adding_and_overriding_renderers:
 
@@ -804,7 +806,7 @@ See also :ref:`renderer_directive` and
 :meth:`repoze.bfg.configuration.Configurator.add_renderer`.
 
 .. index::
-   triple: exceptions; special; view
+   single: view exceptions
 
 Using Special Exceptions In View Callables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -832,7 +834,9 @@ made available to the view which :mod:`repoze.bfg` invokes as
 ``request.environ['repoze.bfg.message']``.
 
 .. index::
-   triple: view; forms; unicode
+   single: unicode, views, and forms
+   single: forms, views, and unicode
+   single: views, forms, and unicode
 
 Handling Form Submissions in View Callables (Unicode and Character Set Issues)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -966,7 +970,6 @@ rendered in a request that has a ``;charset=utf-8`` stanza on its
 
 .. index::
    single: view configuration
-   pair: view; configuration
 
 .. _view_configuration:
 
@@ -987,17 +990,17 @@ collectively, as a :term:`triad`.
 View configuration is performed in one of three ways:
 
 - by adding a ``<view>`` declaration to :term:`ZCML` used by your
-  application (see :ref:`mapping_views_using_zcml_section` and
-  :ref:`view_directive`).
+  application as per :ref:`mapping_views_using_zcml_section` and
+  :ref:`view_directive`.
 
 - by running a :term:`scan` against application source code which has
   a :class:`repoze.bfg.view.bfg_view` decorator attached to a Python
-  object (see :class:`repoze.bfg.view.bfg_view` and
-  :ref:`mapping_views_using_a_decorator_section`).
+  object as per :class:`repoze.bfg.view.bfg_view` and
+  :ref:`mapping_views_using_a_decorator_section`.
 
 - by using the :meth:`repoze.bfg.configuration.Configurator.add_view`
-  method (see :meth:`repoze.bfg.configuration.Configurator.add_view`
-  and :ref:`mapping_views_using_imperative_config_section`).
+  method as per :meth:`repoze.bfg.configuration.Configurator.add_view`
+  and :ref:`mapping_views_using_imperative_config_section`.
 
 Each of these mechanisms is completely equivalent to the other.
 
@@ -1009,7 +1012,9 @@ performed in one of the following two ways:
   method to create a route with a ``view`` argument.
 
 - by adding a ``<route>`` declaration that uses a ``view`` attribute to
-  :term:`ZCML` used by your application.
+  :term:`ZCML` used by your application as per :ref:`route_directive`.
+
+.. _view_configuration_parameters:
 
 View Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1273,7 +1278,7 @@ Predicate Arguments
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
 
 .. index::
-   triple: zcml; view; configuration
+   single: ZCML view configuration
 
 .. _mapping_views_using_zcml_section:
 
@@ -1368,7 +1373,7 @@ apply for the class which is named.
 See :ref:`view_directive` for complete ZCML directive documentation.
 
 .. index::
-   triple: view; bfg_view; decorator
+   single: bfg_view decorator
 
 .. _mapping_views_using_a_decorator_section:
 
@@ -1531,7 +1536,7 @@ function.  For example:
 
 You can use the :class:`repoze.bfg.view.bfg_view` decorator as a
 simple callable to manually decorate classes in Python 2.5 and below
-(without the decorator syntactic sugar), if you wish:
+without the decorator syntactic sugar, if you wish:
 
 .. code-block:: python
    :linenos:
@@ -1568,7 +1573,7 @@ This registers the same view under two different names.
 .. note:: :class:`repoze.bfg.view.bfg_view` decorator stacking is a
    feature new in :mod:`repoze.bfg` 1.1.  Previously, these decorators
    could not be stacked without the effect of the "upper" decorator
-   cancelling the effect of the the decorator "beneath" it.
+   cancelling the effect of the decorator "beneath" it.
 
 The decorator can also be used against class methods:
 
@@ -1622,7 +1627,6 @@ equivalently as the below:
 
 .. index::
    single: add_view
-   triple: imperative; adding; view
 
 .. _mapping_views_using_imperative_config_section:
 
@@ -1648,7 +1652,7 @@ example:
    config.add_view(hello_world, name='hello.html')
 
 .. index::
-   pair: model; interfaces
+   single: model interfaces
 
 .. _using_model_interfaces:
 
@@ -1742,7 +1746,8 @@ within view configuration, see
 :ref:`models_which_implement_interfaces`.
 
 .. index::
-   pair: view; security
+   single: view security
+   pair: security; view
 
 .. _view_security_section:
 
@@ -1774,7 +1779,7 @@ user does not possess the ``add`` permission relative to the current
 :ref:`protecting_views`.
 
 .. index::
-   pair: view; lookup
+   single: view lookup
 
 .. _view_lookup:
 
@@ -1817,7 +1822,8 @@ the user's browser, representing a "not found" (404) page.  See
 the default notfound view.
 
 .. index::
-   pair: debugging; not found errors
+   single: debugging not found errors
+   single: not found error (debugging)
 
 .. _debug_notfound_section:
 

@@ -82,25 +82,25 @@ Here is the source for ``models.py``:
    manager* instead of controlling commits and aborts to database
    operations by hand.
 
-#. *Line 20*. Set up a SQLAlchemy metadata object.
+#. *Line 21*. Set up a SQLAlchemy metadata object.
 
-#. *Lines 22-24*.  A model class named ``Model``.  It has an
+#. *Lines 23-25*.  A model class named ``Model``.  It has an
    ``__init__`` that takes a single argument (``name``).  It stores a
    single attribute named ``name``.
 
-#. *Lines 26-31*.  A SQLAlchemy ``Table`` declaration named
+#. *Lines 27-32*.  A SQLAlchemy ``Table`` declaration named
    ``models_table`` which we'll use later to map onto our ``Model``
    class.
 
-#. *Line 33*.  We map our ``models_table`` table to our Models class
+#. *Line 34*.  We map our ``models_table`` table to our Models class
    here.  This makes an association between the ``Model`` class and
    the ``models`` table in the database, as far as SQLAlchemy is
    concerned.
 
-#. *Lines 35-40*.  A function named ``populate`` which adds a single
+#. *Lines 36-41*.  A function named ``populate`` which adds a single
    model instance into our SQL storage and commits a transaction.
 
-#. *Lines 42-50*.  A function named ``initialize_sql`` which sets up
+#. *Lines 43-51*.  A function named ``initialize_sql`` which sets up
    an actual SQL database and binds it to our SQLAlchemy DBSession
    object.  It also calls the ``populate`` function, to do initial
    database population.

@@ -1,10 +1,10 @@
 .. index::
-   pair: finding; context
+   single: context finding
 
 .. _contextfinding_chapter:
 
-Context Finding
----------------
+Context Finding and View Lookup
+-------------------------------
 
 In order for a web application to perform any useful action, the web
 framework must provide a mechanism to find and invoke code written by
@@ -21,8 +21,8 @@ finding` and :term:`view lookup`.
   request.
 
 - Using the context and view name provided by :term:`context finding`,
-  the :mod:`repoze.bfg` view lookup subsystem is provided with a
-  :term:`request`, a :term:`context` and a :term:`view name`.  It is
+  the :mod:`repoze.bfg` :term:`view lookup` subsystem is provided with
+  a :term:`request`, a :term:`context` and a :term:`view name`.  It is
   then responsible for finding and invoking a :term:`view callable`.
   A view callable is a specific bit of code written and registered by
   the application developer which receives the :term:`request` and
@@ -50,22 +50,17 @@ requesting user.
    :term:`authorization`, which is not well-supported in frameworks
    that do not provide a notion of a context.
 
-This chapter documents :term:`context finding`.  There are two
-separate :term:`context finding` subsystems in :mod:`repoze.bfg`:
-:term:`traversal` and :term:`URL dispatch`.  The subsystems are
-documented within this chapter.  They can be used separately or they
-can be combined.
+There are two separate :term:`context finding` subsystems in
+:mod:`repoze.bfg`: :term:`traversal` and :term:`URL dispatch`.  The
+subsystems are documented within this chapter.  They can be used
+separately or they can be combined.  Three chapters which follow
+describe :term:`context finding`: :ref:`traversal_chapter`,
+:ref:`urldispatch_chapter` and :ref:`hybrid_chapter`.
 
 There is only one :term:`view lookup` subsystem present in
 :mod:`repoze.bfg`.  Where appropriate, within this chapter, we
-describe how view lookup interacts with context finding.
-
-.. toctree::
-   :maxdepth: 2
-
-   traversal
-   urldispatch
-   hybrid
+describe how view lookup interacts with context finding.  One chapter
+which follows describes :term:`view lookup`: :ref:`views_chapter`.
 
 Should I Use Traversal or URL Dispatch for Context Finding?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,7 +95,7 @@ just aren't possible.  Essentially, URL-dispatch based systems just
 don't deal very well with URLs that represent arbitrary-depth
 hierarchies.
 
-But :term:`traversal`, *does* work well for URLs that represent
+But :term:`traversal` *does* work well for URLs that represent
 arbitrary-depth hierarchies.  Since the path segments that compose a
 URL are addressed separately, it becomes very easy to form URLs that
 represent arbitrary depth hierarchies in a system that uses traversal.
@@ -120,3 +115,4 @@ advantages over using URL-based dispatch.
 
 Since :mod:`repoze.bfg` provides support for both approaches, you can
 use either exclusively or combine them as you see fit.
+

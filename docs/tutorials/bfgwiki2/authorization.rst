@@ -105,13 +105,13 @@ Adding ``security.py``
 Add a ``security.py`` module within your package (in the same
 directory as "run.py", "views.py", etc) with the following content:
 The groupfinder defined here is an :term:`authentication policy`
-"callback"; it is a a callable that accepts a userid and a request.
-If the userid exists in the system, the callback will return a
-sequence of group identifiers (or an empty sequence if the user isn't
-a member of any groups).  If the userid *does not* exist in the
-system, the callback will return ``None``.  We'll use "dummy" data to
-represent user and groups sources.  When we're done, your
-application's ``security.py`` will look like this.
+"callback"; it is a callable that accepts a userid and a request.  If
+the userid exists in the system, the callback will return a sequence
+of group identifiers (or an empty sequence if the user isn't a member
+of any groups).  If the userid *does not* exist in the system, the
+callback will return ``None``.  We'll use "dummy" data to represent
+user and groups sources.  When we're done, your application's
+``security.py`` will look like this.
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:

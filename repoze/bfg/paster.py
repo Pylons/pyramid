@@ -92,6 +92,7 @@ class BFGShellCommand(Command):
                'root object.')
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
         config_file, section_name = self.args
+        self.logging_file_config(config_file)
         app = get_app(config_file, section_name, loadapp=self.loadapp[0])
         root, closer = get_root(app)
         if self.IPShell is not None and not self.options.disable_ipython:

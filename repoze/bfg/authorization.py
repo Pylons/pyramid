@@ -12,7 +12,7 @@ from repoze.bfg.security import Everyone
 class ACLAuthorizationPolicy(object):
     """ An :term:`authorization policy` which consults an :term:`ACL`
     object attached to a :term:`context` to determine authorization
-    information about a a :term:`principal` or multiple principals.
+    information about a :term:`principal` or multiple principals.
     If the context is part of a :term:`lineage`, the context's parents
     are consulted for ACL information too.  The following is true
     about this security policy.

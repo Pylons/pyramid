@@ -10,15 +10,15 @@ Each deployment of an application written using :mod:`repoze.bfg`
 implies a specific *configuration* of the framework itself.  For
 example, an application which serves up MP3s for user consumption
 might plug code into the framework that manages songs, while an
-application that application might plug in code that manages
-accounting information.  :mod:`repoze.bfg` refers to the way in which
-code is plugged in to it for a specific application as
+application that manages corporate data might plug in code that
+manages accounting information.  :mod:`repoze.bfg` refers to the way
+in which code is plugged in to it for a specific application as
 "configuration".
 
 Most people understand "configuration" as coarse settings that inform
 the high-level operation of a specific application deployment.  For
 instance, it's easy to think of the values implied by a ``.ini`` file
-which is parsed at application startup time as "configuration".
+parsed at application startup time as "configuration".
 :mod:`repoze.bfg` extends this pattern to application development,
 using the term "configuration" to express standardized ways that code
 gets plugged into a deployment of the framework itself.  When you plug
@@ -32,7 +32,7 @@ and *declarative* configuration.  We'll examine both modes in the
 sections which follow.
 
 .. index::
-   pair: imperative; configuration
+   single: imperative configuration
 
 .. _imperative_configuration:
 
@@ -77,14 +77,14 @@ power of Python, including conditionals, can be employed in this mode
 of configuration.
 
 .. index::
-   pair: declarative; configuration
+   single: declarative configuration
 
 .. _declarative_configuration:
 
 Declarative Configuration
 -------------------------
 
-A :mod:`repoze.bfg` application can be alternatively be configured
+A :mod:`repoze.bfg` application can be alternately be configured
 "declaratively", if so desired.  Declarative configuration relies on
 *declarations* made external to the code in a configuration file
 format named :term:`ZCML` (Zope Configuration Markup Language), an XML
@@ -214,19 +214,14 @@ benefit being that applications configured declaratively can be
 *overridden* and *extended* by third parties without requiring the
 third party to change application code.  If you want to build a
 framework or an extensible application, using declarative
-configuration is a good idea.  Declarative configuration has an
-obvious downside: you can't use plain-old-Python syntax you probably
-already know and understand to configure your application; instead you
-need to use :term:`ZCML`.
+configuration is a good idea.
 
-.. note::
-
-   See :ref:`extending_chapter` for a discussion of extending and
-   overriding :mod:`repoze.bfg` applications.
-
+Declarative configuration has an obvious downside: you can't use
+plain-old-Python syntax you probably already know and understand to
+configure your application; instead you need to use :term:`ZCML`.
 
 .. index::
-   pair: ZCML; conflict detection
+   single: ZCML conflict detection
 
 ZCML Conflict Detection
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,9 +256,9 @@ might have conflicted.
 
 .. index::
    single: bfg_view
-   pair: ZCML directive; view
-   single: configuration decorations
-   pair: code; scanning
+   single: ZCML view directive
+   single: configuration decoration
+   single: code scanning
 
 .. _decorations_and_code_scanning:
 
@@ -273,12 +268,12 @@ Configuration Decorations and Code Scanning
 An alternate mode of declarative configuration lends more *locality of
 reference* to a :term:`configuration declaration`.  It's sometimes
 painful to have all configuration done in ZCML, or even in imperative
-code, because you may need to have two files open at once; the file
-that represents the configuration, and the file that contains the
-implementation objects (such as :term:`view callable` functions) that
-the configuration references.  To avoid this, :mod:`repoze.bfg` allows
-you to insert :term:`configuration decoration` statements very close
-to code that is referred to by the declaration itself.  For example:
+code, because you may need to have two files open at once to see the
+"big picture": the file that represents the configuration, and the
+file that contains the implementation objects referenced by the
+configuration.  To avoid this, :mod:`repoze.bfg` allows you to insert
+:term:`configuration decoration` statements very close to code that is
+referred to by the declaration itself.  For example:
 
 .. code-block:: python
    :linenos:

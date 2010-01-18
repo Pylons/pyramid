@@ -17,10 +17,10 @@ templates".
 
 .. index::
    single: paster templates
-   single: bfg_starter
-   single: bfg_zodb
-   single: bfg_alchemy
-   single: bfg_routesalchemy
+   single: bfg_starter paster template
+   single: bfg_zodb paster template
+   single: bfg_alchemy paster template
+   single: bfg_routesalchemy paster template
 
 .. _additional_paster_templates:
 
@@ -39,30 +39,35 @@ differ from each other on two axes:
 The included templates are these:
 
 ``bfg_starter``
+
   URL mapping via :term:`traversal` and no persistence mechanism.
 
 ``bfg_zodb``
+
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`
 
 ``bfg_routesalchemy`` 
+
   URL mapping via :term:`URL dispatch` and persistence via
   :term:`SQLAlchemy`
 
 ``bfg_alchemy``
+
   URL mapping via :term:`traversal` and persistence va
   :term:`SQLAlchemy`
 
-All existing project templates use :term:`ZCML` instead of
-:term:`imperative configuration`.  All existing project templates also
-make the assumption that you want your code to live in a Python
-:term:`package`.  Even if your application is extremely simple, it is
-useful to place code that drives the application within a package,
-because a package is more easily extended with new code and an
-application that lives inside a package can be distributed more easily
-than one which does not live within a package.
+Each of these project templates uses :term:`ZCML` instead of
+:term:`imperative configuration`.  Each also makes the assumption that
+you want your code to live in a Python :term:`package`.  Even if your
+application is extremely simple, it is useful to place code that
+drives the application within a package, because a package is more
+easily extended with new code.  An application that lives inside a
+package can also be distributed more easily than one which does not
+live within a package.
 
 .. index::
-   pair: project; creating
+   single: creating a project
+   single: project
 
 .. _creating_a_project:
 
@@ -87,6 +92,8 @@ using the ``bfg_starter`` template.  The ``create`` version of paster
 invokes the creation of a project from a template.  To use a different
 template, such as ``bfg_routesalchemy``, you'd just change the last
 argument.  For example:
+
+.. code-block:: text
 
    $ bin/paster create -t bfg_routesalchemy
 
@@ -115,17 +122,17 @@ project we name ``MyProject``:
    name during ``paster create`` by adding the project name to the
    command line, e.g. ``paster create -t bfg_starter MyProject``.
 
-As a result of invoking the ``paster create`` command above, a project
-is created in a directory named ``MyProject``.  That directory is a
+As a result of invoking the ``paster create`` command, a project is
+created in a directory named ``MyProject``.  That directory is a
 :term:`setuptools` :term:`project` directory from which a setuptools
 :term:`distribution` can be created.  The ``setup.py`` file in that
 directory can be used to distribute your application, or install your
 application for deployment or development.
 
 A sample :term:`PasteDeploy` ``.ini`` file named ``MyProject.ini``
-will also be created in the project directory.  You will use the
-``paster serve`` command against this ``.ini`` file to run your
-application.
+will also be created in the project directory.  You will use this
+``.ini`` file to configure a server, to run your application, and to
+and debug your application.
 
 The ``MyProject`` project directory contains an additional
 subdirectory named ``myproject`` (note the case difference)
@@ -161,10 +168,11 @@ Elided output from a run of this command is shown below:
 
 This will install the :term:`distribution` representing your
 application's into the interpreter's library set so it can be found
-and run by :term:`PasteDeploy` via ``paster serve``.
+and run by :term:`PasteDeploy` via the command ``paster serve``.
 
 .. index::
-   pair: running; tests
+   single: running tests
+   single: tests (running)
 
 Running The Tests For Your Application
 --------------------------------------
@@ -257,7 +265,7 @@ standard Python interpreter shell unconditionally.
 .. code-block::  text
 
    [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell \
-         MyProject.ini main
+         --disable-ipython MyProject.ini main
 
 You should always use a section name argument that refers to the
 actual ``app`` section within the Paste configuration file that points
@@ -292,7 +300,8 @@ against the above ``.ini`` file, an error will likely occur.  Use the
 most specific reference to the application within the ``.ini`` file
 possible as the section name argument.
 
-Press "Ctrl-D" to exit the interactive shell.
+Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on
+Windows).
 
 .. index::
    single: running an application
@@ -321,8 +330,8 @@ Here's sample output from a run of ``paster serve``:
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
-By default, generated :mod:`repoze.bfg` applications will listen on
-TCP port 6543.
+By default, :mod:`repoze.bfg` applications generated from a ``paster``
+template will listen on TCP port 6543.
 
 During development, it's often useful to run ``paster serve`` using
 its ``--reload`` option.  When ``--reload`` is passed to ``paster
@@ -345,47 +354,46 @@ For more detailed information about the startup process, see
 variables and configuration file settings that influence startup and
 runtime behavior, see :ref:`environment_chapter`.
 
-.. topic:: Disusing ``paster serve`` and Using Alternate Servers
+Using an Alternate WSGI Server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   The code generated by :mod:`repoze.bfg` ``paster`` templates
-   assumes that you will be using the ``paster serve`` command to
-   start your application while you do development.  However, ``paster
-   serve`` is by no means the only way to start up and serve a
-   :mod:`repoze.bfg` application.  As we saw in
-   :ref:`configuration_narr`, ``paster serve`` needn't be invoked at
-   all to run a :mod:`repoze.bfg` application.  The use of ``paster
-   serve`` to run a :mod:`repoze.bfg` application is purely
-   conventional based on the output of its ``paster`` templates.
+The code generated by :mod:`repoze.bfg` ``paster`` templates assumes
+that you will be using the ``paster serve`` command to start your
+application while you do development.  However, ``paster serve`` is by
+no means the only way to start up and serve a :mod:`repoze.bfg`
+application.  As we saw in :ref:`configuration_narr`, ``paster serve``
+needn't be invoked at all to run a :mod:`repoze.bfg` application.  The
+use of ``paster serve`` to run a :mod:`repoze.bfg` application is
+purely conventional based on the output of its ``paster`` templates.
 
-   Any :term:`WSGI` server is capable of running a :mod:`repoze.bfg`
-   application.  Some WSGI servers don't require the
-   :term:`PasteDeploy` framework's ``paster serve`` command to do
-   server process management at all.  Each :term:`WSGI` server has its
-   own documentation about how it creates a process to run an
-   application, and there are many of them, so we cannot provide the
-   details for each here.  But the concepts are largely the same,
-   whatever server you happen to use.
+Any :term:`WSGI` server is capable of running a :mod:`repoze.bfg`
+application.  Some WSGI servers don't require the :term:`PasteDeploy`
+framework's ``paster serve`` command to do server process management
+at all.  Each :term:`WSGI` server has its own documentation about how
+it creates a process to run an application, and there are many of
+them, so we cannot provide the details for each here.  But the
+concepts are largely the same, whatever server you happen to use.
 
-   One popular production alternative to a ``paster``-invoked server
-   is :term:`mod_wsgi`.  can also use :term:`mod_wsgi` to serve your
-   :mod:`repoze.bfg` application using the Apache web server rather
-   than any "pure-Python" server that is started as a result of
-   ``paster serve``.  See :ref:`modwsgi_tutorial` for details.
-   However, it is usually easier to *develop* an application using a
-   ``paster serve`` -invoked webserver, as exception and debugging
-   output will be sent to the console.
+One popular production alternative to a ``paster``-invoked server is
+:term:`mod_wsgi`.  can also use :term:`mod_wsgi` to serve your
+:mod:`repoze.bfg` application using the Apache web server rather than
+any "pure-Python" server that is started as a result of ``paster
+serve``.  See :ref:`modwsgi_tutorial` for details.  However, it is
+usually easier to *develop* an application using a ``paster serve``
+-invoked webserver, as exception and debugging output will be sent to
+the console.
 
 Viewing the Application
 -----------------------
 
 Once your application is running via ``paster serve``, you may visit
 ``http://localhost:6543/`` in your browser.  You will see something in
-your browser like what is displayed below:
+your browser like what is displayed in the following image:
 
 .. image:: project.png
 
-That's the page shown by default when you visit an unmodified ``paster
-create`` -generated ``bfg_starter`` application.
+This is the page shown by default when you visit an unmodified
+``paster create`` -generated ``bfg_starter`` application in a browser.
 
 .. index::
    single: project structure
@@ -482,8 +490,7 @@ The ``use`` setting is required in the ``[app:main]`` section.  The
 ``use`` setting points at a :term:`setuptools` :term:`entry point`
 named ``MyProject#app`` (the ``egg:`` prefix in ``egg:MyProject#app``
 indicates that this is an entry point *URI* specifier, where the
-"scheme" is "egg"; there are no other schemes currently, so the
-``egg:`` prefix is arguably not very useful).
+"scheme" is "egg").
 
 .. sidebar::  ``setuptools`` Entry Points and PasteDeploy ``.ini`` Files
 
@@ -496,19 +503,18 @@ indicates that this is an entry point *URI* specifier, where the
    named ``app`` (the entry point name) which has a value
    ``myproject.run:app``.  The *key* ``app`` is what our
    ``egg:MyProject#app`` value of the ``use`` section in our config
-   file is pointing at.  The value represents a Python "dotted-name"
-   path, which refers to a callable in our ``myproject`` package's
-   ``run.py`` module.
-
-   In English, this entry point can thus be referred to as a "Paste
-   application factory in the ``MyProject`` project which has the
-   entry point named ``app`` where the entry point refers to a ``app``
-   function in the ``mypackage.run`` module".  If indeed if you open
-   up the ``run.py`` module generated within the ``myproject``
-   package, you'll see a ``app`` function.  This is the function
-   called :term:`PasteDeploy` when the ``paster serve`` command is
-   invoked against our application.  It accepts a global configuration
-   object and *returns* an instance of our application.
+   file is pointing at.  The value represents a :term:`dotted Python
+   name` path, which refers to a callable in our ``myproject``
+   package's ``run.py`` module.  In English, this entry point can thus
+   be referred to as a "Paste application factory in the ``MyProject``
+   project which has the entry point named ``app`` where the entry
+   point refers to a ``app`` function in the ``mypackage.run``
+   module".  If indeed if you open up the ``run.py`` module generated
+   within the ``myproject`` package, you'll see a ``app`` function.
+   This is the function called :term:`PasteDeploy` when the ``paster
+   serve`` command is invoked against our application.  It accepts a
+   global configuration object and *returns* an instance of our
+   application.
 
 The ``use`` setting is the only setting required in the ``[app:main]``
 section unless you've changed the callable referred to by the
@@ -534,9 +540,9 @@ application.  See :ref:`environment_chapter` for more information
 about these settings.
 
 The ``[server:main]`` section of the configuration file configures a
-WSGI server which listens on port 6543.  It is configured to listen on
-all interfaces (``0.0.0.0``).  The ``Paste#http`` server will create a
-new thread for each request.
+WSGI server which listens on TCP port 6543.  It is configured to
+listen on all interfaces (``0.0.0.0``).  The ``Paste#http`` server
+will create a new thread for each request.
 
 .. note::
 
@@ -547,7 +553,8 @@ new thread for each request.
 
 See the :term:`PasteDeploy` documentation for more information about
 other types of things you can put into this ``.ini`` file, such as
-other applications, :term:`middleware` and alternate servers.
+other applications, :term:`middleware` and alternate :term:`WSGI`
+server implementations.
 
 .. index::
    single: setup.py
@@ -564,8 +571,8 @@ distributing your application.
 
   ``setup.py`` is the defacto standard which Python developers use to
   distribute their reusable code.  You can read more about
-  ``setup.py`` files and their usage in the :term:`Setuptools`
-  documentation.
+  ``setup.py`` files and their usage in the `Setuptools documentation
+  <http://peak.telecommunity.com/DevCenter/setuptools>`_.
 
 Our generated ``setup.py`` looks like this:
 
@@ -595,14 +602,15 @@ that should point at your application project's URL (if any).
 be found when packaging the application.  ``include_package_data``
 will include non-Python files when the application is packaged if
 those files are checked into version control.  ``zip_safe`` indicates
-that this package is not safe to ship as a zipped egg (it will unpack
-as a directory, which is more convenient).  ``install_requires`` and
-``tests_require`` indicate that this package depends on the
-``repoze.bfg`` package.  ``test_suite`` points at the package for our
-application, which means all tests found in the package will be
-installed.  We examined ``entry_points`` in our discussion of the
-``MyProject.ini`` file; this file defines the ``app`` entry point that
-represents our project's application.
+that this package is not safe to use as a zipped egg; instead it will
+always unpack as a directory, which is more convenient.
+``install_requires`` and ``tests_require`` indicate that this package
+depends on the ``repoze.bfg`` package.  ``test_suite`` points at the
+package for our application, which means all tests found in the
+package will be run when ``setup.py test`` is invoked.  We examined
+``entry_points`` in our discussion of the ``MyProject.ini`` file; this
+file defines the ``app`` entry point that represents our project's
+application.
 
 Usually you only need to think about the contents of the ``setup.py``
 file when distributing your application to other people, or when
@@ -670,7 +678,7 @@ particular way.
 ``configure.zcml``
 ~~~~~~~~~~~~~~~~~~
 
-The ``configure.zcml`` contains configuration statements that inform
+The ``configure.zcml`` contains configuration statements that populate
 the :term:`application registry`. It looks like so:
 
 .. literalinclude:: MyProject/myproject/configure.zcml
@@ -682,13 +690,12 @@ the :term:`application registry`. It looks like so:
    namespace.  Add-on packages may require other namespaces.
 
 #. Line 4 initializes :mod:`repoze.bfg` -specific configuration
-   directives by including the :mod:`repoze.bfg.includes` package.
-   This causes all of the ZCML within the ``configure.zcml`` of the
-   :mod:`repoze.bfg.includes` package (which can be found in the main
-   :mod:`repoze.bfg` sources) to be "included" in this configuration
-   file's scope.  Effectively this means that we can use (for this
-   example) the ``view`` and ``static`` directives which follow later
-   in this file.
+   directives by including the ``repoze.bfg.includes`` package.  This
+   causes all of the ZCML within the ``configure.zcml`` of the
+   ``repoze.bfg.includes`` package to be "included" in this
+   configuration file's scope.  Effectively this means that we can use
+   (for this example) the ``view`` and ``static`` directives which
+   follow later in this file.
 
 #. Lines 6-10 register a "default view" (a view that has no ``name``
    attribute).  It is registered so that it will be found when the
@@ -711,9 +718,9 @@ the :term:`application registry`. It looks like so:
    is a template that will be used to render the result of the view
    callable.  This particular view declaration points at
    ``templates/mytemplate.pt``, which is a *relative* file
-   specification (it's relative to the directory in which the
-   ``configure.zcml`` file lives).  The template file it points at is
-   a :term:`Chameleon` ZPT template file.
+   specification; it's relative to the directory in which the
+   ``configure.zcml`` file lives.  The template file it points at is a
+   :term:`Chameleon` ZPT template file.
 
 #. Lines 12-15 register a static view, which will register a view
    which serves up the files from the ``templates/static`` directory
@@ -729,20 +736,21 @@ the :term:`application registry`. It looks like so:
 ~~~~~~~~~~~~
 
 Much of the heavy lifting in a :mod:`repoze.bfg` application comes in
-the form of *view callables*.  A :term:`view callable` is the bridge
-between the content in the model, and the response given back to a
-browser.
+the form of *view callables*.  A :term:`view callable` is the main
+tool of a :mod:`repoze.bfg` web application developer; it is a bit of
+code which accepts a :term:`request` and which returns a
+:term:`response`.
 
 .. literalinclude:: MyProject/myproject/views.py
    :linenos:
 
-Lines 1-2 provide the ``my_view`` that was registered as the view
-callable.  ``configure.zcml`` said that the default URL for instances
-that are of the class :class:`myproject.models.MyModel` should run
-this :func:`myproject.views.my_view` function.
+This bit of code was registered as the view callable within
+``configure.zcml``.  ``configure.zcml`` said that the default URL for
+instances that are of the class :class:`myproject.models.MyModel`
+should run this :func:`myproject.views.my_view` function.
 
 This view callable function is handed a single piece of information:
-the the :term:`request`.  The *request* is an instance of the
+the :term:`request`.  The *request* is an instance of the
 :term:`WebOb` ``Request`` class representing the browser's request to
 our server.
 
@@ -774,9 +782,10 @@ views, renderers, and templates relate and cooperate.
 ``models.py``
 ~~~~~~~~~~~~~
 
-The ``models.py`` module provides the :term:`model` data for our
-application.  We write a class named ``MyModel`` that provides the
-behavior.  
+The ``models.py`` module provides the :term:`model` data and behavior
+for our application.  Models are objects which store application data
+and provide APIs which mutate and return this data.  We write a class
+named ``MyModel`` that provides the behavior.
 
 .. literalinclude:: MyProject/myproject/models.py
    :linenos:
@@ -804,8 +813,8 @@ so the sample application uses an instance of
 ~~~~~~~~~~
 
 We need a small Python module that configures our application and
-advertises itself to our :term:`PasteDeploy` ``.ini`` file.  This is
-the file named ``run.py``:
+which advertises an entry point for use by our :term:`PasteDeploy`
+``.ini`` file.  This is the file named ``run.py``:
 
 .. literalinclude:: MyProject/myproject/run.py
    :linenos:
@@ -853,10 +862,10 @@ The ``tests.py`` module includes unit tests for your application.
    :linenos:
 
 This sample ``tests.py`` file has a single unit test defined within
-it.  This test is executed when you run ``python setup.py test -q``.
-You may add more tests here as you build your application.  You are
-not required to write tests to use :mod:`repoze.bfg`, this file is
-simply provided as convenience and example.
+it.  This test is executed when you run ``python setup.py test``.  You
+may add more tests here as you build your application.  You are not
+required to write tests to use :mod:`repoze.bfg`, this file is simply
+provided as convenience and example.
 
 See :ref:`unittesting_chapter` for more information about writing
 :mod:`repoze.bfg` unit tests.

@@ -33,6 +33,9 @@ Narrative Documentation
    narr/firstapp
    narr/project
    narr/contextfinding
+   narr/traversal
+   narr/urldispatch
+   narr/hybrid
    narr/views
    narr/static
    narr/webob

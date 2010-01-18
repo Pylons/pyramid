@@ -2,17 +2,9 @@
 
 - Named notfound views.
 
-- Expand/review:
-
-  [ ] View Configuration Parameters
-
-  [ ] View Lookup and Invocation
+- Supply X-Vhm-Host support.
 
 - Review tutorials.
-
-- Review index.
-
-- Review API docs.
 
 - Basic WSGI documentation (pipeline / app / server).
 

@@ -58,7 +58,7 @@ def route_url(route_name, request, *elements, **kw):
     structure will be turned into a query string per the documentation
     of :func:`repoze.bfg.encode.urlencode` function.  After the query
     data is turned into a query string, a leading ``?`` is prepended,
-    and the the resulting string is appended to the generated URL.
+    and the resulting string is appended to the generated URL.
 
     .. note:: Python data structures that are passed as ``_query``
               which are sequences or dictionaries are turned into a
@@ -162,7 +162,7 @@ def model_url(model, request, *elements, **kw):
     structure will be turned into a query string per the documentation
     of ``repoze.url.urlencode`` function.  After the query data is
     turned into a query string, a leading ``?`` is prepended, and the
-    the resulting string is appended to the generated URL.
+    resulting string is appended to the generated URL.
 
     .. note:: Python data structures that are passed as ``query``
               which are sequences or dictionaries are turned into a

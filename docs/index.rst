@@ -44,6 +44,9 @@ Narrative documentation in chapter form explaining how to use
    narr/project
    narr/startup
    narr/contextfinding
+   narr/traversal
+   narr/urldispatch
+   narr/hybrid
    narr/views
    narr/static
    narr/webob

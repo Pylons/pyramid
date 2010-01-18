@@ -9,17 +9,23 @@
 :mod:`repoze.bfg` Introduction
 ==============================
 
-Most of the logic in a web application is completely
-application-specific.  For example, the content of a web page served
-by one web application might be a representation of the contents of an
-accounting ledger, while the content of of a web page served by
-another might be a listing of songs.  These applications probably
-won't serve the same set of customers.  However, both a ledger-serving
-application and a song-serving application might be written using
-:mod:`repoze.bfg` because it is a very general open source Python web
-*framework*.  As a framework, the primary job of :mod:`repoze.bfg` is
-to make it easier for a developer to create arbitrary web
-applications.
+If they are judged only by differences in user interface, most web
+applications seem to have very little in common with each other. For
+example, a web page served by one web application might be a
+representation of the contents of an accounting ledger, while a web
+page served by another application might be a listing of songs.  These
+applications probably won't serve the same set of customers.  However,
+although they're not very similar on the surface, both a
+ledger-serving application and a song-serving application could be
+successfully be written using :mod:`repoze.bfg`.
+
+:mod:`repoze.bfg` is a very general open source Python web
+*framework*.  As a framework, its primary job is to make it easier for
+a developer to create an arbitrary web application.  The type of
+application being created isn't really important; it could be a
+spreadsheet, a corporate intranet, or an "oh-so-Web-2.0" social
+networking platform.  :mod:`repoze.bfg` is general enough that it can
+be used in a wide variety of circumstances.
 
 .. sidebar:: Frameworks vs. Libraries
 
@@ -75,9 +81,8 @@ Speed
   need, the less pain you'll have.
 
 Familiarity
-  As web developers, we've become accustomed to working in very
-  particular ways over the years.  This framework is a canonization of
-  practices that "fit our brains".
+  The :mod:`repoze.bfg` framework is a canonization of practices that
+  "fit the brains" of its authors.
 
 Trustability
   :mod:`repoze.bfg` is developed conservatively and tested
@@ -96,7 +101,7 @@ This book usually refers to the framework by its full package name,
 .. index::
    single: Repoze
    single: Agendaless Consulting
-   pair: repoze; namespace package
+   single: repoze namespace package
 
 What Is Repoze?
 ---------------
@@ -130,13 +135,15 @@ and can be used separately.
 concepts and features from each, combining them into a unique web
 framework.
 
-Features such as :term:`traversal` and easy extensibility trace their
-origins back to :term:`Zope`.  Like Zope applications,
-:mod:`repoze.bfg` applications can be easily extended.  If you obey
-certain constraints, the application you produce can be reused,
-modified, re-integrated, or extended by third-party developers without
-modification to the original application itself: no fork of the
-application is required.
+Many features of :mod:`repoze.bfg` trace their origins back to
+:term:`Zope`.  Like Zope applications, :mod:`repoze.bfg` applications
+can be configured via a set of declarative configuration files.  Like
+Zope applications, :mod:`repoze.bfg` applications can be easily
+extended: if you obey certain constraints, the application you produce
+can be reused, modified, re-integrated, or extended by third-party
+developers without forking the original application.  The concepts of
+:term:`traversal` and declarative security in :mod:`repoze.bfg` were
+pioneered first in Zope.
 
 The :mod:`repoze.bfg` concept of :term:`URL dispatch` is inspired by
 the :term:`Routes` system used by :term:`Pylons`.  Like Pylons,
@@ -147,24 +154,10 @@ mechanism to map URLs to :term:`view` code, along with a set of
 conventions for calling those views.  You are free to use third-party
 components that fit your needs in your applications.
 
-Insofar as the term `model-view-controller
-<http://en.wikipedia.org/wiki/Model–view–controller>`_ has been
-claimed to represent a class of web frameworks, :mod:`repoze.bfg`
-generally fits into this class.  The concepts of :term:`view` and
-:term:`model` are used by :mod:`repoze.bfg` as they would be by
-Django.
-
-.. sidebar:: You Say BFG is MVC, But Where's The Controller?
-
-   The :mod:`repoze.bfg` authors believe that the MVC pattern just
-   doesn't really fit the web very well. In a :mod:`repoze.bfg`
-   application, there are models, which store data, and views, which
-   present the data stored in models.  However, no facility provided
-   by the framework actually maps to the concept of a "controller".
-   So :mod:`repoze.bfg` is actually an "MV" framework rather than an
-   "MVC" framework.  "MVC", however, is close enough as a general
-   classification moniker for purposes of comparison with other web
-   frameworks.
+The concepts of :term:`view` and :term:`model` are used by
+:mod:`repoze.bfg` mostly as they would be by Django.
+:mod:`repoze.bfg` has a documentation culture more like Django's than
+like Zope's.
 
 Like :term:`Pylons`, but unlike :term:`Zope`, a :mod:`repoze.bfg`
 application developer may use completely imperative code to perform
@@ -185,4 +178,22 @@ on the ZODB software.  Likewise, :term:`Django` tends to assume that
 you want to store your application's data in a relational database.
 :mod:`repoze.bfg` makes no such assumption; it allows you to use a
 relational database but doesn't encourage or discourage the decision.
+
+Other Python web frameworks advertise themselves as members of a class
+of web frameworks named `model-view-controller
+<http://en.wikipedia.org/wiki/Model–view–controller>`_ frameworks.
+Insofar as this term has been claimed to represent a class of web
+frameworks, :mod:`repoze.bfg` also generally fits into this class.
+
+.. sidebar:: You Say BFG is MVC, But Where's The Controller?
+
+   The :mod:`repoze.bfg` authors believe that the MVC pattern just
+   doesn't really fit the web very well. In a :mod:`repoze.bfg`
+   application, there are models, which store data, and views, which
+   present the data stored in models.  However, no facility provided
+   by the framework actually maps to the concept of a "controller".
+   So :mod:`repoze.bfg` is actually an "MV" framework rather than an
+   "MVC" framework.  "MVC", however, is close enough as a general
+   classification moniker for purposes of comparison with other web
+   frameworks.
 

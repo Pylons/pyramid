@@ -49,7 +49,7 @@ mutating that data.
    different to avoid confusion.
 
 .. index::
-   pair: model; constructor
+   single: model constructor
 
 Defining a Model Constructor
 ----------------------------
@@ -75,7 +75,7 @@ callable, and which returns a model instance.  In the above example,
 the ``BlogEntry`` class can be "called", returning a model instance.
 
 .. index::
-   pair: model; interfaces
+   single: model interfaces
 
 .. _models_which_implement_interfaces:
 
@@ -297,7 +297,8 @@ and so on.
    slash or empty tuple element).
 
 .. index::
-   pair: model; API functions
+   single: model API functions
+   single: url generation (traversal)
 
 :mod:`repoze.bfg` API Functions That Act Against Models
 -------------------------------------------------------
@@ -308,7 +309,7 @@ more information about how a model instance becomes the context.
 
 The APIs provided by :ref:`traversal_module` are used against model
 instances.  These functions can be used to find the "path" of a model,
-find the URL of a model, the root model in an object graph, and so on.
+the root model in an object graph, or generate a URL to a model.
 
 The APIs provided by :ref:`location_module` are used against model
 instances.  These can be used to walk down an object graph, or

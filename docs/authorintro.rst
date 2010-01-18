@@ -10,6 +10,9 @@ the book content, I'll provide some context regarding the genesis of
 I hope you enjoy both this book and the software it documents.  I've
 had a blast writing both.
 
+.. index::
+   single: book audience
+
 Audience
 ========
 
@@ -86,6 +89,7 @@ This book is divided into four major parts:
    single: repoze.zope2
    single: Zope 3
    single: Zope 2
+   single: repoze.bfg genesis
 
 The Genesis of :mod:`repoze.bfg`
 ================================
@@ -134,6 +138,22 @@ none.  It combines all the "good parts" from other web frameworks into
 a cohesive whole that is reliable, down-to-earth, flexible, speedy,
 and well-documented.
 
+.. index::
+   single: Bicking, Ian
+   single: Everitt, Paul
+   single: Seaver, Tres
+   single: Sawyers, Andrew
+   single: Borch, Malthe
+   single: de la Guardia, Carlos
+   single: Brandl, Georg
+   single: Oram, Simon
+   single: Hardwick, Nat
+   single: Fulton, Jim
+   single: Moroz, Tom
+   single: Koym, Todd
+   single: van Rossum, Guido
+   single: Peters, Tim
+
 Thanks
 ======
 
@@ -145,9 +165,10 @@ Thanks to the following people for providing expertise, resources, and
 software.  Without the help of these folks, neither this book nor the
 software which it details would exist: Paul Everitt, Tres Seaver,
 Andrew Sawyers, Malthe Borch, Carlos de la Guardia, Georg Brandl,
-Simon Oram of Electrosoup, Ian Bicking of the Open Planning Project,
-Jim Fulton of Zope Corporation, Tom Moroz of the Open Society
-Institute, and Todd Koym of Environmental Health Sciences.
+Simon Oram and Nat Hardwick of Electrosoup, Ian Bicking of the Open
+Planning Project, Jim Fulton of Zope Corporation, Tom Moroz of the
+Open Society Institute, and Todd Koym of Environmental Health
+Sciences.
 
 Thanks to Guido van Rossum and Tim Peters for Python.
 

@@ -131,7 +131,7 @@ def model_path(model, *elements):
               attempt to append it to a string and it will cause a
               :exc:`TypeError`.
 
-    .. note:: The the :term:`root` model *must* have a ``__name__``
+    .. note:: The :term:`root` model *must* have a ``__name__``
               attribute with a value of either ``None`` or the empty
               string for paths to be generated properly.  If the root
               model has a non-null ``__name__`` attribute, its name
@@ -288,7 +288,7 @@ def model_path_tuple(model, *elements):
     ``model`` object based on its position in an object graph, e.g
     ``('', 'foo', 'bar')``.  Any positional arguments passed in as
     ``elements`` will be appended as elements in the tuple
-    representing the the model path.  For instance, if the model's
+    representing the model path.  For instance, if the model's
     path is ``('', 'foo', 'bar')`` and elements equals ``('a', 'b')``,
     the returned tuple will be ``('', 'foo', 'bar', 'a', b')``.  The
     first element of this tuple will always be the empty string (a
@@ -312,7 +312,7 @@ def model_path_tuple(model, *elements):
               dictionary will be placed in the path tuple; no warning
               or error will be given.
 
-    .. note:: The the :term:`root` model *must* have a ``__name__``
+    .. note:: The :term:`root` model *must* have a ``__name__``
               attribute with a value of either ``None`` or the empty
               string for path tuples to be generated properly.  If
               the root model has a non-null ``__name__`` attribute,

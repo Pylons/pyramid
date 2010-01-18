@@ -7,11 +7,11 @@
    single: debug_notfound
    single: debug_all
    single: reload_all
-   pair: debug; settings
-   pair: reload; settings
-   pair: environment; variables
-   pair: ini file; settings
-   pair: PasteDeploy; settings
+   single: debug settings
+   single: reload settings
+   single: environment variables
+   single: ini file settings
+   single: PasteDeploy settings
   
 .. _environment_chapter:
 
@@ -167,7 +167,8 @@ effect settings that do not start with ``reload_*`` such as
 ``debug_notfound``.
 
 .. index:: 
-   pair: reload_templates; reload_resources
+   single: reload_templates
+   single: reload_resources
 
 Understanding the Distinction Between ``reload_templates`` and ``reload_resources``
 -----------------------------------------------------------------------------------

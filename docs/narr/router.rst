@@ -1,6 +1,7 @@
 .. index::
    single: request processing
    single: request
+   single: router
 
 .. _router_chapter:
 

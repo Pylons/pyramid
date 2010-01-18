@@ -3,14 +3,15 @@
 Combining Traversal and URL Dispatch
 ====================================
 
-:mod:`repoze.bfg` makes an honest attempt to unify the (largely
-incompatible) concepts of :term:`traversal` and :term:`url dispatch`.
+:mod:`repoze.bfg` makes an honest attempt to unify the largely
+incompatible concepts of :term:`traversal` and :term:`url dispatch`.
 
-When you write *most* :mod:`repoze.bfg` applications, you'll be using
-either one or the other concept, but not both, to resolve URLs to
-:term:`view` callables.  However, to solve some problems, it's useful
-to use both traversal *and* URL dispatch within the same application.
-:mod:`repoze.bfg` makes this possible via *hybrid* applications.
+When you write most :mod:`repoze.bfg` applications, you'll be using
+either one or the other subsystem, but not both, to perform
+:term:`context finding`.  However, to solve specific problems, it's
+useful to use *both* traversal *and* URL dispatch within the same
+application.  :mod:`repoze.bfg` makes this possible via *hybrid*
+applications.
 
 .. warning::
 
@@ -106,9 +107,9 @@ this:
 "Under the hood", the above view statements register a view using the
 following context/request/name :term:`triad`:
 
-- The :term:`context` interface ``None``
+- the :term:`context` interface ``None``
 
-- the the :class:`repoze.bfg.interfaces.IRequest` :term:`request type`
+- the :class:`repoze.bfg.interfaces.IRequest` :term:`request type`
   interface
 
 - a :term:`view name` matching the ``name=`` argument.
@@ -123,29 +124,10 @@ The ``.views.foobar`` view callable above will be called when the URL
 Hybrid Applications
 -------------------
 
-We've seen that *either* traversal or url dispatch can be used to
-create a :mod:`repoze.bfg` application.  However, it is possible to
-combine the competing concepts of traversal and url dispatch to
-resolve URLs to code within the same application.
-
-Understanding how hybrid mode works requires a little "inside
-baseball" knowledge of how :mod:`repoze.bfg` works.  No matter whether
-:term:`traversal` or :term:`URL dispatch` is used, :mod:`repoze.bfg`
-uses the :term:`Zope Component Architecture` under the hood to
-dispatch a request to a :term:`view callable`.  In Zope Component
-Architecture-speak, a view callable is a "multi adapter" registered
-for a :term:`context` type and a :term:`request` type as well as a
-particular :term:`view name`, also known as a :term:`triad`.  When a
-request is generated and a :term:`router` performs its logic, it
-locates these three values.  These three values are fed to the
-:term:`application registry` as a query to find "the best" view
-callable.
-
-.. note:: To understand this process more deeply, it may be useful to
-   read :ref:`router_chapter`.
-
-A hybrid-mode application is one which performs :term:`traversal`
-*after* a :term:`route` has already matched.
+Clearl *either* traversal or url dispatch can be used to create a
+:mod:`repoze.bfg` application.  However, it is possible to combine the
+competing concepts of traversal and url dispatch to resolve URLs to
+code within the same application.
 
 To "turn on" hybrid mode, use a :term:`route configuration` that
 includes a ``path`` argument that contains a special dynamic part:
@@ -191,32 +173,28 @@ factory looks like so:
        return root
 
 We've defined a bogus graph here that can be traversed, and a
-root_factory method that returns the root of the graph.  Because the
-Traversable object we've defined has a ``__getitem__`` method that
-does something nominally useful, using traversal against the root
-implied by a route statement becomes a not-completely-insane thing to
-do.  So for this route:
+``root_factory`` method that returns the root of the graph that we can
+pass to our :class:`repoze.bfg.configuration.Configurator`.
 
-.. code-block:: xml
+Because the ``Traversable`` object we've defined has a ``__getitem__``
+method that does something nominally useful, using traversal against
+the root implied by a route statement becomes a not-completely-insane
+thing to do.
 
-   <route
-     path=":foo/:bar/*traverse"
-     name="home"
-     view=".views.home"
-     />
+Under the circumstance implied by ``:foo/:bar/*traverse``, traversal
+is performed *after* the route matches.  If the root factory returns a
+traversable object, the "capture value" implied by the ``*traverse``
+element in the path pattern will be used to traverse the graph,
+starting from the root object returned from the root factory.
 
-Under this circumstance, traversal is performed *after* the route
-matches.  If the root factory returns a traversable object, the
-"capture value" implied by the ``*traverse`` element in the path
-pattern will be used to traverse the graph.  For example, if the URL
-requested by a user was ``http://example.com/one/two/a/b/c``, and the
-above route was matched (some other route might match before this one
-does), the traversal path used against the root would be ``a/b/c``.
-:mod:`repoze.bfg` will attempt to traverse a graph through the edges
-``a``, ``b``, and ``c``.  In our above example, that would imply that
-the *context* of the view would be the ``Traversable`` object we've
-named ``c`` in our bogus graph, using the ``.views.home`` view as the
-view callable.
+For example, if the URL requested by a user was
+``http://example.com/one/two/a/b/c``, and the above route was matched
+(some other route might match before this one does), the traversal
+path used against the root would be ``a/b/c``.  :mod:`repoze.bfg` will
+attempt to traverse a graph through the edges ``a``, ``b``, and ``c``.
+In our above example, that would imply that the *context* of the view
+would be the ``Traversable`` object we've named ``c`` in our bogus
+graph, using the ``.views.home`` view as the view callable.
 
 We can also define extra views that match a route:
 
@@ -248,24 +226,26 @@ view callable will be called instead of the *default* view callable
 (the one implied by the route with the name ``home``).
 
 .. index::
-   pair: subpath; route
+   single: route subpath
+   single: subpath (route)
 
 .. _star_subpath:
 
 Using ``*subpath`` in a Route Path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are certain (extremely rare) cases when you'd like to influence
+There are certain extremely rare cases when you'd like to influence
 the traversal :term:`subpath` when a route matches without actually
 performing traversal.  For instance, the
 :func:`repoze.bfg.wsgi.wsgiapp2` decorator and the
 :class:`repoze.bfg.view.static` helper attempt to compute
 ``PATH_INFO`` from the request's subpath, so it's useful to be able to
-influence this value.  When ``*subpath`` exists in a path pattern, no
-path is actually traversed, but the traversal algorithm will return a
-:term:`subpath` list implied by the capture value of ``*subpath``.
-You'll see this pattern most commonly in route declarations that look
-like this:
+influence this value.
+
+When ``*subpath`` exists in a path pattern, no path is actually
+traversed, but the traversal algorithm will return a :term:`subpath`
+list implied by the capture value of ``*subpath``.  You'll see this
+pattern most commonly in route declarations that look like this:
 
 .. code-block:: xml
 
@@ -283,12 +263,12 @@ Corner Cases
 ------------
 
 A number of corner case "gotchas" exist when using a hybrid
-application.  Let's see what they are.
+application.  We'll detail them here.
 
 .. _globalviews_corner_case:
 
-"Global" Views Match Any Route When A More Specific View Doesn't
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"Global" View Configurations May Match When A Route-Specific View Configuration Doesn't
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that views that don't mention a ``route_name`` will *also* match
 when *any* route matches.  For example, the "bazbuz" view below will
@@ -338,59 +318,56 @@ to be "bazbuz", the ``.views.bazbuz2`` view will be used.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This corner case is only interesting if you are using a hybrid
-application and you believe the "wrong" view is being called for a
-given request.
+application and you believe the wrong view callable is being found for
+a given request.
 
-A view is registered for a ``route`` either as its default view via
-the ``view=`` attribute of a ``route`` declaration in ZCML, via a
-standalone ``<view>`` declaration, or via the ``@bfg_route`` decorator
-which has a ``route_name`` that matches the route's name.  At startup
-time, when such a registration is encountered, the view is registered
-for the ``context`` type ``None`` (meaning *any* context) and a
-*special* request type which is dynamically generated.  This request
-type also derives from a "base" request type, which is what allows it
-to match against views defined without a route name (see
-:ref:`globalviews_corner_case`).
+A view is registered for a route either via :term:`route
+configuration` by passing a ``view`` argument, or via :term:`view
+configuration` by passing a ``route_name`` that matches the route's
+name.
 
-When a request URL matches a ``<route>`` path, the special request
-type interface mentioned in the previous paragraph is attached to the
-``request`` object as it is created.  The *root* found by the router
-is based on either the route's ``factory`` (or the default root
-factory if no ``factory`` is mentioned in the ``<route>``
-declaration).  This root is eventually resolved to a ``context`` via
+At startup time, when such a registration is encountered, the view is
+registered for the ``context`` type ``None`` -- meaning *any* context
+-- and a *special* request type which is dynamically generated.  This
+request type also derives from a "base" request type, which is what
+allows it to match against views defined without a route name as per
+see :ref:`globalviews_corner_case`.
+
+When a request URL matches a route configuration path, the special
+request type interface mentioned in the previous paragraph is attached
+to the ``request`` object as it is created.  The *root* found by the
+router is based on either the route's ``factory`` or the default root
+factory if no ``factory`` is mentioned in the route configuration.
+This root is eventually resolved to a ``context`` via
 :term:`traversal`.  This ``context`` will either have some particular
-interface, or it won't, depending on the result of traversal.
+:term:`interface`, or it won't, depending on the result of traversal.
 
-Given how view dispatch works, since the registration made "under the
-hood" for views that match a route use the (very weakly binding)
-``None`` value as the context value's interface, if the context that
-is found has a specific interface, and a global view statement is
-registered against this interface as its context interface, it's
-likely that the *global* view will match *before* the view that is
-attached to the route unless the ``view_context`` attribute is used on
-the ``route`` registration to match the "correct" interface first
-(because then both the request type and the context type are "more
-specific" for the view registration).
+The view configuration registration made "under the hood" for view
+callables that match a route use the very weakly binding ``None``
+value as the context value's interface.  Given how :term:`view lookup`
+works, if the context that is found has a specific interface, and a
+global view configuration statement is registered using this interface
+as its ``context``, it's likely that the *global* view calable will
+match *before* the view callable that is attached to the route.  This
+behavior can be subverted if the ``view_context`` attribute is used on
+the route registration, because then both the request type and the
+context type can be made "more specific" for the view registration
+related to the route.
 
-What it all boils down to is: if a request that matches a route
+What it all boils down to is this: if a request that matches a route
 resolves to a view you don't expect it to, use the ``view_context``
-attribute of the ``route`` statement (*or* the ``context`` attribute
-of the ZCML statement that also has a ``route_name`` *or* the
-equivalent ``context`` parameter to the
-:class:`repoze.bfg.view.bfg_view` decorator that also has a
-``route_name`` parameter) to name the specific context interface you
-want the route-related view to match.
+attribute of route configuration *or* the ``context`` attribute of
+:term:`view configuration` which names a ``route_name`` to name the
+specific context interface you want the route-related view to match.
 
-Yes, that was as painful for me to write as it was for you to read.
-
-Registering a Default View for a Route That has a ``view`` attribute
+Registering a Default View for a Route That Has a ``view`` Attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is an error to provide *both* a ``view`` attribute on a ZCML
-``<route>`` declaration *and* a ZCML ``<view>`` declaration that
-serves as a "default view" (a view with no ``name`` attribute or the
-empty ``name`` attribute).  For example, this pair of route/view
-statements will generate a "conflict" error at startup time.
+It is an error to provide *both* a ``view`` argument to a :term:`route
+configuration` *and* a :term:`view configuration` which names a
+``route_name`` that has no ``name`` value or the empty ``name`` value.
+For example, this pair of route/view ZCML declarations will generate a
+"conflict" error at startup time.
 
 .. code-block:: xml
 
@@ -422,7 +399,6 @@ Can also be spelled like so:
 
 .. code-block:: xml
 
-
    <route
      path=":foo/:bar/*traverse"
      name="home"
@@ -433,10 +409,11 @@ Can also be spelled like so:
      view=".views.home"
      />
 
-The two spellings are logically equivalent.  
+The two spellings are logically equivalent.  In fact, the former is
+just a syntactical shortcut for the latter.
 
-Binding Extra Views Against a  ``<route>`` Statement that Doesn't Have a ``*traverse`` Element In Its Path
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Binding Extra Views Against a Route Configuration that Doesn't Have a ``*traverse`` Element In Its Path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here's another corner case that just makes no sense.
 

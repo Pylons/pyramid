@@ -10,7 +10,7 @@ The behavior of a :mod:`repoze.bfg` application that obeys certain
 constraints can be *overridden* or *extended* without modification.
 
 .. index::
-   triple: building; extensible; application
+   single: extensible application
 
 Rules for Building An Extensible Application
 --------------------------------------------
@@ -44,7 +44,7 @@ repoze bfg using the :term:`pkg_resources` API such as static files
 and templates.
 
 .. index::
-   pair: ZCML; granularity
+   single: ZCML granularity
 
 ZCML Granularity
 ~~~~~~~~~~~~~~~~
@@ -76,7 +76,7 @@ own package, if necessary.  However, doing so is considerate, and
 allows for the best reusability.
 
 .. index::
-   pair: extending existing; application
+   single: extending an existing application
 
 Extending an Existing Application
 ---------------------------------
@@ -237,7 +237,7 @@ such ``<resource>`` declarations to your override package's
 ``configure.zcml`` to perform overrides.
 
 .. index::
-   pair: ZCML; inclusion
+   single: ZCML inclusion
 
 Dealing With ZCML Inclusions
 ----------------------------

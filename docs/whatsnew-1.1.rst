@@ -783,8 +783,8 @@ Deprecations and Behavior Differences
 - The import of ``repoze.bfg.security.Unauthorized`` is deprecated in
   favor of ``repoze.bfg.exceptions.Forbidden``.  The old location
   still functions but emits a deprecation warning.  The rename from
-  ``Unauthorized`` to ``Forbidden`` brings parity to the the name of
-  the exception and the system view it invokes when raised.
+  ``Unauthorized`` to ``Forbidden`` brings parity to the name of the
+  exception and the system view it invokes when raised.
 
 - Custom ZCML directives which register an authentication or
   authorization policy (ala "authtktauthenticationpolicy" or

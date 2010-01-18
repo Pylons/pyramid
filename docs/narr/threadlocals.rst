@@ -1,5 +1,5 @@
 .. index::
-   single: thread local variables
+   single: thread locals
    single: get_current_request
    single: get_current_registry
 
@@ -132,9 +132,9 @@ follows:
   ever be called within application-specific forks of third-party
   library code.  The library you've forked almost certainly has
   nothing to do with :mod:`repoze.bfg`, and making it dependent on
-  repoze.bfg (rather than making your :mod:`repoze.bfg` application
-  depend upon it) means you're forming a dependency in the wrong
-  direction.
+  :mod:`repoze.bfg` (rather than making your :mod:`repoze.bfg`
+  application depend upon it) means you're forming a dependency in the
+  wrong direction.
 
 Use of the :func:`repoze.bfg.threadlocal.get_current_request` function
 in application code *is* still useful in very limited circumstances.

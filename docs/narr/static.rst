@@ -80,7 +80,8 @@ directive.  Use of the ``add_static_view`` imperative configuration
 method is completely equivalent to using ZCML for the same purpose.
 
 .. index::
-   triple: generating; static resource; urls
+   single: generating static resource urls
+   single: static resource urls
 
 .. _generating_static_resource_urls:
 
@@ -151,7 +152,7 @@ URLs will continue to resolve properly after the rename.
    :mod:`repoze.bfg` 1.1.
 
 .. index::
-   pair: view; static resource
+   single: static resource view
 
 Advanced: Serving Static Resources Using a View Callable
 --------------------------------------------------------

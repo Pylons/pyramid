@@ -76,7 +76,7 @@ the combination of the :term:`view name` and the :term:`context`.
 Traversal is the act of obtaining these two items.
 
 .. index::
-   pair: traversal; high-level overview
+   single: traversal overview
 
 A High-Level Overview of Traversal
 ----------------------------------
@@ -87,7 +87,7 @@ the ``PATH_INFO`` portion of the :term:`WSGI` environment.  The
 ``PATH_INFO`` portion of the WSGI environment is the portion of a
 request's URL following the hostname and port number, but before any
 query string elements or fragment element.  For example the
-``PATH_INFO`` portion of the the URL
+``PATH_INFO`` portion of the URL
 ``http://example.com:8080/a/b/c?foo=1`` is ``/a/b/c``.
 
 Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of
@@ -243,10 +243,11 @@ Each container node is presumed to be willing to return a child node
 or raise a ``KeyError`` based on a name passed to its ``__getitem__``.
 
 No leaf-level instance is required to have a ``__getitem__``.  If
-leaf-level instances happen to have a ``__getitem__`` (through some
-historical inequity), you should subclass these node types and cause
-their ``__getitem__`` methods to simply raise a ``KeyError``.  Or just
-disuse them and think up another strategy.
+instances that you'd like to be leaves already happen to have a
+``__getitem__`` through some historical inequity, you should subclass
+these node types and cause their ``__getitem__`` methods to simply
+raise a ``KeyError``.  Or just disuse them and think up another
+strategy.
 
 Usually, the traversal root is a *container* node, and as such it
 contains other nodes.  However, it doesn't *need* to be a container.
@@ -263,6 +264,7 @@ until all path segments are exhausted.
 
 .. index::
    single: traversal algorithm
+   single: view lookup
 
 .. _traversal_algorithm:
 
@@ -285,10 +287,14 @@ sections to give you an idea of how traversal and view lookup
 cooperate, because they are almost always used together.
 
 .. index::
-   pair: traversal; algorithm
+   single: view name
+   single: context
+   single: subpath
+   single: root factory
+   single: default view
 
-A Descrption of The Traversal Algorithm
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A Description of The Traversal Algorithm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When a user requests a page from your :mod:`traversal` -powered
 application, the system uses this algorithm to find a :term:`context`
@@ -344,7 +350,7 @@ and a :term:`view name`.
     should be treated as a :term:`view name`).
 
 #.  When traversal ends for any of the reasons in the previous step,
-    the the last object found during traversal is deemed to be the
+    the last object found during traversal is deemed to be the
     :term:`context`.  If the path has been exhausted when traversal
     ends, the :term:`view name` is deemed to be the empty string
     (``''``).  However, if the path was *not* exhausted before
@@ -386,7 +392,7 @@ about it in this chapter.
 .. image:: modelgraphtraverser.png
 
 .. index::
-   pair: traversal; examples
+   single: traversal examples
 
 Traversal Algorithm Examples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -509,10 +515,12 @@ expected to return a response.
    :ref:`request_and_context_view_definitions`.  But you don't need to
    if you don't want to.  In view callables that accept only a
    request, the :term:`context` found by traversal is available as the
-   ``context`` attribute of the request object.  The :term:`view name`
-   is available as the ``view_name`` attribute of the request object.
-   Other :mod:`repoze.bfg` -speficic request attributes are also
-   available as described in :ref:`special_request_attributes`.
+   ``context`` attribute of the request object,
+   e.g. ``request.context``.  The :term:`view name` is available as
+   the ``view_name`` attribute of the request object,
+   e.g. ``request.view_name``.  Other :mod:`repoze.bfg` -speficic
+   request attributes are also available as described in
+   :ref:`special_request_attributes`.
 
 References
 ----------

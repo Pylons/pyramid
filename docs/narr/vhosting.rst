@@ -1,3 +1,6 @@
+.. index::
+   single: virtual hosting
+
 .. _vhosting_chapter:
 
 Virtual Hosting
@@ -10,9 +13,6 @@ URL space that it does not "naturally" inhabit.
 :mod:`repoze.bfg` provides facilities for serving an application under
 a URL "prefix", as well as serving a *portion* of a :term:`traversal`
 based application under a root URL.
-
-.. index::
-   pair: virtual hosting; URL prefix
 
 Hosting an Application Under a URL Prefix
 -----------------------------------------
@@ -75,7 +75,7 @@ In the above configuration, we root a :mod:`repoze.bfg` application at
 ``/bfgapp`` within the Apache configuration.
 
 .. index::
-   pair: virtual hosting; virtual root
+   single: virtual root
 
 Virtual Root Support
 --------------------

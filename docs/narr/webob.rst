@@ -1,5 +1,5 @@
 .. index::
-   pair:  ian; bicking
+   single: Bicking, Ian
    single: WebOb
 
 .. _webob_chapter:
@@ -45,7 +45,7 @@ creating requests.
 
 .. index::
    single: request object
-   single: request attributes; standard
+   single: request attributes
 
 Request
 ~~~~~~~
@@ -107,7 +107,7 @@ instance, ``req.if_modified_since`` returns a `datetime
 <http://pythonpaste.org/webob/class-webob.Request.html>`_.
 
 .. index::
-   pair: request attributes; special
+   single: request attributes (special)
 
 .. _special_request_attributes:
 
@@ -119,35 +119,30 @@ In addition to the standard :term:`WebOb` attributes,
 request.
 
 ``req.subpath``
-
   The traversal :term:`subpath` will be available as the ``subpath``
   attribute of the :term:`request` object.  It will be a sequence
   containing zero or more elements (which will be Unicode objects).
   See :ref:`traversal_chapter` for information about the subpath.
 
 ``req.view_name``
-
   The :term:`view name` will be available as the ``view_name``
   attribute of the :term:`request` object.  It will be a single string
   (possibly the empty string if we're rendering a default view).
   See :ref:`traversal_chapter` for information about view names.
 
 ``req.root``
-
   The :term:`root` object will be available as the ``root`` attribute
   of the :term:`request` object.  It will be the model object at which
   traversal started (the root).  See :ref:`traversal_chapter` for
   information about root objects.
 
 ``req.context``
-
   The :term:`context` will be available as the ``context`` attribute
   of the :term:`request` object.  It will be the context object
   implied by the current request.  See :ref:`traversal_chapter` for
   information about context objects.
 
 ``req.traversed``
-
   The "traversal path" will be as the ``traversed`` attribute of the
   :term:`request` object.  It will be a sequence representing the
   ordered set of names that were used to traverse to the
@@ -157,14 +152,12 @@ request.
   for more information.
 
 ``req.virtual_root``
-
   The :term:`virtual root` will be available as the ``virtual_root``
   attribute of the :term:`request` object.  It will be the virtual
   root object implied by the current request.  See
   :ref:`vhosting_chapter` for more information about virtual roots.
 
 ``req.virtual_root_path``
-
   The :term:`virtual root` *path* will be available as the
   ``virtual_root_path`` attribute of the :term:`request` object.  It
   will be a sequence representing the ordered set of names that were
@@ -172,7 +165,7 @@ request.
   :ref:`vhosting_chapter` for more information about virtual roots.
 
 .. index::
-   pair: request; URLs
+   single: request URLs
 
 URLs
 ++++
@@ -198,7 +191,7 @@ of the request.  I'll show various values for an example URL
     is True, then resolves it relative to ``req.application_url``.
 
 .. index::
-   pair: request; methods
+   single: request methods
 
 Methods
 +++++++
@@ -221,7 +214,8 @@ only a few you'll use often:
     subrequests or testing.
 
 .. index::
-   pair: request; unicode
+   single: request (and unicode)
+   single: unicode (and the request)
 
 Unicode
 +++++++
@@ -312,7 +306,7 @@ Here's the highlights:
     attribute later).  It can also do HEAD and Range requests.
 
 .. index::
-   pair: response; headers
+   single: response headers
 
 Headers
 +++++++
@@ -325,7 +319,7 @@ The details are available in the `extracted Response documentation
 <http://pythonpaste.org/webob/class-webob.Response.html>`_.
 
 .. index::
-   pair: response; creating
+   single: response (creating)
 
 Instantiating the Response
 ++++++++++++++++++++++++++
@@ -345,7 +339,7 @@ default to anything, though if you subclass ``Response`` and set
 ``default_content_type`` you can override this behavior.
 
 .. index::
-   pair: response; exceptions
+   single: response exceptions
 
 Exceptions
 ++++++++++
@@ -392,7 +386,7 @@ attributes like ``content_type``, ``charset``, etc. on these exception
 objects.
 
 .. index::
-   pair: WebOb; multidict
+   single: multidict (WebOb)
 
 Multidict
 ~~~~~~~~~

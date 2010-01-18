@@ -1,5 +1,5 @@
-Next release
-============
+1.2b1 (2010-01-17)
+==================
 
 Bug Fixes
 ---------
@@ -10,6 +10,12 @@ Bug Fixes
   a ``__del__`` method of a ``Cleanup`` class added to the WSFI
   environment.  The ``__del__`` strategy was fragile and caused
   problems in the wild.  Thanks to Daniel Holth for testing.
+
+Features
+--------
+
+- Read logging configuration from PasteDeploy config file ``loggers``
+  section (and related) when ``paster bfgshell`` is invoked.
 
 Documentation
 -------------

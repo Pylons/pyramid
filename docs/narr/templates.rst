@@ -111,7 +111,9 @@ For example, here's an example of using `Mako
    :term:`renderer`.  However, it's reasonably easy to write custom
    templating system binding packages for use under :mod:`repoze.bfg`
    so that templates written in the language can be used as renderers.
-   See :ref:`available_template_system_bindings` for example packages.
+   See :ref:`adding_and_overriding_renderers` for instructions on how
+   to create your own template renderer and
+   :ref:`available_template_system_bindings` for example packages.
 
 If you need more control over the status code and content-type, or
 other response attributes from views that use direct templating, you
@@ -148,7 +150,8 @@ Here's an example of manufacturing a response object using the result of
 
 .. index::
    single: templates used as renderers
-   pair: renderers; template
+   single: template renderers
+   single: renderer (template)
 
 .. _templates_used_as_renderers:
 
@@ -205,7 +208,7 @@ renderer configuration can be done imperatively and via :term:`ZCML`.
 See :ref:`views_which_use_a_renderer`.  See also
 :ref:`built_in_renderers`.
 
-Not just any template from any arbitrary templating systemmay be used
+Not just any template from any arbitrary templating system may be used
 as a renderer.  Bindings must exist specifically for :mod:`repoze.bfg`
 to use a templating language template as a renderer.  Currently,
 :mod:`repoze.bfg` has built-in support for two Chameleon templating
@@ -226,14 +229,12 @@ of :term:`Jinja2` templates as renderers.  See
    out of the response body (often HTML).  View callables which use
    renderers typically return a dictionary, and making assertions
    about the information is almost always more direct than needing to
-   parse HTML.
-
-   Specifying a renderer from within :term:`ZCML` (as opposed to
-   imperatively or via a ``bfg_view`` decorator, or using a template
-   directly from within a view callable) also makes it possible for
-   someone to modify the template used to render a view without
-   needing to fork your code to do so.  See :ref:`extending_chapter`
-   for more information.
+   parse HTML.  Specifying a renderer from within :term:`ZCML` (as
+   opposed to imperatively or via a ``bfg_view`` decorator, or using a
+   template directly from within a view callable) also makes it
+   possible for someone to modify the template used to render a view
+   without needing to fork your code to do so.  See
+   :ref:`extending_chapter` for more information.
 
 By default, views rendered via a template renderer return a
 :term:`Response` object which has a *status code* of ``200 OK`` and a
@@ -244,7 +245,8 @@ within the view before returning the dictionary.  See
 :ref:`response_request_attrs` for more information.
 
 .. index::
-   triple: Chameleon; ZPT; templates
+   single: Chameleon ZPT templates
+   single: ZPT templates (Chameleon)
 
 .. _chameleon_zpt_templates:
 
@@ -329,6 +331,7 @@ works in these templates.
 
 .. index::
    single: ZPT macros
+   single: Chameleon ZPT macros
 
 Using ZPT Macros in :mod:`repoze.bfg`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -390,7 +393,7 @@ And ``templates/mytemplate.pt`` might look like so:
     </html>
 
 .. index::
-   pair: Chameleon; text templates
+   single: Chameleon text templates
 
 .. _chameleon_text_templates:
 
@@ -435,7 +438,7 @@ See also :ref:`built_in_renderers` for more general information about
 renderers, including Chameleon text renderers.
 
 .. index::
-   pair: template renderer; side effects
+   single: template renderer side effects
 
 Side Effects of Rendering a Chameleon Template
 ----------------------------------------------
@@ -448,10 +451,9 @@ files showing up in your ``templates`` directory (or otherwise
 directly "next" to your templates), it is due to this feature.
 
 If you're using a version control system such as Subversion, you
-should cause it to ignore these files.  Here's the contents of my
-``svn propedit svn:ignore .`` in each of my ``templates`` directories.
-(Note that I always name my Chameleon ZPT template files with a
-``.pt`` extension, so that this pattern works):
+should cause it to ignore these files.  Here's the contents of the
+author's ``svn propedit svn:ignore .`` in each of my ``templates``
+directories.
 
 .. code-block:: bash
    :linenos:
@@ -459,8 +461,13 @@ should cause it to ignore these files.  Here's the contents of my
    *.pt.py
    *.txt.py
 
+Note that I always name my Chameleon ZPT template files with a ``.pt``
+extension and my Chameleon text template files with a ``.txt``
+extension so that these ``svn:ignore`` patterns work.
+
 .. index::
-   pair: template; automatic reloading
+   single: automatic reloading of templates
+   single: template automatic reload
 
 .. _reload_templates_section:
 
@@ -486,7 +493,7 @@ variable set to ``1``, For example::
 
   $ BFG_RELOAD_TEMPLATES=1 bin/paster serve myproject.ini
 
-To use a setting in the the application ``.ini`` file for the same
+To use a setting in the application ``.ini`` file for the same
 purpose, set the ``reload_templates`` key to ``true`` within the
 application's configuration section, e.g.::
 
@@ -495,7 +502,8 @@ application's configuration section, e.g.::
   reload_templates = true
 
 .. index::
-   pair: template; internationalization
+   single: template internationalization
+   single: internationalization (of templates)
 
 :term:`Chameleon` Template Internationalization
 -----------------------------------------------

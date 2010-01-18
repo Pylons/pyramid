@@ -219,10 +219,8 @@ Glossary
      given the :term:`authentication` information in the request.
 
    authentication
-     The act of determining that the credentials a user presents during
-     a particular request are "good".  :mod:`repoze.bfg` uses the
-     :term:`authentication` data supplied by the upstream component as
-     one input during :term:`authorization`.  Authentication in
+     The act of determining that the credentials a user presents
+     during a particular request are "good".  Authentication in
      :mod:`repoze.bfg` is performed via an :term:`authentication
      policy`.
 
@@ -444,7 +442,7 @@ Glossary
    repoze.lemonade
      Zope2 CMF-like `data structures and helper facilities
      <http://docs.repoze.org/lemonade>`_ for CA-and-ZODB-based
-     applications useful within bfg applications.
+     applications useful within :mod:`repoze.bfg` applications.
 
    repoze.catalog
      An indexing and search facility (fielded and full-text) based on
@@ -593,7 +591,7 @@ Glossary
       The :term:`view callable` invoked by :mod:`repoze.bfg` when the
       developer explicitly raises a
       ``repoze.bfg.exceptions.Forbidden`` exception from within
-      :term:`view` code or :term:`root factory` code, or when the the
+      :term:`view` code or :term:`root factory` code, or when the
       :term:`view configuration` and :term:`authorization policy` found
       for a request disallows a particular view invocation.
       :mod:`repoze.bfg` provides a default implementation of a

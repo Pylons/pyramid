@@ -1,5 +1,5 @@
 .. index::
-   single: url dispatch
+   single: URL dispatch
 
 .. _urldispatch_chapter:
 
@@ -64,12 +64,13 @@ using :term:`traversal` to perform context finding and view lookup.
 Route Configuration
 -------------------
 
-:term:`route configuration` is the act of adding a new :term:`route`
+:term:`Route configuration` is the act of adding a new :term:`route`
 to an application.  A route has a *path*, representing a pattern meant
 to match against the ``PATH_INFO`` portion of a URL, and a *name*,
 which is used by developers within a :mod:`repoze.bfg` application to
 uniquely identify a particular route when generating a URL.  It also
-optionally has a ``factory`` and a set of :term:`view` parameters.
+optionally has a ``factory``, a set of :term:`route predicate`
+parameters, and a set of :term:`view` parameters.
 
 A route configuration may be added to the system via :term:`imperative
 configuration` or via :term:`ZCML`.  Both are completely equivalent.
@@ -204,7 +205,7 @@ developer to combine :term:`URL dispatch` and :term:`traversal` in
 various exceptional cases as documented in :ref:`hybrid_chapter`.
 
 .. index::
-   pair: URL dispatch; path pattern syntax
+   single: route path pattern syntax
 
 .. _route_path_pattern_syntax:
 
@@ -319,11 +320,7 @@ Will generate the following matchdict:
    {'fizzle':(u'La Pe\xf1a', u'a', u'b', u'c')}
 
 .. index::
-   triple: ZCML directive; route; examples
-
-
-.. index::
-   pair: route; ordering
+   single: route ordering
 
 Route Declaration Ordering
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -354,10 +351,11 @@ patterns might be added in the following order:
 
 In such a configuration, the ``members/abc`` pattern would *never* be
 matched; this is because the match ordering will always match
-``members/:def`` first and ``members/abc`` will never be reached.
+``members/:def`` first; the route configuration with ``members/abc``
+will never be evaluated.
 
 .. index::
-   pair: route; factory
+   single: route factory
 
 Route Factories
 ~~~~~~~~~~~~~~~
@@ -624,7 +622,7 @@ finding` and :term:`view lookup`.
 
 
 .. index::
-   pair: URL dispatch; matchdict
+   single: matchdict
 
 The Matchdict
 ~~~~~~~~~~~~~
@@ -843,7 +841,8 @@ More uses for this style of associating views with routes are explored
 in :ref:`hybrid_chapter`.
 
 .. index::
-   pair: URL dispatch; matching the root URL
+   single: matching the root URL
+   single: root url (matching)
 
 Matching the Root URL
 ---------------------
@@ -873,7 +872,8 @@ Or provide the literal string ``/`` as the path:
        />
 
 .. index::
-   pair: URL dispatch; generating route URLs
+   single: generating route URLs
+   single: route URLs
 
 Generating Route URLs
 ---------------------
@@ -897,7 +897,7 @@ hostname implied ``http:/example.com``).  See the
 information.
 
 .. index::
-   pair: URL dispatch; slash-redirecting
+   single: redirecting to slash-appended routes
 
 Redirecting to Slash-Appended Routes
 ------------------------------------
@@ -1022,13 +1022,12 @@ Using :mod:`repoze.bfg` Security With URL Dispatch
 
 :mod:`repoze.bfg` provides its own security framework which consults a
 :term:`authorization policy` before allowing any application code to
-be called.  This framework operates in terms of ACLs (Access Control
-Lists, see :ref:`security_chapter` for more information about the
-:mod:`repoze.bfg` authorization subsystem).  A common thing to want to
-do is to attach an ``__acl__`` to the context object dynamically for
-declarative security purposes.  You can use the ``factory`` argument
-that points at a factory which attaches a custom ``__acl__`` to an
-object at its creation time.
+be called.  This framework operates in terms of an access control
+list, which is stored as an ``__acl__`` attribute of a context object.
+A common thing to want to do is to attach an ``__acl__`` to the
+context object dynamically for declarative security purposes.  You can
+use the ``factory`` argument that points at a factory which attaches a
+custom ``__acl__`` to an object at its creation time.
 
 Such a ``factory`` might look like so:
 
@@ -1052,38 +1051,6 @@ not very ambitious.
 
 .. note:: See :ref:`security_chapter` for more information about
    :mod:`repoze.bfg` security and ACLs.
-
-Using Context Within a View Callable
-------------------------------------
-
-When using :term:`url dispatch` exclusively in an application (as
-opposed to using both url dispatch *and* :term:`traversal` in the same
-application), the :term:`context` of the view isn't always terribly
-interesting, particularly if you never use a ``factory`` attribute on
-your route definitions.
-
-However, if you do use a ``factory`` attribute on your route
-definitions, you may be very interested in the :term:`context` of the
-view.  You can access the ``context`` of a view within the body of a
-view callable via ``request.context``
-
-:mod:`repoze.bfg` also supports view callables defined with two
-arguments: ``context`` and ``request``.  For example, the below
-function can be used as a view callable.
-
-.. code-block:: python
-   :linenos:
-
-   from webob import Response
-
-   def hello_view(context, request):
-       return Response('Hello!')
-
-The ``context`` passed to this view will be an instance returned by
-the default root factory or an instance returned by the ``factory``
-argument to your route definition.
-
-See :ref:`request_and_context_view_definitions` for more information.
 
 References
 ----------

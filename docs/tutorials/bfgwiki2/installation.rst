@@ -113,7 +113,7 @@ Preparation, Windows
 
    .. code-block:: text
 
-      c:\bigfntut> Scripts/easy_install -i \
+      c:\bigfntut> Scripts\easy_install -i \
                 http://dist.repoze.org/bfg/current/simple repoze.bfg
 
 #. Use ``easy_install`` to install various packages from PyPI.

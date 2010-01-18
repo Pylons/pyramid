@@ -4,7 +4,7 @@ Installing :mod:`repoze.bfg`
 ============================
 
 .. index::
-   pair: install; preparation
+   single: install preparation
 
 Before You Install
 ------------------
@@ -111,8 +111,18 @@ executable and accept the defaults during the installation process.
 You may also need to download and install the `Python for Windows
 extensions <http://sourceforge.net/projects/pywin32/files/>`_.
 
+.. warning::
+
+   After you install Python on Windows, you may need to add the
+   ``C:\Python26`` directory to your environment's ``Path`` in order
+   to make it possible to invoke Python from a command prompt by
+   typing ``python``.  To do so, right click ``My Computer``, select
+   ``Properties`` --> ``Advanced Tab`` --> ``Environment Variables``
+   and add that directory to the end of the ``Path`` environment
+   variable.
+
 .. index::
-   pair: installing; UNIX
+   single: installing on UNIX
 
 .. _installing_unix:
 
@@ -174,7 +184,7 @@ the script.  To remediate this, you may need to do:
    $ sudo python ez_setup.py
 
 .. index::
-   pair: installing; virtualenv
+   single: virtualenv
 
 Installing the ``virtualenv`` Package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,7 +207,7 @@ to install it as your system's administrative user.  For example:
    $ sudo easy_install virtualenv
 
 .. index::
-   pair: creating; virtualenv
+   single: virtualenv
 
 Creating the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -244,7 +254,7 @@ This command will take longer than the previous ones to complete, as it
 downloads and installs a number of dependencies.
 
 .. index::
-   pair: installing; Windows
+   single: installing on Windows
 
 .. _installing_windows:
 
@@ -299,7 +309,7 @@ Installing :mod:`repoze.bfg` on a Windows System
            http://dist.repoze.org/bfg/current/simple repoze.bfg
 
 .. index::
-   pair: installing; Google App Engine
+   single: installing on Google App Engine
 
 Installing :mod:`repoze.bfg` on Google App Engine
 -------------------------------------------------

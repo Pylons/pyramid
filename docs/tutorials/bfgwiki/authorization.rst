@@ -50,8 +50,8 @@ content:
    :language: python
 
 The ``groupfinder`` function defined here is an authorization policy
-"callback"; it is a a callable that accepts a userid and a request.
-If the userid exists in the set of users known by the system, the
+"callback"; it is a callable that accepts a userid and a request.  If
+the userid exists in the set of users known by the system, the
 callback will return a sequence of group identifiers (or an empty
 sequence if the user isn't a member of any groups).  If the userid
 *does not* exist in the system, the callback will return ``None``.
