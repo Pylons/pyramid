@@ -40,8 +40,8 @@ such as :mod:`repoze.bfg`, it is not always the best tool with which
 to build an *application* due to the opacity of the ``zope.component``
 APIs.  Accordingly, :mod:`repoze.bfg` tends to hide the the presence
 of the ZCA from application developers.  You needn't understand the
-ZCA to create a :mod:`repoze.bfg` application; the use of the ZCA is
-effectively only a framework implementation detail.
+ZCA to create a :mod:`repoze.bfg` application; its use is effectively
+only a framework implementation detail.
 
 However, developers whom are already used to writing :term:`Zope`
 applications often still wish to use the ZCA while building a
