@@ -11,7 +11,6 @@ Attributes
 ~~~~~~~~~~
 
 ``package``
-
     The package to scan or the single dot (``.``), meaning the
     "current" package (the package in which the ZCML file lives).
 

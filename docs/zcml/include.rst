@@ -13,11 +13,9 @@ Attributes
 ~~~~~~~~~~
 
 ``package``
-
    A :term:`dotted Python name` which references a Python :term:`package`.
 
 ``filename``
-
    An absolute or relative filename which references a ZCML file.
 
 The ``package`` and ``filename`` attributes can be used together or

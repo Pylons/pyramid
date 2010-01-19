@@ -11,7 +11,6 @@ Attributes
 ~~~~~~~~~~
 
 ``for``
-
    The class or :term:`interface` that you are subscribing the
    listener for, e.g. :class:`repoze.bfg.interfaces.INewRequest`.
    Registering a subscriber for a specific class or interface limits
@@ -20,7 +19,6 @@ Attributes
    (implying *any* event type).
 
 ``handler``
-
    A :term:`dotted Python name` which references an event handler
    callable.  The callable should accept a single argument: ``event``.
    The return value of the callable is ignored.

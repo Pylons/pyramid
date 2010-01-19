@@ -9,21 +9,17 @@ Attributes
 ~~~~~~~~~~
 
 ``factory``
-
   The adapter factory (often a class).
 
 ``provides``
-
   The :term:`interface` that an adapter instance resulting from a
   lookup will provide.
 
 ``for``
-
   Interfaces or classes to be adapted, separated by spaces,
   e.g. ``interfaces.IFoo interfaces.IBar``.
 
 ``name``
-
   The adapter name.
 
 Example

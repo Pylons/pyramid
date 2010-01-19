@@ -11,7 +11,6 @@ Attributes
 ~~~~~~~~~~
 
 ``identifier_name``
-
     The ``identifier_name`` controls the name used to look up the
     :term:`repoze.who` "identifier" plugin within
     ``request.environ['repoze.who.plugins']`` which is used by this
@@ -19,7 +18,6 @@ Attributes
     ``auth_tkt``.
 
 ``callback``
-
     The ``callback`` is a Python dotted name to a function passed the
     repoze.who identity and the request as positional arguments.  The
     callback is expected to return None if the user represented by the

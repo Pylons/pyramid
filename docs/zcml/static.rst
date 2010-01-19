@@ -12,13 +12,11 @@ Attributes
 ~~~~~~~~~~
 
 ``name``
-
   The (application-root-relative) URL prefix of the static directory.
   For example, to serve static files from ``/static`` in most
   applications, you would provide a ``name`` of ``static``.
 
 ``path``
-
   A path to a directory on disk where the static files live.  This
   path may either be 1) absolute (e.g. ``/foo/bar/baz``) 2)
   Python-package-relative (e.g. (``packagename:foo/bar/baz``) or 3)
@@ -26,7 +24,6 @@ Attributes
   contains the directive (e.g. ``foo/bar/baz``).
 
 ``cache_max_age``
-
   The number of seconds that the static resource can be cached, as
   represented in the returned response's ``Expires`` and/or
   ``Cache-Control`` headers, when any static file is served from this

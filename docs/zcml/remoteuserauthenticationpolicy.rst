@@ -11,13 +11,11 @@ Attributes
 ~~~~~~~~~~
 
 ``environ_key``
-
     The ``environ_key`` is the name that will be used to obtain the
     remote user value from the WSGI environment.  It defaults to
     ``REMOTE_USER``.
 
 ``callback``
-
     The ``callback`` is a Python dotted name to a function passed the
     string representing the remote user and the request as positional
     arguments.  The callback is expected to return None if the user

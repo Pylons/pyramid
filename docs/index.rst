@@ -63,6 +63,7 @@ Narrative documentation in chapter form explaining how to use
    narr/resources
    narr/router
    narr/threadlocals
+   narr/zca
 
 Tutorials
 =========

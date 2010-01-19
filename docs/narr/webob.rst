@@ -118,17 +118,17 @@ In addition to the standard :term:`WebOb` attributes,
 :mod:`repoze.bfg` adds the following special attributes to every
 request.
 
-``req.subpath``
-  The traversal :term:`subpath` will be available as the ``subpath``
-  attribute of the :term:`request` object.  It will be a sequence
-  containing zero or more elements (which will be Unicode objects).
-  See :ref:`traversal_chapter` for information about the subpath.
+``req.context``
+  The :term:`context` will be available as the ``context`` attribute
+  of the :term:`request` object.  It will be the context object
+  implied by the current request.  See :ref:`traversal_chapter` for
+  information about context objects.
 
-``req.view_name``
-  The :term:`view name` will be available as the ``view_name``
-  attribute of the :term:`request` object.  It will be a single string
-  (possibly the empty string if we're rendering a default view).
-  See :ref:`traversal_chapter` for information about view names.
+``req.registry``
+  The :term:`application registry` will be available as
+  the ``registry`` attribute of the :term:`request` object.  See
+  :ref:`zca_chapter` for more information about the application
+  registry.
 
 ``req.root``
   The :term:`root` object will be available as the ``root`` attribute
@@ -136,11 +136,11 @@ request.
   traversal started (the root).  See :ref:`traversal_chapter` for
   information about root objects.
 
-``req.context``
-  The :term:`context` will be available as the ``context`` attribute
-  of the :term:`request` object.  It will be the context object
-  implied by the current request.  See :ref:`traversal_chapter` for
-  information about context objects.
+``req.subpath``
+  The traversal :term:`subpath` will be available as the ``subpath``
+  attribute of the :term:`request` object.  It will be a sequence
+  containing zero or more elements (which will be Unicode objects).
+  See :ref:`traversal_chapter` for information about the subpath.
 
 ``req.traversed``
   The "traversal path" will be as the ``traversed`` attribute of the
@@ -150,6 +150,12 @@ request.
   is a virtual root associated with request, the virtual root path is
   included within the traversal path.  See :ref:`traversal_chapter`
   for more information.
+
+``req.view_name``
+  The :term:`view name` will be available as the ``view_name``
+  attribute of the :term:`request` object.  It will be a single string
+  (possibly the empty string if we're rendering a default view).
+  See :ref:`traversal_chapter` for information about view names.
 
 ``req.virtual_root``
   The :term:`virtual root` will be available as the ``virtual_root``

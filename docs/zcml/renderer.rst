@@ -10,12 +10,10 @@ Attributes
 ~~~~~~~~~~
 
 ``factory``
-
     A :term:`dotted Python name` referencing a callable object that
     accepts a renderer name and returns a :term:`renderer` object.
 
 ``name``
-
    The renderer name, which is a string.
 
 Examples

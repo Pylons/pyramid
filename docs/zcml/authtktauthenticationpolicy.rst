@@ -11,12 +11,10 @@ Attributes
 ~~~~~~~~~~
 
 ``secret``
-
     The ``secret`` is a string that will be used to encrypt the data
     stored by the cookie.  It is required and has no default.
 
 ``callback``
-
     The ``callback`` is a Python dotted name to a function passed the
     string representing the userid stored in the cookie and the
     request as positional arguments.  The callback is expected to
@@ -26,18 +24,15 @@ Attributes
     exist with no groups.  It defaults to ``None``.
 
 ``cookie_name``
-
     The ``cookie_name`` is the name used for the cookie that contains
     the user information.  It defaults to ``repoze.bfg.auth_tkt``.
 
 ``secure``
-
     ``secure`` is a boolean value.  If it's set to "true", the cookie
     will only be sent back by the browser over a secure (HTTPS)
     connection.  It defaults to "false".
 
 ``include_ip``
-
     ``include_ip`` is a boolean value.  If it's set to true, the
     requesting IP address is made part of the authentication data in
     the cookie; if the IP encoded in the cookie differs from the IP of
@@ -45,7 +40,6 @@ Attributes
     defaults to "false".
 
 ``timeout``
-
     ``timeout`` is an integer value.  It represents the maximum age in
     seconds which the auth_tkt ticket will be considered valid.  If
     ``timeout`` is specified, and ``reissue_time`` is also specified,
@@ -54,7 +48,6 @@ Attributes
     valid forever.
 
 ``reissue_time``
-
     ``reissue_time`` is an integer value.  If ``reissue_time`` is
     specified, when we encounter a cookie that is older than the
     reissue time (in seconds), but younger that the ``timeout``, a new
@@ -64,7 +57,6 @@ Attributes
     authentication.
 
 ``max_age``
-
     ``max_age`` is the maximum age of the auth_tkt *cookie*, in
     seconds.  This differs from ``timeout`` inasmuch as ``timeout``
     represents the lifetime of the ticket contained in the cookie,

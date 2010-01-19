@@ -27,7 +27,6 @@ Non-Predicate Attributes
 ########################
 
 ``view``
-
   The :term:`dotted Python name` to a :term:`view callable`.  This
   attribute is required unless a ``renderer`` attribute also exists.
   If a ``renderer`` attribute exists on the directive, this attribute
@@ -35,13 +34,11 @@ Non-Predicate Attributes
   :ref:`views_which_use_a_renderer`).
 
 ``permission``
-
   The name of a *permission* that the user must possess in order to
   call the view.  See :ref:`view_security_section` for more
   information about view security and permissions.
 
 ``attr``
-
   The view machinery defaults to using the ``__call__`` method of the
   view callable (or the function itself, if the view callable is a
   function) to obtain a response dictionary.  The ``attr`` value
@@ -55,7 +52,6 @@ Non-Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``renderer``
-
   This is either a single string term (e.g. ``json``) or a string
   implying a path or :term:`resource specification`
   (e.g. ``templates/views.pt``).  If the renderer value is a single
@@ -90,7 +86,6 @@ Non-Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``wrapper``
-
   The :term:`view name` (*not* an object dotted name) of another view
   declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
   which will receive the response body of this view as the
@@ -113,12 +108,10 @@ Predicate Attributes
 ####################
 
 ``name``
-
   The *view name*.  Read the :ref:`traversal_chapter` to understand
   the concept of a view name.
 
 ``context``
-
   A :term:`dotted Python name` representing the Python class that the
   :term:`context` must be an instance of, *or* the :term:`interface`
   that the :term:`context` must provide in order for this view to be
@@ -129,7 +122,6 @@ Predicate Attributes
   spelling).
 
 ``route_name``
-
   *This attribute services an advanced feature that isn't often used
   unless you want to perform traversal after a route has matched.*
   This value must match the ``name`` of a ``<route>`` declaration (see
@@ -142,7 +134,6 @@ Predicate Attributes
   advanced feature.
 
 ``request_type``
-
   This value should be a :term:`dotted Python name` string
   representing the :term:`interface` that the :term:`request` must
   have in order for this view to be found and called.  The presence of
@@ -154,7 +145,6 @@ Predicate Attributes
   attribute instead for maximum forward compatibility.
 
 ``request_method``
-
   This value can either be one of the strings 'GET', 'POST', 'PUT',
   'DELETE', or 'HEAD' representing an HTTP ``REQUEST_METHOD``.  A view
   declaration with this attribute ensures that the view will only be
@@ -164,7 +154,6 @@ Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``request_param``
-
   This value can be any string.  A view declaration with this
   attribute ensures that the view will only be called when the request
   has a key in the ``request.params`` dictionary (an HTTP ``GET`` or
@@ -178,7 +167,6 @@ Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``containment``
-
   This value should be a :term:`dotted Python name` string
   representing the class that a graph traversal parent object of the
   :term:`context` must be an instance of (or :term:`interface` that a
@@ -190,7 +178,6 @@ Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``xhr``
-
   This value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`request` must possess an
   ``HTTP_X_REQUESTED_WITH`` (aka ``X-Requested-With``) header that has
@@ -201,7 +188,6 @@ Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``accept``
-
   The value of this attribute represents a match query for one or more
   mimetypes in the ``Accept`` HTTP request header.  If this value is
   specified, it must be in one of the following forms: a mimetype
@@ -213,7 +199,6 @@ Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``header``
-
   The value of this attribute represents an HTTP header name or a
   header name/value pair.  If the value contains a ``:`` (colon), it
   will be considered a name/value pair (e.g. ``User-Agent:Mozilla/.*``
@@ -233,7 +218,6 @@ Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``path_info``
-
   The value of this attribute represents a regular expression pattern
   that will be tested against the ``PATH_INFO`` WSGI environment
   variable.  If the regex matches, this predicate will be true.
@@ -241,7 +225,6 @@ Predicate Attributes
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``custom_predicates``
-
   This value should be a sequence of references to custom predicate
   callables (e.g. ``dotted.name.one dotted.name.two``, if used in
   ZCML; a :term:`dotted Python name` to each callable separated by a

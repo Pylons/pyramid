@@ -52,6 +52,7 @@ Narrative Documentation
    narr/router
    narr/startup
    narr/threadlocals
+   narr/zca
 
 .. _tutorials:
 

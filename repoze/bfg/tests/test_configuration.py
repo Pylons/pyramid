@@ -173,6 +173,20 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
+    def test_setup_registry_fixed(self):
+        class DummyRegistry(object):
+            def subscribers(self, events, name):
+                self.events = events
+                return events
+            def registerUtility(self, impl, iface, name=None, info=None):
+                pass
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        config.setup_registry()
+        self.assertEqual(reg.has_listeners, True)
+        self.assertEqual(reg.notify(1), None)
+        self.assertEqual(reg.events, (1,))
+
     def test_setup_registry_custom_settings(self):
         from repoze.bfg.registry import Registry
         from repoze.bfg.interfaces import ISettings

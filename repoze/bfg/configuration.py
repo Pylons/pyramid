@@ -261,6 +261,19 @@ class Configurator(object):
         self._set_authentication_policy(authentication)
         self._set_authorization_policy(authorization)
 
+    def _fix_registry(self):
+        """ Fix up a ZCA component registry that is not a
+        repoze.bfg.registry.Registry by adding analogues of
+        ``has_listeners`` and ``notify`` through monkey-patching."""
+
+        if not hasattr(self.registry, 'notify'):
+            def notify(*events):
+                [ _ for _ in self.registry.subscribers(events, None) ]
+            self.registry.notify = notify
+
+        if not hasattr(self.registry, 'has_listeners'):
+            self.registry.has_listeners = True
+
     # API
 
     def setup_registry(self, settings=None, root_factory=None,
@@ -283,6 +296,7 @@ class Configurator(object):
         security policies, renderers, and a debug logger using the
         configurator's current registry, as per the descriptions in
         the Configurator constructor."""
+        self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)
         if debug_logger is None:

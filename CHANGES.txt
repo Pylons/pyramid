@@ -1,3 +1,24 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- When the ``Configurator`` is passed an instance of
+  ``zope.component.registry.Components`` as a ``registry`` constructor
+  argument, fix the instance up to have the attributes we expect of an
+  instance of ``repoze.bfg.registry.Registry`` when ``setup_registry``
+  is called.  This makes it possible to use the global Zope component
+  registry as a BFG application registry.
+
+Documentation
+-------------
+
+- Change renderings of ZCML directive documentation.
+
+- Add a narrative documentation chapter: "Using the Zope Component
+  Architecture in ``repoze.bfg``"
+
 1.2b1 (2010-01-18)
 ==================
 
@@ -7,7 +28,7 @@ Bug Fixes
 - In ``bfg_routesalchemy``, ``bfg_alchemy`` paster templates and the
   ``bfgwiki2`` tutorial, clean up the SQLAlchemy connection by
   registering a ``repoze.tm.after_end`` callback instead of relying on
-  a ``__del__`` method of a ``Cleanup`` class added to the WSFI
+  a ``__del__`` method of a ``Cleanup`` class added to the WSGI
   environment.  The ``__del__`` strategy was fragile and caused
   problems in the wild.  Thanks to Daniel Holth for testing.
 

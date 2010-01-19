@@ -9,22 +9,18 @@ Attributes
 ~~~~~~~~~~
 
 ``component``
-
   The utility component (cannot be specified if ``factory`` is
   specified).
 
 ``factory``
-
   A factory that creates a component (cannot be specified if
   ``component`` is specified).
 
 ``provides``
-
   The :term:`interface` that an utility instance resulting from a
   lookup will provide.
 
 ``name``
-
   The utility name.
 
 Example

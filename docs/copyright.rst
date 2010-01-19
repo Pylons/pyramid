@@ -61,6 +61,13 @@ Used with permission:
    The :ref:`webob_chapter` chapter is adapted, with permission, from
    documentation originally written by Ian Bicking.
 
+Print Production
+----------------
+
+The print version of this book was produced using the `Sphinx
+<http://sphinx.pocoo.org/>`_ documentation generation system and the
+`LaTeX <http://www.latex-project.org/>`_ typesetting system.
+
 Contacting The Publisher
 ------------------------
 

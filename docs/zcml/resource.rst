@@ -10,12 +10,10 @@ Attributes
 ~~~~~~~~~~
 
 ``to_override``
-
    A :term:`resource specification` specifying the resource to be
    overridden.
 
 ``override_with``
-
    A :term:`resource specification` specifying the resource which
    is used as the override.
 

@@ -13,7 +13,6 @@ Attributes
 ~~~~~~~~~~
 
 ``xmlns``
-
    The default XML namespace used for subdirectives.
 
 Example
