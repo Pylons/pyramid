@@ -91,7 +91,7 @@ will appear to fail when used in a :mod:`repoze.bfg` application,
 because they'll be consulting the ZCA global registry rather than the
 component registry associated with your :mod:`repoze.bfg` application.
 
-There are three ways to fix this: by disusing the ZCA global registry
+There are three ways to fix this: by disusing the ZCA global API
 entirely, by using
 :meth:`repoze.bfg.configuration.Configurator.hook_zca` or by passing
 the ZCA global registry to the :term:`Configurator` constructor at

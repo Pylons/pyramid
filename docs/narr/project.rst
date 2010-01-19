@@ -39,20 +39,16 @@ differ from each other on two axes:
 The included templates are these:
 
 ``bfg_starter``
-
   URL mapping via :term:`traversal` and no persistence mechanism.
 
 ``bfg_zodb``
-
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`
 
 ``bfg_routesalchemy`` 
-
   URL mapping via :term:`URL dispatch` and persistence via
   :term:`SQLAlchemy`
 
 ``bfg_alchemy``
-
   URL mapping via :term:`traversal` and persistence va
   :term:`SQLAlchemy`
 
