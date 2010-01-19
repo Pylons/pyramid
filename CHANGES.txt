@@ -11,13 +11,23 @@ Bug Fixes
   is called.  This makes it possible to use the global Zope component
   registry as a BFG application registry.
 
+- When WebOb 0.9.7.1 was used, a deprecation warning was issued for
+  the class attribute named ``charset`` within
+  ``repoze.bfg.request.Request``.  BFG now *requires* WebOb >= 0.9.7,
+  and code was added so that this deprecation warning has disappeared.
+
 Documentation
 -------------
 
 - Change renderings of ZCML directive documentation.
 
 - Add a narrative documentation chapter: "Using the Zope Component
-  Architecture in ``repoze.bfg``"
+  Architecture in repoze.bfg".
+
+Dependencies
+------------
+
+- Require WebOb >= 0.9.7
 
 1.2b1 (2010-01-18)
 ==================

@@ -13,11 +13,11 @@ def make_request_ascii(event):
     code written before :mod:`repoze.bfg` 0.7.0 can continue to work
     without a change"""
     request = event.request
-    request.charset = None
+    request.default_charset = None
 
 class Request(WebobRequest):
     implements(IRequest)
-    charset = 'utf-8'
+    default_charset = 'utf-8'
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior
     __getattr__ = object.__getattribute__
