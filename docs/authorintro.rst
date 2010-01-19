@@ -154,6 +154,8 @@ and well-documented.
    single: van Rossum, Guido
    single: Peters, Tim
    single: Rossi, Chris
+   single: Holth, Daniel
+   single: Hathaway, Shane
 
 Thanks
 ======
@@ -165,11 +167,11 @@ typewriter (a Royal), and my mother, who bought me my first computer
 Thanks to the following people for providing expertise, resources, and
 software.  Without the help of these folks, neither this book nor the
 software which it details would exist: Paul Everitt, Tres Seaver,
-Andrew Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Georg
-Brandl, Simon Oram and Nat Hardwick of Electrosoup, Ian Bicking of the
-Open Planning Project, Jim Fulton of Zope Corporation, Tom Moroz of
-the Open Society Institute, and Todd Koym of Environmental Health
-Sciences.
+Andrew Sawyers, Malthe Borch, Carlos de la Guardia, Chris Rossi, Shane
+Hathaway, Daniel Holth, Georg Brandl, Simon Oram and Nat Hardwick of
+Electrosoup, Ian Bicking of the Open Planning Project, Jim Fulton of
+Zope Corporation, Tom Moroz of the Open Society Institute, and Todd
+Koym of Environmental Health Sciences.
 
 Thanks to Guido van Rossum and Tim Peters for Python.
 
