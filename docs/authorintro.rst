@@ -118,7 +118,7 @@ development, it became clear that Zope 2 had simply begun to exceed my
 tolerance for complexity, and I began to look around for simpler
 options.
 
-I considered the using Zope 3 application server machinery, but it
+I considered using the Zope 3 application server machinery, but it
 turned out that it had become more indirect than the Zope 2 machinery
 it aimed to replace, which didn't fulfill the goal of simplification.
 I also considered using Django and Pylons, but neither of those
