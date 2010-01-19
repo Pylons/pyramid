@@ -113,7 +113,7 @@ For example, if the path info sequence is ``['a', 'b', 'c']``:
   "A" object's ``__getitem__`` is called with that value (``b``) as an
   argument; we'll presume it succeeds.
 
-- When the "A" object's ``__getitem__`` succeeeds it will return an
+- When the "A" object's ``__getitem__`` succeeds it will return an
   object, which we'll call "B".  The :term:`context` temporarily
   becomes the "B" object.
 

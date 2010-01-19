@@ -49,7 +49,7 @@ The included templates are these:
   :term:`SQLAlchemy`
 
 ``bfg_alchemy``
-  URL mapping via :term:`traversal` and persistence va
+  URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
 
 Each of these project templates uses :term:`ZCML` instead of

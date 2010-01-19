@@ -257,7 +257,7 @@ value ``'goodbye'``.  The ``name`` argument supplied in this
 :term:`view name` of ``goodbye`` should cause the ``goodbye_world``
 view callable to be invoked.  In this particular application, this
 means that the ``goodbye_world`` view callable will be invoked when
-the URL ``/goodbye`` is visted by a browser.
+the URL ``/goodbye`` is visited by a browser.
 
 Each invocation of the ``add_view`` method implies a :term:`view
 configuration` registration.  Each :term:`predicate` provided as a
