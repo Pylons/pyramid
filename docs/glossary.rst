@@ -495,7 +495,7 @@ Glossary
      serialization format.
 
    renderer
-     A serializer that can be referrred to via :term:`view
+     A serializer that can be referred to via :term:`view
      configuration` which converts a non-:term:`Response` return
      values from a :term:`view` into a string (and ultimately a
      response).  Using a renderer can make writing views that require

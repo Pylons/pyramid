@@ -424,7 +424,7 @@ which renders this template:
    def my_view(request):
        return {'name':'world'}
 
-When the template is renderered, it will show:
+When the template is rendered, it will show:
 
 .. code-block:: text
 

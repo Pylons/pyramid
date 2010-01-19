@@ -124,7 +124,7 @@ The ``.views.foobar`` view callable above will be called when the URL
 Hybrid Applications
 -------------------
 
-Clearl *either* traversal or url dispatch can be used to create a
+Clearly *either* traversal or url dispatch can be used to create a
 :mod:`repoze.bfg` application.  However, it is possible to combine the
 competing concepts of traversal and url dispatch to resolve URLs to
 code within the same application.
@@ -347,7 +347,7 @@ callables that match a route use the very weakly binding ``None``
 value as the context value's interface.  Given how :term:`view lookup`
 works, if the context that is found has a specific interface, and a
 global view configuration statement is registered using this interface
-as its ``context``, it's likely that the *global* view calable will
+as its ``context``, it's likely that the *global* view callable will
 match *before* the view callable that is attached to the route.  This
 behavior can be subverted if the ``view_context`` attribute is used on
 the route registration, because then both the request type and the

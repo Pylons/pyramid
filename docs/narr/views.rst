@@ -11,7 +11,7 @@ a request made to your application.
 
 .. note:: 
 
-   A :mod:`repoze.bfg` :term:`view callable` is oten referred to in
+   A :mod:`repoze.bfg` :term:`view callable` is often referred to in
    conversational shorthand as a :term:`view`.  In this documentation,
    however, we need to use less ambiguous terminology because there
    are significant differences between view *configuration*, the code
@@ -758,7 +758,7 @@ renderer factory, use:
       factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
 
 After you do this, :mod:`repoze.bfg` will treat templates ending in
-both the ``.pt`` and ``.zpt`` filename extensions as Chameleon ZTP
+both the ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT
 templates.
 
 To override the default mapping in which files with a ``.pt``
@@ -1025,7 +1025,7 @@ arguments.
 Many arguments supplied during view configuration are :term:`view
 predicate` arguments.  View predicate arguments used during view
 configuration are used to narrow the set of circumstances in which
-:mod:`view lookup` will find a partcular view callable.  In general,
+:mod:`view lookup` will find a particular view callable.  In general,
 the fewer number of predicates which are supplied to a particular view
 configuration, the more likely it is that the associated view callable
 will be invoked.  A greater the number supplied, the less likely.

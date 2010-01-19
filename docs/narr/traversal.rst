@@ -92,7 +92,7 @@ query string elements or fragment element.  For example the
 
 Traversal treats the ``PATH_INFO`` segment of a URL as a sequence of
 path segments.  For example, the ``PATH_INFO`` string ``/a/b/c`` is
-coverted to the sequence ``['a', 'b', 'c']``.
+converted to the sequence ``['a', 'b', 'c']``.
 
 After the path info is converted, a lookup is performed against the
 object graph for each path segment.  Each lookup uses the
@@ -105,7 +105,7 @@ For example, if the path info sequence is ``['a', 'b', 'c']``:
   ``__getitem__`` method using that value (``a``) as an argument;
   we'll presume it succeeds.
 
-- When the root object's ``__getitem__`` succeeeds it will return an
+- When the root object's ``__getitem__`` succeeds it will return an
   object, which we'll call "A".  The :term:`context` temporarily
   becomes the "A" object.
 
@@ -518,7 +518,7 @@ expected to return a response.
    ``context`` attribute of the request object,
    e.g. ``request.context``.  The :term:`view name` is available as
    the ``view_name`` attribute of the request object,
-   e.g. ``request.view_name``.  Other :mod:`repoze.bfg` -speficic
+   e.g. ``request.view_name``.  Other :mod:`repoze.bfg` -specific
    request attributes are also available as described in
    :ref:`special_request_attributes`.
 
@@ -536,5 +536,5 @@ deal with traversal, such as traversal invocation from within
 application code.
 
 The :func:`repoze.bfg.url.model_url` function generates a URL when
-given an object retrived from an object graph.
+given an object retrieved from an object graph.
 

@@ -111,7 +111,7 @@ ZCA "global" API functions such as ``zope.component.getSiteManager``,
 component registry has a method API that offers the same
 functionality; it can be used instead.  For example, presuming the
 ``registry`` value below is a Zope Component Architecture component
-registry, the folllowing bit of code is equivalent to
+registry, the following bit of code is equivalent to
 ``zope.component.getUtility(IFoo)``:
 
 .. code-block:: python

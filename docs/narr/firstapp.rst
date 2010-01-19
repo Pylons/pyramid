@@ -246,7 +246,7 @@ learn in later chapters what a :term:`view name` is, and under which
 circumstances a request will have a view name that is the empty
 string; in this particular application, it means that the
 ``hello_world`` view callable will be invoked when the root URL ``/``
-is visted by a browser.
+is visited by a browser.
 
 The line ``config.add_view(goodbye_world, name='goodbye')`` registers
 the ``goodbye_world`` function as a view callable.  The line calls

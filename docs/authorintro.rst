@@ -96,7 +96,7 @@ The Genesis of :mod:`repoze.bfg`
 
 I wrote :mod:`repoze.bfg` after many years of writing applications
 using :term:`Zope`.  Zope provided me with a lot of mileage: it wasn't
-until almost a decade of succesfully creating applications using it
+until almost a decade of successfully creating applications using it
 that I decided to write a different web framework.  Although
 :mod:`repoze.bfg` takes inspiration from a variety of web frameworks,
 it owes more of its core design to Zope than any other.

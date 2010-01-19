@@ -116,7 +116,7 @@ ZCML Directive Reference
    zcml/notfound
    zcml/remoteuserauthenticationpolicy
    zcml/renderer
-   zcml/repozewho1authenticatiohnpolicy
+   zcml/repozewho1authenticationpolicy
    zcml/resource
    zcml/route
    zcml/scan

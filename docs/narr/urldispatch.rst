@@ -48,7 +48,7 @@ If route configuration is present in an application, the
 :mod:`repoze.bfg` :term:`Router` checks every incoming request against
 an ordered set of URL matching patterns present in a *route map*.
 
-If any route patern matches the information in the :term:`request`
+If any route pattern matches the information in the :term:`request`
 provided to :mod:`repoze.bfg`, a route-specific :term:`context` and
 :term:`view name` will be generated.  In this circumstance,
 :mod:`repoze.bfg` will shortcut :term:`traversal`, and will invoke

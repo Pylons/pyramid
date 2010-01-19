@@ -187,7 +187,7 @@ filesystem.  Let's take a look at that ``configure.zcml`` file again:
 Note that this file contains some XML, and that the XML contains a
 ``<view>`` :term:`configuration declaration` tag that references a
 :term:`dotted Python name`.  This dotted name refers to the
-``hello_world`` function that lives in our ``helloword`` Python
+``hello_world`` function that lives in our ``helloworld`` Python
 module.
 
 This ``<view>`` declaration tag performs the same function as the

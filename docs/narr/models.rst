@@ -9,7 +9,7 @@ omnipresent in :mod:`repoze.bfg`:
   willing to walk over when :term:`traversal` is used.
 
 - The ``context`` and ``containment`` arguments to
-  :meth:`repoze.bfg.configuration.Configurator.add_vew` often
+  :meth:`repoze.bfg.configuration.Configurator.add_view` often
   reference a model class.
 
 - A :term:`root factory` returns a model instance.
@@ -55,7 +55,7 @@ Defining a Model Constructor
 ----------------------------
 
 An example of a model constructor, ``BlogEntry`` is presented below.
-It is implemente as a class which, when instantiated, becomes a model
+It is implemented as a class which, when instantiated, becomes a model
 instance.
 
 .. code-block:: python
