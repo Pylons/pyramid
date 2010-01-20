@@ -62,13 +62,13 @@ class TestStaticApp(unittest.TestCase):
             result.body,
             open(os.path.join(here, 'fixtures/minimal.pt'), 'r').read())
 
-class TestFixtureApp(unittest.TestCase):
+class TwillBase(unittest.TestCase):
     def setUp(self):
         import sys
         import twill
         from repoze.bfg.configuration import Configurator
         config = Configurator()
-        config.load_zcml('repoze.bfg.tests.fixtureapp:configure.zcml')
+        config.load_zcml(self.config)
         twill.add_wsgi_intercept('localhost', 6543, config.make_wsgi_app)
         if sys.platform is 'win32': # pragma: no cover
             out = open('nul:', 'wb')
@@ -85,6 +85,8 @@ class TestFixtureApp(unittest.TestCase):
         twill.set_output(None)
         testing.tearDown()
 
+class TestFixtureApp(TwillBase):
+    config = 'repoze.bfg.tests.fixtureapp:configure.zcml'
     def test_it(self):
         import twill.commands
         browser = twill.commands.get_browser()
@@ -96,6 +98,20 @@ class TestFixtureApp(unittest.TestCase):
         self.assertEqual(browser.get_html(), 'fixture')
         browser.go('http://localhost:6543/dummyskin.html')
         self.assertEqual(browser.get_code(), 404)
+
+class TestCCBug(TwillBase):
+    # "unordered" as reported in IRC by author of
+    # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
+    config = 'repoze.bfg.tests.ccbugapp:configure.zcml'
+    def test_it(self):
+        import twill.commands
+        browser = twill.commands.get_browser()
+        browser.go('http://localhost:6543/licenses/1/v1/rdf')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'rdf')
+        browser.go('http://localhost:6543/licenses/1/v1/juri')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'juri')
 
 class DummyContext(object):
     pass

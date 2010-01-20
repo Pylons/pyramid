@@ -108,6 +108,27 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['match']['action'], 'action1')
         self.assertEqual(result['match']['article'], 'article1')
 
+    def test_cc_bug(self):
+        # "unordered" as reported in IRC by author of
+        # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
+        mapper = self._makeOne()
+        mapper.connect('licenses/:license_code/:license_version/rdf', 'rdf')
+        mapper.connect('licenses/:license_code/:license_version/:jurisdiction',
+                       'juri')
+
+        request = self._getRequest(PATH_INFO='/licenses/1/v2/rdf')
+        result = mapper(request)
+        self.assertEqual(result['route'], mapper.routes['rdf'])
+        self.assertEqual(result['match']['license_code'], '1')
+        self.assertEqual(result['match']['license_version'], 'v2')
+
+        request = self._getRequest(PATH_INFO='/licenses/1/v2/usa')
+        result = mapper(request)
+        self.assertEqual(result['route'], mapper.routes['juri'])
+        self.assertEqual(result['match']['license_code'], '1')
+        self.assertEqual(result['match']['license_version'], 'v2')
+        self.assertEqual(result['match']['jurisdiction'], 'usa')
+
     def test_root_route_matches(self):
         mapper = self._makeOne()
         mapper.connect('', 'root')

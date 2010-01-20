@@ -1,0 +1,15 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg.includes" />
+
+  <route
+     view=".views.rdf_view"
+     path="licenses/:license_code/:license_version/rdf"
+     name="rdf" />
+
+  <route
+     view=".views.juri_view"
+     path="licenses/:license_code/:license_version/:jurisdiction"
+     name="juri" />
+
+</configure>
