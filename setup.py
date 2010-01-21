@@ -46,7 +46,7 @@ if sys.version_info[:2] < (2, 6):
     
 setup(name='repoze.bfg',
       version=__version__,
-      description='A WSGI web framework influenced by Zope, Django, and Pylons',
+      description='The repoze.bfg web application framework',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
@@ -56,7 +56,7 @@ setup(name='repoze.bfg',
         "Topic :: Internet :: WWW/HTTP :: WSGI",
         "License :: Repoze Public License",
         ],
-      keywords='web wsgi bfg zope',
+      keywords='web wsgi bfg',
       author="Agendaless Consulting",
       author_email="repoze-dev@lists.repoze.org",
       url="http://bfg.repoze.org",

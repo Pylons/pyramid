@@ -1,8 +1,9 @@
 repoze.bfg
 ==========
 
-``repoze.bfg`` is a Python web application framework based on WSGI.
-It is inspired by Zope, Pylons, and Django.
+``repoze.bfg`` is a small, fast, down-to-earth, open source Python web
+development framework. It makes real-world web application development
+and deployment more fun, more predictable, and more productive.
 
 Support and Documentation
 -------------------------
