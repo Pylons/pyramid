@@ -20,6 +20,10 @@ Bug Fixes
   of predicates registered first (literally first, not "earlier") for
   a triad would lose during view lookup to one registered with fewer.
 
+- Make sure views with exactly N custom predicates are always called
+  before views with exactly N non-custom predicates given all else is
+  equal in the view configuration.
+
 Documentation
 -------------
 
