@@ -50,6 +50,16 @@ class TestRequest(unittest.TestCase):
         inst = self._makeOne({})
         self.assertTrue(IRequest.providedBy(inst))
 
+    def test_setattr_and_getattr_dotnotation(self):
+        inst = self._makeOne({})
+        inst.foo = 1
+        self.assertEqual(inst.foo, 1)
+
+    def test_setattr_and_getattr(self):
+        inst = self._makeOne({})
+        setattr(inst, 'bar', 1)
+        self.assertEqual(getattr(inst, 'bar'), 1)
+
     def test___contains__(self):
         environ ={'zooma':1}
         inst = self._makeOne(environ)
