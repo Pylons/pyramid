@@ -168,7 +168,7 @@ The following types work as view callables in this style:
           return Response('OK')
 
 #. Classes that have an ``__init__`` method that accepts ``context,
-   request``, e.g.:
+   request`` and a ``__call__`` which accepts no arguments, e.g.:
 
    .. code-block:: python
       :linenos:
@@ -177,6 +177,10 @@ The following types work as view callables in this style:
 
       class view(object):
           def __init__(self, context, request):
+              self.context = context
+              self.request = request
+
+          def __call__(self):
               return Response('OK')
 
 #. Arbitrary callables that have a ``__call__`` method that accepts
