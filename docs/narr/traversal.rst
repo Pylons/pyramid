@@ -280,7 +280,7 @@ specific object graph.
 We'll also talk a bit about :term:`view lookup` .  The
 :ref:`views_chapter` chapter discusses :term:`view lookup` in detail,
 and it is the canonical source for information about views.
-Technically, :term:`traversal` is a :mod:`repoze.bfg` subsystem that
+Technically, :term:`view lookup` is a :mod:`repoze.bfg` subsystem that
 is separated from traversal entirely.  However, we'll describe the
 fundamental behavior of view lookup in the examples in the next few
 sections to give you an idea of how traversal and view lookup
