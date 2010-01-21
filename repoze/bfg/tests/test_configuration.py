@@ -1030,6 +1030,31 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         self._assertNotFound(wrapper, None, request)
 
+    def test_add_view_custom_predicate_bests_standard_predicate(self):
+        view = lambda *arg: 'OK'
+        view2 = lambda *arg: 'NOT OK'
+        config = self._makeOne()
+        def pred1(context, request):
+            return True
+        config.add_view(view=view, custom_predicates=(pred1,))
+        config.add_view(view=view2, request_method='GET')
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.method = 'GET'
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_custom_more_preds_first_bests_fewer_preds_last(self):
+        view = lambda *arg: 'OK'
+        view2 = lambda *arg: 'NOT OK'
+        config = self._makeOne()
+        config.add_view(view=view, request_method='GET', xhr=True)
+        config.add_view(view=view2, request_method='GET')
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.method = 'GET'
+        request.is_xhr = True
+        self.assertEqual(wrapper(None, request), 'OK')
+
     def _assertRoute(self, config, name, path, num_predicates=0):
         from repoze.bfg.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)

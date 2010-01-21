@@ -16,6 +16,10 @@ Bug Fixes
   ``repoze.bfg.request.Request``.  BFG now *requires* WebOb >= 0.9.7,
   and code was added so that this deprecation warning has disappeared.
 
+- Fix a view lookup ordering bug whereby a view with a larger number
+  of predicates registered first (literally first, not "earlier") for
+  a triad would lose during view lookup to one registered with fewer.
+
 Documentation
 -------------
 

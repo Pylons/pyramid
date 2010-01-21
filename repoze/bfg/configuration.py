@@ -206,7 +206,7 @@ class Configurator(object):
 
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer_name=None, wrapper_viewname=None,
-                     viewname=None, accept=None):
+                     viewname=None, accept=None, score=MAX_WEIGHT):
         renderer = self._renderer_from_name(renderer_name)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
@@ -220,7 +220,7 @@ class Configurator(object):
                                      authn_policy, authz_policy, settings,
                                      logger)
         predicated_view = _predicate_wrap(debug_view, predicates)
-        derived_view = _accept_wrap(predicated_view, accept)
+        derived_view = _attr_wrap(predicated_view, accept, score)
         return derived_view
 
     def _override(self, package, path, override_package, override_prefix,
@@ -718,7 +718,7 @@ class Configurator(object):
             containment=containment, custom=custom_predicates)
 
         derived_view = self._derive_view(view, permission, predicates, attr,
-                                         renderer, wrapper, name, accept)
+                                         renderer, wrapper, name, accept, score)
 
         if context is None:
             context = for_
@@ -780,7 +780,8 @@ class Configurator(object):
             else:
                 multiview = MultiView(name)
                 old_accept = getattr(old_view, '__accept__', None)
-                multiview.add(old_view, MAX_WEIGHT, old_accept)
+                old_score = getattr(old_view, '__score__', MAX_WEIGHT)
+                multiview.add(old_view, old_score, old_accept)
             multiview.add(derived_view, score, accept)
             for view_type in (IView, ISecuredView):
                 # unregister any existing views
@@ -1378,11 +1379,6 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     predicates = []
     weight = MAX_WEIGHT
 
-    if custom:
-        for predicate in custom:
-            weight = weight - 10
-            predicates.append(predicate)
-
     if xhr:
         def xhr_predicate(context, request):
             return request.is_xhr
@@ -1444,6 +1440,11 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             return find_interface(context, containment) is not None
         weight = weight - 80
         predicates.append(containment_predicate)
+
+    if custom:
+        for predicate in custom:
+            weight = weight - 100
+            predicates.append(predicate)
 
     # this will be == MAX_WEIGHT if no predicates
     score = weight / (len(predicates) + 1)
@@ -1535,6 +1536,10 @@ def decorate_view(wrapped_view, original_view):
         pass
     try:
         wrapped_view.__accept__ = original_view.__accept__
+    except AttributeError:
+        pass
+    try:
+        wrapped_view.__score__ = original_view.__score__
     except AttributeError:
         pass
     return True
@@ -1781,15 +1786,18 @@ def _authdebug_view(view, permission, authn_policy, authz_policy, settings,
 
     return wrapped_view
 
-def _accept_wrap(view, accept):
+def _attr_wrap(view, accept, score):
     # this is a little silly but we don't want to decorate the original
-    # function
-    if accept is None:
-        return view
-    def accept_view(context, request):
+    # function with attributes that indicate accept and score,
+    # so we use a wrapper
+    if (accept is None) and (score == MAX_WEIGHT):
+        return view # defaults
+    def attr_view(context, request):
         return view(context, request)
-    accept_view.__accept__ = accept
-    return accept_view
+    attr_view.__accept__ = accept
+    attr_view.__score__ = score
+    decorate_view(attr_view, view)
+    return attr_view
 
 # note that ``options`` is a b/w compat alias for ``settings`` and
 # ``Configurator`` is a testing dep inj
