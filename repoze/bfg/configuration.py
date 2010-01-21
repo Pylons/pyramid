@@ -60,6 +60,8 @@ from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.view import render_view_to_response
 from repoze.bfg.view import static
 
+MAX_WEIGHT = 10000
+
 DEFAULT_RENDERERS = (
     ('.pt', chameleon_zpt.renderer_factory),
     ('.txt', chameleon_text.renderer_factory),
@@ -406,7 +408,6 @@ class Configurator(object):
         the current configuration state and sends a
         :class:`repoze.bfg.interfaces.IWSGIApplicationCreatedEvent`
         event to all listeners."""
-        # manager in arglist for testing dep injection only
         from repoze.bfg.router import Router # avoid circdep
         app = Router(self.registry)
         # We push the registry on to the stack here in case any code
@@ -779,7 +780,7 @@ class Configurator(object):
             else:
                 multiview = MultiView(name)
                 old_accept = getattr(old_view, '__accept__', None)
-                multiview.add(old_view, sys.maxint, old_accept)
+                multiview.add(old_view, MAX_WEIGHT, old_accept)
             multiview.add(derived_view, score, accept)
             for view_type in (IView, ISecuredView):
                 # unregister any existing views
@@ -1190,7 +1191,6 @@ class Configurator(object):
 
         See :ref:`changing_the_forbidden_view` for more
         information."""
-        
         return self._system_view(IForbiddenView, *arg, **kw)
 
     def set_notfound_view(self, *arg, **kw):
@@ -1373,14 +1373,14 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     # share the same number of predicates.
 
     # Views which do not have any predicates get a score of
-    # sys.maxint, meaning that they will be tried very last.
+    # MAX_WEIGHT, meaning that they will be tried very last.
 
     predicates = []
-    weight = sys.maxint
+    weight = MAX_WEIGHT
 
     if custom:
         for predicate in custom:
-            weight = weight - 1
+            weight = weight - 10
             predicates.append(predicate)
 
     if xhr:
@@ -1445,7 +1445,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         weight = weight - 80
         predicates.append(containment_predicate)
 
-    # this will be == sys.maxint if no predicates
+    # this will be == MAX_WEIGHT if no predicates
     score = weight / (len(predicates) + 1)
     return score, predicates
 
@@ -1792,7 +1792,7 @@ def _accept_wrap(view, accept):
     return accept_view
 
 # note that ``options`` is a b/w compat alias for ``settings`` and
-# ``Configurator`` and ``getSiteManager`` are testing dep injs
+# ``Configurator`` is a testing dep inj
 def make_app(root_factory, package=None, filename='configure.zcml',
              settings=None, options=None, Configurator=Configurator):
     """ Return a Router object, representing a fully configured
