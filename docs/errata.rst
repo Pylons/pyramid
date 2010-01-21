@@ -15,3 +15,17 @@ Should read:
   separated from traversal entirely."
 
 
+pp. 103
+-------
+
+The sentence:
+
+  "The Context Finding and View Lookup (pp. 57) describes how a
+  context and a view name are computed using information from the
+  request. "
+
+Should read:
+
+  "The chapter named Context Finding and View Lookup (pp. 57)
+  describes how, using information from the request, a context and a
+  view name are computed ."

@@ -18,11 +18,11 @@ a request made to your application.
    that implements a view *callable*, and the process of view
    *lookup*.
 
-The :ref:`contextfinding_chapter` describes how a :term:`context` and
-a :term:`view name` are computed using information from the
-:term:`request`.  But neither the context nor the view name found are
-very useful unless those elements can eventually be mapped to a
-:term:`view callable`.
+The chapter named :ref:`contextfinding_chapter` describes how, using
+information from the :term:`request`, a :term:`context` and a
+:term:`view name` are computed.  But neither the context nor the view
+name found are very useful unless those elements can eventually be
+mapped to a :term:`view callable`.
 
 The job of actually locating and invoking the "best" :term:`view
 callable` is the job of the :term:`view lookup` subsystem.  The view
