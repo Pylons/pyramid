@@ -2412,6 +2412,16 @@ class Test_rendered_response(unittest.TestCase):
         result = self._callFUT(renderer, response, request=request)
         self.assertEqual(result.cache_control.max_age, 100)
 
+    def test_with_real_request(self):
+        # functional
+        from repoze.bfg.request import Request
+        renderer = self._makeRenderer()
+        response = {'a':'1'}
+        request = Request({})
+        request.response_status = '406 You Lose'
+        result = self._callFUT(renderer, response, request=request)
+        self.assertEqual(result.status, '406 You Lose')
+
 class Test_decorate_view(unittest.TestCase):
     def _callFUT(self, wrapped, original):
         from repoze.bfg.configuration import decorate_view
