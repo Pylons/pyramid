@@ -736,13 +736,10 @@ class Configurator(object):
             context = for_
 
         r_context = context
-        r_request_iface = request_iface
         if r_context is None:
             r_context = Interface
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
-        if not IInterface.providedBy(r_request_iface):
-            r_request_iface = implementedBy(r_request_iface)
 
         registered = self.registry.adapters.registered
 
@@ -767,7 +764,7 @@ class Configurator(object):
         old_view = None
 
         for view_type in (IView, ISecuredView, IMultiView):
-            old_view = registered((r_request_iface, r_context), view_type, name)
+            old_view = registered((request_iface, r_context), view_type, name)
             if old_view is not None:
                 break
         
@@ -799,7 +796,7 @@ class Configurator(object):
             for view_type in (IView, ISecuredView):
                 # unregister any existing views
                 self.registry.adapters.unregister(
-                    (r_request_iface, r_context), view_type, name=name)
+                    (request_iface, r_context), view_type, name=name)
             self.registry.registerAdapter(multiview, (request_iface, context),
                                           IMultiView, name, info=_info)
 

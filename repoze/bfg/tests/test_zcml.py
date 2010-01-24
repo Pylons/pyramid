@@ -69,6 +69,15 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(result, 'OK')
         self.failIf(hasattr(view, '__call_permissive__'))
 
+    def test_request_type_asnoninterfacestring(self):
+        from repoze.bfg.exceptions import ConfigurationError
+        context = DummyContext('notaninterface')
+        view = lambda *arg: 'OK'
+        self.assertRaises(ConfigurationError,
+                          self._callFUT,
+                          context, 'repoze.view', IDummy, view=view,
+                          request_type='whatever')
+
     def test_with_dotted_renderer(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
