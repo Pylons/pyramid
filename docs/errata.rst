@@ -64,3 +64,29 @@ Should read:
 
             def __call__(self):
                 return Response('OK')
+pp. 98
+------
+
+The section entitled "Global View Configurations May Match When a
+Route-Specific View Configuration Doesn't" is incorrect.  The entire
+section should be disregarded.
+
+pp. 99
+------
+
+The section entitled "context Type Registrations Bind More Tightly
+Than request Type Registrations" is incorrect.  The entire section
+should be disgregarded.
+
+pp. 83
+-------
+
+A "route configuration" argument was omitted:
+
+  ``use_global_views``
+    When a request matches this route, and view lookup cannot find a
+    view which has a 'route_name' predicate argument that matches the
+    route, try to fall back to using a view that otherwise matches the
+    context, request, and view name (but does not match the route name
+    predicate).
+
