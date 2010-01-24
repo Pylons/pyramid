@@ -14,6 +14,12 @@
      context="repoze.bfg.traversal.DefaultRootFactory"
      />
 
+  <view
+    name="global2"
+    view=".views.global2_view"
+    context="repoze.bfg.traversal.DefaultRootFactory"
+    />
+
   <route
      path="def"
      name="route2"
@@ -37,6 +43,19 @@
   <route
      path="jkl"
      name="route4"
+     />
+
+  <!-- the global view should not be found for this route (/global2) -->
+  <route
+     path="mno/*traverse"
+     name="route5"
+     />
+
+  <!-- the global view should be found for this route (/global2) -->
+  <route
+     path="pqr/*traverse"
+     name="route6"
+     use_global_views="True"
      />
 
 </configure>

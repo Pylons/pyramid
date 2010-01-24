@@ -135,6 +135,11 @@ class TestHybridApp(TwillBase):
         self.assertEqual(browser.get_html(), 'global')
         browser.go('http://localhost:6543/jkl')
         self.assertEqual(browser.get_code(), 404)
+        browser.go('http://localhost:6543/mno/global2')
+        self.assertEqual(browser.get_code(), 404)
+        browser.go('http://localhost:6543/pqr/global2')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'global2')
 
 class DummyContext(object):
     pass
