@@ -122,7 +122,7 @@ def view_execution_permitted(context, request, name=''):
         reg = request.registry
     except AttributeError:
         reg = get_current_registry() # b/c
-    provides = map(providedBy, (context, request))
+    provides = map(providedBy, (request, context))
     view = reg.adapters.lookup(provides, ISecuredView, name=name)
     if view is None:
         return Allowed(

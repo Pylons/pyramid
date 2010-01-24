@@ -79,8 +79,8 @@ class Request(WebobRequest):
     def values(self):
         return self.environ.values()
 
-def route_request_iface(name):
-    return InterfaceClass('%s_IRequest' % name)
+def route_request_iface(name, bases=()):
+    return InterfaceClass('%s_IRequest' % name, bases=bases)
 
 def add_global_response_headers(request, headerlist):
     attrs = request.__dict__

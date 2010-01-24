@@ -5,6 +5,7 @@ from zope.interface import providedBy
 from repoze.bfg.interfaces import IDebugLogger
 from repoze.bfg.interfaces import IForbiddenView
 from repoze.bfg.interfaces import INotFoundView
+from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRouter
@@ -70,6 +71,8 @@ class Router(object):
             attrs = request.__dict__
             attrs['registry'] = registry
             has_listeners and registry.notify(NewRequest(request))
+
+            request_iface = IRequest
             
             try:
                 # find the root
@@ -82,10 +85,10 @@ class Router(object):
                         environ['bfg.routes.route'] = route
                         environ['bfg.routes.matchdict'] = match
                         request.matchdict = match
-                        iface = registry.queryUtility(IRouteRequest,
-                                                      name=route.name)
-                        if iface is not None:
-                            alsoProvides(request, iface)
+                        request_iface = registry.queryUtility(
+                            IRouteRequest,
+                            name=route.name,
+                            default=IRequest)
                         root_factory = route.factory or self.root_factory
 
                 root = root_factory(request)
@@ -103,9 +106,10 @@ class Router(object):
                     tdict['virtual_root_path'])
                 attrs.update(tdict)
                 has_listeners and registry.notify(AfterTraversal(request))
-                provides = map(providedBy, (context, request))
+                context_iface = providedBy(context)
                 view_callable = adapters.lookup(
-                    provides, IView, name=view_name, default=None)
+                    (request_iface, context_iface),
+                    IView, name=view_name, default=None)
 
                 # invoke the view callable
                 if view_callable is None:

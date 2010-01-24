@@ -695,27 +695,39 @@ class Configurator(object):
             request_method = request_type
             request_type = None
 
-        if request_type and route_name:
-            raise ConfigurationError(
-                'A view cannot be configured with both the request_type and '
-                'route_name parameters: these two features when used together '
-                'causes an internal conflict.')
+        if request_type is not None:
+            if not IInterface.providedBy(request_type):
+                raise ConfigurationError(
+                    'request_type must be an interface, not %s' % request_type)
 
-        if request_type is None:
-            request_type = IRequest
+        request_iface = IRequest
 
         if route_name is not None:
-            request_type = self.registry.queryUtility(IRouteRequest,
-                                                      name=route_name)
-            if request_type is None:
-                request_type = route_request_iface(route_name)
-                self.registry.registerUtility(request_type, IRouteRequest,
-                                              name=route_name)
+            request_iface = self.registry.queryUtility(IRouteRequest,
+                                                       name=route_name)
+            if request_iface is None:
+                deferred_views = getattr(self.registry,
+                                         'deferred_route_views', None)
+                if deferred_views is None:
+                    deferred_views = self.registry.deferred_route_views = {}
+                info = dict(
+                    view=view, name=name, for_=for_, permission=permission, 
+                    request_type=request_type, route_name=route_name,
+                    request_method=request_method, request_param=request_param,
+                    containment=containment, attr=attr,
+                    renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
+                    header=header, path_info=path_info, custom_predicates=(),
+                    context=context, _info=u''
+                    )
+                view_info = deferred_views.setdefault(route_name, [])
+                view_info.append(info)
+                return
 
         score, predicates = _make_predicates(
             xhr=xhr, request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
-            containment=containment, custom=custom_predicates)
+            containment=containment, request_type=request_type,
+            custom=custom_predicates)
 
         derived_view = self._derive_view(view, permission, predicates, attr,
                                          renderer, wrapper, name, accept, score)
@@ -724,13 +736,13 @@ class Configurator(object):
             context = for_
 
         r_context = context
-        r_request_type = request_type
+        r_request_iface = request_iface
         if r_context is None:
             r_context = Interface
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
-        if not IInterface.providedBy(r_request_type):
-            r_request_type = implementedBy(r_request_type)
+        if not IInterface.providedBy(r_request_iface):
+            r_request_iface = implementedBy(r_request_iface)
 
         registered = self.registry.adapters.registered
 
@@ -755,7 +767,7 @@ class Configurator(object):
         old_view = None
 
         for view_type in (IView, ISecuredView, IMultiView):
-            old_view = registered((r_context, r_request_type), view_type, name)
+            old_view = registered((r_request_iface, r_context), view_type, name)
             if old_view is not None:
                 break
         
@@ -767,7 +779,8 @@ class Configurator(object):
                 view_iface = ISecuredView
             else:
                 view_iface = IView
-            self.registry.registerAdapter(derived_view, (context, request_type),
+            self.registry.registerAdapter(derived_view,
+                                          (request_iface, context),
                                           view_iface, name, info=_info)
         else:
             # XXX we could try to be more efficient here and register
@@ -786,8 +799,8 @@ class Configurator(object):
             for view_type in (IView, ISecuredView):
                 # unregister any existing views
                 self.registry.adapters.unregister(
-                    (r_context, r_request_type), view_type, name=name)
-            self.registry.registerAdapter(multiview, (context, request_type),
+                    (r_request_iface, r_context), view_type, name=name)
+            self.registry.registerAdapter(multiview, (request_iface, context),
                                           IMultiView, name, info=_info)
 
     def add_route(self, name, path, view=None, view_for=None,
@@ -801,6 +814,7 @@ class Configurator(object):
                   renderer=None, view_renderer=None, view_header=None, 
                   view_accept=None, view_xhr=False,
                   view_path_info=None, view_context=None,
+                  use_global_views=False,
                   _info=u''):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
@@ -1022,6 +1036,16 @@ class Configurator(object):
           If the ``view`` argument is not provided, this argument has no
           effect.
 
+        use_global_views
+
+          When a request matches this route, and view lookup cannot
+          find a view which has a ``route_name`` predicate argument
+          that matches the route, try to fall back to using a view
+          that otherwise matches the context, request, and view name
+          (but which does not match the route_name predicate).
+
+          .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
+
         """
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
@@ -1036,9 +1060,14 @@ class Configurator(object):
 
         request_iface = self.registry.queryUtility(IRouteRequest, name=name)
         if request_iface is None:
-            request_iface = route_request_iface(name)
+            bases = use_global_views and (IRequest,) or ()
+            request_iface = route_request_iface(name, bases)
             self.registry.registerUtility(
                 request_iface, IRouteRequest, name=name)
+            deferred_views = getattr(self.registry, 'deferred_route_views', {})
+            view_info = deferred_views.pop(name, ())
+            for info in view_info:
+                self.add_view(**info)
 
         if view:
             if view_context is None:
@@ -1349,7 +1378,7 @@ class Configurator(object):
 
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
-                     containment=None, custom=()):
+                     containment=None, request_type=None, custom=()):
     # Predicates are added to the predicate list in (presumed)
     # computation expense order.  All predicates associated with a
     # view must evaluate true for the view to "match" a request.
@@ -1440,6 +1469,12 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             return find_interface(context, containment) is not None
         weight = weight - 80
         predicates.append(containment_predicate)
+
+    if request_type is not None:
+        def request_type_predicate(context, request):
+            return request_type.providedBy(request)
+        weight = weight - 90
+        predicates.append(request_type_predicate)
 
     if custom:
         for predicate in custom:

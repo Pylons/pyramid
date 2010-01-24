@@ -1,3 +1,40 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- When "hybrid mode" (both traversal and urldispatch) is in use,
+  default to finding route-related views even if a non-route-related
+  view registration has been made with a more specific context.  The
+  default used to be to find views with a more specific context first.
+  Use the ``use_global_views`` argument to the route configuration to
+  get back the older behavior.
+
+Features
+--------
+
+- Add ``use_global_views`` argument to ``add_route`` method of
+  Configurator.  When this argument is true, views registered for *no*
+  route will be found if no more specific view related to the route is
+  found.
+
+- Add ``use_global_views`` attribute to ZCML ``<route>`` directive
+  (see above).
+
+Internal
+--------
+
+- When registering a view, register the view adapter with the
+  "requires" interfaces as ``(request_type, context_type)`` rather
+  than ``(context_type, request_type)``.  This provides for saner
+  lookup, because the registration will always be made with a specific
+  request interface, but registration may not be made with a specific
+  context interface.  In general, when creating multiadapters, you
+  want to order the provides interfaces so that the the elements which
+  are more likely to have specific interfaces are ordered before those
+  which may not.
+
 1.2b2 (2010-01-21)
 ==================
 

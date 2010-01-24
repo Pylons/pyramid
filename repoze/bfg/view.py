@@ -67,7 +67,7 @@ def render_view_to_response(context, request, name='', secure=True):
     was disallowed.
 
     If ``secure`` is ``False``, no permission checking is done."""
-    provides = map(providedBy, (context, request))
+    provides = map(providedBy, (request, context))
     try:
         reg = request.registry
     except AttributeError:

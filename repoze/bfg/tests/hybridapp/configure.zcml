@@ -1,0 +1,42 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg.includes" />
+
+  <!-- we want this view to "win" -->
+  <route
+     view=".views.route_view"
+     path="abc"
+     name="route" />
+
+  <!-- .. even though this one has a more specific context -->
+  <view
+     view=".views.global_view"
+     context="repoze.bfg.traversal.DefaultRootFactory"
+     />
+
+  <route
+     path="def"
+     name="route2"
+     />
+
+  <!-- we want this view to win for route2 even though global view with 
+       context is more specific -->
+  <view
+     route_name="route2"
+     view=".views.route2_view"
+     />
+
+  <!-- the global view should be found for this route -->
+  <route
+     path="ghi"
+     name="route3"
+     use_global_views="True"
+     />
+
+  <!-- the global view should not be found for this route -->
+  <route
+     path="jkl"
+     name="route4"
+     />
+
+</configure>

@@ -203,6 +203,14 @@ Attributes
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
+``use_global_views``
+  When a request matches this route, and view lookup cannot find a view
+  which has a 'route_name' predicate argument that matches the route,
+  try to fall back to using a view that otherwise matches the context,
+  request, and view name (but does not match the route name predicate).
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
+
 Alternatives
 ~~~~~~~~~~~~
 

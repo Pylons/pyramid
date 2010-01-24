@@ -36,7 +36,7 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         config = Configurator()
         config.scan(test_integration)
         reg = config.registry
-        view = reg.adapters.lookup((INothing, IRequest), IView, name='')
+        view = reg.adapters.lookup((IRequest, INothing), IView, name='')
         self.assertEqual(view, wsgiapptest)
 
 here = os.path.dirname(__file__)
@@ -112,6 +112,29 @@ class TestCCBug(TwillBase):
         browser.go('http://localhost:6543/licenses/1/v1/juri')
         self.assertEqual(browser.get_code(), 200)
         self.assertEqual(browser.get_html(), 'juri')
+
+class TestHybridApp(TwillBase):
+    # make sure views registered for a route "win" over views registered
+    # without one, even though the context of the non-route view may
+    # be more specific than the route view.
+    config = 'repoze.bfg.tests.hybridapp:configure.zcml'
+    def test_it(self):
+        import twill.commands
+        browser = twill.commands.get_browser()
+        browser.go('http://localhost:6543/')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'global')
+        browser.go('http://localhost:6543/abc')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'route')
+        browser.go('http://localhost:6543/def')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'route2')
+        browser.go('http://localhost:6543/ghi')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'global')
+        browser.go('http://localhost:6543/jkl')
+        self.assertEqual(browser.get_code(), 404)
 
 class DummyContext(object):
     pass

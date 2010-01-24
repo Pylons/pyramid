@@ -354,7 +354,7 @@ class TestRouter(unittest.TestCase):
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', IContext, IRequest)
+        self._registerView(view, '', IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -381,7 +381,7 @@ class TestRouter(unittest.TestCase):
         response = DummyResponse()
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', IContext, IRequest)
+        self._registerView(view, '', IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -400,7 +400,7 @@ class TestRouter(unittest.TestCase):
         response = DummyResponse()
         view = DummyView(response, raise_unauthorized=True)
         environ = self._makeEnviron()
-        self._registerView(view, '', IContext, IRequest)
+        self._registerView(view, '', IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
         response = router(environ, start_response)
@@ -419,7 +419,7 @@ class TestRouter(unittest.TestCase):
         response = DummyResponse()
         view = DummyView(response, raise_notfound=True)
         environ = self._makeEnviron()
-        self._registerView(view, '', IContext, IRequest)
+        self._registerView(view, '', IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
         response = router(environ, start_response)
@@ -441,7 +441,7 @@ class TestRouter(unittest.TestCase):
             request.global_response_headers = [('b', 2)]
             return response
         environ = self._makeEnviron()
-        self._registerView(view, '', IContext, IRequest)
+        self._registerView(view, '', IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
         router(environ, start_response)
@@ -519,7 +519,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
         self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, routing_args)
-        self.failUnless(req_iface.providedBy(request))
 
     def test_call_route_matches_doesnt_overwrite_subscriber_iface(self):
         from repoze.bfg.interfaces import INewRequest
@@ -560,7 +559,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
         self.assertEqual(environ['bfg.routes.route'].name, 'foo')
         self.assertEqual(request.matchdict, routing_args)
-        self.failUnless(req_iface.providedBy(request))
         self.failUnless(IFoo.providedBy(request))
 
     def test_root_factory_raises_notfound(self):

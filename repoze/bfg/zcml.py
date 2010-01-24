@@ -6,6 +6,7 @@ from zope.configuration.fields import GlobalInterface
 from zope.configuration.fields import GlobalObject
 from zope.configuration.fields import Tokens
 
+from zope.interface.interfaces import IInterface
 from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface import providedBy
@@ -181,6 +182,9 @@ def view(
 
     if request_type is not None:
         request_type = _context.resolve(request_type)
+        if not IInterface.providedBy(request_type):
+            raise ConfigurationError(
+                'request_type must be an interface, not %s' % request_type)
 
     if renderer and '.' in renderer:
         renderer = path_spec(_context, renderer)
@@ -256,6 +260,7 @@ class IRouteDirective(Interface):
         required=False,
         value_type=GlobalObject()
         )
+    use_global_views = Bool(title=u'use_global_views', required=False)
 
 def route(_context, name, path, view=None, view_for=None,
           permission=None, factory=None, for_=None,
@@ -265,7 +270,8 @@ def route(_context, name, path, view=None, view_for=None,
           view_request_param=None, view_containment=None, view_attr=None,
           renderer=None, view_renderer=None, view_header=None, 
           view_accept=None, view_xhr=False,
-          view_path_info=None, view_context=None):
+          view_path_info=None, view_context=None,
+          use_global_views=False):
     """ Handle ``route`` ZCML directives
     """
     # the strange ordering of the request kw args above is for b/w
@@ -307,6 +313,7 @@ def route(_context, name, path, view=None, view_for=None,
             view_accept=view_accept,
             view_xhr=view_xhr,
             view_path_info=view_path_info,
+            use_global_views=use_global_views,
             _info=_context.info
             )
 
@@ -327,7 +334,7 @@ def route(_context, name, path, view=None, view_for=None,
             reg.registerUtility(request_iface, IRouteRequest, name=name)
         _context.action(
             discriminator = (
-                'view', view_context, '', request_iface, IView,
+                'view', view_context, '', None, IView,
                 view_containment, view_request_param, view_request_method,
                 name, view_attr, view_xhr, view_accept, view_header,
                 view_path_info),

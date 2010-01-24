@@ -30,7 +30,7 @@ class ConfiguratorTests(unittest.TestCase):
         if request_iface is None:
             request_iface = IRequest
         return config.registry.adapters.lookup(
-            (ctx_iface, request_iface), IView, name=name,
+            (request_iface, ctx_iface), IView, name=name,
             default=None)
 
     def _getRouteRequestIface(self, config, name):
@@ -563,7 +563,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_view(view=view)
         wrapper = config.registry.adapters.lookup(
-            (Interface, IRequest), ISecuredView, name='', default=None)
+            (IRequest, Interface), ISecuredView, name='', default=None)
         self.assertEqual(wrapper, view)
 
     def test_add_view_multiview_replaces_existing_view(self):
@@ -574,7 +574,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (Interface, IRequest), IView, name='')
+            view, (IRequest, Interface), IView, name='')
         config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -588,7 +588,7 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (Interface, IRequest), ISecuredView, name='')
+            view, (IRequest, Interface), ISecuredView, name='')
         config.add_view(view=view)
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -605,7 +605,7 @@ class ConfiguratorTests(unittest.TestCase):
             return 'OK2'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (Interface, IRequest), IView, name='')
+            view, (IRequest, Interface), IView, name='')
         config.add_view(view=view2, accept='text/html')
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -628,7 +628,7 @@ class ConfiguratorTests(unittest.TestCase):
         view.__accept__ = 'text/html'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (Interface, IRequest), IView, name='')
+            view, (IRequest, Interface), IView, name='')
         config.add_view(view=view2)
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
@@ -645,7 +645,7 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IMultiView
         view = DummyMultiView()
         config = self._makeOne()
-        config.registry.registerAdapter(view, (Interface, IRequest),
+        config.registry.registerAdapter(view, (IRequest, Interface),
                                         IMultiView, name='')
         view2 = lambda *arg: 'OK2'
         config.add_view(view=view2)
@@ -667,32 +667,12 @@ class ConfiguratorTests(unittest.TestCase):
         view2 = lambda *arg: 'OK2'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (ISuper, IRequest), IView, name='')
+            view, (IRequest, ISuper), IView, name='')
         config.add_view(view=view2, for_=ISub)
         wrapper = self._getViewCallable(config, ISuper, IRequest)
         self.failIf(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
         wrapper = self._getViewCallable(config, ISub, IRequest)
-        self.failIf(IMultiView.providedBy(wrapper))
-        self.assertEqual(wrapper(None, None), 'OK2')
-
-    def test_add_view_multiview_request_superclass_then_subclass(self):
-        from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IMultiView
-        class ISubRequest(IRequest):
-            pass
-        view = lambda *arg: 'OK'
-        view2 = lambda *arg: 'OK2'
-        config = self._makeOne()
-        config.registry.registerAdapter(
-            view, (Interface, IRequest), IView, name='')
-        config.add_view(view=view2, request_type=ISubRequest)
-        wrapper = self._getViewCallable(config, Interface, IRequest)
-        self.failIf(IMultiView.providedBy(wrapper))
-        self.assertEqual(wrapper(None, None), 'OK')
-        wrapper = self._getViewCallable(config, Interface, ISubRequest)
         self.failIf(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK2')
 
@@ -801,31 +781,44 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(renderer.path, 'repoze.bfg.tests:fixtures/minimal.txt')
 
     def test_add_view_with_request_type_as_iface(self):
+        from zope.interface import directlyProvides
         def view(context, request):
             return 'OK'
         config = self._makeOne()
         config.add_view(request_type=IDummy, view=view)
-        wrapper = self._getViewCallable(config, None, IDummy)
-        result = wrapper(None, None)
+        wrapper = self._getViewCallable(config, None)
+        request = self._makeRequest(config)
+        directlyProvides(request, IDummy)
+        result = wrapper(None, request)
         self.assertEqual(result, 'OK')
 
     def test_add_view_with_request_type_as_noniface(self):
-        from zope.interface import providedBy
-        def view(context, request):
-            return 'OK'
+        from repoze.bfg.exceptions import ConfigurationError
+        view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.add_view(request_type=object, view=view)
-        request_iface = providedBy(object)
-        wrapper = self._getViewCallable(config, None, request_iface)
-        result = wrapper(None, None)
-        self.assertEqual(result, 'OK')
+        self.assertRaises(ConfigurationError,
+                          config.add_view, view, '', None, None, object)
 
     def test_add_view_with_route_name(self):
+        from zope.component import ComponentLookupError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, route_name='foo')
-        request_type = self._getRouteRequestIface(config, 'foo')
-        wrapper = self._getViewCallable(config, None, request_type)
+        self.assertEqual(len(config.registry.deferred_route_views), 1)
+        infos = config.registry.deferred_route_views['foo']
+        self.assertEqual(len(infos), 1)
+        info = infos[0]
+        self.assertEqual(info['route_name'], 'foo')
+        self.assertEqual(info['view'], view)
+        self.assertRaises(ComponentLookupError,
+                          self._getRouteRequestIface, config, 'foo')
+        wrapper = self._getViewCallable(config, None)
+        self.assertEqual(wrapper, None)
+        config.add_route('foo', '/a/b')
+        request_iface = self._getRouteRequestIface(config, 'foo')
+        self.failIfEqual(request_iface, None)
+        wrapper = self._getViewCallable(config, request_iface=request_iface)
+        self.failIfEqual(wrapper, None)
         self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_with_request_method_true(self):
@@ -1363,7 +1356,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
         wrapped = config.registry.adapters.lookup(
-            (iface, request_type), IView, name='')
+            (request_type, iface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
@@ -1379,7 +1372,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
         wrapped = config.registry.adapters.lookup(
-            (iface, request_type), IView, name='')
+            (request_type, iface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
@@ -1398,7 +1391,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
         wrapped = config.registry.adapters.lookup(
-            (iface, request_type), IView, name='')
+            (request_type, iface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
 

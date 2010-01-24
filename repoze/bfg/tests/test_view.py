@@ -9,10 +9,9 @@ class BaseTest(object):
     def tearDown(self):
         cleanUp()
 
-    def _registerView(self, reg, app, name, *for_):
+    def _registerView(self, reg, app, name):
         from repoze.bfg.interfaces import IRequest
-        if not for_:
-            for_ = (IContext, IRequest)
+        for_ = (IRequest, IContext)
         from repoze.bfg.interfaces import IView
         reg.registerAdapter(app, for_, IView, name)
 

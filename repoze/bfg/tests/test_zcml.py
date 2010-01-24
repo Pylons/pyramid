@@ -37,7 +37,7 @@ class TestViewDirective(unittest.TestCase):
         register = action['callable']
         register()
         reg = get_current_registry()
-        wrapper = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        wrapper = reg.adapters.lookup((IRequest, IDummy), IView, name='')
         request = DummyRequest()
         request.method = 'GET'
         self.assertEqual(wrapper.__predicated__(None, request), True)
@@ -45,12 +45,12 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(wrapper.__predicated__(None, request), False)
         
     def test_request_type_asinterfacestring(self):
+        from zope.interface import directlyProvides
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewPermission
         from repoze.bfg.interfaces import IRequest
         context = DummyContext(IDummy)
-        view = lambda *arg: None
+        view = lambda *arg: 'OK'
         self._callFUT(context, 'repoze.view', IDummy, view=view,
                       request_type='whatever')
         actions = context.actions
@@ -61,11 +61,13 @@ class TestViewDirective(unittest.TestCase):
         register = actions[0]['callable']
         register()
         reg = get_current_registry()
-        regview = reg.adapters.lookup((IDummy, IDummy), IView, name='')
-        self.assertEqual(view, regview)
+        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
+        self.assertNotEqual(view, regview)
+        request = DummyRequest()
+        directlyProvides(request, IDummy)
+        result = regview(None, request)
+        self.assertEqual(result, 'OK')
         self.failIf(hasattr(view, '__call_permissive__'))
-        perm = reg.adapters.lookup((IDummy, IRequest), IViewPermission, name='')
-        self.assertEqual(perm, None)
 
     def test_with_dotted_renderer(self):
         from repoze.bfg.threadlocal import get_current_registry
@@ -89,7 +91,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
         self.assertEqual(regview(None, None).body, 'OK')
 
     def test_with_custom_predicates(self):
@@ -114,7 +116,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
         self.assertEqual(regview(None, None), 'OK')
 
     def test_context_trumps_for(self):
@@ -135,7 +137,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
         self.assertEqual(regview(None, None), 'OK')
 
     def test_with_for(self):
@@ -155,7 +157,7 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        regview = reg.adapters.lookup((IDummy, IRequest), IView, name='')
+        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
         self.assertEqual(regview(None, None), 'OK')
 
 class TestNotFoundDirective(unittest.TestCase):
@@ -510,10 +512,10 @@ class TestRouteDirective(unittest.TestCase):
         reg = get_current_registry()
         request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
-        discrim = ('view', None, '', request_type, IView, None, None, None,
+        discrim = ('view', None, '', None, IView, None, None, None,
                    'name', None, False, None, None, None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = reg.adapters.lookup((Interface, request_type), IView, name='')
+        wrapped = reg.adapters.lookup((request_type, Interface), IView, name='')
         self.failUnless(wrapped)
 
     def test_with_view_and_view_context(self):
@@ -537,10 +539,10 @@ class TestRouteDirective(unittest.TestCase):
         reg = get_current_registry()
         request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
-        discrim = ('view', IDummy, '', request_type, IView, None, None, None,
+        discrim = ('view', IDummy, '', None, IView, None, None, None,
                    'name', None, False, None, None, None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = reg.adapters.lookup((IDummy, request_type), IView, name='')
+        wrapped = reg.adapters.lookup((request_type, IDummy), IView, name='')
         self.failUnless(wrapped)
 
     def test_with_view_context_trumps_view_for(self):
@@ -567,10 +569,10 @@ class TestRouteDirective(unittest.TestCase):
         reg = get_current_registry()
         request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
-        discrim = ('view', IDummy, '', request_type, IView, None, None, None,
+        discrim = ('view', IDummy, '', None, IView, None, None, None,
                    'name', None, False, None, None, None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = reg.adapters.lookup((IDummy, request_type), IView, name='')
+        wrapped = reg.adapters.lookup((request_type, IDummy), IView, name='')
         self.failUnless(wrapped)
 
     def test_with_dotted_renderer(self):
@@ -604,10 +606,10 @@ class TestRouteDirective(unittest.TestCase):
         view_action = actions[1]
         request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
-        discrim = ('view', None, '', request_type, IView, None, None, None,
+        discrim = ('view', None, '', None, IView, None, None, None,
                    'name', None, False, None, None, None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = reg.adapters.lookup((Interface, request_type), IView, name='')
+        wrapped = reg.adapters.lookup((request_type, Interface), IView, name='')
         self.failUnless(wrapped)
         request = DummyRequest()
         result = wrapped(None, request)
@@ -674,7 +676,7 @@ class TestStaticDirective(unittest.TestCase):
         self.assertEqual(discriminator[4], IView)
         iface = implementedBy(StaticRootFactory)
         request_type = reg.getUtility(IRouteRequest, 'name')
-        view = reg.adapters.lookup((iface, request_type), IView, name='')
+        view = reg.adapters.lookup((request_type, iface), IView, name='')
         request = DummyRequest()
         self.assertEqual(view(None, request).__class__, PackageURLParser)
 
