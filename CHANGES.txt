@@ -1,5 +1,5 @@
-Next release
-============
+1.2b3 (2010-01-24)
+==================
 
 Bug Fixes
 ---------
@@ -8,7 +8,7 @@ Bug Fixes
   default to finding route-related views even if a non-route-related
   view registration has been made with a more specific context.  The
   default used to be to find views with a more specific context first.
-  Use the ``use_global_views`` argument to the route configuration to
+  Use the new ``use_global_views`` argument to the route definition to
   get back the older behavior.
 
 Features
