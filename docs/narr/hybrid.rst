@@ -216,14 +216,16 @@ Views that spell a route name are meant to associate a particular view
 declaration with a route, using the route's name, in order to indicate
 that the view should *only be invoked when the route matches*.
 
-Views declared *after* the route declaration may have a ``route_name``
-attribute which refers to the value of the ``<route>`` declaration's
-``name`` attribute ("home").  The ``<view>`` declaration above names a
-different view and (more importantly) a different :term:`view name`.
-It's :term:`view name` will be looked for during traversal.  So if our
-URL is "http://example.com/one/two/a/another", the ``.views.another``
-view callable will be called instead of the *default* view callable
-(the one implied by the route with the name ``home``).
+View configurations may have a ``route_name`` attribute which refers
+to the value of the ``<route>`` declaration's ``name`` attribute.  In
+the above example, the route name is ``home``.
+
+The ``<view>`` declaration above names a different view and (more
+importantly) a different :term:`view name`.  It's :term:`view name`
+will be looked for during traversal.  So if our URL is
+"http://example.com/one/two/a/another", the ``.views.another`` view
+callable will be called instead of the *default* view callable (the
+one implied by the route with the name ``home``).
 
 .. index::
    single: route subpath
@@ -259,106 +261,35 @@ Where ``.views.static_view`` is an instance of
 :class:`repoze.bfg.view.static`.  This effectively tells the static
 helper to traverse everything in the subpath as a filename.
 
+Making Global Views Match
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, view configurations that don't mention a ``route_name``
+will be found by view lookup when a route matches.  You can make these
+match forcibly by adding the ``use_global_views`` flag to the route
+definition.  For example, the ``views.bazbuz`` view below will be
+found if the route named ``abc`` below is matched and the
+``PATH_INFO`` is ``/abc/bazbuz``, even though the view configuration
+statement does not have the ``route_name="abc"`` attribute.
+
+.. code-block:: xml
+
+   <route
+     path="/abc/*traverse"
+     name="abc"
+     use_global_views="True"
+     />
+
+   <view
+     name="bazbuz"
+     view=".views.bazbuz"
+     />
+
 Corner Cases
 ------------
 
 A number of corner case "gotchas" exist when using a hybrid
 application.  We'll detail them here.
-
-.. _globalviews_corner_case:
-
-"Global" View Configurations May Match When A Route-Specific View Configuration Doesn't
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Note that views that don't mention a ``route_name`` will *also* match
-when *any* route matches.  For example, the "bazbuz" view below will
-be found if the route named "abc" below is matched.
-
-.. code-block:: xml
-
-   <route
-     path="/abc/*traverse"
-     name="abc"
-     view=".views.abc"
-     />
-
-   <view
-     name="bazbuz"
-     view=".views.bazbuz"
-     />
-
-To override the behavior of the "bazbuz" view when this route matches,
-use an additional view that mentions the route name explicitly.
-
-.. code-block:: xml
-
-   <route
-     path="/abc/*traverse"
-     name="abc"
-     view=".views.abc"
-     />
-
-   <view
-     name="bazbuz"
-     view=".views.bazbuz"
-     />
-
-   <view
-     name="bazbuz"
-     route_name="abc"
-     view=".views.bazbuz2"
-     />
-
-In the above setup, when no route matches, and traversal finds the
-view name to be "bazbuz", the ``.views.bazbuz`` view will be used.
-However, if the "abc" route matches, and traversal finds the view name
-to be "bazbuz", the ``.views.bazbuz2`` view will be used.
-
-``context`` Type Registrations Bind More Tightly Than ``request``  Type Registrations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This corner case is only interesting if you are using a hybrid
-application and you believe the wrong view callable is being found for
-a given request.
-
-A view is registered for a route either via :term:`route
-configuration` by passing a ``view`` argument, or via :term:`view
-configuration` by passing a ``route_name`` that matches the route's
-name.
-
-At startup time, when such a registration is encountered, the view is
-registered for the ``context`` type ``None`` -- meaning *any* context
--- and a *special* request type which is dynamically generated.  This
-request type also derives from a "base" request type, which is what
-allows it to match against views defined without a route name as per
-see :ref:`globalviews_corner_case`.
-
-When a request URL matches a route configuration path, the special
-request type interface mentioned in the previous paragraph is attached
-to the ``request`` object as it is created.  The *root* found by the
-router is based on either the route's ``factory`` or the default root
-factory if no ``factory`` is mentioned in the route configuration.
-This root is eventually resolved to a ``context`` via
-:term:`traversal`.  This ``context`` will either have some particular
-:term:`interface`, or it won't, depending on the result of traversal.
-
-The view configuration registration made "under the hood" for view
-callables that match a route use the very weakly binding ``None``
-value as the context value's interface.  Given how :term:`view lookup`
-works, if the context that is found has a specific interface, and a
-global view configuration statement is registered using this interface
-as its ``context``, it's likely that the *global* view callable will
-match *before* the view callable that is attached to the route.  This
-behavior can be subverted if the ``view_context`` attribute is used on
-the route registration, because then both the request type and the
-context type can be made "more specific" for the view registration
-related to the route.
-
-What it all boils down to is this: if a request that matches a route
-resolves to a view you don't expect it to, use the ``view_context``
-attribute of route configuration *or* the ``context`` attribute of
-:term:`view configuration` which names a ``route_name`` to name the
-specific context interface you want the route-related view to match.
 
 Registering a Default View for a Route That Has a ``view`` Attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
