@@ -31,9 +31,9 @@ Internal
   lookup, because the registration will always be made with a specific
   request interface, but registration may not be made with a specific
   context interface.  In general, when creating multiadapters, you
-  want to order the provides interfaces so that the the elements which
-  are more likely to have specific interfaces are ordered before those
-  which may not.
+  want to order the requires interfaces so that the the elements which
+  are more likely to be registered using specific interfaces are
+  ordered before those which are less likely.
 
 1.2b2 (2010-01-21)
 ==================
