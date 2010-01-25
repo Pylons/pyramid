@@ -1,4 +1,3 @@
-from zope.interface import alsoProvides
 from zope.interface import implements
 from zope.interface import providedBy
 
