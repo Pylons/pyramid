@@ -83,7 +83,7 @@ class Router(object):
                         environ['wsgiorg.routing_args'] = ((), match)
                         environ['bfg.routes.route'] = route
                         environ['bfg.routes.matchdict'] = match
-                        request.matchdict = match
+                        attrs['matchdict'] = match
                         request_iface = registry.queryUtility(
                             IRouteRequest,
                             name=route.name,
