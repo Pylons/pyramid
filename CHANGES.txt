@@ -1,7 +1,8 @@
 Next release
 ============
 
-- ...
+- Remove dependency on ``sourcecodegen`` (not depended upon by
+  Chameleon 1.1.1+).
 
 1.2b3 (2010-01-24)
 ==================

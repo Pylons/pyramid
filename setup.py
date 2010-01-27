@@ -34,7 +34,6 @@ install_requires=[
     'WebOb>=0.9.7', # "default_charset" 
     'repoze.lru',
     'setuptools',
-    'sourcecodegen>=0.6.11', # tests fail without this requirement?  (wtf)
     'zope.component >= 3.6.0', # independent of zope.hookable
     'zope.configuration',
     'zope.deprecation',
