@@ -124,7 +124,7 @@ The ``.views.foobar`` view callable above will be called when the URL
 Hybrid Applications
 -------------------
 
-Clearly *either* traversal or url dispatch can be used to create a
+Clearly either traversal or url dispatch can be used to create a
 :mod:`repoze.bfg` application.  However, it is possible to combine the
 competing concepts of traversal and url dispatch to resolve URLs to
 code within the same application.
@@ -150,12 +150,13 @@ using route configuration that contains the special token
 
 When the this route is matched, :mod:`repoze.bfg` will attempt to use
 :term:`traversal` against the context implied by the :term:`root
-factory` of this route.  The above example isn't very useful unless
-you've defined a custom :term:`root factory` by passing it to
-constructor of a :class:`repoze.bfg.configuration.Configurator`
-because the *default* root factory cannot be traversed (it has no
-useful ``__getitem__`` method).  But let's imagine that your root
-factory looks like so:
+factory` of this route.
+
+The above example isn't very useful unless you've defined a custom
+:term:`root factory` by passing it to constructor of a
+:class:`repoze.bfg.configuration.Configurator` because the *default*
+root factory cannot be traversed (it has no useful ``__getitem__``
+method).  But let's imagine that your root factory looks like so:
 
 .. code-block:: python
 
@@ -173,28 +174,29 @@ factory looks like so:
        return root
 
 We've defined a bogus graph here that can be traversed, and a
-``root_factory`` method that returns the root of the graph that we can
-pass to our :class:`repoze.bfg.configuration.Configurator`.
+``root_factory`` function that returns the root of the graph that we
+can pass to our :class:`repoze.bfg.configuration.Configurator`.
 
 Because the ``Traversable`` object we've defined has a ``__getitem__``
 method that does something nominally useful, using traversal against
-the root implied by a route statement becomes a not-completely-insane
-thing to do.
+the root implied by a route statement becomes a reasonable thing to
+do.
 
 Under the circumstance implied by ``:foo/:bar/*traverse``, traversal
-is performed *after* the route matches.  If the root factory returns a
-traversable object, the "capture value" implied by the ``*traverse``
-element in the path pattern will be used to traverse the graph,
-starting from the root object returned from the root factory.
+is performed *after* the route matches.  If the root factory
+associated with that route returns a traversable object, the "capture
+value" implied by the ``*traverse`` element in the path pattern will
+be used to traverse the graph, starting from the root object returned
+from the root factory.
 
 For example, if the URL requested by a user was
-``http://example.com/one/two/a/b/c``, and the above route was matched
-(some other route might match before this one does), the traversal
-path used against the root would be ``a/b/c``.  :mod:`repoze.bfg` will
-attempt to traverse a graph through the edges ``a``, ``b``, and ``c``.
-In our above example, that would imply that the *context* of the view
-would be the ``Traversable`` object we've named ``c`` in our bogus
-graph, using the ``.views.home`` view as the view callable.
+``http://example.com/one/two/a/b/c``, and the above route was matched,
+the traversal path used against the root would be ``a/b/c``.
+:mod:`repoze.bfg` will attempt to traverse a graph through the edges
+``a``, ``b``, and ``c``.  In our above example, that would imply that
+the *context* of the view would be the ``Traversable`` object we've
+named ``c`` in our bogus graph, using the ``.views.home`` view as the
+view callable.
 
 We can also define extra views that match a route:
 
