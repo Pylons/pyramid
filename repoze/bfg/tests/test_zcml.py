@@ -521,8 +521,7 @@ class TestRouteDirective(unittest.TestCase):
         reg = get_current_registry()
         request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
-        discrim = ('view', None, '', None, IView, None, None, None,
-                   'name', None, False, None, None, None)
+        discrim = ('view', None, '', None, IView, 'name', None)
         self.assertEqual(view_discriminator, discrim)
         wrapped = reg.adapters.lookup((request_type, Interface), IView, name='')
         self.failUnless(wrapped)
@@ -548,8 +547,7 @@ class TestRouteDirective(unittest.TestCase):
         reg = get_current_registry()
         request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
-        discrim = ('view', IDummy, '', None, IView, None, None, None,
-                   'name', None, False, None, None, None)
+        discrim = ('view', IDummy, '', None, IView, 'name', None)
         self.assertEqual(view_discriminator, discrim)
         wrapped = reg.adapters.lookup((request_type, IDummy), IView, name='')
         self.failUnless(wrapped)
@@ -578,8 +576,7 @@ class TestRouteDirective(unittest.TestCase):
         reg = get_current_registry()
         request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
-        discrim = ('view', IDummy, '', None, IView, None, None, None,
-                   'name', None, False, None, None, None)
+        discrim = ('view', IDummy, '', None, IView, 'name', None)
         self.assertEqual(view_discriminator, discrim)
         wrapped = reg.adapters.lookup((request_type, IDummy), IView, name='')
         self.failUnless(wrapped)
@@ -615,8 +612,7 @@ class TestRouteDirective(unittest.TestCase):
         view_action = actions[1]
         request_type = reg.getUtility(IRouteRequest, 'name')
         view_discriminator = view_action['discriminator']
-        discrim = ('view', None, '', None, IView, None, None, None,
-                   'name', None, False, None, None, None)
+        discrim = ('view', None, '', None, IView, 'name', None)
         self.assertEqual(view_discriminator, discrim)
         wrapped = reg.adapters.lookup((request_type, Interface), IView, name='')
         self.failUnless(wrapped)

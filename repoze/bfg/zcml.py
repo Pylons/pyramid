@@ -237,15 +237,7 @@ class IRouteDirective(Interface):
     # alias for view_renderer
     renderer = TextLine(title=u'renderer', required=False)
 
-    view_request_method = TextLine(title=u'view_request_method', required=False)
-    view_containment = GlobalObject(
-        title = u'Dotted name of a containment class or interface',
-        required=False)
     view_attr = TextLine(title=u'view_attr', required=False)
-    view_header = TextLine(title=u'view_header', required=False)
-    view_accept = TextLine(title=u'view_accept', required=False)
-    view_xhr = Bool(title=u'view_xhr', required=False)
-    view_path_info = TextLine(title=u'view_path_info', required=False)
 
     request_method = TextLine(title=u'request_method', required=False)
     request_param = TextLine(title=u'request_param', required=False)
@@ -262,20 +254,32 @@ class IRouteDirective(Interface):
         )
     use_global_views = Bool(title=u'use_global_views', required=False)
 
-def route(_context, name, path, view=None, view_for=None,
-          permission=None, factory=None, for_=None,
-          header=None, xhr=False, accept=None, path_info=None,
-          request_method=None, request_param=None, custom_predicates=(),
-          view_permission=None, view_request_method=None,
-          view_request_param=None, view_containment=None, view_attr=None,
-          renderer=None, view_renderer=None, view_header=None, 
-          view_accept=None, view_xhr=False,
-          view_path_info=None, view_context=None,
+def route(_context,
+          name,
+          path,
+          view=None,
+          view_for=None,
+          permission=None,
+          factory=None,
+          for_=None,
+          header=None,
+          xhr=False,
+          accept=None,
+          path_info=None,
+          request_method=None,
+          request_param=None,
+          custom_predicates=(),
+          view_permission=None,
+          view_attr=None,
+          renderer=None,
+          view_renderer=None,
+          view_context=None,
           use_global_views=False):
     """ Handle ``route`` ZCML directives
     """
     # the strange ordering of the request kw args above is for b/w
     # compatibility purposes.
+
     # these are route predicates; if they do not match, the next route
     # in the routelist will be tried
     reg = get_current_registry()
@@ -304,15 +308,8 @@ def route(_context, name, path, view=None, view_for=None,
             view=view,
             view_context=view_context,
             view_permission=view_permission,
-            view_request_method=view_request_method,
-            view_request_param=view_request_param,
-            view_containment=view_containment,
-            view_attr=view_attr,
             view_renderer=view_renderer,
-            view_header=view_header,
-            view_accept=view_accept,
-            view_xhr=view_xhr,
-            view_path_info=view_path_info,
+            view_attr=view_attr,
             use_global_views=use_global_views,
             _info=_context.info
             )
@@ -334,10 +331,7 @@ def route(_context, name, path, view=None, view_for=None,
             reg.registerUtility(request_iface, IRouteRequest, name=name)
         _context.action(
             discriminator = (
-                'view', view_context, '', None, IView,
-                view_containment, view_request_param, view_request_method,
-                name, view_attr, view_xhr, view_accept, view_header,
-                view_path_info),
+                'view', view_context, '', None, IView, name, view_attr),
             )
 
 class ISystemViewDirective(Interface):

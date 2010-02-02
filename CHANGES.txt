@@ -1,6 +1,22 @@
 Next release
 ============
 
+- Remove ``view_header``, ``view_accept``, ``view_xhr``,
+  ``view_path_info``, ``view_request_method``, ``view_request_param``,
+  and ``view_containment`` predicate arguments from the
+  ``Configurator.add_route`` argument list.  These arguments were
+  speculative.  If you need the features exposed by these arguments,
+  add a view associated with a route using the ``route_name`` argument
+  to the ``add_view`` method instead.
+
+- Remove ``view_header``, ``view_accept``, ``view_xhr``,
+  ``view_path_info``, ``view_request_method``, ``view_request_param``,
+  and ``view_containment`` predicate arguments from the ``route`` ZCML
+  directive attribute set.  These attributes were speculative.  If you
+  need the features exposed by these attributes, add a view associated
+  with a route using the ``route_name`` attribute of the ``view`` ZCML
+  directive instead.
+
 - Remove dependency on ``sourcecodegen`` (not depended upon by
   Chameleon 1.1.1+).
 

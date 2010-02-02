@@ -800,17 +800,26 @@ class Configurator(object):
             self.registry.registerAdapter(multiview, (request_iface, context),
                                           IMultiView, name, info=_info)
 
-    def add_route(self, name, path, view=None, view_for=None,
-                  permission=None, factory=None, for_=None,
-                  header=None, xhr=False, accept=None, path_info=None,
-                  request_method=None, request_param=None,
+    def add_route(self,
+                  name,
+                  path,
+                  view=None,
+                  view_for=None,
+                  permission=None,
+                  factory=None,
+                  for_=None,
+                  header=None,
+                  xhr=False,
+                  accept=None,
+                  path_info=None,
+                  request_method=None,
+                  request_param=None,
                   custom_predicates=(),
-                  view_permission=None, view_request_method=None,
-                  view_request_param=None,
-                  view_containment=None, view_attr=None,
-                  renderer=None, view_renderer=None, view_header=None, 
-                  view_accept=None, view_xhr=False,
-                  view_path_info=None, view_context=None,
+                  view_permission=None,
+                  renderer=None,
+                  view_renderer=None,
+                  view_context=None,
+                  view_attr=None,
                   use_global_views=False,
                   _info=u''):
         """ Add a :term:`route configuration` to the current
@@ -992,31 +1001,6 @@ class Configurator(object):
 
           This argument can also be spelled as ``renderer``.
 
-        view_request_type
-
-          A reference to an :term:`interface` representing a
-          :term:`request type`.  If this argument is not specified,
-          any request type will be considered a match for the view
-          associated with this route.
-
-          If the ``view`` argument is not provided, this argument has
-          no effect.
-
-          This argument can also be spelled as ``request_type``.
-
-        view_containment
-
-          This value should be a reference to a Python class or
-          :term:`interface` that a parent object in the
-          :term:`lineage` must provide in order for the view related
-          to this route to be found and called.  Your models must be
-          'location-aware' to use this feature.  See
-          :ref:`location_aware` for more information about
-          location-awareness.
-
-          If the ``view`` argument is not provided, this argument has no
-          effect.
-
         view_attr
 
           The view machinery defaults to using the ``__call__`` method
@@ -1079,15 +1063,7 @@ class Configurator(object):
                 view=view,
                 name='',
                 route_name=name, 
-                request_method=view_request_method,
-                request_param=view_request_param,
-                containment=view_containment,
-                attr=view_attr,
                 renderer=view_renderer,
-                header=view_header,
-                accept=view_accept,
-                xhr=view_xhr,
-                path_info=view_path_info,
                 _info=_info,
                 )
 

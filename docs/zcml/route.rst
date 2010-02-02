@@ -162,31 +162,6 @@ Attributes
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
-``view_request_type``
-  A :term:`dotted Python name` to an interface representing a
-  :term:`request type`.  If this argument is not specified, any
-  request type will be considered a match for the view associated with
-  this route.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  This attribute can also be spelled as ``request_type``.
-
-``view_containment``
-  This value should be a :term:`dotted Python name` string
-  representing the class that a graph traversal parent object of the
-  :term:`context` must be an instance of (or :term:`interface` that a
-  parent object must provide) in order for this view to be found and
-  called.  Your models must be "location-aware" to use this feature.
-  See :ref:`location_aware` for more information about
-  location-awareness.
-
-  If the ``view`` attribute is not provided, this attribute has no
-  effect.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``view_attr``
   The view machinery defaults to using the ``__call__`` method of the
   view callable (or the function itself, if the view callable is a

@@ -550,27 +550,6 @@ information.
 
   This argument can also be spelled as ``renderer``.
 
-``view_request_type``
-  A reference to an :term:`interface` representing a :term:`request
-  type`.  If this argument is not specified, any request type will be
-  considered a match for the view associated with this route.
-
-  If the ``view`` argument is not provided, this argument has
-  no effect.
-
-  This argument can also be spelled as ``request_type``.
-
-``view_containment``
-  This value should be a reference to a Python class or
-  :term:`interface` that a parent object in the :term:`lineage` must
-  provide in order for the view related to this route to be found and
-  called.  Your models must be 'location-aware' to use this feature.
-  See :ref:`location_aware` for more information about
-  location-awareness.
-
-  If the ``view`` argument is not provided, this argument has no
-  effect.
-
 ``view_attr``
   The view machinery defaults to using the ``__call__`` method of the
   view callable (or the function itself, if the view callable is a
