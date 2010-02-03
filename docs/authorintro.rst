@@ -156,6 +156,7 @@ and well-documented.
    single: Rossi, Chris
    single: Holth, Daniel
    single: Hathaway, Shane
+   single: Akkerman, Wichert
 
 Thanks
 ======
