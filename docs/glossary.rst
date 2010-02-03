@@ -655,3 +655,8 @@ Glossary
      "the best" view callable for a given circumstance: a
      :term:`context` type, a :term:`view name` and a :term:`request`.
 
+   Google App Engine
+     `Google App Engine <http://code.google.com/appengine/>`_ (aka
+     "GAE") is a Python application hosting service offered by Google.
+     :mod:`repoze.bfg` runs on GAE.
+

@@ -267,8 +267,8 @@ templates is available from `the Chameleon website
 
 .. warning:: 
 
-   :term:`Chameleon` only works on :term:`CPython` platforms.  This
-   does not include Google's App Engine nor :term:`Jython`.  On these
+   :term:`Chameleon` only works on :term:`CPython` platforms and
+   :term:`Google App Engine`.  On :term:`Jython` and other non-CPython
    platforms, you should use ``repoze.bfg.jinja2`` instead.  See
    :ref:`available_template_system_bindings`.
 

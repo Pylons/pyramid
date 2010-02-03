@@ -330,7 +330,7 @@ command name instead of the ``python`` command name.
 
 One caveat exists to using :mod:`repoze.bfg` under Jython: the
 :term:`Chameleon` templating engine, which is the default templating
-engine for :mod:`repoze.bfg` does not work on non-CPython platforms.
+engine for :mod:`repoze.bfg` does not work on Jython.
 
 The ``repoze.bfg.jinja2`` distribution provides templating for
 :mod:`repoze.bfg` using the :term:`Jinja2` templating system.  You may
