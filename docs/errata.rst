@@ -64,6 +64,7 @@ Should read:
 
             def __call__(self):
                 return Response('OK')
+
 pp. 98
 ------
 

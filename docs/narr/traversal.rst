@@ -146,6 +146,8 @@ within the :ref:`views_chapter` chapter.
    single: traversal graph
    single: model graph
 
+.. _the_object_graph:
+
 The Object Graph
 ----------------
 
@@ -180,7 +182,8 @@ named ``config``:
 Using the ``root_factory`` argument to a
 :class:`repoze.bfg.configuration.Configurator` constructor tells your
 :mod:`repoze.bfg` application to call this root factory to generate a
-root object whenever a request enters the application.
+root object whenever a request enters the application.  This root
+factory is also known as the global root factory.
 
 A root factory is passed a :term:`request` object and it is expected
 to return an object which represents the root of the object graph.

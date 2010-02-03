@@ -357,6 +357,8 @@ will never be evaluated.
 .. index::
    single: route factory
 
+.. _route_factories:
+
 Route Factories
 ~~~~~~~~~~~~~~~
 
