@@ -595,6 +595,8 @@ An example of its usage, with all attributes fully expanded:
     timeout="86400"
     reissue_time="600"
     max_age="31536000"
+    path="/"
+    http_only="False"
     />
 
 See :ref:`authtktauthenticationpolicy_directive` for details about

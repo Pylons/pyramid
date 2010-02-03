@@ -456,6 +456,63 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.failUnless(result[2][1].endswith('; Path=/; Domain=.localhost'))
         self.failUnless(result[2][1].startswith('auth_tkt='))
 
+    def test_remember_path(self):
+        plugin = self._makeOne('secret', include_ip=True,
+                               path="/cgi-bin/bfg.cgi/")
+        request = self._makeRequest()
+        result = plugin.remember(request, 'other')
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.failUnless(result[0][1].endswith('; Path=/cgi-bin/bfg.cgi/'))
+        self.failUnless(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.failUnless(result[1][1].endswith(
+            '; Path=/cgi-bin/bfg.cgi/; Domain=localhost'))
+        self.failUnless(result[1][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[2][0], 'Set-Cookie')
+        self.failUnless(result[2][1].endswith(
+            '; Path=/cgi-bin/bfg.cgi/; Domain=.localhost'))
+        self.failUnless(result[2][1].startswith('auth_tkt='))
+
+    def test_remember_http_only(self):
+        plugin = self._makeOne('secret', include_ip=True, http_only=True)
+        request = self._makeRequest()
+        result = plugin.remember(request, 'other')
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.failUnless(result[0][1].endswith('; HttpOnly'))
+        self.failUnless(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.failUnless(result[1][1].endswith('; HttpOnly'))
+        self.failUnless(result[1][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[2][0], 'Set-Cookie')
+        self.failUnless(result[2][1].endswith('; HttpOnly'))
+        self.failUnless(result[2][1].startswith('auth_tkt='))
+
+    def test_remember_secure(self):
+        plugin = self._makeOne('secret', include_ip=True, secure=True)
+        request = self._makeRequest()
+        result = plugin.remember(request, 'other')
+        self.assertEqual(len(result), 3)
+
+        self.assertEqual(result[0][0], 'Set-Cookie')
+        self.failUnless('; Secure' in result[0][1])
+        self.failUnless(result[0][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[1][0], 'Set-Cookie')
+        self.failUnless('; Secure' in result[1][1])
+        self.failUnless(result[1][1].startswith('auth_tkt='))
+
+        self.assertEqual(result[2][0], 'Set-Cookie')
+        self.failUnless('; Secure' in result[2][1])
+        self.failUnless(result[2][1].startswith('auth_tkt='))
+
     def test_remember_string_userid(self):
         plugin = self._makeOne('secret')
         request = self._makeRequest()

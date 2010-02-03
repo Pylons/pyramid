@@ -1,6 +1,23 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
+- Ensure that ``secure`` flag for AuthTktAuthenticationPolicy
+  constructor does what it's documented to do (merge Daniel Holth's
+  fancy-cookies-2 branch).
+
+New Features
+------------
+
+- Add ``path`` and ``http_only`` options to
+  AuthTktAuthenticationPolicy constructor (merge Daniel Holth's
+  fancy-cookies-2 branch).
+
+Backwards Incompatibilities
+---------------------------
+
 - Remove ``view_header``, ``view_accept``, ``view_xhr``,
   ``view_path_info``, ``view_request_method``, ``view_request_param``,
   and ``view_containment`` predicate arguments from the
@@ -16,6 +33,9 @@ Next release
   need the features exposed by these attributes, add a view associated
   with a route using the ``route_name`` attribute of the ``view`` ZCML
   directive instead.
+
+Dependencies
+------------
 
 - Remove dependency on ``sourcecodegen`` (not depended upon by
   Chameleon 1.1.1+).

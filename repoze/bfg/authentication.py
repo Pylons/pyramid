@@ -225,6 +225,18 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        to set this to a value that is lower than ``timeout`` or
        ``reissue_time``, although it is not explicitly prevented.
        Optional.
+
+    ``path``
+ 
+       Default: ``/``. The path for which the auth_tkt cookie is valid.
+       May be desirable if the application only serves part of a domain.
+       Optional.
+ 
+    ``http_only``
+ 
+       Default: ``False``. Hide cookie from JavaScript by setting the
+       HttpOnly flag. Not honored by all browsers.
+       Optional.
     """
     implements(IAuthenticationPolicy)
     def __init__(self,
@@ -235,7 +247,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
                  include_ip=False,
                  timeout=None,
                  reissue_time=None,
-                 max_age=None):
+                 max_age=None,
+                 path="/",
+                 http_only=False,
+                 ):
         self.cookie = AuthTktCookieHelper(
             secret,
             cookie_name=cookie_name,
@@ -244,6 +259,8 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             timeout=timeout,
             reissue_time=reissue_time,
             max_age=max_age,
+            http_only=http_only,
+            path=path,
             )
         self.callback = callback
 
@@ -286,7 +303,7 @@ class AuthTktCookieHelper(object):
     
     def __init__(self, secret, cookie_name='auth_tkt', secure=False,
                  include_ip=False, timeout=None, reissue_time=None,
-                 max_age=None):
+                 max_age=None, http_only=False, path="/"):
         self.secret = secret
         self.cookie_name = cookie_name
         self.include_ip = include_ip
@@ -297,6 +314,15 @@ class AuthTktCookieHelper(object):
                 raise ValueError('reissue_time must be lower than timeout')
         self.reissue_time = reissue_time
         self.max_age = max_age
+        self.http_only = http_only
+        self.path = path
+
+        static_flags = []
+        if self.secure:
+            static_flags.append('; Secure')
+        if self.http_only:
+            static_flags.append('; HttpOnly')
+        self.static_flags = "".join(static_flags)
 
     def _get_cookies(self, environ, value, max_age=None):
         if max_age is EXPIRE:
@@ -314,14 +340,18 @@ class AuthTktCookieHelper(object):
 
         cur_domain = environ.get('HTTP_HOST', environ.get('SERVER_NAME'))
         wild_domain = '.' + cur_domain
+
         cookies = [
-            ('Set-Cookie', '%s="%s"; Path=/%s' % (
-            self.cookie_name, value, max_age)),
-            ('Set-Cookie', '%s="%s"; Path=/; Domain=%s%s' % (
-            self.cookie_name, value, cur_domain, max_age)),
-            ('Set-Cookie', '%s="%s"; Path=/; Domain=%s%s' % (
-            self.cookie_name, value, wild_domain, max_age))
+            ('Set-Cookie', '%s="%s"; Path=%s%s%s' % (
+            self.cookie_name, value, self.path, max_age, self.static_flags)),
+            ('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
+            self.cookie_name, value, self.path, cur_domain, max_age,
+                self.static_flags)),
+            ('Set-Cookie', '%s="%s"; Path=%s; Domain=%s%s%s' % (
+            self.cookie_name, value, self.path, wild_domain, max_age,
+                self.static_flags))
             ]
+
         return cookies
 
     def identify(self, request):

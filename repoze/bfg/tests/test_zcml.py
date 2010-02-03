@@ -423,7 +423,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         self._callFUT(context, 'sosecret', callback=callback,
                       cookie_name='repoze.bfg.auth_tkt',
                       secure=True, include_ip=True, timeout=100,
-                      reissue_time=60)
+                      reissue_time=60, http_only=True, path="/sub/")
         actions = context.actions
         self.assertEqual(len(actions), 1)
         regadapt = actions[0]
@@ -431,6 +431,8 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(regadapt['callable'], None)
         self.assertEqual(regadapt['args'], ())
         policy = reg.getUtility(IAuthenticationPolicy)
+        self.assertEqual(policy.cookie.path, '/sub/')
+        self.assertEqual(policy.cookie.http_only, True)
         self.assertEqual(policy.cookie.secret, 'sosecret')
         self.assertEqual(policy.callback, callback)
 
@@ -444,7 +446,8 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
                           context, 'sosecret', callback=callback,
                           cookie_name='repoze.bfg.auth_tkt',
                           secure=True, include_ip=True, timeout=100,
-                          reissue_time=500)
+                          reissue_time=500, http_only=True,
+                          path="/cgi-bin/bfg.cgi/")
 
 class TestACLAuthorizationPolicyDirective(unittest.TestCase):
     def setUp(self):
