@@ -165,7 +165,7 @@ common framework configuration tasks such as adding a view or a route.
 In Zope, :term:`ZCML` is typically required for similar purposes.  In
 :term:`Grok`, a Zope-based web framework, :term:`decorator` objects
 and class-level declarations are used for this purpose.
-:mod:`repoze.bfg` *supports* :term:`ZCML` and supports decorator-based
+:mod:`repoze.bfg` supports :term:`ZCML` and decorator-based
 configuration, but does not require either. See
 :ref:`configuration_narr` for more information.
 

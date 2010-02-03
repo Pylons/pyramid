@@ -127,14 +127,14 @@ interface of a registry instead, you need only know how to obtain the
 
 There are two ways of doing so:
 
-- use the :func:`repoze.bfg.threadlocal.get_current_registry``
+- use the :func:`repoze.bfg.threadlocal.get_current_registry`
   function within :mod:`repoze.bfg` view or model code.  This will
   always return the "current" :mod:`repoze.bfg` application registry.
 
 - use the attribute of the :term:`request` object named ``registry``
   in your :mod:`repoze.bfg` view code, eg. ``request.registry``.  This
-  is the application registry related to the running :mod:`repoze.bfg`
-  application.
+  is the ZCA component registry related to the running
+  :mod:`repoze.bfg` application.
 
 See :ref:`threadlocals_chapter` for more information about
 :func:`repoze.bfg.threadlocal.get_current_registry`.

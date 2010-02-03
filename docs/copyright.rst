@@ -90,5 +90,5 @@ via http://bfg.repoze.org.
 Errata
 ------
 
-Errata for this book will be placed at http://bfg.repoze.org/book_errata.
+Errata for this book will be placed at `http://bfg.repoze.org/book_errata`.
 
