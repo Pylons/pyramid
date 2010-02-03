@@ -13,7 +13,7 @@ ISBN-10: 0615345379
 
 ISBN-13: 978-0-615-34537-6
 
-First print publishing: January, 2010
+First print publishing: February, 2010
 
 All rights reserved.  This material may be copied or distributed only
 subject to the terms and conditions set forth in the `Creative Commons
