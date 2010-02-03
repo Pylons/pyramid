@@ -1,6 +1,12 @@
 Next release
 ============
 
+Documentation
+-------------
+
+- Update GAE tutorial to use Chameleon instead of Jinja2 (now that
+  it's possible).
+
 Bug Fixes
 ---------
 

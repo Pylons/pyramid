@@ -12,13 +12,6 @@ This tutorial is written in terms of using the command line on a UNIX
 system; it should be possible to perform similar actions on a Windows
 system.
 
-.. note:: :term:`Chameleon` cannot easily be used on Google App
-   Engine due to GAE environment limitations, so the tutorial is
-   presented in terms of using :term:`Jinja2` as the templating
-   language in the generated BFG application.  It is possible to *use*
-   Chameleon templates on GAE, it's just not possible to *compile*
-   them under GAE.
-
 #. Download Google's `App Engine SDK
    <http://code.google.com/appengine/downloads.html>`_ and install it
    on your system.
@@ -50,13 +43,13 @@ system.
    ``bfgapp/app/`` which is the directory you will upload to
    appengine.
 
-#. Install :mod:`repoze.bfg.jinja2` into the virtualenv
+#. Install :mod:`repoze.bfg` into the virtualenv
 
    .. code-block:: text
 
       $ cd bfgapp/
       $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple/ \
-             repoze.bfg.jinja2
+             repoze.bfg
 
    This will install :mod:`repoze.bfg` in the environment.
 
@@ -65,14 +58,14 @@ system.
    We'll use the standard way to create a :mod:`repoze.bfg`
    application, but we'll have to move some files around when we are
    done.  The below commands assume your current working directory is
-   the ``bfgapp`` virtualenv director you created in the third step
+   the ``bfgapp`` virtualenv directory you created in the third step
    above:
 
    .. code-block:: text
 
       $ cd app
       $ rm -rf bfgapp
-      $ bin/paster create -t bfg_jinja2_starter bfgapp
+      $ bin/paster create -t bfg_starter bfgapp
       $ mv bfgapp aside
       $ mv aside/bfgapp .
       $ rm -rf aside
