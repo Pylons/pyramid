@@ -8,8 +8,8 @@ Bug Fixes
   constructor does what it's documented to do (merge Daniel Holth's
   fancy-cookies-2 branch).
 
-New Features
-------------
+Features
+--------
 
 - Add ``path`` and ``http_only`` options to
   AuthTktAuthenticationPolicy constructor (merge Daniel Holth's
