@@ -30,8 +30,8 @@ from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.configuration import Configurator
 from repoze.bfg.exceptions import ConfigurationError
-from repoze.bfg.path import package_path
 from repoze.bfg.request import route_request_iface
+from repoze.bfg.resource import resource_spec_from_abspath
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
 
@@ -775,24 +775,14 @@ def utility(_context, provides=None, component=None, factory=None, name=''):
         )
 
 def path_spec(context, path):
-    # Convert an absolute path to a resource in a package to a
-    # resource specification if possible; otherwise return the
-    # absolute path; we prefer registering resource specifications
-    # over absolute paths because these can be overridden by the
-    # resource directive.
+    # we prefer registering resource specifications over absolute
+    # paths because these can be overridden by the resource directive.
     if ':' in path and not os.path.isabs(path):
         # it's already a resource specification
         return path
     abspath = context.path(path)
     if hasattr(context, 'package') and context.package:
-        package = context.package
-        if getattr(package, '__name__', None) == '__main__':
-            return abspath
-        pp = package_path(package) + os.path.sep
-        if abspath.startswith(pp):
-            relpath = abspath[len(pp):]
-            return '%s:%s' % (package.__name__,
-                              relpath.replace(os.path.sep, '/'))
+        return resource_spec_from_abspath(abspath, context.package)
     return abspath
 
 def zcml_configure(name, package):

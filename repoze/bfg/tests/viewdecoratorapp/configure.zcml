@@ -1,0 +1,6 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg.includes" />
+  <scan package="."/>
+
+</configure>

@@ -151,6 +151,23 @@ class TestRestBugApp(TwillBase):
         self.assertEqual(browser.get_code(), 200)
         self.assertEqual(browser.get_html(), 'gotten')
 
+class TestViewDecoratorApp(TwillBase):
+    config = 'repoze.bfg.tests.viewdecoratorapp:configure.zcml'
+    def test_it(self):
+        import twill.commands
+        browser = twill.commands.get_browser()
+        browser.go('http://localhost:6543/first')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('OK' in browser.get_html())
+
+        browser.go('http://localhost:6543/second')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('OK2' in browser.get_html())
+
+        browser.go('http://localhost:6543/third')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('OK3' in browser.get_html())
+
 class DummyContext(object):
     pass
 

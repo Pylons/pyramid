@@ -1,5 +1,6 @@
 import cgi
 import mimetypes
+import os
 import sys
 
 # See http://bugs.python.org/issue5853 which is a recursion bug
@@ -26,7 +27,9 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IView
 
 from repoze.bfg.path import caller_package
+from repoze.bfg.path import package_path
 from repoze.bfg.resource import resolve_resource_spec
+from repoze.bfg.resource import resource_spec_from_abspath
 from repoze.bfg.static import PackageURLParser
 from repoze.bfg.threadlocal import get_current_registry
 
@@ -489,6 +492,20 @@ class bfg_view(object):
         else:
             settings = getattr(wrapped, '__bfg_view_settings__', [])
             wrapped.__bfg_view_settings__ = settings
+
+        # try to convert the renderer provided into a fully qualified
+        # resource specification
+        abspath = setting.get('renderer')
+        if abspath is not None and '.' in abspath:
+            isabs = os.path.isabs(abspath)
+            if not (':' in abspath and not isabs):
+                # not already a resource spec
+                if not isabs:
+                    pp = package_path(module)
+                    abspath = os.path.join(pp, abspath)
+                resource = resource_spec_from_abspath(abspath, module)
+                setting['renderer'] = resource
+
         settings.append(setting)
         return wrapped
 

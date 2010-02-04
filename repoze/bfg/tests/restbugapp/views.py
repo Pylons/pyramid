@@ -13,6 +13,3 @@ class PetRESTView(BaseRESTView):
     def GET(self):
         return Response('gotten')
     
-    def POST(self):
-        return Response('posted')
-        

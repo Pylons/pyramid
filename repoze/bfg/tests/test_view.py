@@ -367,6 +367,36 @@ class TestBFGViewDecorator(unittest.TestCase):
         settings = decorated.__bfg_view_settings__
         self.assertEqual(settings[0]['custom_predicates'], (1,))
 
+    def test_call_with_renderer_nodot(self):
+        decorator = self._makeOne(renderer='json')
+        def foo():
+            """ docstring """
+        wrapped = decorator(foo)
+        self.failUnless(wrapped is foo)
+        settings = wrapped.__bfg_view_settings__[0]
+        self.assertEqual(settings['renderer'], 'json')
+
+    def test_call_with_renderer_relpath(self):
+        decorator = self._makeOne(renderer='fixtures/minimal.pt')
+        def foo():
+            """ docstring """
+        wrapped = decorator(foo)
+        self.failUnless(wrapped is foo)
+        settings = wrapped.__bfg_view_settings__[0]
+        self.assertEqual(settings['renderer'],
+                         'repoze.bfg.tests.test_view:fixtures/minimal.pt')
+
+    def test_call_with_renderer_pkgpath(self):
+        decorator = self._makeOne(
+            renderer='repoze.bfg.tests.test_view:fixtures/minimal.pt')
+        def foo():
+            """ docstring """
+        wrapped = decorator(foo)
+        self.failUnless(wrapped is foo)
+        settings = wrapped.__bfg_view_settings__[0]
+        self.assertEqual(settings['renderer'],
+                         'repoze.bfg.tests.test_view:fixtures/minimal.pt')
+
 class TestDefaultForbiddenView(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
         from repoze.bfg.view import default_forbidden_view

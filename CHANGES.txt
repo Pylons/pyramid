@@ -10,6 +10,11 @@ Bug Fixes
   class was being called instead of the method named via
   ``view_attr``.
 
+- Fix a bug whereby a ``renderer`` argument to the ``@bfg_view``
+  decorator that provided a package-relative template filename might
+  not have been resolved properly.  Symptom: inappropriate ``Missing
+  template resource`` errors.
+
 1.2b4 (2010-02-03)
 ==================
 

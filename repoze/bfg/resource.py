@@ -5,6 +5,7 @@ from zope.interface import implements
 
 from repoze.bfg.interfaces import IPackageOverrides
 
+from repoze.bfg.path import package_path
 from repoze.bfg.threadlocal import get_current_registry
 
 class OverrideProvider(pkg_resources.DefaultProvider):
@@ -180,3 +181,18 @@ def resolve_resource_spec(spec, package_name='__main__'):
     elif package_name is None:
         package_name, filename = None, spec
     return package_name, filename
+
+def resource_spec_from_abspath(abspath, package):
+    """ Try to convert an absolute path to a resource in a package to
+    a resource specification if possible; otherwise return the
+    absolute path.  """
+    if getattr(package, '__name__', None) == '__main__':
+        return abspath
+    pp = package_path(package) + os.path.sep
+    if abspath.startswith(pp):
+        relpath = abspath[len(pp):]
+        return '%s:%s' % (package.__name__,
+                          relpath.replace(os.path.sep, '/'))
+    return abspath
+            
+    
