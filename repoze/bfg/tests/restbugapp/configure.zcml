@@ -1,0 +1,25 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg.includes"/>
+ 
+  <route
+    path="/pet"
+    name="gameactions_pet_get_pets"
+    view=".views.PetRESTView"
+    view_attr="GET"
+    request_method="GET"
+    permission="view"
+    renderer="json"
+    />
+ 
+  <route
+    path="/pet"
+    name="gameactions_pet_care_for_pet"
+    view=".views.PetRESTView"
+    view_attr="POST"
+    request_method="POST"
+    permission="view"
+    renderer="json"
+    />
+ 
+</configure>

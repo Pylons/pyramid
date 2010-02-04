@@ -1064,6 +1064,7 @@ class Configurator(object):
                 name='',
                 route_name=name, 
                 renderer=view_renderer,
+                attr=view_attr,
                 _info=_info,
                 )
 

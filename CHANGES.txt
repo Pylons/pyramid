@@ -1,3 +1,15 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- 1.2b4 introduced a bug whereby views added via a route configuration
+  that named a view callable and also a ``view_attr`` became broken.
+  Symptom: ``MyViewClass is not callable`` or the ``__call__`` of a
+  class was being called instead of the method named via
+  ``view_attr``.
+
 1.2b4 (2010-02-03)
 ==================
 

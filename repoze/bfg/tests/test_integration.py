@@ -141,6 +141,16 @@ class TestHybridApp(TwillBase):
         self.assertEqual(browser.get_code(), 200)
         self.assertEqual(browser.get_html(), 'global2')
 
+class TestRestBugApp(TwillBase):
+    # test bug reported by delijati 2010/2/3 (http://pastebin.com/d4cc15515)
+    config = 'repoze.bfg.tests.restbugapp:configure.zcml'
+    def test_it(self):
+        import twill.commands
+        browser = twill.commands.get_browser()
+        browser.go('http://localhost:6543/pet')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'gotten')
+
 class DummyContext(object):
     pass
 

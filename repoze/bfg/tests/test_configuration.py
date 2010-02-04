@@ -1197,6 +1197,20 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertRoute(config, 'name', 'path')
         self.assertEqual(wrapper(None, None).body, 'Hello!')
 
+    def test_add_route_with_view_attr(self):
+        config = self._makeOne()
+        self._registerRenderer(config)
+        class View(object):
+            def __init__(self, context, request):
+                pass
+            def alt(self):
+                return 'OK'
+        config.add_route('name', 'path', view=View, view_attr='alt')
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(config, None, request_type)
+        self._assertRoute(config, 'name', 'path')
+        self.assertEqual(wrapper(None, None), 'OK')
+
     def test_add_route_with_view_renderer_alias(self):
         config = self._makeOne()
         self._registerRenderer(config)
