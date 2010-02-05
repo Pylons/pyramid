@@ -225,10 +225,7 @@ packages. You can zip a package like so:
 Note that it requires the whole egg file name.  For a BFG app, the
 following packages are good candidates to be zipped.
 
-- pytz
-- chameleon.core
-- chameleon.zpt
+- Chameleon
 - zope.i18n
-- zope.testing
 
 Once the zipping procedure is finished you can try uploading again.
