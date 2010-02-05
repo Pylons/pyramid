@@ -1141,4 +1141,5 @@ class DummyRequest:
 class DummyPackage(object):
     def __init__(self, name):
         self.__name__ = name
+        self.__file__ = '/__init__.py'
         

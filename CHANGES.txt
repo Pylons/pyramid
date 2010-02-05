@@ -1,3 +1,12 @@
+Next release
+============
+
+Bug Fixes
+---------
+
+- More correct conversion of provided ``renderer`` values to resource
+  specification values (internal).
+
 1.2b5 (2010-02-04)
 ==================
 

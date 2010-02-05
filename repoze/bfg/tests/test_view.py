@@ -384,18 +384,18 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.failUnless(wrapped is foo)
         settings = wrapped.__bfg_view_settings__[0]
         self.assertEqual(settings['renderer'],
-                         'repoze.bfg.tests.test_view:fixtures/minimal.pt')
+                         'repoze.bfg.tests:fixtures/minimal.pt')
 
     def test_call_with_renderer_pkgpath(self):
         decorator = self._makeOne(
-            renderer='repoze.bfg.tests.test_view:fixtures/minimal.pt')
+            renderer='repoze.bfg.tests:fixtures/minimal.pt')
         def foo():
             """ docstring """
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
         settings = wrapped.__bfg_view_settings__[0]
         self.assertEqual(settings['renderer'],
-                         'repoze.bfg.tests.test_view:fixtures/minimal.pt')
+                         'repoze.bfg.tests:fixtures/minimal.pt')
 
 class TestDefaultForbiddenView(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):

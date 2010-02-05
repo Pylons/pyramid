@@ -6,6 +6,7 @@ from zope.interface import implements
 from repoze.bfg.interfaces import IPackageOverrides
 
 from repoze.bfg.path import package_path
+from repoze.bfg.path import package_name
 from repoze.bfg.threadlocal import get_current_registry
 
 class OverrideProvider(pkg_resources.DefaultProvider):
@@ -172,15 +173,15 @@ class FileOverride:
         if resource_name == self.path:
             return self.package, self.prefix
 
-def resolve_resource_spec(spec, package_name='__main__'):
+def resolve_resource_spec(spec, pname='__main__'):
     if os.path.isabs(spec):
         return None, spec
     filename = spec
     if ':' in spec:
-        package_name, filename = spec.split(':', 1)
+        pname, filename = spec.split(':', 1)
     elif package_name is None:
-        package_name, filename = None, spec
-    return package_name, filename
+        pname, filename = None, spec
+    return pname, filename
 
 def resource_spec_from_abspath(abspath, package):
     """ Try to convert an absolute path to a resource in a package to
@@ -191,7 +192,7 @@ def resource_spec_from_abspath(abspath, package):
     pp = package_path(package) + os.path.sep
     if abspath.startswith(pp):
         relpath = abspath[len(pp):]
-        return '%s:%s' % (package.__name__,
+        return '%s:%s' % (package_name(package),
                           relpath.replace(os.path.sep, '/'))
     return abspath
             
