@@ -788,52 +788,6 @@ class TraversalContextURLTests(unittest.TestCase):
         result = context_url()
         self.assertEqual(result, 'http://example.com:5432//bar/')
 
-    def test_with_minimized_route(self):
-        root = DummyContext()
-        root.__name__ = None
-        root.__parent__ = None
-        one = DummyContext()
-        one.__name__ = 'one'
-        one.__parent__ = root
-        route = DummyRoute()
-        route.minimization = True
-        request = DummyRequest({'bfg.routes.route':route,
-                                'bfg.routes.matchdict':{'a':1}})
-        context_url = self._makeOne(one, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/example/')
-        self.assertEqual(route.generate_kw, {'a':1, 'traverse':'/one/'})
-
-    def test_with_non_minimized_route(self):
-        root = DummyContext()
-        root.__name__ = None
-        root.__parent__ = None
-        one = DummyContext()
-        one.__name__ = 'one'
-        one.__parent__ = root
-        route = DummyRoute()
-        route.minimization = False
-        request = DummyRequest({'bfg.routes.route':route,
-                                'bfg.routes.matchdict':{'a':1}})
-        context_url = self._makeOne(one, request)
-        result = context_url()
-        self.assertEqual(result, 'http://example.com:5432/example/')
-        self.assertEqual(route.generate_kw, {'a':1, 'traverse':'/one/'})
-
-    def test_with_route_generation_fail(self):
-        root = DummyContext()
-        root.__name__ = None
-        root.__parent__ = None
-        one = DummyContext()
-        one.__name__ = 'one'
-        one.__parent__ = root
-        route = DummyRoute()
-        route.raise_exc = KeyError
-        request = DummyRequest({'bfg.routes.route':route,
-                                'bfg.routes.matchdict':{'a':1}})
-        context_url = self._makeOne(one, request)
-        self.assertRaises(KeyError, context_url)
-
 class TestVirtualRoot(unittest.TestCase):
     def setUp(self):
         cleanUp()

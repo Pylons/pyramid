@@ -1,6 +1,14 @@
 Next release
 ============
 
+Backwards Incompatibilities
+---------------------------
+
+- Remove magical feature of ``repoze.bfg.url.model_url`` which
+  prepended a fully-expanded urldispatch route URL before a the
+  model's path if it was noticed that the request had matched a route.
+  This feature was ill-conceived, and didn't work in all scenarios.
+
 Bug Fixes
 ---------
 

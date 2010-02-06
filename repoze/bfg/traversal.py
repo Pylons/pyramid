@@ -628,19 +628,6 @@ class TraversalContextURL(object):
             if path.startswith(vroot_path):
                 path = path[len(vroot_path):]
 
-        if 'bfg.routes.route' in environ:
-            route = environ['bfg.routes.route']
-            matchdict = environ['bfg.routes.matchdict'].copy()
-            matchdict['traverse'] = path
-            try:
-                segments = route.generate(matchdict)
-            except KeyError, why:
-                raise KeyError(
-                    "Couldn't generate URL for matchdict %r: %s" %
-                    (matchdict, str(why)))
-            app_url = request.application_url
-            return app_url + segments
-
         app_url = request.application_url # never ends in a slash
         return app_url + path
 
