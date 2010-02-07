@@ -997,15 +997,6 @@ class DummyContextURL:
     def virtual_root(self):
         return '123'
 
-class DummyRoute:
-    result = '/example/'
-    raise_exc = None
-    def generate(self, kw):
-        self.generate_kw = kw
-        if self.raise_exc:
-            raise self.raise_exc
-        return self.result
-
 def _makeRequest(environ=None):
     from repoze.bfg.registry import Registry
     request = DummyRequest()

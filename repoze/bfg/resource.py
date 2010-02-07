@@ -179,7 +179,7 @@ def resolve_resource_spec(spec, pname='__main__'):
     filename = spec
     if ':' in spec:
         pname, filename = spec.split(':', 1)
-    elif package_name is None:
+    elif pname is None:
         pname, filename = None, spec
     return pname, filename
 
