@@ -1,3 +1,5 @@
+.. _zcml_directives:
+
 ZCML Directives
 ===============
 
