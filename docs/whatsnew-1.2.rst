@@ -11,23 +11,16 @@ Major Feature Additions
 -----------------------
 
 The major feature addition in 1.2 is an :term:`imperative
-configuration` mode.
+configuration` mode. This implies:
 
-A :mod:`repoze.bfg` application can now begin its life as a single
-Python file.  Later, the application might evolve into a set of Python
-files in a package.  Even later, it might start making use of other
-configuration features, such as :term:`ZCML` and perhaps a
-:term:`scan`.  But neither the use of a package nor the use of
-non-imperative configuration is required to create a simple
-:mod:`repoze.bfg` application any longer.
+- A :mod:`repoze.bfg` application can now be contained within a single
+  Python file.
 
-:term:`Imperative configuration` makes :mod:`repoze.bfg` competitive
-with "microframeworks" such as `Bottle <http://bottle.paws.de/>`_ and
-`Tornado <http://www.tornadoweb.org/>`_.  :mod:`repoze.bfg` has a good
-deal of functionality that most microframeworks lack, so this is
-hopefully a "best of both worlds" feature.
+- Developers are no longer required to use or understand :term:`ZCML`
+  to create a :mod:`repoze.bfg` application (ZCML is, however still
+  supported).
 
-The simplest possible :mod:`repoze.bfg` application is now:
+The simplest possible :mod:`repoze.bfg` 1.2 application is:
 
   .. code-block:: python
      :linenos:
@@ -47,11 +40,28 @@ The simplest possible :mod:`repoze.bfg` application is now:
          app = config.make_wsgi_app()
          serve(app)
 
-For an introduction to imperative-mode configuration, see
+This feature tends to make :mod:`repoze.bfg` competitive with
+"microframeworks" such as `Bottle <http://bottle.paws.de/>`_ and
+`Tornado <http://www.tornadoweb.org/>`_.  :mod:`repoze.bfg` has a good
+deal of functionality that most microframeworks lack, so this is
+hopefully a "best of both worlds" feature.
+
+Imperative configuration is also useful while writing tests.
+
+For an introduction to imperative configuration mode, see
 :ref:`configuration_narr`.
 
-Minor Miscellaneous Feature Additions
--------------------------------------
+Minor Feature Additions
+-----------------------
+
+- Jython compatibility (at least when ``repoze.bfg.jinja2`` is used as
+  the templating engine; Chameleon does not work under Jython).
+
+- Read logging configuration from PasteDeploy config file ``loggers``
+  section (and related) when ``paster bfgshell`` is invoked.
+
+- The ``AuthTktAuthenticationPolicy`` now accepts two additional
+  constructor arguments: ``path`` and ``http_only``.
 
 - The :func:`repoze.bfg.testing.setUp` function now accepts three
   extra optional keyword arguments: ``registry``, ``request`` and
@@ -87,13 +97,6 @@ Minor Miscellaneous Feature Additions
   registry (the result of :func:`zope.component.getGlobalSiteManager`)
   once again.
 
-- :class:`repoze.bfg.testing.DummyModel` now accepts a new constructor
-  keyword argument: ``__provides__``.  If this constructor argument is
-  provided, it should be an interface or a tuple of interfaces.  The
-  resulting model will then provide these interfaces (they will be
-  attached to the constructed model via
-  :func:`zope.interface.alsoProvides`).
-
 - When the :exc:`repoze.bfg.exceptions.NotFound` or
   :exc:`repoze.bfg.exceptions.Forbidden` error is raised from within a
   custom :term:`root factory` or the factory of a :term:`route`, the
@@ -104,6 +107,21 @@ Minor Miscellaneous Feature Additions
   ``None``.  Also, the request will not be decorated with
   ``view_name``, ``subpath``, ``context``, etc. as would normally be
   the case if traversal had been allowed to take place.
+
+- :class:`repoze.bfg.testing.DummyModel` now accepts a new constructor
+  keyword argument: ``__provides__``.  If this constructor argument is
+  provided, it should be an interface or a tuple of interfaces.  The
+  resulting model will then provide these interfaces (they will be
+  attached to the constructed model via
+  :func:`zope.interface.alsoProvides`).
+
+- Read logging configuration from PasteDeploy config file ``loggers``
+  section (and related) when ``paster bfgshell`` is invoked.
+
+- View registration via ZCML now accepts an attribute named
+  ``context``.  This is an alias for the older argument named ``for``;
+  it is preferred over ``for``, but ``for`` will continue to be
+  supported "forever".
 
 Backwards Incompatibilites
 --------------------------
@@ -180,20 +198,13 @@ Backwards Incompatibilites
   ``authentication_policy`` nor an ``authorization_policy`` argument.
   These features were deprecated in version 1.0 and have been removed.
 
-- Obscure: the machinery which configured views with a
-  ``request_type`` *and* a ``route_name`` would ignore the request
-  interface implied by ``route_name`` registering a view only for the
-  interface implied by ``request_type``.  In the unlikely event that
-  you were trying to use these two features together, the symptom
-  would have been that views that named a ``request_type`` but which
-  were also associated with routes were not found when the route
-  matched.  Now if a view is configured with both a ``request_type``
-  and a ``route_name``, an error is raised.
-
 - The ``route`` ZCML directive now no longer accepts the
-  ``request_type`` or ``view_request_type`` attributes.  These
-  attributes didn't actually work in any useful way (see entry above
-  this one).
+  ``request_type``, ``view_request_type``, ``view_header``,
+  ``view_accept``, ``view_xhr``, ``view_path_info``,
+  ``view_request_method``, ``view_request_param``, or
+  ``view_containment`` attributes.  If you need the features exposed
+  by these attributes, add a view associated with a route using the
+  ``route_name`` attribute of the ``view`` ZCML directive instead.
 
 - Because the ``repoze.bfg`` package now includes implementations of
   the ``adapter``, ``subscriber`` and ``utility`` ZCML directives, it
@@ -211,6 +222,18 @@ Backwards Incompatibilites
 - The :mod:`repoze.bfg.templating` module has been removed; it had
   been deprecated in 1.1 and hasn't possessed any APIs since before
   1.0.
+
+- Remove magical feature of :meth:`repoze.bfg.url.model_url` which
+  prepended a fully-expanded urldispatch route URL before a the
+  model's path if it was noticed that the request had matched a route.
+  This feature was ill-conceived, and didn't work in all scenarios.
+
+- When "hybrid mode" (both traversal and urldispatch) is in use,
+  default to finding route-related views even if a non-route-related
+  view registration has been made with a more specific context.  The
+  default used to be to find views with a more specific context first.
+  Use the new ``use_global_views`` argument to the route definition to
+  get back the older behavior.
 
 Deprecations and Behavior Differences
 -------------------------------------
@@ -261,8 +284,24 @@ Dependency Changes
 - A dependency on the ``repoze.zcml`` package has been removed (its
   functionality is replaced internally).
 
+- A dependency on the ``sourcecodegen`` package has been removed.
+
+- :mod:`repoze.bfg` now depends on :term:`WebOb` 0.9.7 or better.
+
+- Doc-deprecated most helper functions in the ``repoze.bfg.testing``
+  module.  These helper functions likely won't be removed any time
+  soon, nor will they generate a warning any time soon, due to their
+  heavy use in the wild, but equivalent behavior exists in methods of
+  a :class:`repoze.bfg.configuration.Configurator`.
+
 Documentation Enhancements
 --------------------------
+
+- This documentation has been published in `printed form
+  <http://bfg.repoze.org/book>`_ under the title *The repoze.bfg Web
+  Application Framework, Version 1.2*.  It was reworked and
+  restructured extensively for this publication.  `Show your support
+  for BFG by buying a copy! <http://bfg.repoze.org/book>`_.
 
 - The documentation now uses the "request-only" view calling
   convention in most examples (as opposed to the ``context, request``
@@ -302,3 +341,24 @@ Documentation Enhancements
   documentation chapter explaining the effect of raising
   :exc:`repoze.bfg.exceptions.NotFound` and
   :exc:`repoze.bfg.exceptions.Forbidden` from within view code.
+
+- Add a narrative documentation chapter named :ref:`zca_chapter`.
+
+- Created new top-level documentation section named
+  :ref:`zcml_directives`.  This section contains detailed ZCML
+  directive information, some of which was removed from various
+  narrative chapters.
+
+Licensing Changes
+-----------------
+
+- The publication of the documentation as a printed book required an
+  explicit documentation licensing change: the documentation (the
+  content in the "docs" directory) is now offered under the `Creative
+  Commons Attribution-Noncommercial-Share Alike 3.0 United States
+  License <http://creativecommons.org/licenses/by-nc-sa/3.0/us/>`_.
+  This is only a documentation licensing change: the :mod:`repoze.bfg`
+  software itself (everything except the contents of the "docs"
+  directory) is still offered under `a BSD-like license
+  <http://repoze.org/license.html>`_.
+
