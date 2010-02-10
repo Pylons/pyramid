@@ -13,6 +13,13 @@
 
 import sys, os
 
+# skip raw nodes
+from sphinx.writers.text import TextTranslator
+from docutils import nodes
+def raw(*arg):
+    raise nodes.SkipNode
+TextTranslator.visit_raw = raw
+
 book = os.environ.get('BOOK')
 
 # If your extensions are in another directory, add it here. If the directory
