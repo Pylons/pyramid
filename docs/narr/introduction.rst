@@ -17,7 +17,7 @@ page served by another application might be a listing of songs.  These
 applications probably won't serve the same set of customers.  However,
 although they're not very similar on the surface, both a
 ledger-serving application and a song-serving application could be
-successfully be written using :mod:`repoze.bfg`.
+successfully written using :mod:`repoze.bfg`.
 
 :mod:`repoze.bfg` is a very general open source Python web
 *framework*.  As a framework, its primary job is to make it easier for
