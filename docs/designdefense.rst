@@ -778,7 +778,7 @@ declarations as :term:`ACL` objects.
 Having context-sensitive declarative security for individual objects
 in the object graph is simply required for this class of application.
 Other frameworks save for Zope just do not have this feature.  This is
-the one of the primary reasons that :mod:`repoze.bfg` was actually
+one of the primary reasons that :mod:`repoze.bfg` was actually
 written.
 
 If you don't like this, it doesn't mean you can't use
