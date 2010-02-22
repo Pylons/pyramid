@@ -405,3 +405,39 @@ LaTeXTranslator.visit_literal = visit_literal
 ##         self.linenos = False
 
 ## PygmentsBridge.latex_formatter = NoLinenosLatexFormatter
+
+# -- Options for Epub output ---------------------------------------------------
+
+# Bibliographic Dublin Core info.
+epub_title = 'The repoze.bfg Web Application Framework, Version 1.2'
+epub_author = 'Chris McDonough'
+epub_publisher = 'Agendaless Consulting'
+epub_copyright = '2008-2010'
+
+# The language of the text. It defaults to the language option
+# or en if the language is not set.
+epub_language = 'en'
+
+# The scheme of the identifier. Typical schemes are ISBN or URL.
+epub_scheme = 'ISBN'
+
+# The unique identifier of the text. This can be a ISBN number
+# or the project homepage.
+epub_identifier = '0615345379'
+
+# A unique identification for the text.
+epub_uid = 'The repoze.bfg Web Application Framework, Version 1.2-v0'
+
+# HTML files that should be inserted before the pages created by sphinx.
+# The format is a list of tuples containing the path and title.
+#epub_pre_files = []
+
+# HTML files shat should be inserted after the pages created by sphinx.
+# The format is a list of tuples containing the path and title.
+#epub_post_files = []
+
+# A list of files that should not be packed into the epub file.
+#epub_exclude_files = []
+
+# The depth of the table of contents in toc.ncx.
+epub_tocdepth = 3
