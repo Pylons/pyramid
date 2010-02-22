@@ -306,8 +306,8 @@ Windows).
    single: startup
    single: mod_wsgi
 
-Runnning The Project Application
---------------------------------
+Running The Project Application
+-------------------------------
 
 Once a project is installed for development, you can run the
 application it represents using the ``paster serve`` command against
@@ -507,10 +507,10 @@ indicates that this is an entry point *URI* specifier, where the
    point refers to a ``app`` function in the ``mypackage.run``
    module".  If indeed if you open up the ``run.py`` module generated
    within the ``myproject`` package, you'll see a ``app`` function.
-   This is the function called :term:`PasteDeploy` when the ``paster
-   serve`` command is invoked against our application.  It accepts a
-   global configuration object and *returns* an instance of our
-   application.
+   This is the function called by :term:`PasteDeploy` when the
+   ``paster serve`` command is invoked against our application.  It
+   accepts a global configuration object and *returns* an instance of
+   our application.
 
 The ``use`` setting is the only setting required in the ``[app:main]``
 section unless you've changed the callable referred to by the
