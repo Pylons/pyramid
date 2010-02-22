@@ -76,7 +76,7 @@ Here is the source for ``models.py``:
    named ``configure.zcml`` is implemented here.  Instances of this
    class will be capable of being persisted in :term:`ZODB` because
    the class inherits from the
-   :class:`persistint.mapping.PersistentMapping` class.  The
+   :class:`persistent.mapping.PersistentMapping` class.  The
    ``__parent__`` and ``__name__`` are important parts of the
    :term:`traversal` protocol.  By default, have these as ``None``
    indicating that this is the :term:`root` object.
