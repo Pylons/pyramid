@@ -123,7 +123,7 @@ def render_view_to_iterable(context, request, name='', secure=True):
 def render_view(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
     configuration` that matches the :term:`view name` ``name``
-    registered against the specified ``context`` and ``request`` and
+    registered against the specified ``context`` and ``request``
     and unwind the view response's ``app_iter`` (see
     :ref:`the_response`) into a single string.  This function will
     return ``None`` if a corresponding :term:`view callable` cannot be

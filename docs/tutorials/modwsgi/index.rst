@@ -17,7 +17,7 @@ commands and files.
 .. note:: Unfortunately these instructions almost certainly won't work
    for deploying a :mod:`repoze.bfg` application on a Windows system
    using ``mod_wsgi``.  If you have experience with :mod:`repoze.bfg`
-   and and ``mod_wsgi`` on Windows systems, please help us document
+   and ``mod_wsgi`` on Windows systems, please help us document
    this experience by submitting documentation to the `mailing list
    <http://lists.repoze.org/listinfo/repoze-dev>`_.
 
