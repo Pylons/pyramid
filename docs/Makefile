@@ -78,3 +78,8 @@ linkcheck:
 	@echo
 	@echo "Link check complete; look for any errors in the above output " \
 	      "or in .build/linkcheck/output.txt."
+
+epub:
+	$(SPHINXBUILD) -b epub $(ALLSPHINXOPTS) .build/epub
+	@echo
+	@echo "Build finished. The epub file is in .build/epub."
