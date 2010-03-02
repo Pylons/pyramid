@@ -137,6 +137,6 @@ except ImportError: # pragma: no cover
 
 try:
     from pkgutil import walk_packages
-except ImportError:
+except ImportError: #pragma: no cover
     from pkgutil_26 import walk_packages
 
