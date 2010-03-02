@@ -1,4 +1,6 @@
 Copyright (c) 2008-2010 Agendaless Consulting and Contributors.
 (http://www.agendaless.com), All Rights Reserved
 
-Portions (c) Django Project (http://djangoproject.com).
+Portions (c) Django Project (http://djangoproject.com/).
+
+Portions (c) Zope Foundation and contributors (http://www.zope.org/).
