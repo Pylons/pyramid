@@ -195,12 +195,12 @@ object is often an instance of a class which has a ``__getitem__``
 method.
 
 .. warning:: In :mod:`repoze.bfg` 1.0 and prior versions, the root
-   factory was passed a term WSGI *environment* object (a dictionary)
-   while in :mod:`repoze.bfg` 1.1+ it is passed a :term:`request`
-   object.  For backwards compatibility purposes, the request object
-   passed to the root factory has a dictionary-like interface that
-   emulates the WSGI environment, so code expecting the argument to be
-   a dictionary will continue to work.
+   factory was passed a WSGI *environment* object (a dictionary) while
+   in :mod:`repoze.bfg` 1.1+ it is passed a :term:`request` object.
+   For backwards compatibility purposes, the request object passed to
+   the root factory has a dictionary-like interface that emulates the
+   WSGI environment, so code expecting the argument to be a dictionary
+   will continue to work.
 
 If no :term:`root factory` is passed to the :mod:`repoze.bfg`
 :term:`Configurator` constructor, or the ``root_factory`` is specified
