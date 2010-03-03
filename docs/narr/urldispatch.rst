@@ -406,7 +406,7 @@ Other arguments are view configuration related arguments.  These only
 have an effect when the route configuration names a ``view``.
 
 Other arguments are ``name`` and ``factory``.  These arguments are
-neither a predicate arguments nor view configuration information
+neither predicate arguments nor view configuration information
 arguments.
 
 **Non-Predicate Arguments**
