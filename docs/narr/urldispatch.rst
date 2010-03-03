@@ -334,7 +334,7 @@ they are added to the application at startup time.  This is unlike
 :term:`traversal`, which depends on emergent behavior which happens as
 a result of traversing a graph.
 
-The order that route are evaluated when they are defined via
+The order that routes are evaluated when they are defined via
 :term:`ZCML` is the order in which they appear in the ZCML relative to
 each other.  For routes added via the
 :mod:`repoze.bfg.configuration.Configurator.add_route` method, the
