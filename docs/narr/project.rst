@@ -685,7 +685,7 @@ the :term:`application registry`. It looks like so:
    language.  ``http://namespaces.repoze.org/bfg`` is the default XML
    namespace.  Add-on packages may require other namespaces.
 
-#. Line 4 initializes :mod:`repoze.bfg` -specific configuration
+#. Line 3 initializes :mod:`repoze.bfg` -specific configuration
    directives by including the ``repoze.bfg.includes`` package.  This
    causes all of the ZCML within the ``configure.zcml`` of the
    ``repoze.bfg.includes`` package to be "included" in this
@@ -693,7 +693,7 @@ the :term:`application registry`. It looks like so:
    (for this example) the ``view`` and ``static`` directives which
    follow later in this file.
 
-#. Lines 6-10 register a "default view" (a view that has no ``name``
+#. Lines 5-9 register a "default view" (a view that has no ``name``
    attribute).  It is registered so that it will be found when the
    :term:`context` of the request is an instance of the
    :class:`myproject.models.MyModel` class.  The ``view`` attribute
@@ -718,12 +718,12 @@ the :term:`application registry`. It looks like so:
    ``configure.zcml`` file lives.  The template file it points at is a
    :term:`Chameleon` ZPT template file.
 
-#. Lines 12-15 register a static view, which will register a view
+#. Lines 11-14 register a static view, which will register a view
    which serves up the files from the ``templates/static`` directory
    relative to the directory in which the ``configure.zcml`` file
    lives.
 
-#. Line 17 ends the ``configure`` root tag.
+#. Line 16 ends the ``configure`` root tag.
 
 .. index::
    single: views.py
