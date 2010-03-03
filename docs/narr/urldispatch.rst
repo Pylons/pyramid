@@ -136,10 +136,10 @@ Route Configuration That Names a View Callable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When a route configuration declaration names a ``view`` attribute, the
-attribute will be a value that references a :term:`view callable`.  A
-view callable, as described in :ref:`views_chapter`, is
-developer-supplied code that "does stuff" as the result of a request.
-For more information about how to create view callables, see
+value of the attribute will reference a :term:`view callable`.  A view
+callable, as described in :ref:`views_chapter`, is developer-supplied
+code that "does stuff" as the result of a request.  For more
+information about how to create view callables, see
 :ref:`views_chapter`.
 
 Here's an example route configuration that references a view callable:
