@@ -17,6 +17,9 @@ Backwards Incompatibilities
 Bug Fixes
 ---------
 
+- Defer conditional import of IPython to avoid breakage under mod_wsgi.
+  http://bugs.repoze.org/issue138
+
 - More correct conversion of provided ``renderer`` values to resource
   specification values (internal).
 

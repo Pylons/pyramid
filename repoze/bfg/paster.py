@@ -9,11 +9,6 @@ from paste.util.template import paste_script_template_renderer
 
 from repoze.bfg.scripting import get_root
 
-try:
-    from IPython.Shell import IPShell # pragma: no cover
-except ImportError:
-    IPShell = None # pragma: no cover
-
 
 class StarterProjectTemplate(Template):
     _template_dir = 'paster_templates/starter'
@@ -43,6 +38,7 @@ def get_app(config_file, name, loadapp=loadapp):
     app = loadapp(config_name, name=name, relative_to=here_dir)
     return app
 
+_marker = object()
 class BFGShellCommand(Command):
     """Open an interactive shell with a :mod:`repoze.bfg` app loaded.
 
@@ -78,7 +74,6 @@ class BFGShellCommand(Command):
 
     interact = (interact,) # for testing
     loadapp = (loadapp,) # for testing
-    IPShell = IPShell # for testing
     verbose = 3
 
     def __init__(self, *arg, **kw):
@@ -87,7 +82,12 @@ class BFGShellCommand(Command):
         self.usage = '\n' + self.__doc__
         Command.__init__(self, *arg, **kw)
 
-    def command(self):
+    def command(self, IPShell=_marker):
+        if IPShell is _marker:
+            try: #pragma no cover
+                from IPython.Shell import IPShell
+            except ImportError: #pragma no cover
+                IPShell = None
         cprt =('Type "help" for more information. "root" is the BFG app '
                'root object.')
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
@@ -95,9 +95,9 @@ class BFGShellCommand(Command):
         self.logging_file_config(config_file)
         app = get_app(config_file, section_name, loadapp=self.loadapp[0])
         root, closer = get_root(app)
-        if self.IPShell is not None and not self.options.disable_ipython:
+        if IPShell is not None and not self.options.disable_ipython:
             try:
-                shell = self.IPShell(argv=[], user_ns={'root':root})
+                shell = IPShell(argv=[], user_ns={'root':root})
                 shell.IP.BANNER = shell.IP.BANNER + '\n\n' + banner
                 shell.mainloop()
             finally:
@@ -107,5 +107,3 @@ class BFGShellCommand(Command):
                 self.interact[0](banner, local={'root':root})
             finally:
                 closer()
-
-                

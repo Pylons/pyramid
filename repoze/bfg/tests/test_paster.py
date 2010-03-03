@@ -20,7 +20,7 @@ class TestBFGShellCommand(unittest.TestCase):
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython =True
-        command.command()
+        command.command(IPShell=None)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
         self.failUnless(loadapp.relative_to)
@@ -38,12 +38,11 @@ class TestBFGShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.loadapp = (loadapp,)
         dummy_shell_factory = DummyIPShellFactory()
-        command.IPShell = dummy_shell_factory
         command.args = ('/foo/bar/myapp.ini', 'myapp')
         class Options(object): pass
         command.options = Options()
         command.options.disable_ipython = False
-        command.command()
+        command.command(IPShell=dummy_shell_factory)
         self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
         self.assertEqual(loadapp.section_name, 'myapp')
         self.failUnless(loadapp.relative_to)
