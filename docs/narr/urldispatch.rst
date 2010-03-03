@@ -405,9 +405,9 @@ the route matching process.
 Other arguments are view configuration related arguments.  These only
 have an effect when the route configuration names a ``view``.
 
-Other arguments are ``name`` and ``factory``.  These are required
-arguments but represent neither a predicate nor view configuration
-information.
+Other arguments are ``name`` and ``factory``.  These arguments are
+neither a predicate arguments nor view configuration information
+arguments.
 
 **Non-Predicate Arguments**
 
