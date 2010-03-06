@@ -371,7 +371,7 @@ them, so we cannot provide the details for each here.  But the
 concepts are largely the same, whatever server you happen to use.
 
 One popular production alternative to a ``paster``-invoked server is
-:term:`mod_wsgi`.  can also use :term:`mod_wsgi` to serve your
+:term:`mod_wsgi`. You can also use :term:`mod_wsgi` to serve your
 :mod:`repoze.bfg` application using the Apache web server rather than
 any "pure-Python" server that is started as a result of ``paster
 serve``.  See :ref:`modwsgi_tutorial` for details.  However, it is
