@@ -35,10 +35,12 @@ class MyApp(object):
     def __getitem__(self, key):
         session= DBSession()
         try:
-            key = int(key)
+            id = int(key)
         except (ValueError, TypeError):
             raise KeyError(key)
-        query = session.query(MyModel).filter_by(id=key)
+
+        query = session.query(MyModel).filter_by(id=id)
+
         try:
             item = query.one()
             item.__parent__ = self
