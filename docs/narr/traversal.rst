@@ -45,7 +45,7 @@ commands:
    cd buz
    cd myfile
 
-The user now know he has found a *file*, because the ``cd`` command
+The user now knows he has found a *file*, because the ``cd`` command
 issues an error when he executed ``cd myfile``.  Now he knows that he
 can run the ``cat`` command:
 
