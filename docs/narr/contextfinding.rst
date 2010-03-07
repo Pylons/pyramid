@@ -28,7 +28,7 @@ finding` and :term:`view lookup`.
   the application developer which receives the :term:`request` and
   which returns a :term:`response`.
 
-These two subsystems are are used by :mod:`repoze.bfg` serially:
+These two subsystems are used by :mod:`repoze.bfg` serially:
 first, a :term:`context finding` subsystem does its job.  Then the
 result of context finding is passed to the :term:`view lookup`
 subsystem.  The view lookup system finds a :term:`view callable`
