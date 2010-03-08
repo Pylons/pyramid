@@ -441,7 +441,7 @@ At this point, traversal has ended, and :term:`view lookup` begins.
 
 Because it's the "context", the view lookup machinery examines "bar"
 to find out what "type" it is. Let's say it finds that the context is
-an ``Bar`` type (because "bar" happens to be an instance of the class
+a ``Bar`` type (because "bar" happens to be an instance of the class
 ``Bar``).  Using the :term:`view name` (``baz``) and the type, view
 lookup asks the :term:`application registry` this question:
 
