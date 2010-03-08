@@ -367,7 +367,7 @@ and a :term:`view name`.
 
 Once :term:`context` and :term:`view name` and associated attributes
 such as the :term:`subpath` are located, the job of :term:`traversal`
-is finished.  It passes the back the information it obtained to its
+is finished.  It passes back the information it obtained to its
 caller, the :mod:`repoze.bfg` :term:`Router`, which subsequently
 invokes :term:`view lookup` with the context and view name
 information.
