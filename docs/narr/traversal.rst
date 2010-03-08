@@ -280,7 +280,7 @@ how the algorithm works, and some example traversal scenarios that
 might help you understand how the algorithm operates against a
 specific object graph.
 
-We'll also talk a bit about :term:`view lookup` .  The
+We'll also talk a bit about :term:`view lookup`.  The
 :ref:`views_chapter` chapter discusses :term:`view lookup` in detail,
 and it is the canonical source for information about views.
 Technically, :term:`view lookup` is a :mod:`repoze.bfg` subsystem that
