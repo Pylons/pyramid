@@ -245,7 +245,7 @@ method is how Python itself typically determines whether an object is
 Each container node is presumed to be willing to return a child node
 or raise a ``KeyError`` based on a name passed to its ``__getitem__``.
 
-No leaf-level instance is required to have a ``__getitem__``.  If
+Leaf-level instances must not have a ``__getitem__``.  If
 instances that you'd like to be leaves already happen to have a
 ``__getitem__`` through some historical inequity, you should subclass
 these node types and cause their ``__getitem__`` methods to simply
