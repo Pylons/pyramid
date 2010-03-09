@@ -285,7 +285,7 @@ Glossary
      `A lightweight Python web framework <http://pylonshq.com>`_.
 
    ZODB
-      `Zope Object Database <http://wiki.zope.org/ZODB/FrontPage>`_, a
+      `Zope Object Database <http://zodb.org>`_, a
       persistent Python object store.
 
    ZEO
