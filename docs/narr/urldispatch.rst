@@ -21,7 +21,7 @@ benefit from having any visible separation between :term:`context
 finding` and :term:`view lookup`.  To this end, URL dispatch provides
 a handy syntax that allows you to effectively map URLs *directly* to
 :term:`view` code in such a way that you needn't think about your
-application in terms "context finding" at all.  This makes developing
+application in terms of "context finding" at all.  This makes developing
 a :mod:`repoze.bfg` application seem more like developing an
 application in a system that is "context-free", such as :term:`Pylons`
 or :term:`Django`.
@@ -232,7 +232,7 @@ and:
    /:foo/bar/baz
 
 A path segment (an individual item between ``/`` characters in the
-path) may either be a literal string (e.g. ``foo``) *or* it may
+path) may either be a literal string (e.g. ``foo``) *or* it may be a
 segment replacement marker (e.g. ``:foo``).  A segment replacement
 marker is in the format ``:name``, where this means "accept any
 characters up to the next slash and use this as the ``name`` matchdict
