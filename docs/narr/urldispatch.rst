@@ -574,7 +574,7 @@ represent neither predicates nor view configuration information.
 Route Matching
 --------------
 
-The main purpose of route configuration is to match (nor not match)
+The main purpose of route configuration is to match (or not match)
 the ``PATH_INFO`` present in the WSGI environment provided during a
 request against a URL path pattern.
 
@@ -629,7 +629,7 @@ Routing Examples
 ----------------
 
 Let's check out some examples of how route configuration statements
-might be commonly declared, and what will happen if a they are matched
+might be commonly declared, and what will happen if they are matched
 by the information present in a request.  The examples that follow
 assume that :term:`ZCML` will be used to perform route configuration,
 although you can use :term:`imperative configuration` equivalently if
