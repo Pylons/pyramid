@@ -1031,7 +1031,7 @@ If the route ``archives/:article`` is matched, and the article number
 is ``1``, :mod:`repoze.bfg` will generate an ``Article``
 :term:`context` with an ACL on it that allows the ``editor`` principal
 the ``view`` permission.  Obviously you can do more generic things
-that inspect the routes match dict to see if the ``article`` argument
+than inspect the routes match dict to see if the ``article`` argument
 matches a particular string; our sample ``Article`` factory class is
 not very ambitious.
 
