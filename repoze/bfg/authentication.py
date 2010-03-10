@@ -192,10 +192,10 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``timeout``
 
-       Default: ``None``.  Maximum number of seconds after which a
-       newly issued ticket will be considered valid.  After this
-       amount of time, the ticket will expire (effectively logging the
-       user out).  If this value is ``None``, the token never expires.
+       Default: ``None``.  Maximum number of seconds which a newly
+       issued ticket will be considered valid.  After this amount of
+       time, the ticket will expire (effectively logging the user
+       out).  If this value is ``None``, the ticket never expires.
        Optional.
 
     ``reissue_time``
