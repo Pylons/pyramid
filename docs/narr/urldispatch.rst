@@ -894,12 +894,12 @@ For behavior like Django's ``APPEND_SLASH=True``, use the
 Found view (indicating that no view was found), and any routes have
 been defined in the configuration of your application, if the value of
 ``PATH_INFO`` does not already end in a slash, and if the value of
-``PATH_INFO`` *plus* a slash matches any route's path, do an HTTP
+``PATH_INFO`` *plus* a slash matches any route's path, it does an HTTP
 redirect to the slash-appended ``PATH_INFO``.
 
-Let's use an example, because this behavior is a bit magical.  If this
-your route configuration is looks like so, and the
-``append_slash_notfound_view`` is configured in your application:
+Let's use an example, because this behavior is a bit magical. If the
+``append_slash_notfound_view`` is configured in your application and
+your route configuration looks like so:
 
 .. code-block:: xml
    :linenos:
