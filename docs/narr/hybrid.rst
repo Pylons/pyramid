@@ -127,7 +127,7 @@ application and a hybrid application:
   ``PATH_INFO`` string, but a portion of the URL determined by a
   matching pattern in the matched route configuration's path.
 
-- In a purely traversal based applications, view configurations which
+- In a purely traversal based application, view configurations which
   do not mention a ``route_name`` argument are considered during
   :term:`view lookup`; in a hybrid application, when a route is
   matched, only view configurations which mention that route's name as
@@ -183,9 +183,9 @@ match is straightforward.  When a route is matched:
 
 .. note::
 
-   Root factories related to a route were explained previously in
-   within :ref:`route_factories`.  Both the global root factory and
-   default root factory were explained previously within
+   Root factories related to a route were explained previously within
+   :ref:`route_factories`.  Both the global root factory and default
+   root factory were explained previously within
    :ref:`the_object_graph`.  
 
 Using ``*traverse`` In a Route Path
@@ -233,7 +233,8 @@ The *default* :term:`root factory` cannot be traversed: it has no
 useful ``__getitem__`` method.  So we'll need to associate this route
 configuration with a non-default root factory in order to create a
 useful hybrid application.  To that end, let's imagine that we've
-created a root factory looks like so in a module named ``routes.py``:
+created a root factory that looks like so in a module named
+``routes.py``:
 
 .. code-block:: python
    :linenos:
