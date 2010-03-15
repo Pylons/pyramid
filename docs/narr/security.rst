@@ -92,7 +92,7 @@ authorization policy.
 You must also enable an :term:`authentication policy` in order to
 enable the an authorization policy.  This is because authorization, in
 general, depends upon authentication.  Use the
-``authorization_policy`` argument to the
+``authentication_policy`` argument to the
 :class:`repoze.bfg.configuration.Configurator` class during
 application setup to specify an authentication policy.
 
