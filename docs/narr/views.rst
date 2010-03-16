@@ -235,7 +235,7 @@ app_iter
 
 If a view happens to return something to the :mod:`repoze.bfg`
 :term:`router` which does not implement this interface,
-:mod:`repoze.bfg` will attempt to use an a :term:`renderer` to
+:mod:`repoze.bfg` will attempt to use a :term:`renderer` to
 construct a response.  The renderer associated with a view callable
 can be varied by changing the ``renderer`` attribute in the view's
 configuration.  See :ref:`views_which_use_a_renderer`.
@@ -735,7 +735,7 @@ on its final dot.  The second element of the split is typically the
 filename extension.  This extension is used to look up a renderer
 factory for the configured view.  Then the value of ``renderer`` is
 passed to the factory to create a renderer for the view.  In this
-case, the view configuration will create an instance of an
+case, the view configuration will create an instance of a
 ``Jinja2Renderer`` for each view configuration which includes anything
 ending with ``.jinja2`` as its ``renderer`` value.  The ``name``
 passed to the ``Jinja2Renderer`` constructor will usually be a
@@ -822,8 +822,8 @@ the :term:`WSGI` server which invoked the application.
 However, for convenience, two special exceptions exist which are
 always handled by :mod:`repoze.bfg` itself.  These are
 :exc:`repoze.bfg.exceptions.NotFound` and
-:exc:`repoze.bfg.exceptions.Forbidden`.  Both is an exception class
-which accepts a single positional constructor argument: a ``message``.
+:exc:`repoze.bfg.exceptions.Forbidden`.  Both are exception classes
+which accept a single positional constructor argument: a ``message``.
 
 If :exc:`repoze.bfg.exceptions.NotFound` is raised within view code,
 the result of the :term:`Not Found View` will be returned to the user
