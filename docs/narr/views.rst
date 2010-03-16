@@ -618,7 +618,7 @@ For example, to add a renderer which renders views which have a
 
    The first argument is the renderer name.
 
-   The second argument is a reference to an to an implementation of a
+   The second argument is a reference to an implementation of a
    :term:`renderer factory`.
 
 Adding a New Renderer
@@ -648,14 +648,14 @@ following interface:
 
 There are essentially two different kinds of renderer factories:
 
-- A renderer factory which which expects to accept a :term:`resource
+- A renderer factory which expects to accept a :term:`resource
   specification` or an absolute path as the ``name`` value in its
   constructor.  These renderer factories are registered with a
   ``name`` value that begins with a dot (``.``).  These types of
   renderer factories usually relate to a file on the filesystem, such
   as a template.
 
-- A renderer factory which expects to accepts a token that does not
+- A renderer factory which expects to accept a token that does not
   represent a filesystem path or a resource specification in its
   constructor.  These renderer factories are registered with a
   ``name`` value that does not begin with a dot.  These renderer
