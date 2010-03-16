@@ -376,7 +376,7 @@ representation of the dictionary:
 The body of the response returned by such a view will be a string
 representing the ``str()`` serialization of the return value:
 
-.. code-block: python
+.. code-block:: python
    :linenos:
 
    {'content': 'Hello!'}
@@ -414,7 +414,7 @@ view will render the returned dictionary to a JSON serialization:
 The body of the response returned by such a view will be a string
 representing the JSON serialization of the return value:
 
-.. code-block: python
+.. code-block:: python
    :linenos:
 
    '{"content": "Hello!"}'
