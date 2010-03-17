@@ -1032,7 +1032,7 @@ configuration are used to narrow the set of circumstances in which
 :mod:`view lookup` will find a particular view callable.  In general,
 the fewer number of predicates which are supplied to a particular view
 configuration, the more likely it is that the associated view callable
-will be invoked.  A greater the number supplied, the less likely.
+will be invoked.  The greater the number supplied, the less likely.
 
 Some view configuration arguments are non-predicate arguments.  These
 tend to modify the response of the view callable or prevent the view
@@ -1072,7 +1072,7 @@ Non-Predicate Arguments
   implying a path or :term:`resource specification`
   (e.g. ``templates/views.pt``) naming a :term:`renderer`
   implementation.  If the ``renderer`` value does not contain a dot
-  ``.``, the specified string will be used to look up a renderer
+  (``.``), the specified string will be used to look up a renderer
   implementation, and that renderer implementation will be used to
   construct a response from the view return value.  If the
   ``renderer`` value contains a dot (``.``), the specified term will
@@ -1193,7 +1193,7 @@ Predicate Arguments
 
 ``containment``
   This value should be a reference to a Python class or
-  term:`interface` that a parent object in the :term:`lineage` must
+  :term:`interface` that a parent object in the :term:`lineage` must
   provide in order for this view to be found and called.  The nodes in
   your object graph must be "location-aware" to use this feature.
 
