@@ -17,13 +17,13 @@ Serving Static Resources Using a ZCML Directive
 Use of the ``static`` ZCML directive or the
 :meth:`repoze.bfg.configuration.configurator.add_static_view` method
 is the preferred way to instruct :mod:`repoze.bfg` to serve static
-resources such as JavaScript and CSS files. These mechanisms makes
+resources such as JavaScript and CSS files. This mechanism makes
 static files available at a name relative to the application root URL,
 e.g. ``/static``.
 
 Here's an example of a ``static`` ZCML directive that will serve files
-up ``/static`` URL from the ``/var/www/static`` directory of the
-computer which runs the :mod:`repoze.bfg` application.
+up under the ``/static`` URL from the ``/var/www/static`` directory of
+the computer which runs the :mod:`repoze.bfg` application.
 
 .. code-block:: xml
    :linenos:
@@ -34,8 +34,8 @@ computer which runs the :mod:`repoze.bfg` application.
       />
 
 Here's an example of a ``static`` directive that will serve files up
-``/static`` URL from the ``a/b/c/static`` directory of the Python
-package named ``some_package``.
+under the ``/static`` URL from the ``a/b/c/static`` directory of the
+Python package named ``some_package``.
 
 .. code-block:: xml
    :linenos:
@@ -57,8 +57,8 @@ package in which the ``configure.zcml`` file lives.
       path="static"
       />
 
-When you place your static files on filesystem in the directory
-represented as the ``path`` of the directive you, you should be able
+When you place your static files on the filesystem in the directory
+represented as the ``path`` of the directive, you should be able
 to view the static files in this directory via a browser at URLs
 prefixed with the directive's ``name``.  For instance if the
 ``static`` directive's ``name`` is ``static`` and the static
