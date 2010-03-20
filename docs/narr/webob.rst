@@ -87,10 +87,10 @@ object:
     A simple dictionary of all the cookies.
 
 ``req.headers``:
-    A dictionary of all the headers.  This is dictionary is case-insensitive.
+    A dictionary of all the headers.  This dictionary is case-insensitive.
 
 ``req.urlvars`` and ``req.urlargs``:
-    ``req.urlvars`` is the keyword parameters associated with the
+    ``req.urlvars`` are the keyword parameters associated with the
     request URL.  ``req.urlargs`` are the positional parameters.
     These are set by products like `Routes
     <http://routes.groovie.org/>`_ and `Selector
@@ -143,11 +143,11 @@ request.
   See :ref:`traversal_chapter` for information about the subpath.
 
 ``req.traversed``
-  The "traversal path" will be as the ``traversed`` attribute of the
+  The "traversal path" will be available as the ``traversed`` attribute of the
   :term:`request` object.  It will be a sequence representing the
   ordered set of names that were used to traverse to the
   :term:`context`, not including the view name or subpath.  If there
-  is a virtual root associated with request, the virtual root path is
+  is a virtual root associated with the request, the virtual root path is
   included within the traversal path.  See :ref:`traversal_chapter`
   for more information.
 
@@ -289,8 +289,8 @@ Here's the highlights:
     This optional attribute can point to the request object associated
     with this response object.
 
-``response.set_cookie(key, value, max_age=None, path='/', ...)``: Set
-    a cookie.  The keyword arguments control the various cookie
+``response.set_cookie(key, value, max_age=None, path='/', ...)``: 
+    Set a cookie.  The keyword arguments control the various cookie
     parameters.  The ``max_age`` argument is the length for the cookie
     to live in seconds (you may also use a timedelta object).  The
     ``Expires`` key will also be set based on the value of
@@ -305,11 +305,12 @@ Here's the highlights:
     or if ``seconds`` is 0 then the response is uncacheable (this also
     sets the ``Expires`` header).
 
-``response(environ, start_response)``: The response object is a WSGI
-    application.  As an application, it acts according to how you
-    create it.  It *can* do conditional responses if you pass
-    ``conditional_response=True`` when instantiating (or set that
-    attribute later).  It can also do HEAD and Range requests.
+``response(environ, start_response)``: 
+    The response object is a WSGI application.  As an application, it
+    acts according to how you create it.  It *can* do conditional
+    responses if you pass ``conditional_response=True`` when
+    instantiating (or set that attribute later).  It can also do HEAD
+    and Range requests.
 
 .. index::
    single: response headers
