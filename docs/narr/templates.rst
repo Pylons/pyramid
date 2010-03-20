@@ -11,7 +11,7 @@ Out of the box, :mod:`repoze.bfg` provides templating via the
 support for two different types of templates: :term:`ZPT` templates
 and text templates.
 
-Before discussing how built-in templates are templates are used in
+Before discussing how built-in templates are used in
 detail, we'll discuss two ways to render templates within
 :mod:`repoze.bfg` in general: directly, and via renderer
 configuration.
@@ -34,7 +34,7 @@ given templating engine to do so.
 :term:`Chameleon` templates directly from within a view callable.  For
 example, if there is a :term:`Chameleon` ZPT template named ``foo.pt``
 in a directory in your application named ``templates``, you can render
-the template from within the body of view callable like so:
+the template from within the body of a view callable like so:
 
 .. code-block:: python
    :linenos:
@@ -50,11 +50,11 @@ The ``sample_view`` :term:`view callable` above returns a
 ``foo`` and ``bar`` available as top-level names for replacement or
 comparison purposes.
 
-Every views must return a :term:`response` object (except for views
+Every view must return a :term:`response` object (except for views
 which use a :term:`renderer`, which we'll see shortly).  The
 :func:`repoze.bfg.chameleon_zpt.render_template_to_response` function
 is a shortcut function that actually returns a response object, but
-not all template APIs know about responses.  When you use an template
+not all template APIs know about responses.  When you use a template
 API that is "response-ignorant" you can also easily render a template
 to a string, and construct your own response object as necessary with
 the string as the body.
@@ -158,7 +158,7 @@ Here's an example of manufacturing a response object using the result of
 Templates Used as Renderers
 ---------------------------
 
-Instead of using templating system APIs within a the body of a view
+Instead of using templating system APIs within the body of a view
 function directly to render a specific template, you may associate a
 template written in a supported templating language with a view
 indirectly by specifying it as a :term:`renderer`.
@@ -225,7 +225,7 @@ of :term:`Jinja2` templates as renderers.  See
    Views which use templating APIs directly must return a
    :term:`Response` object.  Making testing assertions about response
    objects is typically an indirect process, because it means that
-   your test code often needs to somehow needs to parse information
+   your test code often needs to somehow parse information
    out of the response body (often HTML).  View callables which use
    renderers typically return a dictionary, and making assertions
    about the information is almost always more direct than needing to
@@ -339,13 +339,13 @@ Using ZPT Macros in :mod:`repoze.bfg`
 When a :term:`renderer` is used to render a template,
 :mod:`repoze.bfg` makes at least two top-level names available to the
 template by default: ``context`` and ``request``.  One of the common
-needs in ZPT-based template is to one template's "macros" from within
+needs in ZPT-based templates is to use one template's "macros" from within
 a different template.  In Zope, this is typically handled by
 retrieving the template from the ``context``.  But having a hold of
 the context in :mod:`repoze.bfg` is not helpful: templates cannot
 usually be retrieved from models.  To use macros in :mod:`repoze.bfg`,
 you need to make the macro template itself available to the rendered
-template by passing template in which the macro is defined (or even
+template by passing the template in which the macro is defined (or even
 the macro itself) *into* the rendered template.  To make a macro
 available to the rendered template, you can retrieve a different
 template using the :func:`repoze.bfg.chameleon_zpt.get_template` API,
@@ -476,7 +476,7 @@ Automatically Reloading Templates
 
 It's often convenient to see changes you make to a template file
 appear immediately without needing to restart the application process.
-:mod:`repoze.bfg` allows you configure your application development
+:mod:`repoze.bfg` allows you to configure your application development
 environment so that a change to a template will be automatically
 detected, and the template will be reloaded on the next rendering.
 
