@@ -259,7 +259,7 @@ In order for :mod:`repoze.bfg` location, security, URL-generation, and
 traversal functions (such as the functions exposed in
 :ref:`location_module`, :ref:`traversal_module`, and :ref:`url_module`
 as well as certain functions in :ref:`security_module` ) to work
-properly against a instances in an object graph, all nodes in the
+properly against the instances in an object graph, all nodes in the
 graph must be :term:`location` -aware.  This means they must have two
 attributes: ``__parent__`` and ``__name__``.
 
@@ -280,7 +280,7 @@ The ``__parent__`` of the root object should be ``None`` and its
 A node returned from the root item's ``__getitem__`` method should
 have a ``__parent__`` attribute that is a reference to the root
 object, and its ``__name__`` attribute should match the name by which
-it is are reachable via the root object's ``__getitem__``.  *That*
+it is reachable via the root object's ``__getitem__``.  *That*
 object's ``__getitem__`` should return objects that have a
 ``__parent__`` attribute that points at that object, and
 ``__getitem__``-returned objects should have a ``__name__`` attribute
