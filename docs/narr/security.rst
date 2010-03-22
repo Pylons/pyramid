@@ -41,7 +41,7 @@ Here's how it works at a high level:
 - If the authorization policy denies access, the view callable is not
   invoked; instead the :term:`forbidden view` is invoked.
 
-Authorization is enabled by modifying your application to include a
+Authorization is enabled by modifying your application to include an
 :term:`authentication policy` and :term:`authorization policy`.
 :mod:`repoze.bfg` comes with a variety of implementations of these
 policies.  To provide maximal flexibility, :mod:`repoze.bfg` also
@@ -90,7 +90,7 @@ Passing an ``authorization_policy`` argument to the constructor of the
 authorization policy.
 
 You must also enable an :term:`authentication policy` in order to
-enable the an authorization policy.  This is because authorization, in
+enable the authorization policy.  This is because authorization, in
 general, depends upon authentication.  Use the
 ``authentication_policy`` argument to the
 :class:`repoze.bfg.configuration.Configurator` class during
@@ -118,7 +118,7 @@ attempting to call some :term:`view`.
 
 While it is possible to mix and match different authentication and
 authorization policies, it is an error to pass an authentication
-policy without the an authorization policy or vice versa to a
+policy without the authorization policy or vice versa to a
 :term:`Configurator` constructor.
 
 See also the :mod:`repoze.bfg.authorization` and
@@ -210,7 +210,7 @@ may be performed via the ``@bfg_view`` decorator:
        """ Add blog entry code goes here """
        pass
 
-Or an the same thing can be done using the
+Or the same thing can be done using the
 :meth:`repoze.bfg.configuration.Configurator.add_view` method:
 
 .. ignore-next-block
@@ -245,7 +245,7 @@ context.  An ACL is associated with a context by virtue of the
 *instance* if you need instance-level security, or it can be defined
 on the model *class* if you just need type-level security.
 
-For example, an ACL might be attached to model for a blog via its
+For example, an ACL might be attached to the model for a blog via its
 class:
 
 .. code-block:: python
@@ -314,7 +314,7 @@ system-defined principal indicating, literally, everyone -- is allowed
 to view the blog, the ``group:editors`` principal is allowed to add to
 and edit the blog.
 
-Each elements of an ACL is an :term:`ACE` or access control entry.
+Each element of an ACL is an :term:`ACE` or access control entry.
 For example, in the above code block, there are three ACEs: ``(Allow,
 Everyone, 'view')``, ``(Allow, 'group:editors', 'add')``, and
 ``(Allow, 'group:editors', 'edit')``.
@@ -464,7 +464,7 @@ the following:
 .. code-block:: python
 
    from repoze.bfg.security import ALL_PERMISSIONS
-   (Deny, Everyone, ALL_PERMISSIONS)
+   __acl__ = [ (Deny, Everyone, ALL_PERMISSIONS) ]
 
 .. index::
    single: ACL inheritance
@@ -480,7 +480,7 @@ parent is consulted for an ACL, ad infinitum, until we've reached the
 root and there are no more parents left.
 
 In order to allow the security machinery to perform ACL inheritance,
-model objects must provide :term:`location` -awareness.  Providing
+model objects must provide *location-awareness*.  Providing
 *location-awareness* means two things: the root object in the graph
 must have a ``_name__`` attribute and a ``__parent__`` attribute.
 
@@ -555,8 +555,8 @@ one of :data:`repoze.bfg.security.ACLAllowed`,
 :data:`repoze.bfg.security.ACLDenied`,
 :data:`repoze.bfg.security.Allowed`, or
 :data:`repoze.bfg.security.Denied`, as documented in
-:ref:`security_module`.  At very minimum these objects will have a
-``msg`` attribute, which is a string indicating why permission was
+:ref:`security_module`.  At the very minimum these objects will have a
+``msg`` attribute, which is a string indicating why the permission was
 denied or allowed.  Introspecting this information in the debugger or
 via print statements when a call to
 :func:`repoze.bfg.security.has_permission` fails is often useful.
@@ -679,7 +679,7 @@ Creating Your Own Authentication Policy
 security policies (see :mod:`repoze.bfg.authentication`).  However,
 creating your own authentication policy is often necessary when you
 want to control the "horizontal and vertical" of how your users
-authenticate.  Doing so is matter of creating an instance of something
+authenticate.  Doing so is a matter of creating an instance of something
 that implements the following interface:
 
 .. code-block:: python
@@ -718,14 +718,14 @@ time as ``authentication_policy`` to use it.
 Creating Your Own Authorization Policy
 --------------------------------------
 
-An authentication policy the policy that allows or denies access after
+An authorization policy is a policy that allows or denies access after
 a user has been authenticated.  By default, :mod:`repoze.bfg` will use
 the :class:`repoze.bfg.authorization.ACLAuthorizationPolicy` if an
 authentication policy is activated and an authorization policy isn't
 otherwise specified.
 
 In some cases, it's useful to be able to use a different
-authentication policy than the
+authorization policy than the default
 :class:`repoze.bfg.authorization.ACLAuthorizationPolicy`.  For
 example, it might be desirable to construct an alternate authorization
 policy which allows the application to use an authorization mechanism
