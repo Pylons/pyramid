@@ -32,7 +32,7 @@ If you use the ``urlmap`` composite application "in front" of a
 :mod:`repoze.bfg` application or if you use :term:`mod_wsgi` to serve
 up a :mod:`repoze.bfg` application, nothing special needs to be done
 within the application for URLs to be generated that contain a
-prefix. :mod:`paste.urlmap` and :term:`mod_wsgi` and manipulate the
+prefix. :mod:`paste.urlmap` and :term:`mod_wsgi` manipulate the
 :term:`WSGI` environment in such a way that the ``PATH_INFO`` and
 ``SCRIPT_NAME`` variables are correct for some given prefix.
 
