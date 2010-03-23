@@ -17,7 +17,7 @@ Changing the Not Found View
 When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
 :term:`not found view`, which is a :term:`view callable`. The view it
 invokes can be customized through application configuration.  This
-view can be configured in via :term:`imperative configuration` or
+view can be configured via :term:`imperative configuration` or
 :term:`ZCML`.
 
 .. topic:: Using Imperative Configuration
