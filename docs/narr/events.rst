@@ -90,7 +90,7 @@ provides documentation of what attributes of the event are available.
 
 The return value of a subscriber function is ignored.  Subscribers to
 the same event type are not guaranteed to be called in any particular
-order relative to each another.
+order relative to each other.
 
 All the concrete :mod:`repoze.bfg` event types are documented in the
 :ref:`events_module` API documentation.
