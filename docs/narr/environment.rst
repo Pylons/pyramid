@@ -155,7 +155,7 @@ application's ``.ini`` file.
 If you want to turn all ``debug`` settings (every setting that starts
 with ``debug_``). on in one fell swoop, you can use
 ``BFG_DEBUG_ALL=1`` as an environment variable setting or you may use
-``debug_all=true`` in the config file.  Note that this does not effect
+``debug_all=true`` in the config file.  Note that this does not affect
 settings that do not start with ``debug_*`` such as
 ``reload_templates``.
 
@@ -163,7 +163,7 @@ If you want to turn all ``reload`` settings (every setting that starts
 with ``reload_``). on in one fell swoop, you can use
 ``BFG_RELOAD_ALL=1`` as an environment variable setting or you may use
 ``reload_all=true`` in the config file.  Note that this does not
-effect settings that do not start with ``reload_*`` such as
+affect settings that do not start with ``reload_*`` such as
 ``debug_notfound``.
 
 .. index:: 
@@ -180,7 +180,7 @@ static files and other resources), so the distinction can be
 confusing.  It's helpful to read :ref:`overriding_resources_section`
 for some context about resources in general.
 
-When ``reload_templates`` is true, :mod:`repoze.bfg`` takes advantage
+When ``reload_templates`` is true, :mod:`repoze.bfg` takes advantage
 of the underlying templating systems' ability to check for file
 modifications to an individual template file.  When
 ``reload_templates`` is true but ``reload_resources`` is *not* true,
@@ -189,7 +189,7 @@ the template filename returned by pkg_resources is cached by
 same template file will return a cached template filename.  The
 underlying templating system checks for modifications to this
 particular file for every request.  Setting ``reload_templates`` to
-``True`` doesn't effect performance dramatically (although it should
+``True`` doesn't affect performance dramatically (although it should
 still not be used in production because it has some effect).
 
 However, when ``reload_resources`` is true, :mod:`repoze.bfg` will not
@@ -198,7 +198,7 @@ changing the content of an overridden resource directory for templates
 without restarting the server after every change.  Subsequent requests
 for the same template file may return different filenames based on the
 current state of overridden resource directories. Setting
-``reload_resources`` to ``True`` effects performance *dramatically*,
+``reload_resources`` to ``True`` affects performance *dramatically*,
 slowing things down by an order of magnitude for each template
 rendering.  However, it's convenient to enable when moving files
 around in overridden resource directories. ``reload_resources`` makes
