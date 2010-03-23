@@ -77,14 +77,14 @@ these functions and the data structures they return.
 
 If your code uses these ``get_current_*`` functions or calls
 :mod:`repoze.bfg` code which uses ``get_current_*`` functions, you
-will need to construct at :term:`Configurator` and call its ``begin``
+will need to construct a :term:`Configurator` and call its ``begin``
 method within the ``setUp`` method of your unit test and call the same
 configurator's ``end`` method within the ``tearDown`` method of your
 unit test.
 
 The use of a Configurator and its ``begin`` and ``end`` methods allows
 you to supply each unit test method in a test case with an environment
-that has a isolated registry and an isolated request for the duration
+that has an isolated registry and an isolated request for the duration
 of a single test.  Here's an example of using this feature:
 
 .. code-block:: python
