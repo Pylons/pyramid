@@ -20,12 +20,12 @@ maximally extensible :mod:`repoze.bfg` application: you should not use
 any :term:`configuration decoration` or :term:`imperative
 configuration`. This means the application developer should avoid
 relying on :term:`configuration decoration` meant to be detected via
-the a :term:`scan`, and you mustn't configure your :mod:`repoze.bfg`
+a :term:`scan`, and you mustn't configure your :mod:`repoze.bfg`
 application *imperatively* by using any code which configures the
 application through methods of the :term:`Configurator` (except for
 the :meth:`repoze.bfg.configuration.Configurator.load_zcml` method).
 
-Instead, must always use :term:`ZCML` for the equivalent
+Instead, you must always use :term:`ZCML` for the equivalent
 purposes. :term:`ZCML` declarations that belong to an application can
 be "overridden" by integrators as necessary, but decorators and
 imperative code which perform the same tasks cannot.  Use only
@@ -107,7 +107,7 @@ configuration imperatively, one of two things may be true:
   :meth:`repoze.bfg.configuration.Configurator.scan` method).  This
   will cause the decorators to do nothing.  At this point, you will
   need to convert all the configuration done in decorators into
-  equivalent :term:`ZCML` and add that ZCML to an a separate Python
+  equivalent :term:`ZCML` and add that ZCML to a separate Python
   package as described in :ref:`extending_the_application`.
 
   If the source of trouble is configuration done imperatively in a
@@ -151,7 +151,7 @@ something like this:
   package="theoriginalapp" file="views.zcml"/>``.
 
 - On a line in the new package's ``configure.zcml`` file that falls
-  after (XML-ordering-wise) the all ``include`` statements of original
+  after (XML-ordering-wise) all the ``include`` statements of the original
   package ZCML, put an ``includeOverrides`` statement which identifies
   *another* ZCML file within the new package (for example
   ``<includeOverrides file="overrides.zcml"/>``.
