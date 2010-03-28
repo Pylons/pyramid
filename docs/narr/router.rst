@@ -41,7 +41,7 @@ processing?
    ``bfg.routes.route`` key and a ``bfg.routes.matchdict`` are added
    to the WSGI environment, and an attribute named ``matchdict`` is
    added to the request.  A root object associated with the route
-   found is also generated.  If a the :term:`route configuration`
+   found is also generated.  If the :term:`route configuration`
    which matched has an associated a ``factory`` argument, this
    factory is used to generate the root object, otherwise a default
    :term:`root factory` is used.
