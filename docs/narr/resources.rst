@@ -86,7 +86,7 @@ given :mod:`repoze.bfg` application.  For example, you may wish to
 reuse an existing :mod:`repoze.bfg` application more or less
 unchanged.  However, some specific template file owned by the
 application might have inappropriate HTML, or some static resource
-(such as a logo file or some CSS file) might not appropriate.  You
+(such as a logo file or some CSS file) might not be appropriate.  You
 *could* just fork the application entirely, but it's often more
 convenient to just override the resources that are inappropriate and
 reuse the application "as is".  This is particularly true when you
@@ -196,7 +196,7 @@ Individual subdirectories within a package can also be overridden:
 If you wish to override a directory with another directory, you *must*
 make sure to attach the slash to the end of both the ``to_override``
 specification and the ``override_with`` specification.  If you fail to
-attach a slash to the end of a specification that points a directory,
+attach a slash to the end of a specification that points to a directory,
 you will get unexpected results.
 
 You cannot override a directory specification with a file
@@ -290,7 +290,7 @@ Individual subdirectories within a package can also be overridden:
 If you wish to override a directory with another directory, you *must*
 make sure to attach the slash to the end of both the ``to_override``
 specification and the ``override_with`` specification.  If you fail to
-attach a slash to the end of a specification that points a directory,
+attach a slash to the end of a specification that points to a directory,
 you will get unexpected results.
 
 The package name in a specification may start with a dot, meaning that
