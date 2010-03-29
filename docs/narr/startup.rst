@@ -92,16 +92,6 @@ press ``return`` after running ``paster serve MyProject.ini``.
    ``{'reload_templates':'true', 'debug_authorization':'false',
    'debug_notfound':'false'}``.
 
-#. The PasteDeploy application constructor itself is invoked.  It is
-   represented by the ``app`` function in ``run.py``.  A typical
-   :mod:`repoze.bfg` ``app`` function will look like the below.
-
-   .. literalinclude:: MyProject/myproject/run.py
-      :linenos:
-
-   Note that the ``app`` function imports the ``get_root`` :term:`root
-   factory` function from the ``myproject.models`` Python module.
-
 #. The ``app`` function first constructs a
    :class:`repoze.bfg.configuration.Configurator` instance, passing
    ``get_root`` to it as its ``root_factory`` argument, and
