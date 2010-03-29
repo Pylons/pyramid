@@ -43,7 +43,7 @@ of the ZCA from application developers.  You needn't understand the
 ZCA to create a :mod:`repoze.bfg` application; its use is effectively
 only a framework implementation detail.
 
-However, developers whom are already used to writing :term:`Zope`
+However, developers who are already used to writing :term:`Zope`
 applications often still wish to use the ZCA while building a
 :mod:`repoze.bfg` application; :mod:`repoze.bfg` makes this possible.
 
@@ -74,8 +74,8 @@ Most production Zope applications are relatively large, making it
 impractical due to memory constraints to run more than one Zope
 application per Python process.  However, a :mod:`repoze.bfg`
 application may be very small and consume very little memory, so it's
-a reasonable goal to be able to want to run more than one BFG
-application per process.
+a reasonable goal to be able to run more than one BFG application per
+process.
 
 In order to make it possible to run more than one :mod:`repoze.bfg`
 application in a single process, :mod:`repoze.bfg` defaults to using a
@@ -86,7 +86,7 @@ trying to use patterns which you might use to build a typical
 :term:`Zope` application to build a :mod:`repoze.bfg` application.
 Without special help, ZCA "global" APIs such as
 ``zope.component.getUtility`` and ``zope.component.getSiteManager``
-will use the ZCA "global" registry.  Therefore, these APIs application
+will use the ZCA "global" registry.  Therefore, these APIs
 will appear to fail when used in a :mod:`repoze.bfg` application,
 because they'll be consulting the ZCA global registry rather than the
 component registry associated with your :mod:`repoze.bfg` application.
