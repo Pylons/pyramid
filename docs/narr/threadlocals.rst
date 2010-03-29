@@ -33,7 +33,7 @@ For historical reasons, however, thread local variables are indeed
 consulted by various :mod:`repoze.bfg` API functions.  For example,
 the implementation of the :mod:`repoze.bfg.security` function named
 :func:`repoze.bfg.security.authenticated_userid` retrieves the thread
-local :term:`application registry` as a matter of course to find a
+local :term:`application registry` as a matter of course to find an
 :term:`authentication policy`.  It uses the
 :func:`repoze.bfg.threadlocal.get_current_registry` function to
 retrieve the application registry, from which it looks up the
@@ -84,7 +84,7 @@ and pop the threadlocal stack when the system is under test.  See
 
 Scripts which use :mod:`repoze.bfg` machinery but never actually start
 a WSGI server or receive requests via HTTP such as scripts which use
-the :mod:`repoze.bfg.scripting`` API will never cause any Router code
+the :mod:`repoze.bfg.scripting` API will never cause any Router code
 to be executed.  However, the :mod:`repoze.bfg.scripting` APIs also
 push some values on to the thread locals stack as a matter of course.
 Such scripts should expect the
