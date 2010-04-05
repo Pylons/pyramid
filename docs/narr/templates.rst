@@ -516,7 +516,6 @@ of text within :term:`Chameleon` templates.
 .. index::
    single: template system bindings
    single: Jinja2
-   single: Genshi
 
 .. _available_template_system_bindings:
 
