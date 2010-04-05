@@ -515,7 +515,7 @@ renderer:
        renderer="templates/foo.txt"
        />
 
-Views with use a Chameleon renderer can vary response attributes by
+Views which use a Chameleon renderer can vary response attributes by
 attaching properties to the request.  See
 :ref:`response_request_attrs`.
 
