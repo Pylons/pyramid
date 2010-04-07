@@ -11,6 +11,13 @@ Bug Fixes
   ``bfg_alchemy`` application template's ``MyApp`` model was an
   integer.  This was incorrect.  It is now a string.
 
+Internal
+--------
+
+- Replace the statement ``path = path.rstrip('/').lstrip('/')`` with
+  the simpler ``path = path.strip('/')`` in the
+  ``repoze.bfg.traversal.traversal_path`` function.
+
 1.2 (2010-02-10)
 ================
 

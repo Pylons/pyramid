@@ -421,8 +421,7 @@ def traversal_path(path):
               their own traversal machinery, as opposed to users
               writing applications in :mod:`repoze.bfg`.
     """
-    path = path.rstrip('/')
-    path = path.lstrip('/')
+    path = path.strip('/')
     clean = []
     for segment in path.split('/'):
         segment = urllib.unquote(segment) # deal with spaces in path segment
