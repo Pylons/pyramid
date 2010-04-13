@@ -165,11 +165,11 @@ always begin at a root object.  Therefore it's important to know
 Figuring out which :term:`root` object results from a particular route
 match is straightforward.  When a route is matched:
 
-- If the route's configuration has a ``root_factory`` argument which
+- If the route's configuration has a ``factory`` argument which
   points to a :term:`root factory` callable, that callable will be
   called to generate a :term:`root` object.
 
-- If the route's configuration does not have a ``root_factory``
+- If the route's configuration does not have a ``factory``
   argument, the *global* :term:`root factory` will be called to
   generate a :term:`root` object.  The global root factory is the
   callable implied by the ``root_factory`` argument passed to
@@ -263,10 +263,10 @@ route configuration statement:
    <route
      path=":foo/:bar/*traverse"
      name="home"
-     root_factory=".routes.root_factory"
+     factory=".routes.root_factory"
      />
 
-The ``root_factory`` above points at the function we've defined.  It
+The ``factory`` above points at the function we've defined.  It
 will return an instance of the ``Traversable`` class as a root object
 whenever this route is matched.  Because the ``Traversable`` object
 we've defined has a ``__getitem__`` method that does something
@@ -282,7 +282,7 @@ to do.
   :class:`repoze.bfg.configuration.Configurator` constructor instead
   of associating it with a particular route inside the route's
   configuration.  Every hybrid route configuration that is matched but
-  which does *not* name a ``root_factory``` attribute will use the use
+  which does *not* name a ``factory``` attribute will use the use
   global ``root_factory`` function to generate a root object.
 
 When the route configuration named ``home`` above is matched during a
@@ -319,7 +319,7 @@ invoked after a route matches:
    <route
      path=":foo/:bar/*traverse"
      name="home"
-     root_factory=".routes.root_factory"
+     factory=".routes.root_factory"
      />
 
    <view
@@ -355,7 +355,7 @@ when a hybrid route is matched:
    <route
      path=":foo/:bar/*traverse"
      name="home"
-     root_factory=".routes.root_factory"
+     factory=".routes.root_factory"
      />
 
    <view
