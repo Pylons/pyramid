@@ -49,6 +49,8 @@ Features
   The feature can be used with any view registration mechanism
   (``@bfg_view`` decorator, ZCML, or imperative ``add_view`` styles).
 
+  This feature was kindly contributed by Andrey Popp.
+
 Deprecations
 ------------
 
