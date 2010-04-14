@@ -13,11 +13,10 @@ class TestRouter(unittest.TestCase):
 
     def _registerRouteRequest(self, name):
         from repoze.bfg.interfaces import IRouteRequest
-        from zope.interface import Interface
-        class IRequest(Interface):
-            """ """
-        self.registry.registerUtility(IRequest, IRouteRequest, name=name)
-        return IRequest
+        from repoze.bfg.request import route_request_iface
+        iface = route_request_iface(name)
+        self.registry.registerUtility(iface, IRouteRequest, name=name)
+        return iface
 
     def _connectRoute(self, path, name, factory=None):
         from repoze.bfg.interfaces import IRoutesMapper
@@ -75,9 +74,10 @@ class TestRouter(unittest.TestCase):
         self.registry.registerAdapter(DummyTraverserFactory, (None,),
                                       ITraverser, name='')
 
-    def _registerView(self, app, name, *for_):
+    def _registerView(self, app, name, classifier, req_iface, ctx_iface):
         from repoze.bfg.interfaces import IView
-        self.registry.registerAdapter(app, for_, IView, name)
+        self.registry.registerAdapter(
+            app, (classifier, req_iface, ctx_iface), IView, name)
 
     def _registerEventListener(self, iface):
         L = []
@@ -118,44 +118,15 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.root_policy, rootfactory)
 
-    def test_iforbiddenview_override(self):
-        from repoze.bfg.interfaces import IForbiddenView
-        def app():
-            """ """
-        self.registry.registerUtility(app, IForbiddenView)
-        router = self._makeOne()
-        self.assertEqual(router.forbidden_view, app)
-
-    def test_iforbiddenview_nooverride(self):
-        router = self._makeOne()
-        from repoze.bfg.view import default_forbidden_view
-        self.assertEqual(router.forbidden_view, default_forbidden_view)
-
-    def test_inotfoundview_override(self):
-        from repoze.bfg.interfaces import INotFoundView
-        def app():
-            """ """
-        self.registry.registerUtility(app, INotFoundView)
-        router = self._makeOne()
-        self.assertEqual(router.notfound_view, app)
-
-    def test_inotfoundview_nooverride(self):
-        router = self._makeOne()
-        from repoze.bfg.view import default_notfound_view
-        self.assertEqual(router.notfound_view, default_notfound_view)
-
     def test_call_traverser_default(self):
+        from repoze.bfg.exceptions import NotFound
         environ = self._makeEnviron()
         logger = self._registerLogger()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
-        self.failUnless('<code>/</code>' in result[0], result)
-        self.failIf('debug_notfound' in result[0])
+        why = exc_raised(NotFound, router, environ, start_response)
+        self.failUnless('/' in why[0], why)
+        self.failIf('debug_notfound' in why[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_traverser_raises_notfound_class(self):
@@ -165,12 +136,7 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context, raise_error=NotFound)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
-        self.failUnless('<code></code>' in result[0], result)
+        self.assertRaises(NotFound, router, environ, start_response)
 
     def test_traverser_raises_notfound_instance(self):
         from repoze.bfg.exceptions import NotFound
@@ -179,12 +145,8 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context, raise_error=NotFound('foo'))
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
-        self.failUnless('<code>foo</code>' in result[0], result)
+        why = exc_raised(NotFound, router, environ, start_response)
+        self.failUnless('foo' in why[0], why)
 
     def test_traverser_raises_forbidden_class(self):
         from repoze.bfg.exceptions import Forbidden
@@ -193,12 +155,7 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context, raise_error=Forbidden)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '401 Unauthorized')
-        self.failUnless('<code></code>' in result[0], result)
+        self.assertRaises(Forbidden, router, environ, start_response)
 
     def test_traverser_raises_forbidden_instance(self):
         from repoze.bfg.exceptions import Forbidden
@@ -207,30 +164,24 @@ class TestRouter(unittest.TestCase):
         self._registerTraverserFactory(context, raise_error=Forbidden('foo'))
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '401 Unauthorized')
-        self.failUnless('<code>foo</code>' in result[0], result)
+        why = exc_raised(Forbidden, router, environ, start_response)
+        self.failUnless('foo' in why[0], why)
 
     def test_call_no_view_registered_no_isettings(self):
+        from repoze.bfg.exceptions import NotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
         logger = self._registerLogger()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
-        self.failUnless('<code>/</code>' in result[0], result)
-        self.failIf('debug_notfound' in result[0])
+        why = exc_raised(NotFound, router, environ, start_response)
+        self.failUnless('/' in why[0], why)
+        self.failIf('debug_notfound' in why[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_false(self):
+        from repoze.bfg.exceptions import NotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -238,16 +189,13 @@ class TestRouter(unittest.TestCase):
         self._registerSettings(debug_notfound=False)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
-        self.failUnless('<code>/</code>' in result[0], result)
-        self.failIf('debug_notfound' in result[0])
+        why = exc_raised(NotFound, router, environ, start_response)
+        self.failUnless('/' in why[0], why)
+        self.failIf('debug_notfound' in why[0])
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_true(self):
+        from repoze.bfg.exceptions import NotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -255,17 +203,13 @@ class TestRouter(unittest.TestCase):
         logger = self._registerLogger()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        headers = start_response.headers
-        self.assertEqual(len(headers), 2)
-        status = start_response.status
-        self.assertEqual(status, '404 Not Found')
+        why = exc_raised(NotFound, router, environ, start_response)
         self.failUnless(
             "debug_notfound of url http://localhost:8080/; path_info: '/', "
-            "context:" in result[0])
-        self.failUnless(
-            "view_name: '', subpath: []" in result[0])
-        self.failUnless('http://localhost:8080' in result[0], result)
+            "context:" in why[0])
+        self.failUnless("view_name: '', subpath: []" in why[0])
+        self.failUnless('http://localhost:8080' in why[0], why)
+
         self.assertEqual(len(logger.messages), 1)
         message = logger.messages[0]
         self.failUnless('of url http://localhost:8080' in message)
@@ -275,35 +219,25 @@ class TestRouter(unittest.TestCase):
         self.failUnless("subpath: []" in message)
 
     def test_call_view_returns_nonresponse(self):
+        from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
         view = DummyView('abc')
-        self._registerView(view, '', None, None)
-        router = self._makeOne()
-        start_response = DummyStartResponse()
-        self.assertRaises(ValueError, router, environ, start_response)
-
-    def test_inotfoundview_returns_nonresponse(self):
-        from repoze.bfg.interfaces import INotFoundView
-        context = DummyContext()
-        environ = self._makeEnviron()
-        self._registerTraverserFactory(context)
-        def app(context, request):
-            """ """
-        self.registry.registerUtility(app, INotFoundView)
+        self._registerView(view, '', IViewClassifier, None, None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(ValueError, router, environ, start_response)
 
     def test_call_view_registered_nonspecific_default_path(self):
+        from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', None, None)
+        self._registerView(view, '', IViewClassifier, None, None)
         self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
@@ -318,6 +252,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.root, context)
 
     def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
+        from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context, view_name='foo',
                                        subpath=['bar'],
@@ -327,7 +262,7 @@ class TestRouter(unittest.TestCase):
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, 'foo', None, None)
+        self._registerView(view, 'foo', IViewClassifier, None, None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -346,6 +281,7 @@ class TestRouter(unittest.TestCase):
         class IContext(Interface):
             pass
         from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context)
@@ -354,7 +290,7 @@ class TestRouter(unittest.TestCase):
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', IRequest, IContext)
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -370,6 +306,8 @@ class TestRouter(unittest.TestCase):
     def test_call_view_registered_specific_fail(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
+        from repoze.bfg.exceptions import NotFound
+        from repoze.bfg.interfaces import IViewClassifier
         class IContext(Interface):
             pass
         class INotContext(Interface):
@@ -381,31 +319,30 @@ class TestRouter(unittest.TestCase):
         response = DummyResponse()
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', IRequest, IContext)
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        result = router(environ, start_response)
-        self.assertEqual(start_response.status, '404 Not Found')
-        self.failUnless('404' in result[0])
+        self.assertRaises(NotFound, router, environ, start_response)
 
     def test_call_view_raises_forbidden(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
+        from repoze.bfg.exceptions import Forbidden
         class IContext(Interface):
             pass
         from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = DummyView(response, raise_unauthorized=True)
+        view = DummyView(response, raise_exception=Forbidden("unauthorized"))
         environ = self._makeEnviron()
-        self._registerView(view, '', IRequest, IContext)
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        response = router(environ, start_response)
-        self.assertEqual(start_response.status, '401 Unauthorized')
-        self.assertEqual(environ['repoze.bfg.message'], 'unauthorized')
+        why = exc_raised(Forbidden, router, environ, start_response)
+        self.assertEqual(why[0], 'unauthorized')
 
     def test_call_view_raises_notfound(self):
         from zope.interface import Interface
@@ -413,18 +350,19 @@ class TestRouter(unittest.TestCase):
         class IContext(Interface):
             pass
         from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.exceptions import NotFound
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse()
-        view = DummyView(response, raise_notfound=True)
+        view = DummyView(response, raise_exception=NotFound("notfound"))
         environ = self._makeEnviron()
-        self._registerView(view, '', IRequest, IContext)
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
-        response = router(environ, start_response)
-        self.assertEqual(start_response.status, '404 Not Found')
-        self.assertEqual(environ['repoze.bfg.message'], 'notfound')
+        why = exc_raised(NotFound, router, environ, start_response)
+        self.assertEqual(why[0], 'notfound')
 
     def test_call_request_has_global_response_headers(self):
         from zope.interface import Interface
@@ -432,6 +370,7 @@ class TestRouter(unittest.TestCase):
         class IContext(Interface):
             pass
         from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
@@ -441,7 +380,7 @@ class TestRouter(unittest.TestCase):
             request.global_response_headers = [('b', 2)]
             return response
         environ = self._makeEnviron()
-        self._registerView(view, '', IRequest, IContext)
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
         router(environ, start_response)
@@ -452,13 +391,14 @@ class TestRouter(unittest.TestCase):
         from repoze.bfg.interfaces import INewRequest
         from repoze.bfg.interfaces import INewResponse
         from repoze.bfg.interfaces import IAfterTraversal
+        from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', None, None)
+        self._registerView(view, '', IViewClassifier, None, None)
         request_events = self._registerEventListener(INewRequest)
         aftertraversal_events = self._registerEventListener(IAfterTraversal)
         response_events = self._registerEventListener(INewResponse)
@@ -474,13 +414,14 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, response.app_iter)
 
     def test_call_pushes_and_pops_threadlocal_manager(self):
+        from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron()
-        self._registerView(view, '', None, None)
+        self._registerView(view, '', IViewClassifier, None, None)
         router = self._makeOne()
         start_response = DummyStartResponse()
         router.threadlocal_manager = DummyThreadLocalManager()
@@ -489,7 +430,8 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(len(router.threadlocal_manager.popped), 1)
 
     def test_call_route_matches_and_has_factory(self):
-        req_iface = self._registerRouteRequest('foo')
+        from repoze.bfg.interfaces import IViewClassifier
+        self._registerRouteRequest('foo')
         root = object()
         def factory(request):
             return root
@@ -500,7 +442,7 @@ class TestRouter(unittest.TestCase):
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
-        self._registerView(view, '', None, None)
+        self._registerView(view, '', IViewClassifier, None, None)
         self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
@@ -522,9 +464,10 @@ class TestRouter(unittest.TestCase):
 
     def test_call_route_matches_doesnt_overwrite_subscriber_iface(self):
         from repoze.bfg.interfaces import INewRequest
+        from repoze.bfg.interfaces import IViewClassifier
         from zope.interface import alsoProvides
         from zope.interface import Interface
-        req_iface = self._registerRouteRequest('foo')
+        self._registerRouteRequest('foo')
         class IFoo(Interface):
             pass
         def listener(event):
@@ -540,7 +483,7 @@ class TestRouter(unittest.TestCase):
         response.app_iter = ['Hello world']
         view = DummyView(response)
         environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
-        self._registerView(view, '', None, None)
+        self._registerView(view, '', IViewClassifier, None, None)
         self._registerRootFactory(context)
         router = self._makeOne()
         start_response = DummyStartResponse()
@@ -576,9 +519,8 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         router = self._makeOne()
         start_response = DummyStartResponse()
-        app_iter = router(environ, start_response)
-        self.assertEqual(start_response.status, '404 Not Found')
-        self.failUnless('from root factory' in app_iter[0])
+        why = exc_raised(NotFound, router, environ, start_response)
+        self.failUnless('from root factory' in why[0])
 
     def test_root_factory_raises_forbidden(self):
         from repoze.bfg.interfaces import IRootFactory
@@ -595,29 +537,378 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         router = self._makeOne()
         start_response = DummyStartResponse()
+        why = exc_raised(Forbidden, router, environ, start_response)
+        self.failUnless('from root factory' in why[0])
+
+    def test_root_factory_exception_propagating(self):
+        from repoze.bfg.interfaces import IRootFactory
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        def rootfactory(request):
+            raise RuntimeError()
+        self.registry.registerUtility(rootfactory, IRootFactory)
+        class IContext(Interface):
+            pass
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(RuntimeError, router, environ, start_response)
+
+    def test_traverser_exception_propagating(self):
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context, raise_error=RuntimeError())
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(RuntimeError, router, environ, start_response)
+
+    def test_call_view_exception_propagating(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        response = DummyResponse()
+        view = DummyView(response, raise_exception=RuntimeError)
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(RuntimeError, router, environ, start_response)
+
+    def test_call_view_raises_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        response = DummyResponse()
+        exception_response = DummyResponse()
+        exception_response.app_iter = ["Hello, world"]
+        view = DummyView(response, raise_exception=RuntimeError)
+        exception_view = DummyView(exception_response)
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, RuntimeError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(result, ["Hello, world"])
+        self.assertEqual(view.request.exception.__class__, RuntimeError)
+
+    def test_call_view_raises_super_exception_sub_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        class SuperException(Exception):
+            pass
+        class SubException(SuperException):
+            pass
+        response = DummyResponse()
+        exception_response = DummyResponse()
+        exception_response.app_iter = ["Hello, world"]
+        view = DummyView(response, raise_exception=SuperException)
+        exception_view = DummyView(exception_response)
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, SubException)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(SuperException, router, environ, start_response)
+
+    def test_call_view_raises_sub_exception_super_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        class SuperException(Exception):
+            pass
+        class SubException(SuperException):
+            pass
+        response = DummyResponse()
+        exception_response = DummyResponse()
+        exception_response.app_iter = ["Hello, world"]
+        view = DummyView(response, raise_exception=SubException)
+        exception_view = DummyView(exception_response)
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, SuperException)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(result, ["Hello, world"])
+
+    def test_call_view_raises_exception_another_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        class MyException(Exception):
+            pass
+        class AnotherException(Exception):
+            pass
+        response = DummyResponse()
+        exception_response = DummyResponse()
+        exception_response.app_iter = ["Hello, world"]
+        view = DummyView(response, raise_exception=MyException)
+        exception_view = DummyView(exception_response)
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, AnotherException)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(MyException, router, environ, start_response)
+
+    def test_root_factory_raises_exception_view(self):
+        from repoze.bfg.interfaces import IRootFactory
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        def rootfactory(request):
+            raise RuntimeError()
+        self.registry.registerUtility(rootfactory, IRootFactory)
+        exception_response = DummyResponse()
+        exception_response.app_iter = ["Hello, world"]
+        exception_view = DummyView(exception_response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, RuntimeError)
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        start_response = DummyStartResponse()
         app_iter = router(environ, start_response)
-        self.assertEqual(start_response.status, '401 Unauthorized')
-        self.failUnless('from root factory' in app_iter[0])
+        self.assertEqual(app_iter, ["Hello, world"])
+
+    def test_traverser_raises_exception_view(self):
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        environ = self._makeEnviron()
+        context = DummyContext()
+        self._registerTraverserFactory(context, raise_error=RuntimeError())
+        exception_response = DummyResponse()
+        exception_response.app_iter = ["Hello, world"]
+        exception_view = DummyView(exception_response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, RuntimeError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        result = router(environ, start_response)
+        self.assertEqual(result, ["Hello, world"])
+
+    def test_exception_view_returns_non_response(self):
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        environ = self._makeEnviron()
+        response = DummyResponse()
+        view = DummyView(response, raise_exception=RuntimeError)
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        exception_view = DummyView(None)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, RuntimeError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(ValueError, router, environ, start_response)
+
+    def test_call_route_raises_route_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        req_iface = self._registerRouteRequest('foo')
+        self._connectRoute('archives/:action/:article', 'foo', None)
+        view = DummyView(DummyResponse(), raise_exception=RuntimeError)
+        self._registerView(view, '', IViewClassifier, req_iface, None)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view = DummyView(response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           req_iface, RuntimeError)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        result = router(environ, start_response)
+        self.assertEqual(result, ["Hello, world"])
+
+    def test_call_view_raises_exception_route_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        req_iface = self._registerRouteRequest('foo')
+        self._connectRoute('archives/:action/:article', 'foo', None)
+        view = DummyView(DummyResponse(), raise_exception=RuntimeError)
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view = DummyView(response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           req_iface, RuntimeError)
+        environ = self._makeEnviron()
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        self.assertRaises(RuntimeError, router, environ, start_response)
+
+    def test_call_route_raises_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        req_iface = self._registerRouteRequest('foo')
+        self._connectRoute('archives/:action/:article', 'foo', None)
+        view = DummyView(DummyResponse(), raise_exception=RuntimeError)
+        self._registerView(view, '', IViewClassifier, req_iface, None)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view = DummyView(response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, RuntimeError)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        result = router(environ, start_response)
+        self.assertEqual(result, ["Hello, world"])
+
+    def test_call_route_raises_super_exception_sub_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        class SuperException(Exception):
+            pass
+        class SubException(SuperException):
+            pass
+        req_iface = self._registerRouteRequest('foo')
+        self._connectRoute('archives/:action/:article', 'foo', None)
+        view = DummyView(DummyResponse(), raise_exception=SuperException)
+        self._registerView(view, '', IViewClassifier, req_iface, None)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view = DummyView(response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, SubException)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        self.assertRaises(SuperException, router, environ, start_response)
+
+    def test_call_route_raises_sub_exception_super_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        class SuperException(Exception):
+            pass
+        class SubException(SuperException):
+            pass
+        req_iface = self._registerRouteRequest('foo')
+        self._connectRoute('archives/:action/:article', 'foo', None)
+        view = DummyView(DummyResponse(), raise_exception=SubException)
+        self._registerView(view, '', IViewClassifier, req_iface, None)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view = DummyView(response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, SuperException)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        result = router(environ, start_response)
+        self.assertEqual(result, ["Hello, world"])
+
+    def test_call_route_raises_exception_another_exception_view(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        class MyException(Exception):
+            pass
+        class AnotherException(Exception):
+            pass
+        req_iface = self._registerRouteRequest('foo')
+        self._connectRoute('archives/:action/:article', 'foo', None)
+        view = DummyView(DummyResponse(), raise_exception=MyException)
+        self._registerView(view, '', IViewClassifier, req_iface, None)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view = DummyView(response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, AnotherException)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        self.assertRaises(MyException, router, environ, start_response)
+
+    def test_call_route_raises_exception_view_specializing(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IRequest
+        req_iface = self._registerRouteRequest('foo')
+        self._connectRoute('archives/:action/:article', 'foo', None)
+        view = DummyView(DummyResponse(), raise_exception=RuntimeError)
+        self._registerView(view, '', IViewClassifier, req_iface, None)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view = DummyView(response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           IRequest, RuntimeError)
+        response_spec = DummyResponse()
+        response_spec.app_iter = ["Hello, special world"]
+        exception_view_spec = DummyView(response_spec)
+        self._registerView(exception_view_spec, '', IExceptionViewClassifier,
+                           req_iface, RuntimeError)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        result = router(environ, start_response)
+        self.assertEqual(result, ["Hello, special world"])
+
+    def test_call_route_raises_exception_view_another_route(self):
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        req_iface = self._registerRouteRequest('foo')
+        another_req_iface = self._registerRouteRequest('bar')
+        self._connectRoute('archives/:action/:article', 'foo', None)
+        view = DummyView(DummyResponse(), raise_exception=RuntimeError)
+        self._registerView(view, '', IViewClassifier, req_iface, None)
+        response = DummyResponse()
+        response.app_iter = ["Hello, world"]
+        exception_view = DummyView(response)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           another_req_iface, RuntimeError)
+        environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
+        start_response = DummyStartResponse()
+        router = self._makeOne()
+        self.assertRaises(RuntimeError, router, environ, start_response)
+
+    def test_call_view_raises_exception_view_route(self):
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        req_iface = self._registerRouteRequest('foo')
+        response = DummyResponse()
+        exception_response = DummyResponse()
+        exception_response.app_iter = ["Hello, world"]
+        view = DummyView(response, raise_exception=RuntimeError)
+        exception_view = DummyView(exception_response)
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, None)
+        self._registerView(exception_view, '', IExceptionViewClassifier,
+                           req_iface, RuntimeError)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        self.assertRaises(RuntimeError, router, environ, start_response)
 
 class DummyContext:
     pass
 
 class DummyView:
-    def __init__(self, response, raise_unauthorized=False,
-                 raise_notfound=False):
+    def __init__(self, response, raise_exception=None):
         self.response = response
-        self.raise_unauthorized = raise_unauthorized
-        self.raise_notfound = raise_notfound
+        self.raise_exception = raise_exception
 
     def __call__(self, context, request):
         self.context = context
         self.request = request
-        if self.raise_unauthorized:
-            from repoze.bfg.exceptions import Forbidden
-            raise Forbidden('unauthorized')
-        if self.raise_notfound:
-            from repoze.bfg.exceptions import NotFound
-            raise NotFound('notfound')
+        if not self.raise_exception is None:
+            raise self.raise_exception
         return self.response
 
 class DummyRootFactory:
@@ -662,3 +953,12 @@ class DummyLogger:
     warn = info
     debug = info
 
+def exc_raised(exc, func, *arg, **kw):
+    try:
+        func(*arg, **kw)
+    except exc, e:
+        return e
+    else:
+        raise AssertionError('%s not raised' % exc) # pragma: no cover
+
+    

@@ -1,12 +1,41 @@
 :mod:`repoze.bfg` TODOs
 =======================
 
-- Decide on ``unhook_zca`` argument to ``tearDown``.
-
-- Named notfound views.
-
 - Supply ``X-Vhm-Host`` support.
 
 - Review tutorials.
 
 - Basic WSGI documentation (pipeline / app / server).
+
+- Decide on INotFoundView and IForbidden interface, which are obsolete now.
+
+- Document exception view lookup machinery:
+
+    - Lookup proceeds by request interface first and then by interface provided
+      by exception. 
+
+    - If lookup fails with more special request interface (read as request
+      interface related to some route) it will fallback to lookup by IRequest.
+
+    - Current order of interfaces used for exception view lookup leads to the
+      following statement: view with more special request interface and more
+      common context interfaces always matched first, event if we have view
+      with IRequest, but more special context interfaces (see integration tests
+      with hybridapp for route9).
+
+- Exception view backwards compat / features:
+
+  - Add an "exception" attr to the request before calling an exception
+    view.
+
+  - Register wrapper views within set_notfound_view and
+    set_forbidden_view (and ZCML if it doesn't call those) so that
+    "context" is either the "real" context or None.
+
+- Use Venusian for decorator scanning (fix Venusian to have scan
+  categories first).
+
+- Allow a translator to be supplied for template rendering.
+
+- Figure out a way to expose some of the functionality of
+  ``Configurator._derive_view`` as an API.

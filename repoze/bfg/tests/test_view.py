@@ -11,7 +11,8 @@ class BaseTest(object):
 
     def _registerView(self, reg, app, name):
         from repoze.bfg.interfaces import IRequest
-        for_ = (IRequest, IContext)
+        from repoze.bfg.interfaces import IViewClassifier
+        for_ = (IViewClassifier, IRequest, IContext)
         from repoze.bfg.interfaces import IView
         reg.registerAdapter(app, for_, IView, name)
 

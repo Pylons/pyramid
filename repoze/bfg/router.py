@@ -2,8 +2,7 @@ from zope.interface import implements
 from zope.interface import providedBy
 
 from repoze.bfg.interfaces import IDebugLogger
-from repoze.bfg.interfaces import IForbiddenView
-from repoze.bfg.interfaces import INotFoundView
+from repoze.bfg.interfaces import IExceptionViewClassifier
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouteRequest
@@ -12,19 +11,17 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IViewClassifier
 
 from repoze.bfg.configuration import make_app # b/c import
 from repoze.bfg.events import AfterTraversal
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
-from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.traversal import ModelGraphTraverser
-from repoze.bfg.view import default_forbidden_view
-from repoze.bfg.view import default_notfound_view
 
 make_app # prevent pyflakes from complaining
 
@@ -37,8 +34,6 @@ class Router(object):
     def __init__(self, registry):
         q = registry.queryUtility
         self.logger = q(IDebugLogger)
-        self.notfound_view = q(INotFoundView, default=default_notfound_view)
-        self.forbidden_view = q(IForbiddenView, default=default_forbidden_view)
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
         self.routes_mapper = q(IRoutesMapper)
         self.root_policy = self.root_factory # b/w compat
@@ -56,6 +51,7 @@ class Router(object):
         return an iterable.
         """
         registry = self.registry
+        adapters = registry.adapters
         has_listeners = registry.has_listeners
         logger = self.logger
         manager = self.threadlocal_manager
@@ -72,7 +68,7 @@ class Router(object):
             has_listeners and registry.notify(NewRequest(request))
 
             request_iface = IRequest
-            
+
             try:
                 # find the root
                 root_factory = self.root_factory
@@ -94,7 +90,6 @@ class Router(object):
                 attrs['root'] = root
 
                 # find a view callable
-                adapters = registry.adapters
                 traverser = adapters.queryAdapter(root, ITraverser)
                 if traverser is None:
                     traverser = ModelGraphTraverser(root)
@@ -107,7 +102,7 @@ class Router(object):
                 has_listeners and registry.notify(AfterTraversal(request))
                 context_iface = providedBy(context)
                 view_callable = adapters.lookup(
-                    (request_iface, context_iface),
+                    (IViewClassifier, request_iface, context_iface),
                     IView, name=view_name, default=None)
 
                 # invoke the view callable
@@ -125,25 +120,27 @@ class Router(object):
                     else:
                         msg = request.path_info
                     environ['repoze.bfg.message'] = msg
-                    response = self.notfound_view(context, request)
+                    raise NotFound(msg)
                 else:
                     response = view_callable(context, request)
 
             # handle exceptions raised during root finding and view lookup
-            except Forbidden, why:
+            except Exception, why:
+                for_ = (IExceptionViewClassifier,
+                        request_iface.combined,
+                        providedBy(why))
+                view_callable = adapters.lookup(for_, IView, default=None)
+                if view_callable is None:
+                    raise
+
                 try:
                     msg = why[0]
-                except (IndexError, TypeError):
+                except Exception:
                     msg = ''
                 environ['repoze.bfg.message'] = msg
-                response = self.forbidden_view(context, request)
-            except NotFound, why:
-                try:
-                    msg = why[0]
-                except (IndexError, TypeError):
-                    msg = ''
-                environ['repoze.bfg.message'] = msg
-                response = self.notfound_view(context, request)
+
+                attrs['exception'] = why
+                response = view_callable(why, request)
 
             # process the response
             has_listeners and registry.notify(NewResponse(response))
@@ -159,7 +156,7 @@ class Router(object):
             if 'global_response_headers' in attrs:
                 headers = list(headers)
                 headers.extend(attrs['global_response_headers'])
-            
+
             start_response(status, headers)
             return app_iter
 

@@ -3,8 +3,8 @@
 Using Hooks
 ===========
 
-"Hooks" can be used to influence the behavior of the
-:mod:`repoze.bfg` framework in various ways.
+"Hooks" can be used to influence the behavior of the :mod:`repoze.bfg`
+framework in various ways.
 
 .. index::
    single: not found view
@@ -15,23 +15,29 @@ Changing the Not Found View
 ---------------------------
 
 When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
-:term:`not found view`, which is a :term:`view callable`. The view it
-invokes can be customized through application configuration.  This
-view can be configured via :term:`imperative configuration` or
-:term:`ZCML`.
+:term:`not found view`, which is a :term:`view callable`. A default
+notfound view exists.  The default not found view can be overridden
+through application configuration.  This override can be done via
+:term:`imperative configuration` or :term:`ZCML`.
+
+The :term:`not found view` callable is a view callable like any other.
+The :term:`view configuration` which causes it to be a "not found"
+view consists only of naming the :exc:`repoze.bfg.exceptions.NotFound`
+class as the ``context`` of the view configuration.
 
 .. topic:: Using Imperative Configuration
 
    If your application uses :term:`imperative configuration`, you can
    replace the Not Found view by using the
-   :meth:`repoze.bfg.configuration.Configurator.set_notfound_view`
-   method:
+   :meth:`repoze.bfg.configuration.Configurator.add_view` method to
+   register an "exception view":
 
    .. code-block:: python
       :linenos:
 
-      import helloworld.views
-      config.set_notfound_view(helloworld.views.notfound_view)
+      from repoze.bfg.exceptions import NotFound
+      from helloworld.views import notfound_view
+      config.add_view(notfound_view, context=NotFound)
 
    Replace ``helloworld.views.notfound_view`` with a reference to the
    Python :term:`view callable` you want to use to represent the Not
@@ -46,16 +52,22 @@ view can be configured via :term:`imperative configuration` or
    .. code-block:: xml
       :linenos:
 
-      <notfound 
-          view="helloworld.views.notfound_view"/>
+      <view
+        view="helloworld.views.notfound_view"
+        context="repoze.bfg.exceptions.NotFound"/>
 
    Replace ``helloworld.views.notfound_view`` with the Python dotted name
    to the notfound view you want to use.
 
-   Other attributes of the ``notfound`` directive are documented at
-   :ref:`notfound_directive`.
+Like any other view, the notfound view must accept at least a
+``request`` parameter, or both ``context`` and ``request``.  The
+``request`` is the current :term:`request` representing the denied
+action.  The ``context`` (if used in the call signature) will be the
+instance of the :exc:`repoze.bfg.exceptions.NotFound` exception that
+caused the view to be called.
 
-Here's some sample code that implements a minimal NotFound view:
+Here's some sample code that implements a minimal NotFound view
+callable:
 
 .. code-block:: python
    :linenos:
@@ -65,13 +77,21 @@ Here's some sample code that implements a minimal NotFound view:
    def notfound_view(request):
        return HTTPNotFound()
 
-.. note:: When a NotFound view is invoked, it is passed a
-   :term:`request`.  The ``environ`` attribute of the request is the
-   WSGI environment.  Within the WSGI environ will be a key named
-   ``repoze.bfg.message`` that has a value explaining why the not
-   found error was raised.  This error will be different when the
-   ``debug_notfound`` environment setting is true than it is when it
-   is false.
+.. note:: When a NotFound view callable is invoked, it is passed a
+   :term:`request`.  The ``exception`` attribute of the request will
+   be an instance of the :exc:`repoze.bfg.exceptions.NotFound`
+   exception that caused the not found view to be called.  The value
+   of ``request.exception.args[0]`` will be a value explaining why the
+   not found error was raised.  This message will be different when
+   the ``debug_notfound`` environment setting is true than it is when
+   it is false.
+
+.. warning:: When a NotFound view callable accepts an argument list as
+   described in :ref:`request_and_context_view_definitions`, the
+   ``context`` passed as the first argument to the view callable will
+   be the :exc:`repoze.bfg.exceptions.NotFound` exception instance.
+   If available, the *model* context will still be available as
+   ``request.context``.
 
 .. index::
    single: forbidden view
@@ -84,21 +104,28 @@ Changing the Forbidden View
 When :mod:`repoze.bfg` can't authorize execution of a view based on
 the :term:`authorization policy` in use, it invokes a :term:`forbidden
 view`.  The default forbidden response has a 401 status code and is
-very plain, but it can be overridden as necessary using either
-:term:`imperative configuration` or :term:`ZCML`:
+very plain, but the view which generates it can be overridden as
+necessary using either :term:`imperative configuration` or
+:term:`ZCML`:
+
+The :term:`forbidden view` callable is a view callable like any other.
+The :term:`view configuration` which causes it to be a "not found"
+view consists only of naming the :exc:`repoze.bfg.exceptions.Forbidden`
+class as the ``context`` of the view configuration.
 
 .. topic:: Using Imperative Configuration
 
    If your application uses :term:`imperative configuration`, you can
    replace the Forbidden view by using the
-   :meth:`repoze.bfg.configuration.Configurator.set_forbidden_view`
-   method:
+   :meth:`repoze.bfg.configuration.Configurator.add_view` method to
+   register an "exception view":
 
    .. code-block:: python
       :linenos:
 
-      import helloworld.views
-      config.set_forbiddden_view(helloworld.views.forbidden_view)
+      from helloworld.views import forbidden_view
+      from repoze.bfg.exceptions import Forbidden
+      config.add_view(forbidden_view, context=Forbidden)
 
    Replace ``helloworld.views.forbidden_view`` with a reference to the
    Python :term:`view callable` you want to use to represent the
@@ -113,15 +140,12 @@ very plain, but it can be overridden as necessary using either
    .. code-block:: xml
       :linenos:
 
-      <forbidden
-          view="helloworld.views.forbidden_view"/>
-
+      <view
+        view="helloworld.views.notfound_view"
+        context="repoze.bfg.exceptions.Forbidden"/>
 
    Replace ``helloworld.views.forbidden_view`` with the Python
    dotted name to the forbidden view you want to use.
-
-   Other attributes of the ``forbidden`` directive are documented at
-   :ref:`forbidden_directive`.
 
 Like any other view, the forbidden view must accept at least a
 ``request`` parameter, or both ``context`` and ``request``.  The
@@ -140,13 +164,14 @@ Here's some sample code that implements a minimal forbidden view:
    def forbidden_view(request):
        return render_template_to_response('templates/login_form.pt')
 
-.. note:: When a forbidden view is invoked, it is passed the
-   :term:`request` as the second argument.  An attribute of the
-   request is ``environ``, which is the WSGI environment.  Within the
-   WSGI environ will be a key named ``repoze.bfg.message`` that has a
-   value explaining why the current view invocation was forbidden.
-   This error will be different when the ``debug_authorization``
-   environment setting is true than it is when it is false.
+.. note:: When a forbidden view callable is invoked, it is passed a
+   :term:`request`.  The ``exception`` attribute of the request will
+   be an instance of the :exc:`repoze.bfg.exceptions.Forbidden`
+   exception that caused the forbidden view to be called.  The value
+   of ``request.exception.args[0]`` will be a value explaining why the
+   forbidden was raised.  This message will be different when the
+   ``debug_authorization`` environment setting is true than it is when
+   it is false.
 
 .. warning:: the default forbidden view sends a response with a ``401
    Unauthorized`` status code for backwards compatibility reasons.

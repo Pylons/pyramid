@@ -198,9 +198,8 @@ effectively a "macro" which calls the
 behalf.
 
 The ``<view>`` tag is an example of a :mod:`repoze.bfg` declaration
-tag.  Other such tags include ``<route>``, ``<scan>``, ``<notfound>``,
-``<forbidden>``, and others.  Each of these tags is effectively a
-"macro" which calls methods of a
+tag.  Other such tags include ``<route>`` and ``<scan>``.  Each of
+these tags is effectively a "macro" which calls methods of a
 :class:`repoze.bfg.configuration.Configurator` object on your behalf.
 
 Essentially, using a :term:`ZCML` file and loading it from the

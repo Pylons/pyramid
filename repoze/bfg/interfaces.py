@@ -29,6 +29,9 @@ class IWSGIApplicationCreatedEvent(Interface):
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
+# for exception view lookups 
+IRequest.combined = IRequest
+
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
     route-specific interfaces.  Not an API."""
@@ -78,6 +81,12 @@ class IResponseFactory(Interface):
         should accept all the arguments that the webob.Response class
         accepts)"""
 
+class IViewClassifier(Interface):
+    """ *Internal only* marker interface for views."""
+
+class IExceptionViewClassifier(Interface):
+    """ *Internal only* marker interface for exception views."""
+
 class IView(Interface):
     def __call__(context, request):
         """ Must return an object that implements IResponse.  May
@@ -99,7 +108,7 @@ class IMultiView(ISecuredView):
     """ *internal only*.  A multiview is a secured view that is a
     collection of other views.  Each of the views is associated with
     zero or more predicates.  Not an API."""
-    def add(view, predicates, score):
+    def add(view, predicates, order, accept=None, phash=None):
         """ Add a view to the multiview. """
 
 class IRootFactory(Interface):
@@ -242,4 +251,4 @@ class IPackageOverrides(Interface):
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)
-VH_ROOT_KEY = 'HTTP_X_VHM_ROOT' 
+VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'

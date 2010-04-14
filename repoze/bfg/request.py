@@ -80,7 +80,11 @@ class Request(WebobRequest):
         return self.environ.values()
 
 def route_request_iface(name, bases=()):
-    return InterfaceClass('%s_IRequest' % name, bases=bases)
+    iface = InterfaceClass('%s_IRequest' % name, bases=bases)
+    # for exception view lookups 
+    iface.combined = InterfaceClass('%s_combined_IRequest' % name,
+                                    bases=(iface, IRequest))
+    return iface
 
 def add_global_response_headers(request, headerlist):
     attrs = request.__dict__

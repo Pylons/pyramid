@@ -5,9 +5,10 @@
 
   <scan package="."/>
 
-  <forbidden
+  <view
     view=".login.login"
-    renderer="templates/login.pt"/>
+    renderer="templates/login.pt"
+    context="repoze.bfg.exceptions.Forbidden"/>
 
   <authtktauthenticationpolicy
     secret="sosecret"

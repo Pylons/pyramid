@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import threading
+import types
 import inspect
 
 from webob import Response
@@ -17,9 +18,8 @@ from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IDebugLogger
 from repoze.bfg.interfaces import IDefaultRootFactory
-from repoze.bfg.interfaces import IForbiddenView
+from repoze.bfg.interfaces import IExceptionViewClassifier
 from repoze.bfg.interfaces import IMultiView
-from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IRequest
@@ -32,12 +32,14 @@ from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITemplateRenderer
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IViewClassifier
 
 from repoze.bfg import chameleon_text
 from repoze.bfg import chameleon_zpt
 from repoze.bfg import renderers
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.compat import all
+from repoze.bfg.compat import md5
 from repoze.bfg.compat import walk_packages
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
@@ -59,8 +61,11 @@ from repoze.bfg.traversal import find_interface
 from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.view import render_view_to_response
 from repoze.bfg.view import static
+from repoze.bfg.view import default_notfound_view
+from repoze.bfg.view import default_forbidden_view
 
-MAX_WEIGHT = 10000
+MAX_ORDER = 1 << 30
+DEFAULT_PHASH = md5().hexdigest()
 
 DEFAULT_RENDERERS = (
     ('.pt', chameleon_zpt.renderer_factory),
@@ -206,7 +211,8 @@ class Configurator(object):
 
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer_name=None, wrapper_viewname=None,
-                     viewname=None, accept=None, score=MAX_WEIGHT):
+                     viewname=None, accept=None, order=MAX_ORDER,
+                     phash=DEFAULT_PHASH):
         renderer = self._renderer_from_name(renderer_name)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
@@ -220,7 +226,7 @@ class Configurator(object):
                                      authn_policy, authz_policy, settings,
                                      logger)
         predicated_view = _predicate_wrap(debug_view, predicates)
-        derived_view = _attr_wrap(predicated_view, accept, score)
+        derived_view = _attr_wrap(predicated_view, accept, order, phash)
         return derived_view
 
     def _override(self, package, path, override_package, override_prefix,
@@ -234,23 +240,6 @@ class Configurator(object):
                 self.registry.registerUtility(override, IPackageOverrides,
                                               name=pkg_name, info=_info)
             override.insert(path, override_pkg_name, override_prefix)
-
-
-    def _system_view(self, iface, view=None, attr=None, renderer=None,
-                    wrapper=None, _info=u''):
-        if not view:
-            if renderer:
-                def view(context, request):
-                    return {}
-            else:
-                raise ConfigurationError(
-                    '"view" argument was not specified and no renderer '
-                    'specified')
-
-        derived_view = self._derive_view(view, attr=attr,
-                                         renderer_name=renderer,
-                                         wrapper_viewname=wrapper)
-        self.registry.registerUtility(derived_view, iface, '', info=_info)
 
     def _set_security_policies(self, authentication, authorization=None):
         if authorization is None:
@@ -312,6 +301,8 @@ class Configurator(object):
                                         authorization_policy)
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
+        self.set_notfound_view(default_notfound_view)
+        self.set_forbidden_view(default_forbidden_view)
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -723,14 +714,15 @@ class Configurator(object):
                 view_info.append(info)
                 return
 
-        score, predicates = _make_predicates(
+        order, predicates, phash = _make_predicates(
             xhr=xhr, request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
             containment=containment, request_type=request_type,
             custom=custom_predicates)
 
         derived_view = self._derive_view(view, permission, predicates, attr,
-                                         renderer, wrapper, name, accept, score)
+                                         renderer, wrapper, name, accept, order,
+                                         phash)
 
         if context is None:
             context = for_
@@ -764,41 +756,76 @@ class Configurator(object):
         old_view = None
 
         for view_type in (IView, ISecuredView, IMultiView):
-            old_view = registered((request_iface, r_context), view_type, name)
+            old_view = registered((IViewClassifier, request_iface, r_context),
+                                  view_type, name)
             if old_view is not None:
                 break
-        
-        if old_view is None:
-            # No component was registered for any of our I*View
-            # interfaces exactly; this is the first view for this
-            # triad.  We don't need a multiview.
-            if hasattr(derived_view, '__call_permissive__'):
+
+        is_exception_view = isexception(context)
+
+        def regclosure():
+            if hasattr(view, '__call_permissive__'):
                 view_iface = ISecuredView
             else:
                 view_iface = IView
-            self.registry.registerAdapter(derived_view,
-                                          (request_iface, context),
-                                          view_iface, name, info=_info)
+            self.registry.registerAdapter(
+                derived_view, (IViewClassifier, request_iface, context),
+                view_iface, name, info=_info)
+            if is_exception_view:
+                self.registry.registerAdapter(
+                    derived_view,
+                    (IExceptionViewClassifier, request_iface, context),
+                    view_iface, name, info=_info)
+
+        is_multiview = IMultiView.providedBy(old_view)
+        old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
+
+        if old_view is None:
+            # - No component was yet registered for any of our I*View
+            #   interfaces exactly; this is the first view for this
+            #   triad.
+            regclosure()
+
+        elif (not is_multiview) and (old_phash == phash):
+            # - A single view component was previously registered with
+            #   the same predicate hash as this view; this registration
+            #   is therefore an override.
+            regclosure()
+        
         else:
+            # - A view or multiview was already registered for this
+            #   triad, and the new view is not an override.
+            
             # XXX we could try to be more efficient here and register
             # a non-secured view for a multiview if none of the
             # multiview's consituent views have a permission
             # associated with them, but this code is getting pretty
             # rough already
-            if IMultiView.providedBy(old_view):
+            if is_multiview:
                 multiview = old_view
             else:
                 multiview = MultiView(name)
                 old_accept = getattr(old_view, '__accept__', None)
-                old_score = getattr(old_view, '__score__', MAX_WEIGHT)
-                multiview.add(old_view, old_score, old_accept)
-            multiview.add(derived_view, score, accept)
+                old_order = getattr(old_view, '__order__', MAX_ORDER)
+                multiview.add(old_view, old_order, old_accept, old_phash)
+            multiview.add(derived_view, order, accept, phash)
             for view_type in (IView, ISecuredView):
                 # unregister any existing views
                 self.registry.adapters.unregister(
-                    (request_iface, r_context), view_type, name=name)
-            self.registry.registerAdapter(multiview, (request_iface, context),
-                                          IMultiView, name, info=_info)
+                    (IViewClassifier, request_iface, r_context),
+                    view_type, name=name)
+                if is_exception_view:
+                    self.registry.adapters.unregister(
+                        (IExceptionViewClassifier, request_iface, r_context),
+                        view_type, name=name)
+            self.registry.registerAdapter(
+                multiview, (IViewClassifier, request_iface, context),
+                IMultiView, name, info=_info)
+            if is_exception_view:
+                self.registry.registerAdapter(
+                    multiview,
+                    (IExceptionViewClassifier, request_iface, context),
+                    IMultiView, name, info=_info)
 
     def add_route(self,
                   name,
@@ -1030,13 +1057,15 @@ class Configurator(object):
         """
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
-        _, predicates = _make_predicates(xhr=xhr,
-                                         request_method=request_method,
-                                         path_info=path_info,
-                                         request_param=request_param,
-                                         header=header,
-                                         accept=accept,
-                                         custom=custom_predicates)
+        ignored, predicates, ignored = _make_predicates(
+            xhr=xhr,
+            request_method=request_method,
+            path_info=path_info,
+            request_param=request_param,
+            header=header,
+            accept=accept,
+            custom=custom_predicates
+            )
         
 
         request_iface = self.registry.queryUtility(IRouteRequest, name=name)
@@ -1172,10 +1201,32 @@ class Configurator(object):
         override(package, path, override_package, override_prefix,
                  _info=_info)
 
-    def set_forbidden_view(self, *arg, **kw):
+    def set_forbidden_view(self, view=None, attr=None, renderer=None,
+                           wrapper=None, _info=u''):
         """ Add a default forbidden view to the current configuration
         state.
 
+        .. warning:: This method has been deprecated in
+           :mod:`repoze.bfg` 1.3.  *Do not use it for new development;
+           it should only be used to support older code bases which
+           depend upon it.* See :ref:`changing_the_forbidden_view` to
+           see how a forbidden view should be registered in new
+           projects.
+
+        ..note:: For backwards compatibility with :mod:`repoze.bfg`
+           1.2, unlike an 'exception view' as described in
+           :ref:`exception_views`, a ``context, request`` view
+           callable registered using this API should not expect to
+           receive the exception as its first (``context``) argument.
+           Instead it should expect to receive the 'real' context as
+           found via context-finding or ``None`` if no context could
+           be found.  The exception causing the registered view to be
+           called is however still available as ``request.exception``.
+        .. warning:: This method has been deprecated in
+           :mod:`repoze.bfg` 1.3.  See
+           :ref:`changing_the_forbidden_view` to see how a not found
+           view should be registered in :mod:`repoze.bfg` 1.3+.
+
         The ``view`` argument should be a :term:`view callable`.
 
         The ``attr`` argument should be the attribute of the view
@@ -1191,16 +1242,36 @@ class Configurator(object):
 
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
-        method's ``wrapper`` argument for a description).
+        method's ``wrapper`` argument for a description)."""
+        view = self._derive_view(view, attr=attr, renderer_name=renderer)
+        def bwcompat_view(context, request):
+            ctx = getattr(request, 'context', None)
+            return view(ctx, request)
+        return self.add_view(bwcompat_view, context=Forbidden,
+                             wrapper=wrapper, _info=_info)
 
-        See :ref:`changing_the_forbidden_view` for more
-        information."""
-        return self._system_view(IForbiddenView, *arg, **kw)
-
-    def set_notfound_view(self, *arg, **kw):
+    def set_notfound_view(self, view=None, attr=None, renderer=None,
+                          wrapper=None, _info=u''):
         """ Add a default not found view to the current configuration
         state.
 
+        .. warning:: This method has been deprecated in
+           :mod:`repoze.bfg` 1.3.  *Do not use it for new development;
+           it should only be used to support older code bases which
+           depend upon it.* See :ref:`changing_the_notfound_view` to
+           see how a not found view should be registered in new
+           projects.
+
+        ..note:: For backwards compatibility with :mod:`repoze.bfg`
+           1.2, unlike an 'exception view' as described in
+           :ref:`exception_views`, a ``context, request`` view
+           callable registered using this API should not expect to
+           receive the exception as its first (``context``) argument.
+           Instead it should expect to receive the 'real' context as
+           found via context-finding or ``None`` if no context could
+           be found.  The exception causing the registered view to be
+           called is however still available as ``request.exception``.
+
         The ``view`` argument should be a :term:`view callable`.
 
         The ``attr`` argument should be the attribute of the view
@@ -1217,11 +1288,13 @@ class Configurator(object):
         The ``wrapper`` argument should be the name of another view
         which will wrap this view when rendered (see the ``add_view``
         method's ``wrapper`` argument for a description).
-
-        See :ref:`changing_the_notfound_view` for more
-        information.
         """
-        return self._system_view(INotFoundView, *arg, **kw)
+        view = self._derive_view(view, attr=attr, renderer_name=renderer)
+        def bwcompat_view(context, request):
+            ctx = getattr(request, 'context', None)
+            return view(ctx, request)
+        return self.add_view(bwcompat_view, context=NotFound,
+                             wrapper=wrapper, _info=_info)
 
     def add_static_view(self, name, path, cache_max_age=3600, _info=u''):
         """ Add a view used to render static resources to the current
@@ -1353,46 +1426,68 @@ class Configurator(object):
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
                      containment=None, request_type=None, custom=()):
-    # Predicates are added to the predicate list in (presumed)
-    # computation expense order.  All predicates associated with a
-    # view must evaluate true for the view to "match" a request.
-    # Elsewhere in the code, we evaluate them using a generator
-    # expression.  The fastest predicate should be evaluated first,
-    # then the next fastest, and so on, as if one returns false, the
-    # remainder of the predicates won't need to be evaluated.
 
-    # Each predicate is associated with a weight value.  The weight
-    # symbolizes the relative potential "importance" of the predicate
-    # to all other predicates.  A larger weight indicates greater
-    # importance.  These weights are subtracted from an aggregate
-    # 'weight' variable.  The aggregate weight is then divided by the
-    # length of the predicate list to compute a "score" for this view.
-    # The score represents the ordering in which a "multiview" ( a
+    # PREDICATES
+    # ----------
+    #
+    # Given an argument list, a predicate list is computed.
+    # Predicates are added to a predicate list in (presumed)
+    # computation expense order.  All predicates associated with a
+    # view or route must evaluate true for the view or route to
+    # "match" during a request.  Elsewhere in the code, we evaluate
+    # predicates using a generator expression.  The fastest predicate
+    # should be evaluated first, then the next fastest, and so on, as
+    # if one returns false, the remainder of the predicates won't need
+    # to be evaluated.
+    #
+    # While we compute predicates, we also compute a predicate hash
+    # (aka phash) that can be used by a caller to identify identical
+    # predicate lists.
+    #
+    # ORDERING
+    # --------
+    #
+    # A "order" is computed for the predicate list.  An order is
+    # a scoring.
+    #
+    # Each predicate is associated with a weight value, which is a
+    # multiple of 2.  The weight of a predicate symbolizes the
+    # relative potential "importance" of the predicate to all other
+    # predicates.  A larger weight indicates greater importance.
+    #
+    # All weights for a given predicate list are bitwise ORed together
+    # to create a "score"; this score is then subtracted from
+    # MAX_ORDER and divided by an integer representing the number of
+    # predicates+1 to determine the order.
+    #
+    # The order represents the ordering in which a "multiview" ( a
     # collection of views that share the same context/request/name
     # triad but differ in other ways via predicates) will attempt to
-    # call its set of views.  Views with lower scores will be tried
+    # call its set of views.  Views with lower orders will be tried
     # first.  The intent is to a) ensure that views with more
     # predicates are always evaluated before views with fewer
     # predicates and b) to ensure a stable call ordering of views that
-    # share the same number of predicates.
-
-    # Views which do not have any predicates get a score of
-    # MAX_WEIGHT, meaning that they will be tried very last.
+    # share the same number of predicates.  Views which do not have
+    # any predicates get an order of MAX_ORDER, meaning that they will
+    # be tried very last.
 
     predicates = []
-    weight = MAX_WEIGHT
+    weights = []
+    h = md5()
 
     if xhr:
         def xhr_predicate(context, request):
             return request.is_xhr
-        weight = weight - 20
+        weights.append(1 << 0)
         predicates.append(xhr_predicate)
+        h.update('xhr:%r' % bool(xhr))
 
     if request_method is not None:
         def request_method_predicate(context, request):
             return request.method == request_method
-        weight = weight - 30
+        weights.append(1 << 2)
         predicates.append(request_method_predicate)
+        h.update('request_method:%r' % request_method)
 
     if path_info is not None:
         try:
@@ -1401,8 +1496,9 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             raise ConfigurationError(why[0])
         def path_info_predicate(context, request):
             return path_info_val.match(request.path_info) is not None
-        weight = weight - 40
+        weights.append(1 << 3)
         predicates.append(path_info_predicate)
+        h.update('path_info:%r' % path_info)
 
     if request_param is not None:
         request_param_val = None
@@ -1412,8 +1508,9 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             if request_param_val is None:
                 return request_param in request.params
             return request.params.get(request_param) == request_param_val
-        weight = weight - 50
+        weights.append(1 << 4)
         predicates.append(request_param_predicate)
+        h.update('request_param:%r=%r' % (request_param, request_param_val))
 
     if header is not None:
         header_name = header
@@ -1429,35 +1526,43 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
                 return header_name in request.headers
             val = request.headers.get(header_name)
             return header_val.match(val) is not None
-        weight = weight - 60
+        weights.append(1 << 5)
         predicates.append(header_predicate)
+        h.update('header:%r=%r' % (header_name, header_val))
 
     if accept is not None:
         def accept_predicate(context, request):
             return accept in request.accept
-        weight = weight - 70
+        weights.append(1 << 6)
         predicates.append(accept_predicate)
+        h.update('accept:%r' % accept)
 
     if containment is not None:
         def containment_predicate(context, request):
             return find_interface(context, containment) is not None
-        weight = weight - 80
+        weights.append(1 << 7)
         predicates.append(containment_predicate)
+        h.update('containment:%r' % id(containment))
 
     if request_type is not None:
         def request_type_predicate(context, request):
             return request_type.providedBy(request)
-        weight = weight - 90
+        weights.append(1 << 8)
         predicates.append(request_type_predicate)
+        h.update('request_type:%r' % id(request_type))
 
     if custom:
-        for predicate in custom:
-            weight = weight - 100
+        for num, predicate in enumerate(custom):
             predicates.append(predicate)
+            h.update('custom%s:%r' % (num, id(predicate)))
+        weights.append(1 << 9)
 
-    # this will be == MAX_WEIGHT if no predicates
-    score = weight / (len(predicates) + 1)
-    return score, predicates
+    score = 0
+    for bit in weights:
+        score = score | bit
+    order = (MAX_ORDER - score) / (len(predicates) + 1)
+    phash = h.hexdigest()
+    return order, predicates, phash
 
 class MultiView(object):
     implements(IMultiView)
@@ -1468,13 +1573,19 @@ class MultiView(object):
         self.views = []
         self.accepts = []
 
-    def add(self, view, score, accept=None):
+    def add(self, view, order, accept=None, phash=None):
+        if phash is not None:
+            for i, (s, v, h) in enumerate(list(self.views)):
+                if phash == h:
+                    self.views[i] = (order, view, phash)
+                    return
+
         if accept is None or '*' in accept:
-            self.views.append((score, view))
+            self.views.append((order, view, phash))
             self.views.sort()
         else:
             subset = self.media_views.setdefault(accept, [])
-            subset.append((score, view))
+            subset.append((order, view, phash))
             subset.sort()
             accepts = set(self.accepts)
             accepts.add(accept)
@@ -1496,7 +1607,7 @@ class MultiView(object):
         return self.views
 
     def match(self, context, request):
-        for score, view in self.get_views(request):
+        for order, view, phash in self.get_views(request):
             if not hasattr(view, '__predicated__'):
                 return view
             if view.__predicated__(context, request):
@@ -1515,7 +1626,7 @@ class MultiView(object):
         return view(context, request)
 
     def __call__(self, context, request):
-        for score, view in self.get_views(request):
+        for order, view, phash in self.get_views(request):
             try:
                 return view(context, request)
             except NotFound:
@@ -1548,7 +1659,7 @@ def decorate_view(wrapped_view, original_view):
     except AttributeError:
         pass
     try:
-        wrapped_view.__score__ = original_view.__score__
+        wrapped_view.__order__ = original_view.__order__
     except AttributeError:
         pass
     return True
@@ -1795,18 +1906,25 @@ def _authdebug_view(view, permission, authn_policy, authz_policy, settings,
 
     return wrapped_view
 
-def _attr_wrap(view, accept, score):
+def _attr_wrap(view, accept, order, phash):
     # this is a little silly but we don't want to decorate the original
-    # function with attributes that indicate accept and score,
+    # function with attributes that indicate accept, order, and phash,
     # so we use a wrapper
-    if (accept is None) and (score == MAX_WEIGHT):
+    if (accept is None) and (order == MAX_ORDER) and (phash == DEFAULT_PHASH):
         return view # defaults
     def attr_view(context, request):
         return view(context, request)
     attr_view.__accept__ = accept
-    attr_view.__score__ = score
+    attr_view.__order__ = order
+    attr_view.__phash__ = phash
     decorate_view(attr_view, view)
     return attr_view
+
+def isclass(o):
+    return isinstance(o, (type, types.ClassType))
+
+def isexception(o):
+    return isinstance(o, Exception) or isclass(o) and issubclass(o, Exception)
 
 # note that ``options`` is a b/w compat alias for ``settings`` and
 # ``Configurator`` is a testing dep inj

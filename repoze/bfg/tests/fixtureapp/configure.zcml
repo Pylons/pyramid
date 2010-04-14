@@ -7,6 +7,21 @@
       />
 
   <view
+      view=".views.exception_view"
+      for="RuntimeError"
+      />
+
+  <view
+      view=".views.protected_view"
+      name="protected.html"
+      />
+
+  <view
+      view=".views.erroneous_view"
+      name="error.html"
+      />
+
+  <view
       view=".views.fixture_view"
       name="dummyskin.html"
       request_type=".views.IDummy"

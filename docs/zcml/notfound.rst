@@ -3,6 +3,14 @@
 ``notfound``
 ------------
 
+.. warning::
+
+   The ``notfound`` ZCML directive is deprecated in :mod:`repoze.bfg`
+   version 1.3.  Instead, you should use the :ref:`view_directive`
+   directive with a ``context`` that names the
+   :exc:`repoze.bfg.exceptions.NotFound` class.  See
+   :ref:`changing_the_notfound_view` form more information.
+
 When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
 :term:`not found view`.  The default not found view is very plain, but
 the view callable used can be configured via the ``notfound`` ZCML
@@ -62,8 +70,12 @@ Example
 Alternatives
 ~~~~~~~~~~~~
 
-The :meth:`repoze.bfg.configuration.Configurator.set_notfound_view`
-method performs the same job as the ``notfound`` ZCML directive.
+Use the :ref:`view_directive` directive with a ``context`` that names
+the :exc:`repoze.bfg.exceptions.NotFound` class.
+
+Use the :meth:`repoze.bfg.configuration.Configurator.add_view` method,
+passing it a ``context`` which is the
+:exc:`repoze.bfg.exceptions.NotFound` class.
 
 See Also
 ~~~~~~~~

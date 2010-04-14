@@ -140,3 +140,9 @@ try:
 except ImportError: #pragma: no cover
     from pkgutil_26 import walk_packages
 
+try:
+    from hashlib import md5
+except ImportError: # pragma: no cover
+    import md5
+    md5 = md5.new
+    

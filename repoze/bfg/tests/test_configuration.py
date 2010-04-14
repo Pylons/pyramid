@@ -21,16 +21,22 @@ class ConfiguratorTests(unittest.TestCase):
         return Renderer
 
     def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
-                         name=''):
+                         name='', exception_view=False):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        if exception_view:
+            classifier = IExceptionViewClassifier
+        else:
+            classifier = IViewClassifier
         if ctx_iface is None:
             ctx_iface = Interface
         if request_iface is None:
             request_iface = IRequest
         return config.registry.adapters.lookup(
-            (request_iface, ctx_iface), IView, name=name,
+            (classifier, request_iface, ctx_iface), IView, name=name,
             default=None)
 
     def _getRouteRequestIface(self, config, name):
@@ -182,6 +188,8 @@ class ConfiguratorTests(unittest.TestCase):
                 pass
         reg = DummyRegistry()
         config = self._makeOne(reg)
+        config.set_notfound_view = lambda *arg, **kw: None
+        config.set_forbidden_view = lambda *arg, **kw: None
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
         self.assertEqual(reg.notify(1), None)
@@ -558,25 +566,203 @@ class ConfiguratorTests(unittest.TestCase):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import ISecuredView
+        from repoze.bfg.interfaces import IViewClassifier
         view = lambda *arg: 'OK'
         view.__call_permissive__ = view
         config = self._makeOne()
         config.add_view(view=view)
         wrapper = config.registry.adapters.lookup(
-            (IRequest, Interface), ISecuredView, name='', default=None)
+            (IViewClassifier, IRequest, Interface),
+            ISecuredView, name='', default=None)
         self.assertEqual(wrapper, view)
+
+    def test_add_view_exception_register_secured_view(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        view = lambda *arg: 'OK'
+        view.__call_permissive__ = view
+        config = self._makeOne()
+        config.add_view(view=view, context=RuntimeError)
+        wrapper = config.registry.adapters.lookup(
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='', default=None)
+        self.assertEqual(wrapper, view)
+
+    def test_add_view_same_phash_overrides_existing_single_view(self):
+        from repoze.bfg.compat import md5
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IMultiView
+        phash = md5()
+        phash.update('xhr:True')
+        view = lambda *arg: 'NOT OK'
+        view.__phash__ = phash.hexdigest()
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (IViewClassifier, IRequest, Interface), IView, name='')
+        def newview(context, request):
+            return 'OK'
+        config.add_view(view=newview, xhr=True)
+        wrapper = self._getViewCallable(config)
+        self.failIf(IMultiView.providedBy(wrapper))
+        request = DummyRequest()
+        request.is_xhr = True
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_exc_same_phash_overrides_existing_single_view(self):
+        from repoze.bfg.compat import md5
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IMultiView
+        phash = md5()
+        phash.update('xhr:True')
+        view = lambda *arg: 'NOT OK'
+        view.__phash__ = phash.hexdigest()
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view,
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        def newview(context, request):
+            return 'OK'
+        config.add_view(view=newview, xhr=True,
+                        context=RuntimeError)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
+        self.failIf(IMultiView.providedBy(wrapper))
+        request = DummyRequest()
+        request.is_xhr = True
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_default_phash_overrides_no_phash(self):
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IMultiView
+        view = lambda *arg: 'NOT OK'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (IViewClassifier, IRequest, Interface), IView, name='')
+        def newview(context, request):
+            return 'OK'
+        config.add_view(view=newview)
+        wrapper = self._getViewCallable(config)
+        self.failIf(IMultiView.providedBy(wrapper))
+        request = DummyRequest()
+        request.is_xhr = True
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_exc_default_phash_overrides_no_phash(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IMultiView
+        view = lambda *arg: 'NOT OK'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view,
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        def newview(context, request):
+            return 'OK'
+        config.add_view(view=newview, context=RuntimeError)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
+        self.failIf(IMultiView.providedBy(wrapper))
+        request = DummyRequest()
+        request.is_xhr = True
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_default_phash_overrides_default_phash(self):
+        from repoze.bfg.configuration import DEFAULT_PHASH
+        from zope.interface import Interface
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IMultiView
+        view = lambda *arg: 'NOT OK'
+        view.__phash__ = DEFAULT_PHASH
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (IViewClassifier, IRequest, Interface), IView, name='')
+        def newview(context, request):
+            return 'OK'
+        config.add_view(view=newview)
+        wrapper = self._getViewCallable(config)
+        self.failIf(IMultiView.providedBy(wrapper))
+        request = DummyRequest()
+        request.is_xhr = True
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_exc_default_phash_overrides_default_phash(self):
+        from repoze.bfg.configuration import DEFAULT_PHASH
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IMultiView
+        view = lambda *arg: 'NOT OK'
+        view.__phash__ = DEFAULT_PHASH
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view,
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        def newview(context, request):
+            return 'OK'
+        config.add_view(view=newview, context=RuntimeError)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
+        self.failIf(IMultiView.providedBy(wrapper))
+        request = DummyRequest()
+        request.is_xhr = True
+        self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_multiview_replaces_existing_view(self):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IMultiView
         view = lambda *arg: 'OK'
+        view.__phash__ = 'abc'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (IRequest, Interface), IView, name='')
+            view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view)
         wrapper = self._getViewCallable(config)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual(wrapper(None, None), 'OK')
+
+    def test_add_view_exc_multiview_replaces_existing_view(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IMultiView
+        view = lambda *arg: 'OK'
+        view.__phash__ = 'abc'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view,
+            (IViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        config.registry.registerAdapter(
+            view,
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        config.add_view(view=view, context=RuntimeError)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
@@ -585,12 +771,39 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import ISecuredView
         from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
         view = lambda *arg: 'OK'
+        view.__phash__ = 'abc'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (IRequest, Interface), ISecuredView, name='')
+            view, (IViewClassifier, IRequest, Interface),
+            ISecuredView, name='')
         config.add_view(view=view)
         wrapper = self._getViewCallable(config)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual(wrapper(None, None), 'OK')
+
+    def test_add_view_exc_multiview_replaces_existing_securedview(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import ISecuredView
+        from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        view = lambda *arg: 'OK'
+        view.__phash__ = 'abc'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view,
+            (IViewClassifier, IRequest, implementedBy(RuntimeError)),
+            ISecuredView, name='')
+        config.registry.registerAdapter(
+            view,
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            ISecuredView, name='')
+        config.add_view(view=view, context=RuntimeError)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK')
 
@@ -599,15 +812,47 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
         def view(context, request):
             return 'OK'
         def view2(context, request):
             return 'OK2'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (IRequest, Interface), IView, name='')
+            view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view2, accept='text/html')
         wrapper = self._getViewCallable(config)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual(len(wrapper.views), 1)
+        self.assertEqual(len(wrapper.media_views), 1)
+        self.assertEqual(wrapper(None, None), 'OK')
+        request = DummyRequest()
+        request.accept = DummyAccept('text/html', 'text/html')
+        self.assertEqual(wrapper(None, request), 'OK2')
+
+    def test_add_view_exc_with_accept_multiview_replaces_existing_view(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        def view(context, request):
+            return 'OK'
+        def view2(context, request):
+            return 'OK2'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view,
+            (IViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        config.registry.registerAdapter(
+            view,
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        config.add_view(view=view2, accept='text/html', context=RuntimeError)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
         self.assertEqual(len(wrapper.media_views), 1)
@@ -621,16 +866,51 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
         def view(context, request):
             return 'OK'
         def view2(context, request):
             return 'OK2'
         view.__accept__ = 'text/html'
+        view.__phash__ = 'abc'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (IRequest, Interface), IView, name='')
+            view, (IViewClassifier, IRequest, Interface), IView, name='')
         config.add_view(view=view2)
         wrapper = self._getViewCallable(config)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual(len(wrapper.views), 1)
+        self.assertEqual(len(wrapper.media_views), 1)
+        self.assertEqual(wrapper(None, None), 'OK2')
+        request = DummyRequest()
+        request.accept = DummyAccept('text/html')
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_exc_mulview_replaces_existing_view_with___accept__(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        def view(context, request):
+            return 'OK'
+        def view2(context, request):
+            return 'OK2'
+        view.__accept__ = 'text/html'
+        view.__phash__ = 'abc'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view,
+            (IViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        config.registry.registerAdapter(
+            view,
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IView, name='')
+        config.add_view(view=view2, context=RuntimeError)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
         self.failUnless(IMultiView.providedBy(wrapper))
         self.assertEqual(len(wrapper.views), 1)
         self.assertEqual(len(wrapper.media_views), 1)
@@ -643,15 +923,41 @@ class ConfiguratorTests(unittest.TestCase):
         from zope.interface import Interface
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
         view = DummyMultiView()
         config = self._makeOne()
-        config.registry.registerAdapter(view, (IRequest, Interface),
-                                        IMultiView, name='')
+        config.registry.registerAdapter(
+            view, (IViewClassifier, IRequest, Interface),
+            IMultiView, name='')
         view2 = lambda *arg: 'OK2'
         config.add_view(view=view2)
         wrapper = self._getViewCallable(config)
         self.failUnless(IMultiView.providedBy(wrapper))
-        self.assertEqual(wrapper.views, [(view2, None)])
+        self.assertEqual([x[:2] for x in wrapper.views], [(view2, None)])
+        self.assertEqual(wrapper(None, None), 'OK1')
+
+    def test_add_view_exc_multiview_replaces_multiview(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        view = DummyMultiView()
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view,
+            (IViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IMultiView, name='')
+        config.registry.registerAdapter(
+            view,
+            (IExceptionViewClassifier, IRequest, implementedBy(RuntimeError)),
+            IMultiView, name='')
+        view2 = lambda *arg: 'OK2'
+        config.add_view(view=view2, context=RuntimeError)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError), exception_view=True)
+        self.failUnless(IMultiView.providedBy(wrapper))
+        self.assertEqual([x[:2] for x in wrapper.views], [(view2, None)])
         self.assertEqual(wrapper(None, None), 'OK1')
 
     def test_add_view_multiview_context_superclass_then_subclass(self):
@@ -659,6 +965,7 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
         class ISuper(Interface):
             pass
         class ISub(ISuper):
@@ -667,7 +974,7 @@ class ConfiguratorTests(unittest.TestCase):
         view2 = lambda *arg: 'OK2'
         config = self._makeOne()
         config.registry.registerAdapter(
-            view, (IRequest, ISuper), IView, name='')
+            view, (IViewClassifier, IRequest, ISuper), IView, name='')
         config.add_view(view=view2, for_=ISub)
         wrapper = self._getViewCallable(config, ISuper, IRequest)
         self.failIf(IMultiView.providedBy(wrapper))
@@ -675,6 +982,40 @@ class ConfiguratorTests(unittest.TestCase):
         wrapper = self._getViewCallable(config, ISub, IRequest)
         self.failIf(IMultiView.providedBy(wrapper))
         self.assertEqual(wrapper(None, None), 'OK2')
+
+    def test_add_view_multiview_exception_superclass_then_subclass(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IMultiView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IExceptionViewClassifier
+        class Super(Exception):
+            pass
+        class Sub(Super):
+            pass
+        view = lambda *arg: 'OK'
+        view2 = lambda *arg: 'OK2'
+        config = self._makeOne()
+        config.registry.registerAdapter(
+            view, (IViewClassifier, IRequest, Super), IView, name='')
+        config.registry.registerAdapter(
+            view, (IExceptionViewClassifier, IRequest, Super), IView, name='')
+        config.add_view(view=view2, for_=Sub)
+        wrapper = self._getViewCallable(
+            config, implementedBy(Super), IRequest)
+        wrapper_exc_view = self._getViewCallable(
+            config, implementedBy(Super), IRequest, exception_view=True)
+        self.assertEqual(wrapper_exc_view, wrapper)
+        self.failIf(IMultiView.providedBy(wrapper_exc_view))
+        self.assertEqual(wrapper_exc_view(None, None), 'OK')
+        wrapper = self._getViewCallable(
+            config, implementedBy(Sub), IRequest)
+        wrapper_exc_view = self._getViewCallable(
+            config, implementedBy(Sub), IRequest, exception_view=True)
+        self.assertEqual(wrapper_exc_view, wrapper)
+        self.failIf(IMultiView.providedBy(wrapper_exc_view))
+        self.assertEqual(wrapper_exc_view(None, None), 'OK2')
 
     def test_add_view_multiview_call_ordering(self):
         from zope.interface import directlyProvides
@@ -820,6 +1161,37 @@ class ConfiguratorTests(unittest.TestCase):
         wrapper = self._getViewCallable(config, request_iface=request_iface)
         self.failIfEqual(wrapper, None)
         self.assertEqual(wrapper(None, None), 'OK')
+
+    def test_add_view_with_route_name_exception(self):
+        from zope.interface import implementedBy
+        from zope.component import ComponentLookupError
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(view=view, route_name='foo', context=RuntimeError)
+        self.assertEqual(len(config.registry.deferred_route_views), 1)
+        infos = config.registry.deferred_route_views['foo']
+        self.assertEqual(len(infos), 1)
+        info = infos[0]
+        self.assertEqual(info['route_name'], 'foo')
+        self.assertEqual(info['view'], view)
+        self.assertRaises(ComponentLookupError,
+                          self._getRouteRequestIface, config, 'foo')
+        wrapper_exc_view = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError),
+            exception_view=True)
+        self.assertEqual(wrapper_exc_view, None)
+        config.add_route('foo', '/a/b')
+        request_iface = self._getRouteRequestIface(config, 'foo')
+        self.failIfEqual(request_iface, None)
+        wrapper_exc_view = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError),
+            request_iface=request_iface, exception_view=True)
+        self.failIfEqual(wrapper_exc_view, None)
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError),
+            request_iface=request_iface)
+        self.assertEqual(wrapper_exc_view, wrapper)
+        self.assertEqual(wrapper_exc_view(None, None), 'OK')
 
     def test_add_view_with_request_method_true(self):
         view = lambda *arg: 'OK'
@@ -1048,6 +1420,16 @@ class ConfiguratorTests(unittest.TestCase):
         request.is_xhr = True
         self.assertEqual(wrapper(None, request), 'OK')
 
+    def test_add_view_same_predicates(self):
+        view2 = lambda *arg: 'second'
+        view1 = lambda *arg: 'first'
+        config = self._makeOne()
+        config.add_view(view=view1)
+        config.add_view(view=view2)
+        view = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        self.assertEqual(view(None, request), 'second')
+
     def _assertRoute(self, config, name, path, num_predicates=0):
         from repoze.bfg.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -1162,6 +1544,22 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, None), 'OK')
         self._assertRoute(config, 'name', 'path')
         wrapper = self._getViewCallable(config, IOther, request_type)
+        self.assertEqual(wrapper, None)
+
+    def test_add_route_with_view_exception(self):
+        from zope.interface import implementedBy
+        config = self._makeOne()
+        view = lambda *arg: 'OK'
+        config.add_route('name', 'path', view=view, view_context=RuntimeError)
+        request_type = self._getRouteRequestIface(config, 'name')
+        wrapper = self._getViewCallable(
+            config, ctx_iface=implementedBy(RuntimeError),
+            request_iface=request_type, exception_view=True)
+        self.assertEqual(wrapper(None, None), 'OK')
+        self._assertRoute(config, 'name', 'path')
+        wrapper = self._getViewCallable(
+            config, ctx_iface=IOther,
+            request_iface=request_type, exception_view=True)
         self.assertEqual(wrapper, None)
 
     def test_add_route_with_view_for(self):
@@ -1280,6 +1678,7 @@ class ConfiguratorTests(unittest.TestCase):
         from zope.interface import implementedBy
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         config = self._makeOne()
         config.add_static_view('static', 'fixtures/static')
         request_type = self._getRouteRequestIface(config, 'static')
@@ -1287,7 +1686,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
         wrapped = config.registry.adapters.lookup(
-            (request_type, iface), IView, name='')
+            (IViewClassifier, request_type, iface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
@@ -1296,6 +1695,7 @@ class ConfiguratorTests(unittest.TestCase):
         from zope.interface import implementedBy
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         config = self._makeOne()
         config.add_static_view('static', 'repoze.bfg.tests:fixtures/static')
         request_type = self._getRouteRequestIface(config, 'static')
@@ -1303,7 +1703,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
         wrapped = config.registry.adapters.lookup(
-            (request_type, iface), IView, name='')
+            (IViewClassifier, request_type, iface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
@@ -1313,6 +1713,7 @@ class ConfiguratorTests(unittest.TestCase):
         from zope.interface import implementedBy
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         config = self._makeOne()
         here = os.path.dirname(__file__)
         static_path = os.path.join(here, 'fixtures', 'static')
@@ -1322,76 +1723,63 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.factory.__class__, StaticRootFactory)
         iface = implementedBy(StaticRootFactory)
         wrapped = config.registry.adapters.lookup(
-            (request_type, iface), IView, name='')
+            (IViewClassifier, request_type, iface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
 
-    def test__system_view_no_view_no_renderer(self):
-        from repoze.bfg.exceptions import ConfigurationError
-        config = self._makeOne()
-        self.assertRaises(ConfigurationError, config._system_view, IDummy)
-
-    def test__system_view_no_view_with_renderer(self):
-        config = self._makeOne()
-        self._registerRenderer(config, name='.pt')
-        config._system_view(IDummy,
-                           renderer='repoze.bfg.tests:fixtures/minimal.pt')
-        request = self._makeRequest(config)
-        view = config.registry.getUtility(IDummy)
-        result = view(None, request)
-        self.assertEqual(result.body, 'Hello!')
-
-    def test__system_view_with_attr(self):
-        config = self._makeOne()
-        class view(object):
-            def __init__(self, context, request):
-                pass
-            def index(self):
-                return 'OK'
-        config._system_view(IDummy, view=view, attr='index')
-        view = config.registry.getUtility(IDummy)
-        request = self._makeRequest(config)
-        result = view(None, request)
-        self.assertEqual(result, 'OK')
-
-    def test__system_view_with_wrapper(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        config = self._makeOne()
-        view = lambda *arg: DummyResponse()
-        wrapper = lambda *arg: 'OK2'
-        config.registry.registerAdapter(wrapper, (Interface, Interface),
-                                        IView, name='wrapper')
-        config._system_view(IDummy, view=view, wrapper='wrapper')
-        view = config.registry.getUtility(IDummy)
-        request = self._makeRequest(config)
-        directlyProvides(request, IRequest)
-        request.registry = config.registry
-        context = DummyContext()
-        result = view(context, request)
-        self.assertEqual(result, 'OK2')
-
     def test_set_notfound_view(self):
-        from repoze.bfg.interfaces import INotFoundView
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.exceptions import NotFound
         config = self._makeOne()
-        view = lambda *arg: 'OK'
+        view = lambda *arg: arg
         config.set_notfound_view(view)
         request = self._makeRequest(config)
-        view = config.registry.getUtility(INotFoundView)
+        view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
+                                     request_iface=IRequest)
         result = view(None, request)
-        self.assertEqual(result, 'OK')
+        self.assertEqual(result, (None, request))
+
+    def test_set_notfound_view_request_has_context(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.exceptions import NotFound
+        config = self._makeOne()
+        view = lambda *arg: arg
+        config.set_notfound_view(view)
+        request = self._makeRequest(config)
+        request.context = 'abc'
+        view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
+                                     request_iface=IRequest)
+        result = view(None, request)
+        self.assertEqual(result, ('abc', request))
 
     def test_set_forbidden_view(self):
-        from repoze.bfg.interfaces import IForbiddenView
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.exceptions import Forbidden
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.set_forbidden_view(view)
         request = self._makeRequest(config)
-        view = config.registry.getUtility(IForbiddenView)
+        view = self._getViewCallable(config, ctx_iface=implementedBy(Forbidden),
+                                     request_iface=IRequest)
         result = view(None, request)
         self.assertEqual(result, 'OK')
+
+    def test_set_forbidden_view_request_has_context(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.exceptions import Forbidden
+        config = self._makeOne()
+        view = lambda *arg: arg
+        config.set_forbidden_view(view)
+        request = self._makeRequest(config)
+        request.context = 'abc'
+        view = self._getViewCallable(config, ctx_iface=implementedBy(Forbidden),
+                                     request_iface=IRequest)
+        result = view(None, request)
+        self.assertEqual(result, ('abc', request))
 
     def test__set_authentication_policy(self):
         from repoze.bfg.interfaces import IAuthenticationPolicy
@@ -1680,6 +2068,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test__derive_view_with_wrapper_viewname(self):
         from webob import Response
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         inner_response = Response('OK')
         def inner_view(context, request):
             return inner_response
@@ -1690,7 +2079,7 @@ class ConfiguratorTests(unittest.TestCase):
             return Response('outer ' + request.wrapped_body)
         config = self._makeOne()
         config.registry.registerAdapter(
-            outer_view, (None, None), IView, 'owrap')
+            outer_view, (IViewClassifier, None, None), IView, 'owrap')
         result = config._derive_view(inner_view, viewname='inner',
                                     wrapper_viewname='owrap')
         self.failIf(result is inner_view)
@@ -2396,6 +2785,183 @@ class Test_decorate_view(unittest.TestCase):
         self.failUnless(view1.__predicated__.im_func is
                         view2.__predicated__.im_func)
 
+class Test__make_predicates(unittest.TestCase):
+    def _callFUT(self, **kw):
+        from repoze.bfg.configuration import _make_predicates
+        return _make_predicates(**kw)
+
+    def test_ordering_xhr_and_request_method_trump_only_containment(self):
+        order1, _, _ = self._callFUT(xhr=True, request_method='GET')
+        order2, _, _ = self._callFUT(containment=True)
+        self.failUnless(order1 < order2)
+
+    def test_ordering_number_of_predicates(self):
+        order1, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            header='header',
+            accept='accept',
+            containment='containment',
+            request_type='request_type',
+            custom=('a',)
+            )
+        order2, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            header='header',
+            accept='accept',
+            containment='containment',
+            request_type='request_type',
+            custom=('a',)
+            )
+        order3, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            header='header',
+            accept='accept',
+            containment='containment',
+            request_type='request_type',
+            ) 
+        order4, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            header='header',
+            accept='accept',
+            containment='containment',
+            )
+        order5, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            header='header',
+            accept='accept',
+            )
+        order6, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            header='header',
+            )
+        order7, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            )
+        order8, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            )
+        order9, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            )
+        order10, _, _ = self._callFUT(
+            xhr='xhr',
+            )
+        order11, _, _ = self._callFUT(
+            )
+        self.assertEqual(order1, order2)
+        self.failUnless(order3 > order2)
+        self.failUnless(order4 > order3)
+        self.failUnless(order5 > order4)
+        self.failUnless(order6 > order5)
+        self.failUnless(order7 > order6)
+        self.failUnless(order8 > order7)
+        self.failUnless(order9 > order8)
+        self.failUnless(order10 > order9)
+        self.failUnless(order11 > order10)
+
+    def test_ordering_importance_of_predicates(self):
+        order1, _, _ = self._callFUT(
+            xhr='xhr',
+            )
+        order2, _, _ = self._callFUT(
+            request_method='request_method',
+            )
+        order3, _, _ = self._callFUT(
+            path_info='path_info',
+            ) 
+        order4, _, _ = self._callFUT(
+            request_param='param',
+            )
+        order5, _, _ = self._callFUT(
+            header='header',
+            )
+        order6, _, _ = self._callFUT(
+            accept='accept',
+            )
+        order7, _, _ = self._callFUT(
+            containment='containment',
+            )
+        order8, _, _ = self._callFUT(
+            request_type='request_type',
+            )
+        order9, _, _ = self._callFUT(
+            custom=('a',),
+            )
+        self.failUnless(order1 > order2)
+        self.failUnless(order2 > order3)
+        self.failUnless(order3 > order4)
+        self.failUnless(order4 > order5)
+        self.failUnless(order5 > order6)
+        self.failUnless(order6 > order7)
+        self.failUnless(order7 > order8)
+        self.failUnless(order8 > order9)
+
+    def test_ordering_importance_and_number(self):
+        order1, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            )
+        order2, _, _ = self._callFUT(
+            custom=('a',),
+            )
+        self.failUnless(order1 < order2)
+
+        order1, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            )
+        order2, _, _ = self._callFUT(
+            request_method='request_method',
+            custom=('a',),
+            )
+        self.failUnless(order1 > order2)
+
+        order1, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            )
+        order2, _, _ = self._callFUT(
+            request_method='request_method',
+            custom=('a',),
+            )
+        self.failUnless(order1 < order2)
+
+        order1, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            )
+        order2, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            custom=('a',),
+            )
+        self.failUnless(order1 > order2)
 
 class TestMultiView(unittest.TestCase):
     def _getTargetClass(self):
@@ -2418,20 +2984,33 @@ class TestMultiView(unittest.TestCase):
     def test_add(self):
         mv = self._makeOne()
         mv.add('view', 100)
-        self.assertEqual(mv.views, [(100, 'view')])
+        self.assertEqual(mv.views, [(100, 'view', None)])
         mv.add('view2', 99)
-        self.assertEqual(mv.views, [(99, 'view2'), (100, 'view')])
+        self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
         mv.add('view3', 100, 'text/html')
-        self.assertEqual(mv.media_views['text/html'], [(100, 'view3')])
+        self.assertEqual(mv.media_views['text/html'], [(100, 'view3', None)])
         mv.add('view4', 99, 'text/html')
         self.assertEqual(mv.media_views['text/html'],
-                         [(99, 'view4'), (100, 'view3')])
+                         [(99, 'view4', None), (100, 'view3', None)])
         mv.add('view5', 100, 'text/xml')
-        self.assertEqual(mv.media_views['text/xml'], [(100, 'view5')])
+        self.assertEqual(mv.media_views['text/xml'], [(100, 'view5', None)])
         self.assertEqual(set(mv.accepts), set(['text/xml', 'text/html']))
-        self.assertEqual(mv.views, [(99, 'view2'), (100, 'view')])
+        self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
         mv.add('view6', 98, 'text/*')
-        self.assertEqual(mv.views, [(98, 'view6'),(99, 'view2'), (100, 'view')])
+        self.assertEqual(mv.views, [(98, 'view6', None),
+                                    (99, 'view2', None),
+                                    (100, 'view', None)])
+
+    def test_add_with_phash(self):
+        mv = self._makeOne()
+        mv.add('view', 100, phash='abc')
+        self.assertEqual(mv.views, [(100, 'view', 'abc')])
+        mv.add('view', 100, phash='abc')
+        self.assertEqual(mv.views, [(100, 'view', 'abc')])
+        mv.add('view', 100, phash='def')
+        self.assertEqual(mv.views, [(100, 'view', 'abc'), (100, 'view', 'def')])
+        mv.add('view', 100, phash='abc')
+        self.assertEqual(mv.views, [(100, 'view', 'abc'), (100, 'view', 'def')])
 
     def test_get_views_request_has_no_accept(self):
         request = DummyRequest()
@@ -2478,7 +3057,7 @@ class TestMultiView(unittest.TestCase):
         def view(context, request):
             """ """
         view.__predicated__ = lambda *arg: False
-        mv.views = [(100, view)]
+        mv.views = [(100, view, None)]
         context = DummyContext()
         request = DummyRequest()
         self.assertRaises(NotFound, mv.match, context, request)
@@ -2488,7 +3067,7 @@ class TestMultiView(unittest.TestCase):
         def view(context, request):
             """ """
         view.__predicated__ = lambda *arg: True
-        mv.views = [(100, view)]
+        mv.views = [(100, view, None)]
         context = DummyContext()
         request = DummyRequest()
         result = mv.match(context, request)
@@ -2505,7 +3084,7 @@ class TestMultiView(unittest.TestCase):
         mv = self._makeOne()
         def view(context, request):
             """ """
-        mv.views = [(100, view)]
+        mv.views = [(100, view, None)]
         self.assertEqual(mv.__permitted__(None, None), True)
         
     def test_permitted(self):
@@ -2515,7 +3094,7 @@ class TestMultiView(unittest.TestCase):
         def permitted(context, request):
             return False
         view.__permitted__ = permitted
-        mv.views = [(100, view)]
+        mv.views = [(100, view, None)]
         context = DummyContext()
         request = DummyRequest()
         result = mv.__permitted__(context, request)
@@ -2539,7 +3118,7 @@ class TestMultiView(unittest.TestCase):
             raise NotFound
         def view2(context, request):
             return expected_response
-        mv.views = [(100, view1), (99, view2)]
+        mv.views = [(100, view1, None), (99, view2, None)]
         response = mv(context, request)
         self.assertEqual(response, expected_response)
 
@@ -2551,7 +3130,7 @@ class TestMultiView(unittest.TestCase):
         expected_response = DummyResponse()
         def view(context, request):
             return expected_response
-        mv.views = [(100, view)]
+        mv.views = [(100, view, None)]
         response = mv(context, request)
         self.assertEqual(response, expected_response)
 
@@ -2573,7 +3152,7 @@ class TestMultiView(unittest.TestCase):
         def permissive(context, request):
             return expected_response
         view.__call_permissive__ = permissive
-        mv.views = [(100, view)]
+        mv.views = [(100, view, None)]
         response = mv.__call_permissive__(context, request)
         self.assertEqual(response, expected_response)
 
@@ -2585,7 +3164,7 @@ class TestMultiView(unittest.TestCase):
         expected_response = DummyResponse()
         def view(context, request):
             return expected_response
-        mv.views = [(100, view)]
+        mv.views = [(100, view, None)]
         response = mv.__call_permissive__(context, request)
         self.assertEqual(response, expected_response)
 
@@ -2598,7 +3177,7 @@ class TestMultiView(unittest.TestCase):
         def view(context, request):
             return expected_response
         mv.views = [(100, None)]
-        mv.media_views['text/xml'] = [(100, view)]
+        mv.media_views['text/xml'] = [(100, view, None)]
         mv.accepts = ['text/xml']
         response = mv(context, request)
         self.assertEqual(response, expected_response)
@@ -2611,8 +3190,8 @@ class TestMultiView(unittest.TestCase):
         expected_response = DummyResponse()
         def view(context, request):
             return expected_response
-        mv.views = [(100, view)]
-        mv.media_views['text/xml'] = [(100, None)]
+        mv.views = [(100, view, None)]
+        mv.media_views['text/xml'] = [(100, None, None)]
         mv.accepts = ['text/xml']
         response = mv(context, request)
         self.assertEqual(response, expected_response)
@@ -2932,8 +3511,8 @@ class DummyMultiView:
     def __init__(self):
         self.views = []
         self.name = 'name'
-    def add(self, view, score, accept=None):
-        self.views.append((view, accept))
+    def add(self, view, order, accept=None, phash=None):
+        self.views.append((view, accept, phash))
     def __call__(self, context, request):
         return 'OK1'
     def __permitted__(self, context, request):

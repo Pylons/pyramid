@@ -9,6 +9,14 @@ view`.  The default forbidden response has a 401 status code and is
 very plain, but it can be overridden as necessary using the
 ``forbidden`` ZCML directive.
 
+.. warning::
+
+   The ``forbidden`` ZCML directive is deprecated in :mod:`repoze.bfg`
+   version 1.3.  Instead, you should use the :ref:`view_directive`
+   directive with a ``context`` that names the
+   :exc:`repoze.bfg.exceptions.Forbidden` class.  See
+   :ref:`changing_the_forbidden_view` form more information.
+
 Attributes
 ~~~~~~~~~~
 
@@ -63,8 +71,12 @@ Example
 Alternatives
 ~~~~~~~~~~~~
 
-The :meth:`repoze.bfg.configuration.Configurator.set_forbidden_view`
-method performs the same job as the ``forbidden`` ZCML directive.
+Use the :ref:`view_directive` directive with a ``context`` that names
+the :exc:`repoze.bfg.exceptions.Forbidden` class.
+
+Use the :meth:`repoze.bfg.configuration.Configurator.add_view` method,
+passing it a ``context`` which is the
+:exc:`repoze.bfg.exceptions.Forbidden` class.
 
 See Also
 ~~~~~~~~

@@ -31,12 +31,14 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
     def test_scanned(self):
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.configuration import Configurator
         from repoze.bfg.tests import test_integration
         config = Configurator()
         config.scan(test_integration)
         reg = config.registry
-        view = reg.adapters.lookup((IRequest, INothing), IView, name='')
+        view = reg.adapters.lookup(
+            (IViewClassifier, IRequest, INothing), IView, name='')
         self.assertEqual(view, wsgiapptest)
 
 here = os.path.dirname(__file__)
@@ -63,11 +65,12 @@ class TestStaticApp(unittest.TestCase):
             open(os.path.join(here, 'fixtures/minimal.pt'), 'r').read())
 
 class TwillBase(unittest.TestCase):
+    root_factory = None
     def setUp(self):
         import sys
         import twill
         from repoze.bfg.configuration import Configurator
-        config = Configurator()
+        config = Configurator(root_factory=self.root_factory)
         config.load_zcml(self.config)
         twill.add_wsgi_intercept('localhost', 6543, config.make_wsgi_app)
         if sys.platform is 'win32': # pragma: no cover
@@ -98,6 +101,11 @@ class TestFixtureApp(TwillBase):
         self.assertEqual(browser.get_html(), 'fixture')
         browser.go('http://localhost:6543/dummyskin.html')
         self.assertEqual(browser.get_code(), 404)
+        browser.go('http://localhost:6543/error.html')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'supressed')
+        browser.go('http://localhost:6543/protected.html')
+        self.assertEqual(browser.get_code(), 401)
 
 class TestCCBug(TwillBase):
     # "unordered" as reported in IRC by author of
@@ -140,6 +148,15 @@ class TestHybridApp(TwillBase):
         browser.go('http://localhost:6543/pqr/global2')
         self.assertEqual(browser.get_code(), 200)
         self.assertEqual(browser.get_html(), 'global2')
+        browser.go('http://localhost:6543/error')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'supressed')
+        browser.go('http://localhost:6543/error2')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'supressed2')
+        browser.go('http://localhost:6543/error_sub')
+        self.assertEqual(browser.get_code(), 200)
+        self.assertEqual(browser.get_html(), 'supressed2')
 
 class TestRestBugApp(TwillBase):
     # test bug reported by delijati 2010/2/3 (http://pastebin.com/d4cc15515)
@@ -167,6 +184,44 @@ class TestViewDecoratorApp(TwillBase):
         browser.go('http://localhost:6543/third')
         self.assertEqual(browser.get_code(), 200)
         self.failUnless('OK3' in browser.get_html())
+
+from repoze.bfg.tests.exceptionviewapp.models import AnException, NotAnException
+excroot = {'anexception':AnException(),
+           'notanexception':NotAnException()}
+
+class TestExceptionViewsApp(TwillBase):
+    config = 'repoze.bfg.tests.exceptionviewapp:configure.zcml'
+    root_factory = lambda *arg: excroot
+    def test_it(self):
+        import twill.commands
+        browser = twill.commands.get_browser()
+        browser.go('http://localhost:6543/')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('maybe' in browser.get_html())
+
+        browser.go('http://localhost:6543/notanexception')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('no' in browser.get_html())
+
+        browser.go('http://localhost:6543/anexception')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('yes' in browser.get_html())
+        
+        browser.go('http://localhost:6543/route_raise_exception')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('yes' in browser.get_html())
+
+        browser.go('http://localhost:6543/route_raise_exception2')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('yes' in browser.get_html())
+
+        browser.go('http://localhost:6543/route_raise_exception3')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('whoa' in browser.get_html())
+
+        browser.go('http://localhost:6543/route_raise_exception4')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('whoa' in browser.get_html())
 
 class DummyContext(object):
     pass

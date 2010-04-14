@@ -936,7 +936,8 @@ stanza:
 .. code-block:: xml
    :linenos:
 
-   <notfound
+   <view
+     context="repoze.bfg.exceptions.NotFound"
      view="repoze.bfg.views.append_slash_notfound_view"
     />
 

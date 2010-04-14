@@ -1,0 +1,44 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.bfg.includes" />
+
+  <view view=".views.maybe"/>
+
+  <view context=".models.NotAnException"
+        view=".views.no"/>
+
+  <view context=".models.AnException"
+        view=".views.yes"/>
+
+  <view name="raise_exception"
+        view=".views.raise_exception"/>
+
+  <route name="route_raise_exception"
+         path="route_raise_exception"
+         view=".views.raise_exception"/>
+
+  <route name="route_raise_exception2"
+         path="route_raise_exception2"
+         view=".views.raise_exception"
+         factory=".models.route_factory"/>
+
+  <route name="route_raise_exception3"
+         path="route_raise_exception3"
+         view=".views.raise_exception"
+         factory=".models.route_factory2"/>
+
+  <view context=".models.AnException"
+        route_name="route_raise_exception3"
+        view=".views.whoa"/>
+
+  <route name="route_raise_exception4"
+         path="route_raise_exception4"
+         view=".views.raise_exception"/>
+
+  <view context=".models.AnException"
+        route_name="route_raise_exception4"
+        view=".views.whoa"/>
+
+</configure>
+
+

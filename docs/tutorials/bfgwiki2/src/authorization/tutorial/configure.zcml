@@ -53,9 +53,10 @@
      view_permission="edit"
      />
 
-  <forbidden
+  <view
      view=".login.login"
-     renderer="templates/login.pt"/>
+     renderer="templates/login.pt"
+     for="repoze.bfg.exceptions.Forbidden"/>
 
   <authtktauthenticationpolicy
     secret="sosecret"

@@ -18,8 +18,6 @@ from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import IForbiddenView
-from repoze.bfg.interfaces import INotFoundView
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IView
@@ -30,6 +28,8 @@ from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.configuration import Configurator
 from repoze.bfg.exceptions import ConfigurationError
+from repoze.bfg.exceptions import NotFound
+from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import resource_spec_from_abspath
 from repoze.bfg.static import StaticRootFactory
@@ -356,29 +356,52 @@ class ISystemViewDirective(Interface):
         description = u'',
         required=False)
 
-class SystemViewHandler(object):
-    def __init__(self, iface):
-        self.iface = iface
+def notfound(_context,
+             view=None,
+             attr=None,
+             renderer=None,
+             wrapper=None):
 
-    def __call__(self, _context, view=None, attr=None, renderer=None,
-                 wrapper=None):
-        if renderer and '.' in renderer:
-            renderer = path_spec(_context, renderer)
+    if renderer and '.' in renderer:
+        renderer = path_spec(_context, renderer)
 
-        def register(iface=self.iface):
-            reg = get_current_registry()
-            config = Configurator(reg, package=_context.package)
-            config._system_view(iface, view=view, attr=attr, renderer=renderer,
-                                wrapper=wrapper, _info=_context.info)
+    def register():
+        reg = get_current_registry()
+        config = Configurator(reg, package=_context.package)
+        config.set_notfound_view(view=view, attr=attr, renderer=renderer,
+                                 wrapper=wrapper, _info=_context.info)
 
-        _context.action(
-            discriminator = self.iface,
-            callable = register,
-            )
-        
-notfound = SystemViewHandler(INotFoundView)
-forbidden = SystemViewHandler(IForbiddenView)
+    discriminator = ('view', NotFound, '', None, IView, None, None, None,
+                     None, attr, False, None, None, None)
 
+    _context.action(
+        discriminator = discriminator,
+        callable = register,
+        )
+
+def forbidden(_context,
+             view=None,
+             attr=None,
+             renderer=None,
+             wrapper=None):
+
+    if renderer and '.' in renderer:
+        renderer = path_spec(_context, renderer)
+
+    def register():
+        reg = get_current_registry()
+        config = Configurator(reg, package=_context.package)
+        config.set_forbidden_view(view=view, attr=attr, renderer=renderer,
+                                 wrapper=wrapper, _info=_context.info)
+
+    discriminator = ('view', Forbidden, '', None, IView, None, None, None,
+                     None, attr, False, None, None, None)
+
+    _context.action(
+        discriminator = discriminator,
+        callable = register,
+        )
+    
 class IResourceDirective(Interface):
     """
     Directive for specifying that one package may override resources from

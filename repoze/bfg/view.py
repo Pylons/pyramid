@@ -25,6 +25,7 @@ from zope.interface.advice import getFrameInfo
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IViewClassifier
 
 from repoze.bfg.path import caller_package
 from repoze.bfg.path import package_path
@@ -70,7 +71,7 @@ def render_view_to_response(context, request, name='', secure=True):
     was disallowed.
 
     If ``secure`` is ``False``, no permission checking is done."""
-    provides = map(providedBy, (request, context))
+    provides = [IViewClassifier] + map(providedBy, (request, context))
     try:
         reg = request.registry
     except AttributeError:

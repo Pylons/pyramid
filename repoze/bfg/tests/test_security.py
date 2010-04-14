@@ -118,6 +118,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         from repoze.bfg.threadlocal import get_current_registry
         from zope.interface import Interface
         from repoze.bfg.interfaces import ISecuredView
+        from repoze.bfg.interfaces import IViewClassifier
         class Checker(object):
             def __permitted__(self, context, request):
                 self.context = context
@@ -125,7 +126,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
                 return allow
         checker = Checker()
         reg = get_current_registry()
-        reg.registerAdapter(checker, (Interface, Interface),
+        reg.registerAdapter(checker, (IViewClassifier, Interface, Interface),
                             ISecuredView, view_name)
         return checker
 

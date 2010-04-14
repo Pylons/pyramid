@@ -5,6 +5,7 @@ from zope.deprecation import deprecated
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import ISecuredView
+from repoze.bfg.interfaces import IViewClassifier
 
 from repoze.bfg.exceptions import Forbidden as Unauthorized # b/c import
 from repoze.bfg.threadlocal import get_current_registry
@@ -122,7 +123,7 @@ def view_execution_permitted(context, request, name=''):
         reg = request.registry
     except AttributeError:
         reg = get_current_registry() # b/c
-    provides = map(providedBy, (request, context))
+    provides = [IViewClassifier] + map(providedBy, (request, context))
     view = reg.adapters.lookup(provides, ISecuredView, name=name)
     if view is None:
         return Allowed(

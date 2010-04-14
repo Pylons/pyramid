@@ -165,6 +165,8 @@ class Test_route_request_iface(unittest.TestCase):
     def test_it(self):
         iface = self._callFUT('routename')
         self.assertEqual(iface.__name__, 'routename_IRequest')
+        self.assertTrue(hasattr(iface, 'combined'))
+        self.assertEqual(iface.combined.__name__, 'routename_combined_IRequest')
 
 class Test_add_global_response_headers(unittest.TestCase):
     def _callFUT(self, request, headerlist):

@@ -23,6 +23,7 @@ class TestViewDirective(unittest.TestCase):
     def test_request_type_ashttpmethod(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         view = lambda *arg: None
@@ -37,7 +38,8 @@ class TestViewDirective(unittest.TestCase):
         register = action['callable']
         register()
         reg = get_current_registry()
-        wrapper = reg.adapters.lookup((IRequest, IDummy), IView, name='')
+        wrapper = reg.adapters.lookup(
+            (IViewClassifier, IRequest, IDummy), IView, name='')
         request = DummyRequest()
         request.method = 'GET'
         self.assertEqual(wrapper.__predicated__(None, request), True)
@@ -48,6 +50,7 @@ class TestViewDirective(unittest.TestCase):
         from zope.interface import directlyProvides
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRequest
         context = DummyContext(IDummy)
         view = lambda *arg: 'OK'
@@ -61,7 +64,8 @@ class TestViewDirective(unittest.TestCase):
         register = actions[0]['callable']
         register()
         reg = get_current_registry()
-        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
+        regview = reg.adapters.lookup(
+            (IViewClassifier, IRequest, IDummy), IView, name='')
         self.assertNotEqual(view, regview)
         request = DummyRequest()
         directlyProvides(request, IDummy)
@@ -81,6 +85,7 @@ class TestViewDirective(unittest.TestCase):
     def test_with_dotted_renderer(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRendererFactory
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
@@ -100,12 +105,14 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
+        regview = reg.adapters.lookup(
+            (IViewClassifier, IRequest, IDummy), IView, name='')
         self.assertEqual(regview(None, None).body, 'OK')
 
     def test_with_custom_predicates(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         reg = get_current_registry()
@@ -125,12 +132,14 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
+        regview = reg.adapters.lookup(
+            (IViewClassifier, IRequest, IDummy), IView, name='')
         self.assertEqual(regview(None, None), 'OK')
 
     def test_context_trumps_for(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         reg = get_current_registry()
@@ -146,12 +155,14 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
+        regview = reg.adapters.lookup(
+            (IViewClassifier, IRequest, IDummy), IView, name='')
         self.assertEqual(regview(None, None), 'OK')
 
     def test_with_for(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRequest
         context = DummyContext()
         reg = get_current_registry()
@@ -166,7 +177,8 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(actions[0]['discriminator'], discrim)
         register = actions[0]['callable']
         register()
-        regview = reg.adapters.lookup((IRequest, IDummy), IView, name='')
+        regview = reg.adapters.lookup(
+            (IViewClassifier, IRequest, IDummy), IView, name='')
         self.assertEqual(regview(None, None), 'OK')
 
 class TestNotFoundDirective(unittest.TestCase):
@@ -176,13 +188,17 @@ class TestNotFoundDirective(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, context, view):
+    def _callFUT(self, context, view, **kw):
         from repoze.bfg.zcml import notfound
-        return notfound(context, view)
+        return notfound(context, view, **kw)
     
     def test_it(self):
+        from zope.interface import implementedBy
         from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import INotFoundView
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.exceptions import NotFound
 
         context = DummyContext()
         def view(request):
@@ -191,14 +207,48 @@ class TestNotFoundDirective(unittest.TestCase):
         actions = context.actions
         self.assertEqual(len(actions), 1)
 
+        discrim = ('view', NotFound, '', None, IView, None, None, None, None,
+                   None, False, None, None, None)
         regadapt = actions[0]
-        self.assertEqual(regadapt['discriminator'], INotFoundView)
+        self.assertEqual(regadapt['discriminator'], discrim)
         register = regadapt['callable']
         register()
         reg = get_current_registry()
-        derived_view = reg.getUtility(INotFoundView)
+        derived_view = reg.adapters.lookup(
+            (IViewClassifier, IRequest, implementedBy(NotFound)),
+            IView, default=None)
+
+        self.assertNotEqual(derived_view, None)
         self.assertEqual(derived_view(None, None), 'OK')
-        self.assertEqual(derived_view.__name__, view.__name__)
+        self.assertEqual(derived_view.__name__, 'bwcompat_view')
+
+    def test_it_with_dotted_renderer(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.exceptions import NotFound
+        from repoze.bfg.configuration import Configurator
+        context = DummyContext()
+        reg = get_current_registry()
+        config = Configurator(reg)
+        def dummy_renderer_factory(*arg, **kw):
+            return lambda *arg, **kw: 'OK'
+        config.add_renderer('.pt', dummy_renderer_factory)
+        def view(request):
+            return {}
+        self._callFUT(context, view, renderer='fake.pt')
+        actions = context.actions
+        regadapt = actions[0]
+        register = regadapt['callable']
+        register()
+        derived_view = reg.adapters.lookup(
+            (IViewClassifier, IRequest, implementedBy(NotFound)),
+            IView, default=None)
+        self.assertNotEqual(derived_view, None)
+        self.assertEqual(derived_view(None, None).body, 'OK')
+        self.assertEqual(derived_view.__name__, 'bwcompat_view')
 
 class TestForbiddenDirective(unittest.TestCase):
     def setUp(self):
@@ -207,92 +257,67 @@ class TestForbiddenDirective(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, context, view):
+    def _callFUT(self, context, view, **kw):
         from repoze.bfg.zcml import forbidden
-        return forbidden(context, view)
+        return forbidden(context, view, **kw)
     
     def test_it(self):
+        from zope.interface import implementedBy
         from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.exceptions import Forbidden
         context = DummyContext()
         def view(request):
             return 'OK'
         self._callFUT(context, view)
         actions = context.actions
-        from repoze.bfg.interfaces import IForbiddenView
 
         self.assertEqual(len(actions), 1)
 
+        discrim = ('view', Forbidden, '', None, IView, None, None, None, None,
+                   None, False, None, None, None)
         regadapt = actions[0]
-        self.assertEqual(regadapt['discriminator'], IForbiddenView)
+        self.assertEqual(regadapt['discriminator'], discrim)
         register = regadapt['callable']
         register()
         reg = get_current_registry()
-        derived_view = reg.getUtility(IForbiddenView)
+        derived_view = reg.adapters.lookup(
+            (IViewClassifier, IRequest, implementedBy(Forbidden)),
+            IView, default=None)
+
+        self.assertNotEqual(derived_view, None)
         self.assertEqual(derived_view(None, None), 'OK')
-        self.assertEqual(derived_view.__name__, view.__name__)
+        self.assertEqual(derived_view.__name__, 'bwcompat_view')
 
-class TestSystemViewHandler(unittest.TestCase):
-    def setUp(self):
-        testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def _makeOne(self, iface):
-        from repoze.bfg.zcml import SystemViewHandler
-        return SystemViewHandler(iface)
-
-    def test_no_view_no_renderer(self):
-        handler = self._makeOne(IDummy)
-        from repoze.bfg.exceptions import ConfigurationError
-        context = DummyContext()
-        handler(context)
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        regadapt = actions[0]
-        self.assertEqual(regadapt['discriminator'], IDummy)
-        register = regadapt['callable']
-        self.assertRaises(ConfigurationError, register)
-    
-    def test_no_view_with_renderer(self):
+    def test_it_with_dotted_renderer(self):
+        from zope.interface import implementedBy
         from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRendererFactory
-        reg = get_current_registry()
-        def renderer(path):
-            return lambda *arg: 'OK'
-        reg.registerUtility(renderer, IRendererFactory, name='dummy')
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.exceptions import Forbidden
+        from repoze.bfg.configuration import Configurator
         context = DummyContext()
-        handler = self._makeOne(IDummy)
-        handler(context, renderer='dummy')
+        reg = get_current_registry()
+        config = Configurator(reg)
+        def dummy_renderer_factory(*arg, **kw):
+            return lambda *arg, **kw: 'OK'
+        config.add_renderer('.pt', dummy_renderer_factory)
+        def view(request):
+            return {}
+        self._callFUT(context, view, renderer='fake.pt')
         actions = context.actions
-        self.assertEqual(len(actions), 1)
         regadapt = actions[0]
-        self.assertEqual(regadapt['discriminator'], IDummy)
         register = regadapt['callable']
         register()
-        derived_view = reg.getUtility(IDummy)
-        request = DummyRequest()
-        self.assertEqual(derived_view(None, request).body, 'OK')
-
-    def test_template_renderer(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRendererFactory
-        reg = get_current_registry()
-        def renderer(path):
-            return lambda *arg: 'OK'
-        reg.registerUtility(renderer, IRendererFactory, name='.pt')
-        context = DummyContext()
-        handler = self._makeOne(IDummy)
-        handler(context, renderer='fixtures/minimal.pt')
-        actions = context.actions
-        self.assertEqual(len(actions), 1)
-        regadapt = actions[0]
-        self.assertEqual(regadapt['discriminator'], IDummy)
-        register = regadapt['callable']
-        register()
-        derived_view = reg.getUtility(IDummy)
-        request = DummyRequest()
-        self.assertEqual(derived_view(None, request).body, 'OK')
+        derived_view = reg.adapters.lookup(
+            (IViewClassifier, IRequest, implementedBy(Forbidden)),
+            IView, default=None)
+        self.assertNotEqual(derived_view, None)
+        self.assertEqual(derived_view(None, None).body, 'OK')
+        self.assertEqual(derived_view.__name__, 'bwcompat_view')
 
 class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
     def setUp(self):
@@ -506,6 +531,7 @@ class TestRouteDirective(unittest.TestCase):
         from repoze.bfg.threadlocal import get_current_registry
         from zope.interface import Interface
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRouteRequest
         context = DummyContext()
         view = lambda *arg: 'OK'
@@ -526,12 +552,14 @@ class TestRouteDirective(unittest.TestCase):
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', None, IView, 'name', None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = reg.adapters.lookup((request_type, Interface), IView, name='')
+        wrapped = reg.adapters.lookup(
+            (IViewClassifier, request_type, Interface), IView, name='')
         self.failUnless(wrapped)
 
     def test_with_view_and_view_context(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRouteRequest
         context = DummyContext()
         view = lambda *arg: 'OK'
@@ -552,12 +580,14 @@ class TestRouteDirective(unittest.TestCase):
         view_discriminator = view_action['discriminator']
         discrim = ('view', IDummy, '', None, IView, 'name', None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = reg.adapters.lookup((request_type, IDummy), IView, name='')
+        wrapped = reg.adapters.lookup(
+            (IViewClassifier, request_type, IDummy), IView, name='')
         self.failUnless(wrapped)
 
     def test_with_view_context_trumps_view_for(self):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRouteRequest
         context = DummyContext()
         view = lambda *arg: 'OK'
@@ -581,7 +611,8 @@ class TestRouteDirective(unittest.TestCase):
         view_discriminator = view_action['discriminator']
         discrim = ('view', IDummy, '', None, IView, 'name', None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = reg.adapters.lookup((request_type, IDummy), IView, name='')
+        wrapped = reg.adapters.lookup(
+            (IViewClassifier, request_type, IDummy), IView, name='')
         self.failUnless(wrapped)
 
     def test_with_dotted_renderer(self):
@@ -589,9 +620,8 @@ class TestRouteDirective(unittest.TestCase):
         from repoze.bfg.threadlocal import get_current_registry
         from zope.interface import Interface
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRouteRequest
-
-
         from repoze.bfg.interfaces import IRendererFactory
         reg = get_current_registry()
         def renderer(path):
@@ -617,7 +647,8 @@ class TestRouteDirective(unittest.TestCase):
         view_discriminator = view_action['discriminator']
         discrim = ('view', None, '', None, IView, 'name', None)
         self.assertEqual(view_discriminator, discrim)
-        wrapped = reg.adapters.lookup((request_type, Interface), IView, name='')
+        wrapped = reg.adapters.lookup(
+            (IViewClassifier, request_type, Interface), IView, name='')
         self.failUnless(wrapped)
         request = DummyRequest()
         result = wrapped(None, request)
@@ -658,6 +689,7 @@ class TestStaticDirective(unittest.TestCase):
         from zope.interface import implementedBy
         from repoze.bfg.static import StaticRootFactory
         from repoze.bfg.interfaces import IView
+        from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRouteRequest
         from repoze.bfg.interfaces import IRoutesMapper
         context = DummyContext()
@@ -684,7 +716,8 @@ class TestStaticDirective(unittest.TestCase):
         self.assertEqual(discriminator[4], IView)
         iface = implementedBy(StaticRootFactory)
         request_type = reg.getUtility(IRouteRequest, 'name')
-        view = reg.adapters.lookup((request_type, iface), IView, name='')
+        view = reg.adapters.lookup(
+            (IViewClassifier, request_type, iface), IView, name='')
         request = DummyRequest()
         self.assertEqual(view(None, request).__class__, PackageURLParser)
 

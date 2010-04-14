@@ -14,6 +14,7 @@ from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import IView
+from repoze.bfg.interfaces import IViewClassifier
 from repoze.bfg.interfaces import IViewPermission
 
 from repoze.bfg.configuration import Configurator
@@ -165,6 +166,7 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
        :meth:`repoze.bfg.configuration.Configurator.add_view``
        method in your unit and integration tests.
     """
+    for_ = (IViewClassifier, ) + for_
     if view is None:
         def view(context, request):
             return Response(result)

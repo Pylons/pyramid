@@ -133,7 +133,7 @@ represent the method expected to return a response, you can use an
 
 .. _request_and_context_view_definitions:
 
-Request-And-Context View Callable Definitions
+Context-And-Request View Callable Definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Usually, view callables are defined to accept only a single argument:
@@ -813,6 +813,8 @@ See also :ref:`renderer_directive` and
 .. index::
    single: view exceptions
 
+.. _special_exceptions_in_callables:
+
 Using Special Exceptions In View Callables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -836,7 +838,92 @@ agent which performed the request.
 
 In all cases, the message provided to the exception constructor is
 made available to the view which :mod:`repoze.bfg` invokes as
-``request.environ['repoze.bfg.message']``.
+``request.exception.args[0]``.
+
+Exception Views
+~~~~~~~~~~~~~~~~
+
+The machinery which allows the special
+:exc:`repoze.bfg.exceptions.NotFound` and
+:exc:`repoze.bfg.exceptions.Forbidden` exceptions to be caught by
+specialized views as described in
+:ref:`special_exceptions_in_callables` can also be used by application
+developers to convert arbitrary exceptions to responses.
+
+To register a view that should be called whenever a particular
+exception is raised from with :mod:`repoze.bfg` view code, use the
+exception class or one of its superclasses as the ``context`` of a
+view configuration which points at a view callable you'd like to
+generate a response.
+
+For example, given the following exception class in a module named
+``helloworld.exceptions``:
+
+.. code-block:: python
+   :linenos:
+
+   class ValidationFailure(Exception):
+       def __init__(self, msg):
+           self.msg = msg
+
+
+You can wire a view callable to be called whenever any of your *other*
+code raises a ``hellworld.exceptions.ValidationFailure`` exception:
+
+.. code-block:: python
+   :linenos:
+
+   from helloworld.exceptions import ValidationFailure
+
+   @bfg_view(context=ValidationFailure)
+   def failed_validation(exc, request):
+       response =  Response('Failed validation: %s' % exc.msg)
+       response.status_int = 500
+       return response
+
+Assuming that a :term:`scan` was run to pick up this view
+registration, this view callable will be invoked whenever a
+``helloworld.exceptions.ValidationError`` is raised by your
+application's view code.  The same exception raised by a custom root
+factory or a custom traverser is also caught and hooked.
+
+Other normal view predicates can also be used in combination with an
+exception view registration:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.view import bfg_view
+   from repoze.bfg.exceptions import NotFound
+   from webob.exc import HTTPNotFound
+
+   @bfg_view(context=NotFound, route_name='home')
+   def notfound_view(request):
+       return HTTPNotFound()
+
+The above exception view names the ``route_name`` of ``home``, meaning
+that it will only be called when the route matched has a name of
+``home``.  You can therefore have more than one exception view for any
+given exception in the system: the "most specific" one will be called
+when the set of request circumstances which match the view
+registration.
+
+The only view predicate that cannot be not be used successfully when
+creating an exception view configuration is ``name``.  The name used
+to look up an exception view is always the empty string.  Views
+registered as exception views which have a name will be ignored.
+
+.. note::
+
+  Normal (non-exception) views registered against a context which
+  inherits from :exc:`Exception` will work normally.  When an
+  exception view configuraton is processed, *two* exceptions are
+  registered.  One as a "normal" view, the other as an "exception"
+  view.  This means that you can use an exception as ``context`` for a
+  normal view.
+
+The feature can be used with any view registration mechanism
+(``@bfg_view`` decorator, ZCML, or imperative ``add_view`` styles).
 
 .. index::
    single: unicode, views, and forms
