@@ -66,6 +66,11 @@ Internal
   arguments instead of two to accomodate orthogonality of exception
   views.
 
+- The ``repoze.bfg.interfaces.IForbiddenView`` and
+  ``repoze.bfg.interfaces.INotFoundView`` interfaces were removed;
+  they weren't APIs and they became vestigial with the addition of
+  exception views.
+
 Documentation
 -------------
 
