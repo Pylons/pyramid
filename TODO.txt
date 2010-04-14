@@ -23,15 +23,6 @@
       with IRequest, but more special context interfaces (see integration tests
       with hybridapp for route9).
 
-- Exception view backwards compat / features:
-
-  - Add an "exception" attr to the request before calling an exception
-    view.
-
-  - Register wrapper views within set_notfound_view and
-    set_forbidden_view (and ZCML if it doesn't call those) so that
-    "context" is either the "real" context or None.
-
 - Use Venusian for decorator scanning (fix Venusian to have scan
   categories first).
 
