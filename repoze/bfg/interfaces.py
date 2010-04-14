@@ -213,29 +213,6 @@ class IRoutesMapper(Interface):
         """ Return a matchdict for the request; the ``route`` key will
         either be a Route object or ``None`` if no route matched."""
 
-class IForbiddenView(Interface):
-    """ A utility which returns an IResponse as the result of the
-    denial of a view invocation by a security policy."""
-    def __call__(context, request):
-        """ Return an object implementing IResponse (an object with
-        the status, headerlist, and app_iter attributes) as a result
-        of a view invocation denial by a security policy.
-        
-        Note that the ``message`` key in the WSGI environ
-        (request.environ) provides information pertaining to the
-        reason for the view invocation denial.  The ``context`` passed
-        to the forbidden app factory will be the context found by the
-        repoze.bfg router during traversal or url dispatch.  The
-        ``request`` will be the request object which caused the deny."""
-
-class INotFoundView(Interface):
-    """ A utility which returns a NotFound response (an IResponse)
-    when a view cannot be located for a particular URL"""
-    def __call__(context, request):
-        """ Return a NotFound response.  When the view is rendered,
-        a``message`` key in the WSGI environ provides information
-        pertaining to the reason for the notfound error."""
-
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.
     """

@@ -7,8 +7,6 @@
 
 - Basic WSGI documentation (pipeline / app / server).
 
-- Decide on INotFoundView and IForbidden interface, which are obsolete now.
-
 - Document exception view lookup machinery:
 
     - Lookup proceeds by request interface first and then by interface provided
