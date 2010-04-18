@@ -489,6 +489,9 @@ class bfg_view(object):
         info = self.venusian.attach(wrapped, callback, category='bfg')
 
         if info.scope == 'class':
+            # if the decorator was attached to a method in a class, or
+            # otherwise executed at class scope, we need to set an
+            # 'attr' into the settings if one isn't already in there
             if settings['attr'] is None:
                 settings['attr'] = wrapped.__name__
 
