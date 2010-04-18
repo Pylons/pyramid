@@ -40,7 +40,7 @@
 
      .. automethod:: override_resource(to_override, override_with)
 
-     .. automethod:: scan(package)
+     .. automethod:: scan(package=None, categories=None)
 
      .. automethod:: set_forbidden_view(view=None, attr=None, renderer=None, wrapper=None)
 

@@ -582,7 +582,7 @@ def scan(_context, package):
     _context.action(
         discriminator=None,
         callable=config.scan,
-        args=(package, _context.info)
+        args=(package, None, _context.info)
         )
 
 class IAdapterDirective(Interface):

@@ -51,6 +51,12 @@ Features
 
   This feature was kindly contributed by Andrey Popp.
 
+- Use "Venusian" (`http://docs.repoze.org/venusian
+  <http://docs.repoze.org/venusian>`) to perform ``bfg_view``
+  decorator scanning rather than relying on a BFG-internal decorator
+  scanner.  (Truth be told, Venusian is really just a generalization
+  of the BFG-internal decorator scanner).
+
 Deprecations
 ------------
 
@@ -60,6 +66,12 @@ Deprecations
    directives.  Those methods and directives will continue to work for
    the foreseeable future, but they are deprecated in the
    documentation.
+
+Dependencies
+------------
+
+- A new install-time dependency on the ``venusian`` distribution was
+  added.
 
 Internal
 --------
@@ -72,6 +84,11 @@ Internal
   ``repoze.bfg.interfaces.INotFoundView`` interfaces were removed;
   they weren't APIs and they became vestigial with the addition of
   exception views.
+
+- Remove ``repoze.bfg.compat.pkgutil_26.py`` and import alias
+  ``repoze.bfg.compat.walk_packages``.  These were only required by
+  internal scanning machinery; Venusian replaced the internal scanning
+  machinery, so these are no longer required.
 
 Documentation
 -------------

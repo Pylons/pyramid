@@ -38,6 +38,7 @@ install_requires=[
     'zope.configuration',
     'zope.deprecation',
     'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
+    'venusian >= 0.2',
     ]
 
 if sys.version_info[:2] < (2, 6):

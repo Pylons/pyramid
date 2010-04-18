@@ -6,6 +6,7 @@ import types
 import inspect
 
 from webob import Response
+import venusian
 
 from zope.configuration import xmlconfig
 
@@ -40,7 +41,6 @@ from repoze.bfg import renderers
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.compat import all
 from repoze.bfg.compat import md5
-from repoze.bfg.compat import walk_packages
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
@@ -138,6 +138,7 @@ class Configurator(object):
     log warnings and authorization debugging information.  """
     
     manager = manager # for testing injection
+    venusian = venusian # for testing injection
     def __init__(self, registry=None, package=None, settings=None,
                  root_factory=None, authentication_policy=None,
                  authorization_policy=None, renderers=DEFAULT_RENDERERS,
@@ -1103,7 +1104,7 @@ class Configurator(object):
             self.registry.registerUtility(mapper, IRoutesMapper)
         mapper.connect(path, name, factory, predicates=predicates)
 
-    def scan(self, package=None, _info=u''):
+    def scan(self, package=None, categories=None, _info=u''):
         """ Scan a Python package and any of its subpackages for
         objects marked with :term:`configuration decoration` such as
         :class:`repoze.bfg.view.bfg_view`.  Any decorated object found
@@ -1112,27 +1113,29 @@ class Configurator(object):
         The ``package`` argument should be a reference to a Python
         :term:`package` or module object.  If ``package`` is ``None``,
         the package of the *caller* is used.
+
+        The ``categories`` argument, if provided, should be the
+        :term:`Venusian` 'scan categories' to use during scanning.
+        Providing this argument is not often necessary; specifying
+        scan categories is an extremely advanced usage.
+
+        By default, ``categories`` is ``None`` which will execute
+        *all* Venusian decorator callbacks including
+        :mod:`repoze.bfg`-related decorators such as ``bfg_view``.  If
+        this is not desirable because the codebase has other
+        Venusian-using decorators that aren't meant to be invoked
+        during a particular scan, use ``('bfg',)`` as a ``categories``
+        value to limit the execution of decorator callbacks to only
+        those registered by :mod:`repoze.bfg` itself.  Or pass a
+        sequence of Venusian scan categories as necessary
+        (e.g. ``('bfg', 'myframework')``) to limit the decorators
+        called to the set of categories required.
         """
         if package is None: # pragma: no cover
             package = caller_package()
 
-        def register_decorations(name, ob):
-            settings = getattr(ob, '__bfg_view_settings__', None)
-            if settings is not None:
-                for setting in settings:
-                    self.add_view(view=ob, _info=_info, **setting)
-            
-        for name, ob in inspect.getmembers(package):
-            register_decorations(name, ob)
-
-        if hasattr(package, '__path__'): # package, not module
-            results = walk_packages(package.__path__, package.__name__+'.')
-
-            for importer, modname, ispkg in results:
-                __import__(modname)
-                module = sys.modules[modname]
-                for name, ob in inspect.getmembers(module, None):
-                    register_decorations(name, ob)
+        scanner = self.venusian.Scanner(config=self)
+        scanner.scan(package, categories=categories)
 
     def add_renderer(self, name, factory, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`renderer` factory to the current

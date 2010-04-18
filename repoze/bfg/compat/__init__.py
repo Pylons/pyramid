@@ -136,11 +136,6 @@ except ImportError: # pragma: no cover
     import simplejson as json
 
 try:
-    from pkgutil import walk_packages
-except ImportError: #pragma: no cover
-    from pkgutil_26 import walk_packages
-
-try:
     from hashlib import md5
 except ImportError: # pragma: no cover
     import md5

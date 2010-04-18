@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 from repoze.bfg.testing import cleanUp
 
@@ -302,100 +303,109 @@ class TestBFGViewDecorator(unittest.TestCase):
         
     def test_call_function(self):
         decorator = self._makeOne()
-        def foo():
-            """ docstring """
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__[0]
-        self.assertEqual(settings['permission'], None)
-        self.assertEqual(settings['context'], None)
-        self.assertEqual(settings['request_type'], None)
+        settings = call_venusian(venusian)
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(settings[0]['permission'], None)
+        self.assertEqual(settings[0]['context'], None)
+        self.assertEqual(settings[0]['request_type'], None)
 
-    def test_call_oldstyle_class(self):
+    def test_call_class(self):
         decorator = self._makeOne()
-        class foo:
-            """ docstring """
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        decorator.venusian.info.scope = 'class'
+        class foo(object): pass
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__[0]
-        self.assertEqual(settings['permission'], None)
-        self.assertEqual(settings['context'], None)
-        self.assertEqual(settings['request_type'], None)
-
-    def test_call_newstyle_class(self):
-        decorator = self._makeOne()
-        class foo(object):
-            """ docstring """
-        wrapped = decorator(foo)
-        self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__[0]
-        self.assertEqual(settings['permission'], None)
-        self.assertEqual(settings['context'], None)
-        self.assertEqual(settings['request_type'], None)
+        settings = call_venusian(venusian)
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(settings[0]['permission'], None)
+        self.assertEqual(settings[0]['context'], None)
+        self.assertEqual(settings[0]['request_type'], None)
 
     def test_stacking(self):
         decorator1 = self._makeOne(name='1')
+        venusian1 = DummyVenusian()
+        decorator1.venusian = venusian1
+        venusian2 = DummyVenusian()
         decorator2 = self._makeOne(name='2')
-        def foo():
-            """ docstring """
+        decorator2.venusian = venusian2
+        def foo(): pass
         wrapped1 = decorator1(foo)
         wrapped2 = decorator2(wrapped1)
         self.failUnless(wrapped1 is foo)
         self.failUnless(wrapped2 is foo)
-        self.assertEqual(len(foo.__bfg_view_settings__), 2)
-        settings1 = foo.__bfg_view_settings__[0]
-        self.assertEqual(settings1['name'], '1')
-        settings2 = foo.__bfg_view_settings__[1]
-        self.assertEqual(settings2['name'], '2')
+        settings1 = call_venusian(venusian1)
+        self.assertEqual(len(settings1), 1)
+        self.assertEqual(settings1[0]['name'], '1')
+        settings2 = call_venusian(venusian2)
+        self.assertEqual(len(settings2), 1)
+        self.assertEqual(settings2[0]['name'], '2')
 
     def test_call_as_method(self):
         decorator = self._makeOne()
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        decorator.venusian.info.scope = 'class'
         def foo(self): pass
         def bar(self): pass
         class foo(object):
-            """ docstring """
             foomethod = decorator(foo)
             barmethod = decorator(bar)
-        settings = foo.__bfg_view_settings__
+        settings = call_venusian(venusian)
         self.assertEqual(len(settings), 2)
         self.assertEqual(settings[0]['attr'], 'foo')
         self.assertEqual(settings[1]['attr'], 'bar')
 
     def test_with_custom_predicates(self):
         decorator = self._makeOne(custom_predicates=(1,))
-        def foo(context, request): return 'OK'
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(context, request): pass
         decorated = decorator(foo)
-        settings = decorated.__bfg_view_settings__
+        self.failUnless(decorated is foo)
+        settings = call_venusian(venusian)
         self.assertEqual(settings[0]['custom_predicates'], (1,))
 
     def test_call_with_renderer_nodot(self):
         decorator = self._makeOne(renderer='json')
-        def foo():
-            """ docstring """
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__[0]
-        self.assertEqual(settings['renderer'], 'json')
+        settings = call_venusian(venusian)
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(settings[0]['renderer'], 'json')
 
     def test_call_with_renderer_relpath(self):
         decorator = self._makeOne(renderer='fixtures/minimal.pt')
-        def foo():
-            """ docstring """
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__[0]
-        self.assertEqual(settings['renderer'],
+        settings = call_venusian(venusian)
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(settings[0]['renderer'],
                          'repoze.bfg.tests:fixtures/minimal.pt')
 
     def test_call_with_renderer_pkgpath(self):
         decorator = self._makeOne(
             renderer='repoze.bfg.tests:fixtures/minimal.pt')
-        def foo():
-            """ docstring """
+        venusian = DummyVenusian()
+        decorator.venusian = venusian
+        def foo(): pass
         wrapped = decorator(foo)
         self.failUnless(wrapped is foo)
-        settings = wrapped.__bfg_view_settings__[0]
-        self.assertEqual(settings['renderer'],
+        settings = call_venusian(venusian)
+        self.assertEqual(len(settings), 1)
+        self.assertEqual(settings[0]['renderer'],
                          'repoze.bfg.tests:fixtures/minimal.pt')
 
 class TestDefaultForbiddenView(BaseTest, unittest.TestCase):
@@ -521,3 +531,36 @@ class DummyResponse:
 from zope.interface import Interface
 class IContext(Interface):
     pass
+
+class DummyVenusianInfo(object):
+    scope = 'notaclass'
+    module = sys.modules['repoze.bfg.tests']
+
+class DummyVenusian(object):
+    def __init__(self, info=None):
+        if info is None:
+            info = DummyVenusianInfo()
+        self.info = info
+        self.attachments = []
+
+    def attach(self, wrapped, callback, category=None):
+        self.attachments.append((wrapped, callback, category))
+        return self.info
+
+class DummyConfig(object):
+    def __init__(self):
+        self.settings = []
+
+    def add_view(self, **kw):
+        self.settings.append(kw)
+
+class DummyVenusianContext(object):
+    def __init__(self):
+        self.config = DummyConfig()
+        
+def call_venusian(venusian):
+    context = DummyVenusianContext()
+    for wrapped, callback, category in venusian.attachments:
+        callback(context, None, None)
+    return context.config.settings
+

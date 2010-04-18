@@ -20,8 +20,9 @@ def wsgiapptest(environ, start_response):
 
 class WGSIAppPlusBFGViewTests(unittest.TestCase):
     def test_it(self):
+        from venusian import ATTACH_ATTR
         import types
-        self.failUnless(wsgiapptest.__bfg_view_settings__)
+        self.failUnless(getattr(wsgiapptest, ATTACH_ATTR))
         self.failUnless(type(wsgiapptest) is types.FunctionType)
         context = DummyContext()
         request = DummyRequest()

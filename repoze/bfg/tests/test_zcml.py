@@ -837,8 +837,7 @@ class TestZCMLScanDirective(unittest.TestCase):
         action = actions[0]
         self.assertEqual(action['callable'].im_func, Configurator.scan.im_func)
         self.assertEqual(action['discriminator'], None)
-        self.assertEqual(action['args'], (dummy_module, None))
-
+        self.assertEqual(action['args'], (dummy_module, None, None))
 
 class TestAdapterDirective(unittest.TestCase):
     def setUp(self):

@@ -1,7 +1,6 @@
 import cgi
 import mimetypes
 import os
-import sys
 
 # See http://bugs.python.org/issue5853 which is a recursion bug
 # that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
@@ -16,11 +15,12 @@ if hasattr(mimetypes, 'init'):
 from webob import Response
 from webob.exc import HTTPFound
 
+import venusian
+
 from paste.urlparser import StaticURLParser
 
 from zope.deprecation import deprecated
 from zope.interface import providedBy
-from zope.interface.advice import getFrameInfo
 
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRoutesMapper
@@ -457,6 +457,7 @@ class bfg_view(object):
 
       config.scan()
     """
+    venusian = venusian # for testing injection
     def __init__(self, name='', request_type=None, for_=None, permission=None,
                  route_name=None, request_method=None, request_param=None,
                  containment=None, attr=None, renderer=None, wrapper=None,
@@ -480,34 +481,30 @@ class bfg_view(object):
         self.custom_predicates = custom_predicates
 
     def __call__(self, wrapped):
-        setting = self.__dict__.copy()
-        frame = sys._getframe(1)
-        scope, module, f_locals, f_globals = getFrameInfo(frame)
-        if scope == 'class':
-            # we're in the midst of a class statement; the setdefault
-            # below actually adds a __bfg_view_settings__ attr to the
-            # class __dict__ if one does not already exist
-            settings = f_locals.setdefault('__bfg_view_settings__', [])
-            if setting['attr'] is None:
-                setting['attr'] = wrapped.__name__
-        else:
-            settings = getattr(wrapped, '__bfg_view_settings__', [])
-            wrapped.__bfg_view_settings__ = settings
+        settings = self.__dict__.copy()
+
+        def callback(context, name, ob):
+            context.config.add_view(view=ob, **settings)
+
+        info = self.venusian.attach(wrapped, callback, category='bfg')
+
+        if info.scope == 'class':
+            if settings['attr'] is None:
+                settings['attr'] = wrapped.__name__
 
         # try to convert the renderer provided into a fully qualified
         # resource specification
-        abspath = setting.get('renderer')
+        abspath = settings.get('renderer')
         if abspath is not None and '.' in abspath:
             isabs = os.path.isabs(abspath)
             if not (':' in abspath and not isabs):
                 # not already a resource spec
                 if not isabs:
-                    pp = package_path(module)
+                    pp = package_path(info.module)
                     abspath = os.path.join(pp, abspath)
-                resource = resource_spec_from_abspath(abspath, module)
-                setting['renderer'] = resource
+                resource = resource_spec_from_abspath(abspath, info.module)
+                settings['renderer'] = resource
 
-        settings.append(setting)
         return wrapped
 
 def default_view(context, request, status):
