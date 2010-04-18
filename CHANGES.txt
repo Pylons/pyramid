@@ -52,7 +52,7 @@ Features
   This feature was kindly contributed by Andrey Popp.
 
 - Use "Venusian" (`http://docs.repoze.org/venusian
-  <http://docs.repoze.org/venusian>`) to perform ``bfg_view``
+  <http://docs.repoze.org/venusian>`_) to perform ``bfg_view``
   decorator scanning rather than relying on a BFG-internal decorator
   scanner.  (Truth be told, Venusian is really just a generalization
   of the BFG-internal decorator scanner).
