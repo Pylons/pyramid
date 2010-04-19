@@ -22,7 +22,7 @@ Features
   returned.
 
   Other normal view predicates can also be used in combination with an
-  exception view registration:
+  exception view registration::
 
       from repoze.bfg.view import bfg_view
       from repoze.bfg.exceptions import NotFound

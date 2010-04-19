@@ -265,6 +265,15 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
+    def test_setup_registry_translator_factory(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import ITranslatorFactory
+        factory = object()
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(translator_factory=factory)
+        self.assertEqual(reg.getUtility(ITranslatorFactory), factory)
+
     def test_add_settings_settings_already_registered(self):
         from repoze.bfg.registry import Registry
         from repoze.bfg.interfaces import ISettings
@@ -1726,6 +1735,14 @@ class ConfiguratorTests(unittest.TestCase):
             (IViewClassifier, request_type, iface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
+
+    def test_set_translator_factory(self):
+        from repoze.bfg.interfaces import ITranslatorFactory
+        def factory(): pass
+        config = self._makeOne()
+        config.set_translator_factory(factory)
+        self.assertEqual(config.registry.getUtility(ITranslatorFactory),
+                         factory)
 
     def test_set_notfound_view(self):
         from zope.interface import implementedBy

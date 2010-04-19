@@ -31,6 +31,7 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITemplateRenderer
+from repoze.bfg.interfaces import ITranslatorFactory
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewClassifier
@@ -135,14 +136,23 @@ class Configurator(object):
     logs to stderr will be used.  If it is passed, it should be an
     instance of the :class:`logging.Logger` (PEP 282) standard library
     class.  The debug logger is used by :mod:`repoze.bfg` itself to
-    log warnings and authorization debugging information.  """
+    log warnings and authorization debugging information.
+
+    If ``translator_factory`` is passed, it should be a
+    :term:`translator factory` object.  A translator factory is an
+    object which accepts a request and which returns a translation
+    function.  The translation function accepts a :term:`translation
+    string` and returns a Unicode object representing the translated
+    string.  The default for ``translator_factory`` is ``None``,
+    meaning that no translation is performed during template
+    rendering.  """
     
     manager = manager # for testing injection
     venusian = venusian # for testing injection
     def __init__(self, registry=None, package=None, settings=None,
                  root_factory=None, authentication_policy=None,
                  authorization_policy=None, renderers=DEFAULT_RENDERERS,
-                 debug_logger=None):
+                 debug_logger=None, translator_factory=None):
         self.package = package or caller_package()
         self.registry = registry
         if registry is None:
@@ -154,7 +164,8 @@ class Configurator(object):
                 authentication_policy=authentication_policy,
                 authorization_policy=authorization_policy,
                 renderers=renderers,
-                debug_logger=debug_logger)
+                debug_logger=debug_logger,
+                translator_factory=translator_factory)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -270,7 +281,8 @@ class Configurator(object):
 
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
-                       renderers=DEFAULT_RENDERERS, debug_logger=None):
+                       renderers=DEFAULT_RENDERERS, debug_logger=None,
+                       translator_factory=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
@@ -304,6 +316,8 @@ class Configurator(object):
             self.add_renderer(name, renderer)
         self.set_notfound_view(default_notfound_view)
         self.set_forbidden_view(default_forbidden_view)
+        if translator_factory is not None:
+            self.set_translator_factory(translator_factory)
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -1225,10 +1239,6 @@ class Configurator(object):
            found via context-finding or ``None`` if no context could
            be found.  The exception causing the registered view to be
            called is however still available as ``request.exception``.
-        .. warning:: This method has been deprecated in
-           :mod:`repoze.bfg` 1.3.  See
-           :ref:`changing_the_forbidden_view` to see how a not found
-           view should be registered in :mod:`repoze.bfg` 1.3+.
 
         The ``view`` argument should be a :term:`view callable`.
 
@@ -1298,6 +1308,11 @@ class Configurator(object):
             return view(ctx, request)
         return self.add_view(bwcompat_view, context=NotFound,
                              wrapper=wrapper, _info=_info)
+
+    def set_translator_factory(self, factory):
+        """ Set ``factory`` up as the current application
+        :term:`translator factory` (for internationalization)"""
+        self.registry.registerUtility(factory, ITranslatorFactory)
 
     def add_static_view(self, name, path, cache_max_age=3600, _info=u''):
         """ Add a view used to render static resources to the current

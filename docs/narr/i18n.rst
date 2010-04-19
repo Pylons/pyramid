@@ -1,0 +1,36 @@
+.. index::
+   single: i18n
+   single: internationalization
+
+.. _i18n_chapter:
+
+Using Internationalization
+==========================
+
+Setting Up Translation
+----------------------
+
+Pass a :term:`translator factory` object to your application's
+:mod:`repoze.bfg.configuration.Configurator` by supplying it with a
+``translator_factory`` argument.  A translator factory is an object
+which accepts a :term:`request` and which returns a callable.  The
+callable returned by a translator factory is a :term:`translator`; it
+must accept a single positional argument which represents a
+:term:`translation string` and should return a fully expanded
+translation of the translation string.
+
+The exact operation of a translator is left to the implementor of a
+particular translation factory.
+
+Obtaining the Translator via :func:`repoze.bfg.i18n.get_translator`
+--------------------------------------------------------------------
+
+If you need to perform translation "by hand" in an application, use
+the :func:`repoze.bfg.i18n.get_translator` function to obtain a
+translator.  A translator is a callable which accepts either a
+:term:`translation string` or a normal Unicode object and which
+returns a Unicode object representing the translation.
+
+XXX
+
+

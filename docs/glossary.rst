@@ -667,3 +667,27 @@ Glossary
      at import time, the action usually taken by the decorator is
      deferred until a separate "scan" phase.  :mod:`repoze.bfg` relies
      on Venusian to provide a basis for its :term:`scan` feature.
+
+   Translation String
+     An instance of the :class:`repoze.bfg.i18n.TranslationString`,
+     which is a class that behaves like a Unicode string, but has
+     several extra attributes such as ``domain``, ``msgid``, and
+     ``mapping`` for use during translation.  Translation strings are
+     usually created by hand within software, but are sometimes
+     created on the behalf of the system for automatic template
+     translation.  For more information, see :ref:`i18n_chapter`.
+
+   Translator
+     A callable which receives a :term:`translation string` and
+     returns a translated Unicode object for the purposes of
+     internationalization.  A translator may be suppled to a
+     :mod:`repoze.bfg` application at startup time indirectly via the
+     ``translator_factory`` function, which is a :term:`translator
+     factory`.
+
+   Translator Factory
+     A callable which receives a :term:`request` and returns a
+     :term:`translator` for the purposes of internationalization.  A
+     translator factory may be suppled to a :mod:`repoze.bfg`
+     application at startup time via the ``translator_factory``
+     function.
