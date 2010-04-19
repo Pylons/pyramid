@@ -126,17 +126,22 @@ def get_translator(request, translator_factory=None):
     return translator
 
 class InterpolationOnlyTranslator(object):
+
     """ A class implementing the :term:`translator factory` interface
     as its constructor and the :term:`translator` interface as its
     ``__call__`` method.  Useful as a minimal translator factory, this
     class only does basic interpolation of mapping values; it does not
-    actually do any language translations.  Use::
+    actually do any language translations and ignores all
+    :term:`translation domain` information. To use it explicitly::
 
         from repoze.bfg.configuration import Configurator
         from repoze.bfg.i18n import InterpolationOnlyTranslator
         config = Configurator(translator_factory=InterpolationOnlyTranslator)
 
-        """
+    An instance of this class is returned by
+    :func:`repoze.bfg.i18n.get_translator` if no explicit translator
+    factory is registered.
+    """
     classProvides(ITranslatorFactory)
     implements(ITranslator)
     def __init__(self, request):
