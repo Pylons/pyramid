@@ -18,6 +18,9 @@ from zope.interface import implements
 from zope.interface import classProvides
 
 from zope.i18nmessageid.message import Message
+from zope.i18nmessageid import MessageFactory
+
+msg = MessageFactory('bfg')
 
 from repoze.bfg.interfaces import ITranslator
 from repoze.bfg.interfaces import ITranslatorFactory
@@ -68,6 +71,17 @@ def get_translator(request, translator_factory=None):
     return translator
 
 class InterpolationOnlyTranslator(object):
+    """ A class implementing the :term:`translator factory` interface
+    as its constructor and the :term:`translator` interface as its
+    ``__call__`` method.  Useful as a minimal translator factory, this
+    class only does basic interpolation of mapping values; it does not
+    actually do any language translations.  Use::
+
+        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.i18n import InterpolationOnlyTranslator
+        config = Configurator(translator_factory=InterpolationOnlyTranslator)
+
+        """
     classProvides(ITranslatorFactory)
     implements(ITranslator)
     def __init__(self, request):

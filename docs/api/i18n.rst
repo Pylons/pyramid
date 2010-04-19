@@ -7,7 +7,17 @@
 
   .. autofunction:: get_translator(request)
 
+  .. function:: msg(text, domain=None, default=None, mapping=None)
+
+     Create a :class:`repoze.bfg.i18n.TranslationString` instance in
+     the ``bfg`` domain.  If this is a "technical" translation, use a
+     opaque string for ``text``, and make the ``default`` the format
+     string.  if this is a nontechnical translation, pass only
+     ``text``.
+
+  .. autoclass:: InterpolationOnlyTranslator
+
 See :ref:`i18n_chapter` for more information about using
-:mod:`repoze.bfg` internationalization services in an application.
+:mod:`repoze.bfg` internationalization services within an application.
 
 
