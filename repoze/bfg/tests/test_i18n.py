@@ -48,41 +48,6 @@ class TestInterpolationOnlyTranslator(unittest.TestCase):
         result = translator(message)
         self.assertEqual(result, u'text 1')
 
-class TestTranslationString(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.i18n import TranslationString
-        return TranslationString
-    
-    def _makeOne(self, text, **kw):
-        return self._getTargetClass()(text, **kw)
-
-    def test_ctor_defaults(self):
-        ts = self._makeOne('text')
-        self.assertEqual(ts, u'text')
-        self.assertEqual(ts.msgid, u'text')
-        self.assertEqual(ts.domain, None)
-        self.assertEqual(ts.mapping, {})
-
-    def test_ctor_nondefaults(self):
-        ts = self._makeOne(
-            'text', msgid='msgid', domain='domain', mapping='mapping')
-        self.assertEqual(ts, u'text')
-        self.assertEqual(ts.msgid, 'msgid')
-        self.assertEqual(ts.domain, 'domain')
-        self.assertEqual(ts.mapping, 'mapping')
-
-    def test___reduce__(self):
-        klass = self._getTargetClass()
-        ts = self._makeOne('text')
-        result = ts.__reduce__()
-        self.assertEqual(result, (klass, (u'text', u'text', None, {})))
-
-    def test___getstate__(self):
-        ts = self._makeOne(
-            'text', msgid='msgid', domain='domain', mapping='mapping')
-        result = ts.__getstate__()
-        self.assertEqual(result, (u'text', 'msgid', 'domain', 'mapping'))
-
 class TestChameleonTranslate(unittest.TestCase):
     def setUp(self):
         request = DummyRequest()
@@ -124,8 +89,8 @@ class TestChameleonTranslate(unittest.TestCase):
         result = trans('text')
         self.assertEqual(result, 'text')
         self.assertEqual(self.request.chameleon_target_language, None)
-        self.assertEqual(result.msgid, 'text')
         self.assertEqual(result.domain, None)
+        self.assertEqual(result.default, 'text')
         self.assertEqual(result.mapping, {})
 
     def test_with_allargs(self):
@@ -138,9 +103,9 @@ class TestChameleonTranslate(unittest.TestCase):
                        context=None, target_language='lang',
                        default='default')
         self.assertEqual(self.request.chameleon_target_language, 'lang')
-        self.assertEqual(result, 'default')
-        self.assertEqual(result.msgid, 'text')
+        self.assertEqual(result, 'text')
         self.assertEqual(result.domain, 'domain')
+        self.assertEqual(result.default, 'default')
         self.assertEqual(result.mapping, {'a':'1'})
 
 class Test_interpolate(unittest.TestCase):

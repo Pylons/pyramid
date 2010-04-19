@@ -1,7 +1,23 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+
 import re
 
 from zope.interface import implements
 from zope.interface import classProvides
+
+from zope.i18nmessageid.message import Message
 
 from repoze.bfg.interfaces import ITranslator
 from repoze.bfg.interfaces import ITranslatorFactory
@@ -9,6 +25,8 @@ from repoze.bfg.interfaces import IChameleonTranslate
 
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.threadlocal import get_current_request
+
+TranslationString = Message
 
 def get_translator(request, translator_factory=None):
     """ Return a :term:`translator` for the given request based on the
@@ -59,23 +77,6 @@ class InterpolationOnlyTranslator(object):
         mapping = getattr(message, 'mapping', None)
         return interpolate(message, mapping)
 
-class TranslationString(unicode):
-    __slots__ = ('msgid', 'domain', 'mapping')
-    def __new__(cls, text, msgid=None, domain=None, mapping=None):
-        self = unicode.__new__(cls, text)
-        if msgid is None:
-            msgid = unicode(text)
-        self.msgid = msgid
-        self.domain = domain
-        self.mapping = mapping or {}
-        return self
-
-    def __reduce__(self):
-        return self.__class__, self.__getstate__()
-
-    def __getstate__(self):
-        return unicode(self), self.msgid, self.domain, self.mapping
-
 class ChameleonTranslate(object):
     implements(IChameleonTranslate)
     def __init__(self, translator_factory):
@@ -95,9 +96,9 @@ class ChameleonTranslate(object):
         if mapping is None:
             mapping = {}
         if translator is None:
-            return unicode(default) % mapping
-        if not isinstance(text, TranslationString):
-            text = TranslationString(default, msgid=text, domain=domain,
+            return interpolate(unicode(default), mapping)
+        if not hasattr(text, 'mapping'):
+            text = TranslationString(text, domain=domain, default=default,
                                      mapping=mapping)
         return translator(text)
         
