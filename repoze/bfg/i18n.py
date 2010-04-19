@@ -33,9 +33,8 @@ def get_translator(request, translator_factory=None):
                 reg = request.registry
             except AttributeError:
                 reg = get_current_registry()
-            if reg is None: # pragma: no cover
-                return None # only in insane circumstances
-            translator_factory = reg.queryUtility(ITranslatorFactory)
+            if reg is not None: # pragma: no cover
+                translator_factory = reg.queryUtility(ITranslatorFactory)
 
         if translator_factory is None:
             request_value = False
@@ -102,7 +101,6 @@ class ChameleonTranslate(object):
                                      mapping=mapping)
         return translator(text)
         
-    
 NAME_RE = r"[a-zA-Z][-a-zA-Z0-9_]*"
 
 _interp_regex = re.compile(r'(?<!\$)(\$(?:(%(n)s)|{(%(n)s)}))'
