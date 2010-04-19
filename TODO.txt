@@ -7,7 +7,10 @@
 
 - Allow a translator to be supplied for template rendering.
 
-- Allow a debug argument to be supplied for template rendering.
+- Allow a debug argument to be supplied for template rendering
+  (requires Chameleon capable of accepting the ``debug`` argument to a
+  template constructor; behavior currently implemented on Chameleon
+  head but not in any release).
 
 - Figure out a way to expose some of the functionality of
   ``Configurator._derive_view`` as an API.

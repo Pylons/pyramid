@@ -4,7 +4,7 @@ Next release
 Features
 --------
 
-- Added "exception views".  When you use an exception (anything than
+- Added "exception views".  When you use an exception (anything that
   inherits from the Python ``Exception`` builtin) as view context
   argument, e.g.::
 
@@ -47,7 +47,8 @@ Features
   contexts will also work.
 
   The feature can be used with any view registration mechanism
-  (``@bfg_view`` decorator, ZCML, or imperative ``add_view`` styles).
+  (``@bfg_view`` decorator, ZCML, or imperative ``config.add_view``
+  styles).
 
   This feature was kindly contributed by Andrey Popp.
 
