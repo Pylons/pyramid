@@ -1,20 +1,70 @@
 import unittest
 
+class TestTranslationString(unittest.TestCase):
+    def _makeOne(self, text, **kw):
+        from repoze.bfg.i18n import TranslationString
+        return TranslationString(text, **kw)
+
+    def test_msgid_None(self):
+        inst = self._makeOne('text')
+        self.assertEqual(inst, 'text')
+        self.assertEqual(inst.default, 'text')
+
+    def test_msgid_not_None(self):
+        inst = self._makeOne('text', msgid='msgid')
+        self.assertEqual(inst, 'msgid')
+        self.assertEqual(inst.default, 'text')
+
+    def test_allargs(self):
+        inst = self._makeOne('text', msgid='msgid', mapping='mapping',
+                             domain='domain')
+        self.assertEqual(inst, 'msgid')
+        self.assertEqual(inst.default, 'text')
+        self.assertEqual(inst.mapping, 'mapping')
+        self.assertEqual(inst.domain, 'domain')
+
+class TestTranslationStringFactory(unittest.TestCase):
+    def _makeOne(self, domain):
+        from repoze.bfg.i18n import TranslationStringFactory
+        return TranslationStringFactory(domain)
+
+    def test_allargs(self):
+        factory = self._makeOne('budge')
+        inst = factory('text', mapping='mapping', msgid='msgid')
+        self.assertEqual(inst, 'msgid')
+        self.assertEqual(inst.domain, 'budge')
+        self.assertEqual(inst.mapping, 'mapping')
+        self.assertEqual(inst.default, 'text')
+
+class Test_bfg_tstr(unittest.TestCase):
+    def _callFUT(self, text, **kw):
+        from repoze.bfg.i18n import bfg_tstr
+        return bfg_tstr(text, **kw)
+
+    def test_allargs(self):
+        inst = self._callFUT('text', mapping='mapping', msgid='msgid')
+        self.assertEqual(inst, 'msgid')
+        self.assertEqual(inst.domain, 'bfg')
+        self.assertEqual(inst.mapping, 'mapping')
+        self.assertEqual(inst.default, 'text')
+
 class Test_get_translator(unittest.TestCase):
     def _callFUT(self, request):
         from repoze.bfg.i18n import get_translator
         return get_translator(request)
 
     def test_no_ITranslatorFactory(self):
+        from repoze.bfg.i18n import InterpolationOnlyTranslator
         request = DummyRequest()
         request.registry = DummyRegistry()
         translator = self._callFUT(request)
-        self.assertEqual(translator, None)
+        self.assertEqual(translator.__class__, InterpolationOnlyTranslator)
 
     def test_no_registry_on_request(self):
+        from repoze.bfg.i18n import InterpolationOnlyTranslator
         request = DummyRequest()
         translator = self._callFUT(request)
-        self.assertEqual(translator, None)
+        self.assertEqual(translator.__class__, InterpolationOnlyTranslator)
 
     def test_with_ITranslatorFactory_from_registry(self):
         request = DummyRequest()
@@ -29,13 +79,6 @@ class Test_get_translator(unittest.TestCase):
         request._bfg_translator = 'abc'
         translator = self._callFUT(request)
         self.assertEqual(translator, 'abc')
-
-    def test_with_ITranslatorFactory_from_request_neg_cache(self):
-        request = DummyRequest()
-        request.registry = DummyRegistry()
-        request._bfg_translator = False
-        translator = self._callFUT(request)
-        self.assertEqual(translator, None)
 
 class TestInterpolationOnlyTranslator(unittest.TestCase):
     def _makeOne(self, request):
@@ -78,7 +121,6 @@ class TestChameleonTranslate(unittest.TestCase):
         trans = self._makeOne(None)
         result = trans('text')
         self.assertEqual(result, 'text')
-        self.assertEqual(self.request.chameleon_target_language, None)
 
     def test_with_current_request_and_translator(self):
         from repoze.bfg.interfaces import ITranslatorFactory
@@ -88,7 +130,6 @@ class TestChameleonTranslate(unittest.TestCase):
         trans = self._makeOne(None)
         result = trans('text')
         self.assertEqual(result, 'text')
-        self.assertEqual(self.request.chameleon_target_language, None)
         self.assertEqual(result.domain, None)
         self.assertEqual(result.default, 'text')
         self.assertEqual(result.mapping, {})
@@ -102,7 +143,6 @@ class TestChameleonTranslate(unittest.TestCase):
         result = trans('text', domain='domain', mapping={'a':'1'},
                        context=None, target_language='lang',
                        default='default')
-        self.assertEqual(self.request.chameleon_target_language, 'lang')
         self.assertEqual(result, 'text')
         self.assertEqual(result.domain, 'domain')
         self.assertEqual(result.default, 'default')
@@ -159,8 +199,8 @@ class DummyRegistry(object):
     def __init__(self, tfactory=None):
         self.tfactory = tfactory
 
-    def queryUtility(self, iface):
-        return self.tfactory
+    def queryUtility(self, iface, default=None):
+        return self.tfactory or default
 
 class DummyTranslator(object):
     def __call__(self, message):

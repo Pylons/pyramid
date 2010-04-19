@@ -7,12 +7,219 @@
 Using Internationalization
 ==========================
 
-Setting Up Translation
+:mod:`repoze.bfg` offers an internationalization (i18n) subsystem that
+can be used to translate the text of buttons, the text of error
+messages and other software-defined values into the native language of
+aq user of your :mod:`repoze-bfg` driven website.
+
+Activating Translation
 ----------------------
 
-Pass a :term:`translator factory` object to your application's
+By default, a :mod:`repoze.bfg` application performs no translation
+without explicitly configuring a :term:`translator factory`.  To make
+any translation at all happen, you must pass a translator factory
+object to your application's
 :mod:`repoze.bfg.configuration.Configurator` by supplying it with a
-``translator_factory`` argument.  
+``translator_factory`` argument.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.i18n import InterpolationOnlyTranslator
+   config = Configurator(translator_factory=InterpolationOnlyTranslator)
+
+.. note:: At the time of this writing, only one (very weak) translator
+   factory named :class:`repoze.bfg.i18n.InterpolationOnlyTranslator`
+   ships as part of the :mod:`repoze.bfg` software.  This class only
+   does basic interpolation of mapping values; it does not actually do
+   any language translation.
+
+Creating a Translation String
+-----------------------------
+
+While you write your software, you can insert specialized markup into
+your Python code that makes it possible for the system to translate
+text values into the languages used by your application's users.  This
+markup generates a :term:`translation string`.  A translation string
+is an object that behave mostly like a normal Unicode object, except
+that it also carries around extra information related to its job as
+part of :mod:`repoze.bfg` the translation machinery.
+
+Using The ``TranslationString`` Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+One way to create a translation string is to use the
+:class:`repoze.bfg.i18n.TranslationString` callable:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add')
+
+This creates a Unicode-like object that is a TranslationString.
+
+The first argument to :class:`repoze.bfg.i18n.TranslationString` is
+the ``text``; it is required.  The ``text`` value acts as a default
+value for the translation string if a translation to the user's
+language cannot be found at translation time.  The ``text`` argument
+must be a Unicode object or an ASCII string.  The text may optionally
+contain *replacement markers*.  For instance:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add ${number}')
+
+Within the string above, ``${stuff}`` is a replacement marker.  It
+will be replaced by whatever is in the *mapping* for a translation
+string.  The mapping may be supplied at the same time as the
+replacement marker:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add ${number}', mapping={'number':1})
+
+Any number of replacement markers can be present in th text value, any
+number of times.  Only markers which can be replaced by the values in
+the *mapping* will be replaced at translation time.  The others will
+not be interpolated and will be output literally.
+
+A translation string should also usually carry a *domain*.  The domain
+represents a translation category to disambiguate it from other
+translations of the same msgid, in case they conflict.
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add ${number}', mapping={'number':1}, 
+                          domain='form')
+
+The above translation string named a domain of "form".  A
+:term:`translator` function will often use the domain to locate a file
+on the filesystem which contains translations for a given context.  In
+this case, if it were trying to translate to our msgid to German, it
+might try to find a translation from a :term:`gettext` file like this
+one::
+
+   locale/de/LC_MESSAGES/form.mo
+
+In other words, it would want to take translations from the "form.mo"
+translation file in the German language.
+
+Domain translation support is dependent upon the :term:`translator
+factory` in use.  Not all translator factories use domain information
+that is associated with a translation string.  However, it is always
+safe to associate a given translation string with a domain; the
+information is ignored by translators that don't support it.
+
+Finally, the TranslationString constructor accepts a ``msgid``
+argument.  If a ``msgid`` argument is supplied, it is used as the
+*message identifier* for the translation string.  When ``msgid`` is
+``None``, the ``text`` value passed to a TranslationString is used as
+an implicit message identifier.  Message identifiers are matched with
+translations in translation files, so it is often useful to create
+translation strings with "opaque" message identifiers unrelated to
+their default text:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add ${number}', msgid='add-number',
+                           domain='form', mapping={'number':1})
+
+Using the ``bfg_tstr`` Translation String Factory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another way to generate a translation string is to use the
+:attr:`repoze.bfg.i18n.bfg_tstr` object.  This object is a
+*translation string factory*.  Basically a translation string factory
+presets the ``domain`` value of any :term:`translation string`
+generated by using it.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import bfg_tstr as _
+   ts = _('Add ${number}', msgid='add-number', mapping={'number':1})
+
+.. note:: We imported ``bfg_tstr`` as the name ``_``.  This is a
+   convention which will be supported by translation file generation
+   tools.
+
+The result of calling ``bfg_tstr`` is a
+:class:`repoze.bfg.i18n.TranslationString` instance.  Even though a
+``domain`` value was not passed to bfg_tstr (as would have been
+necessary if the :class:`repoze.bfg.i18n.TranslationString`
+constructor were used instead of a translation string factory), the
+``domain`` attribute of the resulting translation string will be
+``bfg``.  As a result, the previous code example is completely
+equivalent (except for spelling) to:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString as _
+   ts = _('Add ${number}', msgid='add-number', mapping={'number':1}, 
+          domain='form')
+
+Using the ``TranslationStringFactory`` Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can set up your own translation string factory much like the one
+provided as :mod:`repoze.bfg.i18n.bfg_tstr` by using the
+:class:`repoze.bfg.i18n.TranslationStringFactory` class.  For example,
+if you'd like to create a translation string factory which presets the
+``domain`` value of generated translation strings to ``form``, you'd
+do something like this:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationStringFactory
+   _ = TranslationStringFactory('form')
+   ts = _('Add ${number}', msgid='add-number', mapping={'number':1})
+
+.. note:: We created this factory with the name ``_``.  This is a
+   convention which will be supported by translation file generation
+   tools.
+
+Performing a Translation by Hand
+--------------------------------
+
+If you need to perform translation "by hand" in an application, use
+the :func:`repoze.bfg.i18n.get_translator` function to obtain a
+:term:`translator` .  :func:`repoze.bfg.i18n.get_translator` will
+return either the current translator defined by the
+``translator_factory`` passed to the Configurator at startup or a
+default translator if no explicit translator factory has been
+registered.
+
+Remember that a translator is a callable which accepts either a
+:term:`translation string` and which returns a Unicode object
+representing the translation.  So, generating a translation in a view
+component of your application might look like so:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import get_translator
+
+   from repoze.bfg.i18n import bfg_tstr as _
+   ts = _('Add ${number}', mapping={'number':1})
+
+   def aview(request):
+       translator = get_translator(request)
+       translated = translator(ts)
+
+A translator may be called any number of times after being retrieved
+from the ``get_translator`` function.
 
 Defining A Translator Factory
 -----------------------------
@@ -28,8 +235,7 @@ expanded translation of the translation string.
 A simplistic implementation of both a translator factory and a
 translator (via its constructor and ``__call__`` methods respecively)
 named :class:`repoze.bfg.i18n.InterpolationOnlyTranslator` is defined.
-This class only does basic interpolation of mapping values; it does
-not actually do any language translations.  Here it is:
+Here it is:
 
 .. code-block:: python
    :linenos:
@@ -56,33 +262,4 @@ constructor.
    from repoze.bfg.configuration import Configurator
    from repoze.bfg.i18n import InterpolationOnlyTranslator
    config = Configurator(translator_factory=InterpolationOnlyTranslator, ...)
-
-Obtaining the Current Translator via :func:`repoze.bfg.i18n.get_translator`
----------------------------------------------------------------------------
-
-If you need to perform translation "by hand" in an application, use
-the :func:`repoze.bfg.i18n.get_translator` function to obtain the
-translator.  :func:`repoze.bfg.i18n.get_translator` will return either
-the current :term:`translator` or ``None`` if no translator is
-defined.
-
-Remeber that a translator is a callable which accepts either a
-:term:`translation string` and which returns a Unicode object
-representing the translation.
-
-Creating a Translation String The Hard Way
-------------------------------------------
-
-Use the :class:`repoze.bfg.i18n.TranslationString` constructor to
-create a translation string.
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.i18n import TranslationString
-   ts = TranslationString('abc')
-
-  
-
-
 

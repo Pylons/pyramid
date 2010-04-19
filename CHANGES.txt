@@ -74,7 +74,12 @@ Dependencies
 - A new install-time dependency on the ``venusian`` distribution was
   added.
 
-- Chameleon 1.2.2 or better is now required (internationalization).
+- Chameleon 1.2.3 or better is now required (internationalization and
+  per-template debug settings).
+
+- Add an explicit direct dependency on ``zope.i18nmessageid``.  This
+  distribution was already a transitive dependency, but now we're
+  relying on it directly within ``repoze.bfg.i18n``.
 
 Internal
 --------
