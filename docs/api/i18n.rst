@@ -12,8 +12,8 @@
      Create a :class:`repoze.bfg.i18n.TranslationString` instance in
      the ``bfg`` domain.  If this is a "technical" translation, use a
      opaque string for ``text``, and make the ``default`` the format
-     string.  if this is a nontechnical translation, pass only
-     ``text``.
+     string.  if this is a nontechnical translation, pass ``text``
+     without a ``default``.
 
   .. autoclass:: InterpolationOnlyTranslator
 

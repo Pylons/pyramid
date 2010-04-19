@@ -12,25 +12,77 @@ Setting Up Translation
 
 Pass a :term:`translator factory` object to your application's
 :mod:`repoze.bfg.configuration.Configurator` by supplying it with a
-``translator_factory`` argument.  A translator factory is an object
-which accepts a :term:`request` and which returns a callable.  The
-callable returned by a translator factory is a :term:`translator`; it
-must accept a single positional argument which represents a
-:term:`translation string` and should return a fully expanded
-translation of the translation string.
+``translator_factory`` argument.  
+
+Defining A Translator Factory
+-----------------------------
+
+A translator factory is an object which accepts a :term:`request` and
+which returns a :term:`translator` callable.
+
+The :term:`translator` callable returned by a translator factory must
+accept a single positional argument which represents a
+:term:`translation string` and should return a fully localized and
+expanded translation of the translation string.
+
+A simplistic implementation of both a translator factory and a
+translator (via its constructor and ``__call__`` methods respecively)
+named :class:`repoze.bfg.i18n.InterpolationOnlyTranslator` is defined.
+This class only does basic interpolation of mapping values; it does
+not actually do any language translations.  Here it is:
+
+.. code-block:: python
+   :linenos:
+
+    from repoze.bfg.i18n import interpolate
+
+    class InterpolationOnlyTranslator(object):
+        def __init__(self, request):
+            self.request = request
+
+        def __call__(self, message):
+            mapping = getattr(message, 'mapping', None)
+            return interpolate(message, mapping)
 
 The exact operation of a translator is left to the implementor of a
-particular translation factory.
+particular translator factory.  You can define and use your own
+translator factory by passing it as the ``translator_factory``
+argument to the :class:`repoze.bfg.configuration.Configurator`
+constructor.
 
-Obtaining the Translator via :func:`repoze.bfg.i18n.get_translator`
---------------------------------------------------------------------
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.i18n import InterpolationOnlyTranslator
+   config = Configurator(translator_factory=InterpolationOnlyTranslator, ...)
+
+Obtaining the Current Translator via :func:`repoze.bfg.i18n.get_translator`
+---------------------------------------------------------------------------
 
 If you need to perform translation "by hand" in an application, use
-the :func:`repoze.bfg.i18n.get_translator` function to obtain a
-translator.  A translator is a callable which accepts either a
-:term:`translation string` or a normal Unicode object and which
-returns a Unicode object representing the translation.
+the :func:`repoze.bfg.i18n.get_translator` function to obtain the
+translator.  :func:`repoze.bfg.i18n.get_translator` will return either
+the current :term:`translator` or ``None`` if no translator is
+defined.
 
-XXX
+Remeber that a translator is a callable which accepts either a
+:term:`translation string` and which returns a Unicode object
+representing the translation.
+
+Creating a Translation String The Hard Way
+------------------------------------------
+
+Use the :class:`repoze.bfg.i18n.TranslationString` constructor to
+create a translation string.
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('abc')
+
+  
+
 
 
