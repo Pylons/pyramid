@@ -232,10 +232,16 @@ VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'
 
 class ITranslatorFactory(Interface):
     """ Internal interface representing an i18n translator factory """
-    def __call__(self, request):
+    def __call__(request):
         """ Return a translator """
 
 class ITranslator(Interface):
-    def __call__(self, tstr):
+    def __call__(tstr):
         """ Return a translation based on the translation string tstr """
-    
+
+class IChameleonTranslate(Interface):
+    """ Internal interface representing a chameleon translate function """
+    def __call__(msgid, domain=None, mapping=None, context=None,
+                 target_language=None, default=None):
+        """ Translate a mess of arguments to a Unicode object """
+        

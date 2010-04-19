@@ -1738,11 +1738,15 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_set_translator_factory(self):
         from repoze.bfg.interfaces import ITranslatorFactory
+        from repoze.bfg.interfaces import IChameleonTranslate
         def factory(): pass
         config = self._makeOne()
         config.set_translator_factory(factory)
         self.assertEqual(config.registry.getUtility(ITranslatorFactory),
                          factory)
+        self.assertEqual(
+            config.registry.getUtility(IChameleonTranslate).translator_factory,
+            factory)
 
     def test_set_notfound_view(self):
         from zope.interface import implementedBy

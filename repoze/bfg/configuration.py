@@ -17,6 +17,7 @@ from zope.interface import implements
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
+from repoze.bfg.interfaces import IChameleonTranslate
 from repoze.bfg.interfaces import IDebugLogger
 from repoze.bfg.interfaces import IDefaultRootFactory
 from repoze.bfg.interfaces import IExceptionViewClassifier
@@ -46,6 +47,7 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.exceptions import ConfigurationError
+from repoze.bfg.i18n import ChameleonTranslate
 from repoze.bfg.log import make_stream_logger
 from repoze.bfg.path import caller_package
 from repoze.bfg.registry import Registry
@@ -1313,6 +1315,8 @@ class Configurator(object):
         """ Set ``factory`` up as the current application
         :term:`translator factory` (for internationalization)"""
         self.registry.registerUtility(factory, ITranslatorFactory)
+        ctranslate = ChameleonTranslate(factory)
+        self.registry.registerUtility(ctranslate, IChameleonTranslate)
 
     def add_static_view(self, name, path, cache_max_age=3600, _info=u''):
         """ Add a view used to render static resources to the current

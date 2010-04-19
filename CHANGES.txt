@@ -74,6 +74,8 @@ Dependencies
 - A new install-time dependency on the ``venusian`` distribution was
   added.
 
+- Chameleon 1.2.2 or better is now required (internationalization).
+
 Internal
 --------
 

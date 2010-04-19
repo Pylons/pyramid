@@ -27,7 +27,7 @@ except IOError:
     README = CHANGES = ''
 
 install_requires=[
-    'Chameleon',
+    'Chameleon >= 1.2.2',
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',

@@ -43,7 +43,7 @@ class TestInterpolationOnlyTranslator(unittest.TestCase):
         return InterpolationOnlyTranslator(request)
 
     def test_it(self):
-        message = DummyMessage('text %(a)s', mapping={'a':'1'})
+        message = DummyMessage('text ${a}', mapping={'a':'1'})
         translator = self._makeOne(None)
         result = translator(message)
         self.assertEqual(result, u'text 1')
@@ -83,7 +83,7 @@ class TestTranslationString(unittest.TestCase):
         result = ts.__getstate__()
         self.assertEqual(result, (u'text', 'msgid', 'domain', 'mapping'))
 
-class Test_chameleon_translate(unittest.TestCase):
+class TestChameleonTranslate(unittest.TestCase):
     def setUp(self):
         request = DummyRequest()
         from repoze.bfg.configuration import Configurator
@@ -94,21 +94,24 @@ class Test_chameleon_translate(unittest.TestCase):
     def tearDown(self):
         self.config.end()
         
-    def _callFUT(self, text, **kw):
-        from repoze.bfg.i18n import chameleon_translate
-        return chameleon_translate(text, **kw)
+    def _makeOne(self, factory):
+        from repoze.bfg.i18n import ChameleonTranslate
+        return ChameleonTranslate(factory)
 
     def test_text_None(self):
-        result = self._callFUT(None)
+        trans = self._makeOne(None)
+        result = trans(None)
         self.assertEqual(result, None)
 
     def test_no_current_request(self):
         self.config.manager.pop()
-        result = self._callFUT('text')
+        trans = self._makeOne(None)
+        result = trans('text')
         self.assertEqual(result, 'text')
 
     def test_with_current_request_no_translator(self):
-        result = self._callFUT('text')
+        trans = self._makeOne(None)
+        result = trans('text')
         self.assertEqual(result, 'text')
         self.assertEqual(self.request.chameleon_target_language, None)
 
@@ -117,7 +120,8 @@ class Test_chameleon_translate(unittest.TestCase):
         translator = DummyTranslator()
         factory = DummyTranslatorFactory(translator)
         self.config.registry.registerUtility(factory, ITranslatorFactory)
-        result = self._callFUT('text')
+        trans = self._makeOne(None)
+        result = trans('text')
         self.assertEqual(result, 'text')
         self.assertEqual(self.request.chameleon_target_language, None)
         self.assertEqual(result.msgid, 'text')
@@ -129,14 +133,49 @@ class Test_chameleon_translate(unittest.TestCase):
         translator = DummyTranslator()
         factory = DummyTranslatorFactory(translator)
         self.config.registry.registerUtility(factory, ITranslatorFactory)
-        result = self._callFUT('text', domain='domain', mapping={'a':'1'},
-                               context=None, target_language='lang',
-                               default='default')
+        trans = self._makeOne(None)
+        result = trans('text', domain='domain', mapping={'a':'1'},
+                       context=None, target_language='lang',
+                       default='default')
         self.assertEqual(self.request.chameleon_target_language, 'lang')
         self.assertEqual(result, 'default')
         self.assertEqual(result.msgid, 'text')
         self.assertEqual(result.domain, 'domain')
         self.assertEqual(result.mapping, {'a':'1'})
+
+class Test_interpolate(unittest.TestCase):
+    def _callFUT(self, text, mapping=None):
+        from repoze.bfg.i18n import interpolate
+        return interpolate(text, mapping)
+
+    def test_substitution(self):
+        mapping = {"name": "Zope", "version": 3}
+        result = self._callFUT(u"This is $name version ${version}.", mapping)
+        self.assertEqual(result, u'This is Zope version 3.')
+
+    def test_subsitution_more_than_once(self):
+        mapping = {"name": "Zope", "version": 3}
+        result = self._callFUT(
+            u"This is $name version ${version}. ${name} $version!",
+            mapping)
+        self.assertEqual(result, u'This is Zope version 3. Zope 3!')
+
+    def test_double_dollar_escape(self):
+        mapping = {"name": "Zope", "version": 3}
+        result = self._callFUT('$$name', mapping)
+        self.assertEqual(result, u'$$name')
+
+    def test_missing_not_interpolated(self):
+        mapping = {"name": "Zope", "version": 3}
+        result = self._callFUT(
+            u"This is $name $version. $unknown $$name $${version}.",
+            mapping)
+        self.assertEqual(result,
+                         u'This is Zope 3. $unknown $$name $${version}.')
+
+    def test_missing_mapping(self):
+        result = self._callFUT(u"This is ${name}")
+        self.assertEqual(result, u'This is ${name}')
 
 class DummyMessage(unicode):
     def __new__(cls, text, msgid=None, domain=None, mapping=None):
