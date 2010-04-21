@@ -27,7 +27,7 @@ except IOError:
     README = CHANGES = ''
 
 install_requires=[
-    'Chameleon >= 1.2.3',
+    'Chameleon',
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',
@@ -39,7 +39,6 @@ install_requires=[
     'zope.deprecation',
     'zope.interface >= 3.5.1',  # 3.5.0 comment: "allow to bootstrap on jython"
     'venusian >= 0.2',
-    'zope.i18nmessageid',
     ]
 
 if sys.version_info[:2] < (2, 6):

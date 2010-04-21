@@ -42,7 +42,6 @@ Narrative Documentation
    narr/templates
    narr/models
    narr/security
-   narr/i18n
    narr/vhosting
    narr/events
    narr/environment
