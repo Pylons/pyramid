@@ -413,17 +413,23 @@ class TestDefaultForbiddenView(BaseTest, unittest.TestCase):
         from repoze.bfg.view import default_forbidden_view
         return default_forbidden_view(context, request)
 
+    def test_no_registry_on_request(self):
+        request = None
+        context = Exception()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '401 Unauthorized')
+        self.failUnless('<code></code>' in response.body)
+
     def test_nomessage(self):
         request = self._makeRequest()
-        context = self._makeContext()
+        context = Exception()
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '401 Unauthorized')
         self.failUnless('<code></code>' in response.body)
 
     def test_withmessage(self):
         request = self._makeRequest()
-        request.environ['repoze.bfg.message'] = 'abc&123'
-        context = self._makeContext()
+        context = Exception('abc&123')
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '401 Unauthorized')
         self.failUnless('<code>abc&amp;123</code>' in response.body)
@@ -433,17 +439,23 @@ class TestDefaultNotFoundView(BaseTest, unittest.TestCase):
         from repoze.bfg.view import default_notfound_view
         return default_notfound_view(context, request)
 
+    def test_no_registry_on_request(self):
+        request = None
+        context = Exception()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+        self.failUnless('<code></code>' in response.body)
+
     def test_nomessage(self):
         request = self._makeRequest()
-        context = self._makeContext()
+        context = Exception()
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
         self.failUnless('<code></code>' in response.body)
 
     def test_withmessage(self):
         request = self._makeRequest()
-        request.environ['repoze.bfg.message'] = 'abc&123'
-        context = self._makeContext()
+        context = Exception('abc&123')
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
         self.failUnless('<code>abc&amp;123</code>' in response.body)
@@ -469,29 +481,37 @@ class AppendSlashNotFoundView(BaseTest, unittest.TestCase):
         reg.registerUtility(mapper, IRoutesMapper)
         return mapper
 
+    def test_context_is_not_exception(self):
+        request = self._makeRequest(PATH_INFO='/abc')
+        request.exception = Exception('halloo')
+        context = DummyContext()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '404 Not Found')
+        self.failUnless('halloo' in response.body)
+
     def test_no_mapper(self):
         request = self._makeRequest(PATH_INFO='/abc')
-        context = DummyContext()
+        context = Exception()
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_no_path(self):
         request = self._makeRequest()
-        context = self._makeContext()
+        context = Exception()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_mapper_path_already_slash_ending(self):
         request = self._makeRequest(PATH_INFO='/abc/')
-        context = DummyContext()
+        context = Exception()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_matches(self):
         request = self._makeRequest(PATH_INFO='/abc')
-        context = DummyContext()
+        context = Exception()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '302 Found')

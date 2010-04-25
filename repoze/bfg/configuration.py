@@ -314,8 +314,8 @@ class Configurator(object):
                                         authorization_policy)
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
-        self.set_notfound_view(default_notfound_view)
-        self.set_forbidden_view(default_forbidden_view)
+        self.add_view(default_notfound_view, context=NotFound)
+        self.add_view(default_forbidden_view, context=Forbidden)
         if locale_negotiator:
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)
 
@@ -1258,8 +1258,8 @@ class Configurator(object):
         method's ``wrapper`` argument for a description)."""
         view = self._derive_view(view, attr=attr, renderer_name=renderer)
         def bwcompat_view(context, request):
-            ctx = getattr(request, 'context', None)
-            return view(ctx, request)
+            context = getattr(request, 'context', None)
+            return view(context, request)
         return self.add_view(bwcompat_view, context=Forbidden,
                              wrapper=wrapper, _info=_info)
 
@@ -1304,8 +1304,8 @@ class Configurator(object):
         """
         view = self._derive_view(view, attr=attr, renderer_name=renderer)
         def bwcompat_view(context, request):
-            ctx = getattr(request, 'context', None)
-            return view(ctx, request)
+            context = getattr(request, 'context', None)
+            return view(context, request)
         return self.add_view(bwcompat_view, context=NotFound,
                              wrapper=wrapper, _info=_info)
 
@@ -1749,11 +1749,12 @@ def rendered_response(renderer, response, view, context, request,
         return response
     result = renderer(response, {'view':view, 'renderer_name':renderer_name,
                                  'context':context, 'request':request})
-    response_factory = Response
-    reg = getattr(request, 'registry', None)
-    if reg is not None:
-        # be kind to old unit tests
-        response_factory = reg.queryUtility(IResponseFactory, default=Response)
+    try:
+        registry = request.registry
+    except AttributeError:
+        registry = get_current_registry()
+    response_factory = registry.queryUtility(IResponseFactory,
+                                             default=Response)
     response = response_factory(result)
     if request is not None: # in tests, it may be None
         attrs = request.__dict__

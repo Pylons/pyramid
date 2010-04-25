@@ -9,8 +9,9 @@ class Forbidden(Exception):
 
     This exception's constructor accepts a single positional argument,
     which should be a string.  The value of this string will be placed
-    into the WSGI environment under the ``repoze.bfg.message`` key,
-    for availability to the Forbidden view."""
+    into the WSGI environment by the router under the
+    ``repoze.bfg.message`` key, for availability to the
+    :term:`Forbidden View`."""
 
 class NotFound(Exception):
     """\
@@ -21,8 +22,9 @@ class NotFound(Exception):
 
     This exception's constructor accepts a single positional argument,
     which should be a string.  The value of this string will be placed
-    into the WSGI environment under the ``repoze.bfg.message`` key,
-    for availability to the Not Found view."""
+    into the WSGI environment by the router under the
+    ``repoze.bfg.message`` key, for availability to the :term:`Not Found
+    View`."""
 
 class ConfigurationError(ZCE):
     """ Raised when inappropriate input values are supplied to an API

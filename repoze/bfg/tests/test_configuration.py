@@ -184,16 +184,33 @@ class ConfiguratorTests(unittest.TestCase):
             def subscribers(self, events, name):
                 self.events = events
                 return events
-            def registerUtility(self, impl, iface, name=None, info=None):
+            def registerUtility(self, *arg, **kw):
                 pass
         reg = DummyRegistry()
         config = self._makeOne(reg)
-        config.set_notfound_view = lambda *arg, **kw: None
-        config.set_forbidden_view = lambda *arg, **kw: None
+        config.add_view = lambda *arg, **kw: False
         config.setup_registry()
         self.assertEqual(reg.has_listeners, True)
         self.assertEqual(reg.notify(1), None)
         self.assertEqual(reg.events, (1,))
+
+    def test_setup_registry_registers_default_exception_views(self):
+        from repoze.bfg.exceptions import NotFound
+        from repoze.bfg.exceptions import Forbidden
+        from repoze.bfg.view import default_notfound_view
+        from repoze.bfg.view import default_forbidden_view
+        class DummyRegistry(object):
+            def registerUtility(self, *arg, **kw):
+                pass
+        reg = DummyRegistry()
+        config = self._makeOne(reg)
+        views = []
+        config.add_view = lambda *arg, **kw: views.append((arg, kw))
+        config.setup_registry()
+        self.assertEqual(views[0], ((default_notfound_view,),
+                                    {'context':NotFound}))
+        self.assertEqual(views[1], ((default_forbidden_view,),
+                                    {'context':Forbidden}))
 
     def test_setup_registry_custom_settings(self):
         from repoze.bfg.registry import Registry

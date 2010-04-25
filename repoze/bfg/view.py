@@ -512,8 +512,8 @@ class bfg_view(object):
 
 def default_view(context, request, status):
     try:
-        msg = cgi.escape(request.environ['repoze.bfg.message'])
-    except KeyError:
+        msg = cgi.escape('%s' % context.args[0])
+    except Exception:
         msg = ''
     html = """
     <html>
@@ -526,12 +526,12 @@ def default_view(context, request, status):
     """ % (status, status, msg)
     headers = [('Content-Length', str(len(html))),
                ('Content-Type', 'text/html')]
-    response_factory = Response
-    registry = getattr(request, 'registry', None)
-    if registry is not None:
-        # be kind to old tests
-        response_factory = registry.queryUtility(IResponseFactory,
-                                                 default=Response)
+    try:
+        registry = request.registry
+    except AttributeError:
+        registry = get_current_registry()
+    response_factory = registry.queryUtility(IResponseFactory,
+                                             default=Response)
     return response_factory(status = status,
                             headerlist = headers,
                             app_iter = [html])
@@ -558,21 +558,27 @@ def append_slash_notfound_view(context, request):
     If you use :term:`ZCML`, add the following to your application's
     ``configure.zcml`` to use this view as the Not Found view::
 
-      <notfound
+      <view
+         context="repoze.bfg.exceptions.NotFound"
          view="repoze.bfg.view.append_slash_notfound_view"/>
 
     Or use the
-    :meth:`repoze.bfg.configuration.Configurator.set_notfound_view`
+    :meth:`repoze.bfg.configuration.Configurator.add_view`
     method if you don't use ZCML::
 
+      from repoze.bfg.exceptions import NotFound
       from repoze.bfg.view import append_slash_notfound_view
-      config.set_notfound_view(append_slash_notfound_view)
+      config.add_view(append_slash_notfound_view, context=NotFound)
 
     See also :ref:`changing_the_notfound_view`.
 
     .. note:: This function is new as of :mod:`repoze.bfg` version 1.1.
 
     """
+    if not isinstance(context, Exception):
+        # backwards compat for an append_notslash_view registered via
+        # config.set_notfound_view instead of as a proper exception view
+        context = getattr(request, 'exception', None)
     path = request.environ.get('PATH_INFO', '/')
     registry = request.registry
     mapper = registry.queryUtility(IRoutesMapper)

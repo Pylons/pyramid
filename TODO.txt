@@ -10,9 +10,7 @@
 
 - Provide a webob.Response class facade for forward compat.
 
-- Replace default_notfound_view and default_forbidden_view with better
-  exception view candidates.
-
 - Fix message catalog extraction / compilation documentation.
 
 - Docs about creating a venusian decorator.
+
