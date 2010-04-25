@@ -479,8 +479,10 @@ You can obtain the locale name related to a request by using the
        locale_name = get_locale_name(request)
 
 This returns the locale name negotiated by the currently active
-:term:`locale negotiator` or the default locale name (usually
-``en``) if no locale negotiator is configured.
+:term:`locale negotiator` or the default locale name (usually ``en``)
+if no locale negotiator is configured.  You can change the default
+locale name by changing the ``default_locale_name`` setting; see
+:ref:`default_locale_name_setting`.
 
 Once :func:`repoze.bfg.i18n.get_locale_name` has run once, the local
 name is stored on the request object it is passed.  Subsequent calls

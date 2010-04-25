@@ -122,6 +122,8 @@ Turns on all ``reload*`` settings.
 |                                 |                             |
 +---------------------------------+-----------------------------+
 
+.. _default_locale_name_setting:
+
 Default Locale Name
 --------------------
 
