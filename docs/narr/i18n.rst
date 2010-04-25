@@ -309,10 +309,10 @@ The message catalog template will end up in
 ``myapplication/locale/myapplication.pot``.
 
 .. index::
-   pair: initalizing; message catalog
+   pair: initializing; message catalog
 
-Initializaing a Message Catalog File
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Initializing a Message Catalog File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Initialize a message catalog for a specific locale from a
 pre-generated ``.pot`` template::
