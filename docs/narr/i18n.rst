@@ -329,7 +329,7 @@ pre-generated ``.pot`` template::
 The message catalog ``.po`` file will end up in
 ``myapplication/locale/es/LC_MESSAGES/myapplication.po``.
 
-XXX finish
+.. XXX finish
 
 .. index::
    pair: updating; message catalog
@@ -342,7 +342,7 @@ Update ``.po`` files based on changes to the ``.pot`` file::
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py update_catalog
 
-XXX finish
+.. XXX finish
 
 .. index::
    pair: compiling; message catalog
@@ -355,7 +355,7 @@ Compile ``.po`` files to ``.mo`` files::
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py compile_catalog
 
-XXX finish
+.. XXX finish
 
 .. index::
    single: localizer
@@ -584,7 +584,9 @@ through translation before being rendered:
    :linenos:
 
    <a tal:attributes="href some_translation_string">Click here</a>
-   XXX this appears to not yet work as of Chameleon 1.2.3
+
+.. XXX the last example above appears to not yet work as of Chameleon
+.. 1.2.3
 
 The features represented by attributes of the ``i18n`` namespace of
 Chameleon will also consult the :mod:`repoze.bfg` translations.
