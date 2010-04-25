@@ -511,6 +511,11 @@ class bfg_view(object):
         return wrapped
 
 def default_view(context, request, status):
+    if not isinstance(context, Exception):
+        # backwards compat for a default_view registered via
+        # config.set_notfound_view or config.set_forbidden_view
+        # instead of as a proper exception view
+        context = getattr(request, 'exception', None)
     try:
         msg = cgi.escape('%s' % context.args[0])
     except Exception:

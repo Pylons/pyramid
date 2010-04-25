@@ -408,57 +408,57 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.assertEqual(settings[0]['renderer'],
                          'repoze.bfg.tests:fixtures/minimal.pt')
 
-class TestDefaultForbiddenView(BaseTest, unittest.TestCase):
+class TestDefaultView(BaseTest):
+    def test_no_registry_on_request(self):
+        request = None
+        context = Exception()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, self.status)
+        self.failUnless('<code></code>' in response.body)
+
+    def test_nomessage(self):
+        request = self._makeRequest()
+        context = Exception()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, self.status)
+        self.failUnless('<code></code>' in response.body)
+
+    def test_withmessage(self):
+        request = self._makeRequest()
+        context = Exception('abc&123')
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, self.status)
+        self.failUnless('<code>abc&amp;123</code>' in response.body)
+
+    def test_context_not_exception(self):
+        request = self._makeRequest()
+        request.exception = Exception('woo')
+        context = None
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, self.status)
+        self.failUnless('<code>woo</code>' in response.body)
+        
+    def test_msg_exception_raised(self):
+        request = self._makeRequest()
+        context = None
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, self.status)
+        self.failUnless('<code></code>' in response.body)
+
+class TestDefaultForbiddenView(TestDefaultView, unittest.TestCase):
+    status = '401 Unauthorized'
+
     def _callFUT(self, context, request):
         from repoze.bfg.view import default_forbidden_view
         return default_forbidden_view(context, request)
 
-    def test_no_registry_on_request(self):
-        request = None
-        context = Exception()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '401 Unauthorized')
-        self.failUnless('<code></code>' in response.body)
 
-    def test_nomessage(self):
-        request = self._makeRequest()
-        context = Exception()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '401 Unauthorized')
-        self.failUnless('<code></code>' in response.body)
+class TestDefaultNotFoundView(TestDefaultView, unittest.TestCase):
+    status = '404 Not Found'
 
-    def test_withmessage(self):
-        request = self._makeRequest()
-        context = Exception('abc&123')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '401 Unauthorized')
-        self.failUnless('<code>abc&amp;123</code>' in response.body)
-
-class TestDefaultNotFoundView(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
         from repoze.bfg.view import default_notfound_view
         return default_notfound_view(context, request)
-
-    def test_no_registry_on_request(self):
-        request = None
-        context = Exception()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '404 Not Found')
-        self.failUnless('<code></code>' in response.body)
-
-    def test_nomessage(self):
-        request = self._makeRequest()
-        context = Exception()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '404 Not Found')
-        self.failUnless('<code></code>' in response.body)
-
-    def test_withmessage(self):
-        request = self._makeRequest()
-        context = Exception('abc&123')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '404 Not Found')
-        self.failUnless('<code>abc&amp;123</code>' in response.body)
 
 class AppendSlashNotFoundView(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
