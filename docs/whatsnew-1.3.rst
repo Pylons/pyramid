@@ -81,10 +81,10 @@ The above exception view names the ``route_name`` of ``home``, meaning
 that it will only be called when the route matched has a name of
 ``home``.  You can therefore have more than one exception view for any
 given exception in the system: the "most specific" one will be called
-when the set of request circumstances which match the view
-registration.  The only predicate that cannot be not be used
-successfully is ``name``.  The name used to look up an exception view
-is always the empty string.
+when the set of request circumstances match the view registration.
+The only predicate that cannot be not be used successfully is
+``name``.  The name used to look up an exception view is always the
+empty string.
 
 Existing (pre-1.3) normal views registered against objects inheriting
 from :class:`Exception` will continue to work.  Exception views used
@@ -103,7 +103,8 @@ Minor Feature Additions
 - Use :term:`Venusian` to perform ``@bfg_view`` decorator scanning
   rather than relying on a BFG-internal decorator scanner.  This means
   that user-defined decorators can be defined and found during
-  :mod:`repoze.bfg` scanning.
+  :mod:`repoze.bfg` scanning (although documentation for doing so is
+  currently not provided).
 
 - It is now possible to turn on Chameleon template "debugging mode"
   for all Chameleon BFG templates by setting a BFG-related Paster
