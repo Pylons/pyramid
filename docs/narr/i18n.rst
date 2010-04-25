@@ -56,10 +56,10 @@ This creates a Unicode-like object that is a TranslationString.
 
 .. note::
 
-   For people more familiar with :term:`Zope` i8n, a TranslationString
+   For people more familiar with :term:`Zope` i18n, a TranslationString
    is a lot like a ``zope.i18nmessageid.Message`` object.  It is not a
    subclass, however.  For people more familiar with :term:`Pylons` or
-   :term:`Django` i8n, using a TranslationString is a lot like using
+   :term:`Django` i18n, using a TranslationString is a lot like using
    "lazy" versions of related gettext APIs.
 
 The first argument to :class:`repoze.bfg.i18n.TranslationString` is
