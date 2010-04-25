@@ -577,10 +577,9 @@ displaying the arguments passed to the template itself.
 :term:`Chameleon` Template Internationalization
 -----------------------------------------------
 
-See `the internationalization chapter
-<http://chameleon.repoze.org/docs/latest/i18n.html>`_ of the Chameleon
-documentation for information about supporting internationalized units
-of text within :term:`Chameleon` templates.
+See :ref:`chameleon_translation_strings` for information about
+supporting internationalized units of text within :term:`Chameleon`
+templates.
 
 .. index::
    single: template system bindings
