@@ -221,6 +221,76 @@ class Configurator(object):
     def _split_spec(self, path_or_spec):
         return resolve_resource_spec(path_or_spec, self.package.__name__)
 
+    def derive_view(self, view, attr=None, renderer=None):
+        """
+        Create a :term:`view callable` using the function, instance,
+        or class provided as ``view`` object.
+
+        This is API is useful to framework extenders who create
+        pluggable systems which need to register 'proxy' view
+        callables for functions, instances, or classes which meet the
+        requirements of being a :mod:`repoze.bfg` view callable.  For
+        example, a ``some_other_framework`` function in another
+        framework may want to allow a user to supply a view callable,
+        but he may want to wrap the view callable in his own before
+        registering the wrapper as a :mod:`repoze.bfg` view callable.
+        Because a :mod:`repoze.bfg` view callable can be any of a
+        number of valid objects, the framework extender will not know
+        how to call the user-supplied object.  Running it through
+        ``derive_view`` normalizes it to a callable which accepts two
+        arguments: ``context`` and ``request``.
+
+        For example:
+
+        .. code-block:: python
+
+           def some_other_framework(user_supplied_view):
+               config = Configurator(reg)
+               proxy_view = config.derive_view(user_supplied_view)
+               def my_wrapper(context, request):
+                   do_something_that_mutates(request)
+                   return proxy_view(context, request)
+               config.add_view(my_wrapper)
+
+        The ``view`` object provided should be one of the following:
+
+        - A function or another non-class callable object that accepts
+          a :term:`request` as a single positional argument and which
+          returns a :term:`response` object.
+
+        - A function or other non-class callable object that accepts
+          two positional arguments, ``context, request`` and which
+          returns a :term:`response` object.
+
+        - A class which accepts a single positional argument in its
+          constructor named ``request``, and which has a ``__call__``
+          method that accepts no arguments that returns a
+          :term:`response` object.
+
+        - A class which accepts two positional arguments named
+          ``context, request``, and which has a ``__call__`` method
+          that accepts no arguments that returns a :term:`response`
+          object.
+
+        This API returns a callable which accepts the arguments
+        ``context, request`` and which returns the result of calling
+        the provided ``view`` object.
+
+        The ``attr`` keyword argument is most useful when the view
+        object is a class.  It names the method that should be used as
+        the callable.  If ``attr`` is not provided, the attribute
+        effectively defaults to ``__call__``.  See
+        :ref:`class_as_view` for more information.
+
+        The ``renderer`` keyword argument, if supplies, causes the
+        returned callable to use a :term:`renderer` to convert the
+        user-supplied view result to a :term:`response` object.  If a
+        ``renderer`` argument is not supplied, the user-supplied view
+        must itself return a :term:`response` object.
+        """
+
+        return self._derive_view(view, attr=attr, renderer_name=renderer)
+
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer_name=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,

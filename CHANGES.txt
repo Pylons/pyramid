@@ -77,6 +77,15 @@ Features
   more helpful debugging information.  This mode is on by default in
   all new projects.
 
+- Add a new method of the Configurator named ``derive_view`` which can
+  be used to generate a BFG view callable from a user-supplied
+  function, instance, or class. This useful for external framework and
+  plugin authors wishing to wrap callables supplied by their users
+  which follow the same calling conventions and response conventions
+  as objects that can be supplied directly to BFG as a view callable.
+  See the ``derive_view`` method in the
+  ``repoze.bfg.configuration.Configurator`` docs.
+
 ZCML
 ----
 

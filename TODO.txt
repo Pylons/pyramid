@@ -5,9 +5,6 @@
 
 - Basic WSGI documentation (pipeline / app / server).
 
-- Figure out a way to expose some of the functionality of
-  ``Configurator._derive_view`` as an API.
-
 - Provide a webob.Response class facade for forward compat.
 
 - Fix message catalog extraction / compilation documentation.

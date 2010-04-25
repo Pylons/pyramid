@@ -1879,6 +1879,48 @@ class ConfiguratorTests(unittest.TestCase):
         result = config._renderer_from_name(None)
         self.assertEqual(result, 'OK')
 
+    def test_derive_view_function(self):
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        result = config.derive_view(view)
+        self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_derive_view_with_renderer(self):
+        def view(request):
+            return 'OK'
+        config = self._makeOne()
+        class moo(object):
+            def __init__(self, *arg, **kw):
+                pass
+            def __call__(self, *arg, **kw):
+                return 'moo'
+        config.add_renderer('moo', moo)
+        result = config.derive_view(view, renderer='moo')
+        self.failIf(result is view)
+        self.assertEqual(result(None, None).body, 'moo')
+
+    def test_derive_view_class_without_attr(self):
+        class View(object):
+            def __init__(self, request):
+                pass
+            def __call__(self):
+                return 'OK'
+        config = self._makeOne()
+        result = config.derive_view(View)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_derive_view_class_with_attr(self):
+        class View(object):
+            def __init__(self, request):
+                pass
+            def another(self):
+                return 'OK'
+        config = self._makeOne()
+        result = config.derive_view(View, attr='another')
+        self.assertEqual(result(None, None), 'OK')
+
     def test__derive_view_as_function_context_and_request(self):
         def view(context, request):
             return 'OK'
