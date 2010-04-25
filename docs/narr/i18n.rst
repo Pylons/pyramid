@@ -673,7 +673,7 @@ to provide translations to your application.
 
 A locale negotiator is a bit of code which accepts a request and which
 returns a :term:`locale name`.  It is consulted when
-:meth:`repoze.bfg.i18n.Localizer.translate`
+:meth:`repoze.bfg.i18n.Localizer.translate` or
 :meth:`repoze.bfg.i18n.Localizer.pluralize` is invoked.  It is also
 consulted when :func:`repoze.bfg.i18n.get_locale_name` or
 :func:`repoze.bfg.i18n.negotiate_locale_name` is invoked.

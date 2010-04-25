@@ -25,6 +25,7 @@ Front Matter
 .. toctree::
    :maxdepth: 2
 
+   whatsnew-1.3
    whatsnew-1.2
    whatsnew-1.1
 

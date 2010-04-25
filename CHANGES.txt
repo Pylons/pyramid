@@ -18,7 +18,7 @@ Features
 
   For the above example, when the ``repoze.bfg.exceptions.NotFound``
   exception is raised by any view or any root factory, the
-  ``notfound_view`` view callable wil be invoked and its response
+  ``notfound_view`` view callable will be invoked and its response
   returned.
 
   Other normal view predicates can also be used in combination with an
@@ -129,7 +129,7 @@ Documentation
 - A new API chapter for the ``repoze.bfg.i18n`` module was added.
 
 - Documentation for the new ``translationdir`` and
-  ``locale_negotiator`` ZCML directives were added.
+  ``localenegotiator`` ZCML directives were added.
 
 Paster Templates
 ----------------
