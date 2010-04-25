@@ -116,6 +116,15 @@ Minor Feature Additions
   more helpful debugging information.  This mode is on by default in
   newly generated projects.  See also :ref:`debug_templates_section`.
 
+- A new API method named
+  :meth:`repoze.bfg.configuration.Configurator.derive_view` was
+  added. This API can be used to generate a BFG view callable from a
+  user-supplied function, instance, or class. This useful for external
+  framework and plugin authors wishing to wrap callables supplied by
+  their users which follow the same calling conventions and response
+  conventions as objects that can be supplied directly to BFG as a
+  view callable.
+
 Backwards Incompatibilites
 --------------------------
 
