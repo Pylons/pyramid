@@ -696,110 +696,112 @@ can provide your own locale negotiator function as required.
 Adding a Translation Directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may add a :term:`translation directory` to your application's
-configuration either imperatively or via ZCML.  Adding a translation
-directory registers all of its constituent :term:`message catalog`
-files (all of the ``.mo`` files found within all ``LC_MESSAGES``
-directories within each locale directory in the translation directory)
-within your :mod:`repoze.bfg` application to be available to use for
-translation services.
+Adding a :term:`translation directory` registers all of its
+constituent :term:`message catalog` files (all of the ``.mo`` files
+found within all ``LC_MESSAGES`` directories within each locale
+directory in the translation directory) within your :mod:`repoze.bfg`
+application to be available to use for translation services.
 
-Imperative
-++++++++++
+You may add a translation directory to your application's
+configuration using either imperative configuration or ZCML.
 
-You can add a translation directory imperatively by using the
-:meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
-during application startup.
+.. topic:: Using Imperative Configuration
 
-For example:
+    You can add a translation directory imperatively by using the
+    :meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
+    during application startup.
 
-.. code-block:: python
-   :linenos:
+    For example:
 
-   from repoze.bfg.configuration import Configurator
-   from repoze.bfg.i18n import default_locale_negotiator
-   config = Configurator(locale_negotiator=default_locale_negotiator)
-   config.begin()
-   config.add_translation_dirs('my.application:locale/', 
-                               'another.application:locale/')
-   config.end()
+    .. code-block:: python
+       :linenos:
 
-A message catalog in a translation directory added via
-:meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
-will be merged into translations from an message catalog added earlier
-if both translation directories contain translations for the same
-locale and :term:`translation domain`.
+       from repoze.bfg.configuration import Configurator
+       from repoze.bfg.i18n import default_locale_negotiator
+       config = Configurator(
+                locale_negotiator=default_locale_negotiator)
+       config.begin()
+       config.add_translation_dirs('my.application:locale/', 
+                                   'another.application:locale/')
+       config.end()
 
-ZCML
-++++
+    A message catalog in a translation directory added via
+    :meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
+    will be merged into translations from an message catalog added earlier
+    if both translation directories contain translations for the same
+    locale and :term:`translation domain`.
 
-You can add a translation directory via ZCML by using the
-:ref:`translationdir_directive` ZCML directive:
+.. topic:: Using ZCML
 
-.. code-block:: xml
-   :linenos:
+    You can add a translation directory via ZCML by using the
+    :ref:`translationdir_directive` ZCML directive:
 
-   <translationdir dir="my.application:locale/"/>
+    .. code-block:: xml
+       :linenos:
 
-A message catalog in a translation directory added via
-:ref:`translationdir_directive` will be merged into translations from
-an message catalog added earlier if both translation directories
-contain translations for the same locale and :term:`translation
-domain`.
+       <translationdir dir="my.application:locale/"/>
+
+    A message catalog in a translation directory added via
+    :ref:`translationdir_directive` will be merged into translations from
+    an message catalog added earlier if both translation directories
+    contain translations for the same locale and :term:`translation
+    domain`.
 
 .. _adding_a_locale_negotiator:
 
 Adding a Locale Negotiator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may add a :term:`locale negotiator` either imperatively or via
-ZCML.  A locale negotiator informs the operation of a
+A :term:`locale negotiator` informs the operation of a
 :term:`localizer` by telling it what :term:`locale name` is related to
 a particular request.  See :ref:`creating_a_locale_negotiator`.
 
-Imperative
-++++++++++
+You may add a locale directory to your application's
+configuration using either imperative configuration or ZCML.
 
-Pass an object which can act as the negotiator as the
-``locale_negotiator`` argument of the
-:class:`repoze.bfg.configuration.Configurator` instance during
-application startup.
+.. topic:: Using Imperative Configuration
 
-For example:
+    Pass an object which can act as the negotiator as the
+    ``locale_negotiator`` argument of the
+    :class:`repoze.bfg.configuration.Configurator` instance during
+    application startup.
 
-.. code-block:: python
-   :linenos:
+    For example:
 
-   from repoze.bfg.configuration import Configurator
-   from repoze.bfg.i18n import default_locale_negotiator
-   config = Configurator(locale_negotiator=default_locale_negotiator)
+    .. code-block:: python
+       :linenos:
 
-Alternately, use the
-:meth:`repoze.bfg.configuration.Configurator.set_locale_negotiator`
-method.
+       from repoze.bfg.configuration import Configurator
+       from repoze.bfg.i18n import default_locale_negotiator
+       config = Configurator(
+                locale_negotiator=default_locale_negotiator)
 
-For example:
+    Alternately, use the
+    :meth:`repoze.bfg.configuration.Configurator.set_locale_negotiator`
+    method.
 
-.. code-block:: python
-   :linenos:
+    For example:
 
-   from repoze.bfg.configuration import Configurator
-   from repoze.bfg.i18n import default_locale_negotiator
-   config = Configurator()
-   config.begin()
-   config.set_locale_negotiator(default_locale_negotiator)
-   config.end()
+    .. code-block:: python
+       :linenos:
 
-ZCML
-++++
+       from repoze.bfg.configuration import Configurator
+       from repoze.bfg.i18n import default_locale_negotiator
+       config = Configurator()
+       config.begin()
+       config.set_locale_negotiator(default_locale_negotiator)
+       config.end()
 
-You can add a translation directory via ZCML by using the
-:ref:`localenegotiator_directive` ZCML directive:
+.. topic:: Using ZCML
 
-.. code-block:: xml
-   :linenos:
+    You can add a translation directory via ZCML by using the
+    :ref:`localenegotiator_directive` ZCML directive:
 
-   <localenegotiator negotiator="repoze.bfg.i18n.default_locale_negotiator"/>
+    .. code-block:: xml
+       :linenos:
+
+       <localenegotiator 
+        negotiator="repoze.bfg.i18n.default_locale_negotiator"/>
 
 .. _creating_a_locale_negotiator:
 
@@ -824,3 +826,4 @@ Locale negotiation can be complex.  Your application may require a
 policy-laden locale negotiator policy, so you can write your own and
 supply it to an application configuration as per
 :ref:`adding_a_locale_negotiator`.
+
