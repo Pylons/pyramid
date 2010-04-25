@@ -739,4 +739,16 @@ Glossary
    Message Catalog
      A :term:`gettext` ``.mo`` file containing translations.
 
+   Internationalization
+     The act of creating software with a user interface that can
+     potentially be displayed in more than one language or cultural
+     context.  Often shortened to "i18n" (because the word
+     "internationalization" is I, 18 letters, then N).  See also:
+     :term:`Localization`.
 
+   Localization
+     The process of displaying the user interface of an
+     internationalized application in a particular language or
+     cultural context.  Often shortened to "l10" (because the word
+     "localization" is L, 10 letters, then N).  See also:
+     :term:`Internationalization`.

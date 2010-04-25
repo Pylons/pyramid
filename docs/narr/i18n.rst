@@ -9,10 +9,16 @@
 Internationalization and Localization
 =====================================
 
-:mod:`repoze.bfg` offers internationalization (i18n) and localization
-(l10n) subsystems that can be used to translate the text of buttons,
-the text of error messages and other software- and template-defined
-values into the native language of a user of your application.
+:term:`Internationalization` (i18n) is the act of creating software
+with a user interface that can potentially be displayed in more than
+one language or cultural context.  :term:`Localization` (l10n) is the
+process of displaying the user interface of an internationalized
+application in a *particular* language or cultural context.
+
+:mod:`repoze.bfg` offers internationalization and localization
+subsystems that can be used to translate the text of buttons, error
+messages and other software- and template-defined values into the
+native language of a user of your application.
 
 .. note: The APIs and functionality described in this chapter are new
    as of :mod:`repoze.bfg` version 1.3.
@@ -29,10 +35,10 @@ Creating a Translation String
 While you write your software, you can insert specialized markup into
 your Python code that makes it possible for the system to translate
 text values into the languages used by your application's users.  This
-markup generates a :term:`translation string`.  A translation string
-is an object that behave mostly like a normal Unicode object, except
-that it also carries around extra information related to its job as
-part of the :mod:`repoze.bfg` translation machinery.
+markup creates a :term:`translation string`.  A translation string is
+an object that behave mostly like a normal Unicode object, except that
+it also carries around extra information related to its job as part of
+the :mod:`repoze.bfg` translation machinery.
 
 Using The ``TranslationString`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
