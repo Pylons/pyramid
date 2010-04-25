@@ -435,10 +435,10 @@ signature:
        ...
 
 The ``singular`` and ``plural`` arguments should each be a Unicode
-value representing a :term:`message identifier`.  ``num`` should be an
+value representing a :term:`message identifier`.  ``n`` should be an
 integer.  ``domain`` should be a :term:`translation domain`, and
 ``mapping`` should be a dictionary that is used for *replacement
-value* interpolation of the translated string.  If ``num`` is plural
+value* interpolation of the translated string.  If ``n`` is plural
 for the current locale, ``pluralize`` will return a Unicode
 translation for the message id ``plural``, otherwise it will return a
 Unicode translation for the message id ``singular``.
