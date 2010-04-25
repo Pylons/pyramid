@@ -1055,7 +1055,7 @@ class TestTranslationDirDirective(unittest.TestCase):
     def test_it(self):
         from repoze.bfg.configuration import Configurator
         context = DummyContext()
-        tdir = 'repoze.bfg.tests.fixtures:locale'
+        tdir = 'repoze.bfg.tests.localeapp:locale'
         self._callFUT(context, tdir)
         actions = context.actions
         self.assertEqual(len(actions), 1)

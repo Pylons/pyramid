@@ -179,7 +179,7 @@ class Test_get_localizer(unittest.TestCase):
         from repoze.bfg.i18n import Localizer
         registry = get_current_registry()
         here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'fixtures', 'locale')
+        localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         registry.registerUtility(localedirs, ITranslationDirectories)
         request = DummyRequest()
@@ -198,7 +198,7 @@ class Test_get_localizer(unittest.TestCase):
         from repoze.bfg.i18n import Localizer
         registry = get_current_registry()
         here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'fixtures', 'locale')
+        localedir = os.path.join(here, 'localeapp', 'locale')
         localedirs = [localedir]
         registry.registerUtility(localedirs, ITranslationDirectories)
         request = DummyRequest()
@@ -270,7 +270,7 @@ class TestTranslations(unittest.TestCase):
         import gettext
         import os
         here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'fixtures', 'locale')
+        localedir = os.path.join(here, 'localeapp', 'locale')
         locales = ['de', 'en']
         klass = self._getTargetClass()
         result = klass.load(localedir, locales, domain=None)
@@ -279,7 +279,7 @@ class TestTranslations(unittest.TestCase):
     def test_load_found_locale_and_domain(self):
         import os
         here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'fixtures', 'locale')
+        localedir = os.path.join(here, 'localeapp', 'locale')
         locales = ['de', 'en']
         klass = self._getTargetClass()
         result = klass.load(localedir, locales, domain='deformsite')
@@ -288,7 +288,7 @@ class TestTranslations(unittest.TestCase):
     def test_load_found_locale_and_domain_locale_is_string(self):
         import os
         here = os.path.dirname(__file__)
-        localedir = os.path.join(here, 'fixtures', 'locale')
+        localedir = os.path.join(here, 'localeapp', 'locale')
         locales = 'de'
         klass = self._getTargetClass()
         result = klass.load(localedir, locales, domain='deformsite')

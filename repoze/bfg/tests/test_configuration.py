@@ -1825,9 +1825,9 @@ class ConfiguratorTests(unittest.TestCase):
         import os
         from repoze.bfg.interfaces import ITranslationDirectories
         config = self._makeOne()
-        config.add_translation_dirs('repoze.bfg.tests.fixtures:locale')
+        config.add_translation_dirs('repoze.bfg.tests.localeapp:locale')
         here = os.path.dirname(__file__)
-        locale = os.path.join(here, 'fixtures', 'locale')
+        locale = os.path.join(here, 'localeapp', 'locale')
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
 
@@ -1838,7 +1838,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         manager.push({'request':request, 'registry':config.registry})
         try:
-            config.add_translation_dirs('repoze.bfg.tests.fixtures:locale')
+            config.add_translation_dirs('repoze.bfg.tests.localeapp:locale')
             translate = config.registry.getUtility(IChameleonTranslate)
             self.assertEqual(translate('Approve'), u'Approve')
         finally:
@@ -1849,7 +1849,7 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import ITranslationDirectories
         config = self._makeOne()
         here = os.path.dirname(__file__)
-        locale = os.path.join(here, 'fixtures', 'locale')
+        locale = os.path.join(here, 'localeapp', 'locale')
         config.add_translation_dirs(locale)
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
