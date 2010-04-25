@@ -233,6 +233,8 @@ section within the ``.ini`` file.  For example, if your application
    reload_templates = true
    debug_authorization = false
    debug_notfound = false
+   debug_templates = true
+   default_locale_name = en
 
 If so, you can use the following command to invoke a debug shell using
 the name ``main`` as a section name:
@@ -279,6 +281,8 @@ following ``.ini`` file content:
    reload_templates = true
    debug_authorization = false
    debug_notfound = false
+   debug_templates = true
+   default_locale_name = en
 
    [pipeline:main]
    pipeline = egg:repoze.tm2#tm
@@ -531,6 +535,17 @@ template changes will not require an application restart to be
 detected.  See :ref:`reload_templates_section` for more information.
 
 .. warning:: The ``reload_templates`` option should be turned off for
+   production applications, as template rendering is slowed when it is
+   turned on.
+
+The ``debug_templates`` setting in the ``[app:main]`` section is a
+:mod:`repoze.bfg` -specific setting which is passed into the
+framework.  If it exists, and its value is ``true``, :term:`Chameleon`
+template exceptions will contained more detailed and helpful
+information about the error than when this value is ``false``.  See
+:ref:`debug_templates_section` for more information.
+
+.. warning:: The ``debug_templates`` option should be turned off for
    production applications, as template rendering is slowed when it is
    turned on.
 

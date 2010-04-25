@@ -51,11 +51,14 @@ class TextTemplateRenderer(object):
     def template(self):
         settings = get_settings()
         auto_reload = settings and settings['reload_templates']
+        debug = settings and settings['debug_templates']
         reg = get_current_registry()
         translate = None
         if reg is not None:
             translate = reg.queryUtility(IChameleonTranslate)
-        return TextTemplateFile(self.path, auto_reload=auto_reload,
+        return TextTemplateFile(self.path,
+                                auto_reload=auto_reload,
+                                debug=debug,
                                 translate=translate)
 
     def implementation(self):

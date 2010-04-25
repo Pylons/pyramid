@@ -6,6 +6,7 @@ use = egg:{{project}}#app
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
+debug_templates = true
 default_locale_name = en
 
 [server:main]
