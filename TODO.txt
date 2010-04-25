@@ -19,3 +19,6 @@
 
 - Replace default_notfound_view and default_forbidden_view with better
   exception view candidates.
+
+- Fix message catalog extraction / compilation documentation.
+
