@@ -494,6 +494,9 @@ avoid this caching, you can use the
 You can also obtain the locale name related to a request using the
 ``locale_name`` attribute of a :term:`localizer`.
 
+.. code-block:: python
+   :linenos:
+
    from repoze.bfg.i18n import get_localizer
 
    def aview(request):
