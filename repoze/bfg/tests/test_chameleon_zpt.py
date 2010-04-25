@@ -75,6 +75,22 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.translate, ct)
 
+    def test_template_with_debug_templates(self):
+        self.config.add_settings({'debug_templates':True})
+        minimal = self._getTemplatePath('minimal.pt')
+        instance = self._makeOne(minimal)
+        self.failIf('template' in instance.__dict__)
+        template  = instance.template
+        self.assertEqual(template.debug, True)
+
+    def test_template_with_reload_templates(self):
+        self.config.add_settings({'reload_templates':True})
+        minimal = self._getTemplatePath('minimal.pt')
+        instance = self._makeOne(minimal)
+        self.failIf('template' in instance.__dict__)
+        template  = instance.template
+        self.assertEqual(template.auto_reload, True)
+
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.pt')
         instance = self._makeOne(minimal)
