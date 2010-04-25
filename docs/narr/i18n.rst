@@ -209,10 +209,13 @@ with translation markers, you can work on translations.
 
 .. note::
 
-   The steps used to work with gettext translation files in
-   :mod:`repoze.bfg` are very similar to the steps supported by
-   `Pylons internationalization
-   <http://wiki.pylonshq.com/display/pylonsdocs/Internationalization+and+Localization>`_.
+   The steps a developer must take to work with :term:`gettext`
+   :term:`message catalog` files within a :mod:`repoze.bfg`
+   application are very similar to the steps a :term:`Pylons`
+   developer must take to do the same.  See the `Pylons
+   internationalization documentation
+   <http://wiki.pylonshq.com/display/pylonsdocs/Internationalization+and+Localization>`_
+   for more information.
 
 .. index::
    single: Babel
@@ -252,14 +255,51 @@ install Babel like so:
    C> bin\easy_install Babel
 
 .. index::
+   single: Babel; message extractors
+
+Changing the ``setup.py``
++++++++++++++++++++++++++
+
+You need some "hair" to your application's ``setup.py`` file (see
+:ref:`project_narr` for information about the composition of an
+application's ``setup.py`` file).  In particular, add the ``Babel``
+distribution to your application's ``install_requires`` list and
+insert a set of references to :term:`Babel` *message extractors*
+within the call to :func:`setuptools.setup`:
+
+.. code-block:: python
+   :linenos:
+
+    setup(name="mypackage",
+          ...
+          install_requires = [
+                ....
+                "Babel",
+                ],
+          message_extractors = { ".": [
+                ("**.py",   "chameleon_python", None ),
+                ("**.pt",   "chameleon_xml", None ),
+                ]},
+          )
+
+The ``message_extractors`` stanza placed into the ``setup.py`` file
+cause the :term:`Babel` message catalog extraction machinery to also
+consider ``**.pt`` files when doing message id extraction.
+
+.. index::
    pair: extracting; messages
 
 Extracting Messages from Code and Templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once :term:`Babel` is installed, you may extract a message catalog
-template from the code and :term:`Chameleon` templates which reside in
-your application::
+Once :term:`Babel` is installed and your application's ``setup.py``
+file has the correct message extractor references, you may extract a
+message catalog template from the code and :term:`Chameleon` templates
+which reside in your :mod:`repoze.bfg` application.  You run a
+``setup.py`` command to extract the messages:
+
+.. code-block:: bash
+   :linenos:
 
    $ cd /place/where/myapplication/setup.py/lives
    $ mkdir -p myapplication/locale
@@ -268,16 +308,14 @@ your application::
 The message catalog template will end up in
 ``myapplication/locale/myapplication.pot``.
 
-XXX finish, including hair about Chameleon template scraping
-
 .. index::
    pair: initalizing; message catalog
 
 Initializaing a Message Catalog File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Initialize a message catalog for a specific locale from a pregenerated
-``.pot`` template::
+Initialize a message catalog for a specific locale from a
+pre-generated ``.pot`` template::
 
    $ cd /place/where/myapplication/setup.py/lives
    $ python setup.py init_catalog -l es
