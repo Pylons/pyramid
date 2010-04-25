@@ -1041,6 +1041,56 @@ class TestUtilityDirective(unittest.TestCase):
         self.assertEqual(utility['args'], (component, IFactory, '', None))
         self.assertEqual(utility['kw'], {})
 
+class TestTranslationDirDirective(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import translationdir
+        return translationdir(*arg, **kw)
+
+    def test_it(self):
+        from repoze.bfg.configuration import Configurator
+        context = DummyContext()
+        tdir = 'repoze.bfg.tests.fixtures:locale'
+        self._callFUT(context, tdir)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = context.actions[0]
+        self.assertEqual(action['discriminator'], ('tdir', tdir))
+        self.assertEqual(action['callable'].im_func,
+                         Configurator.add_translation_dirs.im_func)
+        self.assertEqual(action['args'], (tdir,))
+        action['callable'](*action['args']) # doesn't blow up
+
+class TestLocaleNegotiatorDirective(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, *arg, **kw):
+        from repoze.bfg.zcml import localenegotiator
+        return localenegotiator(*arg, **kw)
+
+    def test_it(self):
+        from repoze.bfg.configuration import Configurator
+        context = DummyContext()
+        dummy_negotiator = object()
+        self._callFUT(context, dummy_negotiator)
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        action = context.actions[0]
+        self.assertEqual(action['discriminator'], 'lnegotiator')
+        self.assertEqual(action['callable'].im_func,
+                         Configurator.set_locale_negotiator.im_func)
+        self.assertEqual(action['args'], (dummy_negotiator,))
+        action['callable'](*action['args']) # doesn't blow up
+
 class TestLoadZCML(unittest.TestCase):
     def setUp(self):
         testing.setUp()

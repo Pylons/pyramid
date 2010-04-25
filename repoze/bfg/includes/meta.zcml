@@ -77,6 +77,18 @@
         />
 
     <meta:directive
+        name="translationdir"
+        schema="repoze.bfg.zcml.ITranslationDirDirective"
+        handler="repoze.bfg.zcml.translationdir"
+        />
+
+    <meta:directive
+        name="localenegotiator"
+        schema="repoze.bfg.zcml.ILocaleNegotiatorDirective"
+        handler="repoze.bfg.zcml.localenegotiator"
+        />
+
+    <meta:directive
         name="adapter"
         schema="repoze.bfg.zcml.IAdapterDirective"
         handler="repoze.bfg.zcml.adapter"

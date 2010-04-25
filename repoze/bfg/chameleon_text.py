@@ -22,6 +22,7 @@ except ImportError: # pragma: no cover
 
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
+from repoze.bfg.interfaces import IChameleonTranslate
 
 from repoze.bfg.decorator import reify
 from repoze.bfg.renderers import template_renderer_factory
@@ -50,7 +51,12 @@ class TextTemplateRenderer(object):
     def template(self):
         settings = get_settings()
         auto_reload = settings and settings['reload_templates']
-        return TextTemplateFile(self.path, auto_reload=auto_reload)
+        reg = get_current_registry()
+        translate = None
+        if reg is not None:
+            translate = reg.queryUtility(IChameleonTranslate)
+        return TextTemplateFile(self.path, auto_reload=auto_reload,
+                                translate=translate)
 
     def implementation(self):
         return self.template

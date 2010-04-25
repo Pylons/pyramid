@@ -36,12 +36,16 @@ class Settings(dict):
                                            config_reload_resources))
         configure_zcml = self.get('configure_zcml', '')
         eff_configure_zcml = eget('BFG_CONFIGURE_ZCML', configure_zcml)
+        locale_name = self.get('locale_name', 'en')
+        eff_locale_name = eget('BFG_DEFAULT_LOCALE_NAME', locale_name)
+        
         update = {
             'debug_authorization': eff_debug_all or eff_debug_auth,
             'debug_notfound': eff_debug_all or eff_debug_notfound,
             'reload_templates': eff_reload_all or eff_reload_templates,
             'reload_resources':eff_reload_all or eff_reload_resources,
             'configure_zcml':eff_configure_zcml,
+            'default_locale_name':eff_locale_name,
             }
 
         self.update(update)

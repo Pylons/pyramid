@@ -13,6 +13,7 @@ except ImportError: # pragma: no cover
         def __init__(self, *arg, **kw):
             raise ImportError, exc, tb
 
+from repoze.bfg.interfaces import IChameleonTranslate
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
 
@@ -33,7 +34,12 @@ class ZPTTemplateRenderer(object):
     def template(self):
         settings = get_settings()
         auto_reload = settings and settings['reload_templates']
-        return PageTemplateFile(self.path, auto_reload=auto_reload)
+        reg = get_current_registry()
+        translate = None
+        if reg is not None:
+            translate = reg.queryUtility(IChameleonTranslate)
+        return PageTemplateFile(self.path, auto_reload=auto_reload,
+                                translate=translate)
 
     def implementation(self):
         return self.template

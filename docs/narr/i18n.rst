@@ -1,0 +1,777 @@
+.. index::
+   single: i18n
+   single: l10n
+   single: internationalization
+   single: localization
+
+.. _i18n_chapter:
+
+Internationalization and Localization
+=====================================
+
+:mod:`repoze.bfg` offers internationalization (i18n) and localization
+(l10n) subsystems that can be used to translate the text of buttons,
+the text of error messages and other software- and template-defined
+values into the native language of a user of your application.
+
+.. note: The APIs and functionality described in this chapter are new
+   as of :mod:`repoze.bfg` version 1.3.
+
+.. index::
+   single: translation string
+   pair: domain; translation
+   pair: msgid; translation
+   single: message identifier
+
+Creating a Translation String
+-----------------------------
+
+While you write your software, you can insert specialized markup into
+your Python code that makes it possible for the system to translate
+text values into the languages used by your application's users.  This
+markup generates a :term:`translation string`.  A translation string
+is an object that behave mostly like a normal Unicode object, except
+that it also carries around extra information related to its job as
+part of the :mod:`repoze.bfg` translation machinery.
+
+Using The ``TranslationString`` Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The most primitive way to create a translation string is to use the
+:class:`repoze.bfg.i18n.TranslationString` callable:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add')
+
+This creates a Unicode-like object that is a TranslationString.
+
+.. note::
+
+   For people more familiar with :term:`Zope` i8n, a TranslationString
+   is a lot like a ``zope.i18nmessageid.Message`` object.  It is not a
+   subclass, however.  For people more familiar with :term:`Pylons` or
+   :term:`Django` i8n, using a TranslationString is a lot like using
+   "lazy" versions of related gettext APIs.
+
+The first argument to :class:`repoze.bfg.i18n.TranslationString` is
+the ``msgid``; it is required.  It represents the key into the
+translation mappings provided by a particular localization. The
+``msgid`` argument must be a Unicode object or an ASCII string.  The
+msgid may optionally contain *replacement markers*.  For instance:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add ${number}')
+
+Within the string above, ``${stuff}`` is a replacement marker.  It
+will be replaced by whatever is in the *mapping* for a translation
+string.  The mapping may be supplied at the same time as the
+replacement marker itself:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add ${number}', mapping={'number':1})
+
+Any number of replacement markers can be present in the msgid value,
+any number of times.  Only markers which can be replaced by the values
+in the *mapping* will be replaced at translation time.  The others
+will not be interpolated and will be output literally.
+
+A translation string should also usually carry a *domain*.  The domain
+represents a translation category to disambiguate it from other
+translations of the same msgid, in case they conflict.
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('Add ${number}', mapping={'number':1}, 
+                          domain='form')
+
+The above translation string named a domain of ``form``.  A
+:term:`translator` function will often use the domain to locate the
+right translator file on the filesystem which contains translations
+for a given domain.  In this case, if it were trying to translate to
+our msgid to German, it might try to find a translation from a
+:term:`gettext` file within a :term:`translation directory` like this
+one::
+
+   locale/de/LC_MESSAGES/form.mo
+
+In other words, it would want to take translations from the ``form.mo``
+translation file in the German language.
+
+Finally, the TranslationString constructor accepts a ``default``
+argument.  If a ``default`` argument is supplied, it replaces usages
+of the ``msgid`` as the *default value* for the translation string.
+When ``default`` is ``None``, the ``msgid`` value passed to a
+TranslationString is used as an implicit message identifier.  Message
+identifiers are matched with translations in translation files, so it
+is often useful to create translation strings with "opaque" message
+identifiers unrelated to their default text:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString
+   ts = TranslationString('add-number', default='Add ${number}',
+                           domain='form', mapping={'number':1})
+
+When default text is used, Default text objects may contain
+replacement values.
+
+.. index::
+   single: translation string factory
+
+Using the ``TranslationStringFactory`` Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another way to generate a translation string is to use the
+:attr:`repoze.bfg.i18n.TranslationStringFactory` object.  This object
+is a *translation string factory*.  Basically a translation string
+factory presets the ``domain`` value of any :term:`translation string`
+generated by using it.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationStringFactory
+   _ = TranslationStringFactory('bfg')
+   ts = _('Add ${number}', msgid='add-number', mapping={'number':1})
+
+.. note:: We assigned the translation string factory to the name
+   ``_``.  This is a convention which will be supported by translation
+   file generation tools.
+
+After assigning ``_`` to the result of a
+:func:`repoze.bfg.i18n.TranslationStringFactory`, the subsequent
+result of calling ``_`` will be a
+:class:`repoze.bfg.i18n.TranslationString` instance.  Even though a
+``domain`` value was not passed to ``_` (as would have been necessary
+if the :class:`repoze.bfg.i18n.TranslationString` constructor were
+used instead of a translation string factory), the ``domain``
+attribute of the resulting translation string will be ``bfg``.  As a
+result, the previous code example is completely equivalent (except for
+spelling) to:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationString as _
+   ts = _('Add ${number}', msgid='add-number', mapping={'number':1}, 
+          domain='bfg')
+
+You can set up your own translation string factory much like the one
+provided above by using the
+:class:`repoze.bfg.i18n.TranslationStringFactory` class.  For example,
+if you'd like to create a translation string factory which presets the
+``domain`` value of generated translation strings to ``form``, you'd
+do something like this:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import TranslationStringFactory
+   _ = TranslationStringFactory('form')
+   ts = _('Add ${number}', msgid='add-number', mapping={'number':1})
+
+Creating a unique domain for your application via a translation string
+factory is best practice.  Using your own unique translation domain
+allows another person to reuse your application without needing to
+merge your translation files with his own.  Instead, he can just
+include your package's :term:`translation directory` via the
+:meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
+method.
+
+.. note::
+
+   For people familiar with Zope internationalization, a
+   TranslationStringFactory is a lot like a
+   ``zope.i18nmessageid.MessageFactory`` object.  It is not a
+   subclass, however.
+
+.. index::
+   single: gettext
+   single: translation directories
+
+Working With ``gettext`` Translation Files
+------------------------------------------
+
+Once your application source code files and templates are marked up
+with translation markers, you can work on translations.
+
+.. note::
+
+   The steps used to work with gettext translation files in
+   :mod:`repoze.bfg` are very similar to the steps supported by
+   `Pylons internationalization
+   <http://wiki.pylonshq.com/display/pylonsdocs/Internationalization+and+Localization>`_.
+
+.. index::
+   single: Babel
+
+.. _installing_babel:
+
+Installing Babel
+~~~~~~~~~~~~~~~~
+
+In order for the commands related to working with ``gettext``
+translation files to work properly, you will need to have
+:term:`Babel` installed into the same environment in which
+:mod:`repoze.bfg` is installed.
+
+Installation on UNIX
+++++++++++++++++++++
+
+If the :term:`virtualenv` into which you've installed your
+:mod:`repoze.bfg` application lives in ``/my/virtualenv``, you can
+install Babel like so:
+
+.. code-block:: bash
+
+   $ cd /my/virtualenv
+   $ bin/easy_install Babel
+
+Installation on Windows
++++++++++++++++++++++++
+
+If the :term:`virtualenv` into which you've installed your
+:mod:`repoze.bfg` application lives in ``C:\my\virtualenv``, you can
+install Babel like so:
+
+.. code-block:: bash
+
+   C> cd \my\virtualenv
+   C> bin\easy_install Babel
+
+.. index::
+   pair: extracting; messages
+
+Extracting Messages from Code and Templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once :term:`Babel` is installed, you may extract a message catalog
+template from the code and :term:`Chameleon` templates which reside in
+your application::
+
+   $ cd /place/where/myapplication/setup.py/lives
+   $ mkdir -p myapplication/locale
+   $ python setup.py extract_messages
+
+The message catalog template will end up in
+``myapplication/locale/myapplication.pot``.
+
+XXX finish, including hair about Chameleon template scraping
+
+.. index::
+   pair: initalizing; message catalog
+
+Initializaing a Message Catalog File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Initialize a message catalog for a specific locale from a pregenerated
+``.pot`` template::
+
+   $ cd /place/where/myapplication/setup.py/lives
+   $ python setup.py init_catalog -l es
+
+The message catalog ``.po`` file will end up in
+``myapplication/locale/es/LC_MESSAGES/myapplication.po``.
+
+XXX finish
+
+.. index::
+   pair: updating; message catalog
+
+Updating a Catalog File
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Update ``.po`` files based on changes to the ``.pot`` file::
+
+   $ cd /place/where/myapplication/setup.py/lives
+   $ python setup.py update_catalog
+
+XXX finish
+
+.. index::
+   pair: compiling; message catalog
+
+Compiling a Message Catalog File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Compile ``.po`` files to ``.mo`` files::
+
+   $ cd /place/where/myapplication/setup.py/lives
+   $ python setup.py compile_catalog
+
+XXX finish
+
+.. index::
+   single: localizer
+   single: get_localizer
+
+Using a Localizer
+-----------------
+
+A :term:`localizer` is an object that allows you to perform
+translation or pluralization "by hand" in an application.  You may use
+the :func:`repoze.bfg.i18n.get_localizer` function to obtain a
+:term:`localizer`.  :func:`repoze.bfg.i18n.get_localizer`. This
+function will return either the localizer object implied by the active
+:term:`locale negotiator` or a default localizer object if no explicit
+locale negotiator is registered.
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import get_localizer
+
+   def aview(request):
+       locale = get_localizer(request)
+
+.. index::
+   single: translating (i18n)
+
+.. _performing_a_translation:
+
+Performing a Translation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A :term:`localizer` has a ``translate`` method which accepts either a
+:term:`translation string` or a Unicode string and which returns a
+Unicode object representing the translation.  So, generating a
+translation in a view component of an application might look like so:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import get_localizer
+   from repoze.bfg.i18n import TranslationString
+
+   ts = TranslationString('Add ${number}', mapping={'number':1}, domain='bfg')
+
+   def aview(request):
+       localizer = get_localizer(request)
+       translated = localizer.translate(ts) # translation string
+       # ... use translated ...
+
+The :func:`repoze.bfg.i18n.get_localizer` function will return a
+:class:`repoze.bfg.i18n.Localizer` object bound to the locale name
+represented by the request.  The translation returned from its
+:meth:`repoze.bfg.i18n.Localizer.translate` method will depend on the
+``domain`` attribute of the provided translation string as well as the
+locale of the localizer.
+
+.. note:: If you're using :term:`Chameleon` templates, you don't need
+   to pre-translate translation strings this way.  See
+   :ref:`chameleon_translation_strings`.
+
+.. index::
+   single: pluralizing (i18n)
+
+.. _performing_a_pluralization:
+
+Performing a Pluralization
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A :term:`localizer` has a ``pluralize`` method with the following
+signature:
+
+.. code-block:: python
+   :linenos:
+
+   def pluralize(singular, plural, n, domain=None, mapping=None):
+       ...
+
+The ``singular`` and ``plural`` arguments should each be a Unicode
+value representing a :term:`message identifier`.  ``num`` should be an
+integer.  ``domain`` should be a :term:`translation domain`, and
+``mapping`` should be a dictionary that is used for *replacement
+value* interpolation of the translated string.  If ``num`` is plural
+for the current locale, ``pluralize`` will return a Unicode
+translation for the message id ``plural``, otherwise it will return a
+Unicode translation for the message id ``singular``.
+
+The arguments provided as ``singular`` and/or ``plural`` may also be
+:term:`translation string` objects, but the domain and mapping
+information attached to those object is ignored.
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import get_localizer
+
+   def aview(request):
+       localizer = get_localizer(request)
+       translated = localizer.pluralize('Item', 'Items', 1, 'mydomain')
+       # ... use translated ...
+
+.. index::
+   single: locale name
+   single: get_locale_name
+   single: negotiate_locale_name
+
+.. _obtaining_the_locale_name:
+
+Obtaining the Locale Name for a Request
+---------------------------------------
+
+You can obtain the locale name related to a request by using the
+:func:`repoze.bfg.i18n.get_locale_name` function.
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import get_locale_name
+
+   def aview(request):
+       locale_name = get_locale_name(request)
+
+This returns the locale name negotiated by the currently active
+:term:`locale negotiator` or the default locale name (usually
+``en``) if no locale negotiator is configured.
+
+Once :func:`repoze.bfg.i18n.get_locale_name` has run once, the local
+name is stored on the request object it is passed.  Subsequent calls
+to :func:`repoze.bfg.i18n.get_locale_name` will return the stored
+locale name without invoking the :term:`locale negotiator`.  To
+avoid this caching, you can use the
+:func:`repoze.bfg.i18n.negotiate_locale_name` function:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.i18n import negotiate_locale_name
+
+   def aview(request):
+       locale_name = negotiate_locale_name(request)
+
+You can also obtain the locale name related to a request using the
+``locale_name`` attribute of a :term:`localizer`.
+
+   from repoze.bfg.i18n import get_localizer
+
+   def aview(request):
+       localizer = get_localizer(request)
+       locale_name = localizer.locale_name
+
+Obtaining the locale name as an attribute of a localizer is equivalent
+to obtaining a locale name by calling the
+:func:`repoze.bfg.i18n.get_locale_name` function.
+
+.. index::
+   single: date and currency formatting (i18n)
+   single: Babel
+
+Performing Date Formatting and Currency Formatting
+--------------------------------------------------
+
+:mod:`repoze.bfg` does not itself perform date and currency formatting
+for different locales.  However, :term:`Babel` can help you do this
+via the :class:`babel.core.Locale` class.  The `Babel documentation
+for this class
+<http://babel.edgewall.org/wiki/ApiDocs/babel.core#babel.core:Locale>`_
+provides minimal information about how to perform date and currency
+related locale operations.  See :ref:`installing_babel` for
+information about how to install Babel.
+
+The :class:`babel.core.Locale` class requires a :term:`locale name` as
+an argument to its constructor. You can use :mod:`repoze.bfg` APIs to
+obtain the locale name for a request to pass to the
+:class:`babel.core.Locale` constructor; see
+:ref:`obtaining_the_locale_name`.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from babel.core import Locale
+   from repoze.bfg.i18n import get_locale_name
+
+   def aview(request):
+       locale_name = get_locale_name(request)
+       locale = Locale(locale_name)
+
+.. index::
+   pair: translation strings; Chameleon
+
+.. _chameleon_translation_strings:
+
+Chameleon Template Support for Translation Strings
+--------------------------------------------------
+
+When a :term:`translation string` is used as the subject of textual
+rendering by a :term:`Chameleon` template renderer, it will
+automatically be translated to the requesting user's language if a
+suitable translation exists. This is true of both the ZPT and text
+variants of the Chameleon template renderers.
+
+For example, in a Chameleon ZPT template, the translation string
+represented by "some_translation_string" in each example below will go
+through translation before being rendered:
+
+.. code-block:: xml
+   :linenos:
+
+   <span tal:content="some_translation_string"/>
+
+.. code-block:: xml
+   :linenos:
+
+   <span tal:replace="some_translation_string"/>
+
+.. code-block:: xml
+   :linenos:
+
+   <span>${some_translation_string}</span>
+
+.. code-block:: xml
+   :linenos:
+
+   <a tal:attributes="href some_translation_string">Click here</a>
+   XXX this appears to not yet work as of Chameleon 1.2.3
+
+The features represented by attributes of the ``i18n`` namespace of
+Chameleon will also consult the :mod:`repoze.bfg` translations.
+See
+`http://chameleon.repoze.org/docs/latest/i18n.html#the-i18n-namespace
+<http://chameleon.repoze.org/docs/latest/i18n.html#the-i18n-namespace>`_.
+
+.. note::
+
+   Unlike when Chameleon is used outside of :mod:`repoze.bfg`, when it
+   is used *within* :mod:`repoze.bfg`, it does not support use of the
+   ``zope.i18n`` translation framework.  Applications which use
+   :mod:`repoze.bfg` should use the features documented in this
+   chapter rather than ``zope.i18n``.
+
+Third party :mod:`repoze.bfg` template renderers might not provide
+this support out of the box and may need special code to do an
+equivalent.  For those, you can always use the more manual translation
+facility described in :ref:`performing_a_translation`.
+
+.. index::
+   single: localization deployment settings
+   single:  default_locale_name
+
+.. _localization_deployment_settings:
+
+Localization-Related Deployment Settings
+----------------------------------------
+
+A :mod:`repoze.bfg` application will have a ``default_locale_name``
+setting.  This value represents the default locale name when no
+:term:`locale negotiator` is registered.  Pass it to the
+:mod:`repoze.bfg.configuration.Configurator` constructor at startup
+time:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   config = Configurator(settings={'default_locale_name':'de'})
+
+You may alternately supply a ``default_locale_name`` via an
+application's Paster ``.ini`` file:
+
+.. code-block:: ini
+   :linenos:
+
+   [app:main]
+   use = egg:MyProject#app
+   reload_templates = true
+   debug_authorization = false
+   debug_notfound = false
+   default_locale_name = de
+
+If this value is not supplied via the Configurator constructor or via
+a Paste onfig file, it will default to ``en``.
+
+If this setting is supplied within the :mod:`repoze.bfg` application
+``.ini`` file, it will be available as a settings key:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.setttings import get_settings
+   settings = get_settings()
+   default_locale_name = settings['default_locale_name']
+
+.. index::
+   pair: translation; activating
+   pair: locale; negotiator
+   single: translation directory
+
+.. _activating_translation:
+
+Activating Translation
+----------------------
+
+By default, a :mod:`repoze.bfg` application performs no translation.
+To turn translation on, you must do both of these two things:
+
+- Add at least one :term:`translation directory` to your application.
+
+- Configure a :term:`locale negotiator` into your application's
+  configuration.
+
+:term:`gettext` is the underlying machinery behind the
+:mod:`repoze.bfg` translation machinery.  A translation directory is a
+directory organized to be useful to :term:`gettext`.  A translation
+directory usually includes a listing of language directories, each of
+which itself includes an ``LC_MESSAGES`` directory.  Each
+``LC_MESSAGES`` directory should contain one or more ``.mo`` files.
+Each ``.mo`` file represents a :term:`message catalog`, which is used
+to provide translations to your application.
+
+A locale negotiator is a bit of code which accepts a request and which
+returns a :term:`locale name`.  It is consulted when
+:meth:`repoze.bfg.i18n.Localizer.translate`
+:meth:`repoze.bfg.i18n.Localizer.pluralize` is invoked.  It is also
+consulted when :func:`repoze.bfg.i18n.get_locale_name` or
+:func:`repoze.bfg.i18n.negotiate_locale_name` is invoked.
+
+At the time of this writing, only one (very weak) built-in locale
+negotiator implementation named
+:class:`repoze.bfg.i18n.default_locale_negotiator` ships as part of
+the :mod:`repoze.bfg` software.  This negotiator looks only at the the
+``request.params['locale']`` value to determine the locale name.  You
+can provide your own locale negotiator function as required.
+
+Adding a Translation Directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may add a :term:`translation directory` to your application's
+configuration either imperatively or via ZCML.  Adding a translation
+directory registers all of its constituent :term:`message catalog`
+files (all of the ``.mo`` files found within all ``LC_MESSAGES``
+directories within each locale directory in the translation directory)
+within your :mod:`repoze.bfg` application to be available to use for
+translation services.
+
+Imperative
+++++++++++
+
+You can add a translation directory imperatively by using the
+:meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
+during application startup.
+
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.i18n import default_locale_negotiator
+   config = Configurator(locale_negotiator=default_locale_negotiator)
+   config.begin()
+   config.add_translation_dirs('my.application:locale/', 
+                               'another.application:locale/')
+   config.end()
+
+A message catalog in a translation directory added via
+:meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
+will be merged into translations from an message catalog added earlier
+if both translation directories contain translations for the same
+locale and :term:`translation domain`.
+
+ZCML
+++++
+
+You can add a translation directory via ZCML by using the
+:ref:`translationdir_directive` ZCML directive:
+
+.. code-block:: xml
+   :linenos:
+
+   <translationdir dir="my.application:locale/"/>
+
+A message catalog in a translation directory added via
+:ref:`translationdir_directive` will be merged into translations from
+an message catalog added earlier if both translation directories
+contain translations for the same locale and :term:`translation
+domain`.
+
+.. _adding_a_locale_negotiator:
+
+Adding a Locale Negotiator
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may add a :term:`locale negotiator` either imperatively or via
+ZCML.  A locale negotiator informs the operation of a
+:term:`localizer` by telling it what :term:`locale name` is related to
+a particular request.  See :ref:`creating_a_locale_negotiator`.
+
+Imperative
+++++++++++
+
+Pass an object which can act as the negotiator as the
+``locale_negotiator`` argument of the
+:class:`repoze.bfg.configuration.Configurator` instance during
+application startup.
+
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.i18n import default_locale_negotiator
+   config = Configurator(locale_negotiator=default_locale_negotiator)
+
+Alternately, use the
+:meth:`repoze.bfg.configuration.Configurator.set_locale_negotiator`
+method.
+
+For example:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.i18n import default_locale_negotiator
+   config = Configurator()
+   config.begin()
+   config.set_locale_negotiator(default_locale_negotiator)
+   config.end()
+
+ZCML
+++++
+
+You can add a translation directory via ZCML by using the
+:ref:`localenegotiator_directive` ZCML directive:
+
+.. code-block:: xml
+   :linenos:
+
+   <localenegotiator negotiator="repoze.bfg.i18n.default_locale_negotiator"/>
+
+.. _creating_a_locale_negotiator:
+
+Creating a Locale Negotiator
+----------------------------
+
+A :term:`locale negotiator` is simply a callable which accepts a
+request and returns a single :term:`locale name`.  Here's an
+implementation of a simple locale negotiator:
+
+.. code-block:: python
+   :linenos:
+
+    def default_locale_negotiator(request):
+        locale_name = request.params.get('locale')
+        if locale_name is None:
+            settings = get_settings() or {}
+            locale_name = settings.get('default_locale_name', 'en')
+        return locale_name
+
+Locale negotiation can be complex.  Your application may require a
+policy-laden locale negotiator policy, so you can write your own and
+supply it to an application configuration as per
+:ref:`adding_a_locale_negotiator`.

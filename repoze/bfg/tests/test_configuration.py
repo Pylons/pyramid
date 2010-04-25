@@ -255,6 +255,15 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry()
         self.failUnless(reg.getUtility(IRootFactory))
 
+    def test_setup_registry_locale_negotiator(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import ILocaleNegotiator
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(locale_negotiator='abc')
+        utility = reg.getUtility(ILocaleNegotiator)
+        self.assertEqual(utility, 'abc')
+
     def test_setup_registry_alternate_renderers(self):
         from repoze.bfg.registry import Registry
         from repoze.bfg.interfaces import IRendererFactory
@@ -1796,6 +1805,54 @@ class ConfiguratorTests(unittest.TestCase):
         config._set_authorization_policy(policy)
         self.assertEqual(
             config.registry.getUtility(IAuthorizationPolicy), policy)
+
+    def test_set_locale_negotiator(self):
+        from repoze.bfg.interfaces import ILocaleNegotiator
+        config = self._makeOne()
+        def negotiator(request): pass
+        config.set_locale_negotiator(negotiator)
+        self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
+                         negotiator)
+
+    def test_add_translation_dirs_missing_dir(self):
+        from repoze.bfg.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError,
+                          config.add_translation_dirs,
+                          '/wont/exist/on/my/system')
+
+    def test_add_translation_dirs_resource_spec(self):
+        import os
+        from repoze.bfg.interfaces import ITranslationDirectories
+        config = self._makeOne()
+        config.add_translation_dirs('repoze.bfg.tests.fixtures:locale')
+        here = os.path.dirname(__file__)
+        locale = os.path.join(here, 'fixtures', 'locale')
+        self.assertEqual(config.registry.getUtility(ITranslationDirectories),
+                         [locale])
+
+    def test_add_translation_dirs_registers_chameleon_translate(self):
+        from repoze.bfg.interfaces import IChameleonTranslate
+        from repoze.bfg.threadlocal import manager
+        request = DummyRequest()
+        config = self._makeOne()
+        manager.push({'request':request, 'registry':config.registry})
+        try:
+            config.add_translation_dirs('repoze.bfg.tests.fixtures:locale')
+            translate = config.registry.getUtility(IChameleonTranslate)
+            self.assertEqual(translate('Approve'), u'Approve')
+        finally:
+            manager.pop()
+
+    def test_add_translation_dirs_abspath(self):
+        import os
+        from repoze.bfg.interfaces import ITranslationDirectories
+        config = self._makeOne()
+        here = os.path.dirname(__file__)
+        locale = os.path.join(here, 'fixtures', 'locale')
+        config.add_translation_dirs(locale)
+        self.assertEqual(config.registry.getUtility(ITranslationDirectories),
+                         [locale])
 
     def test__renderer_from_name_default_renderer(self):
         from repoze.bfg.interfaces import IRendererFactory

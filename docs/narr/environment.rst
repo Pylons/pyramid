@@ -9,6 +9,7 @@
    single: reload_all
    single: debug settings
    single: reload settings
+   single: default_locale_name
    single: environment variables
    single: ini file settings
    single: PasteDeploy settings
@@ -116,6 +117,22 @@ Turns on all ``reload*`` settings.
 | Environment Variable Name       | Config File Setting Name    |
 +=================================+=============================+
 | ``BFG_RELOAD_ALL``              |  ``reload_all``             |
+|                                 |                             |
+|                                 |                             |
+|                                 |                             |
++---------------------------------+-----------------------------+
+
+Default Locale Name
+--------------------
+
+The value supplied here is used as the default locale name when a
+:term:`locale negotiator` is not registered.  See also
+:ref:`localization_deployment_settings`.
+
++---------------------------------+-----------------------------+
+| Environment Variable Name       | Config File Setting Name    |
++=================================+=============================+
+| ``BFG_DEFAULT_LOCALE_NAME``     |  ``default_locale_name``    |
 |                                 |                             |
 |                                 |                             |
 |                                 |                             |

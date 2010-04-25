@@ -421,6 +421,7 @@ structure::
   |   |-- tests.py
   |   `-- views.py
   |-- MyProject.ini
+  |-- setup.cfg
   `-- setup.py
 
 The ``MyProject`` :term:`Project`
@@ -440,6 +441,9 @@ describe, run, and test your application.
 
 #. ``MyProject.ini`` is a :term:`PasteDeploy` configuration file that
    can be used to execute your application.
+
+#. ``setup.cfg`` is a :term:`setuptools` configuration file used by
+   ``setup.py``.
 
 #. ``setup.py`` is the file you'll use to test and distribute your
    application.  It is a standard :term:`setuptools` ``setup.py``
@@ -632,6 +636,21 @@ tarball to other people who want to use your application.
    version control system such as Subversion.  After you do this, when
    you rerun ``setup.py sdist``, all files checked into the version
    control system will be included in the tarball.
+
+``setup.cfg``
+~~~~~~~~~~~~~
+
+The ``setup.cfg`` file is a :term:`setuptools` configuration file.  It
+contains various settings related to testing and internationalization:
+
+Our generated ``setup.cfg`` looks like this:
+
+.. literalinclude:: MyProject/setup.cfg
+   :linenos:
+
+The values in the default setup file allow various commonly-used
+internationalization commands and testing commands to work more
+smoothly.
 
 .. index::
    single: package

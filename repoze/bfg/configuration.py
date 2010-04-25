@@ -8,6 +8,8 @@ import inspect
 from webob import Response
 import venusian
 
+from translationstring import ChameleonTranslate
+
 from zope.configuration import xmlconfig
 
 from zope.interface import Interface
@@ -17,9 +19,11 @@ from zope.interface import implements
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
+from repoze.bfg.interfaces import IChameleonTranslate
 from repoze.bfg.interfaces import IDebugLogger
 from repoze.bfg.interfaces import IDefaultRootFactory
 from repoze.bfg.interfaces import IExceptionViewClassifier
+from repoze.bfg.interfaces import ILocaleNegotiator
 from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRendererFactory
@@ -31,6 +35,7 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITemplateRenderer
+from repoze.bfg.interfaces import ITranslationDirectories
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewClassifier
@@ -45,8 +50,10 @@ from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.exceptions import ConfigurationError
+from repoze.bfg.i18n import get_localizer
 from repoze.bfg.log import make_stream_logger
 from repoze.bfg.path import caller_package
+from repoze.bfg.path import package_path
 from repoze.bfg.registry import Registry
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import PackageOverrides
@@ -54,6 +61,7 @@ from repoze.bfg.resource import resolve_resource_spec
 from repoze.bfg.settings import Settings
 from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
+from repoze.bfg.threadlocal import get_current_request
 from repoze.bfg.threadlocal import manager
 from repoze.bfg.traversal import traversal_path
 from repoze.bfg.traversal import DefaultRootFactory
@@ -135,14 +143,16 @@ class Configurator(object):
     logs to stderr will be used.  If it is passed, it should be an
     instance of the :class:`logging.Logger` (PEP 282) standard library
     class.  The debug logger is used by :mod:`repoze.bfg` itself to
-    log warnings and authorization debugging information.  """
-    
+    log warnings and authorization debugging information.
+
+    """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
     def __init__(self, registry=None, package=None, settings=None,
                  root_factory=None, authentication_policy=None,
                  authorization_policy=None, renderers=DEFAULT_RENDERERS,
-                 debug_logger=None):
+                 debug_logger=None,
+                 locale_negotiator=None):
         self.package = package or caller_package()
         self.registry = registry
         if registry is None:
@@ -154,7 +164,8 @@ class Configurator(object):
                 authentication_policy=authentication_policy,
                 authorization_policy=authorization_policy,
                 renderers=renderers,
-                debug_logger=debug_logger)
+                debug_logger=debug_logger,
+                locale_negotiator=locale_negotiator)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -270,7 +281,8 @@ class Configurator(object):
 
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
-                       renderers=DEFAULT_RENDERERS, debug_logger=None):
+                       renderers=DEFAULT_RENDERERS, debug_logger=None,
+                       locale_negotiator=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
@@ -304,6 +316,8 @@ class Configurator(object):
             self.add_renderer(name, renderer)
         self.set_notfound_view(default_notfound_view)
         self.set_forbidden_view(default_forbidden_view)
+        if locale_negotiator:
+            registry.registerUtility(locale_negotiator, ILocaleNegotiator)
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -1225,10 +1239,6 @@ class Configurator(object):
            found via context-finding or ``None`` if no context could
            be found.  The exception causing the registered view to be
            called is however still available as ``request.exception``.
-        .. warning:: This method has been deprecated in
-           :mod:`repoze.bfg` 1.3.  See
-           :ref:`changing_the_forbidden_view` to see how a not found
-           view should be registered in :mod:`repoze.bfg` 1.3+.
 
         The ``view`` argument should be a :term:`view callable`.
 
@@ -1298,6 +1308,71 @@ class Configurator(object):
             return view(ctx, request)
         return self.add_view(bwcompat_view, context=NotFound,
                              wrapper=wrapper, _info=_info)
+
+    def set_locale_negotiator(self, negotiator):
+        """
+        Set the :term:`locale negotiator` for this application.  The
+        :term:`locale negotiator` is a callable which accepts a
+        :term:`request` object and which returns a :term:`locale
+        name`.  Later calls to this method override earlier calls;
+        there can be only one locale negotiator active at a time
+        within an application.  See :ref:`activating_translation` for
+        more information.
+
+        .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
+        """
+        self.registry.registerUtility(negotiator, ILocaleNegotiator)
+
+    def add_translation_dirs(self, *specs):
+        """ Add one or more :term:`translation directory` paths to the
+        current configuration state.  The ``specs`` argument is a
+        sequence that may contain absolute directory paths
+        (e.g. ``/usr/share/locale``) or :term:`resource specification`
+        names naming a directory path (e.g. ``some.package:locale``)
+        or a combination of the two.
+
+        Example:
+
+        .. code-block:: python
+
+           add_translations_dirs('/usr/share/locale', 'some.package:locale')
+
+        .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
+        """
+        for spec in specs:
+
+            package_name, filename = self._split_spec(spec)
+            if package_name is None: # absolute filename
+                directory = filename
+            else:
+                __import__(package_name)
+                package = sys.modules[package_name]
+                directory = os.path.join(package_path(package), filename)
+
+            if not os.path.isdir(os.path.realpath(directory)):
+                raise ConfigurationError('"%s" is not a directory' % directory)
+
+            tdirs = self.registry.queryUtility(ITranslationDirectories)
+            if tdirs is None:
+                tdirs = []
+                self.registry.registerUtility(tdirs, ITranslationDirectories)
+
+            tdirs.insert(0, directory)
+
+        if specs:
+
+            # We actually only need an IChameleonTranslate function
+            # utility to be registered zero or one times.  We register the
+            # same function once for each added translation directory,
+            # which does too much work, but has the same effect.
+
+            def translator(msg):
+                request = get_current_request()
+                localizer = get_localizer(request)
+                return localizer.translate(msg)
+
+            ctranslate = ChameleonTranslate(translator)
+            self.registry.registerUtility(ctranslate, IChameleonTranslate)
 
     def add_static_view(self, name, path, cache_max_age=3600, _info=u''):
         """ Add a view used to render static resources to the current

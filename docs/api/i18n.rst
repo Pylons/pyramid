@@ -1,0 +1,31 @@
+.. _i18n_module:
+
+:mod:`repoze.bfg.i18n`
+----------------------
+
+.. automodule:: repoze.bfg.i18n
+
+  .. autoclass:: TranslationString
+ 
+  .. autoclass:: TranslationStringFactory
+
+  .. autoclass:: Localizer
+     :members:
+
+     .. attribute:: locale_name
+
+        The locale name for this localizer (e.g. ``en`` or ``en_US``).
+
+  .. autofunction:: get_localizer
+
+  .. autofunction:: negotiate_locale_name
+
+  .. autofunction:: get_locale_name
+
+  .. autofunction:: default_locale_negotiator
+
+See :ref:`i18n_chapter` for more information about using
+:mod:`repoze.bfg` internationalization and localization services
+within an application.
+
+

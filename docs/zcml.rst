@@ -16,6 +16,7 @@ directive documentation is organized alphabetically by directive name.
    zcml/configure
    zcml/forbidden
    zcml/include
+   zcml/localenegotiator
    zcml/notfound
    zcml/remoteuserauthenticationpolicy
    zcml/renderer
@@ -25,5 +26,6 @@ directive documentation is organized alphabetically by directive name.
    zcml/scan
    zcml/static
    zcml/subscriber
+   zcml/translationdir
    zcml/utility
    zcml/view

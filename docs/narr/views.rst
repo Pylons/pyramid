@@ -840,6 +840,11 @@ In all cases, the message provided to the exception constructor is
 made available to the view which :mod:`repoze.bfg` invokes as
 ``request.exception.args[0]``.
 
+.. index::
+   single: exception views
+
+.. _exception_views:
+
 Exception Views
 ~~~~~~~~~~~~~~~~
 

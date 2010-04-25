@@ -22,7 +22,7 @@ Features
   returned.
 
   Other normal view predicates can also be used in combination with an
-  exception view registration:
+  exception view registration::
 
       from repoze.bfg.view import bfg_view
       from repoze.bfg.exceptions import NotFound
@@ -58,6 +58,22 @@ Features
   scanner.  (Truth be told, Venusian is really just a generalization
   of the BFG-internal decorator scanner).
 
+- Internationalization and localization features as documented in the
+  narrative documentation chapter entitled ``Internationalization and
+  Localization``.
+
+- A new setting named ``default_locale_name`` was added.  If this
+  string is present as a Paster ``.ini`` file option, it will be
+  considered the default locale name.  The default locale name is used
+  during locale-related operations such as language translation.
+
+ZCML
+----
+
+- Add a ``translationdir`` ZCML directive to support localization.
+
+- Add a ``localenegotiator`` ZCML directive to support localization.
+
 Deprecations
 ------------
 
@@ -73,6 +89,12 @@ Dependencies
 
 - A new install-time dependency on the ``venusian`` distribution was
   added.
+
+- A new install-time dependency on the ``translationstring``
+  distribution was added.
+
+- Chameleon 1.2.3 or better is now required (internationalization and
+  per-template debug settings).
 
 Internal
 --------
@@ -96,3 +118,32 @@ Documentation
 
 - Exception view documentation was added to the ``Hooks`` narrative
   chapter.
+
+- A new narrative chapter entitled ``Internationalization and
+  Localization`` was added.
+
+- The "Environment Variables and ``ini`` File Settings" chapter was
+  changed: documentation about the ``default_locale_name`` setting was
+  added.
+
+- A new API chapter for the ``repoze.bfg.i18n`` module was added.
+
+- Documentation for the new ``translationdir`` and
+  ``locale_negotiator`` ZCML directives were added.
+
+Paster Templates
+----------------
+
+- All paster templates now create a ``setup.cfg`` which includes
+  commands related to nose testing and Babel message catalog
+  extraction/compilation.
+
+- A ``default_locale_name = en`` setting was added to each existing paster
+  template.
+
+Licensing
+---------
+
+- The Edgewall (BSD) license was added to the LICENSES.txt file, as
+  some code in the ``repoze.bfg.i18n`` derives from Babel source.
+

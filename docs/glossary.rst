@@ -667,3 +667,76 @@ Glossary
      at import time, the action usually taken by the decorator is
      deferred until a separate "scan" phase.  :mod:`repoze.bfg` relies
      on Venusian to provide a basis for its :term:`scan` feature.
+
+   Translation String
+     An instance of :class:`repoze.bfg.i18n.TranslationString`, which
+     is a class that behaves like a Unicode string, but has several
+     extra attributes such as ``domain``, ``msgid``, and ``mapping``
+     for use during translation.  Translation strings are usually
+     created by hand within software, but are sometimes created on the
+     behalf of the system for automatic template translation.  For
+     more information, see :ref:`i18n_chapter`.
+
+   Translation Domain
+     A string representing the "context" in which a translation was
+     made.  For example the word "java" might be translated
+     differently if the translation domain is "programming-languages"
+     than would be if the translation domain was "coffee".  A
+     translation domain is represnted by a collection of ``.mo`` files
+     within one or more :term:`translation directory` directories.
+
+   Translator
+     A callable which receives a :term:`translation string` and
+     returns a translated Unicode object for the purposes of
+     internationalization.  A :term:`localizer` supplies a
+     translator to a :mod:`repoze.bfg` application accessible via its
+     ``translate`` method.
+
+   Translation Directory
+     A translation directory is a :term:`gettext` translation
+     directory.  It contains language folders, which themselves
+     contain ``LC_MESSAGES`` folders, which contain ``.mo`` files.
+     Each ``.mo`` file represents a set of translations for a language
+     in a :term:`translation domain`.  The name of the ``.mo`` file
+     (minus the .mo extension) is the translation domain name.
+
+   Localizer
+     An instance of the class :class:`repoze.bfg.i18n.Localizer` which
+     provides translation and pluralization services to an
+     application.  It is retrieved via the
+     :func:`repoze.bfg.i18n.get_localizer` function.
+
+   Locale Name
+     A string like ``en``, ``en_US``, ``de``, or ``de_AT`` which
+     uniquely identifies a particular locale.
+
+   Locale Negotiator
+     An object supplying a policy determining which :term:`locale
+     name` best represents a given :term:`request`.  It is used by the
+     :func:`repoze.bfg.i18n.get_locale_name`, and
+     :func:`repoze.bfg.i18n.negotiate_locale_name` functions, and
+     indirectly by :func:`repoze.bfg.i18n.get_localizer`.  The
+     :func:`repoze.bfg.i18n.default_locale_negotiator` function
+     is an example of a locale negotiator.
+
+   Gettext
+     The GNU `gettext <http://www.gnu.org/software/gettext/>`_
+     library, used by the :mod:`repoze.bfg` translation machinery.
+
+   Babel
+     A `collection of tools <http://babel.edgewall.org/>`_ for
+     internationalizing Python applications.  :mod:`repoze.bfg` does
+     not depend on Babel to operate, but if Babel is installed,
+     additional locale functionality becomes available to your
+     application.
+
+   Message Identifier
+     A string used as a translation lookup key during localization.
+     The ``msgid`` argument to a :term:`translation string` is a
+     message identifier.  Message identifiers are also present in a
+     :term:`message catalog`.
+
+   Message Catalog
+     A :term:`gettext` ``.mo`` file containing translations.
+
+

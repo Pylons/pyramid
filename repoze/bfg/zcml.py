@@ -585,6 +585,41 @@ def scan(_context, package):
         args=(package, None, _context.info)
         )
 
+class ITranslationDirDirective(Interface):
+    dir = TextLine(
+        title=u"Add a translation directory",
+        description=(u"Add a translation directory"),
+        required=True,
+        )
+
+def translationdir(_context, dir):
+    path = path_spec(_context, dir)
+    reg = get_current_registry()
+    config = Configurator(reg, package=_context.package)
+
+    _context.action(
+        discriminator = ('tdir', path),
+        callable=config.add_translation_dirs,
+        args = (dir,),
+        )
+
+class ILocaleNegotiatorDirective(Interface):
+    negotiator = GlobalObject(
+        title=u"Configure a locale negotiator",
+        description=(u'Configure a locale negotiator'),
+        required=True,
+        )
+
+def localenegotiator(_context, negotiator):
+    reg = get_current_registry()
+    config = Configurator(reg, package=_context.package)
+
+    _context.action(
+        discriminator = 'lnegotiator',
+        callable=config.set_locale_negotiator,
+        args = (negotiator,)
+        )
+
 class IAdapterDirective(Interface):
     """
     Register an adapter

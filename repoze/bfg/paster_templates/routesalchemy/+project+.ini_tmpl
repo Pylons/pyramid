@@ -6,6 +6,7 @@ use = egg:{{package}}#app
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
+default_locale_name = en
 db_string = sqlite:///%(here)s/{{package}}.db
 
 [pipeline:main]

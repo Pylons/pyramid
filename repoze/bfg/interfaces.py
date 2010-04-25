@@ -229,3 +229,20 @@ class IPackageOverrides(Interface):
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)
 VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'
+
+class IChameleonTranslate(Interface):
+    """ Internal interface representing a chameleon translate function """
+    def __call__(msgid, domain=None, mapping=None, context=None,
+                 target_language=None, default=None):
+        """ Translate a mess of arguments to a Unicode object """
+
+class ILocalizer(Interface):
+    """ Localizer for a specific language """
+        
+class ILocaleNegotiator(Interface):
+    def __call__(request):
+        """ Return a locale name """
+
+class ITranslationDirectories(Interface):
+    """ A list object representing all known translation directories
+    for an application"""

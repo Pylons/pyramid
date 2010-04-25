@@ -28,6 +28,16 @@ class Base:
         
 
 class TextTemplateRendererTests(Base, unittest.TestCase):
+    def setUp(self):
+        from repoze.bfg.configuration import Configurator
+        from repoze.bfg.registry import Registry
+        registry = Registry()
+        self.config = Configurator(registry=registry)
+        self.config.begin()
+
+    def tearDown(self):
+        self.config.end()
+        
     def _getTargetClass(self):
         from repoze.bfg.chameleon_text import TextTemplateRenderer
         return TextTemplateRenderer
@@ -53,6 +63,16 @@ class TextTemplateRendererTests(Base, unittest.TestCase):
         self.failIf('template' in instance.__dict__)
         template  = instance.template
         self.assertEqual(template, instance.__dict__['template'])
+
+    def test_template_with_ichameleon_translate(self):
+        from repoze.bfg.interfaces import IChameleonTranslate
+        def ct(): pass
+        self.config.registry.registerUtility(ct, IChameleonTranslate)
+        minimal = self._getTemplatePath('minimal.txt')
+        instance = self._makeOne(minimal)
+        self.failIf('template' in instance.__dict__)
+        template  = instance.template
+        self.assertEqual(template.translate, ct)
 
     def test_call(self):
         minimal = self._getTemplatePath('minimal.txt')
