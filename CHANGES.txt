@@ -141,6 +141,10 @@ Documentation
 - Documentation for the new ``translationdir`` and
   ``localenegotiator`` ZCML directives were added.
 
+- A section was added to the Templates chapter entitled "Nicer
+  Exceptions in Templates" describing the result of setting
+  ``debug_templates = true``.
+
 Paster Templates
 ----------------
 
