@@ -107,27 +107,48 @@ class TestSettings(unittest.TestCase):
         result = self._makeOne({'debug_notfound':'false'},
                              {'BFG_DEBUG_NOTFOUND':'1'})
         self.assertEqual(result['debug_notfound'], True)
-        
+
+    def test_debug_templates(self):
+        result = self._makeOne({})
+        self.assertEqual(result['debug_templates'], False)
+        result = self._makeOne({'debug_templates':'false'})
+        self.assertEqual(result['debug_templates'], False)
+        result = self._makeOne({'debug_templates':'t'})
+        self.assertEqual(result['debug_templates'], True)
+        result = self._makeOne({'debug_templates':'1'})
+        self.assertEqual(result['debug_templates'], True)
+        result = self._makeOne({}, {'BFG_DEBUG_TEMPLATES':'1'})
+        self.assertEqual(result['debug_templates'], True)
+        result = self._makeOne({'debug_templates':'false'},
+                             {'BFG_DEBUG_TEMPLATES':'1'})
+        self.assertEqual(result['debug_templates'], True)
+
     def test_debug_all(self):
         result = self._makeOne({})
         self.assertEqual(result['debug_notfound'], False)
         self.assertEqual(result['debug_authorization'], False)
+        self.assertEqual(result['debug_templates'], False)
         result = self._makeOne({'debug_all':'false'})
         self.assertEqual(result['debug_notfound'], False)
         self.assertEqual(result['debug_authorization'], False)
+        self.assertEqual(result['debug_templates'], False)
         result = self._makeOne({'debug_all':'t'})
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_authorization'], True)
+        self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({'debug_all':'1'})
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_authorization'], True)
+        self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({}, {'BFG_DEBUG_ALL':'1'})
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_authorization'], True)
+        self.assertEqual(result['debug_templates'], True)
         result = self._makeOne({'debug_all':'false'},
                              {'BFG_DEBUG_ALL':'1'})
         self.assertEqual(result['debug_notfound'], True)
         self.assertEqual(result['debug_authorization'], True)
+        self.assertEqual(result['debug_templates'], True)
 
     def test_configure_zcml(self):
         result = self._makeOne({})
@@ -139,6 +160,17 @@ class TestSettings(unittest.TestCase):
         result = self._makeOne({'configure_zcml':'def'},
                              {'BFG_CONFIGURE_ZCML':'abc'})
         self.assertEqual(result['configure_zcml'], 'abc')
+
+    def test_default_locale_name(self):
+        result = self._makeOne({})
+        self.assertEqual(result['default_locale_name'], 'en')
+        result = self._makeOne({'default_locale_name':'abc'})
+        self.assertEqual(result['default_locale_name'], 'abc')
+        result = self._makeOne({}, {'BFG_DEFAULT_LOCALE_NAME':'abc'})
+        self.assertEqual(result['default_locale_name'], 'abc')
+        result = self._makeOne({'default_locale_name':'def'},
+                             {'BFG_DEFAULT_LOCALE_NAME':'abc'})
+        self.assertEqual(result['default_locale_name'], 'abc')
 
     def test_originals_kept(self):
         result = self._makeOne({'a':'i am so a'})

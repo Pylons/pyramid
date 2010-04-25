@@ -5,8 +5,6 @@
 
 - Basic WSGI documentation (pipeline / app / server).
 
-- Allow a translator to be supplied for template rendering.
-
 - Allow a debug argument to be supplied for template rendering
   (requires Chameleon capable of accepting the ``debug`` argument to a
   template constructor; behavior currently implemented on Chameleon

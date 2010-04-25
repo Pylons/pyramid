@@ -28,6 +28,9 @@ class Settings(dict):
         config_debug_notfound = self.get('debug_notfound', '')
         eff_debug_notfound = asbool(eget('BFG_DEBUG_NOTFOUND',
                                          config_debug_notfound))
+        config_debug_templates = self.get('debug_templates', '')
+        eff_debug_templates = asbool(eget('BFG_DEBUG_TEMPLATES',
+                                          config_debug_templates))
         config_reload_templates = self.get('reload_templates', '')
         eff_reload_templates = asbool(eget('BFG_RELOAD_TEMPLATES',
                                            config_reload_templates))
@@ -36,12 +39,13 @@ class Settings(dict):
                                            config_reload_resources))
         configure_zcml = self.get('configure_zcml', '')
         eff_configure_zcml = eget('BFG_CONFIGURE_ZCML', configure_zcml)
-        locale_name = self.get('locale_name', 'en')
+        locale_name = self.get('default_locale_name', 'en')
         eff_locale_name = eget('BFG_DEFAULT_LOCALE_NAME', locale_name)
         
         update = {
             'debug_authorization': eff_debug_all or eff_debug_auth,
             'debug_notfound': eff_debug_all or eff_debug_notfound,
+            'debug_templates': eff_debug_all or eff_debug_templates,
             'reload_templates': eff_reload_all or eff_reload_templates,
             'reload_resources':eff_reload_all or eff_reload_resources,
             'configure_zcml':eff_configure_zcml,
