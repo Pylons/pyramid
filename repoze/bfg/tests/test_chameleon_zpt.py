@@ -91,6 +91,16 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         template  = instance.template
         self.assertEqual(template.auto_reload, True)
 
+    def test_template_with_emptydict(self):
+        from repoze.bfg.interfaces import ISettings
+        self.config.registry.registerUtility({}, ISettings)
+        minimal = self._getTemplatePath('minimal.pt')
+        instance = self._makeOne(minimal)
+        self.failIf('template' in instance.__dict__)
+        template  = instance.template
+        self.assertEqual(template.auto_reload, False)
+        self.assertEqual(template.debug, False)
+
     def test_call_with_nondict_value(self):
         minimal = self._getTemplatePath('minimal.pt')
         instance = self._makeOne(minimal)

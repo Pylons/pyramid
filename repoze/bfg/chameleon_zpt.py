@@ -33,8 +33,13 @@ class ZPTTemplateRenderer(object):
     @reify # avoid looking up reload_templates before manager pushed
     def template(self):
         settings = get_settings()
-        auto_reload = settings and settings['reload_templates']
-        debug = settings and settings['debug_templates']
+        debug = False
+        auto_reload = False
+        if settings:
+            # using .get here is a strategy to be kind to old *tests* rather
+            # than being kind to any existing production system
+            auto_reload = settings.get('reload_templates')
+            debug = settings.get('debug_templates')
         reg = get_current_registry()
         translate = None
         if reg is not None:
