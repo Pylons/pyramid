@@ -60,7 +60,7 @@ copyright = '2008-2010, Agendaless Consulting'
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.3dev'
+version = '1.3a1'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -409,7 +409,7 @@ LaTeXTranslator.visit_literal = visit_literal
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The repoze.bfg Web Application Framework, Version 1.2'
+epub_title = 'The repoze.bfg Web Application Framework, Version 1.3'
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
 epub_copyright = '2008-2010'
@@ -426,7 +426,7 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615345379'
 
 # A unique identification for the text.
-epub_uid = 'The repoze.bfg Web Application Framework, Version 1.2-v0'
+epub_uid = 'The repoze.bfg Web Application Framework, Version 1.3-v0'
 
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.
