@@ -12,7 +12,7 @@ Features
 - The default locale negotiator has become more complex.
 
   * First, the negotiator looks for the ``_LOCALE_`` attribute of
-    the request object (possibly set by an :term:`event listener`).
+    the request object (possibly set by a view or an event listener).
   
   * Then it looks for the ``request.params['_LOCALE_']`` value.
 
@@ -36,6 +36,9 @@ Documentation
 
 - Documentation concerning locale negotiation in the
   Internationalizationa and Localization chapter was updated.
+
+- Expanded portion of i18n narrative chapter docs which discuss
+  working with gettext files.
 
 1.3a1 (2010-04-26)
 ==================

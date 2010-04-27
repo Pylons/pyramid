@@ -710,6 +710,10 @@ Glossary
      A string like ``en``, ``en_US``, ``de``, or ``de_AT`` which
      uniquely identifies a particular locale.
 
+   Default Locale Name
+     The :term:`locale name` used by an application when no explicit
+     locale name is set.  See :ref:`localization_deployment_settings`.
+
    Locale Negotiator
      An object supplying a policy determining which :term:`locale
      name` best represents a given :term:`request`.  It is used by the
