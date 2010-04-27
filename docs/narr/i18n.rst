@@ -479,10 +479,10 @@ You can obtain the locale name related to a request by using the
        locale_name = get_locale_name(request)
 
 This returns the locale name negotiated by the currently active
-:term:`locale negotiator` or the default locale name (usually ``en``)
-if no locale negotiator is configured.  You can change the default
-locale name by changing the ``default_locale_name`` setting; see
-:ref:`default_locale_name_setting`.
+:term:`locale negotiator` or the :term:`default locale name` (usually
+``en``) if the locale negotiator returns ``None``.  You can change the
+default locale name by changing the ``default_locale_name`` setting;
+see :ref:`default_locale_name_setting`.
 
 Once :func:`repoze.bfg.i18n.get_locale_name` has run once, the local
 name is stored on the request object it is passed.  Subsequent calls
@@ -617,8 +617,8 @@ Localization-Related Deployment Settings
 ----------------------------------------
 
 A :mod:`repoze.bfg` application will have a ``default_locale_name``
-setting.  This value represents the default locale name when no
-:term:`locale negotiator` is registered.  Pass it to the
+setting.  This value represents the :term:`default locale name` used
+when the :term:`locale negotiator` returns ``None``.  Pass it to the
 :mod:`repoze.bfg.configuration.Configurator` constructor at startup
 time:
 
@@ -665,12 +665,14 @@ Activating Translation
 ----------------------
 
 By default, a :mod:`repoze.bfg` application performs no translation.
-To turn translation on, you must do both of these two things:
+To turn translation on, you must:
 
-- Add at least one :term:`translation directory` to your application.
+- add at least one :term:`translation directory` to your application.
 
-- Configure a :term:`locale negotiator` into your application's
-  configuration.
+- ensure that your application sets the :term:`locale` correctly.
+
+Adding a Translation Directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :term:`gettext` is the underlying machinery behind the
 :mod:`repoze.bfg` translation machinery.  A translation directory is a
@@ -680,23 +682,6 @@ which itself includes an ``LC_MESSAGES`` directory.  Each
 ``LC_MESSAGES`` directory should contain one or more ``.mo`` files.
 Each ``.mo`` file represents a :term:`message catalog`, which is used
 to provide translations to your application.
-
-A locale negotiator is a bit of code which accepts a request and which
-returns a :term:`locale name`.  It is consulted when
-:meth:`repoze.bfg.i18n.Localizer.translate` or
-:meth:`repoze.bfg.i18n.Localizer.pluralize` is invoked.  It is also
-consulted when :func:`repoze.bfg.i18n.get_locale_name` or
-:func:`repoze.bfg.i18n.negotiate_locale_name` is invoked.
-
-At the time of this writing, only one (very weak) built-in locale
-negotiator implementation named
-:class:`repoze.bfg.i18n.default_locale_negotiator` ships as part of
-the :mod:`repoze.bfg` software.  This negotiator looks only at the the
-``request.params['locale']`` value to determine the locale name.  You
-can provide your own locale negotiator function as required.
-
-Adding a Translation Directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Adding a :term:`translation directory` registers all of its
 constituent :term:`message catalog` files (all of the ``.mo`` files
@@ -719,12 +704,10 @@ configuration using either imperative configuration or ZCML.
        :linenos:
 
        from repoze.bfg.configuration import Configurator
-       from repoze.bfg.i18n import default_locale_negotiator
-       config = Configurator(
-                locale_negotiator=default_locale_negotiator)
        config.begin()
        config.add_translation_dirs('my.application:locale/', 
                                    'another.application:locale/')
+       ...
        config.end()
 
     A message catalog in a translation directory added via
@@ -749,16 +732,106 @@ configuration using either imperative configuration or ZCML.
     contain translations for the same locale and :term:`translation
     domain`.
 
-.. _adding_a_locale_negotiator:
+Setting the Locale
+~~~~~~~~~~~~~~~~~~
 
-Adding a Locale Negotiator
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+When the *default locale negotiator* (see
+:ref:`default_locale_negotiator`) is in use, you can inform
+:mod:`repoze.bfg` of the current locale name by doing any of these
+things before any translations need to be performed:
+
+- Set the ``_LOCALE_`` attribute of the request to a valid locale name
+  (usually directly within view code).  E.g. ``request._LOCALE_ =
+  'de'``.
+
+- Ensure that a valid locale name value is in the ``request.params``
+  dictionary under the key named ``_LOCALE_``.  This is usually the
+  result of passing a ``_LOCALE_`` value in the query string or in the
+  body of a form post associated with a request.  For example,
+  visiting ``http://my.application?_LOCALE_=de``.
+
+- Ensure that a valid locale name value is in the ``request.cookies``
+  dictionary under the key named ``_LOCALE_``.  This is usually the
+  result of setting a ``_LOCALE_`` cookie in a prior response,
+  e.g. ``response.set_cookie('_LOCALE_', 'de')``.
+
+.. note::
+
+   If this locale negotiation scheme is inappropriate for a particular
+   application, you can configure a custom :term:`locale negotiator`
+   function into that application as required.  See
+   :ref:`custom_locale_negotiator`.
+
+.. _locale_negotiators:
+
+Locale Negotiators
+------------------
 
 A :term:`locale negotiator` informs the operation of a
 :term:`localizer` by telling it what :term:`locale name` is related to
-a particular request.  See :ref:`creating_a_locale_negotiator`.
+a particular request.  A locale negotiator is a bit of code which
+accepts a request and which returns a :term:`locale name`.  It is
+consulted when :meth:`repoze.bfg.i18n.Localizer.translate` or
+:meth:`repoze.bfg.i18n.Localizer.pluralize` is invoked.  It is also
+consulted when :func:`repoze.bfg.i18n.get_locale_name` or
+:func:`repoze.bfg.i18n.negotiate_locale_name` is invoked.
 
-You may add a locale directory to your application's
+.. _default_locale_negotiator:
+
+The Default Locale Negotiator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most applications can make use of the default locale negotiator, which
+requires no additional coding or configuration.
+
+The default locale negotiator implementation named
+:class:`repoze.bfg.i18n.default_locale_negotiator` uses the following
+set of steps to dermine the locale name.
+
+- First, the negotiator looks for the ``_LOCALE_`` attribute of
+  the request object (possibly set by an :term:`event listener`).
+
+- Then it looks for the ``request.params['_LOCALE_']`` value.
+
+- Then it looks for the ``request.cookies['_LOCALE_']`` value.
+
+- If no locale can be found via the request, it falls back to using
+  the :term:`default locale name` (see
+  :ref:`localization_deployment_settings`).
+
+- Finally, if the default locale name is not explicitly set, it uses
+  the locale name ``en``.
+
+.. _custom_locale_negotiator:
+
+Using a Custom Locale Negotiator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Locale negotiation is sometimes policy-laden and complex.  If the
+(simple) default locale negotiation scheme described in
+:ref:`activating translation` is inappropriate for your application,
+you may create and a special :term:`locale negotiator`.  Subsequently
+you may override the default locale negotiator by adding your newly
+created locale negotiator to your application's configuration.
+
+A locale negotiator is simply a callable which
+accepts a request and returns a single :term:`locale name` or ``None``
+if no locale can be determined.
+
+Here's an implementation of a simple locale negotiator:
+
+.. code-block:: python
+   :linenos:
+
+    def my_locale_negotiator(request):
+        locale_name = request.params.get('my_locale')
+        return locale_name
+
+If a locale negotiator returns ``None``, it signifies to
+:mod:`repoze.bfg` that the default application locale name should be
+used.
+
+You may add your newly created locale negotiator to your application's
 configuration using either imperative configuration or ZCML.
 
 .. topic:: Using Imperative Configuration
@@ -774,9 +847,7 @@ configuration using either imperative configuration or ZCML.
        :linenos:
 
        from repoze.bfg.configuration import Configurator
-       from repoze.bfg.i18n import default_locale_negotiator
-       config = Configurator(
-                locale_negotiator=default_locale_negotiator)
+       config = Configurator(locale_negotiator=my_locale_negotiator)
 
     Alternately, use the
     :meth:`repoze.bfg.configuration.Configurator.set_locale_negotiator`
@@ -788,44 +859,19 @@ configuration using either imperative configuration or ZCML.
        :linenos:
 
        from repoze.bfg.configuration import Configurator
-       from repoze.bfg.i18n import default_locale_negotiator
        config = Configurator()
        config.begin()
-       config.set_locale_negotiator(default_locale_negotiator)
+       config.set_locale_negotiator(my_locale_negotiator)
        config.end()
 
 .. topic:: Using ZCML
 
-    You can add a translation directory via ZCML by using the
+    You can add a locale negotiator via ZCML by using the
     :ref:`localenegotiator_directive` ZCML directive:
 
     .. code-block:: xml
        :linenos:
 
        <localenegotiator 
-        negotiator="repoze.bfg.i18n.default_locale_negotiator"/>
-
-.. _creating_a_locale_negotiator:
-
-Creating a Locale Negotiator
-----------------------------
-
-A :term:`locale negotiator` is simply a callable which accepts a
-request and returns a single :term:`locale name`.  Here's an
-implementation of a simple locale negotiator:
-
-.. code-block:: python
-   :linenos:
-
-    def default_locale_negotiator(request):
-        locale_name = request.params.get('locale')
-        if locale_name is None:
-            settings = get_settings() or {}
-            locale_name = settings.get('default_locale_name', 'en')
-        return locale_name
-
-Locale negotiation can be complex.  Your application may require a
-policy-laden locale negotiator policy, so you can write your own and
-supply it to an application configuration as per
-:ref:`adding_a_locale_negotiator`.
+        negotiator="my_application.my_module.my_locale_negotiator"/>
 

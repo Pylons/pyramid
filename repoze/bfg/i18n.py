@@ -96,14 +96,27 @@ class Localizer(object):
 
 
 def default_locale_negotiator(request):
-    """ The default :term:`locale negotiator`.  Returns a locale
-    name based on ``request.params.get('locale')`` or the
-    ``default_locale_name`` settings option; or ``en`` if all else
-    fails."""
-    locale_name = request.params.get('locale')
+    """ The default :term:`locale negotiator`.  Returns a locale name
+    or ``None``.
+
+    - First, the negotiator looks for the ``_LOCALE_`` attribute of
+      the request object (possibly set by an :term:`event listener`).
+  
+    - Then it looks for the ``request.params['_LOCALE_']`` value.
+
+    - Then it looks for the ``request.cookies['_LOCALE_']`` value.
+
+    - Finally, the negotiator returns ``None`` if the locale could not
+      be determined via any of the previous checks (when a locale
+      negotiator returns ``None``, it signifies that the
+      :term:`default locale` should be used.)
+    """
+    name = '_LOCALE_'
+    locale_name = getattr(request, name, None)
     if locale_name is None:
-        settings = get_settings() or {}
-        locale_name = settings.get('default_locale_name', 'en')
+        locale_name = request.params.get(name)
+        if locale_name is None:
+            locale_name = request.cookies.get(name)
     return locale_name
 
 def negotiate_locale_name(request):
@@ -113,12 +126,14 @@ def negotiate_locale_name(request):
         registry = request.registry
     except AttributeError:
         registry = get_current_registry()
-    negotiator = registry.queryUtility(ILocaleNegotiator)
-    if negotiator is None:
+    negotiator = registry.queryUtility(ILocaleNegotiator,
+                                       default=default_locale_negotiator)
+    locale_name = negotiator(request)
+
+    if locale_name is None:
         settings = get_settings() or {}
         locale_name = settings.get('default_locale_name', 'en')
-    else:
-        locale_name = negotiator(request)
+
     return locale_name
 
 def get_locale_name(request):

@@ -145,6 +145,10 @@ class Configurator(object):
     class.  The debug logger is used by :mod:`repoze.bfg` itself to
     log warnings and authorization debugging information.
 
+    If ``locale_negotiator`` is passed, it should be a
+    :term:`locale negotiator` implementation.  See
+    :ref:`custom_locale_negotiator`.
+
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -367,9 +371,9 @@ class Configurator(object):
         initialization.
 
         ``setup_registry`` configures settings, a root factory,
-        security policies, renderers, and a debug logger using the
-        configurator's current registry, as per the descriptions in
-        the Configurator constructor."""
+        security policies, renderers, a debug logger, and a locale
+        negotiator using the configurator's current registry, as per
+        the descriptions in the Configurator constructor."""
         self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)

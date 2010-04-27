@@ -94,6 +94,15 @@ class Test_negotiate_locale_name(unittest.TestCase):
         result = self._callFUT(request)
         self.assertEqual(result, 'settings')
 
+    def test_use_default_locale_negotiator(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        registry = get_current_registry()
+        request = DummyRequest()
+        request.registry = registry
+        request._LOCALE_ = 'locale'
+        result = self._callFUT(request)
+        self.assertEqual(result, 'locale')
+
     def test_default_default(self):
         request = DummyRequest()
         result = self._callFUT(request)
@@ -219,24 +228,26 @@ class Test_default_locale_negotiator(unittest.TestCase):
         from repoze.bfg.i18n import default_locale_negotiator
         return default_locale_negotiator(request)
 
-    def test_from_settings(self):
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.threadlocal import get_current_registry
-        settings = {'default_locale_name':'dude'}
-        registry = get_current_registry()
-        registry.registerUtility(settings, ISettings)
+    def test_from_none(self):
         request = DummyRequest()
         result = self._callFUT(request)
-        self.assertEqual(result, 'dude')
-        
-    def test_settings_empty(self):
+        self.assertEqual(result, None)
+
+    def test_from_request_attr(self):
         request = DummyRequest()
+        request._LOCALE_ = 'foo'
         result = self._callFUT(request)
-        self.assertEqual(result, 'en')
-        
+        self.assertEqual(result, 'foo')
+
     def test_from_params(self):
         request = DummyRequest()
-        request.params['locale'] = 'foo'
+        request.params['_LOCALE_'] = 'foo'
+        result = self._callFUT(request)
+        self.assertEqual(result, 'foo')
+
+    def test_from_cookies(self):
+        request = DummyRequest()
+        request.cookies['_LOCALE_'] = 'foo'
         result = self._callFUT(request)
         self.assertEqual(result, 'foo')
 
@@ -370,6 +381,7 @@ class TestTranslations(unittest.TestCase):
 class DummyRequest(object):
     def __init__(self):
         self.params = {}
+        self.cookies = {}
 
 def dummy_negotiator(request):
     return 'bogus'

@@ -1,3 +1,42 @@
+Next release
+============
+
+Features
+--------
+
+- A locale negotiator no longer needs to be registered explicitly. The
+  default locale negotiator at
+  ``repoze.bfg.i18n.default_locale_negotiator`` is now used
+  unconditionally as... um, the default locale negotiator.
+
+- The default locale negotiator has become more complex.
+
+  * First, the negotiator looks for the ``_LOCALE_`` attribute of
+    the request object (possibly set by an :term:`event listener`).
+  
+  * Then it looks for the ``request.params['_LOCALE_']`` value.
+
+  * Then it looks for the ``request.cookies['_LOCALE_']`` value.
+
+Backwards Incompatibilities
+---------------------------
+
+- The default locale negotiator now looks for the parameter named
+  ``_LOCALE_`` rather than a parameter named ``locale`` in
+  ``request.params``.
+
+Behavior Changes
+----------------
+
+- A locale negotiator may now return ``None``, signifying that the
+  default locale should be used.
+
+Documentation
+-------------
+
+- Documentation concerning locale negotiation in the
+  Internationalizationa and Localization chapter was updated.
+
 1.3a1 (2010-04-26)
 ==================
 

@@ -3518,6 +3518,8 @@ class DummyRequest:
     subpath = ()
     def __init__(self):
         self.environ = {'PATH_INFO':'/static'}
+        self.params = {}
+        self.cookies = {}
     def copy(self):
         return self
     def get_response(self, app):
