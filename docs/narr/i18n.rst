@@ -74,7 +74,7 @@ msgid may optionally contain *replacement markers*.  For instance:
    from repoze.bfg.i18n import TranslationString
    ts = TranslationString('Add ${number}')
 
-Within the string above, ``${stuff}`` is a replacement marker.  It
+Within the string above, ``${number}`` is a replacement marker.  It
 will be replaced by whatever is in the *mapping* for a translation
 string.  The mapping may be supplied at the same time as the
 replacement marker itself:
