@@ -602,17 +602,17 @@ You can obtain the locale name related to a request by using the
        locale_name = get_locale_name(request)
 
 This returns the locale name negotiated by the currently active
-:term:`locale negotiator` or the :term:`default locale name` (usually
-``en``) if the locale negotiator returns ``None``.  You can change the
-default locale name by changing the ``default_locale_name`` setting;
-see :ref:`default_locale_name_setting`.
+:term:`locale negotiator` or the :term:`default locale name` if the
+locale negotiator returns ``None``.  You can change the default locale
+name by changing the ``default_locale_name`` setting; see
+:ref:`default_locale_name_setting`.
 
-Once :func:`repoze.bfg.i18n.get_locale_name` has run once, the local
-name is stored on the request object it is passed.  Subsequent calls
-to :func:`repoze.bfg.i18n.get_locale_name` will return the stored
-locale name without invoking the :term:`locale negotiator`.  To
-avoid this caching, you can use the
-:func:`repoze.bfg.i18n.negotiate_locale_name` function:
+Once :func:`repoze.bfg.i18n.get_locale_name` has run once, the locale
+name is stored on the request object.  Subsequent calls to
+:func:`repoze.bfg.i18n.get_locale_name` will return the stored locale
+name without invoking the :term:`locale negotiator`.  To avoid this
+caching, you can use the :func:`repoze.bfg.i18n.negotiate_locale_name`
+function:
 
 .. code-block:: python
    :linenos:
