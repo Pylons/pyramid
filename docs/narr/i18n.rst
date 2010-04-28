@@ -568,7 +568,7 @@ Unicode translation for the message id ``singular``.
 
 The arguments provided as ``singular`` and/or ``plural`` may also be
 :term:`translation string` objects, but the domain and mapping
-information attached to those object is ignored.
+information attached to those objects is ignored.
 
 .. code-block:: python
    :linenos:
