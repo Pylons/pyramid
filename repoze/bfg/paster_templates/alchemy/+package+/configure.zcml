@@ -20,8 +20,4 @@
      path="templates/static"
      />
 
-  <subscriber for="repoze.bfg.interfaces.INewRequest"
-     handler=".run.handle_teardown"
-     />
-
 </configure>

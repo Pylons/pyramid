@@ -1,3 +1,24 @@
+Next release
+============
+
+Paster Templates
+----------------
+
+- The ``bfg_alchemy`` and ``bfg_routesalchemy`` templates no longer
+  register a ``handle_teardown`` event listener which calls
+  ``DBSession.remove``.  This was found by Chris Withers to be
+  unnecessary.
+
+Documentation
+-------------
+
+- The "bfgwiki2" (URL dispatch wiki) tutorial code and documentation
+  was changed to remove the ``handle_teardown`` event listener which
+  calls ``DBSession.remove``.
+
+- Any mention of the ``handle_teardown`` event listener as used by the
+  paster templates was removed from the URL Dispatch narrative chapter.
+
 1.3a2 (2010-04-28)
 ==================
 

@@ -3,9 +3,6 @@
   <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
 
-  <subscriber for="repoze.bfg.interfaces.INewRequest"
-    handler=".run.handle_teardown"/>
-
   <route 
     path=""
     name="home"

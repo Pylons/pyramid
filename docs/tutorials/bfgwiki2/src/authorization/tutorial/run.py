@@ -1,18 +1,7 @@
-import transaction
-
 from repoze.bfg.configuration import Configurator
-from repoze.tm import after_end
-from repoze.tm import isActive
 
-from tutorial.models import DBSession
 from tutorial.models import initialize_sql
 from tutorial.models import RootFactory
-
-def handle_teardown(event):
-    environ = event.request.environ
-    if isActive(environ):
-        t = transaction.get()
-        after_end.register(DBSession.remove, t)
 
 def app(global_config, **settings):
     """ This function returns a WSGI application.

@@ -33,10 +33,7 @@ following:
 
 #. *Line 4*. Boilerplate, the comment explains.
 
-#. *Lines 6-7*.  Register a :term:`subscriber` that tears down the
-   SQLAlchemy connection after a request is finished.
-
-#. *Lines 9-13*.  Register a ``<route>`` :term:`route configuration`
+#. *Lines 6-11*.  Register a ``<route>`` :term:`route configuration`
    that will be used when the URL is ``/``.  Since this ``<route>``
    has an empty ``path`` attribute, it is the "default" route. The
    attribute named ``view`` with the value ``.views.my_view`` is the
@@ -50,7 +47,7 @@ following:
    ``.views.my_view`` view returns a dictionary, a :term:`renderer`
    will use this template to create a response.
 
-#. *Lines 15-18*.  Register a ``<static>`` directive that will match
+#. *Lines 13-16*.  Register a ``<static>`` directive that will match
    any URL that starts with ``/static/``.  This will serve up static
    resources for us, in this case, at
    ``http://localhost:6543/static/`` and below.  With this
@@ -105,8 +102,6 @@ Here is the source for ``models.py``:
    object.  It also calls the ``populate`` function, to do initial
    database population.
 
-.. _sql_tm2_cleanup:
-
 App Startup with ``run.py``
 ---------------------------
 
@@ -121,29 +116,23 @@ function within the file named ``run.py``:
       :linenos:
       :language: py
 
-#. *Lines 1-8*. Imports to support later code.
+#. *Lines 1-3*. Imports to support later code.
 
-#. *Lines 10-14*.  An event :term:`subscriber` which performs cleanup
-   at transaction boundaries.  As a result of registering this event
-   subscriber, after the current transaction is committed or aborted,
-   our database connection will be removed.
-
-#. *Lines 22-25*. Get the database configuration string from the
+#. *Lines 11-14*. Get the database configuration string from the
    ``tutorial.ini`` file's ``[app:sql]`` section.  This will be a URI
    (something like ``sqlite://``).
 
-#. Line *26*. We initialize our SQL database using SQLAlchemy, passing
+#. Line *15*. We initialize our SQL database using SQLAlchemy, passing
    it the db string.
 
-#. *Line 27*.  We construct a :term:`Configurator`.  The first
-   argument provided to the configurator is the :term:`root factory`,
-   which is used by the :mod:`repoze.bfg` :term:`traversal` mechanism.
-   Since this is a URL dispatch application, the root factory is
-   ``None``.  The second argument ``settings`` is passed as a keyword
-   argument.  It contains a dictionary of settings parsed by
-   PasteDeploy.
+#. *Line 16*.  We construct a :term:`Configurator`.  ``settings`` is
+   passed as a keyword argument with the dictionary values passed by
+   PasteDeploy as the ``settings`` argument.  This will be a
+   dictionary of settings parsed by PasteDeploy, which contains
+   deployment-related values such as ``reload_templates``,
+   ``db_string``, etc.
 
-#. *Lines 28-31*.  We then load a ZCML file to do application
+#. *Lines 17-20*.  We then load a ZCML file to do application
    configuration, and use the
    :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.
