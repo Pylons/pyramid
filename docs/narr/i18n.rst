@@ -294,15 +294,17 @@ install Babel like so:
 Changing the ``setup.py``
 +++++++++++++++++++++++++
 
-You need some "hair" to your application's ``setup.py`` file (see
-:ref:`project_narr` for information about the composition of an
-application's ``setup.py`` file) in order to properly generate
-:term:`gettext` files from your application.
+You need a to add a few boilerplate lines to your application's
+``setup.py`` file in order to properly generate :term:`gettext` files
+from your application.
 
-In particular, add the ``Babel`` distribution to your application's
+.. note:: See :ref:`project_narr` to learn about about the
+  composition of an application's ``setup.py`` file.
+
+In particular, add the ``Babel`` distribution to the
 ``install_requires`` list and insert a set of references to
 :term:`Babel` *message extractors* within the call to
-:func:`setuptools.setup`:
+:func:`setuptools.setup` inside your application's ``setup.py`` file:
 
 .. code-block:: python
    :linenos:
