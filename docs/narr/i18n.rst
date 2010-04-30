@@ -294,7 +294,7 @@ install Babel like so:
 Changing the ``setup.py``
 +++++++++++++++++++++++++
 
-You need a to add a few boilerplate lines to your application's
+You need to add a few boilerplate lines to your application's
 ``setup.py`` file in order to properly generate :term:`gettext` files
 from your application.
 
