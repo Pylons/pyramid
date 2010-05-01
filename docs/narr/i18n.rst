@@ -805,7 +805,7 @@ languages is smaller than all those detected within registered
 translation directories.  The easiest way to allow for this is to make
 the application entirely responsible for knowing which languages are
 allowed to be translated to instead of relying on the framework to
-divine this information from translation directorty file info.
+divine this information from translation directory file info.
 
 You can set up a system to allow a deployer to select available
 languages based on convention by using the :mod:`repoze.bfg.settings`
