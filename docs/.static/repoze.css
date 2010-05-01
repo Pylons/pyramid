@@ -25,3 +25,9 @@ div.related a {
 div.body p {
     text-align: left !important;
 }
+
+/* fix google chrome <pre> tag renderings */
+
+pre {
+   line-height: normal !important;
+}
