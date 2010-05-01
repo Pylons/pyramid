@@ -779,6 +779,57 @@ If this setting is supplied within the :mod:`repoze.bfg` application
    settings = get_settings()
    default_locale_name = settings['default_locale_name']
 
+"Detecting" Available Languages
+-------------------------------
+
+Other systems provide an API that returns the set of "available
+languages" as indicated by the union of all languages in all
+translation directories on disk at the time of the call to the API.
+
+It is by design that :mod:`repoze.bfg` doesn't supply such an API.
+Instead, the application itself responsible for knowing the "available
+languages".  The rationale is this: any particular application
+deployment must always know which languages it should be translatable
+to anyway, regardless of which translation files are on disk.
+
+Here's why: it's not a given that because translations exist in a
+particular language within the registered set of translation
+directories that this particular deployment wants to allow translation
+to that language.  For example, some translations may exist but they
+may be be incomplete or incorrect.  Or there may be translations to a
+language but not for all translation domains.
+
+Any nontrivial application deployment will always need to be able to
+selectively choose to allow only some languages even if that set of
+languages is smaller than all those detected within registered
+translation directories.  The easiest way to allow for this is to make
+the application entirely responsible for knowing which languages are
+allowed to be translated to instead of relying on the framework to
+divine this information from translation directorty file info.
+
+You can set up a system to allow a deployer to select available
+languages based on convention by using the :mod:`repoze.bfg.settings`
+mechanism:
+
+Allow a deployer to modify your application's PasteDeploy .ini file:
+
+.. code-block:: ini
+
+   [app:main]
+   use = egg:MyProject#app
+   ...
+   available_languages = fr de en ru
+
+Then as a part of the code of a custom :term:`locale negotiator`:
+
+.. code-block:: py
+
+  from repoze.bfg.settings import get_settings
+  languages = get_settings()['available_languages'].split()
+
+This is only a suggestion.  You can create a your own "available
+languages" configuration scheme as necessary.
+
 .. index::
    pair: translation; activating
    pair: locale; negotiator

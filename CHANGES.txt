@@ -19,6 +19,9 @@ Documentation
 - Any mention of the ``handle_teardown`` event listener as used by the
   paster templates was removed from the URL Dispatch narrative chapter.
 
+- A section entitled Detecting Available Languages was added to the
+  i18n narrative docs chapter.
+
 1.3a2 (2010-04-28)
 ==================
 
