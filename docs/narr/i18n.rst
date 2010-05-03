@@ -322,7 +322,7 @@ In particular, add the ``Babel`` distribution to the
           )
 
 The ``message_extractors`` stanza placed into the ``setup.py`` file
-cause the :term:`Babel` message catalog extraction machinery to also
+causes the :term:`Babel` message catalog extraction machinery to also
 consider ``**.pt`` files when doing message id extraction.
 
 .. index::
@@ -609,7 +609,7 @@ locale negotiator returns ``None``.  You can change the default locale
 name by changing the ``default_locale_name`` setting; see
 :ref:`default_locale_name_setting`.
 
-Once :func:`repoze.bfg.i18n.get_locale_name` has run once, the locale
+Once :func:`repoze.bfg.i18n.get_locale_name` is first run, the locale
 name is stored on the request object.  Subsequent calls to
 :func:`repoze.bfg.i18n.get_locale_name` will return the stored locale
 name without invoking the :term:`locale negotiator`.  To avoid this
@@ -888,7 +888,7 @@ configuration using either imperative configuration or ZCML.
 
     A message catalog in a translation directory added via
     :meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
-    will be merged into translations from an message catalog added earlier
+    will be merged into translations from a message catalog added earlier
     if both translation directories contain translations for the same
     locale and :term:`translation domain`.
 
@@ -904,7 +904,7 @@ configuration using either imperative configuration or ZCML.
 
     A message catalog in a translation directory added via
     :ref:`translationdir_directive` will be merged into translations from
-    an message catalog added earlier if both translation directories
+    a message catalog added earlier if both translation directories
     contain translations for the same locale and :term:`translation
     domain`.
 
