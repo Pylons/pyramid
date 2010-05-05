@@ -115,7 +115,7 @@ the :ref:`configuration_module` chapter for information about the API
 of a :term:`Configurator`, including its ``begin`` and ``end``
 methods.
 
-If you also want to make :func:`repoze.bfg.get_current_registry`
+If you also want to make :func:`repoze.bfg.get_current_request`
 return something other than ``None`` during the course of a single
 test, you can pass a :term:`request` object into the
 :meth:`repoze.bfg.configuration.Configurator.begin` method of the
