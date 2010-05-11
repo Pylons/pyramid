@@ -70,7 +70,7 @@ Tutorials
 =========
 
 Detailed tutorials explaining how to use :mod:`repoze.bfg` to build
-and various types of applications and how to deploy :mod:`repoze.bfg`
+various types of applications and how to deploy :mod:`repoze.bfg`
 applications to various platforms.
 
 .. toctree::
