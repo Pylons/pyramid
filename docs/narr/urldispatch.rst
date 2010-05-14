@@ -938,7 +938,7 @@ stanza:
 
    <view
      context="repoze.bfg.exceptions.NotFound"
-     view="repoze.bfg.views.append_slash_notfound_view"
+     view="repoze.bfg.view.append_slash_notfound_view"
     />
 
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
