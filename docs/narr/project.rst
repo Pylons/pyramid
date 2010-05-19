@@ -70,7 +70,7 @@ live within a package.
 Creating the Project
 --------------------
 
-In in :ref:`installing_chapter`, you created a virtual Python
+In :ref:`installing_chapter`, you created a virtual Python
 environment via the ``virtualenv`` command.  To start a
 :mod:`repoze.bfg` :term:`project`, use the ``paster`` facility
 installed within the virtualenv.  In :ref:`installing_chapter` we

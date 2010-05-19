@@ -358,6 +358,6 @@ When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
 various Chameleon libraries, WebOb, Paste, PasteScript, and
 PasteDeploy libraries are installed.
 
-Additionally, as shown in a following chapter, PasteScript (aka
+Additionally, as chronicled in :ref:`project_narr`, PasteScript (aka
 *paster*) templates will be registered that make it easy to start a
 new :mod:`repoze.bfg` project.
