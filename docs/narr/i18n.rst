@@ -767,7 +767,7 @@ application's Paster ``.ini`` file:
    default_locale_name = de
 
 If this value is not supplied via the Configurator constructor or via
-a Paste onfig file, it will default to ``en``.
+a Paste config file, it will default to ``en``.
 
 If this setting is supplied within the :mod:`repoze.bfg` application
 ``.ini`` file, it will be available as a settings key:
