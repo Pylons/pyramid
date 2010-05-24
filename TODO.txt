@@ -11,3 +11,111 @@
 
 - Docs about creating a venusian decorator.
 
+Renderer overhaul
+------------------
+
+Currently the division of responsibility between the BFG configurator
+and a BFG renderer implementation is awkward and wrong.
+
+- Renderer factories have no ability to convert a raw ``renderer=``
+  path (e.g. ``templates/foo.pt```) into something internally
+  meaningful.  Instead, BFG mangles the string into a package-relative
+  spec before it is passed to the renderer factory.  This is wrong, as
+  some renderers may not be interested in package-relative specs at
+  all (for instance, loader-style renderers which have a hardcoded set
+  of template locations).  The reason, however, that BFG currently
+  does it this way is that the raw renderer path alone does not
+  contain enough information itself to be useful; knowledge of the
+  *package* is also required for package-based renderers to make sense
+  of relative renderer strings (e.g. ``templates/foo.pt`` could mean
+  the ``templates/foo.pt`` file within the ``mypackage`` package).
+
+  To fix this, we need to provide some way to pass the package name to
+  the renderer factory as well as the renderer path.  But the package
+  name isn't the only thing an *arbitrary* renderer might need.
+  Another renderer might need, for example, a deployment setting.  So
+  we'll need to identify all the crap that *might* be useful to a
+  renderer factory and we'll need to pass all of it into the renderer
+  factory as a garbage barge dictionary; individual renderers will
+  make use of whatever they can from that garbage barge dictionary.
+  Garbage barge dict item candidates: ``package`` (the "current"
+  package), ``config`` (the configurator), ``package_name`` (the
+  current package's ``__name__``), ``settings`` (the deployment
+  settings), ``registry`` (the component registry).
+
+- A BFG renderer currently returns a *string*.  It would be more
+  symmetric if a renderer always returned a Response object.  Then the
+  calling machinery inside BFG could treat a view which happened to
+  use a renderer exactly the same as a view which returns a response
+  directly.  Maybe.  Problem: varying response attributes such as
+  ``content-type``, etc only makes sense when the view callable uses a
+  renderer; not when it doesn't, so there's some asymmetry there.
+  Maybe we make renderers return Responses, but still keep the
+  attribute-inspection stuff inside BFG, only used when we call a view
+  which we know uses a renderer.  We *could* always call the attribute
+  inspection stuff, but it would be a slowdown in cases where views
+  really do always return a Response directly.
+
+- The ``system`` value passed to a renderer is not extensible.  It
+  should be extensible on a per-application basis.  For example, you
+  might want to add a top-level variable ``c`` to the values passed to
+  all renderers representing a template context to emulate Pylons.
+
+- ``repoze.bfg.chameleon_zpt.render_template_to_response``, et. al. do
+  not use the same machinery as view renderers.  It would be useful if
+  templates rendered with ``render_template_to_response`` had the same
+  ``system`` values available to it as templates renderered via a view
+  renderer.
+
+To at least partially ameliorate the above, renderer factories should
+be changed to things that have a set of interfaces something like
+this::
+
+    class IRendererFactory(Interface):
+        def __call__(path, info):
+            "" Return an IRenderer."""
+
+    class IRenderer(Interface):
+        def __call__(value, system):
+            """  Return a Response """
+
+A semi-pseudocode example:
+
+    from webob import Response
+
+    class SampleRendererFactory(object):
+        def __init__(self, **config):
+            self.config = config
+
+        def __call__(self, path, info):
+            path = do_something_to_evaluate_path_using_info(path, info)
+            search_path = self.config['search_path']
+            debug = self.config['debug']
+            def renderer(value, system):
+                string = do_rendering(search_path, debug, path, value, system)
+                return Response(string)
+            return renderer
+
+   if __name__ == '__main__':
+
+        def view1(request):
+            return {'a':1}
+
+        def view2(request):
+            return {'a':2}
+
+        renderer_factory = SampleRendererFactory(search_path=['/a', '/b'])
+
+        package_name = 'some.package'
+
+        for view, path in [
+                            (view1, 'templates/foo.pt'), 
+                            (view2, 'templates/bar.pt'),
+                           ]:
+            renderer = renderer_factory(path, dict(package_name=package_name))
+            register_renderer_for_view(renderer, view)
+
+This is mostly an amelioration for the first and second bullet points
+above.  The second two bullet points are not addressed by it.
+
+
