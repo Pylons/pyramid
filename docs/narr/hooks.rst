@@ -337,24 +337,26 @@ class :class:`repoze.bfg.traversal.TraversalContextURL` in the
 <http://svn.repoze.org/repoze.bfg/trunk/repoze/bfg/traversal.py>`_ of
 the :term:`Repoze` Subversion repository.
 
-Registering your own decorators
--------------------------------
+Registering Configuration Decorators
+------------------------------------
 
-The decorators provided by :mod:`repoze.bfg`, such as
-:class:`~repoze.bfg.view.bfg_view`, neither molest the
-functions or classes they're decorating nor cause any side effects
-to happen until a :term:`scan` is performed.
+Decorators such as :class:`repoze.bfg.view.bfg_view` don't change the
+behavior of the functions or classes they're decorating.  Instead,
+when a :term:`scan` is performed, a modified version of the function
+or class is registered with :mod:`repoze.bfg`.
 
-You may wish to have your own decorators that exhibit such
+You may wish to have your own decorators that offer such
 behaviour. This is possible by using the :term:`Venusian` package in
-the same way that is used by :mod:`repoze.bfg`.
+the same way that it is used by :mod:`repoze.bfg`.
 
-For example, suppose you wanted to write a decorator that registered a
-particular function with a :term:`Zope Component Architecture`
-utility. Such a utility is likely only to be available once your
+By way of example, let's suppose you want to write a decorator that
+registers the function it wraps with a :term:`Zope Component
+Architecture` "utility" within the :term:`application registry`
+provided by :mod:`repoze.bfg`. The application registry and the
+utility inside the registry is likely only to be available once your
 application's configuration is at least partially completed. A normal
-decorator would fail as it would be executed before the
-configuration had even begun. 
+decorator would fail as it would be executed before the configuration
+had even begun.
 
 However, using :term:`Venusian`, the decorator could be written as
 follows:
@@ -363,7 +365,8 @@ follows:
    :linenos:
 
    import venusian
-   from zope.component import getSiteManager
+   from repoze.bfg.threadlocal import get_current_registry
+   from mypackage.interfaces import IMyUtility
     
    class registerFunction(object):
         
@@ -371,12 +374,13 @@ follows:
            self.path = path
 
        def register(self,scanner,name,wrapped):
-           getSiteManager().getUtility(ISomething).register(
-               self.path,wrapped
+           registry = get_current_registry()
+           registry.getUtility(IMyUtility).register(
+               self.path, wrapped
                )
         
        def __call__(self,wrapped):
-           venusian.attach(wrapped,self.register)
+           venusian.attach(wrapped, self.register)
            return wrapped
     
 This decorator could then be used to register functions throughout
@@ -389,7 +393,7 @@ your code:
    def my_function():
       do_stuff()
 
-However, the utility would only be used when a :term:`scan` was
+However, the utility would only be looked up when a :term:`scan` was
 performed, enabling you to set up the utility in advance:
 
 .. code-block:: python
@@ -417,5 +421,5 @@ performed, enabling you to set up the utility in advance:
        app = config.make_wsgi_app()
        serve(app, host='0.0.0.0')
 
-For full details, please read the `Venusian documentations
-<http://docs.repoze.org/venusian>`__.
+For full details, please read the `Venusian documentation
+<http://docs.repoze.org/venusian>`_.
