@@ -1,7 +1,13 @@
 Next release
 ============
 
-- Add items here.
+Documentation
+-------------
+
+- The authorization chapter of the ZODB Wiki Tutorial
+  (docs/tutorials/bfgwiki) was changed to demonstrate authorization
+  via a group rather than via a direct username (thanks to Alex
+  Marandon).
 
 1.3a3 (2010-05-01)
 ==================
