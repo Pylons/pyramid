@@ -4,15 +4,15 @@ Adding Authorization
 
 Our application currently allows anyone with access to the server to
 view, edit, and add pages to our wiki.  For purposes of demonstration
-we'll change our application to allow people whom possess a specific
-username (`editor`) to add and edit wiki pages but we'll continue
-allowing anyone with access to the server to view pages.
+we'll change our application to allow people whom are members of a
+*group* named ``group:editors`` to add and edit wiki pages but we'll
+continue allowing anyone with access to the server to view pages.
 :mod:`repoze.bfg` provides facilities for *authorization* and
 *authentication*.  We'll make use of both features to provide security
 to our application.
 
 The source code for this tutorial stage can be browsed at
-`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.2/authorization>`_.
+`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.3/authorization>`_.
 
 Configuring a ``repoze.bfg`` Authentication Policy
 --------------------------------------------------
@@ -37,6 +37,13 @@ invocation can not be authorized.  When you're done, your
    :linenos:
    :language: xml
 
+Note that the ``authtktauthenticationpolicy`` tag has two attributes:
+``secret`` and ``callback``.  ``secret`` is a string representing an
+encryption key used by the "authentication ticket" machinery
+represented by this policy: it is required.  The ``callback`` is a
+string, representing a :term:`Python dotted name`, which points at the
+``groupfinder`` function in the current directory's ``security.py``
+file.  We haven't added that module yet, but we're about to.
 
 Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -54,8 +61,12 @@ The ``groupfinder`` function defined here is an authorization policy
 the userid exists in the set of users known by the system, the
 callback will return a sequence of group identifiers (or an empty
 sequence if the user isn't a member of any groups).  If the userid
-*does not* exist in the system, the callback will return ``None``.
-We'll use "dummy" data to represent user and groups sources.
+*does not* exist in the system, the callback will return ``None``.  In
+a production system this data will most often come from a database,
+but here we use "dummy" data to represent user and groups
+sources. Note that the ``editor`` user is a member of the
+``group:editors`` group in our dummy group data (the ``GROUPS`` data
+structure).
 
 Adding Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -153,7 +164,8 @@ class scope to our ``Wiki`` class:
 .. code-block:: python
    :linenos:
 
-   __acl__ = [ (Allow, Everyone, 'view'), (Allow, 'editor', 'edit') ]
+   __acl__ = [ (Allow, Everyone, 'view'), 
+               (Allow, 'group:editors', 'edit') ]
 
 It's only happenstance that we're assigning this ACL at class scope.
 An ACL can be attached to an object *instance* too; this is how "row
@@ -195,16 +207,30 @@ pass a ``permission`` argument to each of our
 - We add ``permission='edit'`` to the decorator attached to the
   ``add_page`` view function.  This makes the assertion that only
   users who possess the effective ``view`` permission at the time of
-  the request may invoke this view.  We've granted the``editor``
-  principal the view permission at the root model via its ACL, so only
-  the user named ``editor`` will able to invoke the ``add_page`` view.
+  the request may invoke this view.  We've granted the
+  ``group:editors`` principal the view permission at the root model
+  via its ACL, so only the a user whom is a member of the group named
+  ``group:editors`` will able to invoke the ``add_page`` view.  We've
+  likewise given the ``editor`` user membership to this group via thes
+  ``security.py`` file by mapping him to the ``group:editors`` group
+  in the ``GROUPS`` data structure (``GROUPS =
+  {'editor':['group:editors']}``); the ``groupfinder`` function
+  consults the ``GROUPS`` data structure.  This means that the
+  ``editor`` user can add pages.
 
 - We add ``permission='edit'`` to the ``bfg_view`` decorator attached
   to the ``edit_page`` view function.  This makes the assertion that
   only users who possess the effective ``view`` permission at the time
-  of the request may invoke this view.  We've granted ``editor`` the
-  view permission at the root model via its ACL, so only the user
-  named ``editor`` will able to invoke the ``edit_page`` view.
+  of the request may invoke this view.  We've granted the
+  ``group:editors`` principal the view permission at the root model
+  via its ACL, so only the a user whom is a member of the group named
+  ``group:editors`` will able to invoke the ``edit_page`` view.  We've
+  likewise given the ``editor`` user membership to this group via thes
+  ``security.py`` file by mapping him to the ``group:editors`` group
+  in the ``GROUPS`` data structure (``GROUPS =
+  {'editor':['group:editors']}``); the ``groupfinder`` function
+  consults the ``GROUPS`` data structure.  This means that the
+  ``editor`` user can edit pages.
 
 Viewing the Application in a Browser
 ------------------------------------

@@ -12,7 +12,7 @@ container for "Page" objects, which will be instances of the "Page"
 class.
 
 The source code for this tutorial stage can be browsed at
-`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.2/models>`_.
+`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.3/models>`_.
 
 Deleting the Database
 ---------------------

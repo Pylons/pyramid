@@ -10,8 +10,8 @@ from tutorial.models import Wiki
 from tutorial.security import USERS
 
 @bfg_view(context=Wiki, name='login', renderer='templates/login.pt')
-def login(context, request):
-    login_url = model_url(context, request, 'login')
+def login(request):
+    login_url = model_url(request.context, request, 'login')
     referrer = request.url
     if referrer == login_url:
         referrer = '/' # never use the login form itself as came_from
@@ -37,8 +37,8 @@ def login(context, request):
         )
     
 @bfg_view(context=Wiki, name='logout')
-def logout(context, request):
+def logout(request):
     headers = forget(request)
-    return HTTPFound(location = model_url(context, request),
+    return HTTPFound(location = model_url(request.context, request),
                      headers = headers)
     

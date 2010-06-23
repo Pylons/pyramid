@@ -26,7 +26,7 @@ wire them into :mod:`repoze.bfg` using some :term:`view
 configuration` via :term:`ZCML`.
 
 The source code for this tutorial stage can be browsed at
-`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.2/views>`_.
+`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.3/views>`_.
 
 Adding View Functions
 =====================
