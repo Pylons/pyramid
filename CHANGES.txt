@@ -13,6 +13,10 @@ Documentation
   (docs/tutorials/bfgwiki2) was changed to demonstrate authorization
   via a group rather than via a direct username.
 
+- Redirect requests for tutorial sources to
+  http://docs.repoze.org/bfgwiki-1.3 and
+  http://docs.repoze.org/bfgwiki2-1.3/ respectively.
+
 1.3a3 (2010-05-01)
 ==================
 
