@@ -15,7 +15,7 @@ to our application.
 
 The source code for this tutorial stage can be browsed at
 `docs.repoze.org
-<http://docs.repoze.org/bfgwiki2-1.2/authorization>`_.
+<http://docs.repoze.org/bfgwiki2-1.3/authorization>`_.
 
 Adding A Root Factory
 ---------------------
@@ -40,7 +40,8 @@ your ``models.py`` file:
    from repoze.bfg.security import Everyone
 
    class RootFactory(object):
-       __acl__ = [ (Allow, Everyone, 'view'), (Allow, 'editor', 'edit') ]
+       __acl__ = [ (Allow, Everyone, 'view'), 
+                   (Allow, 'group:editors', 'edit') ]
        def __init__(self, request):
            self.__dict__.update(request.matchdict)
 
@@ -51,11 +52,12 @@ attached to the request object passed to our view callables as the
 
 All of our context objects will possess an ``__acl__`` attribute that
 allows :data:`repoze.bfg.security.Everyone` (a special principal) to
-view all pages, while allowing only a user named ``editor`` to edit
-and add pages.  The ``__acl__`` attribute attached to a context is
-interpreted specially by :mod:`repoze.bfg` as an access control list
-during view callable execution.  See :ref:`assigning_acls` for more
-information about what an :term:`ACL` represents.
+view all pages, while allowing only a :term:`principal` named
+``group:editors`` to edit and add pages.  The ``__acl__`` attribute
+attached to a context is interpreted specially by :mod:`repoze.bfg` as
+an access control list during view callable execution.  See
+:ref:`assigning_acls` for more information about what an :term:`ACL`
+represents.
 
 .. note: Although we don't use the functionality here, the ``factory``
    used to create route contexts may differ per-route as opposed to
@@ -93,29 +95,57 @@ value ``edit`` to the ``edit_page`` and ``add_page`` route
 declarations.  This indicates that the view callables which these
 routes reference cannot be invoked without the authenticated user
 possessing the ``edit`` permission with respect to the current
-context.  When you're done, your ``configure.zcml`` will look like so
+context.
+
+This makes the assertion that only users who possess the effective
+``edit`` permission at the time of the request may invoke those two
+views.  We've granted the ``group:editors`` principal the ``edit``
+permission at the root model via its ACL, so only the a user whom is a
+member of the group named ``group:editors`` will able to invoke the
+views associated with the ``add_page`` or ``edit_page`` routes.  
+
+When you're done, your ``configure.zcml`` will look like so
 
 .. literalinclude:: src/authorization/tutorial/configure.zcml
    :linenos:
    :language: xml
+
+Note that the ``authtktauthenticationpolicy`` tag has two attributes:
+``secret`` and ``callback``.  ``secret`` is a string representing an
+encryption key used by the "authentication ticket" machinery
+represented by this policy: it is required.  The ``callback`` is a
+string, representing a :term:`Python dotted name`, which points at the
+``groupfinder`` function in the current directory's ``security.py``
+file.  We haven't added that module yet, but we're about to.
 
 Adding ``security.py``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Add a ``security.py`` module within your package (in the same
 directory as "run.py", "views.py", etc) with the following content:
+
+.. literalinclude:: src/authorization/tutorial/security.py
+   :linenos:
+   :language: python
+
 The groupfinder defined here is an :term:`authentication policy`
 "callback"; it is a callable that accepts a userid and a request.  If
 the userid exists in the system, the callback will return a sequence
 of group identifiers (or an empty sequence if the user isn't a member
 of any groups).  If the userid *does not* exist in the system, the
-callback will return ``None``.  We'll use "dummy" data to represent
-user and groups sources.  When we're done, your application's
-``security.py`` will look like this.
+callback will return ``None``.  In a production system, user and group
+data will most often come from a database, but here we use "dummy"
+data to represent user and groups sources. Note that the ``editor``
+user is a member of the ``group:editors`` group in our dummy group
+data (the ``GROUPS`` data structure).
 
-.. literalinclude:: src/authorization/tutorial/security.py
-   :linenos:
-   :language: python
+We've given the ``editor`` user membership to the ``group:editors`` by
+mapping him to this group in the ``GROUPS`` data structure (``GROUPS =
+{'editor':['group:editors']}``).  Since the ``groupfinder`` function
+consults the ``GROUPS`` data structure, this will mean that, as a
+result of the ACL attached to the root returned by the root factory,
+and the permission associated with the ``add_page`` and ``edit_page``
+views, the ``editor`` user should be able to add and edit pages.
 
 Adding Login and Logout Views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -9,6 +9,10 @@ Documentation
   via a group rather than via a direct username (thanks to Alex
   Marandon).
 
+- The authorization chapter of the SQLAlchemy Wiki Tutorial
+  (docs/tutorials/bfgwiki2) was changed to demonstrate authorization
+  via a group rather than via a direct username.
+
 1.3a3 (2010-05-01)
 ==================
 

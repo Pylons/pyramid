@@ -7,7 +7,7 @@ basic, but they provide a good orientation for the high-level patterns
 common to most :term:`url dispatch` -based :mod:`repoze.bfg` projects.
 
 The source code for this tutorial stage can be browsed at
-`docs.repoze.org <http://docs.repoze.org/bfgwiki2-1.2/basiclayout>`_.
+`docs.repoze.org <http://docs.repoze.org/bfgwiki2-1.3/basiclayout>`_.
 
 ``__init__.py``
 ---------------

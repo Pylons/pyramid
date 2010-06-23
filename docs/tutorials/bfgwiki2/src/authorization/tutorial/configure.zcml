@@ -57,6 +57,7 @@
 
   <authtktauthenticationpolicy
     secret="sosecret"
+    callback=".security.groupfinder"
     />
 
   <aclauthorizationpolicy/>

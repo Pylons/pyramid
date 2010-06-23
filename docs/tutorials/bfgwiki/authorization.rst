@@ -206,28 +206,28 @@ pass a ``permission`` argument to each of our
 
 - We add ``permission='edit'`` to the decorator attached to the
   ``add_page`` view function.  This makes the assertion that only
-  users who possess the effective ``view`` permission at the time of
+  users who possess the effective ``edit`` permission at the time of
   the request may invoke this view.  We've granted the
-  ``group:editors`` principal the view permission at the root model
-  via its ACL, so only the a user whom is a member of the group named
-  ``group:editors`` will able to invoke the ``add_page`` view.  We've
-  likewise given the ``editor`` user membership to this group via thes
-  ``security.py`` file by mapping him to the ``group:editors`` group
-  in the ``GROUPS`` data structure (``GROUPS =
+  ``group:editors`` principal the ``edit`` permission at the root
+  model via its ACL, so only the a user whom is a member of the group
+  named ``group:editors`` will able to invoke the ``add_page`` view.
+  We've likewise given the ``editor`` user membership to this group
+  via thes ``security.py`` file by mapping him to the
+  ``group:editors`` group in the ``GROUPS`` data structure (``GROUPS =
   {'editor':['group:editors']}``); the ``groupfinder`` function
   consults the ``GROUPS`` data structure.  This means that the
   ``editor`` user can add pages.
 
 - We add ``permission='edit'`` to the ``bfg_view`` decorator attached
   to the ``edit_page`` view function.  This makes the assertion that
-  only users who possess the effective ``view`` permission at the time
+  only users who possess the effective ``edit`` permission at the time
   of the request may invoke this view.  We've granted the
-  ``group:editors`` principal the view permission at the root model
-  via its ACL, so only the a user whom is a member of the group named
-  ``group:editors`` will able to invoke the ``edit_page`` view.  We've
-  likewise given the ``editor`` user membership to this group via thes
-  ``security.py`` file by mapping him to the ``group:editors`` group
-  in the ``GROUPS`` data structure (``GROUPS =
+  ``group:editors`` principal the ``edit`` permission at the root
+  model via its ACL, so only the a user whom is a member of the group
+  named ``group:editors`` will able to invoke the ``edit_page`` view.
+  We've likewise given the ``editor`` user membership to this group
+  via thes ``security.py`` file by mapping him to the
+  ``group:editors`` group in the ``GROUPS`` data structure (``GROUPS =
   {'editor':['group:editors']}``); the ``groupfinder`` function
   consults the ``GROUPS`` data structure.  This means that the
   ``editor`` user can edit pages.

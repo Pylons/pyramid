@@ -10,7 +10,7 @@ created a basic Wiki application with authentication.
 
 For cut and paste purposes, the source code for all stages of this
 tutorial can be browsed at `docs.repoze.org
-<http://docs.repoze.org/bfgwiki2-1.2>`_.
+<http://docs.repoze.org/bfgwiki2-1.3>`_.
 
 .. toctree::
    :maxdepth: 2
