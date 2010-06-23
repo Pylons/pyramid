@@ -370,16 +370,16 @@ follows:
     
    class registerFunction(object):
         
-       def __init__(self,path):
+       def __init__(self, path):
            self.path = path
 
-       def register(self,scanner,name,wrapped):
+       def register(self, scanner, name, wrapped):
            registry = get_current_registry()
            registry.getUtility(IMyUtility).register(
                self.path, wrapped
                )
         
-       def __call__(self,wrapped):
+       def __call__(self, wrapped):
            venusian.attach(wrapped, self.register)
            return wrapped
     
