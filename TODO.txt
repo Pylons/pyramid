@@ -9,7 +9,11 @@
 
 - Fix message catalog extraction / compilation documentation.
 
-- Docs about creating a venusian decorator.
+- Change docs about creating a venusian decorator to not use ZCA.
+
+- Add a ``susbcriber`` decorator and docs.
+
+- Venusian: skip .pyc-only files.
 
 Renderer overhaul
 ------------------
@@ -118,4 +122,5 @@ A semi-pseudocode example:
 This is mostly an amelioration for the first and second bullet points
 above.  The second two bullet points are not addressed by it.
 
-
+Also: think about generalizing this a bit into something which wraps a
+view callable like a decorator, which can influence input and output.
