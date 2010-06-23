@@ -1,6 +1,13 @@
 Next release
 ============
 
+Features
+--------
+
+- Undocumented hook: make ``get_app`` and ``get_root`` of the
+  ``repoze.bfg.paster.BFGShellCommand`` hookable in cases where
+  endware may interfere with the default versions.
+
 Documentation
 -------------
 

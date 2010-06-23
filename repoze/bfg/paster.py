@@ -74,6 +74,8 @@ class BFGShellCommand(Command):
 
     interact = (interact,) # for testing
     loadapp = (loadapp,) # for testing
+    get_app = staticmethod(get_app) # hook point
+    get_root = staticmethod(get_root) # hook point
     verbose = 3
 
     def __init__(self, *arg, **kw):
@@ -93,8 +95,8 @@ class BFGShellCommand(Command):
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
         config_file, section_name = self.args
         self.logging_file_config(config_file)
-        app = get_app(config_file, section_name, loadapp=self.loadapp[0])
-        root, closer = get_root(app)
+        app = self.get_app(config_file, section_name, loadapp=self.loadapp[0])
+        root, closer = self.get_root(app)
         if IPShell is not None and not self.options.disable_ipython:
             try:
                 shell = IPShell(argv=[], user_ns={'root':root})

@@ -15,7 +15,6 @@ class TestBFGShellCommand(unittest.TestCase):
         loadapp = DummyLoadApp(app)
         command.interact = (interact,)
         command.loadapp = (loadapp,)
-        command.IPShellEmbed = True # fake out
         command.args = ('/foo/bar/myapp.ini', 'myapp')
         class Options(object): pass
         command.options = Options()
@@ -54,6 +53,59 @@ class TestBFGShellCommand(unittest.TestCase):
         self.assertEqual(dummy_shell_factory.shell.global_ns, {})
         self.failUnless('\n\n' in dummy_shell_factory.shell.IP.BANNER)
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
+
+    def test_command_get_app_hookable(self):
+        from paste.deploy import loadapp
+        command = self._makeOne()
+        app = DummyApp()
+        apped = []
+        def get_app(*arg, **kw):
+            apped.append((arg, kw))
+            return app
+        command.get_app = get_app
+        interact = DummyInteractor()
+        app = DummyApp()
+        command.interact = (interact,)
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython =True
+        command.command(IPShell=None)
+        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
+        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(pushed['registry'], dummy_registry)
+        self.assertEqual(pushed['request'].registry, dummy_registry)
+        self.assertEqual(interact.local, {'root':dummy_root})
+        self.failUnless(interact.banner)
+        self.assertEqual(len(app.threadlocal_manager.popped), 1)
+        self.assertEqual(apped, [(('/foo/bar/myapp.ini', 'myapp'),
+                                  {'loadapp': loadapp})])
+
+    def test_command_get_root_hookable(self):
+        command = self._makeOne()
+        interact = DummyInteractor()
+        app = DummyApp()
+        loadapp = DummyLoadApp(app)
+        command.interact = (interact,)
+        command.loadapp = (loadapp,)
+        root = Dummy()
+        apps = []
+        def get_root(app):
+            apps.append(app)
+            return root, lambda *arg: None
+        command.get_root =get_root
+        command.args = ('/foo/bar/myapp.ini', 'myapp')
+        class Options(object): pass
+        command.options = Options()
+        command.options.disable_ipython =True
+        command.command(IPShell=None)
+        self.assertEqual(loadapp.config_name, 'config:/foo/bar/myapp.ini')
+        self.assertEqual(loadapp.section_name, 'myapp')
+        self.failUnless(loadapp.relative_to)
+        self.assertEqual(len(app.threadlocal_manager.pushed), 0)
+        self.assertEqual(interact.local, {'root':root})
+        self.failUnless(interact.banner)
+        self.assertEqual(apps, [app])
 
 class TestGetApp(unittest.TestCase):
     def _callFUT(self, config_file, section_name, loadapp):
