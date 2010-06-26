@@ -13,8 +13,6 @@
 
 - Add a ``susbcriber`` decorator and docs.
 
-- Venusian: skip .pyc-only files.
-
 Renderer overhaul
 ------------------
 
