@@ -17,11 +17,10 @@ Features
   always ``None``.
 
   As of this release, the first argument passed to a predicate is now
-  a dictionary conventionally named ``info`` consisting of ``match``,
-  ``route``, and ``mapper``.  ``match`` is a dictionary: it represents
-  the arguments matched in the URL by the route.  ``route`` is an
-  object representing the route that matched.  ``mapper`` is the url
-  dispatch route mapper object.
+  a dictionary conventionally named ``info`` consisting of ``route``,
+  and ``match``.  ``match`` is a dictionary: it represents the
+  arguments matched in the URL by the route.  ``route`` is an object
+  representing the route which was matched.
 
   This is useful when predicates need access to the route match.  For
   example::
@@ -30,10 +29,15 @@ Features
         def predicate(info, request):
             if info['match'][segment_name] in args:
                 return True
+        return predicate
 
     num_one_two_or_three = any_of('num, 'one', 'two', 'three')
 
     add_route('/:num', custom_predicates=(num_one_two_or_three,))
+
+  The ``route`` object is an object that has two useful attributes:
+  ``name`` and ``path``.  The ``name`` attribute is the route name.
+  The ``path`` attribute is the route pattern.
 
 Documentation
 -------------

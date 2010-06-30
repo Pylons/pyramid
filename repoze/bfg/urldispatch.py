@@ -51,7 +51,10 @@ class RoutesMapper(object):
             match = route.match(path)
             if match is not None:
                 preds = route.predicates
-                info = {'route':route, 'match':match}
+                # NB: it is the intent that only 'match' be relied on
+                # by built-in predicates.  'route' and 'mapper' may be
+                # used by custom predicates.
+                info = {'match':match, 'route':route}
                 if preds and not all((p(info, request) for p in preds)):
                     continue
                 return info
