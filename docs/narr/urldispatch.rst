@@ -624,12 +624,18 @@ For instance, a predicate might do some type conversion of values:
                    match[segment_name] = int(match[segment_name])
                except (TypeError, ValueError):
                    pass
+            return True
        return predicate
 
     ymd_to_int = integers('year', 'month', 'day')
 
     config.add_route('num', '/:year/:month/:day', 
                      custom_predicates=(ymd_to_int,))
+
+Note that a conversion predicate is still a predicate so it must
+return ``True`` or ``False``; a predicate that does *only* conversion,
+such as the one we demonstrate above should unconditionally return
+``True``.
 
 The ``match`` dictionary passed within ``info`` to each predicate
 attached to a route will be the same dictionary.  Therefore, when
