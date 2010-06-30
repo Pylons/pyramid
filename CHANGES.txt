@@ -8,6 +8,33 @@ Features
   ``repoze.bfg.paster.BFGShellCommand`` hookable in cases where
   endware may interfere with the default versions.
 
+- In earlier versions, a custom route predicate associated with a url
+  dispatch route (each of the predicate functions fed to the
+  ``custom_predicates`` argument of
+  ``repoze.bfg.configuration.Configurator.add_route``) has always
+  required a 2-positional argument signature, e.g. ``(context,
+  request)``.  Before this release, the ``context`` argument was
+  always ``None``.
+
+  As of this release, the first argument passed to a predicate is now
+  a dictionary conventionally named ``info`` consisting of ``match``,
+  ``route``, and ``mapper``.  ``match`` is a dictionary: it represents
+  the arguments matched in the URL by the route.  ``route`` is an
+  object representing the route that matched.  ``mapper`` is the url
+  dispatch route mapper object.
+
+  This is useful when predicates need access to the route match.  For
+  example::
+
+    def any_of(segment_name, *args):
+        def predicate(info, request):
+            if info['match'][segment_name] in args:
+                return True
+
+    num_one_two_or_three = any_of('num, 'one', 'two', 'three')
+
+    add_route('/:num', custom_predicates=(num_one_two_or_three,))
+
 Documentation
 -------------
 

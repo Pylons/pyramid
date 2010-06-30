@@ -108,6 +108,16 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['match']['action'], 'action1')
         self.assertEqual(result['match']['article'], 'article1')
 
+    def test_custom_predicate_gets_info(self):
+        mapper = self._makeOne()
+        def pred(info, request):
+            self.assertEqual(info['match'], {'action':u'action1'})
+            self.assertEqual(info['route'], mapper.routes['foo'])
+            return True
+        mapper.connect('archives/:action/article1', 'foo', predicates=[pred])
+        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        mapper(request)
+
     def test_cc_bug(self):
         # "unordered" as reported in IRC by author of
         # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
