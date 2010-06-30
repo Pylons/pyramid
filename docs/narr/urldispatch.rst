@@ -571,8 +571,10 @@ represent neither predicates nor view configuration information.
   try to fall back to using a view that otherwise matches the context,
   request, and view name (but does not match the route name predicate).
 
-Custom Predicates
-~~~~~~~~~~~~~~~~~
+.. _custom_route_predicates:
+
+Custom Route Predicates
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Each of the predicate callables fed to the ``custom_predicates``
 argument of :meth:`repoze.bfg.configuration.Configurator.add_route` or

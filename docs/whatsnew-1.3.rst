@@ -125,6 +125,21 @@ Minor Feature Additions
   conventions as objects that can be supplied directly to BFG as a
   view callable.
 
+- Prior to 1.3, a *route predicate* had no access to route pattern
+  matching information and had no way to know which route was matched.
+  Now, each of the predicate callables fed to the
+  ``custom_predicates`` argument of
+  :meth:`repoze.bfg.configuration.Configurator.add_route` or the
+  ``custom_predicates`` ZCML attribute can be a callable accepting two
+  arguments.  The first argument passed to a custom predicate is a
+  dictionary conventionally named ``info``.  The second argument is
+  the current :term:`request` object.  The ``info`` dictionary has a
+  number of contained values: ``match`` is a dictionary: it represents
+  the arguments matched in the URL by the route.  ``route`` is an
+  object representing the route which was matched.  See also
+  :ref:`custom_route_predicates`.  In prior versions, the ``info``
+  argument was always ``None``.
+
 Backwards Incompatibilites
 --------------------------
 
