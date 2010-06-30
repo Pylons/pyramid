@@ -578,7 +578,7 @@ Each of the predicate callables fed to the ``custom_predicates``
 argument of :meth:`repoze.bfg.configuration.Configurator.add_route` or
 the ``custom_predicates`` ZCML attribute must be a callable accepting
 two arguments.  The first argument passed to a custom predicate is a
-dictionary conventionally named ``info`.  The second argument is the
+dictionary conventionally named ``info``.  The second argument is the
 current :term:`request` object.
 
 The ``info`` dictionary has a number of contained values: ``match`` is

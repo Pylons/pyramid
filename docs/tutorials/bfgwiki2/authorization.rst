@@ -114,7 +114,7 @@ Note that the ``authtktauthenticationpolicy`` tag has two attributes:
 ``secret`` and ``callback``.  ``secret`` is a string representing an
 encryption key used by the "authentication ticket" machinery
 represented by this policy: it is required.  The ``callback`` is a
-string, representing a :term:`Python dotted name`, which points at the
+string, representing a :term:`dotted Python name`, which points at the
 ``groupfinder`` function in the current directory's ``security.py``
 file.  We haven't added that module yet, but we're about to.
 
