@@ -33,11 +33,21 @@ Features
 
     num_one_two_or_three = any_of('num, 'one', 'two', 'three')
 
-    add_route('/:num', custom_predicates=(num_one_two_or_three,))
+    add_route('num', '/:num', custom_predicates=(num_one_two_or_three,))
 
   The ``route`` object is an object that has two useful attributes:
   ``name`` and ``path``.  The ``name`` attribute is the route name.
-  The ``path`` attribute is the route pattern.
+  The ``path`` attribute is the route pattern.  An example of using
+  the route in a set of route predicates::
+
+    def twenty_ten(info, request):
+        if info['route'].name in ('ymd', 'ym', 'y'):
+            return info['match']['year'] == '2010'
+
+    add_route('y', '/:year', custom_predicates=(twenty_ten,))
+    add_route('ym', '/:year/:month', custom_predicates=(twenty_ten,))
+    add_route('ymd', '/:year/:month:/day', custom_predicates=(twenty_ten,))
+
 
 Documentation
 -------------
