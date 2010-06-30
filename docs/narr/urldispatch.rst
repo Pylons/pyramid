@@ -571,6 +571,105 @@ represent neither predicates nor view configuration information.
   try to fall back to using a view that otherwise matches the context,
   request, and view name (but does not match the route name predicate).
 
+Custom Predicates
+~~~~~~~~~~~~~~~~~
+
+Each of the predicate callables fed to the ``custom_predicates``
+argument of :meth:`repoze.bfg.configuration.Configurator.add_route` or
+the ``custom_predicates`` ZCML attribute must be a callable accepting
+two arguments.  The first argument passed to a custom predicate is a
+dictionary conventionally named ``info`.  The second argument is the
+current :term:`request` object.
+
+The ``info`` dictionary has a number of contained values: ``match`` is
+a dictionary: it represents the arguments matched in the URL by the
+route.  ``route`` is an object representing the route which was
+matched.
+
+``info['match']`` is useful when predicates need access to the route
+match.  For example:
+
+.. code-block:: python
+
+    def any_of(segment_name, *allowed):
+        def predicate(info, request):
+            if info['match'][segment_name] in allowed:
+                return True
+        return predicate
+
+    num_one_two_or_three = any_of('num, 'one', 'two', 'three')
+
+    config.add_route('num', '/:num', 
+                     custom_predicates=(num_one_two_or_three,))
+
+The above ``any_of`` function generates a predicate which ensures that
+the match value named ``segment_name`` is in the set of allowable
+values represented by ``allowed``.  We use this ``any_of`` function to
+generate a predicate function named ``num_one_two_or_three``, which
+ensures that the ``num`` segment is one of the values ``one``,
+``two``, or ``three`` , and use the result as a custom predicate by
+feeding it inside a tuple to the ``custom_predicates`` argument to
+:meth:`repoze.configuration.Configurator.add_route`.
+
+A custom route predicate may also *modify* the ``match`` dictionary.
+For instance, a predicate might do some type conversion of values:
+
+.. code-block:: python
+
+   def integers(*segment_names):
+       def predicate(info, request):
+           match = info['match']
+           for segment_name in segment_names:
+               try:
+                   match[segment_name] = int(match[segment_name])
+               except (TypeError, ValueError):
+                   pass
+       return predicate
+
+    ymd_to_int = integers('year', 'month', 'day')
+
+    config.add_route('num', '/:year/:month/:day', 
+                     custom_predicates=(ymd_to_int,))
+
+The ``match`` dictionary passed within ``info`` to each predicate
+attached to a route will be the same dictionary.  Therefore, when
+registering a custom predicate which modifies the ``match`` dict, the
+code registering the predicate should usually arrange for the
+predicate to be the *last* custom predicate in the custom predicate
+list.  Otherwise, custom predicates which fire subsequent to the
+predicate which performs the ``match`` modification will receive the
+*modified* match dictionary.
+
+.. warning::
+
+   It is a poor idea to rely on ordering of custom predicates to build
+   some conversion pipeline, where one predicate depends on the side
+   effect of another.  For instance, it's a poor idea to register two
+   custom predicates, one which handles conversion of a value to an
+   int, the next which handles conversion of that integer to some
+   custom object.  Just do all that in a single custom predicate.
+
+The ``route`` object in the ``info`` dict is an object that has two
+useful attributes: ``name`` and ``path``.  The ``name`` attribute is
+the route name.  The ``path`` attribute is the route pattern.  An
+example of using the route in a set of route predicates:
+
+.. code-block:: python
+   :linenos:
+
+    def twenty_ten(info, request):
+        if info['route'].name in ('ymd', 'ym', 'y'):
+            return info['match']['year'] == '2010'
+
+    config.add_route('y', '/:year', custom_predicates=(twenty_ten,))
+    config.add_route('ym', '/:year/:month', custom_predicates=(twenty_ten,))
+    config.add_route('ymd', '/:year/:month:/day', 
+                     custom_predicates=(twenty_ten,))
+
+The above predicate, when added to a number of route configurations
+ensures that the year match argument is '2010' if and only if the
+route name is 'ymd', 'ym', or 'y'.
+
 Route Matching
 --------------
 
@@ -605,7 +704,6 @@ routes.
 If no route matches after all route patterns are exhausted,
 :mod:`repoze.bfg` falls back to :term:`traversal` to do :term:`context
 finding` and :term:`view lookup`.
-
 
 .. index::
    single: matchdict
