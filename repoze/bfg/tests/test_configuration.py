@@ -1699,59 +1699,52 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(overrides.inserted, [('path', 'opackage', 'oprefix')])
         self.assertEqual(overrides.package, package)
 
-    def test_add_static_view_here_relative(self):
+    def test_add_static_here_no_utility_registered(self):
         from repoze.bfg.static import PackageURLParser
         from zope.interface import implementedBy
-        from repoze.bfg.static import StaticRootFactory
+        from repoze.bfg.static import StaticURLInfo
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewClassifier
         config = self._makeOne()
         config.add_static_view('static', 'fixtures/static')
         request_type = self._getRouteRequestIface(config, 'static')
         route = self._assertRoute(config, 'static', 'static*subpath')
-        self.assertEqual(route.factory.__class__, StaticRootFactory)
-        iface = implementedBy(StaticRootFactory)
+        self.assertEqual(route.factory.__class__, type(lambda x: x))
+        iface = implementedBy(StaticURLInfo)
         wrapped = config.registry.adapters.lookup(
             (IViewClassifier, request_type, iface), IView, name='')
         request = self._makeRequest(config)
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
     def test_add_static_view_package_relative(self):
-        from repoze.bfg.static import PackageURLParser
-        from zope.interface import implementedBy
-        from repoze.bfg.static import StaticRootFactory
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IStaticURLInfo
+        info = DummyStaticURLInfo()
         config = self._makeOne()
+        config.registry.registerUtility(info, IStaticURLInfo)
         config.add_static_view('static', 'repoze.bfg.tests:fixtures/static')
-        request_type = self._getRouteRequestIface(config, 'static')
-        route = self._assertRoute(config, 'static', 'static*subpath')
-        self.assertEqual(route.factory.__class__, StaticRootFactory)
-        iface = implementedBy(StaticRootFactory)
-        wrapped = config.registry.adapters.lookup(
-            (IViewClassifier, request_type, iface), IView, name='')
-        request = self._makeRequest(config)
-        self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
+        self.assertEqual(info.added,
+                         [('static', 'repoze.bfg.tests:fixtures/static', {})])
+
+    def test_add_static_view_package_here_relative(self):
+        from repoze.bfg.interfaces import IStaticURLInfo
+        info = DummyStaticURLInfo()
+        config = self._makeOne()
+        config.registry.registerUtility(info, IStaticURLInfo)
+        config.add_static_view('static', 'fixtures/static')
+        self.assertEqual(info.added,
+                         [('static', 'repoze.bfg.tests:fixtures/static', {})])
 
     def test_add_static_view_absolute(self):
-        from paste.urlparser import StaticURLParser
         import os
-        from zope.interface import implementedBy
-        from repoze.bfg.static import StaticRootFactory
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IStaticURLInfo
+        info = DummyStaticURLInfo()
         config = self._makeOne()
+        config.registry.registerUtility(info, IStaticURLInfo)
         here = os.path.dirname(__file__)
         static_path = os.path.join(here, 'fixtures', 'static')
         config.add_static_view('static', static_path)
-        request_type = self._getRouteRequestIface(config, 'static')
-        route = self._assertRoute(config, 'static', 'static*subpath')
-        self.assertEqual(route.factory.__class__, StaticRootFactory)
-        iface = implementedBy(StaticRootFactory)
-        wrapped = config.registry.adapters.lookup(
-            (IViewClassifier, request_type, iface), IView, name='')
-        request = self._makeRequest(config)
-        self.assertEqual(wrapped(None, request).__class__, StaticURLParser)
+        self.assertEqual(info.added,
+                         [('static', static_path, {})])
 
     def test_set_notfound_view(self):
         from zope.interface import implementedBy
@@ -3661,3 +3654,10 @@ class DummyFactory(object):
 class DummyEvent:
     implements(IDummy)
 
+class DummyStaticURLInfo:
+    def __init__(self):
+        self.added = []
+        
+    def add(self, name, spec, **kw):
+        self.added.append((name, spec, kw))
+        

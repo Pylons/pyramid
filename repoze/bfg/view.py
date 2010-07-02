@@ -17,8 +17,6 @@ from webob.exc import HTTPFound
 
 import venusian
 
-from paste.urlparser import StaticURLParser
-
 from zope.deprecation import deprecated
 from zope.interface import providedBy
 
@@ -27,11 +25,9 @@ from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewClassifier
 
-from repoze.bfg.path import caller_package
 from repoze.bfg.path import package_path
-from repoze.bfg.resource import resolve_resource_spec
 from repoze.bfg.resource import resource_spec_from_abspath
-from repoze.bfg.static import PackageURLParser
+from repoze.bfg.static import static_view as static # B/C
 from repoze.bfg.threadlocal import get_current_registry
 
 # b/c imports
@@ -50,6 +46,8 @@ deprecated('NotFound',
     "deprecated as of repoze.bfg 1.1; instead use 'from "
     "repoze.bfg.exceptions import NotFound')",
     )
+
+static = static # dont yet deprecate this (ever?)
 
 _marker = object()
 
@@ -165,67 +163,6 @@ def is_response(ob):
              isinstance(ob.status, basestring) ) :
             return True
     return False
-
-class static(object):
-    """ An instance of this class is a callable which can act as a
-    :mod:`repoze.bfg` :term:`view callable`; this view will serve
-    static files from a directory on disk based on the ``root_dir``
-    you provide to its constructor.
-
-    The directory may contain subdirectories (recursively); the static
-    view implementation will descend into these directories as
-    necessary based on the components of the URL in order to resolve a
-    path into a response.
-
-    You may pass an absolute or relative filesystem path or a
-    :term:`resource specification` representing the directory
-    containing static files as the ``root_dir`` argument to this
-    class' constructor.
-
-    If the ``root_dir`` path is relative, and the ``package_name``
-    argument is ``None``, ``root_dir`` will be considered relative to
-    the directory in which the Python file which *calls* ``static``
-    resides.  If the ``package_name`` name argument is provided, and a
-    relative ``root_dir`` is provided, the ``root_dir`` will be
-    considered relative to the Python :term:`package` specified by
-    ``package_name`` (a dotted path to a Python package).
-
-    ``cache_max_age`` influences the ``Expires`` and ``Max-Age``
-    response headers returned by the view (default is 3600 seconds or
-    five minutes).
-
-    .. note:: If the ``root_dir`` is relative to a :term:`package`, or
-         is a :term:`resource specification` the :mod:`repoze.bfg`
-         ``resource`` ZCML directive or
-         :class:`repoze.bfg.configuration.Configurator` method can be
-         used to override resources within the named ``root_dir``
-         package-relative directory.  However, if the ``root_dir`` is
-         absolute, the ``resource`` directive will not be able to
-         override the resources it contains.  """
-    
-    def __init__(self, root_dir, cache_max_age=3600, package_name=None):
-        # package_name is for bw compat; it is preferred to pass in a
-        # package-relative path as root_dir
-        # (e.g. ``anotherpackage:foo/static``).
-        caller_package_name = caller_package().__name__
-        package_name = package_name or caller_package_name
-        package_name, root_dir = resolve_resource_spec(root_dir, package_name)
-        if package_name is None:
-            app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
-        else:
-            app = PackageURLParser(
-                package_name, root_dir, cache_max_age=cache_max_age)
-        self.app = app
-
-    def __call__(self, context, request):
-        subpath = '/'.join(request.subpath)
-        request_copy = request.copy()
-        # Fix up PATH_INFO to get rid of everything but the "subpath"
-        # (the actual path to the file relative to the root dir).
-        request_copy.environ['PATH_INFO'] = '/' + subpath
-        # Zero out SCRIPT_NAME for good measure.
-        request_copy.environ['SCRIPT_NAME'] = ''
-        return request_copy.get_response(self.app)
 
 class bfg_view(object):
     """ A function, class or method :term:`decorator` which allows a

@@ -32,7 +32,7 @@ from repoze.bfg.exceptions import NotFound
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import resource_spec_from_abspath
-from repoze.bfg.static import StaticRootFactory
+from repoze.bfg.static import StaticURLInfo
 from repoze.bfg.threadlocal import get_current_registry
 
 ###################### directives ##########################
@@ -558,17 +558,19 @@ def static(_context, name, path, cache_max_age=3600):
     config = Configurator(reg, package=_context.package)
 
     _context.action(
-        discriminator = ('route', name, False, None, None, None, None, None),
+        discriminator=('static', name),
         callable=config.add_static_view,
-        args = (name, path, cache_max_age, _context.info),
+        args = (name, path),
+        kw = {'cache_max_age':cache_max_age, '_info':_context.info},
         )
 
-    _context.action(
-        discriminator = (
-            'view', StaticRootFactory, '', None, IView, None,  None, None,
-            name, None, None, None, None, None,
+    if not '/' in name:
+        _context.action(
+            discriminator = (
+                'view', StaticURLInfo, '', None, IView, None,  None, None,
+                name, None, None, None, None, None,
+                )
             )
-        )
 
 class IScanDirective(Interface):
     package = GlobalObject(

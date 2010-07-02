@@ -6,10 +6,10 @@ from repoze.lru import lru_cache
 
 from repoze.bfg.interfaces import IContextURL
 from repoze.bfg.interfaces import IRoutesMapper
+from repoze.bfg.interfaces import IStaticURLInfo
 
 from repoze.bfg.encode import urlencode
 from repoze.bfg.path import caller_package
-from repoze.bfg.static import StaticRootFactory
 from repoze.bfg.threadlocal import get_current_registry
 from repoze.bfg.traversal import TraversalContextURL
 from repoze.bfg.traversal import quote_path_segment
@@ -84,6 +84,17 @@ def route_url(route_name, request, *elements, **kw):
     element will always follow the query element,
     e.g. ``http://example.com?foo=1#bar``.
 
+    If a keyword ``_app_url`` is present, it will be used as the
+    protocol/hostname/port/leading path prefix of the generated URL.
+    For example, using an ``_app_url`` of
+    ``http://example.com:8080/foo`` would cause the URL
+    ``http://example.com:8080/foo/fleeb/flub`` to be returned from
+    this function if the expansion of the route pattern associated
+    with the ``route_name`` expanded to ``/fleeb/flub``.  If
+    ``_app_url`` is not specified, the result of
+    ``request.application_url`` will be used as the prefix (the
+    default).
+
     This function raises a :exc:`KeyError` if the URL cannot be
     generated due to missing replacement names.  Extra replacement
     names are ignored.
@@ -96,6 +107,7 @@ def route_url(route_name, request, *elements, **kw):
 
     anchor = ''
     qs = ''
+    app_url = None
 
     if '_query' in kw:
         qs = '?' + urlencode(kw.pop('_query'), doseq=True)
@@ -106,6 +118,9 @@ def route_url(route_name, request, *elements, **kw):
             anchor = anchor.encode('utf-8')
         anchor = '#' + anchor
 
+    if '_app_url' in kw:
+        app_url = kw.pop('_app_url')
+
     path = mapper.generate(route_name, kw) # raises KeyError if generate fails
 
     if elements:
@@ -115,7 +130,13 @@ def route_url(route_name, request, *elements, **kw):
     else:
         suffix = ''
 
-    return request.application_url + path + suffix + qs + anchor
+    if app_url is None:
+        # we only defer lookup of application_url until here because
+        # it's somewhat expensive; we won't need to do it if we've
+        # been passed _app_url
+        app_url = request.application_url
+
+    return app_url + path + suffix + qs + anchor
 
 def model_url(model, request, *elements, **kw):
     """
@@ -281,18 +302,11 @@ def static_url(path, request, **kw):
     except AttributeError:
         reg = get_current_registry() # b/c
     
-    mapper = reg.getUtility(IRoutesMapper)
-    routes = mapper.get_routes()
-
-    for route in routes:
-        factory = route.factory
-        if factory.__class__ is StaticRootFactory:
-            if path.startswith(factory.spec):
-                subpath = path[len(factory.spec):]
-                kw['subpath'] = subpath
-                return route_url(route.name, request, **kw)
-
-    raise ValueError('No static URL definition matching %s' % path)
+    info = reg.queryUtility(IStaticURLInfo)
+    if info is None:
+        raise ValueError('No static URL definition matching %s' % path)
+        
+    return info.generate(path, request, **kw)
 
 @lru_cache(1000)
 def _join_elements(elements):

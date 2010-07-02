@@ -29,8 +29,7 @@ class IWSGIApplicationCreatedEvent(Interface):
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
 
-# for exception view lookups 
-IRequest.combined = IRequest
+IRequest.combined = IRequest # for exception view lookups 
 
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
@@ -72,6 +71,13 @@ class IAuthorizationPolicy(Interface):
     def principals_allowed_by_permission(context, permission):
         """ Return a set of principal identifiers allowed by the permission """
 
+class IStaticURLInfo(Interface):
+    """ A policy for generating URLs to static resources """
+    def add(name, spec, **extra):
+        """ Add a new static info registration """
+
+    def generate(path, request, **kw):
+        """ Generate a URL for the given path """
 
 class IResponseFactory(Interface):
     """ A utility which generates a response factory """

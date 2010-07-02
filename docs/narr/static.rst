@@ -21,9 +21,17 @@ resources such as JavaScript and CSS files. This mechanism makes
 static files available at a name relative to the application root URL,
 e.g. ``/static``.
 
+Note that the ``path`` provided to ``static`` may be a fully qualified
+:term:`resource specification`, a package-relative path, or an
+*absolute path*.  The ``path`` with the value ``a/b/c/static`` of a
+``static`` directive in a ZCML file that resides in the "mypackage"
+package will resolve to a package-qualified resource such as
+``some_package:a/b/c/static``.
+
 Here's an example of a ``static`` ZCML directive that will serve files
 up under the ``/static`` URL from the ``/var/www/static`` directory of
-the computer which runs the :mod:`repoze.bfg` application.
+the computer which runs the :mod:`repoze.bfg` application using an
+absolute path.
 
 .. code-block:: xml
    :linenos:
@@ -35,7 +43,8 @@ the computer which runs the :mod:`repoze.bfg` application.
 
 Here's an example of a ``static`` directive that will serve files up
 under the ``/static`` URL from the ``a/b/c/static`` directory of the
-Python package named ``some_package``.
+Python package named ``some_package`` using a fully qualified
+:term:`resource specification`.
 
 .. code-block:: xml
    :linenos:
@@ -47,7 +56,8 @@ Python package named ``some_package``.
 
 Here's an example of a ``static`` directive that will serve files up
 under the ``/static`` URL from the ``static`` directory of the Python
-package in which the ``configure.zcml`` file lives.
+package in which the ``configure.zcml`` file lives using a
+package-relative path.
 
 .. code-block:: xml
    :linenos:
@@ -57,22 +67,52 @@ package in which the ``configure.zcml`` file lives.
       path="static"
       />
 
-When you place your static files on the filesystem in the directory
-represented as the ``path`` of the directive, you should be able
-to view the static files in this directory via a browser at URLs
-prefixed with the directive's ``name``.  For instance if the
-``static`` directive's ``name`` is ``static`` and the static
-directive's ``path`` is ``/path/to/static``,
-``http://localhost:6543/static/foo.js`` will return the file
-``/path/to/static/dir/foo.js``.  The static directory may contain
-subdirectories recursively, and any subdirectories may hold files;
-these will be resolved by the static view as you would expect.
-
-See :ref:`static_directive` for detailed information about the
-``static`` ZCML directive.
-
 .. note:: The :ref:`static_directive` ZCML directive is new in
    :mod:`repoze.bfg` 1.1.
+
+Whether you use for ``path`` a fully qualified resource specification,
+an absolute path, or a package-relative path, When you place your
+static files on the filesystem in the directory represented as the
+``path`` of the directive, you will then be able to view the static
+files in this directory via a browser at URLs prefixed with the
+directive's ``name``.  For instance if the ``static`` directive's
+``name`` is ``static`` and the static directive's ``path`` is
+``/path/to/static``, ``http://localhost:6543/static/foo.js`` will
+return the file ``/path/to/static/dir/foo.js``.  The static directory
+may contain subdirectories recursively, and any subdirectories may
+hold files; these will be resolved by the static view as you would
+expect.
+
+While the ``path`` argument can be a number of different things, the
+``name`` argument of the ``static`` ZCML directive can also be one of
+a number of things: a *view name* or a *URL*.  The above examples have
+shown usage of the ``name`` argument as a view name.  When ``name`` is
+a *URL* (or any string with a slash (``/``) in it), static resources
+can be served from an external webserver.  In this mode, the ``name``
+is used as the URL prefix when generating a URL using
+:func:`repoze.bfg.url.static_url`.
+
+For example, the ``static`` ZCML directive may be fed a ``name``
+argument which is ``http://example.com/images``:
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="http://example.com/images"
+      path="mypackage:images"
+      />
+
+Because the ``static`` ZCML directive is provided with a ``name``
+argument that is the URL prefix ``http://example.com/images``,
+subsequent calls to :func:`repoze.bfg.url.static_url` with paths that
+start with the ``path`` argument passed to
+:meth:`repoze.bfg.configuration.Configurator.add_static_view` will
+generate a URL something like ``http://example.com/logo.png``.  The
+external webserver listening on ``example.com`` must be itself
+configured to respond properly to such a request.  The
+:func:`repoze.bfg.url.static_url` API is discussed in more detail
+later in this chapter.
 
 The :meth:`repoze.bfg.configuration.Configurator.add_static_view`
 method offers an imperative equivalent to the ``static`` ZCML
@@ -95,6 +135,9 @@ static resource directory, a special helper API named
 :func:`repoze.bfg.static_url` can be used to generate the appropriate
 URL for a package resource that lives in one of the directories named
 by the static registration ``path`` attribute.
+
+.. note:: The :func:`repoze.bfg.url.static_url` API is new in
+   :mod:`repoze.bfg` 1.1.
 
 For example, let's assume you create a set of ``static`` declarations
 in ZCML like so:
@@ -148,8 +191,33 @@ rather than constructing static URLs "by hand" is that if you need to
 change the ``name`` of a static URL declaration in ZCML, the generated
 URLs will continue to resolve properly after the rename.
 
-.. note:: The :func:`repoze.bfg.url.static_url` API is new in
-   :mod:`repoze.bfg` 1.1.
+URLs may also be generated by :func:`repoze.bfg.url.static_url` to
+static resources that live *outside* the :mod:`repoze.bfg`
+application.  This will happen when the ``name`` argument provided to
+the ``static`` ZCML directive or the
+:meth:`repoze.bfg.configuration.Configurator.add_static_view` API
+associated with the path fed to :func:`repoze.bfg.url.static_url` is a
+*URL* instead of a view name.  For example, the ``name`` argument
+given to either the ZCML directive or the configurator API may be
+``http://example.com`` while the the ``path`` given may be
+``mypackage:images``:
+
+.. code-block:: xml
+   :linenos:
+
+   <static
+      name="static1"
+      path="mypackage:images"
+      />
+
+Under such a configuration, the URL generated by ``static_url`` for
+resources which begin with ``mypackage:images`` will be prefixed with
+``http://example.com/images``:
+
+.. code-block:: python
+
+   static_url('mypackage:images/logo.png', request)
+   # -> http://example.com/images/logo.png
 
 .. index::
    single: static resource view

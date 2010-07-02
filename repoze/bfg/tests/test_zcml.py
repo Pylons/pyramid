@@ -683,11 +683,11 @@ class TestStaticDirective(unittest.TestCase):
         from repoze.bfg.zcml import static
         return static(*arg, **kw)
 
-    def test_it(self):
+    def test_it_with_slash(self):
         from repoze.bfg.static import PackageURLParser
         from repoze.bfg.threadlocal import get_current_registry
         from zope.interface import implementedBy
-        from repoze.bfg.static import StaticRootFactory
+        from repoze.bfg.static import StaticURLInfo
         from repoze.bfg.interfaces import IView
         from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IRouteRequest
@@ -701,9 +701,8 @@ class TestStaticDirective(unittest.TestCase):
 
         route_action = actions[0]
         discriminator = route_action['discriminator']
-        self.assertEqual(discriminator,
-                         ('route', 'name', False, None, None, None, None, None))
-        route_action['callable'](*route_action['args'])
+        self.assertEqual(discriminator, ('static', 'name'))
+        route_action['callable'](*route_action['args'], **route_action['kw'])
         mapper = reg.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         self.assertEqual(len(routes), 1)
@@ -712,15 +711,14 @@ class TestStaticDirective(unittest.TestCase):
 
         view_action = actions[1]
         discriminator = view_action['discriminator']
-        self.assertEqual(discriminator[:3], ('view', StaticRootFactory, ''))
+        self.assertEqual(discriminator[:3], ('view', StaticURLInfo, ''))
         self.assertEqual(discriminator[4], IView)
-        iface = implementedBy(StaticRootFactory)
+        iface = implementedBy(StaticURLInfo)
         request_type = reg.getUtility(IRouteRequest, 'name')
         view = reg.adapters.lookup(
             (IViewClassifier, request_type, iface), IView, name='')
         request = DummyRequest()
         self.assertEqual(view(None, request).__class__, PackageURLParser)
-
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):

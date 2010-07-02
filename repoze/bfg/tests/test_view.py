@@ -206,72 +206,6 @@ class TestIsResponse(unittest.TestCase):
         response.status = None
         self.assertEqual(self._callFUT(response), False)
 
-class TestStaticView(BaseTest, unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _getTargetClass(self):
-        from repoze.bfg.view import static
-        return static
-
-    def _makeOne(self, path, package_name=None):
-        return self._getTargetClass()(path, package_name=package_name)
-        
-    def test_abspath(self):
-        import os
-        path = os.path.dirname(__file__)
-        view = self._makeOne(path)
-        context = DummyContext()
-        request = DummyRequest()
-        request.subpath = ['__init__.py']
-        request.environ = self._makeEnviron()
-        response = view(context, request)
-        self.assertEqual(request.copied, True)
-        self.assertEqual(response.directory, path)
-
-    def test_relpath(self):
-        path = 'fixtures'
-        view = self._makeOne(path)
-        context = DummyContext()
-        request = DummyRequest()
-        request.subpath = ['__init__.py']
-        request.environ = self._makeEnviron()
-        response = view(context, request)
-        self.assertEqual(request.copied, True)
-        self.assertEqual(response.root_resource, 'fixtures')
-        self.assertEqual(response.resource_name, 'fixtures')
-        self.assertEqual(response.package_name, 'repoze.bfg.tests')
-        self.assertEqual(response.cache_max_age, 3600)
-
-    def test_relpath_withpackage(self):
-        view = self._makeOne('another:fixtures')
-        context = DummyContext()
-        request = DummyRequest()
-        request.subpath = ['__init__.py']
-        request.environ = self._makeEnviron()
-        response = view(context, request)
-        self.assertEqual(request.copied, True)
-        self.assertEqual(response.root_resource, 'fixtures')
-        self.assertEqual(response.resource_name, 'fixtures')
-        self.assertEqual(response.package_name, 'another')
-        self.assertEqual(response.cache_max_age, 3600)
-
-    def test_relpath_withpackage_name(self):
-        view = self._makeOne('fixtures', package_name='another')
-        context = DummyContext()
-        request = DummyRequest()
-        request.subpath = ['__init__.py']
-        request.environ = self._makeEnviron()
-        response = view(context, request)
-        self.assertEqual(request.copied, True)
-        self.assertEqual(response.root_resource, 'fixtures')
-        self.assertEqual(response.resource_name, 'fixtures')
-        self.assertEqual(response.package_name, 'another')
-        self.assertEqual(response.cache_max_age, 3600)
-
 class TestBFGViewDecorator(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -520,19 +454,6 @@ class AppendSlashNotFoundView(BaseTest, unittest.TestCase):
 
 class DummyContext:
     pass
-
-class DummyRequest:
-    def __init__(self, environ=None):
-        if environ is None:
-            environ = {}
-        self.environ = environ
-        
-    def get_response(self, application):
-        return application
-
-    def copy(self):
-        self.copied = True
-        return self
 
 def make_view(response):
     def view(context, request):

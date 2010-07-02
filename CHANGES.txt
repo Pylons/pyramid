@@ -48,6 +48,23 @@ Features
     add_route('ym', '/:year/:month', custom_predicates=(twenty_ten,))
     add_route('ymd', '/:year/:month:/day', custom_predicates=(twenty_ten,))
 
+- The ``repoze.bfg.url.route_url`` API has changed.  If a keyword
+  ``_app_url`` is present in the arguments passed to ``route_url``,
+  this value will be used as the protocol/hostname/port/leading path
+  prefix of the generated URL.  For example, using an ``_app_url`` of
+  ``http://example.com:8080/foo`` would cause the URL
+  ``http://example.com:8080/foo/fleeb/flub`` to be returned from this
+  function if the expansion of the route pattern associated with the
+  ``route_name`` expanded to ``/fleeb/flub``.
+
+- It is now possible to use a URL as the ``name`` argument fed to
+  ``repoze.bfg.configuration.Configurator.add_static_view``.  When the
+  name argument is a URL, the ``repoze.bfg.url.static_url`` API will
+  generate join this URL (as a prefix) to a path including the static
+  file name.  This makes it more possible to put static media on a
+  separate webserver for production, while keeping static media
+  package-internal and served by the development webserver during
+  development.
 
 Documentation
 -------------
@@ -67,6 +84,16 @@ Documentation
 
 - A section named ``Custom Route Predicates`` was added to the URL
   Dispatch narrative chapter.
+
+- The Static Resources chapter has been updated to mention using
+  ``static_url`` to generate URLs to external webservers.
+
+Internal
+--------
+
+- Removed ``repoze.bfg.static.StaticURLFactory`` in favor of a new
+  abstraction revolving around the (still-internal)
+  ``repoze.bfg.static.StaticURLInfo`` helper class.
 
 1.3a3 (2010-05-01)
 ==================

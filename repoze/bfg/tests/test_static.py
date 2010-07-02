@@ -1,4 +1,5 @@
 import unittest
+from repoze.bfg.testing import cleanUp
 
 class TestPackageURLParser(unittest.TestCase):
     def _getTargetClass(self):
@@ -148,17 +149,195 @@ class TestPackageURLParser(unittest.TestCase):
         self.failUnless('404 Not Found' in body)
         self.assertEqual(sr.status, '404 Not Found')
 
-class TestStaticRootFactory(unittest.TestCase):
-    def test_it(self):
-        from repoze.bfg.static import StaticRootFactory
-        factory = StaticRootFactory('abc') 
-        self.assertEqual(factory.spec, 'abc')
-        self.assertEqual(factory({}), factory)
+class TestStaticView(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _getTargetClass(self):
+        from repoze.bfg.view import static
+        return static
+
+    def _makeOne(self, path, package_name=None):
+        return self._getTargetClass()(path, package_name=package_name)
+        
+    def _makeEnviron(self, **extras):
+        environ = {
+            'wsgi.url_scheme':'http',
+            'wsgi.version':(1,0),
+            'SERVER_NAME':'localhost',
+            'SERVER_PORT':'8080',
+            'REQUEST_METHOD':'GET',
+            }
+        environ.update(extras)
+        return environ
+
+    def test_abspath(self):
+        import os
+        path = os.path.dirname(__file__)
+        view = self._makeOne(path)
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(response.directory, path)
+
+    def test_relpath(self):
+        path = 'fixtures'
+        view = self._makeOne(path)
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(response.root_resource, 'fixtures')
+        self.assertEqual(response.resource_name, 'fixtures')
+        self.assertEqual(response.package_name, 'repoze.bfg.tests')
+        self.assertEqual(response.cache_max_age, 3600)
+
+    def test_relpath_withpackage(self):
+        view = self._makeOne('another:fixtures')
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(response.root_resource, 'fixtures')
+        self.assertEqual(response.resource_name, 'fixtures')
+        self.assertEqual(response.package_name, 'another')
+        self.assertEqual(response.cache_max_age, 3600)
+
+    def test_relpath_withpackage_name(self):
+        view = self._makeOne('fixtures', package_name='another')
+        context = DummyContext()
+        request = DummyRequest()
+        request.subpath = ['__init__.py']
+        request.environ = self._makeEnviron()
+        response = view(context, request)
+        self.assertEqual(request.copied, True)
+        self.assertEqual(response.root_resource, 'fixtures')
+        self.assertEqual(response.resource_name, 'fixtures')
+        self.assertEqual(response.package_name, 'another')
+        self.assertEqual(response.cache_max_age, 3600)
+
+class TestStaticURLInfo(unittest.TestCase):
+    def _getTargetClass(self):
+        from repoze.bfg.static import StaticURLInfo
+        return StaticURLInfo
+    
+    def _makeOne(self, config):
+        return self._getTargetClass()(config)
+
+    def test_verifyClass(self):
+        from repoze.bfg.interfaces import IStaticURLInfo
+        from zope.interface.verify import verifyClass
+        verifyClass(IStaticURLInfo, self._getTargetClass())
+
+    def test_verifyObject(self):
+        from repoze.bfg.interfaces import IStaticURLInfo
+        from zope.interface.verify import verifyObject
+        verifyObject(IStaticURLInfo, self._makeOne(None))
+
+    def test_ctor(self):
+        info = self._makeOne(None)
+        self.assertEqual(info.registrations, [])
+        self.assertEqual(info.config, None)
+
+    def test_generate_missing(self):
+        inst = self._makeOne(None)
+        request = DummyRequest()
+        self.assertRaises(ValueError, inst.generate, 'path', request)
+
+    def test_generate_slash_in_name1(self):
+        inst = self._makeOne(None)
+        inst.registrations = [('http://example.com/foo/', 'package:path')]
+        request = DummyRequest()
+        result = inst.generate('package:path/abc', request)
+        self.assertEqual(result, 'http://example.com/foo/abc')
+
+    def test_generate_slash_in_name2(self):
+        inst = self._makeOne(None)
+        inst.registrations = [('http://example.com/foo/', 'package:path')]
+        request = DummyRequest()
+        result = inst.generate('package:path', request)
+        self.assertEqual(result, 'http://example.com/foo/')
+
+    def test_generate_route_url(self):
+        inst = self._makeOne(None)
+        inst.registrations = [('viewname', 'package:path')]
+        def route_url(n, r, **kw):
+            self.assertEqual(n, 'viewname')
+            self.assertEqual(r, request)
+            self.assertEqual(kw, {'subpath':'/abc', 'a':1})
+            return 'url'
+        request = DummyRequest()
+        inst.route_url = route_url
+        result = inst.generate('package:path/abc', request, a=1)
+        self.assertEqual(result, 'url')
+
+    def test_add_already_exists(self):
+        inst = self._makeOne(None)
+        inst.registrations = [('http://example.com/', 'package:path')]
+        inst.add('http://example.com/', 'anotherpackage:path')
+        expected = [('http://example.com/', 'anotherpackage:path')]
+        self.assertEqual(inst.registrations, expected)
+        
+    def test_add_url_withendslash(self):
+        inst = self._makeOne(None)
+        inst.add('http://example.com/', 'anotherpackage:path')
+        expected = [('http://example.com/', 'anotherpackage:path')]
+        self.assertEqual(inst.registrations, expected)
+
+    def test_add_url_noendslash(self):
+        inst = self._makeOne(None)
+        inst.add('http://example.com', 'anotherpackage:path')
+        expected = [('http://example.com/', 'anotherpackage:path')]
+        self.assertEqual(inst.registrations, expected)
+
+    def test_add_viewname(self):
+        from repoze.bfg.static import static_view
+        class Config:
+            def add_route(self, *arg, **kw):
+                self.arg = arg
+                self.kw = kw
+        config = Config()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1)
+        expected = [('view', 'anotherpackage:path')]
+        self.assertEqual(inst.registrations, expected)
+        self.assertEqual(config.arg, ('view', 'view*subpath'))
+        self.assertEqual(config.kw['_info'], None)
+        self.assertEqual(config.kw['view_for'], self._getTargetClass())
+        self.assertEqual(config.kw['factory'](), inst)
+        self.assertEqual(config.kw['view'].__class__, static_view)
+        self.assertEqual(config.kw['view'].app.cache_max_age, 1)
+        self.assertEqual(inst.registrations, expected)
 
 class DummyStartResponse:
     def __call__(self, status, headerlist, exc_info=None):
         self.status = status
         self.headerlist = headerlist
         self.exc_info = exc_info
-        
     
+class DummyContext:
+    pass
+
+class DummyRequest:
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
+        self.environ = environ
+        
+    def get_response(self, application):
+        return application
+
+    def copy(self):
+        self.copied = True
+        return self
+

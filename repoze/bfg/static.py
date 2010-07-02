@@ -1,10 +1,18 @@
 import os
 import pkg_resources
+from urlparse import urljoin
 
 from paste import httpexceptions
 from paste import request
 from paste.httpheaders import ETAG
 from paste.urlparser import StaticURLParser
+
+from zope.interface import implements
+
+from repoze.bfg.interfaces import IStaticURLInfo
+from repoze.bfg.path import caller_package
+from repoze.bfg.resource import resolve_resource_spec
+from repoze.bfg.url import route_url
 
 class PackageURLParser(StaticURLParser):
     """ This probably won't work with zipimported resources """
@@ -76,10 +84,113 @@ class PackageURLParser(StaticURLParser):
         return '<%s %s:%s at %s>' % (self.__class__.__name__, self.package_name,
                                      self.root_resource, id(self))
 
-class StaticRootFactory:
-    def __init__(self, spec):
-        self.spec = spec
+class StaticURLInfo(object):
+    implements(IStaticURLInfo)
 
-    def __call__(self, environ):
-        return self
+    route_url = staticmethod(route_url) # for testing only
+
+    def __init__(self, config):
+        self.config = config
+        self.registrations = []
+
+    def generate(self, path, request, **kw):
+        for (name, spec) in self.registrations:
+            if path.startswith(spec):
+                subpath = path[len(spec):]
+                if '/' in name:
+                    return urljoin(name, subpath[1:])
+                else:
+                    kw['subpath'] = subpath
+                    return self.route_url(name, request, **kw)
+
+        raise ValueError('No static URL definition matching %s' % path)
+
+    def add(self, name, spec, **extra):
+        names = [ t[0] for t in self.registrations ]
+        if name in names:
+            idx = names.index(name)
+            self.registrations.pop(idx)
+
+        if '/' in name:
+            # it's a URL
+            if not name.endswith('/'):
+                # make sure it ends with a slash
+                name = name + '/'
+        else:
+            # it's a view name
+            _info = extra.pop('_info', None)
+            cache_max_age = extra.pop('cache_max_age', None)
+            view = static_view(spec, cache_max_age=cache_max_age)
+            # register a route using this view
+            self.config.add_route(
+                name,
+                "%s*subpath" % name,
+                view=view,
+                view_for=self.__class__,
+                factory=lambda *x: self,
+                _info=_info
+                )
+
+        self.registrations.append((name, spec))
+
+class static_view(object):
+    """ An instance of this class is a callable which can act as a
+    :mod:`repoze.bfg` :term:`view callable`; this view will serve
+    static files from a directory on disk based on the ``root_dir``
+    you provide to its constructor.
+
+    The directory may contain subdirectories (recursively); the static
+    view implementation will descend into these directories as
+    necessary based on the components of the URL in order to resolve a
+    path into a response.
+
+    You may pass an absolute or relative filesystem path or a
+    :term:`resource specification` representing the directory
+    containing static files as the ``root_dir`` argument to this
+    class' constructor.
+
+    If the ``root_dir`` path is relative, and the ``package_name``
+    argument is ``None``, ``root_dir`` will be considered relative to
+    the directory in which the Python file which *calls* ``static``
+    resides.  If the ``package_name`` name argument is provided, and a
+    relative ``root_dir`` is provided, the ``root_dir`` will be
+    considered relative to the Python :term:`package` specified by
+    ``package_name`` (a dotted path to a Python package).
+
+    ``cache_max_age`` influences the ``Expires`` and ``Max-Age``
+    response headers returned by the view (default is 3600 seconds or
+    five minutes).
+
+    .. note:: If the ``root_dir`` is relative to a :term:`package`, or
+         is a :term:`resource specification` the :mod:`repoze.bfg`
+         ``resource`` ZCML directive or
+         :class:`repoze.bfg.configuration.Configurator` method can be
+         used to override resources within the named ``root_dir``
+         package-relative directory.  However, if the ``root_dir`` is
+         absolute, the ``resource`` directive will not be able to
+         override the resources it contains.  """
+    
+    def __init__(self, root_dir, cache_max_age=3600, package_name=None):
+        # package_name is for bw compat; it is preferred to pass in a
+        # package-relative path as root_dir
+        # (e.g. ``anotherpackage:foo/static``).
+        caller_package_name = caller_package().__name__
+        package_name = package_name or caller_package_name
+        package_name, root_dir = resolve_resource_spec(root_dir, package_name)
+        if package_name is None:
+            app = StaticURLParser(root_dir, cache_max_age=cache_max_age)
+        else:
+            app = PackageURLParser(
+                package_name, root_dir, cache_max_age=cache_max_age)
+        self.app = app
+
+    def __call__(self, context, request):
+        subpath = '/'.join(request.subpath)
+        request_copy = request.copy()
+        # Fix up PATH_INFO to get rid of everything but the "subpath"
+        # (the actual path to the file relative to the root dir).
+        request_copy.environ['PATH_INFO'] = '/' + subpath
+        # Zero out SCRIPT_NAME for good measure.
+        request_copy.environ['SCRIPT_NAME'] = ''
+        return request_copy.get_response(self.app)
 

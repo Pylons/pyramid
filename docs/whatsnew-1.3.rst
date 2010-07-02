@@ -140,6 +140,15 @@ Minor Feature Additions
   :ref:`custom_route_predicates`.  In prior versions, the ``info``
   argument was always ``None``.
 
+- It is now possible to use a URL as the ``name`` argument fed to
+  :meth:`repoze.bfg.configuration.Configurator.add_static_view`.  When
+  the name argument is a URL, the :func:`repoze.bfg.url.static_url`
+  API will generate join this URL (as a prefix) to a path including
+  the static file name.  This makes it more possible to put static
+  media on a separate webserver for production, while keeping static
+  media package-internal and served by the development webserver
+  during development.
+
 Backwards Incompatibilites
 --------------------------
 
