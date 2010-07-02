@@ -140,6 +140,15 @@ Minor Feature Additions
   :ref:`custom_route_predicates`.  In prior versions, the ``info``
   argument was always ``None``.
 
+- The :func:`repoze.bfg.url.route_url` API has changed.  If a keyword
+  ``_app_url`` is present in the arguments passed to ``route_url``,
+  this value will be used as the protocol/hostname/port/leading path
+  prefix of the generated URL.  For example, using an ``_app_url`` of
+  ``http://example.com:8080/foo`` would cause the URL
+  ``http://example.com:8080/foo/fleeb/flub`` to be returned from this
+  function if the expansion of the route pattern associated with the
+  ``route_name`` expanded to ``/fleeb/flub``.
+
 - It is now possible to use a URL as the ``name`` argument fed to
   :meth:`repoze.bfg.configuration.Configurator.add_static_view`.  When
   the name argument is a URL, the :func:`repoze.bfg.url.static_url`
