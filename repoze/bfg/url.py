@@ -95,6 +95,9 @@ def route_url(route_name, request, *elements, **kw):
     ``request.application_url`` will be used as the prefix (the
     default).
 
+    .. note:: Special treatment of ``_app_url`` was added in
+              :mod:`repoze.bfg` 1.3.
+
     This function raises a :exc:`KeyError` if the URL cannot be
     generated due to missing replacement names.  Extra replacement
     names are ignored.

@@ -103,8 +103,8 @@ Minor Feature Additions
 - Use :term:`Venusian` to perform ``@bfg_view`` decorator scanning
   rather than relying on a BFG-internal decorator scanner.  This means
   that user-defined decorators can be defined and found during
-  :mod:`repoze.bfg` scanning (although documentation for doing so is
-  currently not provided).
+  :mod:`repoze.bfg` scanning.  See
+  :ref:`registering_configuration_decorators` for more information.
 
 - It is now possible to turn on Chameleon template "debugging mode"
   for all Chameleon BFG templates by setting a BFG-related Paster
@@ -127,7 +127,7 @@ Minor Feature Additions
 
 - Prior to 1.3, a *route predicate* had no access to route pattern
   matching information and had no way to know which route was matched.
-  Now, each of the predicate callables fed to the
+  As of 1.3a4, each of the predicate callables fed to the
   ``custom_predicates`` argument of
   :meth:`repoze.bfg.configuration.Configurator.add_route` or the
   ``custom_predicates`` ZCML attribute can be a callable accepting two
@@ -201,6 +201,26 @@ Documentation Enhancements
 
 - Documentation for the new :ref:`translationdir_directive` and
   :ref:`localenegotiator_directive` ZCML directives were added.
+
+- A section :ref:`custom_route_predicates` was added to the URL
+  Dispatch narrative chapter.
+
+- The :ref:`static_resources_section` and
+  :ref:`generating_static_resource_urls` sections of the Static
+  Resources chapter have been updated to mention using
+  :func:`repoze.bfg.url.static_url` to generate URLs to external
+  webservers.
+
+- Documentation for registering a new configuration decorator was
+  added in :ref:`registering_configuration_decorators`.
+
+- The authorization chapter of the :ref:`bfg_wiki_tutorial` was
+  changed to demonstrate authorization via a group rather than via a
+  direct username.
+
+- The authorization chapter of the :ref:`bfg_sql_wiki_tutorial` was
+  changed to demonstrate authorization via a group rather than via a
+  direct username.
 
 Licensing Changes
 -----------------

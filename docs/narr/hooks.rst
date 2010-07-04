@@ -337,6 +337,8 @@ class :class:`repoze.bfg.traversal.TraversalContextURL` in the
 <http://svn.repoze.org/repoze.bfg/trunk/repoze/bfg/traversal.py>`_ of
 the :term:`Repoze` Subversion repository.
 
+.. _registering_configuration_decorators:
+
 Registering Configuration Decorators
 ------------------------------------
 
@@ -423,3 +425,8 @@ performed, enabling you to set up the utility in advance:
 
 For full details, please read the `Venusian documentation
 <http://docs.repoze.org/venusian>`_.
+
+.. note::
+
+   Application-developer-registerable configuration decorators were
+   introduced in :mod:`repoze.bfg` 1.3.
