@@ -1471,8 +1471,7 @@ class Configurator(object):
         served.  Note that this argument has no effect when the
         ``name`` is a *url prefix*.
 
-        Usage
-        -----
+        *Usage*
 
         The ``add_static_view`` function is typically used in
         conjunction with the :func:`repoze.bfg.url.static_url`
