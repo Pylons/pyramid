@@ -13,6 +13,8 @@
 
 - Add a ``susbcriber`` decorator and docs.
 
+- ``decorator=`` parameter to bfg_view.
+
 Renderer overhaul
 ------------------
 
