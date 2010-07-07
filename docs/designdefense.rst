@@ -748,10 +748,9 @@ BFG Provides Too Few "Rails"
 By design, :mod:`repoze.bfg` is not a particularly "opinionated" web
 framework.  It has a relatively parsimonious feature set.  It contains
 no built in ORM nor any particular database bindings.  It contains no
-form generation framework or sessioning library.  It does not help
-with internationalization of content.  It has no administrative web
-user interface.  It has no built in text indexing.  It does not
-dictate how you arrange your code.
+form generation framework.  It does not contain a sessioning library.
+It has no administrative web user interface.  It has no built in text
+indexing.  It does not dictate how you arrange your code.
 
 Such opinionated functionality exists in applications and frameworks
 built *on top* of :mod:`repoze.bfg`.  It's intended that higher-level
