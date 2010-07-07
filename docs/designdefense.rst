@@ -826,9 +826,9 @@ BFG Has Too Many Dependencies
 
 This is true.  At the time of this writing, the total number of Python
 package distributions that :mod:`repoze.bfg` depends upon transitively
-is 14 if you use Python 2.6, or 16, if you use Python 2.4 or 2.5.
-This is a lot more than zero package distribution dependencies: a
-metric which various Python microframeworks and Django boast.
+is 14 if you use Python 2.6 or 2.7, or 16 if you use Python 2.4 or
+2.5.  This is a lot more than zero package distribution dependencies:
+a metric which various Python microframeworks and Django boast.
 
 The :mod:`zope.component` and :mod:`zope.configuration` packages on
 which :mod:`repoze.bfg` depends have transitive dependencies on
