@@ -43,11 +43,12 @@ class TraversalPathTests(unittest.TestCase):
         self.assertEqual(self._callFUT(path), (decoded, decoded))
         
     def test_utf16(self):
+        from repoze.bfg.exceptions import URLDecodeError
         import urllib
         la = unicode('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
         encoded = urllib.quote(la)
         path = '/'.join([encoded, encoded])
-        self.assertRaises(TypeError, self._callFUT, path)
+        self.assertRaises(URLDecodeError, self._callFUT, path)
 
 class ModelGraphTraverserTests(unittest.TestCase):
     def setUp(self):
@@ -246,7 +247,8 @@ class ModelGraphTraverserTests(unittest.TestCase):
         policy = self._makeOne(root)
         segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
-        self.assertRaises(TypeError, policy, environ)
+        from repoze.bfg.exceptions import URLDecodeError
+        self.assertRaises(URLDecodeError, policy, environ)
 
     def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
         foo = DummyContext()
@@ -254,7 +256,8 @@ class ModelGraphTraverserTests(unittest.TestCase):
         policy = self._makeOne(root)
         segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
-        self.assertRaises(TypeError, policy, environ)
+        from repoze.bfg.exceptions import URLDecodeError
+        self.assertRaises(URLDecodeError, policy, environ)
 
     def test_withroute_nothingfancy(self):
         model = DummyContext()

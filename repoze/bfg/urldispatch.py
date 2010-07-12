@@ -3,6 +3,7 @@ from urllib import unquote
 
 from repoze.bfg.compat import all
 from repoze.bfg.encode import url_quote
+from repoze.bfg.exceptions import URLDecodeError
 from repoze.bfg.traversal import traversal_path
 from repoze.bfg.traversal import quote_path_segment
 
@@ -102,7 +103,15 @@ def _compile_route(route):
                 if k == star:
                     d[k] = traversal_path(v)
                 else:
-                    d[k] = unquote(v).decode('utf-8')
+                    encoded = unquote(v)
+                    try:
+                        d[k] = encoded.decode('utf-8')
+                    except UnicodeDecodeError, e:
+                        raise URLDecodeError(
+                            e.encoding, e.object, e.start, e.end, e.reason
+                            )
+                        
+                        
         return d
                     
 

@@ -11,3 +11,4 @@
 
   .. autoclass:: ConfigurationError
 
+  .. autoclass:: URLDecodeError

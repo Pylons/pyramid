@@ -10,6 +10,7 @@ from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import VH_ROOT_KEY
 
 from repoze.bfg.encode import url_quote
+from repoze.bfg.exceptions import URLDecodeError
 from repoze.bfg.location import lineage
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import get_current_registry
@@ -129,7 +130,7 @@ def model_path(model, *elements):
               ``__name__`` which (by error) is a dictionary, the
               :func:`repoze.bfg.traversal.model_path` function will
               attempt to append it to a string and it will cause a
-              :exc:`TypeError`.
+              :exc:`repoze.bfg.exceptions.URLDecodeError`.
 
     .. note:: The :term:`root` model *must* have a ``__name__``
               attribute with a value of either ``None`` or the empty
@@ -251,13 +252,14 @@ def traverse(model, path):
     Unicode during traversal: Each segment is URL-unquoted, and
     decoded into Unicode. Each segment is assumed to be encoded using
     the UTF-8 encoding (or a subset, such as ASCII); a
-    :exc:`TypeError` is raised if a segment cannot be decoded.  If a
-    segment name is empty or if it is ``.``, it is ignored.  If a
-    segment name is ``..``, the previous segment is deleted, and the
-    ``..`` is ignored.  As a result of this process, the return values
-    ``view_name``, each element in the ``subpath``, each element in
-    ``traversed``, and each element in the ``virtual_root_path`` will
-    be Unicode as opposed to a string, and will be URL-decoded.
+    :exc:`repoze.bfg.exceptions.URLDecodeError` is raised if a segment
+    cannot be decoded.  If a segment name is empty or if it is ``.``,
+    it is ignored.  If a segment name is ``..``, the previous segment
+    is deleted, and the ``..`` is ignored.  As a result of this
+    process, the return values ``view_name``, each element in the
+    ``subpath``, each element in ``traversed``, and each element in
+    the ``virtual_root_path`` will be Unicode as opposed to a string,
+    and will be URL-decoded.
     """
 
     if hasattr(path, '__iter__'):
@@ -370,11 +372,11 @@ def traversal_path(path):
     traverse a graph.  The ``PATH_INFO`` is split on slashes, creating
     a list of segments.  Each segment is URL-unquoted, and decoded
     into Unicode. Each segment is assumed to be encoded using the
-    UTF-8 encoding (or a subset, such as ASCII); a :exc:`TypeError` is
-    raised if a segment cannot be decoded.  If a segment name is empty
-    or if it is ``.``, it is ignored.  If a segment name is ``..``,
-    the previous segment is deleted, and the ``..`` is ignored.
-    Examples:
+    UTF-8 encoding (or a subset, such as ASCII); a
+    :exc:`repoze.bfg.exceptions.URLDecodeError` is raised if a segment
+    cannot be decoded.  If a segment name is empty or if it is ``.``,
+    it is ignored.  If a segment name is ``..``, the previous segment
+    is deleted, and the ``..`` is ignored.  Examples:
 
     ``/``
 
@@ -432,9 +434,10 @@ def traversal_path(path):
         else:
             try:
                 segment = segment.decode('utf-8')
-            except UnicodeDecodeError:
-                raise TypeError('Could not decode path segment %r using the '
-                                'UTF-8 decoding scheme' % segment)
+            except UnicodeDecodeError, e:
+                raise URLDecodeError(
+                    e.encoding, e.object, e.start, e.end, e.reason
+                    )
             clean.append(segment)
     return tuple(clean)
 

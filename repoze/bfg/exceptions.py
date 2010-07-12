@@ -26,6 +26,17 @@ class NotFound(Exception):
     ``repoze.bfg.message`` key, for availability to the :term:`Not Found
     View`."""
 
+class URLDecodeError(UnicodeDecodeError):
+    """
+    This exception is raised when :mod:`repoze.bfg` cannot
+    successfully decode a URL or a URL path segment.  This exception
+    it behaves just like the Python builtin
+    :exc:`UnicodeDecodeError`. It is a subclass of the builtin
+    :exc:`UnicodeDecodeError` exception only for identity purposes,
+    mostly so an exception view can be registered when a URL cannot be
+    decoded.
+    """
+
 class ConfigurationError(ZCE):
     """ Raised when inappropriate input values are supplied to an API
     method of a :term:`Configurator`"""

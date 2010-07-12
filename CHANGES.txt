@@ -1,6 +1,19 @@
 Next release
 ============
 
+Features
+--------
+
+- New internal exception: ``repoze.bfg.exceptions.URLDecodeError``.
+  This URL is a subclass of the built-in Python exception named
+  ``UnicodeDecodeError``.
+
+- When decoding a URL segment to Unicode fails, the exception raised
+  is now ``repoze.bfg.exceptions.URLDecodeError`` instead of
+  ``UnicodeDecodeError``.  This makes it possible to register an
+  exception view invoked specifically when ``repoze.bfg`` cannot
+  decode a URL.
+
 Bug Fixes
 ---------
 

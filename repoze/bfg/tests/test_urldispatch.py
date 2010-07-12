@@ -224,6 +224,11 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(matcher('foo/baz/biz/buz/bar'), None)
         self.assertEqual(generator({'baz':1, 'buz':2}), '/foo/1/biz/2/bar')
 
+    def test_url_decode_error(self):
+        from repoze.bfg.exceptions import URLDecodeError
+        matcher, generator = self._callFUT('/:foo')
+        self.assertRaises(URLDecodeError, matcher, '/%FF%FE%8B%00')
+
 class TestCompileRouteMatchFunctional(unittest.TestCase):
     def matches(self, pattern, path, result):
         from repoze.bfg.urldispatch import _compile_route
