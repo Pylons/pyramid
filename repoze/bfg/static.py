@@ -1,6 +1,7 @@
 import os
 import pkg_resources
 from urlparse import urljoin
+from urlparse import urlparse
 
 from paste import httpexceptions
 from paste import request
@@ -94,10 +95,10 @@ class StaticURLInfo(object):
         self.registrations = []
 
     def generate(self, path, request, **kw):
-        for (name, spec) in self.registrations:
+        for (name, spec, is_url) in self.registrations:
             if path.startswith(spec):
                 subpath = path[len(spec):]
-                if '/' in name:
+                if is_url:
                     return urljoin(name, subpath[1:])
                 else:
                     kw['subpath'] = subpath
@@ -111,11 +112,12 @@ class StaticURLInfo(object):
             idx = names.index(name)
             self.registrations.pop(idx)
 
-        if '/' in name:
+        if urlparse(name)[0]:
             # it's a URL
             if not name.endswith('/'):
                 # make sure it ends with a slash
                 name = name + '/'
+            self.registrations.append((name, spec, True))
         else:
             # it's a view name
             _info = extra.pop('_info', None)
@@ -130,8 +132,7 @@ class StaticURLInfo(object):
                 factory=lambda *x: self,
                 _info=_info
                 )
-
-        self.registrations.append((name, spec))
+            self.registrations.append((name, spec, False))
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a

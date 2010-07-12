@@ -256,21 +256,21 @@ class TestStaticURLInfo(unittest.TestCase):
 
     def test_generate_slash_in_name1(self):
         inst = self._makeOne(None)
-        inst.registrations = [('http://example.com/foo/', 'package:path')]
+        inst.registrations = [('http://example.com/foo/', 'package:path', True)]
         request = DummyRequest()
         result = inst.generate('package:path/abc', request)
         self.assertEqual(result, 'http://example.com/foo/abc')
 
     def test_generate_slash_in_name2(self):
         inst = self._makeOne(None)
-        inst.registrations = [('http://example.com/foo/', 'package:path')]
+        inst.registrations = [('http://example.com/foo/', 'package:path', True)]
         request = DummyRequest()
         result = inst.generate('package:path', request)
         self.assertEqual(result, 'http://example.com/foo/')
 
     def test_generate_route_url(self):
         inst = self._makeOne(None)
-        inst.registrations = [('viewname', 'package:path')]
+        inst.registrations = [('viewname', 'package:path', False)]
         def route_url(n, r, **kw):
             self.assertEqual(n, 'viewname')
             self.assertEqual(r, request)
@@ -285,19 +285,19 @@ class TestStaticURLInfo(unittest.TestCase):
         inst = self._makeOne(None)
         inst.registrations = [('http://example.com/', 'package:path')]
         inst.add('http://example.com/', 'anotherpackage:path')
-        expected = [('http://example.com/', 'anotherpackage:path')]
+        expected = [('http://example.com/', 'anotherpackage:path', True)]
         self.assertEqual(inst.registrations, expected)
         
     def test_add_url_withendslash(self):
         inst = self._makeOne(None)
         inst.add('http://example.com/', 'anotherpackage:path')
-        expected = [('http://example.com/', 'anotherpackage:path')]
+        expected = [('http://example.com/', 'anotherpackage:path', True)]
         self.assertEqual(inst.registrations, expected)
 
     def test_add_url_noendslash(self):
         inst = self._makeOne(None)
         inst.add('http://example.com', 'anotherpackage:path')
-        expected = [('http://example.com/', 'anotherpackage:path')]
+        expected = [('http://example.com/', 'anotherpackage:path', True)]
         self.assertEqual(inst.registrations, expected)
 
     def test_add_viewname(self):
@@ -309,7 +309,7 @@ class TestStaticURLInfo(unittest.TestCase):
         config = Config()
         inst = self._makeOne(config)
         inst.add('view', 'anotherpackage:path', cache_max_age=1)
-        expected = [('view', 'anotherpackage:path')]
+        expected = [('view', 'anotherpackage:path', False)]
         self.assertEqual(inst.registrations, expected)
         self.assertEqual(config.arg, ('view', 'view*subpath'))
         self.assertEqual(config.kw['_info'], None)
