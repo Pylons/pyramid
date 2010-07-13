@@ -106,7 +106,7 @@ the :term:`authorization policy` in use, it invokes a :term:`forbidden
 view`.  The default forbidden response has a 401 status code and is
 very plain, but the view which generates it can be overridden as
 necessary using either :term:`imperative configuration` or
-:term:`ZCML`:
+:term:`ZCML`.
 
 The :term:`forbidden view` callable is a view callable like any other.
 The :term:`view configuration` which causes it to be a "not found"

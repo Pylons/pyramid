@@ -88,9 +88,9 @@ class Configurator(object):
     :term:`application registry`.
 
     The Configurator accepts a number of arguments: ``registry``,
-    ``package``, ``settings``, ``root_factory``, ``zcml_file``,
+    ``package``, ``settings``, ``root_factory``,
     ``authentication_policy``, ``authorization_policy``, ``renderers``
-    and ``debug_logger``.
+    ``debug_logger`` and ``locale_negotiator``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :class:`repoze.bfg.registry.Registry`
