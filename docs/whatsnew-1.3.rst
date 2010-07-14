@@ -158,10 +158,12 @@ Minor Feature Additions
   media package-internal and served by the development webserver
   during development.
 
-Backwards Incompatibilites
---------------------------
+Backwards Incompatibilities
+---------------------------
 
-N/A
+- In previous releases, when a URL could not be decoded from UTF-8
+  during traversal, a :exc:`TypeError` was raised.  Now the error
+  which is raised is :exc:`repoze.bfg.exceptions.URLDecodeError`.
 
 Deprecations and Behavior Differences
 -------------------------------------

@@ -22,6 +22,13 @@ Bug Fixes
   1.3a4, view names that contained a slash were supported as route
   prefixes. 1.3a4 broke this by trying to treat them as full URLs.
 
+Backwards Incompatibilities
+----------------------------
+
+- in previous releases, when a URL could not be decoded from UTF-8
+  during traversal, a ``TypeError`` was raised.  Now the error which
+  is raised is a ``repoze.bfg.exceptions.URLDecodeError``.
+
 1.3a4 (2010-07-03)
 ==================
 
