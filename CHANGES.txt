@@ -1,5 +1,5 @@
-Next release
-============
+1.3a5 (2010-07-14)
+==================
 
 Features
 --------
@@ -21,6 +21,12 @@ Bug Fixes
   ``repoze.bfg.configuration.Configurator.add_static_view``.  Before
   1.3a4, view names that contained a slash were supported as route
   prefixes. 1.3a4 broke this by trying to treat them as full URLs.
+
+Documentation
+-------------
+
+- The ``repoze.bfg.exceptions.URLDecodeError`` exception was added to
+  the exceptions chapter of the API documentation.
 
 Backwards Incompatibilities
 ----------------------------
