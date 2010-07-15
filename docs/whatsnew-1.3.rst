@@ -158,6 +158,18 @@ Minor Feature Additions
   media package-internal and served by the development webserver
   during development.
 
+- A new :ref:`view predicate` was added named ``match_val``.  The
+  ``match_val`` value represents the presence of a value in the
+  structure added to the request named ``matchdict`` during :term:`URL
+  dispatch` representing the match values from the route pattern
+  (e.g. if the route pattern has ``:foo`` in it, and the route
+  matches, a key will exist in the matchdict named ``foo``).  Like all
+  other view predicates, this feature is exposed via the
+  :class:`repoze.bfg.view.bfg_view` API, the
+  :class:`repoze.bfg.configuration.Configurator.add_view` API, and the
+  ZCML :ref:`view_directive` directive.  See the documentation for
+  those APIs for more inforamtion.
+
 Backwards Incompatibilities
 ---------------------------
 
