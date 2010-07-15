@@ -1,3 +1,40 @@
+Next release
+============
+
+Features
+--------
+
+- New view predicate: match_val.  The ``match_val`` value represents
+  the presence of a value in the structure added to the request named
+  ``matchdict`` during URL dispatch representing the match values from
+  the route pattern (e.g. if the route pattern has ``:foo`` in it, and
+  the route matches, a key will exist in the matchdict named ``foo``).
+  Like all other view predicates, this feature is exposed via the
+  ``bfg_view`` API, the Configurator ``add_view`` API, and the ZCML
+  ``view`` directive.
+
+Documentation
+-------------
+
+- API documentation for the ``add_view`` method of the configurator
+  changed to include ``match_val``.
+
+- ZCML documentation for ``view`` ZCML directive changed to include
+  ``match_val``.
+
+- The ``Views`` narrative chapter now contains a description of the
+  ``match_val`` predicate.
+
+Bug Fixes
+---------
+
+- The ``header`` predicate (when used as either a view predicate or a
+  route predicate) had a problem when specified with a name/regex
+  pair.  When the header did not exist in the headers dictionary, the
+  regex match could be fed ``None``, causing it to throw a
+  ``TypeError: expected string or buffer`` exception.  Now, the
+  predicate returns False as intended.
+
 1.3a5 (2010-07-14)
 ==================
 

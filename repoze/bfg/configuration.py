@@ -2,7 +2,6 @@ import os
 import re
 import sys
 import threading
-import types
 import inspect
 
 from webob import Response
@@ -526,8 +525,8 @@ class Configurator(object):
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
-                 header=None, path_info=None, custom_predicates=(),
-                 context=None, _info=u''):
+                 header=None, path_info=None, match_val=None,
+                 custom_predicates=(), context=None, _info=u''):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -746,6 +745,33 @@ class Configurator(object):
           variable.  If the regex matches, this predicate will be
           ``True``.
 
+          
+        match_val
+
+          The ``match_val`` value represents the presence of a value
+          in the :term:`URL dispatch` structure added to the request
+          named ``matchdict``.  ``matchdict`` represents the match
+          values from the route pattern (e.g. if the route pattern has
+          ``:foo`` in it, and the route matches, a key will exist in
+          the matchdict named ``foo``).  If the value does not contain
+          a colon, the entire value will be considered to be the name
+          of a matchdict key (e.g. ``action``). If the value does
+          contain a ``:`` (colon), it will be considered a name/value
+          pair (e.g. ``action:generate.html`` or ``action:\w+.html``).
+          The right hand side following the colon should be a regular
+          expression.
+
+          If the value does not contain a colon, the key specified by
+          the name must be present in the URL dispatch matchdict for
+          this predicate to be true; the value of the key is ignored.
+          If the value does contain a colon, the name implied by the
+          right hand must be present in the matchdict *and* the
+          regular expression specified on the right hand side of the
+          colon must match the value for the name in the matchdict for
+          this predicate to be true.
+
+          .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
+
         custom_predicates
 
           This value should be a sequence of references to custom
@@ -796,18 +822,18 @@ class Configurator(object):
                     request_method=request_method, request_param=request_param,
                     containment=containment, attr=attr,
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
-                    header=header, path_info=path_info, custom_predicates=(),
-                    context=context, _info=u''
+                    header=header, path_info=path_info, match_val=match_val,
+                    custom_predicates=(), context=context, _info=u''
                     )
                 view_info = deferred_views.setdefault(route_name, [])
                 view_info.append(info)
                 return
 
-        order, predicates, phash = _make_predicates(
-            xhr=xhr, request_method=request_method, path_info=path_info,
+        order, predicates, phash = _make_predicates(xhr=xhr,
+            request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
             containment=containment, request_type=request_type,
-            custom=custom_predicates)
+            view_match_val=match_val, custom=custom_predicates)
 
         derived_view = self._derive_view(view, permission, predicates, attr,
                                          renderer, wrapper, name, accept, order,
@@ -1655,7 +1681,8 @@ class Configurator(object):
 
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
-                     containment=None, request_type=None, custom=()):
+                     containment=None, request_type=None,
+                     view_match_val=None, custom=()):
 
     # PREDICATES
     # ----------
@@ -1708,7 +1735,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if xhr:
         def xhr_predicate(context, request):
             return request.is_xhr
-        weights.append(1 << 0)
+        weights.append(1 << 1)
         predicates.append(xhr_predicate)
         h.update('xhr:%r' % bool(xhr))
 
@@ -1755,6 +1782,8 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             if header_val is None:
                 return header_name in request.headers
             val = request.headers.get(header_name)
+            if val is None:
+                return False
             return header_val.match(val) is not None
         weights.append(1 << 5)
         predicates.append(header_predicate)
@@ -1781,11 +1810,34 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         predicates.append(request_type_predicate)
         h.update('request_type:%r' % id(request_type))
 
+    if view_match_val is not None:
+        match_name = view_match_val
+        match_val = None
+        if ':' in match_name:
+            match_name, match_val = match_name.split(':', 1)
+            try:
+                match_val = re.compile(match_val)
+            except re.error, why:
+                raise ConfigurationError(why[0])
+        def view_match_val_predicate(context, request):
+            matchdict = getattr(request, 'matchdict', None)
+            if matchdict is None:
+                return False
+            if match_val is None:
+                return match_name in matchdict
+            val = matchdict.get(match_name)
+            if val is None:
+                return False
+            return match_val.match(val) is not None
+        weights.append(1 << 9)
+        predicates.append(view_match_val_predicate)
+        h.update('view_match_val:%r=%r' % (match_name, match_val))
+
     if custom:
         for num, predicate in enumerate(custom):
             predicates.append(predicate)
             h.update('custom%s:%r' % (num, id(predicate)))
-        weights.append(1 << 9)
+        weights.append(1 << 10)
 
     score = 0
     for bit in weights:
@@ -2151,11 +2203,10 @@ def _attr_wrap(view, accept, order, phash):
     decorate_view(attr_view, view)
     return attr_view
 
-def isclass(o):
-    return isinstance(o, (type, types.ClassType))
-
 def isexception(o):
-    return isinstance(o, Exception) or isclass(o) and issubclass(o, Exception)
+    return isinstance(o, Exception) or (
+        inspect.isclass(o) and issubclass(o, Exception)
+        )
 
 # note that ``options`` is a b/w compat alias for ``settings`` and
 # ``Configurator`` is a testing dep inj

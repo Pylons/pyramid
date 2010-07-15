@@ -141,6 +141,11 @@ class IViewDirective(Interface):
         description=(u'Accepts a regular expression.'),
         required = False)
 
+    match_val = TextLine(
+        title=u'Matchdict name/value pair in the form "name=<regex>"',
+        description=u'Regular expression matching for matchdict values',
+        required = False)
+
     custom_predicates = Tokens(
         title=u"One or more custom dotted names to custom predicate callables",
         description=(u"A list of dotted name references to callables that "
@@ -168,6 +173,7 @@ def view(
     accept=None,
     header=None,
     path_info=None,
+    match_val=None,
     custom_predicates=(),
     context=None,
     cacheable=True, # not used, here for b/w compat < 0.8
@@ -199,7 +205,8 @@ def view(
             request_method=request_method, request_param=request_param,
             containment=containment, attr=attr, renderer=renderer,
             wrapper=wrapper, xhr=xhr, accept=accept, header=header,
-            path_info=path_info, custom_predicates=custom_predicates,
+            path_info=path_info, match_val=match_val,
+            custom_predicates=custom_predicates,
             _info=_context.info)
 
     discriminator = ['view', context, name, request_type, IView, containment,

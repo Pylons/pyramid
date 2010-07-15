@@ -224,6 +224,30 @@ Predicate Attributes
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
+``match_val``
+
+  The ``match_val`` value represents the presence of a value in the
+  :term:`URL dispatch` structure added to the request named
+  ``matchdict``.  ``matchdict`` represents the match values from the
+  route pattern (e.g. if the route pattern has ``:foo`` in it, and the
+  route matches, a key will exist in the matchdict named ``foo``).  If
+  the value does not contain a colon, the entire value will be
+  considered to be the name of a matchdict key (e.g. ``action``). If
+  the value does contain a ``:`` (colon), it will be considered a
+  name/value pair (e.g. ``action:generate.html`` or
+  ``action:\w+.html``).  The right hand side following the colon
+  should be a regular expression.
+
+  If the value does not contain a colon, the key specified by the name
+  must be present in the URL dispatch matchdict for this predicate to
+  be true; the value of the key is ignored.  If the value does contain
+  a colon, the name implied by the right hand must be present in the
+  matchdict *and* the regular expression specified on the right hand
+  side of the colon must match the value for the name in the matchdict
+  for this predicate to be true.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
+
 ``custom_predicates``
   This value should be a sequence of references to custom predicate
   callables (e.g. ``dotted.name.one dotted.name.two``, if used in

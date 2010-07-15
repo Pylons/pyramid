@@ -1358,6 +1358,33 @@ Predicate Arguments
   taken into consideration when deciding whether or not to invoke the
   associated view callable.
 
+``match_val``
+
+  This value represents :term:`URL dispatch` ``request.matchdict``
+  name or a matchdict name/value pair.  ``request.matchdict`` is a
+  dictionary representing the match values from the route pattern
+  (e.g. if the route pattern has ``:foo`` in it, and the route
+  matches, a key will exist in the matchdict named ``foo``).
+
+  If ``match_val`` is specified, it must be the name of a key presumed
+  to be present in the ``matchdict`` or a ``key:regex`` pair.
+
+  If ``match_val`` is specified without a colon in it
+  (e.g. ``action``), the predicate will return true if the
+  ``matchdict`` has a key which exists with any value.
+
+  When the ``match_val`` contains a ``:`` (colon), it will be split at
+  the first colon; the left hand of that split will considered a key
+  and the right hand a regular expression.  For example, in
+  ``action:\w+\.html``, the key part is ``action``, the regex part is
+  ``\w+\.html``.  The resulting predicate will only be true if the
+  matchdict contains a key that matches the key part *and* the
+  matchdict value is matched by the regex part.
+
+  If ``match_val`` is not specified, the composition, presence or
+  absence of values in the matchdict is not taken into consideration
+  when deciding whether or not to invoke the associated view callable.
+
 ``custom_predicates``
   If ``custom_predicates`` is specified, it must be a sequence of
   references to custom predicate callables.  Use custom predicates
