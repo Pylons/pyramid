@@ -40,3 +40,11 @@ class URLDecodeError(UnicodeDecodeError):
 class ConfigurationError(ZCE):
     """ Raised when inappropriate input values are supplied to an API
     method of a :term:`Configurator`"""
+
+class PredicateMismatch(NotFound):
+    """ Internal exception (not an API) raised by multiviews when no
+    view matches.  This exception subclasses the ``NotFound``
+    exception only one reason: if it reaches the main exception
+    handler, it should be treated like a ``NotFound`` by any exception
+    view registrations."""
+

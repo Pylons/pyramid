@@ -49,6 +49,7 @@ from repoze.bfg.compat import md5
 from repoze.bfg.events import WSGIApplicationCreatedEvent
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
+from repoze.bfg.exceptions import PredicateMismatch
 from repoze.bfg.exceptions import ConfigurationError
 from repoze.bfg.i18n import get_localizer
 from repoze.bfg.log import make_stream_logger
@@ -1894,7 +1895,7 @@ class MultiView(object):
                 return view
             if view.__predicated__(context, request):
                 return view
-        raise NotFound(self.name)
+        raise PredicateMismatch(self.name)
 
     def __permitted__(self, context, request):
         view = self.match(context, request)
@@ -1911,9 +1912,9 @@ class MultiView(object):
         for order, view, phash in self.get_views(request):
             try:
                 return view(context, request)
-            except NotFound:
+            except PredicateMismatch:
                 continue
-        raise NotFound(self.name)
+        raise PredicateMismatch(self.name)
 
 def decorate_view(wrapped_view, original_view):
     if wrapped_view is original_view:
@@ -2130,7 +2131,7 @@ def _predicate_wrap(view, predicates):
     def predicate_wrapper(context, request):
         if all((predicate(context, request) for predicate in predicates)):
             return view(context, request)
-        raise NotFound('predicate mismatch for view %s' % view)
+        raise PredicateMismatch('predicate mismatch for view %s' % view)
     def checker(context, request):
         return all((predicate(context, request) for predicate in
                     predicates))

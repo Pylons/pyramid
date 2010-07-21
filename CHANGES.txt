@@ -35,6 +35,37 @@ Bug Fixes
   ``TypeError: expected string or buffer`` exception.  Now, the
   predicate returns False as intended.
 
+Backwards Incompatibilities
+---------------------------
+
+- A new internal exception class (*not* an API) named
+  ``repoze.bfg.exceptions.PredicateMismatch`` now exists.  This
+  exception is currently raised when no constituent view of a
+  multiview can be called (due to no predicate match).  Previously, in
+  this situation, a ``repoze.bfg.exceptions.NotFound`` was raised.  We
+  provide backwards compatibility for code that expected a
+  ``NotFound`` to be raised when no predicates match by causing
+  ``repoze.bfg.exceptions.PredicateMismatch`` to inherit from
+  ``NotFound``.  This will cause any exception view registered for
+  ``NotFound`` to be called when a predicate mismatch occurs, as was
+  the previous behavior.
+
+  There is however, one perverse case that will expose a backwards
+  incompatibility.  If 1) you had a view that was registered as a
+  member of a multiview 2) this view explicitly raised a ``NotFound``
+  exception *in order to* proceed to the next predicate check in the
+  multiview, that code will now behave differently: rather than
+  skipping to the next view match, a NotFound will be raised to the
+  top-level exception handling machinery instead.  For code to be
+  depending upon the behavior of a view raising ``NotFound`` to
+  proceed to the next predicate match, would be tragic, but not
+  impossible, given that ``NotFound`` is a public interface.
+  ``repoze.bfg.exceptions.PredicateMismatch`` is not a public API and
+  cannot be depended upon by application code, so you should not
+  change your view code to raise ``PredicateMismatch``.  Instead, move
+  the logic which raised the ``NotFound`` exception in the view out
+  into a custom view predicate.
+
 1.3a5 (2010-07-14)
 ==================
 

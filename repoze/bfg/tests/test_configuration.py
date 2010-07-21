@@ -3307,19 +3307,32 @@ class TestMultiView(unittest.TestCase):
         self.assertRaises(NotFound, mv, context, request)
 
     def test___call__intermediate_not_found(self):
-        from repoze.bfg.exceptions import NotFound
+        from repoze.bfg.exceptions import PredicateMismatch
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
         request.view_name = ''
         expected_response = DummyResponse()
         def view1(context, request):
-            raise NotFound
+            raise PredicateMismatch
         def view2(context, request):
             return expected_response
         mv.views = [(100, view1, None), (99, view2, None)]
         response = mv(context, request)
         self.assertEqual(response, expected_response)
+
+    def test___call__raise_not_found_isnt_interpreted_as_pred_mismatch(self):
+        from repoze.bfg.exceptions import NotFound
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.view_name = ''
+        def view1(context, request):
+            raise NotFound
+        def view2(context, request):
+            """ """
+        mv.views = [(100, view1, None), (99, view2, None)]
+        self.assertRaises(NotFound, mv, context, request)
 
     def test___call__(self):
         mv = self._makeOne()
