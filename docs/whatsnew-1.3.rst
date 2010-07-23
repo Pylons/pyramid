@@ -170,6 +170,18 @@ Minor Feature Additions
   ZCML :ref:`view_directive` directive.  See the documentation for
   those APIs for more inforamtion.
 
+- New argument to
+  :class:`repoze.bfg.configuration.Configurator.add_route` and the
+  ZCML ``route`` directive: ``traverse``.  If you would like to cause
+  the :term:`context` to be something other than the :term:`root`
+  object when this route matches, you can spell a traversal pattern as
+  the ``traverse`` argument.  This traversal pattern will be used as
+  the traversal path: traversal will begin at the root object implied
+  by this route (either the global root, or the object returned by the
+  ``factory`` associated with this route).  See
+  :class:`repoze.bfg.configuration.Configurator.add_route` for more
+  information (the ``traverse`` argument).
+
 Backwards Incompatibilities
 ---------------------------
 

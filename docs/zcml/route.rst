@@ -40,6 +40,45 @@ Attributes
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
+``traverse``
+  If you would like to cause the :term:`context` to be something other
+  than the :term:`root` object when this route matches, you can spell
+  a traversal pattern as the ``traverse`` argument.  This traversal
+  pattern will be used as the traversal path: traversal will begin at
+  the root object implied by this route (either the global root, or
+  the object returned by the ``factory`` associated with this route).
+
+  The syntax of the ``traverse`` argument is the same as it is for
+  ``path``. For example, if the ``path`` provided to the ``route``
+  directive is ``articles/:article/edit``, and the ``traverse``
+  argument provided to the ``route`` directive is ``/:article``, when
+  a request comes in that causes the route to match in such a way that
+  the ``article`` match value is '1' (when the request URI is
+  ``/articles/1/edit``), the traversal path will be generated as
+  ``/1``.  This means that the root object's ``__getitem__`` will be
+  called with the name ``1`` during the traversal phase.  If the ``1``
+  object exists, it will become the :term:`context` of the request.
+  :ref:`traversal_chapter` has more information about traversal.
+
+  If the traversal path contains segment marker names which are not
+  present in the path argument, a runtime error will occur.  The
+  ``traverse`` pattern should not contain segment markers that do not
+  exist in the ``path``.
+
+  A similar combining of routing and traversal is available when a
+  route is matched which contains a ``*traverse`` remainder marker in
+  its path (see :ref:`using_traverse_in_a_route_path`).  The
+  ``traverse`` argument to the ``route`` directive allows you to
+  associate route patterns with an arbitrary traversal path without
+  using a a ``*traverse`` remainder marker; instead you can use other
+  match information.
+
+  Note that the ``traverse`` argument to the ``route`` directive is
+  ignored when attached to a route that has a ``*traverse`` remainder
+  marker in its path.
+
+  .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
+
 ``request_method``
   A string representing an HTTP method name, e.g. ``GET``, ``POST``,
   ``HEAD``, ``DELETE``, ``PUT``.  If this argument is not specified,

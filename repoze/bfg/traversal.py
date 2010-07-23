@@ -515,7 +515,7 @@ class ModelGraphTraverser(object):
                 subpath = traversal_path(subpath)
 
         else:
-            # this request did not match a Routes route
+            # this request did not match a route
             subpath = ()
             try:
                 path = environ['PATH_INFO'] or '/'

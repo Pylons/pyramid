@@ -957,6 +957,7 @@ class Configurator(object):
                   path_info=None,
                   request_method=None,
                   request_param=None,
+                  traverse=None,
                   custom_predicates=(),
                   view_permission=None,
                   renderer=None,
@@ -989,6 +990,49 @@ class Configurator(object):
           object when this route matches. For example,
           ``mypackage.models.MyFactoryClass``.  If this argument is
           not specified, a default root factory will be used.
+
+        traverse
+
+          If you would like to cause the :term:`context` to be
+          something other than the :term:`root` object when this route
+          matches, you can spell a traversal pattern as the
+          ``traverse`` argument.  This traversal pattern will be used
+          as the traversal path: traversal will begin at the root
+          object implied by this route (either the global root, or the
+          object returned by the ``factory`` associated with this
+          route).
+
+          The syntax of the ``traverse`` argument is the same as it is
+          for ``path``. For example, if the ``path`` provided to
+          ``add_route`` is ``articles/:article/edit``, and the
+          ``traverse`` argument provided to ``add_route`` is
+          ``/:article``, when a request comes in that causes the route
+          to match in such a way that the ``article`` match value is
+          '1' (when the request URI is ``/articles/1/edit``), the
+          traversal path will be generated as ``/1``.  This means that
+          the root object's ``__getitem__`` will be called with the
+          name ``1`` during the traversal phase.  If the ``1`` object
+          exists, it will become the :term:`context` of the request.
+          :ref:`traversal_chapter` has more information about
+          traversal.
+
+          If the traversal path contains segment marker names which
+          are not present in the path argument, a runtime error will
+          occur.  The ``traverse`` pattern should not contain segment
+          markers that do not exist in the ``path``.
+
+          A similar combining of routing and traversal is available
+          when a route is matched which contains a ``*traverse``
+          remainder marker in its path (see
+          :ref:`using_traverse_in_a_route_path`).  The ``traverse``
+          argument to add_route allows you to associate route patterns
+          with an arbitrary traversal path without using a a
+          ``*traverse`` remainder marker; instead you can use other
+          match information.
+
+          Note that the ``traverse`` argument to ``add_route`` is
+          ignored when attached to a route that has a ``*traverse``
+          remainder marker in its path.
 
         Predicate Arguments
 
@@ -1683,7 +1727,7 @@ class Configurator(object):
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
                      containment=None, request_type=None,
-                     view_match_val=None, custom=()):
+                     view_match_val=None, traverse=None, custom=()):
 
     # PREDICATES
     # ----------
@@ -1833,6 +1877,26 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         weights.append(1 << 9)
         predicates.append(view_match_val_predicate)
         h.update('view_match_val:%r=%r' % (match_name, match_val))
+
+    if traverse is not None:
+        # ``traverse`` can only be used as a *route* "predicate"; it
+        # adds 'traverse' to the matchdict if it's specified in the
+        # routing args.  This causes the ModelGraphTraverser to use
+        # the resolved traverse pattern as the traversal path.
+        from repoze.bfg.urldispatch import _compile_route
+        _, tgenerate = _compile_route(traverse)
+        def traverse_predicate(context, request):
+            if 'traverse' in context:
+                return True
+            tvalue = tgenerate(context)
+            context['traverse'] = traversal_path(tvalue)
+            return True
+        # This isn't actually a predicate, it's just a infodict
+        # modifier that injects ``traverse`` into the matchdict.  As a
+        # result, the ``traverse_predicate`` function above always
+        # returns True, and we don't need to update the hash or attach
+        # a weight to it
+        predicates.append(traverse_predicate)
 
     if custom:
         for num, predicate in enumerate(custom):

@@ -188,6 +188,8 @@ match is straightforward.  When a route is matched:
    root factory were explained previously within
    :ref:`the_object_graph`.  
 
+.. _using_traverse_in_a_route_path:
+
 Using ``*traverse`` In a Route Path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
