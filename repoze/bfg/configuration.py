@@ -1230,6 +1230,7 @@ class Configurator(object):
             request_param=request_param,
             header=header,
             accept=accept,
+            traverse=traverse,
             custom=custom_predicates
             )
         
