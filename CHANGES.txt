@@ -62,6 +62,9 @@ Documentation
 - The ``Views`` narrative chapter now contains a description of the
   ``match_val`` predicate.
 
+- The ``Hybrid`` narrative chapter now contains a description of the
+  ``traverse`` route argument.
+
 Bug Fixes
 ---------
 

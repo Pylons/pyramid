@@ -206,13 +206,13 @@ of a route's path:
      />
 
 A ``*traverse`` token at the end of the path in a route's
-configuration implies a "stararg" *capture* value.  When it is used,
+configuration implies a "remainder" *capture* value.  When it is used,
 it will match the remainder of the path segments of the URL.  This
 remainder becomes the path used to perform traversal.
 
 .. note::
 
-   The ``*stararg`` route path pattern syntax is explained in more
+   The ``*remainder`` route path pattern syntax is explained in more
    detail within :ref:`route_path_pattern_syntax`.
 
 Note that unlike the examples provided within
@@ -391,6 +391,57 @@ More complicated matching can be composed.  All arguments to *route*
 configuration statements and *view* configuration statements are
 supported in hybrid applications (such as :term:`predicate`
 arguments).
+
+Using the ``traverse`` Argument In a Route Definition
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rather than using the ``*traverse`` remainder marker in a path
+pattern, you can use the ``traverse`` argument to the
+:meth:`repoze.bfg.configuration.Configurator.add_route`` method or the
+``traverse`` attribute of the :ref:`route_directive` ZCML directive.
+(either method is equivalent).
+
+When you use the ``*traverse`` remainder marker, the traversal path is
+limited to being the remainder segments of a request URL when a route
+matches.  However, when you use the ``traverse`` argument or
+attribute, you have more control over how to compose a traversal path.
+
+Here's a use of the ``traverse`` pattern in a ZCML ``route``
+declaration:
+
+.. code-block:: xml
+   :linenos:
+
+   <route
+     name="abc"
+     path="/articles/:article/edit"
+     traverse="/articles/:article"
+     />
+
+The syntax of the ``traverse`` argument is the same as it is for
+``path``.
+
+If, as above, the ``path`` provided is ``articles/:article/edit``, and
+the ``traverse`` argument provided is ``/:article``, when a request
+comes in that causes the route to match in such a way that the
+``article`` match value is ``1`` (when the request URI is
+``/articles/1/edit``), the traversal path will be generated as ``/1``.
+This means that the root object's ``__getitem__`` will be called with
+the name ``1`` during the traversal phase.  If the ``1`` object
+exists, it will become the :term:`context` of the request.
+:ref:`traversal_chapter` has more information about traversal.
+
+If the traversal path contains segment marker names which are not
+present in the path argument, a runtime error will occur.  The
+``traverse`` pattern should not contain segment markers that do not
+exist in the ``path``.
+
+Note that the ``traverse`` argument is ignored when attached to a
+route that has a ``*traverse`` remainder marker in its path.
+
+Traversal will begin at the root object implied by this route (either
+the global root, or the object returned by the ``factory`` associated
+with this route).
 
 Making Global Views Match
 +++++++++++++++++++++++++

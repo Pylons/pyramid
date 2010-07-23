@@ -174,6 +174,7 @@ def view(
     header=None,
     path_info=None,
     match_val=None,
+    traverse=None,
     custom_predicates=(),
     context=None,
     cacheable=True, # not used, here for b/w compat < 0.8
@@ -205,7 +206,7 @@ def view(
             request_method=request_method, request_param=request_param,
             containment=containment, attr=attr, renderer=renderer,
             wrapper=wrapper, xhr=xhr, accept=accept, header=header,
-            path_info=path_info, match_val=match_val,
+            path_info=path_info, match_val=match_val, 
             custom_predicates=custom_predicates,
             _info=_context.info)
 
@@ -252,6 +253,12 @@ class IRouteDirective(Interface):
     accept = TextLine(title=u'accept', required=False)
     xhr = Bool(title=u'xhr', required=False)
     path_info = TextLine(title=u'path_info', required=False)
+
+    traverse = TextLine(
+        title=u'Traverse pattern"',
+        description=u'A pattern which will compose a traversal path',
+        required = False)
+
     custom_predicates = Tokens(
         title=u"One or more custom dotted names to custom predicate callables",
         description=(u"A list of dotted name references to callables that "
@@ -281,6 +288,7 @@ def route(_context,
           renderer=None,
           view_renderer=None,
           view_context=None,
+          traverse=None,
           use_global_views=False):
     """ Handle ``route`` ZCML directives
     """
@@ -318,6 +326,7 @@ def route(_context,
             view_renderer=view_renderer,
             view_attr=view_attr,
             use_global_views=use_global_views,
+            traverse=traverse,
             _info=_context.info
             )
 
