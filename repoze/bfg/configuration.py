@@ -544,8 +544,8 @@ class Configurator(object):
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
-                 header=None, path_info=None, match_val=None,
-                 custom_predicates=(), context=None, _info=u''):
+                 header=None, path_info=None, custom_predicates=(),
+                 context=None, _info=u''):
         """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
@@ -765,32 +765,6 @@ class Configurator(object):
           ``True``.
 
           
-        match_val
-
-          The ``match_val`` value represents the presence of a value
-          in the :term:`URL dispatch` structure added to the request
-          named ``matchdict``.  ``matchdict`` represents the match
-          values from the route pattern (e.g. if the route pattern has
-          ``:foo`` in it, and the route matches, a key will exist in
-          the matchdict named ``foo``).  If the value does not contain
-          a colon, the entire value will be considered to be the name
-          of a matchdict key (e.g. ``action``). If the value does
-          contain a ``:`` (colon), it will be considered a name/value
-          pair (e.g. ``action:generate.html`` or ``action:\w+.html``).
-          The right hand side following the colon should be a regular
-          expression.
-
-          If the value does not contain a colon, the key specified by
-          the name must be present in the URL dispatch matchdict for
-          this predicate to be true; the value of the key is ignored.
-          If the value does contain a colon, the name implied by the
-          right hand must be present in the matchdict *and* the
-          regular expression specified on the right hand side of the
-          colon must match the value for the name in the matchdict for
-          this predicate to be true.
-
-          .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
-
         custom_predicates
 
           This value should be a sequence of references to custom
@@ -841,7 +815,7 @@ class Configurator(object):
                     request_method=request_method, request_param=request_param,
                     containment=containment, attr=attr,
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
-                    header=header, path_info=path_info, match_val=match_val,
+                    header=header, path_info=path_info,
                     custom_predicates=(), context=context, _info=u''
                     )
                 view_info = deferred_views.setdefault(route_name, [])
@@ -852,7 +826,7 @@ class Configurator(object):
             request_method=request_method, path_info=path_info,
             request_param=request_param, header=header, accept=accept,
             containment=containment, request_type=request_type,
-            view_match_val=match_val, custom=custom_predicates)
+            custom=custom_predicates)
 
         derived_view = self._derive_view(view, permission, predicates, attr,
                                          renderer, wrapper, name, accept, order,
@@ -1051,6 +1025,8 @@ class Configurator(object):
           Note that the ``traverse`` argument to ``add_route`` is
           ignored when attached to a route that has a ``*traverse``
           remainder marker in its path.
+
+          .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
 
         Predicate Arguments
 
@@ -1759,7 +1735,7 @@ class Configurator(object):
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
                      containment=None, request_type=None,
-                     view_match_val=None, traverse=None, custom=()):
+                     traverse=None, custom=()):
 
     # PREDICATES
     # ----------
@@ -1886,29 +1862,6 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
         h.update('request_type:%r' % id(request_type))
-
-    if view_match_val is not None:
-        match_name = view_match_val
-        match_val = None
-        if ':' in match_name:
-            match_name, match_val = match_name.split(':', 1)
-            try:
-                match_val = re.compile(match_val)
-            except re.error, why:
-                raise ConfigurationError(why[0])
-        def view_match_val_predicate(context, request):
-            matchdict = getattr(request, 'matchdict', None)
-            if matchdict is None:
-                return False
-            if match_val is None:
-                return match_name in matchdict
-            val = matchdict.get(match_name)
-            if val is None:
-                return False
-            return match_val.match(val) is not None
-        weights.append(1 << 9)
-        predicates.append(view_match_val_predicate)
-        h.update('view_match_val:%r=%r' % (match_name, match_val))
 
     if traverse is not None:
         # ``traverse`` can only be used as a *route* "predicate"; it

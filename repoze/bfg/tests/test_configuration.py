@@ -1414,68 +1414,6 @@ class ConfiguratorTests(unittest.TestCase):
         request.path_info = '/'
         self._assertNotFound(wrapper, None, request)
 
-    def test_add_view_with_match_val_badregex(self):
-        from repoze.bfg.exceptions import ConfigurationError
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        self.assertRaises(ConfigurationError,
-                          config.add_view, view=view, match_val='action:a\\')
-
-    def test_add_view_with_match_val_no_matchdict(self):
-        from repoze.bfg.exceptions import NotFound
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        config.add_view(view=view, match_val='action')
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        self.assertRaises(NotFound, wrapper, None, request)
-
-    def test_add_view_with_match_val_noval_match(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        config.add_view(view=view, match_val='action')
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.matchdict = {'action':'whatever'}
-        self.assertEqual(wrapper(None, request), 'OK')
-
-    def test_add_view_with_match_val_noval_nomatch(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        config.add_view(view=view, match_val='action')
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.matchdict = {'notaction':'whatever'}
-        self._assertNotFound(wrapper, None, request)
-
-    def test_add_view_with_match_val_val_match(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        config.add_view(view=view, match_val='action:\d')
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.matchdict = {'action':'1'}
-        self.assertEqual(wrapper(None, request), 'OK')
-
-    def test_add_view_with_match_val_val_nomatch(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        config.add_view(view=view, match_val=r'action:\d')
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.matchdict = {'action':'abc'}
-        self._assertNotFound(wrapper, None, request)
-
-    def test_add_view_with_match_val_val_missing(self):
-        from repoze.bfg.exceptions import NotFound
-        view = lambda *arg: 'OK'
-        config = self._makeOne()
-        config.add_view(view=view, match_val=r'action:\d')
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.matchdict = {'notaction':'1'}
-        self.assertRaises(NotFound, wrapper, None, request)
-
     def test_add_view_with_custom_predicates_match(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
@@ -3001,7 +2939,6 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            view_match_val='view_match_val',
             custom=('a',)
             )
         order2, _, _ = self._callFUT(
@@ -3013,7 +2950,6 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            view_match_val='view_match_val',
             custom=('a',)
             )
         order3, _, _ = self._callFUT(
@@ -3025,8 +2961,7 @@ class Test__make_predicates(unittest.TestCase):
             accept='accept',
             containment='containment',
             request_type='request_type',
-            view_match_val='view_match_val',
-            ) 
+            )
         order4, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
@@ -3035,7 +2970,6 @@ class Test__make_predicates(unittest.TestCase):
             header='header',
             accept='accept',
             containment='containment',
-            request_type='request_type',
             )
         order5, _, _ = self._callFUT(
             xhr='xhr',
@@ -3044,7 +2978,6 @@ class Test__make_predicates(unittest.TestCase):
             request_param='param',
             header='header',
             accept='accept',
-            containment='containment',
             )
         order6, _, _ = self._callFUT(
             xhr='xhr',
@@ -3052,34 +2985,26 @@ class Test__make_predicates(unittest.TestCase):
             path_info='path_info',
             request_param='param',
             header='header',
-            accept='accept',
             )
         order7, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
             path_info='path_info',
             request_param='param',
-            header='header',
             )
         order8, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
             path_info='path_info',
-            request_param='param',
             )
         order9, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
-            path_info='path_info',
             )
         order10, _, _ = self._callFUT(
             xhr='xhr',
-            request_method='request_method',
             )
         order11, _, _ = self._callFUT(
-            xhr='xhr',
-            )
-        order12, _, _ = self._callFUT(
             )
         self.assertEqual(order1, order2)
         self.failUnless(order3 > order2)
@@ -3091,7 +3016,6 @@ class Test__make_predicates(unittest.TestCase):
         self.failUnless(order9 > order8)
         self.failUnless(order10 > order9)
         self.failUnless(order11 > order10)
-        self.failUnless(order12 > order11)
 
     def test_ordering_importance_of_predicates(self):
         order1, _, _ = self._callFUT(
@@ -3119,9 +3043,6 @@ class Test__make_predicates(unittest.TestCase):
             request_type='request_type',
             )
         order9, _, _ = self._callFUT(
-            view_match_val='view_match_val',
-            )
-        order10, _, _ = self._callFUT(
             custom=('a',),
             )
         self.failUnless(order1 > order2)
@@ -3132,7 +3053,6 @@ class Test__make_predicates(unittest.TestCase):
         self.failUnless(order6 > order7)
         self.failUnless(order7 > order8)
         self.failUnless(order8 > order9)
-        self.failUnless(order9 > order10)
 
     def test_ordering_importance_and_number(self):
         order1, _, _ = self._callFUT(

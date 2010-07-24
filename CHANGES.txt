@@ -4,15 +4,6 @@ Next release
 Features
 --------
 
-- New view predicate: match_val.  The ``match_val`` value represents
-  the presence of a value in the structure added to the request named
-  ``matchdict`` during URL dispatch representing the match values from
-  the route pattern (e.g. if the route pattern has ``:foo`` in it, and
-  the route matches, a key will exist in the matchdict named ``foo``).
-  Like all other view predicates, this feature is exposed via the
-  ``bfg_view`` API, the Configurator ``add_view`` API, and the ZCML
-  ``view`` directive.
-
 - New argument to ``repoze.bfg.configuration.Configurator.add_route``
   and the ``route`` ZCML directive: ``traverse``.  If you would like
   to cause the ``context`` to be something other than the ``root``
@@ -59,15 +50,6 @@ Features
 
 Documentation
 -------------
-
-- API documentation for the ``add_view`` method of the configurator
-  changed to include ``match_val``.
-
-- ZCML documentation for ``view`` ZCML directive changed to include
-  ``match_val``.
-
-- The ``Views`` narrative chapter now contains a description of the
-  ``match_val`` predicate.
 
 - The ``Hybrid`` narrative chapter now contains a description of the
   ``traverse`` route argument.

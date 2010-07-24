@@ -158,18 +158,6 @@ Minor Feature Additions
   media package-internal and served by the development webserver
   during development.
 
-- A new :ref:`view predicate` was added named ``match_val``.  The
-  ``match_val`` value represents the presence of a value in the
-  structure added to the request named ``matchdict`` during :term:`URL
-  dispatch` representing the match values from the route pattern
-  (e.g. if the route pattern has ``:foo`` in it, and the route
-  matches, a key will exist in the matchdict named ``foo``).  Like all
-  other view predicates, this feature is exposed via the
-  :class:`repoze.bfg.view.bfg_view` API, the
-  :class:`repoze.bfg.configuration.Configurator.add_view` API, and the
-  ZCML :ref:`view_directive` directive.  See the documentation for
-  those APIs for more inforamtion.
-
 - New argument to
   :class:`repoze.bfg.configuration.Configurator.add_route` and the
   ZCML ``route`` directive: ``traverse``.  If you would like to cause
@@ -181,6 +169,13 @@ Minor Feature Additions
   ``factory`` associated with this route).  See
   :class:`repoze.bfg.configuration.Configurator.add_route` for more
   information (the ``traverse`` argument).
+
+- A new method of the ``Configurator`` exists:
+  ``set_request_factory``.  If used, this method will set the factory
+  used by the :mod:`repoze.bfg` router to create all request objects.
+  The ``Configurator`` constructor also takes an additional argument:
+  ``request_factory``.  If used, this argument will set the factory
+  used by the :mod:`repoze.bfg` router to create all request objects.
 
 Backwards Incompatibilities
 ---------------------------
@@ -247,6 +242,9 @@ Documentation Enhancements
 - The authorization chapter of the :ref:`bfg_sql_wiki_tutorial` was
   changed to demonstrate authorization via a group rather than via a
   direct username.
+
+- The :ref:`hooks_chapter` chapter now contains a section about
+  changing the request factory.
 
 Licensing Changes
 -----------------
