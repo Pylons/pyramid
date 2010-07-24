@@ -337,6 +337,63 @@ class :class:`repoze.bfg.traversal.TraversalContextURL` in the
 <http://svn.repoze.org/repoze.bfg/trunk/repoze/bfg/traversal.py>`_ of
 the :term:`Repoze` Subversion repository.
 
+.. _changing_the_request_factory:
+
+Changing the Request Factory
+----------------------------
+
+Whenever :mod:`repoze.bfg` handles a :term:`WSGI` request, it creates
+a :term:`request` object based on the WSGI environment it has been
+passed.  By default, an instance of the
+:class:`repoze.bfg.request.Request` class is created to represent the
+request object.
+
+The class (aka "factory") that :mod:`repoze.bfg` uses to create a
+request object instance can be changed by passing a
+``request_factory`` argument to the constructor of the
+:term:`configurator`.
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.request import Request
+
+   class MyRequest(Request):
+       pass
+
+   config = Configurator(request_factory=MyRequest)
+
+The same ``MyRequest`` class can alternately be registered via ZCML as
+a request factory through the use of the ZCML ``utility`` directive.
+In the below, we assume it lives in a package named
+``mypackage.mymodule``.
+
+.. code-block:: xml
+   :linenos:
+
+   <utility
+      component="mypackage.mymodule.MyRequest"
+      provides="repoze.bfg.interfaces.IRequestFactory"
+    />
+
+Lastly, if you're doing imperative configuration, and you'd rather do
+it after you've already constructed a :term:`configurator` it can also
+be registered via the
+:meth:`repoze.bfg.configuration.Configurator.set_request_factory`
+method:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.request import Request
+
+   class MyRequest(Request):
+       pass
+
+   config = Configurator()
+   config.set_request_factory(MyRequestFactory)
+
 .. _registering_configuration_decorators:
 
 Registering Configuration Decorators

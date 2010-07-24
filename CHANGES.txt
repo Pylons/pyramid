@@ -49,6 +49,13 @@ Features
   Note that the ``traverse`` argument is ignored when attached to a
   route that has a ``*traverse`` remainder marker in its path.
 
+- A new method of the ``Configurator`` exists:
+  ``set_request_factory``.  If used, this method will set the factory
+  used by the :mod:`repoze.bfg` router to create all request objects.
+
+- The ``Configurator`` constructor takes an additional argument:
+  ``request_factory``.  If used, this argument will set the factory
+  used by the :mod:`repoze.bfg` router to create all request objects.
 
 Documentation
 -------------
@@ -64,6 +71,9 @@ Documentation
 
 - The ``Hybrid`` narrative chapter now contains a description of the
   ``traverse`` route argument.
+
+- The ``Hooks`` narrative chapter now contains a section about
+  changing the request factory.
 
 Bug Fixes
 ---------

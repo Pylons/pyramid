@@ -118,6 +118,14 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.root_policy, rootfactory)
 
+    def test_request_factory(self):
+        from repoze.bfg.interfaces import IRequestFactory
+        class DummyRequestFactory(object):
+            pass
+        self.registry.registerUtility(DummyRequestFactory, IRequestFactory)
+        router = self._makeOne()
+        self.assertEqual(router.request_factory, DummyRequestFactory)
+
     def test_call_traverser_default(self):
         from repoze.bfg.exceptions import NotFound
         environ = self._makeEnviron()

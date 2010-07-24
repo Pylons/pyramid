@@ -144,7 +144,11 @@ class DummyIPShell(object):
 
 dummy_root = Dummy()
 
-dummy_registry = Dummy()
+class DummyRegistry(object):
+    def queryUtility(self, iface, default=None):
+        return default
+
+dummy_registry = DummyRegistry()
 
 class DummyInteractor:
     def __call__(self, banner, local):

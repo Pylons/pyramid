@@ -7,6 +7,7 @@ from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRouter
+from repoze.bfg.interfaces import IRequestFactory
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import ITraverser
@@ -36,9 +37,10 @@ class Router(object):
         self.logger = q(IDebugLogger)
         self.root_factory = q(IRootFactory, default=DefaultRootFactory)
         self.routes_mapper = q(IRoutesMapper)
+        self.request_factory = q(IRequestFactory, default=Request)
         self.root_policy = self.root_factory # b/w compat
         self.registry = registry
-        settings = registry.queryUtility(ISettings)
+        settings = q(ISettings)
         if settings is not None:
             self.debug_notfound = settings['debug_notfound']
 
@@ -60,7 +62,7 @@ class Router(object):
 
         try:
             # create the request
-            request = Request(environ)
+            request = self.request_factory(environ)
             context = None
             threadlocals['request'] = request
             attrs = request.__dict__

@@ -938,6 +938,20 @@ class TraverseTests(unittest.TestCase):
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['context'], model)
 
+    def test_requestfactory_overridden(self):
+        from repoze.bfg.interfaces import IRequestFactory
+        from repoze.bfg.request import Request
+        from repoze.bfg.threadlocal import get_current_registry
+        reg = get_current_registry()
+        class MyRequest(Request):
+            pass
+        reg.registerUtility(MyRequest, IRequestFactory)
+        model = DummyContext()
+        traverser = make_traverser({'context':model, 'view_name':''})
+        self._registerTraverser(traverser)
+        self._callFUT(model, [''])
+        self.assertEqual(model.request.__class__, MyRequest)
+
 class TestDefaultRootFactory(unittest.TestCase):
     def _getTargetClass(self):
         from repoze.bfg.traversal import DefaultRootFactory

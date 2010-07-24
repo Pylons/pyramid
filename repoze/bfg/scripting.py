@@ -1,4 +1,5 @@
 from repoze.bfg.request import Request
+from repoze.bfg.interfaces import IRequestFactory
 
 def get_root(app, request=None):
     """ Return a tuple composed of ``(root, closer)`` when provided a
@@ -11,7 +12,9 @@ def get_root(app, request=None):
     constructed and passed to the root factory if ``request`` is None."""
     registry = app.registry
     if request is None:
-        request = Request.blank('/')
+        request_factory = registry.queryUtility(
+            IRequestFactory, default=Request)
+        request = request_factory.blank('/')
         request.registry = registry
     threadlocals = {'registry':registry, 'request':request}
     app.threadlocal_manager.push(threadlocals)

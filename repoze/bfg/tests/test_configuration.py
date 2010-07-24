@@ -281,6 +281,15 @@ class ConfiguratorTests(unittest.TestCase):
         utility = reg.getUtility(ILocaleNegotiator)
         self.assertEqual(utility, 'abc')
 
+    def test_setup_registry_request_factory(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IRequestFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(request_factory='abc')
+        utility = reg.getUtility(IRequestFactory)
+        self.assertEqual(utility, 'abc')
+
     def test_setup_registry_alternate_renderers(self):
         from repoze.bfg.registry import Registry
         from repoze.bfg.interfaces import IRendererFactory
@@ -1895,6 +1904,12 @@ class ConfiguratorTests(unittest.TestCase):
         config.set_locale_negotiator(negotiator)
         self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
                          negotiator)
+
+    def test_set_request_factory(self):
+        from repoze.bfg.interfaces import IRequestFactory
+        config = self._makeOne()
+        config.set_request_factory('abc')
+        self.assertEqual(config.registry.getUtility(IRequestFactory), 'abc')
 
     def test_add_translation_dirs_missing_dir(self):
         from repoze.bfg.exceptions import ConfigurationError

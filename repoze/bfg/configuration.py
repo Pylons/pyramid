@@ -27,6 +27,7 @@ from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IRequest
+from repoze.bfg.interfaces import IRequestFactory
 from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouteRequest
@@ -90,7 +91,7 @@ class Configurator(object):
     The Configurator accepts a number of arguments: ``registry``,
     ``package``, ``settings``, ``root_factory``,
     ``authentication_policy``, ``authorization_policy``, ``renderers``
-    ``debug_logger`` and ``locale_negotiator``.
+    ``debug_logger``, ``locale_negotiator``, and ``request_factory``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :class:`repoze.bfg.registry.Registry`
@@ -149,6 +150,19 @@ class Configurator(object):
     :term:`locale negotiator` implementation.  See
     :ref:`custom_locale_negotiator`.
 
+    If ``request_factory`` is passed, it should be an object that implements
+    the same methods and attributes as the :class:`repoze.bfg.request.Request`
+    class (particularly ``__call__`` and ``blank``).  This will be the
+    factory used by the :mod:`repoze.bfg` router to create all request
+    objects.  If this attribute is ``None``,
+    the :class:`repoze.bfg.request.Request` class will be used as the
+    request factory.
+
+    .. note:: The
+       :meth:`repoze.bfg.configuration.Configurator.set_request_factory`
+       method can be used to achieve the same purpose as passing
+       ``request_factory``to the Configurator constructor any time after the
+       configurator has been constructed.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -156,7 +170,8 @@ class Configurator(object):
                  root_factory=None, authentication_policy=None,
                  authorization_policy=None, renderers=DEFAULT_RENDERERS,
                  debug_logger=None,
-                 locale_negotiator=None):
+                 locale_negotiator=None,
+                 request_factory=None):
         self.package = package or caller_package()
         self.registry = registry
         if registry is None:
@@ -169,7 +184,8 @@ class Configurator(object):
                 authorization_policy=authorization_policy,
                 renderers=renderers,
                 debug_logger=debug_logger,
-                locale_negotiator=locale_negotiator)
+                locale_negotiator=locale_negotiator,
+                request_factory=request_factory)
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -356,7 +372,7 @@ class Configurator(object):
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
                        renderers=DEFAULT_RENDERERS, debug_logger=None,
-                       locale_negotiator=None):
+                       locale_negotiator=None, request_factory=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
@@ -392,6 +408,8 @@ class Configurator(object):
         self.add_view(default_forbidden_view, context=Forbidden)
         if locale_negotiator:
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)
+        if request_factory:
+            self.set_request_factory(request_factory)
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -1460,6 +1478,19 @@ class Configurator(object):
             return view(context, request)
         return self.add_view(bwcompat_view, context=NotFound,
                              wrapper=wrapper, _info=_info)
+
+    def set_request_factory(self, factory):
+        """ The object passed as ``factory`` will be used by the
+        :mod:`repoze.bfg` router to create all request objects.
+        This factory object must have the same methods and attributes
+        as the :class:`repoze.bfg.request.Request` class (particularly
+        ``__call__`` and ``blank``).
+
+        .. note:: Using the :meth:``request_factory`` argument to the
+           :class:`repoze.bfg.configuration.Configurator` constructor
+           can be used to achieve the same purpose.
+        """
+        self.registry.registerUtility(factory, IRequestFactory)
 
     def set_locale_negotiator(self, negotiator):
         """

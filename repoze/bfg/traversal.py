@@ -6,6 +6,7 @@ from zope.interface.interfaces import IInterface
 from repoze.lru import lru_cache
 
 from repoze.bfg.interfaces import IContextURL
+from repoze.bfg.interfaces import IRequestFactory
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import VH_ROOT_KEY
 
@@ -275,8 +276,9 @@ def traverse(model, path):
     if path and path[0] == '/':
         model = find_root(model)
 
-    request = Request.blank(path)
     reg = get_current_registry()
+    request_factory = reg.queryUtility(IRequestFactory, default=Request)
+    request = request_factory.blank(path)
     request.registry = reg
     traverser = reg.queryAdapter(model, ITraverser)
     if traverser is None:

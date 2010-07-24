@@ -28,12 +28,33 @@ class TestGetRoot(unittest.TestCase):
         closer()
         self.assertEqual(len(app.threadlocal_manager.popped), 1)
 
+    def test_it_requestfactory_overridden(self):
+        app = DummyApp()
+        request = Dummy()
+        class DummyFactory(object):
+            @classmethod
+            def blank(cls, path):
+                return request
+        registry = DummyRegistry(DummyFactory)
+        app.registry = registry
+        root, closer = self._callFUT(app)
+        self.assertEqual(len(app.threadlocal_manager.pushed), 1)
+        pushed = app.threadlocal_manager.pushed[0]
+        self.assertEqual(pushed['request'], request)
 
 class Dummy:
     pass
 
 dummy_root = Dummy()
-dummy_registry = Dummy()
+
+class DummyRegistry(object):
+    def __init__(self, result=None):
+        self.result = result
+
+    def queryUtility(self, iface, default=None):
+        return self.result or default
+
+dummy_registry = DummyRegistry()
 
 class DummyApp:
     def __init__(self):
