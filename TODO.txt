@@ -20,14 +20,4 @@
   documentation for reference to a renderer as *only* view
   configuration (it's a larger concept now).
 
-- The ``system`` value passed to a renderer is not extensible.  It
-  should be extensible on a per-application basis.  For example, you
-  might want to add a top-level variable ``c`` to the values passed to
-  all renderers representing a template context to emulate Pylons.
-
-- ``repoze.bfg.chameleon_zpt.render_template_to_response``, et. al. do
-  not use the same machinery as view renderers.  It would be useful if
-  templates rendered with ``render_template_to_response`` had the same
-  ``system`` values available to it as templates renderered via a view
-  renderer.
-
+- Allow ``view=`` passed to add_route and add_view to be a string.
