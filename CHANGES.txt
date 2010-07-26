@@ -1,3 +1,14 @@
+Next release
+============
+
+Features
+--------
+
+- The ``repoze.bfg.configuration.Configurator.add_route`` API now
+  returns the route object that was added.
+
+
+
 1.3a6 (2010-07-25)
 ==================
 
@@ -82,9 +93,6 @@ Features
 - The ``repoze.bfg.configuration.Configurator.testing_add_template``
   has been renamed to ``testing_add_renderer``.  A backwards
   compatibility alias is present using the old name.
-
-- The ``repoze.bfg.configuration.Configurator.add_route`` API now
-  returns the route object that was added.
 
 Documentation
 -------------
