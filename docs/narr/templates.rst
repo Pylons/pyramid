@@ -1,3 +1,5 @@
+.. _templates_chapter:
+
 Templates
 =========
 

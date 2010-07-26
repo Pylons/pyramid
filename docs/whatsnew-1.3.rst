@@ -177,12 +177,150 @@ Minor Feature Additions
   ``request_factory``.  If used, this argument will set the factory
   used by the :mod:`repoze.bfg` router to create all request objects.
 
+- A new method of the ``Configurator`` exists:
+  ``set_request_factory``.  If used, this method will set the factory
+  used by the ``repoze.bfg`` router to create all request objects.
+
+- The ``Configurator`` constructor takes an additional argument:
+  ``request_factory``.  If used, this argument will set the factory
+  used by the ``repoze.bfg`` router to create all request objects.
+
+- The ``Configurator`` constructor takes an additional argument:
+  ``request_factory`.  If used, this argument will set the factory
+  used by the ``repoze.bfg`` router to create all request objects.
+
+- A new method of the ``Configurator`` exists:
+  ``set_renderer_globals_factory``.  If used, this method will set the
+  factory used by the ``repoze.bfg`` router to create renderer
+  globals.
+
+- A new method of the ``Configurator`` exists: ``get_settings``.  If
+  used, this method will return the current settings object (performs
+  the same job as the ``repoze.bfg.settings.get_settings`` API).
+
+- The ``Configurator`` constructor takes an additional argument:
+  ``renderer_globals_factory``.  If used, this argument will set the
+  factory used by the ``repoze.bfg`` router to create renderer
+  globals.
+
+- Add ``repoze.bfg.renderers.render``,
+  ``repoze.bfg.renderers.render_to_response`` and
+  ``repoze.bfg.renderers.get_renderer`` functions.  These are
+  imperative APIs which will use the same rendering machinery used by
+  view configurations with a ``renderer=`` attribute/argument to
+  produce a rendering or renderer.  Because these APIs provide a
+  central API for all rendering, they now form the preferred way to
+  perform imperative template rendering.  Using functions named
+  ``render_*` from modules such as ``repoze.bfg.chameleon_zpt`` and
+  ``repoze.bfg.chameleon_text`` is now discouraged (although not
+  deprecated).  The code the backing older templating-system-specific
+  APIs now calls into the newer ``repoze.bfg.renderer`` code.
+
+- The ``repoze.bfg.configuration.Configurator.testing_add_template``
+  has been renamed to ``testing_add_renderer``.  A backwards
+  compatibility alias is present using the old name.
+
+- When decoding a URL segment to Unicode fails, the exception raised
+  is now ``repoze.bfg.exceptions.URLDecodeError`` instead of
+  ``UnicodeDecodeError``.  This makes it possible to register an
+  exception view invoked specifically when ``repoze.bfg`` cannot
+  decode a URL.
+
 Backwards Incompatibilities
 ---------------------------
 
 - In previous releases, when a URL could not be decoded from UTF-8
   during traversal, a :exc:`TypeError` was raised.  Now the error
   which is raised is :exc:`repoze.bfg.exceptions.URLDecodeError`.
+
+- A new internal exception class (*not* an API) named
+  ``repoze.bfg.exceptions.PredicateMismatch`` now exists.  This
+  exception is currently raised when no constituent view of a
+  multiview can be called (due to no predicate match).  Previously, in
+  this situation, a ``repoze.bfg.exceptions.NotFound`` was raised.  We
+  provide backwards compatibility for code that expected a
+  ``NotFound`` to be raised when no predicates match by causing
+  ``repoze.bfg.exceptions.PredicateMismatch`` to inherit from
+  ``NotFound``.  This will cause any exception view registered for
+  ``NotFound`` to be called when a predicate mismatch occurs, as was
+  the previous behavior.
+
+  There is however, one perverse case that will expose a backwards
+  incompatibility.  If 1) you had a view that was registered as a
+  member of a multiview 2) this view explicitly raised a ``NotFound``
+  exception *in order to* proceed to the next predicate check in the
+  multiview, that code will now behave differently: rather than
+  skipping to the next view match, a NotFound will be raised to the
+  top-level exception handling machinery instead.  For code to be
+  depending upon the behavior of a view raising ``NotFound`` to
+  proceed to the next predicate match, would be tragic, but not
+  impossible, given that ``NotFound`` is a public interface.
+  ``repoze.bfg.exceptions.PredicateMismatch`` is not a public API and
+  cannot be depended upon by application code, so you should not
+  change your view code to raise ``PredicateMismatch``.  Instead, move
+  the logic which raised the ``NotFound`` exception in the view out
+  into a custom view predicate.
+
+- If, when you run your application's unit test suite under BFG 1.3, a
+  ``KeyError`` naming a template or a ``ValueError`` indicating that a
+  'renderer factory' is not registered may is raised
+  (e.g. ``ValueError: No factory for renderer named '.pt' when looking
+  up karl.views:templates/snippets.pt``), you may need to perform some
+  extra setup in your test code.
+
+  The best solution is to use the
+  ``repoze.bfg.configuration.Configurator.testing_add_renderer`` (or,
+  alternately the deprecated
+  ``repoze.bfg.testing.registerTemplateRenderer`` or
+  ``registerDummyRenderer``) API within the code comprising each
+  individual unit test suite to register a "dummy" renderer for each
+  of the templates and renderers used by code under test.  For
+  example::
+
+    config = Configurator()
+    config.testing_add_renderer('karl.views:templates/snippets.pt')
+
+  This will register a basic dummy renderer for this particular
+  missing template.  The ``testing_add_renderer`` API actually
+  *returns* the renderer, but if you don't care about how the render
+  is used, you don't care about having a reference to it either.
+
+  A more rough way to solve the issue exists.  It causes the "real"
+  template implementations to be used while the system is under test,
+  which is suboptimal, because tests will run slower, and unit tests
+  won't actually *be* unit tests, but it is easier.  Always ensure you
+  call the ``setup_registry()`` method of the Configurator .  Eg::
+
+    reg = MyRegistry()
+    config = Configurator(registry=reg)
+    config.setup_registry()
+
+  Calling ``setup_registry`` only has an effect if you're *passing in*
+  a ``registry`` argument to the Configurator constructor.
+  ``setup_registry`` is called by the course of normal operations
+  anyway if you do not pass in a ``registry``.
+
+  If your test suite isn't using a Configurator yet, and is still
+  using the older ``repoze.bfg.testing`` APIs name ``setUp`` or
+  ``cleanUp``, these will register the renderers on your behalf.
+
+  A variant on the symptom for this theme exists: you may already be
+  dutifully registering a dummy template or renderer for a template
+  used by the code you're testing using ``testing_register_renderer``
+  or ``registerTemplateRenderer``, but (perhaps unbeknownst to you)
+  the code under test expects to be able to use a "real" template
+  renderer implementation to retrieve or render *another* template
+  that you forgot was being rendered as a side effect of calling the
+  code you're testing.  This happened to work because it found the
+  *real* template while the system was under test previously, and now
+  it cannot.  The solution is the same.
+
+  It may also help reduce confusion to use a *resource specification*
+  to specify the template path in the test suite and code rather than
+  a relative path in either.  A resource specification is unambiguous,
+  while a relative path needs to be relative to "here", where "here"
+  isn't always well-defined ("here" in a test suite may or may not be
+  the same as "here" in the code under test).
 
 Deprecations and Behavior Differences
 -------------------------------------
@@ -194,6 +332,31 @@ Deprecations and Behavior Differences
   directives.  Those methods and directives will continue to work for
   the foreseeable future, but they are deprecated in the
   documentation.
+
+- The ``repoze.bfg.renderers.rendered_response`` function was never an
+  official API, but may have been imported by extensions in the wild.
+  It is officially deprecated in this release.  Use
+  ``repoze.bfg.renderers.render_to_response`` instead.
+
+- The following APIs are *documentation* deprecated (meaning they are
+  officially deprecated in documentation but do not raise a
+  deprecation error upon their usage, and may continue to work for an
+  indefinite period of time):
+
+  In the :mod:`repoze.bfg.chameleon_zpt` module: ``get_renderer``,
+  ``getx_template``, ``render_template``,
+  ``render_template_to_response``.  The suggested alternatives are
+  documented within the docstrings of those methods (which are still
+  present in the documentation).
+
+  In the :mod:`repoze.bfg.chameleon_text` module: ``get_renderer``,
+  ``get_template``, ``render_template``,
+  ``render_template_to_response``.  The suggested alternatives are
+  documented within the docstrings of those methods (which are still
+  present in the documentation).
+
+  In general, to perform template-related functions, one should now
+  use the various methods in the :mod:`repoze.bfg.renderers` module.
 
 Dependency Changes
 ------------------
@@ -245,6 +408,21 @@ Documentation Enhancements
 
 - The :ref:`hooks_chapter` chapter now contains a section about
   changing the request factory.
+
+- The :ref:`hooks_chapter` chapter now contains sections about
+  changing the request factory and adding a renderer globals factory.
+
+- The :ref:`hybrid_chapter` chapter now contains a description of the
+  ``traverse`` route argument.
+
+- The API documentation includes a new module:
+  :mod:`repoze.bfg.renderers`.
+
+- The :ref:`templates` chapter was updated; all narrative that used
+  templating-specific APIs within examples to perform rendering (such
+  as the :func:`repoze.bfg.chameleon_zpt.render_template_to_response`
+  method) was changed to use :mod:`repoze.bfg.renderers` ``render_*``
+  functions.
 
 Licensing Changes
 -----------------

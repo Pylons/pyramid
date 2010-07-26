@@ -62,7 +62,7 @@ Features
   the same job as the ``repoze.bfg.settings.get_settings`` API).
 
 - The ``Configurator`` constructor takes an additional argument:
-  ``renderer_globals_factory`.  If used, this argument will set the
+  ``renderer_globals_factory``.  If used, this argument will set the
   factory used by the ``repoze.bfg`` router to create renderer
   globals.
 
@@ -89,8 +89,8 @@ Documentation
 - The ``Hybrid`` narrative chapter now contains a description of the
   ``traverse`` route argument.
 
-- The ``Hooks`` narrative chapter now contains a section about
-  changing the request factory.
+- The ``Hooks`` narrative chapter now contains sections about
+  changing the request factory and adding a renderer globals factory.
 
 - The API documentation includes a new module:
   ``repoze.bfg.renderers``.
