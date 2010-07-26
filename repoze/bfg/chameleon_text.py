@@ -1,7 +1,5 @@
 import sys
 
-from webob import Response
-
 from zope.interface import implements
 
 try:
@@ -20,12 +18,12 @@ except ImportError: # pragma: no cover
     class Parser(object):
         pass
 
-from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import ITemplateRenderer
 from repoze.bfg.interfaces import IChameleonTranslate
 
 from repoze.bfg.decorator import reify
-from repoze.bfg.renderers import template_renderer_factory
+from repoze.bfg import renderers
+from repoze.bfg.path import caller_package
 from repoze.bfg.settings import get_settings
 from repoze.bfg.threadlocal import get_current_registry
 
@@ -40,7 +38,7 @@ class TextTemplateFile(TemplateFile):
                                                doctype, **kwargs)
 
 def renderer_factory(path):
-    return template_renderer_factory(path, TextTemplateRenderer)
+    return renderers.template_renderer_factory(path, TextTemplateRenderer)
 
 class TextTemplateRenderer(object):
     implements(ITemplateRenderer)
@@ -82,15 +80,26 @@ def get_renderer(path):
     :term:`Chameleon` text template using the template implied by the
     ``path`` argument.  The ``path`` argument may be a
     package-relative path, an absolute path, or a :term:`resource
-    specification`."""
-    return renderer_factory(path)
+    specification`.
+    
+    .. warning:: This API is deprecated in :mod:`repoze.bfg` 1.3.  Use
+       :func:`repoze.bfg.renderers.get_renderer` instead.
+    """
+    package = caller_package()
+    return renderers.renderer_from_name(path, package)
 
 def get_template(path):
     """ Return the underyling object representing a :term:`Chameleon`
     text template using the template implied by the ``path`` argument.
     The ``path`` argument may be a package-relative path, an absolute
-    path, or a :term:`resource specification`."""
-    renderer = renderer_factory(path)
+    path, or a :term:`resource specification`.
+
+    .. warning:: This API is deprecated in :mod:`repoze.bfg` 1.3.  Use
+       the ``implementation()`` method of a template renderer retrieved via
+       :func:`repoze.bfg.renderers.get_renderer` instead.
+    """
+    package = caller_package()
+    renderer = renderers.renderer_from_name(path, package)
     return renderer.implementation()
 
 def render_template(path, **kw):
@@ -99,9 +108,13 @@ def render_template(path, **kw):
     package-relative path, an absolute path, or a :term:`resource
     specification`.  The arguments in ``*kw`` are passed as top-level
     names to the template, and so may be used within the template
-    itself.  Returns a string."""
-    renderer = renderer_factory(path)
-    return renderer(kw, {})
+    itself.  Returns a string.
+
+    .. warning:: This API is deprecated in :mod:`repoze.bfg` 1.3.  Use
+       :func:`repoze.bfg.renderers.render` instead.
+    """
+    package = caller_package()
+    return renderers._render(path, None, kw, {}, None, package)
 
 def render_template_to_response(path, **kw):
     """ Render a :term:`Chameleon` text template using the template
@@ -110,9 +123,10 @@ def render_template_to_response(path, **kw):
     specification`.  The arguments in ``*kw`` are passed as top-level
     names to the template, and so may be used within the template
     itself.  Returns a :term:`Response` object with the body as the
-    template result.."""
-    renderer = renderer_factory(path)
-    result = renderer(kw, {})
-    reg = get_current_registry()
-    response_factory = reg.queryUtility(IResponseFactory, default=Response)
-    return response_factory(result)
+    template result.
+
+    .. warning:: This API is deprecated in :mod:`repoze.bfg` 1.3.  Use
+       :func:`repoze.bfg.renderers.render_to_response` instead.
+    """
+    package = caller_package()
+    return renderers._render_to_response(path, None, kw, {}, None, package)

@@ -31,46 +31,109 @@ The most straightforward way to use a template within
 given templating engine to do so.
 
 :mod:`repoze.bfg` provides various APIs that allow you to render
-:term:`Chameleon` templates directly from within a view callable.  For
-example, if there is a :term:`Chameleon` ZPT template named ``foo.pt``
-in a directory in your application named ``templates``, you can render
-the template from within the body of a view callable like so:
+templates directly from within a view callable.  For example, if there
+is a :term:`Chameleon` ZPT template named ``foo.pt`` in a directory in
+your application named ``templates``, you can render the template from
+within the body of a view callable like so:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import render_template_to_response
+   from repoze.bfg.renderers import render_to_response
 
    def sample_view(request):
-       return render_template_to_response('templates/foo.pt', foo=1, bar=2)
+       return render_to_response('templates/foo.pt', foo=1, bar=2, 
+                                 request=request)
+
+.. warning:: Earlier iterations of this documentation
+.. (pre-version-1.3) encouraged the application developer to use
+   ZPT-specific APIs such as
+   :func:`repoze.bfg.chameleon_zpt.render_template_to_response`,
+   :func:`repoze.bfg.chameleon_zpt.render_template_to_iterable`, and
+   :func:`repoze.bfg.chameleon_zpt.render_template` to render
+   templates directly.  This style of rendering still works, but at
+   least for purposes of this documentation, those functions are
+   deprecated.  Application developers are encouraged instead to use
+   the functions available in the :mod:`repoze.bfg.renderers` module
+   to perform rendering tasks.  This set of functions works to render
+   templates for all renderer extensions registered with
+   :mod:`repoze.bfg`.
 
 The ``sample_view`` :term:`view callable` above returns a
 :term:`response` object which contains the body of the
-``template/foo.pt`` template.  The template author will have the names
+``templates/foo.pt`` template.  In this case, the ``templates``
+directory should live in the same directory as the module containing
+the ``sample_view`` function.  The template author will have the names
 ``foo`` and ``bar`` available as top-level names for replacement or
 comparison purposes.
 
-Every view must return a :term:`response` object (except for views
-which use a :term:`renderer`, which we'll see shortly).  The
-:func:`repoze.bfg.chameleon_zpt.render_template_to_response` function
-is a shortcut function that actually returns a response object, but
-not all template APIs know about responses.  When you use a template
-API that is "response-ignorant" you can also easily render a template
-to a string, and construct your own response object as necessary with
-the string as the body.
+In the example above, the path ``templates/foo.pt`` is relative to the
+directory in which the file which defines the view configuration
+lives.  In this case, this is the directory containing the file that
+defines the ``sample_view`` function.  Although a renderer path is
+usually just a simple relative pathname, a path named as a renderer
+can be absolute, starting with a slash on UNIX or a drive letter
+prefix on Windows.
 
-For example, the :func:`repoze.bfg.chameleon_zpt.render_template` API
-returns a string.  We can manufacture a :term:`response` object
-directly, and use that string as the body of the response:
+The path can alternately be a :term:`resource specification` in the
+form ``some.dotted.package_name:relative/path``, making it possible to
+address template resources which live in another package.  For
+example:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import render_template
+   from repoze.bfg.renderers import render_to_response
+
+   def sample_view(request):
+       return render_to_response('mypackage:templates/foo.pt', foo=1, bar=2,
+                                 request=request)
+
+A resource specification points at a file within a Python *package*.
+In this case, it points at a file named ``foo.pt`` within the
+``templates`` directory of the ``mypackage`` package.  Using a
+resource specification instead of a relative template name is usually
+a good idea, because calls to ``render_to_response`` using resource
+specifications will continue to work properly if you move the code
+containing them around.
+
+In the examples above we pass in a keyword argument named ``request``
+representing the current :mod:`repoze.bfg` request. Passing a request
+keyword argument will cause the ``render_to_response`` function to
+supply the renderer with more correct system values (see
+:ref:`renderer_system_values`), because most of the information
+required to compose proper system values is present in the request.
+If you care about the correct system values being provided to the
+renderer being called (in particular, if your template relies on the
+name ``request`` or ``context``, or if you've configured special
+:term:`renderer globals` make sure to pass ``request`` as a keyword
+argument in every call to to a ``repoze.bfg.renderers.render_*``
+function.
+
+Every view must return a :term:`response` object (except for views
+which use a :term:`renderer` named via view configuration, which we'll
+see shortly).  The :func:`repoze.bfg.renders.render_to_response`
+function is a shortcut function that actually returns a response
+object.
+
+Obviously not all APIs you might call to get respnonse data will
+return a response object.  If you call a "response-ignorant" API that
+returns information you'd like to use as a response (such as when you
+render a template to a string), you must construct your own response
+object as necessary with the string as the body.  For example, the
+:func:`repoze.bfg.renderers.render` API returns a string.  We can
+manufacture a :term:`response` object directly, and use that string as
+the body of the response:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.renderers import render
    from webob import Response
 
    def sample_view(request):
-       result = render_template('templates/foo.pt', foo=1, bar=2)
+       result = render('mypackage:templates/foo.pt', foo=1, bar=2, 
+                       request=request)
        response = Response(result)
        return response
 
@@ -83,7 +146,7 @@ functions into your views module, use those APIs to generate a string,
 then return that string as the body of a :term:`WebOb`
 :term:`Response` object.
 
-For example, here's an example of using `Mako
+For example, here's an example of using raw `Mako
 <http://www.makotemplates.org/>`_ from within a :mod:`repoze.bfg`
 :term:`view`:
 
@@ -99,6 +162,13 @@ For example, here's an example of using `Mako
        result = template.render(name=request.params['name'])
        response = Response(result)
        return response
+
+You probably wouldn't use this particular snippet in a project,
+because it's easier to use the Mako renderer bindings which already
+exist for :mod:`repoze.bfg` named ``repoze.bfg.mako`` (available from
+`PyPI <http://pypi.python.org/pypi/repoze.bfg.mako>`_).  But if your
+favorite templating system is not supported as a renderer extension
+for BFG, you can create your own simple conmbination as shown above.
 
 .. note::
 
@@ -121,29 +191,31 @@ may set attributes on the response that influence these values.
 
 Here's an example of changing the content-type and status of the
 response object returned by
-:func:`repoze.bfg.chameleon_zpt.render_template_to_response`:
+:func:`repoze.bfg.renderers.render_to_response`:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import render_template_to_response
+   from repoze.bfg.renderers.render_to_response
 
    def sample_view(request):
-       response = render_template_to_response('templates/foo.pt', foo=1, bar=2)
+       response = render_to_response('templates/foo.pt', foo=1, bar=2, 
+                                     request=request)
        response.content_type = 'text/plain'
        response.status_int = 204
        return response
 
-Here's an example of manufacturing a response object using the result of
-:func:`repoze.bfg.chameleon_zpt.render_template` (a string):
+Here's an example of manufacturing a response object using the result
+of :func:`repoze.bfg.renderers.render` (a string):
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import render_template
+   from repoze.bfg.renderers import render
    from webob import Response
    def sample_view(request):
-       result = render_template('templates/foo.pt', foo=1, bar=2)
+       result = render('mypackage:templates/foo.pt', foo=1, bar=2, 
+                       request=request)
        response = Response(result)
        response.content_type = 'text/plain'
        return response
@@ -153,22 +225,50 @@ Here's an example of manufacturing a response object using the result of
    single: template renderers
    single: renderer (template)
 
+
+.. _renderer_system_values:
+
+System Values Used During Rendering
+-----------------------------------
+
+When a template is rendered using
+:func:`repoze.bfg.render_to_response` or :func:`repoze.bfg.render`,
+the renderer representing the template will be provided with a number
+of *system* values.  These values are provided in a dictionary to the
+renderer and include:
+
+``context``
+  The current :mod:`repoze.bfg` context if ``request`` was provided as
+  a keyword argument or ``None``.
+
+``request``
+  The request provided as a keyword argument.
+
+``renderer_name``
+  The renderer name used to perform the rendering,
+  e.g. ``mypackage:templates/foo.pt``.
+
+What any particular renderer does with them is up to the renderer
+itself, but most renderers, including al Chameleon renderers, make
+these names available as top-level template variables.
+
 .. _templates_used_as_renderers:
 
-Templates Used as Renderers
----------------------------
+Templates Used as Renderers via Configuration
+---------------------------------------------
 
-Instead of using templating system APIs within the body of a view
-function directly to render a specific template, you may associate a
-template written in a supported templating language with a view
-indirectly by specifying it as a :term:`renderer`.
+Instead of using the :func:`repoze.bfg.renderers.render_to_response`
+API within the body of a view function directly to render a specific
+template to a response, you may associate a template written in a
+supported templating language with a view indirectly by specifying it
+as a :term:`renderer` in *view configuration*.
 
-To use a renderer, specify a template :term:`resource specification`
-as the ``renderer`` argument or attribute to the :term:`view
-configuration` of a :term:`view callable`.  Then return a *dictionary*
-from that view callable.  The dictionary items returned by the view
-callable will be made available to the renderer template as top-level
-names.
+To use a renderer via view configuration, specify a template
+:term:`resource specification` as the ``renderer`` argument or
+attribute to the :term:`view configuration` of a :term:`view
+callable`.  Then return a *dictionary* from that view callable.  The
+dictionary items returned by the view callable will be made available
+to the renderer template as top-level names.
 
 The association of a template as a renderer for a :term:`view
 configuration` makes it possible to replace code within a :term:`view
@@ -187,6 +287,18 @@ template renderer:
    def my_view(request):
        return {'foo':1, 'bar':2}
 
+.. note:: It is not necessary to supply the ``request`` value as a key
+   in the dictionary result returned from a renderer-configured view
+   callable in order to ensure that the "most correct" system values
+   are supplied to the renderer as it is when you use
+   :func:`repoze.bfg.renderers.render` or
+   :func:`repoze.bfg.renderers.render_to_response`.  This is handled
+   automatically.
+
+Similar renderer configuration can be done imperatively and via
+:term:`ZCML`.  See :ref:`views_which_use_a_renderer`.  See also
+:ref:`built_in_renderers`.
+
 The ``renderer`` argument to the ``@bfg_view`` configuration decorator
 shown above is the template *path*.  In the example above, the path
 ``templates/foo.pt`` is *relative*.  Relative to what, you ask?
@@ -201,13 +313,6 @@ a :term:`resource specification` in the form
 ``some.dotted.package_name:relative/path``, making it possible to
 address template resources which live in another package.
 
-When a template :term:`renderer` is used to render the result of a
-view callable, several names are passed into the template as top-level
-names by default, including ``context`` and ``request``.  Similar
-renderer configuration can be done imperatively and via :term:`ZCML`.
-See :ref:`views_which_use_a_renderer`.  See also
-:ref:`built_in_renderers`.
-
 Not just any template from any arbitrary templating system may be used
 as a renderer.  Bindings must exist specifically for :mod:`repoze.bfg`
 to use a templating language template as a renderer.  Currently,
@@ -217,17 +322,18 @@ discussion of their details.  :mod:`repoze.bfg` also supports the use
 of :term:`Jinja2` templates as renderers.  See
 :ref:`available_template_system_bindings`.
 
-.. sidebar:: Why Use A Renderer
+.. sidebar:: Why Use A Renderer via View Configuration
 
-   Using a renderer is usually a better way to render templates than
-   using any templating API directly from within a :term:`view
-   callable` because it makes the view callable more unit-testable.
-   Views which use templating APIs directly must return a
-   :term:`Response` object.  Making testing assertions about response
-   objects is typically an indirect process, because it means that
-   your test code often needs to somehow parse information
-   out of the response body (often HTML).  View callables which use
-   renderers typically return a dictionary, and making assertions
+   Using a renderer in view configuration is usually a better way to
+   render templates than using any rendering API directly from within
+   a :term:`view callable` because it makes the view callable more
+   unit-testable.  Views which use templating or rendering APIs
+   directly must return a :term:`Response` object.  Making testing
+   assertions about response objects is typically an indirect process,
+   because it means that your test code often needs to somehow parse
+   information out of the response body (often HTML).  View callables
+   which are configured with renderers externally via view
+   configuration typically return a dictionary, and making assertions
    about the information is almost always more direct than needing to
    parse HTML.  Specifying a renderer from within :term:`ZCML` (as
    opposed to imperatively or via a ``bfg_view`` decorator, or using a
@@ -243,6 +349,11 @@ of a view that uses a renderer, such as the content-type, headers, or
 status attributes, you must set attributes on the *request* object
 within the view before returning the dictionary.  See
 :ref:`response_request_attrs` for more information.
+
+The same set of system values are provided to templates rendered via a
+rendere view configuration as those provided to templates rendered
+imperatively.  See :ref:`renderer_system_values`.
+
 
 .. index::
    single: Chameleon ZPT templates
@@ -285,10 +396,6 @@ the template as a :term:`renderer` like so:
    def my_view(request):
        return {'foo':1, 'bar':2}
 
-If you'd rather use templates directly within a view callable (without
-the indirection of using a renderer), see :ref:`chameleon_zpt_module`
-for the API description.
-
 See also :ref:`built_in_renderers` for more general information about
 renderers, including Chameleon ZPT renderers.
 
@@ -323,9 +430,8 @@ Here's what a simple :term:`Chameleon` ZPT template used under
 Note the use of :term:`Genshi` -style ``${replacements}`` above.  This
 is one of the ways that :term:`Chameleon` ZPT differs from standard
 ZPT.  The above template expects to find a ``project`` key in the set
-of keywords passed in to it via
-:func:`repoze.bfg.chameleon_zpt.render_template` or
-:func:`repoze.bfg.render_template_to_response`. Typical ZPT
+of keywords passed in to it via :func:`repoze.bfg.renderers.render` or
+:func:`repoze.bfg.renderers.render_to_response`. Typical ZPT
 attribute-based syntax (e.g. ``tal:content`` and ``tal:replace``) also
 works in these templates.
 

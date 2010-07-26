@@ -5,7 +5,7 @@
 
 .. automodule:: repoze.bfg.configuration
 
-  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None)
+  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None)
 
      .. attribute:: registry
 
@@ -20,7 +20,9 @@
 
      .. automethod:: unhook_zca()
 
-     .. automethod:: setup_registry(settings=None, root_factory=None, authentication_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None)
+     .. automethod:: get_settings
+
+     .. automethod:: setup_registry(settings=None, root_factory=None, authentication_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None)
 
      .. automethod:: add_renderer(name, factory)
 
@@ -54,11 +56,13 @@
 
      .. automethod:: set_request_factory
 
+     .. automethod:: set_renderer_globals_factory
+
      .. automethod:: testing_securitypolicy
 
      .. automethod:: testing_models
 
      .. automethod:: testing_add_subscriber
 
-     .. automethod:: testing_add_template
+     .. automethod:: testing_add_renderer
 

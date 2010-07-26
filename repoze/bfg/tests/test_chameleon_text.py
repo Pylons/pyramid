@@ -166,88 +166,33 @@ class GetRendererTests(Base, unittest.TestCase):
         from repoze.bfg.chameleon_text import get_renderer
         return get_renderer(name)
 
-    def test_nonabs_registered(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.chameleon_text import TextTemplateRenderer
-        from repoze.bfg.interfaces import ITemplateRenderer
-        minimal = self._getTemplatePath('minimal.txt')
-        utility = TextTemplateRenderer(minimal)
-        self._registerUtility(utility, ITemplateRenderer, name=minimal)
-        result = self._callFUT(minimal)
-        self.assertEqual(result, utility)
-        reg = get_current_registry()
-        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), utility)
-        
-    def test_nonabs_unregistered(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.chameleon_text import TextTemplateRenderer
-        from repoze.bfg.interfaces import ITemplateRenderer
-        minimal = self._getTemplatePath('minimal.txt')
-        reg = get_current_registry()
-        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), None)
-        utility = TextTemplateRenderer(minimal)
-        self._registerUtility(utility, ITemplateRenderer, name=minimal)
-        result = self._callFUT(minimal)
-        self.assertEqual(result, utility)
-        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), utility)
-
-    def test_explicit_registration(self):
-        from repoze.bfg.interfaces import ITemplateRenderer
+    def test_it(self):
+        from repoze.bfg.interfaces import IRendererFactory
         class Dummy:
             template = object()
-        utility = Dummy()
-        self._registerUtility(utility, ITemplateRenderer, name='foo')
+            def implementation(self): pass
+        renderer = Dummy()
+        def rf(spec):
+            return renderer
+        self._registerUtility(rf, IRendererFactory, name='foo')
         result = self._callFUT('foo')
-        self.failUnless(result is utility)
+        self.failUnless(result is renderer)
 
-class GetTemplateTests(unittest.TestCase, Base):
-    def setUp(self):
-        Base.setUp(self)
-
-    def tearDown(self):
-        Base.tearDown(self)
-
+class GetTemplateTests(Base, unittest.TestCase):
     def _callFUT(self, name):
         from repoze.bfg.chameleon_text import get_template
         return get_template(name)
 
-    def test_nonabs_registered(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.chameleon_text import TextTemplateRenderer
-        from repoze.bfg.interfaces import ITemplateRenderer
-        minimal = self._getTemplatePath('minimal.txt')
-        utility = TextTemplateRenderer(minimal)
-        self._registerUtility(utility, ITemplateRenderer, name=minimal)
-        result = self._callFUT(minimal)
-        self.assertEqual(result.filename, minimal)
-        reg = get_current_registry()
-        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), utility)
-        
-    def test_nonabs_unregistered(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.chameleon_text import TextTemplateRenderer
-        from repoze.bfg.interfaces import ITemplateRenderer
-        minimal = self._getTemplatePath('minimal.txt')
-        reg = get_current_registry()
-        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), None)
-        utility = TextTemplateRenderer(minimal)
-        self._registerUtility(utility, ITemplateRenderer, name=minimal)
-        result = self._callFUT(minimal)
-        self.assertEqual(result.filename, minimal)
-        self.assertEqual(reg.queryUtility(ITemplateRenderer, minimal), utility)
-
-    def test_explicit_registration(self):
-        from repoze.bfg.interfaces import ITemplateRenderer
+    def test_it(self):
+        from repoze.bfg.interfaces import IRendererFactory
         class Dummy:
             template = object()
             def implementation(self):
                 return self.template
-        utility = Dummy()
-        self._registerUtility(utility, ITemplateRenderer, name='foo')
+        renderer = Dummy()
+        def rf(spec):
+            return renderer
+        self._registerUtility(rf, IRendererFactory, name='foo')
         result = self._callFUT('foo')
-        self.failUnless(result is utility.template)
-        
-        
-        
-
+        self.failUnless(result is renderer.template)
 

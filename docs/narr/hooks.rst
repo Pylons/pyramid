@@ -394,6 +394,72 @@ method:
    config = Configurator()
    config.set_request_factory(MyRequestFactory)
 
+.. _adding_renderer_globals:
+
+Adding Renderer Globals
+-----------------------
+
+Whenever :mod:`repoze.bfg` handles a request to perform a rendering
+(after a view with a ``renderer=`` configuration attribute is invoked,
+or when the any of the methods beginning with ``render`` within the
+:mod:`repoze.bfg.renderers` module are called, *renderer globals* can
+be injected into the *system* values sent to the renderer.  By
+default, no renderer globals are injected, and the "bare" system
+values (such as ``request``, ``context``, and ``renderer_name``) are
+the only values present in the system dictionary passed to every
+renderer.
+
+A callback that :mod:`repoze.bfg` will call every time a renderer is
+invoked can be added by passing a ``renderer_globals_factory``
+argument to the constructor of the :term:`configurator`.
+
+.. code-block:: python
+   :linenos:
+
+   def globals_factory(system):
+       return {'a':1}
+
+   config = Configurator(renderer_globals_factory=globals_factory)
+
+Such a callback must accept a single positional argument (notionally
+named ``system``) which will contain the original system values.  It
+must return a dictionary of values that will be merged into the system
+dictionary.
+
+A renderer globals factory can alternately be registered via ZCML as a
+through the use of the ZCML ``utility`` directive.  In the below, we
+assume a ``globals_factory`` function lives in a package named
+``mypackage.mymodule``.
+
+.. code-block:: xml
+   :linenos:
+
+   <utility
+      component="mypackage.mymodule.renderer_globals_factory"
+      provides="repoze.bfg.interfaces.IRendererGlobalsFactory"
+    />
+
+Lastly, if you're doing imperative configuration, and you'd rather do
+it after you've already constructed a :term:`configurator` it can also
+be registered via the
+:meth:`repoze.bfg.configuration.Configurator.set_renderer_globals_factory`
+method:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.configuration import Configurator
+   from repoze.bfg.request import Request
+
+.. code-block:: python
+   :linenos:
+
+   def globals_factory(system):
+       return {'a':1}
+
+   config = Configurator()
+   config.set_renderer_globals_factory(globals_factory)
+
 .. _registering_configuration_decorators:
 
 Registering Configuration Decorators

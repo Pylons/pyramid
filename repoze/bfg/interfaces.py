@@ -179,6 +179,15 @@ class IRendererFactory(Interface):
     def __call__(name):
         """ Return an object that implements ``IRenderer``  """
 
+class IRendererGlobalsFactory(Interface):
+    def __call__(system_values):
+        """ Return a dictionary of global renderer values (aka
+        top-level template names).  The ``system_values`` value passed
+        in will be a dictionary that includes at least a ``request``
+        key, indicating the current request, and the value
+        ``renderer_name``, which will be the name of the renderer in
+        use."""
+
 class ITemplateRenderer(IRenderer):
     def implementation():
         """ Return the object that the underlying templating system

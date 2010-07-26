@@ -66,18 +66,18 @@ class Test_registerTemplateRenderer(TestBase):
         renderer = testing.registerTemplateRenderer('templates/foo')
         from repoze.bfg.testing import DummyTemplateRenderer
         self.failUnless(isinstance(renderer, DummyTemplateRenderer))
-        from repoze.bfg.chameleon_zpt import render_template_to_response
-        render_template_to_response('templates/foo', foo=1, bar=2)
-        self.assertEqual(dict(foo=1, bar=2), renderer._received)
+        from repoze.bfg.renderers import render_to_response
+        render_to_response('templates/foo', foo=1, bar=2)
+        renderer.assert_(foo=1)
+        renderer.assert_(bar=2)
 
     def test_registerTemplateRenderer_explicitrenderer(self):
         from repoze.bfg import testing
         def renderer(kw, system):
-            raise ValueError
+            self.assertEqual(kw, {'foo':1, 'bar':2})
         renderer = testing.registerTemplateRenderer('templates/foo', renderer)
-        from repoze.bfg.chameleon_zpt import render_template_to_response
-        self.assertRaises(ValueError, render_template_to_response,
-                          'templates/foo', foo=1, bar=2)
+        from repoze.bfg.renderers import render_to_response
+        render_to_response('templates/foo', foo=1, bar=2)
 
 class Test_registerEventListener(TestBase):
     def test_registerEventListener_single(self):
@@ -526,8 +526,8 @@ class TestDummyTemplateRenderer(unittest.TestCase):
         renderer = self._makeOne()
         impl = renderer.implementation()
         impl(a=1, b=2)
-        self.assertEqual(renderer._received['a'], 1)
-        self.assertEqual(renderer._received['b'], 2)
+        self.assertEqual(renderer._implementation._received['a'], 1)
+        self.assertEqual(renderer._implementation._received['b'], 2)
 
     def test_getattr(self):
         renderer = self._makeOne()
@@ -665,6 +665,59 @@ class Test_tearDown(unittest.TestCase):
             self.assertEqual(result, hook)
             getSiteManager.reset()
             manager.clear()
+
+class TestDummyRendererFactory(unittest.TestCase):
+    def _makeOne(self, name, factory):
+        from repoze.bfg.testing import DummyRendererFactory
+        return DummyRendererFactory(name, factory)
+
+    def test_add_no_colon(self):
+        f = self._makeOne('name', None)
+        f.add('spec', 'renderer')
+        self.assertEqual(f.renderers['spec'], 'renderer')
+
+    def test_add_with_colon(self):
+        f = self._makeOne('name', None)
+        f.add('spec:spec2', 'renderer')
+        self.assertEqual(f.renderers['spec:spec2'], 'renderer')
+        self.assertEqual(f.renderers['spec2'], 'renderer')
+
+    def test_call(self):
+        f = self._makeOne('name', None)
+        f.renderers['spec'] = 'renderer'
+        self.assertEqual(f('spec'), 'renderer')
+        
+    def test_call2(self):
+        f = self._makeOne('name', None)
+        f.renderers['spec'] = 'renderer'
+        self.assertEqual(f('spec:spec'), 'renderer')
+
+    def test_call3(self):
+        def factory(spec):
+            return 'renderer'
+        f = self._makeOne('name', factory)
+        self.assertEqual(f('spec'), 'renderer')
+
+    def test_call_miss(self):
+        f = self._makeOne('name', None)
+        self.assertRaises(KeyError, f, 'spec')
+
+class TestMockTemplate(unittest.TestCase):
+    def _makeOne(self, response):
+        from repoze.bfg.testing import MockTemplate
+        return MockTemplate(response)
+
+    def test_getattr(self):
+        template = self._makeOne(None)
+        self.assertEqual(template.foo, template)
+
+    def test_getitem(self):
+        template = self._makeOne(None)
+        self.assertEqual(template['foo'], template)
+
+    def test_call(self):
+        template = self._makeOne('123')
+        self.assertEqual(template(), '123')
 
 from zope.interface import Interface
 from zope.interface import implements

@@ -1,4 +1,5 @@
 import copy
+import types
 
 from webob import Response
 
@@ -122,12 +123,10 @@ def registerTemplateRenderer(path, renderer=None):
     filename ala ``templates/foo.pt``) and return the renderer object.
     If the ``renderer`` argument is None, a 'dummy' renderer will be
     used.  This function is useful when testing code that calls the
-    :func:`repoze.bfg.chameleon_zpt.render_template_to_response`
-    function or
-    :func:`repoze.bfg.chameleon_text.render_template_to_response`
-    function or any other ``render_template*`` API of any built-in
-    templating system (see :mod:`repoze.bfg.chameleon_zpt` and
-    :mod:`repoze.bfg.chameleon_text`).
+    :func:`repoze.bfg.renderers.render` function or
+    :func:`repoze.bfg.renderers.render_to_response` function or any
+    other ``render_*`` or ``get_*`` API of the
+    :mod:`repoze.bfg.renderers` module.
 
     .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
        Instead use the
@@ -140,7 +139,7 @@ def registerTemplateRenderer(path, renderer=None):
     return config.testing_add_template(path, renderer)
 
 # registerDummyRenderer is a deprecated alias that should never be removed
-# (far too much usage in the wild)
+# (too much usage in the wild)
 registerDummyRenderer = registerTemplateRenderer
 
 def registerView(name, result='', view=None, for_=(Interface, Interface),
@@ -371,7 +370,7 @@ class DummyRootFactory(object):
         if 'bfg.routes.matchdict' in request:
             self.__dict__.update(request['bfg.routes.matchdict'])
 
-class DummySecurityPolicy:
+class DummySecurityPolicy(object):
     """ A standin for both an IAuthentication and IAuthorization policy """
     def __init__(self, userid=None, groupids=(), permissive=True):
         self.userid = userid
@@ -401,7 +400,7 @@ class DummySecurityPolicy:
     def principals_allowed_by_permission(self, context, permission):
         return self.effective_principals(None)
 
-class DummyTemplateRenderer:
+class DummyTemplateRenderer(object):
     """
     An instance of this class is returned from
     :func:`repoze.bfg.testing.registerTemplateRenderer`.  It has a
@@ -412,14 +411,25 @@ class DummyTemplateRenderer:
 
     def __init__(self, string_response=''):
         self._received = {}
-        self.string_response = string_response
-        
+        self._string_response = string_response
+        self._implementation = MockTemplate(string_response)
+
+    # For in-the-wild test code that doesn't create its own renderer,
+    # but mutates our internals instead.  When all you read is the
+    # source code, *everything* is an API!
+    def _get_string_response(self):
+        return self._string_response
+    def _set_string_response(self, response):
+        self._string_response = response
+        self._implementation.response = response
+    string_response = property(_get_string_response, _set_string_response)
+
     def implementation(self):
-        def callit(**kw):
-            return self(kw)
-        return callit
+        return self._implementation
     
     def __call__(self, kw, system=None):
+        if system:
+            self._received.update(system)
         self._received.update(kw)
         return self.string_response
 
@@ -427,13 +437,15 @@ class DummyTemplateRenderer:
         """ Backwards compatibility """
         val = self._received.get(k, _marker)
         if val is _marker:
-            raise AttributeError(k)
+            val = self._implementation._received.get(k, _marker)
+            if val is _marker:
+                raise AttributeError(k)
         return val
 
     def assert_(self, **kw):
         """ Accept an arbitrary set of assertion key/value pairs.  For
         each assertion key/value pair assert that the renderer
-        (eg. :func:`repoze.bfg.chameleon_zpt.render_template_to_response`)
+        (eg. :func:`repoze.bfg.renderer.render_to_response`)
         received the key with a value that equals the asserted
         value. If the renderer did not receive the key at all, or the
         value received by the renderer doesn't match the assertion
@@ -441,8 +453,11 @@ class DummyTemplateRenderer:
         for k, v in kw.items():
             myval = self._received.get(k, _marker)
             if myval is _marker:
-                raise AssertionError(
-                    'A value for key "%s" was not passed to the renderer' % k)
+                myval = self._implementation._received.get(k, _marker)
+                if myval is _marker:
+                    raise AssertionError(
+                        'A value for key "%s" was not passed to the renderer'
+                        % k)
                     
             if myval != v:
                 raise AssertionError(
@@ -533,7 +548,7 @@ class DummyModel:
             inst.__parent__ = __parent__
         return inst
 
-class DummyRequest:
+class DummyRequest(object):
     """ A dummy request object (imitates a :term:`request` object).
     
     The ``params``, ``environ``, ``headers``, ``path``, and
@@ -675,6 +690,24 @@ def setUp(registry=None, request=None, hook_zca=True):
     if registry is None:
         registry = Registry('testing')
     config = Configurator(registry=registry)
+    if hasattr(registry, 'registerUtility'):
+        # Sometimes nose calls us with a non-registry object because
+        # it thinks this function is module test setup.  Likewise,
+        # someone may be passing us an esoteric "dummy" registry, and
+        # the below won't succeed if it doesn't have a registerUtility
+        # method.
+        from repoze.bfg.configuration import DEFAULT_RENDERERS
+        for name, renderer in DEFAULT_RENDERERS:
+            # Cause the default renderers to be registered because
+            # in-the-wild test code relies on being able to call
+            # e.g. ``repoze.bfg.chameleon_zpt.render_template``
+            # without registering a .pt renderer, expecting the "real"
+            # template to be rendered.  This is a holdover from when
+            # individual template system renderers weren't indirected
+            # by the ``repoze.bfg.renderers`` machinery, and
+            # ``render_template`` and friends went behind the back of
+            # any existing renderer factory lookup system.
+            config.add_renderer(name, renderer)
     hook_zca and config.hook_zca()
     config.begin(request=request)
     return config
@@ -732,3 +765,48 @@ def cleanUp(*arg, **kw):
     extensive production usage, it will never be removed."""
     return setUp(*arg, **kw)
 
+class DummyRendererFactory(object):
+    """ Registered by
+    ``repoze.bfg.configuration.Configurator.testing_add_template`` as
+    a dummy renderer factory.  The indecision about what to use as a
+    key (a spec vs. a relative name) is caused by test suites in the
+    wild believing they can register either.  The ``factory`` argument
+    passed to this constructor is usually the *real* template renderer
+    factory, found when ``testing_add_renderer`` is called."""
+    def __init__(self, name, factory):
+        self.name = name
+        self.factory = factory # the "real" renderer factory reg'd previously
+        self.renderers = {}
+
+    def add(self, spec, renderer):
+        self.renderers[spec] = renderer
+        if ':' in spec:
+            package, relative = spec.split(':', 1)
+            self.renderers[relative] = renderer
+
+    def __call__(self, spec):
+        renderer = self.renderers.get(spec)
+        if renderer is None:
+            if ':' in spec:
+                package, relative = spec.split(':', 1)
+                renderer = self.renderers.get(relative)
+            if renderer is None:
+                if self.factory:
+                    renderer = self.factory(spec)
+                else:
+                    raise KeyError('No testing renderer registered for %r' %
+                                   spec)
+        return renderer
+            
+        
+class MockTemplate(object):
+    def __init__(self, response):
+        self._received = {}
+        self.response = response
+    def __getattr__(self, attrname):
+        return self
+    def __getitem__(self, attrname):
+        return self
+    def __call__(self, *arg, **kw):
+        self._received.update(kw)
+        return self.response

@@ -4,7 +4,6 @@ import sys
 import threading
 import inspect
 
-from webob import Response
 import venusian
 
 from translationstring import ChameleonTranslate
@@ -26,16 +25,15 @@ from repoze.bfg.interfaces import ILocaleNegotiator
 from repoze.bfg.interfaces import IMultiView
 from repoze.bfg.interfaces import IPackageOverrides
 from repoze.bfg.interfaces import IRendererFactory
+from repoze.bfg.interfaces import IRendererGlobalsFactory
 from repoze.bfg.interfaces import IRequest
 from repoze.bfg.interfaces import IRequestFactory
-from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRootFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import ISecuredView
 from repoze.bfg.interfaces import ISettings
 from repoze.bfg.interfaces import IStaticURLInfo
-from repoze.bfg.interfaces import ITemplateRenderer
 from repoze.bfg.interfaces import ITranslationDirectories
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
@@ -44,6 +42,7 @@ from repoze.bfg.interfaces import IViewClassifier
 from repoze.bfg import chameleon_text
 from repoze.bfg import chameleon_zpt
 from repoze.bfg import renderers
+from repoze.bfg.renderers import _render_to_response
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.compat import all
 from repoze.bfg.compat import md5
@@ -91,7 +90,8 @@ class Configurator(object):
     The Configurator accepts a number of arguments: ``registry``,
     ``package``, ``settings``, ``root_factory``,
     ``authentication_policy``, ``authorization_policy``, ``renderers``
-    ``debug_logger``, ``locale_negotiator``, and ``request_factory``.
+    ``debug_logger``, ``locale_negotiator``, ``request_factory``, and
+    ``renderer_globals_factory``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
     must be an instance of the :class:`repoze.bfg.registry.Registry`
@@ -118,7 +118,8 @@ class Configurator(object):
     If the ``settings`` argument is passed, it should be a Python
     dictionary representing the deployment settings for this
     application.  These are later retrievable using the
-    :func:`repoze.bfg.settings.get_settings` API.
+    :meth:`repoze.bfg.configuration.Configurator.get_settings` and
+    :func:`repoze.bfg.settings.get_settings` APIs.
 
     If the ``root_factory`` argument is passed, it should be an object
     representing the default :term:`root factory` for your
@@ -150,28 +151,21 @@ class Configurator(object):
     :term:`locale negotiator` implementation.  See
     :ref:`custom_locale_negotiator`.
 
-    If ``request_factory`` is passed, it should be an object that implements
-    the same methods and attributes as the :class:`repoze.bfg.request.Request`
-    class (particularly ``__call__`` and ``blank``).  This will be the
-    factory used by the :mod:`repoze.bfg` router to create all request
-    objects.  If this attribute is ``None``,
-    the :class:`repoze.bfg.request.Request` class will be used as the
-    request factory.
-
-    .. note:: The
-       :meth:`repoze.bfg.configuration.Configurator.set_request_factory`
-       method can be used to achieve the same purpose as passing
-       ``request_factory``to the Configurator constructor any time after the
-       configurator has been constructed.
     """
     manager = manager # for testing injection
     venusian = venusian # for testing injection
-    def __init__(self, registry=None, package=None, settings=None,
-                 root_factory=None, authentication_policy=None,
-                 authorization_policy=None, renderers=DEFAULT_RENDERERS,
+    def __init__(self,
+                 registry=None,
+                 package=None,
+                 settings=None,
+                 root_factory=None,
+                 authentication_policy=None,
+                 authorization_policy=None,
+                 renderers=DEFAULT_RENDERERS,
                  debug_logger=None,
                  locale_negotiator=None,
-                 request_factory=None):
+                 request_factory=None,
+                 renderer_globals_factory=None):
         self.package = package or caller_package()
         self.registry = registry
         if registry is None:
@@ -185,7 +179,9 @@ class Configurator(object):
                 renderers=renderers,
                 debug_logger=debug_logger,
                 locale_negotiator=locale_negotiator,
-                request_factory=request_factory)
+                request_factory=request_factory,
+                renderer_globals_factory=renderer_globals_factory
+                )
 
     def _set_settings(self, mapping):
         settings = Settings(mapping or {})
@@ -200,6 +196,17 @@ class Configurator(object):
             factory = DefaultRootFactory
         self.registry.registerUtility(factory, IRootFactory)
         self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
+
+    def _renderer_factory_from_name(self, path_or_spec):
+        if '.' in path_or_spec:
+            name = os.path.splitext(path_or_spec)[1]
+            spec = self._make_spec(path_or_spec)
+        else:
+            name = path_or_spec
+            spec = path_or_spec
+
+        factory = self.registry.queryUtility(IRendererFactory, name=name)
+        return name, spec, factory
         
     def _renderer_from_name(self, path_or_spec):
         if path_or_spec is None:
@@ -209,16 +216,11 @@ class Configurator(object):
                 return factory(path_or_spec)
             return None
 
-        if '.' in path_or_spec:
-            name = os.path.splitext(path_or_spec)[1]
-            spec = self._make_spec(path_or_spec)
-        else:
-            name = path_or_spec
-            spec = path_or_spec
-
-        factory = self.registry.queryUtility(IRendererFactory, name=name)
+        name, spec, factory = self._renderer_factory_from_name(path_or_spec)
         if factory is None:
-            raise ValueError('No renderer for renderer name %r' % name)
+            raise ValueError(
+                'No factory for renderer named %r when looking up %s' %
+                (name, spec))
         return factory(spec)
 
     def _set_authentication_policy(self, policy, _info=u''):
@@ -372,7 +374,8 @@ class Configurator(object):
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
                        renderers=DEFAULT_RENDERERS, debug_logger=None,
-                       locale_negotiator=None, request_factory=None):
+                       locale_negotiator=None, request_factory=None,
+                       renderer_globals_factory=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
@@ -387,9 +390,10 @@ class Configurator(object):
         initialization.
 
         ``setup_registry`` configures settings, a root factory,
-        security policies, renderers, a debug logger, and a locale
-        negotiator using the configurator's current registry, as per
-        the descriptions in the Configurator constructor."""
+        security policies, renderers, a debug logger, a locale
+        negotiator, and various other settings using the
+        configurator's current registry, as per the descriptions in
+        the Configurator constructor."""
         self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)
@@ -410,6 +414,8 @@ class Configurator(object):
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)
         if request_factory:
             self.set_request_factory(request_factory)
+        if renderer_globals_factory:
+            self.set_renderer_globals_factory(renderer_globals_factory)
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -477,7 +483,8 @@ class Configurator(object):
         Configurator constructor with one or more 'setting' key/value
         pairs.  A setting is a single key/value pair in the
         dictionary-ish object returned from the API
-        :func:`repoze.bfg.settings.get_settings`.
+        :func:`repoze.bfg.settings.get_settings` and
+        :meth:`repoze.bfg.configuration.Configurator.get_settings`.
 
         You may pass a dictionary::
 
@@ -487,9 +494,10 @@ class Configurator(object):
     
            config.add_settings(external_uri='http://example.com')
 
-        This function is useful when you need to test code that
-        calls the :func:`repoze.bfg.settings.get_settings` API and which
-        uses return values from that API.
+        This function is useful when you need to test code that calls
+        the :func:`repoze.bfg.settings.get_settings` API (or the
+        :meth:`repoze.bfg.configuration.Configurator.get_settings`
+        API) and which uses return values from that API.
 
         .. note:: This method is new as of :mod:`repoze.bfg` 1.2.
         """
@@ -500,6 +508,21 @@ class Configurator(object):
             utility = self._set_settings(settings)
         utility.update(settings)
         utility.update(kw)
+
+    def get_settings(self):
+        """
+        Return a 'settings' object for the current application.  A
+        'settings' object is a dictionary-like object that contains
+        key/value pairs based on the dictionary passed as the ``settings``
+        argument to the :class:`repoze.bfg.configuration.Configurator`
+        constructor or the :func:`repoze.bfg.router.make_app` API.
+
+        .. note:: For backwards compatibility, dictionary keys can also be
+           looked up as attributes of the settings object.
+
+        .. note:: the :class:`repoze.bfg.settings.get_settings` function
+           performs the same duty."""
+        return self.registry.queryUtility(ISettings)
 
     def make_wsgi_app(self):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
@@ -1468,6 +1491,21 @@ class Configurator(object):
         """
         self.registry.registerUtility(factory, IRequestFactory)
 
+    def set_renderer_globals_factory(self, factory):
+        """ The object passed as ``factory`` will be used by the
+        :mod:`repoze.bfg` rendering machinery as a renderers global
+        factory (see :ref:`adding_renderer_globals`).  The factory
+        must return a dictionary of items that will be merged intto
+        the *system* dictionary passed in to every renderer used by
+        the application.
+
+        .. note:: Using the :meth:``renderer_globals_factory``
+           argument to the
+           :class:`repoze.bfg.configuration.Configurator` constructor
+           can be used to achieve the same purpose.
+        """
+        self.registry.registerUtility(factory, IRendererGlobalsFactory)
+
     def set_locale_negotiator(self, negotiator):
         """
         Set the :term:`locale negotiator` for this application.  The
@@ -1479,6 +1517,10 @@ class Configurator(object):
         more information.
 
         .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
+
+        .. note:: Using the :meth:``locale_negotiator`` argument to
+           the :class:`repoze.bfg.configuration.Configurator`
+           constructor can be used to achieve the same purpose.
         """
         self.registry.registerUtility(negotiator, ILocaleNegotiator)
 
@@ -1712,25 +1754,43 @@ class Configurator(object):
         self.add_subscriber(subscriber, event_iface)
         return L
 
-    def testing_add_template(self, path, renderer=None):
-        """Unit/integration testing helper: register a template
-        renderer at ``path`` (usually a relative filename ala
-        ``templates/foo.pt``) and return the renderer object.  If the
-        ``renderer`` argument is None, a 'dummy' renderer will be
-        used.  This function is useful when testing code that calls
-        the
-        :func:`repoze.bfg.chameleon_zpt.render_template_to_response`
-        function or
-        :func:`repoze.bfg.chameleon_text.render_template_to_response`
-        function or any other ``render_template*`` API of any built-in
-        templating system (see :mod:`repoze.bfg.chameleon_zpt` and
-        :mod:`repoze.bfg.chameleon_text`).
+    def testing_add_renderer(self, path, renderer=None):
+        """Unit/integration testing helper: register a renderer at
+        ``path`` (usually a relative filename ala ``templates/foo.pt``
+        or a resource specification) and return the renderer object.
+        If the ``renderer`` argument is None, a 'dummy' renderer will
+        be used.  This function is useful when testing code that calls
+        the :func:`repoze.bfg.renderers.render` function or
+        :func:`repoze.bfg.renderers.render_to_response` function or
+        any other ``render_*`` or ``get_*`` API of the
+        :mod:`repoze.bfg.renderers` module.
+
+        Note that calling this method for with a ``path`` argument
+        representing a renderer factory type (e.g. for ``foo.pt``
+        usually implies the ``chameleon_zpt`` renderer factory)
+        clobbers any existing renderer factory registered for that
+        type.
+
+        .. note:: This method is also available under the alias
+           ``testing_add_template`` (an older name for it).
+
+        .. note:: This method is new in :mod:`repoze.bfg` 1.3 (the
+           method named ``testing_add_template`` had the same signature
+           and purpose in previous releases)..
         """
+        from repoze.bfg.testing import DummyRendererFactory
+        name, spec, factory = self._renderer_factory_from_name(path)
+        if factory is None or not isinstance(factory, DummyRendererFactory):
+            factory = DummyRendererFactory(name, factory)
+            self.registry.registerUtility(factory, IRendererFactory, name=name)
+
         from repoze.bfg.testing import DummyTemplateRenderer
         if renderer is None:
             renderer = DummyTemplateRenderer()
-        self.registry.registerUtility(renderer, ITemplateRenderer, path)
+        factory.add(spec, renderer)
         return renderer
+
+    testing_add_template = testing_add_renderer
 
 def _make_predicates(xhr=None, request_method=None, path_info=None,
                      request_param=None, header=None, accept=None,
@@ -1996,40 +2056,6 @@ def decorate_view(wrapped_view, original_view):
         pass
     return True
 
-def rendered_response(renderer, response, view, context, request,
-                      renderer_name):
-    if ( hasattr(response, 'app_iter') and hasattr(response, 'headerlist')
-         and hasattr(response, 'status') ):
-        return response
-    result = renderer(response, {'view':view, 'renderer_name':renderer_name,
-                                 'context':context, 'request':request})
-    try:
-        registry = request.registry
-    except AttributeError:
-        registry = get_current_registry()
-    response_factory = registry.queryUtility(IResponseFactory,
-                                             default=Response)
-    response = response_factory(result)
-    if request is not None: # in tests, it may be None
-        attrs = request.__dict__
-        content_type = attrs.get('response_content_type', None)
-        if content_type is not None:
-            response.content_type = content_type
-        headerlist = attrs.get('response_headerlist', None)
-        if headerlist is not None:
-            for k, v in headerlist:
-                response.headers.add(k, v)
-        status = attrs.get('response_status', None)
-        if status is not None:
-            response.status = status
-        charset = attrs.get('response_charset', None)
-        if charset is not None:
-            response.charset = charset
-        cache_for = attrs.get('response_cache_for', None)
-        if cache_for is not None:
-            response.cache_expires = cache_for
-    return response
-
 def requestonly(class_or_callable, attr=None):
     """ Return true of the class or callable accepts only a request argument,
     as opposed to something that accepts context, request """
@@ -2073,6 +2099,12 @@ def requestonly(class_or_callable, attr=None):
 
     return False
 
+def is_response(ob):
+    if ( hasattr(ob, 'app_iter') and hasattr(ob, 'headerlist') and
+         hasattr(ob, 'status') ):
+        return True
+    return False
+
 def _map_view(view, attr=None, renderer=None, renderer_name=None):
     wrapped_view = view
 
@@ -2093,10 +2125,15 @@ def _map_view(view, attr=None, renderer=None, renderer_name=None):
                 else:
                     response = getattr(inst, attr)()
                 if renderer is not None:
-                    response = rendered_response(renderer, 
-                                                 response, inst,
-                                                 context, request,
-                                                 renderer_name)
+                    if not is_response(response):
+                        system = {'view':inst, 'renderer_name':renderer_name,
+                                  'context':context, 'request':request}
+                        response = _render_to_response(renderer_name,
+                                                       request,
+                                                       response,
+                                                       system,
+                                                       renderer,
+                                                       None)
                 return response
             wrapped_view = _bfg_class_requestonly_view
         else:
@@ -2108,10 +2145,15 @@ def _map_view(view, attr=None, renderer=None, renderer_name=None):
                 else:
                     response = getattr(inst, attr)()
                 if renderer is not None:
-                    response = rendered_response(renderer, 
-                                                 response, inst,
-                                                 context, request,
-                                                 renderer_name)
+                    if not is_response(response):
+                        system = {'view':inst, 'renderer_name':renderer_name,
+                                  'context':context, 'request':request}
+                        response = _render_to_response(renderer_name,
+                                                       request,
+                                                       response,
+                                                       system,
+                                                       renderer,
+                                                       None)
                 return response
             wrapped_view = _bfg_class_view
 
@@ -2125,10 +2167,15 @@ def _map_view(view, attr=None, renderer=None, renderer_name=None):
                 response = getattr(view, attr)(request)
 
             if renderer is not None:
-                response = rendered_response(renderer,
-                                             response, view,
-                                             context, request,
-                                             renderer_name)
+                if not is_response(response):
+                    system = {'view':view, 'renderer_name':renderer_name,
+                              'context':context, 'request':request}
+                    response = _render_to_response(renderer_name,
+                                                   request,
+                                                   response,
+                                                   system,
+                                                   renderer,
+                                                   None)
             return response
         wrapped_view = _bfg_requestonly_view
 
@@ -2136,20 +2183,30 @@ def _map_view(view, attr=None, renderer=None, renderer_name=None):
         def _bfg_attr_view(context, request):
             response = getattr(view, attr)(context, request)
             if renderer is not None:
-                response = rendered_response(renderer, 
-                                             response, view,
-                                             context, request,
-                                             renderer_name)
+                if not is_response(response):
+                    system = {'view':view, 'renderer_name':renderer_name,
+                              'context':context, 'request':request}
+                    response = _render_to_response(renderer_name,
+                                                   request,
+                                                   response,
+                                                   system,
+                                                   renderer,
+                                                   None)
             return response
         wrapped_view = _bfg_attr_view
 
     elif renderer is not None:
         def _rendered_view(context, request):
             response = view(context, request)
-            response = rendered_response(renderer, 
-                                         response, view,
-                                         context, request,
-                                         renderer_name)
+            if not is_response(response):
+                system = {'view':view, 'renderer_name':renderer_name,
+                              'context':context, 'request':request}
+                response = _render_to_response(renderer_name,
+                                               request,
+                                               response,
+                                               system,
+                                               renderer,
+                                               None)
             return response
         wrapped_view = _rendered_view
 

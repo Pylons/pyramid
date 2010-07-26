@@ -71,6 +71,10 @@ def get_settings():
 
     .. note:: For backwards compatibility, dictionary keys can also be
        looked up as attributes of the settings object.
+
+    .. note:: the
+       :class:`repoze.bfg.configuration.Configurator.get_settings` method
+       performs the same duty.
     """
     reg = get_current_registry()
     return reg.queryUtility(ISettings)

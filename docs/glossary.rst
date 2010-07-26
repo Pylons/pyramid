@@ -756,3 +756,8 @@ Glossary
      cultural context.  Often shortened to "l10" (because the word
      "localization" is L, 10 letters, then N).  See also:
      :term:`Internationalization`.
+
+   renderer globals
+      Values injected as names into a renderer based on application
+      policy.  See :ref:`adding_renderer_globals` for more
+      information.
