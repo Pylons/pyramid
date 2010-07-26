@@ -49,7 +49,7 @@ Features
   used by the ``repoze.bfg`` router to create all request objects.
 
 - The ``Configurator`` constructor takes an additional argument:
-  ``request_factory`.  If used, this argument will set the factory
+  ``request_factory``.  If used, this argument will set the factory
   used by the ``repoze.bfg`` router to create all request objects.
 
 - A new method of the ``Configurator`` exists:
@@ -74,7 +74,7 @@ Features
   produce a rendering or renderer.  Because these APIs provide a
   central API for all rendering, they now form the preferred way to
   perform imperative template rendering.  Using functions named
-  ``render_*` from modules such as ``repoze.bfg.chameleon_zpt`` and
+  ``render_*`` from modules such as ``repoze.bfg.chameleon_zpt`` and
   ``repoze.bfg.chameleon_text`` is now discouraged (although not
   deprecated).  The code the backing older templating-system-specific
   APIs now calls into the newer ``repoze.bfg.renderer`` code.
