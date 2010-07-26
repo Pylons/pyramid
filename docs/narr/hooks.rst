@@ -402,7 +402,7 @@ Adding Renderer Globals
 Whenever :mod:`repoze.bfg` handles a request to perform a rendering
 (after a view with a ``renderer=`` configuration attribute is invoked,
 or when the any of the methods beginning with ``render`` within the
-:mod:`repoze.bfg.renderers` module are called, *renderer globals* can
+:mod:`repoze.bfg.renderers` module are called), *renderer globals* can
 be injected into the *system* values sent to the renderer.  By
 default, no renderer globals are injected, and the "bare" system
 values (such as ``request``, ``context``, and ``renderer_name``) are
@@ -424,7 +424,8 @@ argument to the constructor of the :term:`configurator`.
 Such a callback must accept a single positional argument (notionally
 named ``system``) which will contain the original system values.  It
 must return a dictionary of values that will be merged into the system
-dictionary.
+dictionary.  See :ref:`renderer_system_values` for discription of the
+values present in the system dictionary.
 
 A renderer globals factory can alternately be registered via ZCML as a
 through the use of the ZCML ``utility`` directive.  In the below, we
