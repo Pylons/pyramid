@@ -1510,8 +1510,9 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_route_defaults(self):
         config = self._makeOne()
-        config.add_route('name', 'path')
+        route = config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'path')
+        self.assertEqual(route.name, 'name')
 
     def test_add_route_with_xhr(self):
         config = self._makeOne()

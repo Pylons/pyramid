@@ -1285,7 +1285,7 @@ class Configurator(object):
         if mapper is None:
             mapper = RoutesMapper()
             self.registry.registerUtility(mapper, IRoutesMapper)
-        mapper.connect(path, name, factory, predicates=predicates)
+        return mapper.connect(path, name, factory, predicates=predicates)
 
     def scan(self, package=None, categories=None, _info=u''):
         """ Scan a Python package and any of its subpackages for
