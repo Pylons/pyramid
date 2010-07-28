@@ -32,6 +32,9 @@ Documentation
 - Added ``repoze.bfg.events.subscriber`` API documentation to
   ``repoze.bfg.events`` API docs.
 
+- Added a section named "Zope 3 Enforces 'TTW' Authorization Checks By
+  Default; BFG Does Not" to the "Design Defense" chapter.
+
 1.3a6 (2010-07-25)
 ==================
 
