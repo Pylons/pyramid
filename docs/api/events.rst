@@ -5,11 +5,19 @@
 
 .. automodule:: repoze.bfg.events
 
-  .. autoclass:: NewRequest
+Functions
+~~~~~~~~~
 
-  .. autoclass:: NewResponse
+.. autofunction:: subscriber
 
-  .. autoclass:: WSGIApplicationCreatedEvent
+Event Types
+~~~~~~~~~~~
+
+.. autoclass:: NewRequest
+
+.. autoclass:: NewResponse
+
+.. autoclass:: WSGIApplicationCreatedEvent
 
 See :ref:`events_chapter` for more information about how to register
 code which subscribes to these events.

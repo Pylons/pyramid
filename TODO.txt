@@ -11,14 +11,17 @@
 
 - Change docs about creating a venusian decorator to not use ZCA.
 
-- Add a ``susbcriber`` decorator and docs.
-
 - ``decorator=`` parameter to bfg_view.
 
 - Try to better explain the relationship between a renderer and a
   template in the templates chapter and elsewhere.  Scan the
   documentation for reference to a renderer as *only* view
   configuration (it's a larger concept now).
+
+- Create a ``render_view`` that works by using config.derive_view
+  against an existing view instead of querying the registry.
+
+- Create a function which performs a recursive request.
 
 - Subscriber decorator.
 

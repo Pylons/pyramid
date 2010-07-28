@@ -34,8 +34,8 @@ The mere existence of a subscriber function, however, is not
 sufficient to arrange for it to be called.  To arrange for the
 subscriber to be called, you'll need to use the
 :meth:`repoze.bfg.configurator.Configurator.add_subscriber` method to
-register the subscriber imperatively, or you'll need to use ZCML for
-the same purpose:
+register the subscriber imperatively, or via a decorator, or you'll
+need to use ZCML for the same purpose:
 
 .. topic:: Configuring an Event Listener Imperatively
 
@@ -59,6 +59,44 @@ the same purpose:
    The first argument to
    :meth:`repoze.bfg.configuration.Configurator.add_subscriber` is the
    subscriber function; the second argument is the event type.
+
+.. topic:: Configuring an Event Listener Through ZCML
+
+   You can configure an event listener by modifying your application's
+   ``configure.zcml``.  Here's an example of a bit of XML you can add
+   to the ``configure.zcml`` file which registers the above
+   ``mysubscriber`` function, which we assume lives in a
+   ``subscribers.py`` module within your application:
+
+   .. code-block:: xml
+      :linenos:
+
+      <subscriber
+         for="repoze.bfg.interfaces.INewRequest"
+         handler=".subscribers.mysubscriber"
+       />
+
+   See also :ref:`subscriber_directive`.
+
+.. topic:: Configuring an Event Listener Using a Decorator
+
+   You can configure a subscriber function to be called for some event
+   type via the :func:`repoze.bfg.events.subscriber` function.
+
+   .. code-block:: python
+      :linenos:
+
+      from repoze.bfg.interfaces import INewRequest
+      from repoze.bfg.events import subscriber
+
+      @subscriber(INewRequest)
+      def mysubscriber(event):
+          event.request.foo = 1
+
+   When the :func:`repoze.bfg.subscriber` decorator is used a
+   :term:`scan` must be performed against the package containing the
+   decorated function for the decorator to have any effect.  See
+   :func:`repoze.bfg.subscriber` for more information.
 
 .. topic:: Configuring an Event Listener Through ZCML
 

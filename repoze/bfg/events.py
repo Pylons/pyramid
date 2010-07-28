@@ -1,9 +1,73 @@
+import venusian
+
 from zope.interface import implements
 
 from repoze.bfg.interfaces import IAfterTraversal
 from repoze.bfg.interfaces import INewRequest
 from repoze.bfg.interfaces import INewResponse
 from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+
+class subscriber(object):
+    """ Decorator activated via a :term:`scan` which treats the
+    function being decorated as an event subscriber for the set of
+    interfaces passed as ``*ifaces`` to the decorator constructor.
+
+    For example:
+
+    .. code-block:: python
+    
+       from repoze.bfg.interfaces import INewRequest
+       from repoze.bfg.events import subscriber
+
+       @subscriber(INewRequest)
+       def mysubscriber(event):
+           event.request.foo = 1
+
+    More than one event type can be passed as a construtor argument:
+        
+    .. code-block:: python
+    
+       from repoze.bfg.interfaces import INewRequest
+       from repoze.bfg.events import subscriber
+
+       @subscriber(INewRequest, INewResponse)
+       def mysubscriber(event):
+           print event
+
+    When the ``subscriber`` decorator is used without passing an arguments,
+    the function it decorates is called for every event sent:
+
+    .. code-block:: python
+    
+       from repoze.bfg.interfaces import INewRequest
+       from repoze.bfg.events import subscriber
+
+       @subscriber()
+       def mysubscriber(event):
+           print event
+
+    This method will have no effect until a :term:`scan` is performed
+    against the package or module which contains it, ala:
+
+    .. code-block:: python
+    
+       from repoze.bfg.configuration import Configurator
+       config = Configurator()
+       config.scan('somepackage_containing_subscribers')
+
+    """
+    venusian = venusian # for unit testing
+
+    def __init__(self, *ifaces):
+        self.ifaces = ifaces
+
+    def register(self, scanner, name, wrapped):
+        config = scanner.config
+        config.add_subscriber(wrapped, self.ifaces)
+
+    def __call__(self, wrapped):
+        self.venusian.attach(wrapped, self.register, category='bfg')
+        return wrapped
 
 class NewRequest(object):
     """ An instance of this class is emitted as an :term:`event`

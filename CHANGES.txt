@@ -7,6 +7,12 @@ Features
 - The ``repoze.bfg.configuration.Configurator.add_route`` API now
   returns the route object that was added.
 
+- A ``repoze.bfg.events.subscriber`` decorator was added.  This
+  decorator decorates module-scope functions, which are then treated
+  as event listeners after a scan() is performed.  See the Events
+  narrative documentation chapter and the ``repoze.bfg.events`` module
+  documentation for more information.
+
 Bug Fixes
 ---------
 
@@ -16,6 +22,15 @@ Bug Fixes
   ``custom_predicate`` argument to ``add_view`` was lost.  Symptom:
   wrong view matches when using URL dispatch and custom view
   predicates together.
+
+Documentation
+--------------
+
+- Added description of the ``repoze.bfg.events.subscriber`` decorator
+  to the Events narrative chapter.
+
+- Added ``repoze.bfg.events.subscriber`` API documentation to
+  ``repoze.bfg.events`` API docs.
 
 1.3a6 (2010-07-25)
 ==================

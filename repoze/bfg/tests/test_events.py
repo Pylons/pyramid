@@ -92,6 +92,60 @@ class AfterTraversalEventTests(unittest.TestCase):
         inst = self._makeOne(request)
         self.assertEqual(inst.request, request)
 
+class TestSubscriber(unittest.TestCase):
+    def setUp(self):
+        registry = DummyRegistry()
+        from repoze.bfg.configuration import Configurator
+        self.config = Configurator(registry)
+        self.config.begin()
+
+    def tearDown(self):
+        self.config.end()
+
+    def _makeOne(self, *ifaces):
+        from repoze.bfg.events import subscriber
+        return subscriber(*ifaces)
+
+    def test_register(self):
+        from zope.interface import Interface
+        class IFoo(Interface): pass
+        class IBar(Interface): pass
+        dec = self._makeOne(IFoo, IBar)
+        def foo(): pass
+        config = DummyConfigurator()
+        scanner = Dummy()
+        scanner.config = config
+        dec.register(scanner, None, foo)
+        self.assertEqual(config.subscribed, [(foo, (IFoo, IBar))])
+
+    def test___call__(self):
+        dec = self._makeOne()
+        dummy_venusian = DummyVenusian()
+        dec.venusian = dummy_venusian
+        def foo(): pass
+        dec(foo)
+        self.assertEqual(dummy_venusian.attached, [(foo, dec.register, 'bfg')])
+
+class DummyConfigurator(object):
+    def __init__(self):
+        self.subscribed = []
+
+    def add_subscriber(self, wrapped, ifaces):
+        self.subscribed.append((wrapped, ifaces))
+
+class DummyRegistry(object):
+    pass
+        
+class DummyVenusian(object):
+    def __init__(self):
+        self.attached = []
+
+    def attach(self, wrapped, fn, category=None):
+        self.attached.append((wrapped, fn, category))
+
+class Dummy:
+    pass
+        
 class DummyRequest:
     pass
 
