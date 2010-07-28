@@ -1165,34 +1165,34 @@ access.  I like this, because it means:
 Defense
 ~~~~~~~
 
-:mod:`repoze.bfg` was developed by folks familiar with Zope2, which
-has a "through the web" security model.  The TTW security model which
-was the precursor to Zope 3's security proxies.  Over time, as the
-:mod:`repoze.bfg` developers (working in Zope2) created such sites, we
-found authorization checks during code interpretation extremely useful
-in a minority of projects.  But much of the time, TTW authorization
-checks usually slowed down the development velocity of projects that
-had no delegation requirements.  In particular, if we weren't allowing
-"untrusted" users to write arbitrary Python code to be executed by our
-application, the burden of "through the web" security checks proved
-too costly to justify.  We (collectively) haven't written an
-application on top of which untrusted developers are allowed to write
-code in many years, so it seemed to make sense to drop this model by
-default in a new web framework.
+:mod:`repoze.bfg` was developed by folks familiar with Zope 2, which
+has a "through the web" security model.  This "TTW" security model was
+the precursor to Zope 3's security proxies.  Over time, as the
+:mod:`repoze.bfg` developers (working in Zope 2) created such sites,
+we found authorization checks during code interpretation extremely
+useful in a minority of projects.  But much of the time, TTW
+authorization checks usually slowed down the development velocity of
+projects that had no delegation requirements.  In particular, if we
+weren't allowing "untrusted" users to write arbitrary Python code to
+be executed by our application, the burden of "through the web"
+security checks proved too costly to justify.  We (collectively)
+haven't written an application on top of which untrusted developers
+are allowed to write code in many years, so it seemed to make sense to
+drop this model by default in a new web framework.
 
 And since we tend to use the same toolkit for all web applications, it's
 just never been a concern to be able to use  the same set of
 restricted-execution code under two web different frameworks.
 
-The original author justifications for disabling security proxies by
-default notwithstanding, given that Zope 3 security proxies are
-"viral" by nature, the only requirement to use one is to make sure you
-wrap a single object in a security proxy and make sure to access that
-object normally when you want proxy security checks to happen.  It is
+Justifications for disabling security proxies by default
+notwithstanding, given that Zope 3 security proxies are "viral" by
+nature, the only requirement to use one is to make sure you wrap a
+single object in a security proxy and make sure to access that object
+normally when you want proxy security checks to happen.  It is
 possible to override the :mod:`repoze.bfg` "traverser" for a given
-application (see :ref:`changing_the_traverser`).  It is possible to
-plug in a different traverser which returns
-Zope3-security-proxy-wrapped objects for each traversed object
+application (see :ref:`changing_the_traverser`).  To get Zope3-like
+behavior, it is possible to plug in a different traverser which
+returns Zope3-security-proxy-wrapped objects for each traversed object
 (including the :term:`context` and the :term:`root`).  This would have
 the effect of creating a more Zope3-like environment without much
 effort.
