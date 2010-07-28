@@ -839,7 +839,8 @@ class Configurator(object):
                     containment=containment, attr=attr,
                     renderer=renderer, wrapper=wrapper, xhr=xhr, accept=accept,
                     header=header, path_info=path_info,
-                    custom_predicates=(), context=context, _info=u''
+                    custom_predicates=custom_predicates, context=context,
+                    _info=u''
                     )
                 view_info = deferred_views.setdefault(route_name, [])
                 view_info.append(info)

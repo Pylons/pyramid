@@ -7,7 +7,15 @@ Features
 - The ``repoze.bfg.configuration.Configurator.add_route`` API now
   returns the route object that was added.
 
+Bug Fixes
+---------
 
+- When adding a view for a route which did not yet exist ("did not yet
+  exist" meaning, temporally, a view was added with a route name for a
+  route which had not yet been added via add_route), the value of the
+  ``custom_predicate`` argument to ``add_view`` was lost.  Symptom:
+  wrong view matches when using URL dispatch and custom view
+  predicates together.
 
 1.3a6 (2010-07-25)
 ==================

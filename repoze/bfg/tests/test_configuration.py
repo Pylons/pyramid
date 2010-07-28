@@ -1219,6 +1219,17 @@ class ConfiguratorTests(unittest.TestCase):
         self.failIfEqual(wrapper, None)
         self.assertEqual(wrapper(None, None), 'OK')
 
+    def test_deferred_route_views_retains_custom_predicates(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(view=view, route_name='foo', custom_predicates=('123',))
+        self.assertEqual(len(config.registry.deferred_route_views), 1)
+        infos = config.registry.deferred_route_views['foo']
+        self.assertEqual(len(infos), 1)
+        info = infos[0]
+        self.assertEqual(info['route_name'], 'foo')
+        self.assertEqual(info['custom_predicates'], ('123',))
+
     def test_add_view_with_route_name_exception(self):
         from zope.interface import implementedBy
         from zope.component import ComponentLookupError
