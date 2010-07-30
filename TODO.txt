@@ -29,6 +29,8 @@
 
 - Ability to use configurator as a context manager.
 
+- Switch tutorials and templates to non-ZCML.
+
 - These methods of Configurator should allow the arguments it receives
   named below them to be strings:
 
