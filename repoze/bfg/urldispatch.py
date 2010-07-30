@@ -79,7 +79,7 @@ def _compile_route(route):
         name = pat.pop()
         name = name[2:]
         gen.append('/%%(%s)s' % name)
-        name = '/(?P<%s>[^/]*)' % name
+        name = '/(?P<%s>[^/]+)' % name
         rpat.append(name)
         s = pat.pop()
         if s:

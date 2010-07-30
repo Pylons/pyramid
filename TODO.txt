@@ -27,6 +27,8 @@
 
 - Debug option to print view matching decision.
 
+- Ability to use configurator as a context manager.
+
 - These methods of Configurator should allow the arguments it receives
   named below them to be strings:
 

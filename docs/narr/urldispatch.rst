@@ -258,6 +258,24 @@ It will not match the following patterns however:
    foo/1/2/        -> No match (trailing slash)
    bar/abc/def     -> First segment literal mismatch
 
+The match for a segment replacement marker in a segment will be done
+only up to the first non-alphanumeric character in the segment in the
+pattern.  So, for instance, if this route pattern was used:
+
+.. code-block:: text
+
+   foo/:name.html
+
+The literal path ``/foo/biz.html`` will match the above route pattern,
+and the match result will be ``{'name':u'biz'}``.  However, the
+literal path ``/foo/biz`` will not match, because it does not contain
+a literal ``.html`` at the end of the segment represented by
+``:name.html`` (it only contains ``biz``, not ``biz.html``).
+
+This does not mean, however, that you can use two segment replacement
+markers in the same segment.  For instance, ``/:foo:bar`` is a
+nonsensical route pattern.  It will never match anything.
+
 Note that values representing path segments matched with a
 ``:segment`` match will be url-unquoted and decoded from UTF-8 into
 Unicode within the matchdict.  So for instance, the following
@@ -294,8 +312,8 @@ matchdicts:
 
 .. code-block:: text
 
-   foo/1/2/           -> {'baz':1, 'bar':2, 'fizzle':()}
-   foo/abc/def/a/b/c  -> {'baz':abc, 'bar':def, 'fizzle':('a', 'b', 'c')}
+   foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':()}
+   foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle':('a', 'b', 'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value
 put into the matchdict is turned into a tuple of path segments

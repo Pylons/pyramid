@@ -230,9 +230,11 @@ class TestCompileRoute(unittest.TestCase):
         self.assertRaises(URLDecodeError, matcher, '/%FF%FE%8B%00')
 
 class TestCompileRouteMatchFunctional(unittest.TestCase):
-    def matches(self, pattern, path, result):
+    def matches(self, pattern, path, expected):
         from repoze.bfg.urldispatch import _compile_route
-        self.assertEqual(_compile_route(pattern)[0](path), result)
+        matcher = _compile_route(pattern)[0]
+        result = matcher(path)
+        self.assertEqual(result, expected)
 
     def generates(self, pattern, dict, result):
         from repoze.bfg.urldispatch import _compile_route
@@ -244,9 +246,12 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.matches('/', '/foo', None)
         self.matches('/foo/', '/foo', None)
         self.matches('/:x', '', None)
+        self.matches('/:x', '/', None)
+        self.matches('/abc/:def', '/abc/', None)
+        import pdb; pdb.set_trace()
+        self.matches('/abc/:def:baz', '/abc/bleep', None) # bad pattern
         self.matches('', '/', {})
         self.matches('/', '/', {})
-        self.matches('/:x', '/', {'x':''})
         self.matches('/:x', '/a', {'x':'a'})
         self.matches('zzz/:x', '/zzz/abc', {'x':'abc'})
         self.matches('zzz/:x*traverse', '/zzz/abc', {'x':'abc', 'traverse':()})
