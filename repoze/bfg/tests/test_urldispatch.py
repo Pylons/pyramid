@@ -248,7 +248,6 @@ class TestCompileRouteMatchFunctional(unittest.TestCase):
         self.matches('/:x', '', None)
         self.matches('/:x', '/', None)
         self.matches('/abc/:def', '/abc/', None)
-        import pdb; pdb.set_trace()
         self.matches('/abc/:def:baz', '/abc/bleep', None) # bad pattern
         self.matches('', '/', {})
         self.matches('/', '/', {})
