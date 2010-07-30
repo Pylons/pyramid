@@ -23,7 +23,9 @@
 
 - Create a function which performs a recursive request.
 
-- Subscriber decorator.
+- Debug option to print route matching decision.
+
+- Debug option to print view matching decision.
 
 - These methods of Configurator should allow the arguments it receives
   named below them to be strings:
