@@ -233,11 +233,14 @@ and:
 
 A path segment (an individual item between ``/`` characters in the
 path) may either be a literal string (e.g. ``foo``) *or* it may be a
-segment replacement marker (e.g. ``:foo``).  A segment replacement
-marker is in the format ``:name``, where this means "accept any
-characters up to the next slash and use this as the ``name`` matchdict
-value."  For example, the following pattern defines one literal
-segment ("foo") and two dynamic segments ("baz", and "bar"):
+segment replacement marker (e.g. ``:foo``) or a certain combination of
+both.
+
+A segment replacement marker is in the format ``:name``, where this
+means "accept any characters up to the next nonalphaunumeric character
+and use this as the ``name`` matchdict value."  For example, the
+following pattern defines one literal segment ("foo") and two dynamic
+segments ("baz", and "bar"):
 
 .. code-block:: text
 
@@ -275,6 +278,17 @@ a literal ``.html`` at the end of the segment represented by
 This does not mean, however, that you can use two segment replacement
 markers in the same segment.  For instance, ``/:foo:bar`` is a
 nonsensical route pattern.  It will never match anything.
+
+Segments must contain at least one character in order to match a
+segment replacement marker.  For example, for the URL ``/abc/``:
+
+- ``/abc/:foo`` will not match.
+
+- ``/:foo/`` will match.
+
+.. warning:: Due to a bug, the
+   must-be-one-character-to-match-segment-marker rule new to version
+   1.3.  It is untrue for older releases.
 
 Note that values representing path segments matched with a
 ``:segment`` match will be url-unquoted and decoded from UTF-8 into
