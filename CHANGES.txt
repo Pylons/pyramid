@@ -23,6 +23,24 @@ Bug Fixes
   wrong view matches when using URL dispatch and custom view
   predicates together.
 
+- Pattern matches for a ``:segment`` marker in a URL dispatch route
+  pattern now always match at least one character.  See "Backwards
+  Incompatibilities" below in this changelog.
+
+Backwards Incompatibilities
+---------------------------
+
+- A bug existed in the regular expression to do URL matching.  As an
+  example, the URL matching machinery would cause the pattern
+  ``/{foo}`` to match the root URL ``/`` resulting in a match
+  dictionary of ``{'foo':u''}`` or the pattern ``/{fud}/edit might
+  match the URL ``//edit`` resulting in a match dictionary of
+  ``{'fud':u''}``.  It was always the intent that ``:segment`` markers
+  in the pattern would need to match *at least one* character, and
+  never match the empty string.  This, however, means that in certain
+  circumstances, a routing match which your application inadvertently
+  depended upon may no longer happen.
+
 Documentation
 --------------
 
