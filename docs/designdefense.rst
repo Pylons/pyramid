@@ -1,3 +1,5 @@
+.. _design_defense:
+
 Defending BFG's Design
 ======================
 
@@ -1143,7 +1145,7 @@ Zope 3 Enforces "TTW" Authorization Checks By Default; BFG Does Not
 -------------------------------------------------------------------
 
 Challenge
-~~~~~~~~~
++++++++++
 
 :mod:`repoze.bfg` performs automatic authorization checks only at
 :term:`view` execution time.  Zope 3 wraps context objects with a
@@ -1163,7 +1165,7 @@ access.  I like this, because it means:
    :mod:`repoze.bfg` and in the Twisted-based system the same way.
 
 Defense
-~~~~~~~
++++++++
 
 :mod:`repoze.bfg` was developed by folks familiar with Zope 2, which
 has a "through the web" security model.  This "TTW" security model was
