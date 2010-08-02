@@ -3553,6 +3553,155 @@ class TestMakeApp(unittest.TestCase):
                             Configurator=DummyConfigurator)
         self.assertEqual(app.zcml_file, '2.zcml')
 
+class TestDottedNameResolver(unittest.TestCase):
+    def _makeOne(self, package=None):
+        from repoze.bfg.configuration import DottedNameResolver
+        return DottedNameResolver(package)
+
+    def config_exc(self, func, *arg, **kw):
+        from repoze.bfg.exceptions import ConfigurationError
+        try:
+            func(*arg, **kw)
+        except ConfigurationError, e:
+            return e
+        else:
+            raise AssertionError('Invalid not raised') # pragma: no cover
+
+    def test_zope_dottedname_style_resolve_absolute(self):
+        typ = self._makeOne()
+        result = typ._zope_dottedname_style(
+            'repoze.bfg.tests.test_configuration.TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+        
+    def test_zope_dottedname_style_irrresolveable_absolute(self):
+        typ = self._makeOne()
+        self.assertRaises(ImportError, typ._zope_dottedname_style,
+            'repoze.bfg.test_configuration.nonexisting_name')
+
+    def test__zope_dottedname_style_resolve_relative(self):
+        import repoze.bfg.tests
+        typ = self._makeOne(package=repoze.bfg.tests)
+        result = typ._zope_dottedname_style(
+            '.test_configuration.TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+
+    def test__zope_dottedname_style_resolve_relative_leading_dots(self):
+        import repoze.bfg.tests.test_configuration
+        typ = self._makeOne(package=repoze.bfg.tests.test_configuration)
+        result = typ._zope_dottedname_style(
+            '..test_configuration.TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+
+    def test__zope_dottedname_style_resolve_relative_is_dot(self):
+        import repoze.bfg.tests
+        typ = self._makeOne(package=repoze.bfg.tests)
+        result = typ._zope_dottedname_style('.')
+        self.assertEqual(result, repoze.bfg.tests)
+
+    def test__zope_dottedname_style_irresolveable_relative_is_dot(self):
+        typ = self._makeOne()
+        e = self.config_exc(typ._zope_dottedname_style, '.')
+        self.assertEqual(
+            e.args[0],
+            "relative name '.' irresolveable without package")
+
+    def test_zope_dottedname_style_resolve_relative_nocurrentpackage(self):
+        typ = self._makeOne()
+        e = self.config_exc(typ._zope_dottedname_style, '.whatever')
+        self.assertEqual(
+            e.args[0],
+            "relative name '.whatever' irresolveable without package")
+
+    def test_zope_dottedname_style_irrresolveable_relative(self):
+        import repoze.bfg.tests
+        typ = self._makeOne(package=repoze.bfg.tests)
+        self.assertRaises(ImportError, typ._zope_dottedname_style,
+                          '.notexisting')
+
+    def test__zope_dottedname_style_resolveable_relative(self):
+        import repoze.bfg
+        typ = self._makeOne(package=repoze.bfg)
+        result = typ._zope_dottedname_style('.tests')
+        from repoze.bfg import tests
+        self.assertEqual(result, tests)
+
+    def test__zope_dottedname_style_irresolveable_absolute(self):
+        typ = self._makeOne()
+        self.assertRaises(
+            ImportError,
+            typ._zope_dottedname_style, 'repoze.bfg.fudge.bar')
+
+    def test__zope_dottedname_style_resolveable_absolute(self):
+        typ = self._makeOne()
+        result = typ._zope_dottedname_style(
+            'repoze.bfg.tests.test_configuration.TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+
+    def test__pkg_resources_style_resolve_absolute(self):
+        typ = self._makeOne()
+        result = typ._pkg_resources_style(
+            'repoze.bfg.tests.test_configuration:TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+        
+    def test__pkg_resources_style_irrresolveable_absolute(self):
+        typ = self._makeOne()
+        self.assertRaises(ImportError, typ._pkg_resources_style,
+            'repoze.bfg.tests:nonexisting')
+
+    def test__pkg_resources_style_resolve_relative_startswith_colon(self):
+        import repoze.bfg.tests.test_configuration
+        typ = self._makeOne(package=repoze.bfg.tests.test_configuration)
+        result = typ._pkg_resources_style(':TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+
+    def test__pkg_resources_style_resolve_relative_startswith_dot(self):
+        import repoze.bfg.tests
+        typ = self._makeOne(package=repoze.bfg.tests)
+        result = typ._pkg_resources_style(
+            '.test_configuration:TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+
+    def test__pkg_resources_style_resolve_relative_is_dot(self):
+        import repoze.bfg.tests
+        typ = self._makeOne(package=repoze.bfg.tests)
+        result = typ._pkg_resources_style('.')
+        self.assertEqual(result, repoze.bfg.tests)
+        
+    def test__pkg_resources_style_resolve_relative_nocurrentpackage(self):
+        typ = self._makeOne()
+        from repoze.bfg.exceptions import ConfigurationError
+        self.assertRaises(ConfigurationError, typ._pkg_resources_style,
+                          '.whatever')
+
+    def test__pkg_resources_style_irrresolveable_relative(self):
+        import repoze.bfg
+        typ = self._makeOne(package=repoze.bfg)
+        self.assertRaises(ImportError, typ._pkg_resources_style,
+                          ':notexisting')
+
+    def test_deserialize_not_a_string(self):
+        typ = self._makeOne()
+        e = self.config_exc(typ, None)
+        self.assertEqual(e.args[0], 'None is not a string')
+
+    def test_deserialize_using_pkgresources_style(self):
+        typ = self._makeOne()
+        result = typ(
+            'repoze.bfg.tests.test_configuration:TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+
+    def test_deserialize_using_zope_dottedname_style(self):
+        typ = self._makeOne()
+        result = typ(
+            'repoze.bfg.tests.test_configuration:TestDottedNameResolver')
+        self.assertEqual(result, self.__class__)
+
+    def test_deserialize_style_raises(self):
+        typ = self._makeOne()
+        e = self.config_exc(typ, 'cant.be.found')
+        self.assertEqual(e.args[0],
+                         "The dotted name 'cant.be.found' cannot be imported")
+
 class DummyRequest:
     subpath = ()
     def __init__(self):

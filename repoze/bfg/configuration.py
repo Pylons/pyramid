@@ -2372,3 +2372,101 @@ def make_app(root_factory, package=None, filename='configure.zcml',
     config.end()
     return config.make_wsgi_app()
 
+
+class DottedNameResolver(object):
+    """ This class resolves dotted name references to 'global' Python
+    objects (objects which can be imported) to those objects.
+
+    Two dotted name styles are supported during deserialization:
+
+    - ``pkg_resources``-style dotted names where non-module attributes
+      of a module are separated from the rest of the path using a ':'
+      e.g. ``package.module:attr``.
+
+    - ``zope.dottedname``-style dotted names where non-module
+      attributes of a module are separated from the rest of the path
+      using a '.' e.g. ``package.module.attr``.
+
+    These styles can be used interchangeably.  If the serialization
+    contains a ``:`` (colon), the ``pkg_resources`` resolution
+    mechanism will be chosen, otherwise the ``zope.dottedname``
+    resolution mechanism will be chosen.
+
+    The constructor accepts a single argument named ``package`` which
+    should be a Python module or package object; it is used when
+    *relative* dotted names are supplied to the ``__call__`` method.
+    A dotted name which has a ``.`` (dot) or ``:`` (colon) as its
+    first character is treated as relative.  E.g. if ``.minidom`` is
+    supplied to ``deserialize``, and the ``package`` argument to this
+    type was passed the ``xml`` module object, the resulting import
+    would be for ``xml.minidom``.  If a relative package name is
+    supplied to ``deserialize``, and no ``package`` was supplied to
+    the constructor, an :exc:`repoze.bfg.ConfigurationError` error
+    will be raised.
+
+    When a dotted name cannot be resolved, a
+    :class:`repoze.bfg.exceptions.ConfigurationError` error is raised.
+    """
+    def __init__(self, package):
+        self.package = package
+
+    def _pkg_resources_style(self, value):
+        """ package.module:attr style """
+        import pkg_resources
+        if value.startswith('.') or value.startswith(':'):
+            if not self.package:
+                raise ConfigurationError(
+                    'relative name %r irresolveable without package' % value)
+            if value in ['.', ':']:
+                value = self.package.__name__
+            else:
+                value = self.package.__name__ + value
+        return pkg_resources.EntryPoint.parse(
+            'x=%s' % value).load(False)
+
+    def _zope_dottedname_style(self, value):
+        """ package.module.attr style """
+        module = self.package and self.package.__name__ or None
+        if value == '.':
+            if self.package is None:
+                raise ConfigurationError(
+                    'relative name %r irresolveable without package' % value)
+            name = module.split('.')
+        else:
+            name = value.split('.')
+            if not name[0]:
+                if module is None:
+                    raise ConfigurationError(
+                        'relative name %r irresolveable without '
+                        'package' % value
+                        )
+                module = module.split('.')
+                name.pop(0)
+                while not name[0]:
+                    module.pop()
+                    name.pop(0)
+                name = module + name
+
+        used = name.pop(0)
+        found = __import__(used)
+        for n in name:
+            used += '.' + n
+            try:
+                found = getattr(found, n)
+            except AttributeError:
+                __import__(used)
+                found = getattr(found, n) # pragma: no cover
+
+        return found
+
+    def __call__(self, dotted):
+        if not isinstance(dotted, basestring):
+            raise ConfigurationError('%r is not a string' % dotted)
+        try:
+            if ':' in dotted:
+                return self._pkg_resources_style(dotted)
+            else:
+                return self._zope_dottedname_style(dotted)
+        except ImportError:
+            raise ConfigurationError(
+                'The dotted name %r cannot be imported' % dotted)
