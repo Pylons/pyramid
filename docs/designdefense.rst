@@ -1501,9 +1501,9 @@ Consider the following simple `Groundhog
     app.route('/:action')
     def action():
         if action == 'add':
-           return '<html>add</html>
+           return '<html>add</html>'
         if action == 'delete':
-           return '<html>delete</html>
+           return '<html>delete</html>'
         return app.abort(404)
 
     if __name__ == '__main__':
@@ -1521,9 +1521,9 @@ rearrange the order of the function definitions in the file?
     app.route('/:action')
     def action():
         if action == 'add':
-           return '<html>add</html>
+           return '<html>add</html>'
         if action == 'delete':
-           return '<html>delete</html>
+           return '<html>delete</html>'
         return app.abort(404)
 
     app.route('/admin')
