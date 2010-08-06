@@ -1678,8 +1678,7 @@ shortcut serving API which executes the ``paste.httpserver`` WSGI
 server.  It will likely be named less attractively to indicate it is
 only a shortcut.
 
-:meth:`repoze.bfg.configuration.Configurator.begin` and
-:meth:`repoze.bfg.configuration.Configurator.end` methods
+:meth:`repoze.bfg.configuration.Configurator.begin` and :meth:`repoze.bfg.configuration.Configurator.end` methods
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 The methods :meth:`repoze.bfg.configuration.Configurator.begin` and
@@ -1734,7 +1733,6 @@ where comments take into account what we've discussed in the
        config.end()                  # bogus, but required.
        app = config.make_wsgi_app()  # explicitly WSGI
        serve(app, host='0.0.0.0')    # explicitly WSGI
-
 
 Other Challenges
 ----------------
