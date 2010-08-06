@@ -1199,6 +1199,543 @@ returns Zope3-security-proxy-wrapped objects for each traversed object
 the effect of creating a more Zope3-like environment without much
 effort.
 
+.. _microframeworks_smaller_hello_world:
+
+Microframeworks Have Smaller Hello World Programs
+-------------------------------------------------
+
+Some developers and microframework authors point out that BFG's "hello
+world" program is longer (by about five lines) than the equivalent
+program in their favorite microframework.  Guilty as charged; in a
+contest of "whose is shortest", BFG indeed loses.
+
+This loss isn't for lack of trying: BFG aims to be useful in the same
+circumstance in which microframeworks claim dominance: single-file
+applications.  But BFG doesn't sacrifice its ability to credibly
+support larger applications in order to achieve hello-world LoC parity
+with the current crop of microframeworks.  BFG's design instead tries
+to avoid some common pitfalls associated with naive declarative
+configuration schemes.
+
+.. _you_dont_own_modulescope:
+
+Application Programmers Don't Control The Module-Scope Codepath (Import-Time Side-Effects Are Evil)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Please imagine a directory structure with a set of Python files in
+it:
+
+.. code-block:: text
+
+    .
+    |-- app.py
+    |-- app2.py
+    `-- config.py
+
+The contents of ``app.py``:
+
+.. code-block:: python
+
+    from config import decorator
+    from config import L
+    import pprint
+
+    @decorator
+    def foo():
+        pass
+
+    if __name__ == '__main__':
+        import app2
+        pprint.pprint(L)
+
+The contents of ``app2.py``:
+
+.. code-block:: python
+
+    import app
+
+    @app.decorator
+    def bar():
+        pass
+
+The contents of ``config.py``:
+
+.. code-block:: python
+
+    L = []
+
+    def decorator(func):
+        L.append(func)
+        return func
+
+If we cd to the directory that holds these files and we run ``python
+app.py`` given the directory structure and code above, what happens?
+Presuably, our ``decorator`` decorator will be used twice, once by the
+decorated function ``foo`` in ``app.py`` and once by the decorated
+function ``bar`` in ``app2.py``.  Since each time the decorator is
+used, the list ``L`` in ``config.py`` is appended to, we'd expect a
+list with two elements to be printed, right?  Sadly, no:
+
+.. code-block:: bash
+
+    [chrism@thinko]$ python app.py 
+    [<function foo at 0x7f4ea41ab1b8>,
+     <function foo at 0x7f4ea41ab230>,
+     <function bar at 0x7f4ea41ab2a8>]
+
+By visual inspection, that outcome (three different functions in the
+list) seems impossible.  We only defined two functions and we
+decorated each of those functions only once, so we believe that the
+``decorator`` decorator will only run twice.  However, what we believe
+is wrong because the code at module scope in our ``app.py`` module was
+*executed twice*.  The code is executed once when the script is run as
+``__main__`` (via ``python app.py``), and then it is executed again
+when ``app2.py`` imports the same file as ``app``.
+
+What does this have to do with our comparison to microframeworks?
+Many microframeworks in the current crop (e.g. Bottle, Flask)
+encourage you to attach configuration decorators to objects defined at
+module scope.  These decorators execute arbitrarily complex
+registration code which populates a singleton registry that is a
+global defined in external Python module.  This is analogous to the
+above example: the "global registry" in the above example is the list
+``L``.
+
+Let's see what happens when we use the same pattern with the (
+`Groundhog <http://bfg.repoze.org/videos#groundhog1>`_ microframework.
+Replace the contents of ``app.py`` above with this:
+
+.. code-block:: python
+
+    from config import gh
+
+    @gh.route('/foo/')
+    def foo():
+        return 'foo'
+
+    if __name__ == '__main__':
+        import app2
+        pprint.pprint(L)
+
+Replace the contents of ``app2.py`` above with this:
+
+.. code-block:: python
+
+    import app
+
+    @app.gh.route('/bar/')
+    def bar():
+        'return bar'
+
+Replace the contents of ``config.py`` above with this:
+
+.. code-block:: python
+
+    from groundhog import Groundhog
+    gh = Groundhog('myapp', 'seekrit')
+
+How many routes will be registered within the routing table of the
+"gh" Groundhog application?  If you answered three, you are correct.
+How many would a casual reader (and any sane developer) expect to be
+registered?  If you answered two, you are correct.  Will the double
+registration be a problem?  With our fictional Groundhog framework's
+``route`` method backing this application, not really.  It will slow
+the application down a little bit, because it will need to miss twice
+for a route when it does not match.  Will it be a problem with another
+framework, another application, or another decorator?  Who knows.  You
+need to understand the application in its totality, the framework in
+its totality, and the chronology of execution to be able to predict
+what the impact of unintentional code double-execution will be.
+
+The encouragement to use decorators which perform population of an
+external registry has an unintended consequence: the application
+developer now must assert ownership of every codepath that executes
+Python module scope code. This code is presumed by the current crop of
+decorator-based microframeworks to execute once and only once; if it
+executes more than once, weird things will start to happen.  It is up
+to the application developer to maintain this invariant.
+Unfortunately, however, in reality, this is an impossible task,
+because, Python programmers *do not own the module scope codepath, and
+never will*.  Microframework programmers therefore will at some point
+then need to start reading the tea leaves about what *might* happen if
+module scope code gets executed more than once like we do in the
+previous paragraph.  This is a really pretty poor situation to find
+yourself in as an application developer: you probably didn't even know
+you signed up for the job, because the documentation offered by
+decorator-based microframeworks don't warn you about it.
+
+Python application programmers do not control the module scope
+codepath.  Anyone who tries to sell you on the idea that they do is
+simply mistaken.  Test runners that you may want to use to run your
+code's tests often perform imports of arbitrary code in strange orders
+that manifest bugs like the one demonstrated above.  API documentation
+generation tools do the same.  Some (mutant) people even think it's
+safe to use the Python ``reload`` command or delete objects from
+``sys.modules``, each of which has hilarious effects when used against
+code that has import- time side effects.  When Python programmers
+assume they can use the module-scope codepath to run arbitrary code
+(especially code which populates an external registry), and this
+assumption is challenged by reality, the application developer is
+often required to undergo a painful, meticulous debugging process to
+find the root cause of an inevitably obscure symptom.  The solution is
+often to rearrange application import ordering or move an import
+statement from module-scope into a function body.  The rationale for
+doing so can never be expressed adequnately in the checkin message
+which accompanies the fix or documented succinctly enough for the
+benefit of the rest of the development team so that the problem never
+happens again.  It will happen again next month too, especially if you
+are working on a project with other people who haven't yet
+internalized the lessons you learned while you stepped through
+module-scope code using ``pdb``.
+
+Folks who have a large investment in eager decorator-based
+configuration that populates an external data structure (such as
+microframework authors) may argue that the set of circumstances I
+outlined above is anomalous and contrived.  They will argue that it
+just will never happen.  If you never intend your application to grow
+beyond one or two or three modules, that's probably true.  However, as
+your codebase grows, and becomes spread across a greater number of
+modules, the circumstances in which module-scope code will be executed
+multiple times will become more and more likely to occur and less and
+less predictable.  It's not responsible to claim that double-execution
+of module-scope code will never happen.  It will; it's just a matter
+of luck, time, and application complexity.
+
+If microframework authors do admit that the circumstance isn't
+contrived, they might then argue that "real" damage will never happen
+as the result of the double-execution (or triple-execution, etc) of
+module scope code.  You would be wise to disbelieve this assertion.
+The potential outcomes of multiple execution are too numerous to
+predict because they involve delicate relationships between
+application and framework code as well as chronology of code
+execution.  It's literally impossible for a framework author to know
+what will happen in all circumstances ("X is executed, then Y, then X
+again.. a train leaves Chicago at 50 mph... ").  And even if given the
+gift of omniscience for some limited set of circumstances, the
+framework author almost certainly does not have the double-execution
+anomaly in mind when coding new features.  He's thinking of adding a
+feature, not protecting against problems that might be caused by the
+1% multiple execution case.  However, any 1% case may cause 50% of
+your pain on a project, so it'd be nice if it never occured.
+
+Responsible microframeworks actually offer a back-door way around the
+problem.  They allow you to disuse decorator based configuration
+entirely.  Instead of requiring you to do the following:
+
+.. code-block:: python
+
+    gh = Groundhog('myapp', 'seekrit')
+
+    @gh.route('/foo/')
+    def foo():
+        return 'foo'
+
+    if __name__ == '__main__':
+        gh.run()
+
+They allow you to disuse the decorator syntax and go
+almost-all-imperative:
+
+.. code-block:: python
+
+    def foo():
+        return 'foo'
+
+    gh = Groundhog('myapp', 'seekrit')
+
+    if __name__ == '__main__':
+        gh.add_route(foo, '/foo/')
+        gh.run()
+
+This is a generic mode of operation that is encouraged in the BFG
+documentation. Some existing microframeworks (Flask, in particular)
+allow for it as well.  None (other than BFG) *encourage* it.  If you
+never expect your application to grow beyond two or three or four or
+ten modules, it probably doesn't matter very much which mode you use.
+If your application grows large, however, imperative configuration can
+provide better predictability.
+
+.. note::
+
+  Astute readers may notice that BFG has configuration decorators too.
+  Aha!  Don't these decorators have the same problems?  No.  These
+  decorators do not populate an external Python module when they are
+  executed.  They only mutate the functions (and classes and methods)
+  they're attached to.  These mutations must later be found during a
+  "scan" process that has a predictable and structured import phase.
+  Module-localized mutation is actually the best-case circumstance for
+  double-imports; if a module only mutates itself and its contents at
+  import time, if it is imported twice, that's OK, because each
+  decorator invocation will always be mutating an independent copy of
+  the object its attached to, not a shared resource like a registry in
+  another module.  This has the effect that double-registrations will
+  never be performed.
+
+Routes (Usually) Need Relative Ordering
++++++++++++++++++++++++++++++++++++++++
+
+Consider the following simple `Groundhog
+<http://bfg.repoze.org/videos#groundhog1>`_ application:
+
+.. code-block:: python
+
+    from groundhog import Groundhog
+    app = Groundhog('myapp', 'seekrit')
+
+    app.route('/admin')
+    def admin():
+        return '<html>admin page</html>'
+
+    app.route('/:action')
+    def action():
+        if action == 'add':
+           return '<html>add</html>
+        if action == 'delete':
+           return '<html>delete</html>
+        return app.abort(404)
+
+    if __name__ == '__main__':
+        app.run()
+
+If you run this application and visit the URL ``/admin``, you will see
+"admin" page.  This is the intended result.  However, what if you
+rearrange the order of the function definitions in the file?
+
+.. code-block:: python
+
+    from groundhog import Groundhog
+    app = Groundhog('myapp', 'seekrit')
+
+    app.route('/:action')
+    def action():
+        if action == 'add':
+           return '<html>add</html>
+        if action == 'delete':
+           return '<html>delete</html>
+        return app.abort(404)
+
+    app.route('/admin')
+    def admin():
+        return '<html>admin page</html>'
+
+    if __name__ == '__main__':
+        app.run()
+
+If you run this application and visit the URL ``/admin``, you will now
+be returned a 404 error.  This is probably not what you intended.  The
+reason you see a 404 error when you rearrange function definition
+ordering is that routing declarations expressed via our
+microframework's routing decorators have an *ordering*, and that
+ordering matters.
+
+In the first case, where we achieved the expected result, we first
+added a route with the pattern ``/admin``, then we added a route with
+the pattern ``/:action`` by virtue of adding routing patterns via
+decorators at module scope.  When a request with a ``PATH_INFO`` of
+``/admin`` enters our application, the web framework loops over each
+of our application's route patterns in the order in which they were
+defined in our module.  As a result, the view associated with the
+``/admin`` routing pattern will be invoked: it matches first.  All is
+right with the world.
+
+In the first case, where we did not achieve the expected result, we
+first added a route with the pattern ``/:action``, then we added a
+route with the pattern ``/admin``.  When a request with a
+``PATH_INFO`` of ``/admin`` enters our application, the web framework
+loops over each of our application's route patterns in the order in
+which they were defined in our module.  As a result, the view
+associated with the ``/:action`` routing pattern will be invoked: it
+matches first.  A 404 error is raised.
+
+You may be willing to maintain an ordering of your view functions
+which reifies your routing policy.  Your application may be small
+enough where this will never cause an issue.  If it becomes large
+enough to matter, however, I don't envy you.  Maintaining that
+ordering as your application grows larger will be difficult.  At some
+point, you will also need to start controlling *import* ordering as
+well as function definition ordering.  When your application grows
+beyond the size of a single file, and when decorators are used to
+register views, the non-``__main__`` modules which contain
+configuration decorators must be imported somehow for their
+configuration to be executed.
+
+Does that make you a little
+uncomfortable?  It should, because :ref:`you_dont_own_modulescope`.
+
+"Stacked Object Proxies" Are Too Clever / Thread Locals Are A Nuisance
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+In another manifestation of "import fascination", some microframeworks
+use the ``import`` statement to get a handle to an object which *is
+not logically global*:
+
+.. code-block:: python
+
+    from flask import request
+
+    @app.route('/login', methods=['POST', 'GET'])
+    def login():
+        error = None
+        if request.method == 'POST':
+            if valid_login(request.form['username'],
+                           request.form['password']):
+                return log_the_user_in(request.form['username'])
+            else:
+                error = 'Invalid username/password'
+        # this is executed if the request method was GET or the
+        # credentials were invalid    
+
+The `Pylons <http://pylonshq.com>`_ web framework uses a similar
+strategy.  It calls these things "Stacked Object Proxies", so, for
+purposes of this discussion, I'll do so as well.
+
+Import statements in Python (``import foo``, ``from bar import baz``)
+are most frequently performed to obtain a reference to an object
+defined globally within an external Python module.  However, in
+"normal" programs, they are never used to obtain a reference to an
+object that has a lifetime measured by the scope of the body of a
+function.  It would be absurd to try to import, for example, a
+variable named ``i`` representing a loop counter defined in the body
+of a function.  For example, we'd never try to import ``i`` from the
+code below:
+
+.. code-block::  python
+
+   def afunc():
+       for i in range(10):
+           print i
+
+By its nature, the *request* object created as the result of a WSGI
+server's call into a long-lived web framework cannot be global,
+because the lifetime of a single request will be much shorter than the
+lifetime of the process running the framework.  A request object
+created by a web framework actually has more similarity to the ``i``
+loop counter in our example above than it has to any comparable
+importable object defined in the Python standard library or in
+"normal" library code.
+
+However, systems which use stacked object proxies promote locally
+scoped objects such as ``request`` out to module scope, for the
+purpose of being able to offer users a "nice" spelling involving
+``import``.  They, for what I consider dubious reasons, would rather
+present to their users the canonical way of getting at a ``request``
+as ``from framework import request`` instead of a saner ``from
+myframework.threadlocals import get_request; request = get_request()``
+even though the latter is more explicit.
+
+It would be *most* explicit if the microframeworks did not use thread
+local variables at all.  BFG view functions are passed a request
+object; many of BFG's APIs require that an explicit request object be
+passed to them.  It is *possible* to retrieve the current BFG request
+as a threadlocal variable but it is a "in case of emergency, break
+glass" type of activity.  This explicitness makes BFG view functions
+more easily unit testable, as you don't need to rely on the framework
+to manufacture suitable "dummy" request (and other similarly-scoped)
+objects during test setup.  It also makes them more likely to work on
+arbitrary systems, such as async servers that do no monkeypatching.
+
+Explicitly WSGI
++++++++++++++++
+
+Some microframeworks offer a ``run()`` method of an application object
+that executes a default server configuration for easy execution.
+
+BFG doesn't currently try to hide the fact that its router is a WSGI
+application behind a convenience ``run()`` API.  It just tells people
+to import a WSGI server and use it to serve up their BFG application
+as per the documentation of that WSGI server.
+
+The extra lines saved by abstracting away the serving step behind
+``run()`` seem to have driven dubious second-order decisions related
+to API in some microframeworks.  For example, Bottle contains a
+``ServerAdapter`` subclass for each type of WSGI server it supports
+via its ``app.run()`` mechanism.  This means that there exists code in
+``bottle.py`` that depends on the following modules: ``wsgiref``,
+``flup``, ``paste``, ``cherrypy``, ``fapws``, ``tornado``,
+``google.appengine``, ``twisted.web``, ``diesel``, ``gevent``,
+``gunicorn``, ``eventlet``, and ``rocket``.  You choose the kind of
+server you want to run by passing its name into the ``run`` method.
+In theory, this sounds great: I can try Bottle out on ``gunicorn``
+just by passing in a name!  However, to fully test Bottle, all of
+these third-party systems must be installed and functional; the Bottle
+developers must monitor changes to each of these packages and make
+sure their code still interfaces properly with them.  This expands the
+packages required for testing greatly; this is a *lot* of
+requirements.  It is likely difficult to fully automate these tests
+due to requirements conflicts and build issues.
+
+As a result, for single-file apps, we currently don't bother to offer
+a ``run()`` shortcut; we tell folks to import their WSGI server of
+choice and run it "by hand".  For the people who want a server
+abstraction layer, we suggest that they use PasteDeploy.  In
+PasteDeploy-based systems, the onus for making sure that the server
+can interface with a WSGI application is placed on the server
+developer, not the web framework developer, making it more likely to
+be timely and correct.
+
+All of the above said, BFG version 1.3 will offer a ``run()`` - like
+shortcut serving API which executes the ``paste.httpserver`` WSGI
+server.  It will likely be named less attractively to indicate it is
+only a shortcut.
+
+:meth:`repoze.bfg.configuration.Configurator.begin` and
+:meth:`repoze.bfg.configuration.Configurator.end` methods
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The methods :meth:`repoze.bfg.configuration.Configurator.begin` and
+:meth:`repoze.bfg.configuration.Configurator.end` are used to bracket
+the configuration phase of a :mod:`repoze.bfg` application.
+
+These exist because existing legacy third party *configuration* (not
+runtime) code relies on a threadlocal stack being populated. The
+``begin`` method pushes data on to a threadlocal stack.  The ``end``
+method pops it back off.
+
+For the simplest applications, these lines are actually not required.
+I *could* omit them from every BFG hello world app without ill effect.
+However, when users use certain configuration methods (ones not
+represented in the hello world app), calling code will begin to fail
+when it is not bracketed between a ``begin()`` and an ``end()``.  It
+is just easier to tell users that this bracketing is required than to
+try to explain to them which circumstances it is actually required and
+which it is not, because the explanation is often torturous.
+
+The effectively-required execution of these two methods is a wholly
+bogus artifact of an early bad design decision which encouraged
+application developers to use threadlocal data structures during the
+execution of configuration plugins.  However, I don't hate my
+framework's users enough to break backwards compatibility for the sake
+of removing two boilerplate lines of code, so it stays, at least for
+the foreseeable future.  If I eventually figure out a way to remove
+the requirement, these methods will turn into no-ops and they will be
+removed from the documenation.
+
+Wrapping Up
++++++++++++
+
+Here's a diagrammed version of the simplest repoze.bfg application,
+where comments take into account what we've discussed in the
+:ref:`microframeworks_smaller_hello_world` section.
+
+.. code-block:: python
+
+   from webob import Response                 # explicit response objects, no TL
+   from paste.httpserver import serve         # explicitly WSGI
+
+   def hello_world(request):  # accepts a request; no request thread local reqd
+       # explicit response object means no response threadlocal
+       return Response('Hello world!') 
+
+   if __name__ == '__main__':
+       from repoze.bfg.configuration import Configurator
+       config = Configurator()       # no global application object.
+       config.begin()                # bogus, but required.
+       config.add_view(hello_world)  # explicit non-decorator registration
+       config.end()                  # bogus, but required.
+       app = config.make_wsgi_app()  # explicitly WSGI
+       serve(app, host='0.0.0.0')    # explicitly WSGI
+
+
 Other Challenges
 ----------------
 
