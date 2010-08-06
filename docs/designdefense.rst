@@ -1204,18 +1204,30 @@ effort.
 Microframeworks Have Smaller Hello World Programs
 -------------------------------------------------
 
-Some developers and microframework authors point out that BFG's "hello
-world" program is longer (by about five lines) than the equivalent
-program in their favorite microframework.  Guilty as charged; in a
-contest of "whose is shortest", BFG indeed loses.
+Self-described "microframeworks" exist: `Bottle
+<http://bottle.paws.de>`_ and `Flask <http://flask.pocoo.org/>`_ are
+two that are becoming popular.  `Bobo <http://bobo.digicool.com/>`_
+doesn't describe itself as a microframework, but its intended userbase
+is much the same.  Many others exist.  We've actually even (only as a
+teaching tool, not as any sort of official project) `created one using
+BFG <http://bfg.repoze.org/videos#groundhog1>`_. Microframeworks are
+small frameworks with one common feature: each allows its users to
+create a fully functional application that lives in a single Python
+file.
 
-This loss isn't for lack of trying: BFG aims to be useful in the same
+Some developers and microframework authors point out that BFG's "hello
+world" single-file program is longer (by about five lines) than the
+equivalent program in their favorite microframework.  Guilty as
+charged; in a contest of "whose is shortest", BFG indeed loses.
+
+This loss isn't for lack of trying. BFG aims to be useful in the same
 circumstance in which microframeworks claim dominance: single-file
 applications.  But BFG doesn't sacrifice its ability to credibly
 support larger applications in order to achieve hello-world LoC parity
 with the current crop of microframeworks.  BFG's design instead tries
 to avoid some common pitfalls associated with naive declarative
-configuration schemes.
+configuration schemes.  The subsections which follow explain the
+rationale.
 
 .. _you_dont_own_modulescope:
 
