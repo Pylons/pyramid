@@ -1058,6 +1058,8 @@ information.
 .. index::
    single: redirecting to slash-appended routes
 
+.. _redirecting_to_slash_appended_routes:
+
 Redirecting to Slash-Appended Routes
 ------------------------------------
 
@@ -1114,11 +1116,23 @@ stanza:
      view="repoze.bfg.view.append_slash_notfound_view"
     />
 
+Or use the :meth:`repoze.bfg.configuration.Configurator.add_view`
+method if you don't use ZCML:
+
+.. code-block:: python
+   :linenos:
+
+   from repoze.bfg.exceptions import NotFound
+   from repoze.bfg.view import append_slash_notfound_view
+   config.add_view(append_slash_notfound_view, context=NotFound)
+
 See :ref:`view_module` and :ref:`changing_the_notfound_view` for more
 information about the slash-appending not found view and for a more
 general description of how to configure a not found view.
 
 .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
+
+.. _cleaning_up_after_a_request:
 
 Cleaning Up After a Request
 ---------------------------
@@ -1164,8 +1178,37 @@ Then in the ``configure.zcml`` of your package, inject the following:
   <subscriber for="repoze.bfg.interfaces.INewRequest"
     handler="mypackage.run.handle_teardown"/>
 
-This will cause the DBSession to be removed whenever the WSGI
-environment is destroyed (usually at the end of every request).
+Or, if you don't use ZCML, but you do use a :term:`scan` add a
+subscriber decorator:
+
+.. code-block:: python
+
+   from repoze.bfg.events import subscriber
+   from repoze.bfg.interfaces import INewRequest
+
+   @subscriber(INewRequest)
+   def handle_teardown(event):
+       environ = event.request.environ
+       environ['mypackage.sqlcleaner'] = Cleanup(DBSession.remove)
+
+Or finally, it can be done imperatively via the ``add_subscriber``
+method of a :term:`Configurator`.
+
+.. code-block:: python
+
+   from repoze.bfg.interfaces import INewRequest
+   from repoze.bfg.configuration imoport Configurator
+
+   def handle_teardown(event):
+       environ = event.request.environ
+       environ['mypackage.sqlcleaner'] = Cleanup(DBSession.remove)
+
+   config = Configurator()
+   config.add_subscriber(handle_teardown, INewRequest)
+
+Any of the above three ways to register a handle_teardown subscriber
+will cause the DBSession to be removed whenever the WSGI environment
+is destroyed (usually at the end of every request).
 
 .. note:: This is only an example.  In particular, it is not necessary
    to cause ``DBSession.remove`` to be called as the result of an

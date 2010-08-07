@@ -429,6 +429,15 @@ class AppendSlashNotFoundView(BaseTest, unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
+    def test_custom_notfound_view(self):
+        request = self._makeRequest(PATH_INFO='/abc')
+        def notfound(exc, request):
+            return 'abc'
+        request.custom_notfound_view = notfound
+        context = Exception()
+        response = self._callFUT(context, request)
+        self.assertEqual(response, 'abc')
+
     def test_no_path(self):
         request = self._makeRequest()
         context = Exception()

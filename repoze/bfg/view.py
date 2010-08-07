@@ -516,6 +516,46 @@ def append_slash_notfound_view(context, request):
 
     .. note:: This function is new as of :mod:`repoze.bfg` version 1.1.
 
+    There can only be one Not Found view in any :mod:`repoze.bfg
+    application.  If you use ``append_slash_notfound_view`` as the Not
+    Found view, it still must generate a NotFound response when it
+    cannot redirect to a slash-appended URL; this not found response
+    will be visible to site users.
+
+    If you wish to use a custom notfound view callable when
+    ``append_slash_notfound_view`` does not redirect to a
+    slash-appended URL, use a wrapper function as the
+    :exc:`repoze.bfg.exceptions.NotFound` view; have this wrapper
+    attach a :term:`view callable` which returns a response to the
+    request object named ``custom_notfound_view`` before calling
+    ``append_slash_notfound_view``.  For example:
+
+    .. code-block:: python
+
+       from webob.exc import HTTPNotFound
+       from repoze.bfg.exceptions import NotFound
+       from repoze.bfg.view import append_slash_notfound_view
+
+       def notfound_view(exc, request):
+           def fallback_notfound_view(exc, request):
+               return HTTPNotFound('It aint there, stop trying!')
+           request.fallback_notfound_view = fallback_notfound_view
+           return append_slash_notfound_view(exc, request)
+
+       config.add_view(notfound_view, context=NotFound)
+
+    ``custom_notfound_view`` must adhere to the two-argument view
+    callable calling convention of ``(context, request)`` (``context``
+    will be the exception object).
+
+    If ``custom_notfound_view`` is not found on the request object, a
+    default notfound response will be generated when the
+    ``append_slash_notfound_view`` doesn't redirect to a
+    slash-appended URL.
+
+    .. note:: The checking for ``request.custom_notfound_view`` by
+       ``append_slash_notfound_view`` is new as of :mod:`repoze.bfg`
+       version 1.3.
     """
     if not isinstance(context, Exception):
         # backwards compat for an append_notslash_view registered via
@@ -529,5 +569,7 @@ def append_slash_notfound_view(context, request):
         for route in mapper.get_routes():
             if route.match(slashpath) is not None:
                 return HTTPFound(location=slashpath)
-    return default_view(context, request, '404 Not Found')
+    notfound_view = getattr(request, 'custom_notfound_view',
+                            default_notfound_view)
+    return notfound_view(context, request)
 

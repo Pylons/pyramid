@@ -1,3 +1,54 @@
+Next release
+============
+
+Features
+--------
+
+- There can only be one Not Found view in any ``repoze.bfg``
+  application.  If you use
+  ``repoze.bfg.view.append_slash_notfound_view`` as the Not Found
+  view, it still must generate a NotFound response when it cannot
+  redirect to a slash-appended URL; this not found response will be
+  visible to site users.
+
+  As of this release, if you wish to use a custom notfound view
+  callable when ``append_slash_notfound_view`` does not redirect to a
+  slash-appended URL, use a wrapper function as the
+  ``repoze.bfg.exceptions.NotFound`` view; have this wrapper attach a
+  view callable which returns a response to the request object named
+  ``custom_notfound_view`` before calling
+  ``append_slash_notfound_view``.  For example::
+
+       from webob.exc import HTTPNotFound
+       from repoze.bfg.exceptions import NotFound
+       from repoze.bfg.view import append_slash_notfound_view
+
+       def notfound_view(exc, request):
+           def fallback_notfound_view(exc, request):
+               return HTTPNotFound('It aint there, stop trying!')
+           request.fallback_notfound_view = fallback_notfound_view
+           return append_slash_notfound_view(exc, request)
+
+       config.add_view(notfound_view, context=NotFound)
+
+  ``custom_notfound_view`` must adhere to the two-argument view
+  callable calling convention of ``(context, request)`` (``context``
+  will be the exception object).
+
+  If ``custom_notfound_view`` is not found on the request object, a
+  default notfound response will be generated when the
+  ``append_slash_notfound_view`` doesn't redirect to a slash-appended
+  URL.
+
+Documentation
+--------------
+
+- Expanded the "Cleaning Up After a Request" section of the URL
+  Dispatch narrative chapter.
+
+- Expanded the "Redirecting to Slash-Appended Routes" section of the
+  URL Dispatch narrative chapter.
+
 1.3a7 (2010-08-01)
 ==================
 
