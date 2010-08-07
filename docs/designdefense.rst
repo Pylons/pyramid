@@ -1550,14 +1550,15 @@ defined in our module.  As a result, the view associated with the
 ``/admin`` routing pattern will be invoked: it matches first.  All is
 right with the world.
 
-In the first case, where we did not achieve the expected result, we
+In the second case, where we did not achieve the expected result, we
 first added a route with the pattern ``/:action``, then we added a
 route with the pattern ``/admin``.  When a request with a
 ``PATH_INFO`` of ``/admin`` enters our application, the web framework
 loops over each of our application's route patterns in the order in
 which they were defined in our module.  As a result, the view
 associated with the ``/:action`` routing pattern will be invoked: it
-matches first.  A 404 error is raised.
+matches first.  A 404 error is raised.  This is not what we wanted; it
+just happened due to the order in which we defined our view functions.
 
 You may be willing to maintain an ordering of your view functions
 which reifies your routing policy.  Your application may be small
