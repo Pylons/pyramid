@@ -235,6 +235,22 @@ Minor Feature Additions
 - The :func:`repoze.bfg.configuration.Configurator.add_route` API now
   returns the route object that was added.
 
+- There can only be one Not Found view in any :mod:`repoze.bfg`
+  application.  If you use
+  :func:`repoze.bfg.view.append_slash_notfound_view` as the Not Found
+  view, it still must generate a 404 response when it cannot redirect
+  to a slash-appended URL; this not found response will be visible to
+  site users.  As of this release, if you wish to use a custom
+  notfound view callable when
+  :func:`repoze.bfg.view.append_slash_notfound_view` does not redirect
+  to a slash-appended URL, use a wrapper function as the
+  :exc:`repoze.bfg.exceptions.NotFound` exception view; have this
+  wrapper attach a view callable which returns a response to the
+  request object named ``custom_notfound_view`` before calling
+  :func:`repoze.bfg.view.append_slash_notfound_view`.  See
+  :func:`repoze.bfg.view.append_slash_notfound_view` for more
+  information.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -466,6 +482,12 @@ Documentation Enhancements
 
 - Added a section named "Zope 3 Enforces 'TTW' Authorization Checks By
   Default; BFG Does Not" to the :ref:`design_defense` chapter.
+
+- Expanded the :ref:`cleaning_up_after_a_request` section of the URL
+  Dispatch narrative chapter.
+
+- Expanded the :ref:`redirecting_to_slash_appended_routes` section of
+  the URL Dispatch narrative chapter.
 
 Licensing Changes
 -----------------
