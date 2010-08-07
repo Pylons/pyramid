@@ -1313,7 +1313,7 @@ global defined in external Python module.  This is analogous to the
 above example: the "global registry" in the above example is the list
 ``L``.
 
-Let's see what happens when we use the same pattern with the (
+Let's see what happens when we use the same pattern with the
 `Groundhog <http://bfg.repoze.org/videos#groundhog1>`_ microframework.
 Replace the contents of ``app.py`` above with this:
 
@@ -1686,9 +1686,12 @@ can interface with a WSGI application is placed on the server
 developer, not the web framework developer, making it more likely to
 be timely and correct.
 
-All of the above said, BFG version 1.3 will offer a ``run()`` - like
-shortcut serving API which executes the ``paste.httpserver`` WSGI
-server.  It will likely be named less attractively to indicate it is
+All of the above said, BFG version 1.3 may offer a ``run()`` - like
+shortcut serving API which executes a WSGI server.  But I might also
+chicken out and not add it: I'd rather not deal with needing to supply
+support answers like `this one
+<http://twitter.com/bottlepy/status/20451760706>`_.  If I add such a
+method, it will likely be named less attractively to indicate it is
 only a shortcut.
 
 :meth:`repoze.bfg.configuration.Configurator.begin` and :meth:`repoze.bfg.configuration.Configurator.end` methods
