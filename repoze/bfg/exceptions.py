@@ -1,7 +1,43 @@
 from zope.configuration.exceptions import ConfigurationError as ZCE
+from zope.interface import implements
 
-class Forbidden(Exception):
-    """\
+from repoze.bfg.decorator import reify
+from repoze.bfg.interfaces import IExceptionResponse
+import cgi
+
+class ExceptionResponse(Exception):
+    """ Abstract class to support behaving as a WSGI response object """
+    implements(IExceptionResponse)
+    status = None
+
+    def __init__(self, message=''):
+        Exception.__init__(self, message) # B / C
+        self.message = message
+
+    @reify # defer execution until asked explicitly
+    def app_iter(self):
+         return [
+             """
+             <html>
+             <title>%s</title>
+             <body>
+             <h1>%s</h1>
+             <code>%s</code>
+             </body>
+             </html>
+             """ % (self.status, self.status, cgi.escape(self.message))
+             ]
+
+    @reify # defer execution until asked explicitly
+    def headerlist(self):
+        return [
+            ('Content-Length', str(len(self.app_iter[0]))),
+            ('Content-Type', 'text/html')
+            ]
+        
+        
+class Forbidden(ExceptionResponse):
+    """
     Raise this exception within :term:`view` code to immediately
     return the :term:`forbidden view` to the invoking user.  Usually
     this is a basic ``401`` page, but the forbidden view can be
@@ -11,10 +47,12 @@ class Forbidden(Exception):
     which should be a string.  The value of this string will be placed
     into the WSGI environment by the router under the
     ``repoze.bfg.message`` key, for availability to the
-    :term:`Forbidden View`."""
+    :term:`Forbidden View`.
+    """
+    status = '401 Unauthorized'
 
-class NotFound(Exception):
-    """\
+class NotFound(ExceptionResponse):
+    """
     Raise this exception within :term:`view` code to immediately
     return the :term:`Not Found view` to the invoking user.  Usually
     this is a basic ``404`` page, but the Not Found view can be
@@ -24,7 +62,18 @@ class NotFound(Exception):
     which should be a string.  The value of this string will be placed
     into the WSGI environment by the router under the
     ``repoze.bfg.message`` key, for availability to the :term:`Not Found
-    View`."""
+    View`.
+    """
+    status = '404 Not Found'
+
+class PredicateMismatch(NotFound):
+    """
+    Internal exception (not an API) raised by multiviews when no
+    view matches.  This exception subclasses the ``NotFound``
+    exception only one reason: if it reaches the main exception
+    handler, it should be treated like a ``NotFound`` by any exception
+    view registrations.
+    """
 
 class URLDecodeError(UnicodeDecodeError):
     """
@@ -40,11 +89,4 @@ class URLDecodeError(UnicodeDecodeError):
 class ConfigurationError(ZCE):
     """ Raised when inappropriate input values are supplied to an API
     method of a :term:`Configurator`"""
-
-class PredicateMismatch(NotFound):
-    """ Internal exception (not an API) raised by multiviews when no
-    view matches.  This exception subclasses the ``NotFound``
-    exception only one reason: if it reaches the main exception
-    handler, it should be treated like a ``NotFound`` by any exception
-    view registrations."""
 

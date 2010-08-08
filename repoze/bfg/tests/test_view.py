@@ -342,59 +342,7 @@ class TestBFGViewDecorator(unittest.TestCase):
         self.assertEqual(settings[0]['renderer'],
                          'repoze.bfg.tests:fixtures/minimal.pt')
 
-class TestDefaultView(BaseTest):
-    def test_no_registry_on_request(self):
-        request = None
-        context = Exception()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, self.status)
-        self.failUnless('<code></code>' in response.body)
-
-    def test_nomessage(self):
-        request = self._makeRequest()
-        context = Exception()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, self.status)
-        self.failUnless('<code></code>' in response.body)
-
-    def test_withmessage(self):
-        request = self._makeRequest()
-        context = Exception('abc&123')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, self.status)
-        self.failUnless('<code>abc&amp;123</code>' in response.body)
-
-    def test_context_not_exception(self):
-        request = self._makeRequest()
-        request.exception = Exception('woo')
-        context = None
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, self.status)
-        self.failUnless('<code>woo</code>' in response.body)
-        
-    def test_msg_exception_raised(self):
-        request = self._makeRequest()
-        context = None
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, self.status)
-        self.failUnless('<code></code>' in response.body)
-
-class TestDefaultForbiddenView(TestDefaultView, unittest.TestCase):
-    status = '401 Unauthorized'
-
-    def _callFUT(self, context, request):
-        from repoze.bfg.view import default_forbidden_view
-        return default_forbidden_view(context, request)
-
-
-class TestDefaultNotFoundView(TestDefaultView, unittest.TestCase):
-    status = '404 Not Found'
-
-    def _callFUT(self, context, request):
-        from repoze.bfg.view import default_notfound_view
-        return default_notfound_view(context, request)
-
-class AppendSlashNotFoundView(BaseTest, unittest.TestCase):
+class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
         from repoze.bfg.view import append_slash_notfound_view
         return append_slash_notfound_view(context, request)
@@ -417,49 +365,81 @@ class AppendSlashNotFoundView(BaseTest, unittest.TestCase):
 
     def test_context_is_not_exception(self):
         request = self._makeRequest(PATH_INFO='/abc')
-        request.exception = Exception('halloo')
+        request.exception = ExceptionResponse()
         context = DummyContext()
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
-        self.failUnless('halloo' in response.body)
+        self.assertEqual(response.app_iter, ['Not Found'])
 
     def test_no_mapper(self):
         request = self._makeRequest(PATH_INFO='/abc')
-        context = Exception()
+        context = ExceptionResponse()
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
-    def test_custom_notfound_view(self):
-        request = self._makeRequest(PATH_INFO='/abc')
-        def notfound(exc, request):
-            return 'abc'
-        request.custom_notfound_view = notfound
-        context = Exception()
-        response = self._callFUT(context, request)
-        self.assertEqual(response, 'abc')
-
     def test_no_path(self):
         request = self._makeRequest()
-        context = Exception()
+        context = ExceptionResponse()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_mapper_path_already_slash_ending(self):
         request = self._makeRequest(PATH_INFO='/abc/')
-        context = Exception()
+        context = ExceptionResponse()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '404 Not Found')
 
     def test_matches(self):
         request = self._makeRequest(PATH_INFO='/abc')
-        context = Exception()
+        context = ExceptionResponse()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/abc/')
 
+class TestAppendSlashNotFoundViewFactory(BaseTest, unittest.TestCase):
+    def _makeOne(self, notfound_view):
+        from repoze.bfg.view import AppendSlashNotFoundViewFactory
+        return AppendSlashNotFoundViewFactory(notfound_view)
+    
+    def test_custom_notfound_view(self):
+        request = self._makeRequest(PATH_INFO='/abc')
+        context = ExceptionResponse()
+        def custom_notfound(context, request):
+            return 'OK'
+        view = self._makeOne(custom_notfound)
+        response = view(context, request)
+        self.assertEqual(response, 'OK')
+
+class Test_default_exceptionresponse_view(unittest.TestCase):
+    def _callFUT(self, context, request):
+        from repoze.bfg.view import default_exceptionresponse_view
+        return default_exceptionresponse_view(context, request)
+
+    def test_is_exception(self):
+        context = Exception()
+        result = self._callFUT(context, None)
+        self.failUnless(result is context)
+
+    def test_is_not_exception_no_request_exception(self):
+        context = object()
+        request = DummyRequest()
+        result = self._callFUT(context, request)
+        self.failUnless(result is context)
+
+    def test_is_not_exception_request_exception(self):
+        context = object()
+        request = DummyRequest()
+        request.exception = 'abc'
+        result = self._callFUT(context, request)
+        self.assertEqual(result, 'abc')
+
+class ExceptionResponse(Exception):
+    status = '404 Not Found'
+    app_iter = ['Not Found']
+    headerlist = []
 
 class DummyContext:
     pass
@@ -468,6 +448,9 @@ def make_view(response):
     def view(context, request):
         return response
     return view
+
+class DummyRequest:
+    pass
 
 class DummyResponse:
     status = '200 OK'

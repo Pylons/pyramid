@@ -24,6 +24,22 @@ class IWSGIApplicationCreatedEvent(Interface):
     is called."""
     app = Attribute(u"Published application")
 
+class IResponse(Interface): # not an API
+    status = Attribute('WSGI status code of response')
+    headerlist = Attribute('List of response headers')
+    app_iter = Attribute('Iterable representing the response body')
+
+class IException(Interface): # not an API
+    """ An interface representing a generic exception """
+
+class IExceptionResponse(IException, IResponse):
+    """ An interface representing a WSGI response which is also an
+    exception object.  Register an exception view using this interface
+    as a ``context`` to apply the registered view for all exception
+    types raised by :mod:`repoze.bfg` internally
+    (:class:`repoze.bfg.exceptions.NotFound` and
+    :class:`repoze.bfg.exceptions.Forbidden`)."""
+
 # internal interfaces
 
 class IRequest(Interface):
@@ -34,11 +50,6 @@ IRequest.combined = IRequest # for exception view lookups
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
     route-specific interfaces.  Not an API."""
-
-class IResponse(Interface):
-    status = Attribute('WSGI status code of response')
-    headerlist = Attribute('List of response headers')
-    app_iter = Attribute('Iterable representing the response body')
 
 class IAuthenticationPolicy(Interface):
     """ An object representing a BFG authentication policy. """
@@ -271,3 +282,4 @@ class ILocaleNegotiator(Interface):
 class ITranslationDirectories(Interface):
     """ A list object representing all known translation directories
     for an application"""
+

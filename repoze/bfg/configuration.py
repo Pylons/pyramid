@@ -38,6 +38,8 @@ from repoze.bfg.interfaces import ITranslationDirectories
 from repoze.bfg.interfaces import ITraverser
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewClassifier
+from repoze.bfg.interfaces import IExceptionResponse
+from repoze.bfg.interfaces import IException
 
 from repoze.bfg import chameleon_text
 from repoze.bfg import chameleon_zpt
@@ -69,8 +71,7 @@ from repoze.bfg.traversal import DefaultRootFactory
 from repoze.bfg.traversal import find_interface
 from repoze.bfg.urldispatch import RoutesMapper
 from repoze.bfg.view import render_view_to_response
-from repoze.bfg.view import default_notfound_view
-from repoze.bfg.view import default_forbidden_view
+from repoze.bfg.view import default_exceptionresponse_view
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
@@ -408,8 +409,8 @@ class Configurator(object):
                                         authorization_policy)
         for name, renderer in renderers:
             self.add_renderer(name, renderer)
-        self.add_view(default_notfound_view, context=NotFound)
-        self.add_view(default_forbidden_view, context=Forbidden)
+        self.add_view(default_exceptionresponse_view,
+                      context=IExceptionResponse)
         if locale_negotiator:
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)
         if request_factory:
@@ -2312,8 +2313,12 @@ def _attr_wrap(view, accept, order, phash):
     return attr_view
 
 def isexception(o):
-    return isinstance(o, Exception) or (
-        inspect.isclass(o) and issubclass(o, Exception)
+    if IInterface.providedBy(o):
+        if IException.isEqualOrExtendedBy(o):
+            return True
+    return (
+        isinstance(o, Exception) or
+        (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
 # note that ``options`` is a b/w compat alias for ``settings`` and

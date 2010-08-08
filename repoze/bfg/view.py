@@ -1,4 +1,3 @@
-import cgi
 import mimetypes
 import os
 
@@ -12,7 +11,6 @@ import os
 if hasattr(mimetypes, 'init'):
     mimetypes.init()
 
-from webob import Response
 from webob.exc import HTTPFound
 
 import venusian
@@ -20,7 +18,6 @@ import venusian
 from zope.deprecation import deprecated
 from zope.interface import providedBy
 
-from repoze.bfg.interfaces import IResponseFactory
 from repoze.bfg.interfaces import IRoutesMapper
 from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewClassifier
@@ -447,129 +444,103 @@ class bfg_view(object):
 
         return wrapped
 
-def default_view(context, request, status):
+def default_exceptionresponse_view(context, request):
     if not isinstance(context, Exception):
-        # backwards compat for a default_view registered via
+        # backwards compat for an exception response view registered via
         # config.set_notfound_view or config.set_forbidden_view
         # instead of as a proper exception view
-        context = getattr(request, 'exception', None)
-    try:
-        msg = cgi.escape('%s' % context.args[0])
-    except Exception:
-        msg = ''
-    html = """
-    <html>
-    <title>%s</title>
-    <body>
-    <h1>%s</h1>
-    <code>%s</code>
-    </body>
-    </html>
-    """ % (status, status, msg)
-    headers = [('Content-Length', str(len(html))),
-               ('Content-Type', 'text/html')]
-    try:
+        context = getattr(request, 'exception', context)
+    return context
+
+class AppendSlashNotFoundViewFactory(object):
+    """ There can only be one :term:`Not Found view` in any
+    :mod:`repoze.bfg application.  Even if you use
+    :func:`repoze.bfg.view.append_slash_notfound_view` as the Not
+    Found view, :mod:`repoze.bfg` still must generate a ``404 Not
+    Found`` response when it cannot redirect to a slash-appended URL;
+    this not found response will be visible to site users.
+
+    If you don't care what this 404 response looks like, and you only
+    need redirections to slash-appended route URLs, you may use the
+    :func:`repoze.bfg.view.append_slash_notfound_view` object as the
+    Not Found view.  However, if you wish to use a *custom* notfound
+    view callable when a URL cannot be redirected to a slash-appended
+    URL, you may wish to use an instance of this class as the Not
+    Found view, supplying a :term:`view callable` to be used as the
+    custom notfound view as the first argument to its constructor.
+    For instance:
+
+    .. code-block:: python
+
+       from repoze.bfg.exceptions import NotFound
+       from repoze.bfg.view import AppendSlashNotFoundViewFactory
+
+       def notfound_view(context, request):
+           return HTTPNotFound('It aint there, stop trying!')
+
+       custom_append_slash = AppendSlashNotFoundViewFactory(notfound_view)
+       config.add_view(custom_append_slash, context=NotFound)
+
+    The ``notfound_view`` supplied must adhere to the two-argument
+    view callable calling convention of ``(context, request)``
+    (``context`` will be the exception object).
+
+    .. note:: This class is new as of :mod:`repoze.bfg` version 1.3.
+
+    """
+    def __init__(self, notfound_view=None):
+        if notfound_view is None:
+            notfound_view = default_exceptionresponse_view
+        self.notfound_view = notfound_view
+
+    def __call__(self, context, request):
+        if not isinstance(context, Exception):
+            # backwards compat for an append_notslash_view registered via
+            # config.set_notfound_view instead of as a proper exception view
+            context = getattr(request, 'exception', None)
+        path = request.environ.get('PATH_INFO', '/')
         registry = request.registry
-    except AttributeError:
-        registry = get_current_registry()
-    response_factory = registry.queryUtility(IResponseFactory,
-                                             default=Response)
-    return response_factory(status = status,
-                            headerlist = headers,
-                            app_iter = [html])
+        mapper = registry.queryUtility(IRoutesMapper)
+        if mapper is not None and not path.endswith('/'):
+            slashpath = path + '/'
+            for route in mapper.get_routes():
+                if route.match(slashpath) is not None:
+                    return HTTPFound(location=slashpath)
+        return self.notfound_view(context, request)
 
-def default_forbidden_view(context, request):
-    return default_view(context, request, '401 Unauthorized')
+append_slash_notfound_view = AppendSlashNotFoundViewFactory()
+append_slash_notfound_view.__doc__ = """\
+For behavior like Django's ``APPEND_SLASH=True``, use this view as the
+:term:`Not Found view` in your application.
 
-def default_notfound_view(context, request):
-    return default_view(context, request, '404 Not Found')
+When this view is the Not Found view (indicating that no view was
+found), and any routes have been defined in the configuration of your
+application, if the value of the ``PATH_INFO`` WSGI environment
+variable does not already end in a slash, and if the value of
+``PATH_INFO`` *plus* a slash matches any route's path, do an HTTP
+redirect to the slash-appended PATH_INFO.  Note that this will *lose*
+``POST`` data information (turning it into a GET), so you shouldn't
+rely on this to redirect POST requests.
 
-def append_slash_notfound_view(context, request):
-    """For behavior like Django's ``APPEND_SLASH=True``, use this view
-    as the :term:`Not Found view` in your application.
-
-    When this view is the Not Found view (indicating that no view was
-    found), and any routes have been defined in the configuration of
-    your application, if the value of the ``PATH_INFO`` WSGI
-    environment variable does not already end in a slash, and if the
-    value of ``PATH_INFO`` *plus* a slash matches any route's path, do
-    an HTTP redirect to the slash-appended PATH_INFO.  Note that this
-    will *lose* ``POST`` data information (turning it into a GET), so
-    you shouldn't rely on this to redirect POST requests.
-
-    If you use :term:`ZCML`, add the following to your application's
-    ``configure.zcml`` to use this view as the Not Found view::
+If you use :term:`ZCML`, add the following to your application's
+``configure.zcml`` to use this view as the Not Found view::
 
       <view
          context="repoze.bfg.exceptions.NotFound"
          view="repoze.bfg.view.append_slash_notfound_view"/>
 
-    Or use the
-    :meth:`repoze.bfg.configuration.Configurator.add_view`
-    method if you don't use ZCML::
+Or use the
+:meth:`repoze.bfg.configuration.Configurator.add_view`
+method if you don't use ZCML::
 
-      from repoze.bfg.exceptions import NotFound
-      from repoze.bfg.view import append_slash_notfound_view
-      config.add_view(append_slash_notfound_view, context=NotFound)
+  from repoze.bfg.exceptions import NotFound
+  from repoze.bfg.view import append_slash_notfound_view
+  config.add_view(append_slash_notfound_view, context=NotFound)
 
-    See also :ref:`changing_the_notfound_view`.
+See also :ref:`changing_the_notfound_view`.
 
-    .. note:: This function is new as of :mod:`repoze.bfg` version 1.1.
+.. note:: This function is new as of :mod:`repoze.bfg` version 1.1.
+"""
 
-    There can only be one Not Found view in any :mod:`repoze.bfg
-    application.  If you use ``append_slash_notfound_view`` as the Not
-    Found view, it still must generate a NotFound response when it
-    cannot redirect to a slash-appended URL; this not found response
-    will be visible to site users.
 
-    If you wish to use a custom notfound view callable when
-    ``append_slash_notfound_view`` does not redirect to a
-    slash-appended URL, use a wrapper function as the
-    :exc:`repoze.bfg.exceptions.NotFound` view; have this wrapper
-    attach a :term:`view callable` which returns a response to the
-    request object named ``custom_notfound_view`` before calling
-    ``append_slash_notfound_view``.  For example:
-
-    .. code-block:: python
-
-       from webob.exc import HTTPNotFound
-       from repoze.bfg.exceptions import NotFound
-       from repoze.bfg.view import append_slash_notfound_view
-
-       def notfound_view(exc, request):
-           def fallback_notfound_view(exc, request):
-               return HTTPNotFound('It aint there, stop trying!')
-           request.fallback_notfound_view = fallback_notfound_view
-           return append_slash_notfound_view(exc, request)
-
-       config.add_view(notfound_view, context=NotFound)
-
-    ``custom_notfound_view`` must adhere to the two-argument view
-    callable calling convention of ``(context, request)`` (``context``
-    will be the exception object).
-
-    If ``custom_notfound_view`` is not found on the request object, a
-    default notfound response will be generated when the
-    ``append_slash_notfound_view`` doesn't redirect to a
-    slash-appended URL.
-
-    .. note:: The checking for ``request.custom_notfound_view`` by
-       ``append_slash_notfound_view`` is new as of :mod:`repoze.bfg`
-       version 1.3.
-    """
-    if not isinstance(context, Exception):
-        # backwards compat for an append_notslash_view registered via
-        # config.set_notfound_view instead of as a proper exception view
-        context = getattr(request, 'exception', None)
-    path = request.environ.get('PATH_INFO', '/')
-    registry = request.registry
-    mapper = registry.queryUtility(IRoutesMapper)
-    if mapper is not None and not path.endswith('/'):
-        slashpath = path + '/'
-        for route in mapper.get_routes():
-            if route.match(slashpath) is not None:
-                return HTTPFound(location=slashpath)
-    notfound_view = getattr(request, 'custom_notfound_view',
-                            default_notfound_view)
-    return notfound_view(context, request)
 

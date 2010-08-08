@@ -4,41 +4,47 @@ Next release
 Features
 --------
 
-- There can only be one Not Found view in any ``repoze.bfg``
-  application.  If you use
+- New public interface: ``repoze.bfg.exceptions.IExceptionResponse``.
+  This interface is provided by all internal exception classes (such
+  as ``repoze.bfg.exceptions.NotFound`` and
+  ``repoze.bfg.exceptions.Forbidden``), instances of which are both
+  exception objects and can behave as WSGI response objects.  This
+  interface is made public so that exception classes which are also
+  valid WSGI response factories can be configured to implement them
+  or exception instances which are also or response instances can be
+  configured to provide them.
+
+- New API class: ``repoze.bfg.view.AppendSlashNotFoundViewFactory``.
+
+  There can only be one Not Found view in any :mod:`repoze.bfg
+  application.  Even if you use
   ``repoze.bfg.view.append_slash_notfound_view`` as the Not Found
-  view, it still must generate a NotFound response when it cannot
-  redirect to a slash-appended URL; this not found response will be
-  visible to site users.
+  view, ``repoze.bfg`` still must generate a ``404 Not Found``
+  response when it cannot redirect to a slash-appended URL; this not
+  found response will be visible to site users.
 
-  As of this release, if you wish to use a custom notfound view
-  callable when ``append_slash_notfound_view`` does not redirect to a
-  slash-appended URL, use a wrapper function as the
-  ``repoze.bfg.exceptions.NotFound`` view; have this wrapper attach a
-  view callable which returns a response to the request object named
-  ``custom_notfound_view`` before calling
-  ``append_slash_notfound_view``.  For example::
+  If you don't care what this 404 response looks like, and you only
+  need redirections to slash-appended route URLs, you may use the
+  ``repoze.bfg.view.append_slash_notfound_view`` object as the Not
+  Found view.  However, if you wish to use a *custom* notfound view
+  callable when a URL cannot be redirected to a slash-appended URL,
+  you may wish to use an instance of the
+  ``repoze.bfg.view.AppendSlashNotFoundViewFactory`` class as the Not
+  Found view, supplying the notfound view callable as the first
+  argument to its constructor.  For instance::
 
-       from webob.exc import HTTPNotFound
        from repoze.bfg.exceptions import NotFound
-       from repoze.bfg.view import append_slash_notfound_view
+       from repoze.bfg.view import AppendSlashNotFoundViewFactory
 
-       def notfound_view(exc, request):
-           def fallback_notfound_view(exc, request):
-               return HTTPNotFound('It aint there, stop trying!')
-           request.fallback_notfound_view = fallback_notfound_view
-           return append_slash_notfound_view(exc, request)
+       def notfound_view(context, request):
+           return HTTPNotFound('It aint there, stop trying!')
 
-       config.add_view(notfound_view, context=NotFound)
+       custom_append_slash = AppendSlashNotFoundViewFactory(notfound_view)
+       config.add_view(custom_append_slash, context=NotFound)
 
-  ``custom_notfound_view`` must adhere to the two-argument view
+  The ``notfound_view`` supplied must adhere to the two-argument view
   callable calling convention of ``(context, request)`` (``context``
   will be the exception object).
-
-  If ``custom_notfound_view`` is not found on the request object, a
-  default notfound response will be generated when the
-  ``append_slash_notfound_view`` doesn't redirect to a slash-appended
-  URL.
 
 Documentation
 --------------
@@ -48,6 +54,22 @@ Documentation
 
 - Expanded the "Redirecting to Slash-Appended Routes" section of the
   URL Dispatch narrative chapter.
+
+Internal
+--------
+
+- Previously, two default view functions were registered at
+  Configurator setup (one for ``repoze.bfg.exceptions.NotFound`` named
+  ``default_notfound_view`` and one for
+  ``repoze.bfg.exceptions.Forbidden`` named
+  ``default_forbidden_view``) to render internal exception responses.
+  Those default view functions have been removed, replaced with a
+  generic default view function which is registered at Configurator
+  setup for the ``repoze.bfg.interfaces.IExceptionResponse`` interface
+  that simply returns the exception instance; the ``NotFound` and
+  ``Forbidden`` classes are now still exception factories but they are
+  also response factories which generate instances that implement the
+  new ``repoze.bfg.interfaces.IExceptionResponse`` interface.
 
 1.3a7 (2010-08-01)
 ==================

@@ -1132,6 +1132,45 @@ general description of how to configure a not found view.
 
 .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
+Custom Not Found View With Slash Appended Routes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There can only be one :term:`Not Found view` in any :mod:`repoze.bfg
+application.  Even if you use
+:func:`repoze.bfg.view.append_slash_notfound_view` as the Not Found
+view, :mod:`repoze.bfg` still must generate a ``404 Not Found``
+response when it cannot redirect to a slash-appended URL; this not
+found response will be visible to site users.
+
+If you don't care what this 404 response looks like, and only you need
+redirections to slash-appended route URLs, you may use the
+:func:`repoze.bfg.view.append_slash_notfound_view` object as the Not
+Found view as described above.  However, if you wish to use a *custom*
+notfound view callable when a URL cannot be redirected to a
+slash-appended URL, you may wish to use an instance of the
+:class:`repoze.bfg.view.AppendSlashNotFoundViewFactory` class as the
+Not Found view, supplying a :term:`view callable` to be used as the
+custom notfound view as the first argument to its constructor.  For
+instance:
+
+.. code-block:: python
+
+     from repoze.bfg.exceptions import NotFound
+     from repoze.bfg.view import AppendSlashNotFoundViewFactory
+
+     def notfound_view(context, request):
+         return HTTPNotFound('It aint there, stop trying!')
+
+     custom_append_slash = AppendSlashNotFoundViewFactory(notfound_view)
+     config.add_view(custom_append_slash, context=NotFound)
+
+The ``notfound_view`` supplied must adhere to the two-argument view
+callable calling convention of ``(context, request)`` (``context``
+will be the exception object).
+
+.. note:: The :class:`repoze.bfg.view.AppendSlashNotFoundViewFactory`
+   class is new as of BFG 1.3.
+
 .. _cleaning_up_after_a_request:
 
 Cleaning Up After a Request

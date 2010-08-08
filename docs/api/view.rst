@@ -19,6 +19,7 @@
   .. autoclass:: static
      :members:
 
-  .. autofunction:: append_slash_notfound_view
+  .. autofunction:: append_slash_notfound_view(context, request)
 
+  .. autoclass:: AppendSlashNotFoundViewFactory
 

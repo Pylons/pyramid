@@ -194,11 +194,9 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.notify(1), None)
         self.assertEqual(reg.events, (1,))
 
-    def test_setup_registry_registers_default_exception_views(self):
-        from repoze.bfg.exceptions import NotFound
-        from repoze.bfg.exceptions import Forbidden
-        from repoze.bfg.view import default_notfound_view
-        from repoze.bfg.view import default_forbidden_view
+    def test_setup_registry_registers_default_exceptionresponse_view(self):
+        from repoze.bfg.interfaces import IExceptionResponse
+        from repoze.bfg.view import default_exceptionresponse_view
         class DummyRegistry(object):
             def registerUtility(self, *arg, **kw):
                 pass
@@ -207,10 +205,25 @@ class ConfiguratorTests(unittest.TestCase):
         views = []
         config.add_view = lambda *arg, **kw: views.append((arg, kw))
         config.setup_registry()
-        self.assertEqual(views[0], ((default_notfound_view,),
-                                    {'context':NotFound}))
-        self.assertEqual(views[1], ((default_forbidden_view,),
-                                    {'context':Forbidden}))
+        self.assertEqual(views[0], ((default_exceptionresponse_view,),
+                                    {'context':IExceptionResponse}))
+
+    def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
+        from zope.interface import implementedBy
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.exceptions import NotFound
+        from repoze.bfg.registry import Registry
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry() # registers IExceptionResponse default view
+        def myview(context, request):
+            return 'OK'
+        config.add_view(myview, context=NotFound)
+        request = self._makeRequest(config)
+        view = self._getViewCallable(config, ctx_iface=implementedBy(NotFound),
+                                     request_iface=IRequest)
+        result = view(None, request)
+        self.assertEqual(result, 'OK')
 
     def test_setup_registry_custom_settings(self):
         from repoze.bfg.registry import Registry
@@ -3701,6 +3714,32 @@ class TestDottedNameResolver(unittest.TestCase):
         e = self.config_exc(typ, 'cant.be.found')
         self.assertEqual(e.args[0],
                          "The dotted name 'cant.be.found' cannot be imported")
+
+class Test_isexception(unittest.TestCase):
+    def _callFUT(self, ob):
+        from repoze.bfg.configuration import isexception
+        return isexception(ob)
+    
+    def test_is_exception_instance(self):
+        class E(Exception):
+            pass
+        e = E()
+        self.assertEqual(self._callFUT(e), True)
+
+    def test_is_exception_class(self):
+        class E(Exception):
+            pass
+        self.assertEqual(self._callFUT(E), True)
+
+    def test_is_IException(self):
+        from repoze.bfg.interfaces import IException
+        self.assertEqual(self._callFUT(IException), True)
+
+    def test_is_IException_subinterface(self):
+        from repoze.bfg.interfaces import IException
+        class ISubException(IException):
+            pass
+        self.assertEqual(self._callFUT(ISubException), True)
 
 class DummyRequest:
     subpath = ()
