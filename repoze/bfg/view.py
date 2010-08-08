@@ -454,7 +454,7 @@ def default_exceptionresponse_view(context, request):
 
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any
-    :mod:`repoze.bfg application.  Even if you use
+    :mod:`repoze.bfg` application.  Even if you use
     :func:`repoze.bfg.view.append_slash_notfound_view` as the Not
     Found view, :mod:`repoze.bfg` still must generate a ``404 Not
     Found`` response when it cannot redirect to a slash-appended URL;
