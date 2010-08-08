@@ -48,7 +48,7 @@ within the body of a view callable like so:
                                  request=request)
 
 .. warning:: Earlier iterations of this documentation
-.. (pre-version-1.3) encouraged the application developer to use
+   (pre-version-1.3) encouraged the application developer to use
    ZPT-specific APIs such as
    :func:`repoze.bfg.chameleon_zpt.render_template_to_response`,
    :func:`repoze.bfg.chameleon_zpt.render_template_to_iterable`, and
