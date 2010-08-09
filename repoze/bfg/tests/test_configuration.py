@@ -290,27 +290,30 @@ class ConfiguratorTests(unittest.TestCase):
         from repoze.bfg.interfaces import ILocaleNegotiator
         reg = Registry()
         config = self._makeOne(reg)
-        config.setup_registry(locale_negotiator='abc')
+        negotiator = object()
+        config.setup_registry(locale_negotiator=negotiator)
         utility = reg.getUtility(ILocaleNegotiator)
-        self.assertEqual(utility, 'abc')
+        self.assertEqual(utility, negotiator)
 
     def test_setup_registry_request_factory(self):
         from repoze.bfg.registry import Registry
         from repoze.bfg.interfaces import IRequestFactory
         reg = Registry()
         config = self._makeOne(reg)
-        config.setup_registry(request_factory='abc')
+        factory = object()
+        config.setup_registry(request_factory=factory)
         utility = reg.getUtility(IRequestFactory)
-        self.assertEqual(utility, 'abc')
+        self.assertEqual(utility, factory)
 
     def test_setup_registry_renderer_globals_factory(self):
         from repoze.bfg.registry import Registry
         from repoze.bfg.interfaces import IRendererGlobalsFactory
         reg = Registry()
         config = self._makeOne(reg)
-        config.setup_registry(renderer_globals_factory='abc')
+        factory = object()
+        config.setup_registry(renderer_globals_factory=factory)
         utility = reg.getUtility(IRendererGlobalsFactory)
-        self.assertEqual(utility, 'abc')
+        self.assertEqual(utility, factory)
 
     def test_setup_registry_alternate_renderers(self):
         from repoze.bfg.registry import Registry
@@ -1893,8 +1896,9 @@ class ConfiguratorTests(unittest.TestCase):
     def test_set_request_factory(self):
         from repoze.bfg.interfaces import IRequestFactory
         config = self._makeOne()
-        config.set_request_factory('abc')
-        self.assertEqual(config.registry.getUtility(IRequestFactory), 'abc')
+        factory = object()
+        config.set_request_factory(factory)
+        self.assertEqual(config.registry.getUtility(IRequestFactory), factory)
 
     def test_add_translation_dirs_missing_dir(self):
         from repoze.bfg.exceptions import ConfigurationError
