@@ -2421,7 +2421,7 @@ class DottedNameResolver(object):
         if value.startswith('.') or value.startswith(':'):
             if not self.package:
                 raise ConfigurationError(
-                    'relative name %r irresolveable without package' % value)
+                    'relative name %r irresolveable without package' % (value,))
             if value in ['.', ':']:
                 value = self.package.__name__
             else:
@@ -2435,7 +2435,7 @@ class DottedNameResolver(object):
         if value == '.':
             if self.package is None:
                 raise ConfigurationError(
-                    'relative name %r irresolveable without package' % value)
+                    'relative name %r irresolveable without package' % (value,))
             name = module.split('.')
         else:
             name = value.split('.')
@@ -2443,7 +2443,7 @@ class DottedNameResolver(object):
                 if module is None:
                     raise ConfigurationError(
                         'relative name %r irresolveable without '
-                        'package' % value
+                        'package' % (value,)
                         )
                 module = module.split('.')
                 name.pop(0)
@@ -2466,7 +2466,7 @@ class DottedNameResolver(object):
 
     def __call__(self, dotted):
         if not isinstance(dotted, basestring):
-            raise ConfigurationError('%r is not a string' % dotted)
+            raise ConfigurationError('%r is not a string' % (dotted,))
         try:
             if ':' in dotted:
                 return self._pkg_resources_style(dotted)
@@ -2474,4 +2474,4 @@ class DottedNameResolver(object):
                 return self._zope_dottedname_style(dotted)
         except ImportError:
             raise ConfigurationError(
-                'The dotted name %r cannot be imported' % dotted)
+                'The dotted name %r cannot be imported' % (dotted,))
