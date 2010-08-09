@@ -10,13 +10,13 @@ Features
   ``repoze.bfg.exceptions.Forbidden``), instances of which are both
   exception objects and can behave as WSGI response objects.  This
   interface is made public so that exception classes which are also
-  valid WSGI response factories can be configured to implement them
-  or exception instances which are also or response instances can be
+  valid WSGI response factories can be configured to implement them or
+  exception instances which are also or response instances can be
   configured to provide them.
 
 - New API class: ``repoze.bfg.view.AppendSlashNotFoundViewFactory``.
 
-  There can only be one Not Found view in any :mod:`repoze.bfg
+  There can only be one Not Found view in any ``repoze.bfg``
   application.  Even if you use
   ``repoze.bfg.view.append_slash_notfound_view`` as the Not Found
   view, ``repoze.bfg`` still must generate a ``404 Not Found``
@@ -66,7 +66,7 @@ Internal
   Those default view functions have been removed, replaced with a
   generic default view function which is registered at Configurator
   setup for the ``repoze.bfg.interfaces.IExceptionResponse`` interface
-  that simply returns the exception instance; the ``NotFound` and
+  that simply returns the exception instance; the ``NotFound`` and
   ``Forbidden`` classes are now still exception factories but they are
   also response factories which generate instances that implement the
   new ``repoze.bfg.interfaces.IExceptionResponse`` interface.
