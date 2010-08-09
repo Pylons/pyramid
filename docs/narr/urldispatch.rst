@@ -1135,7 +1135,7 @@ general description of how to configure a not found view.
 Custom Not Found View With Slash Appended Routes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There can only be one :term:`Not Found view` in any :mod:`repoze.bfg
+There can only be one :term:`Not Found view` in any :mod:`repoze.bfg`
 application.  Even if you use
 :func:`repoze.bfg.view.append_slash_notfound_view` as the Not Found
 view, :mod:`repoze.bfg` still must generate a ``404 Not Found``
