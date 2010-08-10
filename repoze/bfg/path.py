@@ -1,6 +1,11 @@
 import os
 import pkg_resources
 import sys
+import imp
+
+ignore_types = [ imp.C_EXTENSION, imp.C_BUILTIN ]
+init_names = [ '__init__%s' % x[0] for x in imp.get_suffixes() if
+               x[0] and x[2] not in ignore_types ]
 
 def caller_path(path, level=2):
     if not os.path.isabs(path):
@@ -25,7 +30,7 @@ def package_name(pkg_or_module):
     pkg_filename = pkg_or_module.__file__
     pkg_name = pkg_or_module.__name__
     splitted = os.path.split(pkg_filename)
-    if splitted[-1] in ('__init__.py', '__init__.pyc', '__init__.pyo'):
+    if splitted[-1] in init_names:
         # it's a package
         return pkg_name
     return pkg_name.rsplit('.', 1)[0]
