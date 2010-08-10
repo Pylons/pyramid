@@ -1,3 +1,14 @@
+Next release
+============
+
+Internal
+--------
+
+- Use ``imp.get_suffixes`` indirection in
+  ``repoze.bfg.path.package_name`` instead of hardcoded ``.py``
+  ``.pyc`` and ``.pyo`` to use for comparison when attemtping to
+  decide if a directory is a package.
+
 1.3a8 (2010-08-08)
 ==================
 
