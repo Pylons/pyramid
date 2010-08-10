@@ -15,6 +15,7 @@
 __version__ = '1.3a8'
 
 import os
+import platform
 import sys
 
 from setuptools import setup, find_packages
@@ -42,6 +43,12 @@ install_requires=[
     'translationstring',
     ]
 
+if platform.system() == 'Java':
+    tests_require = install_requires + ['twill']
+else:
+    tests_require= install_requires + ['Sphinx', 'docutils', 'coverage',
+                                       'twill']
+
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
     
@@ -67,8 +74,7 @@ setup(name='repoze.bfg',
       namespace_packages = ['repoze', 'repoze.bfg'],
       zip_safe=False,
       install_requires = install_requires,
-      tests_require= install_requires + ['Sphinx', 'docutils', 'coverage',
-                                         'twill'],
+      tests_require = tests_require,
       test_suite="repoze.bfg.tests",
       entry_points = """\
         [paste.paster_create_template]
