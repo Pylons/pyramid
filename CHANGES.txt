@@ -9,6 +9,9 @@ Internal
   ``.pyc`` and ``.pyo`` to use for comparison when attemtping to
   decide if a directory is a package.
 
+- Make tests runnable again under Jython (although they do not all
+  pass currently).
+
 1.3a8 (2010-08-08)
 ==================
 
