@@ -64,7 +64,7 @@ def render_to_response(_renderer_name, **values):
     The ``values`` provided will be supplied as top-level names to the
     renderer.  These will be augmented by a basic set of top-level
     system names, such as ``request``, ``context``, and
-    ``renderer_name` unless any of these names is already provided
+    ``renderer_name`` unless any of these names is already provided
     within ``*values``.  If :term:`renderer globals` have been
     specified, these will also be used to agument the value.
 
