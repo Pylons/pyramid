@@ -112,6 +112,24 @@ class TestPackagePath(unittest.TestCase):
         self.failIf(hasattr(module, '__bfg_abspath__'))
         self.assertEqual(result, module.package_path)
 
+class TestPackageOf(unittest.TestCase):
+    def _callFUT(self, package):
+        from repoze.bfg.path import package_of
+        return package_of(package)
+
+    def test_it_package(self):
+        from repoze.bfg import tests
+        package = DummyPackageOrModule(tests)
+        result = self._callFUT(package)
+        self.assertEqual(result, tests)
+
+    def test_it_module(self):
+        import repoze.bfg.tests.test_configuration
+        from repoze.bfg import tests
+        package = DummyPackageOrModule(repoze.bfg.tests.test_configuration)
+        result = self._callFUT(package)
+        self.assertEqual(result, tests)
+
 class TestPackageName(unittest.TestCase):
     def _callFUT(self, package):
         from repoze.bfg.path import package_name

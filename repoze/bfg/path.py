@@ -35,6 +35,12 @@ def package_name(pkg_or_module):
         return pkg_name
     return pkg_name.rsplit('.', 1)[0]
 
+def package_of(pkg_or_module):
+    """ Return the package of a module or return the package itself """
+    pkg_name = package_name(pkg_or_module)
+    __import__(pkg_name)
+    return sys.modules[pkg_name]
+
 def caller_package(level=2, caller_module=caller_module):
     # caller_module in arglist for tests
     module = caller_module(level+1)

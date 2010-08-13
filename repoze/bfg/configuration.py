@@ -3,6 +3,7 @@ import re
 import sys
 import threading
 import inspect
+import pkg_resources
 
 import venusian
 
@@ -57,6 +58,7 @@ from repoze.bfg.i18n import get_localizer
 from repoze.bfg.log import make_stream_logger
 from repoze.bfg.path import caller_package
 from repoze.bfg.path import package_path
+from repoze.bfg.path import package_of
 from repoze.bfg.registry import Registry
 from repoze.bfg.request import route_request_iface
 from repoze.bfg.resource import PackageOverrides
@@ -109,12 +111,13 @@ class Configurator(object):
        are ignored.
 
     If the ``package`` argument is passed, it must be a reference to a
-    Python :term:`package` (e.g. ``sys.modules['thepackage']``).  This
-    value is used as a basis to convert relative paths passed to
-    various configuration methods, such as methods which accept a
-    ``renderer`` argument, into absolute paths.  If ``None`` is passed
-    (the default), the package is assumed to be the Python package in
-    which the *caller* of the ``Configurator`` constructor lives.
+    Python :term:`package` (e.g. ``sys.modules['thepackage']``) or a
+    :term:`dotted Python name` to same.  This value is used as a basis
+    to convert relative paths passed to various configuration methods,
+    such as methods which accept a ``renderer`` argument, into
+    absolute paths.  If ``None`` is passed (the default), the package
+    is assumed to be the Python package in which the *caller* of the
+    ``Configurator`` constructor lives.
 
     If the ``settings`` argument is passed, it should be a Python
     dictionary representing the deployment settings for this
@@ -167,10 +170,15 @@ class Configurator(object):
                  locale_negotiator=None,
                  request_factory=None,
                  renderer_globals_factory=None):
-        self.package = package or caller_package()
+        if package is None:
+            package = caller_package()
+        name_resolver = DottedNameResolver(package)
+        self.name_resolver = name_resolver
+        self.package_name = name_resolver.package_name
+        self.package = name_resolver.package
         self.registry = registry
         if registry is None:
-            registry = Registry(self.package.__name__)
+            registry = Registry(self.package_name)
             self.registry = registry
             self.setup_registry(
                 settings=settings,
@@ -236,83 +244,13 @@ class Configurator(object):
 
     def _make_spec(self, path_or_spec):
         package, filename = resolve_resource_spec(path_or_spec,
-                                                  self.package.__name__)
+                                                  self.package_name)
         if package is None:
             return filename # absolute filename
         return '%s:%s' % (package, filename)
 
     def _split_spec(self, path_or_spec):
-        return resolve_resource_spec(path_or_spec, self.package.__name__)
-
-    def derive_view(self, view, attr=None, renderer=None):
-        """
-        Create a :term:`view callable` using the function, instance,
-        or class provided as ``view`` object.
-
-        This is API is useful to framework extenders who create
-        pluggable systems which need to register 'proxy' view
-        callables for functions, instances, or classes which meet the
-        requirements of being a :mod:`repoze.bfg` view callable.  For
-        example, a ``some_other_framework`` function in another
-        framework may want to allow a user to supply a view callable,
-        but he may want to wrap the view callable in his own before
-        registering the wrapper as a :mod:`repoze.bfg` view callable.
-        Because a :mod:`repoze.bfg` view callable can be any of a
-        number of valid objects, the framework extender will not know
-        how to call the user-supplied object.  Running it through
-        ``derive_view`` normalizes it to a callable which accepts two
-        arguments: ``context`` and ``request``.
-
-        For example:
-
-        .. code-block:: python
-
-           def some_other_framework(user_supplied_view):
-               config = Configurator(reg)
-               proxy_view = config.derive_view(user_supplied_view)
-               def my_wrapper(context, request):
-                   do_something_that_mutates(request)
-                   return proxy_view(context, request)
-               config.add_view(my_wrapper)
-
-        The ``view`` object provided should be one of the following:
-
-        - A function or another non-class callable object that accepts
-          a :term:`request` as a single positional argument and which
-          returns a :term:`response` object.
-
-        - A function or other non-class callable object that accepts
-          two positional arguments, ``context, request`` and which
-          returns a :term:`response` object.
-
-        - A class which accepts a single positional argument in its
-          constructor named ``request``, and which has a ``__call__``
-          method that accepts no arguments that returns a
-          :term:`response` object.
-
-        - A class which accepts two positional arguments named
-          ``context, request``, and which has a ``__call__`` method
-          that accepts no arguments that returns a :term:`response`
-          object.
-
-        This API returns a callable which accepts the arguments
-        ``context, request`` and which returns the result of calling
-        the provided ``view`` object.
-
-        The ``attr`` keyword argument is most useful when the view
-        object is a class.  It names the method that should be used as
-        the callable.  If ``attr`` is not provided, the attribute
-        effectively defaults to ``__call__``.  See
-        :ref:`class_as_view` for more information.
-
-        The ``renderer`` keyword argument, if supplies, causes the
-        returned callable to use a :term:`renderer` to convert the
-        user-supplied view result to a :term:`response` object.  If a
-        ``renderer`` argument is not supplied, the user-supplied view
-        must itself return a :term:`response` object.
-        """
-
-        return self._derive_view(view, attr=attr, renderer_name=renderer)
+        return resolve_resource_spec(path_or_spec, self.package_name)
 
     def _derive_view(self, view, permission=None, predicates=(),
                      attr=None, renderer_name=None, wrapper_viewname=None,
@@ -371,6 +309,21 @@ class Configurator(object):
             self.registry.has_listeners = True
 
     # API
+
+    def with_package(self, package):
+        """ Return a new Configurator instance with the same registry
+        as this configurator using the package supplied as the
+        ``package`` argument to the new configurator."""
+        return self.__class__(registry=self.registry, package=package)
+
+    def maybe_dotted(self, dotted):
+        """ Resolve the dotted name ``dotted`` to a global Python
+        object.  If ``dotted`` is not a string, return it without
+        attempting to do any name resolution.  If ``dotted`` is a
+        relative dotted name (e.g. ``.foo.bar``, consider it relative
+        to the ``package`` argument supplied to this Configurator's
+        constructor."""
+        return self.name_resolver.maybe_resolve(dotted)
 
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
@@ -461,6 +414,76 @@ class Configurator(object):
         value.
         """
         return self.manager.pop()
+
+    def derive_view(self, view, attr=None, renderer=None):
+        """
+        Create a :term:`view callable` using the function, instance,
+        or class provided as ``view`` object.
+
+        This is API is useful to framework extenders who create
+        pluggable systems which need to register 'proxy' view
+        callables for functions, instances, or classes which meet the
+        requirements of being a :mod:`repoze.bfg` view callable.  For
+        example, a ``some_other_framework`` function in another
+        framework may want to allow a user to supply a view callable,
+        but he may want to wrap the view callable in his own before
+        registering the wrapper as a :mod:`repoze.bfg` view callable.
+        Because a :mod:`repoze.bfg` view callable can be any of a
+        number of valid objects, the framework extender will not know
+        how to call the user-supplied object.  Running it through
+        ``derive_view`` normalizes it to a callable which accepts two
+        arguments: ``context`` and ``request``.
+
+        For example:
+
+        .. code-block:: python
+
+           def some_other_framework(user_supplied_view):
+               config = Configurator(reg)
+               proxy_view = config.derive_view(user_supplied_view)
+               def my_wrapper(context, request):
+                   do_something_that_mutates(request)
+                   return proxy_view(context, request)
+               config.add_view(my_wrapper)
+
+        The ``view`` object provided should be one of the following:
+
+        - A function or another non-class callable object that accepts
+          a :term:`request` as a single positional argument and which
+          returns a :term:`response` object.
+
+        - A function or other non-class callable object that accepts
+          two positional arguments, ``context, request`` and which
+          returns a :term:`response` object.
+
+        - A class which accepts a single positional argument in its
+          constructor named ``request``, and which has a ``__call__``
+          method that accepts no arguments that returns a
+          :term:`response` object.
+
+        - A class which accepts two positional arguments named
+          ``context, request``, and which has a ``__call__`` method
+          that accepts no arguments that returns a :term:`response`
+          object.
+
+        This API returns a callable which accepts the arguments
+        ``context, request`` and which returns the result of calling
+        the provided ``view`` object.
+
+        The ``attr`` keyword argument is most useful when the view
+        object is a class.  It names the method that should be used as
+        the callable.  If ``attr`` is not provided, the attribute
+        effectively defaults to ``__call__``.  See
+        :ref:`class_as_view` for more information.
+
+        The ``renderer`` keyword argument, if supplies, causes the
+        returned callable to use a :term:`renderer` to convert the
+        user-supplied view result to a :term:`response` object.  If a
+        ``renderer`` argument is not supplied, the user-supplied view
+        must itself return a :term:`response` object.
+        """
+
+        return self._derive_view(view, attr=attr, renderer_name=renderer)
 
     def add_subscriber(self, subscriber, iface=None, info=u''):
         """Add an event :term:`subscriber` for the event stream
@@ -894,7 +917,7 @@ class Configurator(object):
             if old_view is not None:
                 break
 
-        is_exception_view = isexception(context)
+        isexc = isexception(context)
 
         def regclosure():
             if hasattr(view, '__call_permissive__'):
@@ -902,9 +925,10 @@ class Configurator(object):
             else:
                 view_iface = IView
             self.registry.registerAdapter(
-                derived_view, (IViewClassifier, request_iface, context),
+                derived_view,
+                (IViewClassifier, request_iface, context),
                 view_iface, name, info=_info)
-            if is_exception_view:
+            if isexc:
                 self.registry.registerAdapter(
                     derived_view,
                     (IExceptionViewClassifier, request_iface, context),
@@ -947,18 +971,19 @@ class Configurator(object):
                 self.registry.adapters.unregister(
                     (IViewClassifier, request_iface, r_context),
                     view_type, name=name)
-                if is_exception_view:
+                if isexc:
                     self.registry.adapters.unregister(
                         (IExceptionViewClassifier, request_iface, r_context),
                         view_type, name=name)
             self.registry.registerAdapter(
-                multiview, (IViewClassifier, request_iface, context),
-                IMultiView, name, info=_info)
-            if is_exception_view:
+                multiview,
+                (IViewClassifier, request_iface, context),
+                IMultiView, name=name, info=_info)
+            if isexc:
                 self.registry.registerAdapter(
                     multiview,
                     (IExceptionViewClassifier, request_iface, context),
-                    IMultiView, name, info=_info)
+                    IMultiView, name=name, info=_info)
 
     def add_route(self,
                   name,
@@ -2385,11 +2410,11 @@ class DottedNameResolver(object):
     Two dotted name styles are supported during deserialization:
 
     - ``pkg_resources``-style dotted names where non-module attributes
-      of a module are separated from the rest of the path using a ':'
+      of a package are separated from the rest of the path using a ':'
       e.g. ``package.module:attr``.
 
     - ``zope.dottedname``-style dotted names where non-module
-      attributes of a module are separated from the rest of the path
+      attributes of a package are separated from the rest of the path
       using a '.' e.g. ``package.module.attr``.
 
     These styles can be used interchangeably.  If the serialization
@@ -2398,42 +2423,79 @@ class DottedNameResolver(object):
     resolution mechanism will be chosen.
 
     The constructor accepts a single argument named ``package`` which
-    should be a Python module or package object; it is used when
-    *relative* dotted names are supplied to the ``__call__`` method.
-    A dotted name which has a ``.`` (dot) or ``:`` (colon) as its
-    first character is treated as relative.  E.g. if ``.minidom`` is
-    supplied to ``deserialize``, and the ``package`` argument to this
-    type was passed the ``xml`` module object, the resulting import
-    would be for ``xml.minidom``.  If a relative package name is
-    supplied to ``deserialize``, and no ``package`` was supplied to
-    the constructor, an :exc:`repoze.bfg.ConfigurationError` error
-    will be raised.
+    should be a one of:
+
+    - a Python module or package object
+
+    - A fully qualified (not relative) dotted name to a module or package
+
+    - The value ``None``
+
+    The ``package`` is used when relative dotted names are supplied to
+    the resolver's ``resolve`` and ``maybe_resolve`` methods.  A
+    dotted name which has a ``.`` (dot) or ``:`` (colon) as its first
+    character is treated as relative.
+    
+    If the value ``None`` is supplied as the package name, the
+    resolver will only be able to resolve fully qualified (not
+    relative) names.  Any attempt to resolve a relative name when the
+    ``package`` is ``None`` will result in an
+    :exc:`repoze.bfg.configuration.ConfigurationError` exception.
+
+    If a *module* or *module name* (as opposed to a package or package
+    name) is supplied as ``package``, its containing package is
+    computed and this package used to derive the package name (all
+    names are resolved relative to packages, never to modules).  For
+    example, if the ``package`` argument to this type was passed the
+    string ``xml.dom.expatbuilder``, and ``.mindom`` is supplied to
+    the ``resolve`` method, the resulting import would be for
+    ``xml.minidom``, because ``xml.dom.expatbuilder`` is a module
+    object, not a package object.
+
+    If a *package* or *package name* (as opposed to a module or module
+    name) is supplied as ``package``, this package will be used to
+    relative compute dotted names.  For example, if the ``package``
+    argument to this type was passed the string ``xml.dom``, and
+    ``.minidom`` is supplied to the ``resolve`` method, the resulting
+    import would be for ``xml.minidom``.
 
     When a dotted name cannot be resolved, a
     :class:`repoze.bfg.exceptions.ConfigurationError` error is raised.
     """
     def __init__(self, package):
-        self.package = package
+        if package is None:
+            self.package_name = None
+            self.package = None
+        else:
+            if isinstance(package, basestring):
+                try:
+                    __import__(package)
+                except ImportError:
+                    raise ConfigurationError(
+                        'The dotted name %r cannot be imported' % (package,))
+                package = sys.modules[package]
+            self.package = package_of(package)
+            self.package_name = self.package.__name__
 
     def _pkg_resources_style(self, value):
         """ package.module:attr style """
-        import pkg_resources
         if value.startswith('.') or value.startswith(':'):
-            if not self.package:
+            if not self.package_name:
                 raise ConfigurationError(
-                    'relative name %r irresolveable without package' % (value,))
+                    'relative name %r irresolveable without '
+                    'package_name' % (value,))
             if value in ['.', ':']:
-                value = self.package.__name__
+                value = self.package_name
             else:
-                value = self.package.__name__ + value
+                value = self.package_name + value
         return pkg_resources.EntryPoint.parse(
             'x=%s' % value).load(False)
 
     def _zope_dottedname_style(self, value):
         """ package.module.attr style """
-        module = self.package and self.package.__name__ or None
+        module = self.package_name and self.package_name or None
         if value == '.':
-            if self.package is None:
+            if self.package_name is None:
                 raise ConfigurationError(
                     'relative name %r irresolveable without package' % (value,))
             name = module.split('.')
@@ -2464,14 +2526,20 @@ class DottedNameResolver(object):
 
         return found
 
-    def __call__(self, dotted):
+    def resolve(self, dotted):
         if not isinstance(dotted, basestring):
             raise ConfigurationError('%r is not a string' % (dotted,))
-        try:
-            if ':' in dotted:
-                return self._pkg_resources_style(dotted)
-            else:
-                return self._zope_dottedname_style(dotted)
-        except ImportError:
-            raise ConfigurationError(
-                'The dotted name %r cannot be imported' % (dotted,))
+        return self.maybe_resolve(dotted)
+
+    def maybe_resolve(self, dotted):
+        if isinstance(dotted, basestring):
+            try:
+                if ':' in dotted:
+                    return self._pkg_resources_style(dotted)
+                else:
+                    return self._zope_dottedname_style(dotted)
+            except ImportError:
+                raise ConfigurationError(
+                    'The dotted name %r cannot be imported' % (dotted,))
+        return dotted
+        

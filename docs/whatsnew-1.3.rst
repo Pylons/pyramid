@@ -271,6 +271,24 @@ Minor Feature Additions
   callable calling convention of ``(context, request)`` (``context``
   will be the exception object).
 
+- The :class:`repoze.bfg.configuration.Configurator` constructor now
+  accepts a dotted name *string* to a package as a ``package``
+  argument. The ``package`` argument was previously required to be a
+  package *object* (not a dotted name string).
+
+- The :meth:`repoze.bfg.configuration.Configurator.with_package`
+  method was added.  This method returns a new Configurator using the
+  same application registry as the configurator object it is called
+  upon. The new configurator is created afresh with its ``package``
+  constructor argument set to the value passed to ``with_package``.
+
+- The :meth:`repoze.bfg.configuration.Configurator.maybe_dotted`
+  method resolves a Python dotted name string supplied as its
+  ``dotted`` argument to a global Python object.  If the value cannot
+  be resolved, a :exc:`repoze.bfg.configuration.ConfigurationError` is
+  raised.  If the value supplied as ``dotted`` is not a string, the
+  value is returned unconditionally without any resolution attempted.
+
 Backwards Incompatibilities
 ---------------------------
 

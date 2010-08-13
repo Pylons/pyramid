@@ -22,6 +22,10 @@
 
      .. automethod:: get_settings
 
+     .. automethod:: with_package
+
+     .. automethod:: maybe_dotted
+
      .. automethod:: setup_registry(settings=None, root_factory=None, authentication_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None)
 
      .. automethod:: add_renderer(name, factory)
