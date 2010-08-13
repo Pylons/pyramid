@@ -243,30 +243,106 @@ class Test_rendered_response(unittest.TestCase):
         result = self._callFUT(renderer, response)
         self.assertEqual(result.body, 'Hello!')
 
-class Test__make_response(unittest.TestCase):
+
+class TestRendererHelper(unittest.TestCase):
     def setUp(self):
-        self.config = testing.setUp()
+        self.config = cleanUp()
 
     def tearDown(self):
-        testing.tearDown()
+        cleanUp()
 
-    def _callFUT(self, request, result):
-        from repoze.bfg.renderers import _make_response
-        return _make_response(request, result)
+    def _makeOne(self, *arg, **kw):
+        from repoze.bfg.renderers import RendererHelper
+        return RendererHelper(*arg, **kw)
 
-    def test_with_content_type(self):
+    def _registerRendererFactory(self):
+        from repoze.bfg.interfaces import IRendererFactory
+        def renderer(*arg):
+            def respond(*arg):
+                return arg
+            return respond
+        self.config.registry.registerUtility(renderer, IRendererFactory,
+                                             name='.foo')
+        return renderer
+
+    def test_resolve_spec_path_is_None(self):
+        helper = self._makeOne('loo.foo')
+        result = helper.resolve_spec(None)
+        self.assertEqual(result, None)
+
+    def test_resolve_spec_package_is_None(self):
+        helper = self._makeOne('loo.foo')
+        result = helper.resolve_spec('/foo/bar')
+        self.assertEqual(result, '/foo/bar')
+
+    def test_resolve_spec_absolute(self):
+        helper = self._makeOne('loo.foo')
+        result = helper.resolve_spec('repoze.bfg:flub')
+        self.assertEqual(result, 'repoze.bfg:flub')
+
+    def test_resolve_spec_relative(self):
+        helper = self._makeOne('loo.foo', package='repoze.bfg')
+        result = helper.resolve_spec('flub')
+        self.assertEqual(result, 'repoze.bfg:flub')
+
+    def test_render_to_response(self):
+        self._registerRendererFactory()
+        request = Dummy()
+        helper = self._makeOne('loo.foo')
+        response = helper.render_to_response('values', 'system_values',
+                                             request=request)
+        self.assertEqual(response.body, ('values', 'system_values'))
+
+    def test_render_explicit_registry(self):
+        factory = self._registerRendererFactory()
+        class DummyRegistry(object):
+            def __init__(self):
+                self.responses = [factory, lambda *arg: {}]
+            def queryUtility(self, iface, name=None):
+                self.queried = True
+                return self.responses.pop(0)
+        reg = DummyRegistry()
+        helper = self._makeOne('loo.foo', registry=reg)
+        result = helper.render('value', {})
+        self.assertEqual(result, ('value', {}))
+        self.failUnless(reg.queried)
+
+    def test_render_system_values_is_None(self):
+        self._registerRendererFactory()
+        request = Dummy()
+        context = Dummy()
+        request.context = context
+        helper = self._makeOne('loo.foo')
+        result = helper.render('values', None, request=request)
+        system = {'request':request, 'context':context,
+                  'renderer_name':'loo.foo', 'view':None}
+        self.assertEqual(result, ('values', system))
+
+    def test_render_renderer_globals_factory_active(self):
+        self._registerRendererFactory()
+        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        def rg(system):
+            return {'a':1}
+        self.config.registry.registerUtility(rg, IRendererGlobalsFactory)
+        helper = self._makeOne('loo.foo')
+        result = helper.render('values', None)
+        self.assertEqual(result[1]['a'], 1)
+
+    def test__make_response_with_content_type(self):
         request = testing.DummyRequest()
         attrs = {'response_content_type':'text/nonsense'}
         request.__dict__.update(attrs)
-        response = self._callFUT(request, 'abc')
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
         self.assertEqual(response.content_type, 'text/nonsense')
         self.assertEqual(response.body, 'abc')
 
-    def test_with_headerlist(self):
+    def test__make_response_with_headerlist(self):
         request = testing.DummyRequest()
         attrs = {'response_headerlist':[('a', '1'), ('b', '2')]}
         request.__dict__.update(attrs)
-        response = self._callFUT(request, 'abc')
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
         self.assertEqual(response.headerlist,
                          [('Content-Type', 'text/html; charset=UTF-8'),
                           ('Content-Length', '3'),
@@ -274,26 +350,29 @@ class Test__make_response(unittest.TestCase):
                           ('b', '2')])
         self.assertEqual(response.body, 'abc')
 
-    def test_with_status(self):
+    def test__make_response_with_status(self):
         request = testing.DummyRequest()
         attrs = {'response_status':'406 You Lose'}
         request.__dict__.update(attrs)
-        response = self._callFUT(request, 'abc')
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
         self.assertEqual(response.status, '406 You Lose')
         self.assertEqual(response.body, 'abc')
 
-    def test_with_charset(self):
+    def test__make_response_with_charset(self):
         request = testing.DummyRequest()
         attrs = {'response_charset':'UTF-16'}
         request.__dict__.update(attrs)
-        response = self._callFUT(request, 'abc')
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
         self.assertEqual(response.charset, 'UTF-16')
 
-    def test_with_cache_for(self):
+    def test__make_response_with_cache_for(self):
         request = testing.DummyRequest()
         attrs = {'response_cache_for':100}
         request.__dict__.update(attrs)
-        response = self._callFUT(request, 'abc')
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
         self.assertEqual(response.cache_control.max_age, 100)
 
     def test_with_alternate_response_factory(self):
@@ -303,110 +382,21 @@ class Test__make_response(unittest.TestCase):
                 self.result = result
         self.config.registry.registerUtility(ResponseFactory, IResponseFactory)
         request = testing.DummyRequest()
-        response = self._callFUT(request, 'abc')
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
         self.assertEqual(response.__class__, ResponseFactory)
         self.assertEqual(response.result, 'abc')
 
-    def test_with_real_request(self):
+    def test__make_response_with_real_request(self):
         # functional
         from repoze.bfg.request import Request
         request = Request({})
         attrs = {'response_status':'406 You Lose'}
         request.__dict__.update(attrs)
-        response = self._callFUT(request, 'abc')
+        helper = self._makeOne('loo.foo')
+        response = helper._make_response('abc', request)
         self.assertEqual(response.status, '406 You Lose')
         self.assertEqual(response.body, 'abc')
-
-class Test__render(unittest.TestCase):
-    def setUp(self):
-        self.config = cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, renderer_name, request, values, system_values, renderer,
-                 package):
-        from repoze.bfg.renderers import _render
-        return _render(renderer_name, request, values, system_values, renderer,
-                       package)
-
-    def test_explicit_renderer(self):
-        def renderer(*arg):
-            return arg
-        result = self._callFUT(
-            'name', 'request', 'values', 'system_values', renderer, None)
-        self.assertEqual(result, ('values', 'system_values'))
-        
-    def test_request_has_registry(self):        
-        request = Dummy()
-        class DummyRegistry(object):
-            def queryUtility(self, iface):
-                self.queried = True
-                return None
-        reg = DummyRegistry()
-        request.registry = reg
-        def renderer(*arg):
-            return arg
-        result = self._callFUT(
-            'name', request, 'values', 'system_values', renderer, None)
-        self.assertEqual(result, ('values', 'system_values'))
-        self.failUnless(reg.queried)
-
-    def test_renderer_is_None(self):
-        from repoze.bfg.interfaces import IRendererFactory
-        def renderer(values, system):
-            return rf
-        def rf(spec):
-            return renderer
-        self.config.registry.registerUtility(rf, IRendererFactory, name='name')
-        result = self._callFUT(
-            'name', 'request', 'values', 'system_values', None, None)
-        self.assertEqual(result, rf)
-
-    def test_system_values_is_None(self):
-        def renderer(*arg):
-            return arg
-        request = Dummy()
-        context = Dummy()
-        request.context = context
-        result = self._callFUT(
-            'name', request, 'values', None, renderer, None)
-        system = {'request':request, 'context':context,
-                  'renderer_name':'name', 'view':None}
-        self.assertEqual(result, ('values', system))
-
-    def test_renderer_globals_factory_active(self):
-        from repoze.bfg.interfaces import IRendererGlobalsFactory
-        def rg(system):
-            return {'a':1}
-        self.config.registry.registerUtility(rg, IRendererGlobalsFactory)
-        def renderer(*arg):
-            return arg
-        result = self._callFUT(
-            'name', 'request', 'values', {'a':2}, renderer, None)
-        self.assertEqual(result, ('values', {'a':1}))
-
-class Test__render_to_response(unittest.TestCase):
-    def setUp(self):
-        self.config = cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _callFUT(self, renderer_name, request, values, system_values, renderer,
-                 package):
-        from repoze.bfg.renderers import _render_to_response
-        return _render_to_response(
-            renderer_name, request, values, system_values, renderer,
-            package)
-
-    def test_it(self):
-        def renderer(*arg):
-            return 'hello'
-        request = Dummy()
-        result = self._callFUT(
-            'name', request, 'values', 'system_values', renderer, None)
-        self.assertEqual(result.body, 'hello')
 
 class Test_render(unittest.TestCase):
     def setUp(self):
@@ -415,15 +405,15 @@ class Test_render(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, renderer_name, **kw):
+    def _callFUT(self, renderer_name, value, request=None, package=None):
         from repoze.bfg.renderers import render
-        return render(renderer_name, **kw)
+        return render(renderer_name, value, request=request, package=package)
 
     def test_it_no_request(self):
         renderer = self.config.testing_add_renderer(
             'repoze.bfg.tests:abc/def.pt')
         renderer.string_response = 'abc'
-        result = self._callFUT('abc/def.pt', a=1)
+        result = self._callFUT('abc/def.pt', dict(a=1))
         self.assertEqual(result, 'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=None)
@@ -434,7 +424,7 @@ class Test_render(unittest.TestCase):
         renderer.string_response = 'abc'
         request = testing.DummyRequest()
         result = self._callFUT('abc/def.pt',
-                               a=1, request=request)
+                               dict(a=1), request=request)
         self.assertEqual(result, 'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=request)
@@ -446,15 +436,16 @@ class Test_render_to_response(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    def _callFUT(self, renderer_name, **kw):
+    def _callFUT(self, renderer_name, value, request=None, package=None):
         from repoze.bfg.renderers import render_to_response
-        return render_to_response(renderer_name, **kw)
+        return render_to_response(renderer_name, value, request=request,
+                                  package=package)
 
     def test_it_no_request(self):
         renderer = self.config.testing_add_renderer(
             'repoze.bfg.tests:abc/def.pt')
         renderer.string_response = 'abc'
-        response = self._callFUT('abc/def.pt', a=1)
+        response = self._callFUT('abc/def.pt', dict(a=1))
         self.assertEqual(response.body, 'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=None)
@@ -465,7 +456,7 @@ class Test_render_to_response(unittest.TestCase):
         renderer.string_response = 'abc'
         request = testing.DummyRequest()
         response = self._callFUT('abc/def.pt',
-                               a=1, request=request)
+                                 dict(a=1), request=request)
         self.assertEqual(response.body, 'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=request)

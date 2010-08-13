@@ -67,7 +67,7 @@ class Test_registerTemplateRenderer(TestBase):
         from repoze.bfg.testing import DummyTemplateRenderer
         self.failUnless(isinstance(renderer, DummyTemplateRenderer))
         from repoze.bfg.renderers import render_to_response
-        render_to_response('templates/foo', foo=1, bar=2)
+        render_to_response('templates/foo', dict(foo=1, bar=2))
         renderer.assert_(foo=1)
         renderer.assert_(bar=2)
 
@@ -77,7 +77,7 @@ class Test_registerTemplateRenderer(TestBase):
             self.assertEqual(kw, {'foo':1, 'bar':2})
         renderer = testing.registerTemplateRenderer('templates/foo', renderer)
         from repoze.bfg.renderers import render_to_response
-        render_to_response('templates/foo', foo=1, bar=2)
+        render_to_response('templates/foo', dict(foo=1, bar=2))
 
 class Test_registerEventListener(TestBase):
     def test_registerEventListener_single(self):

@@ -767,7 +767,7 @@ def cleanUp(*arg, **kw):
 
 class DummyRendererFactory(object):
     """ Registered by
-    ``repoze.bfg.configuration.Configurator.testing_add_template`` as
+    ``repoze.bfg.configuration.Configurator.testing_add_renderer`` as
     a dummy renderer factory.  The indecision about what to use as a
     key (a spec vs. a relative name) is caused by test suites in the
     wild believing they can register either.  The ``factory`` argument

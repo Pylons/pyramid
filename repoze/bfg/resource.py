@@ -174,6 +174,8 @@ class FileOverride:
             return self.package, self.prefix
 
 def resolve_resource_spec(spec, pname='__main__'):
+    if pname and not isinstance(pname, basestring):
+        pname = pname.__name__ # as package
     if os.path.isabs(spec):
         return None, spec
     filename = spec

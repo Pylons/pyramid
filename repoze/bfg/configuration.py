@@ -45,7 +45,7 @@ from repoze.bfg.interfaces import IException
 from repoze.bfg import chameleon_text
 from repoze.bfg import chameleon_zpt
 from repoze.bfg import renderers
-from repoze.bfg.renderers import _render_to_response
+from repoze.bfg.renderers import RendererHelper
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.compat import all
 from repoze.bfg.compat import md5
@@ -206,32 +206,6 @@ class Configurator(object):
         self.registry.registerUtility(factory, IRootFactory)
         self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
 
-    def _renderer_factory_from_name(self, path_or_spec):
-        if '.' in path_or_spec:
-            name = os.path.splitext(path_or_spec)[1]
-            spec = self._make_spec(path_or_spec)
-        else:
-            name = path_or_spec
-            spec = path_or_spec
-
-        factory = self.registry.queryUtility(IRendererFactory, name=name)
-        return name, spec, factory
-        
-    def _renderer_from_name(self, path_or_spec):
-        if path_or_spec is None:
-            # check for global default renderer
-            factory = self.registry.queryUtility(IRendererFactory)
-            if factory is not None:
-                return factory(path_or_spec)
-            return None
-
-        name, spec, factory = self._renderer_factory_from_name(path_or_spec)
-        if factory is None:
-            raise ValueError(
-                'No factory for renderer named %r when looking up %s' %
-                (name, spec))
-        return factory(spec)
-
     def _set_authentication_policy(self, policy, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`authentication policy` to
         the current configuration."""
@@ -256,12 +230,12 @@ class Configurator(object):
                      attr=None, renderer_name=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
-        renderer = self._renderer_from_name(renderer_name)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
         settings = self.registry.queryUtility(ISettings)
         logger = self.registry.queryUtility(IDebugLogger)
-        mapped_view = _map_view(view, attr, renderer, renderer_name)
+        mapped_view = _map_view(view, attr, renderer_name, self.registry,
+                                self.package)
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
         secured_view = _secure_view(owrapped_view, permission,
                                     authn_policy, authz_policy)
@@ -1819,15 +1793,17 @@ class Configurator(object):
            and purpose in previous releases)..
         """
         from repoze.bfg.testing import DummyRendererFactory
-        name, spec, factory = self._renderer_factory_from_name(path)
-        if factory is None or not isinstance(factory, DummyRendererFactory):
-            factory = DummyRendererFactory(name, factory)
-            self.registry.registerUtility(factory, IRendererFactory, name=name)
+        helper = RendererHelper(path, registry=self.registry)
+        factory = helper.factory
+        if not isinstance(factory, DummyRendererFactory):
+            factory = DummyRendererFactory(helper.renderer_type, helper.factory)
+            self.registry.registerUtility(factory, IRendererFactory,
+                                          name=helper.renderer_type)
 
         from repoze.bfg.testing import DummyTemplateRenderer
         if renderer is None:
             renderer = DummyTemplateRenderer()
-        factory.add(spec, renderer)
+        factory.add(helper.renderer_name, renderer)
         return renderer
 
     testing_add_template = testing_add_renderer
@@ -2145,8 +2121,14 @@ def is_response(ob):
         return True
     return False
 
-def _map_view(view, attr=None, renderer=None, renderer_name=None):
+def _map_view(view, attr=None, renderer_name=None, registry=None, package=None):
     wrapped_view = view
+
+    helper = None
+    if renderer_name:
+        helper = RendererHelper(renderer_name,
+                                registry=registry,
+                                package=package)
 
     if inspect.isclass(view):
         # If the object we've located is a class, turn it into a
@@ -2164,16 +2146,12 @@ def _map_view(view, attr=None, renderer=None, renderer_name=None):
                     response = inst()
                 else:
                     response = getattr(inst, attr)()
-                if renderer is not None:
+                if helper is not None:
                     if not is_response(response):
                         system = {'view':inst, 'renderer_name':renderer_name,
                                   'context':context, 'request':request}
-                        response = _render_to_response(renderer_name,
-                                                       request,
-                                                       response,
-                                                       system,
-                                                       renderer,
-                                                       None)
+                        response = helper.render_to_response(response, system,
+                                                             request=request)
                 return response
             wrapped_view = _bfg_class_requestonly_view
         else:
@@ -2184,16 +2162,12 @@ def _map_view(view, attr=None, renderer=None, renderer_name=None):
                     response = inst()
                 else:
                     response = getattr(inst, attr)()
-                if renderer is not None:
+                if helper is not None:
                     if not is_response(response):
                         system = {'view':inst, 'renderer_name':renderer_name,
                                   'context':context, 'request':request}
-                        response = _render_to_response(renderer_name,
-                                                       request,
-                                                       response,
-                                                       system,
-                                                       renderer,
-                                                       None)
+                        response = helper.render_to_response(response, system,
+                                                             request=request)
                 return response
             wrapped_view = _bfg_class_view
 
@@ -2206,47 +2180,35 @@ def _map_view(view, attr=None, renderer=None, renderer_name=None):
             else:
                 response = getattr(view, attr)(request)
 
-            if renderer is not None:
+            if helper is not None:
                 if not is_response(response):
                     system = {'view':view, 'renderer_name':renderer_name,
                               'context':context, 'request':request}
-                    response = _render_to_response(renderer_name,
-                                                   request,
-                                                   response,
-                                                   system,
-                                                   renderer,
-                                                   None)
+                    response = helper.render_to_response(response, system,
+                                                         request=request)
             return response
         wrapped_view = _bfg_requestonly_view
 
     elif attr:
         def _bfg_attr_view(context, request):
             response = getattr(view, attr)(context, request)
-            if renderer is not None:
+            if helper is not None:
                 if not is_response(response):
                     system = {'view':view, 'renderer_name':renderer_name,
                               'context':context, 'request':request}
-                    response = _render_to_response(renderer_name,
-                                                   request,
-                                                   response,
-                                                   system,
-                                                   renderer,
-                                                   None)
+                    response = helper.render_to_response(response, system,
+                                                         request=request)
             return response
         wrapped_view = _bfg_attr_view
 
-    elif renderer is not None:
+    elif helper is not None:
         def _rendered_view(context, request):
             response = view(context, request)
             if not is_response(response):
                 system = {'view':view, 'renderer_name':renderer_name,
-                              'context':context, 'request':request}
-                response = _render_to_response(renderer_name,
-                                               request,
-                                               response,
-                                               system,
-                                               renderer,
-                                               None)
+                          'context':context, 'request':request}
+                response = helper.render_to_response(response, system,
+                                                     request=request)
             return response
         wrapped_view = _rendered_view
 

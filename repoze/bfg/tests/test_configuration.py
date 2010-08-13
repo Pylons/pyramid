@@ -1989,14 +1989,6 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
 
-    def test__renderer_from_name_default_renderer(self):
-        from repoze.bfg.interfaces import IRendererFactory
-        config = self._makeOne()
-        factory = lambda *arg: 'OK'
-        config.registry.registerUtility(factory, IRendererFactory)
-        result = config._renderer_from_name(None)
-        self.assertEqual(result, 'OK')
-
     def test_derive_view_function(self):
         def view(request):
             return 'OK'
@@ -2571,7 +2563,8 @@ class ConfiguratorTests(unittest.TestCase):
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
         request.registry = config.registry
-        render_to_response('templates/foo.pt', foo=1, bar=2, request=request)
+        render_to_response(
+            'templates/foo.pt', {'foo':1, 'bar':2}, request=request)
         renderer.assert_(foo=1)
         renderer.assert_(bar=2)
         renderer.assert_(request=request)
@@ -2589,7 +2582,7 @@ class ConfiguratorTests(unittest.TestCase):
         request.registry = config.registry
         try:
             render_to_response(
-                'templates/foo.pt', foo=1, bar=2, request=request)
+                'templates/foo.pt', {'foo':1, 'bar':2}, request=request)
         except E:
             pass
         else: # pragma: no cover
@@ -2604,7 +2597,8 @@ class ConfiguratorTests(unittest.TestCase):
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
         request.registry = config.registry
-        render_to_response('templates/foo.pt', foo=1, bar=2, request=request)
+        render_to_response('templates/foo.pt', dict(foo=1, bar=2),
+                           request=request)
         renderer.assert_(foo=1)
         renderer.assert_(bar=2)
         renderer.assert_(request=request)
@@ -2613,22 +2607,25 @@ class Test__map_view(unittest.TestCase):
     def setUp(self):
         from repoze.bfg.registry import Registry
         self.registry = Registry()
+        testing.setUp(registry=self.registry)
 
     def tearDown(self):
         del self.registry
+        testing.tearDown()
         
-    def _registerRenderer(self, name='.txt'):
+    def _registerRenderer(self, typ='.txt'):
         from repoze.bfg.interfaces import IRendererFactory
         from repoze.bfg.interfaces import ITemplateRenderer
         from zope.interface import implements
         class Renderer:
             implements(ITemplateRenderer)
+            spec = 'abc' + typ
             def __init__(self, path):
                 self.__class__.path = path
             def __call__(self, *arg):
                 return 'Hello!'
-        self.registry.registerUtility(Renderer, IRendererFactory, name=name)
-        return Renderer(name)
+        self.registry.registerUtility(Renderer, IRendererFactory, name=typ)
+        return Renderer
 
     def _makeRequest(self):
         request = DummyRequest()
@@ -2656,7 +2653,8 @@ class Test__map_view(unittest.TestCase):
     def test__map_view_as_function_with_attr_and_renderer(self):
         renderer = self._registerRenderer()
         view = lambda *arg: 'OK'
-        result = self._callFUT(view, attr='__name__', renderer=renderer)
+        result = self._callFUT(view, attr='__name__',
+                               renderer_name=renderer.spec)
         self.failIf(result is view)
         self.assertRaises(TypeError, result, None, None)
         
@@ -2714,7 +2712,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(view, attr='index', renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -2755,7 +2753,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(view, attr='index', renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -2796,7 +2794,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(view, attr='index', renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -2837,7 +2835,7 @@ class Test__map_view(unittest.TestCase):
                 pass
             def index(self):
                 return {'a':'1'}
-        result = self._callFUT(view, attr='index', renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -2869,7 +2867,7 @@ class Test__map_view(unittest.TestCase):
             def index(self, context, request):
                 return {'a':'1'}
         view = View()
-        result = self._callFUT(view, attr='index', renderer=renderer)
+        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
         self.failIf(result is view)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
@@ -2904,7 +2902,7 @@ class Test__map_view(unittest.TestCase):
             def index(self, request):
                 return {'a':'1'}
         view = View()
-        result = self._callFUT(view, attr='index', renderer = renderer)
+        result = self._callFUT(view, attr='index', renderer_name=renderer.spec)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -2916,12 +2914,37 @@ class Test__map_view(unittest.TestCase):
         renderer = self._registerRenderer()
         def view(context, request):
             return {'a':'1'}
-        result = self._callFUT(view, renderer=renderer)
+        result = self._callFUT(view, renderer_name=renderer.spec)
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
+
+    def test__map_view_with_registry(self):
+        renderer = self._registerRenderer()
+        def view(context, request):
+            return {'a':'1'}
+        result = self._callFUT(view, renderer_name=renderer.spec,
+                               registry=self.registry)
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+
+    def test__map_view_with_package(self):
+        renderer = self._registerRenderer()
+        def view(context, request):
+            return {'a':'1'}
+        result = self._callFUT(view, renderer_name=renderer.spec,
+                               package='repoze.bfg')
+        self.failIf(result is view)
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        request = self._makeRequest()
+        self.assertEqual(result(None, request).body, 'Hello!')
+        self.assertEqual(renderer.path, 'repoze.bfg:abc.txt')
 
 class Test_decorate_view(unittest.TestCase):
     def _callFUT(self, wrapped, original):

@@ -33,8 +33,45 @@ Features
   ``relative_spec`` is not a string, the value is returned
   unconditionally without any resolution attempted.
 
+Backwards Incompatibilities
+---------------------------
+
+- The functions in ``repoze.bfg.renderers`` named ``render`` and
+  ``render_to_response`` introduced in 1.3a6 previously took a set of
+  ``**values`` arguments for the values to be passed to the renderer.
+  This was wrong, as renderers don't need to accept only dictionaries
+  (they can accept any type of object).  Now, the value sent to the
+  renderer must be supplied as a positional argument named ``value``.
+  The ``request`` argument is still a keyword argument, however.
+
+- The functions in ``repoze.bfg.renderers`` named ``render`` and
+  ``render_to_response`` now accept an additonal keyword argument
+  named ``package``.
+
+- The ``get_renderer`` API in ``repoze.bfg.renderers`` now accepts a
+  ``package`` argument.
+
 Internal
 --------
+
+- The ``repoze.bfg.res08rce.resolve_resource_spec`` function can now
+  accept a package object as its ``pname`` argument instead of just a
+  package name.
+
+- The ``_renderer_factory_from_name`` and ``_renderer_from_name``
+  methods of the Configurator were removed.  These were never APIs.
+
+- The ``_render``, ``_render_to_response`` and ``_make_response``
+  functions with ``repoze.bfg.render`` (added in 1.3a6) have been
+  removed.
+
+- A new helper class ``repoze.bfg.renderers.RendererHelper`` was
+  added.
+
+- The _map_view function of ``repoze.bfg.configuration`` now takes
+  only a renderer_name argument instead of both a ``renderer`` and
+  ``renderer``_name argument.  It also takes a ``package`` argument
+  now.
 
 - Use ``imp.get_suffixes`` indirection in
   ``repoze.bfg.path.package_name`` instead of hardcoded ``.py``

@@ -64,15 +64,16 @@ def get_renderer(path):
     ``path`` argument.  The ``path`` argument may be a
     package-relative path, an absolute path, or a :term:`resource
     specification`.
-
+    
     .. warning:: This API is deprecated in :mod:`repoze.bfg` 1.3.  Use
        :func:`repoze.bfg.renderers.get_renderer` instead.
     """
     package = caller_package()
-    return renderers.renderer_from_name(path, package)
+    factory = renderers.RendererHelper(path, package=package)
+    return factory.get_renderer()
 
 def get_template(path):
-    """ Return the underlying object representing a :term:`Chameleon`
+    """ Return the underyling object representing a :term:`Chameleon`
     ZPT template using the template implied by the ``path`` argument.
     The ``path`` argument may be a package-relative path, an absolute
     path, or a :term:`resource specification`.
@@ -82,8 +83,8 @@ def get_template(path):
        :func:`repoze.bfg.renderers.get_renderer` instead.
     """
     package = caller_package()
-    renderer = renderers.renderer_from_name(path, package)
-    return renderer.implementation()
+    factory = renderers.RendererHelper(path, package=package)
+    return factory.get_renderer().implementation()
 
 def render_template(path, **kw):
     """ Render a :term:`Chameleon` ZPT template using the template
@@ -97,7 +98,9 @@ def render_template(path, **kw):
        :func:`repoze.bfg.renderers.render` instead.
     """
     package = caller_package()
-    return renderers._render(path, None, kw, {}, None, package)
+    request = kw.pop('request', None)
+    renderer = renderers.RendererHelper(path, package=package)
+    return renderer.render(kw, None, request=request)
 
 def render_template_to_response(path, **kw):
     """ Render a :term:`Chameleon` ZPT template using the template
@@ -112,5 +115,6 @@ def render_template_to_response(path, **kw):
        :func:`repoze.bfg.renderers.render_to_response` instead.
     """
     package = caller_package()
-    return renderers._render_to_response(path, None, kw, {}, None, package)
-
+    request = kw.pop('request', None)
+    renderer = renderers.RendererHelper(path, package=package)
+    return renderer.render_to_response(kw, None, request=request)
