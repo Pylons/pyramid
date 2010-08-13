@@ -325,6 +325,19 @@ class Configurator(object):
         constructor."""
         return self.name_resolver.maybe_resolve(dotted)
 
+    def absolute_resource_spec(self, relative_spec):
+        """ Resolve the potentially relative :term:`resource
+        specification` string passed as ``relative_spec`` into an
+        absolute resource specification string and return the string.
+        Use the ``package`` of this configurator as the package to
+        which the resource specification will be considered relative
+        when generating an absolute resource specification.  If the
+        provided ``relative_spec`` argument is already absolute, or if
+        the ``relative_spec`` is not a string, it is simply returned."""
+        if not isinstance(relative_spec, basestring):
+            return relative_spec
+        return self._make_spec(relative_spec)
+
     def setup_registry(self, settings=None, root_factory=None,
                        authentication_policy=None, authorization_policy=None,
                        renderers=DEFAULT_RENDERERS, debug_logger=None,

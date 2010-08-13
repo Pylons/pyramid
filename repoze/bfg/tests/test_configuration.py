@@ -210,6 +210,24 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.maybe_dotted(repoze.bfg.tests)
         self.assertEqual(result, repoze.bfg.tests)
 
+    def test_absolute_resource_spec_already_absolute(self):
+        import repoze.bfg.tests
+        config = self._makeOne(package=repoze.bfg.tests)
+        result = config.absolute_resource_spec('already:absolute')
+        self.assertEqual(result, 'already:absolute')
+
+    def test_absolute_resource_spec_notastring(self):
+        import repoze.bfg.tests
+        config = self._makeOne(package=repoze.bfg.tests)
+        result = config.absolute_resource_spec(None)
+        self.assertEqual(result, None)
+
+    def test_absolute_resource_spec_relative(self):
+        import repoze.bfg.tests
+        config = self._makeOne(package=repoze.bfg.tests)
+        result = config.absolute_resource_spec('templates')
+        self.assertEqual(result, 'repoze.bfg.tests:templates')
+
     def test_setup_registry_fixed(self):
         class DummyRegistry(object):
             def subscribers(self, events, name):

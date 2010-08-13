@@ -19,12 +19,19 @@ Features
   references are allowed (the work to allow dotted names isntead of
   object references everywhere has not yet been done, however).
 
-- The ``repoze.bfg.configuration.Configurator.maybe_dotted`` method
-  resolves a Python dotted name string supplied as its ``dotted``
-  argument to a global Python object.  If the value cannot be
-  resolved, a ``repoze.bfg.configuration.ConfigurationError`` is
+- The new ``repoze.bfg.configuration.Configurator.maybe_dotted``
+  method resolves a Python dotted name string supplied as its
+  ``dotted`` argument to a global Python object.  If the value cannot
+  be resolved, a ``repoze.bfg.configuration.ConfigurationError`` is
   raised.  If the value supplied as ``dotted`` is not a string, the
   value is returned unconditionally without any resolution attempted.
+
+- The new
+  ``repoze.bfg.configuration.Configurator.absolute_resource_spec``
+  method resolves a potentially relative "resource specification"
+  string into an absolute version.  If the value supplied as
+  ``relative_spec`` is not a string, the value is returned
+  unconditionally without any resolution attempted.
 
 Internal
 --------
