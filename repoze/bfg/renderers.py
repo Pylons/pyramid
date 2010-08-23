@@ -44,7 +44,7 @@ def render(renderer_name, value, request=None, package=None):
 
     The 'system' values supplied to the renderer will include a basic
     set of top-level system names, such as ``request``, ``context``,
-    and ``renderer_name`.  If :term:`renderer globals` have been
+    and ``renderer_name`.  If :term:`renderer globals`` have been
     specified, these will also be used to agument the value.
 
     Supply a ``request`` parameter in order to provide the renderer
@@ -88,7 +88,7 @@ def render_to_response(renderer_name, value, request=None, package=None):
 
     The 'system' values supplied to the renderer will include a basic
     set of top-level system names, such as ``request``, ``context``,
-    and ``renderer_name`.  If :term:`renderer globals` have been
+    and ``renderer_name``.  If :term:`renderer globals` have been
     specified, these will also be used to agument the value.
 
     Supply a ``request`` parameter in order to provide the renderer
