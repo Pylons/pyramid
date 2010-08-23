@@ -44,7 +44,8 @@ within the body of a view callable like so:
    from repoze.bfg.renderers import render_to_response
 
    def sample_view(request):
-       return render_to_response('templates/foo.pt', foo=1, bar=2, 
+       return render_to_response('templates/foo.pt', 
+                                 {'foo':1, 'bar':2}, 
                                  request=request)
 
 .. warning:: Earlier iterations of this documentation
@@ -88,7 +89,8 @@ example:
    from repoze.bfg.renderers import render_to_response
 
    def sample_view(request):
-       return render_to_response('mypackage:templates/foo.pt', foo=1, bar=2,
+       return render_to_response('mypackage:templates/foo.pt',
+                                 {'foo':1, 'bar':2},
                                  request=request)
 
 A resource specification points at a file within a Python *package*.
@@ -134,7 +136,8 @@ the body of the response:
    from webob import Response
 
    def sample_view(request):
-       result = render('mypackage:templates/foo.pt', foo=1, bar=2, 
+       result = render('mypackage:templates/foo.pt', 
+                       {'foo':1, 'bar':2}, 
                        request=request)
        response = Response(result)
        return response
@@ -201,7 +204,8 @@ response object returned by
    from repoze.bfg.renderers.render_to_response
 
    def sample_view(request):
-       response = render_to_response('templates/foo.pt', foo=1, bar=2, 
+       response = render_to_response('templates/foo.pt',
+                                     {'foo':1, 'bar':2},
                                      request=request)
        response.content_type = 'text/plain'
        response.status_int = 204
@@ -216,7 +220,8 @@ of :func:`repoze.bfg.renderers.render` (a string):
    from repoze.bfg.renderers import render
    from webob import Response
    def sample_view(request):
-       result = render('mypackage:templates/foo.pt', foo=1, bar=2, 
+       result = render('mypackage:templates/foo.pt',
+                       {'foo':1, 'bar':2}, 
                        request=request)
        response = Response(result)
        response.content_type = 'text/plain'
@@ -456,7 +461,7 @@ you need to make the macro template itself available to the rendered
 template by passing the template in which the macro is defined (or even
 the macro itself) *into* the rendered template.  To make a macro
 available to the rendered template, you can retrieve a different
-template using the :func:`repoze.bfg.chameleon_zpt.get_template` API,
+template using the :func:`repoze.bfg.renderers.get_renderer` API,
 and pass it in to the template being rendered.  For example, using a
 :term:`view configuration` via a :class:`repoze.bfg.view.bfg_view`
 decorator that uses a :term:`renderer`:
@@ -464,12 +469,12 @@ decorator that uses a :term:`renderer`:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import get_template
+   from repoze.bfg.renderers import get_renderer
    from repoze.bfg.view import bfg_view
 
    @bfg_view(renderer='templates/mytemplate.pt')
    def my_view(request):
-       main = get_template('templates/master.pt')
+       main = get_renderer('templates/master.pt').implementation()
        return {'main':main}
 
 Where ``templates/master.pt`` might look like so:
@@ -525,7 +530,6 @@ which renders this template:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import get_template
    from repoze.bfg.view import bfg_view
 
    @bfg_view(renderer='templates/mytemplate.txt')
