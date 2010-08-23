@@ -290,7 +290,7 @@ Minor Feature Additions
   value is returned unconditionally without any resolution attempted.
 
 - The new
-  :meth"`repoze.bfg.configuration.Configurator.absolute_resource_spec`
+  :meth:`repoze.bfg.configuration.Configurator.absolute_resource_spec`
   method resolves a potentially relative :term:`resource
   specification` string into an absolute version.
 

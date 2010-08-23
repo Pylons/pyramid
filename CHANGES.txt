@@ -54,7 +54,7 @@ Backwards Incompatibilities
 Internal
 --------
 
-- The ``repoze.bfg.res08rce.resolve_resource_spec`` function can now
+- The ``repoze.bfg.resource.resolve_resource_spec`` function can now
   accept a package object as its ``pname`` argument instead of just a
   package name.
 
