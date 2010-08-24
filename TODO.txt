@@ -54,6 +54,9 @@
   work (resources are not found under static2).  The problem appears
   to be in the handling of route matching.
 
+- Race condition when caching templates:
+  https://bugs.launchpad.net/karl3/+bug/621364.
+
 - These methods of Configurator should allow the arguments it receives
   named below them to be strings:
 
