@@ -50,6 +50,9 @@
 
 - Switch tutorials and templates to non-ZCML.
 
+- Adding two static views: /static first and /static2 second doesnt
+  work.  The problem appears to be in the handling of route matching.
+
 - These methods of Configurator should allow the arguments it receives
   named below them to be strings:
 
