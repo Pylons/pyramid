@@ -60,6 +60,9 @@
 - Provide a response_cookies attribute on the request for rendered
   responses that can be used as input to response.set_cookie.
 
+- Raise an exception when a value in response_headerlist is not a
+  string or decide to encode.
+
 - These methods of Configurator should allow the arguments it receives
   named below them to be strings:
 
