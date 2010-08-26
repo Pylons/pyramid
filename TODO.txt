@@ -57,6 +57,9 @@
 - Race condition when caching templates:
   https://bugs.launchpad.net/karl3/+bug/621364.
 
+- Provide a response_cookies attribute on the request for rendered
+  responses that can be used as input to response.set_cookie.
+
 - These methods of Configurator should allow the arguments it receives
   named below them to be strings:
 
