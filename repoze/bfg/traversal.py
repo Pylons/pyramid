@@ -491,6 +491,8 @@ class ModelGraphTraverser(object):
 
     implements(ITraverser)
 
+    VIEW_SELECTOR = '@@'
+
     def __init__(self, root):
         self.root = root
 
@@ -548,7 +550,7 @@ class ModelGraphTraverser(object):
             i = 0
             vpath_tuple = traversal_path(vpath)
             for segment in vpath_tuple:
-                if segment[:2] =='@@':
+                if segment[:2] == self.VIEW_SELECTOR:
                     return {'context':ob,
                             'view_name':segment[2:],
                             'subpath':vpath_tuple[i+1:],
