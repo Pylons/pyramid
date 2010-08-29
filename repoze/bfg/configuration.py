@@ -1513,7 +1513,7 @@ class Configurator(object):
         the *system* dictionary passed in to every renderer used by
         the application.
 
-        .. note:: Using the :meth:``renderer_globals_factory``
+        .. note:: Using the :meth:`renderer_globals_factory`
            argument to the
            :class:`repoze.bfg.configuration.Configurator` constructor
            can be used to achieve the same purpose.
