@@ -180,11 +180,6 @@ Minor Feature Additions
   will set the factory used by the :mod:`repoze.bfg` router to create
   all request objects.
 
-- The :class:`repoze.bfg.configuration.Configurator` constructor takes
-  an additional argument: ``request_factory``.  If used, this argument
-  will set the factory used by the :mod:`repoze.bfg` router to create
-  all request objects.
-
 - A new method exists
   :meth:`repoze.bfg.configuration.Configurator.set_renderer_globals_factory`.
   If used, this method will set the factory used by the
