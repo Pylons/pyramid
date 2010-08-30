@@ -15,10 +15,10 @@ Attributes
 ``package``
    A :term:`dotted Python name` which references a Python :term:`package`.
 
-``filename``
+``file``
    An absolute or relative filename which references a ZCML file.
 
-The ``package`` and ``filename`` attributes can be used together or
+The ``package`` and ``file`` attributes can be used together or
 separately as necessary.
 
 Examples
@@ -36,28 +36,28 @@ Examples
    .. code-block:: xml
       :linenos:
 
-      <include filename="other.zcml" />
+      <include file="other.zcml" />
 
 .. topic:: Loading a File From a Subdirectory of the Current Package
 
    .. code-block:: xml
       :linenos:
 
-      <include filename="subdir/other.zcml" />
+      <include file="subdir/other.zcml" />
 
 .. topic:: Loading the File Named ``/absolute/path/other.zcml``
 
    .. code-block:: xml
       :linenos:
 
-      <include filename="/absolute/path/other.zcml" />
+      <include file="/absolute/path/other.zcml" />
 
 .. topic:: Loading the File Named ``other.zcml`` From a Package Explicitly
 
    .. code-block:: xml
       :linenos:
 
-      <include package="some.package" filename="other.zcml" />
+      <include package="some.package" file="other.zcml" />
 
 Alternatives
 ~~~~~~~~~~~~

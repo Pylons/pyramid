@@ -51,6 +51,13 @@ Backwards Incompatibilities
 - The ``get_renderer`` API in ``repoze.bfg.renderers`` now accepts a
   ``package`` argument.
 
+Documentation
+-------------
+
+- The ZCML ``include`` directive docs were incorrect: they specified
+  ``filename`` rather than (the correct) ``file`` as an allowable
+  attribute.
+
 Internal
 --------
 
