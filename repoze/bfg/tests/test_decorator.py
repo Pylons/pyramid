@@ -19,5 +19,11 @@ class TestReify(unittest.TestCase):
         result = decorator.__get__(None)
         self.assertEqual(result, decorator)
 
+    def test___doc__copied(self):
+        def wrapped(inst):
+            """My doc"""
+        decorator = self._makeOne(wrapped)
+        self.assertEqual(decorator.__doc__, "My doc")
+        
 class Dummy(object):
     pass

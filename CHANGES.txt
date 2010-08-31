@@ -88,6 +88,9 @@ Internal
 - Make tests runnable again under Jython (although they do not all
   pass currently).
 
+- The reify decorator now maintains the docstring of the function it
+  wraps.
+
 1.3a8 (2010-08-08)
 ==================
 
