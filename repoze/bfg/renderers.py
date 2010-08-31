@@ -27,10 +27,11 @@ def render(renderer_name, value, request=None, package=None):
 
     If the renderer name refers to a file on disk (such as when the
     renderer is a template), it's usually best to supply the name as a
-    :term:`resource specification`.
+    :term:`resource specification`
+    (e.g. ``packagename:path/to/template.pt``).
 
     You may supply a relative resource spec as ``renderer_name``.  If
-    the ``package`` argument is supplied, a relative renderer name
+    the ``package`` argument is supplied, a relative renderer path
     will be converted to an absolute resource specification by
     combining the package supplied as ``package`` with the relative
     resource specification supplied as ``renderer_name``.  If you do
