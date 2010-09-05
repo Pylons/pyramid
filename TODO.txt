@@ -71,3 +71,13 @@
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
+- Add a default_view_permission setting:
+
+  From IRC: if I use something like http://bfg.repoze.org/pastebin/764
+  (does it even make any sense?), why do I still have to put
+  view_permission="something_random" inside every <route>, so that
+  those alc's kick in? or am I doing it completely wrong?
+
+
+
+
