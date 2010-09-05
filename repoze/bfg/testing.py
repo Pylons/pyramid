@@ -568,6 +568,7 @@ class DummyRequest(object):
     application_url = 'http://example.com'
     host = 'example.com:80'
     content_length = 0
+    response_callbacks = ()
     def __init__(self, params=None, environ=None, headers=None, path='/',
                  cookies=None, post=None, **kw):
         if environ is None:
@@ -607,6 +608,11 @@ class DummyRequest(object):
         self.marshalled = params # repoze.monty
         self.registry = get_current_registry()
         self.__dict__.update(kw)
+
+    def add_response_callback(self, callback):
+        if not self.response_callbacks:
+            self.response_callbacks = []
+        self.response_callbacks.append(callback)
 
 def setUp(registry=None, request=None, hook_zca=True):
     """

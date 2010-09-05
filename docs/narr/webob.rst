@@ -13,35 +13,29 @@ Request and Response Objects
 :mod:`repoze.bfg` uses the :term:`WebOb` package to supply
 :term:`request` and :term:`response` object implementations.  The
 :term:`request` object that is passed to a :mod:`repoze.bfg`
-:term:`view` is an instance of the :class:`repoze.bfg.Request` class,
-which is a subclass of :class:`webob.Request`.  The :term:`response`
-returned from a :mod:`repoze.bfg` :term:`view` :term:`renderer` is an
-instance of the :mod:`webob.Response` class.  Users can also return an
-instance of :mod:`webob.Response` directly from a view as necessary.
+:term:`view` is an instance of the :class:`repoze.bfg.request.Request`
+class, which is a subclass of :class:`webob.Request`.  The
+:term:`response` returned from a :mod:`repoze.bfg` :term:`view`
+:term:`renderer` is an instance of the :mod:`webob.Response` class.
+Users can also return an instance of :mod:`webob.Response` directly
+from a view as necessary.
 
 WebOb is a project separate from :mod:`repoze.bfg` with a separate set
 of authors and a fully separate `set of documentation
 <http://pythonpaste.org/webob/>`_.
 
-.. warning:: The following information is only an overview of the
-   request and response objects provided by :term:`WebOb`.  See the
-   `reference documentation
-   <http://pythonpaste.org/webob/reference.html>`_ for more detailed
-   API reference information.  All methods in the :term:`WebOb`
-   documentation work against :mod:`repoze.bfg` requests and
-   responses.
-
 WebOb provides objects for HTTP requests and responses.  Specifically
 it does this by wrapping the `WSGI <http://wsgi.org>`_ request
-environment and response status/headers/app_iter(body).
+environment and response status/headers/app_iter (body).
 
-The request and response objects provide many conveniences for parsing
-HTTP request and forming HTTP responses.  Both objects are read/write:
-as a result, WebOb is also a nice way to create HTTP requests and
-parse HTTP responses; however, we won't cover that use case in this
-document.  The `reference documentation
+WebOb request and response objects provide many conveniences for
+parsing WSGI requests and forming WSGI responses.  WebOb is a nice way
+to represent "raw" WSGI requests and responses; however, we won't
+cover that use case in this document, as users of :mod:`repoze.bfg`
+don't typically need to use the WSGI-related features of WebOb
+directly.  The `reference documentation
 <http://pythonpaste.org/webob/reference.html>`_ shows many examples of
-creating requests.
+creating requests and using response objects in this manner, however.
 
 .. index::
    single: request object
@@ -102,9 +96,7 @@ for instance: ``req.accept_language``, ``req.content_length``,
 *parsed* form of each header, for whatever parsing makes sense.  For
 instance, ``req.if_modified_since`` returns a `datetime
 <http://python.org/doc/current/lib/datetime-datetime.html>`_ object
-(or None if the header is was not provided).  Details are in the
-`Request reference
-<http://pythonpaste.org/webob/class-webob.Request.html>`_.
+(or None if the header is was not provided).
 
 .. index::
    single: request attributes (special)
@@ -115,60 +107,11 @@ Special Attributes Added to the Request by :mod:`repoze.bfg`
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 In addition to the standard :term:`WebOb` attributes,
-:mod:`repoze.bfg` adds the following special attributes to every
-request.
-
-``req.context``
-  The :term:`context` will be available as the ``context`` attribute
-  of the :term:`request` object.  It will be the context object
-  implied by the current request.  See :ref:`traversal_chapter` for
-  information about context objects.
-
-``req.registry``
-  The :term:`application registry` will be available as
-  the ``registry`` attribute of the :term:`request` object.  See
-  :ref:`zca_chapter` for more information about the application
-  registry.
-
-``req.root``
-  The :term:`root` object will be available as the ``root`` attribute
-  of the :term:`request` object.  It will be the model object at which
-  traversal started (the root).  See :ref:`traversal_chapter` for
-  information about root objects.
-
-``req.subpath``
-  The traversal :term:`subpath` will be available as the ``subpath``
-  attribute of the :term:`request` object.  It will be a sequence
-  containing zero or more elements (which will be Unicode objects).
-  See :ref:`traversal_chapter` for information about the subpath.
-
-``req.traversed``
-  The "traversal path" will be available as the ``traversed`` attribute of the
-  :term:`request` object.  It will be a sequence representing the
-  ordered set of names that were used to traverse to the
-  :term:`context`, not including the view name or subpath.  If there
-  is a virtual root associated with the request, the virtual root path is
-  included within the traversal path.  See :ref:`traversal_chapter`
-  for more information.
-
-``req.view_name``
-  The :term:`view name` will be available as the ``view_name``
-  attribute of the :term:`request` object.  It will be a single string
-  (possibly the empty string if we're rendering a default view).
-  See :ref:`traversal_chapter` for information about view names.
-
-``req.virtual_root``
-  The :term:`virtual root` will be available as the ``virtual_root``
-  attribute of the :term:`request` object.  It will be the virtual
-  root object implied by the current request.  See
-  :ref:`vhosting_chapter` for more information about virtual roots.
-
-``req.virtual_root_path``
-  The :term:`virtual root` *path* will be available as the
-  ``virtual_root_path`` attribute of the :term:`request` object.  It
-  will be a sequence representing the ordered set of names that were
-  used to traverse to the virtual root object.  See
-  :ref:`vhosting_chapter` for more information about virtual roots.
+:mod:`repoze.bfg` adds special attributes to every request:
+``context``, ``registry``, ``root``, ``subpath``, ``traversed``,
+``view_name``, ``virtual_root`` , and ``virtual_root_path``.  These
+attributes are documented further within the
+:class:`repoze.bfg.request.Request` API documentation.
 
 .. index::
    single: request URLs
@@ -242,6 +185,18 @@ corresponding ``req.str_*`` (like ``req.str_POST``) that is always
 
 .. index::
    single: response object
+
+More Details
+++++++++++++
+
+More detail about the request object API is available in:
+
+- The :class:`repoze.bfg.request.Request` API documentation.
+
+- The `WebOb documentation <http://pythonpaste.org/webob>`_ .  All
+  methods and attributes of a ``webob.Request`` documented within the
+  WebOb documentation will work against request objects created by
+  :mod:`repoze.bfg`.
 
 Response
 ~~~~~~~~
@@ -394,6 +349,17 @@ objects.
 
 .. index::
    single: multidict (WebOb)
+
+More Details
+++++++++++++
+
+More details about the response object API are available in the `WebOb
+documentation <http://pythonpaste.org/webob>`_ .  All methods and
+attributes of a ``webob.Response`` documented within the WebOb
+documentation will work against response objects created by
+:mod:`repoze.bfg`.  :mod:`repoze.bfg` does not use a Webob Response
+object subclass to represent a response, it uses WebOb's Response
+class directly.
 
 Multidict
 ~~~~~~~~~

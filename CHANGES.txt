@@ -1,3 +1,36 @@
+Next release
+============
+
+Documentation
+-------------
+
+- Add an API chapter for the ``repoze.bfg.request`` module, which
+  includes documentation for the ``repoze.bfg.request.Request`` class
+  (the "request object").
+
+- Modify the "Request and Response" narrative chapter to reference the
+  new ``repoze.bfg.request`` API chapter.  Some content was moved from
+  this chapter into the API documentation itself.
+
+Features
+--------
+
+- A new ``repoze.bfg.request.Request.add_response_callback`` API has
+  been added.  This method is documented in the new
+  ``repoze.bfg.request`` API chapter.  It can be used to influence
+  response values before a concrete response object has been created.
+
+Internal
+--------
+
+- The (internal) feature which made it possible to attach a
+  ``global_response_headers`` attribute to the request (which was
+  assumed to contain a sequence of header key/value pairs which would
+  later be added to the response by the router), has been removed.
+  The functionality of
+  ``repoze.bfg.request.Request.add_response_callback`` takes its
+  place.
+
 1.3a9 (2010-08-22)
 ==================
 

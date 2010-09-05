@@ -416,9 +416,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         request = self._makeRequest({'HTTP_COOKIE':'auth_tkt=bogus'})
         result = plugin.identify(request)
         self.failUnless(result)
-        response_headers = request.global_response_headers
-        self.assertEqual(len(response_headers), 3)
-        self.assertEqual(response_headers[0][0], 'Set-Cookie')
+        self.assertEqual(len(request.callbacks), 1)
+        response = DummyResponse()
+        request.callbacks[0](None, response)
+        self.assertEqual(len(response.headers.added), 3)
+        self.assertEqual(response.headers.added[0][0], 'Set-Cookie')
 
     def test_remember(self):
         plugin = self._makeOne('secret')
@@ -595,6 +597,10 @@ class DummyContext:
 class DummyRequest:
     def __init__(self, environ):
         self.environ = environ
+        self.callbacks = []
+
+    def add_response_callback(self, callback):
+        self.callbacks.append(callback)
 
 class DummyWhoPlugin:
     def remember(self, environ, identity):
@@ -652,3 +658,14 @@ class DummyAuthTktModule(object):
     class BadTicket(Exception):
         pass
 
+class DummyHeaders:
+    def __init__(self):
+        self.added = []
+
+    def add(self, k, v):
+        self.added.append((k, v))
+
+class DummyResponse:
+    def __init__(self):
+        self.headers = DummyHeaders()
+        

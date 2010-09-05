@@ -157,6 +157,33 @@ class TestRequest(unittest.TestCase):
         result = inst.values()
         self.assertEqual(result, environ.values())
 
+    def test_add_response_callback(self):
+        inst = self._makeOne({})
+        self.assertEqual(inst.response_callbacks, ())
+        def callback(request, response):
+            """ """
+        inst.add_response_callback(callback)
+        self.assertEqual(inst.response_callbacks, [callback])
+        inst.add_response_callback(callback)
+        self.assertEqual(inst.response_callbacks, [callback, callback])
+
+    def test__process_response_callbacks(self):
+        inst = self._makeOne({})
+        def callback1(request, response):
+            request.called1 = True
+            response.called1 = True
+        def callback2(request, response):
+            request.called2  = True
+            response.called2 = True
+        inst.response_callbacks = [callback1, callback2]
+        response = DummyResponse()
+        inst._process_response_callbacks(response)
+        self.assertEqual(inst.called1, True)
+        self.assertEqual(inst.called2, True)
+        self.assertEqual(response.called1, True)
+        self.assertEqual(response.called2, True)
+        self.assertEqual(inst.response_callbacks, ())
+
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):
         from repoze.bfg.request import route_request_iface
@@ -175,10 +202,11 @@ class Test_add_global_response_headers(unittest.TestCase):
 
     def test_it(self):
         request = DummyRequest()
-        headers = [('a', 1), ('b', 2)]
-        request.global_response_headers = headers[:]
+        response = DummyResponse()
         self._callFUT(request, [('c', 1)])
-        self.assertEqual(request.global_response_headers, headers + [('c', 1)])
+        self.assertEqual(len(request.response_callbacks), 1)
+        request.response_callbacks[0](None, response)
+        self.assertEqual(response.headers.added,  [('c', 1)] )
 
 class DummyRequest:
     def __init__(self, environ=None):
@@ -186,10 +214,21 @@ class DummyRequest:
             environ = {}
         self.environ = environ
 
+    def add_response_callback(self, callback):
+        self.response_callbacks = [callback]
+
 class DummyNewRequestEvent:
     def __init__(self, request):
         self.request = request
         
+class DummyHeaders:
+    def __init__(self):
+        self.added = []
+    def add(self, k, v):
+        self.added.append((k, v))
 
+class DummyResponse:
+    def __init__(self):
+        self.headers = DummyHeaders()
 
 

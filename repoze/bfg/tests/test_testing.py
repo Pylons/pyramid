@@ -514,6 +514,12 @@ class TestDummyRequest(unittest.TestCase):
         request = self._makeOne(water = 1)
         self.assertEqual(request.water, 1)
 
+    def test_add_response_callback(self):
+        request = self._makeOne()
+        request.add_response_callback(1)
+        self.assertEqual(request.response_callbacks, [1])
+        
+
 class TestDummyTemplateRenderer(unittest.TestCase):
     def _getTargetClass(self, ):
         from repoze.bfg.testing import DummyTemplateRenderer

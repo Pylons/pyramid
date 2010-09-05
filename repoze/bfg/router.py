@@ -144,8 +144,6 @@ class Router(object):
                 attrs['exception'] = why
                 response = view_callable(why, request)
 
-            # process the response
-            has_listeners and registry.notify(NewResponse(response))
             try:
                 headers = response.headerlist
                 app_iter = response.app_iter
@@ -155,9 +153,11 @@ class Router(object):
                     'Non-response object returned from view named %s '
                     '(and no renderer): %r' % (view_name, response))
 
-            if 'global_response_headers' in attrs:
-                headers = list(headers)
-                headers.extend(attrs['global_response_headers'])
+            if request.response_callbacks:
+                request._process_response_callbacks(response)
+
+            # process the response
+            has_listeners and registry.notify(NewResponse(response))
 
             start_response(status, headers)
             return app_iter

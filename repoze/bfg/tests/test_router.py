@@ -372,7 +372,7 @@ class TestRouter(unittest.TestCase):
         why = exc_raised(NotFound, router, environ, start_response)
         self.assertEqual(why[0], 'notfound')
 
-    def test_call_request_has_global_response_headers(self):
+    def test_call_request_has_response_callbacks(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
         class IContext(Interface):
@@ -385,15 +385,16 @@ class TestRouter(unittest.TestCase):
         response = DummyResponse('200 OK')
         response.headerlist = [('a', 1)]
         def view(context, request):
-            request.global_response_headers = [('b', 2)]
+            def callback(request, response):
+                response.called_back = True
+            request.response_callbacks = [callback]
             return response
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
         start_response = DummyStartResponse()
         router(environ, start_response)
-        self.assertEqual(start_response.status, '200 OK')
-        self.assertEqual(start_response.headers, [('a', 1), ('b', 2)])
+        self.assertEqual(response.called_back, True)
 
     def test_call_eventsends(self):
         from repoze.bfg.interfaces import INewRequest
