@@ -20,6 +20,14 @@ Features
   ``repoze.bfg.request`` API chapter.  It can be used to influence
   response values before a concrete response object has been created.
 
+Backwards Incompatibilities
+---------------------------
+
+- The INewResponse event is now not sent to listeners if the response
+  returned by view code (or a renderer) is not a "real" response
+  (e.g. if it does not have ``.status``, ``.headerlist`` and
+  ``.app_iter`` attribtues).
+
 Internal
 --------
 
