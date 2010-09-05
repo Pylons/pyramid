@@ -239,10 +239,10 @@ System Values Used During Rendering
 -----------------------------------
 
 When a template is rendered using
-:func:`repoze.bfg.render_to_response` or :func:`repoze.bfg.render`,
-the renderer representing the template will be provided with a number
-of *system* values.  These values are provided in a dictionary to the
-renderer and include:
+:func:`repoze.bfg.renderers.render_to_response` or
+:func:`repoze.bfg.renderers.render`, the renderer representing the
+template will be provided with a number of *system* values.  These
+values are provided in a dictionary to the renderer and include:
 
 ``context``
   The current :mod:`repoze.bfg` context if ``request`` was provided as
@@ -254,6 +254,10 @@ renderer and include:
 ``renderer_name``
   The renderer name used to perform the rendering,
   e.g. ``mypackage:templates/foo.pt``.
+
+You can define more values which will be passed to every template
+executed as a result of rendering by defining :term:`renderer
+globals`.
 
 What any particular renderer does with them is up to the renderer
 itself, but most renderers, including al Chameleon renderers, make
