@@ -86,9 +86,12 @@ API Reference
    api/configuration
    api/events
    api/exceptions
+   api/i18n
    api/interfaces
    api/location
    api/paster
+   api/renderers
+   api/request
    api/router
    api/scripting
    api/security
