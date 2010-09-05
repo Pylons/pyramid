@@ -30,7 +30,7 @@ class TestRoute(unittest.TestCase):
     def test_match(self):
         route = self._makeOne(':path')
         self.assertEqual(route.match('/whatever'), {'path':'whatever'})
-        
+
     def test_generate(self):
         route = self._makeOne(':path')
         self.assertEqual(route.generate({'path':'abc'}), '/abc')
@@ -78,7 +78,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(mapper.routelist[0].path,
                          'archives/:action/:article2')
 
-    def test_route_matches(self):
+    def test___call__route_matches(self):
         mapper = self._makeOne()
         mapper.connect('archives/:action/:article', 'foo')
         request = self._getRequest(PATH_INFO='/archives/action1/article1')
@@ -87,7 +87,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['match']['action'], 'action1')
         self.assertEqual(result['match']['article'], 'article1')
 
-    def test_route_matches_with_predicates(self):
+    def test___call__route_matches_with_predicates(self):
         mapper = self._makeOne()
         mapper.connect('archives/:action/:article', 'foo',
                        predicates=[lambda *arg: True])
@@ -97,7 +97,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['match']['action'], 'action1')
         self.assertEqual(result['match']['article'], 'article1')
 
-    def test_route_fails_to_match_with_predicates(self):
+    def test___call__route_fails_to_match_with_predicates(self):
         mapper = self._makeOne()
         mapper.connect('archives/:action/article1', 'foo',
                        predicates=[lambda *arg: True, lambda *arg: False])
@@ -108,7 +108,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['match']['action'], 'action1')
         self.assertEqual(result['match']['article'], 'article1')
 
-    def test_custom_predicate_gets_info(self):
+    def test___call__custom_predicate_gets_info(self):
         mapper = self._makeOne()
         def pred(info, request):
             self.assertEqual(info['match'], {'action':u'action1'})
@@ -139,7 +139,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['match']['license_version'], 'v2')
         self.assertEqual(result['match']['jurisdiction'], 'usa')
 
-    def test_root_route_matches(self):
+    def test___call__root_route_matches(self):
         mapper = self._makeOne()
         mapper.connect('', 'root')
         request = self._getRequest(PATH_INFO='/')
@@ -147,7 +147,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
 
-    def test_root_route_matches2(self):
+    def test___call__root_route_matches2(self):
         mapper = self._makeOne()
         mapper.connect('/', 'root')
         request = self._getRequest(PATH_INFO='/')
@@ -155,7 +155,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
 
-    def test_root_route_when_path_info_empty(self):
+    def test___call__root_route_when_path_info_empty(self):
         mapper = self._makeOne()
         mapper.connect('/', 'root')
         request = self._getRequest(PATH_INFO='')
@@ -163,7 +163,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
 
-    def test_no_path_info(self):
+    def test___call__no_path_info(self):
         mapper = self._makeOne()
         mapper.connect('/', 'root')
         request = self._getRequest()
