@@ -450,10 +450,6 @@ method:
    :linenos:
 
    from repoze.bfg.configuration import Configurator
-   from repoze.bfg.request import Request
-
-.. code-block:: python
-   :linenos:
 
    def globals_factory(system):
        return {'a':1}
