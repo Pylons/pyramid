@@ -50,10 +50,6 @@
 
 - Switch tutorials and templates to non-ZCML.
 
-- Adding two static views: /static first and /static2 second doesnt
-  work (resources are not found under static2).  The problem appears
-  to be in the handling of route matching.
-
 - Race condition when caching templates:
   https://bugs.launchpad.net/karl3/+bug/621364.
 

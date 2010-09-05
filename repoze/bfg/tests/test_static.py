@@ -311,7 +311,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add('view', 'anotherpackage:path', cache_max_age=1)
         expected = [('view', 'anotherpackage:path', False)]
         self.assertEqual(inst.registrations, expected)
-        self.assertEqual(config.arg, ('view', 'view*subpath'))
+        self.assertEqual(config.arg, ('view', 'view/*subpath'))
         self.assertEqual(config.kw['_info'], None)
         self.assertEqual(config.kw['view_for'], self._getTargetClass())
         self.assertEqual(config.kw['factory'](), inst)

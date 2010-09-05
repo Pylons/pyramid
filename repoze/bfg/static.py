@@ -126,7 +126,7 @@ class StaticURLInfo(object):
             # register a route using this view
             self.config.add_route(
                 name,
-                "%s*subpath" % name,
+                "%s/*subpath" % name,
                 view=view,
                 view_for=self.__class__,
                 factory=lambda *x: self,

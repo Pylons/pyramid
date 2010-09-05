@@ -1,17 +1,6 @@
 Next release
 ============
 
-Documentation
--------------
-
-- Add an API chapter for the ``repoze.bfg.request`` module, which
-  includes documentation for the ``repoze.bfg.request.Request`` class
-  (the "request object").
-
-- Modify the "Request and Response" narrative chapter to reference the
-  new ``repoze.bfg.request`` API chapter.  Some content was moved from
-  this chapter into the API documentation itself.
-
 Features
 --------
 
@@ -66,6 +55,17 @@ Features
   testing_add_subscriber
      event_iface
 
+Bug Fixes
+---------
+
+- The route pattern registered internally for a a local "static view"
+  (either via the ``static`` ZCML directive or via the
+  ``add_static_view`` method of the configurator) was incorrect.  It
+  was regsistered for e.g. ``static*traverse``, while it should have
+  been registered for ``static/*traverse``.  Symptom: two static views
+  could not reliably be added to a system when they both shared the
+  same path prefix (e.g. ``/static`` and ``/static2``).
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -73,6 +73,17 @@ Backwards Incompatibilities
   returned by view code (or a renderer) is not a "real" response
   (e.g. if it does not have ``.status``, ``.headerlist`` and
   ``.app_iter`` attribtues).
+
+Documentation
+-------------
+
+- Add an API chapter for the ``repoze.bfg.request`` module, which
+  includes documentation for the ``repoze.bfg.request.Request`` class
+  (the "request object").
+
+- Modify the "Request and Response" narrative chapter to reference the
+  new ``repoze.bfg.request`` API chapter.  Some content was moved from
+  this chapter into the API documentation itself.
 
 Internal
 --------

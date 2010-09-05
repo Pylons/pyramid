@@ -1970,7 +1970,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_static_view('static', 'fixtures/static')
         request_type = self._getRouteRequestIface(config, 'static')
-        route = self._assertRoute(config, 'static', 'static*subpath')
+        route = self._assertRoute(config, 'static', 'static/*subpath')
         self.assertEqual(route.factory.__class__, type(lambda x: x))
         iface = implementedBy(StaticURLInfo)
         wrapped = config.registry.adapters.lookup(

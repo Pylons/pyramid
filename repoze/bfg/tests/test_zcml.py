@@ -706,7 +706,7 @@ class TestStaticDirective(unittest.TestCase):
         mapper = reg.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         self.assertEqual(len(routes), 1)
-        self.assertEqual(routes[0].path, 'name*subpath')
+        self.assertEqual(routes[0].path, 'name/*subpath')
         self.assertEqual(routes[0].name, 'name')
 
         view_action = actions[1]
