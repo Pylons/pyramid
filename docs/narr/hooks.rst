@@ -416,10 +416,11 @@ argument to the constructor of the :term:`configurator`.
 .. code-block:: python
    :linenos:
 
-   def globals_factory(system):
+   def renderer_globals_factory(system):
        return {'a':1}
 
-   config = Configurator(renderer_globals_factory=globals_factory)
+   config = Configurator(
+            renderer_globals_factory=renderer_globals_factory)
 
 Such a callback must accept a single positional argument (notionally
 named ``system``) which will contain the original system values.  It
@@ -429,8 +430,8 @@ values present in the system dictionary.
 
 A renderer globals factory can alternately be registered via ZCML as a
 through the use of the ZCML ``utility`` directive.  In the below, we
-assume a ``globals_factory`` function lives in a package named
-``mypackage.mymodule``.
+assume a ``renderers_globals_factory`` function lives in a package
+named ``mypackage.mymodule``.
 
 .. code-block:: xml
    :linenos:
@@ -451,11 +452,11 @@ method:
 
    from repoze.bfg.configuration import Configurator
 
-   def globals_factory(system):
+   def renderer_globals_factory(system):
        return {'a':1}
 
    config = Configurator()
-   config.set_renderer_globals_factory(globals_factory)
+   config.set_renderer_globals_factory(renderer_globals_factory)
 
 .. _registering_configuration_decorators:
 
