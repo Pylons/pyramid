@@ -620,7 +620,8 @@ For example, to add a renderer which renders views which have a
    The first argument is the renderer name.
 
    The second argument is a reference to an implementation of a
-   :term:`renderer factory`.
+   :term:`renderer factory` or a :term:`dotted Python name` referring
+   to such an object.
 
 Adding a New Renderer
 +++++++++++++++++++++
@@ -1537,8 +1538,8 @@ Or replaces the need to add this imperative configuration stanza:
 .. ignore-next-block
 .. code-block:: python
 
-   config.add_view(name='my_view', request_method='POST', context=MyModel,
-                   permission='read')
+   config.add_view('.views.my_view', name='my_view', request_method='POST', 
+                   context=MyModel, permission='read')
 
 All arguments to ``bfg_view`` may be omitted.  For example:
 
@@ -1747,6 +1748,12 @@ example:
    # config is assumed to be an instance of the
    # repoze.bfg.configuration.Configurator class
    config.add_view(hello_world, name='hello.html')
+
+The first argument, ``view``, is required.  It must either be a Python
+object which is the view itself or a :term:`dotted Python name` to
+such an object.  All other arguments are optional.  See
+:meth:`repoze.bfg.configuration.Configurator.add_view` for more
+information.
 
 .. index::
    single: model interfaces

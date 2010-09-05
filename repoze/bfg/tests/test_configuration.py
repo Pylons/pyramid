@@ -306,6 +306,16 @@ class ConfiguratorTests(unittest.TestCase):
         result = reg.getUtility(IDebugLogger)
         self.assertEqual(logger, result)
 
+    def test_setup_registry_debug_logger_dottedname(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IDebugLogger
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(debug_logger='repoze.bfg.tests')
+        result = reg.getUtility(IDebugLogger)
+        import repoze.bfg.tests
+        self.assertEqual(result, repoze.bfg.tests)
+
     def test_setup_registry_authentication_policy(self):
         from repoze.bfg.registry import Registry
         from repoze.bfg.interfaces import IAuthenticationPolicy
@@ -315,6 +325,28 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry(authentication_policy=policy)
         result = reg.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy, result)
+
+    def test_setup_registry_authentication_policy_dottedname(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IAuthenticationPolicy
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(authentication_policy='repoze.bfg.tests')
+        result = reg.getUtility(IAuthenticationPolicy)
+        import repoze.bfg.tests
+        self.assertEqual(result, repoze.bfg.tests)
+
+    def test_setup_registry_authorization_policy_dottedname(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IAuthorizationPolicy
+        reg = Registry()
+        config = self._makeOne(reg)
+        dummy = object()
+        config.setup_registry(authentication_policy=dummy,
+                              authorization_policy='repoze.bfg.tests')
+        result = reg.getUtility(IAuthorizationPolicy)
+        import repoze.bfg.tests
+        self.assertEqual(result, repoze.bfg.tests)
 
     def test_setup_registry_authorization_policy_only(self):
         from repoze.bfg.registry import Registry
@@ -333,6 +365,25 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         config.setup_registry()
         self.failUnless(reg.getUtility(IRootFactory))
+
+    def test_setup_registry_dottedname_root_factory(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IRootFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        import repoze.bfg.tests
+        config.setup_registry(root_factory='repoze.bfg.tests')
+        self.assertEqual(reg.getUtility(IRootFactory), repoze.bfg.tests)
+
+    def test_setup_registry_locale_negotiator_dottedname(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import ILocaleNegotiator
+        reg = Registry()
+        config = self._makeOne(reg)
+        import repoze.bfg.tests
+        config.setup_registry(locale_negotiator='repoze.bfg.tests')
+        utility = reg.getUtility(ILocaleNegotiator)
+        self.assertEqual(utility, repoze.bfg.tests)
 
     def test_setup_registry_locale_negotiator(self):
         from repoze.bfg.registry import Registry
@@ -354,6 +405,16 @@ class ConfiguratorTests(unittest.TestCase):
         utility = reg.getUtility(IRequestFactory)
         self.assertEqual(utility, factory)
 
+    def test_setup_registry_request_factory_dottedname(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IRequestFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        import repoze.bfg.tests
+        config.setup_registry(request_factory='repoze.bfg.tests')
+        utility = reg.getUtility(IRequestFactory)
+        self.assertEqual(utility, repoze.bfg.tests)
+
     def test_setup_registry_renderer_globals_factory(self):
         from repoze.bfg.registry import Registry
         from repoze.bfg.interfaces import IRendererGlobalsFactory
@@ -363,6 +424,16 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry(renderer_globals_factory=factory)
         utility = reg.getUtility(IRendererGlobalsFactory)
         self.assertEqual(utility, factory)
+
+    def test_setup_registry_renderer_globals_factory_dottedname(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        reg = Registry()
+        config = self._makeOne(reg)
+        import repoze.bfg.tests
+        config.setup_registry(renderer_globals_factory='repoze.bfg.tests')
+        utility = reg.getUtility(IRendererGlobalsFactory)
+        self.assertEqual(utility, repoze.bfg.tests)
 
     def test_setup_registry_alternate_renderers(self):
         from repoze.bfg.registry import Registry
@@ -444,6 +515,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(L[0], event)
         config.registry.notify(object())
         self.assertEqual(len(L), 1)
+
+    def test_add_subscriber_dottednames(self):
+        import repoze.bfg.tests
+        from repoze.bfg.interfaces import INewRequest
+        config = self._makeOne()
+        config.add_subscriber('repoze.bfg.tests',
+                              'repoze.bfg.interfaces.INewRequest')
+        handlers = list(config.registry.registeredHandlers())
+        self.assertEqual(len(handlers), 1)
+        handler = handlers[0]
+        self.assertEqual(handler.handler, repoze.bfg.tests)
+        self.assertEqual(handler.required, (INewRequest,))
 
     def test_add_object_event_subscriber(self):
         from zope.interface import implements
@@ -538,7 +621,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(ConfigurationError, config.add_view, view, '', None,
                           None, True, True)
 
-    def test_add_view_with_request_type_string(self):
+    def test_add_view_with_request_type_methodname_string(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, request_type='GET')
@@ -548,6 +631,20 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
         request = DummyRequest()
         request.method = 'GET'
+        result = wrapper(None, request)
+        self.assertEqual(result, 'OK')
+
+    def test_add_view_with_request_type(self):
+        from zope.interface import directlyProvides
+        from repoze.bfg.interfaces import IRequest
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(view=view,
+                        request_type='repoze.bfg.interfaces.IRequest')
+        wrapper = self._getViewCallable(config)
+        request = DummyRequest()
+        self._assertNotFound(wrapper, None, request)
+        directlyProvides(request, IRequest)
         result = wrapper(None, request)
         self.assertEqual(result, 'OK')
 
@@ -567,6 +664,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper.__module__, view.__module__)
         self.assertEqual(wrapper.__name__, view.__name__)
         self.assertEqual(wrapper.__doc__, view.__doc__)
+
+    def test_add_view_view_callable_dottedname(self):
+        config = self._makeOne()
+        config.add_view(view='repoze.bfg.tests.test_configuration.dummy_view')
+        wrapper = self._getViewCallable(config)
+        self.assertEqual(wrapper(None, None), 'OK')
 
     def test_add_view_with_function_callable(self):
         view = lambda *arg: 'OK'
@@ -651,6 +754,22 @@ class ConfiguratorTests(unittest.TestCase):
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(context=IDummy, view=view)
+        wrapper = self._getViewCallable(config, IDummy)
+        self.assertEqual(wrapper, view)
+
+    def test_add_view_context_as_dottedname(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(context='repoze.bfg.tests.test_configuration.IDummy',
+                        view=view)
+        wrapper = self._getViewCallable(config, IDummy)
+        self.assertEqual(wrapper, view)
+
+    def test_add_view_for__as_dottedname(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(for_='repoze.bfg.tests.test_configuration.IDummy',
+                        view=view)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
 
@@ -1487,6 +1606,18 @@ class ConfiguratorTests(unittest.TestCase):
         context = DummyContext()
         self._assertNotFound(wrapper, context, None)
 
+    def test_add_view_with_containment_dottedname(self):
+        from zope.interface import directlyProvides
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        config.add_view(
+            view=view,
+            containment='repoze.bfg.tests.test_configuration.IDummy')
+        wrapper = self._getViewCallable(config)
+        context = DummyContext()
+        directlyProvides(context, IDummy)
+        self.assertEqual(wrapper(context, None), 'OK')
+
     def test_add_view_with_path_info_badregex(self):
         from repoze.bfg.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
@@ -1589,6 +1720,19 @@ class ConfiguratorTests(unittest.TestCase):
         route = config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.name, 'name')
+
+    def test_add_route_with_factory(self):
+        config = self._makeOne()
+        factory = object()
+        route = config.add_route('name', 'path', factory=factory)
+        self.assertEqual(route.factory, factory)
+
+    def test_add_route_with_factory_dottedname(self):
+        config = self._makeOne()
+        route = config.add_route(
+            'name', 'path',
+            factory='repoze.bfg.tests.test_configuration.dummyfactory')
+        self.assertEqual(route.factory, dummyfactory)
 
     def test_add_route_with_xhr(self):
         config = self._makeOne()
@@ -1942,12 +2086,44 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
                          negotiator)
 
+    def test_set_locale_negotiator_dottedname(self):
+        from repoze.bfg.interfaces import ILocaleNegotiator
+        config = self._makeOne()
+        config.set_locale_negotiator(
+            'repoze.bfg.tests.test_configuration.dummyfactory')
+        self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
+                         dummyfactory)
+
     def test_set_request_factory(self):
         from repoze.bfg.interfaces import IRequestFactory
         config = self._makeOne()
         factory = object()
         config.set_request_factory(factory)
         self.assertEqual(config.registry.getUtility(IRequestFactory), factory)
+
+    def test_set_request_factory_dottedname(self):
+        from repoze.bfg.interfaces import IRequestFactory
+        config = self._makeOne()
+        config.set_request_factory(
+            'repoze.bfg.tests.test_configuration.dummyfactory')
+        self.assertEqual(config.registry.getUtility(IRequestFactory),
+                         dummyfactory)
+
+    def test_set_renderer_globals_factory(self):
+        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        config = self._makeOne()
+        factory = object()
+        config.set_renderer_globals_factory(factory)
+        self.assertEqual(config.registry.getUtility(IRendererGlobalsFactory),
+                         factory)
+
+    def test_set_renderer_globals_factory_dottedname(self):
+        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        config = self._makeOne()
+        config.set_renderer_globals_factory(
+            'repoze.bfg.tests.test_configuration.dummyfactory')
+        self.assertEqual(config.registry.getUtility(IRendererGlobalsFactory),
+                         dummyfactory)
 
     def test_add_translation_dirs_missing_dir(self):
         from repoze.bfg.exceptions import ConfigurationError
@@ -1995,6 +2171,13 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         result = config.derive_view(view)
         self.failIf(result is view)
+        self.assertEqual(result(None, None), 'OK')
+
+    def test_derive_view_dottedname(self):
+        config = self._makeOne()
+        result = config.derive_view(
+            'repoze.bfg.tests.test_configuration.dummy_view')
+        self.failIf(result is dummy_view)
         self.assertEqual(result(None, None), 'OK')
 
     def test_derive_view_with_renderer(self):
@@ -2367,6 +2550,14 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
                          renderer)
 
+    def test_add_renderer_dottedname_factory(self):
+        from repoze.bfg.interfaces import IRendererFactory
+        config = self._makeOne()
+        import repoze.bfg.tests
+        config.add_renderer('name', 'repoze.bfg.tests')
+        self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
+                         repoze.bfg.tests)
+
     def test_scan_integration(self):
         from zope.interface import alsoProvides
         from repoze.bfg.interfaces import IRequest
@@ -2466,6 +2657,22 @@ class ConfiguratorTests(unittest.TestCase):
         result = render_view_to_response(ctx, req, 'pod_notinit')
         self.assertEqual(result, None)
 
+    def test_scan_integration_dottedname_package(self):
+        from zope.interface import alsoProvides
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.view import render_view_to_response
+        config = self._makeOne()
+        config.scan('repoze.bfg.tests.grokkedapp')
+
+        ctx = DummyContext()
+        req = DummyRequest()
+        alsoProvides(req, IRequest)
+        req.registry = config.registry
+
+        req.method = 'GET'
+        result = render_view_to_response(ctx, req, '')
+        self.assertEqual(result, 'grokked')
+
     def test_testing_securitypolicy(self):
         from repoze.bfg.testing import DummySecurityPolicy
         config = self._makeOne()
@@ -2513,6 +2720,17 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_subscriber_single(self):
         config = self._makeOne()
         L = config.testing_add_subscriber(IDummy)
+        event = DummyEvent()
+        config.registry.notify(event)
+        self.assertEqual(len(L), 1)
+        self.assertEqual(L[0], event)
+        config.registry.notify(object())
+        self.assertEqual(len(L), 1)
+
+    def test_testing_add_subscriber_dottedname(self):
+        config = self._makeOne()
+        L = config.testing_add_subscriber(
+            'repoze.bfg.tests.test_configuration.IDummy')
         event = DummyEvent()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
@@ -3999,3 +4217,8 @@ class DummyStaticURLInfo:
     def add(self, name, spec, **kw):
         self.added.append((name, spec, kw))
         
+def dummy_view(request):
+    return 'OK'
+
+def dummyfactory(request):
+    """ """

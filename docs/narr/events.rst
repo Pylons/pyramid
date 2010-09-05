@@ -58,7 +58,8 @@ need to use ZCML for the same purpose:
 
    The first argument to
    :meth:`repoze.bfg.configuration.Configurator.add_subscriber` is the
-   subscriber function; the second argument is the event type.
+   subscriber function (or a :term:`Python dotted name` which refers
+   to a subscriber callable); the second argument is the event type.
 
 .. topic:: Configuring an Event Listener Through ZCML
 

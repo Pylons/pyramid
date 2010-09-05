@@ -183,7 +183,10 @@ Using the ``root_factory`` argument to a
 :class:`repoze.bfg.configuration.Configurator` constructor tells your
 :mod:`repoze.bfg` application to call this root factory to generate a
 root object whenever a request enters the application.  This root
-factory is also known as the global root factory.
+factory is also known as the global root factory.  A root factory can
+alternately be passed to the ``Configurator`` as a :term:`dotted
+Python name` which refers to a root factory object defined in a
+different module.
 
 A root factory is passed a :term:`request` object and it is expected
 to return an object which represents the root of the object graph.

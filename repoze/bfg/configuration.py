@@ -126,15 +126,17 @@ class Configurator(object):
     :func:`repoze.bfg.settings.get_settings` APIs.
 
     If the ``root_factory`` argument is passed, it should be an object
-    representing the default :term:`root factory` for your
-    application.  If it is ``None``, a default root factory will be
-    used.
+    representing the default :term:`root factory` for your application
+    or a :term:`dotted Python name` to same.  If it is ``None``, a
+    default root factory will be used.
 
     If ``authentication_policy`` is passed, it should be an instance
-    of an :term:`authentication policy`.
+    of an :term:`authentication policy` or a :term:`dotted Python
+    name` to same.
 
-    If ``authorization_policy`` is passed, it should be an instance
-    of an :term:`authorization policy`.
+    If ``authorization_policy`` is passed, it should be an instance of
+    an :term:`authorization policy` or a :term:`dotted Python name` to
+    same.
 
     .. note:: A ``ConfigurationError`` will be raised when an
        authorization policy is supplied without also supplying an
@@ -142,18 +144,21 @@ class Configurator(object):
 
     If ``renderers`` is passed, it should be a list of tuples
     representing a set of :term:`renderer` factories which should be
-    configured into this application.  If it is not passed, a default
-    set of renderer factories is used.
+    configured into this application (each tuple representing a set of
+    positional values that should be passed to
+    :meth:`repoze.bfg.configuration.Configurator.add_renderer`).  If
+    it is not passed, a default set of renderer factories is used.
 
     If ``debug_logger`` is not passed, a default debug logger that
     logs to stderr will be used.  If it is passed, it should be an
     instance of the :class:`logging.Logger` (PEP 282) standard library
-    class.  The debug logger is used by :mod:`repoze.bfg` itself to
-    log warnings and authorization debugging information.
+    class or a :term:`dotted Python name` to same.  The debug logger
+    is used by :mod:`repoze.bfg` itself to log warnings and
+    authorization debugging information.
 
-    If ``locale_negotiator`` is passed, it should be a
-    :term:`locale negotiator` implementation.  See
-    :ref:`custom_locale_negotiator`.
+    If ``locale_negotiator`` is passed, it should be a :term:`locale
+    negotiator` implementation or a :term:`dotted Python name` to
+    same.  See :ref:`custom_locale_negotiator`.
 
     """
     manager = manager # for testing injection
@@ -201,6 +206,7 @@ class Configurator(object):
         """ Add a :term:`root factory` to the current configuration
         state.  If the ``factory`` argument is ``None`` a default root
         factory will be registered."""
+        factory = self.maybe_dotted(factory)
         if factory is None:
             factory = DefaultRootFactory
         self.registry.registerUtility(factory, IRootFactory)
@@ -209,11 +215,14 @@ class Configurator(object):
     def _set_authentication_policy(self, policy, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`authentication policy` to
         the current configuration."""
+        policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthenticationPolicy, info=_info)
         
     def _set_authorization_policy(self, policy, _info=u''):
         """ Add a :mod:`repoze.bfg` :term:`authorization policy` to
-        the current configuration state."""
+        the current configuration state (also accepts a :term:`dotted
+        Python name`."""
+        policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthorizationPolicy, info=_info)
 
     def _make_spec(self, path_or_spec):
@@ -230,6 +239,7 @@ class Configurator(object):
                      attr=None, renderer_name=None, wrapper_viewname=None,
                      viewname=None, accept=None, order=MAX_ORDER,
                      phash=DEFAULT_PHASH):
+        view = self.maybe_dotted(view)
         authn_policy = self.registry.queryUtility(IAuthenticationPolicy)
         authz_policy = self.registry.queryUtility(IAuthorizationPolicy)
         settings = self.registry.queryUtility(ISettings)
@@ -338,6 +348,7 @@ class Configurator(object):
         self._fix_registry()
         self._set_settings(settings)
         self._set_root_factory(root_factory)
+        debug_logger = self.maybe_dotted(debug_logger)
         if debug_logger is None:
             debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
         registry = self.registry
@@ -352,10 +363,13 @@ class Configurator(object):
         self.add_view(default_exceptionresponse_view,
                       context=IExceptionResponse)
         if locale_negotiator:
+            locale_negotiator = self.maybe_dotted(locale_negotiator)
             registry.registerUtility(locale_negotiator, ILocaleNegotiator)
         if request_factory:
+            request_factory = self.maybe_dotted(request_factory)
             self.set_request_factory(request_factory)
         if renderer_globals_factory:
+            renderer_globals_factory=self.maybe_dotted(renderer_globals_factory)
             self.set_renderer_globals_factory(renderer_globals_factory)
 
     # getSiteManager is a unit testing dep injection
@@ -404,8 +418,10 @@ class Configurator(object):
 
     def derive_view(self, view, attr=None, renderer=None):
         """
+        
         Create a :term:`view callable` using the function, instance,
-        or class provided as ``view`` object.
+        or class (or :term:`dotted Python name` referring to the same)
+        provided as ``view`` object.
 
         This is API is useful to framework extenders who create
         pluggable systems which need to register 'proxy' view
@@ -453,6 +469,9 @@ class Configurator(object):
           that accepts no arguments that returns a :term:`response`
           object.
 
+        - A :term:`dotted Python name` which refers to any of the
+          kinds of objects above.
+
         This API returns a callable which accepts the arguments
         ``context, request`` and which returns the result of calling
         the provided ``view`` object.
@@ -463,25 +482,30 @@ class Configurator(object):
         effectively defaults to ``__call__``.  See
         :ref:`class_as_view` for more information.
 
-        The ``renderer`` keyword argument, if supplies, causes the
-        returned callable to use a :term:`renderer` to convert the
-        user-supplied view result to a :term:`response` object.  If a
-        ``renderer`` argument is not supplied, the user-supplied view
-        must itself return a :term:`response` object.
-        """
+        The ``renderer`` keyword argument should be a renderer
+        name. If supplied, it will cause the returned callable to use
+        a :term:`renderer` to convert the user-supplied view result to
+        a :term:`response` object.  If a ``renderer`` argument is not
+        supplied, the user-supplied view must itself return a
+        :term:`response` object.  """
 
         return self._derive_view(view, attr=attr, renderer_name=renderer)
 
     def add_subscriber(self, subscriber, iface=None, info=u''):
         """Add an event :term:`subscriber` for the event stream
         implied by the supplied ``iface`` interface.  The
-        ``subscriber`` argument represents a callable object; it will
-        be called with a single object ``event`` whenever
+        ``subscriber`` argument represents a callable object (or a
+        :ref:`Python dotted name` which identifies a callable); it
+        will be called with a single object ``event`` whenever
         :mod:`repoze.bfg` emits an :term:`event` associated with the
-        ``iface``.  Using the default ``iface`` value, ``None`` will
-        cause the subscriber to be registered for all event types. See
-        :ref:`events_chapter` for more information about events and
-        subscribers."""
+        ``iface``, which may be an :term:`interface` or a class or a
+        :term:`dotted Python name` to a global object representing an
+        interface or a class.  Using the default ``iface`` value,
+        ``None`` will cause the subscriber to be registered for all
+        event types. See :ref:`events_chapter` for more information
+        about events and subscribers."""
+        dotted = self.maybe_dotted
+        subscriber, iface = dotted(subscriber), dotted(iface)
         if iface is None:
             iface = (Interface,)
         if not isinstance(iface, (tuple, list)):
@@ -592,8 +616,9 @@ class Configurator(object):
 
         view
 
-          A reference to a :term:`view callable`.  This argument is
-          required unless a ``renderer`` argument also exists.  If a
+          A :term:`view callable` or a :term:`dotted Python name`
+          which refers to a view callable.  This argument is required
+          unless a ``renderer`` argument also exists.  If a
           ``renderer`` argument is passed, and a ``view`` argument is
           not provided, the view callable defaults to a callable that
           returns an empty dictionary (see
@@ -685,8 +710,9 @@ class Configurator(object):
 
         context
 
-          An object representing Python class that the :term:`context`
-          must be an instance of, *or* the :term:`interface` that the
+          An object or a :term:`dotted Python name` referring to an
+          interface or class object that the :term:`context` must be
+          an instance of, *or* the :term:`interface` that the
           :term:`context` must provide in order for this view to be
           found and called.  This predicate is true when the
           :term:`context` is an instance of the represented class or
@@ -743,11 +769,11 @@ class Configurator(object):
 
         containment
 
-          This value should be a reference to a Python class or
-          :term:`interface` that a parent object in the
-          :term:`lineage` must provide in order for this view to be
-          found and called.  The nodes in your object graph must be
-          "location-aware" to use this feature.  See
+          This value should be a Python class or :term:`interface` or
+          a :term:`dotted Python name` to such an object that a parent
+          object in the :term:`lineage` must provide in order for this
+          view to be found and called.  The nodes in your object graph
+          must be "location-aware" to use this feature.  See
           :ref:`location_aware` for more information about
           location-awareness.
 
@@ -814,6 +840,10 @@ class Configurator(object):
 
           .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
           """
+        view = self.maybe_dotted(view)
+        context = self.maybe_dotted(context)
+        for_ = self.maybe_dotted(for_)
+        containment = self.maybe_dotted(containment)
 
         if not view:
             if renderer:
@@ -829,6 +859,7 @@ class Configurator(object):
             request_type = None
 
         if request_type is not None:
+            request_type = self.maybe_dotted(request_type)
             if not IInterface.providedBy(request_type):
                 raise ConfigurationError(
                     'request_type must be an interface, not %s' % request_type)
@@ -1014,7 +1045,8 @@ class Configurator(object):
 
         factory
 
-          A reference to a Python object (often a function or a class)
+          A Python object (often a function or a class) or a
+          :term:`dotted Python name` which refers to the same object
           that will generate a :mod:`repoze.bfg` :term:`context`
           object when this route matches. For example,
           ``mypackage.models.MyFactoryClass``.  If this argument is
@@ -1174,17 +1206,18 @@ class Configurator(object):
 
         view
 
-          A reference to a Python object that will be used as a view
-          callable when this route
+          A Python object or :term:`dotted Python name` to the same
+          object that will be used as a view callable when this route
           matches. e.g. ``mypackage.views.my_view``.
           
         view_context
 
-          A reference to a class or an :term:`interface` that the
-          :term:`context` of the view should match for the view named
-          by the route to be used.  This argument is only useful if
-          the ``view`` attribute is used.  If this attribute is not
-          specified, the default (``None``) will be used.
+          A class or an :term:`interface` or :term:`dotted Python
+          name` to the same object which the :term:`context` of the
+          view should match for the view named by the route to be
+          used.  This argument is only useful if the ``view``
+          attribute is used.  If this attribute is not specified, the
+          default (``None``) will be used.
 
           If the ``view`` argument is not provided, this argument has
           no effect.
@@ -1299,6 +1332,7 @@ class Configurator(object):
         if mapper is None:
             mapper = RoutesMapper()
             self.registry.registerUtility(mapper, IRoutesMapper)
+        factory = self.maybe_dotted(factory)
         return mapper.connect(path, name, factory, predicates=predicates)
 
     def scan(self, package=None, categories=None, _info=u''):
@@ -1307,9 +1341,10 @@ class Configurator(object):
         :class:`repoze.bfg.view.bfg_view`.  Any decorated object found
         will influence the current configuration state.
 
-        The ``package`` argument should be a reference to a Python
-        :term:`package` or module object.  If ``package`` is ``None``,
-        the package of the *caller* is used.
+        The ``package`` argument should be a Python :term:`package` or
+        module object (or a :term:`dotted Python name` which refers to
+        such a package or module).  If ``package`` is ``None``, the
+        package of the *caller* is used.
 
         The ``categories`` argument, if provided, should be the
         :term:`Venusian` 'scan categories' to use during scanning.
@@ -1328,6 +1363,7 @@ class Configurator(object):
         (e.g. ``('bfg', 'myframework')``) to limit the decorators
         called to the set of categories required.
         """
+        package = self.maybe_dotted(package)
         if package is None: # pragma: no cover
             package = caller_package()
 
@@ -1335,13 +1371,15 @@ class Configurator(object):
         scanner.scan(package, categories=categories)
 
     def add_renderer(self, name, factory, _info=u''):
-        """ Add a :mod:`repoze.bfg` :term:`renderer` factory to the current
-        configuration state.
+        """
+        Add a :mod:`repoze.bfg` :term:`renderer` factory to the
+        current configuration state.
 
         The ``name`` argument is the renderer name.
 
         The ``factory`` argument is Python reference to an
-        implementation of a :term:`renderer` factory.
+        implementation of a :term:`renderer` factory or a
+        :term:`dotted Python name` to same.
 
         Note that this function must be called *before* any
         ``add_view`` invocation that names the renderer name as an
@@ -1350,6 +1388,7 @@ class Configurator(object):
         in the sequence of renderers passed as ``renderer`` than it is
         to use this method.
         """
+        factory = self.maybe_dotted(factory)
         self.registry.registerUtility(
             factory, IRendererFactory, name=name, info=_info)
 
@@ -1423,7 +1462,8 @@ class Configurator(object):
            be found.  The exception causing the registered view to be
            called is however still available as ``request.exception``.
 
-        The ``view`` argument should be a :term:`view callable`.
+        The ``view`` argument should be a :term:`view callable` or a
+        :term:`dotted Python name` which refers to a view callable.
 
         The ``attr`` argument should be the attribute of the view
         callable used to retrieve the response (see the ``add_view``
@@ -1468,7 +1508,8 @@ class Configurator(object):
            be found.  The exception causing the registered view to be
            called is however still available as ``request.exception``.
 
-        The ``view`` argument should be a :term:`view callable`.
+        The ``view`` argument should be a :term:`view callable` or a
+        :term:`dotted Python name` which refers to a view callable.
 
         The ``attr`` argument should be the attribute of the view
         callable used to retrieve the response (see the ``add_view``
@@ -1493,31 +1534,36 @@ class Configurator(object):
                              wrapper=wrapper, _info=_info)
 
     def set_request_factory(self, factory):
-        """ The object passed as ``factory`` will be used by the
-        :mod:`repoze.bfg` router to create all request objects.
-        This factory object must have the same methods and attributes
-        as the :class:`repoze.bfg.request.Request` class (particularly
-        ``__call__`` and ``blank``).
+        """ The object passed as ``factory`` should be an object (or a
+        :term:`dotted Python name` which refers to an object) which
+        will be used by the :mod:`repoze.bfg` router to create all
+        request objects.  This factory object must have the same
+        methods and attributes as the
+        :class:`repoze.bfg.request.Request` class (particularly
+        ``__call__``, and ``blank``).
 
         .. note:: Using the :meth:``request_factory`` argument to the
            :class:`repoze.bfg.configuration.Configurator` constructor
            can be used to achieve the same purpose.
         """
+        factory = self.maybe_dotted(factory)
         self.registry.registerUtility(factory, IRequestFactory)
 
     def set_renderer_globals_factory(self, factory):
-        """ The object passed as ``factory`` will be used by the
-        :mod:`repoze.bfg` rendering machinery as a renderers global
-        factory (see :ref:`adding_renderer_globals`).  The factory
-        must return a dictionary of items that will be merged intto
-        the *system* dictionary passed in to every renderer used by
-        the application.
+        """ The object passed as ``factory`` should be an object (or a
+        :term:`dotted Python name` which refers to an object) that
+        will be used by the :mod:`repoze.bfg` rendering machinery as a
+        renderers global factory (see :ref:`adding_renderer_globals`).
+        The factory must return a dictionary of items that will be
+        merged intto the *system* dictionary passed in to every
+        renderer used by the application.
 
         .. note:: Using the :meth:`renderer_globals_factory`
            argument to the
            :class:`repoze.bfg.configuration.Configurator` constructor
            can be used to achieve the same purpose.
         """
+        factory = self.maybe_dotted(factory)
         self.registry.registerUtility(factory, IRendererGlobalsFactory)
 
     def set_locale_negotiator(self, negotiator):
@@ -1525,10 +1571,14 @@ class Configurator(object):
         Set the :term:`locale negotiator` for this application.  The
         :term:`locale negotiator` is a callable which accepts a
         :term:`request` object and which returns a :term:`locale
-        name`.  Later calls to this method override earlier calls;
-        there can be only one locale negotiator active at a time
-        within an application.  See :ref:`activating_translation` for
-        more information.
+        name`.  The ``negotiator`` argument should be the locale
+        negotiator implementation or a :term:`dotted Python` name
+        which refers to such an implementation.
+
+        Later calls to this method override earlier calls; there can
+        be only one locale negotiator active at a time within an
+        application.  See :ref:`activating_translation` for more
+        information.
 
         .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
 
@@ -1536,6 +1586,7 @@ class Configurator(object):
            the :class:`repoze.bfg.configuration.Configurator`
            constructor can be used to achieve the same purpose.
         """
+        negotiator = self.maybe_dotted(negotiator)
         self.registry.registerUtility(negotiator, ILocaleNegotiator)
 
     def add_translation_dirs(self, *specs):
@@ -1762,6 +1813,7 @@ class Configurator(object):
         The default value of ``event_iface`` (``None``) implies a
         subscriber registered for *any* kind of event.
         """
+        event_iface = self.maybe_dotted(event_iface)
         L = []
         def subscriber(*event):
             L.extend(event)

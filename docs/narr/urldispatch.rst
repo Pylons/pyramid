@@ -448,11 +448,11 @@ represent neither predicates nor view configuration information.
   application.
 
 ``factory``
-  A reference to a Python object (often a function or a class) that
-  will generate a :mod:`repoze.bfg` :term:`context` object when this
-  route matches. For example, ``mypackage.models.MyFactoryClass``.  If
-  this argument is not specified, the traversal root factory will be
-  used.
+  A Python object (often a function or a class) or a :term:`Python
+  dotted name` to such an object that will generate a
+  :mod:`repoze.bfg` :term:`context` object when this route
+  matches. For example, ``mypackage.models.MyFactoryClass``.  If this
+  argument is not specified, the traversal root factory will be used.
 
 ``traverse``
   If you would like to cause the :term:`context` to be something other
@@ -573,15 +573,16 @@ represent neither predicates nor view configuration information.
 **View-Related Arguments**
 
 ``view``
-  A reference to a Python object that will be used as a view callable
-  when this route matches. e.g. ``mypackage.views.my_view``.
+  A Python object or a :term:`dotted Python name` to such an object
+  that will be used as a view callable when this route
+  matches. e.g. ``mypackage.views.my_view``.
   
 ``view_context``
-  A reference to a class or an :term:`interface` that the
-  :term:`context` of the view should match for the view named by the
-  route to be used.  This argument is only useful if the ``view``
-  attribute is used.  If this attribute is not specified, the default
-  (``None``) will be used.
+  A class or an :term:`interface` (or a :term:`dotted Python name` to
+  such an object) that the :term:`context` of the view should match
+  for the view named by the route to be used.  This argument is only
+  useful if the ``view`` attribute is used.  If this attribute is not
+  specified, the default (``None``) will be used.
 
   If the ``view`` argument is not provided, this argument has
   no effect.

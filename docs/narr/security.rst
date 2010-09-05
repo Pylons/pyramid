@@ -110,6 +110,11 @@ For example:
    config = Configurator(authentication_policy=authentication_policy,
                          authorization_policy=authorization_policy)
 
+.. note:: the ``authentication_policy`` and ``authorization_policy``
+   arguments may also be passed to the Configurator as :ref:`dotted
+   Python name` values, each representing the dotted name path to a
+   suitable implementation global defined at Python module scope.
+
 The above configuration enables a policy which compares the value of
 an "auth ticket" cookie passed in the request's environment which
 contains a reference to a single :term:`principal` against the

@@ -63,80 +63,11 @@
 - Raise an exception when a value in response_headerlist is not a
   string or decide to encode.
 
-- These methods of Configurator should allow the arguments it receives
-  named below them to be strings:
-
-  __init__
-
-     [ ] package
-
-  setup_registry
-
-     [ ] root_factory
-     [.] authentication_policy
-     [.] authorization_policy
-     [ ] locale_negotiator
-     [ ] request_factory
-     [ ] renderer_globals_factory
-
-  add_subscriber()
-
-     [ ] subscriber
-     [ ] iface
-
-  derive_view()
-
-     [ ] view
-
-  add_view()
-
-     [ ] view
-     [ ] for_
-     [ ] request_type
-     [ ] containment
-     [ ] context
-
-  add_route()
-
-     [.] view
-     [.] view_for
-     [ ] factory
-     [.] for_
-     [.] view_context
-
-  scan()
-
-     [ ] package
-
-  add_renderer()
-
-     [ ] factory
-
-  set_forbidden_view()
-
-     [ ] view
-
-  set_notfound_view()
-
-     [ ] view
-
-  set_request_factory()
-
-     [ ] factory
-
-  set_renderer_globals_factory()
-
-     [ ] factory
-
-  set_locale_negotiator()
-
-     [ ] negotiator
-
-  testing_add_subscriber
-
-     [ ] event_iface
-
 - Make NewResponse event carry request.
 
 - Change docs so that we dont use INewReponse, but instead just
   NewResponse (likewise for INewRequest, etc).
+
+- Change "Cleaning up After a Request" in the urldispatch chapter to
+  use ``request.add_response_callback``.
+

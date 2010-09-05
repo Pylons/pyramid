@@ -235,14 +235,15 @@ arguments is known as a view configuration :term:`predicate`.
 
 The line ``config.add_view(hello_world)`` registers the
 ``hello_world`` function as a view callable.  The ``add_view`` method
-of a Configurator must be called with a view callable object as its
-first argument, so the first argument passed is the ``hello_world``
-function.  This line calls ``add_view`` with a *default* value for the
-:term:`predicate` argument, named ``name``.  The ``name`` predicate
-defaults to a value equalling the empty string (``''``).  This means
-that we're instructing :mod:`repoze.bfg` to invoke the ``hello_world``
-view callable when the :term:`view name` is the empty string.  We'll
-learn in later chapters what a :term:`view name` is, and under which
+of a Configurator must be called with a view callable object or a
+:term:`dotted Python name` as its first argument, so the first
+argument passed is the ``hello_world`` function.  This line calls
+``add_view`` with a *default* value for the :term:`predicate`
+argument, named ``name``.  The ``name`` predicate defaults to a value
+equalling the empty string (``''``).  This means that we're
+instructing :mod:`repoze.bfg` to invoke the ``hello_world`` view
+callable when the :term:`view name` is the empty string.  We'll learn
+in later chapters what a :term:`view name` is, and under which
 circumstances a request will have a view name that is the empty
 string; in this particular application, it means that the
 ``hello_world`` view callable will be invoked when the root URL ``/``

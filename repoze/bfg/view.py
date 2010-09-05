@@ -200,9 +200,11 @@ class bfg_view(object):
     ``request_param``, ``containment``, ``xhr``, ``accept``,
     ``header`` and ``path_info``.
 
-    If ``context`` is not supplied, the interface
-    ``zope.interface.Interface`` (matching any context) is used.  An alias
-    for ``context`` is ``for_``.
+    ``context`` should be a Python object or :term:`dotted Python
+    name` representing the context type that must be found for this
+    view to be called.  If ``context`` is not supplied, the interface
+    ``zope.interface.Interface`` (matching any context) is used.  An
+    alias for ``context`` is ``for_``.
 
     If ``permission`` is not supplied, no permission is registered for
     this view (it's accessible by any caller).
@@ -248,12 +250,15 @@ class bfg_view(object):
     right hand side of the expression (``123``) for the view to "match" the
     current request.
 
-    If ``containment`` is not supplied, this view will be called when
-    the context of the request has any (or no) :term:`lineage`.  If
-    ``containment`` *is* supplied, it must be a class or
-    :term:`interface`, denoting that the view 'matches' the current
-    request only if any graph :term:`lineage` node possesses this
-    class or interface.
+    ``containment`` should be a Python object or :term:`dotted Python
+    name` representing a class or interface type which must be found
+    as one of the context's location parents for this view to be
+    called.  If ``containment`` is not supplied, this view will be
+    called when the context of the request has any (or no)
+    :term:`lineage`.  If ``containment`` *is* supplied, it must be a
+    class or :term:`interface`, denoting that the view'matches' the
+    current request only if any graph :term:`lineage` node possesses
+    this class or interface.
 
     If ``xhr`` is specified, it must be a boolean value.  If the value
     is ``True``, the view will only be invoked if the request's
