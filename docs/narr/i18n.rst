@@ -1013,8 +1013,8 @@ configuration using either imperative configuration or ZCML.
 
 .. topic:: Using Imperative Configuration
 
-    Pass an object which can act as the negotiator (or a :term:`Python
-    dotted name` referring to the object) as the ``locale_negotiator``
+    Pass an object which can act as the negotiator (or a :term:`dotted
+    Python name` referring to the object) as the ``locale_negotiator``
     argument of the :class:`repoze.bfg.configuration.Configurator`
     instance during application startup.
 

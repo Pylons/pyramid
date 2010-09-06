@@ -448,8 +448,8 @@ represent neither predicates nor view configuration information.
   application.
 
 ``factory``
-  A Python object (often a function or a class) or a :term:`Python
-  dotted name` to such an object that will generate a
+  A Python object (often a function or a class) or a :term:`dotted
+  Python name` to such an object that will generate a
   :mod:`repoze.bfg` :term:`context` object when this route
   matches. For example, ``mypackage.models.MyFactoryClass``.  If this
   argument is not specified, the traversal root factory will be used.

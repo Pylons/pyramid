@@ -352,7 +352,7 @@ The class (aka "factory") that :mod:`repoze.bfg` uses to create a
 request object instance can be changed by passing a
 ``request_factory`` argument to the constructor of the
 :term:`configurator`.  This argument can be either a callable or a
-:term:`Python dotted name` representing a callable.
+:term:`dotted Python name` representing a callable.
 
 .. code-block:: python
    :linenos:
@@ -413,7 +413,7 @@ renderer.
 A callback that :mod:`repoze.bfg` will call every time a renderer is
 invoked can be added by passing a ``renderer_globals_factory``
 argument to the constructor of the :term:`configurator`.  This
-callback can either be a callable object or a :term:`Python dotted
+callback can either be a callable object or a :term:`dotted Python
 name` representing such a callable.
 
 .. code-block:: python

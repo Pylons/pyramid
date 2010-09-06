@@ -30,10 +30,10 @@ Features
      view
 
   add_view
-     view, for_, context, request_type, containment
+     view, ``for_``, context, request_type, containment
 
   add_route()
-     view, view_for, factory, for_, view_context
+     view, view_for, factory, ``for_``, view_context
 
   scan
      package

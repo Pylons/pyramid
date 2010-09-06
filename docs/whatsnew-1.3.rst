@@ -289,6 +289,63 @@ Minor Feature Additions
   method resolves a potentially relative :term:`resource
   specification` string into an absolute version.
 
+- A new :meth:`repoze.bfg.request.Request.add_response_callback` API
+  has been added.  This method is documented in the new
+  :mod:`repoze.bfg.request` API chapter.  It can be used to influence
+  response values before a concrete response object has been created.
+
+- The :class:`repoze.bfg.interfaces.INewResponse` interface now
+  includes a ``request`` attribute; as a result, a handler for
+  INewResponse now has access to the request which caused the
+  response.
+
+- Each of the follow methods of the
+  :class:`repoze.bfg.configuration.Configurator` now allow the
+  below-named arguments to be passed as "dotted name strings"
+  (e.g. "foo.bar.baz") rather than as actual implementation objects
+  that must be imported:
+
+  setup_registry
+     root_factory, authentication_policy, authorization_policy,
+     debug_logger, locale_negotiator, request_factory,
+     renderer_globals_factory
+
+  add_subscriber
+     subscriber, iface
+
+  derive_view
+     view
+
+  add_view
+     view, ``for_``, context, request_type, containment
+
+  add_route()
+     view, view_for, factory, ``for_``, view_context
+
+  scan
+     package
+
+  add_renderer
+     factory
+
+  set_forbidden_view
+     view
+
+  set_notfound_view
+     view
+
+  set_request_factory
+     factory
+
+  set_renderer_globals_factory()
+     factory
+
+  set_locale_negotiator
+     negotiator
+
+  testing_add_subscriber
+     event_iface
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -409,6 +466,11 @@ Backwards Incompatibilities
   circumstances, a routing match which your application inadvertently
   depended upon may no longer happen.
 
+- The :class:`repoze.bfg.interfaces.INewResponse` event is now not
+  sent to listeners if the response returned by view code (or a
+  renderer) is not a "real" response (e.g. if it does not have
+  ``.status``, ``.headerlist`` and ``.app_iter`` attribtues).
+
 Deprecations and Behavior Differences
 -------------------------------------
 
@@ -526,6 +588,17 @@ Documentation Enhancements
 
 - Expanded the :ref:`redirecting_to_slash_appended_routes` section of
   the URL Dispatch narrative chapter.
+
+- Add an API chapter for the :mod:`repoze.bfg.request` module, which
+  includes documentation for the :class:`repoze.bfg.request.Request`
+  class (the "request object").
+
+- Modify the :ref:`webob_chapter` narrative chapter to reference the
+  new :mod:`repoze.bfg.request` API chapter.  Some content was moved
+  from this chapter into the API documentation itself.
+
+- Various changes to denote that Python dotted names are now allowed
+  as input to Configurator methods.
 
 Licensing Changes
 -----------------

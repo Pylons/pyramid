@@ -301,12 +301,12 @@ class Configurator(object):
         return self.__class__(registry=self.registry, package=package)
 
     def maybe_dotted(self, dotted):
-        """ Resolve the dotted name ``dotted`` to a global Python
-        object.  If ``dotted`` is not a string, return it without
-        attempting to do any name resolution.  If ``dotted`` is a
-        relative dotted name (e.g. ``.foo.bar``, consider it relative
-        to the ``package`` argument supplied to this Configurator's
-        constructor."""
+        """ Resolve the :term:`dotted Python name` ``dotted`` to a
+        global Python object.  If ``dotted`` is not a string, return
+        it without attempting to do any name resolution.  If
+        ``dotted`` is a relative dotted name (e.g. ``.foo.bar``,
+        consider it relative to the ``package`` argument supplied to
+        this Configurator's constructor."""
         return self.name_resolver.maybe_resolve(dotted)
 
     def absolute_resource_spec(self, relative_spec):
@@ -495,7 +495,7 @@ class Configurator(object):
         """Add an event :term:`subscriber` for the event stream
         implied by the supplied ``iface`` interface.  The
         ``subscriber`` argument represents a callable object (or a
-        :ref:`Python dotted name` which identifies a callable); it
+        :term:`dotted Python name` which identifies a callable); it
         will be called with a single object ``event`` whenever
         :mod:`repoze.bfg` emits an :term:`event` associated with the
         ``iface``, which may be an :term:`interface` or a class or a
@@ -1572,7 +1572,7 @@ class Configurator(object):
         :term:`locale negotiator` is a callable which accepts a
         :term:`request` object and which returns a :term:`locale
         name`.  The ``negotiator`` argument should be the locale
-        negotiator implementation or a :term:`dotted Python` name
+        negotiator implementation or a :term:`dotted Python name`
         which refers to such an implementation.
 
         Later calls to this method override earlier calls; there can
