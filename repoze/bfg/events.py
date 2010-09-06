@@ -82,8 +82,12 @@ class NewRequest(object):
 class NewResponse(object):
     """ An instance of this class is emitted as an :term:`event`
     whenever any :mod:`repoze.bfg` view returns a :term:`response`.
-    The instance has an attribute, ``response``, which is the response
-    object returned by the view.  This class implements the
+
+    The instance has two attributes:``request``, which is the request
+    which caused the response, and ``response``, which is the response
+    object returned by a view or renderer.
+
+    This class implements the
     :class:`repoze.bfg.interfaces.INewResponse` interface.
 
     .. note::
@@ -96,7 +100,8 @@ class NewResponse(object):
        :class:`repoze.bfg.interfaces.INewRequest` event.
     """
     implements(INewResponse)
-    def __init__(self, response):
+    def __init__(self, request, response):
+        self.request = request
         self.response = response
 
 class AfterTraversal(object):

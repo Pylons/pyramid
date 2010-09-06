@@ -157,7 +157,7 @@ class Router(object):
                 request._process_response_callbacks(response)
 
             # process the response
-            has_listeners and registry.notify(NewResponse(response))
+            has_listeners and registry.notify(NewResponse(request, response))
 
             start_response(status, headers)
             return app_iter

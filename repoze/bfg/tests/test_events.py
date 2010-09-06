@@ -31,8 +31,8 @@ class NewResponseEventTests(unittest.TestCase):
         from repoze.bfg.events import NewResponse
         return NewResponse
 
-    def _makeOne(self, response):
-        return self._getTargetClass()(response)
+    def _makeOne(self, request, response):
+        return self._getTargetClass()(request, response)
 
     def test_class_implements(self):
         from repoze.bfg.interfaces import INewResponse
@@ -43,13 +43,16 @@ class NewResponseEventTests(unittest.TestCase):
     def test_instance_implements(self):
         from repoze.bfg.interfaces import INewResponse
         from zope.interface.verify import verifyObject
+        request = DummyRequest()
         response = DummyResponse()
-        inst = self._makeOne(response)
+        inst = self._makeOne(request, response)
         verifyObject(INewResponse, inst)
 
     def test_ctor(self):
+        request = DummyRequest()
         response = DummyResponse()
-        inst = self._makeOne(response)
+        inst = self._makeOne(request, response)
+        self.assertEqual(inst.request, request)
         self.assertEqual(inst.response, response)
 
 class WSGIAppEventTests(unittest.TestCase):

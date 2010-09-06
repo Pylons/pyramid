@@ -9,6 +9,10 @@ Features
   ``repoze.bfg.request`` API chapter.  It can be used to influence
   response values before a concrete response object has been created.
 
+- The ``repoze.bfg.interfaces.INewResponse`` interface now includes a
+  ``request`` attribute; as a result, a handler for INewResponse now
+  has access to the request which caused the response.
+
 - Each of the follow methods of the Configurator now allow the
   below-named arguments to be passed as "dotted name strings"
   (e.g. "foo.bar.baz") rather than as actual implementation objects
@@ -85,6 +89,9 @@ Documentation
   new ``repoze.bfg.request`` API chapter.  Some content was moved from
   this chapter into the API documentation itself.
 
+- Various changes to denote that Python dotted names are now allowed
+  as input to Configurator methods.
+
 Internal
 --------
 
@@ -95,6 +102,10 @@ Internal
   The functionality of
   ``repoze.bfg.request.Request.add_response_callback`` takes its
   place.
+
+- The ``repoze.bfg.events.NewResponse`` class's construct has changed:
+  it now must be created with ``(request, response)`` rather than
+  simply ``(response)``.
 
 1.3a9 (2010-08-22)
 ==================

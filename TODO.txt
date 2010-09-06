@@ -59,8 +59,6 @@
 - Raise an exception when a value in response_headerlist is not a
   string or decide to encode.
 
-- Make NewResponse event carry request.
-
 - Change docs so that we dont use INewReponse, but instead just
   NewResponse (likewise for INewRequest, etc).
 

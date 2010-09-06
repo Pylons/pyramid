@@ -16,6 +16,7 @@ class INewRequest(Interface):
 class INewResponse(Interface):
     """ An event type that is emitted whenever any :mod:`repoze.bfg`
     view returns a response."""
+    request = Attribute('The request object')
     response = Attribute('The response object')
 
 class IWSGIApplicationCreatedEvent(Interface):

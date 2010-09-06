@@ -202,5 +202,7 @@ because the interface defined at
 know that :class:`repoze.bfg.interfaces.INewResponse` events have a
 ``response`` attribute, which is a response object constructed by your
 application, because the interface defined at
-:class:`repoze.bfg.interfaces.INewResponse` says it must.
+:class:`repoze.bfg.interfaces.INewResponse` says it must
+(:class:`repoze.bfg.interfaces.INewResponse` objects also have a
+``request``).
 
