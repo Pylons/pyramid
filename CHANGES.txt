@@ -1,7 +1,7 @@
 1.3a11 (2010-09-05)
 ===================
 
-Big Fixes
+Bug Fixes
 ---------
 
 - Process the response callbacks and the NewResponse event earlier, to
