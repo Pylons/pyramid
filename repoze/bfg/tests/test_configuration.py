@@ -3392,6 +3392,16 @@ class Test__make_predicates(unittest.TestCase):
             )
         self.failUnless(order1 > order2)
 
+    def test_different_custom_predicates_with_same_hash(self):
+        class PredicateWithHash(object):
+            def __hash__(self):
+                return 1
+        a = PredicateWithHash()
+        b = PredicateWithHash()
+        _, _, a_phash = self._callFUT(custom=(a,))
+        _, _, b_phash = self._callFUT(custom=(b,))
+        self.assertEqual(a_phash, b_phash)
+
     def test_traverse_has_remainder_already(self):
         order, predicates, phash = self._callFUT(traverse='/1/:a/:b')
         self.assertEqual(len(predicates), 1)

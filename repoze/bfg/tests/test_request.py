@@ -206,7 +206,7 @@ class Test_add_global_response_headers(unittest.TestCase):
         self._callFUT(request, [('c', 1)])
         self.assertEqual(len(request.response_callbacks), 1)
         request.response_callbacks[0](None, response)
-        self.assertEqual(response.headers.added,  [('c', 1)] )
+        self.assertEqual(response.headerlist,  [('c', 1)] )
 
 class DummyRequest:
     def __init__(self, environ=None):
@@ -221,14 +221,8 @@ class DummyNewRequestEvent:
     def __init__(self, request):
         self.request = request
         
-class DummyHeaders:
-    def __init__(self):
-        self.added = []
-    def add(self, k, v):
-        self.added.append((k, v))
-
 class DummyResponse:
     def __init__(self):
-        self.headers = DummyHeaders()
+        self.headerlist = []
 
 

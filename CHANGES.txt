@@ -1,6 +1,9 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
 - Fix a bug in ``repoze.bfg.url.static_url`` URL generation: if two
   resource specifications were used to create two separate static
   views, but they shared a common prefix, it was possible that
@@ -8,6 +11,18 @@ Next release
 
 - Fix another bug in ``repoze.bfg.static_url`` URL generation: too
   many slashes in generated URL.
+
+Internal
+--------
+
+- Use ``hash()`` rather than ``id()`` when computing the "phash" of a
+  custom route/view predicate in order to allow the custom predicate
+  some control over which predicates are "equal".
+
+- Use ``response.headerlist.append`` instead of
+  ``response.headers.add`` in
+  ``repoze.bfg.request.add_global_response_headers`` in case the
+  response is not a WebOb response.
 
 1.3a11 (2010-09-05)
 ===================

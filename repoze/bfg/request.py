@@ -154,7 +154,7 @@ def route_request_iface(name, bases=()):
 def add_global_response_headers(request, headerlist):
     def add_headers(request, response):
         for k, v in headerlist:
-            response.headers.add(k, v)
+            response.headerlist.append((k, v))
     request.add_response_callback(add_headers)
 
 from repoze.bfg.threadlocal import get_current_request as get_request # b/c

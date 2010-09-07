@@ -1982,14 +1982,14 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
             return find_interface(context, containment) is not None
         weights.append(1 << 7)
         predicates.append(containment_predicate)
-        h.update('containment:%r' % id(containment))
+        h.update('containment:%r' % hash(containment))
 
     if request_type is not None:
         def request_type_predicate(context, request):
             return request_type.providedBy(request)
         weights.append(1 << 8)
         predicates.append(request_type_predicate)
-        h.update('request_type:%r' % id(request_type))
+        h.update('request_type:%r' % hash(request_type))
 
     if traverse is not None:
         # ``traverse`` can only be used as a *route* "predicate"; it
@@ -2014,7 +2014,13 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
     if custom:
         for num, predicate in enumerate(custom):
             predicates.append(predicate)
-            h.update('custom%s:%r' % (num, id(predicate)))
+            # using hash() here rather than id() is intentional: we
+            # want to allow custom predicates that are part of
+            # frameworks to be able to define custom __hash__
+            # functions for custom predicates, so that the hash output
+            # of predicate instances which are "logically the same"
+            # may compare equal.
+            h.update('custom%s:%r' % (num, hash(predicate)))
         weights.append(1 << 10)
 
     score = 0
