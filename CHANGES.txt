@@ -12,6 +12,12 @@ Bug Fixes
 - Fix another bug in ``repoze.bfg.static_url`` URL generation: too
   many slashes in generated URL.
 
+- Prevent a race condition which could result in a ``RuntimeError``
+  when rendering a Chameleon template that has not already been
+  rendered once.  This would usually occur directly after a restart,
+  when more than one person or thread is trying to execute the same
+  view at the same time: https://bugs.launchpad.net/karl3/+bug/621364
+
 Internal
 --------
 

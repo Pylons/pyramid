@@ -1,5 +1,6 @@
 import os
 import pkg_resources
+import threading
 
 from webob import Response
 
@@ -150,7 +151,12 @@ def string_renderer_factory(name):
 
 # utility functions, not API
 
-def template_renderer_factory(spec, impl):
+# Lock to prevent simultaneous registry writes; used in
+# template_renderer_factory.  template_renderer_factory may be called
+# at runtime, from more than a single thread.
+registry_lock = threading.Lock() 
+
+def template_renderer_factory(spec, impl, lock=registry_lock):
     reg = get_current_registry()
     if os.path.isabs(spec):
         # 'spec' is an absolute filename
@@ -159,7 +165,12 @@ def template_renderer_factory(spec, impl):
         renderer = reg.queryUtility(ITemplateRenderer, name=spec)
         if renderer is None:
             renderer = impl(spec)
-            reg.registerUtility(renderer, ITemplateRenderer, name=spec)
+            # cache the template
+            try:
+                lock.acquire()
+                reg.registerUtility(renderer, ITemplateRenderer, name=spec)
+            finally:
+                lock.release()
     else:
         # spec is a package:relpath resource spec
         renderer = reg.queryUtility(ITemplateRenderer, name=spec)
@@ -178,7 +189,11 @@ def template_renderer_factory(spec, impl):
             renderer = impl(abspath)
             if not _reload_resources():
                 # cache the template
-                reg.registerUtility(renderer, ITemplateRenderer, name=spec)
+                try:
+                    lock.acquire()
+                    reg.registerUtility(renderer, ITemplateRenderer, name=spec)
+                finally:
+                    lock.release()
         
     return renderer
 
