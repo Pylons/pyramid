@@ -1,3 +1,14 @@
+Next release
+============
+
+- Fix a bug in ``repoze.bfg.url.static_url`` URL generation: if two
+  resource specifications were used to create two separate static
+  views, but they shared a common prefix, it was possible that
+  ``static_url`` would generate an incorrect URL.
+
+- Fix another bug in ``repoze.bfg.static_url`` URL generation: too
+  many slashes in generated URL.
+
 1.3a11 (2010-09-05)
 ===================
 

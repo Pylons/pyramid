@@ -707,14 +707,14 @@ class TestStaticDirective(unittest.TestCase):
         routes = mapper.get_routes()
         self.assertEqual(len(routes), 1)
         self.assertEqual(routes[0].path, 'name/*subpath')
-        self.assertEqual(routes[0].name, 'name')
+        self.assertEqual(routes[0].name, 'name/')
 
         view_action = actions[1]
         discriminator = view_action['discriminator']
         self.assertEqual(discriminator[:3], ('view', StaticURLInfo, ''))
         self.assertEqual(discriminator[4], IView)
         iface = implementedBy(StaticURLInfo)
-        request_type = reg.getUtility(IRouteRequest, 'name')
+        request_type = reg.getUtility(IRouteRequest, 'name/')
         view = reg.adapters.lookup(
             (IViewClassifier, request_type, iface), IView, name='')
         request = DummyRequest()

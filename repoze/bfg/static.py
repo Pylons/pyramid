@@ -99,7 +99,7 @@ class StaticURLInfo(object):
             if path.startswith(spec):
                 subpath = path[len(spec):]
                 if is_url:
-                    return urljoin(name, subpath[1:])
+                    return urljoin(name, subpath)
                 else:
                     kw['subpath'] = subpath
                     return self.route_url(name, request, **kw)
@@ -107,16 +107,32 @@ class StaticURLInfo(object):
         raise ValueError('No static URL definition matching %s' % path)
 
     def add(self, name, spec, **extra):
+        # This feature only allows for the serving of a directory and
+        # the files contained within, not of a single resource;
+        # appending a slash here if the spec doesn't have one is
+        # required for proper prefix matching done in ``generate``
+        # (``subpath = path[len(spec):]``).
+        if not spec.endswith('/'):
+            spec = spec + '/'
+
+        # we also make sure the name ends with a slash, purely as a
+        # convenience: a name that is a url is required to end in a
+        # slash, so that ``urljoin(name, subpath))`` will work above
+        # when the name is a URL, and it doesn't hurt things for it to
+        # have a name that ends in a slash if it's used as a route
+        # name instead of a URL.
+        if not name.endswith('/'):
+            # make sure it ends with a slash
+            name = name + '/'
+
         names = [ t[0] for t in self.registrations ]
+
         if name in names:
             idx = names.index(name)
             self.registrations.pop(idx)
 
         if urlparse(name)[0]:
             # it's a URL
-            if not name.endswith('/'):
-                # make sure it ends with a slash
-                name = name + '/'
             self.registrations.append((name, spec, True))
         else:
             # it's a view name
@@ -126,7 +142,7 @@ class StaticURLInfo(object):
             # register a route using this view
             self.config.add_route(
                 name,
-                "%s/*subpath" % name,
+                "%s*subpath" % name, # name already ends with slash
                 view=view,
                 view_for=self.__class__,
                 factory=lambda *x: self,
