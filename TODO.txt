@@ -72,25 +72,3 @@
   view_permission="something_random" inside every <route>, so that
   those alc's kick in? or am I doing it completely wrong?
 
-- Need to allow view configs that contain custom predicates a shot at
-  comparing the same
-
-  View configs compare equal if their "phash" is the same
-
-  We'll have to extend bfg to let it compute a phash from a custom
-  predicate right now, it just uses the id of the predicate.  Right
-  now it does:
-
-  for num, predicate in enumerate(custom):
-      predicates.append(predicate)
-      h.update('custom%s:%r' % (num, id(predicate)))
-
-  I'll have to make it do:
-
-  for num, predicate in enumerate(custom):
-      predicates.append(predicate)
-      h.update('custom%s:%r' % (num, get_phash(predicate)))
-
-  where get_phash does something sensible but falls back to id
-
-
