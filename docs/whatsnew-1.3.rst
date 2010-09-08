@@ -346,6 +346,21 @@ Minor Feature Additions
   testing_add_subscriber
      event_iface
 
+- The argument to
+  :meth:`repoze.bfg.configuration.Configurator.add_route` which was
+  previously called ``path`` is now called ``pattern`` for better
+  explicability.  For backwards compatibility purposes, passing a
+  keyword argument named ``path`` to ``add_route`` will still work
+  indefinitely.
+
+- The ``path`` attribute to the ZCML ``route`` directive (see
+  :ref:`route_directive`) is now named ``pattern`` for better
+  explicability.  The older ``path`` attribute will continue to work
+  indefinitely.
+
+- The ``routesalchemy`` paster template has been updated to use
+  ``pattern`` in its route declarations rather than ``path``.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -519,6 +534,9 @@ Dependency Changes
 - Chameleon 1.2.3 or better is now required (internationalization and
   per-template debug settings).
 
+- :mod:`repoze.bfg` ``tests_require`` now includes
+  ``repoze.sphinx.autointerface`` as a dependency.
+
 Documentation Enhancements
 --------------------------
 
@@ -599,6 +617,17 @@ Documentation Enhancements
 
 - Various changes to denote that Python dotted names are now allowed
   as input to Configurator methods.
+
+- All narrative, API, and tutorial docs which referred to a route
+  pattern as a ``path`` have now been updated to refer to them as a
+  ``pattern``.
+
+- The :mod:`repoze.bfg.interfaces` API documentation page is now
+  rendered via ``repoze.sphinx.autointerface``.
+
+- The :ref:`urldispatch_chapter` chapter now refers to the
+  :mod:`repoze.bfg.interfaces` chapter to explain the API of an
+  :class:`repoze.bfg.interfaces.IRoute` object.
 
 Licensing Changes
 -----------------
