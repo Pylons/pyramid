@@ -234,12 +234,48 @@ class IDebugLogger(Interface):
 
 ILogger = IDebugLogger # b/c
 
+class IRoute(Interface):
+    """ Interface representing the type of object returned from
+    ``IRoutesMapper.get_route``"""
+    name = Attribute('The route name')
+    pattern = Attribute('The route pattern')
+    factory = Attribute(
+        'The :term:`root factory` used by the :mod:`repoze.bfg` router '
+        'when this route matches (or ``None``)')
+    predicates = Attribute(
+        'A sequence of :term:`route predicate` objects used to '
+        'determine if a request matches this route or not or not after '
+        'basic pattern matching has been completed.')
+    def match(path):
+        """
+        If the ``path`` passed to this function can be matched by the
+        ``pattern`` of this route, return a dictionary (the
+        'matchdict'), which will contain keys representing the dynamic
+        segment markers in the pattern mapped to values extracted from
+        the provided ``path``.
+
+        If the ``path`` passed to this function cannot be matched by
+        the ``pattern`` of this route, return ``None``.
+        """
+    def generate(kw):
+        """
+        Generate a URL based on filling in the dynamic segment markers
+        in the pattern using the ``kw`` dictionary provided.
+        """
+
 class IRoutesMapper(Interface):
     """ Interface representing a Routes ``Mapper`` object """
     def get_routes():
         """ Return a sequence of Route objects registered in the mapper."""
 
-    def connect(path, name, factory=None, predicates=()):
+    def has_routes():
+        """ Returns ``True`` if any route has been registered. """
+
+    def get_route(name):
+        """ Returns an ``IRoute`` object if a route with the name ``name``
+        was registered, otherwise return ``None``."""
+
+    def connect(name, pattern, factory=None, predicates=()):
         """ Add a new route. """
 
     def generate(name, kw):
@@ -247,8 +283,11 @@ class IRoutesMapper(Interface):
         keywords implied by kw"""
 
     def __call__(request):
-        """ Return a matchdict for the request; the ``route`` key will
-        either be a Route object or ``None`` if no route matched."""
+        """ Return a dictionary containing matching information for
+        the request; the ``route`` key of this dictionary will either
+        be a Route object or ``None`` if no route matched; the
+        ``match``key will be the matchdict or ``None`` if no route
+        matched."""
 
 class IContextURL(Interface):
     """ An adapter which deals with URLs related to a context.

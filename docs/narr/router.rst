@@ -33,9 +33,9 @@ processing?
    configuration, the :mod:`repoze.bfg` :term:`router` calls a
    :term:`URL dispatch` "route mapper."  The job of the mapper is to
    examine the ``PATH_INFO`` implied by the request to determine
-   whether any user-defined :term:`route` matches the current WSGI
-   environment.  The :term:`router` passes the request as an argument
-   to the mapper.
+   whether any user-defined :term:`route` pattern matches the current
+   WSGI environment.  The :term:`router` passes the request as an
+   argument to the mapper.
 
 #. If any route matches, the WSGI environment is mutated; a
    ``bfg.routes.route`` key and a ``bfg.routes.matchdict`` are added

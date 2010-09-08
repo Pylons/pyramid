@@ -22,12 +22,13 @@ callable is assumed to return a :term:`response` object.
 
 The request passed to every view that is called as the result of a
 route match has an attribute named ``matchdict`` that contains the
-elements placed into the URL by the ``path`` of a ``route`` statement.
-For instance, if a route statement in ``configure.zcml`` had the path
-``:one/:two``, and the URL at ``http://example.com/foo/bar`` was
-invoked, matching this path, the matchdict dictionary attached to the
-request passed to the view would have a ``one`` key with the value
-``foo`` and a ``two`` key with the value ``bar``.
+elements placed into the URL by the ``pattern`` of a ``route``
+statement.  For instance, if a route statement in ``configure.zcml``
+had the pattern ``:one/:two``, and the URL at
+``http://example.com/foo/bar`` was invoked, matching this pattern, the
+matchdict dictionary attached to the request passed to the view would
+have a ``one`` key with the value ``foo`` and a ``two`` key with the
+value ``bar``.
 
 The source code for this tutorial stage can be browsed at
 `docs.repoze.org <http://docs.repoze.org/bfgwiki2-1.3/views>`_.
@@ -275,21 +276,21 @@ Note that the *ordering* of these declarations is very important.
 ``route`` declarations are matched in the order they're found in the
 ``configure.zcml`` file.
 
-#. Add a declaration which maps the empty path (signifying the root
+#. Add a declaration which maps the empty pattern (signifying the root
    URL) to the view named ``view_wiki`` in our ``views.py`` file with
    the name ``view_wiki``.  This is the :term:`default view` for the
    wiki.
 
-#. Add a declaration which maps the path pattern ``:pagename`` to the
+#. Add a declaration which maps the pattern ``:pagename`` to the
    view named ``view_page`` in our ``views.py`` file with the view
    name ``view_page``.  This is the regular view for a page.
 
-#. Add a declaration which maps the path pattern
+#. Add a declaration which maps the pattern
    ``:pagename/edit_page`` to the view named ``edit_page`` in our
    ``views.py`` file with the name ``edit_page``.  This is the edit view
    for a page.
 
-#. Add a declaration which maps the path pattern
+#. Add a declaration which maps the pattern
    ``add_page/:pagename`` to the view named ``add_page`` in our
    ``views.py`` file with the name ``add_page``.  This is the add view
    for a new page.

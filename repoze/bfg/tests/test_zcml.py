@@ -514,7 +514,7 @@ class TestRouteDirective(unittest.TestCase):
         from repoze.bfg.zcml import route
         return route(*arg, **kw)
 
-    def _assertRoute(self, name, path, num_predicates=0):
+    def _assertRoute(self, name, pattern, num_predicates=0):
         from repoze.bfg.threadlocal import get_current_registry
         from repoze.bfg.interfaces import IRoutesMapper
         reg = get_current_registry()
@@ -523,7 +523,7 @@ class TestRouteDirective(unittest.TestCase):
         route = routes[0]
         self.assertEqual(len(routes), 1)
         self.assertEqual(route.name, name)
-        self.assertEqual(route.path, path)
+        self.assertEqual(route.pattern, pattern)
         self.assertEqual(len(routes[0].predicates), num_predicates)
         return route
 
@@ -535,7 +535,7 @@ class TestRouteDirective(unittest.TestCase):
         from repoze.bfg.interfaces import IRouteRequest
         context = DummyContext()
         view = lambda *arg: 'OK'
-        self._callFUT(context, 'name', 'path', view=view)
+        self._callFUT(context, 'name', 'pattern', view=view)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
@@ -544,7 +544,7 @@ class TestRouteDirective(unittest.TestCase):
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self._assertRoute('name', 'path')
+        self._assertRoute('name', 'pattern')
 
         view_action = actions[1]
         reg = get_current_registry()
@@ -563,7 +563,8 @@ class TestRouteDirective(unittest.TestCase):
         from repoze.bfg.interfaces import IRouteRequest
         context = DummyContext()
         view = lambda *arg: 'OK'
-        self._callFUT(context, 'name', 'path', view=view, view_context=IDummy)
+        self._callFUT(context, 'name', 'pattern', view=view,
+                      view_context=IDummy)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
@@ -572,7 +573,7 @@ class TestRouteDirective(unittest.TestCase):
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self._assertRoute('name', 'path')
+        self._assertRoute('name', 'pattern')
 
         view_action = actions[1]
         reg = get_current_registry()
@@ -593,8 +594,8 @@ class TestRouteDirective(unittest.TestCase):
         view = lambda *arg: 'OK'
         class Foo:
             pass
-        self._callFUT(context, 'name', 'path', view=view, view_context=IDummy,
-                      view_for=Foo)
+        self._callFUT(context, 'name', 'pattern', view=view,
+                      view_context=IDummy, view_for=Foo)
         actions = context.actions
         self.assertEqual(len(actions), 2)
 
@@ -603,7 +604,7 @@ class TestRouteDirective(unittest.TestCase):
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self._assertRoute('name', 'path')
+        self._assertRoute('name', 'pattern')
 
         view_action = actions[1]
         reg = get_current_registry()
@@ -630,7 +631,7 @@ class TestRouteDirective(unittest.TestCase):
 
         context = DummyContext()
         view = lambda *arg: 'OK'
-        self._callFUT(context, 'name', 'path', view=view,
+        self._callFUT(context, 'name', 'pattern', view=view,
                       renderer='fixtureapp/templates/foo.pt')
         actions = context.actions
         self.assertEqual(len(actions), 2)
@@ -640,7 +641,7 @@ class TestRouteDirective(unittest.TestCase):
         route_discriminator = route_action['discriminator']
         self.assertEqual(route_discriminator,
                          ('route', 'name', False, None, None, None, None,None))
-        self._assertRoute('name', 'path')
+        self._assertRoute('name', 'pattern')
 
         view_action = actions[1]
         request_type = reg.getUtility(IRouteRequest, 'name')
@@ -660,7 +661,8 @@ class TestRouteDirective(unittest.TestCase):
         preds = tuple(sorted([pred1, pred2]))
 
         context = DummyContext()
-        self._callFUT(context, 'name', 'path', custom_predicates=(pred1, pred2))
+        self._callFUT(context, 'name', 'pattern',
+                      custom_predicates=(pred1, pred2))
         actions = context.actions
         self.assertEqual(len(actions), 1)
 
@@ -670,7 +672,39 @@ class TestRouteDirective(unittest.TestCase):
         self.assertEqual(
             route_discriminator,
             ('route', 'name', False, None, None, None, None,None) + preds)
-        self._assertRoute('name', 'path', 2)
+        self._assertRoute('name', 'pattern', 2)
+
+    def test_with_path_argument_no_pattern(self):
+        context = DummyContext()
+        self._callFUT(context, 'name', path='pattern')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        route_action = actions[0]
+        route_action['callable']()
+        route_discriminator = route_action['discriminator']
+        self.assertEqual(route_discriminator,
+                         ('route', 'name', False, None, None, None, None,None))
+        self._assertRoute('name', 'pattern')
+
+    def test_with_path_argument_and_pattern(self):
+        context = DummyContext()
+        self._callFUT(context, 'name', pattern='pattern', path='path')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+
+        route_action = actions[0]
+        route_action['callable']()
+        route_discriminator = route_action['discriminator']
+        self.assertEqual(route_discriminator,
+                         ('route', 'name', False, None, None, None, None,None))
+        self._assertRoute('name', 'pattern')
+        
+
+    def test_with_neither_path_nor_pattern(self):
+        from repoze.bfg.exceptions import ConfigurationError
+        context = DummyContext()
+        self.assertRaises(ConfigurationError, self._callFUT, context, 'name')
 
 class TestStaticDirective(unittest.TestCase):
     def setUp(self):
@@ -706,7 +740,7 @@ class TestStaticDirective(unittest.TestCase):
         mapper = reg.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         self.assertEqual(len(routes), 1)
-        self.assertEqual(routes[0].path, 'name/*subpath')
+        self.assertEqual(routes[0].pattern, 'name/*subpath')
         self.assertEqual(routes[0].name, 'name/')
 
         view_action = actions[1]

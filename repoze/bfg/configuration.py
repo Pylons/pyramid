@@ -1005,7 +1005,7 @@ class Configurator(object):
 
     def add_route(self,
                   name,
-                  path,
+                  pattern=None,
                   view=None,
                   view_for=None,
                   permission=None,
@@ -1025,6 +1025,7 @@ class Configurator(object):
                   view_context=None,
                   view_attr=None,
                   use_global_views=False,
+                  path=None,
                   _info=u''):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
@@ -1064,7 +1065,7 @@ class Configurator(object):
           route).
 
           The syntax of the ``traverse`` argument is the same as it is
-          for ``path``. For example, if the ``path`` provided to
+          for ``pattern``. For example, if the ``pattern`` provided to
           ``add_route`` is ``articles/:article/edit``, and the
           ``traverse`` argument provided to ``add_route`` is
           ``/:article``, when a request comes in that causes the route
@@ -1078,14 +1079,15 @@ class Configurator(object):
           traversal.
 
           If the traversal path contains segment marker names which
-          are not present in the path argument, a runtime error will
-          occur.  The ``traverse`` pattern should not contain segment
-          markers that do not exist in the ``path``.
+          are not present in the ``pattern`` argument, a runtime error
+          will occur.  The ``traverse`` pattern should not contain
+          segment markers that do not exist in the ``pattern``
+          argument.
 
           A similar combining of routing and traversal is available
           when a route is matched which contains a ``*traverse``
-          remainder marker in its path (see
-          :ref:`using_traverse_in_a_route_path`).  The ``traverse``
+          remainder marker in its pattern (see
+          :ref:`using_traverse_in_a_route_pattern`).  The ``traverse``
           argument to add_route allows you to associate route patterns
           with an arbitrary traversal path without using a a
           ``*traverse`` remainder marker; instead you can use other
@@ -1093,18 +1095,26 @@ class Configurator(object):
 
           Note that the ``traverse`` argument to ``add_route`` is
           ignored when attached to a route that has a ``*traverse``
-          remainder marker in its path.
+          remainder marker in its pattern.
 
           .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
 
         Predicate Arguments
 
-        path
+        pattern
 
-          The path of the route e.g. ``ideas/:idea``.  This argument
-          is required.  See :ref:`route_path_pattern_syntax` for
-          information about the syntax of route paths.  If the path
-          doesn't match the current URL, route matching continues.
+          The pattern of the route e.g. ``ideas/:idea``.  This
+          argument is required.  See :ref:`route_path_pattern_syntax`
+          for information about the syntax of route patterns.  If the
+          pattern doesn't match the current URL, route matching
+          continues.
+
+          .. note:: For backwards compatibility purposes (as of
+             :mod:`repoze.bfg` 1.3), a ``path`` keyword argument
+             passed to this function will be used to represent the
+             pattern value if the ``pattern`` argument is ``None``.
+             If both ``path`` and ``pattern`` are passed, ``pattern``
+             wins.
 
         xhr
 
@@ -1333,7 +1343,11 @@ class Configurator(object):
             mapper = RoutesMapper()
             self.registry.registerUtility(mapper, IRoutesMapper)
         factory = self.maybe_dotted(factory)
-        return mapper.connect(path, name, factory, predicates=predicates)
+        if pattern is None:
+            pattern = path
+        if pattern is None:
+            raise ConfigurationError('"pattern" argument may not be None')
+        return mapper.connect(name, pattern, factory, predicates=predicates)
 
     def scan(self, package=None, categories=None, _info=u''):
         """ Scan a Python package and any of its subpackages for

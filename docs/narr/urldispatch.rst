@@ -65,12 +65,12 @@ Route Configuration
 -------------------
 
 :term:`Route configuration` is the act of adding a new :term:`route`
-to an application.  A route has a *path*, representing a pattern meant
-to match against the ``PATH_INFO`` portion of a URL, and a *name*,
-which is used by developers within a :mod:`repoze.bfg` application to
-uniquely identify a particular route when generating a URL.  It also
-optionally has a ``factory``, a set of :term:`route predicate`
-parameters, and a set of :term:`view` parameters.
+to an application.  A route has a *pattern*, representing a pattern
+meant to match against the ``PATH_INFO`` portion of a URL, and a
+*name*, which is used by developers within a :mod:`repoze.bfg`
+application to uniquely identify a particular route when generating a
+URL.  It also optionally has a ``factory``, a set of :term:`route
+predicate` parameters, and a set of :term:`view` parameters.
 
 A route configuration may be added to the system via :term:`imperative
 configuration` or via :term:`ZCML`.  Both are completely equivalent.
@@ -92,7 +92,7 @@ registry`.  Here's an example:
    # repoze.bfg.configuration.Configurator class; "myview" is assumed
    # to be a "view callable" function
    from views import myview
-   config.add_route(name='myroute', path='/prefix/:one/:two', view=myview)
+   config.add_route('myroute', '/prefix/:one/:two', view=myview)
 
 .. index::
    single: ZCML directive; route
@@ -111,7 +111,7 @@ application.
 
    <route
        name="myroute"
-       path="/prefix/:one/:two"
+       pattern="/prefix/:one/:two"
        view=".views.myview"
     />
 
@@ -149,22 +149,21 @@ Here's an example route configuration that references a view callable:
 
    <route
        name="myroute"
-       path="/prefix/:one/:two"
+       pattern="/prefix/:one/:two"
        view="mypackage.views.myview"
     />
 
 When a route configuration names a ``view`` attribute, the :term:`view
 callable` named as that ``view`` attribute will always be found and
-invoked when the associated route path pattern matches during a
-request.  
+invoked when the associated route pattern matches during a request.
 
 The purpose of making it possible to specify a view callable within a
 route configuration is to prevent developers from needing to deeply
 understand the details of :term:`context finding` and :term:`view
 lookup`.  When a route names a view callable, and a request enters the
-system which matches the path of the route, the result is simple: the
-view callable associated with the route is invoked with the request
-that caused the invocation.
+system which matches the pattern of the route, the result is simple:
+the view callable associated with the route is invoked with the
+request that caused the invocation.
 
 For most usage, you needn't understand more than this; how it works is
 an implementation detail.  In the interest of completeness, however,
@@ -176,8 +175,8 @@ Route View Callable Registration and Lookup Details
 
 When a ``view`` attribute is attached to a route configuration,
 :mod:`repoze.bfg` ensures that a :term:`view configuration` is
-registered that will always be found when the route path pattern is
-matched during a request.  To do so:
+registered that will always be found when the route pattern is matched
+during a request.  To do so:
 
 - A special route-specific :term:`interface` is created at startup time
   for each route configuration declaration.
@@ -194,7 +193,7 @@ matched during a request.  To do so:
 - The fact that the request is decorated with a route-specific
   interface causes the view lookup machinery to always use the view
   callable registered using that interface by the route configuration
-  to service requests that match the route path pattern.
+  to service requests that match the route pattern.
 
 In this way, we supply a shortcut to the developer.  Under the hood,
 :mod:`repoze.bfg` still consumes the :term:`context finding` and
@@ -207,19 +206,19 @@ various exceptional cases as documented in :ref:`hybrid_chapter`.
 .. index::
    single: route path pattern syntax
 
-.. _route_path_pattern_syntax:
+.. _route_pattern_syntax:
 
-Route Path Pattern Syntax
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Route Pattern Syntax
+~~~~~~~~~~~~~~~~~~~~
 
 The syntax of the pattern matching language used by :mod:`repoze.bfg`
-URL dispatch in the *path* argument is straightforward; it is close to
-that of the :term:`Routes` system used by :term:`Pylons`.
+URL dispatch in the *pattern* argument is straightforward; it is close
+to that of the :term:`Routes` system used by :term:`Pylons`.
 
-The *path* used in route configuration may start with a slash
-character.  If the path does not start with a slash character, an
+The *pattern* used in route configuration may start with a slash
+character.  If the pattern does not start with a slash character, an
 implicit slash will be prepended to it at matching time.  For example,
-the following paths are equivalent:
+the following patterns are equivalent:
 
 .. code-block:: text
 
@@ -231,10 +230,10 @@ and:
 
    /:foo/bar/baz
 
-A path segment (an individual item between ``/`` characters in the
-path) may either be a literal string (e.g. ``foo``) *or* it may be a
-segment replacement marker (e.g. ``:foo``) or a certain combination of
-both.
+A patttern segment (an individual item between ``/`` characters in the
+pattern) may either be a literal string (e.g. ``foo``) *or* it may be
+a segment replacement marker (e.g. ``:foo``) or a certain combination
+of both.
 
 A segment replacement marker is in the format ``:name``, where this
 means "accept any characters up to the next nonalphaunumeric character
@@ -314,8 +313,8 @@ decoded):
 
 If the pattern has a ``*`` in it, the name which follows it is
 considered a "remainder match".  A remainder match *must* come at the
-end of the path pattern.  Unlike segment replacement markers, it does
-not need to be preceded by a slash.  For example:
+end of the pattern.  Unlike segment replacement markers, it does not
+need to be preceded by a slash.  For example:
 
 .. code-block:: text
 
@@ -405,7 +404,7 @@ found via :term:`view lookup`.
 .. code-block:: xml
 
    <route
-    path="/abc"
+    pattern="/abc"
     name="abc"
     view=".views.theview"
     factory=".models.root_factory"
@@ -463,7 +462,7 @@ represent neither predicates nor view configuration information.
   the object returned by the ``factory`` associated with this route).
 
   The syntax of the ``traverse`` argument is the same as it is for
-  ``path``. For example, if the ``path`` provided is
+  ``pattern``. For example, if the ``pattern`` provided is
   ``articles/:article/edit``, and the ``traverse`` argument provided
   is ``/:article``, when a request comes in that causes the route to
   match in such a way that the ``article`` match value is '1' (when
@@ -475,27 +474,31 @@ represent neither predicates nor view configuration information.
   information about traversal.
 
   If the traversal path contains segment marker names which are not
-  present in the path argument, a runtime error will occur.  The
-  ``traverse`` pattern should not contain segment markers that do not
-  exist in the ``path``.
+  present in the ``pattern`` argument, a runtime error will occur.
+  The ``traverse`` pattern should not contain segment markers that do
+  not exist in the ``pattern``.
 
   A similar combining of routing and traversal is available when a
   route is matched which contains a ``*traverse`` remainder marker in
-  its path (see :ref:`using_traverse_in_a_route_path`).  The
+  its pattern (see :ref:`using_traverse_in_a_route_pattern`).  The
   ``traverse`` argument allows you to associate route patterns with an
   arbitrary traversal path without using a a ``*traverse`` remainder
   marker; instead you can use other match information.
 
   Note that the ``traverse`` argument is ignored when attached to a
-  route that has a ``*traverse`` remainder marker in its path.
+  route that has a ``*traverse`` remainder marker in its pattern.
 
 **Predicate Arguments**
 
-``path``
+``pattern``
   The path of the route e.g. ``ideas/:idea``.  This argument is
   required.  See :ref:`route_path_pattern_syntax` for information
   about the syntax of route paths.  If the path doesn't match the
-  current URL, route matching continues.
+  current URL, route matching continues.  
+
+  .. note:: In :mod:`repoze.bfg` 1.2 and prior, this argument existed
+     as ``path``.  ``path`` continues to work as an alias for
+     ``pattern``.
 
 ``xhr``
   This value should be either ``True`` or ``False``.  If this value is
@@ -726,9 +729,9 @@ predicate which performs the ``match`` modification will receive the
    custom object.  Just do all that in a single custom predicate.
 
 The ``route`` object in the ``info`` dict is an object that has two
-useful attributes: ``name`` and ``path``.  The ``name`` attribute is
-the route name.  The ``path`` attribute is the route pattern.  An
-example of using the route in a set of route predicates:
+useful attributes: ``name`` and ``pattern``.  The ``name`` attribute
+is the route name.  The ``pattern`` attribute is the route pattern.
+An example of using the route in a set of route predicates:
 
 .. code-block:: python
    :linenos:
@@ -787,12 +790,12 @@ finding` and :term:`view lookup`.
 The Matchdict
 ~~~~~~~~~~~~~
 
-When the URL path pattern associated with a particular route
-configuration is matched by a request, a dictionary named
-``matchdict`` is added as an attribute of the :term:`request` object.
-Thus, ``request.matchdict`` will contain the values that match
-replacement patterns in the ``path`` element.  The keys in a matchdict
-will be strings.  The values will be Unicode objects.
+When the URL pattern associated with a particular route configuration
+is matched by a request, a dictionary named ``matchdict`` is added as
+an attribute of the :term:`request` object.  Thus,
+``request.matchdict`` will contain the values that match replacement
+patterns in the ``pattern`` element.  The keys in a matchdict will be
+strings.  The values will be Unicode objects.
 
 .. note::
 
@@ -822,12 +825,12 @@ The simplest route declaration which configures a route match to
 
    <route
     name="idea"
-    path="site/:id"
+    pattern="site/:id"
     view="mypackage.views.site_view"
     />
 
 When a route configuration with a ``view`` attribute is added to the
-system, and an incoming request matches the *path* of the route
+system, and an incoming request matches the *pattern* of the route
 configuration, the :term:`view callable` named as the ``view``
 attribute of the route configuration will be invoked.
 
@@ -835,15 +838,15 @@ In the case of the above example, when the URL of a request matches
 ``/site/:id``, the view callable at the Python dotted path name
 ``mypackage.views.site_view`` will be called with the request.  In
 other words, we've associated a view callable directly with a route
-path.
+pattern.
 
-When the ``/site/:id`` route path pattern matches during a request,
-the ``site_view`` view callable is invoked with that request as its
-sole argument.  When this route matches, a ``matchdict`` will be
-generated and attached to the request as ``request.matchdict``.  If
-the specific URL matched is ``/site/1``, the ``matchdict`` will be a
-dictionary with a single key, ``id``; the value will be the string
-``'1'``, ex.: ``{'id':'1'}``.
+When the ``/site/:id`` route pattern matches during a request, the
+``site_view`` view callable is invoked with that request as its sole
+argument.  When this route matches, a ``matchdict`` will be generated
+and attached to the request as ``request.matchdict``.  If the specific
+URL matched is ``/site/1``, the ``matchdict`` will be a dictionary
+with a single key, ``id``; the value will be the string ``'1'``, ex.:
+``{'id':'1'}``.
 
 The ``mypackage.views`` module referred to above might look like so:
 
@@ -857,7 +860,7 @@ The ``mypackage.views`` module referred to above might look like so:
 
 The view has access to the matchdict directly via the request, and can
 access variables within it that match keys present as a result of the
-route path pattern.
+route pattern.
 
 See :ref:`views_chapter` for more information about views.
 
@@ -872,19 +875,19 @@ might add to your application:
 
    <route
     name="idea"
-    path="ideas/:idea"
+    pattern="ideas/:idea"
     view="mypackage.views.idea_view"
     />
 
    <route
     name="user"
-    path="users/:user"
+    pattern="users/:user"
     view="mypackage.views.user_view"
     />
 
    <route 
     name="tag" 
-    path="tags/:tag"
+    pattern="tags/:tag"
     view="mypackage.views.tag_view"
     />
 
@@ -941,7 +944,7 @@ An example of using a route with a factory:
 
    <route
     name="idea"
-    path="ideas/:idea"
+    pattern="ideas/:idea"
     view=".views.idea_view"
     factory=".models.Idea"
     />
@@ -972,7 +975,7 @@ a ``view`` declaration.
 
    <route
     name="idea"
-    path="site/:id"
+    pattern="site/:id"
     />
 
    <view
@@ -989,7 +992,7 @@ completely equivalent to this example provided in
 
    <route
     name="idea"
-    path="site/:id"
+    pattern="site/:id"
     view="mypackage.views.site_view"
     />
 
@@ -1007,26 +1010,26 @@ in :ref:`hybrid_chapter`.
 Matching the Root URL
 ---------------------
 
-It's not entirely obvious how to use a route path pattern to match the
-root URL ("/").  To do so, give the empty string as a path in a ZCML
+It's not entirely obvious how to use a route pattern to match the root
+URL ("/").  To do so, give the empty string as a pattern in a ZCML
 ``route`` declaration:
 
 .. code-block:: xml
    :linenos:
 
    <route
-       path=""
+       pattern=""
        name="root"
        view=".views.root_view"
        />
 
-Or provide the literal string ``/`` as the path:
+Or provide the literal string ``/`` as the pattern:
 
 .. code-block:: xml
    :linenos:
 
    <route
-       path="/"
+       pattern="/"
        name="root"
        view=".views.root_view"
        />
@@ -1039,9 +1042,9 @@ Generating Route URLs
 ---------------------
 
 Use the :func:`repoze.bfg.url.route_url` function to generate URLs
-based on route paths.  For example, if you've configured a route in
-ZCML with the ``name`` "foo" and the ``path`` ":a/:b/:c", you might do
-this.
+based on route patterns.  For example, if you've configured a route in
+ZCML with the ``name`` "foo" and the ``pattern`` ":a/:b/:c", you might
+do this.
 
 .. ignore-next-block
 .. code-block:: python
@@ -1070,8 +1073,8 @@ For behavior like Django's ``APPEND_SLASH=True``, use the
 Found view (indicating that no view was found), and any routes have
 been defined in the configuration of your application, if the value of
 ``PATH_INFO`` does not already end in a slash, and if the value of
-``PATH_INFO`` *plus* a slash matches any route's path, it does an HTTP
-redirect to the slash-appended ``PATH_INFO``.
+``PATH_INFO`` *plus* a slash matches any route's pattern, it does an
+HTTP redirect to the slash-appended ``PATH_INFO``.
 
 Let's use an example, because this behavior is a bit magical. If the
 ``append_slash_notfound_view`` is configured in your application and
@@ -1082,12 +1085,12 @@ your route configuration looks like so:
 
    <route
      view=".views.no_slash"
-     path="no_slash"
+     pattern="no_slash"
     />
 
    <route
      view=".views.has_slash"
-     path="has_slash/"
+     pattern="has_slash/"
     />
 
 If a request enters the application with the ``PATH_INFO`` value of

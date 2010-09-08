@@ -40,13 +40,13 @@ to code will often have declarations like this within :term:`ZCML`:
    :linenos:
 
    <route
-     path=":foo/:bar"
+     pattern=":foo/:bar"
      name="foobar"
      view=".views.foobar"
      />
 
    <route
-     path=":baz/:buz"
+     pattern=":baz/:buz"
      name="bazbuz"
      view=".views.bazbuz"
      />
@@ -105,9 +105,9 @@ application than it is like a "pure" URL-dispatch based application.
 But unlike in a "pure" traversal-based application, in a hybrid
 application, :term:`traversal` is performed during a request after a
 route has already matched.  This means that the URL pattern that
-represents the ``path`` argument of a route must match the
-``PATH_INFO`` of a request, and after the route path has matched, most
-of the "normal" rules of traversal with respect to :term:`context
+represents the ``pattern`` argument of a route must match the
+``PATH_INFO`` of a request, and after the route pattern has matched,
+most of the "normal" rules of traversal with respect to :term:`context
 finding` and :term:`view lookup` apply.
 
 There are only four real differences between a purely traversal-based
@@ -125,7 +125,7 @@ application and a hybrid application:
   underlying :term:`WSGI` environment is used wholesale as a traversal
   path; in a hybrid application, the traversal path is not the entire
   ``PATH_INFO`` string, but a portion of the URL determined by a
-  matching pattern in the matched route configuration's path.
+  matching pattern in the matched route configuration's pattern.
 
 - In a purely traversal based application, view configurations which
   do not mention a ``route_name`` argument are considered during
@@ -151,7 +151,7 @@ application except:
 
 To create a hybrid mode application, use a :term:`route configuration`
 that implies a particular :term:`root factory` and which also includes
-a ``path`` argument that contains a special dynamic part: either
+a ``pattern`` argument that contains a special dynamic part: either
 ``*traverse`` or ``*subpath``.
 
 The Root Object for a Route Match
@@ -188,32 +188,32 @@ match is straightforward.  When a route is matched:
    root factory were explained previously within
    :ref:`the_object_graph`.  
 
-.. _using_traverse_in_a_route_path:
+.. _using_traverse_in_a_route_pattern:
 
-Using ``*traverse`` In a Route Path
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using ``*traverse`` In a Route Pattern
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A hybrid application most often implies the inclusion of a route
 configuration that contains the special token ``*traverse`` at the end
-of a route's path:
+of a route's pattern:
 
 .. code-block:: xml
    :linenos:
 
    <route
-     path=":foo/:bar/*traverse"
+     pattern=":foo/:bar/*traverse"
      name="home"
      />
 
-A ``*traverse`` token at the end of the path in a route's
+A ``*traverse`` token at the end of the pattern in a route's
 configuration implies a "remainder" *capture* value.  When it is used,
 it will match the remainder of the path segments of the URL.  This
 remainder becomes the path used to perform traversal.
 
 .. note::
 
-   The ``*remainder`` route path pattern syntax is explained in more
-   detail within :ref:`route_path_pattern_syntax`.
+   The ``*remainder`` route pattern syntax is explained in more
+   detail within :ref:`route_pattern_syntax`.
 
 Note that unlike the examples provided within
 :ref:`urldispatch_chapter`, the ``<route>`` configuration named
@@ -223,7 +223,7 @@ hybrid mode application relies on :term:`traversal` to do
 invoking a specific view callable named directly within the matched
 route's configuration.
 
-Because the path of the above route ends with ``*traverse``, when this
+Because the pattern of the above route ends with ``*traverse``, when this
 route configuration is matched during a request, :mod:`repoze.bfg`
 will attempt to use :term:`traversal` against the :term:`root` object
 implied by the :term:`root factory` implied by the route's
@@ -263,7 +263,7 @@ route configuration statement:
    :linenos:
 
    <route
-     path=":foo/:bar/*traverse"
+     pattern=":foo/:bar/*traverse"
      name="home"
      factory=".routes.root_factory"
      />
@@ -288,15 +288,15 @@ to do.
   global ``root_factory`` function to generate a root object.
 
 When the route configuration named ``home`` above is matched during a
-request, the matchdict generated will be based on its path:
+request, the matchdict generated will be based on its pattern:
 ``:foo/:bar/*traverse``.  The "capture value" implied by the
-``*traverse`` element in the path pattern will be used to traverse the
+``*traverse`` element in the pattern will be used to traverse the
 graph in order to find a context, starting from the root object
 returned from the root factory.  In the above example, the
 :term:`root` object found will be the instance named ``root`` in
 ``routes.py``.
 
-If the URL that matched a route with the path ``:foo/:bar/*traverse``,
+If the URL that matched a route with the pattern ``:foo/:bar/*traverse``,
 is ``http://example.com/one/two/a/b/c``, the traversal path used
 against the root object will be ``a/b/c``.  As a result,
 :mod:`repoze.bfg` will attempt to traverse through the edges ``a``,
@@ -319,7 +319,7 @@ invoked after a route matches:
    :linenos:
 
    <route
-     path=":foo/:bar/*traverse"
+     pattern=":foo/:bar/*traverse"
      name="home"
      factory=".routes.root_factory"
      />
@@ -355,7 +355,7 @@ when a hybrid route is matched:
    :linenos:
 
    <route
-     path=":foo/:bar/*traverse"
+     pattern=":foo/:bar/*traverse"
      name="home"
      factory=".routes.root_factory"
      />
@@ -395,8 +395,8 @@ arguments).
 Using the ``traverse`` Argument In a Route Definition
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rather than using the ``*traverse`` remainder marker in a path
-pattern, you can use the ``traverse`` argument to the
+Rather than using the ``*traverse`` remainder marker in a pattern, you
+can use the ``traverse`` argument to the
 :meth:`repoze.bfg.configuration.Configurator.add_route`` method or the
 ``traverse`` attribute of the :ref:`route_directive` ZCML directive.
 (either method is equivalent).
@@ -414,16 +414,16 @@ declaration:
 
    <route
      name="abc"
-     path="/articles/:article/edit"
+     pattern="/articles/:article/edit"
      traverse="/articles/:article"
      />
 
 The syntax of the ``traverse`` argument is the same as it is for
-``path``.
+``pattern``.
 
-If, as above, the ``path`` provided is ``articles/:article/edit``, and
-the ``traverse`` argument provided is ``/:article``, when a request
-comes in that causes the route to match in such a way that the
+If, as above, the ``pattern`` provided is ``articles/:article/edit``,
+and the ``traverse`` argument provided is ``/:article``, when a
+request comes in that causes the route to match in such a way that the
 ``article`` match value is ``1`` (when the request URI is
 ``/articles/1/edit``), the traversal path will be generated as ``/1``.
 This means that the root object's ``__getitem__`` will be called with
@@ -432,12 +432,12 @@ exists, it will become the :term:`context` of the request.
 :ref:`traversal_chapter` has more information about traversal.
 
 If the traversal path contains segment marker names which are not
-present in the path argument, a runtime error will occur.  The
+present in the pattern argument, a runtime error will occur.  The
 ``traverse`` pattern should not contain segment markers that do not
 exist in the ``path``.
 
 Note that the ``traverse`` argument is ignored when attached to a
-route that has a ``*traverse`` remainder marker in its path.
+route that has a ``*traverse`` remainder marker in its pattern.
 
 Traversal will begin at the root object implied by this route (either
 the global root, or the object returned by the ``factory`` associated
@@ -448,7 +448,7 @@ Making Global Views Match
 
 By default, view configurations that don't mention a ``route_name``
 will be not found by view lookup when a route that mentions a
-``*traverse`` in its path matches.  You can make these match forcibly
+``*traverse`` in its pattern matches.  You can make these match forcibly
 by adding the ``use_global_views`` flag to the route definition.  For
 example, the ``views.bazbuz`` view below will be found if the route
 named ``abc`` below is matched and the ``PATH_INFO`` is
@@ -459,7 +459,7 @@ have the ``route_name="abc"`` attribute.
    :linenos:
 
    <route
-     path="/abc/*traverse"
+     pattern="/abc/*traverse"
      name="abc"
      use_global_views="True"
      />
@@ -475,8 +475,8 @@ have the ``route_name="abc"`` attribute.
 
 .. _star_subpath:
 
-Using ``*subpath`` in a Route Path
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using ``*subpath`` in a Route Pattern
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are certain extremely rare cases when you'd like to influence
 the traversal :term:`subpath` when a route matches without actually
@@ -486,16 +486,16 @@ performing traversal.  For instance, the
 ``PATH_INFO`` from the request's subpath, so it's useful to be able to
 influence this value.
 
-When ``*subpath`` exists in a path pattern, no path is actually
-traversed, but the traversal algorithm will return a :term:`subpath`
-list implied by the capture value of ``*subpath``.  You'll see this
-pattern most commonly in route declarations that look like this:
+When ``*subpath`` exists in a pattern, no path is actually traversed,
+but the traversal algorithm will return a :term:`subpath` list implied
+by the capture value of ``*subpath``.  You'll see this pattern most
+commonly in route declarations that look like this:
 
 .. code-block:: xml
    :linenos:
 
    <route
-    path="/static/*subpath"
+    pattern="/static/*subpath"
     name="static"
     view=".views.static_view"
     />
@@ -523,7 +523,7 @@ For example, this pair of route/view ZCML declarations will generate a
    :linenos:
 
    <route
-     path=":foo/:bar/*traverse"
+     pattern=":foo/:bar/*traverse"
      name="home"
      view=".views.home"
      />
@@ -542,7 +542,7 @@ example, this ``<route>`` statement:
    :linenos:
 
    <route
-     path=":foo/:bar/*traverse"
+     pattern=":foo/:bar/*traverse"
      name="home"
      view=".views.home"
      />
@@ -553,7 +553,7 @@ Can also be spelled like so:
    :linenos:
 
    <route
-     path=":foo/:bar/*traverse"
+     pattern=":foo/:bar/*traverse"
      name="home"
      />
 
@@ -565,8 +565,8 @@ Can also be spelled like so:
 The two spellings are logically equivalent.  In fact, the former is
 just a syntactical shortcut for the latter.
 
-Binding Extra Views Against a Route Configuration that Doesn't Have a ``*traverse`` Element In Its Path
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Binding Extra Views Against a Route Configuration that Doesn't Have a ``*traverse`` Element In Its Patttern
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here's another corner case that just makes no sense.
 
@@ -574,7 +574,7 @@ Here's another corner case that just makes no sense.
    :linenos:
 
    <route
-     path="/abc"
+     pattern="/abc"
      name="abc"
      view=".views.abc"
      />
@@ -592,13 +592,13 @@ when the route matches, because the default view is always invoked
 when a route matches and when no post-match traversal is performed.
 
 To make the above ``<view>`` declaration non-useless, the special
-``*traverse`` token must end the route's path.  For example:
+``*traverse`` token must end the route's pattern.  For example:
 
 .. code-block:: xml
    :linenos:
 
    <route
-     path="/abc/*traverse"
+     pattern="/abc/*traverse"
      name="abc"
      view=".views.abc"
      />

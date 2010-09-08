@@ -9,9 +9,15 @@ class TestRoute(unittest.TestCase):
     def _makeOne(self, *arg):
         return self._getTargetClass()(*arg)
 
+    def test_provides_IRoute(self):
+        from repoze.bfg.interfaces import IRoute
+        from zope.interface.verify import verifyObject
+        verifyObject(IRoute, self._makeOne('name', 'pattern'))
+
     def test_ctor(self):
         import types
-        route = self._makeOne(':path', 'name', 'factory')
+        route = self._makeOne('name', ':path', 'factory')
+        self.assertEqual(route.pattern, ':path')
         self.assertEqual(route.path, ':path')
         self.assertEqual(route.name, 'name')
         self.assertEqual(route.factory, 'factory')
@@ -20,19 +26,20 @@ class TestRoute(unittest.TestCase):
 
     def test_ctor_defaults(self):
         import types
-        route = self._makeOne(':path')
+        route = self._makeOne('name', ':path')
+        self.assertEqual(route.pattern, ':path')
         self.assertEqual(route.path, ':path')
-        self.assertEqual(route.name, None)
+        self.assertEqual(route.name, 'name')
         self.assertEqual(route.factory, None)
         self.failUnless(route.generate.__class__ is types.FunctionType)
         self.failUnless(route.match.__class__ is types.FunctionType)
 
     def test_match(self):
-        route = self._makeOne(':path')
+        route = self._makeOne('name', ':path')
         self.assertEqual(route.match('/whatever'), {'path':'whatever'})
 
     def test_generate(self):
-        route = self._makeOne(':path')
+        route = self._makeOne('name', ':path')
         self.assertEqual(route.generate({'path':'abc'}), '/abc')
 
 class RoutesMapperTests(unittest.TestCase):
@@ -60,6 +67,11 @@ class RoutesMapperTests(unittest.TestCase):
         klass = self._getTargetClass()
         return klass()
 
+    def test_provides_IRoutesMapper(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        from zope.interface.verify import verifyObject
+        verifyObject(IRoutesMapper, self._makeOne())
+
     def test_no_route_matches(self):
         mapper = self._makeOne()
         request = self._getRequest(PATH_INFO='/')
@@ -69,18 +81,18 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test_connect_name_exists_removes_old(self):
         mapper = self._makeOne()
-        mapper.connect('archives/:action/:article', 'foo')
-        mapper.connect('archives/:action/:article2', 'foo')
+        mapper.connect('foo', 'archives/:action/:article')
+        mapper.connect('foo', 'archives/:action/:article2')
         self.assertEqual(len(mapper.routelist), 1)
         self.assertEqual(len(mapper.routes), 1)
-        self.assertEqual(mapper.routes['foo'].path,
+        self.assertEqual(mapper.routes['foo'].pattern,
                          'archives/:action/:article2')
-        self.assertEqual(mapper.routelist[0].path,
+        self.assertEqual(mapper.routelist[0].pattern,
                          'archives/:action/:article2')
 
     def test___call__route_matches(self):
         mapper = self._makeOne()
-        mapper.connect('archives/:action/:article', 'foo')
+        mapper.connect('foo', 'archives/:action/:article')
         request = self._getRequest(PATH_INFO='/archives/action1/article1')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['foo'])
@@ -89,7 +101,7 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test___call__route_matches_with_predicates(self):
         mapper = self._makeOne()
-        mapper.connect('archives/:action/:article', 'foo',
+        mapper.connect('foo', 'archives/:action/:article',
                        predicates=[lambda *arg: True])
         request = self._getRequest(PATH_INFO='/archives/action1/article1')
         result = mapper(request)
@@ -99,9 +111,9 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test___call__route_fails_to_match_with_predicates(self):
         mapper = self._makeOne()
-        mapper.connect('archives/:action/article1', 'foo',
+        mapper.connect('foo', 'archives/:action/article1',
                        predicates=[lambda *arg: True, lambda *arg: False])
-        mapper.connect('archives/:action/:article', 'bar')
+        mapper.connect('bar', 'archives/:action/:article')
         request = self._getRequest(PATH_INFO='/archives/action1/article1')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['bar'])
@@ -114,7 +126,7 @@ class RoutesMapperTests(unittest.TestCase):
             self.assertEqual(info['match'], {'action':u'action1'})
             self.assertEqual(info['route'], mapper.routes['foo'])
             return True
-        mapper.connect('archives/:action/article1', 'foo', predicates=[pred])
+        mapper.connect('foo', 'archives/:action/article1', predicates=[pred])
         request = self._getRequest(PATH_INFO='/archives/action1/article1')
         mapper(request)
 
@@ -122,9 +134,9 @@ class RoutesMapperTests(unittest.TestCase):
         # "unordered" as reported in IRC by author of
         # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
         mapper = self._makeOne()
-        mapper.connect('licenses/:license_code/:license_version/rdf', 'rdf')
-        mapper.connect('licenses/:license_code/:license_version/:jurisdiction',
-                       'juri')
+        mapper.connect('rdf', 'licenses/:license_code/:license_version/rdf')
+        mapper.connect('juri',
+                       'licenses/:license_code/:license_version/:jurisdiction')
 
         request = self._getRequest(PATH_INFO='/licenses/1/v2/rdf')
         result = mapper(request)
@@ -141,7 +153,7 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test___call__root_route_matches(self):
         mapper = self._makeOne()
-        mapper.connect('', 'root')
+        mapper.connect('root', '')
         request = self._getRequest(PATH_INFO='/')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
@@ -149,7 +161,7 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test___call__root_route_matches2(self):
         mapper = self._makeOne()
-        mapper.connect('/', 'root')
+        mapper.connect('root', '/')
         request = self._getRequest(PATH_INFO='/')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
@@ -157,7 +169,7 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test___call__root_route_when_path_info_empty(self):
         mapper = self._makeOne()
-        mapper.connect('/', 'root')
+        mapper.connect('root', '/')
         request = self._getRequest(PATH_INFO='')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
@@ -165,7 +177,7 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test___call__no_path_info(self):
         mapper = self._makeOne()
-        mapper.connect('/', 'root')
+        mapper.connect('root', '/')
         request = self._getRequest()
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
@@ -186,6 +198,17 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(len(routes), 1)
         self.assertEqual(routes[0].__class__, Route)
 
+    def test_get_route_matches(self):
+        mapper = self._makeOne()
+        mapper.connect('whatever', 'archives/:action/:article')
+        result = mapper.get_route('whatever')
+        self.assertEqual(result.pattern, 'archives/:action/:article')
+
+    def test_get_route_misses(self):
+        mapper = self._makeOne()
+        result = mapper.get_route('whatever')
+        self.assertEqual(result, None)
+
     def test_generate(self):
         mapper = self._makeOne()
         def generator(kw):
@@ -195,9 +218,9 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(mapper.generate('abc', {}), 123)
 
 class TestCompileRoute(unittest.TestCase):
-    def _callFUT(self, path):
+    def _callFUT(self, pattern):
         from repoze.bfg.urldispatch import _compile_route
-        return _compile_route(path)
+        return _compile_route(pattern)
 
     def test_no_star(self):
         matcher, generator = self._callFUT('/foo/:baz/biz/:buz/bar')

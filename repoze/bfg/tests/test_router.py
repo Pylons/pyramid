@@ -18,14 +18,14 @@ class TestRouter(unittest.TestCase):
         self.registry.registerUtility(iface, IRouteRequest, name=name)
         return iface
 
-    def _connectRoute(self, path, name, factory=None):
+    def _connectRoute(self, name, path, factory=None):
         from repoze.bfg.interfaces import IRoutesMapper
         from repoze.bfg.urldispatch import RoutesMapper
         mapper = self.registry.queryUtility(IRoutesMapper)
         if mapper is None:
             mapper = RoutesMapper()
             self.registry.registerUtility(mapper, IRoutesMapper)
-        mapper.connect(path, name, factory)
+        mapper.connect(name, path, factory)
 
     def _registerLogger(self):
         from repoze.bfg.interfaces import IDebugLogger
@@ -444,7 +444,7 @@ class TestRouter(unittest.TestCase):
         root = object()
         def factory(request):
             return root
-        self._connectRoute('archives/:action/:article', 'foo', factory)
+        self._connectRoute('foo', 'archives/:action/:article', factory)
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -485,7 +485,7 @@ class TestRouter(unittest.TestCase):
         root = object()
         def factory(request):
             return root
-        self._connectRoute('archives/:action/:article', 'foo', factory)
+        self._connectRoute('foo', 'archives/:action/:article', factory)
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -727,7 +727,7 @@ class TestRouter(unittest.TestCase):
         from repoze.bfg.interfaces import IViewClassifier
         from repoze.bfg.interfaces import IExceptionViewClassifier
         req_iface = self._registerRouteRequest('foo')
-        self._connectRoute('archives/:action/:article', 'foo', None)
+        self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
         self._registerView(view, '', IViewClassifier, req_iface, None)
         response = DummyResponse()
@@ -746,7 +746,7 @@ class TestRouter(unittest.TestCase):
         from repoze.bfg.interfaces import IExceptionViewClassifier
         from repoze.bfg.interfaces import IRequest
         req_iface = self._registerRouteRequest('foo')
-        self._connectRoute('archives/:action/:article', 'foo', None)
+        self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
         self._registerView(view, '', IViewClassifier, IRequest, None)
         response = DummyResponse()
@@ -764,7 +764,7 @@ class TestRouter(unittest.TestCase):
         from repoze.bfg.interfaces import IExceptionViewClassifier
         from repoze.bfg.interfaces import IRequest
         req_iface = self._registerRouteRequest('foo')
-        self._connectRoute('archives/:action/:article', 'foo', None)
+        self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
         self._registerView(view, '', IViewClassifier, req_iface, None)
         response = DummyResponse()
@@ -787,7 +787,7 @@ class TestRouter(unittest.TestCase):
         class SubException(SuperException):
             pass
         req_iface = self._registerRouteRequest('foo')
-        self._connectRoute('archives/:action/:article', 'foo', None)
+        self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=SuperException)
         self._registerView(view, '', IViewClassifier, req_iface, None)
         response = DummyResponse()
@@ -809,7 +809,7 @@ class TestRouter(unittest.TestCase):
         class SubException(SuperException):
             pass
         req_iface = self._registerRouteRequest('foo')
-        self._connectRoute('archives/:action/:article', 'foo', None)
+        self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=SubException)
         self._registerView(view, '', IViewClassifier, req_iface, None)
         response = DummyResponse()
@@ -832,7 +832,7 @@ class TestRouter(unittest.TestCase):
         class AnotherException(Exception):
             pass
         req_iface = self._registerRouteRequest('foo')
-        self._connectRoute('archives/:action/:article', 'foo', None)
+        self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=MyException)
         self._registerView(view, '', IViewClassifier, req_iface, None)
         response = DummyResponse()
@@ -850,7 +850,7 @@ class TestRouter(unittest.TestCase):
         from repoze.bfg.interfaces import IExceptionViewClassifier
         from repoze.bfg.interfaces import IRequest
         req_iface = self._registerRouteRequest('foo')
-        self._connectRoute('archives/:action/:article', 'foo', None)
+        self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
         self._registerView(view, '', IViewClassifier, req_iface, None)
         response = DummyResponse()
@@ -874,7 +874,7 @@ class TestRouter(unittest.TestCase):
         from repoze.bfg.interfaces import IExceptionViewClassifier
         req_iface = self._registerRouteRequest('foo')
         another_req_iface = self._registerRouteRequest('bar')
-        self._connectRoute('archives/:action/:article', 'foo', None)
+        self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
         self._registerView(view, '', IViewClassifier, req_iface, None)
         response = DummyResponse()

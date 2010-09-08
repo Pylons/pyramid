@@ -4,38 +4,38 @@
   <include package="repoze.bfg.includes" />
 
   <static
+    pattern="templates/static"
     name="static"
-    path="templates/static"
     />
 
   <route
-     path="login"
+     pattern="login"
      name="login"
      view=".login.login"
      view_renderer="templates/login.pt"
      />
 
   <route
-     path="logout"
+     pattern="logout"
      name="logout"
      view=".login.logout"
      />
 
   <route
-    path=""
+    pattern=""
     name="view_wiki"
     view=".views.view_wiki"
     />
     
   <route
-     path=":pagename"
+     pattern=":pagename"
      name="view_page"
      view=".views.view_page"
      view_renderer="templates/view.pt"
      />
 
   <route
-     path="add_page/:pagename"
+     pattern="add_page/:pagename"
      name="add_page"
      view=".views.add_page"
      view_renderer="templates/edit.pt"
@@ -43,7 +43,7 @@
      />
 
   <route
-     path=":pagename/edit_page"
+     pattern=":pagename/edit_page"
      name="edit_page"
      view=".views.edit_page"
      view_renderer="templates/edit.pt"

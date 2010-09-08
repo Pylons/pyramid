@@ -1,5 +1,9 @@
 import re
 from urllib import unquote
+from zope.interface import implements
+
+from repoze.bfg.interfaces import IRoutesMapper
+from repoze.bfg.interfaces import IRoute
 
 from repoze.bfg.compat import all
 from repoze.bfg.encode import url_quote
@@ -7,17 +11,21 @@ from repoze.bfg.exceptions import URLDecodeError
 from repoze.bfg.traversal import traversal_path
 from repoze.bfg.traversal import quote_path_segment
 
+
 _marker = object()
 
 class Route(object):
-    def __init__(self, path, name=None, factory=None, predicates=()):
-        self.path = path
-        self.match, self.generate = _compile_route(path)
+    implements(IRoute)
+    def __init__(self, name, pattern, factory=None, predicates=()):
+        self.pattern = pattern
+        self.path = pattern # indefinite b/w compat, not in interface
+        self.match, self.generate = _compile_route(pattern)
         self.name = name
         self.factory = factory
         self.predicates = predicates
 
 class RoutesMapper(object):
+    implements(IRoutesMapper)
     def __init__(self):
         self.routelist = []
         self.routes = {}
@@ -28,11 +36,14 @@ class RoutesMapper(object):
     def get_routes(self):
         return self.routelist
 
-    def connect(self, path, name, factory=None, predicates=()):
+    def get_route(self, name):
+        return self.routes.get(name)
+
+    def connect(self, name, pattern, factory=None, predicates=()):
         if name in self.routes:
             oldroute = self.routes[name]
             self.routelist.remove(oldroute)
-        route = Route(path, name, factory, predicates)
+        route = Route(name, pattern, factory, predicates)
         self.routelist.append(route)
         self.routes[name] = route
         return route

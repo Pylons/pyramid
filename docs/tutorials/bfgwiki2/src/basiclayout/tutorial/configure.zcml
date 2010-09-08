@@ -3,15 +3,16 @@
   <!-- this must be included for the view declarations to work -->
   <include package="repoze.bfg.includes" />
 
-  <route path=""
+  <route
+    pattern=""
     name="home"
     view=".views.my_view"
     view_renderer="templates/mytemplate.pt"
     />
 
   <static
+    pattern="templates/static"
     name="static"
-    path="templates/static"
     />
 
 </configure>

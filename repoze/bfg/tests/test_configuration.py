@@ -1936,6 +1936,17 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertRoute(config, 'name', 'path')
         self.failUnless(hasattr(wrapper, '__call_permissive__'))
 
+    def test_add_route_no_pattern_with_path(self):
+        config = self._makeOne()
+        route = config.add_route('name', path='path')
+        self._assertRoute(config, 'name', 'path')
+        self.assertEqual(route.name, 'name')
+
+    def test_add_route_no_path_no_pattern(self):
+        from repoze.bfg.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_route, 'name')
+
     def test__override_not_yet_registered(self):
         from repoze.bfg.interfaces import IPackageOverrides
         package = DummyPackage('package')

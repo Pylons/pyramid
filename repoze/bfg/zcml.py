@@ -221,7 +221,9 @@ class IRouteDirective(Interface):
     """ The interface for the ``route`` ZCML directive
     """
     name = TextLine(title=u'name', required=True)
-    path = TextLine(title=u'path', required=True)
+    pattern = TextLine(title=u'pattern', required=False)
+    # alias for pattern
+    path = TextLine(title=u'path', required=False)
     factory = GlobalObject(title=u'context factory', required=False)
     view = GlobalObject(title=u'view', required=False)
 
@@ -263,7 +265,7 @@ class IRouteDirective(Interface):
 
 def route(_context,
           name,
-          path,
+          pattern=None,
           view=None,
           view_for=None,
           permission=None,
@@ -282,7 +284,8 @@ def route(_context,
           view_renderer=None,
           view_context=None,
           traverse=None,
-          use_global_views=False):
+          use_global_views=False,
+          path=None):
     """ Handle ``route`` ZCML directives
     """
     # the strange ordering of the request kw args above is for b/w
@@ -300,11 +303,17 @@ def route(_context,
     if view_renderer and '.' in view_renderer:
         view_renderer = path_spec(_context, view_renderer)
 
+    if pattern is None:
+        pattern = path
+
+    if pattern is None:
+        raise ConfigurationError('route directive must include a "pattern"')
+
     def register():
         config = Configurator(reg, package=_context.package)
         config.add_route(
             name,
-            path,
+            pattern,
             factory=factory,
             header=header,
             xhr=xhr,

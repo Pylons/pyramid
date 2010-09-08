@@ -1240,7 +1240,7 @@ Predicate Arguments
   declaration (see :ref:`urldispatch_chapter`) that must match before
   this view will be called.  Note that the ``route`` configuration
   referred to by ``route_name`` usually has a ``*traverse`` token in
-  the value of its ``path``, representing a part of the path that will
+  the value of its ``pattern``, representing a part of the path that will
   be used by :term:`traversal` against the result of the route's
   :term:`root factory`.
 

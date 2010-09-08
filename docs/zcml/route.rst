@@ -9,10 +9,14 @@ the :term:`application registry`.
 Attributes
 ~~~~~~~~~~
 
-``path``
-  The path of the route e.g. ``ideas/:idea``.  This attribute is
-  required.  See :ref:`route_path_pattern_syntax` for information
-  about the syntax of route paths.
+``pattern``
+  The pattern of the route e.g. ``ideas/:idea``.  This attribute is
+  required.  See :ref:`route_pattern_syntax` for information
+  about the syntax of route patterns.
+
+  .. note:: For backwards compatibility purposes, the ``path``
+     attribute can also be used instead of ``pattern``.  ``pattern``
+     is the preferred spelling as of :mod:`repoze.bfg` 1.3.
 
 ``name``
   The name of the route, e.g. ``myroute``.  This attribute is
@@ -49,25 +53,26 @@ Attributes
   the object returned by the ``factory`` associated with this route).
 
   The syntax of the ``traverse`` argument is the same as it is for
-  ``path``. For example, if the ``path`` provided to the ``route``
-  directive is ``articles/:article/edit``, and the ``traverse``
-  argument provided to the ``route`` directive is ``/:article``, when
-  a request comes in that causes the route to match in such a way that
-  the ``article`` match value is '1' (when the request URI is
-  ``/articles/1/edit``), the traversal path will be generated as
-  ``/1``.  This means that the root object's ``__getitem__`` will be
-  called with the name ``1`` during the traversal phase.  If the ``1``
-  object exists, it will become the :term:`context` of the request.
-  :ref:`traversal_chapter` has more information about traversal.
+  ``pattern``. For example, if the ``pattern`` provided to the
+  ``route`` directive is ``articles/:article/edit``, and the
+  ``traverse`` argument provided to the ``route`` directive is
+  ``/:article``, when a request comes in that causes the route to
+  match in such a way that the ``article`` match value is '1' (when
+  the request URI is ``/articles/1/edit``), the traversal path will be
+  generated as ``/1``.  This means that the root object's
+  ``__getitem__`` will be called with the name ``1`` during the
+  traversal phase.  If the ``1`` object exists, it will become the
+  :term:`context` of the request.  :ref:`traversal_chapter` has more
+  information about traversal.
 
   If the traversal path contains segment marker names which are not
-  present in the path argument, a runtime error will occur.  The
-  ``traverse`` pattern should not contain segment markers that do not
-  exist in the ``path``.
+  present in the ``pattern`` argument, a runtime error will occur.
+  The ``traverse`` pattern should not contain segment markers that do
+  not exist in the ``pattern``.
 
   A similar combining of routing and traversal is available when a
   route is matched which contains a ``*traverse`` remainder marker in
-  its path (see :ref:`using_traverse_in_a_route_path`).  The
+  its ``pattern`` (see :ref:`using_traverse_in_a_route_pattern`).  The
   ``traverse`` argument to the ``route`` directive allows you to
   associate route patterns with an arbitrary traversal path without
   using a a ``*traverse`` remainder marker; instead you can use other
@@ -75,7 +80,7 @@ Attributes
 
   Note that the ``traverse`` argument to the ``route`` directive is
   ignored when attached to a route that has a ``*traverse`` remainder
-  marker in its path.
+  marker in its pattern.
 
   .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
 

@@ -18,8 +18,44 @@ Bug Fixes
   when more than one person or thread is trying to execute the same
   view at the same time: https://bugs.launchpad.net/karl3/+bug/621364
 
+Features
+--------
+
+- The argument to ``repoze.bfg.configuration.Configurator.add_route``
+  which was previously called ``path`` is now called ``pattern`` for
+  better explicability.  For backwards compatibility purposes, passing
+  a keyword argument named ``path`` to ``add_route`` will still work
+  indefinitely.
+
+- The ``path`` attribute to the ZCML ``route`` directive is now named
+  ``pattern`` for better explicability.  The older ``path`` attribute
+  will continue to work indefinitely.
+
+Documentation
+-------------
+
+- All narrative, API, and tutorial docs which referred to a route
+  pattern as a ``path`` have now been updated to refer to them as a
+  ``pattern``.
+
+Paster Templates
+----------------
+
+- The routesalchemy template has been updated to use ``pattern`` in
+  its route declarations rather than ``path``.
+
 Internal
 --------
+
+- The ``repoze.bfg.urldispatch.RoutesMapper`` object now has a
+  ``get_route`` method which returns a single Route object or
+  ``None``.
+
+- A new interface ``repoze.bfg.interfaces.IRoute`` was added.  The
+  ``repoze.bfg.urldispatch.Route`` object implements this interface.
+
+- The canonical attribute for accessing the routing pattern from a
+  route object is now ``pattern`` rather than ``path``.
 
 - Use ``hash()`` rather than ``id()`` when computing the "phash" of a
   custom route/view predicate in order to allow the custom predicate
@@ -29,6 +65,18 @@ Internal
   ``response.headers.add`` in
   ``repoze.bfg.request.add_global_response_headers`` in case the
   response is not a WebOb response.
+
+- The ``repoze.bfg.urldispatch.Route`` constructor (not an API) now
+  accepts a different ordering of arguments.  Previously it was
+  ``(pattern, name, factory=None, predicates=())``.  It is now
+  ``(name, pattern, factory=None, predicates=())``.  This is in
+  support of consistency with ``configurator.add_route``.
+
+- The ``repoze.bfg.urldispatch.RoutesMapper.connect`` method (not an
+  API) now accepts a different ordering of arguments.  Previously it
+  was ``(pattern, name, factory=None, predicates=())``.  It is now
+  ``(name, pattern, factory=None, predicates=())``.  This is in
+  support of consistency with ``configurator.add_route``.
 
 1.3a11 (2010-09-05)
 ===================

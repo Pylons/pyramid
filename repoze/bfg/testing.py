@@ -290,12 +290,12 @@ def registerSubscriber(subscriber, iface=Interface):
     config = Configurator(registry)
     return config.add_subscriber(subscriber, iface=iface)
 
-def registerRoute(path, name, factory=None):
-    """ Register a new :term:`route` using a path
+def registerRoute(pattern, name, factory=None):
+    """ Register a new :term:`route` using a pattern
     (e.g. ``:pagename``), a name (e.g. ``home``), and an optional root
     factory.
 
-    The ``path`` argument implies the route path.  The ``name``
+    The ``pattern`` argument implies the route pattern.  The ``name``
     argument implies the route name.  The ``factory`` argument implies
     a :term:`root factory` associated with the route.
 
@@ -311,7 +311,7 @@ def registerRoute(path, name, factory=None):
     """
     reg = get_current_registry()
     config = Configurator(registry=reg)
-    return config.add_route(name, path, factory=factory)
+    return config.add_route(name, pattern, factory=factory)
 
 def registerRoutesMapper(root_factory=None):
     """ Register a routes 'mapper' object.

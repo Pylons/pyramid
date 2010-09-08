@@ -4,7 +4,7 @@
   <include package="repoze.bfg.includes" />
 
   <route 
-    path=""
+    pattern=""
     name="home"
     view=".views.my_view"
     view_renderer="templates/mytemplate.pt"
