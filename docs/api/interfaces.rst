@@ -21,8 +21,6 @@ Other Interfaces
 
   .. autointerface:: IExceptionResponse
 
-  .. autointerface:: IRoutesMapper
-
   .. autointerface:: IRoute
 
 
