@@ -1338,16 +1338,23 @@ class Configurator(object):
                 _info=_info,
                 )
 
-        mapper = self.registry.queryUtility(IRoutesMapper)
-        if mapper is None:
-            mapper = RoutesMapper()
-            self.registry.registerUtility(mapper, IRoutesMapper)
+        mapper = self.get_routes_mapper()
+
         factory = self.maybe_dotted(factory)
         if pattern is None:
             pattern = path
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
         return mapper.connect(name, pattern, factory, predicates=predicates)
+
+    def get_routes_mapper(self):
+        """ Return the :term:`routes mapper` object associated with
+        this configurator's :term:`registry`."""
+        mapper = self.registry.queryUtility(IRoutesMapper)
+        if mapper is None:
+            mapper = RoutesMapper()
+            self.registry.registerUtility(mapper, IRoutesMapper)
+        return mapper
 
     def scan(self, package=None, categories=None, _info=u''):
         """ Scan a Python package and any of its subpackages for

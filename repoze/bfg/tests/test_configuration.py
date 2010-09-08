@@ -1715,6 +1715,19 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(routes[0].predicates), num_predicates)
         return route
 
+    def test_get_routes_mapper_not_yet_registered(self):
+        config = self._makeOne()
+        mapper = config.get_routes_mapper()
+        self.assertEqual(mapper.routelist, [])
+
+    def test_get_routes_mapper_already_registered(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        config = self._makeOne()
+        mapper = object()
+        config.registry.registerUtility(mapper, IRoutesMapper)
+        result = config.get_routes_mapper()
+        self.assertEqual(result, mapper)
+
     def test_add_route_defaults(self):
         config = self._makeOne()
         route = config.add_route('name', 'path')

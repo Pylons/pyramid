@@ -47,6 +47,9 @@ Paster Templates
 Internal
 --------
 
+- Add an API to the ``Configurator`` named ``get_routes_mapper``.
+  This returns an object implementing the ``IRoutesMapper`` interface.
+
 - The ``repoze.bfg.urldispatch.RoutesMapper`` object now has a
   ``get_route`` method which returns a single Route object or
   ``None``.

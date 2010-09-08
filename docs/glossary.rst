@@ -528,6 +528,10 @@ Glossary
      current request, the next route (in definition order) is
      attempted.
 
+   routes mapper
+     An object which compares path information from a request to an
+     ordered set of route patterns.  See :ref:`urldispatch_chapter`.
+
    predicate
      A test which returns ``True`` or ``False``.  Two different types
      of predicates exist in :mod:`repoze.bfg`: a :term:`view predicate`
