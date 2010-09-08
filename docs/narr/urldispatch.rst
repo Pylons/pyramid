@@ -657,8 +657,8 @@ current :term:`request` object.
 The ``info`` dictionary has a number of contained values: ``match`` is
 a dictionary: it represents the arguments matched in the URL by the
 route.  ``route`` is an object representing the route which was
-matched (see ``IRoute`` in :ref:`interfaces_module` for the API of
-such a route object).
+matched (see :class:`repoze.bfg.interfaces.IRoute` for the API of such
+a route object).
 
 ``info['match']`` is useful when predicates need access to the route
 match.  For example:
@@ -750,7 +750,7 @@ The above predicate, when added to a number of route configurations
 ensures that the year match argument is '2010' if and only if the
 route name is 'ymd', 'ym', or 'y'.
 
-See also ``IRoute`` in :ref:`interfaces_module` for more API
+See also :class:`repoze.bfg.interfaces.IRoute` for more API
 documentation about a route object.
 
 Route Matching
