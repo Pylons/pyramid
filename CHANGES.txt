@@ -38,11 +38,23 @@ Documentation
   pattern as a ``path`` have now been updated to refer to them as a
   ``pattern``.
 
+- The ``repoze.bfg.interfaces`` API documentation page is now rendered
+  via ``repoze.sphinx.autointerface``.
+
+- The URL Dispatch narrative chapter now refers to the ``interfaces``
+  chapter to explain the API of an ``IRoute`` object.
+
 Paster Templates
 ----------------
 
 - The routesalchemy template has been updated to use ``pattern`` in
   its route declarations rather than ``path``.
+
+Dependencies
+------------
+
+- ``tests_require`` now includes ``repoze.sphinx.autointerface`` as a
+  dependency.
 
 Internal
 --------

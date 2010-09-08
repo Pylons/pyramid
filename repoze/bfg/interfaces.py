@@ -286,7 +286,7 @@ class IRoutesMapper(Interface):
         """ Return a dictionary containing matching information for
         the request; the ``route`` key of this dictionary will either
         be a Route object or ``None`` if no route matched; the
-        ``match``key will be the matchdict or ``None`` if no route
+        ``match`` key will be the matchdict or ``None`` if no route
         matched."""
 
 class IContextURL(Interface):

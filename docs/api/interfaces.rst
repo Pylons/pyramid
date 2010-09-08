@@ -8,17 +8,21 @@
 Event-Related Interfaces
 ++++++++++++++++++++++++
 
-  .. autoclass:: IAfterTraversal
+  .. autointerface:: IAfterTraversal
 
-  .. autoclass:: INewRequest
+  .. autointerface:: INewRequest
 
-  .. autoclass:: INewResponse
+  .. autointerface:: INewResponse
 
-  .. autoclass:: IWSGIApplicationCreatedEvent
+  .. autointerface:: IWSGIApplicationCreatedEvent
 
 Other Interfaces
 ++++++++++++++++
 
-  .. autoclass:: IExceptionResponse
+  .. autointerface:: IExceptionResponse
+
+  .. autointerface:: IRoutesMapper
+
+  .. autointerface:: IRoute
 
 
