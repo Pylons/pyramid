@@ -8,7 +8,7 @@ configuration` registrations.
 
 This directive accepts a single attribute ,``name``, which should be
 used as the default permission string.  An example of a permission
-string:``view``.  Adding a default permission makes it unnecessary to
+string: ``view``.  Adding a default permission makes it unnecessary to
 protect each view configuration with an explicit permission, unless
 your application policy requires some exception for a particular view.
 
@@ -18,20 +18,18 @@ permission will be executable by entirely anonymous users (any
 authorization policy is ignored).
 
 There can be only one default permission active at a time within an
-application, thus the default permission directive can only be used
-once in any particular set of ZCML.
+application, thus the ``default_permission`` directive can only be
+used once in any particular set of ZCML.
 
 .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
 
 Attributes
 ~~~~~~~~~~
 
-``name`` must be a string representing a :term:`permission`,
+``name``
+    Must be a string representing a :term:`permission`,
     e.g. ``view``.
 
-
-    The ``secret`` is a string that will be used to encrypt the data
-    stored by the cookie.  It is required and has no default.
 
 Example
 ~~~~~~~
@@ -50,7 +48,7 @@ Using the ``default_permission`` argument to the
 :class:`repoze.bfg.configuration.Configurator` constructor can be used
 to achieve the same purpose.
 
-Using the
+Using the 
 :meth:`repoze.bfg.configuration.Configurator.set_default_permission`
 method can be used to achieve the same purpose when using imperative
 configuration.
@@ -58,4 +56,4 @@ configuration.
 See Also
 ~~~~~~~~
 
-See also :ref:``setting_a_default_permission``.
+See also :ref:`setting_a_default_permission`.

@@ -115,6 +115,7 @@ ZCML Directive Reference
    zcml/adapter
    zcml/authtktauthenticationpolicy
    zcml/configure
+   zcml/default_permission
    zcml/forbidden
    zcml/include
    zcml/notfound
