@@ -106,6 +106,12 @@
         handler="repoze.bfg.zcml.utility"
         />
 
+    <meta:directive
+        name="default_permission"
+        schema="repoze.bfg.zcml.IDefaultPermissionDirective"
+        handler="repoze.bfg.zcml.default_permission"
+        />
+
   </meta:directives>
 
 </configure>

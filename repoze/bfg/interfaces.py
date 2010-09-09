@@ -323,3 +323,8 @@ class ITranslationDirectories(Interface):
     """ A list object representing all known translation directories
     for an application"""
 
+class IDefaultPermission(Interface):
+    """ A string object representing the default permission to be used
+    for all view configurations which do not explicitly declare their
+    own."""
+    

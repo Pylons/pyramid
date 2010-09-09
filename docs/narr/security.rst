@@ -232,6 +232,41 @@ possess the ``add`` permission against the :term:`context` to be able
 to invoke the ``blog_entry_add_view`` view.  If he does not, the
 :term:`Forbidden view` will be invoked.
 
+.. _setting_a_default_permission:
+
+Setting a Default Permission
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a permission is not supplied to a view configuration, the
+registered view always be executable by entirely anonymous users: any
+authorization policy in effect is ignored.
+
+In support of making it easier to configure applications which are
+"secure by default", :mod:`repoze.bfg` allows you to configure a
+*default* permission.  If supplied, the default permission is used as
+the permission string to all view registrations which don't otherwise
+name a ``permission`` argument.
+
+These APIs are in support of configuring a default permission for an
+application:
+
+- The ``default_permission`` constructor argument to the
+  :mod:`repoze.bfg.configuration.Configurator` constructor.
+
+- The
+  :meth:`repoze.bfg.configuration.Configurator.set_default_permission`
+  method.
+
+- The :ref:`default_permission_directive` ZCML directive.
+
+When a default permission is registered, if a view configuration
+*does* name its own permission, the default permission is ignored for
+that view registration, and the view-configuration-named permission is
+used.
+
+.. note:: All APIs and ZCML directives related to default permissions
+   are new in :mod:`repoze.bfg` 1.3.
+
 .. index::
    single: ACL
    single: access control list

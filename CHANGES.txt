@@ -1,8 +1,43 @@
 Next release
 ============
 
+Bug Fixes
+---------
+
 - The ``traverse`` route predicate could not successfully generate a
   traversal path.
+
+Features
+--------
+
+- In support of making it easier to configure applications which are
+  "secure by default", a default permission feature was added.  If
+  supplied, the default permission is used as the permission string to
+  all view registrations which don't otherwise name a permission.
+  These APIs are in support of that:
+
+  - A new constructor argument was added to the Configurator:
+    ``default_permission``.
+
+  - A new method was added to the Configurator:
+    ``set_default_permission``.
+
+  - A new ZCML directive was added: ``default_permission``.
+
+Documentation
+-------------
+
+- Added documentation for the ``default_permission`` ZCML directive.
+
+- Added documentation for the ``default_permission`` constructor value
+  and the ``set_default_permission`` method in the Configurator API
+  documentation.
+
+- Added a new section to the "security" chapter named "Setting a
+  Default Permission".
+
+- Document ``renderer_globals_factory`` and ``request_factory``
+  arguments to Configurator constructor.
 
 1.3a12 (2010-09-08)
 ===================

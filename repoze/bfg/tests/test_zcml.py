@@ -1123,6 +1123,30 @@ class TestLocaleNegotiatorDirective(unittest.TestCase):
         self.assertEqual(action['args'], (dummy_negotiator,))
         action['callable'](*action['args']) # doesn't blow up
 
+class TestDefaultPermissionDirective(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _callFUT(self, context, name):
+        from repoze.bfg.zcml import default_permission
+        return default_permission(context, name)
+    
+    def test_it(self):
+        from repoze.bfg.threadlocal import get_current_registry
+        from repoze.bfg.interfaces import IDefaultPermission
+        reg = get_current_registry()
+        context = DummyContext()
+        self._callFUT(context, 'view')
+        actions = context.actions
+        self.assertEqual(len(actions), 1)
+        regadapt = actions[0]
+        self.assertEqual(regadapt['discriminator'], IDefaultPermission)
+        perm = reg.getUtility(IDefaultPermission)
+        self.assertEqual(perm, 'view')
+
 class TestLoadZCML(unittest.TestCase):
     def setUp(self):
         testing.setUp()

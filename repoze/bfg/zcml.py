@@ -18,6 +18,7 @@ from zope.schema import TextLine
 
 from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
+from repoze.bfg.interfaces import IDefaultPermission
 from repoze.bfg.interfaces import IRendererFactory
 from repoze.bfg.interfaces import IRouteRequest
 from repoze.bfg.interfaces import IView
@@ -851,6 +852,18 @@ def utility(_context, provides=None, component=None, factory=None, name=''):
         args = (component, provides, name, _context.info),
         kw = kw,
         )
+
+class IDefaultPermissionDirective(Interface):
+    name = TextLine(title=u'name', required=True)
+
+def default_permission(_context, name):
+    """ Register a default permission name """
+    # the default permission must be registered eagerly so it can
+    # be found by the view registration machinery
+    reg = get_current_registry()
+    config = Configurator(reg, package=_context.package)
+    config.set_default_permission(name)
+    _context.action(discriminator=IDefaultPermission)
 
 def path_spec(context, path):
     # we prefer registering resource specifications over absolute

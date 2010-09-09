@@ -20,6 +20,7 @@ from repoze.bfg.interfaces import IAuthenticationPolicy
 from repoze.bfg.interfaces import IAuthorizationPolicy
 from repoze.bfg.interfaces import IChameleonTranslate
 from repoze.bfg.interfaces import IDebugLogger
+from repoze.bfg.interfaces import IDefaultPermission
 from repoze.bfg.interfaces import IDefaultRootFactory
 from repoze.bfg.interfaces import IExceptionViewClassifier
 from repoze.bfg.interfaces import ILocaleNegotiator
@@ -84,6 +85,8 @@ DEFAULT_RENDERERS = (
     ('json', renderers.json_renderer_factory),
     ('string', renderers.string_renderer_factory),
     )
+
+_marker = object()
 
 class Configurator(object):
     """
@@ -160,7 +163,31 @@ class Configurator(object):
     negotiator` implementation or a :term:`dotted Python name` to
     same.  See :ref:`custom_locale_negotiator`.
 
+    If ``request_factory`` is passed, it should be a :term:`request
+    factory` implementation or a :term:`dotted Python name` to same.
+    See :ref:`custom_request_factory`.  By default it is ``None``,
+    which means use the default request factory.
+
+    If ``renderer_globals_factory`` is passed, it should be a
+    :term:`renderer globals` factory implementation or a :term:`dotted
+    Python name` to same.  See :ref:`custom_renderer_globals_factory`.
+    By default, it is ``None``, which means use no renderer globals
+    factory.
+
+    If ``default_permission`` is passed, it should be a
+    :term:`permission` string to be used as the default permission for
+    all view configuration registrations performed against this
+    Configurator.  An example of a permission string:``'view'``.
+    Adding a default permission makes it unnecessary to protect each
+    view configuration with an explicit permission, unless your
+    application policy requires some exception for a particular view.
+    By default, ``default_permission`` is ``None``, meaning that view
+    configurations which do not explicitly declare a permission will
+    always be executable by entirely anonymous users (any
+    authorization policy in effect is ignored).  See also
+    :ref:`setting_a_default_permission`.
     """
+
     manager = manager # for testing injection
     venusian = venusian # for testing injection
     def __init__(self,
@@ -174,7 +201,8 @@ class Configurator(object):
                  debug_logger=None,
                  locale_negotiator=None,
                  request_factory=None,
-                 renderer_globals_factory=None):
+                 renderer_globals_factory=None,
+                 default_permission=None):
         if package is None:
             package = caller_package()
         name_resolver = DottedNameResolver(package)
@@ -194,7 +222,8 @@ class Configurator(object):
                 debug_logger=debug_logger,
                 locale_negotiator=locale_negotiator,
                 request_factory=request_factory,
-                renderer_globals_factory=renderer_globals_factory
+                renderer_globals_factory=renderer_globals_factory,
+                default_permission=default_permission,
                 )
 
     def _set_settings(self, mapping):
@@ -326,7 +355,8 @@ class Configurator(object):
                        authentication_policy=None, authorization_policy=None,
                        renderers=DEFAULT_RENDERERS, debug_logger=None,
                        locale_negotiator=None, request_factory=None,
-                       renderer_globals_factory=None):
+                       renderer_globals_factory=None,
+                       default_permission=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
@@ -371,6 +401,8 @@ class Configurator(object):
         if renderer_globals_factory:
             renderer_globals_factory=self.maybe_dotted(renderer_globals_factory)
             self.set_renderer_globals_factory(renderer_globals_factory)
+        if default_permission:
+            self.set_default_permission(default_permission)
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -598,7 +630,7 @@ class Configurator(object):
             self.manager.pop()
         return self.registry
 
-    def add_view(self, view=None, name="", for_=None, permission=None, 
+    def add_view(self, view=None, name="", for_=None, permission=_marker, 
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
@@ -629,7 +661,17 @@ class Configurator(object):
           The name of a :term:`permission` that the user must possess
           in order to invoke the :term:`view callable`.  See
           :ref:`view_security_section` for more information about view
-          security and permissions.
+          security and permissions.  If ``permission`` is omitted, a
+          *default* permission may be used for this view registration
+          if one was named as the
+          :class:`repoze.bfg.configuration.Configurator` constructor's
+          ``default_permission`` argument, or if
+          :meth:`repoze.bfg.configuration.Configurator.set_default_permission`
+          was used prior to this view registration.  Pass ``None`` as
+          the permission to explicitly indicate that the view should
+          always be executable by entirely anonymous users, regardless
+          of the default permission, bypassing any
+          :term:`authorization policy` that may be in effect.
 
         attr
 
@@ -893,6 +935,10 @@ class Configurator(object):
             request_param=request_param, header=header, accept=accept,
             containment=containment, request_type=request_type,
             custom=custom_predicates)
+
+        if permission is _marker:
+            # intent: will be None if no default permission is registered
+            permission = self.registry.queryUtility(IDefaultPermission)
 
         derived_view = self._derive_view(view, permission, predicates, attr,
                                          renderer, wrapper, name, accept, order,
@@ -1609,6 +1655,36 @@ class Configurator(object):
         """
         negotiator = self.maybe_dotted(negotiator)
         self.registry.registerUtility(negotiator, ILocaleNegotiator)
+
+    def set_default_permission(self, permission):
+        """
+        Set the default permission to be used by all subsequent
+        :term:`view configuration` registrations.  ``permission``
+        should be a :term:`permission` string to be used as the
+        default permission.  An example of a permission
+        string:``'view'``.  Adding a default permission makes it
+        unnecessary to protect each view configuration with an
+        explicit permission, unless your application policy requires
+        some exception for a particular view.
+
+        If a default permission is *not* set, views represented by
+        view configuration registrations which do not explicitly
+        declare a permission will be executable by entirely anonymous
+        users (any authorization policy is ignored).
+
+        Later calls to this method override earlier calls; there can
+        be only one default permission active at a time within an
+        application.
+
+        See also :ref:`setting_a_default_permission`.
+
+        .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
+
+        .. note:: Using the ``default_permission`` argument to the
+           :class:`repoze.bfg.configuration.Configurator` constructor
+           can be used to achieve the same purpose.
+        """
+        self.registry.registerUtility(permission, IDefaultPermission)
 
     def add_translation_dirs(self, *specs):
         """ Add one or more :term:`translation directory` paths to the

@@ -14,6 +14,7 @@ directive documentation is organized alphabetically by directive name.
    zcml/adapter
    zcml/authtktauthenticationpolicy
    zcml/configure
+   zcml/default_permission
    zcml/forbidden
    zcml/include
    zcml/localenegotiator

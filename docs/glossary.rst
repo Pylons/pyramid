@@ -10,6 +10,10 @@ Glossary
      A ``WebOb`` request object.  See :ref:`webob_chapter` for
      information about request objects.
 
+   request factory
+     An object which, provided a WSGI environment as a single
+     positional argument, returns a ``WebOb`` compatible request.
+
    response
      An object that has three attributes: ``app_iter`` (representing an
      iterable body), ``headerlist`` (representing the http headers sent

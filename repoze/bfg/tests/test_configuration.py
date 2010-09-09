@@ -179,6 +179,11 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
+    def test_ctor_default_permission(self):
+        from repoze.bfg.interfaces import IDefaultPermission
+        config = self._makeOne(default_permission='view')
+        self.assertEqual(config.registry.getUtility(IDefaultPermission), 'view')
+
     def test_with_package_module(self):
         from repoze.bfg.tests import test_configuration
         import repoze.bfg.tests
@@ -444,6 +449,14 @@ class ConfiguratorTests(unittest.TestCase):
         config.setup_registry(renderers=[('yeah', renderer)])
         self.assertEqual(reg.getUtility(IRendererFactory, 'yeah'),
                          renderer)
+
+    def test_setup_registry_default_permission(self):
+        from repoze.bfg.registry import Registry
+        from repoze.bfg.interfaces import IDefaultPermission
+        reg = Registry()
+        config = self._makeOne(reg)
+        config.setup_registry(default_permission='view')
+        self.assertEqual(reg.getUtility(IDefaultPermission), 'view')
 
     def test_get_settings_nosettings(self):
         from repoze.bfg.registry import Registry
@@ -1704,6 +1717,58 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'second')
 
+    def test_add_view_with_permission(self):
+        view1 = lambda *arg: 'OK'
+        outerself = self
+        class DummyPolicy(object):
+            def effective_principals(self, r):
+                outerself.assertEqual(r, request)
+                return ['abc']
+            def permits(self, context, principals, permission):
+                outerself.assertEqual(context, None)
+                outerself.assertEqual(principals, ['abc'])
+                outerself.assertEqual(permission, 'view')
+                return True
+        policy = DummyPolicy()
+        config = self._makeOne(authorization_policy=policy,
+                               authentication_policy=policy)
+        config.add_view(view=view1, permission='view')
+        view = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        self.assertEqual(view(None, request), 'OK')
+
+    def test_add_view_with_default_permission_no_explicit_permission(self):
+        view1 = lambda *arg: 'OK'
+        outerself = self
+        class DummyPolicy(object):
+            def effective_principals(self, r):
+                outerself.assertEqual(r, request)
+                return ['abc']
+            def permits(self, context, principals, permission):
+                outerself.assertEqual(context, None)
+                outerself.assertEqual(principals, ['abc'])
+                outerself.assertEqual(permission, 'view')
+                return True
+        policy = DummyPolicy()
+        config = self._makeOne(authorization_policy=policy,
+                               authentication_policy=policy,
+                               default_permission='view')
+        config.add_view(view=view1)
+        view = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        self.assertEqual(view(None, request), 'OK')
+
+    def test_add_view_with_no_default_permission_no_explicit_permission(self):
+        view1 = lambda *arg: 'OK'
+        class DummyPolicy(object): pass # wont be called
+        policy = DummyPolicy()
+        config = self._makeOne(authorization_policy=policy,
+                               authentication_policy=policy)
+        config.add_view(view=view1)
+        view = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        self.assertEqual(view(None, request), 'OK')
+
     def _assertRoute(self, config, name, path, num_predicates=0):
         from repoze.bfg.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -2148,6 +2213,13 @@ class ConfiguratorTests(unittest.TestCase):
             'repoze.bfg.tests.test_configuration.dummyfactory')
         self.assertEqual(config.registry.getUtility(IRendererGlobalsFactory),
                          dummyfactory)
+
+    def test_set_default_permission(self):
+        from repoze.bfg.interfaces import IDefaultPermission
+        config = self._makeOne()
+        config.set_default_permission('view')
+        self.assertEqual(config.registry.getUtility(IDefaultPermission),
+                         'view')
 
     def test_add_translation_dirs_missing_dir(self):
         from repoze.bfg.exceptions import ConfigurationError

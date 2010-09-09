@@ -5,7 +5,7 @@
 
 .. automodule:: repoze.bfg.configuration
 
-  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None)
+  .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None, default_permission=None)
 
      .. attribute:: registry
 
@@ -59,6 +59,8 @@
      .. automethod:: set_notfound_view(view=None, attr=None, renderer=None, wrapper=None)
 
      .. automethod:: set_locale_negotiator
+
+     .. automethod:: set_default_permission
 
      .. automethod:: set_request_factory
 
