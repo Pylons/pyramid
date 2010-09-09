@@ -28,7 +28,7 @@ Changing ``configure.zcml``
 We'll change our ``configure.zcml`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
 enable declarative security checking.  We'll also add a new view
-stanza, which species a :term:`forbidden view`.  This configures our
+stanza, which specifies a :term:`forbidden view`.  This configures our
 login view to show up when :mod:`repoze.bfg` detects that a view
 invocation can not be authorized.  When you're done, your
 ``configure.zcml`` will look like so:
