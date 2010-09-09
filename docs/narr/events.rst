@@ -61,24 +61,6 @@ need to use ZCML for the same purpose:
    subscriber function (or a :term:`dotted Python name` which refers
    to a subscriber callable); the second argument is the event type.
 
-.. topic:: Configuring an Event Listener Through ZCML
-
-   You can configure an event listener by modifying your application's
-   ``configure.zcml``.  Here's an example of a bit of XML you can add
-   to the ``configure.zcml`` file which registers the above
-   ``mysubscriber`` function, which we assume lives in a
-   ``subscribers.py`` module within your application:
-
-   .. code-block:: xml
-      :linenos:
-
-      <subscriber
-         for="repoze.bfg.interfaces.INewRequest"
-         handler=".subscribers.mysubscriber"
-       />
-
-   See also :ref:`subscriber_directive`.
-
 .. topic:: Configuring an Event Listener Using a Decorator
 
    You can configure a subscriber function to be called for some event
