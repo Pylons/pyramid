@@ -3440,11 +3440,12 @@ class Test__make_predicates(unittest.TestCase):
         order, predicates, phash = self._callFUT(traverse='/1/:a/:b')
         self.assertEqual(len(predicates), 1)
         pred = predicates[0]
-        info = {'a':'a', 'b':'b'}
+        info = {'match':{'a':'a', 'b':'b'}}
         request = DummyRequest()
         result = pred(info, request)
         self.assertEqual(result, True)
-        self.assertEqual(info, {'a':'a', 'b':'b', 'traverse':('1', 'a', 'b')})
+        self.assertEqual(info, {'match':
+                                {'a':'a', 'b':'b', 'traverse':('1', 'a', 'b')}})
 
 class TestMultiView(unittest.TestCase):
     def _getTargetClass(self):

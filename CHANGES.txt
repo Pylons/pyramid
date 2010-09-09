@@ -1,3 +1,9 @@
+Next release
+============
+
+- The ``traverse`` route predicate could not successfully generate a
+  traversal path.
+
 1.3a12 (2010-09-08)
 ===================
 

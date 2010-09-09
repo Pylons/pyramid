@@ -2022,8 +2022,9 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         def traverse_predicate(context, request):
             if 'traverse' in context:
                 return True
-            tvalue = tgenerate(context)
-            context['traverse'] = traversal_path(tvalue)
+            m = context['match']
+            tvalue = tgenerate(m)
+            m['traverse'] = traversal_path(tvalue)
             return True
         # This isn't actually a predicate, it's just a infodict
         # modifier that injects ``traverse`` into the matchdict.  As a
