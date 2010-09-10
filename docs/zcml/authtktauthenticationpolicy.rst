@@ -11,7 +11,7 @@ Attributes
 ~~~~~~~~~~
 
 ``secret``
-    The ``secret`` is a string that will be used to encrypt the data
+    The ``secret`` is a string that will be used to sign the data
     stored by the cookie.  It is required and has no default.
 
 ``callback``

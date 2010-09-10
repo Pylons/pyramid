@@ -164,7 +164,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``secret``
 
-       The secret (a string) used for auth_tkt cookie encryption.
+       The secret (a string) used for auth_tkt cookie signing.
        Required.
 
     ``callback``
