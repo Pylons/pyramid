@@ -40,9 +40,11 @@ class IApplicationCreated(Interface):
 
     .. note:: For backwards compatibility with :mod:`repoze.bfg`
        versions before 1.3, this interface can also be imported as
-       :class:`repoze.bfg.interfaces.IWSGIApplicationCreatedEvent.
+       :class:`repoze.bfg.interfaces.IWSGIApplicationCreatedEvent`.
     """
-    app = Attribute(u"Published application")
+    app = Attribute(u"Created application")
+
+IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
 class IFinishedRequest(Interface):
     """
@@ -54,8 +56,6 @@ class IFinishedRequest(Interface):
     .. note:: This event type is new as of :mod:`repoze.bfg` 1.3.
     """
     request = Attribute('The request object')
-
-IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
 class IResponse(Interface): # not an API
     status = Attribute('WSGI status code of response')

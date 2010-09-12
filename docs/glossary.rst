@@ -586,25 +586,30 @@ Glossary
      a set of :term:`configuration declaration` statements.
 
    Not Found view
-      The :term:`view callable` invoked by :mod:`repoze.bfg` when the
-      developer explicitly raises a
-      ``repoze.bfg.exceptions.NotFound`` exception from within
-      :term:`view` code or :term:`root factory` code, or when the
-      current request doesn't match any :term:`view configuration`.
-      :mod:`repoze.bfg` provides a default implementation of a not
-      found view; it can be overridden.  See
+      An :term:`exception view` invoked by :mod:`repoze.bfg` when the
+      developer explicitly raises a ``repoze.bfg.exceptions.NotFound``
+      exception from within :term:`view` code or :term:`root factory`
+      code, or when the current request doesn't match any :term:`view
+      configuration`.  :mod:`repoze.bfg` provides a default
+      implementation of a not found view; it can be overridden.  See
       :ref:`changing_the_notfound_view`.
 
    Forbidden view
-      The :term:`view callable` invoked by :mod:`repoze.bfg` when the
+      An :term:`exception view` invoked by :mod:`repoze.bfg` when the
       developer explicitly raises a
       ``repoze.bfg.exceptions.Forbidden`` exception from within
       :term:`view` code or :term:`root factory` code, or when the
-      :term:`view configuration` and :term:`authorization policy` found
-      for a request disallows a particular view invocation.
+      :term:`view configuration` and :term:`authorization policy`
+      found for a request disallows a particular view invocation.
       :mod:`repoze.bfg` provides a default implementation of a
       forbidden view; it can be overridden.  See
       :ref:`changing_the_forbidden_view`.
+
+   Exception view
+      An exception view is a :term:`view callable` which may be
+      invoked by :mod:`repoze.bfg` when an exception is raised during
+      request processing.  See :ref:`exception_views` for more
+      information.
 
    thread local
       A thread-local variable is one which is essentially a global
