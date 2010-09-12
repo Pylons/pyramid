@@ -43,7 +43,7 @@ Deprecations
 
 - The ``repoze.bfg.interfaces.IAfterTraversal`` event interface was
   renamed to ``repoze.bfg.interfaces.IContextFound``.  Likewise, the
-  ``repoze.bfg.events.AfterTraveral`` class was renamed to
+  ``repoze.bfg.events.AfterTraversal`` class was renamed to
   ``repoze.bfg.events.ContextFound``.  The older aliases will continue
   to work indefinitely.
 
