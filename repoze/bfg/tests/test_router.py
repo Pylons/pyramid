@@ -383,7 +383,6 @@ class TestRouter(unittest.TestCase):
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
         response = DummyResponse('200 OK')
-        response.headerlist = [('a', 1)]
         def view(context, request):
             def callback(request, response):
                 response.called_back = True
@@ -395,6 +394,61 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         router(environ, start_response)
         self.assertEqual(response.called_back, True)
+
+    def test_call_request_has_finished_callbacks_when_view_succeeds(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        response = DummyResponse('200 OK')
+        def view(context, request):
+            def callback(request):
+                request.environ['called_back'] = True
+            request.finished_callbacks = [callback]
+            return response
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        router(environ, start_response)
+        self.assertEqual(environ['called_back'], True)
+
+    def test_call_request_has_finished_callbacks_when_view_raises(self):
+        from zope.interface import Interface
+        from zope.interface import directlyProvides
+        class IContext(Interface):
+            pass
+        from repoze.bfg.interfaces import IRequest
+        from repoze.bfg.interfaces import IViewClassifier
+        context = DummyContext()
+        directlyProvides(context, IContext)
+        self._registerTraverserFactory(context, subpath=[''])
+        def view(context, request):
+            def callback(request):
+                request.environ['called_back'] = True
+            request.finished_callbacks = [callback]
+            raise NotImplementedError
+        environ = self._makeEnviron()
+        self._registerView(view, '', IViewClassifier, IRequest, IContext)
+        router = self._makeOne()
+        start_response = DummyStartResponse()
+        exc_raised(NotImplementedError, router, environ, start_response)
+        self.assertEqual(environ['called_back'], True)
+
+    def test_call_request_factory_raises(self):
+        # making sure finally doesnt barf when a request cannot be created
+        environ = self._makeEnviron()
+        router = self._makeOne()
+        def dummy_request_factory(environ):
+            raise NotImplementedError
+        router.request_factory = dummy_request_factory
+        start_response = DummyStartResponse()
+        exc_raised(NotImplementedError, router, environ, start_response)
 
     def test_call_eventsends(self):
         from repoze.bfg.interfaces import INewRequest

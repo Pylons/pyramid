@@ -24,6 +24,10 @@ Features
 
   - A new ZCML directive was added: ``default_permission``.
 
+- Add a new request API: ``request.add_finished_callback``.  Finished
+  callbacks are called by the router unconditionally near the very end
+  of request processing.
+
 Deprecations
 ------------
 

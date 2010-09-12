@@ -184,6 +184,28 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(response.called2, True)
         self.assertEqual(inst.response_callbacks, ())
 
+    def test_add_finished_callback(self):
+        inst = self._makeOne({})
+        self.assertEqual(inst.finished_callbacks, ())
+        def callback(request):
+            """ """
+        inst.add_finished_callback(callback)
+        self.assertEqual(inst.finished_callbacks, [callback])
+        inst.add_finished_callback(callback)
+        self.assertEqual(inst.finished_callbacks, [callback, callback])
+
+    def test__process_finished_callbacks(self):
+        inst = self._makeOne({})
+        def callback1(request):
+            request.called1 = True
+        def callback2(request):
+            request.called2  = True
+        inst.finished_callbacks = [callback1, callback2]
+        inst._process_finished_callbacks()
+        self.assertEqual(inst.called1, True)
+        self.assertEqual(inst.called2, True)
+        self.assertEqual(inst.finished_callbacks, ())
+
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):
         from repoze.bfg.request import route_request_iface

@@ -39,6 +39,7 @@ class Request(WebobRequest):
     """
     implements(IRequest)
     response_callbacks = ()
+    finished_callbacks = ()
     default_charset = 'utf-8'
 
     def add_response_callback(self, callback):
@@ -83,6 +84,60 @@ class Request(WebobRequest):
         for callback in self.response_callbacks:
             callback(self, response)
         self.response_callbacks = ()
+
+    def add_finished_callback(self, callback):
+        """
+        Add a callback to the set of callbacks to be called
+        unconditionally by the :term:`router` at the very end of
+        request processing.
+
+        ``callback`` is a callable which accepts a single positional
+        parameter: ``request``.  For example:
+
+        .. code-block:: python
+           :linenos:
+
+           import transaction
+
+           def commit_callback(request):
+               '''commit or abort the transaction associated with request'''
+               if hasattr(request, 'exception'):
+                   transaction.abort()
+               else:
+                   transaction.commit()
+           request.add_finished_callback(commit_callback)
+
+        Finished callbacks are called in the order they're added (
+        first- to most-recently- added).  Finished callbacks (unlike
+        response callbacks) are *always* called, even if an exception
+        happens in application code that prevents a response from
+        being generated.
+
+        The set of finished callbacks associated with a request are
+        called *very late* in the processing of that request; they are
+        essentially the last thing called by the :term:`router`. They
+        are called after response processing has already occurred in a
+        top-level ``finally:`` block within the router request
+        processing code.  As a result, mutations performed to the
+        ``request`` provided to a finished callback will have no
+        meaningful effect, because response processing will have
+        already occurred, and the request's scope will expire almost
+        immediately after all finished callbacks have been processed.
+
+        Errors raised by finished callbacks are not handled specially.
+        They will be propagated to the caller of the :mod:`repoze.bfg`
+        router application.  """
+
+        callbacks = self.finished_callbacks
+        if not callbacks:
+            callbacks = []
+        callbacks.append(callback)
+        self.finished_callbacks = callbacks
+
+    def _process_finished_callbacks(self):
+        for callback in self.finished_callbacks:
+            callback(self)
+        self.finished_callbacks = ()
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior
     __getattr__ = object.__getattribute__

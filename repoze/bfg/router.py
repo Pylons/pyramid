@@ -164,5 +164,9 @@ class Router(object):
             return app_iter
 
         finally:
-            manager.pop()
+            try:
+                if request is not None and request.finished_callbacks:
+                    request._process_finished_callbacks()
+            finally:
+                manager.pop()
 
