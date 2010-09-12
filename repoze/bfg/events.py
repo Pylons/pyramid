@@ -6,7 +6,6 @@ from repoze.bfg.interfaces import IContextFound
 from repoze.bfg.interfaces import INewRequest
 from repoze.bfg.interfaces import INewResponse
 from repoze.bfg.interfaces import IApplicationCreated
-from repoze.bfg.interfaces import IFinishedRequest
 
 class subscriber(object):
     """ Decorator activated via a :term:`scan` which treats the
@@ -161,49 +160,4 @@ class ApplicationCreated(object):
         self.object = app
 
 WSGIApplicationCreatedEvent = ApplicationCreated # b/c (as of 1.3)
-
-class FinishedRequest(object):
-    """
-    This :term:`event` is sent after all request processing is
-    finished.
-
-    An event of this type is emitted unconditionally at the end of
-    request processing, even when an unhandled exception occurs.  This
-    is in contrast to the :class:`repoze.bfg.interfaces.INewResponse`
-    event, which cannot be emitted when, due to an unhandled
-    exception, a response object cannot not be created .  The
-    :class:`repoze.bfg.events.FinishedRequest` event will even be sent
-    when a request cannot not be created due to an error in request
-    factory code: in such a case, the ``request`` attribute of the
-    event will be ``None``.
-
-    Mutating the attached ``request`` object in a subscriber to this
-    event will have no effect, because, when this event is emitted,
-    there is no further request or response processing to be done.  It
-    is purely an informational event, which can be hooked to do
-    'finally:'-style tear-down at the end of each request.
-
-    Instances of this event have an attribute, ``request``, which is
-    the :term:`request` object (or, in extremely rare cases might be
-    ``None``, when a request object cannot be created due to a bug in
-    a request factory) .
-
-    Because this event happens unconditionally, the set of attributes
-    possessed by an attached ``request`` object are indeterminate.  At
-    very least, if the request is not ``None``, it will have a
-    ``registry`` attribute.  However, if an exception was thrown
-    before this event is broadcast, it may not have other
-    :mod:`repoze.bfg` -specific attributes such as ``subpath``,
-    ``root`, ``traversed``, etc.
-
-    Exceptions raised by subscribers of this event are unhandled.
-
-    This class implements the
-    :class:`repoze.bfg.interfaces.IFinishedRequest` interface.
-
-    .. note:: This event type is new as of :mod:`repoze.bfg` 1.3.
-    """
-    implements(IFinishedRequest)
-    def __init__(self, request):
-        self.request = request
 

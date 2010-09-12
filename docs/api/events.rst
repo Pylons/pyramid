@@ -23,8 +23,6 @@ Event Types
 
 .. autoclass:: NewResponse
 
-.. autoclass:: FinishedRequest
-
 See :ref:`events_chapter` for more information about how to register
 code which subscribes to these events.
 

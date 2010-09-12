@@ -18,7 +18,6 @@ from repoze.bfg.configuration import make_app # b/c import
 from repoze.bfg.events import ContextFound
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
-from repoze.bfg.events import FinishedRequest
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
@@ -165,8 +164,5 @@ class Router(object):
             return app_iter
 
         finally:
-            try:
-                has_listeners and registry.notify(FinishedRequest(request))
-            finally:
-                manager.pop()
+            manager.pop()
 

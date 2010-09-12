@@ -126,21 +126,6 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         self.assertEqual(router.request_factory, DummyRequestFactory)
 
-    def test_call_request_factory_raises_finished_request_catches(self):
-        from repoze.bfg.interfaces import IFinishedRequest
-        finished_events = self._registerEventListener(IFinishedRequest)
-        environ = self._makeEnviron()
-        logger = self._registerLogger()
-        router = self._makeOne()
-        def dummy_request_factory(environ):
-            raise NotImplementedError
-        router.request_factory = dummy_request_factory
-        start_response = DummyStartResponse()
-        exc_raised(NotImplementedError, router, environ, start_response)
-        self.assertEqual(len(logger.messages), 0)
-        self.assertEqual(len(finished_events), 1)
-        self.assertEqual(finished_events[0].request, None)
-
     def test_call_traverser_default(self):
         from repoze.bfg.exceptions import NotFound
         environ = self._makeEnviron()
@@ -415,7 +400,6 @@ class TestRouter(unittest.TestCase):
         from repoze.bfg.interfaces import INewRequest
         from repoze.bfg.interfaces import INewResponse
         from repoze.bfg.interfaces import IContextFound
-        from repoze.bfg.interfaces import IFinishedRequest
         from repoze.bfg.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -427,7 +411,6 @@ class TestRouter(unittest.TestCase):
         request_events = self._registerEventListener(INewRequest)
         aftertraversal_events = self._registerEventListener(IContextFound)
         response_events = self._registerEventListener(INewResponse)
-        finished_events = self._registerEventListener(IFinishedRequest)
         router = self._makeOne()
         start_response = DummyStartResponse()
         result = router(environ, start_response)
@@ -437,8 +420,6 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(aftertraversal_events[0].request.environ, environ)
         self.assertEqual(len(response_events), 1)
         self.assertEqual(response_events[0].response, response)
-        self.assertEqual(len(finished_events), 1)
-        self.assertEqual(finished_events[0].request.environ, environ)
         self.assertEqual(result, response.app_iter)
 
     def test_call_pushes_and_pops_threadlocal_manager(self):

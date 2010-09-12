@@ -46,17 +46,6 @@ class IApplicationCreated(Interface):
 
 IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
-class IFinishedRequest(Interface):
-    """
-    This :term:`event` is sent after all request processing is
-    finished.  See the
-    documentation attached to :class:`repoze.bfg.events.FinishedRequest`
-    for more information.
-
-    .. note:: This event type is new as of :mod:`repoze.bfg` 1.3.
-    """
-    request = Attribute('The request object')
-
 class IResponse(Interface): # not an API
     status = Attribute('WSGI status code of response')
     headerlist = Attribute('List of response headers')
