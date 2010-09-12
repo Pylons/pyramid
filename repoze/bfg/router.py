@@ -15,9 +15,10 @@ from repoze.bfg.interfaces import IView
 from repoze.bfg.interfaces import IViewClassifier
 
 from repoze.bfg.configuration import make_app # b/c import
-from repoze.bfg.events import AfterTraversal
+from repoze.bfg.events import ContextFound
 from repoze.bfg.events import NewRequest
 from repoze.bfg.events import NewResponse
+from repoze.bfg.events import FinishedRequest
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.request import Request
 from repoze.bfg.threadlocal import manager
@@ -59,6 +60,7 @@ class Router(object):
         manager = self.threadlocal_manager
         threadlocals = {'registry':registry, 'request':None}
         manager.push(threadlocals)
+        request = None
 
         try:
             # create the request
@@ -68,7 +70,6 @@ class Router(object):
             attrs = request.__dict__
             attrs['registry'] = registry
             has_listeners and registry.notify(NewRequest(request))
-
             request_iface = IRequest
 
             try:
@@ -101,7 +102,7 @@ class Router(object):
                     tdict['traversed'], tdict['virtual_root'],
                     tdict['virtual_root_path'])
                 attrs.update(tdict)
-                has_listeners and registry.notify(AfterTraversal(request))
+                has_listeners and registry.notify(ContextFound(request))
                 context_iface = providedBy(context)
                 view_callable = adapters.lookup(
                     (IViewClassifier, request_iface, context_iface),
@@ -164,5 +165,8 @@ class Router(object):
             return app_iter
 
         finally:
-            manager.pop()
+            try:
+                has_listeners and registry.notify(FinishedRequest(request))
+            finally:
+                manager.pop()
 

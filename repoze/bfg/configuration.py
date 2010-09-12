@@ -50,7 +50,7 @@ from repoze.bfg.renderers import RendererHelper
 from repoze.bfg.authorization import ACLAuthorizationPolicy
 from repoze.bfg.compat import all
 from repoze.bfg.compat import md5
-from repoze.bfg.events import WSGIApplicationCreatedEvent
+from repoze.bfg.events import ApplicationCreated
 from repoze.bfg.exceptions import Forbidden
 from repoze.bfg.exceptions import NotFound
 from repoze.bfg.exceptions import PredicateMismatch
@@ -594,16 +594,16 @@ class Configurator(object):
     def make_wsgi_app(self):
         """ Returns a :mod:`repoze.bfg` WSGI application representing
         the current configuration state and sends a
-        :class:`repoze.bfg.interfaces.IWSGIApplicationCreatedEvent`
+        :class:`repoze.bfg.interfaces.IApplicationCreated`
         event to all listeners."""
         from repoze.bfg.router import Router # avoid circdep
         app = Router(self.registry)
         # We push the registry on to the stack here in case any code
         # that depends on the registry threadlocal APIs used in
-        # listeners subscribed to the WSGIApplicationCreatedEvent.
+        # listeners subscribed to the IApplicationCreated event.
         self.manager.push({'registry':self.registry, 'request':None})
         try:
-            self.registry.notify(WSGIApplicationCreatedEvent(app))
+            self.registry.notify(ApplicationCreated(app))
         finally:
             self.manager.pop()
         return app

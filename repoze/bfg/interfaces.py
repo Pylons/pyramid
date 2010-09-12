@@ -3,27 +3,59 @@ from zope.interface import Interface
 
 # public API interfaces
 
-class IAfterTraversal(Interface):
-    """ An event type that is emitted after :mod:`repoze.bfg`
-    completes traversal but before it calls any view code."""
+class IContextFound(Interface):
+    """ An event type that is emitted after :mod:`repoze.bfg` finds a
+    :term:`context` object but before it calls any view code.  See the
+    documentation attached to :class:`repoze.bfg.events.ContextFound`
+    for more information.
+
+    .. note:: For backwards compatibility with versions of
+       :mod:`repoze.bfg` before 1.3, this event interface can also be
+       imported as :class:`repoze.bfg.interfaces.IAfterTraversal`.
+    """
     request = Attribute('The request object')
+
+IAfterTraversal = IContextFound
 
 class INewRequest(Interface):
     """ An event type that is emitted whenever :mod:`repoze.bfg`
-    begins to process a new request"""
+    begins to process a new request.  See the documentation attached
+    to :class:`repoze.bfg.events.NewRequest` for more information."""
     request = Attribute('The request object')
     
 class INewResponse(Interface):
     """ An event type that is emitted whenever any :mod:`repoze.bfg`
-    view returns a response."""
+    view returns a response. See the
+    documentation attached to :class:`repoze.bfg.events.NewResponse`
+    for more information."""
     request = Attribute('The request object')
     response = Attribute('The response object')
 
-class IWSGIApplicationCreatedEvent(Interface):
+class IApplicationCreated(Interface):
     """ Event issued when the
     :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method
-    is called."""
+    is called.  See the documentation attached to
+    :class:`repoze.bfg.events.ApplicationCreated` for more
+    information.
+
+    .. note:: For backwards compatibility with :mod:`repoze.bfg`
+       versions before 1.3, this interface can also be imported as
+       :class:`repoze.bfg.interfaces.IWSGIApplicationCreatedEvent.
+    """
     app = Attribute(u"Published application")
+
+class IFinishedRequest(Interface):
+    """
+    This :term:`event` is sent after all request processing is
+    finished.  See the
+    documentation attached to :class:`repoze.bfg.events.FinishedRequest`
+    for more information.
+
+    .. note:: This event type is new as of :mod:`repoze.bfg` 1.3.
+    """
+    request = Attribute('The request object')
+
+IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
 
 class IResponse(Interface): # not an API
     status = Attribute('WSGI status code of response')

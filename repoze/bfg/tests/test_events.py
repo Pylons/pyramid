@@ -55,45 +55,69 @@ class NewResponseEventTests(unittest.TestCase):
         self.assertEqual(inst.request, request)
         self.assertEqual(inst.response, response)
 
-class WSGIAppEventTests(unittest.TestCase):
-    def test_object_implements(self):
+class ApplicationCreatedEventTests(unittest.TestCase):
+    def test_alias_object_implements(self):
         from repoze.bfg.events import WSGIApplicationCreatedEvent
         event = WSGIApplicationCreatedEvent(object())
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        from repoze.bfg.interfaces import IApplicationCreated
         from zope.interface.verify import verifyObject
         verifyObject(IWSGIApplicationCreatedEvent, event)
+        verifyObject(IApplicationCreated, event)
 
-    def test_class_implements(self):
+    def test_alias_class_implements(self):
         from repoze.bfg.events import WSGIApplicationCreatedEvent
         from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        from repoze.bfg.interfaces import IApplicationCreated
         from zope.interface.verify import verifyClass
         verifyClass(IWSGIApplicationCreatedEvent, WSGIApplicationCreatedEvent)
+        verifyClass(IApplicationCreated, WSGIApplicationCreatedEvent)
 
-class AfterTraversalEventTests(unittest.TestCase):
-    def _getTargetClass(self):
-        from repoze.bfg.events import AfterTraversal
-        return AfterTraversal
-
-    def _makeOne(self, request):
-        return self._getTargetClass()(request)
+    def test_object_implements(self):
+        from repoze.bfg.events import ApplicationCreated
+        event = ApplicationCreated(object())
+        from repoze.bfg.interfaces import IApplicationCreated
+        from zope.interface.verify import verifyObject
+        verifyObject(IApplicationCreated, event)
 
     def test_class_implements(self):
-        from repoze.bfg.interfaces import IAfterTraversal
+        from repoze.bfg.events import ApplicationCreated
+        from repoze.bfg.interfaces import IApplicationCreated
         from zope.interface.verify import verifyClass
-        klass = self._getTargetClass()
-        verifyClass(IAfterTraversal, klass)
+        verifyClass(IApplicationCreated, ApplicationCreated)
+
+class ContextFoundEventTests(unittest.TestCase):
+    def test_alias_class_implements(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.events import AfterTraversal
+        from repoze.bfg.interfaces import IAfterTraversal
+        from repoze.bfg.interfaces import IContextFound
+        verifyClass(IAfterTraversal, AfterTraversal)
+        verifyClass(IContextFound, AfterTraversal)
+        
+    def test_alias_instance_implements(self):
+        from zope.interface.verify import verifyObject
+        from repoze.bfg.events import AfterTraversal
+        from repoze.bfg.interfaces import IAfterTraversal
+        from repoze.bfg.interfaces import IContextFound
+        request = DummyRequest()
+        inst = AfterTraversal(request)
+        verifyObject(IAfterTraversal, inst)
+        verifyObject(IContextFound, inst)
+
+    def test_class_implements(self):
+        from zope.interface.verify import verifyClass
+        from repoze.bfg.events import ContextFound
+        from repoze.bfg.interfaces import IContextFound
+        verifyClass(IContextFound, ContextFound)
         
     def test_instance_implements(self):
-        from repoze.bfg.interfaces import IAfterTraversal
         from zope.interface.verify import verifyObject
+        from repoze.bfg.events import ContextFound
+        from repoze.bfg.interfaces import IContextFound
         request = DummyRequest()
-        inst = self._makeOne(request)
-        verifyObject(IAfterTraversal, inst)
-
-    def test_ctor(self):
-        request = DummyRequest()
-        inst = self._makeOne(request)
-        self.assertEqual(inst.request, request)
+        inst = ContextFound(request)
+        verifyObject(IContextFound, inst)
 
 class TestSubscriber(unittest.TestCase):
     def setUp(self):

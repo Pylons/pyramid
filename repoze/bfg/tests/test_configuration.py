@@ -563,11 +563,10 @@ class ConfiguratorTests(unittest.TestCase):
         
     def test_make_wsgi_app(self):
         from repoze.bfg.router import Router
-        from repoze.bfg.interfaces import IWSGIApplicationCreatedEvent
+        from repoze.bfg.interfaces import IApplicationCreated
         manager = DummyThreadLocalManager()
         config = self._makeOne()
-        subscriber = self._registerEventListener(config,
-                                                 IWSGIApplicationCreatedEvent)
+        subscriber = self._registerEventListener(config, IApplicationCreated)
         config.manager = manager
         app = config.make_wsgi_app()
         self.assertEqual(app.__class__, Router)
@@ -575,7 +574,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.pushed['request'], None)
         self.failUnless(manager.popped)
         self.assertEqual(len(subscriber), 1)
-        self.failUnless(IWSGIApplicationCreatedEvent.providedBy(subscriber[0]))
+        self.failUnless(IApplicationCreated.providedBy(subscriber[0]))
 
     def test_load_zcml_default(self):
         import repoze.bfg.tests.fixtureapp

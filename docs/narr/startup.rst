@@ -127,8 +127,8 @@ press ``return`` after running ``paster serve MyProject.ini``.
    by the configurator previously populated by ZCML.  The router is a
    WSGI application.
 
-#. A :class:`repoze.bfg.interfaces.WSGIApplicationCreatedEvent` event
-   is emitted (see :ref:`events_chapter` for more information about
+#. A :class:`repoze.bfg.interfaces.IApplicationCreated` event is
+   emitted (see :ref:`events_chapter` for more information about
    events).
 
 #. Assuming there were no errors, the ``app`` function in

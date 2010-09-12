@@ -24,6 +24,29 @@ Features
 
   - A new ZCML directive was added: ``default_permission``.
 
+- The BFG router now emits an additional event unconditionally at the
+  end of request processing:
+  ``repoze.bfg.interfaces.IFinishedRequest``.  This event is meant to
+  be used when it is necessary to perform unconditional cleanup after
+  request processing.  See the ``repoze.bfg.events.FinishedRequest``
+  class documentation for more information.
+
+Deprecations
+------------
+
+- The ``repoze.bfg.interfaces.IWSGIApplicationCreatedEvent`` event
+  interface was renamed to
+  ``repoze.bfg.interfaces.IApplicationCreated``.  Likewise, the
+  ``repoze.bfg.events.WSGIApplicationCreatedEvent`` class was renamed
+  to ``repoze.bfg.events.ApplicationCreated``.  The older aliases will
+  continue to work indefinitely.
+
+- The ``repoze.bfg.interfaces.IAfterTraversal`` event interface was
+  renamed to ``repoze.bfg.interfaces.IContextFound``.  Likewise, the
+  ``repoze.bfg.events.AfterTraveral`` class was renamed to
+  ``repoze.bfg.events.ContextFound``.  The older aliases will continue
+  to work indefinitely.
+
 Documentation
 -------------
 

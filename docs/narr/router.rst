@@ -67,7 +67,7 @@ processing?
    they can be accessed via e.g. ``request.context`` within
    :term:`view` code.
 
-#. A :class:`repoze.bfg.interfaces.IAfterTraversal` :term:`event` is
+#. A :class:`repoze.bfg.interfaces.IContextFound` :term:`event` is
    sent to any subscribers.
 
 #. :mod:`repoze.bfg` looks up a :term:`view` callable using the

@@ -8,13 +8,13 @@
 Event-Related Interfaces
 ++++++++++++++++++++++++
 
-  .. autointerface:: IAfterTraversal
+  .. autointerface:: IApplicationCreated
 
   .. autointerface:: INewRequest
 
-  .. autointerface:: INewResponse
+  .. autointerface:: IContextFound
 
-  .. autointerface:: IWSGIApplicationCreatedEvent
+  .. autointerface:: INewResponse
 
 Other Interfaces
 ++++++++++++++++
