@@ -186,7 +186,7 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(inst.called2, True)
         self.assertEqual(response.called1, True)
         self.assertEqual(response.called2, True)
-        self.assertEqual(inst.response_callbacks, ())
+        self.assertEqual(inst.response_callbacks, [])
 
     def test_add_finished_callback(self):
         inst = self._makeOne({})
@@ -208,7 +208,7 @@ class TestRequest(unittest.TestCase):
         inst._process_finished_callbacks()
         self.assertEqual(inst.called1, True)
         self.assertEqual(inst.called2, True)
-        self.assertEqual(inst.finished_callbacks, ())
+        self.assertEqual(inst.finished_callbacks, [])
 
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):

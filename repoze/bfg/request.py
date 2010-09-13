@@ -88,9 +88,10 @@ class Request(WebobRequest):
         self.response_callbacks = callbacks
 
     def _process_response_callbacks(self, response):
-        for callback in self.response_callbacks:
+        callbacks = self.response_callbacks
+        while callbacks:
+            callback = callbacks.pop(0)
             callback(self, response)
-        self.response_callbacks = ()
 
     def add_finished_callback(self, callback):
         """
@@ -148,9 +149,10 @@ class Request(WebobRequest):
         self.finished_callbacks = callbacks
 
     def _process_finished_callbacks(self):
-        for callback in self.finished_callbacks:
+        callbacks = self.finished_callbacks
+        while callbacks:
+            callback = callbacks.pop(0)
             callback(self)
-        self.finished_callbacks = ()
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior
     __getattr__ = object.__getattribute__
