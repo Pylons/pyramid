@@ -57,9 +57,9 @@ class Router(object):
         has_listeners = registry.has_listeners
         logger = self.logger
         manager = self.threadlocal_manager
-        threadlocals = {'registry':registry, 'request':None}
-        manager.push(threadlocals)
         request = None
+        threadlocals = {'registry':registry, 'request':request}
+        manager.push(threadlocals)
 
         try:
             # create the request
@@ -72,16 +72,19 @@ class Router(object):
             request_iface = IRequest
 
             try:
-                # find the root
+                # find the root object
                 root_factory = self.root_factory
                 if self.routes_mapper is not None:
                     info = self.routes_mapper(request)
                     match, route = info['match'], info['route']
                     if route is not None:
-                        environ['wsgiorg.routing_args'] = ((), match)
-                        environ['bfg.routes.route'] = route
+                        # TODO: kill off bfg.routes.* environ keys
+                        # when traverser requires request arg, and
+                        # cant cope with environ anymore (likely 1.4+)
+                        environ['bfg.routes.route'] = route 
                         environ['bfg.routes.matchdict'] = match
                         attrs['matchdict'] = match
+                        attrs['matched_route'] = route
                         request_iface = registry.queryUtility(
                             IRouteRequest,
                             name=route.name,
@@ -91,7 +94,7 @@ class Router(object):
                 root = root_factory(request)
                 attrs['root'] = root
 
-                # find a view callable
+                # find a context
                 traverser = adapters.queryAdapter(root, ITraverser)
                 if traverser is None:
                     traverser = ModelGraphTraverser(root)
@@ -102,6 +105,8 @@ class Router(object):
                     tdict['virtual_root_path'])
                 attrs.update(tdict)
                 has_listeners and registry.notify(ContextFound(request))
+
+                # find a view callable
                 context_iface = providedBy(context)
                 view_callable = adapters.lookup(
                     (IViewClassifier, request_iface, context_iface),
@@ -121,27 +126,31 @@ class Router(object):
                         logger and logger.debug(msg)
                     else:
                         msg = request.path_info
+                    # repoze.bfg.message should die
                     environ['repoze.bfg.message'] = msg
                     raise NotFound(msg)
                 else:
                     response = view_callable(context, request)
 
-            # handle exceptions raised during root finding and view lookup
+            # handle exceptions raised during root finding and view execution
             except Exception, why:
+                attrs['exception'] = why
+
                 for_ = (IExceptionViewClassifier,
                         request_iface.combined,
                         providedBy(why))
                 view_callable = adapters.lookup(for_, IView, default=None)
+
                 if view_callable is None:
                     raise
 
-                try:
+                # r.b.message should be deprecated
+                try: 
                     msg = why[0]
-                except Exception:
+                except:
                     msg = ''
                 environ['repoze.bfg.message'] = msg
 
-                attrs['exception'] = why
                 response = view_callable(why, request)
 
             # process the response
@@ -164,6 +173,7 @@ class Router(object):
             return app_iter
 
         finally:
+            # post-response cleanup
             try:
                 if request is not None and request.finished_callbacks:
                     request._process_finished_callbacks()

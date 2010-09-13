@@ -461,6 +461,111 @@ method:
    config = Configurator()
    config.set_renderer_globals_factory(renderer_globals_factory)
 
+.. _using_response_callbacks:
+
+Using Response Callbacks
+------------------------
+
+Unlike many other web frameworks, :mod:`repoze.bfg` does not eagerly
+create a global response object.  Adding a :term:`response callback`
+allows an application to register an action to be performed against a
+response object once it is created, usually in order to mutate it.
+
+The :meth:`repoze.bfg.request.Request.add_response_callback` method is
+used to register a response callback.  
+
+A response callback is a callable which accepts two positional
+parameters: ``request`` and ``response``.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   def cache_callback(request, response):
+       """Set the cache_control max_age for the response"""
+       if request.exception is not None:
+           response.cache_control.max_age = 360
+   request.add_response_callback(cache_callback)
+
+No response callback is called if an unhandled exception happens in
+application code, or if the response object returned by a :term:`view
+callable` is invalid.  Response callbacks *are*, however, invoked when
+a :term:`exception view` is rendered successfully: in such a case, the
+:attr:`request.exception` attribute of the request when it enters a
+response callback will be an exception object instead of its default
+value of ``None``.
+
+Response callbacks are called in the order they're added
+(first-to-most-recently-added).  All response callbacks are called
+*before* the :class:`repoze.bfg.interfaces.INewResponse` event is
+sent.  Errors raised by response callbacks are not handled specially.
+They will be propagated to the caller of the :mod:`repoze.bfg` router
+application.
+
+A response callback has a lifetime of a *single* request.  If you want
+a response callback to happen as the result of *every* request, you
+must re-register the callback into every new request (perhaps within a
+subscriber of a :class:`repoze.bfg.interfaces.INewRequest` event).
+
+.. _using_finished_callbacks:
+
+Using Finished Callbacks
+------------------------
+
+A :term:`finished callback` is a function that will be called
+unconditionally by the :mod:`repoze.bfg` :term:`router` at the very
+end of request processing.  A finished callback can be used to perform
+an action at the end of a request unconditionally.
+
+The :meth:`repoze.bfg.request.Request.add_finished_callback` method is
+used to register a finished callback.
+
+A finished callback is a callable which accepts a single positional
+parameter: ``request``.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   import transaction
+
+   def commit_callback(request):
+       '''commit or abort the transaction associated with request'''
+       if request.exception is not None:
+           transaction.abort()
+       else:
+           transaction.commit()
+   request.add_finished_callback(commit_callback)
+
+Finished callbacks are called in the order they're added ( first- to
+most-recently- added).  Finished callbacks (unlike a :term:`response
+callback`) are *always* called, even if an exception happens in
+application code that prevents a response from being generated.
+
+The set of finished callbacks associated with a request are called
+*very late* in the processing of that request; they are essentially
+the very last thing called by the :term:`router` before a request
+"ends". They are called after response processing has already occurred
+in a top-level ``finally:`` block within the router request processing
+code.  As a result, mutations performed to the ``request`` provided to
+a finished callback will have no meaningful effect, because response
+processing will have already occurred, and the request's scope will
+expire almost immediately after all finished callbacks have been
+processed.
+
+It is often necessary to tell whether an exception occurred within
+:term:`view callable` code from within a finished callback: in such a
+case, the :attr:`request.exception` attribute of the request when it
+enters a response callback will be an exception object instead of its
+default value of ``None``.
+
+Errors raised by finished callbacks are not handled specially.  They
+will be propagated to the caller of the :mod:`repoze.bfg` router
+application.
+
+A finished callback has a lifetime of a *single* request.  If you want
+a finished callback to happen as the result of *every* request, you
+must re-register the callback into every new request (perhaps within a
+subscriber of a :class:`repoze.bfg.interfaces.INewRequest` event).
+
 .. _registering_configuration_decorators:
 
 Registering Configuration Decorators

@@ -23,6 +23,10 @@ class TestRequest(unittest.TestCase):
         r = self._makeOne({'PATH_INFO':'/'})
         self.assertEqual(r.charset, 'utf-8')
 
+    def test_exception_defaults_to_None(self):
+        r = self._makeOne({'PATH_INFO':'/'})
+        self.assertEqual(r.exception, None)
+
     def test_params_decoded_from_utf_8_by_default(self):
         environ = {
             'PATH_INFO':'/',

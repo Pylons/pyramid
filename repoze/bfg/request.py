@@ -40,6 +40,7 @@ class Request(WebobRequest):
     implements(IRequest)
     response_callbacks = ()
     finished_callbacks = ()
+    exception = None
     default_charset = 'utf-8'
 
     def add_response_callback(self, callback):
@@ -72,7 +73,13 @@ class Request(WebobRequest):
 
         Errors raised by callbacks are not handled specially.  They
         will be propagated to the caller of the :mod:`repoze.bfg`
-        router application.  """
+        router application.
+
+        .. note: ``add_response_callback`` is new in :mod:`repoze.bfg`
+           1.3.
+
+        See also: :ref:`using_response_callbacks`.
+        """
 
         callbacks = self.response_callbacks
         if not callbacks:
@@ -101,7 +108,7 @@ class Request(WebobRequest):
 
            def commit_callback(request):
                '''commit or abort the transaction associated with request'''
-               if hasattr(request, 'exception'):
+               if request.exception is not None:
                    transaction.abort()
                else:
                    transaction.commit()
@@ -126,7 +133,13 @@ class Request(WebobRequest):
 
         Errors raised by finished callbacks are not handled specially.
         They will be propagated to the caller of the :mod:`repoze.bfg`
-        router application.  """
+        router application.
+
+        .. note: ``add_finished_callback`` is new in :mod:`repoze.bfg`
+           1.3.
+
+        See also: :ref:`using_finished_callbacks`.
+        """
 
         callbacks = self.finished_callbacks
         if not callbacks:

@@ -26,7 +26,39 @@ Features
 
 - Add a new request API: ``request.add_finished_callback``.  Finished
   callbacks are called by the router unconditionally near the very end
-  of request processing.
+  of request processing.  See the "Using Finished Callbacks" section
+  of the "Hooks" narrative chapter of the documentation for more
+  information.
+
+- A ``request.matched_route`` attribute is now added to the request
+  when a route has matched.  Its value is the "route" object that
+  matched (see the ``IRoute`` interface within
+  ``repoze.bfg.interfaces`` API documentation for the API of a route
+  object).
+
+- The ``exception`` attribute of the request is now set slightly
+  earlier and in a slightly different set of scenarios, for benefit of
+  "finished callbacks" and "response callbacks".  In previous
+  versions, the ``exception`` attribute of the request was not set at
+  all if an exception view was not found.  In this version, the
+  ``request.exception`` attribute is set immediately when an exception
+  is caught by the router, even if an exception view could not be
+  found.
+
+Backwards Incompatibilities
+---------------------------
+
+- The router no longer sets the value ``wsgiorg.routing_args`` into
+  the environ when a route matches. The value used to be something
+  like ``((), matchdict)``.  This functionality was only ever
+  obliquely referred to in change logs; it was never documented as an
+  API.
+
+- The ``exception`` attribute of the request now defaults to ``None``.
+  In prior versions, the ``request.exception`` attribute did not exist
+  if an exception was not raised by user code during request
+  processing; it only began existence once an exception view was
+  found.
 
 Deprecations
 ------------
@@ -44,6 +76,13 @@ Deprecations
   ``repoze.bfg.events.ContextFound``.  The older aliases will continue
   to work indefinitely.
 
+- References to the WSGI environment values ``bfg.routes.matchdict``
+  and ``bfg.routes.route`` were removed from documentation.  These
+  will stick around internally for several more releases, but it is
+  ``request.matchdict`` and ``request.matched_route`` are now the
+  "official" way to obtain the matchdict and the route object which
+  resulted in the match.
+
 Documentation
 -------------
 
@@ -58,6 +97,18 @@ Documentation
 
 - Document ``renderer_globals_factory`` and ``request_factory``
   arguments to Configurator constructor.
+
+- Added two sections to the "Hooks" chapter of the documentation:
+  "Using Response Callbacks" and "Using Finished Callbacks".
+
+- Added documentation of the ``request.exception`` attribute to the
+  ``repoze.bfg.request.Request`` API documentation.
+
+- Added glossary entries for "response callback" and "finished
+  callback".
+
+- The "Request Processing" narrative chapter has been updated to note
+  finished and response callback steps.
 
 1.3a12 (2010-09-08)
 ===================

@@ -26,30 +26,37 @@ processing?
 
 #. A :term:`request` object is created based on the WSGI environment.
 
+#. The :term:`registry` associated with the application and the
+   :term:`request` object created in the last step are pushed on to the
+   :term:`thread local` stack that :mod:`repoze.bfg` uses to allow the
+   functions named :func:`repoze.bfg.threadlocal.get_current_request`
+   and :func:`repoze.bfg.threadlocal.get_current_registry` to work.
+
 #. A :class:`repoze.bfg.interfaces.INewRequest` :term:`event` is sent
    to any subscribers.
 
 #. If any :term:`route` has been defined within application
    configuration, the :mod:`repoze.bfg` :term:`router` calls a
    :term:`URL dispatch` "route mapper."  The job of the mapper is to
-   examine the ``PATH_INFO`` implied by the request to determine
-   whether any user-defined :term:`route` pattern matches the current
-   WSGI environment.  The :term:`router` passes the request as an
-   argument to the mapper.
+   examine the request to determine whether any user-defined
+   :term:`route` matches the current WSGI environment.  The
+   :term:`router` passes the request as an argument to the mapper.
 
-#. If any route matches, the WSGI environment is mutated; a
-   ``bfg.routes.route`` key and a ``bfg.routes.matchdict`` are added
-   to the WSGI environment, and an attribute named ``matchdict`` is
-   added to the request.  A root object associated with the route
-   found is also generated.  If the :term:`route configuration`
-   which matched has an associated a ``factory`` argument, this
-   factory is used to generate the root object, otherwise a default
-   :term:`root factory` is used.
+#. If any route matches, the request is mutated; a ``matchdict`` and
+   ``matched_route`` attributes are added to the request object; the
+   former contains a dictionary representign the matched dynamic
+   elements of the request's ``PATH_INFO`` value, the latter contains
+   the :class:`repoze.bfg.interfaces.IRoute` object representing the
+   route which matched.  The root object associated with the route
+   found is also generated: if the :term:`route configuration` which
+   matched has an associated a ``factory`` argument, this factory is
+   used to generate the root object, otherwise a default :term:`root
+   factory` is used.
 
 #. If a route match was *not* found, and a ``root_factory`` argument
    was passed to the :term:`Configurator` constructor, that callable
    is used to generate the root object.  If the ``root_factory``
-   argument passed to the Configurator constructor is ``None``, a
+   argument passed to the Configurator constructor was ``None``, a
    default root factory is used to generate a root object.
 
 #. The :mod:`repoze.bfg` router calls a "traverser" function with the
@@ -75,11 +82,12 @@ processing?
    doesn't exist for this combination of objects (based on the type of
    the context, the type of the request, and the value of the view
    name, and any :term:`predicate` attributes applied to the view
-   configuration), :mod:`repoze.bfg` uses a "not found" view callable
-   to generate a response, and returns that response.
+   configuration), :mod:`repoze.bfg` raises a
+   :class:`repoze.bfg.exceptions.NotFound` exception, which is meant
+   to be caught by a surrounding exception handler.
 
-#. If a view callable was found, :mod:`repoze.bfg` calls the view
-   function.
+#. If a view callable was found, :mod:`repoze.bfg` attempts to call
+   the view function.
 
 #. If an :term:`authorization policy` is in use, and the view was
    protected by a :term:`permission`, :mod:`repoze.bfg` passes the
@@ -88,15 +96,38 @@ processing?
    requesting user, based on credential information in the request and
    security information attached to the context.  If it returns
    ``True``, :mod:`repoze.bfg` calls the view callable to obtain a
-   response.  If it returns ``False``, it uses a :term:`forbidden
-   view` callable to generate a response.
+   response.  If it returns ``False``, it raises a
+   :class:`repoze.bfg.exceptions.Forbidden` exception, which is meant
+   to be called by a surrounding exception handler.
 
-#. A :class:`repoze.bfg.interfaces.INewResponse` :term:`event` is sent
-   to any subscribers.
+#. If any exception was raised within a :term:`root factory`, by
+   :term:`traversal`, by a :term:`view callable` or by
+   :mod:`repoze.bfg` itself (such as when it raises
+   :class:`repoze.bfg.exceptions.NotFound` or
+   :class:`repoze.bfg.exceptions.Forbidden`), the router catches the
+   exception, and attaches it to the request as the ``exception``
+   attribute.  It then attempts to find a :term:`exception view` for
+   the exception that was caught.  If it finds an exception view
+   callable, that callable is called, and is presumed to generate a
+   response.  If an :term:`exception view` that matches the exception
+   cannot be found, the exception is reraised.
 
-#. The response object's ``app_iter``, ``status``, and ``headerlist``
-   attributes are used to generate a WSGI response.  The response is
-   sent back to the upstream WSGI server.
+#. The following steps occur only when a :term:`response` could be
+   successfully generated by a normal :term:`view callable` or an
+   :term:`exception view` callable.  :mod:`repoze.bfg` will attempt to
+   execute any :term:`response callback` functions attached via
+   :meth:`repoze.bfg.request.Request.add_response_callback`.  A
+   :class:`repoze.bfg.interfaces.INewResponse` :term:`event` is then
+   sent to any subscribers.  The response object's ``app_iter``,
+   ``status``, and ``headerlist`` attributes are then used to generate
+   a WSGI response.  The response is sent back to the upstream WSGI
+   server.
+
+#. :mod:`repoze.bfg` will attempt to execute any :term:`finished
+   callback` functions attached via
+   :meth:`repoze.bfg.request.Request.add_finished_callback`.
+
+#. The :term:`thread local` stack is popped.
 
 .. image:: router.png
 

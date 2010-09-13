@@ -518,12 +518,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.subpath, [])
         self.assertEqual(request.context, context)
         self.assertEqual(request.root, root)
-        routing_args = environ['wsgiorg.routing_args'][1]
-        self.assertEqual(routing_args['action'], 'action1')
-        self.assertEqual(routing_args['article'], 'article1')
-        self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
+        matchdict = {'action':'action1', 'article':'article1'}
+        self.assertEqual(environ['bfg.routes.matchdict'], matchdict)
         self.assertEqual(environ['bfg.routes.route'].name, 'foo')
-        self.assertEqual(request.matchdict, routing_args)
+        self.assertEqual(request.matchdict, matchdict)
+        self.assertEqual(request.matched_route.name, 'foo')
 
     def test_call_route_matches_doesnt_overwrite_subscriber_iface(self):
         from repoze.bfg.interfaces import INewRequest
@@ -559,12 +558,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.subpath, [])
         self.assertEqual(request.context, context)
         self.assertEqual(request.root, root)
-        routing_args = environ['wsgiorg.routing_args'][1]
-        self.assertEqual(routing_args['action'], 'action1')
-        self.assertEqual(routing_args['article'], 'article1')
-        self.assertEqual(environ['bfg.routes.matchdict'], routing_args)
+        matchdict = {'action':'action1', 'article':'article1'}
+        self.assertEqual(environ['bfg.routes.matchdict'], matchdict)
         self.assertEqual(environ['bfg.routes.route'].name, 'foo')
-        self.assertEqual(request.matchdict, routing_args)
+        self.assertEqual(request.matchdict, matchdict)
+        self.assertEqual(request.matched_route.name, 'foo')
         self.failUnless(IFoo.providedBy(request))
 
     def test_root_factory_raises_notfound(self):
@@ -634,6 +632,12 @@ class TestRouter(unittest.TestCase):
             pass
         from repoze.bfg.interfaces import IRequest
         from repoze.bfg.interfaces import IViewClassifier
+        from repoze.bfg.interfaces import IRequestFactory
+        def rfactory(environ):
+            return request
+        self.registry.registerUtility(rfactory, IRequestFactory)
+        from repoze.bfg.request import Request
+        request = Request.blank('/')
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
@@ -644,6 +648,9 @@ class TestRouter(unittest.TestCase):
         router = self._makeOne()
         start_response = DummyStartResponse()
         self.assertRaises(RuntimeError, router, environ, start_response)
+        # ``exception`` must be attached to request even if a suitable
+        # exception view cannot be found
+        self.assertEqual(request.exception.__class__, RuntimeError)
 
     def test_call_view_raises_exception_view(self):
         from repoze.bfg.interfaces import IViewClassifier

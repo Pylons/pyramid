@@ -774,3 +774,13 @@ Glossary
       Values injected as names into a renderer based on application
       policy.  See :ref:`adding_renderer_globals` for more
       information.
+
+   response callback
+      A user-defined callback executed by the :term:`router` at a
+      point after a :term:`response` object is successfully created.
+      See :ref:`using_response_callbacks`.
+
+   finished callback
+      A user-defined callback executed by the :term:`router`
+      unconditionally at the very end of request processing .  See
+      :ref:`using_finished_callbacks`.
