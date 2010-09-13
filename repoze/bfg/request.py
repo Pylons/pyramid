@@ -68,7 +68,7 @@ class Request(WebobRequest):
         called if an exception happens in application code, or if the
         response object returned by :term:`view` code is invalid.
 
-        All response callbacks are called *before* the
+        All response callbacks are called *after* the
         :class:`repoze.bfg.interfaces.INewResponse` event is sent.
 
         Errors raised by callbacks are not handled specially.  They

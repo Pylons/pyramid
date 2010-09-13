@@ -61,122 +61,129 @@ class Router(object):
         threadlocals = {'registry':registry, 'request':request}
         manager.push(threadlocals)
 
-        try:
-            # create the request
-            request = self.request_factory(environ)
-            context = None
-            threadlocals['request'] = request
-            attrs = request.__dict__
-            attrs['registry'] = registry
-            has_listeners and registry.notify(NewRequest(request))
-            request_iface = IRequest
+        try: # matches finally: manager.pop()
 
-            try:
-                # find the root object
-                root_factory = self.root_factory
-                if self.routes_mapper is not None:
-                    info = self.routes_mapper(request)
-                    match, route = info['match'], info['route']
-                    if route is not None:
-                        # TODO: kill off bfg.routes.* environ keys
-                        # when traverser requires request arg, and
-                        # cant cope with environ anymore (likely 1.4+)
-                        environ['bfg.routes.route'] = route 
-                        environ['bfg.routes.matchdict'] = match
-                        attrs['matchdict'] = match
-                        attrs['matched_route'] = route
-                        request_iface = registry.queryUtility(
-                            IRouteRequest,
-                            name=route.name,
-                            default=IRequest)
-                        root_factory = route.factory or self.root_factory
+            try: # matches finally:  ... call request finished callbacks ...
+                
+                # create the request
+                request = self.request_factory(environ)
+                context = None
+                threadlocals['request'] = request
+                attrs = request.__dict__
+                attrs['registry'] = registry
+                has_listeners and registry.notify(NewRequest(request))
+                request_iface = IRequest
 
-                root = root_factory(request)
-                attrs['root'] = root
+                try:
+                    # find the root object
+                    root_factory = self.root_factory
+                    if self.routes_mapper is not None:
+                        info = self.routes_mapper(request)
+                        match, route = info['match'], info['route']
+                        if route is not None:
+                            # TODO: kill off bfg.routes.* environ keys
+                            # when traverser requires request arg, and
+                            # cant cope with environ anymore (likely 1.4+)
+                            environ['bfg.routes.route'] = route 
+                            environ['bfg.routes.matchdict'] = match
+                            attrs['matchdict'] = match
+                            attrs['matched_route'] = route
+                            request_iface = registry.queryUtility(
+                                IRouteRequest,
+                                name=route.name,
+                                default=IRequest)
+                            root_factory = route.factory or self.root_factory
 
-                # find a context
-                traverser = adapters.queryAdapter(root, ITraverser)
-                if traverser is None:
-                    traverser = ModelGraphTraverser(root)
-                tdict = traverser(request)
-                context, view_name, subpath, traversed, vroot, vroot_path = (
-                    tdict['context'], tdict['view_name'], tdict['subpath'],
-                    tdict['traversed'], tdict['virtual_root'],
-                    tdict['virtual_root_path'])
-                attrs.update(tdict)
-                has_listeners and registry.notify(ContextFound(request))
+                    root = root_factory(request)
+                    attrs['root'] = root
 
-                # find a view callable
-                context_iface = providedBy(context)
-                view_callable = adapters.lookup(
-                    (IViewClassifier, request_iface, context_iface),
-                    IView, name=view_name, default=None)
+                    # find a context
+                    traverser = adapters.queryAdapter(root, ITraverser)
+                    if traverser is None:
+                        traverser = ModelGraphTraverser(root)
+                    tdict = traverser(request)
+                    context, view_name, subpath, traversed, vroot, vroot_path =(
+                        tdict['context'], tdict['view_name'], tdict['subpath'],
+                        tdict['traversed'], tdict['virtual_root'],
+                        tdict['virtual_root_path'])
+                    attrs.update(tdict)
+                    has_listeners and registry.notify(ContextFound(request))
 
-                # invoke the view callable
-                if view_callable is None:
-                    if self.debug_notfound:
-                        msg = (
-                            'debug_notfound of url %s; path_info: %r, '
-                            'context: %r, view_name: %r, subpath: %r, '
-                            'traversed: %r, root: %r, vroot: %r, '
-                            'vroot_path: %r' % (
-                            request.url, request.path_info, context, view_name,
-                            subpath, traversed, root, vroot, vroot_path)
-                            )
-                        logger and logger.debug(msg)
+                    # find a view callable
+                    context_iface = providedBy(context)
+                    view_callable = adapters.lookup(
+                        (IViewClassifier, request_iface, context_iface),
+                        IView, name=view_name, default=None)
+
+                    # invoke the view callable
+                    if view_callable is None:
+                        if self.debug_notfound:
+                            msg = (
+                                'debug_notfound of url %s; path_info: %r, '
+                                'context: %r, view_name: %r, subpath: %r, '
+                                'traversed: %r, root: %r, vroot: %r, '
+                                'vroot_path: %r' % (
+                                    request.url, request.path_info, context,
+                                    view_name,
+                                    subpath, traversed, root, vroot, vroot_path)
+                                )
+                            logger and logger.debug(msg)
+                        else:
+                            msg = request.path_info
+                        # XXX repoze.bfg.message should be deprecated
+                        environ['repoze.bfg.message'] = msg
+                        raise NotFound(msg)
                     else:
-                        msg = request.path_info
-                    # repoze.bfg.message should die
+                        response = view_callable(context, request)
+
+                # handle exceptions raised during root finding and view-exec
+                except Exception, why:
+                    attrs['exception'] = why
+
+                    for_ = (IExceptionViewClassifier,
+                            request_iface.combined,
+                            providedBy(why))
+                    view_callable = adapters.lookup(for_, IView, default=None)
+
+                    if view_callable is None:
+                        raise
+
+                    # XXX r.b.message should be deprecated
+                    try: 
+                        msg = why[0]
+                    except:
+                        msg = ''
                     environ['repoze.bfg.message'] = msg
-                    raise NotFound(msg)
-                else:
-                    response = view_callable(context, request)
 
-            # handle exceptions raised during root finding and view execution
-            except Exception, why:
-                attrs['exception'] = why
+                    response = view_callable(why, request)
 
-                for_ = (IExceptionViewClassifier,
-                        request_iface.combined,
-                        providedBy(why))
-                view_callable = adapters.lookup(for_, IView, default=None)
+                # process the response
 
-                if view_callable is None:
-                    raise
+                has_listeners and registry.notify(NewResponse(request,response))
 
-                # r.b.message should be deprecated
-                try: 
-                    msg = why[0]
-                except:
-                    msg = ''
-                environ['repoze.bfg.message'] = msg
+                if request.response_callbacks:
+                    request._process_response_callbacks(response)
 
-                response = view_callable(why, request)
+                try:
+                    headers = response.headerlist
+                    app_iter = response.app_iter
+                    status = response.status
+                except AttributeError:
+                    raise ValueError(
+                        'Non-response object returned from view named %s '
+                        '(and no renderer): %r' % (view_name, response))
 
-            # process the response
-
-            if request.response_callbacks:
-                request._process_response_callbacks(response)
-
-            has_listeners and registry.notify(NewResponse(request, response))
-
-            try:
-                headers = response.headerlist
-                app_iter = response.app_iter
-                status = response.status
-            except AttributeError:
-                raise ValueError(
-                    'Non-response object returned from view named %s '
-                    '(and no renderer): %r' % (view_name, response))
+            finally:
+                if request is not None and request.finished_callbacks:
+                    request._process_finished_callbacks()
 
             start_response(status, headers)
             return app_iter
-
+            
         finally:
-            # post-response cleanup
-            try:
-                if request is not None and request.finished_callbacks:
-                    request._process_finished_callbacks()
-            finally:
-                manager.pop()
+            manager.pop()
+            
+
+
+
 

@@ -496,9 +496,9 @@ value of ``None``.
 
 Response callbacks are called in the order they're added
 (first-to-most-recently-added).  All response callbacks are called
-*before* the :class:`repoze.bfg.interfaces.INewResponse` event is
-sent.  Errors raised by response callbacks are not handled specially.
-They will be propagated to the caller of the :mod:`repoze.bfg` router
+*after* the :class:`repoze.bfg.interfaces.INewResponse` event is sent.
+Errors raised by response callbacks are not handled specially.  They
+will be propagated to the caller of the :mod:`repoze.bfg` router
 application.
 
 A response callback has a lifetime of a *single* request.  If you want
