@@ -26,11 +26,11 @@ processing?
 
 #. A :term:`request` object is created based on the WSGI environment.
 
-#. The :term:`registry` associated with the application and the
-   :term:`request` object created in the last step are pushed on to the
-   :term:`thread local` stack that :mod:`repoze.bfg` uses to allow the
-   functions named :func:`repoze.bfg.threadlocal.get_current_request`
-   and :func:`repoze.bfg.threadlocal.get_current_registry` to work.
+#. The :term:`application registry` and the :term:`request` object
+   created in the last step are pushed on to the :term:`thread local`
+   stack that :mod:`repoze.bfg` uses to allow the functions named
+   :func:`repoze.bfg.threadlocal.get_current_request` and
+   :func:`repoze.bfg.threadlocal.get_current_registry` to work.
 
 #. A :class:`repoze.bfg.interfaces.INewRequest` :term:`event` is sent
    to any subscribers.
