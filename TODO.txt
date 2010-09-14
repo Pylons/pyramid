@@ -62,7 +62,3 @@
 - Change "Cleaning up After a Request" in the urldispatch chapter to
   use ``request.add_response_callback``.
 
-- See about pylons.url.route_url and how we can move some stuff into
-  BFG to make it shorter.
-
-- Make sure auth tkt cookie reissue still works (imperatively).
