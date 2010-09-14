@@ -806,6 +806,20 @@ strings.  The values will be Unicode objects.
    If no route URL pattern matches, no ``matchdict`` is attached to
    the request.
 
+.. index::
+   single: matched_route
+
+The Matched Route
+~~~~~~~~~~~~~~~~~
+
+When the URL pattern associated with a particular route configuration
+is matched by a request, an object named ``matched_route`` is added as
+an attribute of the :term:`request` object.  Thus,
+``request.matched_route`` will be an object implementing the
+:class:`repoze.bfg.interfaces.IRoute` interface which matched the
+request.  The most useful attribute of the route object is ``name``,
+which is the name of the route that matched.
+
 Routing Examples
 ----------------
 

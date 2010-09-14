@@ -1,5 +1,5 @@
-Next release
-============
+1.3a13 (2010-09-14)
+===================
 
 Bug Fixes
 ---------
@@ -119,6 +119,9 @@ Documentation
   finished and response callback steps.
 
 - New interface in interfaces API documentation: ``IRoutePregenerator``.
+
+- Added a "The Matched Route" section to the URL Dispatch narrative
+  docs chapter, detailing the ``matched_route`` attribute.
 
 1.3a12 (2010-09-08)
 ===================

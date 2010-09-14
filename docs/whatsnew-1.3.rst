@@ -361,6 +361,50 @@ Minor Feature Additions
 - The ``routesalchemy`` paster template has been updated to use
   ``pattern`` in its route declarations rather than ``path``.
 
+- In support of making it easier to configure applications which are
+  "secure by default", a default permission feature was added.  If
+  supplied, the default permission is used as the permission string to
+  all view registrations which don't otherwise name a permission.
+  These APIs are in support of that:
+
+  - A new constructor argument was added to
+    :mod:`repoze.bfg.configuration.Configurator`:
+    ``default_permission``.
+
+  - A new method was added:
+    :meth:`repoze.bfg.configuration.Configurator.set_default_permission`.
+
+  - A new ZCML directive was added: :ref:`default_permission_directive`.
+
+- Add a new request API:
+  :meth:`repoze.bfg.request.Request.add_finished_callback`.  Finished
+  callbacks are called by the router unconditionally near the very end
+  of request processing.  See the :ref:`using_finished_callbacks` for
+  more information.
+
+- A ``matched_route`` attribute is now added to the :term:`request`
+  object when a route has matched.  Its value is the :term:`route`
+  object that matched (see :class:`repoze.bfg.interfaces.IRoute` for
+  the API of a route object).
+
+- The ``exception`` attribute of the :term:`request` is now set
+  slightly earlier and in a slightly different set of scenarios by the
+  router, for benefit of "finished callbacks" and "response
+  callbacks".  In previous versions, the ``exception`` attribute of
+  the request was not set at all if an exception view was not found.
+  In this version, the ``request.exception`` attribute is set
+  immediately when an exception is caught by the router, even if an
+  exception view could not be found.
+
+- The :meth:`repoze.bfg.configuration.Configurator.add_route` method
+  now accepts a ``pregenerator`` argument.  The pregenerator for the
+  resulting route is called by :func:`repoze.bfg.url.route_url` in
+  order to adjust the set of arguments passed to it by the user for
+  special purposes, such as Pylons 'subdomain' support.  It will
+  influence the URL returned by ``route_url``.  See
+  :class:`repoze.bfg.interfaces.IRoutePregenerator` for more
+  information.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -486,6 +530,19 @@ Backwards Incompatibilities
   renderer) is not a "real" response (e.g. if it does not have
   ``.status``, ``.headerlist`` and ``.app_iter`` attribtues).
 
+- The router no longer sets the value ``wsgiorg.routing_args`` into
+  the environ when a route matches. The value used to be something
+  like ``((), matchdict)``.  This functionality was only ever
+  obliquely referred to in change logs; it was never documented as an
+  API.
+
+- The ``exception`` attribute of the request now defaults to ``None``.
+  In prior versions, the ``request.exception`` attribute did not exist
+  if an exception was not raised by user code during request
+  processing; it only began existence once an exception view was
+  found.
+
+
 Deprecations and Behavior Differences
 -------------------------------------
 
@@ -521,6 +578,26 @@ Deprecations and Behavior Differences
 
   In general, to perform template-related functions, one should now
   use the various methods in the :mod:`repoze.bfg.renderers` module.
+
+- The ``repoze.bfg.interfaces.IWSGIApplicationCreatedEvent`` event
+  interface was renamed to
+  :class:`repoze.bfg.interfaces.IApplicationCreated`.  Likewise, the
+  ``repoze.bfg.events.WSGIApplicationCreatedEvent`` class was renamed
+  to :class:`repoze.bfg.events.ApplicationCreated`.  The older aliases
+  will continue to work indefinitely.
+
+- The ``repoze.bfg.interfaces.IAfterTraversal`` event interface was
+  renamed to :class:`repoze.bfg.interfaces.IContextFound`.  Likewise,
+  the ``repoze.bfg.events.AfterTraversal`` class was renamed to
+  :class:`repoze.bfg.events.ContextFound`.  The older aliases will
+  continue to work indefinitely.
+
+- References to the WSGI environment values ``bfg.routes.matchdict``
+  and ``bfg.routes.route`` were removed from documentation.  These
+  will stick around internally for several more releases, but it is
+  ``request.matchdict`` and ``request.matched_route`` are now the
+  "official" way to obtain the matchdict and the route object which
+  resulted in the match.
 
 Dependency Changes
 ------------------
@@ -628,6 +705,37 @@ Documentation Enhancements
 - The :ref:`urldispatch_chapter` chapter now refers to the
   :mod:`repoze.bfg.interfaces` chapter to explain the API of an
   :class:`repoze.bfg.interfaces.IRoute` object.
+
+- Added documentation for the :ref:`default_permission_directive` ZCML
+  directive.
+
+- Added documentation for the ``default_permission`` parameter of the
+  :class:`repoze.bfg.configuration.Configurator` constructor and the
+  :meth:`repoze.bfg.configuration.Configurator.set_default_permission``
+  method.
+
+- Added a new section to the :ref:`security_chapter` named
+  :ref:`setting_a_default_permission`.
+
+- Document ``renderer_globals_factory`` and ``request_factory``
+  arguments to the :class:`repoze.bfg.configuration.Configurator`
+  constructor.
+
+- Added two sections to the "Hooks" chapter of the documentation:
+  :ref:`using_response_callbacks` and :ref:`using_finished_callbacks`.
+
+- Added documentation of the ``request.exception`` attribute to the
+  :class:`repoze.bfg.request.Request` API documentation.
+
+- The :ref:`router_chapter` narrative chapter has been updated to note
+  finished and response callback steps.
+
+- New interface in interfaces API documentation:
+  :class:`repoze.bfg.interfaces.IRoutePregenerator`.
+
+- Added a "The Matched Route" section to the
+  :ref:`urldispatch_chapter` narrative docs chapter, detailing the
+  ``matched_route`` attribute.
 
 Licensing Changes
 -----------------
