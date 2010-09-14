@@ -2024,6 +2024,11 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.add_route, 'name')
 
+    def test_add_route_with_pregenerator(self):
+        config = self._makeOne()
+        route = config.add_route('name', 'pattern', pregenerator='123')
+        self.assertEqual(route.pregenerator, '123')
+
     def test__override_not_yet_registered(self):
         from repoze.bfg.interfaces import IPackageOverrides
         package = DummyPackage('package')

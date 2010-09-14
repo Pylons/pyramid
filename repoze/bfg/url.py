@@ -101,12 +101,23 @@ def route_url(route_name, request, *elements, **kw):
     This function raises a :exc:`KeyError` if the URL cannot be
     generated due to missing replacement names.  Extra replacement
     names are ignored.
+
+    If the route object which matches the ``route_name`` argument has
+    a :term:`pregenerator`, the ``*elements`` and ``**kw`` arguments
+    arguments passed to this function might be augmented or changed.
     """
     try:
         reg = request.registry
     except AttributeError:
         reg = get_current_registry() # b/c
     mapper = reg.getUtility(IRoutesMapper)
+    route = mapper.get_route(route_name)
+
+    if route is None:
+        raise KeyError('No such route named %s' % route_name)
+
+    if route.pregenerator:
+        elements, kw = route.pregenerator(request, elements, kw)
 
     anchor = ''
     qs = ''
@@ -124,7 +135,7 @@ def route_url(route_name, request, *elements, **kw):
     if '_app_url' in kw:
         app_url = kw.pop('_app_url')
 
-    path = mapper.generate(route_name, kw) # raises KeyError if generate fails
+    path = route.generate(kw) # raises KeyError if generate fails
 
     if elements:
         suffix = _join_elements(elements)

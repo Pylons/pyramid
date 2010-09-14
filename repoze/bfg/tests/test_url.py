@@ -150,7 +150,7 @@ class TestRouteUrl(unittest.TestCase):
     def test_with_elements(self):
         from repoze.bfg.interfaces import IRoutesMapper
         request = _makeRequest()
-        mapper = DummyRoutesMapper(result='/1/2/3')
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = self._callFUT('flub', request, 'extra1', 'extra2',
                                a=1, b=2, c=3, _query={'a':1},
@@ -161,7 +161,7 @@ class TestRouteUrl(unittest.TestCase):
     def test_no_elements(self):
         from repoze.bfg.interfaces import IRoutesMapper
         request = _makeRequest()
-        mapper = DummyRoutesMapper(result='/1/2/3')
+        mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = self._callFUT('flub', request, a=1, b=2, c=3, _query={'a':1},
                                _anchor=u"foo")
@@ -178,22 +178,36 @@ class TestRouteUrl(unittest.TestCase):
 
     def test_generate_doesnt_receive_query_or_anchor(self):
         from repoze.bfg.interfaces import IRoutesMapper
-        mapper = DummyRoutesMapper(result='')
+        route = DummyRoute(result='')
+        mapper = DummyRoutesMapper(route=route)
         from zope.component import getSiteManager
         sm = getSiteManager()
         sm.registerUtility(mapper, IRoutesMapper)
         request = DummyRequest()
         result = self._callFUT('flub', request, _query=dict(name='some_name'))
-        self.assertEqual(mapper.kw, {}) # shouldnt have anchor/query
+        self.assertEqual(route.kw, {}) # shouldnt have anchor/query
         self.assertEqual(result, 'http://example.com:5432?name=some_name')
 
     def test_with_app_url(self):
         from repoze.bfg.interfaces import IRoutesMapper
         request = _makeRequest()
-        mapper = DummyRoutesMapper(result='/1/2/3')
+        mapper = DummyRoutesMapper(route=DummyRoute(result='/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
         result = self._callFUT('flub', request, _app_url='http://example2.com')
         self.assertEqual(result,  'http://example2.com/1/2/3')
+
+    def test_with_pregenerator(self):
+        from repoze.bfg.interfaces import IRoutesMapper
+        request = _makeRequest()
+        route = DummyRoute(result='/1/2/3')
+        def pregenerator(request, elements, kw):
+            return ('a',), {'_app_url':'http://example2.com'}
+        route.pregenerator = pregenerator
+        mapper = DummyRoutesMapper(route=route)
+        request.registry.registerUtility(mapper, IRoutesMapper)
+        result = self._callFUT('flub', request)
+        self.assertEqual(result,  'http://example2.com/1/2/3/a')
+        self.assertEqual(route.kw, {}) # shouldnt have anchor/query
 
 class TestStaticUrl(unittest.TestCase):
     def setUp(self):
@@ -259,14 +273,19 @@ class DummyRequest:
 
 class DummyRoutesMapper:
     raise_exc = None
-    def __init__(self, result='/1/2/3', raise_exc=False, routes=()):
-        self.result = result
-        self.routes = routes
+    def __init__(self, route=None, raise_exc=False):
+        self.route = route
 
-    def generate(self, *route_args, **kw):
+    def get_route(self, route_name):
+        return self.route
+
+class DummyRoute:
+    pregenerator = None
+    def __init__(self, result='/1/2/3'):
+        self.result = result
+
+    def generate(self, kw):
         self.kw = kw
-        if self.raise_exc:
-            raise self.raise_exc
         return self.result
     
 def _makeRequest(environ=None):
@@ -274,7 +293,6 @@ def _makeRequest(environ=None):
     request = DummyRequest(environ)
     request.registry = Registry()
     return request
-
         
 class DummyStaticURLInfo:
     def __init__(self, result):

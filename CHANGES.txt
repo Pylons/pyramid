@@ -45,6 +45,14 @@ Features
   is caught by the router, even if an exception view could not be
   found.
 
+- The ``add_route`` method of a Configurator now accepts a
+  ``pregenerator`` argument.  The pregenerator for the resulting route
+  is called by ``route_url`` in order to adjust the set of arguments
+  passed to it by the user for special purposes, such as Pylons
+  'subdomain' support.  It will influence the URL returned by
+  ``route_url``.  See the ``repoze.bfg.interfaces.IRoutePregenerator``
+  interface for more information.
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -109,6 +117,8 @@ Documentation
 
 - The "Request Processing" narrative chapter has been updated to note
   finished and response callback steps.
+
+- New interface in interfaces API documentation: ``IRoutePregenerator``.
 
 1.3a12 (2010-09-08)
 ===================

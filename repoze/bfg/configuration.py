@@ -1072,6 +1072,7 @@ class Configurator(object):
                   view_attr=None,
                   use_global_views=False,
                   path=None,
+                  pregenerator=None,
                   _info=u''):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
@@ -1142,6 +1143,19 @@ class Configurator(object):
           Note that the ``traverse`` argument to ``add_route`` is
           ignored when attached to a route that has a ``*traverse``
           remainder marker in its pattern.
+
+          .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
+
+        pregenerator
+
+           This option should be a callable object that implements the
+           :class:`repoze.bfg.interfaces.IRoutePregenerator`
+           interface.  A :term:`pregenerator` is a callable called by
+           the :mod:`repoze.bfg.url.route_url` function to augment or
+           replace the arguments it is passed when generating a URL
+           for the route.  This is a feature not often used directly
+           by applications, it is meant to be hooked by frameworks
+           that use :mod:`repoze.bfg` as a base.
 
           .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
 
@@ -1391,7 +1405,8 @@ class Configurator(object):
             pattern = path
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
-        return mapper.connect(name, pattern, factory, predicates=predicates)
+        return mapper.connect(name, pattern, factory, predicates=predicates,
+                              pregenerator=pregenerator)
 
     def get_routes_mapper(self):
         """ Return the :term:`routes mapper` object associated with

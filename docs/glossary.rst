@@ -784,3 +784,12 @@ Glossary
       A user-defined callback executed by the :term:`router`
       unconditionally at the very end of request processing .  See
       :ref:`using_finished_callbacks`.
+
+   pregenerator
+      A pregenerator is a function associated by a developer with a
+      :term:`route`.  It is called by :func:`repoze.bfg.url.route_url`
+      in order to adjust the set of arguments passed to it by the user
+      for special purposes.  It will influence the URL returned by
+      ``route_url``.  See
+      :class:`repoze.bfg.interfaces.IRoutePregenerator` for more
+      information.

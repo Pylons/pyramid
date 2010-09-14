@@ -255,6 +255,31 @@ class IDebugLogger(Interface):
 
 ILogger = IDebugLogger # b/c
 
+class IRoutePregenerator(Interface):
+    def __call__(request, elements, kw):
+        """ A pregenerator is a function associated by a developer
+        with a :term:`route`. The pregenerator for a route is called
+        by :func:`repoze.bfg.url.route_url` in order to adjust the set
+        of arguments passed to it by the user for special purposes,
+        such as Pylons 'subdomain' support.  It will influence the URL
+        returned by ``route_url``.
+
+        A pregenerator should return a two-tuple of ``(elements, kw)``
+        after examining the originals passed to this function, which
+        are the arguments ``(request, elements, kw)``.  The simplest
+        pregenerator is::
+
+            def pregenerator(request, elements, kw):
+                return elements, kw
+
+        You can employ a pregenerator by passing a ``pregenerator``
+        argument to the
+        :meth:`repoze.bfg.configuration.Configurator.add_route`
+        function.
+
+        .. note:: This interface is new as of :mod:`repoze.bfg` 1.3.
+        """
+
 class IRoute(Interface):
     """ Interface representing the type of object returned from
     ``IRoutesMapper.get_route``"""
@@ -267,6 +292,9 @@ class IRoute(Interface):
         'A sequence of :term:`route predicate` objects used to '
         'determine if a request matches this route or not or not after '
         'basic pattern matching has been completed.')
+    pregenerator = Attribute('This attribute should either be ``None`` or '
+                             'a callable object implementing the '
+                             '``IRoutePregenerator`` interface')
     def match(path):
         """
         If the ``path`` passed to this function can be matched by the

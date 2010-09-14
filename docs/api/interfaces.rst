@@ -23,4 +23,5 @@ Other Interfaces
 
   .. autointerface:: IRoute
 
+  .. autointerface:: IRoutePregenerator
 

@@ -16,13 +16,15 @@ _marker = object()
 
 class Route(object):
     implements(IRoute)
-    def __init__(self, name, pattern, factory=None, predicates=()):
+    def __init__(self, name, pattern, factory=None, predicates=(),
+                 pregenerator=None):
         self.pattern = pattern
         self.path = pattern # indefinite b/w compat, not in interface
         self.match, self.generate = _compile_route(pattern)
         self.name = name
         self.factory = factory
         self.predicates = predicates
+        self.pregenerator = pregenerator
 
 class RoutesMapper(object):
     implements(IRoutesMapper)
@@ -39,11 +41,12 @@ class RoutesMapper(object):
     def get_route(self, name):
         return self.routes.get(name)
 
-    def connect(self, name, pattern, factory=None, predicates=()):
+    def connect(self, name, pattern, factory=None, predicates=(),
+                pregenerator=None):
         if name in self.routes:
             oldroute = self.routes[name]
             self.routelist.remove(oldroute)
-        route = Route(name, pattern, factory, predicates)
+        route = Route(name, pattern, factory, predicates, pregenerator)
         self.routelist.append(route)
         self.routes[name] = route
         return route
