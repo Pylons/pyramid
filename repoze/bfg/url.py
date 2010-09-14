@@ -116,7 +116,7 @@ def route_url(route_name, request, *elements, **kw):
     if route is None:
         raise KeyError('No such route named %s' % route_name)
 
-    if route.pregenerator:
+    if route.pregenerator is not None:
         elements, kw = route.pregenerator(request, elements, kw)
 
     anchor = ''
