@@ -1,3 +1,12 @@
+Next version
+============
+
+- A prior changelog entry asserted that the ``INewResponse`` event was
+  not sent to listeners if the response was not "valid" (if a view or
+  renderer returned a response object that did not have a
+  status/headers/app_iter).  This is not true in this release, nor was
+  it true in 1.3a13.
+
 1.3a13 (2010-09-14)
 ===================
 

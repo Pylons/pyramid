@@ -233,8 +233,8 @@ Minor Feature Additions
 - New API class:
   :class:`repoze.bfg.view.AppendSlashNotFoundViewFactory`.
 
-  There can only be one :term:`Not Found view` in any :mod:`repoze.bfg
-  application.  Even if you use
+  There can only be one :term:`Not Found view` in any
+  :mod:`repoze.bfg` application.  Even if you use
   :func:`repoze.bfg.view.append_slash_notfound_view` as the Not Found
   view, :mod:`repoze.bfg` still must generate a ``404 Not Found``
   response when it cannot redirect to a slash-appended URL; this not
@@ -290,9 +290,9 @@ Minor Feature Additions
   specification` string into an absolute version.
 
 - A new :meth:`repoze.bfg.request.Request.add_response_callback` API
-  has been added.  This method is documented in the new
-  :mod:`repoze.bfg.request` API chapter.  It can be used to influence
-  response values before a concrete response object has been created.
+  has been added.  It can be used to influence response values before
+  a concrete response object has been created.  See the
+  :ref:`using_response_callbacks` for more information.
 
 - The :class:`repoze.bfg.interfaces.INewResponse` interface now
   includes a ``request`` attribute; as a result, a handler for
@@ -368,7 +368,7 @@ Minor Feature Additions
   These APIs are in support of that:
 
   - A new constructor argument was added to
-    :mod:`repoze.bfg.configuration.Configurator`:
+    :class:`repoze.bfg.configuration.Configurator`:
     ``default_permission``.
 
   - A new method was added:
@@ -524,11 +524,6 @@ Backwards Incompatibilities
   never match the empty string.  This, however, means that in certain
   circumstances, a routing match which your application inadvertently
   depended upon may no longer happen.
-
-- The :class:`repoze.bfg.interfaces.INewResponse` event is now not
-  sent to listeners if the response returned by view code (or a
-  renderer) is not a "real" response (e.g. if it does not have
-  ``.status``, ``.headerlist`` and ``.app_iter`` attribtues).
 
 - The router no longer sets the value ``wsgiorg.routing_args`` into
   the environ when a route matches. The value used to be something
