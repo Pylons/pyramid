@@ -454,7 +454,7 @@ def default_exceptionresponse_view(context, request):
         # backwards compat for an exception response view registered via
         # config.set_notfound_view or config.set_forbidden_view
         # instead of as a proper exception view
-        context = getattr(request, 'exception', context)
+        context = request.exception or context
     return context
 
 class AppendSlashNotFoundViewFactory(object):
@@ -502,7 +502,7 @@ class AppendSlashNotFoundViewFactory(object):
         if not isinstance(context, Exception):
             # backwards compat for an append_notslash_view registered via
             # config.set_notfound_view instead of as a proper exception view
-            context = getattr(request, 'exception', None)
+            context = request.exception
         path = request.environ.get('PATH_INFO', '/')
         registry = request.registry
         mapper = registry.queryUtility(IRoutesMapper)

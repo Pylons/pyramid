@@ -1,6 +1,16 @@
 Next version
 ============
 
+Bug Fixes
+---------
+
+- If an exception view was registered through the legacy
+  ``set_notfound_view`` or ``set_forbidden_view`` APIs, the context
+  sent to the view was incorrect (could be ``None`` inappropriately).
+
+Errata
+------
+
 - A prior changelog entry asserted that the ``INewResponse`` event was
   not sent to listeners if the response was not "valid" (if a view or
   renderer returned a response object that did not have a

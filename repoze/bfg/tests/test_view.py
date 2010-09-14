@@ -450,7 +450,7 @@ def make_view(response):
     return view
 
 class DummyRequest:
-    pass
+    exception = None
 
 class DummyResponse:
     status = '200 OK'
