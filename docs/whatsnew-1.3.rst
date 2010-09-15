@@ -405,6 +405,8 @@ Minor Feature Additions
   :class:`repoze.bfg.interfaces.IRoutePregenerator` for more
   information.
 
+- Compatibility with WebOb 1.0 (now requires WebOb >= 1.0).
+
 Backwards Incompatibilities
 ---------------------------
 
@@ -537,6 +539,17 @@ Backwards Incompatibilities
   processing; it only began existence once an exception view was
   found.
 
+- Due to changes introduced WebOb 1.0, the
+  ``repoze.bfg.request.make_request_ascii`` event subscriber no longer
+  worked, so it has been removed.  This subscriber was meant to be used
+  in a deployment so that code written before BFG 0.7.0 could run
+  unchanged.  At this point, such code will need to be rewritten to
+  expect Unicode from ``request.GET``, ``request.POST`` and
+  ``request.params`` or it will need to be changed to use
+  ``request.str_POST``, ``request.str_GET`` and/or
+  ``request.str_params`` instead of the non-``str`` versions of same,
+  as the non-``str`` versions of the same APIs always now perform
+  decoding to Unicode.
 
 Deprecations and Behavior Differences
 -------------------------------------
