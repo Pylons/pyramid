@@ -6,15 +6,6 @@ from webob import Request as WebobRequest
 
 from repoze.bfg.interfaces import IRequest
 
-def make_request_ascii(event):
-    """ An function that is useful as a
-    :class:`repoze.bfg.interfaces.INewRequest` :term:`event`
-    :term:`subscriber` that causes the request charset to be ASCII so
-    code written before :mod:`repoze.bfg` 0.7.0 can continue to work
-    without a change"""
-    request = event.request
-    request.default_charset = None
-
 class Request(WebobRequest):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
@@ -41,7 +32,6 @@ class Request(WebobRequest):
     response_callbacks = ()
     finished_callbacks = ()
     exception = None
-    default_charset = 'utf-8'
 
     def add_response_callback(self, callback):
         """

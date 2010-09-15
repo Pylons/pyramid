@@ -1,16 +1,5 @@
 import unittest
 
-class TestMakeRequestASCII(unittest.TestCase):
-    def _callFUT(self, event):
-        from repoze.bfg.request import make_request_ascii
-        return make_request_ascii(event)
-
-    def test_it(self):
-        request = DummyRequest()
-        event = DummyNewRequestEvent(request)
-        self._callFUT(event)
-        self.assertEqual(request.default_charset, None)
-
 class TestRequest(unittest.TestCase):
     def _makeOne(self, environ):
         return self._getTargetClass()(environ)
@@ -21,7 +10,7 @@ class TestRequest(unittest.TestCase):
 
     def test_charset_defaults_to_utf8(self):
         r = self._makeOne({'PATH_INFO':'/'})
-        self.assertEqual(r.charset, 'utf-8')
+        self.assertEqual(r.charset, 'UTF-8')
 
     def test_exception_defaults_to_None(self):
         r = self._makeOne({'PATH_INFO':'/'})
@@ -33,16 +22,8 @@ class TestRequest(unittest.TestCase):
             'QUERY_STRING':'la=La%20Pe%C3%B1a'
             }
         request = self._makeOne(environ)
+        request.charset = None
         self.assertEqual(request.GET['la'], u'La Pe\xf1a')
-
-    def test_params_bystring_when_default_charset_is_None(self):
-        environ = {
-            'PATH_INFO':'/',
-            'QUERY_STRING':'la=La%20Pe%C3%B1a'
-            }
-        request = self._makeOne(environ)
-        request.default_charset = None
-        self.assertEqual(request.GET['la'], 'La Pe\xc3\xb1a')
 
     def test_class_implements(self):
         from repoze.bfg.interfaces import IRequest

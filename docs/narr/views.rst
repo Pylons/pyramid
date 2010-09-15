@@ -1011,7 +1011,7 @@ decode already-decoded (``unicode``) values obtained from
        firstname = request.params['firstname'].decode('utf-8')
        lastname = request.params['lastname'].decode('utf-8')
 
-For implicit decoding to work reliably, you must ensure that every
+For implicit decoding to work reliably, youshould ensure that every
 form you render that posts to a :mod:`repoze.bfg` view is rendered via
 a response that has a ``;charset=UTF-8`` in its ``Content-Type``
 header; or, as in the form above, with a ``meta http-equiv`` tag that
@@ -1041,25 +1041,16 @@ you for response content types that are textual (e.g. ``text/html``,
 ``application/xml``, etc) as it is rendered.  If you are using your
 own response object, you will need to ensure you do this yourself.
 
-To avoid implicit form submission value decoding, so that the values
-returned from ``request.params``, ``request.GET`` and ``request.POST``
-are returned as bytestrings rather than Unicode, add the following to
-your application's ``configure.zcml``::
-
-    <subscriber for="repoze.bfg.interfaces.INewRequest"
-                handler="repoze.bfg.request.make_request_ascii"/>
-
-You can then control form post data decoding "by hand" as necessary.
-For example, when this subscriber is active, the second example above
-will work unconditionally as long as you ensure that your forms are
-rendered in a request that has a ``;charset=utf-8`` stanza on its
-``Content-Type`` header.
-
-.. note:: The behavior that form values are decoded from UTF-8 to
-   Unicode implicitly was introduced in :mod:`repoze.bfg` 0.7.0.
-   Previous versions of :mod:`repoze.bfg` performed no implicit
-   decoding of form values (the default was to treat values as
-   bytestrings).
+.. note:: The behavior that form values are decoded to Unicode
+   implicitly when no content type header exists was introduced in
+   :mod:`repoze.bfg` 0.7.0.  Previous versions of :mod:`repoze.bfg`
+   performed no implicit decoding of form values: it returned the
+   values from ``request.GET``, ``request.POST`` and
+   ``request.params`` as bytestrings.  Code written before 0.7.0 that
+   depended on the values from ``request.params``, ``request.GET`` and
+   ``request.POST`` being returned as bytestrings must at this point
+   be rewritten to use ``request.str_params``, ``request.str_GET`` or
+   ``request.str_POST``, which indeed will return bytestrings.
 
 .. note:: Only the *values* of request params obtained via
    ``request.params``, ``request.GET`` or ``request.POST`` are decoded

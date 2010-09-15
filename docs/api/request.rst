@@ -88,6 +88,3 @@
      .. note:: The exception attribute is new in :mod:`repoze.bfg`
         1.3.
 
-.. autofunction:: make_request_ascii
-
-
