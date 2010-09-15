@@ -224,10 +224,6 @@ class DummyRequest:
     def add_response_callback(self, callback):
         self.response_callbacks = [callback]
 
-class DummyNewRequestEvent:
-    def __init__(self, request):
-        self.request = request
-        
 class DummyResponse:
     def __init__(self):
         self.headerlist = []
