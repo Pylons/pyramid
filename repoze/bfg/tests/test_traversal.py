@@ -50,6 +50,18 @@ class TraversalPathTests(unittest.TestCase):
         path = '/'.join([encoded, encoded])
         self.assertRaises(URLDecodeError, self._callFUT, path)
 
+    def test_unicode_highorder_chars(self):
+        path = u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'
+        self.assertEqual(self._callFUT(path), (u'\u6d41\u884c\u8d8b\u52bf',))
+
+    def test_unicode_simple(self):
+        path = u'/abc'
+        self.assertEqual(self._callFUT(path), (u'abc',))
+
+    def test_unicode_undecodeable_to_ascii(self):
+        path = unicode('/La Pe\xc3\xb1a', 'utf-8')
+        self.assertRaises(UnicodeEncodeError, self._callFUT, path)
+
 class ModelGraphTraverserTests(unittest.TestCase):
     def setUp(self):
         cleanUp()

@@ -371,14 +371,33 @@ def virtual_root(model, request):
 def traversal_path(path):
     """ Given a ``PATH_INFO`` string (slash-separated path segments),
     return a tuple representing that path which can be used to
-    traverse a graph.  The ``PATH_INFO`` is split on slashes, creating
-    a list of segments.  Each segment is URL-unquoted, and decoded
+    traverse a graph.
+
+    The ``PATH_INFO`` is split on slashes, creating a list of
+    segments.  Each segment is URL-unquoted, and subsequently decoded
     into Unicode. Each segment is assumed to be encoded using the
     UTF-8 encoding (or a subset, such as ASCII); a
     :exc:`repoze.bfg.exceptions.URLDecodeError` is raised if a segment
     cannot be decoded.  If a segment name is empty or if it is ``.``,
     it is ignored.  If a segment name is ``..``, the previous segment
-    is deleted, and the ``..`` is ignored.  Examples:
+    is deleted, and the ``..`` is ignored.
+
+    If this function is passed a Unicode object instead of a string,
+    that Unicode object *must* directly encodeable to ASCII.  For
+    example, u'/foo' will work but u'/<unprintable unicode>' (a
+    Unicode object with characters that cannot be encoded to ascii)
+    will not.
+
+    .. note: New in version 1.3, this API eagerly attempts to encode a
+       Unicode ``path`` into ASCII before attempting to split it and
+       decode its segments.  This is for convenience.  In version 1.2
+       and prior, if the path was Unicode, an inappropriate call to
+       the ``decode()`` method of a Unicode path segment could cause a
+       ``UnicodeDecodeError`` to occur even if the Unicode
+       representation of the path contained no 'high order'
+       characters.
+
+    Examples:
 
     ``/``
 
@@ -425,6 +444,8 @@ def traversal_path(path):
               their own traversal machinery, as opposed to users
               writing applications in :mod:`repoze.bfg`.
     """
+    if isinstance(path, unicode):
+        path = path.encode('ascii')
     path = path.strip('/')
     clean = []
     for segment in path.split('/'):
