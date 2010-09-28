@@ -4,6 +4,7 @@ from zope.interface import implements
 
 try:
     from chameleon.zpt.template import PageTemplateFile
+    PageTemplateFile # prevent pyflakes complaining about a redefinition below
 except ImportError: # pragma: no cover
     exc_class, exc, tb = sys.exc_info()
     # Chameleon doesn't work on non-CPython platforms

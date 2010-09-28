@@ -4,6 +4,7 @@ from zope.interface import implements
 
 try:
     from chameleon.core.template import TemplateFile
+    TemplateFile # prevent pyflakes complaining about a redefinition below
 except ImportError: # pragma: no cover
     exc_class, exc, tb = sys.exc_info()
     # Chameleon doesn't work on non-CPython platforms
@@ -13,6 +14,7 @@ except ImportError: # pragma: no cover
 
 try:
     from chameleon.zpt.language import Parser
+    Parser # prevent pyflakes complaining about a redefinition below
 except ImportError: # pragma: no cover
     # Chameleon doesn't work on non-CPython platforms
     class Parser(object):
