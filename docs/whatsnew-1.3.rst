@@ -407,6 +407,24 @@ Minor Feature Additions
 
 - Compatibility with WebOb 1.0 (now requires WebOb >= 1.0).
 
+- The :meth:`repoze.bfg.traversal.traversal_path` API now eagerly
+  attempts to encode a Unicode ``path`` into ASCII before attempting
+  to split it and decode its segments.  This is for convenience,
+  effectively to allow a (stored-as-Unicode-in-a-database, or
+  retrieved-as-Unicode-from-a-request-parameter) Unicode path to be
+  passed to :meth:`repoze.bfg.traversal.find_model`, which eventually
+  internally uses the ``traversal_path`` function under the hood.  In
+  version 1.2 and prior, if the ``path`` was Unicode, that Unicode was
+  split on slashes and each resulting segment value was Unicode.  An
+  inappropriate call to the ``decode()`` method of a resulting Unicode
+  path segment could cause a ``UnicodeDecodeError`` to occur even if
+  the Unicode representation of the path contained no 'high order'
+  characters (it effectively did a "double decode").  By converting
+  the Unicode path argument to ASCII before we attempt to decode and
+  split, genuine errors will occur in a more obvious place while also
+  allowing us to handle (for convenience) the case that it's a Unicode
+  representation formed entirely from ASCII-compatible characters.
+
 Backwards Incompatibilities
 ---------------------------
 
