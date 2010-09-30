@@ -1534,7 +1534,7 @@ class Configurator(object):
            see how a forbidden view should be registered in new
            projects.
 
-        ..note:: For backwards compatibility with :mod:`repoze.bfg`
+        .. note:: For backwards compatibility with :mod:`repoze.bfg`
            1.2, unlike an 'exception view' as described in
            :ref:`exception_views`, a ``context, request`` view
            callable registered using this API should not expect to
