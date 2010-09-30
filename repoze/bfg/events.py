@@ -116,7 +116,6 @@ class NewResponse(object):
         self.response = response
 
 class ContextFound(object):
-    implements(IContextFound)
     """ An instance of this class is emitted as an :term:`event` after
     the :mod:`repoze.bfg` :term:`router` finds a :term:`context`
     object (after it performs traversal) but before any view code is
@@ -135,6 +134,7 @@ class ContextFound(object):
        purposes, this event may also be imported as
        :class:`repoze.bfg.events.AfterTraversal`.
     """
+    implements(IContextFound)
     def __init__(self, request):
         self.request = request
 
