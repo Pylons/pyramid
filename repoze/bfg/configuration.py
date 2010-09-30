@@ -1664,9 +1664,9 @@ class Configurator(object):
 
         .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
 
-        .. note:: Using the :meth:``locale_negotiator`` argument to
-           the :class:`repoze.bfg.configuration.Configurator`
-           constructor can be used to achieve the same purpose.
+        .. note:: Using the ``locale_negotiator`` argument to the
+           :class:`repoze.bfg.configuration.Configurator` constructor
+           can be used to achieve the same purpose.
         """
         negotiator = self.maybe_dotted(negotiator)
         self.registry.registerUtility(negotiator, ILocaleNegotiator)
