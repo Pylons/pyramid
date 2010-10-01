@@ -1632,13 +1632,17 @@ class Configurator(object):
         self.registry.registerUtility(factory, IRequestFactory)
 
     def set_renderer_globals_factory(self, factory):
-        """ The object passed as ``factory`` should be an object (or a
-        :term:`dotted Python name` which refers to an object) that
+        """ The object passed as ``factory`` should be an callable (or
+        a :term:`dotted Python name` which refers to an callable) that
         will be used by the :mod:`repoze.bfg` rendering machinery as a
         renderers global factory (see :ref:`adding_renderer_globals`).
-        The factory must return a dictionary of items that will be
-        merged intto the *system* dictionary passed in to every
-        renderer used by the application.
+
+        The ``factory`` callable must accept a single argument named
+        ``system`` (which will be a dictionary) and it must return a
+        dictionary.  When an application uses a renderer, the
+        factory's return dictionary will be merged into the ``system``
+        dictionary, and therefore will be made available to the code
+        which uses the renderer.
 
         .. note:: Using the :meth:`renderer_globals_factory`
            argument to the
