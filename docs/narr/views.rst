@@ -225,8 +225,13 @@ a :class:`webob.Response` object instance directly.  For example:
    def view(request):
        return Response('OK')
 
-But a view can instead return any object that has the following
-attributes:
+You don't need to always use :class:`webob.Response` to represent a
+response.  :term:`WebOb` provides a range of different "exception"
+classes which can act as response objects too.  For example, an
+instance of the class :class:`webob.exc.HTTPFound` is also a valid
+response object (see :ref:`http_redirect`).  A view can actually any
+object that has the following attributes (these attributes form the
+notional "WebOb Response interface"):
 
 status
   The HTTP status code (including the name) for the response as a string.
@@ -243,16 +248,10 @@ app_iter
   world!</body></html>']`` or it can be a file-like object, or any
   other sort of iterable.
 
-You don't need to always use :class:`webob.Response` to represent a
-response.  :term:`WebOb` provides a range of different "exception"
-classes which can act as response objects too.  For example, an
-instance of the class ``webob.exc.HTTPFound`` is also a valid response
-object (see :ref:`http_redirect`).
-
 Furthermore, a view needn't *always* return a Response object.  If a
-view happens to return something which does not implement the Response
-interface, :mod:`repoze.bfg` will attempt to use a :term:`renderer` to
-construct a response.  For example:
+view happens to return something which does not implement the WebOb
+Response interface, :mod:`repoze.bfg` will attempt to use a
+:term:`renderer` to construct a response.  For example:
 
 .. code-block:: python
    :linenos:
@@ -269,14 +268,14 @@ dictionary does not implement the :term:`WebOb` response interface, so
 without special configuration, this example would fail.  However,
 since a ``renderer`` is associated with the view callable through its
 view configuration (in this case, using a ``renderer`` argument passed
-to :func:`repoze.bfg.bfg_view`), the renderer will attempt to convert
-the result of the view to a response on the developer's behalf.  Of
-course, if no renderer is associated with a view's configuration,
-returning anything except an object which implements the WebOb
-Response interface will result in an error.  And, if a renderer *is*
-used, whatever is returned by the view must be compatible with the
-particular kind of renderer used, or an error may occur during view
-invocation.
+to :func:`repoze.bfg.bfg_view`), if the view does *not* return a
+Response object, the renderer will attempt to convert the result of
+the view to a response on the developer's behalf.  Of course, if no
+renderer is associated with a view's configuration, returning anything
+except an object which implements the WebOb Response interface will
+result in an error.  And, if a renderer *is* used, whatever is
+returned by the view must be compatible with the particular kind of
+renderer used, or an error may occur during view invocation.
 
 Various types of renderers exist, including serialization renderers
 and renderers which use templating systems.  See also
