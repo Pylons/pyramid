@@ -265,17 +265,21 @@ Response interface, :mod:`repoze.bfg` will attempt to use a
 
 The above example returns a *dictionary* from the view callable.  A
 dictionary does not implement the :term:`WebOb` response interface, so
-without special configuration, this example would fail.  However,
-since a ``renderer`` is associated with the view callable through its
-view configuration (in this case, using a ``renderer`` argument passed
-to :func:`repoze.bfg.bfg_view`), if the view does *not* return a
-Response object, the renderer will attempt to convert the result of
-the view to a response on the developer's behalf.  Of course, if no
-renderer is associated with a view's configuration, returning anything
-except an object which implements the WebOb Response interface will
-result in an error.  And, if a renderer *is* used, whatever is
-returned by the view must be compatible with the particular kind of
-renderer used, or an error may occur during view invocation.
+you might believe that this example would fail.  However, since a
+``renderer`` is associated with the view callable through its
+:term:`view configuration` (in this case, using a ``renderer``
+argument passed to :func:`repoze.bfg.view.bfg_view`), if the view does
+*not* return a Response object, the renderer will attempt to convert
+the result of the view to a response on the developer's behalf.  Of
+course, if no renderer is associated with a view's configuration,
+returning anything except an object which implements the WebOb
+Response interface will result in an error.  And, if a renderer *is*
+used, whatever is returned by the view must be compatible with the
+particular kind of renderer used, or an error may occur during view
+invocation.  One exception exists: it is *always* OK to return a WebOb
+Response object, even when a ``renderer`` is configured.  If a view
+callable returns a response object from a view that is configured with
+a renderer, the renderer is bypassed entirely.
 
 Various types of renderers exist, including serialization renderers
 and renderers which use templating systems.  See also
