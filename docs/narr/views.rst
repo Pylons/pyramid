@@ -214,12 +214,22 @@ View Callable Responses
 
 A view callable may always return an object that implements the
 :term:`WebOb` :term:`Response` interface.  The easiest way to return
-something that implements this interface is to return a
-:class:`webob.Response` object instance directly.  But any object that
-has the following attributes will work:
+something that implements the :term:`Response` interface is to return
+a :class:`webob.Response` object instance directly.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+
+   def view(request):
+       return Response('OK')
+
+But a view can instead return any object that has the following
+attributes:
 
 status
-  The HTTP status code (including the name) for the response.
+  The HTTP status code (including the name) for the response as a string.
   E.g. ``200 OK`` or ``401 Unauthorized``.
 
 headerlist
@@ -233,16 +243,50 @@ app_iter
   world!</body></html>']`` or it can be a file-like object, or any
   other sort of iterable.
 
-If a view happens to return something to the :mod:`repoze.bfg`
-:term:`router` which does not implement this interface,
-:mod:`repoze.bfg` will attempt to use a :term:`renderer` to
-construct a response.  The renderer associated with a view callable
-can be varied by changing the ``renderer`` attribute in the view's
-configuration.  See :ref:`views_which_use_a_renderer`.
+You don't need to always use :class:`webob.Response` to represent a
+response.  :term:`WebOb` provides a range of different "exception"
+classes which can act as response objects too.  For example, an
+instance of the class ``webob.exc.HTTPFound`` is also a valid response
+object (see :ref:`http_redirect`).
+
+Furthermore, a view needn't *always* return a Response object.  If a
+view happens to return something which does not implement the Response
+interface, :mod:`repoze.bfg` will attempt to use a :term:`renderer` to
+construct a response.  For example:
+
+.. code-block:: python
+   :linenos:
+
+   from webob import Response
+   from repoze.bfg.view import bfg_view
+
+   @bfg_view(renderer='json')
+   def hello_world(request):
+       return {'content':'Hello!'}
+
+The above example returns a *dictionary* from the view callable.  A
+dictionary does not implement the :term:`WebOb` response interface, so
+without special configuration, this example would fail.  However,
+since a ``renderer`` is associated with the view callable through its
+view configuration (in this case, using a ``renderer`` argument passed
+to :func:`repoze.bfg.bfg_view`), the renderer will attempt to convert
+the result of the view to a response on the developer's behalf.  Of
+course, if no renderer is associated with a view's configuration,
+returning anything except an object which implements the WebOb
+Response interface will result in an error.  And, if a renderer *is*
+used, whatever is returned by the view must be compatible with the
+particular kind of renderer used, or an error may occur during view
+invocation.
+
+Various types of renderers exist, including serialization renderers
+and renderers which use templating systems.  See also
+:ref:`views_which_use_a_renderer`.
 
 .. index::
    single: view http redirect
    single: http redirect (from a view)
+
+.. _http_redirect:
 
 Using a View Callable to Do A HTTP Redirect
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
