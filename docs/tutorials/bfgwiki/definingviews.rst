@@ -16,10 +16,10 @@ assumed to return a :term:`response` object.
    applications, such as this tutorial, the context is used frequently
    within the body of a view method, so it makes sense to use the
    two-argument syntax in this application.  However, in :term:`url
-   dispatch` based applications, however, the context object is rarely
-   used in the view body itself, so within code that uses
-   URL-dispatch-only, it's common to define views as callables that
-   accept only a request to avoid the visual "noise".
+   dispatch` based applications, the context object is rarely used in
+   the view body itself, so within code that uses URL-dispatch-only,
+   it's common to define views as callables that accept only a request
+   to avoid the visual "noise".
 
 We're going to define several :term:`view callable` functions then
 wire them into :mod:`repoze.bfg` using some :term:`view
