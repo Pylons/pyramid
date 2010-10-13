@@ -7,8 +7,9 @@ Glossary
    :sorted:
 
    request
-     A ``WebOb`` request object.  See :ref:`webob_chapter` for
-     information about request objects.
+     A ``WebOb`` request object.  See :ref:`webob_chapter` (narrative)
+     and :ref:`request_module` (API documentation) for information
+     about request objects.
 
    request factory
      An object which, provided a WSGI environment as a single

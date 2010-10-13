@@ -620,6 +620,9 @@ attribute to the request before returning a result:
        request.response_status = '404 Not Found'
        return {'URL':request.URL}
 
+For more information on attributes of the request, see the API
+documentation in :ref:`request_module`.
+
 .. index::
    single: renderer (adding)
 
@@ -1009,7 +1012,8 @@ working with and storing bytestrings, :mod:`repoze.bfg` configures the
 values into Unicode from the UTF-8 character set implicitly.  This
 implicit decoding happens when view code obtains form field values via
 the :term:`WebOb` ``request.params``, ``request.GET``, or
-``request.POST`` APIs.
+``request.POST`` APIs (see :ref:`request_module` for details about
+these APIs).
 
 For example, let's assume that the following form page is served up to
 a browser client, and its ``action`` points at some :mod:`repoze.bfg`

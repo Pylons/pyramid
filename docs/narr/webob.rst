@@ -98,6 +98,9 @@ instance, ``req.if_modified_since`` returns a `datetime
 <http://python.org/doc/current/lib/datetime-datetime.html>`_ object
 (or None if the header is was not provided).
 
+.. note:: Full API documentation for the :mod:`repoze.bfg` request
+   object is available in :ref:`request_module`.
+
 .. index::
    single: request attributes (special)
 
