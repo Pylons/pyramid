@@ -1,3 +1,22 @@
+Next release
+============
+
+Features
+--------
+
+- The ``paster`` template named ``bfg_routesalchemy`` has been updated
+  to use SQLAlchemy declarative syntax.  Thanks to Ergo^.
+
+- The ""bfgwiki2" (SQLAlchemy + url dispatch) tutorial has been
+  updated slightly.  In particular, the source packages no longer
+  attempt to use a private index, and the recommended Python version
+  is now 2.6.  It was also updated to take into account the changes to
+  the ``bfg_routesalchemy`` template used to set up an environment.
+
+- The "bfgwiki" (ZODB + traversal) tutorial has been updated slightly.
+  In particular, the source packages no longer attempt to use a
+  private index, and the recommended Python version is now 2.6.
+
 1.3a15 (2010-09-30)
 ===================
 
