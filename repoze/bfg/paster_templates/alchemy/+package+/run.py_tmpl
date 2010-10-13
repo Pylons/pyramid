@@ -1,4 +1,5 @@
 from repoze.bfg.configuration import Configurator
+from paste.deploy.converters import asbool
 
 from {{package}}.models import appmaker
 
@@ -11,11 +12,9 @@ def app(global_config, **settings):
     zcml_file = settings.get('configure_zcml', 'configure.zcml')
     db_string = settings.get('db_string')
     if db_string is None:
-        raise ValueError("No 'db_string' in application configuration.")
-    db_echo = settings.get('db_echo')
-    if db_echo is None:
-        db_echo = True
-    get_root = appmaker(db_string, db_echo)
+        raise ValueError("No 'db_string' value in application configuration.")
+    db_echo = settings.get('db_echo', 'false')
+    get_root = appmaker(db_string, asbool(db_echo))
     config = Configurator(settings=settings, root_factory=get_root)
     config.begin()
     config.load_zcml(zcml_file)

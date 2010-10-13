@@ -1,21 +1,20 @@
 import transaction
 
+from repoze.bfg.security import Allow
+from repoze.bfg.security import Everyone
+
 from sqlalchemy import create_engine
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Text
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-from sqlalchemy.ext.declarative import declarative_base
-
 from zope.sqlalchemy import ZopeTransactionExtension
-
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Everyone
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
@@ -31,14 +30,8 @@ class Page(Base):
        self.name = name
        self.data = data
 
-class RootFactory(object):
-    __acl__ = [ (Allow, Everyone, 'view'),
-                (Allow, 'group:editors', 'edit') ]
-    def __init__(self, request):
-        self.__dict__.update(request.matchdict)
-
-def initialize_sql(db, echo=False):
-    engine = create_engine(db, echo=echo)
+def initialize_sql(db_string, echo=False):
+    engine = create_engine(db_string, echo=echo)
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
@@ -50,3 +43,9 @@ def initialize_sql(db, echo=False):
     except IntegrityError:
         # already created
         pass
+
+class RootFactory(object):
+    __acl__ = [ (Allow, Everyone, 'view'),
+                (Allow, 'group:editors', 'edit') ]
+    def __init__(self, request):
+        self.__dict__.update(request.matchdict)

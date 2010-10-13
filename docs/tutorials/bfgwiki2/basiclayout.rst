@@ -31,7 +31,7 @@ following:
 #. *Line 1*.  The root ``<configure>`` element, using the
    ``http://namespaces.repoze.org/bfg`` namespace.
 
-#. *Line 4*. Boilerplate, the comment explains.
+#. *Lines 3-4*. Boilerplate, the comment explains.
 
 #. *Lines 6-11*.  Register a ``<route>`` :term:`route configuration`
    that will be used when the URL is ``/``.  Since this ``<route>``
@@ -56,6 +56,8 @@ following:
    ``/foo`` in ``/static/foo``) will be used to compose a path to a
    static file resource, such as a CSS file.
 
+#. *Line 18*.  The closing ``</configure>`` tag.
+
 Content Models with ``models.py``
 ---------------------------------
 
@@ -71,33 +73,28 @@ Here is the source for ``models.py``:
       :linenos:
       :language: py
 
-#. *Lines 1-16*.  Imports to support later code.
+#. *Lines 1-14*.  Imports to support later code.
 
-#. *Line 18*.  We set up a SQLAlchemy "DBSession" object here.  We
+#. *Line 16*.  We set up a SQLAlchemy "DBSession" object here.  We
    specify that we'd like to use the "ZopeTransactionExtension".  This
    extension is an extension which allows us to use a *transaction
    manager* instead of controlling commits and aborts to database
    operations by hand.
 
-#. *Line 21*. Set up a SQLAlchemy metadata object.
+#. *Line 17*.  We create a declarative ``Base`` object to use as a
+   base class for our model.
 
-#. *Lines 23-25*.  A model class named ``Model``.  It has an
-   ``__init__`` that takes a single argument (``name``).  It stores a
-   single attribute named ``name``.
+#. *Lines 19-27*.  A model class named ``MyModel``.  It has an
+   ``__init__`` that takes a two arguments (``name``, and ``value``).
+   It stores these values as ``self.name`` and ``self.value`` within
+   the ``__init__`` function itself.  The ``MyModel`` class also has a
+   ``__tablename__`` attribute.  This informs SQLAlchemy which table
+   to use to store the data representing instances of this class.
 
-#. *Lines 27-32*.  A SQLAlchemy ``Table`` declaration named
-   ``models_table`` which we'll use later to map onto our ``Model``
-   class.
-
-#. *Line 34*.  We map our ``models_table`` table to our Models class
-   here.  This makes an association between the ``Model`` class and
-   the ``models`` table in the database, as far as SQLAlchemy is
-   concerned.
-
-#. *Lines 36-41*.  A function named ``populate`` which adds a single
+#. *Lines 29-34*.  A function named ``populate`` which adds a single
    model instance into our SQL storage and commits a transaction.
 
-#. *Lines 43-51*.  A function named ``initialize_sql`` which sets up
+#. *Lines 36-44*.  A function named ``initialize_sql`` which sets up
    an actual SQL database and binds it to our SQLAlchemy DBSession
    object.  It also calls the ``populate`` function, to do initial
    database population.
@@ -118,21 +115,32 @@ function within the file named ``run.py``:
 
 #. *Lines 1-3*. Imports to support later code.
 
-#. *Lines 11-14*. Get the database configuration string from the
-   ``tutorial.ini`` file's ``[app:sql]`` section.  This will be a URI
+#. *Line 12*.  Obtain the ``configure_zcml`` setting from a value in
+   the ``tutorial.ini`` file's ``[app:sqlalchemy]`` section.  If it
+   doesn't exist in the configuration file, default to
+   ``configure.zcml``.
+
+#. *Lines 13-15*. Get the database configuration string from the
+   ``tutorial.ini`` file's ``[app:sqlalchemy]`` section.  This will be a URI
    (something like ``sqlite://``).
 
-#. Line *15*. We initialize our SQL database using SQLAlchemy, passing
-   it the db string.
+#. *Line 16*. Get the database echo settingf rom ``tutorial.ini``
+   file's ``[app:sqlalchemy]`` section.  This will either be ``true``
+   or ``false``.  If ``true``, the application will print SQL to the
+   console as it is generated and run by SQLAlchemy.  By default, it
+   is false.
 
-#. *Line 16*.  We construct a :term:`Configurator`.  ``settings`` is
+#. Line *17*. We initialize our SQL database using SQLAlchemy, passing
+   it the db string and a variant of the db_echo value.
+
+#. *Line 18*.  We construct a :term:`Configurator`.  ``settings`` is
    passed as a keyword argument with the dictionary values passed by
    PasteDeploy as the ``settings`` argument.  This will be a
    dictionary of settings parsed by PasteDeploy, which contains
    deployment-related values such as ``reload_templates``,
    ``db_string``, etc.
 
-#. *Lines 17-20*.  We then load a ZCML file to do application
+#. *Lines 19-22*.  We then load a ZCML file to do application
    configuration, and use the
    :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method
    to return a :term:`WSGI` application.

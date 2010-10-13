@@ -6,11 +6,10 @@ from sqlalchemy import Integer
 from sqlalchemy import Text
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
-
-from sqlalchemy.ext.declarative import declarative_base
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
@@ -28,8 +27,8 @@ class Page(Base):
        self.name = name
        self.data = data
 
-def initialize_sql(db, echo=False):
-    engine = create_engine(db, echo=echo)
+def initialize_sql(db_string, echo=False):
+    engine = create_engine(db_string, echo=echo)
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)

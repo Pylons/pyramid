@@ -75,4 +75,4 @@ that ends with this exception:
 
 .. code-block:: text
 
-   ImportError: cannot import name Model
+   ImportError: cannot import name MyModel

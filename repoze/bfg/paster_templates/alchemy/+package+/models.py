@@ -19,7 +19,7 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 class MyModel(Base):
-    __tablename__ = 'mymodel'
+    __tablename__ = 'models'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(255), unique=True)
     value = Column(Integer)
@@ -73,7 +73,7 @@ def populate():
     session.flush()
     transaction.commit()
 
-def initialize_sql(db_string, db_echo):
+def initialize_sql(db_string, db_echo=False):
     engine = create_engine(db_string, echo=db_echo)
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
@@ -83,6 +83,6 @@ def initialize_sql(db_string, db_echo):
     except IntegrityError:
         pass
 
-def appmaker(db_string, db_echo):
+def appmaker(db_string, db_echo=False):
     initialize_sql(db_string, db_echo)
     return default_get_root

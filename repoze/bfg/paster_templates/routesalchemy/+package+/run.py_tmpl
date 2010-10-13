@@ -1,4 +1,5 @@
 from repoze.bfg.configuration import Configurator
+from paste.deploy.converters import asbool
 
 from {{package}}.models import initialize_sql
 
@@ -12,7 +13,8 @@ def app(global_config, **settings):
     db_string = settings.get('db_string')
     if db_string is None:
         raise ValueError("No 'db_string' value in application configuration.")
-    initialize_sql(db_string)
+    db_echo = settings.get('db_echo', 'false')
+    initialize_sql(db_string, asbool(db_echo))
     config = Configurator(settings=settings)
     config.begin()
     config.load_zcml(zcml_file)

@@ -1,7 +1,7 @@
 [DEFAULT]
 debug = true
 
-[app:sql]
+[app:sqlalchemy]
 use = egg:{{package}}#app
 reload_templates = true
 debug_authorization = false
@@ -9,11 +9,12 @@ debug_notfound = false
 debug_templates = true
 default_locale_name = en
 db_string = sqlite:///%(here)s/{{package}}.db
+db_echo = false
 
 [pipeline:main]
 pipeline =
     egg:repoze.tm2#tm
-    sql
+    sqlalchemy
 
 [server:main]
 use = egg:Paste#http

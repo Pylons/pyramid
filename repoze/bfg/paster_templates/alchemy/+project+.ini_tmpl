@@ -1,8 +1,8 @@
 [DEFAULT]
 debug = true
 
-[app:alchemy]
-use = egg:{{project}}#app
+[app:sqlalchemy]
+use = egg:{{package}}#app
 reload_templates = true
 debug_authorization = false
 debug_notfound = false
@@ -14,7 +14,7 @@ db_echo = false
 [pipeline:main]
 pipeline =
     egg:repoze.tm2#tm
-    alchemy
+    sqlalchemy
 
 [server:main]
 use = egg:Paste#http

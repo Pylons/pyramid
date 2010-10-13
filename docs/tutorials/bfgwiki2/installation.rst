@@ -22,30 +22,30 @@ Preparation, UNIX
    manager.  For example, on a Debian Linux system, do ``sudo apt-get
    install libsqlite3-dev``.
 
-#. If you don't already have a Python 2.5 interpreter installed on
-   your system, obtain, install, or find `Python 2.5
-   <http://python.org/download/releases/2.5.4/>`_ for your system.
+#. If you don't already have a Python 2.6 interpreter installed on
+   your system, obtain, install, or find `Python 2.6
+   <http://www.python.org/download/releases/2.6.6/>`_ for your system.
 
 #. Install the latest `setuptools` into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
    <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.5 installation:
+   the ``python`` interpreter of your Python 2.6 installation:
 
    .. code-block:: text
 
-      $ /path/to/my/Python-2.5/bin/python ez_setup.py
+      $ /path/to/my/Python-2.6/bin/python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
    .. code-block:: text
 
-      $ /path/to/my/Python-2.5/bin/easy_install virtualenv
+      $ /path/to/my/Python-2.6/bin/easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
    .. code-block:: text
 
-      $ path/to/my/Python-25/bin/virtualenv --no-site-packages bigfntut
+      $ path/to/my/Python-2.6/bin/virtualenv --no-site-packages bigfntut
 
 #. Switch to the ``bigfntut`` directory:
 
@@ -61,8 +61,8 @@ Preparation, UNIX
 
    .. code-block:: text
 
-      $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple \
-              repoze.bfg
+      $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple 
+                 repoze.bfg
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
@@ -74,30 +74,30 @@ Preparation, UNIX
 Preparation, Windows
 --------------------
 
-#. Install, or find `Python 2.5
-   <http://python.org/download/releases/2.5.4/>`_ for your system.
+#. Install, or find `Python 2.6.6
+   <http://python.org/download/releases/2.6.6/>`_ for your system.
 
 #. Install the latest `setuptools` into the Python you
    obtained/installed/found in the step above: download `ez_setup.py
    <http://peak.telecommunity.com/dist/ez_setup.py>`_ and run it using
-   the ``python`` interpreter of your Python 2.5 installation using a
+   the ``python`` interpreter of your Python 2.6 installation using a
    command prompt:
 
    .. code-block:: text
 
-      c:\> c:\Python25\python ez_setup.py
+      c:\> c:\Python26\python ez_setup.py
 
 #. Use that Python's `bin/easy_install` to install `virtualenv`:
 
    .. code-block:: text
 
-      c:\> c:\Python25\Scripts\easy_install virtualenv
+      c:\> c:\Python26\Scripts\easy_install virtualenv
 
 #. Use that Python's virtualenv to make a workspace:
 
    .. code-block:: text
 
-      c:\> c:\Python25\Scripts\virtualenv --no-site-packages bigfntut
+      c:\> c:\Python26\Scripts\virtualenv --no-site-packages bigfntut
 
 #. Switch to the ``bigfntut`` directory:
 
