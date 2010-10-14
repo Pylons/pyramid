@@ -653,7 +653,7 @@ With template debugging off, a :exc:`NameError` exception resulting
 from rendering a template with an undefined variable
 (e.g. ``${wrong}``) might end like this::
 
-  File "/home/fred/env/lib/python2.5/site-packages/Chameleon-1.2.3-py2.5.egg/chameleon/core/utils.py", line 332, in __getitem__
+  File "...", in __getitem__
     raise NameError(key)
   NameError: wrong
 
