@@ -12,7 +12,8 @@ def app(global_config, **settings):
     zcml_file = settings.get('configure_zcml', 'configure.zcml')
     db_string = settings.get('db_string')
     if db_string is None:
-        raise ValueError("No 'db_string' value in application configuration.")
+        raise ValueError(
+            "No 'db_string' value in application configuration.")
     db_echo = settings.get('db_echo', 'false')
     initialize_sql(db_string, asbool(db_echo))
     config = Configurator(settings=settings)
