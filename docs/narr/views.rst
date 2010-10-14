@@ -973,7 +973,7 @@ registered as exception views which have a name will be ignored.
 
   Normal (non-exception) views registered against a context which
   inherits from :exc:`Exception` will work normally.  When an
-  exception view configuraton is processed, *two* exceptions are
+  exception view configuraton is processed, *two* views are
   registered.  One as a "normal" view, the other as an "exception"
   view.  This means that you can use an exception as ``context`` for a
   normal view.
