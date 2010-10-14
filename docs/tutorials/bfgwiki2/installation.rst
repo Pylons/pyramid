@@ -56,20 +56,19 @@ Preparation, UNIX
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "current" index to get
-   :mod:`repoze.bfg` and its direct dependencies installed:
+#. Use ``easy_install`` to get :mod:`repoze.bfg` and its direct
+   dependencies installed:
 
    .. code-block:: text
 
-      $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple 
-                 repoze.bfg
+      $ bin/easy_install repoze.bfg
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
    .. code-block:: text
 
-      $ bin/easy_install docutils nose coverage zope.sqlalchemy SQLAlchemy \
-                repoze.tm2
+      $ bin/easy_install docutils nose coverage zope.sqlalchemy \
+                SQLAlchemy repoze.tm2
 
 Preparation, Windows
 --------------------
@@ -108,20 +107,18 @@ Preparation, Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` and point to the BFG "current" index to get
-   :mod:`repoze.bfg` and its direct dependencies installed:
+#. Use ``easy_install`` to get :mod:`repoze.bfg` and its direct
+   dependencies installed:
 
    .. code-block:: text
 
-      c:\bigfntut> Scripts\easy_install -i \
-                http://dist.repoze.org/bfg/current/simple repoze.bfg
+      c:\bigfntut> Scripts\easy_install repoze.bfg
 
 #. Use ``easy_install`` to install various packages from PyPI.
 
    .. code-block:: text
 
-      c:\bigfntut> Scripts\easy_install -i \
-               http://dist.repoze.org/bfg/current/simple docutils \
+      c:\bigfntut> Scripts\easy_install -i docutils \
                nose coverage zope.sqlalchemy SQLAlchemy repoze.tm2
 
 

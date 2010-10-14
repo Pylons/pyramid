@@ -285,9 +285,9 @@ segment replacement marker.  For example, for the URL ``/abc/``:
 
 - ``/:foo/`` will match.
 
-.. warning:: Due to a bug, the
-   must-be-one-character-to-match-segment-marker rule new to version
-   1.3.  It is untrue for older releases.
+.. warning:: The must-be-one-character-to-match-segment-marker rule is
+   new in version 1.3.  It is untrue for older releases, but this was
+   due to a bug.
 
 Note that values representing path segments matched with a
 ``:segment`` match will be url-unquoted and decoded from UTF-8 into
