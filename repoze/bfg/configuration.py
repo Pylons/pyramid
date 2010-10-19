@@ -326,7 +326,9 @@ class Configurator(object):
     def with_package(self, package):
         """ Return a new Configurator instance with the same registry
         as this configurator using the package supplied as the
-        ``package`` argument to the new configurator."""
+        ``package`` argument to the new configurator.  ``package`` may
+        be an actual Python package object or a Python dotted name
+        representing a package."""
         return self.__class__(registry=self.registry, package=package)
 
     def maybe_dotted(self, dotted):
