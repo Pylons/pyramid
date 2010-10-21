@@ -249,7 +249,7 @@ class RendererHelper(object):
     @reify
     def renderer(self):
         if self.factory is None:
-            raise ValueError('No such renderer factory %s' % self.renderer_type)
+            raise ValueError('No such renderer factory %s' % str(self.renderer_type))
         return self.factory(self.renderer_name)
 
     def resolve_spec(self, path_or_spec):

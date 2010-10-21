@@ -17,6 +17,12 @@ Features
   In particular, the source packages no longer attempt to use a
   private index, and the recommended Python version is now 2.6.
 
+Bug Fixes
+---------
+
+- When a renderer factory could not be found, a misleading error
+  message was raised if the renderer name was not a string.
+
 1.3a15 (2010-09-30)
 ===================
 
