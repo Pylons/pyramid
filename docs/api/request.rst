@@ -1,9 +1,9 @@
 .. _request_module:
 
-:mod:`repoze.bfg.request`
+:mod:`pyramid.request`
 ---------------------------
 
-.. module:: repoze.bfg.request
+.. module:: pyramid.request
 
 .. autoclass:: Request
    :members:
@@ -77,14 +77,11 @@
 
      If an exception was raised by a :term:`root factory` or a
      :term:`view callable`, or at various other points where
-     :mod:`repoze.bfg` executes user-defined code during the
+     :mod:`pyramid` executes user-defined code during the
      processing of a request, the exception object which was caught
      will be available as the ``exception`` attribute of the request
      within a :term:`exception view`, a :term:`response callback` or a
      :term:`finished callback`.  If no exception occurred, the value
      of ``request.exception`` will be ``None`` within response and
      finished callbacks.
-
-     .. note:: The exception attribute is new in :mod:`repoze.bfg`
-        1.3.
 

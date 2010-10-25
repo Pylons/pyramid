@@ -1,9 +1,9 @@
 .. _scripting_module:
 
-:mod:`repoze.bfg.scripting`
+:mod:`pyramid.scripting`
 ---------------------------
 
-.. automodule:: repoze.bfg.scripting
+.. automodule:: pyramid.scripting
 
   .. autofunction:: get_root
 

@@ -1,9 +1,9 @@
 .. _configuration_module:
 
-:mod:`repoze.bfg.configuration`
+:mod:`pyramid.configuration`
 -------------------------------
 
-.. automodule:: repoze.bfg.configuration
+.. automodule:: pyramid.configuration
 
   .. autoclass:: Configurator(registry=None, package=None, settings=None, root_factory=None, authentication_policy=None, authorization_policy=None, renderers=DEFAULT_RENDERERS, debug_logger=None, locale_negotiator=None, request_factory=None, renderer_globals_factory=None, default_permission=None)
 

@@ -1,9 +1,9 @@
 .. _traversal_module:
 
-:mod:`repoze.bfg.traversal`
+:mod:`pyramid.traversal`
 ---------------------------
 
-.. automodule:: repoze.bfg.traversal
+.. automodule:: pyramid.traversal
 
   .. autofunction:: find_interface
 

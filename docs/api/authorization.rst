@@ -1,9 +1,9 @@
 .. _authorization_module:
 
-:mod:`repoze.bfg.authorization`
+:mod:`pyramid.authorization`
 -------------------------------
 
-.. automodule:: repoze.bfg.authorization
+.. automodule:: pyramid.authorization
 
   .. autoclass:: ACLAuthorizationPolicy
 

@@ -1,9 +1,9 @@
 .. _events_module:
 
-:mod:`repoze.bfg.events`
+:mod:`pyramid.events`
 --------------------------
 
-.. automodule:: repoze.bfg.events
+.. automodule:: pyramid.events
 
 Functions
 ~~~~~~~~~

@@ -1,8 +1,8 @@
 .. _router_module:
 
-:mod:`repoze.bfg.router`
+:mod:`pyramid.router`
 ------------------------
 
-.. automodule:: repoze.bfg.router
+.. automodule:: pyramid.router
 
-.. autofunction:: repoze.bfg.router.make_app(root_factory, package=None, filename='configure.zcml', settings=None)
+.. autofunction:: pyramid.router.make_app(root_factory, package=None, filename='configure.zcml', settings=None)

@@ -1,9 +1,9 @@
 .. _security_module:
 
-:mod:`repoze.bfg.security`
+:mod:`pyramid.security`
 ==========================
 
-.. automodule:: repoze.bfg.security
+.. automodule:: pyramid.security
 
 Authentication API Functions
 ----------------------------

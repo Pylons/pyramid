@@ -1,9 +1,9 @@
 .. _chameleon_zpt_module:
 
-:mod:`repoze.bfg.chameleon_zpt`
+:mod:`pyramid.chameleon_zpt`
 -------------------------------
 
-.. automodule:: repoze.bfg.chameleon_zpt
+.. automodule:: pyramid.chameleon_zpt
 
   .. autofunction:: get_template
 
@@ -14,15 +14,15 @@
 These APIs will work against files which supply template text which
 matches the :term:`ZPT` specification.
 
-The API of :mod:`repoze.bfg.chameleon_zpt` is identical to that of
-:mod:`repoze.bfg.chameleon_text`; only its import location is
+The API of :mod:`pyramid.chameleon_zpt` is identical to that of
+:mod:`pyramid.chameleon_text`; only its import location is
 different.  If you need to import an API functions from this module as
-well as the :mod:`repoze.bfg.chameleon_text` module within the same
+well as the :mod:`pyramid.chameleon_text` module within the same
 view file, use the ``as`` feature of the Python import statement,
 e.g.:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import render_template as zpt_render
-   from repoze.bfg.chameleon_text import render_template as text_render
+   from pyramid.chameleon_zpt import render_template as zpt_render
+   from pyramid.chameleon_text import render_template as text_render

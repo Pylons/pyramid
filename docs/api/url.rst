@@ -1,11 +1,11 @@
 .. _url_module:
 
-:mod:`repoze.bfg.url`
+:mod:`pyramid.url`
 ---------------------
 
-.. automodule:: repoze.bfg.url
+.. automodule:: pyramid.url
 
-  .. autofunction:: repoze.bfg.url.model_url(context, request, *elements, query=None, anchor=None)
+  .. autofunction:: pyramid.url.model_url(context, request, *elements, query=None, anchor=None)
 
   .. autofunction:: route_url
 

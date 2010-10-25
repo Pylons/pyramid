@@ -1,9 +1,9 @@
 .. _location_module:
 
-:mod:`repoze.bfg.location`
+:mod:`pyramid.location`
 --------------------------
 
-.. automodule:: repoze.bfg.location
+.. automodule:: pyramid.location
 
   .. autofunction:: lineage
 

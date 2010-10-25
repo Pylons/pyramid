@@ -1,9 +1,9 @@
 .. _testing_module:
 
-:mod:`repoze.bfg.testing`
+:mod:`pyramid.testing`
 ==========================
 
-.. automodule:: repoze.bfg.testing
+.. automodule:: pyramid.testing
 
   .. autofunction:: registerDummySecurityPolicy
 

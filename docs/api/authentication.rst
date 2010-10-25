@@ -1,9 +1,9 @@
 .. _authentication_module:
 
-:mod:`repoze.bfg.authentication`
+:mod:`pyramid.authentication`
 --------------------------------
 
-.. automodule:: repoze.bfg.authentication
+.. automodule:: pyramid.authentication
 
   .. autoclass:: AuthTktAuthenticationPolicy
 

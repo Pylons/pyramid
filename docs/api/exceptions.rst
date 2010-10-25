@@ -1,9 +1,9 @@
 .. _exceptions_module:
 
-:mod:`repoze.bfg.exceptions`
+:mod:`pyramid.exceptions`
 ----------------------------
 
-.. automodule:: repoze.bfg.exceptions
+.. automodule:: pyramid.exceptions
 
   .. autoclass:: Forbidden
 

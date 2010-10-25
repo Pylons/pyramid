@@ -1,9 +1,9 @@
 .. _renderers_module:
 
-:mod:`repoze.bfg.renderers`
+:mod:`pyramid.renderers`
 ---------------------------
 
-.. module:: repoze.bfg.renderers
+.. module:: pyramid.renderers
 
 .. autofunction:: get_renderer
 

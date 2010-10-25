@@ -1,9 +1,9 @@
 .. _settings_module:
 
-:mod:`repoze.bfg.settings`
+:mod:`pyramid.settings`
 --------------------------
 
-.. automodule:: repoze.bfg.settings
+.. automodule:: pyramid.settings
 
   .. autofunction:: get_settings
 

@@ -1,9 +1,9 @@
 .. _view_module:
 
-:mod:`repoze.bfg.view`
+:mod:`pyramid.view`
 ----------------------
 
-.. automodule:: repoze.bfg.view
+.. automodule:: pyramid.view
 
   .. autofunction:: render_view_to_response
 

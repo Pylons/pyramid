@@ -1,9 +1,9 @@
 .. _paster_module:
 
-:mod:`repoze.bfg.paster`
+:mod:`pyramid.paster`
 ---------------------------
 
-.. module:: repoze.bfg.paster
+.. module:: pyramid.paster
 
 .. function:: get_app(config_file, name)
 

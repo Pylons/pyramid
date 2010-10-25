@@ -1,9 +1,9 @@
 .. _threadlocal_module:
 
-:mod:`repoze.bfg.threadlocal`
+:mod:`pyramid.threadlocal`
 -------------------------------
 
-.. automodule:: repoze.bfg.threadlocal
+.. automodule:: pyramid.threadlocal
 
    .. autofunction:: get_current_request()
 

@@ -1,9 +1,9 @@
 .. _wsgi_module:
 
-:mod:`repoze.bfg.wsgi`
+:mod:`pyramid.wsgi`
 --------------------------
 
-.. automodule:: repoze.bfg.wsgi
+.. automodule:: pyramid.wsgi
 
   .. autofunction:: wsgiapp
 

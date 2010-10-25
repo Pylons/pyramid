@@ -1,9 +1,9 @@
 .. _interfaces_module:
 
-:mod:`repoze.bfg.interfaces`
+:mod:`pyramid.interfaces`
 ----------------------------
 
-.. automodule:: repoze.bfg.interfaces
+.. automodule:: pyramid.interfaces
 
 Event-Related Interfaces
 ++++++++++++++++++++++++
