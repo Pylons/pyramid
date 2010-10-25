@@ -8,35 +8,35 @@
 Request Processing
 ==================
 
-Once a :mod:`repoze.bfg` application is up and running, it is ready to
+Once a :mod:`pyramid` application is up and running, it is ready to
 accept requests and return responses.
 
 What happens from the time a :term:`WSGI` request enters a
-:mod:`repoze.bfg` application through to the point that
-:mod:`repoze.bfg` hands off a response back to WSGI for upstream
+:mod:`pyramid` application through to the point that
+:mod:`pyramid` hands off a response back to WSGI for upstream
 processing?
 
 #. A user initiates a request from his browser to the hostname and
-   port number of the WSGI server used by the :mod:`repoze.bfg`
+   port number of the WSGI server used by the :mod:`pyramid`
    application.
 
-#. The WSGI server used by the :mod:`repoze.bfg` application passes
+#. The WSGI server used by the :mod:`pyramid` application passes
    the WSGI environment to the ``__call__`` method of the
-   :mod:`repoze.bfg` :term:`router` object.
+   :mod:`pyramid` :term:`router` object.
 
 #. A :term:`request` object is created based on the WSGI environment.
 
 #. The :term:`application registry` and the :term:`request` object
    created in the last step are pushed on to the :term:`thread local`
-   stack that :mod:`repoze.bfg` uses to allow the functions named
-   :func:`repoze.bfg.threadlocal.get_current_request` and
-   :func:`repoze.bfg.threadlocal.get_current_registry` to work.
+   stack that :mod:`pyramid` uses to allow the functions named
+   :func:`pyramid.threadlocal.get_current_request` and
+   :func:`pyramid.threadlocal.get_current_registry` to work.
 
-#. A :class:`repoze.bfg.interfaces.INewRequest` :term:`event` is sent
+#. A :class:`pyramid.interfaces.INewRequest` :term:`event` is sent
    to any subscribers.
 
 #. If any :term:`route` has been defined within application
-   configuration, the :mod:`repoze.bfg` :term:`router` calls a
+   configuration, the :mod:`pyramid` :term:`router` calls a
    :term:`URL dispatch` "route mapper."  The job of the mapper is to
    examine the request to determine whether any user-defined
    :term:`route` matches the current WSGI environment.  The
@@ -46,7 +46,7 @@ processing?
    ``matched_route`` attributes are added to the request object; the
    former contains a dictionary representign the matched dynamic
    elements of the request's ``PATH_INFO`` value, the latter contains
-   the :class:`repoze.bfg.interfaces.IRoute` object representing the
+   the :class:`pyramid.interfaces.IRoute` object representing the
    route which matched.  The root object associated with the route
    found is also generated: if the :term:`route configuration` which
    matched has an associated a ``factory`` argument, this factory is
@@ -59,7 +59,7 @@ processing?
    argument passed to the Configurator constructor was ``None``, a
    default root factory is used to generate a root object.
 
-#. The :mod:`repoze.bfg` router calls a "traverser" function with the
+#. The :mod:`pyramid` router calls a "traverser" function with the
    root object and the request.  The traverser function attempts to
    traverse the root object (using any existing ``__getitem__`` on the
    root object and subobjects) to find a :term:`context`.  If the root
@@ -74,37 +74,37 @@ processing?
    they can be accessed via e.g. ``request.context`` within
    :term:`view` code.
 
-#. A :class:`repoze.bfg.interfaces.IContextFound` :term:`event` is
+#. A :class:`pyramid.interfaces.IContextFound` :term:`event` is
    sent to any subscribers.
 
-#. :mod:`repoze.bfg` looks up a :term:`view` callable using the
+#. :mod:`pyramid` looks up a :term:`view` callable using the
    context, the request, and the view name.  If a view callable
    doesn't exist for this combination of objects (based on the type of
    the context, the type of the request, and the value of the view
    name, and any :term:`predicate` attributes applied to the view
-   configuration), :mod:`repoze.bfg` raises a
-   :class:`repoze.bfg.exceptions.NotFound` exception, which is meant
+   configuration), :mod:`pyramid` raises a
+   :class:`pyramid.exceptions.NotFound` exception, which is meant
    to be caught by a surrounding exception handler.
 
-#. If a view callable was found, :mod:`repoze.bfg` attempts to call
+#. If a view callable was found, :mod:`pyramid` attempts to call
    the view function.
 
 #. If an :term:`authorization policy` is in use, and the view was
-   protected by a :term:`permission`, :mod:`repoze.bfg` passes the
+   protected by a :term:`permission`, :mod:`pyramid` passes the
    context, the request, and the view_name to a function which
    determines whether the view being asked for can be executed by the
    requesting user, based on credential information in the request and
    security information attached to the context.  If it returns
-   ``True``, :mod:`repoze.bfg` calls the view callable to obtain a
+   ``True``, :mod:`pyramid` calls the view callable to obtain a
    response.  If it returns ``False``, it raises a
-   :class:`repoze.bfg.exceptions.Forbidden` exception, which is meant
+   :class:`pyramid.exceptions.Forbidden` exception, which is meant
    to be called by a surrounding exception handler.
 
 #. If any exception was raised within a :term:`root factory`, by
    :term:`traversal`, by a :term:`view callable` or by
-   :mod:`repoze.bfg` itself (such as when it raises
-   :class:`repoze.bfg.exceptions.NotFound` or
-   :class:`repoze.bfg.exceptions.Forbidden`), the router catches the
+   :mod:`pyramid` itself (such as when it raises
+   :class:`pyramid.exceptions.NotFound` or
+   :class:`pyramid.exceptions.Forbidden`), the router catches the
    exception, and attaches it to the request as the ``exception``
    attribute.  It then attempts to find a :term:`exception view` for
    the exception that was caught.  If it finds an exception view
@@ -114,26 +114,26 @@ processing?
 
 #. The following steps occur only when a :term:`response` could be
    successfully generated by a normal :term:`view callable` or an
-   :term:`exception view` callable.  :mod:`repoze.bfg` will attempt to
+   :term:`exception view` callable.  :mod:`pyramid` will attempt to
    execute any :term:`response callback` functions attached via
-   :meth:`repoze.bfg.request.Request.add_response_callback`.  A
-   :class:`repoze.bfg.interfaces.INewResponse` :term:`event` is then
+   :meth:`pyramid.request.Request.add_response_callback`.  A
+   :class:`pyramid.interfaces.INewResponse` :term:`event` is then
    sent to any subscribers.  The response object's ``app_iter``,
    ``status``, and ``headerlist`` attributes are then used to generate
    a WSGI response.  The response is sent back to the upstream WSGI
    server.
 
-#. :mod:`repoze.bfg` will attempt to execute any :term:`finished
+#. :mod:`pyramid` will attempt to execute any :term:`finished
    callback` functions attached via
-   :meth:`repoze.bfg.request.Request.add_finished_callback`.
+   :meth:`pyramid.request.Request.add_finished_callback`.
 
 #. The :term:`thread local` stack is popped.
 
 .. image:: router.png
 
 This is a very high-level overview that leaves out various details.
-For more detail about subsystems invoked by the BFG router such as
-traversal, URL dispatch, views, and event processing, see
+For more detail about subsystems invoked by the :mod:`pyramid` router
+such as traversal, URL dispatch, views, and event processing, see
 :ref:`contextfinding_chapter`, :ref:`views_chapter`, and
 :ref:`events_chapter`.
 

@@ -55,9 +55,9 @@ can run the ``cat`` command:
 
 The contents of ``myfile`` are now printed on the user's behalf.
 
-:mod:`repoze.bfg` is very much like this inexperienced UNIX user as it
+:mod:`pyramid` is very much like this inexperienced UNIX user as it
 uses :term:`traversal` against an object graph.  In this analogy, we
-can map the ``cat`` program to the :mod:`repoze.bfg` concept of a
+can map the ``cat`` program to the :mod:`pyramid` concept of a
 :term:`view callable`: it is a program that can be run against some
 :term:`context` as the result of :term:`view lookup`.  The file being
 operated on in this analogy is the :term:`context` object; the context
@@ -68,7 +68,7 @@ as a stop condition is analogous to :term:`traversal`.
 
 The analogy we've used is not *exactly* correct, because, while the
 naive user already knows which command he wants to invoke before he
-starts "traversing" (``cat``), :mod:`repoze.bfg` needs to obtain that
+starts "traversing" (``cat``), :mod:`pyramid` needs to obtain that
 information from the path being traversed itself.  In
 :term:`traversal`, the "command" meant to be invoked is a :term:`view
 callable`.  A view callable is derived via :term:`view lookup` from
@@ -136,9 +136,9 @@ the traversal process *after* traversal finds a context object.
 
 The combination of the :term:`context` object and the :term:`view
 name` found via traversal is used later in the same request by a
-separate :mod:`repoze.bfg` subsystem -- the :term:`view lookup`
+separate :mod:`pyramid` subsystem -- the :term:`view lookup`
 subsystem -- to find a :term:`view callable` later within the same
-request.  How :mod:`repoze.bfg` performs view lookup is explained
+request.  How :mod:`pyramid` performs view lookup is explained
 within the :ref:`views_chapter` chapter.
 
 .. index::
@@ -152,11 +152,11 @@ The Object Graph
 ----------------
 
 When your application uses :term:`traversal` to resolve URLs to code,
-your application must supply an *object graph* to :mod:`repoze.bfg`.
+your application must supply an *object graph* to :mod:`pyramid`.
 This graph is represented by a :term:`root` object.
 
 In order to supply a root object for an application, at system startup
-time, the :mod:`repoze.bfg` :term:`Router` is configured with a
+time, the :mod:`pyramid` :term:`Router` is configured with a
 callback known as a :term:`root factory`.  The root factory is
 supplied by the application developer as the ``root_factory`` argument
 to the application's :term:`Configurator`.
@@ -180,8 +180,8 @@ named ``config``:
    config = Configurator(root_factory=Root)
 
 Using the ``root_factory`` argument to a
-:class:`repoze.bfg.configuration.Configurator` constructor tells your
-:mod:`repoze.bfg` application to call this root factory to generate a
+:class:`pyramid.configuration.Configurator` constructor tells your
+:mod:`pyramid` application to call this root factory to generate a
 root object whenever a request enters the application.  This root
 factory is also known as the global root factory.  A root factory can
 alternately be passed to the ``Configurator`` as a :term:`dotted
@@ -197,15 +197,7 @@ with a database connection or another persistence mechanism.  A root
 object is often an instance of a class which has a ``__getitem__``
 method.
 
-.. warning:: In :mod:`repoze.bfg` 1.0 and prior versions, the root
-   factory was passed a WSGI *environment* object (a dictionary) while
-   in :mod:`repoze.bfg` 1.1+ it is passed a :term:`request` object.
-   For backwards compatibility purposes, the request object passed to
-   the root factory has a dictionary-like interface that emulates the
-   WSGI environment, so code expecting the argument to be a dictionary
-   will continue to work.
-
-If no :term:`root factory` is passed to the :mod:`repoze.bfg`
+If no :term:`root factory` is passed to the :mod:`pyramid`
 :term:`Configurator` constructor, or the ``root_factory`` is specified
 as the value ``None``, a *default* root factory is used.  The default
 root factory always returns an object that has no child nodes.
@@ -234,7 +226,7 @@ root factory always returns an object that has no child nodes.
 
 Items contained within the object graph are sometimes analogous to the
 concept of :term:`model` objects used by many other frameworks (and
-:mod:`repoze.bfg` APIs often refers to them as "models", as well).
+:mod:`pyramid` APIs often refers to them as "models", as well).
 They are typically instances of Python classes.
 
 The object graph consists of *container* nodes and *leaf* nodes.
@@ -277,7 +269,7 @@ until all path segments are exhausted.
 The Traversal Algorithm
 -----------------------
 
-This section will attempt to explain the :mod:`repoze.bfg` traversal
+This section will attempt to explain the :mod:`pyramid` traversal
 algorithm.  We'll provide a description of the algorithm, a diagram of
 how the algorithm works, and some example traversal scenarios that
 might help you understand how the algorithm operates against a
@@ -286,7 +278,7 @@ specific object graph.
 We'll also talk a bit about :term:`view lookup`.  The
 :ref:`views_chapter` chapter discusses :term:`view lookup` in detail,
 and it is the canonical source for information about views.
-Technically, :term:`view lookup` is a :mod:`repoze.bfg` subsystem that
+Technically, :term:`view lookup` is a :mod:`pyramid` subsystem that
 is separated from traversal entirely.  However, we'll describe the
 fundamental behavior of view lookup in the examples in the next few
 sections to give you an idea of how traversal and view lookup
@@ -306,7 +298,7 @@ When a user requests a page from your :mod:`traversal` -powered
 application, the system uses this algorithm to find a :term:`context`
 and a :term:`view name`.
 
-#.  The request for the page is presented to the :mod:`repoze.bfg`
+#.  The request for the page is presented to the :mod:`pyramid`
     :term:`router` in terms of a standard :term:`WSGI` request, which
     is represented by a WSGI environment and a WSGI ``start_response``
     callable.
@@ -371,7 +363,7 @@ and a :term:`view name`.
 Once :term:`context` and :term:`view name` and associated attributes
 such as the :term:`subpath` are located, the job of :term:`traversal`
 is finished.  It passes back the information it obtained to its
-caller, the :mod:`repoze.bfg` :term:`Router`, which subsequently
+caller, the :mod:`pyramid` :term:`Router`, which subsequently
 invokes :term:`view lookup` with the context and view name
 information.
 
@@ -453,7 +445,7 @@ lookup asks the :term:`application registry` this question:
   the class ``Bar``.
 
 Let's say that view lookup finds no matching view type.  In this
-circumstance, the :mod:`repoze.bfg` :term:`router` returns the result
+circumstance, the :mod:`pyramid` :term:`router` returns the result
 of the :term:`not found view` and the request ends.
 
 However, for this graph::
@@ -524,7 +516,7 @@ expected to return a response.
    ``context`` attribute of the request object,
    e.g. ``request.context``.  The :term:`view name` is available as
    the ``view_name`` attribute of the request object,
-   e.g. ``request.view_name``.  Other :mod:`repoze.bfg` -specific
+   e.g. ``request.view_name``.  Other :mod:`pyramid` -specific
    request attributes are also available as described in
    :ref:`special_request_attributes`.
 
@@ -532,15 +524,15 @@ References
 ----------
 
 A tutorial showing how :term:`traversal` can be used within a
-:mod:`repoze.bfg` application exists in :ref:`bfg_wiki_tutorial`.
+:mod:`pyramid` application exists in :ref:`bfg_wiki_tutorial`.
 
 See the :ref:`views_chapter` chapter for detailed information about
 :term:`view lookup`.
 
-The :mod:`repoze.bfg.traversal` module contains API functions that
+The :mod:`pyramid.traversal` module contains API functions that
 deal with traversal, such as traversal invocation from within
 application code.
 
-The :func:`repoze.bfg.url.model_url` function generates a URL when
+The :func:`pyramid.url.model_url` function generates a URL when
 given an object retrieved from an object graph.
 

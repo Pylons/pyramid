@@ -1,12 +1,12 @@
 .. _extending_chapter:
 
-Extending An Existing :mod:`repoze.bfg` Application
+Extending An Existing :mod:`pyramid` Application
 ===================================================
 
-If the developer of a :mod:`repoze.bfg` application has obeyed certain
+If the developer of a :mod:`pyramid` application has obeyed certain
 constraints while building that application, a third party should be
 able to change its behavior without needing to modify its source code.
-The behavior of a :mod:`repoze.bfg` application that obeys certain
+The behavior of a :mod:`pyramid` application that obeys certain
 constraints can be *overridden* or *extended* without modification.
 
 .. index::
@@ -16,14 +16,14 @@ Rules for Building An Extensible Application
 --------------------------------------------
 
 There's only one rule you need to obey if you want to build a
-maximally extensible :mod:`repoze.bfg` application: you should not use
+maximally extensible :mod:`pyramid` application: you should not use
 any :term:`configuration decoration` or :term:`imperative
 configuration`. This means the application developer should avoid
 relying on :term:`configuration decoration` meant to be detected via
-a :term:`scan`, and you mustn't configure your :mod:`repoze.bfg`
+a :term:`scan`, and you mustn't configure your :mod:`pyramid`
 application *imperatively* by using any code which configures the
 application through methods of the :term:`Configurator` (except for
-the :meth:`repoze.bfg.configuration.Configurator.load_zcml` method).
+the :meth:`pyramid.configuration.Configurator.load_zcml` method).
 
 Instead, you must always use :term:`ZCML` for the equivalent
 purposes. :term:`ZCML` declarations that belong to an application can
@@ -36,12 +36,12 @@ Fundamental Plugpoints
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The fundamental "plug points" of an application developed using
-:mod:`repoze.bfg` are *routes*, *views*, and *resources*.  Routes are
+:mod:`pyramid` are *routes*, *views*, and *resources*.  Routes are
 declarations made using the ZCML ``<route>`` directive.  Views are
 declarations made using the ZCML ``<view>`` directive (or the
 ``@bfg_view`` decorator).  Resources are files that are accessed by
-repoze bfg using the :term:`pkg_resources` API such as static files
-and templates.
+:mod:`pyramid` using the :term:`pkg_resources` API such as static
+files and templates.
 
 .. index::
    single: ZCML granularity
@@ -88,8 +88,8 @@ and/or imperative code.
 Extending an Application Which Possesses Configuration Decorators Or Which Does Configuration Imperatively
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you've inherited a :mod:`repoze.bfg` application which uses
-:class:`repoze.bfg.view.bfg_view` decorators or which performs
+If you've inherited a :mod:`pyramid` application which uses
+:class:`pyramid.view.bfg_view` decorators or which performs
 configuration imperatively, one of two things may be true:
 
 - If you just want to *extend* the application, you can write
@@ -101,10 +101,10 @@ configuration imperatively, one of two things may be true:
   *may* need to change the source code of the original application.
 
   If the only source of trouble is the existence of
-  :class:`repoze.bfg.view.bfg_view` decorators, you can just prevent a
+  :class:`pyramid.view.bfg_view` decorators, you can just prevent a
   :term:`scan` from happening (by omitting the ``<scan>`` declaration
   from ZCML or omitting any call to the
-  :meth:`repoze.bfg.configuration.Configurator.scan` method).  This
+  :meth:`pyramid.configuration.Configurator.scan` method).  This
   will cause the decorators to do nothing.  At this point, you will
   need to convert all the configuration done in decorators into
   equivalent :term:`ZCML` and add that ZCML to a separate Python
@@ -132,7 +132,7 @@ The general pattern for extending an existing application looks
 something like this:
 
 - Create a new Python package.  The easiest way to do this is to
-  create a new :mod:`repoze.bfg` application using the "paster"
+  create a new :mod:`pyramid` application using the "paster"
   template mechanism.  See :ref:`creating_a_project` for more
   information.
 
@@ -141,7 +141,7 @@ something like this:
   setup.py install``).
 
 - Change the ``configure.zcml`` in the new package to include the
-  original :mod:`repoze.bfg` application's ``configure.zcml`` via an
+  original :mod:`pyramid` application's ``configure.zcml`` via an
   include statement, e.g.  ``<include package="theoriginalapp"/>``.
   Alternately, if the original application writer anticipated
   overriding some things and not others, instead of including the

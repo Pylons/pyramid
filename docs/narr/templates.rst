@@ -4,18 +4,18 @@ Templates
 =========
 
 A :term:`template` is a file on disk which can be used to render
-dynamic data provided by a :term:`view`.  :mod:`repoze.bfg` offers a
+dynamic data provided by a :term:`view`.  :mod:`pyramid` offers a
 number of ways to perform templating tasks out of the box, and
 provides add-on templating support through a set of bindings packages.
 
-Out of the box, :mod:`repoze.bfg` provides templating via the
+Out of the box, :mod:`pyramid` provides templating via the
 :term:`Chameleon` templating library.  :term:`Chameleon` provides
 support for two different types of templates: :term:`ZPT` templates
 and text templates.
 
 Before discussing how built-in templates are used in
 detail, we'll discuss two ways to render templates within
-:mod:`repoze.bfg` in general: directly, and via renderer
+:mod:`pyramid` in general: directly, and via renderer
 configuration.
 
 .. index::
@@ -28,11 +28,11 @@ Templates Used Directly
 -----------------------
 
 The most straightforward way to use a template within
-:mod:`repoze.bfg` is to cause it to be rendered directly within a
+:mod:`pyramid` is to cause it to be rendered directly within a
 :term:`view callable`.  You may use whatever API is supplied by a
 given templating engine to do so.
 
-:mod:`repoze.bfg` provides various APIs that allow you to render
+:mod:`pyramid` provides various APIs that allow you to render
 templates directly from within a view callable.  For example, if there
 is a :term:`Chameleon` ZPT template named ``foo.pt`` in a directory in
 your application named ``templates``, you can render the template from
@@ -41,7 +41,7 @@ within the body of a view callable like so:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.renderers import render_to_response
+   from pyramid.renderers import render_to_response
 
    def sample_view(request):
        return render_to_response('templates/foo.pt', 
@@ -51,16 +51,16 @@ within the body of a view callable like so:
 .. warning:: Earlier iterations of this documentation
    (pre-version-1.3) encouraged the application developer to use
    ZPT-specific APIs such as
-   :func:`repoze.bfg.chameleon_zpt.render_template_to_response`,
-   :func:`repoze.bfg.chameleon_zpt.render_template_to_iterable`, and
-   :func:`repoze.bfg.chameleon_zpt.render_template` to render
+   :func:`pyramid.chameleon_zpt.render_template_to_response`,
+   :func:`pyramid.chameleon_zpt.render_template_to_iterable`, and
+   :func:`pyramid.chameleon_zpt.render_template` to render
    templates directly.  This style of rendering still works, but at
    least for purposes of this documentation, those functions are
    deprecated.  Application developers are encouraged instead to use
-   the functions available in the :mod:`repoze.bfg.renderers` module
+   the functions available in the :mod:`pyramid.renderers` module
    to perform rendering tasks.  This set of functions works to render
    templates for all renderer extensions registered with
-   :mod:`repoze.bfg`.
+   :mod:`pyramid`.
 
 The ``sample_view`` :term:`view callable` above returns a
 :term:`response` object which contains the body of the
@@ -86,7 +86,7 @@ example:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.renderers import render_to_response
+   from pyramid.renderers import render_to_response
 
    def sample_view(request):
        return render_to_response('mypackage:templates/foo.pt',
@@ -102,7 +102,7 @@ specifications will continue to work properly if you move the code
 containing them around.
 
 In the examples above we pass in a keyword argument named ``request``
-representing the current :mod:`repoze.bfg` request. Passing a request
+representing the current :mod:`pyramid` request. Passing a request
 keyword argument will cause the ``render_to_response`` function to
 supply the renderer with more correct system values (see
 :ref:`renderer_system_values`), because most of the information
@@ -111,12 +111,12 @@ If you care about the correct system values being provided to the
 renderer being called (in particular, if your template relies on the
 name ``request`` or ``context``, or if you've configured special
 :term:`renderer globals` make sure to pass ``request`` as a keyword
-argument in every call to to a ``repoze.bfg.renderers.render_*``
+argument in every call to to a ``pyramid.renderers.render_*``
 function.
 
 Every view must return a :term:`response` object (except for views
 which use a :term:`renderer` named via view configuration, which we'll
-see shortly).  The :func:`repoze.bfg.renders.render_to_response`
+see shortly).  The :func:`pyramid.renders.render_to_response`
 function is a shortcut function that actually returns a response
 object.
 
@@ -125,14 +125,14 @@ return a response object.  If you call a "response-ignorant" API that
 returns information you'd like to use as a response (such as when you
 render a template to a string), you must construct your own response
 object as necessary with the string as the body.  For example, the
-:func:`repoze.bfg.renderers.render` API returns a string.  We can
+:func:`pyramid.renderers.render` API returns a string.  We can
 manufacture a :term:`response` object directly, and use that string as
 the body of the response:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.renderers import render
+   from pyramid.renderers import render
    from webob import Response
 
    def sample_view(request):
@@ -143,16 +143,16 @@ the body of the response:
        return response
 
 Because :term:`view callable` functions are typically the only code in
-:mod:`repoze.bfg` that need to know anything about templates, and
+:mod:`pyramid` that need to know anything about templates, and
 because view functions are very simple Python, you can use whatever
 templating system you're most comfortable with within
-:mod:`repoze.bfg`.  Install the templating system, import its API
+:mod:`pyramid`.  Install the templating system, import its API
 functions into your views module, use those APIs to generate a string,
 then return that string as the body of a :term:`WebOb`
 :term:`Response` object.
 
 For example, here's an example of using raw `Mako
-<http://www.makotemplates.org/>`_ from within a :mod:`repoze.bfg`
+<http://www.makotemplates.org/>`_ from within a :mod:`pyramid`
 :term:`view`:
 
 .. ignore-next-block
@@ -170,22 +170,24 @@ For example, here's an example of using raw `Mako
 
 You probably wouldn't use this particular snippet in a project,
 because it's easier to use the Mako renderer bindings which already
-exist for :mod:`repoze.bfg` named ``repoze.bfg.mako`` (available from
+exist for :mod:`pyramid` named ``repoze.bfg.mako`` (available from
 `PyPI <http://pypi.python.org/pypi/repoze.bfg.mako>`_).  But if your
 favorite templating system is not supported as a renderer extension
-for BFG, you can create your own simple conmbination as shown above.
+for :mod:`pyramid`, you can create your own simple combination as
+shown above.
 
 .. note::
 
-   If you use third-party templating languages without cooperating BFG
-   bindings directly within view callables, the auto-template-reload
-   strategy explained in :ref:`reload_templates_section` will not be
-   available, nor will the template resource overriding capability
-   explained in :ref:`overriding_resources_section` be available, nor
-   will it be possible to use any template using that language as a
+   If you use third-party templating languages without cooperating
+   :mod:`pyramid` bindings directly within view callables, the
+   auto-template-reload strategy explained in
+   :ref:`reload_templates_section` will not be available, nor will the
+   template resource overriding capability explained in
+   :ref:`overriding_resources_section` be available, nor will it be
+   possible to use any template using that language as a
    :term:`renderer`.  However, it's reasonably easy to write custom
-   templating system binding packages for use under :mod:`repoze.bfg`
-   so that templates written in the language can be used as renderers.
+   templating system binding packages for use under :mod:`pyramid` so
+   that templates written in the language can be used as renderers.
    See :ref:`adding_and_overriding_renderers` for instructions on how
    to create your own template renderer and
    :ref:`available_template_system_bindings` for example packages.
@@ -196,12 +198,12 @@ may set attributes on the response that influence these values.
 
 Here's an example of changing the content-type and status of the
 response object returned by
-:func:`repoze.bfg.renderers.render_to_response`:
+:func:`pyramid.renderers.render_to_response`:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.renderers.render_to_response
+   from pyramid.renderers.render_to_response
 
    def sample_view(request):
        response = render_to_response('templates/foo.pt',
@@ -212,12 +214,12 @@ response object returned by
        return response
 
 Here's an example of manufacturing a response object using the result
-of :func:`repoze.bfg.renderers.render` (a string):
+of :func:`pyramid.renderers.render` (a string):
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.renderers import render
+   from pyramid.renderers import render
    from webob import Response
    def sample_view(request):
        result = render('mypackage:templates/foo.pt',
@@ -239,13 +241,13 @@ System Values Used During Rendering
 -----------------------------------
 
 When a template is rendered using
-:func:`repoze.bfg.renderers.render_to_response` or
-:func:`repoze.bfg.renderers.render`, the renderer representing the
+:func:`pyramid.renderers.render_to_response` or
+:func:`pyramid.renderers.render`, the renderer representing the
 template will be provided with a number of *system* values.  These
 values are provided in a dictionary to the renderer and include:
 
 ``context``
-  The current :mod:`repoze.bfg` context if ``request`` was provided as
+  The current :mod:`pyramid` context if ``request`` was provided as
   a keyword argument or ``None``.
 
 ``request``
@@ -268,7 +270,7 @@ these names available as top-level template variables.
 Templates Used as Renderers via Configuration
 ---------------------------------------------
 
-Instead of using the :func:`repoze.bfg.renderers.render_to_response`
+Instead of using the :func:`pyramid.renderers.render_to_response`
 API within the body of a view function directly to render a specific
 template to a response, you may associate a template written in a
 supported templating language with a view indirectly by specifying it
@@ -285,14 +287,14 @@ The association of a template as a renderer for a :term:`view
 configuration` makes it possible to replace code within a :term:`view
 callable` that handles the rendering of a template.
 
-Here's an example of using a :class:`repoze.bfg.view.bfg_view`
+Here's an example of using a :class:`pyramid.view.bfg_view`
 decorator to specify a :term:`view configuration` that names a
 template renderer:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='templates/foo.pt')
    def my_view(request):
@@ -302,8 +304,8 @@ template renderer:
    in the dictionary result returned from a renderer-configured view
    callable in order to ensure that the "most correct" system values
    are supplied to the renderer as it is when you use
-   :func:`repoze.bfg.renderers.render` or
-   :func:`repoze.bfg.renderers.render_to_response`.  This is handled
+   :func:`pyramid.renderers.render` or
+   :func:`pyramid.renderers.render_to_response`.  This is handled
    automatically.
 
 Similar renderer configuration can be done imperatively and via
@@ -325,11 +327,11 @@ a :term:`resource specification` in the form
 address template resources which live in another package.
 
 Not just any template from any arbitrary templating system may be used
-as a renderer.  Bindings must exist specifically for :mod:`repoze.bfg`
+as a renderer.  Bindings must exist specifically for :mod:`pyramid`
 to use a templating language template as a renderer.  Currently,
-:mod:`repoze.bfg` has built-in support for two Chameleon templating
+:mod:`pyramid` has built-in support for two Chameleon templating
 languages: ZPT and text.  See :ref:`built_in_renderers` for a
-discussion of their details.  :mod:`repoze.bfg` also supports the use
+discussion of their details.  :mod:`pyramid` also supports the use
 of :term:`Jinja2` templates as renderers.  See
 :ref:`available_template_system_bindings`.
 
@@ -375,9 +377,9 @@ imperatively.  See :ref:`renderer_system_values`.
 :term:`Chameleon` ZPT Templates
 -------------------------------
 
-Like :term:`Zope`, :mod:`repoze.bfg` uses :term:`ZPT` (Zope Page
+Like :term:`Zope`, :mod:`pyramid` uses :term:`ZPT` (Zope Page
 Templates) as its default templating language.  However,
-:mod:`repoze.bfg` uses a different implementation of the :term:`ZPT`
+:mod:`pyramid` uses a different implementation of the :term:`ZPT`
 specification than Zope does: the :term:`Chameleon` templating
 engine. The Chameleon engine complies largely with the `Zope Page
 Template <http://wiki.zope.org/ZPT/FrontPage>`_ template
@@ -401,7 +403,7 @@ the template as a :term:`renderer` like so:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='templates/foo.pt')
    def my_view(request):
@@ -417,7 +419,7 @@ A Sample ZPT Template
 ~~~~~~~~~~~~~~~~~~~~~
 
 Here's what a simple :term:`Chameleon` ZPT template used under
-:mod:`repoze.bfg` might look like:
+:mod:`pyramid` might look like:
 
 .. code-block:: xml
    :linenos:
@@ -433,7 +435,7 @@ Here's what a simple :term:`Chameleon` ZPT template used under
       <body>
          <h1 class="title">Welcome to <code>${project}</code>, an
 	  application generated by the <a
-	  href="http://static.repoze.org/bfgdocs">repoze.bfg</a> web
+	  href="http://pylonshq.com/pyramid">pyramid</a> web
 	  application framework.</h1>
       </body>
     </html>
@@ -441,8 +443,8 @@ Here's what a simple :term:`Chameleon` ZPT template used under
 Note the use of :term:`Genshi` -style ``${replacements}`` above.  This
 is one of the ways that :term:`Chameleon` ZPT differs from standard
 ZPT.  The above template expects to find a ``project`` key in the set
-of keywords passed in to it via :func:`repoze.bfg.renderers.render` or
-:func:`repoze.bfg.renderers.render_to_response`. Typical ZPT
+of keywords passed in to it via :func:`pyramid.renderers.render` or
+:func:`pyramid.renderers.render_to_response`. Typical ZPT
 attribute-based syntax (e.g. ``tal:content`` and ``tal:replace``) also
 works in these templates.
 
@@ -450,31 +452,31 @@ works in these templates.
    single: ZPT macros
    single: Chameleon ZPT macros
 
-Using ZPT Macros in :mod:`repoze.bfg`
+Using ZPT Macros in :mod:`pyramid`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When a :term:`renderer` is used to render a template,
-:mod:`repoze.bfg` makes at least two top-level names available to the
+:mod:`pyramid` makes at least two top-level names available to the
 template by default: ``context`` and ``request``.  One of the common
 needs in ZPT-based templates is to use one template's "macros" from within
 a different template.  In Zope, this is typically handled by
 retrieving the template from the ``context``.  But having a hold of
-the context in :mod:`repoze.bfg` is not helpful: templates cannot
-usually be retrieved from models.  To use macros in :mod:`repoze.bfg`,
+the context in :mod:`pyramid` is not helpful: templates cannot
+usually be retrieved from models.  To use macros in :mod:`pyramid`,
 you need to make the macro template itself available to the rendered
 template by passing the template in which the macro is defined (or even
 the macro itself) *into* the rendered template.  To make a macro
 available to the rendered template, you can retrieve a different
-template using the :func:`repoze.bfg.renderers.get_renderer` API,
+template using the :func:`pyramid.renderers.get_renderer` API,
 and pass it in to the template being rendered.  For example, using a
-:term:`view configuration` via a :class:`repoze.bfg.view.bfg_view`
+:term:`view configuration` via a :class:`pyramid.view.bfg_view`
 decorator that uses a :term:`renderer`:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.renderers import get_renderer
-   from repoze.bfg.view import bfg_view
+   from pyramid.renderers import get_renderer
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='templates/mytemplate.pt')
    def my_view(request):
@@ -517,7 +519,7 @@ And ``templates/mytemplate.pt`` might look like so:
 Templating with :term:`Chameleon` Text Templates
 ------------------------------------------------
 
-:mod:`repoze.bfg` also allows for the use of templates which are
+:mod:`pyramid` also allows for the use of templates which are
 composed entirely of non-XML text via :term:`Chameleon`.  To do so,
 you can create templates that are entirely composed of text except for
 ``${name}`` -style substitution points.
@@ -534,7 +536,7 @@ which renders this template:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='templates/mytemplate.txt')
    def my_view(request):
@@ -592,7 +594,7 @@ Automatically Reloading Templates
 
 It's often convenient to see changes you make to a template file
 appear immediately without needing to restart the application process.
-:mod:`repoze.bfg` allows you to configure your application development
+:mod:`pyramid` allows you to configure your application development
 environment so that a change to a template will be automatically
 detected, and the template will be reloaded on the next rendering.
 
@@ -623,7 +625,7 @@ Nicer Exceptions in Templates
 -----------------------------
 
 The exceptions raised by Chameleon templates when a rendering fails
-are sometimes less than helpful.  :mod:`repoze.bfg` allows you to
+are sometimes less than helpful.  :mod:`pyramid` allows you to
 configure your application development environment so that exceptions
 generated by Chameleon during template compilation and execution will
 contain nicer debugging information.
@@ -663,12 +665,12 @@ on, an exception resulting from the same problem might end like so::
 
     RuntimeError: Caught exception rendering template.
      - Expression: ``wrong``
-     - Filename:   /home/fred/env/bfgzodb/bfgzodb/templates/mytemplate.pt
-     - Arguments:  renderer_name: bfgzodb:templates/mytemplate.pt
+     - Filename:   /home/fred/env/proj/proj/templates/mytemplate.pt
+     - Arguments:  renderer_name: proj:templates/mytemplate.pt
                    template: <PageTemplateFile - at 0x1d2ecf0>
                    xincludes: <XIncludes - at 0x1d3a130>
                    request: <Request - at 0x1d2ecd0>
-                   project: bfgzodb
+                   project: proj
                    macros: <Macros - at 0x1d3aed0>
                    context: <MyModel None at 0x1d39130>
                    view: <function my_view at 0x1d23570>
@@ -706,7 +708,7 @@ templates.
 Available Add-On Template System Bindings
 -----------------------------------------
 
-Jinja2 template bindings are available for :mod:`repoze.bfg` in the
+Jinja2 template bindings are available for :mod:`pyramid` in the
 ``repoze.bfg.jinja2`` package.  It lives in the Repoze Subversion
 repository at `http://svn.repoze.org/repoze.bfg.jinja2
 <http://svn.repoze.org/repoze.bfg.jinja2>`_; it is also available from

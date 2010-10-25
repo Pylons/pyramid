@@ -1,6 +1,6 @@
 .. _installing_chapter:
 
-Installing :mod:`repoze.bfg`
+Installing :mod:`pyramid`
 ============================
 
 .. index::
@@ -10,22 +10,22 @@ Before You Install
 ------------------
 
 You will need `Python <http://python.org>`_ version 2.4 or better to
-run :mod:`repoze.bfg`.  
+run :mod:`pyramid`.  
 
 .. sidebar:: Python Versions
 
-    As of this writing, :mod:`repoze.bfg` has been tested under Python
-    2.4.6, Python 2.5.4 and Python 2.6.2, and Python 2.7a1.  To ensure
-    backwards compatibility, development of :mod:`repoze.bfg` is
+    As of this writing, :mod:`pyramid` has been tested under Python
+    2.4.6, Python 2.5.4 and Python 2.6.2, and Python 2.7.  To ensure
+    backwards compatibility, development of :mod:`pyramid` is
     currently done primarily under Python 2.4 and Python 2.5.
-    :mod:`repoze.bfg` does not run under any version of Python before
+    :mod:`pyramid` does not run under any version of Python before
     2.4, and does not yet run under Python 3.X.
 
-:mod:`repoze.bfg` is known to run on all popular Unix-like systems
+:mod:`pyramid` is known to run on all popular Unix-like systems
 such as Linux, MacOS X, and FreeBSD as well as on Windows platforms.
 It is also known to run on Google's App Engine and :term:`Jython`.
 
-:mod:`repoze.bfg` installation does not require the compilation of any
+:mod:`pyramid` installation does not require the compilation of any
 C code, so you need only a Python interpreter that meets the
 requirements mentioned.
 
@@ -60,7 +60,7 @@ Source Compile Method
 
 It's useful to use a Python interpreter that *isn't* the "system"
 Python interpreter to develop your software.  The authors of
-:mod:`repoze.bfg` tend not to use the system Python for development
+:mod:`pyramid` tend not to use the system Python for development
 purposes; always a self-compiled one.  Compiling Python is usually
 easy, and often the "system" Python is compiled with options that
 aren't optimal for web development.
@@ -126,24 +126,24 @@ extensions <http://sourceforge.net/projects/pywin32/files/>`_.
 
 .. _installing_unix:
 
-Installing :mod:`repoze.bfg` on a UNIX System
+Installing :mod:`pyramid` on a UNIX System
 ---------------------------------------------
 
-It is best practice to install :mod:`repoze.bfg` into a "virtual"
+It is best practice to install :mod:`pyramid` into a "virtual"
 Python environment in order to obtain isolation from any "system"
 packages you've got installed in your Python version.  This can be
 done by using the :term:`virtualenv` package.  Using a virtualenv will
-also prevent :mod:`repoze.bfg` from globally installing versions of
+also prevent :mod:`pyramid` from globally installing versions of
 packages that are not compatible with your system Python.
 
-To set up a virtualenv in which to install :mod:`repoze.bfg`, first
+To set up a virtualenv in which to install :mod:`pyramid`, first
 ensure that :term:`setuptools` is installed.  Invoke ``import
 setuptools`` within the Python interpreter you'd like to run
-:mod:`repoze.bfg` under:
+:mod:`pyramid` under:
 
 .. code-block:: text
 
-   [chrism@vitaminf bfg]$ python
+   [chrism@vitaminf pyramid]$ python
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
    Type "help", "copyright", "credits" or "license" for more information.
@@ -218,15 +218,15 @@ following:
 
 .. code-block:: text
 
-   $ virtualenv --no-site-packages bfgenv
-   New python executable in bfgenv/bin/python
+   $ virtualenv --no-site-packages env
+   New python executable in env/bin/python
    Installing setuptools.............done.
 
 .. warning:: Using ``--no-site-packages`` when generating your
    virtualenv is *very important*. This flag provides the necessary
    isolation for running the set of packages required by
-   :mod:`repoze.bfg`.  If you do not specify ``--no-site-packages``,
-   it's possible that :mod:`repoze.bfg` will not install properly into
+   :mod:`pyramid`.  If you do not specify ``--no-site-packages``,
+   it's possible that :mod:`pyramid` will not install properly into
    the virtualenv, or, even if it does, may not run properly,
    depending on the packages you've already got installed into your
    Python's "main" site-packages dir.
@@ -236,19 +236,18 @@ following:
    to create a virtualenv as a normal user.
 
 You should perform any following commands that mention a "bin"
-directory from within the ``bfgenv`` virtualenv dir.
+directory from within the ``env`` virtualenv dir.
 
-Installing :mod:`repoze.bfg` Into the Virtual Python Environment
+Installing :mod:`pyramid` Into the Virtual Python Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After you've got your ``bfgenv`` virtualenv installed, you may install
-:mod:`repoze.bfg` itself using the following commands from within the
-virtualenv (``bfgenv``) directory:
+After you've got your ``env`` virtualenv installed, you may install
+:mod:`pyramid` itself using the following commands from within the
+virtualenv (``env``) directory:
 
 .. code-block:: text
 
-   $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple \
-         repoze.bfg
+   $ bin/easy_install pyramid
 
 This command will take longer than the previous ones to complete, as it
 downloads and installs a number of dependencies.
@@ -258,7 +257,7 @@ downloads and installs a number of dependencies.
 
 .. _installing_windows:
 
-Installing :mod:`repoze.bfg` on a Windows System
+Installing :mod:`pyramid` on a Windows System
 -------------------------------------------------
 
 #. Install, or find `Python 2.6
@@ -289,51 +288,50 @@ Installing :mod:`repoze.bfg` on a Windows System
 
    .. code-block:: text
 
-      c:\> c:\Python26\Scripts\virtualenv --no-site-packages bfgenv
+      c:\> c:\Python26\Scripts\virtualenv --no-site-packages env
 
-#. Switch to the ``bfgenv`` directory:
+#. Switch to the ``env`` directory:
 
    .. code-block:: text
 
-      c:\> cd bfgenv
+      c:\> cd env
 
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
 #. Use ``easy_install`` pointed at the "current" index to get
-   :mod:`repoze.bfg` and its direct dependencies installed:
+   :mod:`pyramid` and its direct dependencies installed:
 
    .. code-block:: text
 
-      c:\bfgenv> Scripts\easy_install -i \
-           http://dist.repoze.org/bfg/current/simple repoze.bfg
+      c:\env> Scripts\easy_install pyramid
 
 .. index::
    single: installing on Google App Engine
 
-Installing :mod:`repoze.bfg` on Google App Engine
+Installing :mod:`pyramid` on Google App Engine
 -------------------------------------------------
 
 :ref:`appengine_tutorial` documents the steps required to install a
-:mod:`repoze.bfg` application on Google App Engine.
+:mod:`pyramid` application on Google App Engine.
 
-Installing :mod:`repoze.bfg` on Jython
+Installing :mod:`pyramid` on Jython
 --------------------------------------
 
-:mod:`repoze.bfg` is known to work under :term:`Jython` version 2.5.1.
+:mod:`pyramid` is known to work under :term:`Jython` version 2.5.1.
 Install :term:`Jython`, and then follow the installation steps for
-:mod:`repoze.bfg` on your platform described in one of the sections
+:mod:`pyramid` on your platform described in one of the sections
 entitled :ref:`installing_unix` or :ref:`installing_windows` above,
 replacing the ``python`` command with ``jython`` as necessary.  The
 steps are exactly the same except you should use the ``jython``
 command name instead of the ``python`` command name.
 
-One caveat exists to using :mod:`repoze.bfg` under Jython: the
+One caveat exists to using :mod:`pyramid` under Jython: the
 :term:`Chameleon` templating engine, which is the default templating
-engine for :mod:`repoze.bfg` does not work on Jython.
+engine for :mod:`pyramid` does not work on Jython.
 
 The ``repoze.bfg.jinja2`` distribution provides templating for
-:mod:`repoze.bfg` using the :term:`Jinja2` templating system.  You may
+:mod:`pyramid` using the :term:`Jinja2` templating system.  You may
 install it like so using the ``easy_install`` command for Jython:
 
 .. code-block:: python
@@ -341,7 +339,7 @@ install it like so using the ``easy_install`` command for Jython:
    $ easy_install repoze.bfg.jinja2
 
 Once this is done, you can use this command to get started with a
-:mod:`repoze.bfg` sample application that uses the Jinja2 templating
+:mod:`pyramid` sample application that uses the Jinja2 templating
 engine:
 
 .. code-block:: python
@@ -354,10 +352,10 @@ about the ``paster create`` command.
 What Gets Installed
 -------------------
 
-When you ``easy_install`` :mod:`repoze.bfg`, various Zope libraries,
+When you ``easy_install`` :mod:`pyramid`, various Zope libraries,
 various Chameleon libraries, WebOb, Paste, PasteScript, and
 PasteDeploy libraries are installed.
 
 Additionally, as chronicled in :ref:`project_narr`, PasteScript (aka
 *paster*) templates will be registered that make it easy to start a
-new :mod:`repoze.bfg` project.
+new :mod:`pyramid` project.

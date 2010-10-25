@@ -3,11 +3,11 @@
 Combining Traversal and URL Dispatch
 ====================================
 
-When you write most :mod:`repoze.bfg` applications, you'll be using
+When you write most :mod:`pyramid` applications, you'll be using
 one or the other of two available :term:`context finding` subsystems:
 traversal or URL dispatch.  However, to solve a limited set of
 problems, it's useful to use *both* traversal and URL dispatch
-together within the same application.  :mod:`repoze.bfg` makes this
+together within the same application.  :mod:`pyramid` makes this
 possible via *hybrid* applications.
 
 .. warning::
@@ -24,7 +24,7 @@ A Review of Non-Hybrid Applications
 -----------------------------------
 
 When used according to the tutorials in its documentation
-:mod:`repoze.bfg` is a "dual-mode" framework: the tutorials explain
+:mod:`pyramid` is a "dual-mode" framework: the tutorials explain
 how to create an application in terms of using either :term:`url
 dispatch` *or* :term:`traversal`.  This chapter details how you might
 combine these two dispatch mechanisms, but we'll review how they work
@@ -58,7 +58,7 @@ named by the ``view`` attribute is invoked.
 Typically, an application that uses only URL dispatch won't perform
 any configuration in ZCML that includes a ``<view>`` declaration and
 won't have any calls to
-:meth:`repoze.bfg.configuration.Configurator.add_view` in its startup
+:meth:`pyramid.configuration.Configurator.add_view` in its startup
 code.
 
 Traversal Only
@@ -88,13 +88,13 @@ called when the URL ``/bazbuz`` is visited.
 An application that uses :term:`traversal` exclusively to map URLs to
 code usually won't have any ZCML ``<route>`` declarations nor will it
 make any calls to the
-:meth:`repoze.bfg.configuration.Configurator.add_route` method.
+:meth:`pyramid.configuration.Configurator.add_route` method.
 
 Hybrid Applications
 -------------------
 
 Either traversal or url dispatch alone can be used to create a
-:mod:`repoze.bfg` application.  However, it is also possible to
+:mod:`pyramid` application.  However, it is also possible to
 combine the concepts of traversal and url dispatch when building an
 application: the result is a hybrid application.  In a hybrid
 application, traversal is performed *after* a particular route has
@@ -173,11 +173,11 @@ match is straightforward.  When a route is matched:
   argument, the *global* :term:`root factory` will be called to
   generate a :term:`root` object.  The global root factory is the
   callable implied by the ``root_factory`` argument passed to
-  :class:`repoze.bfg.configuration.Configurator` at application
+  :class:`pyramid.configuration.Configurator` at application
   startup time.
 
 - If a ``root_factory`` argument is not provided to the
-  :class:`repoze.bfg.configuration.Configurator` at startup time, a
+  :class:`pyramid.configuration.Configurator` at startup time, a
   *default* root factory is used.  The default root factory is used to
   generate a root object.
 
@@ -224,7 +224,7 @@ invoking a specific view callable named directly within the matched
 route's configuration.
 
 Because the pattern of the above route ends with ``*traverse``, when this
-route configuration is matched during a request, :mod:`repoze.bfg`
+route configuration is matched during a request, :mod:`pyramid`
 will attempt to use :term:`traversal` against the :term:`root` object
 implied by the :term:`root factory` implied by the route's
 configuration.  Once :term:`traversal` has found a :term:`context`,
@@ -281,7 +281,7 @@ to do.
 
   We could have also used our ``root_factory`` callable as the
   ``root_factory`` argument of the
-  :class:`repoze.bfg.configuration.Configurator` constructor instead
+  :class:`pyramid.configuration.Configurator` constructor instead
   of associating it with a particular route inside the route's
   configuration.  Every hybrid route configuration that is matched but
   which does *not* name a ``factory``` attribute will use the use
@@ -299,7 +299,7 @@ returned from the root factory.  In the above example, the
 If the URL that matched a route with the pattern ``:foo/:bar/*traverse``,
 is ``http://example.com/one/two/a/b/c``, the traversal path used
 against the root object will be ``a/b/c``.  As a result,
-:mod:`repoze.bfg` will attempt to traverse through the edges ``a``,
+:mod:`pyramid` will attempt to traverse through the edges ``a``,
 ``b``, and ``c``, beginning at the root object.
 
 In our above example, this particular set of traversal steps will mean
@@ -397,7 +397,7 @@ Using the ``traverse`` Argument In a Route Definition
 
 Rather than using the ``*traverse`` remainder marker in a pattern, you
 can use the ``traverse`` argument to the
-:meth:`repoze.bfg.configuration.Configurator.add_route`` method or the
+:meth:`pyramid.configuration.Configurator.add_route`` method or the
 ``traverse`` attribute of the :ref:`route_directive` ZCML directive.
 (either method is equivalent).
 
@@ -481,8 +481,8 @@ Using ``*subpath`` in a Route Pattern
 There are certain extremely rare cases when you'd like to influence
 the traversal :term:`subpath` when a route matches without actually
 performing traversal.  For instance, the
-:func:`repoze.bfg.wsgi.wsgiapp2` decorator and the
-:class:`repoze.bfg.view.static` helper attempt to compute
+:func:`pyramid.wsgi.wsgiapp2` decorator and the
+:class:`pyramid.view.static` helper attempt to compute
 ``PATH_INFO`` from the request's subpath, so it's useful to be able to
 influence this value.
 
@@ -501,7 +501,7 @@ commonly in route declarations that look like this:
     />
 
 Where ``.views.static_view`` is an instance of
-:class:`repoze.bfg.view.static`.  This effectively tells the static
+:class:`pyramid.view.static`.  This effectively tells the static
 helper to traverse everything in the subpath as a filename.
 
 Corner Cases

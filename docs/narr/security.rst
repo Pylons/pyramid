@@ -6,7 +6,7 @@
 Security
 ========
 
-:mod:`repoze.bfg` provides an optional declarative authorization
+:mod:`pyramid` provides an optional declarative authorization
 system that prevents a :term:`view` from being invoked when the user
 represented by credentials in the :term:`request` does not have an
 appropriate level of access within a particular :term:`context`.
@@ -43,30 +43,10 @@ Here's how it works at a high level:
 
 Authorization is enabled by modifying your application to include an
 :term:`authentication policy` and :term:`authorization policy`.
-:mod:`repoze.bfg` comes with a variety of implementations of these
-policies.  To provide maximal flexibility, :mod:`repoze.bfg` also
+:mod:`pyramid` comes with a variety of implementations of these
+policies.  To provide maximal flexibility, :mod:`pyramid` also
 allows you to create custom authentication policies and authorization
 policies.
-
-.. warning::
-
-   Various systems exist for adding authentication and authorization
-   to arbitrary web frameworks.  Two of these, :mod:`repoze.who` and
-   :mod:`repoze.what` are even written under the same Repoze "flag" as
-   :mod:`repoze.bfg`!  However, neither :mod:`repoze.who` nor
-   :mod:`repoze.what` is required to add authorization or
-   authentication to a :mod:`repoze.bfg` application.  In fact, unless
-   you have very specific requirements that include some sort of
-   "single sign on" or you need to integrate authorization across
-   multiple non-:mod:`repoze.bfg` Python applications, you can
-   probably safely ignore the existence of both :mod:`repoze.who` and
-   :mod:`repoze.what`.  Those packages are useful when adding
-   authentication and authorization to a web framework such as Pylons
-   which has no built-in authentication or authorization machinery.
-   Because :mod:`repoze.bfg` already has facilities for authentication
-   and authorization built in, the use of :mod:`repoze.who` or
-   :mod:`repoze.what` is not required within :mod:`repoze.bfg`
-   applications.
 
 .. index::
    single: authorization policy
@@ -74,7 +54,7 @@ policies.
 Enabling an Authorization Policy
 --------------------------------
 
-By default, :mod:`repoze.bfg` enables no authorization policy.  All
+By default, :mod:`pyramid` enables no authorization policy.  All
 views are accessible by completely anonymous users.  In order to begin
 protecting views from execution based on security settings, you need
 to enable an authorization policy.
@@ -86,14 +66,14 @@ Enabling an Authorization Policy Imperatively
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Passing an ``authorization_policy`` argument to the constructor of the
-:class:`repoze.bfg.configuration.Configurator` class enables an
+:class:`pyramid.configuration.Configurator` class enables an
 authorization policy.
 
 You must also enable an :term:`authentication policy` in order to
 enable the authorization policy.  This is because authorization, in
 general, depends upon authentication.  Use the
 ``authentication_policy`` argument to the
-:class:`repoze.bfg.configuration.Configurator` class during
+:class:`pyramid.configuration.Configurator` class during
 application setup to specify an authentication policy.
 
 For example:
@@ -102,9 +82,9 @@ For example:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.configuration import Configurator
-   from repoze.bfg.authentication import AuthTktAuthenticationPolicy
-   from repoze.bfg.authorization import ACLAuthorizationPolicy
+   from pyramid.configuration import Configurator
+   from pyramid.authentication import AuthTktAuthenticationPolicy
+   from pyramid.authorization import ACLAuthorizationPolicy
    authentication_policy = AuthTktAuthenticationPolicy('seekrit')
    authorization_policy = ACLAuthorizationPolicy()
    config = Configurator(authentication_policy=authentication_policy,
@@ -126,8 +106,8 @@ authorization policies, it is an error to pass an authentication
 policy without the authorization policy or vice versa to a
 :term:`Configurator` constructor.
 
-See also the :mod:`repoze.bfg.authorization` and
-:mod:`repoze.bfg.authentication` modules for alternate implementations
+See also the :mod:`pyramid.authorization` and
+:mod:`pyramid.authentication` modules for alternate implementations
 of authorization and authentication policies.  
 
 Enabling an Authorization Policy Via ZCML
@@ -148,7 +128,7 @@ this:
 .. code-block:: xml
    :linenos:
 
-   <configure xmlns="http://namespaces.repoze.org/bfg">
+   <configure xmlns="http://pylonshq.com/pyramid">
 
      <!-- views and other directives before this... -->
 
@@ -160,13 +140,13 @@ this:
     </configure>
 
 "Under the hood", these statements cause an instance of the class
-:class:`repoze.bfg.authentication.AuthTktAuthenticationPolicy` to be
+:class:`pyramid.authentication.AuthTktAuthenticationPolicy` to be
 injected as the :term:`authentication policy` used by this application
 and an instance of the class
-:class:`repoze.bfg.authorization.ACLAuthorizationPolicy` to be
+:class:`pyramid.authorization.ACLAuthorizationPolicy` to be
 injected as the :term:`authorization policy` used by this application.
 
-:mod:`repoze.bfg` ships with a number of authorization and
+:mod:`pyramid` ships with a number of authorization and
 authentication policy ZCML directives that should prove useful.  See
 :ref:`authentication_policies_directives_section` and
 :ref:`authorization_policies_directives_section` for more information.
@@ -207,7 +187,7 @@ may be performed via the ``@bfg_view`` decorator:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
    from models import Blog
 
    @bfg_view(context=Blog, name='add_entry.html', permission='add')
@@ -216,7 +196,7 @@ may be performed via the ``@bfg_view`` decorator:
        pass
 
 Or the same thing can be done using the
-:meth:`repoze.bfg.configuration.Configurator.add_view` method:
+:meth:`pyramid.configuration.Configurator.add_view` method:
 
 .. ignore-next-block
 .. code-block:: python
@@ -242,7 +222,7 @@ registered view always be executable by entirely anonymous users: any
 authorization policy in effect is ignored.
 
 In support of making it easier to configure applications which are
-"secure by default", :mod:`repoze.bfg` allows you to configure a
+"secure by default", :mod:`pyramid` allows you to configure a
 *default* permission.  If supplied, the default permission is used as
 the permission string to all view registrations which don't otherwise
 name a ``permission`` argument.
@@ -251,10 +231,10 @@ These APIs are in support of configuring a default permission for an
 application:
 
 - The ``default_permission`` constructor argument to the
-  :mod:`repoze.bfg.configuration.Configurator` constructor.
+  :mod:`pyramid.configuration.Configurator` constructor.
 
 - The
-  :meth:`repoze.bfg.configuration.Configurator.set_default_permission`
+  :meth:`pyramid.configuration.Configurator.set_default_permission`
   method.
 
 - The :ref:`default_permission_directive` ZCML directive.
@@ -265,7 +245,7 @@ that view registration, and the view-configuration-named permission is
 used.
 
 .. note:: All APIs and ZCML directives related to default permissions
-   are new in :mod:`repoze.bfg` 1.3.
+   are new in :mod:`pyramid` 1.3.
 
 .. index::
    single: ACL
@@ -276,7 +256,7 @@ used.
 Assigning ACLs to your Model Objects
 ------------------------------------
 
-When the default :mod:`repoze.bfg` :term:`authorization policy`
+When the default :mod:`pyramid` :term:`authorization policy`
 determines whether a user possesses a particular permission in a
 :term:`context`, it examines the :term:`ACL` associated with the
 context.  An ACL is associated with a context by virtue of the
@@ -291,8 +271,8 @@ class:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Everyone
-   from repoze.bfg.security import Allow
+   from pyramid.security import Everyone
+   from pyramid.security import Allow
 
    class Blog(object):
        __acl__ = [
@@ -307,8 +287,8 @@ Or, if your models are persistent, an ACL might be specified via the
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Everyone
-   from repoze.bfg.security import Allow
+   from pyramid.security import Everyone
+   from pyramid.security import Allow
 
    class Blog(object):
        pass
@@ -339,8 +319,8 @@ Here's an example ACL:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Everyone
-   from repoze.bfg.security import Allow
+   from pyramid.security import Everyone
+   from pyramid.security import Allow
 
    __acl__ = [
            (Allow, Everyone, 'view'),
@@ -349,7 +329,7 @@ Here's an example ACL:
            ]
 
 The example ACL indicates that the
-:data:`repoze.bfg.security.Everyone` principal -- a special
+:data:`pyramid.security.Everyone` principal -- a special
 system-defined principal indicating, literally, everyone -- is allowed
 to view the blog, the ``group:editors`` principal is allowed to add to
 and edit the blog.
@@ -360,8 +340,8 @@ Everyone, 'view')``, ``(Allow, 'group:editors', 'add')``, and
 ``(Allow, 'group:editors', 'edit')``.
 
 The first element of any ACE is either
-:data:`repoze.bfg.security.Allow`, or
-:data:`repoze.bfg.security.Deny`, representing the action to take when
+:data:`pyramid.security.Allow`, or
+:data:`pyramid.security.Deny`, representing the action to take when
 the ACE matches.  The second element is a :term:`principal`.  The
 third argument is a permission or sequence of permission names.
 
@@ -369,7 +349,7 @@ A principal is usually a user id, however it also may be a group id if
 your authentication system provides group information and the
 effective :term:`authentication policy` policy is written to respect
 group information.  For example, the
-:class:`repoze.bfg.authentication.RepozeWho1AuthenicationPolicy`
+:class:`pyramid.authentication.RepozeWho1AuthenicationPolicy`
 enabled by the ``repozewho1authenticationpolicy`` ZCML directive
 respects group information if you configure it with a ``callback``.
 See :ref:`authentication_policies_directives_section` for more
@@ -381,9 +361,9 @@ order dictated by the ACL*.  So if you have an ACL like this:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Everyone
-   from repoze.bfg.security import Allow
-   from repoze.bfg.security import Deny
+   from pyramid.security import Everyone
+   from pyramid.security import Allow
+   from pyramid.security import Deny
 
    __acl__ = [
        (Allow, Everyone, 'view'),
@@ -398,9 +378,9 @@ like this:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Everyone
-   from repoze.bfg.security import Allow
-   from repoze.bfg.security import Deny
+   from pyramid.security import Everyone
+   from pyramid.security import Allow
+   from pyramid.security import Deny
 
    __acl__ = [
        (Deny, Everyone, 'view'),
@@ -419,8 +399,8 @@ ACE, as below.
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Everyone
-   from repoze.bfg.security import Allow
+   from pyramid.security import Everyone
+   from pyramid.security import Allow
 
    __acl__ = [
        (Allow, Everyone, 'view'),
@@ -435,18 +415,18 @@ ACE, as below.
 Special Principal Names
 -----------------------
 
-Special principal names exist in the :mod:`repoze.bfg.security`
+Special principal names exist in the :mod:`pyramid.security`
 module.  They can be imported for use in your own code to populate
-ACLs, e.g. :data:`repoze.bfg.security.Everyone`.
+ACLs, e.g. :data:`pyramid.security.Everyone`.
 
-:data:`repoze.bfg.security.Everyone`
+:data:`pyramid.security.Everyone`
 
   Literally, everyone, no matter what.  This object is actually a
   string "under the hood" (``system.Everyone``).  Every user "is" the
   principal named Everyone during every request, even if a security
   policy is not in use.
 
-:data:`repoze.bfg.security.Authenticated`
+:data:`pyramid.security.Authenticated`
 
   Any user with credentials as determined by the current security
   policy.  You might think of it as any user that is "logged in".
@@ -460,12 +440,12 @@ ACLs, e.g. :data:`repoze.bfg.security.Everyone`.
 Special Permissions
 -------------------
 
-Special permission names exist in the :mod:`repoze.bfg.security`
+Special permission names exist in the :mod:`pyramid.security`
 module.  These can be imported for use in ACLs.
 
 .. _all_permissions:
 
-:data:`repoze.bfg.security.ALL_PERMISSIONS`
+:data:`pyramid.security.ALL_PERMISSIONS`
 
   An object representing, literally, *all* permissions.  Useful in an
   ACL like so: ``(Allow, 'fred', ALL_PERMISSIONS)``.  The
@@ -482,7 +462,7 @@ Special ACEs
 ------------
 
 A convenience :term:`ACE` is defined representing a deny to everyone
-of all permissions in :data:`repoze.bfg.security.DENY_ALL`.  This ACE
+of all permissions in :data:`pyramid.security.DENY_ALL`.  This ACE
 is often used as the *last* ACE of an ACL to explicitly cause
 inheriting authorization policies to "stop looking up the traversal
 tree" (effectively breaking any inheritance).  For example, an ACL
@@ -493,17 +473,17 @@ authorization policy is in effect might look like so:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Allow
-   from repoze.bfg.security import DENY_ALL
+   from pyramid.security import Allow
+   from pyramid.security import DENY_ALL
 
    __acl__ = [ (Allow, 'fred', 'view'), DENY_ALL ]
 
-"Under the hood", the :data:`repoze.bfg.security.DENY_ALL` ACE equals
+"Under the hood", the :data:`pyramid.security.DENY_ALL` ACE equals
 the following:
 
 .. code-block:: python
 
-   from repoze.bfg.security import ALL_PERMISSIONS
+   from pyramid.security import ALL_PERMISSIONS
    __acl__ = [ (Deny, Everyone, ALL_PERMISSIONS) ]
 
 .. index::
@@ -545,7 +525,7 @@ location-awareness.  See also :ref:`location_aware`.
 Changing the Forbidden View
 ---------------------------
 
-When :mod:`repoze.bfg` denies a view invocation due to an
+When :mod:`pyramid` denies a view invocation due to an
 authorization denial, the special ``forbidden`` view is invoked.  "Out
 of the box", this forbidden view is very plain.  See
 :ref:`changing_the_forbidden_view` within :ref:`hooks_chapter` for
@@ -586,20 +566,20 @@ also contain security debugging information in its body.
 Debugging Imperative Authorization Failures
 -------------------------------------------
 
-The :func:`repoze.bfg.security.has_permission` API is used to check
+The :func:`pyramid.security.has_permission` API is used to check
 security within view functions imperatively.  It returns instances of
 objects that are effectively booleans.  But these objects are not raw
 ``True`` or ``False`` objects, and have information attached to them
 about why the permission was allowed or denied.  The object will be
-one of :data:`repoze.bfg.security.ACLAllowed`,
-:data:`repoze.bfg.security.ACLDenied`,
-:data:`repoze.bfg.security.Allowed`, or
-:data:`repoze.bfg.security.Denied`, as documented in
+one of :data:`pyramid.security.ACLAllowed`,
+:data:`pyramid.security.ACLDenied`,
+:data:`pyramid.security.Allowed`, or
+:data:`pyramid.security.Denied`, as documented in
 :ref:`security_module`.  At the very minimum these objects will have a
 ``msg`` attribute, which is a string indicating why the permission was
 denied or allowed.  Introspecting this information in the debugger or
 via print statements when a call to
-:func:`repoze.bfg.security.has_permission` fails is often useful.
+:func:`pyramid.security.has_permission` fails is often useful.
 
 .. index::
    pair: ZCML directive; authentication policy
@@ -610,7 +590,7 @@ Built-In Authentication Policy ZCML Directives
 ----------------------------------------------
 
 Instead of configuring an authentication policy and authorization
-policy imperatively, :mod:`repoze.bfg` ships with a few "pre-chewed"
+policy imperatively, :mod:`pyramid` ships with a few "pre-chewed"
 authentication policy ZCML directives that you can make use of within
 your application.
 
@@ -715,8 +695,8 @@ See :ref:`aclauthorizationpolicy_directive` for detailed information.
 Creating Your Own Authentication Policy
 ---------------------------------------
 
-:mod:`repoze.bfg` ships with a number of useful out-of-the-box
-security policies (see :mod:`repoze.bfg.authentication`).  However,
+:mod:`pyramid` ships with a number of useful out-of-the-box
+security policies (see :mod:`pyramid.authentication`).  However,
 creating your own authentication policy is often necessary when you
 want to control the "horizontal and vertical" of how your users
 authenticate.  Doing so is a matter of creating an instance of something
@@ -725,7 +705,7 @@ that implements the following interface:
 .. code-block:: python
 
    class AuthenticationPolicy(object):
-       """ An object representing a BFG authentication policy. """
+       """ An object representing a Pyramid authentication policy. """
        def authenticated_userid(self, request):
            """ Return the authenticated userid or ``None`` if no
            authenticated userid can be found. """
@@ -747,7 +727,7 @@ that implements the following interface:
            current user on subsequent requests. """
 
 After you do so, you can pass an instance of such a class into the
-:class:`repoze.bfg.configuration.Configurator` class at configuration
+:class:`pyramid.configuration.Configurator` class at configuration
 time as ``authentication_policy`` to use it.
 
 .. index::
@@ -759,19 +739,19 @@ Creating Your Own Authorization Policy
 --------------------------------------
 
 An authorization policy is a policy that allows or denies access after
-a user has been authenticated.  By default, :mod:`repoze.bfg` will use
-the :class:`repoze.bfg.authorization.ACLAuthorizationPolicy` if an
+a user has been authenticated.  By default, :mod:`pyramid` will use
+the :class:`pyramid.authorization.ACLAuthorizationPolicy` if an
 authentication policy is activated and an authorization policy isn't
 otherwise specified.
 
 In some cases, it's useful to be able to use a different
 authorization policy than the default
-:class:`repoze.bfg.authorization.ACLAuthorizationPolicy`.  For
+:class:`pyramid.authorization.ACLAuthorizationPolicy`.  For
 example, it might be desirable to construct an alternate authorization
 policy which allows the application to use an authorization mechanism
 that does not involve :term:`ACL` objects.
 
-:mod:`repoze.bfg` ships with only a single default authorization
+:mod:`pyramid` ships with only a single default authorization
 policy, so you'll need to create your own if you'd like to use a
 different one.  Creating and using your own authorization policy is a
 matter of creating an instance of an object that implements the
@@ -780,7 +760,7 @@ following interface:
 .. code-block:: python
 
     class IAuthorizationPolicy(object):
-        """ An object representing a BFG authorization policy. """
+        """ An object representing a Pyramid authorization policy. """
         def permits(self, context, principals, permission):
             """ Return True if any of the principals is allowed the
             permission in the current context, else return False """
@@ -790,5 +770,5 @@ following interface:
                 permission """
 
 After you do so, you can pass an instance of such a class into the
-:class:`repoze.bfg.configuration.Configurator` class at configuration
+:class:`pyramid.configuration.Configurator` class at configuration
 time as ``authorization_policy`` to use it.

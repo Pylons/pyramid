@@ -1,13 +1,13 @@
 .. _project_narr:
 
-Creating a :mod:`repoze.bfg` Project
+Creating a :mod:`pyramid` Project
 ====================================
 
-It's possible to create a :mod:`repoze.bfg` application completely
+It's possible to create a :mod:`pyramid` application completely
 manually, but it's usually more convenient to use a template to
-generate a basic :mod:`repoze.bfg` application structure.
+generate a basic :mod:`pyramid` application structure.
 
-:mod:`repoze.bfg` comes with templates that you can use to generate a
+:mod:`pyramid` comes with templates that you can use to generate a
 project.  Each template makes different configuration assumptions
 about what type of application you're trying to construct.
 
@@ -17,17 +17,17 @@ templates".
 
 .. index::
    single: paster templates
-   single: bfg_starter paster template
-   single: bfg_zodb paster template
-   single: bfg_alchemy paster template
-   single: bfg_routesalchemy paster template
+   single: pyramid_starter paster template
+   single: pyramid_zodb paster template
+   single: pyramid_alchemy paster template
+   single: pyramid_routesalchemy paster template
 
 .. _additional_paster_templates:
 
-Paster Templates Included with :mod:`repoze.bfg`
+Paster Templates Included with :mod:`pyramid`
 ------------------------------------------------
 
-The convenience ``paster`` templates included with :mod:`repoze.bfg`
+The convenience ``paster`` templates included with :mod:`pyramid`
 differ from each other on two axes:
 
 - the persistence mechanism they offer (no persistence mechanism,
@@ -38,17 +38,17 @@ differ from each other on two axes:
 
 The included templates are these:
 
-``bfg_starter``
+``pyramid_starter``
   URL mapping via :term:`traversal` and no persistence mechanism.
 
-``bfg_zodb``
+``pyramid_zodb``
   URL mapping via :term:`traversal` and persistence via :term:`ZODB`
 
-``bfg_routesalchemy`` 
+``pyramid_routesalchemy`` 
   URL mapping via :term:`URL dispatch` and persistence via
   :term:`SQLAlchemy`
 
-``bfg_alchemy``
+``pyramid_alchemy``
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
 
@@ -72,26 +72,26 @@ Creating the Project
 
 In :ref:`installing_chapter`, you created a virtual Python
 environment via the ``virtualenv`` command.  To start a
-:mod:`repoze.bfg` :term:`project`, use the ``paster`` facility
+:mod:`pyramid` :term:`project`, use the ``paster`` facility
 installed within the virtualenv.  In :ref:`installing_chapter` we
-called the virtualenv directory ``bfgenv``; the following command
+called the virtualenv directory ``env``; the following command
 assumes that our current working directory is that directory.
 
-We'll choose the ``bfg_starter`` template for this purpose.
+We'll choose the ``pyramid_starter`` template for this purpose.
 
 .. code-block:: text
 
-   $ bin/paster create -t bfg_starter
+   $ bin/paster create -t pyramid_starter
 
 The above command uses the ``paster`` command to create a project
-using the ``bfg_starter`` template.  The ``create`` version of paster
-invokes the creation of a project from a template.  To use a different
-template, such as ``bfg_routesalchemy``, you'd just change the last
-argument.  For example:
+using the ``pyramid_starter`` template.  The ``create`` version of
+paster invokes the creation of a project from a template.  To use a
+different template, such as ``pyramid_routesalchemy``, you'd just
+change the last argument.  For example:
 
 .. code-block:: text
 
-   $ bin/paster create -t bfg_routesalchemy
+   $ bin/paster create -t pyramid_routesalchemy
 
 ``paster create`` will ask you a single question: the *name* of the
 project.  You should use a string without spaces and with only letters
@@ -100,23 +100,23 @@ project we name ``MyProject``:
 
 .. code-block:: text
 
-   $ bin/paster create -t bfg_starter
+   $ bin/paster create -t pyramid_starter
    Selected and implied templates:
-     repoze.bfg#bfg  repoze.bfg starter project
+     pyramid#bfg  pyramid starter project
 
    Enter project name: MyProject
    Variables:
      egg:      MyProject
      package:  myproject
      project:  MyProject
-   Creating template bfg
+   Creating template pyramid
    Creating directory ./MyProject
    # ... more output ...
-   Running /Users/chrism/projects/repoze/bfg/bin/python setup.py egg_info
+   Running /Users/chrism/projects/pyramid/bin/python setup.py egg_info
 
 .. note:: You can skip the interrogative question about a project
    name during ``paster create`` by adding the project name to the
-   command line, e.g. ``paster create -t bfg_starter MyProject``.
+   command line, e.g. ``paster create -t pyramid_starter MyProject``.
 
 As a result of invoking the ``paster create`` command, a project is
 created in a directory named ``MyProject``.  That directory is a
@@ -133,7 +133,7 @@ and debug your application.
 The ``MyProject`` project directory contains an additional
 subdirectory named ``myproject`` (note the case difference)
 representing a Python :term:`package` which holds very simple
-:mod:`repoze.bfg` sample code.  This is where you'll edit your
+:mod:`pyramid` sample code.  This is where you'll edit your
 application's Python code and templates.
 
 .. index::
@@ -203,7 +203,7 @@ Here's sample output from a test run:
 
 The tests themselves are found in the ``tests.py`` module in your
 ``paster create`` -generated project.  Within a project generated by
-the ``bfg_starter`` template, a single sample test exists.
+the ``pyramid_starter`` template, a single sample test exists.
 
 .. index::
    single: interactive shell
@@ -215,7 +215,7 @@ The Interactive Shell
 
 Once you've installed your program for development using ``setup.py
 develop``, you can use an interactive Python shell to examine your
-:mod:`repoze.bfg` application :term:`model` and :term:`view` objects
+:mod:`pyramid` application :term:`model` and :term:`view` objects
 from a Python prompt.  To do so, use the ``paster`` shell command with
 the ``bfgshell`` argument:
 
@@ -241,7 +241,7 @@ the name ``main`` as a section name:
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=pyramid bfgshell \
          MyProject.ini main
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
@@ -250,7 +250,7 @@ the name ``main`` as a section name:
    <foo.models.MyModel object at 0x445270>
 
 .. note:: You *might* get away without passing
-          ``--plugin=repoze.bfg`` to the bfgshell command.
+          ``--plugin=pyramid`` to the bfgshell command.
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_
 installed in the interpreter you use to invoke the ``paster`` command,
@@ -262,12 +262,12 @@ standard Python interpreter shell unconditionally.
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=pyramid bfgshell \
          --disable-ipython MyProject.ini main
 
 You should always use a section name argument that refers to the
 actual ``app`` section within the Paste configuration file that points
-at your :mod:`repoze.bfg` application *without any middleware
+at your :mod:`pyramid` application *without any middleware
 wrapping*.  In particular, a section name is inappropriate as the
 second argument to "bfgshell" if the configuration section it names is
 a ``pipeline`` rather than an ``app``.  For example, if you have the
@@ -292,7 +292,7 @@ The command you use to invoke the interactive shell should be:
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=pyramid bfgshell \
          MyProject.ini myapp
 
 If you use ``main`` as the section name argument instead of ``myapp``
@@ -330,14 +330,14 @@ Here's sample output from a run of ``paster serve``:
    Starting server in PID 16601.
    serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
 
-By default, :mod:`repoze.bfg` applications generated from a ``paster``
+By default, :mod:`pyramid` applications generated from a ``paster``
 template will listen on TCP port 6543.
 
 During development, it's often useful to run ``paster serve`` using
 its ``--reload`` option.  When ``--reload`` is passed to ``paster
 serve``, changes to any Python module your project uses will cause the
 server to restart.  This typically makes development easier, as
-changes to Python code made within a :mod:`repoze.bfg` application is
+changes to Python code made within a :mod:`pyramid` application is
 not put into effect until the server restarts.
 
 For example:
@@ -357,16 +357,16 @@ runtime behavior, see :ref:`environment_chapter`.
 Using an Alternate WSGI Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The code generated by :mod:`repoze.bfg` ``paster`` templates assumes
+The code generated by :mod:`pyramid` ``paster`` templates assumes
 that you will be using the ``paster serve`` command to start your
 application while you do development.  However, ``paster serve`` is by
-no means the only way to start up and serve a :mod:`repoze.bfg`
+no means the only way to start up and serve a :mod:`pyramid`
 application.  As we saw in :ref:`configuration_narr`, ``paster serve``
-needn't be invoked at all to run a :mod:`repoze.bfg` application.  The
-use of ``paster serve`` to run a :mod:`repoze.bfg` application is
+needn't be invoked at all to run a :mod:`pyramid` application.  The
+use of ``paster serve`` to run a :mod:`pyramid` application is
 purely conventional based on the output of its ``paster`` templates.
 
-Any :term:`WSGI` server is capable of running a :mod:`repoze.bfg`
+Any :term:`WSGI` server is capable of running a :mod:`pyramid`
 application.  Some WSGI servers don't require the :term:`PasteDeploy`
 framework's ``paster serve`` command to do server process management
 at all.  Each :term:`WSGI` server has its own documentation about how
@@ -376,7 +376,7 @@ concepts are largely the same, whatever server you happen to use.
 
 One popular production alternative to a ``paster``-invoked server is
 :term:`mod_wsgi`. You can also use :term:`mod_wsgi` to serve your
-:mod:`repoze.bfg` application using the Apache web server rather than
+:mod:`pyramid` application using the Apache web server rather than
 any "pure-Python" server that is started as a result of ``paster
 serve``.  See :ref:`modwsgi_tutorial` for details.  However, it is
 usually easier to *develop* an application using a ``paster serve``
@@ -393,7 +393,7 @@ your browser like what is displayed in the following image:
 .. image:: project.png
 
 This is the page shown by default when you visit an unmodified
-``paster create`` -generated ``bfg_starter`` application in a browser.
+``paster create`` -generated ``pyramid_starter`` application in a browser.
 
 .. index::
    single: project structure
@@ -401,11 +401,11 @@ This is the page shown by default when you visit an unmodified
 The Project Structure
 ---------------------
 
-Our generated :mod:`repoze.bfg` ``bfg_starter`` application is a
+Our generated :mod:`pyramid` ``pyramid_starter`` application is a
 setuptools :term:`project` (named ``MyProject``), which contains a
 Python :term:`package` (which is *also* named ``myproject``, but
 lowercased; the paster template generates a project which contains a
-package that shares its name except for case).  All :mod:`repoze.bfg`
+package that shares its name except for case).  All :mod:`pyramid`
 ``paster`` -generated projects share a similar structure.
 
 The ``MyProject`` project we've generated has the following directory
@@ -480,7 +480,7 @@ shared by all the applications, servers and :term:`middleware` defined
 within the configuration file.  By default it contains one key
 ``debug``, which is set to ``true``.  This key is used by various
 components to decide whether to act in a "debugging" mode.
-``repoze.bfg`` itself does not do anything at all with this parameter,
+``pyramid`` itself does not do anything at all with this parameter,
 and neither does any template-generated application.
 
 The ``[app:main]`` section represents configuration for your
@@ -529,7 +529,7 @@ module).  You can provide startup-time configuration parameters to
 your application by requiring more settings in this section.
 
 The ``reload_templates`` setting in the ``[app:main]`` section is a
-:mod:`repoze.bfg` -specific setting which is passed into the
+:mod:`pyramid` -specific setting which is passed into the
 framework.  If it exists, and its value is ``true``, :term:`Chameleon`
 template changes will not require an application restart to be
 detected.  See :ref:`reload_templates_section` for more information.
@@ -539,7 +539,7 @@ detected.  See :ref:`reload_templates_section` for more information.
    turned on.
 
 The ``debug_templates`` setting in the ``[app:main]`` section is a
-:mod:`repoze.bfg` -specific setting which is passed into the
+:mod:`pyramid` -specific setting which is passed into the
 framework.  If it exists, and its value is ``true``, :term:`Chameleon`
 template exceptions will contained more detailed and helpful
 information about the error than when this value is ``false``.  See
@@ -550,7 +550,7 @@ information about the error than when this value is ``false``.  See
    turned on.
 
 Various other settings may exist in this section having to do with
-debugging or influencing runtime behavior of a :mod:`repoze.bfg`
+debugging or influencing runtime behavior of a :mod:`pyramid`
 application.  See :ref:`environment_chapter` for more information
 about these settings.
 
@@ -561,9 +561,9 @@ will create a new thread for each request.
 
 .. note::
 
-  In general, :mod:`repoze.bfg` applications generated from ``paster
+  In general, :mod:`pyramid` applications generated from ``paster
   templates`` should be threading-aware.  It is not required that a
-  :mod:`repoze.bfg` application be nonblocking as all application code
+  :mod:`pyramid` application be nonblocking as all application code
   will run in its own thread, provided by the server you're using.
 
 See the :term:`PasteDeploy` documentation for more information about
@@ -620,7 +620,7 @@ those files are checked into version control.  ``zip_safe`` indicates
 that this package is not safe to use as a zipped egg; instead it will
 always unpack as a directory, which is more convenient.
 ``install_requires`` and ``tests_require`` indicate that this package
-depends on the ``repoze.bfg`` package.  ``test_suite`` points at the
+depends on the ``pyramid`` package.  ``test_suite`` points at the
 package for our application, which means all tests found in the
 package will be run when ``setup.py test`` is invoked.  We examined
 ``entry_points`` in our discussion of the ``MyProject.ini`` file; this
@@ -699,7 +699,7 @@ The ``myproject`` :term:`package` lives inside the ``MyProject``
    application.
 
 These are purely conventions established by the ``paster`` template:
-:mod:`repoze.bfg` doesn't insist that you name things in any
+:mod:`pyramid` doesn't insist that you name things in any
 particular way.
 
 .. index::
@@ -716,13 +716,13 @@ the :term:`application registry`. It looks like so:
    :language: xml
 
 #. Line 1 provides the root node and namespaces for the configuration
-   language.  ``http://namespaces.repoze.org/bfg`` is the default XML
+   language.  ``http://pylonshq.com/pyramid`` is the default XML
    namespace.  Add-on packages may require other namespaces.
 
-#. Line 3 initializes :mod:`repoze.bfg` -specific configuration
-   directives by including the ``repoze.bfg.includes`` package.  This
+#. Line 3 initializes :mod:`pyramid` -specific configuration
+   directives by including the ``pyramid.includes`` package.  This
    causes all of the ZCML within the ``configure.zcml`` of the
-   ``repoze.bfg.includes`` package to be "included" in this
+   ``pyramid.includes`` package to be "included" in this
    configuration file's scope.  Effectively this means that we can use
    (for this example) the ``view`` and ``static`` directives which
    follow later in this file.
@@ -765,9 +765,9 @@ the :term:`application registry`. It looks like so:
 ``views.py``
 ~~~~~~~~~~~~
 
-Much of the heavy lifting in a :mod:`repoze.bfg` application comes in
+Much of the heavy lifting in a :mod:`pyramid` application comes in
 the form of *view callables*.  A :term:`view callable` is the main
-tool of a :mod:`repoze.bfg` web application developer; it is a bit of
+tool of a :mod:`pyramid` web application developer; it is a bit of
 code which accepts a :term:`request` and which returns a
 :term:`response`.
 
@@ -825,13 +825,13 @@ named ``MyModel`` that provides the behavior.
 #. Line 4 defines an instance of MyModel as the root.
 
 #. Line 6 is a "root factory" function that will be called by the
-   :mod:`repoze.bfg` *Router* for each request when it wants to find
+   :mod:`pyramid` *Router* for each request when it wants to find
    the root of the object graph.  Conventionally this is called
    ``get_root``.
 
 In a "real" application, the root object would not be such a simple
 object.  Instead, it would be an object that could access some
-persistent data store, such as a database.  :mod:`repoze.bfg` doesn't
+persistent data store, such as a database.  :mod:`pyramid` doesn't
 make any assumption about which sort of datastore you'll want to use,
 so the sample application uses an instance of
 :class:`myproject.models.MyModel` to represent the root.
@@ -850,12 +850,12 @@ which advertises an entry point for use by our :term:`PasteDeploy`
    :linenos:
 
 #. Line 1 imports the :term:`Configurator` class from
-   :mod:`repoze.bfg.configuration` that we use later.
+   :mod:`pyramid.configuration` that we use later.
 
 #. Line 2 imports the ``get_root`` function from
    :mod:`myproject.models` that we use later.
 
-#. Lines 4-13 define a function that returns a :mod:`repoze.bfg`
+#. Lines 4-13 define a function that returns a :mod:`pyramid`
    WSGI application.  This function is meant to be called
    by the :term:`PasteDeploy` framework as a result of running
    ``paster serve``.
@@ -894,8 +894,8 @@ The ``tests.py`` module includes unit tests for your application.
 This sample ``tests.py`` file has a single unit test defined within
 it.  This test is executed when you run ``python setup.py test``.  You
 may add more tests here as you build your application.  You are not
-required to write tests to use :mod:`repoze.bfg`, this file is simply
+required to write tests to use :mod:`pyramid`, this file is simply
 provided as convenience and example.
 
 See :ref:`unittesting_chapter` for more information about writing
-:mod:`repoze.bfg` unit tests.
+:mod:`pyramid` unit tests.

@@ -10,14 +10,14 @@
 Using Events
 =============
 
-An *event* is an object broadcast by the :mod:`repoze.bfg` framework
+An *event* is an object broadcast by the :mod:`pyramid` framework
 at interesting points during the lifetime of an application.  You
-don't need to use events in order to create most :mod:`repoze.bfg`
+don't need to use events in order to create most :mod:`pyramid`
 applications, but they can be useful when you want to perform slightly
 advanced operations.  For example, subscribing to an event can allow
 you to run some code as the result of every new request.
 
-Events in :mod:`repoze.bfg` are always broadcast by the framework.
+Events in :mod:`pyramid` are always broadcast by the framework.
 However, they only become useful when you register a *subscriber*.  A
 subscriber is a function that accepts a single argument named `event`:
 
@@ -33,7 +33,7 @@ when it's called.
 The mere existence of a subscriber function, however, is not
 sufficient to arrange for it to be called.  To arrange for the
 subscriber to be called, you'll need to use the
-:meth:`repoze.bfg.configurator.Configurator.add_subscriber` method to
+:meth:`pyramid.configurator.Configurator.add_subscriber` method to
 register the subscriber imperatively, or via a decorator, or you'll
 need to use ZCML for the same purpose:
 
@@ -41,45 +41,45 @@ need to use ZCML for the same purpose:
 
    You can imperatively configure a subscriber function to be called
    for some event type via the
-   :meth:`repoze.bfg.configuration.Configurator.add_subscriber`
+   :meth:`pyramid.configuration.Configurator.add_subscriber`
    method (see also :term:`Configurator`):
 
    .. code-block:: python
       :linenos:
 
-      from repoze.bfg.interfaces import INewRequest
+      from pyramid.interfaces import INewRequest
 
       from subscribers import mysubscriber
 
       # "config" below is assumed to be an instance of a 
-      # repoze.bfg.configuration.Configurator object
+      # pyramid.configuration.Configurator object
 
       config.add_subscriber(mysubscriber, INewRequest)
 
    The first argument to
-   :meth:`repoze.bfg.configuration.Configurator.add_subscriber` is the
+   :meth:`pyramid.configuration.Configurator.add_subscriber` is the
    subscriber function (or a :term:`dotted Python name` which refers
    to a subscriber callable); the second argument is the event type.
 
 .. topic:: Configuring an Event Listener Using a Decorator
 
    You can configure a subscriber function to be called for some event
-   type via the :func:`repoze.bfg.events.subscriber` function.
+   type via the :func:`pyramid.events.subscriber` function.
 
    .. code-block:: python
       :linenos:
 
-      from repoze.bfg.interfaces import INewRequest
-      from repoze.bfg.events import subscriber
+      from pyramid.interfaces import INewRequest
+      from pyramid.events import subscriber
 
       @subscriber(INewRequest)
       def mysubscriber(event):
           event.request.foo = 1
 
-   When the :func:`repoze.bfg.subscriber` decorator is used a
+   When the :func:`pyramid.subscriber` decorator is used a
    :term:`scan` must be performed against the package containing the
    decorated function for the decorator to have any effect.  See
-   :func:`repoze.bfg.subscriber` for more information.
+   :func:`pyramid.subscriber` for more information.
 
 .. topic:: Configuring an Event Listener Through ZCML
 
@@ -93,15 +93,15 @@ need to use ZCML for the same purpose:
       :linenos:
 
       <subscriber
-         for="repoze.bfg.interfaces.INewRequest"
+         for="pyramid.interfaces.INewRequest"
          handler=".subscribers.mysubscriber"
        />
 
    See also :ref:`subscriber_directive`.
 
 Either of the above registration examples implies that every time the
-:mod:`repoze.bfg` framework emits an event object that supplies an
-:class:`repoze.bfg.interfaces.INewRequest` interface, the
+:mod:`pyramid` framework emits an event object that supplies an
+:class:`pyramid.interfaces.INewRequest` interface, the
 ``mysubscriber`` function will be called with an *event* object.
 
 As you can see, a subscription is made in terms of an
@@ -113,7 +113,7 @@ The return value of a subscriber function is ignored.  Subscribers to
 the same event type are not guaranteed to be called in any particular
 order relative to each other.
 
-All the concrete :mod:`repoze.bfg` event types are documented in the
+All the concrete :mod:`pyramid` event types are documented in the
 :ref:`events_module` API documentation.
 
 An Example
@@ -139,31 +139,31 @@ times by adding the following ZCML to your application's
    :linenos:
 
    <subscriber
-      for="repoze.bfg.interfaces.INewRequest"
+      for="pyramid.interfaces.INewRequest"
       handler=".subscribers.handle_new_request"
     />
 
    <subscriber
-      for="repoze.bfg.interfaces.INewResponse"
+      for="pyramid.interfaces.INewResponse"
       handler=".subscribers.handle_new_response"
     />
 
 If you're not using ZCML, the
-:meth:`repoze.bfg.configuration.Configurator.add_subscriber` method
+:meth:`pyramid.configuration.Configurator.add_subscriber` method
 can alternately be used to perform the same job:
 
 .. ignore-next-block
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.interfaces import INewRequest
-   from repoze.bfg.interfaces import INewResponse
+   from pyramid.interfaces import INewRequest
+   from pyramid.interfaces import INewResponse
 
    from subscribers import handle_new_request
    from subscribers import handle_new_response
 
    # "config" below is assumed to be an instance of a 
-   # repoze.bfg.configuration.Configurator object
+   # pyramid.configuration.Configurator object
 
    config.add_subscriber(handle_new_request, INewRequest)
    config.add_subscriber(handle_new_response, INewResponse)
@@ -177,14 +177,14 @@ Each of our subscriber functions accepts an ``event`` object and
 prints an attribute of the event object.  This begs the question: how
 can we know which attributes a particular event has?
 
-We know that :class:`repoze.bfg.interfaces.INewRequest` event objects
+We know that :class:`pyramid.interfaces.INewRequest` event objects
 have a ``request`` attribute, which is a :term:`request` object,
 because the interface defined at
-:class:`repoze.bfg.interfaces.INewRequest` says it must.  Likewise, we
-know that :class:`repoze.bfg.interfaces.INewResponse` events have a
+:class:`pyramid.interfaces.INewRequest` says it must.  Likewise, we
+know that :class:`pyramid.interfaces.INewResponse` events have a
 ``response`` attribute, which is a response object constructed by your
 application, because the interface defined at
-:class:`repoze.bfg.interfaces.INewResponse` says it must
-(:class:`repoze.bfg.interfaces.INewResponse` objects also have a
+:class:`pyramid.interfaces.INewResponse` says it must
+(:class:`pyramid.interfaces.INewResponse` objects also have a
 ``request``).
 

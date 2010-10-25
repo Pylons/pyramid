@@ -3,7 +3,7 @@
 Using Hooks
 ===========
 
-"Hooks" can be used to influence the behavior of the :mod:`repoze.bfg`
+"Hooks" can be used to influence the behavior of the :mod:`pyramid`
 framework in various ways.
 
 .. index::
@@ -14,7 +14,7 @@ framework in various ways.
 Changing the Not Found View
 ---------------------------
 
-When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
+When :mod:`pyramid` can't map a URL to view code, it invokes a
 :term:`not found view`, which is a :term:`view callable`. A default
 notfound view exists.  The default not found view can be overridden
 through application configuration.  This override can be done via
@@ -22,20 +22,20 @@ through application configuration.  This override can be done via
 
 The :term:`not found view` callable is a view callable like any other.
 The :term:`view configuration` which causes it to be a "not found"
-view consists only of naming the :exc:`repoze.bfg.exceptions.NotFound`
+view consists only of naming the :exc:`pyramid.exceptions.NotFound`
 class as the ``context`` of the view configuration.
 
 .. topic:: Using Imperative Configuration
 
    If your application uses :term:`imperative configuration`, you can
    replace the Not Found view by using the
-   :meth:`repoze.bfg.configuration.Configurator.add_view` method to
+   :meth:`pyramid.configuration.Configurator.add_view` method to
    register an "exception view":
 
    .. code-block:: python
       :linenos:
 
-      from repoze.bfg.exceptions import NotFound
+      from pyramid.exceptions import NotFound
       from helloworld.views import notfound_view
       config.add_view(notfound_view, context=NotFound)
 
@@ -54,7 +54,7 @@ class as the ``context`` of the view configuration.
 
       <view
         view="helloworld.views.notfound_view"
-        context="repoze.bfg.exceptions.NotFound"/>
+        context="pyramid.exceptions.NotFound"/>
 
    Replace ``helloworld.views.notfound_view`` with the Python dotted name
    to the notfound view you want to use.
@@ -63,7 +63,7 @@ Like any other view, the notfound view must accept at least a
 ``request`` parameter, or both ``context`` and ``request``.  The
 ``request`` is the current :term:`request` representing the denied
 action.  The ``context`` (if used in the call signature) will be the
-instance of the :exc:`repoze.bfg.exceptions.NotFound` exception that
+instance of the :exc:`pyramid.exceptions.NotFound` exception that
 caused the view to be called.
 
 Here's some sample code that implements a minimal NotFound view
@@ -79,7 +79,7 @@ callable:
 
 .. note:: When a NotFound view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`repoze.bfg.exceptions.NotFound`
+   be an instance of the :exc:`pyramid.exceptions.NotFound`
    exception that caused the not found view to be called.  The value
    of ``request.exception.args[0]`` will be a value explaining why the
    not found error was raised.  This message will be different when
@@ -89,7 +89,7 @@ callable:
 .. warning:: When a NotFound view callable accepts an argument list as
    described in :ref:`request_and_context_view_definitions`, the
    ``context`` passed as the first argument to the view callable will
-   be the :exc:`repoze.bfg.exceptions.NotFound` exception instance.
+   be the :exc:`pyramid.exceptions.NotFound` exception instance.
    If available, the *model* context will still be available as
    ``request.context``.
 
@@ -101,7 +101,7 @@ callable:
 Changing the Forbidden View
 ---------------------------
 
-When :mod:`repoze.bfg` can't authorize execution of a view based on
+When :mod:`pyramid` can't authorize execution of a view based on
 the :term:`authorization policy` in use, it invokes a :term:`forbidden
 view`.  The default forbidden response has a 401 status code and is
 very plain, but the view which generates it can be overridden as
@@ -110,21 +110,21 @@ necessary using either :term:`imperative configuration` or
 
 The :term:`forbidden view` callable is a view callable like any other.
 The :term:`view configuration` which causes it to be a "not found"
-view consists only of naming the :exc:`repoze.bfg.exceptions.Forbidden`
+view consists only of naming the :exc:`pyramid.exceptions.Forbidden`
 class as the ``context`` of the view configuration.
 
 .. topic:: Using Imperative Configuration
 
    If your application uses :term:`imperative configuration`, you can
    replace the Forbidden view by using the
-   :meth:`repoze.bfg.configuration.Configurator.add_view` method to
+   :meth:`pyramid.configuration.Configurator.add_view` method to
    register an "exception view":
 
    .. code-block:: python
       :linenos:
 
       from helloworld.views import forbidden_view
-      from repoze.bfg.exceptions import Forbidden
+      from pyramid.exceptions import Forbidden
       config.add_view(forbidden_view, context=Forbidden)
 
    Replace ``helloworld.views.forbidden_view`` with a reference to the
@@ -142,7 +142,7 @@ class as the ``context`` of the view configuration.
 
       <view
         view="helloworld.views.notfound_view"
-        context="repoze.bfg.exceptions.Forbidden"/>
+        context="pyramid.exceptions.Forbidden"/>
 
    Replace ``helloworld.views.forbidden_view`` with the Python
    dotted name to the forbidden view you want to use.
@@ -159,14 +159,14 @@ Here's some sample code that implements a minimal forbidden view:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import render_template_to_response
+   from pyramid.chameleon_zpt import render_template_to_response
 
    def forbidden_view(request):
        return render_template_to_response('templates/login_form.pt')
 
 .. note:: When a forbidden view callable is invoked, it is passed a
    :term:`request`.  The ``exception`` attribute of the request will
-   be an instance of the :exc:`repoze.bfg.exceptions.Forbidden`
+   be an instance of the :exc:`pyramid.exceptions.Forbidden`
    exception that caused the forbidden view to be called.  The value
    of ``request.exception.args[0]`` will be a value explaining why the
    forbidden was raised.  This message will be different when the
@@ -187,10 +187,10 @@ Here's some sample code that implements a minimal forbidden view:
 Changing the Traverser
 ----------------------
 
-The default :term:`traversal` algorithm that BFG uses is explained in
-:ref:`traversal_algorithm`.  Though it is rarely necessary, this
-default algorithm can be swapped out selectively for a different
-traversal pattern via configuration.
+The default :term:`traversal` algorithm that :mod:`pyramid` uses is
+explained in :ref:`traversal_algorithm`.  Though it is rarely
+necessary, this default algorithm can be swapped out selectively for a
+different traversal pattern via configuration.
 
 Use an ``adapter`` stanza in your application's ``configure.zcml`` to
 change the default traverser:
@@ -200,7 +200,7 @@ change the default traverser:
 
     <adapter
       factory="myapp.traversal.Traverser"
-      provides="repoze.bfg.interfaces.ITraverser"
+      provides="pyramid.interfaces.ITraverser"
       for="*"
       />
 
@@ -238,16 +238,6 @@ a class that implements the following interface:
            as attributes of the ``request`` object.
            """
 
-.. warning:: In :mod:`repoze.bfg.` 1.0 and previous versions, the
-     traverser ``__call__`` method accepted a WSGI *environment*
-     dictionary rather than a :term:`request` object.  The request
-     object passed to the traverser implements a dictionary-like API
-     which mutates and queries the environment, as a backwards
-     compatibility shim, in order to allow older code to work.
-     However, for maximum forward compatibility, traverser code
-     targeting :mod:`repoze.bfg` 1.1 and higher should expect a
-     request object directly.
-
 More than one traversal algorithm can be active at the same time.  For
 instance, if your :term:`root factory` returns more than one type of
 object conditionally, you could claim that an alternate traverser
@@ -261,37 +251,32 @@ traverser would be used.  For example:
 
     <adapter
       factory="myapp.traversal.Traverser"
-      provides="repoze.bfg.interfaces.ITraverser"
+      provides="pyramid.interfaces.ITraverser"
       for="myapp.models.MyRoot"
       />
 
 If the above stanza was added to a ``configure.zcml`` file,
-:mod:`repoze.bfg` would use the ``myapp.traversal.Traverser`` only
+:mod:`pyramid` would use the ``myapp.traversal.Traverser`` only
 when the application :term:`root factory` returned an instance of the
 ``myapp.models.MyRoot`` object.  Otherwise it would use the default
-:mod:`repoze.bfg` traverser to do traversal.
-
-Example implementations of alternate traversers can be found "in the
-wild" within `repoze.bfg.traversalwrapper
-<http://pypi.python.org/pypi/repoze.bfg.traversalwrapper>`_ and
-`repoze.bfg.metatg <http://svn.repoze.org/repoze.bfg.metatg/trunk/>`_.
+:mod:`pyramid` traverser to do traversal.
 
 .. index::
    single: url generator
 
-Changing How :mod:`repoze.bfg.url.model_url` Generates a URL
+Changing How :mod:`pyramid.url.model_url` Generates a URL
 ------------------------------------------------------------
 
 When you add a traverser as described in
 :ref:`changing_the_traverser`, it's often convenient to continue to
-use the :func:`repoze.bfg.url.model_url` API.  However, since the way
+use the :func:`pyramid.url.model_url` API.  However, since the way
 traversal is done will have been modified, the URLs it generates by
 default may be incorrect.
 
 If you've added a traverser, you can change how
-:func:`repoze.bfg.url.model_url` generates a URL for a specific type
+:func:`pyramid.url.model_url` generates a URL for a specific type
 of :term:`context` by adding an adapter stanza for
-:class:`repoze.bfg.interfaces.IContextURL` to your application's
+:class:`pyramid.interfaces.IContextURL` to your application's
 ``configure.zcml``:
 
 .. code-block:: xml
@@ -299,19 +284,19 @@ of :term:`context` by adding an adapter stanza for
 
     <adapter
       factory="myapp.traversal.URLGenerator"
-      provides="repoze.bfg.interfaces.IContextURL"
+      provides="pyramid.interfaces.IContextURL"
       for="myapp.models.MyRoot *"
       />
 
 In the above example, the ``myapp.traversal.URLGenerator`` class will
-be used to provide services to :func:`repoze.bfg.url.model_url` any
+be used to provide services to :func:`pyramid.url.model_url` any
 time the :term:`context` passed to ``model_url`` is of class
 ``myapp.models.MyRoot``.  The asterisk following represents the type
 of interface that must be possessed by the :term:`request` (in this
 case, any interface, represented by asterisk).
 
 The API that must be implemented by a class that provides
-:class:`repoze.bfg.interfaces.IContextURL` is as follows:
+:class:`pyramid.interfaces.IContextURL` is as follows:
 
 .. code-block:: python
   :linenos:
@@ -332,23 +317,23 @@ The API that must be implemented by a class that provides
           """ Return a URL that points to the context """
 
 The default context URL generator is available for perusal as the
-class :class:`repoze.bfg.traversal.TraversalContextURL` in the
+class :class:`pyramid.traversal.TraversalContextURL` in the
 `traversal module
-<http://svn.repoze.org/repoze.bfg/trunk/repoze/bfg/traversal.py>`_ of
-the :term:`Repoze` Subversion repository.
+<http://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of
+the :term:`Pylons` GitHub Pyramid repository.
 
 .. _changing_the_request_factory:
 
 Changing the Request Factory
 ----------------------------
 
-Whenever :mod:`repoze.bfg` handles a :term:`WSGI` request, it creates
+Whenever :mod:`pyramid` handles a :term:`WSGI` request, it creates
 a :term:`request` object based on the WSGI environment it has been
 passed.  By default, an instance of the
-:class:`repoze.bfg.request.Request` class is created to represent the
+:class:`pyramid.request.Request` class is created to represent the
 request object.
 
-The class (aka "factory") that :mod:`repoze.bfg` uses to create a
+The class (aka "factory") that :mod:`pyramid` uses to create a
 request object instance can be changed by passing a
 ``request_factory`` argument to the constructor of the
 :term:`configurator`.  This argument can be either a callable or a
@@ -357,7 +342,7 @@ request object instance can be changed by passing a
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.request import Request
+   from pyramid.request import Request
 
    class MyRequest(Request):
        pass
@@ -374,20 +359,20 @@ In the below, we assume it lives in a package named
 
    <utility
       component="mypackage.mymodule.MyRequest"
-      provides="repoze.bfg.interfaces.IRequestFactory"
+      provides="pyramid.interfaces.IRequestFactory"
     />
 
 Lastly, if you're doing imperative configuration, and you'd rather do
 it after you've already constructed a :term:`configurator` it can also
 be registered via the
-:meth:`repoze.bfg.configuration.Configurator.set_request_factory`
+:meth:`pyramid.configuration.Configurator.set_request_factory`
 method:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.configuration import Configurator
-   from repoze.bfg.request import Request
+   from pyramid.configuration import Configurator
+   from pyramid.request import Request
 
    class MyRequest(Request):
        pass
@@ -400,17 +385,17 @@ method:
 Adding Renderer Globals
 -----------------------
 
-Whenever :mod:`repoze.bfg` handles a request to perform a rendering
+Whenever :mod:`pyramid` handles a request to perform a rendering
 (after a view with a ``renderer=`` configuration attribute is invoked,
 or when the any of the methods beginning with ``render`` within the
-:mod:`repoze.bfg.renderers` module are called), *renderer globals* can
+:mod:`pyramid.renderers` module are called), *renderer globals* can
 be injected into the *system* values sent to the renderer.  By
 default, no renderer globals are injected, and the "bare" system
 values (such as ``request``, ``context``, and ``renderer_name``) are
 the only values present in the system dictionary passed to every
 renderer.
 
-A callback that :mod:`repoze.bfg` will call every time a renderer is
+A callback that :mod:`pyramid` will call every time a renderer is
 invoked can be added by passing a ``renderer_globals_factory``
 argument to the constructor of the :term:`configurator`.  This
 callback can either be a callable object or a :term:`dotted Python
@@ -441,19 +426,19 @@ named ``mypackage.mymodule``.
 
    <utility
       component="mypackage.mymodule.renderer_globals_factory"
-      provides="repoze.bfg.interfaces.IRendererGlobalsFactory"
+      provides="pyramid.interfaces.IRendererGlobalsFactory"
     />
 
 Lastly, if you're doing imperative configuration, and you'd rather do
 it after you've already constructed a :term:`configurator` it can also
 be registered via the
-:meth:`repoze.bfg.configuration.Configurator.set_renderer_globals_factory`
+:meth:`pyramid.configuration.Configurator.set_renderer_globals_factory`
 method:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.configuration import Configurator
+   from pyramid.configuration import Configurator
 
    def renderer_globals_factory(system):
        return {'a':1}
@@ -466,12 +451,12 @@ method:
 Using Response Callbacks
 ------------------------
 
-Unlike many other web frameworks, :mod:`repoze.bfg` does not eagerly
+Unlike many other web frameworks, :mod:`pyramid` does not eagerly
 create a global response object.  Adding a :term:`response callback`
 allows an application to register an action to be performed against a
 response object once it is created, usually in order to mutate it.
 
-The :meth:`repoze.bfg.request.Request.add_response_callback` method is
+The :meth:`pyramid.request.Request.add_response_callback` method is
 used to register a response callback.  
 
 A response callback is a callable which accepts two positional
@@ -496,15 +481,15 @@ value of ``None``.
 
 Response callbacks are called in the order they're added
 (first-to-most-recently-added).  All response callbacks are called
-*after* the :class:`repoze.bfg.interfaces.INewResponse` event is sent.
+*after* the :class:`pyramid.interfaces.INewResponse` event is sent.
 Errors raised by response callbacks are not handled specially.  They
-will be propagated to the caller of the :mod:`repoze.bfg` router
+will be propagated to the caller of the :mod:`pyramid` router
 application.
 
 A response callback has a lifetime of a *single* request.  If you want
 a response callback to happen as the result of *every* request, you
 must re-register the callback into every new request (perhaps within a
-subscriber of a :class:`repoze.bfg.interfaces.INewRequest` event).
+subscriber of a :class:`pyramid.interfaces.INewRequest` event).
 
 .. _using_finished_callbacks:
 
@@ -512,11 +497,11 @@ Using Finished Callbacks
 ------------------------
 
 A :term:`finished callback` is a function that will be called
-unconditionally by the :mod:`repoze.bfg` :term:`router` at the very
+unconditionally by the :mod:`pyramid` :term:`router` at the very
 end of request processing.  A finished callback can be used to perform
 an action at the end of a request unconditionally.
 
-The :meth:`repoze.bfg.request.Request.add_finished_callback` method is
+The :meth:`pyramid.request.Request.add_finished_callback` method is
 used to register a finished callback.
 
 A finished callback is a callable which accepts a single positional
@@ -558,32 +543,32 @@ enters a response callback will be an exception object instead of its
 default value of ``None``.
 
 Errors raised by finished callbacks are not handled specially.  They
-will be propagated to the caller of the :mod:`repoze.bfg` router
+will be propagated to the caller of the :mod:`pyramid` router
 application.
 
 A finished callback has a lifetime of a *single* request.  If you want
 a finished callback to happen as the result of *every* request, you
 must re-register the callback into every new request (perhaps within a
-subscriber of a :class:`repoze.bfg.interfaces.INewRequest` event).
+subscriber of a :class:`pyramid.interfaces.INewRequest` event).
 
 .. _registering_configuration_decorators:
 
 Registering Configuration Decorators
 ------------------------------------
 
-Decorators such as :class:`repoze.bfg.view.bfg_view` don't change the
+Decorators such as :class:`pyramid.view.bfg_view` don't change the
 behavior of the functions or classes they're decorating.  Instead,
 when a :term:`scan` is performed, a modified version of the function
-or class is registered with :mod:`repoze.bfg`.
+or class is registered with :mod:`pyramid`.
 
 You may wish to have your own decorators that offer such
 behaviour. This is possible by using the :term:`Venusian` package in
-the same way that it is used by :mod:`repoze.bfg`.
+the same way that it is used by :mod:`pyramid`.
 
 By way of example, let's suppose you want to write a decorator that
 registers the function it wraps with a :term:`Zope Component
 Architecture` "utility" within the :term:`application registry`
-provided by :mod:`repoze.bfg`. The application registry and the
+provided by :mod:`pyramid`. The application registry and the
 utility inside the registry is likely only to be available once your
 application's configuration is at least partially completed. A normal
 decorator would fail as it would be executed before the configuration
@@ -596,7 +581,7 @@ follows:
    :linenos:
 
    import venusian
-   from repoze.bfg.threadlocal import get_current_registry
+   from pyramid.threadlocal import get_current_registry
    from mypackage.interfaces import IMyUtility
     
    class registerFunction(object):
@@ -631,7 +616,7 @@ performed, enabling you to set up the utility in advance:
    :linenos:
 
    from paste.httpserver import serve
-   from repoze.bfg.configuration import Configurator
+   from pyramid.configuration import Configurator
 
    class UtilityImplementation:
 
@@ -655,7 +640,3 @@ performed, enabling you to set up the utility in advance:
 For full details, please read the `Venusian documentation
 <http://docs.repoze.org/venusian>`_.
 
-.. note::
-
-   Application-developer-registerable configuration decorators were
-   introduced in :mod:`repoze.bfg` 1.3.

@@ -22,7 +22,7 @@ example, each of the following is a resource:
   in it (if it possessed an ``__init__.py`` it would *be* a package).
 
 The use of resources is quite common in most web development projects.
-For example, when you create a :mod:`repoze.bfg` application using one
+For example, when you create a :mod:`pyramid` application using one
 of the available "paster" templates, as described in
 :ref:`creating_a_project`, the directory representing the application
 contains a Python :term:`package`.  Within that Python package, there
@@ -36,9 +36,9 @@ files.
 Understanding Resources
 -----------------------
 
-Let's imagine you've created a :mod:`repoze.bfg` application that uses
+Let's imagine you've created a :mod:`pyramid` application that uses
 a :term:`Chameleon` ZPT template via the
-:func:`repoze.bfg.chameleon_zpt.render_template_to_response` API.  For
+:func:`pyramid.chameleon_zpt.render_template_to_response` API.  For
 example, the application might address the resource named
 ``templates/some_template.pt`` using that API within a ``views.py``
 file inside a ``myapp`` package:
@@ -47,29 +47,29 @@ file inside a ``myapp`` package:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.chameleon_zpt import render_template_to_response
+   from pyramid.chameleon_zpt import render_template_to_response
    render_template_to_response('templates/some_template.pt')
 
-"Under the hood", when this API is called, :mod:`repoze.bfg` attempts
+"Under the hood", when this API is called, :mod:`pyramid` attempts
 to make sense out of the string ``templates/some_template.pt``
 provided by the developer.  To do so, it first finds the "current"
 package.  The "current" package is the Python package in which the
 ``views.py`` module which contains this code lives.  This would be the
 ``myapp`` package, according to our example so far.  By resolving the
-current package, :mod:`repoze.bfg` has enough information to locate
+current package, :mod:`pyramid` has enough information to locate
 the actual template file.  These are the elements it needs:
 
 - The *package name* (``myapp``)
 
 - The *resource name* (``templates/some_template.pt``)
 
-:mod:`repoze.bfg` uses the :term:`pkg_resources` API to resolve the
+:mod:`pyramid` uses the :term:`pkg_resources` API to resolve the
 package name and resource name to an absolute
 (operating-system-specific) file name.  It eventually passes this
 resolved absolute filesystem path to the Chameleon templating engine,
 which then uses it to load, parse, and execute the template file.
 
-Package names often contain dots.  For example, ``repoze.bfg`` is a
+Package names often contain dots.  For example, ``pyramid`` is a
 package.  Resource names usually look a lot like relative UNIX file
 paths.
 
@@ -82,8 +82,8 @@ Overriding Resources
 --------------------
 
 It can often be useful to override specific resources "from outside" a
-given :mod:`repoze.bfg` application.  For example, you may wish to
-reuse an existing :mod:`repoze.bfg` application more or less
+given :mod:`pyramid` application.  For example, you may wish to
+reuse an existing :mod:`pyramid` application more or less
 unchanged.  However, some specific template file owned by the
 application might have inappropriate HTML, or some static resource
 (such as a logo file or some CSS file) might not be appropriate.  You
@@ -95,7 +95,7 @@ customers (such as a CMS application, or some bug tracking
 application), and you want to make arbitrary visual modifications to a
 particular application deployment without forking the underlying code.
 
-To this end, :mod:`repoze.bfg` contains a feature that makes it
+To this end, :mod:`pyramid` contains a feature that makes it
 possible to "override" one resource with one or more other resources.
 In support of this feature, a :term:`ZCML` directive exists named
 ``resource``.  The ``resource`` directive allows you to *override* the
@@ -106,10 +106,10 @@ following kinds of resources defined in any Python package:
 - A directory containing multiple Chameleon templates.
 
 - Individual static files served up by an instance of the
-  ``repoze.bfg.view.static`` helper class.
+  ``pyramid.view.static`` helper class.
 
 - A directory of static files served up by an instance of the
-  ``repoze.bfg.view.static`` helper class.
+  ``pyramid.view.static`` helper class.
 
 - Any other resource (or set of resources) addressed by code that uses
   the setuptools :term:`pkg_resources` API.
@@ -118,7 +118,7 @@ Usually, overriding a resource in an existing application means
 performing the following steps:
 
 - Create a new Python package.  The easiest way to do this is to
-  create a new :mod:`repoze.bfg` application using the "paster"
+  create a new :mod:`pyramid` application using the "paster"
   template mechanism.  See :ref:`creating_a_project` for more
   information.
 
@@ -129,7 +129,7 @@ performing the following steps:
 - Change the ``configure.zcml`` in the new package to include one or
   more ``resource`` ZCML directives (see :ref:`resource_directive`
   below).  The new package's ``configure.zcml`` should then include
-  the original :mod:`repoze.bfg` application's ``configure.zcml`` via
+  the original :mod:`pyramid` application's ``configure.zcml`` via
   an include statement, e.g.  ``<include
   package="theoriginalpackage"/>``.
 
@@ -142,7 +142,7 @@ performing the following steps:
   for more information about this setting.
 
 Note that overriding resources is not the only way to extend or modify
-the behavior of an existing :mod:`repoze.bfg` application.  A "heavier
+the behavior of an existing :mod:`pyramid` application.  A "heavier
 hammer" way to do the same thing is explained in
 :ref:`extending_chapter`.  The heavier hammer way allows you to
 replace a :term:`view` wholesale rather than resources that might be
@@ -157,7 +157,7 @@ The ``override_resource`` API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An individual call to
-:meth:`repoze.bfg.configuration.Configurator.override_resource` can
+:meth:`pyramid.configuration.Configurator.override_resource` can
 override a single resource.  For example:
 
 .. ignore-next-block
@@ -213,7 +213,7 @@ will need to register two overrides.
 The package name in a specification may start with a dot, meaning that
 the package is relative to the package in which the configuration
 construction file resides (or the ``package`` argument to the
-:class:`repoze.bfg.configuration.Configurator` class construction).
+:class:`pyramid.configuration.Configurator` class construction).
 For example:
 
 .. ignore-next-block
@@ -245,12 +245,12 @@ The ``resource`` ZCML Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of using
-:meth:`repoze.bfg.configuration.Configurator.override_resource` during
+:meth:`pyramid.configuration.Configurator.override_resource` during
 :term:`imperative configuration`, an equivalent can be used to perform
 all the tasks described above within :term:`ZCML`.  The ZCML
 ``resource`` tag is a frontend to using ``override_resource``.
 
-An individual :mod:`repoze.bfg` ``resource`` ZCML statement can
+An individual :mod:`pyramid` ``resource`` ZCML statement can
 override a single resource.  For example:
 
 .. code-block:: xml

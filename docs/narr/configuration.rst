@@ -6,12 +6,12 @@
 Application Configuration 
 =========================
 
-Each deployment of an application written using :mod:`repoze.bfg`
+Each deployment of an application written using :mod:`pyramid`
 implies a specific *configuration* of the framework itself.  For
 example, an application which serves up MP3s for user consumption
 might plug code into the framework that manages songs, while an
 application that manages corporate data might plug in code that
-manages accounting information.  :mod:`repoze.bfg` refers to the way
+manages accounting information.  :mod:`pyramid` refers to the way
 in which code is plugged in to it for a specific application as
 "configuration".
 
@@ -19,15 +19,15 @@ Most people understand "configuration" as coarse settings that inform
 the high-level operation of a specific application deployment.  For
 instance, it's easy to think of the values implied by a ``.ini`` file
 parsed at application startup time as "configuration".
-:mod:`repoze.bfg` extends this pattern to application development,
+:mod:`pyramid` extends this pattern to application development,
 using the term "configuration" to express standardized ways that code
 gets plugged into a deployment of the framework itself.  When you plug
-code into the :mod:`repoze.bfg` framework, you are "configuring"
-:mod:`repoze.bfg` for the purpose of creating a particular application
+code into the :mod:`pyramid` framework, you are "configuring"
+:mod:`pyramid` for the purpose of creating a particular application
 deployment.
 
 There are two different mechanisms you may use to configure
-:mod:`repoze.bfg` to create an application: *imperative* configuration
+:mod:`pyramid` to create an application: *imperative* configuration
 and *declarative* configuration.  We'll examine both modes in the
 sections which follow.
 
@@ -46,7 +46,7 @@ control to the framework; it's "imperative" because you express the
 configuration directly in Python code, and you have the full power of
 Python at your disposal as you issue configuration statements.
 
-Here's one of the simplest :mod:`repoze.bfg` applications, configured
+Here's one of the simplest :mod:`pyramid` applications, configured
 imperatively:
 
 .. code-block:: python
@@ -54,7 +54,7 @@ imperatively:
 
    from webob import Response
    from paste.httpserver import serve
-   from repoze.bfg.configuration import Configurator
+   from pyramid.configuration import Configurator
 
    def hello_world(request):
        return Response('Hello world!')
@@ -84,13 +84,13 @@ of configuration.
 Declarative Configuration
 -------------------------
 
-A :mod:`repoze.bfg` application can be alternately be configured
+A :mod:`pyramid` application can be alternately be configured
 "declaratively", if so desired.  Declarative configuration relies on
 *declarations* made external to the code in a configuration file
 format named :term:`ZCML` (Zope Configuration Markup Language), an XML
 dialect.
 
-A :mod:`repoze.bfg` application configured declaratively requires not
+A :mod:`pyramid` application configured declaratively requires not
 one, but two files: a Python file and a :term:`ZCML` file.
 
 In a file named ``helloworld.py``:
@@ -100,7 +100,7 @@ In a file named ``helloworld.py``:
 
    from webob import Response
    from paste.httpserver import serve
-   from repoze.bfg.configuration import Configurator
+   from pyramid.configuration import Configurator
 
    def hello_world(request):
        return Response('Hello world!')
@@ -119,9 +119,9 @@ previously created ``helloworld.py``:
 .. code-block:: xml
    :linenos:
 
-   <configure xmlns="http://namespaces.repoze.org/bfg">
+   <configure xmlns="http://pylonshq.com/pyramid">
 
-     <include package="repoze.bfg.includes" />
+     <include package="pyramid.includes" />
 
      <view
         view="helloworld.hello_world"
@@ -150,7 +150,7 @@ the ``if __name__ == '__main__'`` section of ``helloworld.py``:
 
 In our "declarative" code, we've removed the call to ``add_view`` and
 replaced it with a call to the
-:meth:`repoze.bfg.configuration.Configurator.load_zcml` method so that
+:meth:`pyramid.configuration.Configurator.load_zcml` method so that
 it now reads as:
 
 .. code-block:: python
@@ -174,9 +174,9 @@ filesystem.  Let's take a look at that ``configure.zcml`` file again:
 .. code-block:: xml
    :linenos:
 
-   <configure xmlns="http://namespaces.repoze.org/bfg">
+   <configure xmlns="http://pylonshq.com/pyramid">
 
-      <include package="repoze.bfg.includes" />
+      <include package="pyramid.includes" />
 
       <view
          view="helloworld.hello_world"
@@ -194,13 +194,13 @@ This ``<view>`` declaration tag performs the same function as the
 ``add_view`` method that was employed within
 :ref:`imperative_configuration`.  In fact, the ``<view>`` tag is
 effectively a "macro" which calls the
-:meth:`repoze.bfg.configuration.Configurator.add_view` method on your
+:meth:`pyramid.configuration.Configurator.add_view` method on your
 behalf.
 
-The ``<view>`` tag is an example of a :mod:`repoze.bfg` declaration
+The ``<view>`` tag is an example of a :mod:`pyramid` declaration
 tag.  Other such tags include ``<route>`` and ``<scan>``.  Each of
 these tags is effectively a "macro" which calls methods of a
-:class:`repoze.bfg.configuration.Configurator` object on your behalf.
+:class:`pyramid.configuration.Configurator` object on your behalf.
 
 Essentially, using a :term:`ZCML` file and loading it from the
 filesystem allows us to put our configuration statements within this
@@ -234,9 +234,9 @@ start.  For example, the following ZCML file has two conflicting
 .. code-block:: xml
    :linenos:
 
-    <configure xmlns="http://namespaces.repoze.org/bfg">
+    <configure xmlns="http://pylonshq.com/pyramid">
 
-      <include package="repoze.bfg.includes" />
+      <include package="pyramid.includes" />
 
       <view
         view="helloworld.hello_world"
@@ -270,14 +270,14 @@ painful to have all configuration done in ZCML, or even in imperative
 code, because you may need to have two files open at once to see the
 "big picture": the file that represents the configuration, and the
 file that contains the implementation objects referenced by the
-configuration.  To avoid this, :mod:`repoze.bfg` allows you to insert
+configuration.  To avoid this, :mod:`pyramid` allows you to insert
 :term:`configuration decoration` statements very close to code that is
 referred to by the declaration itself.  For example:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
    from webob import Response
 
    @bfg_view(name='hello', request_method='GET')
@@ -286,17 +286,17 @@ referred to by the declaration itself.  For example:
 
 The mere existence of configuration decoration doesn't cause any
 configuration registration to be made.  Before they have any effect on
-the configuration of a :mod:`repoze.bfg` application, a configuration
+the configuration of a :mod:`pyramid` application, a configuration
 decoration within application code must be found through a process
 known as a :term:`scan`.
 
-The :class:`repoze.bfg.view.bfg_view` decorator above adds an
+The :class:`pyramid.view.bfg_view` decorator above adds an
 attribute to the ``hello`` function, making it available for a
 :term:`scan` to find it later.
 
-:mod:`repoze.bfg` is willing to :term:`scan` a module or a package and
+:mod:`pyramid` is willing to :term:`scan` a module or a package and
 its subpackages for decorations when the
-:meth:`repoze.bfg.configuration.Configurator.scan` method is invoked:
+:meth:`pyramid.configuration.Configurator.scan` method is invoked:
 scanning implies searching for configuration declarations in a package
 and its subpackages.  For example:
 
@@ -306,7 +306,7 @@ and its subpackages.  For example:
       :linenos:
 
       from paste.httpserver import serve
-      from repoze.bfg.view import bfg_view
+      from pyramid.view import bfg_view
       from webob import Response
      
       @bfg_view()
@@ -314,7 +314,7 @@ and its subpackages.  For example:
           return Response('Hello')
 
       if __name__ == '__main__':
-          from repoze.bfg.configuration import Configurator
+          from pyramid.configuration import Configurator
           config = Configurator()
           config.begin()
           config.scan()
@@ -334,7 +334,7 @@ directive, the package the ZCML file points to is scanned.
       # helloworld.py
 
       from paste.httpserver import serve
-      from repoze.bfg.view import bfg_view
+      from pyramid.view import bfg_view
       from webob import Response
      
       @bfg_view()
@@ -342,7 +342,7 @@ directive, the package the ZCML file points to is scanned.
           return Response('Hello')
 
       if __name__ == '__main__':
-          from repoze.bfg.configuration import Configurator
+          from pyramid.configuration import Configurator
           config = Configurator()
           config.begin()
           config.load_zcml('configure.zcml')
@@ -357,7 +357,7 @@ directive, the package the ZCML file points to is scanned.
 
         <!-- configure.zcml -->
 
-        <include package="repoze.bfg.includes"/>
+        <include package="pyramid.includes"/>
         <scan package="."/>
 
       </configure>
@@ -366,7 +366,7 @@ The scanning machinery imports each module and subpackage in a package
 or module recursively, looking for special attributes attached to
 objects defined within a module.  These special attributes are
 typically attached to code via the use of a :term:`decorator`.  For
-example, the :class:`repoze.bfg.view.bfg_view` decorator can be
+example, the :class:`pyramid.view.bfg_view` decorator can be
 attached to a function or instance method.
 
 Once scanning is invoked, and :term:`configuration decoration` is
@@ -375,8 +375,8 @@ found by the scanner, a set of calls are made to a
 the intent of the configuration decoration.
 
 In the example above, this is best represented as the scanner
-translating the arguments to :class:`repoze.bfg.view.bfg_view` into a
-call to the :meth:`repoze.bfg.configuration.Configurator.add_view`
+translating the arguments to :class:`pyramid.view.bfg_view` into a
+call to the :meth:`pyramid.configuration.Configurator.add_view`
 method, effectively:
 
 .. ignore-next-block
@@ -391,9 +391,9 @@ A combination of imperative configuration, declarative configuration
 via ZCML and scanning can be used to configure any application.  They
 are not mutually exclusive.
 
-The :mod:`repoze.bfg` authors often recommend using mostly declarative
+The :mod:`pyramid` authors often recommend using mostly declarative
 configuration, because it's the more traditional form of configuration
-used in :mod:`repoze.bfg` applications, it can be overridden and
+used in :mod:`pyramid` applications, it can be overridden and
 extended by third party deployers, and there are more examples for it
 "in the wild".
 

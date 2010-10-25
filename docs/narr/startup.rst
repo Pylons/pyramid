@@ -3,7 +3,7 @@
 Startup
 =======
 
-When you cause :mod:`repoze.bfg` to start up in a console window,
+When you cause :mod:`pyramid` to start up in a console window,
 you'll see something much like this show up on the console:
 
 .. code-block:: text
@@ -24,11 +24,11 @@ The Startup Process
 -------------------
 
 The easiest and best-documented way to start and serve a
-:mod:`repoze.bfg` application is to use the ``paster serve`` command
+:mod:`pyramid` application is to use the ``paster serve`` command
 against a :term:`PasteDeploy` ``.ini`` file.  This uses the ``.ini``
 file to infer settings and starts a server listening on a port.  For
 the purposes of this discussion, we'll assume that you are using this
-command to run your :mod:`repoze.bfg` application.
+command to run your :mod:`pyramid` application.
 
 Here's a high-level time-ordered overview of what happens when you
 press ``return`` after running ``paster serve MyProject.ini``.
@@ -44,16 +44,16 @@ press ``return`` after running ``paster serve MyProject.ini``.
    the ``.ini`` file.  This section represents the configuration of a
    :term:`WSGI` application that will be served.  If you're using a
    simple application (e.g. an ``[app:main]`` section of a
-   default-generated :mod:`repoze.bfg` project), the application
+   default-generated :mod:`pyramid` project), the application
    :term:`entry point` or :term:`dotted Python name` will be named on
    the ``use=`` line within the section's configuration.  If, instead
    of a simple application, you're using a WSGI :term:`pipeline`
    (e.g. a ``[pipeline:main]`` section), the application named on the
-   "last" element will refer to your :mod:`repoze.bfg` application.
+   "last" element will refer to your :mod:`pyramid` application.
    If instead of a simple application or a pipeline, you're using a
    Paste "composite" (e.g. ``[composite:main]``), refer to the
    documentation for that particular composite to understand how to
-   make it refer to your :mod:`repoze.bfg` application.
+   make it refer to your :mod:`pyramid` application.
 
 #. The application's *constructor* (named by the entry point reference
    or dotted Python name on the ``use=`` line) is passed the key/value
@@ -61,10 +61,10 @@ press ``return`` after running ``paster serve MyProject.ini``.
    constructor is meant to return a :term:`router` instance, which is
    a :term:`WSGI` application.
 
-   For :mod:`repoze.bfg` applications, the constructor will be a
+   For :mod:`pyramid` applications, the constructor will be a
    function named ``app`` in the ``run.py`` file within the
    :term:`package` in which your application lives.  If this function
-   succeeds, it will return a :mod:`repoze.bfg` :term:`router`
+   succeeds, it will return a :mod:`pyramid` :term:`router`
    instance.  Here's the contents of an example ``run.py`` module:
 
    .. literalinclude:: MyProject/myproject/run.py
@@ -93,7 +93,7 @@ press ``return`` after running ``paster serve MyProject.ini``.
    'debug_notfound':'false'}``.
 
 #. The ``app`` function first constructs a
-   :class:`repoze.bfg.configuration.Configurator` instance, passing
+   :class:`pyramid.configuration.Configurator` instance, passing
    ``get_root`` to it as its ``root_factory`` argument, and
    ``settings`` dictionary captured via the ``**settings`` kwarg as
    its ``settings`` argument.
@@ -109,7 +109,7 @@ press ``return`` after running ``paster serve MyProject.ini``.
    'debug_authorization':'false', 'debug_notfound':'false'}``.
 
 #. The ``app`` function then calls the
-   :meth:`repoze.bfg.configuration.Configurator.load_zcml` method,
+   :meth:`pyramid.configuration.Configurator.load_zcml` method,
    passing in a ``zcml_file`` value.  ``zcml_file`` is the value of
    the ``configure_zcml`` setting or a default of ``configure.zcml``.
    This filename is relative to the run.py file that the ``app``
@@ -121,13 +121,13 @@ press ``return`` after running ``paster serve MyProject.ini``.
    succeeds, an :term:`application registry` is populated using all
    the :term:`ZCML declaration` statements present in the file.
 
-#. The :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app`
+#. The :meth:`pyramid.configuration.Configurator.make_wsgi_app`
    method is called.  The result is a :term:`router` instance.  The
    router is associated with the :term:`application registry` implied
    by the configurator previously populated by ZCML.  The router is a
    WSGI application.
 
-#. A :class:`repoze.bfg.interfaces.IApplicationCreated` event is
+#. A :class:`pyramid.interfaces.IApplicationCreated` event is
    emitted (see :ref:`events_chapter` for more information about
    events).
 

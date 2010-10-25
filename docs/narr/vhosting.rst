@@ -6,21 +6,21 @@
 Virtual Hosting
 ===============
 
-"Virtual hosting" is, loosely, the act of serving a :mod:`repoze.bfg`
-application or a portion of a :mod:`repoze.bfg` application under a
+"Virtual hosting" is, loosely, the act of serving a :mod:`pyramid`
+application or a portion of a :mod:`pyramid` application under a
 URL space that it does not "naturally" inhabit.
 
-:mod:`repoze.bfg` provides facilities for serving an application under
+:mod:`pyramid` provides facilities for serving an application under
 a URL "prefix", as well as serving a *portion* of a :term:`traversal`
 based application under a root URL.
 
 Hosting an Application Under a URL Prefix
 -----------------------------------------
 
-:mod:`repoze.bfg` supports a common form of virtual hosting whereby
-you can host a :mod:`repoze.bfg` application as a "subset" of some
-other site (e.g. under ``http://example.com/mybfgapplication/`` as
-opposed to under ``http://example.com/``).
+:mod:`pyramid` supports a common form of virtual hosting whereby you
+can host a :mod:`pyramid` application as a "subset" of some other site
+(e.g. under ``http://example.com/mypyramidapplication/`` as opposed to
+under ``http://example.com/``).
 
 If you use a "pure Python" environment, this functionality is provided
 by Paste's `urlmap <http://pythonpaste.org/modules/urlmap.html>`_
@@ -29,8 +29,8 @@ by Paste's `urlmap <http://pythonpaste.org/modules/urlmap.html>`_
 hosting translation for you "under the hood".
 
 If you use the ``urlmap`` composite application "in front" of a
-:mod:`repoze.bfg` application or if you use :term:`mod_wsgi` to serve
-up a :mod:`repoze.bfg` application, nothing special needs to be done
+:mod:`pyramid` application or if you use :term:`mod_wsgi` to serve
+up a :mod:`pyramid` application, nothing special needs to be done
 within the application for URLs to be generated that contain a
 prefix. :mod:`paste.urlmap` and :term:`mod_wsgi` manipulate the
 :term:`WSGI` environment in such a way that the ``PATH_INFO`` and
@@ -41,16 +41,16 @@ a ``urlmap`` composite.
 
 .. code-block:: ini
 
-  [app:mybfgapp]
-  use = egg:mybfgapp#app
+  [app:mypyramidapp]
+  use = egg:mypyramidapp#app
 
   [composite:main]
   use = egg:Paste#urlmap
-  /bfgapp =  bfgapp
+  /pyramidapp = mypyramidapp
 
-This "roots" the :mod:`repoze.bfg` application at the prefix
-``/bfgapp`` and serves up the composite as the "main" application in
-the file.
+This "roots" the :mod:`pyramid` application at the prefix
+``/pyramidapp`` and serves up the composite as the "main" application
+in the file.
 
 .. note:: If you're using an Apache server to proxy to a Paste
    ``urlmap`` composite, you may have to use the `ProxyPreserveHost
@@ -69,10 +69,10 @@ work for you:
 .. code-block:: apache
    :linenos:
 
-   WSGIScriptAlias /bfgapp /Users/chrism/projects/modwsgi/env/bfg.wsgi
+   WSGIScriptAlias /pyramidapp /Users/chrism/projects/modwsgi/env/pyramid.wsgi
 
-In the above configuration, we root a :mod:`repoze.bfg` application at
-``/bfgapp`` within the Apache configuration.
+In the above configuration, we root a :mod:`pyramid` application at
+``/pyramidapp`` within the Apache configuration.
 
 .. index::
    single: virtual root
@@ -80,12 +80,12 @@ In the above configuration, we root a :mod:`repoze.bfg` application at
 Virtual Root Support
 --------------------
 
-:mod:`repoze.bfg` also supports "virtual roots", which can be used in
+:mod:`pyramid` also supports "virtual roots", which can be used in
 :term:`traversal` -based (but not :term:`URL dispatch` -based)
 applications.
 
 Virtual root support is useful when you'd like to host some model in a
-:mod:`repoze.bfg` object graph as an application under a URL pathname
+:mod:`pyramid` object graph as an application under a URL pathname
 that does not include the model path itself.  For example, you might
 want to serve the object at the traversal path ``/cms`` as an
 application reachable via ``http://example.com/`` (as opposed to
@@ -97,7 +97,7 @@ that is the absolute pathname to the model object in the traversal
 graph that should behave as the "root" model.  As a result, the
 traversal machinery will respect this value during traversal
 (prepending it to the PATH_INFO before traversal starts), and the
-:func:`repoze.bfg.url.model_url` API will generate the "correct"
+:func:`pyramid.url.model_url` API will generate the "correct"
 virtually-rooted URLs.
 
 An example of an Apache ``mod_proxy`` configuration that will host the
@@ -122,7 +122,7 @@ is below:
    <http://httpd.apache.org/docs/2.2/mod/mod_headers.html>`_ module be
    available in the Apache environment you're using.
 
-For a :mod:`repoze.bfg` application running under :term:`mod_wsgi`,
+For a :mod:`pyramid` application running under :term:`mod_wsgi`,
 the same can be achieved using ``SetEnv``:
 
 .. code-block:: apache
@@ -139,10 +139,10 @@ Further Documentation and Examples
 ----------------------------------
 
 The API documentation in :ref:`traversal_module` documents a
-:func:`repoze.bfg.traversal.virtual_root` API.  When called, it
+:func:`pyramid.traversal.virtual_root` API.  When called, it
 returns the virtual root object (or the physical root object if no
 virtual root has been specified).
 
 :ref:`modwsgi_tutorial` has detailed information about using
-:term:`mod_wsgi` to serve :mod:`repoze.bfg` applications.
+:term:`mod_wsgi` to serve :mod:`pyramid` applications.
 

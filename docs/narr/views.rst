@@ -3,7 +3,7 @@
 Views
 =====
 
-The primary job of any :mod:`repoze.bfg` application is is to find and
+The primary job of any :mod:`pyramid` application is is to find and
 invoke a :term:`view callable` when a :term:`request` reaches the
 application.  View callables are bits of code written by you -- the
 application developer -- which do something interesting in response to
@@ -11,7 +11,7 @@ a request made to your application.
 
 .. note:: 
 
-   A :mod:`repoze.bfg` :term:`view callable` is often referred to in
+   A :mod:`pyramid` :term:`view callable` is often referred to in
    conversational shorthand as a :term:`view`.  In this documentation,
    however, we need to use less ambiguous terminology because there
    are significant differences between view *configuration*, the code
@@ -39,12 +39,12 @@ View Callables
 --------------
 
 No matter how a view callable is eventually found, all view callables
-used by :mod:`repoze.bfg` must be constructed in the same way, and
+used by :mod:`pyramid` must be constructed in the same way, and
 must return the same kind of return value.
 
 Most view callables accept a single argument named ``request``.  This
 argument represents a :term:`WebOb` :term:`Request` object as
-represented to :mod:`repoze.bfg` by the upstream :term:`WSGI` server.
+represented to :mod:`pyramid` by the upstream :term:`WSGI` server.
 
 A view callable may always return a :term:`WebOb` :term:`Response`
 object directly.  It may optionally return another arbitrary
@@ -86,8 +86,6 @@ callable implemented as a function:
 
 Defining a View Callable as a Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. note:: This feature is new as of :mod:`repoze.bfg` 0.8.1.
 
 A view callable may also be a class instead of a function.  When a
 view callable is a class, the calling semantics are slightly different
@@ -250,14 +248,14 @@ app_iter
 
 Furthermore, a view needn't *always* return a Response object.  If a
 view happens to return something which does not implement the WebOb
-Response interface, :mod:`repoze.bfg` will attempt to use a
+Response interface, :mod:`pyramid` will attempt to use a
 :term:`renderer` to construct a response.  For example:
 
 .. code-block:: python
    :linenos:
 
    from webob import Response
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='json')
    def hello_world(request):
@@ -268,7 +266,7 @@ dictionary does not implement the :term:`WebOb` response interface, so
 you might believe that this example would fail.  However, since a
 ``renderer`` is associated with the view callable through its
 :term:`view configuration` (in this case, using a ``renderer``
-argument passed to :func:`repoze.bfg.view.bfg_view`), if the view does
+argument passed to :func:`pyramid.view.bfg_view`), if the view does
 *not* return a Response object, the renderer will attempt to convert
 the result of the view to a response on the developer's behalf.  Of
 course, if no renderer is associated with a view's configuration,
@@ -320,8 +318,6 @@ such as ``401 Unauthorized``.
 Writing View Callables Which Use a Renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note:: This feature is new as of :mod:`repoze.bfg` 1.1
-
 View callables needn't always return a WebOb Response object.
 Instead, they may return an arbitrary Python object, with the
 expectation that a :term:`renderer` will convert that object into a
@@ -360,7 +356,7 @@ If the :term:`view callable` associated with a :term:`view
 configuration` returns a Response object directly (an object with the
 attributes ``status``, ``headerlist`` and ``app_iter``), any renderer
 associated with the view configuration is ignored, and the response is
-passed back to :mod:`repoze.bfg` unmolested.  For example, if your
+passed back to :mod:`pyramid` unmolested.  For example, if your
 view callable returns an instance of the :class:`webob.exc.HTTPFound`
 class as a response, no renderer will be employed.
 
@@ -388,7 +384,7 @@ ZCML directive (see :ref:`adding_and_overriding_renderers`).
 Built-In Renderers
 ~~~~~~~~~~~~~~~~~~
 
-Several built-in "renderers" exist in :mod:`repoze.bfg`.  These
+Several built-in "renderers" exist in :mod:`pyramid`.  These
 renderers can be used in the ``renderer`` attribute of view
 configurations.
 
@@ -414,7 +410,7 @@ representation of the dictionary:
    :linenos:
 
    from webob import Response
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='string')
    def hello_world(request):
@@ -453,7 +449,7 @@ view will render the returned dictionary to a JSON serialization:
    :linenos:
 
    from webob import Response
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='json')
    def hello_world(request):
@@ -576,7 +572,7 @@ Varying Attributes of Rendered Responses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Before a response that is constructed as the result of the use of a
-:term:`renderer` is returned to :mod:`repoze.bfg`, several attributes
+:term:`renderer` is returned to :mod:`pyramid`, several attributes
 of the request are examined which have the potential to influence
 response behavior.
 
@@ -613,7 +609,7 @@ attribute to the request before returning a result:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(name='gone', renderer='templates/gone.pt')
    def myview(request):
@@ -632,14 +628,14 @@ Adding and Overriding Renderers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 New templating systems and serializers can be associated with
-:mod:`repoze.bfg` renderer names.  To this end, configuration
+:mod:`pyramid` renderer names.  To this end, configuration
 declarations can be made which override an existing :term:`renderer
 factory` and which add a new renderer factory.
 
 Adding or overriding a renderer is accomplished via :term:`ZCML` or
 via imperative configuration.  Renderers can be registered
 imperatively using the
-:meth:`repoze.bfg.configuration.Configurator.add_renderer` API or via
+:meth:`pyramid.configuration.Configurator.add_renderer` API or via
 the :ref:`renderer_directive` ZCML directive.
 
 For example, to add a renderer which renders views which have a
@@ -740,7 +736,7 @@ attribute of a :term:`view configuration`:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='amf')
    def myview(request):
@@ -774,7 +770,7 @@ configuration`:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(renderer='templates/mytemplate.jinja2')
    def myview(request):
@@ -795,7 +791,7 @@ passed to the ``Jinja2Renderer`` constructor will usually be a
 renderer factory implementation should be able to deal with either.
 
 See also :ref:`renderer_directive` and
-:meth:`repoze.bfg.configuration.Configurator.add_renderer`.
+:meth:`pyramid.configuration.Configurator.add_renderer`.
 
 Overriding an Existing Renderer
 +++++++++++++++++++++++++++++++
@@ -811,9 +807,9 @@ renderer factory, use:
 
    <renderer
       name=".zpt"
-      factory="repoze.bfg.chameleon_zpt.renderer_factory"/>
+      factory="pyramid.chameleon_zpt.renderer_factory"/>
 
-After you do this, :mod:`repoze.bfg` will treat templates ending in
+After you do this, :mod:`pyramid` will treat templates ending in
 both the ``.pt`` and ``.zpt`` filename extensions as Chameleon ZPT
 templates.
 
@@ -856,10 +852,10 @@ tag):
    :linenos:
 
    <renderer
-      factory="repoze.bfg.renderers.json_renderer_factory"/>
+      factory="pyramid.renderers.json_renderer_factory"/>
 
 See also :ref:`renderer_directive` and
-:meth:`repoze.bfg.configuration.Configurator.add_renderer`.
+:meth:`pyramid.configuration.Configurator.add_renderer`.
 
 .. index::
    single: view exceptions
@@ -870,25 +866,25 @@ Using Special Exceptions In View Callables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Usually when a Python exception is raised within a view callable,
-:mod:`repoze.bfg` allows the exception to propagate all the way out to
+:mod:`pyramid` allows the exception to propagate all the way out to
 the :term:`WSGI` server which invoked the application.
 
 However, for convenience, two special exceptions exist which are
-always handled by :mod:`repoze.bfg` itself.  These are
-:exc:`repoze.bfg.exceptions.NotFound` and
-:exc:`repoze.bfg.exceptions.Forbidden`.  Both are exception classes
+always handled by :mod:`pyramid` itself.  These are
+:exc:`pyramid.exceptions.NotFound` and
+:exc:`pyramid.exceptions.Forbidden`.  Both are exception classes
 which accept a single positional constructor argument: a ``message``.
 
-If :exc:`repoze.bfg.exceptions.NotFound` is raised within view code,
+If :exc:`pyramid.exceptions.NotFound` is raised within view code,
 the result of the :term:`Not Found View` will be returned to the user
 agent which performed the request.
 
-If :exc:`repoze.bfg.exceptions.Forbidden` is raised within view code,
+If :exc:`pyramid.exceptions.Forbidden` is raised within view code,
 the result of the :term:`Forbidden View` will be returned to the user
 agent which performed the request.
 
 In all cases, the message provided to the exception constructor is
-made available to the view which :mod:`repoze.bfg` invokes as
+made available to the view which :mod:`pyramid` invokes as
 ``request.exception.args[0]``.
 
 .. index::
@@ -900,14 +896,14 @@ Exception Views
 ~~~~~~~~~~~~~~~~
 
 The machinery which allows the special
-:exc:`repoze.bfg.exceptions.NotFound` and
-:exc:`repoze.bfg.exceptions.Forbidden` exceptions to be caught by
+:exc:`pyramid.exceptions.NotFound` and
+:exc:`pyramid.exceptions.Forbidden` exceptions to be caught by
 specialized views as described in
 :ref:`special_exceptions_in_callables` can also be used by application
 developers to convert arbitrary exceptions to responses.
 
 To register a view that should be called whenever a particular
-exception is raised from with :mod:`repoze.bfg` view code, use the
+exception is raised from with :mod:`pyramid` view code, use the
 exception class or one of its superclasses as the ``context`` of a
 view configuration which points at a view callable you'd like to
 generate a response.
@@ -949,8 +945,8 @@ exception view registration:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
-   from repoze.bfg.exceptions import NotFound
+   from pyramid.view import bfg_view
+   from pyramid.exceptions import NotFound
    from webob.exc import HTTPNotFound
 
    @bfg_view(context=NotFound, route_name='home')
@@ -990,24 +986,24 @@ Handling Form Submissions in View Callables (Unicode and Character Set Issues)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Most web applications need to accept form submissions from web
-browsers and various other clients.  In :mod:`repoze.bfg`, form
+browsers and various other clients.  In :mod:`pyramid`, form
 submission handling logic is always part of a :term:`view`.  For a
 general overview of how to handle form submission data using the
 :term:`WebOb` API, see :ref:`webob_chapter` and `"Query and POST
 variables" within the WebOb documentation
 <http://pythonpaste.org/webob/reference.html#query-post-variables>`_.
-:mod:`repoze.bfg` defers to WebOb for its request and response
+:mod:`pyramid` defers to WebOb for its request and response
 implementations, and handling form submission data is a property of
 the request implementation.  Understanding WebOb's request API is the
 key to understanding how to process form submission data.
 
 There are some defaults that you need to be aware of when trying to
-handle form submission data in a :mod:`repoze.bfg` view.  Because
+handle form submission data in a :mod:`pyramid` view.  Because
 having high-order (non-ASCII) characters in data contained within form
 submissions is exceedingly common, and because the UTF-8 encoding is
 the most common encoding used on the web for non-ASCII character data,
 and because working and storing Unicode values is much saner than
-working with and storing bytestrings, :mod:`repoze.bfg` configures the
+working with and storing bytestrings, :mod:`pyramid` configures the
 :term:`WebOb` request machinery to attempt to decode form submission
 values into Unicode from the UTF-8 character set implicitly.  This
 implicit decoding happens when view code obtains form field values via
@@ -1016,7 +1012,7 @@ the :term:`WebOb` ``request.params``, ``request.GET``, or
 these APIs).
 
 For example, let's assume that the following form page is served up to
-a browser client, and its ``action`` points at some :mod:`repoze.bfg`
+a browser client, and its ``action`` points at some :mod:`pyramid`
 view code:
 
 .. code-block:: xml
@@ -1037,7 +1033,7 @@ view code:
      </form>
    </html>
 
-The ``myview`` view code in the :mod:`repoze.bfg` application *must*
+The ``myview`` view code in the :mod:`pyramid` application *must*
 expect that the values returned by ``request.params`` will be of type
 ``unicode``, as opposed to type ``str``. The following will work to
 accept a form post from the above form:
@@ -1063,7 +1059,7 @@ decode already-decoded (``unicode``) values obtained from
        lastname = request.params['lastname'].decode('utf-8')
 
 For implicit decoding to work reliably, youshould ensure that every
-form you render that posts to a :mod:`repoze.bfg` view is rendered via
+form you render that posts to a :mod:`pyramid` view is rendered via
 a response that has a ``;charset=UTF-8`` in its ``Content-Type``
 header; or, as in the form above, with a ``meta http-equiv`` tag that
 implies that the charset is UTF-8 within the HTML ``head`` of the page
@@ -1092,20 +1088,9 @@ you for response content types that are textual (e.g. ``text/html``,
 ``application/xml``, etc) as it is rendered.  If you are using your
 own response object, you will need to ensure you do this yourself.
 
-.. note:: The behavior that form values are decoded to Unicode
-   implicitly when no content type header exists was introduced in
-   :mod:`repoze.bfg` 0.7.0.  Previous versions of :mod:`repoze.bfg`
-   performed no implicit decoding of form values: it returned the
-   values from ``request.GET``, ``request.POST`` and
-   ``request.params`` as bytestrings.  Code written before 0.7.0 that
-   depended on the values from ``request.params``, ``request.GET`` and
-   ``request.POST`` being returned as bytestrings must at this point
-   be rewritten to use ``request.str_params``, ``request.str_GET`` or
-   ``request.str_POST``, which indeed will return bytestrings.
-
 .. note:: Only the *values* of request params obtained via
    ``request.params``, ``request.GET`` or ``request.POST`` are decoded
-   to Unicode objects implicitly in :mod:`repoze.bfg`'s default
+   to Unicode objects implicitly in the :mod:`pyramid` default
    configuration.  The keys are still strings.
 
 .. index::
@@ -1117,7 +1102,7 @@ View Configuration: Mapping a Context to a View
 -----------------------------------------------
 
 A developer makes a :term:`view callable` available for use within a
-:mod:`repoze.bfg` application via :term:`view configuration`.  A view
+:mod:`pyramid` application via :term:`view configuration`.  A view
 configuration associates a view callable with a set of statements
 about the set of circumstances which must be true for the view
 callable to be invoked.
@@ -1134,12 +1119,12 @@ View configuration is performed in one of three ways:
   :ref:`view_directive`.
 
 - by running a :term:`scan` against application source code which has
-  a :class:`repoze.bfg.view.bfg_view` decorator attached to a Python
-  object as per :class:`repoze.bfg.view.bfg_view` and
+  a :class:`pyramid.view.bfg_view` decorator attached to a Python
+  object as per :class:`pyramid.view.bfg_view` and
   :ref:`mapping_views_using_a_decorator_section`.
 
-- by using the :meth:`repoze.bfg.configuration.Configurator.add_view`
-  method as per :meth:`repoze.bfg.configuration.Configurator.add_view`
+- by using the :meth:`pyramid.configuration.Configurator.add_view`
+  method as per :meth:`pyramid.configuration.Configurator.add_view`
   and :ref:`mapping_views_using_imperative_config_section`.
 
 Each of these mechanisms is completely equivalent to the other.
@@ -1148,7 +1133,7 @@ A view configuration might also be performed by virtue of :term:`route
 configuration`.  View configuration via route configuration is
 performed in one of the following two ways:
 
-- by using the :meth:`repoze.bfg.configuration.Configurator.add_route`
+- by using the :meth:`pyramid.configuration.Configurator.add_route`
   method to create a route with a ``view`` argument.
 
 - by adding a ``<route>`` declaration that uses a ``view`` attribute to
@@ -1230,7 +1215,7 @@ Non-Predicate Arguments
 
   The ``renderer`` attribute is optional.  If it is not defined, the
   "null" renderer is assumed (no rendering is performed and the value
-  is passed back to the upstream :mod:`repoze.bfg` machinery
+  is passed back to the upstream :mod:`pyramid` machinery
   unmolested).  Note that if the view callable itself returns a
   :term:`response` (see :ref:`the_response`), the specified renderer
   implementation is never called.
@@ -1247,7 +1232,7 @@ Non-Predicate Arguments
   is found: see :ref:`view_lookup`.  The "best" wrapper view will be
   found based on the lookup ordering: "under the hood" this wrapper
   view is looked up via
-  ``repoze.bfg.view.render_view_to_response(context, request,
+  ``pyramid.view.render_view_to_response(context, request,
   'wrapper_viewname')``. The context and request of a wrapper view is
   the same context and request of the inner view.  
 
@@ -1415,8 +1400,6 @@ Predicate Arguments
   If ``custom_predicates`` is not specified, no custom predicates are
   used.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
-
 .. index::
    single: ZCML view configuration
 
@@ -1502,7 +1485,7 @@ attribute:
        name="hello.html"
        />
 
-This indicates that when :mod:`repoze.bfg` identifies that the
+This indicates that when :mod:`pyramid` identifies that the
 :term:`view name` is ``hello.html`` and the context is of any type,
 the ``.views.hello_world`` view callable will be invoked.
 
@@ -1521,7 +1504,7 @@ View Configuration Using the ``@bfg_view`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For better locality of reference, you may use the
-:class:`repoze.bfg.view.bfg_view` decorator to associate your view
+:class:`pyramid.view.bfg_view` decorator to associate your view
 functions with URLs instead of using :term:`ZCML` or imperative
 configuration for the same purpose.
 
@@ -1538,22 +1521,22 @@ configuration for the same purpose.
 
 Usage of the ``bfg_view`` decorator is a form of :term:`declarative
 configuration`, like ZCML, but in decorator form.
-:class:`repoze.bfg.view.bfg_view` can be used to associate :term:`view
+:class:`pyramid.view.bfg_view` can be used to associate :term:`view
 configuration` information -- as done via the equivalent ZCML -- with
-a function that acts as a :mod:`repoze.bfg` view callable.  All ZCML
+a function that acts as a :mod:`pyramid` view callable.  All ZCML
 :ref:`view_directive` attributes (save for the ``view`` attribute) are
 available in decorator form and mean precisely the same thing.
 
-An example of the :class:`repoze.bfg.view.bfg_view` decorator might
-reside in a :mod:`repoze.bfg` application module ``views.py``:
+An example of the :class:`pyramid.view.bfg_view` decorator might
+reside in a :mod:`pyramid` application module ``views.py``:
 
 .. ignore-next-block
 .. code-block:: python
    :linenos:
 
    from models import MyModel
-   from repoze.bfg.view import bfg_view
-   from repoze.bfg.chameleon_zpt import render_template_to_response
+   from pyramid.view import bfg_view
+   from pyramid.chameleon_zpt import render_template_to_response
 
    @bfg_view(name='my_view', request_method='POST', context=MyModel,
              permission='read', renderer='templates/my.pt')
@@ -1589,7 +1572,7 @@ All arguments to ``bfg_view`` may be omitted.  For example:
    :linenos:
 
    from webob import Response
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view()
    def my_view(request):
@@ -1603,8 +1586,8 @@ requests with any request method / request type / request param /
 route name / containment.
 
 The mere existence of a ``@bfg_view`` decorator doesn't suffice to
-perform view configuration.  To make :mod:`repoze.bfg` process your
-:class:`repoze.bfg.view.bfg_view` declarations, you *must* do one of
+perform view configuration.  To make :mod:`pyramid` process your
+:class:`pyramid.view.bfg_view` declarations, you *must* do one of
 the following:
 
 - If you are using :term:`ZCML`, insert the following boilerplate into
@@ -1615,21 +1598,21 @@ the following:
       <scan package="."/>
 
 - If you are using :term:`imperative configuration`, use the ``scan``
-  method of a :class:`repoze.bfg.configuration.Configurator`:
+  method of a :class:`pyramid.configuration.Configurator`:
 
   .. code-block:: python
 
       # config is assumed to be an instance of the
-      # repoze.bfg.configuration.Configurator class
+      # pyramid.configuration.Configurator class
       config.scan()
 
 Please see :ref:`decorations_and_code_scanning` for detailed
 information about what happens when code is scanned for configuration
 declarations resulting from use of decorators like
-:class:`repoze.bfg.view.bfg_view`.
+:class:`pyramid.view.bfg_view`.
 
 See :ref:`configuration_module` for additional API arguments to the
-:meth:`repoze.bfg.configuration.Configurator.scan` method.  For
+:meth:`pyramid.configuration.Configurator.scan` method.  For
 example, the method allows you to supply a ``package`` argument to
 better control exactly *which* code will be scanned.  This is the same
 value implied by the ``package`` attribute of the ZCML ``<scan>``
@@ -1638,7 +1621,7 @@ directive (see :ref:`scan_directive`).
 ``@bfg_view`` Placement
 +++++++++++++++++++++++
 
-A :class:`repoze.bfg.view.bfg_view` decorator can be placed in various
+A :class:`pyramid.view.bfg_view` decorator can be placed in various
 points in your application.
 
 If your view callable is a function, it may be used as a function
@@ -1647,7 +1630,7 @@ decorator:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
    from webob import Response
 
    @bfg_view(name='edit')
@@ -1664,7 +1647,7 @@ function.  For example:
    :linenos:
 
    from webob import Response
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view()
    class MyView(object):
@@ -1674,7 +1657,7 @@ function.  For example:
        def __call__(self):
            return Response('hello')
 
-You can use the :class:`repoze.bfg.view.bfg_view` decorator as a
+You can use the :class:`pyramid.view.bfg_view` decorator as a
 simple callable to manually decorate classes in Python 2.5 and below
 without the decorator syntactic sugar, if you wish:
 
@@ -1682,7 +1665,7 @@ without the decorator syntactic sugar, if you wish:
    :linenos:
 
    from webob import Response
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    class MyView(object):
        def __init__(self, request):
@@ -1693,14 +1676,14 @@ without the decorator syntactic sugar, if you wish:
 
    my_view = bfg_view()(MyView)
 
-More than one :class:`repoze.bfg.view.bfg_view` decorator can be
+More than one :class:`pyramid.view.bfg_view` decorator can be
 stacked on top of any number of others.  Each decorator creates a
 separate view registration.  For example:
 
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
    from webob import Response
 
    @bfg_view(name='edit')
@@ -1710,18 +1693,13 @@ separate view registration.  For example:
 
 This registers the same view under two different names.
 
-.. note:: :class:`repoze.bfg.view.bfg_view` decorator stacking is a
-   feature new in :mod:`repoze.bfg` 1.1.  Previously, these decorators
-   could not be stacked without the effect of the "upper" decorator
-   cancelling the effect of the decorator "beneath" it.
-
 The decorator can also be used against class methods:
 
 .. code-block:: python
    :linenos:
 
    from webob import Response
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    class MyView(object):
        def __init__(self, request):
@@ -1750,7 +1728,7 @@ equivalently as the below:
    :linenos:
 
    from webob import Response
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
 
    @bfg_view(attr='amethod', name='hello')
    class MyView(object):
@@ -1760,11 +1738,6 @@ equivalently as the below:
        def amethod(self):
            return Response('hello')
 
-.. note:: The ability to use the :class:`repoze.bfg.view.bfg_view`
-          decorator as a method decorator is new in :mod:`repoze.bfg`
-          version 1.1.  Previously it could only be used as a class or
-          function decorator.
-
 .. index::
    single: add_view
 
@@ -1773,7 +1746,7 @@ equivalently as the below:
 View Configuration Using the ``add_view`` Method of a Configurator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :meth:`repoze.bfg.configuration.Configurator.add_view` method
+The :meth:`pyramid.configuration.Configurator.add_view` method
 within :ref:`configuration_module` is used to configure a view
 imperatively.  The arguments to this method are very similar to the
 arguments that you provide to the ``@bfg_view`` decorator.  For
@@ -1788,13 +1761,13 @@ example:
        return Response('hello!')
 
    # config is assumed to be an instance of the
-   # repoze.bfg.configuration.Configurator class
+   # pyramid.configuration.Configurator class
    config.add_view(hello_world, name='hello.html')
 
 The first argument, ``view``, is required.  It must either be a Python
 object which is the view itself or a :term:`dotted Python name` to
 such an object.  All other arguments are optional.  See
-:meth:`repoze.bfg.configuration.Configurator.add_view` for more
+:meth:`pyramid.configuration.Configurator.add_view` for more
 information.
 
 .. index::
@@ -1932,7 +1905,7 @@ user does not possess the ``add`` permission relative to the current
 View Lookup and Invocation
 --------------------------
 
-:term:`View lookup` is the :mod:`repoze.bfg` subsystem responsible for
+:term:`View lookup` is the :mod:`pyramid` subsystem responsible for
 finding an invoking a :term:`view callable`.  The view lookup
 subsystem is passed a :term:`context`, a :term:`view name`, and the
 :term:`request` object.  These three bits of information are referred
@@ -1953,7 +1926,7 @@ For any given request, a view with five predicates will always be
 found and evaluated before a view with two, for example.  All
 predicates must match for the associated view to be called.
 
-This does not mean however, that :mod:`repoze.bfg` "stops looking"
+This does not mean however, that :mod:`pyramid` "stops looking"
 when it finds a view registration with predicates that don't match.
 If one set of view predicates does not match, the "next most specific"
 view (if any) view is consulted for predicates, and so on, until a
@@ -1962,7 +1935,7 @@ first view with a set of predicates all of which match the request
 environment will be invoked.
 
 If no view can be found which has predicates which allow it to be
-matched up with the request, :mod:`repoze.bfg` will return an error to
+matched up with the request, :mod:`pyramid` will return an error to
 the user's browser, representing a "not found" (404) page.  See
 :ref:`changing_the_notfound_view` for more information about changing
 the default notfound view.

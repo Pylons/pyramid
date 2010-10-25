@@ -14,15 +14,15 @@ true global variable, one thread or process serving the application
 may receive a different value than another thread or process when that
 variable is "thread local".
 
-When a request is processed, :mod:`repoze.bfg` makes two :term:`thread
+When a request is processed, :mod:`pyramid` makes two :term:`thread
 local` variables available to the application: a "registry" and a
 "request".
 
-Why and How :mod:`repoze.bfg` Uses Thread Local Variables
+Why and How :mod:`pyramid` Uses Thread Local Variables
 ---------------------------------------------------------
 
-How are thread locals beneficial to :mod:`repoze.bfg` and application
-developers who use :mod:`repoze.bfg`?  Well, usually they're decidedly
+How are thread locals beneficial to :mod:`pyramid` and application
+developers who use :mod:`pyramid`?  Well, usually they're decidedly
 **not**.  Using a global or a thread local variable in any application
 usually makes it a lot harder to understand for a casual reader.  Use
 of a thread local or a global is usually just a way to avoid passing
@@ -30,21 +30,21 @@ some value around between functions, which is itself usually a very
 bad idea, at least if code readability counts as an important concern.
 
 For historical reasons, however, thread local variables are indeed
-consulted by various :mod:`repoze.bfg` API functions.  For example,
-the implementation of the :mod:`repoze.bfg.security` function named
-:func:`repoze.bfg.security.authenticated_userid` retrieves the thread
+consulted by various :mod:`pyramid` API functions.  For example,
+the implementation of the :mod:`pyramid.security` function named
+:func:`pyramid.security.authenticated_userid` retrieves the thread
 local :term:`application registry` as a matter of course to find an
 :term:`authentication policy`.  It uses the
-:func:`repoze.bfg.threadlocal.get_current_registry` function to
+:func:`pyramid.threadlocal.get_current_registry` function to
 retrieve the application registry, from which it looks up the
 authentication policy; it then uses the authentication policy to
-retrieve the authenticated user id.  This is how :mod:`repoze.bfg`
+retrieve the authenticated user id.  This is how :mod:`pyramid`
 allows arbitrary authentication policies to be "plugged in".
 
-When they need to do so, :mod:`repoze.bfg` internals use two API
+When they need to do so, :mod:`pyramid` internals use two API
 functions to retrieve the :term:`request` and :term:`application
-registry`: :func:`repoze.bfg.threadlocal.get_current_request` and
-:func:`repoze.bfg.threadlocal.get_current_registry`.  The former
+registry`: :func:`pyramid.threadlocal.get_current_request` and
+:func:`pyramid.threadlocal.get_current_registry`.  The former
 returns the "current" request; the latter returns the "current"
 registry.  Both ``get_current_*`` functions retrieve an object from a
 thread-local data structure.  These API functions are documented in
@@ -52,15 +52,15 @@ thread-local data structure.  These API functions are documented in
 
 These values are thread locals rather than true globals because one
 Python process may be handling multiple simultaneous requests or even
-multiple :mod:`repoze.bfg` applications.  If they were true globals,
-:mod:`repoze.bfg` could not handle multiple simultaneous requests or
-allow more than one :mod:`repoze.bfg` application instance to exist in
+multiple :mod:`pyramid` applications.  If they were true globals,
+:mod:`pyramid` could not handle multiple simultaneous requests or
+allow more than one :mod:`pyramid` application instance to exist in
 a single Python process.
 
-Because one :mod:`repoze.bfg` application is permitted to call
-*another* :mod:`repoze.bfg` application from its own :term:`view` code
+Because one :mod:`pyramid` application is permitted to call
+*another* :mod:`pyramid` application from its own :term:`view` code
 (perhaps as a :term:`WSGI` app with help from the
-:func:`repoze.bfg.wsgi.wsgiapp2` decorator), these variables are
+:func:`pyramid.wsgi.wsgiapp2` decorator), these variables are
 managed in a *stack* during normal system operations.  The stack
 instance itself is a `threading.local
 <http://docs.python.org/library/threading.html#threading.local>`_.
@@ -71,34 +71,34 @@ pushes the application's registry and the request on to the stack.  At
 the end of a request, the stack is popped.  The topmost request and
 registry on the stack are considered "current".  Therefore, when the
 system is operating normally, the very definition of "current" is
-defined entirely by the behavior of a repoze.bfg :term:`Router`.
+defined entirely by the behavior of a pyramid :term:`Router`.
 
 However, during unit testing, no Router code is ever invoked, and the
 definition of "current" is defined by the boundary between calls to
-the :meth:`repoze.bfg.configuration.Configurator.begin` and
-:meth:`repoze.bfg.configuration.Configurator.end` methods (or between
-calls to the :func:`repoze.bfg.testing.setUp` and
-:func:`repoze.bfg.testing.tearDown` functions).  These functions push
+the :meth:`pyramid.configuration.Configurator.begin` and
+:meth:`pyramid.configuration.Configurator.end` methods (or between
+calls to the :func:`pyramid.testing.setUp` and
+:func:`pyramid.testing.tearDown` functions).  These functions push
 and pop the threadlocal stack when the system is under test.  See
 :ref:`test_setup_and_teardown` for the definitions of these functions.
 
-Scripts which use :mod:`repoze.bfg` machinery but never actually start
+Scripts which use :mod:`pyramid` machinery but never actually start
 a WSGI server or receive requests via HTTP such as scripts which use
-the :mod:`repoze.bfg.scripting` API will never cause any Router code
-to be executed.  However, the :mod:`repoze.bfg.scripting` APIs also
+the :mod:`pyramid.scripting` API will never cause any Router code
+to be executed.  However, the :mod:`pyramid.scripting` APIs also
 push some values on to the thread locals stack as a matter of course.
 Such scripts should expect the
-:func:`repoze.bfg.threadlocal.get_current_request` function to always
+:func:`pyramid.threadlocal.get_current_request` function to always
 return ``None``, and should expect the
-:func:`repoze.bfg.threadlocal.get_current_registry` function to return
+:func:`pyramid.threadlocal.get_current_registry` function to return
 exactly the same :term:`application registry` for every request.
 
 Why You Shouldn't Abuse Thread Locals
 -------------------------------------
 
 You probably should almost never use the
-:func:`repoze.bfg.threadlocal.get_current_request` or
-:func:`repoze.bfg.threadlocal.get_current_registry` functions, except
+:func:`pyramid.threadlocal.get_current_request` or
+:func:`pyramid.threadlocal.get_current_registry` functions, except
 perhaps in tests.  In particular, it's almost always a mistake to use
 ``get_current_request`` or ``get_current_registry`` in application
 code because its usage makes it possible to write code that can be
@@ -131,12 +131,12 @@ follows:
 - Neither ``get_current_request`` nor ``get_current_registry`` should
   ever be called within application-specific forks of third-party
   library code.  The library you've forked almost certainly has
-  nothing to do with :mod:`repoze.bfg`, and making it dependent on
-  :mod:`repoze.bfg` (rather than making your :mod:`repoze.bfg`
+  nothing to do with :mod:`pyramid`, and making it dependent on
+  :mod:`pyramid` (rather than making your :mod:`pyramid`
   application depend upon it) means you're forming a dependency in the
   wrong direction.
 
-Use of the :func:`repoze.bfg.threadlocal.get_current_request` function
+Use of the :func:`pyramid.threadlocal.get_current_request` function
 in application code *is* still useful in very limited circumstances.
 As a rule of thumb, usage of ``get_current_request`` is useful
 **within code which is meant to eventually be removed**.  For
@@ -153,10 +153,10 @@ time, the older implementation code is disused and the hack that uses
 ``get_current_request`` is removed.  This would be an appropriate
 place to use the ``get_current_request``.
 
-Use of the :func:`repoze.bfg.threadlocal.get_current_registry`
+Use of the :func:`pyramid.threadlocal.get_current_registry`
 function should be limited to testing scenarios.  The registry made
 current by use of the
-:meth:`repoze.bfg.configuration.Configurator.begin` method during a
-test (or via :func:`repoze.bfg.testing.setUp`) when you do not pass
+:meth:`pyramid.configuration.Configurator.begin` method during a
+test (or via :func:`pyramid.testing.setUp`) when you do not pass
 one in is available to you via this API.
 

@@ -10,17 +10,17 @@ Request and Response Objects
 .. note:: This chapter is adapted from a portion of the :term:`WebOb`
    documentation, originally written by Ian Bicking.
 
-:mod:`repoze.bfg` uses the :term:`WebOb` package to supply
+:mod:`pyramid` uses the :term:`WebOb` package to supply
 :term:`request` and :term:`response` object implementations.  The
-:term:`request` object that is passed to a :mod:`repoze.bfg`
-:term:`view` is an instance of the :class:`repoze.bfg.request.Request`
+:term:`request` object that is passed to a :mod:`pyramid`
+:term:`view` is an instance of the :class:`pyramid.request.Request`
 class, which is a subclass of :class:`webob.Request`.  The
-:term:`response` returned from a :mod:`repoze.bfg` :term:`view`
+:term:`response` returned from a :mod:`pyramid` :term:`view`
 :term:`renderer` is an instance of the :mod:`webob.Response` class.
 Users can also return an instance of :mod:`webob.Response` directly
 from a view as necessary.
 
-WebOb is a project separate from :mod:`repoze.bfg` with a separate set
+WebOb is a project separate from :mod:`pyramid` with a separate set
 of authors and a fully separate `set of documentation
 <http://pythonpaste.org/webob/>`_.
 
@@ -31,7 +31,7 @@ environment and response status/headers/app_iter (body).
 WebOb request and response objects provide many conveniences for
 parsing WSGI requests and forming WSGI responses.  WebOb is a nice way
 to represent "raw" WSGI requests and responses; however, we won't
-cover that use case in this document, as users of :mod:`repoze.bfg`
+cover that use case in this document, as users of :mod:`pyramid`
 don't typically need to use the WSGI-related features of WebOb
 directly.  The `reference documentation
 <http://pythonpaste.org/webob/reference.html>`_ shows many examples of
@@ -98,7 +98,7 @@ instance, ``req.if_modified_since`` returns a `datetime
 <http://python.org/doc/current/lib/datetime-datetime.html>`_ object
 (or None if the header is was not provided).
 
-.. note:: Full API documentation for the :mod:`repoze.bfg` request
+.. note:: Full API documentation for the :mod:`pyramid` request
    object is available in :ref:`request_module`.
 
 .. index::
@@ -106,15 +106,15 @@ instance, ``req.if_modified_since`` returns a `datetime
 
 .. _special_request_attributes:
 
-Special Attributes Added to the Request by :mod:`repoze.bfg`
+Special Attributes Added to the Request by :mod:`pyramid`
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 In addition to the standard :term:`WebOb` attributes,
-:mod:`repoze.bfg` adds special attributes to every request:
+:mod:`pyramid` adds special attributes to every request:
 ``context``, ``registry``, ``root``, ``subpath``, ``traversed``,
 ``view_name``, ``virtual_root`` , and ``virtual_root_path``.  These
 attributes are documented further within the
-:class:`repoze.bfg.request.Request` API documentation.
+:class:`pyramid.request.Request` API documentation.
 
 .. index::
    single: request URLs
@@ -194,12 +194,12 @@ More Details
 
 More detail about the request object API is available in:
 
-- The :class:`repoze.bfg.request.Request` API documentation.
+- The :class:`pyramid.request.Request` API documentation.
 
 - The `WebOb documentation <http://pythonpaste.org/webob>`_ .  All
   methods and attributes of a ``webob.Request`` documented within the
   WebOb documentation will work against request objects created by
-  :mod:`repoze.bfg`.
+  :mod:`pyramid`.
 
 Response
 ~~~~~~~~
@@ -360,7 +360,7 @@ More details about the response object API are available in the `WebOb
 documentation <http://pythonpaste.org/webob>`_ .  All methods and
 attributes of a ``webob.Response`` documented within the WebOb
 documentation will work against response objects created by
-:mod:`repoze.bfg`.  :mod:`repoze.bfg` does not use a Webob Response
+:mod:`pyramid`.  :mod:`pyramid` does not use a Webob Response
 object subclass to represent a response, it uses WebOb's Response
 class directly.
 
