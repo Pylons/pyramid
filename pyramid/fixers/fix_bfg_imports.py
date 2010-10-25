@@ -1,3 +1,5 @@
+import os
+import re
 import sys
 
 from lib2to3.refactor import get_fixers_from_package
@@ -165,13 +167,40 @@ class FixBfgImports(fixer_base.BaseFix):
             if new_name:
                 node.replace(Name(new_name, prefix=bare_name.prefix))
 
+BFG_INCLUDES_RE = (
+    r'include\s+?package\s*?=\s*?[\'\"]repoze\.bfg\.includes[\'\"]')
+BFG_NS_RE = (
+    r'xmlns\s*?=\s*?[\'\"]http://namespaces\.repoze\.org/bfg[\'\"]')
+
+INCLUDES = re.compile(BFG_INCLUDES_RE, re.MULTILINE)
+NS = re.compile(BFG_NS_RE, re.MULTILINE)
+
+def fix_zcml(path):
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith('.zcml'):
+                absfile = os.path.join(root, file)
+                text = open(absfile, 'rb').read()
+                newt =INCLUDES.sub('include package="pyramid.includes"', text)
+                newt = NS.sub('xmlns="http://pyramid.pylonshq.com"', newt)
+                if text != newt:
+                    newf = open(absfile, 'wb')
+                    newf.write(newt)
+                    newf.flush()
+                    newf.close()
+                
+        for dir in dirs:
+            if dir.startswith('.'):
+                dirs.remove(dir)
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
     path = argv[1]
-    fixer_names = get_fixers_from_package('repoze.bfg.fixers')
+    fixer_names = get_fixers_from_package('pyramid.fixers')
     tool = RefactoringTool(fixer_names)
     tool.refactor([path], write=True)
+    fix_zcml(path)
 
 if __name__ == '__main__':
     main()
