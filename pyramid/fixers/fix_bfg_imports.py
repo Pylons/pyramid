@@ -167,12 +167,8 @@ class FixBfgImports(fixer_base.BaseFix):
             if new_name:
                 node.replace(Name(new_name, prefix=bare_name.prefix))
 
-BFG_NS_RE = (
-    r'xmlns\s*?=\s*?[\'\"]http://namespaces\.repoze\.org/bfg[\'\"]')
-BFG_IN_ATTR = (
-    r'[\'\"]\s*?(repoze\.bfg)(.*?)[\'\"]')
-
-
+BFG_NS_RE = r'xmlns\s*?=\s*?[\'\"]http://namespaces\.repoze\.org/bfg[\'\"]'
+BFG_IN_ATTR = r'[\'\"]\s*?(repoze\.bfg)(.*?)[\'\"]'
 ATTR = re.compile(BFG_IN_ATTR, re.MULTILINE)
 NS = re.compile(BFG_NS_RE, re.MULTILINE)
 
