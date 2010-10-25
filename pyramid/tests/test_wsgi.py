@@ -2,7 +2,7 @@ import unittest
 
 class WSGIAppTests(unittest.TestCase):
     def _callFUT(self, app):
-        from repoze.bfg.wsgi import wsgiapp
+        from pyramid.wsgi import wsgiapp
         return wsgiapp(app)
 
     def test_decorator(self):
@@ -14,7 +14,7 @@ class WSGIAppTests(unittest.TestCase):
 
 class WSGIApp2Tests(unittest.TestCase):
     def _callFUT(self, app):
-        from repoze.bfg.wsgi import wsgiapp2
+        from pyramid.wsgi import wsgiapp2
         return wsgiapp2(app)
 
     def test_decorator_with_subpath_and_view_name(self):

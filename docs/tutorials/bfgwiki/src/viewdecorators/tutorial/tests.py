@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class PageModelTests(unittest.TestCase):
 
@@ -80,7 +80,7 @@ class AddPageTests(unittest.TestCase):
         return add_page(context, request)
 
     def test_it_notsubmitted(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
         request.subpath = ['AnotherPage']
@@ -106,7 +106,7 @@ class EditPageTests(unittest.TestCase):
         return edit_page(context, request)
 
     def test_it_notsubmitted(self):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)

@@ -2,7 +2,7 @@ import unittest
 
 class TestReify(unittest.TestCase):
     def _makeOne(self, wrapped):
-        from repoze.bfg.decorator import reify
+        from pyramid.decorator import reify
         return reify(wrapped)
 
     def test___get__withinst(self):

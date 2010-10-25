@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-__version__ = '1.3a15'
+__version__ = '1.0a1'
 
 import os
 import platform
@@ -52,38 +52,37 @@ else:
 if sys.version_info[:2] < (2, 6):
     install_requires.append('simplejson')
     
-setup(name='repoze.bfg',
+setup(name='pyramid',
       version=__version__,
-      description='The repoze.bfg web application framework',
+      description='The Pyramid web application framework, a Pylons project',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",
-        "Framework :: BFG",
+        "Framework :: Pylons",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
         "License :: Repoze Public License",
         ],
-      keywords='web wsgi bfg',
+      keywords='web wsgi pylons pyramid bfg',
       author="Chris McDonough, Agendaless Consulting",
       author_email="repoze-dev@lists.repoze.org",
-      url="http://bfg.repoze.org",
+      url="http://pylonshq.com",
       license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
       packages=find_packages(),
       include_package_data=True,
-      namespace_packages = ['repoze', 'repoze.bfg'],
       zip_safe=False,
       install_requires = install_requires,
       tests_require = tests_require,
-      test_suite="repoze.bfg.tests",
+      test_suite="pyramid.tests",
       entry_points = """\
         [paste.paster_create_template]
-        bfg_starter=repoze.bfg.paster:StarterProjectTemplate
-        bfg_zodb=repoze.bfg.paster:ZODBProjectTemplate
-        bfg_routesalchemy=repoze.bfg.paster:RoutesAlchemyProjectTemplate
-        bfg_alchemy=repoze.bfg.paster:AlchemyProjectTemplate
+        pyramid_starter=pyramid.paster:StarterProjectTemplate
+        pyramid_zodb=pyramid.paster:ZODBProjectTemplate
+        pyramid_routesalchemy=pyramid.paster:RoutesAlchemyProjectTemplate
+        pyramid_alchemy=pyramid.paster:AlchemyProjectTemplate
         [paste.paster_command]
-        bfgshell=repoze.bfg.paster:BFGShellCommand
+        pyramid_shell=pyramid.paster:BFGShellCommand
       """
       )
 

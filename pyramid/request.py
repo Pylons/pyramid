@@ -4,7 +4,7 @@ from zope.interface.interface import InterfaceClass
 
 from webob import Request as WebobRequest
 
-from repoze.bfg.interfaces import IRequest
+from pyramid.interfaces import IRequest
 
 class Request(WebobRequest):
     """
@@ -217,7 +217,7 @@ def add_global_response_headers(request, headerlist):
             response.headerlist.append((k, v))
     request.add_response_callback(add_headers)
 
-from repoze.bfg.threadlocal import get_current_request as get_request # b/c
+from pyramid.threadlocal import get_current_request as get_request # b/c
 
 get_request # prevent PyFlakes complaints
 

@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 
 class TestAllPermissionsList(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestAllPermissionsList(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from repoze.bfg.security import AllPermissionsList
+        from pyramid.security import AllPermissionsList
         return AllPermissionsList
 
     def _makeOne(self):
@@ -24,12 +24,12 @@ class TestAllPermissionsList(unittest.TestCase):
         self.failUnless('anything' in thing)
 
     def test_singleton(self):
-        from repoze.bfg.security import ALL_PERMISSIONS
+        from pyramid.security import ALL_PERMISSIONS
         self.assertEqual(ALL_PERMISSIONS.__class__, self._getTargetClass())
 
 class TestAllowed(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.security import Allowed
+        from pyramid.security import Allowed
         return Allowed
     
     def _makeOne(self, *arg, **kw):
@@ -47,7 +47,7 @@ class TestAllowed(unittest.TestCase):
 
 class TestDenied(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.security import Denied
+        from pyramid.security import Denied
         return Denied
     
     def _makeOne(self, *arg, **kw):
@@ -65,7 +65,7 @@ class TestDenied(unittest.TestCase):
 
 class TestACLAllowed(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.security import ACLAllowed
+        from pyramid.security import ACLAllowed
         return ACLAllowed
     
     def _makeOne(self, *arg, **kw):
@@ -85,7 +85,7 @@ class TestACLAllowed(unittest.TestCase):
 
 class TestACLDenied(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.security import ACLDenied
+        from pyramid.security import ACLDenied
         return ACLDenied
     
     def _makeOne(self, *arg, **kw):
@@ -111,14 +111,14 @@ class TestViewExecutionPermitted(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.security import view_execution_permitted
+        from pyramid.security import view_execution_permitted
         return view_execution_permitted(*arg, **kw)
 
     def _registerSecuredView(self, view_name, allow=True):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         from zope.interface import Interface
-        from repoze.bfg.interfaces import ISecuredView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import ISecuredView
+        from pyramid.interfaces import IViewClassifier
         class Checker(object):
             def __permitted__(self, context, request):
                 self.context = context
@@ -131,8 +131,8 @@ class TestViewExecutionPermitted(unittest.TestCase):
         return checker
 
     def test_no_permission(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ISettings
         settings = dict(debug_authorization=True)
         reg = get_current_registry()
         reg.registerUtility(settings, ISettings)
@@ -147,7 +147,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
     def test_with_permission(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         class IContext(Interface):
             pass
         context = DummyContext()
@@ -166,7 +166,7 @@ class TestHasPermission(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, *arg):
-        from repoze.bfg.security import has_permission
+        from pyramid.security import has_permission
         return has_permission(*arg)
 
     def test_no_authentication_policy(self):
@@ -187,7 +187,7 @@ class TestHasPermission(unittest.TestCase):
         self.assertEqual(self._callFUT('view', None, request), 'yo')
 
     def test_no_registry_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         request = DummyRequest({})
         registry = get_current_registry()
         _registerAuthenticationPolicy(registry, None)
@@ -202,7 +202,7 @@ class TestAuthenticatedUserId(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, request):
-        from repoze.bfg.security import authenticated_userid
+        from pyramid.security import authenticated_userid
         return authenticated_userid(request)
 
     def test_no_authentication_policy(self):
@@ -217,7 +217,7 @@ class TestAuthenticatedUserId(unittest.TestCase):
         self.assertEqual(result, 'yo')
 
     def test_with_authentication_policy_no_reg_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         request = DummyRequest({})
         registry = get_current_registry()
         _registerAuthenticationPolicy(registry, 'yo')
@@ -232,7 +232,7 @@ class TestEffectivePrincipals(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, request):
-        from repoze.bfg.security import effective_principals
+        from pyramid.security import effective_principals
         return effective_principals(request)
 
     def test_no_authentication_policy(self):
@@ -247,7 +247,7 @@ class TestEffectivePrincipals(unittest.TestCase):
         self.assertEqual(result, 'yo')
 
     def test_with_authentication_policy_no_reg_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         request = DummyRequest({})
         _registerAuthenticationPolicy(registry, 'yo')
@@ -262,17 +262,17 @@ class TestPrincipalsAllowedByPermission(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, *arg):
-        from repoze.bfg.security import principals_allowed_by_permission
+        from pyramid.security import principals_allowed_by_permission
         return principals_allowed_by_permission(*arg)
 
     def test_no_authorization_policy(self):
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Everyone
         context = DummyContext()
         result = self._callFUT(context, 'view')
         self.assertEqual(result, [Everyone])
 
     def test_with_authorization_policy(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         _registerAuthorizationPolicy(registry, 'yo')
         context = DummyContext()
@@ -287,7 +287,7 @@ class TestRemember(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, *arg):
-        from repoze.bfg.security import remember
+        from pyramid.security import remember
         return remember(*arg)
 
     def test_no_authentication_policy(self):
@@ -303,7 +303,7 @@ class TestRemember(unittest.TestCase):
         self.assertEqual(result, 'yo')
 
     def test_with_authentication_policy_no_reg_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         request = DummyRequest({})
         _registerAuthenticationPolicy(registry, 'yo')
@@ -318,7 +318,7 @@ class TestForget(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, *arg):
-        from repoze.bfg.security import forget
+        from pyramid.security import forget
         return forget(*arg)
 
     def test_no_authentication_policy(self):
@@ -333,7 +333,7 @@ class TestForget(unittest.TestCase):
         self.assertEqual(result, 'yo')
 
     def test_with_authentication_policy_no_reg_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         request = DummyRequest({})
         _registerAuthenticationPolicy(registry, 'yo')
@@ -375,19 +375,19 @@ class DummyAuthorizationPolicy:
         return self.result
 
 def _registerAuthenticationPolicy(reg, result):
-    from repoze.bfg.interfaces import IAuthenticationPolicy
+    from pyramid.interfaces import IAuthenticationPolicy
     policy = DummyAuthenticationPolicy(result)
     reg.registerUtility(policy, IAuthenticationPolicy)
     return policy
 
 def _registerAuthorizationPolicy(reg, result):
-    from repoze.bfg.interfaces import IAuthorizationPolicy
+    from pyramid.interfaces import IAuthorizationPolicy
     policy = DummyAuthorizationPolicy(result)
     reg.registerUtility(policy, IAuthorizationPolicy)
     return policy
 
 def _makeRequest():
-    from repoze.bfg.registry import Registry
+    from pyramid.registry import Registry
     request = DummyRequest({})
     request.registry = Registry()
     return request

@@ -6,17 +6,17 @@ from webob import Response
 
 from zope.deprecation import deprecated
 
-from repoze.bfg.interfaces import IRendererGlobalsFactory
-from repoze.bfg.interfaces import IRendererFactory
-from repoze.bfg.interfaces import IResponseFactory
-from repoze.bfg.interfaces import ITemplateRenderer
+from pyramid.interfaces import IRendererGlobalsFactory
+from pyramid.interfaces import IRendererFactory
+from pyramid.interfaces import IResponseFactory
+from pyramid.interfaces import ITemplateRenderer
 
-from repoze.bfg.compat import json
-from repoze.bfg.path import caller_package
-from repoze.bfg.settings import get_settings
-from repoze.bfg.threadlocal import get_current_registry
-from repoze.bfg.resource import resolve_resource_spec
-from repoze.bfg.decorator import reify
+from pyramid.compat import json
+from pyramid.path import caller_package
+from pyramid.settings import get_settings
+from pyramid.threadlocal import get_current_registry
+from pyramid.resource import resolve_resource_spec
+from pyramid.decorator import reify
 
 # API
 

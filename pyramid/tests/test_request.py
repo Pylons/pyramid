@@ -5,7 +5,7 @@ class TestRequest(unittest.TestCase):
         return self._getTargetClass()(environ)
 
     def _getTargetClass(self):
-        from repoze.bfg.request import Request
+        from pyramid.request import Request
         return Request
 
     def test_charset_defaults_to_utf8(self):
@@ -26,12 +26,12 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(request.GET['la'], u'La Pe\xf1a')
 
     def test_class_implements(self):
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         klass = self._getTargetClass()
         self.assertTrue(IRequest.implementedBy(klass))
 
     def test_instance_provides(self):
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         inst = self._makeOne({})
         self.assertTrue(IRequest.providedBy(inst))
 
@@ -193,7 +193,7 @@ class TestRequest(unittest.TestCase):
 
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):
-        from repoze.bfg.request import route_request_iface
+        from pyramid.request import route_request_iface
         return route_request_iface(name)
 
     def test_it(self):
@@ -204,7 +204,7 @@ class Test_route_request_iface(unittest.TestCase):
 
 class Test_add_global_response_headers(unittest.TestCase):
     def _callFUT(self, request, headerlist):
-        from repoze.bfg.request import add_global_response_headers
+        from pyramid.request import add_global_response_headers
         return add_global_response_headers(request, headerlist)
 
     def test_it(self):

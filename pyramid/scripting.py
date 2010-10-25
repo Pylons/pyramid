@@ -1,5 +1,5 @@
-from repoze.bfg.request import Request
-from repoze.bfg.interfaces import IRequestFactory
+from pyramid.request import Request
+from pyramid.interfaces import IRequestFactory
 
 def get_root(app, request=None):
     """ Return a tuple composed of ``(root, closer)`` when provided a

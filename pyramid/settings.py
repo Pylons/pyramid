@@ -2,9 +2,9 @@ import os
 
 from zope.interface import implements
 
-from repoze.bfg.interfaces import ISettings
+from pyramid.interfaces import ISettings
 
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.threadlocal import get_current_registry
 
 class Settings(dict):
     """ Deployment settings.  Update application settings (usually

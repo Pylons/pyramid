@@ -2,7 +2,7 @@ import unittest
 
 class TestInside(unittest.TestCase):
     def _callFUT(self, one, two):
-        from repoze.bfg.location import inside
+        from pyramid.location import inside
         return inside(one, two)
     
     def test_inside(self):
@@ -20,7 +20,7 @@ class TestInside(unittest.TestCase):
 
 class TestLineage(unittest.TestCase):
     def _callFUT(self, context):
-        from repoze.bfg.location import lineage
+        from pyramid.location import lineage
         return lineage(context)
 
     def test_lineage(self):
@@ -33,7 +33,7 @@ class TestLineage(unittest.TestCase):
         result = list(self._callFUT(o1))
         self.assertEqual(result, [o1])
 
-from repoze.bfg.interfaces import ILocation
+from pyramid.interfaces import ILocation
 from zope.interface import implements
 class Location(object):
     implements(ILocation)

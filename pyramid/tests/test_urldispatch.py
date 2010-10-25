@@ -1,16 +1,16 @@
 import unittest
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestRoute(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.urldispatch import Route
+        from pyramid.urldispatch import Route
         return Route
 
     def _makeOne(self, *arg):
         return self._getTargetClass()(*arg)
 
     def test_provides_IRoute(self):
-        from repoze.bfg.interfaces import IRoute
+        from pyramid.interfaces import IRoute
         from zope.interface.verify import verifyObject
         verifyObject(IRoute, self._makeOne('name', 'pattern'))
 
@@ -50,7 +50,7 @@ class RoutesMapperTests(unittest.TestCase):
         testing.tearDown()
         
     def _getRequest(self, **kw):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         environ = {'SERVER_NAME':'localhost',
                    'wsgi.url_scheme':'http'}
         environ.update(kw)
@@ -60,7 +60,7 @@ class RoutesMapperTests(unittest.TestCase):
         return request
 
     def _getTargetClass(self):
-        from repoze.bfg.urldispatch import RoutesMapper
+        from pyramid.urldispatch import RoutesMapper
         return RoutesMapper
 
     def _makeOne(self):
@@ -68,7 +68,7 @@ class RoutesMapperTests(unittest.TestCase):
         return klass()
 
     def test_provides_IRoutesMapper(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         from zope.interface.verify import verifyObject
         verifyObject(IRoutesMapper, self._makeOne())
 
@@ -190,7 +190,7 @@ class RoutesMapperTests(unittest.TestCase):
         self.assertEqual(mapper.has_routes(), True)
 
     def test_get_routes(self):
-        from repoze.bfg.urldispatch import Route
+        from pyramid.urldispatch import Route
         mapper = self._makeOne()
         self.assertEqual(mapper.get_routes(), [])
         mapper.connect('whatever', 'archives/:action/:article')
@@ -219,7 +219,7 @@ class RoutesMapperTests(unittest.TestCase):
 
 class TestCompileRoute(unittest.TestCase):
     def _callFUT(self, pattern):
-        from repoze.bfg.urldispatch import _compile_route
+        from pyramid.urldispatch import _compile_route
         return _compile_route(pattern)
 
     def test_no_star(self):
@@ -248,19 +248,19 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(generator({'baz':1, 'buz':2}), '/foo/1/biz/2/bar')
 
     def test_url_decode_error(self):
-        from repoze.bfg.exceptions import URLDecodeError
+        from pyramid.exceptions import URLDecodeError
         matcher, generator = self._callFUT('/:foo')
         self.assertRaises(URLDecodeError, matcher, '/%FF%FE%8B%00')
 
 class TestCompileRouteMatchFunctional(unittest.TestCase):
     def matches(self, pattern, path, expected):
-        from repoze.bfg.urldispatch import _compile_route
+        from pyramid.urldispatch import _compile_route
         matcher = _compile_route(pattern)[0]
         result = matcher(path)
         self.assertEqual(result, expected)
 
     def generates(self, pattern, dict, result):
-        from repoze.bfg.urldispatch import _compile_route
+        from pyramid.urldispatch import _compile_route
         self.assertEqual(_compile_route(pattern)[1](dict), result)
 
     def test_matcher_functional(self):

@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class TestACLAuthorizationPolicy(unittest.TestCase):
     def setUp(self):
@@ -10,7 +10,7 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from repoze.bfg.authorization import ACLAuthorizationPolicy
+        from pyramid.authorization import ACLAuthorizationPolicy
         return ACLAuthorizationPolicy
 
     def _makeOne(self):
@@ -18,12 +18,12 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
 
     def test_class_implements_IAuthorizationPolicy(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
         verifyClass(IAuthorizationPolicy, self._getTargetClass())
 
     def test_instance_implements_IAuthorizationPolicy(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
         verifyObject(IAuthorizationPolicy, self._makeOne())
 
     def test_permits_no_acl(self):
@@ -32,12 +32,12 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(policy.permits(context, [], 'view'), False)
         
     def test_permits(self):
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
-        from repoze.bfg.security import ALL_PERMISSIONS
-        from repoze.bfg.security import DENY_ALL
+        from pyramid.security import Deny
+        from pyramid.security import Allow
+        from pyramid.security import Everyone
+        from pyramid.security import Authenticated
+        from pyramid.security import ALL_PERMISSIONS
+        from pyramid.security import DENY_ALL
         root = DummyContext()
         community = DummyContext(__name__='community', __parent__=root)
         blog = DummyContext(__name__='blog', __parent__=community)
@@ -120,8 +120,8 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
             '<No ACL found on any object in model lineage>')
 
     def test_principals_allowed_by_permission_direct(self):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import DENY_ALL
+        from pyramid.security import Allow
+        from pyramid.security import DENY_ALL
         context = DummyContext()
         acl = [ (Allow, 'chrism', ('read', 'write')),
                 DENY_ALL,
@@ -133,10 +133,10 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, ['chrism'])
 
     def test_principals_allowed_by_permission(self):
-        from repoze.bfg.security import Allow
-        from repoze.bfg.security import Deny
-        from repoze.bfg.security import DENY_ALL
-        from repoze.bfg.security import ALL_PERMISSIONS
+        from pyramid.security import Allow
+        from pyramid.security import Deny
+        from pyramid.security import DENY_ALL
+        from pyramid.security import ALL_PERMISSIONS
         root = DummyContext(__name__='', __parent__=None)
         community = DummyContext(__name__='community', __parent__=root)
         blog = DummyContext(__name__='blog', __parent__=community)

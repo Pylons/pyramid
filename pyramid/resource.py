@@ -3,11 +3,11 @@ import pkg_resources
 
 from zope.interface import implements
 
-from repoze.bfg.interfaces import IPackageOverrides
+from pyramid.interfaces import IPackageOverrides
 
-from repoze.bfg.path import package_path
-from repoze.bfg.path import package_name
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.path import package_path
+from pyramid.path import package_name
+from pyramid.threadlocal import get_current_registry
 
 class OverrideProvider(pkg_resources.DefaultProvider):
     def __init__(self, module):

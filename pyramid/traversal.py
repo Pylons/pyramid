@@ -5,16 +5,16 @@ from zope.interface.interfaces import IInterface
 
 from repoze.lru import lru_cache
 
-from repoze.bfg.interfaces import IContextURL
-from repoze.bfg.interfaces import IRequestFactory
-from repoze.bfg.interfaces import ITraverser
-from repoze.bfg.interfaces import VH_ROOT_KEY
+from pyramid.interfaces import IContextURL
+from pyramid.interfaces import IRequestFactory
+from pyramid.interfaces import ITraverser
+from pyramid.interfaces import VH_ROOT_KEY
 
-from repoze.bfg.encode import url_quote
-from repoze.bfg.exceptions import URLDecodeError
-from repoze.bfg.location import lineage
-from repoze.bfg.request import Request
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.encode import url_quote
+from pyramid.exceptions import URLDecodeError
+from pyramid.location import lineage
+from pyramid.request import Request
+from pyramid.threadlocal import get_current_registry
 
 def find_root(model):
     """ Find the root node in the graph to which ``model``

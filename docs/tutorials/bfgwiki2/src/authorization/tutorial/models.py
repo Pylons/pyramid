@@ -1,7 +1,7 @@
 import transaction
 
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Everyone
+from pyramid.security import Allow
+from pyramid.security import Everyone
 
 from sqlalchemy import create_engine
 from sqlalchemy import Column

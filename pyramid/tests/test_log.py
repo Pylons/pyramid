@@ -2,7 +2,7 @@ import unittest
 
 class TestFunctions(unittest.TestCase):
     def test_make_stream_logger(self):
-        from repoze.bfg.log import make_stream_logger
+        from pyramid.log import make_stream_logger
         import logging
         import sys
         logger = make_stream_logger('foo', sys.stderr, levelname='DEBUG',

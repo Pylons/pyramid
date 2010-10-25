@@ -1,8 +1,8 @@
 from webob.exc import HTTPFound
 
-from repoze.bfg.security import remember
-from repoze.bfg.security import forget
-from repoze.bfg.url import route_url
+from pyramid.security import remember
+from pyramid.security import forget
+from pyramid.url import route_url
 
 from tutorial.security import USERS
 

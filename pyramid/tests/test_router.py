@@ -1,26 +1,26 @@
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class TestRouter(unittest.TestCase):
     def setUp(self):
         testing.setUp()
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         self.registry = get_current_registry()
 
     def tearDown(self):
         testing.tearDown()
 
     def _registerRouteRequest(self, name):
-        from repoze.bfg.interfaces import IRouteRequest
-        from repoze.bfg.request import route_request_iface
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.request import route_request_iface
         iface = route_request_iface(name)
         self.registry.registerUtility(iface, IRouteRequest, name=name)
         return iface
 
     def _connectRoute(self, name, path, factory=None):
-        from repoze.bfg.interfaces import IRoutesMapper
-        from repoze.bfg.urldispatch import RoutesMapper
+        from pyramid.interfaces import IRoutesMapper
+        from pyramid.urldispatch import RoutesMapper
         mapper = self.registry.queryUtility(IRoutesMapper)
         if mapper is None:
             mapper = RoutesMapper()
@@ -28,13 +28,13 @@ class TestRouter(unittest.TestCase):
         mapper.connect(name, path, factory)
 
     def _registerLogger(self):
-        from repoze.bfg.interfaces import IDebugLogger
+        from pyramid.interfaces import IDebugLogger
         logger = DummyLogger()
         self.registry.registerUtility(logger, IDebugLogger)
         return logger
 
     def _registerSettings(self, **kw):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = {'debug_authorization':False, 'debug_notfound':False}
         settings.update(kw)
         self.registry.registerUtility(settings, ISettings)
@@ -43,7 +43,7 @@ class TestRouter(unittest.TestCase):
                                   traversed=None, virtual_root=None,
                                   virtual_root_path=None, raise_error=None,
                                   **kw):
-        from repoze.bfg.interfaces import ITraverser
+        from pyramid.interfaces import ITraverser
 
         if virtual_root is None:
             virtual_root = context
@@ -75,7 +75,7 @@ class TestRouter(unittest.TestCase):
                                       ITraverser, name='')
 
     def _registerView(self, app, name, classifier, req_iface, ctx_iface):
-        from repoze.bfg.interfaces import IView
+        from pyramid.interfaces import IView
         self.registry.registerAdapter(
             app, (classifier, req_iface, ctx_iface), IView, name)
 
@@ -88,12 +88,12 @@ class TestRouter(unittest.TestCase):
 
     def _registerRootFactory(self, val):
         rootfactory = DummyRootFactory(val)
-        from repoze.bfg.interfaces import IRootFactory
+        from pyramid.interfaces import IRootFactory
         self.registry.registerUtility(rootfactory, IRootFactory)
         return rootfactory
 
     def _getTargetClass(self):
-        from repoze.bfg.router import Router
+        from pyramid.router import Router
         return Router
 
     def _makeOne(self):
@@ -119,7 +119,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(router.root_policy, rootfactory)
 
     def test_request_factory(self):
-        from repoze.bfg.interfaces import IRequestFactory
+        from pyramid.interfaces import IRequestFactory
         class DummyRequestFactory(object):
             pass
         self.registry.registerUtility(DummyRequestFactory, IRequestFactory)
@@ -127,7 +127,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(router.request_factory, DummyRequestFactory)
 
     def test_call_traverser_default(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         environ = self._makeEnviron()
         logger = self._registerLogger()
         router = self._makeOne()
@@ -138,7 +138,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(len(logger.messages), 0)
 
     def test_traverser_raises_notfound_class(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context, raise_error=NotFound)
@@ -147,7 +147,7 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(NotFound, router, environ, start_response)
 
     def test_traverser_raises_notfound_instance(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context, raise_error=NotFound('foo'))
@@ -157,7 +157,7 @@ class TestRouter(unittest.TestCase):
         self.failUnless('foo' in why[0], why)
 
     def test_traverser_raises_forbidden_class(self):
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.exceptions import Forbidden
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context, raise_error=Forbidden)
@@ -166,7 +166,7 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(Forbidden, router, environ, start_response)
 
     def test_traverser_raises_forbidden_instance(self):
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.exceptions import Forbidden
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context, raise_error=Forbidden('foo'))
@@ -176,7 +176,7 @@ class TestRouter(unittest.TestCase):
         self.failUnless('foo' in why[0], why)
 
     def test_call_no_view_registered_no_isettings(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -189,7 +189,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_false(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -203,7 +203,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(len(logger.messages), 0)
 
     def test_call_no_view_registered_debug_notfound_true(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -227,7 +227,7 @@ class TestRouter(unittest.TestCase):
         self.failUnless("subpath: []" in message)
 
     def test_call_view_returns_nonresponse(self):
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         environ = self._makeEnviron()
@@ -238,7 +238,7 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(ValueError, router, environ, start_response)
 
     def test_call_view_registered_nonspecific_default_path(self):
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -260,7 +260,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.root, context)
 
     def test_call_view_registered_nonspecific_nondefault_path_and_subpath(self):
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context, view_name='foo',
                                        subpath=['bar'],
@@ -288,8 +288,8 @@ class TestRouter(unittest.TestCase):
         from zope.interface import directlyProvides
         class IContext(Interface):
             pass
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context)
@@ -314,13 +314,13 @@ class TestRouter(unittest.TestCase):
     def test_call_view_registered_specific_fail(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.exceptions import NotFound
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.exceptions import NotFound
+        from pyramid.interfaces import IViewClassifier
         class IContext(Interface):
             pass
         class INotContext(Interface):
             pass
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         context = DummyContext()
         directlyProvides(context, INotContext)
         self._registerTraverserFactory(context, subpath=[''])
@@ -335,11 +335,11 @@ class TestRouter(unittest.TestCase):
     def test_call_view_raises_forbidden(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.exceptions import Forbidden
         class IContext(Interface):
             pass
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
@@ -357,9 +357,9 @@ class TestRouter(unittest.TestCase):
         from zope.interface import directlyProvides
         class IContext(Interface):
             pass
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.exceptions import NotFound
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
@@ -377,8 +377,8 @@ class TestRouter(unittest.TestCase):
         from zope.interface import directlyProvides
         class IContext(Interface):
             pass
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
@@ -400,8 +400,8 @@ class TestRouter(unittest.TestCase):
         from zope.interface import directlyProvides
         class IContext(Interface):
             pass
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
@@ -423,8 +423,8 @@ class TestRouter(unittest.TestCase):
         from zope.interface import directlyProvides
         class IContext(Interface):
             pass
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         directlyProvides(context, IContext)
         self._registerTraverserFactory(context, subpath=[''])
@@ -451,10 +451,10 @@ class TestRouter(unittest.TestCase):
         exc_raised(NotImplementedError, router, environ, start_response)
 
     def test_call_eventsends(self):
-        from repoze.bfg.interfaces import INewRequest
-        from repoze.bfg.interfaces import INewResponse
-        from repoze.bfg.interfaces import IContextFound
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import INewRequest
+        from pyramid.interfaces import INewResponse
+        from pyramid.interfaces import IContextFound
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -477,7 +477,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, response.app_iter)
 
     def test_call_pushes_and_pops_threadlocal_manager(self):
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IViewClassifier
         context = DummyContext()
         self._registerTraverserFactory(context)
         response = DummyResponse()
@@ -493,7 +493,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(len(router.threadlocal_manager.popped), 1)
 
     def test_call_route_matches_and_has_factory(self):
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IViewClassifier
         self._registerRouteRequest('foo')
         root = object()
         def factory(request):
@@ -525,8 +525,8 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.matched_route.name, 'foo')
 
     def test_call_route_matches_doesnt_overwrite_subscriber_iface(self):
-        from repoze.bfg.interfaces import INewRequest
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import INewRequest
+        from pyramid.interfaces import IViewClassifier
         from zope.interface import alsoProvides
         from zope.interface import Interface
         self._registerRouteRequest('foo')
@@ -566,8 +566,8 @@ class TestRouter(unittest.TestCase):
         self.failUnless(IFoo.providedBy(request))
 
     def test_root_factory_raises_notfound(self):
-        from repoze.bfg.interfaces import IRootFactory
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.interfaces import IRootFactory
+        from pyramid.exceptions import NotFound
         from zope.interface import Interface
         from zope.interface import directlyProvides
         def rootfactory(request):
@@ -584,8 +584,8 @@ class TestRouter(unittest.TestCase):
         self.failUnless('from root factory' in why[0])
 
     def test_root_factory_raises_forbidden(self):
-        from repoze.bfg.interfaces import IRootFactory
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.interfaces import IRootFactory
+        from pyramid.exceptions import Forbidden
         from zope.interface import Interface
         from zope.interface import directlyProvides
         def rootfactory(request):
@@ -602,7 +602,7 @@ class TestRouter(unittest.TestCase):
         self.failUnless('from root factory' in why[0])
 
     def test_root_factory_exception_propagating(self):
-        from repoze.bfg.interfaces import IRootFactory
+        from pyramid.interfaces import IRootFactory
         from zope.interface import Interface
         from zope.interface import directlyProvides
         def rootfactory(request):
@@ -630,13 +630,13 @@ class TestRouter(unittest.TestCase):
         from zope.interface import directlyProvides
         class IContext(Interface):
             pass
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRequestFactory
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequestFactory
         def rfactory(environ):
             return request
         self.registry.registerUtility(rfactory, IRequestFactory)
-        from repoze.bfg.request import Request
+        from pyramid.request import Request
         request = Request.blank('/')
         context = DummyContext()
         directlyProvides(context, IContext)
@@ -653,9 +653,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.exception.__class__, RuntimeError)
 
     def test_call_view_raises_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         response = DummyResponse()
         exception_response = DummyResponse()
         exception_response.app_iter = ["Hello, world"]
@@ -672,9 +672,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(view.request.exception.__class__, RuntimeError)
 
     def test_call_view_raises_super_exception_sub_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         class SuperException(Exception):
             pass
         class SubException(SuperException):
@@ -693,9 +693,9 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(SuperException, router, environ, start_response)
 
     def test_call_view_raises_sub_exception_super_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         class SuperException(Exception):
             pass
         class SubException(SuperException):
@@ -715,9 +715,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_view_raises_exception_another_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         class MyException(Exception):
             pass
         class AnotherException(Exception):
@@ -736,9 +736,9 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(MyException, router, environ, start_response)
 
     def test_root_factory_raises_exception_view(self):
-        from repoze.bfg.interfaces import IRootFactory
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRootFactory
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IExceptionViewClassifier
         def rootfactory(request):
             raise RuntimeError()
         self.registry.registerUtility(rootfactory, IRootFactory)
@@ -754,8 +754,8 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(app_iter, ["Hello, world"])
 
     def test_traverser_raises_exception_view(self):
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IExceptionViewClassifier
         environ = self._makeEnviron()
         context = DummyContext()
         self._registerTraverserFactory(context, raise_error=RuntimeError())
@@ -770,9 +770,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_exception_view_returns_non_response(self):
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         environ = self._makeEnviron()
         response = DummyResponse()
         view = DummyView(response, raise_exception=RuntimeError)
@@ -785,8 +785,8 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(ValueError, router, environ, start_response)
 
     def test_call_route_raises_route_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         req_iface = self._registerRouteRequest('foo')
         self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
@@ -803,9 +803,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_view_raises_exception_route_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         req_iface = self._registerRouteRequest('foo')
         self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
@@ -821,9 +821,9 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(RuntimeError, router, environ, start_response)
 
     def test_call_route_raises_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         req_iface = self._registerRouteRequest('foo')
         self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
@@ -840,9 +840,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_route_raises_super_exception_sub_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         class SuperException(Exception):
             pass
         class SubException(SuperException):
@@ -862,9 +862,9 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(SuperException, router, environ, start_response)
 
     def test_call_route_raises_sub_exception_super_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         class SuperException(Exception):
             pass
         class SubException(SuperException):
@@ -885,9 +885,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_route_raises_exception_another_exception_view(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         class MyException(Exception):
             pass
         class AnotherException(Exception):
@@ -907,9 +907,9 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(MyException, router, environ, start_response)
 
     def test_call_route_raises_exception_view_specializing(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
         req_iface = self._registerRouteRequest('foo')
         self._connectRoute('foo', 'archives/:action/:article', None)
         view = DummyView(DummyResponse(), raise_exception=RuntimeError)
@@ -931,8 +931,8 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, special world"])
 
     def test_call_route_raises_exception_view_another_route(self):
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         req_iface = self._registerRouteRequest('foo')
         another_req_iface = self._registerRouteRequest('bar')
         self._connectRoute('foo', 'archives/:action/:article', None)
@@ -949,9 +949,9 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(RuntimeError, router, environ, start_response)
 
     def test_call_view_raises_exception_view_route(self):
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         req_iface = self._registerRouteRequest('foo')
         response = DummyResponse()
         exception_response = DummyResponse()

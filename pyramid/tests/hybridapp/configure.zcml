@@ -1,6 +1,6 @@
 <configure xmlns="http://namespaces.repoze.org/bfg">
 
-  <include package="repoze.bfg.includes" />
+  <include package="pyramid.includes" />
 
   <!-- we want this view to "win" -->
   <route
@@ -11,13 +11,13 @@
   <!-- .. even though this one has a more specific context -->
   <view
      view=".views.global_view"
-     context="repoze.bfg.traversal.DefaultRootFactory"
+     context="pyramid.traversal.DefaultRootFactory"
      />
 
   <view
     name="global2"
     view=".views.global2_view"
-    context="repoze.bfg.traversal.DefaultRootFactory"
+    context="pyramid.traversal.DefaultRootFactory"
     />
 
   <route

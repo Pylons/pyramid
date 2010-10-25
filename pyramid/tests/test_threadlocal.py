@@ -1,4 +1,4 @@
-from repoze.bfg import testing
+from pyramid import testing
 import unittest
 
 class TestThreadLocalManager(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestThreadLocalManager(unittest.TestCase):
         testing.tearDown()
 
     def _getTargetClass(self):
-        from repoze.bfg.threadlocal import ThreadLocalManager
+        from pyramid.threadlocal import ThreadLocalManager
         return ThreadLocalManager
 
     def _makeOne(self, default=lambda *x: 1):
@@ -48,7 +48,7 @@ class TestThreadLocalManager(unittest.TestCase):
 
 class TestGetCurrentRequest(unittest.TestCase):
     def _callFUT(self):
-        from repoze.bfg.threadlocal import get_current_request
+        from pyramid.threadlocal import get_current_request
         return get_current_request()
 
     def test_it_None(self):
@@ -56,7 +56,7 @@ class TestGetCurrentRequest(unittest.TestCase):
         self.assertEqual(request, None)
 
     def test_it(self):
-        from repoze.bfg.threadlocal import manager
+        from pyramid.threadlocal import manager
         request = object()
         try:
             manager.push({'request':request})
@@ -73,11 +73,11 @@ class GetCurrentRegistryTests(unittest.TestCase):
         testing.tearDown()
         
     def _callFUT(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         return get_current_registry()
 
     def test_it(self):
-        from repoze.bfg.threadlocal import manager
+        from pyramid.threadlocal import manager
         try:
             manager.push({'registry':123})
             self.assertEqual(self._callFUT(), 123)
@@ -86,10 +86,10 @@ class GetCurrentRegistryTests(unittest.TestCase):
 
 class GetCurrentRegistryWithoutTestingRegistry(unittest.TestCase):
     def _callFUT(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         return get_current_registry()
 
     def test_it(self):
-        from repoze.bfg.registry import global_registry
+        from pyramid.registry import global_registry
         self.assertEqual(self._callFUT(), global_registry)
     

@@ -2,10 +2,10 @@ import venusian
 
 from zope.interface import implements
 
-from repoze.bfg.interfaces import IContextFound
-from repoze.bfg.interfaces import INewRequest
-from repoze.bfg.interfaces import INewResponse
-from repoze.bfg.interfaces import IApplicationCreated
+from pyramid.interfaces import IContextFound
+from pyramid.interfaces import INewRequest
+from pyramid.interfaces import INewResponse
+from pyramid.interfaces import IApplicationCreated
 
 class subscriber(object):
     """ Decorator activated via a :term:`scan` which treats the

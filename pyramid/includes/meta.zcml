@@ -6,110 +6,110 @@
 
     <meta:directive
         name="view"
-        schema="repoze.bfg.zcml.IViewDirective"
-        handler="repoze.bfg.zcml.view"
+        schema="pyramid.zcml.IViewDirective"
+        handler="pyramid.zcml.view"
         />
 
     <meta:directive
         name="scan"
-        schema="repoze.bfg.zcml.IScanDirective"
-        handler="repoze.bfg.zcml.scan"
+        schema="pyramid.zcml.IScanDirective"
+        handler="pyramid.zcml.scan"
         />
 
     <meta:directive
         name="notfound"
-        schema="repoze.bfg.zcml.ISystemViewDirective"
-        handler="repoze.bfg.zcml.notfound"
+        schema="pyramid.zcml.ISystemViewDirective"
+        handler="pyramid.zcml.notfound"
         />
 
     <meta:directive
         name="forbidden"
-        schema="repoze.bfg.zcml.ISystemViewDirective"
-        handler="repoze.bfg.zcml.forbidden"
+        schema="pyramid.zcml.ISystemViewDirective"
+        handler="pyramid.zcml.forbidden"
         />
 
     <meta:directive
         name="route"
-        schema="repoze.bfg.zcml.IRouteDirective"
-        handler="repoze.bfg.zcml.route"
+        schema="pyramid.zcml.IRouteDirective"
+        handler="pyramid.zcml.route"
         />
 
     <meta:directive
         name="resource"
-        schema="repoze.bfg.zcml.IResourceDirective"
-        handler="repoze.bfg.zcml.resource"
+        schema="pyramid.zcml.IResourceDirective"
+        handler="pyramid.zcml.resource"
         />
 
     <meta:directive
         name="static"
-        schema="repoze.bfg.zcml.IStaticDirective"
-        handler="repoze.bfg.zcml.static"
+        schema="pyramid.zcml.IStaticDirective"
+        handler="pyramid.zcml.static"
         />
 
     <meta:directive
         name="renderer"
-        schema="repoze.bfg.zcml.IRendererDirective"
-        handler="repoze.bfg.zcml.renderer"
+        schema="pyramid.zcml.IRendererDirective"
+        handler="pyramid.zcml.renderer"
         />
 
     <meta:directive
         name="repozewho1authenticationpolicy"
-        schema="repoze.bfg.zcml.IRepozeWho1AuthenticationPolicyDirective"
-        handler="repoze.bfg.zcml.repozewho1authenticationpolicy"
+        schema="pyramid.zcml.IRepozeWho1AuthenticationPolicyDirective"
+        handler="pyramid.zcml.repozewho1authenticationpolicy"
         />
 
     <meta:directive
         name="remoteuserauthenticationpolicy"
-        schema="repoze.bfg.zcml.IRemoteUserAuthenticationPolicyDirective"
-        handler="repoze.bfg.zcml.remoteuserauthenticationpolicy"
+        schema="pyramid.zcml.IRemoteUserAuthenticationPolicyDirective"
+        handler="pyramid.zcml.remoteuserauthenticationpolicy"
         />
 
     <meta:directive
         name="authtktauthenticationpolicy"
-        schema="repoze.bfg.zcml.IAuthTktAuthenticationPolicyDirective"
-        handler="repoze.bfg.zcml.authtktauthenticationpolicy"
+        schema="pyramid.zcml.IAuthTktAuthenticationPolicyDirective"
+        handler="pyramid.zcml.authtktauthenticationpolicy"
         />
 
     <meta:directive
         name="aclauthorizationpolicy"
-        schema="repoze.bfg.zcml.IACLAuthorizationPolicyDirective"
-        handler="repoze.bfg.zcml.aclauthorizationpolicy"
+        schema="pyramid.zcml.IACLAuthorizationPolicyDirective"
+        handler="pyramid.zcml.aclauthorizationpolicy"
         />
 
     <meta:directive
         name="translationdir"
-        schema="repoze.bfg.zcml.ITranslationDirDirective"
-        handler="repoze.bfg.zcml.translationdir"
+        schema="pyramid.zcml.ITranslationDirDirective"
+        handler="pyramid.zcml.translationdir"
         />
 
     <meta:directive
         name="localenegotiator"
-        schema="repoze.bfg.zcml.ILocaleNegotiatorDirective"
-        handler="repoze.bfg.zcml.localenegotiator"
+        schema="pyramid.zcml.ILocaleNegotiatorDirective"
+        handler="pyramid.zcml.localenegotiator"
         />
 
     <meta:directive
         name="adapter"
-        schema="repoze.bfg.zcml.IAdapterDirective"
-        handler="repoze.bfg.zcml.adapter"
+        schema="pyramid.zcml.IAdapterDirective"
+        handler="pyramid.zcml.adapter"
         />
 
     <meta:directive
         name="subscriber"
-        schema="repoze.bfg.zcml.ISubscriberDirective"
-        handler="repoze.bfg.zcml.subscriber"
+        schema="pyramid.zcml.ISubscriberDirective"
+        handler="pyramid.zcml.subscriber"
         />
 
     <meta:directive
         name="utility"
-        schema="repoze.bfg.zcml.IUtilityDirective"
-        handler="repoze.bfg.zcml.utility"
+        schema="pyramid.zcml.IUtilityDirective"
+        handler="pyramid.zcml.utility"
         />
 
     <meta:directive
         name="default_permission"
-        schema="repoze.bfg.zcml.IDefaultPermissionDirective"
-        handler="repoze.bfg.zcml.default_permission"
+        schema="pyramid.zcml.IDefaultPermissionDirective"
+        handler="pyramid.zcml.default_permission"
         />
 
   </meta:directives>

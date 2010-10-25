@@ -2,11 +2,11 @@ from docutils.core import publish_parts
 import re
 
 from webob.exc import HTTPFound
-from repoze.bfg.url import model_url
+from pyramid.url import model_url
 
-from repoze.bfg.security import authenticated_userid
+from pyramid.security import authenticated_userid
 
-from repoze.bfg.view import bfg_view
+from pyramid.view import bfg_view
 
 from tutorial.models import Page
 from tutorial.models import Wiki

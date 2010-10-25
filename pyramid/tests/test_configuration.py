@@ -1,15 +1,15 @@
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class ConfiguratorTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         return Configurator(*arg, **kw)
 
     def _registerRenderer(self, config, name='.txt'):
-        from repoze.bfg.interfaces import IRendererFactory
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import IRendererFactory
+        from pyramid.interfaces import ITemplateRenderer
         from zope.interface import implements
         class Renderer:
             implements(ITemplateRenderer)
@@ -23,10 +23,10 @@ class ConfiguratorTests(unittest.TestCase):
     def _getViewCallable(self, config, ctx_iface=None, request_iface=None,
                          name='', exception_view=False):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         if exception_view:
             classifier = IExceptionViewClassifier
         else:
@@ -40,12 +40,12 @@ class ConfiguratorTests(unittest.TestCase):
             default=None)
 
     def _getRouteRequestIface(self, config, name):
-        from repoze.bfg.interfaces import IRouteRequest
+        from pyramid.interfaces import IRouteRequest
         iface = config.registry.getUtility(IRouteRequest, name)
         return iface
 
     def _assertNotFound(self, wrapper, *arg):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         self.assertRaises(NotFound, wrapper, *arg)
 
     def _registerEventListener(self, config, event_iface=None):
@@ -59,7 +59,7 @@ class ConfiguratorTests(unittest.TestCase):
         return L
 
     def _registerLogger(self, config):
-        from repoze.bfg.interfaces import IDebugLogger
+        from pyramid.interfaces import IDebugLogger
         logger = DummyLogger()
         config.registry.registerUtility(logger, IDebugLogger)
         return logger
@@ -70,23 +70,23 @@ class ConfiguratorTests(unittest.TestCase):
         return request
 
     def _registerSecurityPolicy(self, config, permissive):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
         policy = DummySecurityPolicy(permissive)
         config.registry.registerUtility(policy, IAuthenticationPolicy)
         config.registry.registerUtility(policy, IAuthorizationPolicy)
 
     def _registerSettings(self, config, **settings):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         config.registry.registerUtility(settings, ISettings)
 
     def test_ctor_no_registry(self):
         import sys
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.configuration import Configurator
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import ISettings
+        from pyramid.configuration import Configurator
+        from pyramid.interfaces import IRendererFactory
         config = Configurator()
-        this_pkg = sys.modules['repoze.bfg.tests']
+        this_pkg = sys.modules['pyramid.tests']
         self.failUnless(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
         self.failUnless(config.registry.getUtility(IRendererFactory, 'json'))
@@ -95,7 +95,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(config.registry.getUtility(IRendererFactory, '.txt'))
 
     def test_begin(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         config = Configurator()
         manager = DummyThreadLocalManager()
         config.manager = manager
@@ -105,7 +105,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.popped, False)
 
     def test_begin_with_request(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         config = Configurator()
         request = object()
         manager = DummyThreadLocalManager()
@@ -116,7 +116,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(manager.popped, False)
 
     def test_end(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         config = Configurator()
         manager = DummyThreadLocalManager()
         config.manager = manager
@@ -126,13 +126,13 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_ctor_with_package_registry(self):
         import sys
-        from repoze.bfg.configuration import Configurator
-        bfg_pkg = sys.modules['repoze.bfg']
+        from pyramid.configuration import Configurator
+        bfg_pkg = sys.modules['pyramid']
         config = Configurator(package=bfg_pkg)
         self.assertEqual(config.package, bfg_pkg)
 
     def test_ctor_noreg_custom_settings(self):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = {'reload_templates':True,
                     'mysetting':True}
         config = self._makeOne(settings=settings)
@@ -142,96 +142,96 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(settings['mysetting'], True)
 
     def test_ctor_noreg_debug_logger_None_default(self):
-        from repoze.bfg.interfaces import IDebugLogger
+        from pyramid.interfaces import IDebugLogger
         config = self._makeOne()
         logger = config.registry.getUtility(IDebugLogger)
         self.assertEqual(logger.name, 'repoze.bfg.debug')
 
     def test_ctor_noreg_debug_logger_non_None(self):
-        from repoze.bfg.interfaces import IDebugLogger
+        from pyramid.interfaces import IDebugLogger
         logger = object()
         config = self._makeOne(debug_logger=logger)
         result = config.registry.getUtility(IDebugLogger)
         self.assertEqual(logger, result)
 
     def test_ctor_authentication_policy(self):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         policy = object()
         config = self._makeOne(authentication_policy=policy)
         result = config.registry.getUtility(IAuthenticationPolicy)
         self.assertEqual(policy, result)
 
     def test_ctor_authorization_policy_only(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         policy = object()
         self.assertRaises(ConfigurationError,
                           self._makeOne, authorization_policy=policy)
 
     def test_ctor_no_root_factory(self):
-        from repoze.bfg.interfaces import IRootFactory
+        from pyramid.interfaces import IRootFactory
         config = self._makeOne()
         self.failUnless(config.registry.getUtility(IRootFactory))
 
     def test_ctor_alternate_renderers(self):
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory
         renderer = object()
         config = self._makeOne(renderers=[('yeah', renderer)])
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'yeah'),
                          renderer)
 
     def test_ctor_default_permission(self):
-        from repoze.bfg.interfaces import IDefaultPermission
+        from pyramid.interfaces import IDefaultPermission
         config = self._makeOne(default_permission='view')
         self.assertEqual(config.registry.getUtility(IDefaultPermission), 'view')
 
     def test_with_package_module(self):
-        from repoze.bfg.tests import test_configuration
-        import repoze.bfg.tests
+        from pyramid.tests import test_configuration
+        import pyramid.tests
         config = self._makeOne()
         newconfig = config.with_package(test_configuration)
-        self.assertEqual(newconfig.package, repoze.bfg.tests)
+        self.assertEqual(newconfig.package, pyramid.tests)
 
     def test_with_package_package(self):
-        import repoze.bfg.tests
+        import pyramid.tests
         config = self._makeOne()
-        newconfig = config.with_package(repoze.bfg.tests)
-        self.assertEqual(newconfig.package, repoze.bfg.tests)
+        newconfig = config.with_package(pyramid.tests)
+        self.assertEqual(newconfig.package, pyramid.tests)
 
     def test_maybe_dotted_string_success(self):
-        import repoze.bfg.tests
+        import pyramid.tests
         config = self._makeOne()
-        result = config.maybe_dotted('repoze.bfg.tests')
-        self.assertEqual(result, repoze.bfg.tests)
+        result = config.maybe_dotted('pyramid.tests')
+        self.assertEqual(result, pyramid.tests)
 
     def test_maybe_dotted_string_fail(self):
-        from repoze.bfg.configuration import ConfigurationError
+        from pyramid.configuration import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
                           config.maybe_dotted, 'cant.be.found')
 
     def test_maybe_dotted_notstring_success(self):
-        import repoze.bfg.tests
+        import pyramid.tests
         config = self._makeOne()
-        result = config.maybe_dotted(repoze.bfg.tests)
-        self.assertEqual(result, repoze.bfg.tests)
+        result = config.maybe_dotted(pyramid.tests)
+        self.assertEqual(result, pyramid.tests)
 
     def test_absolute_resource_spec_already_absolute(self):
-        import repoze.bfg.tests
-        config = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests
+        config = self._makeOne(package=pyramid.tests)
         result = config.absolute_resource_spec('already:absolute')
         self.assertEqual(result, 'already:absolute')
 
     def test_absolute_resource_spec_notastring(self):
-        import repoze.bfg.tests
-        config = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests
+        config = self._makeOne(package=pyramid.tests)
         result = config.absolute_resource_spec(None)
         self.assertEqual(result, None)
 
     def test_absolute_resource_spec_relative(self):
-        import repoze.bfg.tests
-        config = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests
+        config = self._makeOne(package=pyramid.tests)
         result = config.absolute_resource_spec('templates')
-        self.assertEqual(result, 'repoze.bfg.tests:templates')
+        self.assertEqual(result, 'pyramid.tests:templates')
 
     def test_setup_registry_fixed(self):
         class DummyRegistry(object):
@@ -249,8 +249,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.events, (1,))
 
     def test_setup_registry_registers_default_exceptionresponse_view(self):
-        from repoze.bfg.interfaces import IExceptionResponse
-        from repoze.bfg.view import default_exceptionresponse_view
+        from pyramid.interfaces import IExceptionResponse
+        from pyramid.view import default_exceptionresponse_view
         class DummyRegistry(object):
             def registerUtility(self, *arg, **kw):
                 pass
@@ -264,9 +264,9 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.exceptions import NotFound
-        from repoze.bfg.registry import Registry
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import NotFound
+        from pyramid.registry import Registry
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry() # registers IExceptionResponse default view
@@ -280,8 +280,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, 'OK')
 
     def test_setup_registry_custom_settings(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.registry import Registry
+        from pyramid.interfaces import ISettings
         settings = {'reload_templates':True,
                     'mysetting':True}
         reg = Registry()
@@ -293,8 +293,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(settings['mysetting'], True)
 
     def test_setup_registry_debug_logger_None_default(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IDebugLogger
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IDebugLogger
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry()
@@ -302,8 +302,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(logger.name, 'repoze.bfg.debug')
 
     def test_setup_registry_debug_logger_non_None(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IDebugLogger
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IDebugLogger
         logger = object()
         reg = Registry()
         config = self._makeOne(reg)
@@ -312,18 +312,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(logger, result)
 
     def test_setup_registry_debug_logger_dottedname(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IDebugLogger
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IDebugLogger
         reg = Registry()
         config = self._makeOne(reg)
-        config.setup_registry(debug_logger='repoze.bfg.tests')
+        config.setup_registry(debug_logger='pyramid.tests')
         result = reg.getUtility(IDebugLogger)
-        import repoze.bfg.tests
-        self.assertEqual(result, repoze.bfg.tests)
+        import pyramid.tests
+        self.assertEqual(result, pyramid.tests)
 
     def test_setup_registry_authentication_policy(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IAuthenticationPolicy
         policy = object()
         reg = Registry()
         config = self._makeOne(reg)
@@ -332,30 +332,30 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(policy, result)
 
     def test_setup_registry_authentication_policy_dottedname(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IAuthenticationPolicy
         reg = Registry()
         config = self._makeOne(reg)
-        config.setup_registry(authentication_policy='repoze.bfg.tests')
+        config.setup_registry(authentication_policy='pyramid.tests')
         result = reg.getUtility(IAuthenticationPolicy)
-        import repoze.bfg.tests
-        self.assertEqual(result, repoze.bfg.tests)
+        import pyramid.tests
+        self.assertEqual(result, pyramid.tests)
 
     def test_setup_registry_authorization_policy_dottedname(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IAuthorizationPolicy
         reg = Registry()
         config = self._makeOne(reg)
         dummy = object()
         config.setup_registry(authentication_policy=dummy,
-                              authorization_policy='repoze.bfg.tests')
+                              authorization_policy='pyramid.tests')
         result = reg.getUtility(IAuthorizationPolicy)
-        import repoze.bfg.tests
-        self.assertEqual(result, repoze.bfg.tests)
+        import pyramid.tests
+        self.assertEqual(result, pyramid.tests)
 
     def test_setup_registry_authorization_policy_only(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.registry import Registry
+        from pyramid.exceptions import ConfigurationError
         policy = object()
         reg = Registry()
         config = self._makeOne(reg)
@@ -364,35 +364,35 @@ class ConfiguratorTests(unittest.TestCase):
                                    authorization_policy=policy)
 
     def test_setup_registry_default_root_factory(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IRootFactory
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRootFactory
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry()
         self.failUnless(reg.getUtility(IRootFactory))
 
     def test_setup_registry_dottedname_root_factory(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IRootFactory
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRootFactory
         reg = Registry()
         config = self._makeOne(reg)
-        import repoze.bfg.tests
-        config.setup_registry(root_factory='repoze.bfg.tests')
-        self.assertEqual(reg.getUtility(IRootFactory), repoze.bfg.tests)
+        import pyramid.tests
+        config.setup_registry(root_factory='pyramid.tests')
+        self.assertEqual(reg.getUtility(IRootFactory), pyramid.tests)
 
     def test_setup_registry_locale_negotiator_dottedname(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import ILocaleNegotiator
+        from pyramid.registry import Registry
+        from pyramid.interfaces import ILocaleNegotiator
         reg = Registry()
         config = self._makeOne(reg)
-        import repoze.bfg.tests
-        config.setup_registry(locale_negotiator='repoze.bfg.tests')
+        import pyramid.tests
+        config.setup_registry(locale_negotiator='pyramid.tests')
         utility = reg.getUtility(ILocaleNegotiator)
-        self.assertEqual(utility, repoze.bfg.tests)
+        self.assertEqual(utility, pyramid.tests)
 
     def test_setup_registry_locale_negotiator(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import ILocaleNegotiator
+        from pyramid.registry import Registry
+        from pyramid.interfaces import ILocaleNegotiator
         reg = Registry()
         config = self._makeOne(reg)
         negotiator = object()
@@ -401,8 +401,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, negotiator)
 
     def test_setup_registry_request_factory(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IRequestFactory
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRequestFactory
         reg = Registry()
         config = self._makeOne(reg)
         factory = object()
@@ -411,18 +411,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, factory)
 
     def test_setup_registry_request_factory_dottedname(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IRequestFactory
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRequestFactory
         reg = Registry()
         config = self._makeOne(reg)
-        import repoze.bfg.tests
-        config.setup_registry(request_factory='repoze.bfg.tests')
+        import pyramid.tests
+        config.setup_registry(request_factory='pyramid.tests')
         utility = reg.getUtility(IRequestFactory)
-        self.assertEqual(utility, repoze.bfg.tests)
+        self.assertEqual(utility, pyramid.tests)
 
     def test_setup_registry_renderer_globals_factory(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRendererGlobalsFactory
         reg = Registry()
         config = self._makeOne(reg)
         factory = object()
@@ -431,18 +431,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, factory)
 
     def test_setup_registry_renderer_globals_factory_dottedname(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRendererGlobalsFactory
         reg = Registry()
         config = self._makeOne(reg)
-        import repoze.bfg.tests
-        config.setup_registry(renderer_globals_factory='repoze.bfg.tests')
+        import pyramid.tests
+        config.setup_registry(renderer_globals_factory='pyramid.tests')
         utility = reg.getUtility(IRendererGlobalsFactory)
-        self.assertEqual(utility, repoze.bfg.tests)
+        self.assertEqual(utility, pyramid.tests)
 
     def test_setup_registry_alternate_renderers(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IRendererFactory
         renderer = object()
         reg = Registry()
         config = self._makeOne(reg)
@@ -451,29 +451,29 @@ class ConfiguratorTests(unittest.TestCase):
                          renderer)
 
     def test_setup_registry_default_permission(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import IDefaultPermission
+        from pyramid.registry import Registry
+        from pyramid.interfaces import IDefaultPermission
         reg = Registry()
         config = self._makeOne(reg)
         config.setup_registry(default_permission='view')
         self.assertEqual(reg.getUtility(IDefaultPermission), 'view')
 
     def test_get_settings_nosettings(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         reg = Registry()
         config = self._makeOne(reg)
         self.assertEqual(config.get_settings(), None)
 
     def test_get_settings_withsettings(self):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = {'a':1}
         config = self._makeOne()
         config.registry.registerUtility(settings, ISettings)
         self.assertEqual(config.get_settings(), settings)
 
     def test_add_settings_settings_already_registered(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.registry import Registry
+        from pyramid.interfaces import ISettings
         reg = Registry()
         config = self._makeOne(reg)
         config._set_settings({'a':1})
@@ -483,8 +483,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(settings['b'], 2)
 
     def test_add_settings_settings_not_yet_registered(self):
-        from repoze.bfg.registry import Registry
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.registry import Registry
+        from pyramid.interfaces import ISettings
         reg = Registry()
         config = self._makeOne(reg)
         config.add_settings({'a':1})
@@ -530,15 +530,15 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
 
     def test_add_subscriber_dottednames(self):
-        import repoze.bfg.tests
-        from repoze.bfg.interfaces import INewRequest
+        import pyramid.tests
+        from pyramid.interfaces import INewRequest
         config = self._makeOne()
-        config.add_subscriber('repoze.bfg.tests',
-                              'repoze.bfg.interfaces.INewRequest')
+        config.add_subscriber('pyramid.tests',
+                              'pyramid.interfaces.INewRequest')
         handlers = list(config.registry.registeredHandlers())
         self.assertEqual(len(handlers), 1)
         handler = handlers[0]
-        self.assertEqual(handler.handler, repoze.bfg.tests)
+        self.assertEqual(handler.handler, pyramid.tests)
         self.assertEqual(handler.required, (INewRequest,))
 
     def test_add_object_event_subscriber(self):
@@ -562,8 +562,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
         
     def test_make_wsgi_app(self):
-        from repoze.bfg.router import Router
-        from repoze.bfg.interfaces import IApplicationCreated
+        from pyramid.router import Router
+        from pyramid.interfaces import IApplicationCreated
         manager = DummyThreadLocalManager()
         config = self._makeOne()
         subscriber = self._registerEventListener(config, IApplicationCreated)
@@ -577,57 +577,57 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(IApplicationCreated.providedBy(subscriber[0]))
 
     def test_load_zcml_default(self):
-        import repoze.bfg.tests.fixtureapp
-        config = self._makeOne(package=repoze.bfg.tests.fixtureapp)
+        import pyramid.tests.fixtureapp
+        config = self._makeOne(package=pyramid.tests.fixtureapp)
         registry = config.load_zcml()
-        from repoze.bfg.tests.fixtureapp.models import IFixture
+        from pyramid.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_load_zcml_routesapp(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         config = self._makeOne()
-        config.load_zcml('repoze.bfg.tests.routesapp:configure.zcml')
+        config.load_zcml('pyramid.tests.routesapp:configure.zcml')
         self.failUnless(config.registry.getUtility(IRoutesMapper))
 
     def test_load_zcml_fixtureapp(self):
-        from repoze.bfg.tests.fixtureapp.models import IFixture
+        from pyramid.tests.fixtureapp.models import IFixture
         config = self._makeOne()
-        config.load_zcml('repoze.bfg.tests.fixtureapp:configure.zcml')
+        config.load_zcml('pyramid.tests.fixtureapp:configure.zcml')
         self.failUnless(config.registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_load_zcml_as_relative_filename(self):
-        import repoze.bfg.tests.fixtureapp
-        config = self._makeOne(package=repoze.bfg.tests.fixtureapp)
+        import pyramid.tests.fixtureapp
+        config = self._makeOne(package=pyramid.tests.fixtureapp)
         registry = config.load_zcml('configure.zcml')
-        from repoze.bfg.tests.fixtureapp.models import IFixture
+        from pyramid.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_load_zcml_as_absolute_filename(self):
         import os
-        import repoze.bfg.tests.fixtureapp
-        config = self._makeOne(package=repoze.bfg.tests.fixtureapp)
-        dn = os.path.dirname(repoze.bfg.tests.fixtureapp.__file__)
+        import pyramid.tests.fixtureapp
+        config = self._makeOne(package=pyramid.tests.fixtureapp)
+        dn = os.path.dirname(pyramid.tests.fixtureapp.__file__)
         c_z = os.path.join(dn, 'configure.zcml')
         registry = config.load_zcml(c_z)
-        from repoze.bfg.tests.fixtureapp.models import IFixture
+        from pyramid.tests.fixtureapp.models import IFixture
         self.failUnless(registry.queryUtility(IFixture)) # only in c.zcml
 
     def test_load_zcml_lock_and_unlock(self):
         config = self._makeOne()
         dummylock = DummyLock()
         config.load_zcml(
-            'repoze.bfg.tests.fixtureapp:configure.zcml',
+            'pyramid.tests.fixtureapp:configure.zcml',
             lock=dummylock)
         self.assertEqual(dummylock.acquired, True)
         self.assertEqual(dummylock.released, True)
 
     def test_add_view_view_callable_None_no_renderer(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.add_view)
 
     def test_add_view_with_request_type_and_route_name(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         view = lambda *arg: 'OK'
         self.assertRaises(ConfigurationError, config.add_view, view, '', None,
@@ -648,11 +648,11 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_with_request_type(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view,
-                        request_type='repoze.bfg.interfaces.IRequest')
+                        request_type='pyramid.interfaces.IRequest')
         wrapper = self._getViewCallable(config)
         request = DummyRequest()
         self._assertNotFound(wrapper, None, request)
@@ -679,7 +679,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_view_callable_dottedname(self):
         config = self._makeOne()
-        config.add_view(view='repoze.bfg.tests.test_configuration.dummy_view')
+        config.add_view(view='pyramid.tests.test_configuration.dummy_view')
         wrapper = self._getViewCallable(config)
         self.assertEqual(wrapper(None, None), 'OK')
 
@@ -772,7 +772,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_view_context_as_dottedname(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.add_view(context='repoze.bfg.tests.test_configuration.IDummy',
+        config.add_view(context='pyramid.tests.test_configuration.IDummy',
                         view=view)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
@@ -780,7 +780,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_view_for__as_dottedname(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()
-        config.add_view(for_='repoze.bfg.tests.test_configuration.IDummy',
+        config.add_view(for_='pyramid.tests.test_configuration.IDummy',
                         view=view)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
@@ -817,9 +817,9 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_register_secured_view(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import ISecuredView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import ISecuredView
+        from pyramid.interfaces import IViewClassifier
         view = lambda *arg: 'OK'
         view.__call_permissive__ = view
         config = self._makeOne()
@@ -831,9 +831,9 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_exception_register_secured_view(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IExceptionViewClassifier
         view = lambda *arg: 'OK'
         view.__call_permissive__ = view
         config = self._makeOne()
@@ -844,12 +844,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper, view)
 
     def test_add_view_same_phash_overrides_existing_single_view(self):
-        from repoze.bfg.compat import md5
+        from pyramid.compat import md5
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IMultiView
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IMultiView
         phash = md5()
         phash.update('xhr:True')
         view = lambda *arg: 'NOT OK'
@@ -867,12 +867,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_same_phash_overrides_existing_single_view(self):
-        from repoze.bfg.compat import md5
+        from pyramid.compat import md5
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IMultiView
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IMultiView
         phash = md5()
         phash.update('xhr:True')
         view = lambda *arg: 'NOT OK'
@@ -895,10 +895,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_default_phash_overrides_no_phash(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IMultiView
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IMultiView
         view = lambda *arg: 'NOT OK'
         config = self._makeOne()
         config.registry.registerAdapter(
@@ -914,10 +914,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_exc_default_phash_overrides_no_phash(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IMultiView
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IMultiView
         view = lambda *arg: 'NOT OK'
         config = self._makeOne()
         config.registry.registerAdapter(
@@ -935,12 +935,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_default_phash_overrides_default_phash(self):
-        from repoze.bfg.configuration import DEFAULT_PHASH
+        from pyramid.configuration import DEFAULT_PHASH
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IMultiView
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IMultiView
         view = lambda *arg: 'NOT OK'
         view.__phash__ = DEFAULT_PHASH
         config = self._makeOne()
@@ -956,12 +956,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_default_phash_overrides_default_phash(self):
-        from repoze.bfg.configuration import DEFAULT_PHASH
+        from pyramid.configuration import DEFAULT_PHASH
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IMultiView
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IMultiView
         view = lambda *arg: 'NOT OK'
         view.__phash__ = DEFAULT_PHASH
         config = self._makeOne()
@@ -981,10 +981,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_multiview_replaces_existing_view(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IMultiView
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IMultiView
         view = lambda *arg: 'OK'
         view.__phash__ = 'abc'
         config = self._makeOne()
@@ -997,11 +997,11 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_exc_multiview_replaces_existing_view(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IExceptionViewClassifier
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IMultiView
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IMultiView
         view = lambda *arg: 'OK'
         view.__phash__ = 'abc'
         config = self._makeOne()
@@ -1021,10 +1021,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_multiview_replaces_existing_securedview(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import ISecuredView
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import ISecuredView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
         view = lambda *arg: 'OK'
         view.__phash__ = 'abc'
         config = self._makeOne()
@@ -1038,11 +1038,11 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_exc_multiview_replaces_existing_securedview(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import ISecuredView
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import ISecuredView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         view = lambda *arg: 'OK'
         view.__phash__ = 'abc'
         config = self._makeOne()
@@ -1062,10 +1062,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_with_accept_multiview_replaces_existing_view(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
         def view(context, request):
             return 'OK'
         def view2(context, request):
@@ -1085,11 +1085,11 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_exc_with_accept_multiview_replaces_existing_view(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         def view(context, request):
             return 'OK'
         def view2(context, request):
@@ -1116,10 +1116,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_multiview_replaces_existing_view_with___accept__(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
         def view(context, request):
             return 'OK'
         def view2(context, request):
@@ -1141,11 +1141,11 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_exc_mulview_replaces_existing_view_with___accept__(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         def view(context, request):
             return 'OK'
         def view2(context, request):
@@ -1174,9 +1174,9 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_multiview_replaces_multiview(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
         view = DummyMultiView()
         config = self._makeOne()
         config.registry.registerAdapter(
@@ -1191,10 +1191,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_exc_multiview_replaces_multiview(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         view = DummyMultiView()
         config = self._makeOne()
         config.registry.registerAdapter(
@@ -1215,10 +1215,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_multiview_context_superclass_then_subclass(self):
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
         class ISuper(Interface):
             pass
         class ISub(ISuper):
@@ -1238,11 +1238,11 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_view_multiview_exception_superclass_then_subclass(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IMultiView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IMultiView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier
         class Super(Exception):
             pass
         class Sub(Super):
@@ -1355,24 +1355,24 @@ class ConfiguratorTests(unittest.TestCase):
                 return {'a':'1'}
         config = self._makeOne()
         renderer = self._registerRenderer(config)
-        fixture = 'repoze.bfg.tests:fixtures/minimal.txt'
+        fixture = 'pyramid.tests:fixtures/minimal.txt'
         config.add_view(view=view, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
-        self.assertEqual(renderer.path, 'repoze.bfg.tests:fixtures/minimal.txt')
+        self.assertEqual(renderer.path, 'pyramid.tests:fixtures/minimal.txt')
 
     def test_add_view_with_template_renderer_no_callable(self):
         config = self._makeOne()
         renderer = self._registerRenderer(config)
-        fixture = 'repoze.bfg.tests:fixtures/minimal.txt'
+        fixture = 'pyramid.tests:fixtures/minimal.txt'
         config.add_view(view=None, renderer=fixture)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
         result = wrapper(None, request)
         self.assertEqual(result.body, 'Hello!')
-        self.assertEqual(renderer.path, 'repoze.bfg.tests:fixtures/minimal.txt')
+        self.assertEqual(renderer.path, 'pyramid.tests:fixtures/minimal.txt')
 
     def test_add_view_with_request_type_as_iface(self):
         from zope.interface import directlyProvides
@@ -1387,7 +1387,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, 'OK')
 
     def test_add_view_with_request_type_as_noniface(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
@@ -1530,7 +1530,7 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_header_badregex(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
@@ -1573,7 +1573,7 @@ class ConfiguratorTests(unittest.TestCase):
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_header_val_missing(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         view = lambda *arg: 'OK'
         config = self._makeOne()
         config.add_view(view=view, header=r'Host:\d')
@@ -1624,14 +1624,14 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         config.add_view(
             view=view,
-            containment='repoze.bfg.tests.test_configuration.IDummy')
+            containment='pyramid.tests.test_configuration.IDummy')
         wrapper = self._getViewCallable(config)
         context = DummyContext()
         directlyProvides(context, IDummy)
         self.assertEqual(wrapper(context, None), 'OK')
 
     def test_add_view_with_path_info_badregex(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
@@ -1769,7 +1769,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(view(None, request), 'OK')
 
     def _assertRoute(self, config, name, path, num_predicates=0):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
         route = routes[0]
@@ -1785,7 +1785,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(mapper.routelist, [])
 
     def test_get_routes_mapper_already_registered(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         config = self._makeOne()
         mapper = object()
         config.registry.registerUtility(mapper, IRoutesMapper)
@@ -1808,7 +1808,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         route = config.add_route(
             'name', 'path',
-            factory='repoze.bfg.tests.test_configuration.dummyfactory')
+            factory='pyramid.tests.test_configuration.dummyfactory')
         self.assertEqual(route.factory, dummyfactory)
 
     def test_add_route_with_xhr(self):
@@ -1986,8 +1986,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapper(None, None).body, 'Hello!')
 
     def test_add_route_with_view_permission(self):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
         config = self._makeOne()
         policy = lambda *arg: None
         config.registry.registerUtility(policy, IAuthenticationPolicy)
@@ -2000,8 +2000,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(hasattr(wrapper, '__call_permissive__'))
 
     def test_add_route_with_view_permission_alias(self):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
         config = self._makeOne()
         policy = lambda *arg: None
         config.registry.registerUtility(policy, IAuthenticationPolicy)
@@ -2020,7 +2020,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.name, 'name')
 
     def test_add_route_no_path_no_pattern(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.add_route, 'name')
 
@@ -2030,7 +2030,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(route.pregenerator, '123')
 
     def test__override_not_yet_registered(self):
-        from repoze.bfg.interfaces import IPackageOverrides
+        from pyramid.interfaces import IPackageOverrides
         package = DummyPackage('package')
         opackage = DummyPackage('opackage')
         config = self._makeOne()
@@ -2042,7 +2042,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(overrides.package, package)
 
     def test__override_already_registered(self):
-        from repoze.bfg.interfaces import IPackageOverrides
+        from pyramid.interfaces import IPackageOverrides
         package = DummyPackage('package')
         opackage = DummyPackage('opackage')
         overrides = DummyOverrides(package)
@@ -2055,11 +2055,11 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(overrides.package, package)
 
     def test_add_static_here_no_utility_registered(self):
-        from repoze.bfg.static import PackageURLParser
+        from pyramid.static import PackageURLParser
         from zope.interface import implementedBy
-        from repoze.bfg.static import StaticURLInfo
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.static import StaticURLInfo
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
         config = self._makeOne()
         config.add_static_view('static', 'fixtures/static')
         request_type = self._getRouteRequestIface(config, 'static/')
@@ -2072,26 +2072,26 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(wrapped(None, request).__class__, PackageURLParser)
 
     def test_add_static_view_package_relative(self):
-        from repoze.bfg.interfaces import IStaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
         info = DummyStaticURLInfo()
         config = self._makeOne()
         config.registry.registerUtility(info, IStaticURLInfo)
-        config.add_static_view('static', 'repoze.bfg.tests:fixtures/static')
+        config.add_static_view('static', 'pyramid.tests:fixtures/static')
         self.assertEqual(info.added,
-                         [('static', 'repoze.bfg.tests:fixtures/static', {})])
+                         [('static', 'pyramid.tests:fixtures/static', {})])
 
     def test_add_static_view_package_here_relative(self):
-        from repoze.bfg.interfaces import IStaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
         info = DummyStaticURLInfo()
         config = self._makeOne()
         config.registry.registerUtility(info, IStaticURLInfo)
         config.add_static_view('static', 'fixtures/static')
         self.assertEqual(info.added,
-                         [('static', 'repoze.bfg.tests:fixtures/static', {})])
+                         [('static', 'pyramid.tests:fixtures/static', {})])
 
     def test_add_static_view_absolute(self):
         import os
-        from repoze.bfg.interfaces import IStaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
         info = DummyStaticURLInfo()
         config = self._makeOne()
         config.registry.registerUtility(info, IStaticURLInfo)
@@ -2103,8 +2103,8 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_set_notfound_view(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import NotFound
         config = self._makeOne()
         view = lambda *arg: arg
         config.set_notfound_view(view)
@@ -2116,8 +2116,8 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_set_notfound_view_request_has_context(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import NotFound
         config = self._makeOne()
         view = lambda *arg: arg
         config.set_notfound_view(view)
@@ -2130,8 +2130,8 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_set_forbidden_view(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import Forbidden
         config = self._makeOne()
         view = lambda *arg: 'OK'
         config.set_forbidden_view(view)
@@ -2143,8 +2143,8 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_set_forbidden_view_request_has_context(self):
         from zope.interface import implementedBy
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.interfaces import IRequest
+        from pyramid.exceptions import Forbidden
         config = self._makeOne()
         view = lambda *arg: arg
         config.set_forbidden_view(view)
@@ -2156,7 +2156,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, ('abc', request))
 
     def test__set_authentication_policy(self):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         config = self._makeOne()
         policy = object()
         config._set_authentication_policy(policy)
@@ -2164,7 +2164,7 @@ class ConfiguratorTests(unittest.TestCase):
             config.registry.getUtility(IAuthenticationPolicy), policy)
 
     def test__set_authorization_policy(self):
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
         config = self._makeOne()
         policy = object()
         config._set_authorization_policy(policy)
@@ -2172,7 +2172,7 @@ class ConfiguratorTests(unittest.TestCase):
             config.registry.getUtility(IAuthorizationPolicy), policy)
 
     def test_set_locale_negotiator(self):
-        from repoze.bfg.interfaces import ILocaleNegotiator
+        from pyramid.interfaces import ILocaleNegotiator
         config = self._makeOne()
         def negotiator(request): pass
         config.set_locale_negotiator(negotiator)
@@ -2180,30 +2180,30 @@ class ConfiguratorTests(unittest.TestCase):
                          negotiator)
 
     def test_set_locale_negotiator_dottedname(self):
-        from repoze.bfg.interfaces import ILocaleNegotiator
+        from pyramid.interfaces import ILocaleNegotiator
         config = self._makeOne()
         config.set_locale_negotiator(
-            'repoze.bfg.tests.test_configuration.dummyfactory')
+            'pyramid.tests.test_configuration.dummyfactory')
         self.assertEqual(config.registry.getUtility(ILocaleNegotiator),
                          dummyfactory)
 
     def test_set_request_factory(self):
-        from repoze.bfg.interfaces import IRequestFactory
+        from pyramid.interfaces import IRequestFactory
         config = self._makeOne()
         factory = object()
         config.set_request_factory(factory)
         self.assertEqual(config.registry.getUtility(IRequestFactory), factory)
 
     def test_set_request_factory_dottedname(self):
-        from repoze.bfg.interfaces import IRequestFactory
+        from pyramid.interfaces import IRequestFactory
         config = self._makeOne()
         config.set_request_factory(
-            'repoze.bfg.tests.test_configuration.dummyfactory')
+            'pyramid.tests.test_configuration.dummyfactory')
         self.assertEqual(config.registry.getUtility(IRequestFactory),
                          dummyfactory)
 
     def test_set_renderer_globals_factory(self):
-        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        from pyramid.interfaces import IRendererGlobalsFactory
         config = self._makeOne()
         factory = object()
         config.set_renderer_globals_factory(factory)
@@ -2211,22 +2211,22 @@ class ConfiguratorTests(unittest.TestCase):
                          factory)
 
     def test_set_renderer_globals_factory_dottedname(self):
-        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        from pyramid.interfaces import IRendererGlobalsFactory
         config = self._makeOne()
         config.set_renderer_globals_factory(
-            'repoze.bfg.tests.test_configuration.dummyfactory')
+            'pyramid.tests.test_configuration.dummyfactory')
         self.assertEqual(config.registry.getUtility(IRendererGlobalsFactory),
                          dummyfactory)
 
     def test_set_default_permission(self):
-        from repoze.bfg.interfaces import IDefaultPermission
+        from pyramid.interfaces import IDefaultPermission
         config = self._makeOne()
         config.set_default_permission('view')
         self.assertEqual(config.registry.getUtility(IDefaultPermission),
                          'view')
 
     def test_add_translation_dirs_missing_dir(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError,
                           config.add_translation_dirs,
@@ -2234,22 +2234,22 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_translation_dirs_resource_spec(self):
         import os
-        from repoze.bfg.interfaces import ITranslationDirectories
+        from pyramid.interfaces import ITranslationDirectories
         config = self._makeOne()
-        config.add_translation_dirs('repoze.bfg.tests.localeapp:locale')
+        config.add_translation_dirs('pyramid.tests.localeapp:locale')
         here = os.path.dirname(__file__)
         locale = os.path.join(here, 'localeapp', 'locale')
         self.assertEqual(config.registry.getUtility(ITranslationDirectories),
                          [locale])
 
     def test_add_translation_dirs_registers_chameleon_translate(self):
-        from repoze.bfg.interfaces import IChameleonTranslate
-        from repoze.bfg.threadlocal import manager
+        from pyramid.interfaces import IChameleonTranslate
+        from pyramid.threadlocal import manager
         request = DummyRequest()
         config = self._makeOne()
         manager.push({'request':request, 'registry':config.registry})
         try:
-            config.add_translation_dirs('repoze.bfg.tests.localeapp:locale')
+            config.add_translation_dirs('pyramid.tests.localeapp:locale')
             translate = config.registry.getUtility(IChameleonTranslate)
             self.assertEqual(translate('Approve'), u'Approve')
         finally:
@@ -2257,7 +2257,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_add_translation_dirs_abspath(self):
         import os
-        from repoze.bfg.interfaces import ITranslationDirectories
+        from pyramid.interfaces import ITranslationDirectories
         config = self._makeOne()
         here = os.path.dirname(__file__)
         locale = os.path.join(here, 'localeapp', 'locale')
@@ -2276,7 +2276,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_derive_view_dottedname(self):
         config = self._makeOne()
         result = config.derive_view(
-            'repoze.bfg.tests.test_configuration.dummy_view')
+            'pyramid.tests.test_configuration.dummy_view')
         self.failIf(result is dummy_view)
         self.assertEqual(result(None, None), 'OK')
 
@@ -2485,7 +2485,7 @@ class ConfiguratorTests(unittest.TestCase):
                          "'view_name' against context None): True")
         
     def test__derive_view_debug_auth_permission_authpol_denied(self):
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.exceptions import Forbidden
         view = lambda *arg: 'OK'
         config = self._makeOne()
         self._registerSettings(config,
@@ -2558,7 +2558,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(predicates, [True, True])
 
     def test__derive_view_with_predicates_notall(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         view = lambda *arg: 'OK'
         predicates = []
         def predicate1(context, request):
@@ -2576,8 +2576,8 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test__derive_view_with_wrapper_viewname(self):
         from webob import Response
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
         inner_response = Response('OK')
         def inner_view(context, request):
             return inner_response
@@ -2612,18 +2612,18 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertRaises(ValueError, wrapped, None, request)
 
     def test_override_resource_samename(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_resource,'a', 'a')
 
     def test_override_resource_directory_with_file(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_resource,
                           'a:foo/', 'a:foo.pt')
 
     def test_override_resource_file_with_directory(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_resource,
                           'a:foo.pt', 'a:foo/')
@@ -2632,18 +2632,18 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         override = DummyUnderOverride()
         config.override_resource(
-            'repoze.bfg.tests.fixtureapp:templates/foo.pt',
-            'repoze.bfg.tests.fixtureapp.subpackage:templates/bar.pt',
+            'pyramid.tests.fixtureapp:templates/foo.pt',
+            'pyramid.tests.fixtureapp.subpackage:templates/bar.pt',
             _override=override)
-        from repoze.bfg.tests import fixtureapp
-        from repoze.bfg.tests.fixtureapp import subpackage
+        from pyramid.tests import fixtureapp
+        from pyramid.tests.fixtureapp import subpackage
         self.assertEqual(override.package, fixtureapp)
         self.assertEqual(override.path, 'templates/foo.pt')
         self.assertEqual(override.override_package, subpackage)
         self.assertEqual(override.override_prefix, 'templates/bar.pt')
 
     def test_add_renderer(self):
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory
         config = self._makeOne()
         renderer = object()
         config.add_renderer('name', renderer)
@@ -2651,18 +2651,18 @@ class ConfiguratorTests(unittest.TestCase):
                          renderer)
 
     def test_add_renderer_dottedname_factory(self):
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory
         config = self._makeOne()
-        import repoze.bfg.tests
-        config.add_renderer('name', 'repoze.bfg.tests')
+        import pyramid.tests
+        config.add_renderer('name', 'pyramid.tests')
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
-                         repoze.bfg.tests)
+                         pyramid.tests)
 
     def test_scan_integration(self):
         from zope.interface import alsoProvides
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.view import render_view_to_response
-        import repoze.bfg.tests.grokkedapp as package
+        from pyramid.interfaces import IRequest
+        from pyramid.view import render_view_to_response
+        import pyramid.tests.grokkedapp as package
         config = self._makeOne()
         config.scan(package)
 
@@ -2759,10 +2759,10 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_scan_integration_dottedname_package(self):
         from zope.interface import alsoProvides
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.view import render_view_to_response
+        from pyramid.interfaces import IRequest
+        from pyramid.view import render_view_to_response
         config = self._makeOne()
-        config.scan('repoze.bfg.tests.grokkedapp')
+        config.scan('pyramid.tests.grokkedapp')
 
         ctx = DummyContext()
         req = DummyRequest()
@@ -2774,12 +2774,12 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, 'grokked')
 
     def test_testing_securitypolicy(self):
-        from repoze.bfg.testing import DummySecurityPolicy
+        from pyramid.testing import DummySecurityPolicy
         config = self._makeOne()
         config.testing_securitypolicy('user', ('group1', 'group2'),
                                       permissive=False)
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
         ut = config.registry.getUtility(IAuthenticationPolicy)
         self.failUnless(isinstance(ut, DummySecurityPolicy))
         ut = config.registry.getUtility(IAuthorizationPolicy)
@@ -2788,8 +2788,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(ut.permissive, False)
 
     def test_testing_models(self):
-        from repoze.bfg.traversal import find_model
-        from repoze.bfg.interfaces import ITraverser
+        from pyramid.traversal import find_model
+        from pyramid.interfaces import ITraverser
         ob1 = object()
         ob2 = object()
         models = {'/ob1':ob1, '/ob2':ob2}
@@ -2830,7 +2830,7 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_subscriber_dottedname(self):
         config = self._makeOne()
         L = config.testing_add_subscriber(
-            'repoze.bfg.tests.test_configuration.IDummy')
+            'pyramid.tests.test_configuration.IDummy')
         event = DummyEvent()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
@@ -2860,7 +2860,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(L[-1], event2)
 
     def test_hook_zca(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         gsm = DummyGetSiteManager()
         config = self._makeOne()
         config.hook_zca(getSiteManager=gsm)
@@ -2875,9 +2875,9 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_renderer(self):
         config = self._makeOne()
         renderer = config.testing_add_renderer('templates/foo.pt')
-        from repoze.bfg.testing import DummyTemplateRenderer
+        from pyramid.testing import DummyTemplateRenderer
         self.failUnless(isinstance(renderer, DummyTemplateRenderer))
-        from repoze.bfg.renderers import render_to_response
+        from pyramid.renderers import render_to_response
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
         request.registry = config.registry
@@ -2894,7 +2894,7 @@ class ConfiguratorTests(unittest.TestCase):
             self.assertEqual(kw, {'foo':1, 'bar':2})
             raise E
         renderer = config.testing_add_renderer('templates/foo.pt', renderer)
-        from repoze.bfg.renderers import render_to_response
+        from pyramid.renderers import render_to_response
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
         request.registry = config.registry
@@ -2909,9 +2909,9 @@ class ConfiguratorTests(unittest.TestCase):
     def test_testing_add_template(self):
         config = self._makeOne()
         renderer = config.testing_add_template('templates/foo.pt')
-        from repoze.bfg.testing import DummyTemplateRenderer
+        from pyramid.testing import DummyTemplateRenderer
         self.failUnless(isinstance(renderer, DummyTemplateRenderer))
-        from repoze.bfg.renderers import render_to_response
+        from pyramid.renderers import render_to_response
         # must provide request to pass in registry (this is a functest)
         request = DummyRequest()
         request.registry = config.registry
@@ -2923,7 +2923,7 @@ class ConfiguratorTests(unittest.TestCase):
 
 class Test__map_view(unittest.TestCase):
     def setUp(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         self.registry = Registry()
         testing.setUp(registry=self.registry)
 
@@ -2932,8 +2932,8 @@ class Test__map_view(unittest.TestCase):
         testing.tearDown()
         
     def _registerRenderer(self, typ='.txt'):
-        from repoze.bfg.interfaces import IRendererFactory
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import IRendererFactory
+        from pyramid.interfaces import ITemplateRenderer
         from zope.interface import implements
         class Renderer:
             implements(ITemplateRenderer)
@@ -2951,7 +2951,7 @@ class Test__map_view(unittest.TestCase):
         return request
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.configuration import _map_view
+        from pyramid.configuration import _map_view
         return _map_view(*arg, **kw)
     
     def test__map_view_as_function_context_and_request(self):
@@ -3256,17 +3256,17 @@ class Test__map_view(unittest.TestCase):
         def view(context, request):
             return {'a':'1'}
         result = self._callFUT(view, renderer_name=renderer.spec,
-                               package='repoze.bfg')
+                               package='pyramid')
         self.failIf(result is view)
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
         request = self._makeRequest()
         self.assertEqual(result(None, request).body, 'Hello!')
-        self.assertEqual(renderer.path, 'repoze.bfg:abc.txt')
+        self.assertEqual(renderer.path, 'pyramid:abc.txt')
 
 class Test_decorate_view(unittest.TestCase):
     def _callFUT(self, wrapped, original):
-        from repoze.bfg.configuration import decorate_view
+        from pyramid.configuration import decorate_view
         return decorate_view(wrapped, original)
     
     def test_it_same(self):
@@ -3316,7 +3316,7 @@ class Test_decorate_view(unittest.TestCase):
 
 class Test__make_predicates(unittest.TestCase):
     def _callFUT(self, **kw):
-        from repoze.bfg.configuration import _make_predicates
+        from pyramid.configuration import _make_predicates
         return _make_predicates(**kw)
 
     def test_ordering_xhr_and_request_method_trump_only_containment(self):
@@ -3525,7 +3525,7 @@ class Test__make_predicates(unittest.TestCase):
 
 class TestMultiView(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.configuration import MultiView
+        from pyramid.configuration import MultiView
         return MultiView
 
     def _makeOne(self, name='name'):
@@ -3533,12 +3533,12 @@ class TestMultiView(unittest.TestCase):
     
     def test_class_implements_ISecuredView(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ISecuredView
+        from pyramid.interfaces import ISecuredView
         verifyClass(ISecuredView, self._getTargetClass())
 
     def test_instance_implements_ISecuredView(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ISecuredView
+        from pyramid.interfaces import ISecuredView
         verifyObject(ISecuredView, self._makeOne())
 
     def test_add(self):
@@ -3605,14 +3605,14 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(mv.get_views(request), mv.views)
 
     def test_match_not_found(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
         self.assertRaises(NotFound, mv.match, context, request)
 
     def test_match_predicate_fails(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         mv = self._makeOne()
         def view(context, request):
             """ """
@@ -3634,7 +3634,7 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(result, view)
 
     def test_permitted_no_views(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
@@ -3661,14 +3661,14 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(result, False)
 
     def test__call__not_found(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
         self.assertRaises(NotFound, mv, context, request)
 
     def test___call__intermediate_not_found(self):
-        from repoze.bfg.exceptions import PredicateMismatch
+        from pyramid.exceptions import PredicateMismatch
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
@@ -3683,7 +3683,7 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(response, expected_response)
 
     def test___call__raise_not_found_isnt_interpreted_as_pred_mismatch(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
@@ -3708,7 +3708,7 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(response, expected_response)
 
     def test__call_permissive__not_found(self):
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.exceptions import NotFound
         mv = self._makeOne()
         context = DummyContext()
         request = DummyRequest()
@@ -3772,7 +3772,7 @@ class TestMultiView(unittest.TestCase):
 
 class TestRequestOnly(unittest.TestCase):
     def _callFUT(self, arg):
-        from repoze.bfg.configuration import requestonly
+        from pyramid.configuration import requestonly
         return requestonly(arg)
     
     def test_newstyle_class_no_init(self):
@@ -3935,7 +3935,7 @@ class TestMakeApp(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.configuration import make_app
+        from pyramid.configuration import make_app
         return make_app(*arg, **kw)
 
     def test_it(self):
@@ -3973,11 +3973,11 @@ class TestMakeApp(unittest.TestCase):
 
 class TestDottedNameResolver(unittest.TestCase):
     def _makeOne(self, package=None):
-        from repoze.bfg.configuration import DottedNameResolver
+        from pyramid.configuration import DottedNameResolver
         return DottedNameResolver(package)
 
     def config_exc(self, func, *arg, **kw):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         try:
             func(*arg, **kw)
         except ConfigurationError, e:
@@ -3988,33 +3988,33 @@ class TestDottedNameResolver(unittest.TestCase):
     def test_zope_dottedname_style_resolve_absolute(self):
         typ = self._makeOne()
         result = typ._zope_dottedname_style(
-            'repoze.bfg.tests.test_configuration.TestDottedNameResolver')
+            'pyramid.tests.test_configuration.TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
         
     def test_zope_dottedname_style_irrresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ._zope_dottedname_style,
-            'repoze.bfg.test_configuration.nonexisting_name')
+            'pyramid.test_configuration.nonexisting_name')
 
     def test__zope_dottedname_style_resolve_relative(self):
-        import repoze.bfg.tests
-        typ = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests
+        typ = self._makeOne(package=pyramid.tests)
         result = typ._zope_dottedname_style(
             '.test_configuration.TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
 
     def test__zope_dottedname_style_resolve_relative_leading_dots(self):
-        import repoze.bfg.tests.test_configuration
-        typ = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests.test_configuration
+        typ = self._makeOne(package=pyramid.tests)
         result = typ._zope_dottedname_style(
             '..tests.test_configuration.TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
 
     def test__zope_dottedname_style_resolve_relative_is_dot(self):
-        import repoze.bfg.tests
-        typ = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests
+        typ = self._makeOne(package=pyramid.tests)
         result = typ._zope_dottedname_style('.')
-        self.assertEqual(result, repoze.bfg.tests)
+        self.assertEqual(result, pyramid.tests)
 
     def test__zope_dottedname_style_irresolveable_relative_is_dot(self):
         typ = self._makeOne()
@@ -4031,63 +4031,63 @@ class TestDottedNameResolver(unittest.TestCase):
             "relative name '.whatever' irresolveable without package")
 
     def test_zope_dottedname_style_irrresolveable_relative(self):
-        import repoze.bfg.tests
-        typ = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests
+        typ = self._makeOne(package=pyramid.tests)
         self.assertRaises(ImportError, typ._zope_dottedname_style,
                           '.notexisting')
 
     def test__zope_dottedname_style_resolveable_relative(self):
-        import repoze.bfg
-        typ = self._makeOne(package=repoze.bfg)
+        import pyramid
+        typ = self._makeOne(package=pyramid)
         result = typ._zope_dottedname_style('.tests')
-        from repoze.bfg import tests
+        from pyramid import tests
         self.assertEqual(result, tests)
 
     def test__zope_dottedname_style_irresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(
             ImportError,
-            typ._zope_dottedname_style, 'repoze.bfg.fudge.bar')
+            typ._zope_dottedname_style, 'pyramid.fudge.bar')
 
     def test__zope_dottedname_style_resolveable_absolute(self):
         typ = self._makeOne()
         result = typ._zope_dottedname_style(
-            'repoze.bfg.tests.test_configuration.TestDottedNameResolver')
+            'pyramid.tests.test_configuration.TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
 
     def test__pkg_resources_style_resolve_absolute(self):
         typ = self._makeOne()
         result = typ._pkg_resources_style(
-            'repoze.bfg.tests.test_configuration:TestDottedNameResolver')
+            'pyramid.tests.test_configuration:TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
         
     def test__pkg_resources_style_irrresolveable_absolute(self):
         typ = self._makeOne()
         self.assertRaises(ImportError, typ._pkg_resources_style,
-            'repoze.bfg.tests:nonexisting')
+            'pyramid.tests:nonexisting')
 
     def test__pkg_resources_style_resolve_relative(self):
-        import repoze.bfg.tests
-        typ = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests
+        typ = self._makeOne(package=pyramid.tests)
         result = typ._pkg_resources_style(
             '.test_configuration:TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
 
     def test__pkg_resources_style_resolve_relative_is_dot(self):
-        import repoze.bfg.tests
-        typ = self._makeOne(package=repoze.bfg.tests)
+        import pyramid.tests
+        typ = self._makeOne(package=pyramid.tests)
         result = typ._pkg_resources_style('.')
-        self.assertEqual(result, repoze.bfg.tests)
+        self.assertEqual(result, pyramid.tests)
         
     def test__pkg_resources_style_resolve_relative_nocurrentpackage(self):
         typ = self._makeOne()
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         self.assertRaises(ConfigurationError, typ._pkg_resources_style,
                           '.whatever')
 
     def test__pkg_resources_style_irrresolveable_relative(self):
-        import repoze.bfg
-        typ = self._makeOne(package=repoze.bfg)
+        import pyramid
+        typ = self._makeOne(package=pyramid)
         self.assertRaises(ImportError, typ._pkg_resources_style,
                           ':notexisting')
 
@@ -4099,13 +4099,13 @@ class TestDottedNameResolver(unittest.TestCase):
     def test_resolve_using_pkgresources_style(self):
         typ = self._makeOne()
         result = typ.resolve(
-            'repoze.bfg.tests.test_configuration:TestDottedNameResolver')
+            'pyramid.tests.test_configuration:TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
 
     def test_resolve_using_zope_dottedname_style(self):
         typ = self._makeOne()
         result = typ.resolve(
-            'repoze.bfg.tests.test_configuration:TestDottedNameResolver')
+            'pyramid.tests.test_configuration:TestDottedNameResolver')
         self.assertEqual(result, self.__class__)
 
     def test_resolve_missing_raises(self):
@@ -4115,33 +4115,33 @@ class TestDottedNameResolver(unittest.TestCase):
                          "The dotted name 'cant.be.found' cannot be imported")
 
     def test_ctor_string_module_resolveable(self):
-        import repoze.bfg.tests
-        typ = self._makeOne('repoze.bfg.tests.test_configuration')
-        self.assertEqual(typ.package, repoze.bfg.tests)
-        self.assertEqual(typ.package_name, 'repoze.bfg.tests')
+        import pyramid.tests
+        typ = self._makeOne('pyramid.tests.test_configuration')
+        self.assertEqual(typ.package, pyramid.tests)
+        self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_string_package_resolveable(self):
-        import repoze.bfg.tests
-        typ = self._makeOne('repoze.bfg.tests')
-        self.assertEqual(typ.package, repoze.bfg.tests)
-        self.assertEqual(typ.package_name, 'repoze.bfg.tests')
+        import pyramid.tests
+        typ = self._makeOne('pyramid.tests')
+        self.assertEqual(typ.package, pyramid.tests)
+        self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_string_irresolveable(self):
-        from repoze.bfg.configuration import ConfigurationError
+        from pyramid.configuration import ConfigurationError
         self.assertRaises(ConfigurationError, self._makeOne, 'cant.be.found')
 
     def test_ctor_module(self):
-        import repoze.bfg.tests
-        import repoze.bfg.tests.test_configuration
-        typ = self._makeOne(repoze.bfg.tests.test_configuration)
-        self.assertEqual(typ.package, repoze.bfg.tests)
-        self.assertEqual(typ.package_name, 'repoze.bfg.tests')
+        import pyramid.tests
+        import pyramid.tests.test_configuration
+        typ = self._makeOne(pyramid.tests.test_configuration)
+        self.assertEqual(typ.package, pyramid.tests)
+        self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_package(self):
-        import repoze.bfg.tests
-        typ = self._makeOne(repoze.bfg.tests)
-        self.assertEqual(typ.package, repoze.bfg.tests)
-        self.assertEqual(typ.package_name, 'repoze.bfg.tests')
+        import pyramid.tests
+        typ = self._makeOne(pyramid.tests)
+        self.assertEqual(typ.package, pyramid.tests)
+        self.assertEqual(typ.package_name, 'pyramid.tests')
 
     def test_ctor_None(self):
         typ = self._makeOne(None)
@@ -4150,7 +4150,7 @@ class TestDottedNameResolver(unittest.TestCase):
 
 class Test_isexception(unittest.TestCase):
     def _callFUT(self, ob):
-        from repoze.bfg.configuration import isexception
+        from pyramid.configuration import isexception
         return isexception(ob)
     
     def test_is_exception_instance(self):
@@ -4165,11 +4165,11 @@ class Test_isexception(unittest.TestCase):
         self.assertEqual(self._callFUT(E), True)
 
     def test_is_IException(self):
-        from repoze.bfg.interfaces import IException
+        from pyramid.interfaces import IException
         self.assertEqual(self._callFUT(IException), True)
 
     def test_is_IException_subinterface(self):
-        from repoze.bfg.interfaces import IException
+        from pyramid.interfaces import IException
         class ISubException(IException):
             pass
         self.assertEqual(self._callFUT(ISubException), True)
@@ -4283,7 +4283,7 @@ class DummyAccept(object):
         return val in self.matches
 
 from zope.interface import implements
-from repoze.bfg.interfaces import IMultiView
+from pyramid.interfaces import IMultiView
 class DummyMultiView:
     implements(IMultiView)
     def __init__(self):

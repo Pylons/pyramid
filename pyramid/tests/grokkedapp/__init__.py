@@ -1,4 +1,4 @@
-from repoze.bfg.view import bfg_view
+from pyramid.view import bfg_view
 
 @bfg_view()
 def grokked(context, request):

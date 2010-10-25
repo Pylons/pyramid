@@ -8,11 +8,11 @@ from paste.request import get_cookies
 
 from zope.interface import implements
 
-from repoze.bfg.interfaces import IAuthenticationPolicy
+from pyramid.interfaces import IAuthenticationPolicy
 
-from repoze.bfg.request import add_global_response_headers
-from repoze.bfg.security import Authenticated
-from repoze.bfg.security import Everyone
+from pyramid.request import add_global_response_headers
+from pyramid.security import Authenticated
+from pyramid.security import Everyone
 
 class CallbackAuthenticationPolicy(object):
     """ Abstract class """

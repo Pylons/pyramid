@@ -1,4 +1,4 @@
-from repoze.bfg.configuration import Configurator
+from pyramid.configuration import Configurator
 from paste.deploy.converters import asbool
 
 from tutorial.models import initialize_sql

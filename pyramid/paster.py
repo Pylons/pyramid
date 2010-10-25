@@ -7,7 +7,7 @@ from paste.script.command import Command
 from paste.script.templates import Template
 from paste.util.template import paste_script_template_renderer
 
-from repoze.bfg.scripting import get_root
+from pyramid.scripting import get_root
 
 
 class StarterProjectTemplate(Template):

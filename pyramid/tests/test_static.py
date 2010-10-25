@@ -1,9 +1,9 @@
 import unittest
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class TestPackageURLParser(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.static import PackageURLParser
+        from pyramid.static import PackageURLParser
         return PackageURLParser
 
     def _makeOne(self, *arg, **kw):
@@ -40,7 +40,7 @@ class TestPackageURLParser(unittest.TestCase):
 
     def test_call_adds_slash_path_info_empty(self):
         environ = self._makeEnviron(PATH_INFO='')
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
@@ -49,7 +49,7 @@ class TestPackageURLParser(unittest.TestCase):
         
     def test_path_info_slash_means_index_html(self):
         environ = self._makeEnviron()
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
@@ -57,7 +57,7 @@ class TestPackageURLParser(unittest.TestCase):
 
     def test_resource_out_of_bounds(self):
         environ = self._makeEnviron()
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         inst.root_resource = 'abcdef'
         sr = DummyStartResponse()
         response = inst(environ, sr)
@@ -67,7 +67,7 @@ class TestPackageURLParser(unittest.TestCase):
 
     def test_resource_doesnt_exist(self):
         environ = self._makeEnviron(PATH_INFO='/notthere')
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
@@ -76,7 +76,7 @@ class TestPackageURLParser(unittest.TestCase):
 
     def test_resource_isdir(self):
         environ = self._makeEnviron(PATH_INFO='/subdir/')
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
@@ -84,7 +84,7 @@ class TestPackageURLParser(unittest.TestCase):
 
     def test_resource_is_file(self):
         environ = self._makeEnviron(PATH_INFO='/index.html')
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
@@ -92,7 +92,7 @@ class TestPackageURLParser(unittest.TestCase):
 
     def test_resource_is_file_with_cache_max_age(self):
         environ = self._makeEnviron(PATH_INFO='/index.html')
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static',
+        inst = self._makeOne('pyramid.tests', 'fixtures/static',
                              cache_max_age=600)
         sr = DummyStartResponse()
         response = inst(environ, sr)
@@ -108,7 +108,7 @@ class TestPackageURLParser(unittest.TestCase):
 
     def test_resource_is_file_with_no_cache_max_age(self):
         environ = self._makeEnviron(PATH_INFO='/index.html')
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         sr = DummyStartResponse()
         response = inst(environ, sr)
         body = response[0]
@@ -126,7 +126,7 @@ class TestPackageURLParser(unittest.TestCase):
                 return True
         dummy_eq = DummyEq()
         environ = self._makeEnviron(HTTP_IF_NONE_MATCH=dummy_eq)
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         sr = DummyStartResponse()
         response = inst(environ, sr)
         self.assertEqual(len(sr.headerlist), 1)
@@ -135,13 +135,13 @@ class TestPackageURLParser(unittest.TestCase):
         self.assertEqual(response[0], '')
 
     def test_repr(self):
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         self.failUnless(
             repr(inst).startswith(
-            '<PackageURLParser repoze.bfg.tests:fixtures/static at'))
+            '<PackageURLParser pyramid.tests:fixtures/static at'))
 
     def test_not_found(self):
-        inst = self._makeOne('repoze.bfg.tests', 'fixtures/static')
+        inst = self._makeOne('pyramid.tests', 'fixtures/static')
         environ = self._makeEnviron()
         sr = DummyStartResponse()
         response = inst.not_found(environ, sr, 'debug_message')
@@ -157,7 +157,7 @@ class TestStaticView(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from repoze.bfg.view import static
+        from pyramid.view import static
         return static
 
     def _makeOne(self, path, package_name=None):
@@ -197,7 +197,7 @@ class TestStaticView(unittest.TestCase):
         self.assertEqual(request.copied, True)
         self.assertEqual(response.root_resource, 'fixtures')
         self.assertEqual(response.resource_name, 'fixtures')
-        self.assertEqual(response.package_name, 'repoze.bfg.tests')
+        self.assertEqual(response.package_name, 'pyramid.tests')
         self.assertEqual(response.cache_max_age, 3600)
 
     def test_relpath_withpackage(self):
@@ -228,19 +228,19 @@ class TestStaticView(unittest.TestCase):
 
 class TestStaticURLInfo(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.static import StaticURLInfo
+        from pyramid.static import StaticURLInfo
         return StaticURLInfo
     
     def _makeOne(self, config):
         return self._getTargetClass()(config)
 
     def test_verifyClass(self):
-        from repoze.bfg.interfaces import IStaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
         from zope.interface.verify import verifyClass
         verifyClass(IStaticURLInfo, self._getTargetClass())
 
     def test_verifyObject(self):
-        from repoze.bfg.interfaces import IStaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
         from zope.interface.verify import verifyObject
         verifyObject(IStaticURLInfo, self._makeOne(None))
 
@@ -301,7 +301,7 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(inst.registrations, expected)
 
     def test_add_viewname(self):
-        from repoze.bfg.static import static_view
+        from pyramid.static import static_view
         class Config:
             def add_route(self, *arg, **kw):
                 self.arg = arg

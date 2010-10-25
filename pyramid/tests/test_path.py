@@ -2,12 +2,12 @@ import unittest
 
 class TestCallerPath(unittest.TestCase):
     def tearDown(self):
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         if hasattr(test_path, '__bfg_abspath__'):
             del test_path.__bfg_abspath__
 
     def _callFUT(self, path, level=2):
-        from repoze.bfg.path import caller_path
+        from pyramid.path import caller_path
         return caller_path(path, level)
 
     def test_isabs(self):
@@ -22,7 +22,7 @@ class TestCallerPath(unittest.TestCase):
 
     def test_memoization_has_bfg_abspath(self):
         import os
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         test_path.__bfg_abspath__ = '/foo/bar'
         result = self._callFUT('a/b/c')
         self.assertEqual(result, os.path.join('/foo/bar', 'a/b/c'))
@@ -30,43 +30,43 @@ class TestCallerPath(unittest.TestCase):
     def test_memoization_success(self):
         import os
         here = os.path.abspath(os.path.dirname(__file__))
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         result = self._callFUT('a/b/c')
         self.assertEqual(result, os.path.join(here, 'a/b/c'))
         self.assertEqual(test_path.__bfg_abspath__, here)
 
 class TestCallerModule(unittest.TestCase):
     def _callFUT(self, level=2):
-        from repoze.bfg.path import caller_module
+        from pyramid.path import caller_module
         return caller_module(level)
 
     def test_it_level_1(self):
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         result = self._callFUT(1)
         self.assertEqual(result, test_path)
 
     def test_it_level_2(self):
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         result = self._callFUT(2)
         self.assertEqual(result, test_path)
 
     def test_it_level_3(self):
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         result = self._callFUT(3)
         self.failIfEqual(result, test_path)
 
 class TestCallerPackage(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.path import caller_package
+        from pyramid.path import caller_package
         return caller_package(*arg, **kw)
 
     def test_it_level_1(self):
-        from repoze.bfg import tests
+        from pyramid import tests
         result = self._callFUT(1)
         self.assertEqual(result, tests)
 
     def test_it_level_2(self):
-        from repoze.bfg import tests
+        from pyramid import tests
         result = self._callFUT(2)
         self.assertEqual(result, tests)
 
@@ -76,37 +76,37 @@ class TestCallerPackage(unittest.TestCase):
         self.assertEqual(result, unittest)
 
     def test_it_package(self):
-        import repoze.bfg.tests
+        import pyramid.tests
         def dummy_caller_module(*arg):
-            return repoze.bfg.tests
+            return pyramid.tests
         result = self._callFUT(1, caller_module=dummy_caller_module)
-        self.assertEqual(result, repoze.bfg.tests)
+        self.assertEqual(result, pyramid.tests)
         
 class TestPackagePath(unittest.TestCase):
     def _callFUT(self, package):
-        from repoze.bfg.path import package_path
+        from pyramid.path import package_path
         return package_path(package)
 
     def test_it_package(self):
-        from repoze.bfg import tests
+        from pyramid import tests
         package = DummyPackageOrModule(tests)
         result = self._callFUT(package)
         self.assertEqual(result, package.package_path)
         
     def test_it_module(self):
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path)
         result = self._callFUT(module)
         self.assertEqual(result, module.package_path)
 
     def test_memoization_success(self):
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path)
         self._callFUT(module)
         self.assertEqual(module.__bfg_abspath__, module.package_path)
         
     def test_memoization_fail(self):
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path, raise_exc=TypeError)
         result = self._callFUT(module)
         self.failIf(hasattr(module, '__bfg_abspath__'))
@@ -114,38 +114,38 @@ class TestPackagePath(unittest.TestCase):
 
 class TestPackageOf(unittest.TestCase):
     def _callFUT(self, package):
-        from repoze.bfg.path import package_of
+        from pyramid.path import package_of
         return package_of(package)
 
     def test_it_package(self):
-        from repoze.bfg import tests
+        from pyramid import tests
         package = DummyPackageOrModule(tests)
         result = self._callFUT(package)
         self.assertEqual(result, tests)
 
     def test_it_module(self):
-        import repoze.bfg.tests.test_configuration
-        from repoze.bfg import tests
-        package = DummyPackageOrModule(repoze.bfg.tests.test_configuration)
+        import pyramid.tests.test_configuration
+        from pyramid import tests
+        package = DummyPackageOrModule(pyramid.tests.test_configuration)
         result = self._callFUT(package)
         self.assertEqual(result, tests)
 
 class TestPackageName(unittest.TestCase):
     def _callFUT(self, package):
-        from repoze.bfg.path import package_name
+        from pyramid.path import package_name
         return package_name(package)
 
     def test_it_package(self):
-        from repoze.bfg import tests
+        from pyramid import tests
         package = DummyPackageOrModule(tests)
         result = self._callFUT(package)
-        self.assertEqual(result, 'repoze.bfg.tests')
+        self.assertEqual(result, 'pyramid.tests')
         
     def test_it_module(self):
-        from repoze.bfg.tests import test_path
+        from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path)
         result = self._callFUT(module)
-        self.assertEqual(result, 'repoze.bfg.tests')
+        self.assertEqual(result, 'pyramid.tests')
 
     def test_it_None(self):
         result = self._callFUT(None)

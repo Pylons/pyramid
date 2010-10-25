@@ -16,65 +16,65 @@ from zope.interface import implementedBy
 from zope.interface.interfaces import IInterface
 from zope.interface import implements
 
-from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import IChameleonTranslate
-from repoze.bfg.interfaces import IDebugLogger
-from repoze.bfg.interfaces import IDefaultPermission
-from repoze.bfg.interfaces import IDefaultRootFactory
-from repoze.bfg.interfaces import IExceptionViewClassifier
-from repoze.bfg.interfaces import ILocaleNegotiator
-from repoze.bfg.interfaces import IMultiView
-from repoze.bfg.interfaces import IPackageOverrides
-from repoze.bfg.interfaces import IRendererFactory
-from repoze.bfg.interfaces import IRendererGlobalsFactory
-from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import IRequestFactory
-from repoze.bfg.interfaces import IRootFactory
-from repoze.bfg.interfaces import IRouteRequest
-from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import ISecuredView
-from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import IStaticURLInfo
-from repoze.bfg.interfaces import ITranslationDirectories
-from repoze.bfg.interfaces import ITraverser
-from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import IViewClassifier
-from repoze.bfg.interfaces import IExceptionResponse
-from repoze.bfg.interfaces import IException
+from pyramid.interfaces import IAuthenticationPolicy
+from pyramid.interfaces import IAuthorizationPolicy
+from pyramid.interfaces import IChameleonTranslate
+from pyramid.interfaces import IDebugLogger
+from pyramid.interfaces import IDefaultPermission
+from pyramid.interfaces import IDefaultRootFactory
+from pyramid.interfaces import IExceptionViewClassifier
+from pyramid.interfaces import ILocaleNegotiator
+from pyramid.interfaces import IMultiView
+from pyramid.interfaces import IPackageOverrides
+from pyramid.interfaces import IRendererFactory
+from pyramid.interfaces import IRendererGlobalsFactory
+from pyramid.interfaces import IRequest
+from pyramid.interfaces import IRequestFactory
+from pyramid.interfaces import IRootFactory
+from pyramid.interfaces import IRouteRequest
+from pyramid.interfaces import IRoutesMapper
+from pyramid.interfaces import ISecuredView
+from pyramid.interfaces import ISettings
+from pyramid.interfaces import IStaticURLInfo
+from pyramid.interfaces import ITranslationDirectories
+from pyramid.interfaces import ITraverser
+from pyramid.interfaces import IView
+from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IExceptionResponse
+from pyramid.interfaces import IException
 
-from repoze.bfg import chameleon_text
-from repoze.bfg import chameleon_zpt
-from repoze.bfg import renderers
-from repoze.bfg.renderers import RendererHelper
-from repoze.bfg.authorization import ACLAuthorizationPolicy
-from repoze.bfg.compat import all
-from repoze.bfg.compat import md5
-from repoze.bfg.events import ApplicationCreated
-from repoze.bfg.exceptions import Forbidden
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.exceptions import PredicateMismatch
-from repoze.bfg.exceptions import ConfigurationError
-from repoze.bfg.i18n import get_localizer
-from repoze.bfg.log import make_stream_logger
-from repoze.bfg.path import caller_package
-from repoze.bfg.path import package_path
-from repoze.bfg.path import package_of
-from repoze.bfg.registry import Registry
-from repoze.bfg.request import route_request_iface
-from repoze.bfg.resource import PackageOverrides
-from repoze.bfg.resource import resolve_resource_spec
-from repoze.bfg.settings import Settings
-from repoze.bfg.static import StaticURLInfo
-from repoze.bfg.threadlocal import get_current_registry
-from repoze.bfg.threadlocal import get_current_request
-from repoze.bfg.threadlocal import manager
-from repoze.bfg.traversal import traversal_path
-from repoze.bfg.traversal import DefaultRootFactory
-from repoze.bfg.traversal import find_interface
-from repoze.bfg.urldispatch import RoutesMapper
-from repoze.bfg.view import render_view_to_response
-from repoze.bfg.view import default_exceptionresponse_view
+from pyramid import chameleon_text
+from pyramid import chameleon_zpt
+from pyramid import renderers
+from pyramid.renderers import RendererHelper
+from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.compat import all
+from pyramid.compat import md5
+from pyramid.events import ApplicationCreated
+from pyramid.exceptions import Forbidden
+from pyramid.exceptions import NotFound
+from pyramid.exceptions import PredicateMismatch
+from pyramid.exceptions import ConfigurationError
+from pyramid.i18n import get_localizer
+from pyramid.log import make_stream_logger
+from pyramid.path import caller_package
+from pyramid.path import package_path
+from pyramid.path import package_of
+from pyramid.registry import Registry
+from pyramid.request import route_request_iface
+from pyramid.resource import PackageOverrides
+from pyramid.resource import resolve_resource_spec
+from pyramid.settings import Settings
+from pyramid.static import StaticURLInfo
+from pyramid.threadlocal import get_current_registry
+from pyramid.threadlocal import get_current_request
+from pyramid.threadlocal import manager
+from pyramid.traversal import traversal_path
+from pyramid.traversal import DefaultRootFactory
+from pyramid.traversal import find_interface
+from pyramid.urldispatch import RoutesMapper
+from pyramid.view import render_view_to_response
+from pyramid.view import default_exceptionresponse_view
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
@@ -598,7 +598,7 @@ class Configurator(object):
         the current configuration state and sends a
         :class:`repoze.bfg.interfaces.IApplicationCreated`
         event to all listeners."""
-        from repoze.bfg.router import Router # avoid circdep
+        from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
         # We push the registry on to the stack here in case any code
         # that depends on the registry threadlocal APIs used in
@@ -1879,7 +1879,7 @@ class Configurator(object):
         :func:`repoze.bfg.security.effective_principals`, and
         :func:`repoze.bfg.security.principals_allowed_by_permission`.
         """
-        from repoze.bfg.testing import DummySecurityPolicy
+        from pyramid.testing import DummySecurityPolicy
         policy = DummySecurityPolicy(userid, groupids, permissive)
         self.registry.registerUtility(policy, IAuthorizationPolicy)
         self.registry.registerUtility(policy, IAuthenticationPolicy)
@@ -1962,7 +1962,7 @@ class Configurator(object):
            method named ``testing_add_template`` had the same signature
            and purpose in previous releases)..
         """
-        from repoze.bfg.testing import DummyRendererFactory
+        from pyramid.testing import DummyRendererFactory
         helper = RendererHelper(path, registry=self.registry)
         factory = helper.factory
         if not isinstance(factory, DummyRendererFactory):
@@ -1970,7 +1970,7 @@ class Configurator(object):
             self.registry.registerUtility(factory, IRendererFactory,
                                           name=helper.renderer_type)
 
-        from repoze.bfg.testing import DummyTemplateRenderer
+        from pyramid.testing import DummyTemplateRenderer
         if renderer is None:
             renderer = DummyTemplateRenderer()
         factory.add(helper.renderer_name, renderer)
@@ -2114,7 +2114,7 @@ def _make_predicates(xhr=None, request_method=None, path_info=None,
         # adds 'traverse' to the matchdict if it's specified in the
         # routing args.  This causes the ModelGraphTraverser to use
         # the resolved traverse pattern as the traversal path.
-        from repoze.bfg.urldispatch import _compile_route
+        from pyramid.urldispatch import _compile_route
         _, tgenerate = _compile_route(traverse)
         def traverse_predicate(context, request):
             if 'traverse' in context:

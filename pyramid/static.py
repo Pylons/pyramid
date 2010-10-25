@@ -10,10 +10,10 @@ from paste.urlparser import StaticURLParser
 
 from zope.interface import implements
 
-from repoze.bfg.interfaces import IStaticURLInfo
-from repoze.bfg.path import caller_package
-from repoze.bfg.resource import resolve_resource_spec
-from repoze.bfg.url import route_url
+from pyramid.interfaces import IStaticURLInfo
+from pyramid.path import caller_package
+from pyramid.resource import resolve_resource_spec
+from pyramid.url import route_url
 
 class PackageURLParser(StaticURLParser):
     """ This probably won't work with zipimported resources """

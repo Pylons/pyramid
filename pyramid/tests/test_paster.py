@@ -2,7 +2,7 @@ import unittest
 
 class TestBFGShellCommand(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.paster import BFGShellCommand
+        from pyramid.paster import BFGShellCommand
         return BFGShellCommand
 
     def _makeOne(self):
@@ -109,7 +109,7 @@ class TestBFGShellCommand(unittest.TestCase):
 
 class TestGetApp(unittest.TestCase):
     def _callFUT(self, config_file, section_name, loadapp):
-        from repoze.bfg.paster import get_app
+        from pyramid.paster import get_app
         return get_app(config_file, section_name, loadapp)
 
     def test_it(self):

@@ -1,4 +1,4 @@
-from repoze.bfg.configuration import Configurator
+from pyramid.configuration import Configurator
 from repoze.zodbconn.finder import PersistentApplicationFinder
 
 from tutorial.models import appmaker

@@ -1,13 +1,13 @@
 import os
 import unittest
 
-from repoze.bfg.wsgi import wsgiapp
-from repoze.bfg.view import bfg_view
-from repoze.bfg.view import static
+from pyramid.wsgi import wsgiapp
+from pyramid.view import bfg_view
+from pyramid.view import static
 
 from zope.interface import Interface
 
-from repoze.bfg import testing
+from pyramid import testing
 
 class INothing(Interface):
     pass
@@ -30,11 +30,11 @@ class WGSIAppPlusBFGViewTests(unittest.TestCase):
         self.assertEqual(result, '123')
 
     def test_scanned(self):
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.configuration import Configurator
-        from repoze.bfg.tests import test_integration
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.configuration import Configurator
+        from pyramid.tests import test_integration
         config = Configurator()
         config.scan(test_integration)
         reg = config.registry
@@ -70,7 +70,7 @@ class TwillBase(unittest.TestCase):
     def setUp(self):
         import sys
         import twill
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         config = Configurator(root_factory=self.root_factory)
         config.load_zcml(self.config)
         twill.add_wsgi_intercept('localhost', 6543, config.make_wsgi_app)
@@ -90,7 +90,7 @@ class TwillBase(unittest.TestCase):
         testing.tearDown()
 
 class TestFixtureApp(TwillBase):
-    config = 'repoze.bfg.tests.fixtureapp:configure.zcml'
+    config = 'pyramid.tests.fixtureapp:configure.zcml'
     def test_it(self):
         import twill.commands
         browser = twill.commands.get_browser()
@@ -111,7 +111,7 @@ class TestFixtureApp(TwillBase):
 class TestCCBug(TwillBase):
     # "unordered" as reported in IRC by author of
     # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
-    config = 'repoze.bfg.tests.ccbugapp:configure.zcml'
+    config = 'pyramid.tests.ccbugapp:configure.zcml'
     def test_it(self):
         import twill.commands
         browser = twill.commands.get_browser()
@@ -126,7 +126,7 @@ class TestHybridApp(TwillBase):
     # make sure views registered for a route "win" over views registered
     # without one, even though the context of the non-route view may
     # be more specific than the route view.
-    config = 'repoze.bfg.tests.hybridapp:configure.zcml'
+    config = 'pyramid.tests.hybridapp:configure.zcml'
     def test_it(self):
         import twill.commands
         browser = twill.commands.get_browser()
@@ -161,7 +161,7 @@ class TestHybridApp(TwillBase):
 
 class TestRestBugApp(TwillBase):
     # test bug reported by delijati 2010/2/3 (http://pastebin.com/d4cc15515)
-    config = 'repoze.bfg.tests.restbugapp:configure.zcml'
+    config = 'pyramid.tests.restbugapp:configure.zcml'
     def test_it(self):
         import twill.commands
         browser = twill.commands.get_browser()
@@ -170,7 +170,7 @@ class TestRestBugApp(TwillBase):
         self.assertEqual(browser.get_html(), 'gotten')
 
 class TestViewDecoratorApp(TwillBase):
-    config = 'repoze.bfg.tests.viewdecoratorapp:configure.zcml'
+    config = 'pyramid.tests.viewdecoratorapp:configure.zcml'
     def test_it(self):
         import twill.commands
         browser = twill.commands.get_browser()
@@ -186,12 +186,12 @@ class TestViewDecoratorApp(TwillBase):
         self.assertEqual(browser.get_code(), 200)
         self.failUnless('OK3' in browser.get_html())
 
-from repoze.bfg.tests.exceptionviewapp.models import AnException, NotAnException
+from pyramid.tests.exceptionviewapp.models import AnException, NotAnException
 excroot = {'anexception':AnException(),
            'notanexception':NotAnException()}
 
 class TestExceptionViewsApp(TwillBase):
-    config = 'repoze.bfg.tests.exceptionviewapp:configure.zcml'
+    config = 'pyramid.tests.exceptionviewapp:configure.zcml'
     root_factory = lambda *arg: excroot
     def test_it(self):
         import twill.commands

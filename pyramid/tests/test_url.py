@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class ModelURLTests(unittest.TestCase):
     def setUp(self):
@@ -10,11 +10,11 @@ class ModelURLTests(unittest.TestCase):
         cleanUp()
         
     def _callFUT(self, model, request, *elements, **kw):
-        from repoze.bfg.url import model_url
+        from pyramid.url import model_url
         return model_url(model, request, *elements, **kw)
 
     def _registerContextURL(self, reg):
-        from repoze.bfg.interfaces import IContextURL
+        from pyramid.interfaces import IContextURL
         from zope.interface import Interface
         class DummyContextURL(object):
             def __init__(self, context, request):
@@ -128,7 +128,7 @@ class ModelURLTests(unittest.TestCase):
         self.assertEqual(result, 'http://example.com:5432/')
 
     def test_no_registry_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
         request = DummyRequest()
         self._registerContextURL(reg)
@@ -144,11 +144,11 @@ class TestRouteUrl(unittest.TestCase):
         cleanUp()
         
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.url import route_url
+        from pyramid.url import route_url
         return route_url(*arg, **kw)
 
     def test_with_elements(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         request = _makeRequest()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
@@ -159,7 +159,7 @@ class TestRouteUrl(unittest.TestCase):
                          'http://example.com:5432/1/2/3/extra1/extra2?a=1#foo')
 
     def test_no_elements(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         request = _makeRequest()
         mapper = DummyRoutesMapper(route=DummyRoute('/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
@@ -169,7 +169,7 @@ class TestRouteUrl(unittest.TestCase):
                          'http://example.com:5432/1/2/3?a=1#foo')
 
     def test_it_generation_error(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         request = _makeRequest()
         mapper = DummyRoutesMapper(raise_exc=KeyError)
         request.registry.registerUtility(mapper, IRoutesMapper)
@@ -177,7 +177,7 @@ class TestRouteUrl(unittest.TestCase):
         self.assertRaises(KeyError, self._callFUT, 'flub', request, a=1)
 
     def test_generate_doesnt_receive_query_or_anchor(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         route = DummyRoute(result='')
         mapper = DummyRoutesMapper(route=route)
         from zope.component import getSiteManager
@@ -189,7 +189,7 @@ class TestRouteUrl(unittest.TestCase):
         self.assertEqual(result, 'http://example.com:5432?name=some_name')
 
     def test_with_app_url(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         request = _makeRequest()
         mapper = DummyRoutesMapper(route=DummyRoute(result='/1/2/3'))
         request.registry.registerUtility(mapper, IRoutesMapper)
@@ -197,7 +197,7 @@ class TestRouteUrl(unittest.TestCase):
         self.assertEqual(result,  'http://example2.com/1/2/3')
 
     def test_with_pregenerator(self):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         request = _makeRequest()
         route = DummyRoute(result='/1/2/3')
         def pregenerator(request, elements, kw):
@@ -217,7 +217,7 @@ class TestStaticUrl(unittest.TestCase):
         cleanUp()
         
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.url import static_url
+        from pyramid.url import static_url
         return static_url(*arg, **kw)
 
     def test_staticurlinfo_notfound(self):
@@ -229,36 +229,36 @@ class TestStaticUrl(unittest.TestCase):
         self.assertRaises(ValueError, self._callFUT, '/static/foo.css', request)
 
     def test_found_rel(self):
-        from repoze.bfg.interfaces import IStaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
         request = _makeRequest()
         info = DummyStaticURLInfo('abc')
         request.registry.registerUtility(info, IStaticURLInfo)
         result = self._callFUT('static/foo.css', request)
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
-                         ('repoze.bfg.tests:static/foo.css', request, {}) )
+                         ('pyramid.tests:static/foo.css', request, {}) )
 
     def test_found_abs(self):
-        from repoze.bfg.interfaces import IStaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
         request = _makeRequest()
         info = DummyStaticURLInfo('abc')
         request.registry.registerUtility(info, IStaticURLInfo)
-        result = self._callFUT('repoze.bfg.tests:static/foo.css', request)
+        result = self._callFUT('pyramid.tests:static/foo.css', request)
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
-                         ('repoze.bfg.tests:static/foo.css', request, {}) )
+                         ('pyramid.tests:static/foo.css', request, {}) )
 
     def test_found_abs_no_registry_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IStaticURLInfo
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IStaticURLInfo
         request = DummyRequest()
         registry = get_current_registry()
         info = DummyStaticURLInfo('abc')
         registry.registerUtility(info, IStaticURLInfo)
-        result = self._callFUT('repoze.bfg.tests:static/foo.css', request)
+        result = self._callFUT('pyramid.tests:static/foo.css', request)
         self.assertEqual(result, 'abc')
         self.assertEqual(info.args,
-                         ('repoze.bfg.tests:static/foo.css', request, {}) )
+                         ('pyramid.tests:static/foo.css', request, {}) )
 
 class DummyContext(object):
     def __init__(self, next=None):
@@ -289,7 +289,7 @@ class DummyRoute:
         return self.result
     
 def _makeRequest(environ=None):
-    from repoze.bfg.registry import Registry
+    from pyramid.registry import Registry
     request = DummyRequest(environ)
     request.registry = Registry()
     return request

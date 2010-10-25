@@ -4,7 +4,7 @@ from docutils.core import publish_parts
 
 from webob.exc import HTTPFound
 
-from repoze.bfg.url import route_url
+from pyramid.url import route_url
 
 from tutorial.models import DBSession
 from tutorial.models import Page

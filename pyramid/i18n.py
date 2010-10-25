@@ -9,12 +9,12 @@ from translationstring import TranslationStringFactory # API
 TranslationString = TranslationString # PyFlakes
 TranslationStringFactory = TranslationStringFactory # PyFlakes
 
-from repoze.bfg.interfaces import ILocalizer
-from repoze.bfg.interfaces import ITranslationDirectories
-from repoze.bfg.interfaces import ILocaleNegotiator
+from pyramid.interfaces import ILocalizer
+from pyramid.interfaces import ITranslationDirectories
+from pyramid.interfaces import ILocaleNegotiator
 
-from repoze.bfg.settings import get_settings
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.settings import get_settings
+from pyramid.threadlocal import get_current_registry
 
 class Localizer(object):
     """

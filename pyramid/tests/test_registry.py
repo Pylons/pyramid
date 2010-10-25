@@ -2,7 +2,7 @@ import unittest
 
 class TestRegistry(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         return Registry
     
     def _makeOne(self):

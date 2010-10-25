@@ -12,14 +12,14 @@ except ImportError: # pragma: no cover
         def __init__(self, *arg, **kw):
             raise ImportError, exc, tb
 
-from repoze.bfg.interfaces import IChameleonTranslate
-from repoze.bfg.interfaces import ITemplateRenderer
+from pyramid.interfaces import IChameleonTranslate
+from pyramid.interfaces import ITemplateRenderer
 
-from repoze.bfg.decorator import reify
-from repoze.bfg.path import caller_package
-from repoze.bfg import renderers
-from repoze.bfg.settings import get_settings
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.decorator import reify
+from pyramid.path import caller_package
+from pyramid import renderers
+from pyramid.settings import get_settings
+from pyramid.threadlocal import get_current_registry
 
 def renderer_factory(path):
     return renderers.template_renderer_factory(path, ZPTTemplateRenderer)

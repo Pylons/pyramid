@@ -1,6 +1,6 @@
 <configure xmlns="http://namespaces.repoze.org/bfg">
 
-  <include package="repoze.bfg.includes" />
+  <include package="pyramid.includes" />
 
   <route
     path=":id"

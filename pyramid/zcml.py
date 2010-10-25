@@ -16,25 +16,25 @@ from zope.schema import Bool
 from zope.schema import Int
 from zope.schema import TextLine
 
-from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import IDefaultPermission
-from repoze.bfg.interfaces import IRendererFactory
-from repoze.bfg.interfaces import IRouteRequest
-from repoze.bfg.interfaces import IView
+from pyramid.interfaces import IAuthenticationPolicy
+from pyramid.interfaces import IAuthorizationPolicy
+from pyramid.interfaces import IDefaultPermission
+from pyramid.interfaces import IRendererFactory
+from pyramid.interfaces import IRouteRequest
+from pyramid.interfaces import IView
 
-from repoze.bfg.authentication import AuthTktAuthenticationPolicy
-from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
-from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
-from repoze.bfg.authorization import ACLAuthorizationPolicy
-from repoze.bfg.configuration import Configurator
-from repoze.bfg.exceptions import ConfigurationError
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.exceptions import Forbidden
-from repoze.bfg.request import route_request_iface
-from repoze.bfg.resource import resource_spec_from_abspath
-from repoze.bfg.static import StaticURLInfo
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authentication import RemoteUserAuthenticationPolicy
+from pyramid.authentication import RepozeWho1AuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.configuration import Configurator
+from pyramid.exceptions import ConfigurationError
+from pyramid.exceptions import NotFound
+from pyramid.exceptions import Forbidden
+from pyramid.request import route_request_iface
+from pyramid.resource import resource_spec_from_abspath
+from pyramid.static import StaticURLInfo
+from pyramid.threadlocal import get_current_registry
 
 ###################### directives ##########################
 

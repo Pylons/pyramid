@@ -11,25 +11,25 @@ from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import alsoProvides
 
-from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import ISecuredView
-from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import IViewClassifier
-from repoze.bfg.interfaces import IViewPermission
+from pyramid.interfaces import IRequest
+from pyramid.interfaces import IRoutesMapper
+from pyramid.interfaces import ISecuredView
+from pyramid.interfaces import IView
+from pyramid.interfaces import IViewClassifier
+from pyramid.interfaces import IViewPermission
 
-from repoze.bfg.configuration import Configurator
-from repoze.bfg.exceptions import Forbidden
-from repoze.bfg.registry import Registry
-from repoze.bfg.security import Allowed
-from repoze.bfg.security import Authenticated
-from repoze.bfg.security import Denied
-from repoze.bfg.security import Everyone
-from repoze.bfg.security import has_permission
-from repoze.bfg.threadlocal import get_current_registry
-from repoze.bfg.threadlocal import manager
-from repoze.bfg.urldispatch import RoutesMapper
-from repoze.bfg.zcml import zcml_configure # API
+from pyramid.configuration import Configurator
+from pyramid.exceptions import Forbidden
+from pyramid.registry import Registry
+from pyramid.security import Allowed
+from pyramid.security import Authenticated
+from pyramid.security import Denied
+from pyramid.security import Everyone
+from pyramid.security import has_permission
+from pyramid.threadlocal import get_current_registry
+from pyramid.threadlocal import manager
+from pyramid.urldispatch import RoutesMapper
+from pyramid.zcml import zcml_configure # API
 
 zcml_configure # prevent pyflakes from complaining
 
@@ -702,7 +702,7 @@ def setUp(registry=None, request=None, hook_zca=True):
         # someone may be passing us an esoteric "dummy" registry, and
         # the below won't succeed if it doesn't have a registerUtility
         # method.
-        from repoze.bfg.configuration import DEFAULT_RENDERERS
+        from pyramid.configuration import DEFAULT_RENDERERS
         for name, renderer in DEFAULT_RENDERERS:
             # Cause the default renderers to be registered because
             # in-the-wild test code relies on being able to call

@@ -1,7 +1,7 @@
 import unittest
 
-from repoze.bfg.testing import cleanUp
-from repoze.bfg import testing
+from pyramid.testing import cleanUp
+from pyramid import testing
 
 class TestTemplateRendererFactory(unittest.TestCase):
     def setUp(self):
@@ -11,17 +11,17 @@ class TestTemplateRendererFactory(unittest.TestCase):
         cleanUp()
         
     def _callFUT(self, path, factory):
-        from repoze.bfg.renderers import template_renderer_factory
+        from pyramid.renderers import template_renderer_factory
         return template_renderer_factory(path, factory)
 
     def test_abspath_notfound(self):
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import ITemplateRenderer
         abspath = '/wont/exist'
         testing.registerUtility({}, ITemplateRenderer, name=abspath)
         self.assertRaises(ValueError, self._callFUT, abspath, None)
 
     def test_abspath_alreadyregistered(self):
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import ITemplateRenderer
         import os
         abspath = os.path.abspath(__file__)
         renderer = {}
@@ -30,7 +30,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
         self.failUnless(result is renderer)
 
     def test_abspath_notyetregistered(self):
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import ITemplateRenderer
         import os
         abspath = os.path.abspath(__file__)
         renderer = {}
@@ -40,25 +40,25 @@ class TestTemplateRendererFactory(unittest.TestCase):
 
     def test_relpath_path_registered(self):
         renderer = {}
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import ITemplateRenderer
         testing.registerUtility(renderer, ITemplateRenderer, name='foo/bar')
         result = self._callFUT('foo/bar', None)
         self.failUnless(renderer is result)
 
     def test_relpath_is_package_registered(self):
         renderer = {}
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import ITemplateRenderer
         testing.registerUtility(renderer, ITemplateRenderer, name='foo:bar/baz')
         result = self._callFUT('foo:bar/baz', None)
         self.failUnless(renderer is result)
 
     def test_spec_notfound(self):
         self.assertRaises(ValueError, self._callFUT,
-                          'repoze.bfg.tests:wont/exist', None)
+                          'pyramid.tests:wont/exist', None)
 
     def test_spec_alreadyregistered(self):
-        from repoze.bfg.interfaces import ITemplateRenderer
-        from repoze.bfg import tests
+        from pyramid.interfaces import ITemplateRenderer
+        from pyramid import tests
         module_name = tests.__name__
         relpath = 'test_renderers.py'
         spec = '%s:%s' % (module_name, relpath)
@@ -69,7 +69,7 @@ class TestTemplateRendererFactory(unittest.TestCase):
 
     def test_spec_notyetregistered(self):
         import os
-        from repoze.bfg import tests
+        from pyramid import tests
         module_name = tests.__name__
         relpath = 'test_renderers.py'
         renderer = {}
@@ -84,31 +84,31 @@ class TestTemplateRendererFactory(unittest.TestCase):
         self.assertEqual(factory.kw, {})
 
     def test_reload_resources_true(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ISettings
+        from pyramid.interfaces import ITemplateRenderer
         settings = {'reload_resources':True}
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('repoze.bfg.tests:test_renderers.py', factory)
+        result = self._callFUT('pyramid.tests:test_renderers.py', factory)
         self.failUnless(result is renderer)
-        spec = '%s:%s' % ('repoze.bfg.tests', 'test_renderers.py')
+        spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         reg = get_current_registry()
         self.assertEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                          None)
 
     def test_reload_resources_false(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import ISettings
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ISettings
+        from pyramid.interfaces import ITemplateRenderer
         settings = {'reload_resources':False}
         testing.registerUtility(settings, ISettings)
         renderer = {}
         factory = DummyFactory(renderer)
-        result = self._callFUT('repoze.bfg.tests:test_renderers.py', factory)
+        result = self._callFUT('pyramid.tests:test_renderers.py', factory)
         self.failUnless(result is renderer)
-        spec = '%s:%s' % ('repoze.bfg.tests', 'test_renderers.py')
+        spec = '%s:%s' % ('pyramid.tests', 'test_renderers.py')
         reg = get_current_registry()
         self.assertNotEqual(reg.queryUtility(ITemplateRenderer, name=spec),
                             None)
@@ -121,11 +121,11 @@ class TestRendererFromName(unittest.TestCase):
         cleanUp()
         
     def _callFUT(self, path, package=None):
-        from repoze.bfg.renderers import renderer_from_name
+        from pyramid.renderers import renderer_from_name
         return renderer_from_name(path, package)
 
     def test_it(self):
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory
         import os
         here = os.path.dirname(os.path.abspath(__file__))
         fixture = os.path.join(here, 'fixtures/minimal.pt')
@@ -136,13 +136,13 @@ class TestRendererFromName(unittest.TestCase):
         self.assertEqual(result, fixture)
 
     def test_with_package(self):
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory
         def factory(path, **kw):
             return path
         testing.registerUtility(factory, IRendererFactory, name='.pt')
-        import repoze.bfg.tests
-        result = self._callFUT('fixtures/minimal.pt', repoze.bfg.tests)
-        self.assertEqual(result, 'repoze.bfg.tests:fixtures/minimal.pt')
+        import pyramid.tests
+        result = self._callFUT('fixtures/minimal.pt', pyramid.tests)
+        self.assertEqual(result, 'pyramid.tests:fixtures/minimal.pt')
 
     def test_it_no_renderer(self):
         self.assertRaises(ValueError, self._callFUT, 'foo')
@@ -150,7 +150,7 @@ class TestRendererFromName(unittest.TestCase):
 
 class Test_json_renderer_factory(unittest.TestCase):
     def _callFUT(self, name):
-        from repoze.bfg.renderers import json_renderer_factory
+        from pyramid.renderers import json_renderer_factory
         return json_renderer_factory(name)
 
     def test_it(self):
@@ -173,7 +173,7 @@ class Test_json_renderer_factory(unittest.TestCase):
 
 class Test_string_renderer_factory(unittest.TestCase):
     def _callFUT(self, name):
-        from repoze.bfg.renderers import string_renderer_factory
+        from pyramid.renderers import string_renderer_factory
         return string_renderer_factory(name)
 
     def test_it_unicode(self):
@@ -220,7 +220,7 @@ class Test_rendered_response(unittest.TestCase):
 
     def _callFUT(self, renderer, response, view=None,
                  context=None, request=None, renderer_name=None):
-        from repoze.bfg.renderers import rendered_response
+        from pyramid.renderers import rendered_response
         if request is None:
             request = testing.DummyRequest()
         return rendered_response(renderer, response, view,
@@ -252,11 +252,11 @@ class TestRendererHelper(unittest.TestCase):
         cleanUp()
 
     def _makeOne(self, *arg, **kw):
-        from repoze.bfg.renderers import RendererHelper
+        from pyramid.renderers import RendererHelper
         return RendererHelper(*arg, **kw)
 
     def _registerRendererFactory(self):
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory
         def renderer(*arg):
             def respond(*arg):
                 return arg
@@ -277,13 +277,13 @@ class TestRendererHelper(unittest.TestCase):
 
     def test_resolve_spec_absolute(self):
         helper = self._makeOne('loo.foo')
-        result = helper.resolve_spec('repoze.bfg:flub')
-        self.assertEqual(result, 'repoze.bfg:flub')
+        result = helper.resolve_spec('pyramid:flub')
+        self.assertEqual(result, 'pyramid:flub')
 
     def test_resolve_spec_relative(self):
-        helper = self._makeOne('loo.foo', package='repoze.bfg')
+        helper = self._makeOne('loo.foo', package='pyramid')
         result = helper.resolve_spec('flub')
-        self.assertEqual(result, 'repoze.bfg:flub')
+        self.assertEqual(result, 'pyramid:flub')
 
     def test_render_to_response(self):
         self._registerRendererFactory()
@@ -320,7 +320,7 @@ class TestRendererHelper(unittest.TestCase):
 
     def test_render_renderer_globals_factory_active(self):
         self._registerRendererFactory()
-        from repoze.bfg.interfaces import IRendererGlobalsFactory
+        from pyramid.interfaces import IRendererGlobalsFactory
         def rg(system):
             return {'a':1}
         self.config.registry.registerUtility(rg, IRendererGlobalsFactory)
@@ -376,7 +376,7 @@ class TestRendererHelper(unittest.TestCase):
         self.assertEqual(response.cache_control.max_age, 100)
 
     def test_with_alternate_response_factory(self):
-        from repoze.bfg.interfaces import IResponseFactory
+        from pyramid.interfaces import IResponseFactory
         class ResponseFactory(object):
             def __init__(self, result):
                 self.result = result
@@ -389,7 +389,7 @@ class TestRendererHelper(unittest.TestCase):
 
     def test__make_response_with_real_request(self):
         # functional
-        from repoze.bfg.request import Request
+        from pyramid.request import Request
         request = Request({})
         attrs = {'response_status':'406 You Lose'}
         request.__dict__.update(attrs)
@@ -406,12 +406,12 @@ class Test_render(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, renderer_name, value, request=None, package=None):
-        from repoze.bfg.renderers import render
+        from pyramid.renderers import render
         return render(renderer_name, value, request=request, package=package)
 
     def test_it_no_request(self):
         renderer = self.config.testing_add_renderer(
-            'repoze.bfg.tests:abc/def.pt')
+            'pyramid.tests:abc/def.pt')
         renderer.string_response = 'abc'
         result = self._callFUT('abc/def.pt', dict(a=1))
         self.assertEqual(result, 'abc')
@@ -420,7 +420,7 @@ class Test_render(unittest.TestCase):
         
     def test_it_with_request(self):
         renderer = self.config.testing_add_renderer(
-            'repoze.bfg.tests:abc/def.pt')
+            'pyramid.tests:abc/def.pt')
         renderer.string_response = 'abc'
         request = testing.DummyRequest()
         result = self._callFUT('abc/def.pt',
@@ -437,13 +437,13 @@ class Test_render_to_response(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, renderer_name, value, request=None, package=None):
-        from repoze.bfg.renderers import render_to_response
+        from pyramid.renderers import render_to_response
         return render_to_response(renderer_name, value, request=request,
                                   package=package)
 
     def test_it_no_request(self):
         renderer = self.config.testing_add_renderer(
-            'repoze.bfg.tests:abc/def.pt')
+            'pyramid.tests:abc/def.pt')
         renderer.string_response = 'abc'
         response = self._callFUT('abc/def.pt', dict(a=1))
         self.assertEqual(response.body, 'abc')
@@ -452,7 +452,7 @@ class Test_render_to_response(unittest.TestCase):
         
     def test_it_with_request(self):
         renderer = self.config.testing_add_renderer(
-            'repoze.bfg.tests:abc/def.pt')
+            'pyramid.tests:abc/def.pt')
         renderer.string_response = 'abc'
         request = testing.DummyRequest()
         response = self._callFUT('abc/def.pt',
@@ -469,12 +469,12 @@ class Test_get_renderer(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, renderer_name, **kw):
-        from repoze.bfg.renderers import get_renderer
+        from pyramid.renderers import get_renderer
         return get_renderer(renderer_name)
 
     def test_it(self):
         renderer = self.config.testing_add_renderer(
-            'repoze.bfg.tests:abc/def.pt')
+            'pyramid.tests:abc/def.pt')
         result = self._callFUT('abc/def.pt')
         self.assertEqual(result, renderer)
 

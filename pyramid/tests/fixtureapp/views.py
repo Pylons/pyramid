@@ -1,6 +1,6 @@
 from zope.interface import Interface
 from webob import Response
-from repoze.bfg.exceptions import Forbidden
+from pyramid.exceptions import Forbidden
 
 def fixture_view(context, request):
     """ """

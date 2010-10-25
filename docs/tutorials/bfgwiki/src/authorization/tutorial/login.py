@@ -1,10 +1,10 @@
 from webob.exc import HTTPFound
 
-from repoze.bfg.view import bfg_view
-from repoze.bfg.url import model_url
+from pyramid.view import bfg_view
+from pyramid.url import model_url
 
-from repoze.bfg.security import remember
-from repoze.bfg.security import forget
+from pyramid.security import remember
+from pyramid.security import forget
 
 from tutorial.models import Wiki
 from tutorial.security import USERS

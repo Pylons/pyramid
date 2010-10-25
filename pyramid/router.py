@@ -1,28 +1,28 @@
 from zope.interface import implements
 from zope.interface import providedBy
 
-from repoze.bfg.interfaces import IDebugLogger
-from repoze.bfg.interfaces import IExceptionViewClassifier
-from repoze.bfg.interfaces import IRequest
-from repoze.bfg.interfaces import IRootFactory
-from repoze.bfg.interfaces import IRouteRequest
-from repoze.bfg.interfaces import IRouter
-from repoze.bfg.interfaces import IRequestFactory
-from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import ISettings
-from repoze.bfg.interfaces import ITraverser
-from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import IViewClassifier
+from pyramid.interfaces import IDebugLogger
+from pyramid.interfaces import IExceptionViewClassifier
+from pyramid.interfaces import IRequest
+from pyramid.interfaces import IRootFactory
+from pyramid.interfaces import IRouteRequest
+from pyramid.interfaces import IRouter
+from pyramid.interfaces import IRequestFactory
+from pyramid.interfaces import IRoutesMapper
+from pyramid.interfaces import ISettings
+from pyramid.interfaces import ITraverser
+from pyramid.interfaces import IView
+from pyramid.interfaces import IViewClassifier
 
-from repoze.bfg.configuration import make_app # b/c import
-from repoze.bfg.events import ContextFound
-from repoze.bfg.events import NewRequest
-from repoze.bfg.events import NewResponse
-from repoze.bfg.exceptions import NotFound
-from repoze.bfg.request import Request
-from repoze.bfg.threadlocal import manager
-from repoze.bfg.traversal import DefaultRootFactory
-from repoze.bfg.traversal import ModelGraphTraverser
+from pyramid.configuration import make_app # b/c import
+from pyramid.events import ContextFound
+from pyramid.events import NewRequest
+from pyramid.events import NewResponse
+from pyramid.exceptions import NotFound
+from pyramid.request import Request
+from pyramid.threadlocal import manager
+from pyramid.traversal import DefaultRootFactory
+from pyramid.traversal import ModelGraphTraverser
 
 make_app # prevent pyflakes from complaining
 

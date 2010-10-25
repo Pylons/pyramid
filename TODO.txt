@@ -82,3 +82,9 @@
 
 - CRSF token machinery
 
+- Converter: <configure xmlns="http://namespaces.repoze.org/bfg"> -> 
+             <configure xmlns="http://pyramid.pylonshq.com/">
+
+- Converter:   <include package="repoze.bfg.includes" /> ->
+               <include package="pyramid.includes" />
+

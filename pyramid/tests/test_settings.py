@@ -2,7 +2,7 @@ import unittest
 
 class TestSettings(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.settings import Settings
+        from pyramid.settings import Settings
         return Settings
 
     def _makeOne(self, d=None, environ=None):
@@ -179,8 +179,8 @@ class TestSettings(unittest.TestCase):
 
 class TestGetSettings(unittest.TestCase):
     def setUp(self):
-        from repoze.bfg.configuration import Configurator
-        from repoze.bfg.registry import Registry
+        from pyramid.configuration import Configurator
+        from pyramid.registry import Registry
         registry = Registry('testing')
         self.config = Configurator(registry=registry)
         self.config.begin()
@@ -189,14 +189,14 @@ class TestGetSettings(unittest.TestCase):
         self.config.end()
         
     def _callFUT(self):
-        from repoze.bfg.settings import get_settings
+        from pyramid.settings import get_settings
         return get_settings()
 
     def test_it_nosettings(self):
         self.assertEqual(self._callFUT(), None)
 
     def test_it_withsettings(self):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         settings = {'a':1}
         self.config.registry.registerUtility(settings, ISettings)
         self.assertEqual(self._callFUT(), settings)

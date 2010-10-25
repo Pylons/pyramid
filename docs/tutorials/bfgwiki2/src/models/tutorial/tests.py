@@ -1,6 +1,6 @@
 import unittest
-from repoze.bfg.configuration import Configurator
-from repoze.bfg import testing
+from pyramid.configuration import Configurator
+from pyramid import testing
 
 def _initTestingDB():
     from tutorial.models import initialize_sql

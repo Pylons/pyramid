@@ -1,6 +1,6 @@
 import threading
 
-from repoze.bfg.registry import global_registry
+from pyramid.registry import global_registry
 
 class ThreadLocalManager(threading.local):
     def __init__(self, default=None):

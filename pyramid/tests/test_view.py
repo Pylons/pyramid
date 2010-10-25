@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class BaseTest(object):
     def setUp(self):
@@ -11,10 +11,10 @@ class BaseTest(object):
         cleanUp()
 
     def _registerView(self, reg, app, name):
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IViewClassifier
         for_ = (IViewClassifier, IRequest, IContext)
-        from repoze.bfg.interfaces import IView
+        from pyramid.interfaces import IView
         reg.registerAdapter(app, for_, IView, name)
 
     def _makeEnviron(self, **extras):
@@ -29,10 +29,10 @@ class BaseTest(object):
         return environ
 
     def _makeRequest(self, **environ):
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.interfaces import IRequest
         from zope.interface import directlyProvides
         from webob import Request
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         environ = self._makeEnviron(**environ)
         request = Request(environ)
         request.registry = Registry()
@@ -48,7 +48,7 @@ class BaseTest(object):
 
 class RenderViewToResponseTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.view import render_view_to_response
+        from pyramid.view import render_view_to_response
         return render_view_to_response(*arg, **kw)
     
     def test_call_no_view_registered(self):
@@ -100,7 +100,7 @@ class RenderViewToResponseTests(BaseTest, unittest.TestCase):
 
 class RenderViewToIterableTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.view import render_view_to_iterable
+        from pyramid.view import render_view_to_iterable
         return render_view_to_iterable(*arg, **kw)
     
     def test_call_no_view_registered(self):
@@ -144,7 +144,7 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
 
 class RenderViewTests(BaseTest, unittest.TestCase):
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.view import render_view
+        from pyramid.view import render_view
         return render_view(*arg, **kw)
     
     def test_call_no_view_registered(self):
@@ -185,7 +185,7 @@ class RenderViewTests(BaseTest, unittest.TestCase):
 
 class TestIsResponse(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.view import is_response
+        from pyramid.view import is_response
         return is_response(*arg, **kw)
 
     def test_is(self):
@@ -214,7 +214,7 @@ class TestBFGViewDecorator(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from repoze.bfg.view import bfg_view
+        from pyramid.view import bfg_view
         return bfg_view
 
     def _makeOne(self, *arg, **kw):
@@ -327,11 +327,11 @@ class TestBFGViewDecorator(unittest.TestCase):
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['renderer'],
-                         'repoze.bfg.tests:fixtures/minimal.pt')
+                         'pyramid.tests:fixtures/minimal.pt')
 
     def test_call_with_renderer_pkgpath(self):
         decorator = self._makeOne(
-            renderer='repoze.bfg.tests:fixtures/minimal.pt')
+            renderer='pyramid.tests:fixtures/minimal.pt')
         venusian = DummyVenusian()
         decorator.venusian = venusian
         def foo(): pass
@@ -340,15 +340,15 @@ class TestBFGViewDecorator(unittest.TestCase):
         settings = call_venusian(venusian)
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['renderer'],
-                         'repoze.bfg.tests:fixtures/minimal.pt')
+                         'pyramid.tests:fixtures/minimal.pt')
 
 class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
     def _callFUT(self, context, request):
-        from repoze.bfg.view import append_slash_notfound_view
+        from pyramid.view import append_slash_notfound_view
         return append_slash_notfound_view(context, request)
 
     def _registerMapper(self, reg, match=True):
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.interfaces import IRoutesMapper
         class DummyRoute(object):
             def __init__(self, val):
                 self.val = val
@@ -401,7 +401,7 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
 
 class TestAppendSlashNotFoundViewFactory(BaseTest, unittest.TestCase):
     def _makeOne(self, notfound_view):
-        from repoze.bfg.view import AppendSlashNotFoundViewFactory
+        from pyramid.view import AppendSlashNotFoundViewFactory
         return AppendSlashNotFoundViewFactory(notfound_view)
     
     def test_custom_notfound_view(self):
@@ -415,7 +415,7 @@ class TestAppendSlashNotFoundViewFactory(BaseTest, unittest.TestCase):
 
 class Test_default_exceptionresponse_view(unittest.TestCase):
     def _callFUT(self, context, request):
-        from repoze.bfg.view import default_exceptionresponse_view
+        from pyramid.view import default_exceptionresponse_view
         return default_exceptionresponse_view(context, request)
 
     def test_is_exception(self):
@@ -467,7 +467,7 @@ class IContext(Interface):
 
 class DummyVenusianInfo(object):
     scope = 'notaclass'
-    module = sys.modules['repoze.bfg.tests']
+    module = sys.modules['pyramid.tests']
 
 class DummyVenusian(object):
     def __init__(self, info=None):

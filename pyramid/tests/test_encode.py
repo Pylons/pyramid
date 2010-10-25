@@ -2,7 +2,7 @@ import unittest
 
 class UrlEncodeTests(unittest.TestCase):
     def _callFUT(self, query, doseq=False):
-        from repoze.bfg.encode import urlencode
+        from pyramid.encode import urlencode
         return urlencode(query, doseq)
 
     def test_ascii_only(self):
@@ -30,7 +30,7 @@ class UrlEncodeTests(unittest.TestCase):
 
 class URLQuoteTests(unittest.TestCase):
     def _callFUT(self, val, safe=''):
-        from repoze.bfg.encode import url_quote
+        from pyramid.encode import url_quote
         return url_quote(val, safe)
 
     def test_it_default(self):
@@ -45,7 +45,7 @@ class URLQuoteTests(unittest.TestCase):
 
 class TestQuotePlus(unittest.TestCase):
     def _callFUT(self, val, safe=''):
-        from repoze.bfg.encode import quote_plus
+        from pyramid.encode import quote_plus
         return quote_plus(val, safe)
     
     def test_it_default(self):

@@ -2,13 +2,13 @@ from zope.interface import providedBy
 
 from zope.deprecation import deprecated
 
-from repoze.bfg.interfaces import IAuthenticationPolicy
-from repoze.bfg.interfaces import IAuthorizationPolicy
-from repoze.bfg.interfaces import ISecuredView
-from repoze.bfg.interfaces import IViewClassifier
+from pyramid.interfaces import IAuthenticationPolicy
+from pyramid.interfaces import IAuthorizationPolicy
+from pyramid.interfaces import ISecuredView
+from pyramid.interfaces import IViewClassifier
 
-from repoze.bfg.exceptions import Forbidden as Unauthorized # b/c import
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.exceptions import Forbidden as Unauthorized # b/c import
+from pyramid.threadlocal import get_current_registry
 
 Unauthorized # prevent PyFlakes from complaining
 

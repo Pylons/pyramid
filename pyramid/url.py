@@ -4,15 +4,15 @@ import os
 
 from repoze.lru import lru_cache
 
-from repoze.bfg.interfaces import IContextURL
-from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import IStaticURLInfo
+from pyramid.interfaces import IContextURL
+from pyramid.interfaces import IRoutesMapper
+from pyramid.interfaces import IStaticURLInfo
 
-from repoze.bfg.encode import urlencode
-from repoze.bfg.path import caller_package
-from repoze.bfg.threadlocal import get_current_registry
-from repoze.bfg.traversal import TraversalContextURL
-from repoze.bfg.traversal import quote_path_segment
+from pyramid.encode import urlencode
+from pyramid.path import caller_package
+from pyramid.threadlocal import get_current_registry
+from pyramid.traversal import TraversalContextURL
+from pyramid.traversal import quote_path_segment
 
 def route_url(route_name, request, *elements, **kw):
     """Generates a fully qualified URL for a named :mod:`repoze.bfg`

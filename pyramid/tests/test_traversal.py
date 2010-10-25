@@ -1,10 +1,10 @@
 import unittest
 
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class TraversalPathTests(unittest.TestCase):
     def _callFUT(self, path):
-        from repoze.bfg.traversal import traversal_path
+        from pyramid.traversal import traversal_path
         return traversal_path(path)
         
     def test_path_startswith_endswith(self):
@@ -43,7 +43,7 @@ class TraversalPathTests(unittest.TestCase):
         self.assertEqual(self._callFUT(path), (decoded, decoded))
         
     def test_utf16(self):
-        from repoze.bfg.exceptions import URLDecodeError
+        from pyramid.exceptions import URLDecodeError
         import urllib
         la = unicode('La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
         encoded = urllib.quote(la)
@@ -70,7 +70,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from repoze.bfg.traversal import ModelGraphTraverser
+        from pyramid.traversal import ModelGraphTraverser
         return ModelGraphTraverser
 
     def _makeOne(self, *arg, **kw):
@@ -84,12 +84,12 @@ class ModelGraphTraverserTests(unittest.TestCase):
 
     def test_class_conforms_to_ITraverser(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ITraverser
+        from pyramid.interfaces import ITraverser
         verifyClass(ITraverser, self._getTargetClass())
 
     def test_instance_conforms_to_ITraverser(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ITraverser
+        from pyramid.interfaces import ITraverser
         context = DummyContext()
         verifyObject(ITraverser, self._makeOne(context))
 
@@ -259,7 +259,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         policy = self._makeOne(root)
         segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
-        from repoze.bfg.exceptions import URLDecodeError
+        from pyramid.exceptions import URLDecodeError
         self.assertRaises(URLDecodeError, policy, environ)
 
     def test_non_utf8_path_segment_settings_unicode_path_segments_fails(self):
@@ -268,7 +268,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
         policy = self._makeOne(root)
         segment = unicode('LaPe\xc3\xb1a', 'utf-8').encode('utf-16')
         environ = self._getEnviron(PATH_INFO='/%s' % segment)
-        from repoze.bfg.exceptions import URLDecodeError
+        from pyramid.exceptions import URLDecodeError
         self.assertRaises(URLDecodeError, policy, environ)
 
     def test_withroute_nothingfancy(self):
@@ -338,7 +338,7 @@ class ModelGraphTraverserTests(unittest.TestCase):
 
 class FindInterfaceTests(unittest.TestCase):
     def _callFUT(self, context, iface):
-        from repoze.bfg.traversal import find_interface
+        from pyramid.traversal import find_interface
         return find_interface(context, iface)
 
     def test_it_interface(self):
@@ -383,7 +383,7 @@ class FindInterfaceTests(unittest.TestCase):
 
 class FindRootTests(unittest.TestCase):
     def _callFUT(self, context):
-        from repoze.bfg.traversal import find_root
+        from pyramid.traversal import find_root
         return find_root(context)
 
     def test_it(self):
@@ -398,13 +398,13 @@ class FindRootTests(unittest.TestCase):
 
 class FindModelTests(unittest.TestCase):
     def _callFUT(self, context, name):
-        from repoze.bfg.traversal import find_model
+        from pyramid.traversal import find_model
         return find_model(context, name)
 
     def _registerTraverser(self, traverser):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
-        from repoze.bfg.interfaces import ITraverser
+        from pyramid.interfaces import ITraverser
         from zope.interface import Interface
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 
@@ -525,7 +525,7 @@ class FindModelTests(unittest.TestCase):
 
 class ModelPathTests(unittest.TestCase):
     def _callFUT(self, model, *elements):
-        from repoze.bfg.traversal import model_path
+        from pyramid.traversal import model_path
         return model_path(model, *elements)
 
     def test_it(self):
@@ -600,7 +600,7 @@ class ModelPathTests(unittest.TestCase):
 
 class ModelPathTupleTests(unittest.TestCase):
     def _callFUT(self, model, *elements):
-        from repoze.bfg.traversal import model_path_tuple
+        from pyramid.traversal import model_path_tuple
         return model_path_tuple(model, *elements)
 
     def test_it(self):
@@ -652,7 +652,7 @@ class ModelPathTupleTests(unittest.TestCase):
 
 class QuotePathSegmentTests(unittest.TestCase):
     def _callFUT(self, s):
-        from repoze.bfg.traversal import quote_path_segment
+        from pyramid.traversal import quote_path_segment
         return quote_path_segment(s)
 
     def test_unicode(self):
@@ -670,24 +670,24 @@ class TraversalContextURLTests(unittest.TestCase):
         return self._getTargetClass()(context, url)
 
     def _getTargetClass(self):
-        from repoze.bfg.traversal import TraversalContextURL
+        from pyramid.traversal import TraversalContextURL
         return TraversalContextURL
 
     def _registerTraverser(self, traverser):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
-        from repoze.bfg.interfaces import ITraverser
+        from pyramid.interfaces import ITraverser
         from zope.interface import Interface
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 
     def test_class_conforms_to_IContextURL(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IContextURL
+        from pyramid.interfaces import IContextURL
         verifyClass(IContextURL, self._getTargetClass())
 
     def test_instance_conforms_to_IContextURL(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IContextURL
+        from pyramid.interfaces import IContextURL
         context = DummyContext()
         request = DummyRequest()
         verifyObject(IContextURL, self._makeOne(context, request))
@@ -736,7 +736,7 @@ class TraversalContextURLTests(unittest.TestCase):
                      'http://example.com:5432/La%20Pe%C3%B1a/La%20Pe%C3%B1a/')
 
     def test_call_with_virtual_root_path(self):
-        from repoze.bfg.interfaces import VH_ROOT_KEY
+        from pyramid.interfaces import VH_ROOT_KEY
         root = DummyContext()
         root.__parent__ = None
         root.__name__ = None
@@ -776,7 +776,7 @@ class TraversalContextURLTests(unittest.TestCase):
         self.assertEqual(context_url.virtual_root(), request.root)
 
     def test_virtual_root_with_virtual_root_path(self):
-        from repoze.bfg.interfaces import VH_ROOT_KEY
+        from pyramid.interfaces import VH_ROOT_KEY
         context = DummyContext()
         context.__parent__ = None
         traversed_to = DummyContext()
@@ -811,11 +811,11 @@ class TestVirtualRoot(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, model, request):
-        from repoze.bfg.traversal import virtual_root
+        from pyramid.traversal import virtual_root
         return virtual_root(model, request)
 
     def test_registered(self):
-        from repoze.bfg.interfaces import IContextURL
+        from pyramid.interfaces import IContextURL
         from zope.interface import Interface
         request = _makeRequest()
         request.registry.registerAdapter(DummyContextURL, (Interface,Interface),
@@ -847,18 +847,18 @@ class TraverseTests(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, name):
-        from repoze.bfg.traversal import traverse
+        from pyramid.traversal import traverse
         return traverse(context, name)
 
     def _registerTraverser(self, traverser):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
-        from repoze.bfg.interfaces import ITraverser
+        from pyramid.interfaces import ITraverser
         from zope.interface import Interface
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 
     def test_request_has_registry(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         model = DummyContext()
         traverser = make_traverser({'context':model, 'view_name':''})
         self._registerTraverser(traverser)
@@ -951,9 +951,9 @@ class TraverseTests(unittest.TestCase):
         self.assertEqual(result['context'], model)
 
     def test_requestfactory_overridden(self):
-        from repoze.bfg.interfaces import IRequestFactory
-        from repoze.bfg.request import Request
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.interfaces import IRequestFactory
+        from pyramid.request import Request
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
         class MyRequest(Request):
             pass
@@ -966,7 +966,7 @@ class TraverseTests(unittest.TestCase):
 
 class TestDefaultRootFactory(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.traversal import DefaultRootFactory
+        from pyramid.traversal import DefaultRootFactory
         return DefaultRootFactory
 
     def _makeOne(self, environ):
@@ -1027,7 +1027,7 @@ class DummyContextURL:
         return '123'
 
 def _makeRequest(environ=None):
-    from repoze.bfg.registry import Registry
+    from pyramid.registry import Registry
     request = DummyRequest()
     request.registry = Registry()
     return request

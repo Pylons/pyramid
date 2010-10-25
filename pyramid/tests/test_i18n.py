@@ -2,11 +2,11 @@
 #
 
 import unittest
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class TestTranslationString(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
-        from repoze.bfg.i18n import TranslationString
+        from pyramid.i18n import TranslationString
         return TranslationString(*arg, **kw)
 
     def test_it(self):
@@ -17,7 +17,7 @@ class TestTranslationString(unittest.TestCase):
 
 class TestTranslationStringFactory(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
-        from repoze.bfg.i18n import TranslationStringFactory
+        from pyramid.i18n import TranslationStringFactory
         return TranslationStringFactory(*arg, **kw)
 
     def test_it(self):
@@ -28,7 +28,7 @@ class TestTranslationStringFactory(unittest.TestCase):
 
 class TestLocalizer(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
-        from repoze.bfg.i18n import Localizer
+        from pyramid.i18n import Localizer
         return Localizer(*arg, **kw)
 
     def test_ctor(self):
@@ -59,13 +59,13 @@ class Test_negotiate_locale_name(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, request):
-        from repoze.bfg.i18n import negotiate_locale_name
+        from pyramid.i18n import negotiate_locale_name
         return negotiate_locale_name(request)
 
     def _registerImpl(self, impl):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
-        from repoze.bfg.interfaces import ILocaleNegotiator
+        from pyramid.interfaces import ILocaleNegotiator
         registry.registerUtility(impl, ILocaleNegotiator)
 
     def test_no_registry_on_request(self):
@@ -75,7 +75,7 @@ class Test_negotiate_locale_name(unittest.TestCase):
         self.assertEqual(result, 'bogus')
 
     def test_with_registry_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         self._registerImpl(dummy_negotiator)
         request = DummyRequest()
@@ -84,10 +84,10 @@ class Test_negotiate_locale_name(unittest.TestCase):
         self.assertEqual(result, 'bogus')
 
     def test_default_from_settings(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         settings = {'default_locale_name':'settings'}
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         registry.registerUtility(settings, ISettings)
         request = DummyRequest()
         request.registry = registry
@@ -95,7 +95,7 @@ class Test_negotiate_locale_name(unittest.TestCase):
         self.assertEqual(result, 'settings')
 
     def test_use_default_locale_negotiator(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         request = DummyRequest()
         request.registry = registry
@@ -116,13 +116,13 @@ class Test_get_locale_name(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, request):
-        from repoze.bfg.i18n import get_locale_name
+        from pyramid.i18n import get_locale_name
         return get_locale_name(request)
 
     def _registerImpl(self, impl):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
-        from repoze.bfg.interfaces import ILocaleNegotiator
+        from pyramid.interfaces import ILocaleNegotiator
         registry.registerUtility(impl, ILocaleNegotiator)
 
     def test_name_on_request(self):
@@ -146,7 +146,7 @@ class Test_get_localizer(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, request):
-        from repoze.bfg.i18n import get_localizer
+        from pyramid.i18n import get_localizer
         return get_localizer(request)
 
     def test_no_registry_on_request(self):
@@ -156,7 +156,7 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result, '123')
 
     def test_with_registry_on_request(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         registry = get_current_registry()
         request = DummyRequest()
         request.bfg_localizer = '123'
@@ -171,8 +171,8 @@ class Test_get_localizer(unittest.TestCase):
         self.assertEqual(result, 'abc')
 
     def test_locale_from_registry(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import ILocalizer
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ILocalizer
         registry = get_current_registry()
         locale = 'abc'
         registry.registerUtility(locale, ILocalizer, name='en')
@@ -183,9 +183,9 @@ class Test_get_localizer(unittest.TestCase):
 
     def test_locale_from_mo(self):
         import os
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import ITranslationDirectories
-        from repoze.bfg.i18n import Localizer
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ITranslationDirectories
+        from pyramid.i18n import Localizer
         registry = get_current_registry()
         here = os.path.dirname(__file__)
         localedir = os.path.join(here, 'localeapp', 'locale')
@@ -202,9 +202,9 @@ class Test_get_localizer(unittest.TestCase):
 
     def test_locale_from_mo_bad_mo(self):
         import os
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import ITranslationDirectories
-        from repoze.bfg.i18n import Localizer
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import ITranslationDirectories
+        from pyramid.i18n import Localizer
         registry = get_current_registry()
         here = os.path.dirname(__file__)
         localedir = os.path.join(here, 'localeapp', 'locale')
@@ -225,7 +225,7 @@ class Test_default_locale_negotiator(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, request):
-        from repoze.bfg.i18n import default_locale_negotiator
+        from pyramid.i18n import default_locale_negotiator
         return default_locale_negotiator(request)
 
     def test_from_none(self):
@@ -253,7 +253,7 @@ class Test_default_locale_negotiator(unittest.TestCase):
 
 class TestTranslations(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.i18n import Translations
+        from pyramid.i18n import Translations
         return Translations
         
     def _makeOne(self):

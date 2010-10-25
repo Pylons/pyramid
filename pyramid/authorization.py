@@ -1,13 +1,13 @@
 from zope.interface import implements
 
-from repoze.bfg.interfaces import IAuthorizationPolicy
+from pyramid.interfaces import IAuthorizationPolicy
 
-from repoze.bfg.location import lineage
-from repoze.bfg.security import ACLAllowed
-from repoze.bfg.security import ACLDenied
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Deny
-from repoze.bfg.security import Everyone
+from pyramid.location import lineage
+from pyramid.security import ACLAllowed
+from pyramid.security import ACLDenied
+from pyramid.security import Allow
+from pyramid.security import Deny
+from pyramid.security import Everyone
 
 class ACLAuthorizationPolicy(object):
     """ An :term:`authorization policy` which consults an :term:`ACL`

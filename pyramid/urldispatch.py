@@ -2,14 +2,14 @@ import re
 from urllib import unquote
 from zope.interface import implements
 
-from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import IRoute
+from pyramid.interfaces import IRoutesMapper
+from pyramid.interfaces import IRoute
 
-from repoze.bfg.compat import all
-from repoze.bfg.encode import url_quote
-from repoze.bfg.exceptions import URLDecodeError
-from repoze.bfg.traversal import traversal_path
-from repoze.bfg.traversal import quote_path_segment
+from pyramid.compat import all
+from pyramid.encode import url_quote
+from pyramid.exceptions import URLDecodeError
+from pyramid.traversal import traversal_path
+from pyramid.traversal import quote_path_segment
 
 
 _marker = object()

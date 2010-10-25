@@ -1,6 +1,6 @@
 import unittest
 
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class Base(object):
     def setUp(self):
@@ -15,15 +15,15 @@ class Base(object):
         return os.path.join(here, 'fixtures', name)
 
     def _registerUtility(self, utility, iface, name=''):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
         reg.registerUtility(utility, iface, name=name)
         return reg
         
 class ZPTTemplateRendererTests(Base, unittest.TestCase):
     def setUp(self):
-        from repoze.bfg.configuration import Configurator
-        from repoze.bfg.registry import Registry
+        from pyramid.configuration import Configurator
+        from pyramid.registry import Registry
         registry = Registry()
         self.config = Configurator(registry=registry)
         self.config.begin()
@@ -32,7 +32,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.config.end()
 
     def _getTargetClass(self):
-        from repoze.bfg.chameleon_zpt import ZPTTemplateRenderer
+        from pyramid.chameleon_zpt import ZPTTemplateRenderer
         return ZPTTemplateRenderer
 
     def _makeOne(self, *arg, **kw):
@@ -41,13 +41,13 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
 
     def test_instance_implements_ITemplate(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import ITemplateRenderer
         path = self._getTemplatePath('minimal.pt')
         verifyObject(ITemplateRenderer, self._makeOne(path))
 
     def test_class_implements_ITemplate(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import ITemplateRenderer
+        from pyramid.interfaces import ITemplateRenderer
         verifyClass(ITemplateRenderer, self._getTargetClass())
 
     def test_call(self):
@@ -66,7 +66,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(template, instance.__dict__['template'])
 
     def test_template_with_ichameleon_translate(self):
-        from repoze.bfg.interfaces import IChameleonTranslate
+        from pyramid.interfaces import IChameleonTranslate
         def ct(): pass
         self.config.registry.registerUtility(ct, IChameleonTranslate)
         minimal = self._getTemplatePath('minimal.pt')
@@ -92,7 +92,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
         self.assertEqual(template.auto_reload, True)
 
     def test_template_with_emptydict(self):
-        from repoze.bfg.interfaces import ISettings
+        from pyramid.interfaces import ISettings
         self.config.registry.registerUtility({}, ISettings)
         minimal = self._getTemplatePath('minimal.pt')
         instance = self._makeOne(minimal)
@@ -117,7 +117,7 @@ class ZPTTemplateRendererTests(Base, unittest.TestCase):
 
 class RenderTemplateTests(Base, unittest.TestCase):
     def _callFUT(self, name, **kw):
-        from repoze.bfg.chameleon_zpt import render_template
+        from pyramid.chameleon_zpt import render_template
         return render_template(name, **kw)
 
     def test_it(self):
@@ -135,7 +135,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         cleanUp()
         
     def _callFUT(self, name, **kw):
-        from repoze.bfg.chameleon_zpt import render_template_to_response
+        from pyramid.chameleon_zpt import render_template_to_response
         return render_template_to_response(name, **kw)
 
     def test_it(self):
@@ -152,7 +152,7 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
         from webob import Response
         class Response2(Response):
             pass
-        from repoze.bfg.interfaces import IResponseFactory
+        from pyramid.interfaces import IResponseFactory
         self._registerUtility(Response2, IResponseFactory)
         minimal = self._getTemplatePath('minimal.pt')
         result = self._callFUT(minimal)
@@ -160,11 +160,11 @@ class RenderTemplateToResponseTests(Base, unittest.TestCase):
 
 class GetRendererTests(Base, unittest.TestCase):
     def _callFUT(self, name):
-        from repoze.bfg.chameleon_zpt import get_renderer
+        from pyramid.chameleon_zpt import get_renderer
         return get_renderer(name)
 
     def test_it(self):
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory
         class Dummy:
             template = object()
             def implementation(self): pass
@@ -177,11 +177,11 @@ class GetRendererTests(Base, unittest.TestCase):
 
 class GetTemplateTests(Base, unittest.TestCase):
     def _callFUT(self, name):
-        from repoze.bfg.chameleon_zpt import get_template
+        from pyramid.chameleon_zpt import get_template
         return get_template(name)
 
     def test_it(self):
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory
         class Dummy:
             template = object()
             def implementation(self):

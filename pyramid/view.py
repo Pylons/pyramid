@@ -18,17 +18,17 @@ import venusian
 from zope.deprecation import deprecated
 from zope.interface import providedBy
 
-from repoze.bfg.interfaces import IRoutesMapper
-from repoze.bfg.interfaces import IView
-from repoze.bfg.interfaces import IViewClassifier
+from pyramid.interfaces import IRoutesMapper
+from pyramid.interfaces import IView
+from pyramid.interfaces import IViewClassifier
 
-from repoze.bfg.path import package_path
-from repoze.bfg.resource import resource_spec_from_abspath
-from repoze.bfg.static import static_view as static # B/C
-from repoze.bfg.threadlocal import get_current_registry
+from pyramid.path import package_path
+from pyramid.resource import resource_spec_from_abspath
+from pyramid.static import static_view as static # B/C
+from pyramid.threadlocal import get_current_registry
 
 # b/c imports
-from repoze.bfg.security import view_execution_permitted
+from pyramid.security import view_execution_permitted
 
 view_execution_permitted # prevent PyFlakes from complaining
 

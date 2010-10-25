@@ -4,7 +4,7 @@ logging.basicConfig()
 
 import unittest
 
-from repoze.bfg import testing
+from pyramid import testing
 
 from zope.interface import Interface
 from zope.interface import implements
@@ -17,14 +17,14 @@ class TestViewDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import view
+        from pyramid.zcml import view
         return view(*arg, **kw)
 
     def test_request_type_ashttpmethod(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
         context = DummyContext()
         view = lambda *arg: None
         self._callFUT(context, 'repoze.view', IDummy, view=view,
@@ -48,10 +48,10 @@ class TestViewDirective(unittest.TestCase):
         
     def test_request_type_asinterfacestring(self):
         from zope.interface import directlyProvides
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
         context = DummyContext(IDummy)
         view = lambda *arg: 'OK'
         self._callFUT(context, 'repoze.view', IDummy, view=view,
@@ -74,7 +74,7 @@ class TestViewDirective(unittest.TestCase):
         self.failIf(hasattr(view, '__call_permissive__'))
 
     def test_request_type_asnoninterfacestring(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         context = DummyContext('notaninterface')
         view = lambda *arg: 'OK'
         self.assertRaises(ConfigurationError,
@@ -83,11 +83,11 @@ class TestViewDirective(unittest.TestCase):
                           request_type='whatever')
 
     def test_with_dotted_renderer(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRendererFactory
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRendererFactory
+        from pyramid.interfaces import IRequest
         context = DummyContext()
         reg = get_current_registry()
         def factory(path):
@@ -110,10 +110,10 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None).body, 'OK')
 
     def test_with_custom_predicates(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
         context = DummyContext()
         reg = get_current_registry()
         view = lambda *arg: 'OK'
@@ -137,10 +137,10 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None), 'OK')
 
     def test_context_trumps_for(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
         context = DummyContext()
         reg = get_current_registry()
         view = lambda *arg: 'OK'
@@ -160,10 +160,10 @@ class TestViewDirective(unittest.TestCase):
         self.assertEqual(regview(None, None), 'OK')
 
     def test_with_for(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRequest
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest
         context = DummyContext()
         reg = get_current_registry()
         view = lambda *arg: 'OK'
@@ -189,16 +189,16 @@ class TestNotFoundDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, context, view, **kw):
-        from repoze.bfg.zcml import notfound
+        from pyramid.zcml import notfound
         return notfound(context, view, **kw)
     
     def test_it(self):
         from zope.interface import implementedBy
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.exceptions import NotFound
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.exceptions import NotFound
 
         context = DummyContext()
         def view(request):
@@ -224,12 +224,12 @@ class TestNotFoundDirective(unittest.TestCase):
 
     def test_it_with_dotted_renderer(self):
         from zope.interface import implementedBy
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.exceptions import NotFound
-        from repoze.bfg.configuration import Configurator
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.exceptions import NotFound
+        from pyramid.configuration import Configurator
         context = DummyContext()
         reg = get_current_registry()
         config = Configurator(reg)
@@ -258,16 +258,16 @@ class TestForbiddenDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, context, view, **kw):
-        from repoze.bfg.zcml import forbidden
+        from pyramid.zcml import forbidden
         return forbidden(context, view, **kw)
     
     def test_it(self):
         from zope.interface import implementedBy
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.exceptions import Forbidden
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.exceptions import Forbidden
         context = DummyContext()
         def view(request):
             return 'OK'
@@ -293,12 +293,12 @@ class TestForbiddenDirective(unittest.TestCase):
 
     def test_it_with_dotted_renderer(self):
         from zope.interface import implementedBy
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRequest
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.exceptions import Forbidden
-        from repoze.bfg.configuration import Configurator
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.exceptions import Forbidden
+        from pyramid.configuration import Configurator
         context = DummyContext()
         reg = get_current_registry()
         config = Configurator(reg)
@@ -327,13 +327,13 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, context, **kw):
-        from repoze.bfg.zcml import repozewho1authenticationpolicy
+        from pyramid.zcml import repozewho1authenticationpolicy
         return repozewho1authenticationpolicy(context, **kw)
 
     def test_it_defaults(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         context = DummyContext()
         self._callFUT(context)
         actions = context.actions
@@ -347,9 +347,9 @@ class TestRepozeWho1AuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(policy.identifier_name, 'auth_tkt')
     
     def test_it(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         context = DummyContext()
         def callback(identity, request):
             """ """
@@ -372,12 +372,12 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, context, **kw):
-        from repoze.bfg.zcml import remoteuserauthenticationpolicy
+        from pyramid.zcml import remoteuserauthenticationpolicy
         return remoteuserauthenticationpolicy(context, **kw)
 
     def test_defaults(self):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
         context = DummyContext()
         def callback(identity, request):
@@ -394,8 +394,8 @@ class TestRemoteUserAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(policy.callback, None)
 
     def test_it(self):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.threadlocal import get_current_registry
         context = DummyContext()
         def callback(identity, request):
             """ """
@@ -419,12 +419,12 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, context, secret, **kw):
-        from repoze.bfg.zcml import authtktauthenticationpolicy
+        from pyramid.zcml import authtktauthenticationpolicy
         return authtktauthenticationpolicy(context, secret, **kw)
 
     def test_it_defaults(self):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
         context = DummyContext()
         self._callFUT(context, 'sosecret')
@@ -439,8 +439,8 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(policy.callback, None)
 
     def test_it_noconfigerror(self):
-        from repoze.bfg.interfaces import IAuthenticationPolicy
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
         context = DummyContext()
         def callback(identity, request):
@@ -462,7 +462,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
         self.assertEqual(policy.callback, callback)
 
     def test_it_configerror(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         context = DummyContext()
         def callback(identity, request):
             """ """
@@ -482,13 +482,13 @@ class TestACLAuthorizationPolicyDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, context, **kw):
-        from repoze.bfg.zcml import aclauthorizationpolicy
+        from pyramid.zcml import aclauthorizationpolicy
         return aclauthorizationpolicy(context, **kw)
     
     def test_it(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.authorization import ACLAuthorizationPolicy
-        from repoze.bfg.interfaces import IAuthorizationPolicy
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.authorization import ACLAuthorizationPolicy
+        from pyramid.interfaces import IAuthorizationPolicy
         reg = get_current_registry()
         context = DummyContext()
         def callback(identity, request):
@@ -511,12 +511,12 @@ class TestRouteDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import route
+        from pyramid.zcml import route
         return route(*arg, **kw)
 
     def _assertRoute(self, name, pattern, num_predicates=0):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IRoutesMapper
         reg = get_current_registry()
         mapper = reg.getUtility(IRoutesMapper)
         routes = mapper.get_routes()
@@ -528,11 +528,11 @@ class TestRouteDirective(unittest.TestCase):
         return route
 
     def test_with_view(self):
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRouteRequest
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRouteRequest
         context = DummyContext()
         view = lambda *arg: 'OK'
         self._callFUT(context, 'name', 'pattern', view=view)
@@ -557,10 +557,10 @@ class TestRouteDirective(unittest.TestCase):
         self.failUnless(wrapped)
 
     def test_with_view_and_view_context(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRouteRequest
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRouteRequest
         context = DummyContext()
         view = lambda *arg: 'OK'
         self._callFUT(context, 'name', 'pattern', view=view,
@@ -586,10 +586,10 @@ class TestRouteDirective(unittest.TestCase):
         self.failUnless(wrapped)
 
     def test_with_view_context_trumps_view_for(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRouteRequest
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRouteRequest
         context = DummyContext()
         view = lambda *arg: 'OK'
         class Foo:
@@ -618,12 +618,12 @@ class TestRouteDirective(unittest.TestCase):
 
     def test_with_dotted_renderer(self):
 
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.threadlocal import get_current_registry
         from zope.interface import Interface
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRouteRequest
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IRendererFactory
         reg = get_current_registry()
         def renderer(path):
             return lambda *arg: 'OK'
@@ -702,7 +702,7 @@ class TestRouteDirective(unittest.TestCase):
         
 
     def test_with_neither_path_nor_pattern(self):
-        from repoze.bfg.exceptions import ConfigurationError
+        from pyramid.exceptions import ConfigurationError
         context = DummyContext()
         self.assertRaises(ConfigurationError, self._callFUT, context, 'name')
 
@@ -714,18 +714,18 @@ class TestStaticDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import static
+        from pyramid.zcml import static
         return static(*arg, **kw)
 
     def test_it_with_slash(self):
-        from repoze.bfg.static import PackageURLParser
-        from repoze.bfg.threadlocal import get_current_registry
+        from pyramid.static import PackageURLParser
+        from pyramid.threadlocal import get_current_registry
         from zope.interface import implementedBy
-        from repoze.bfg.static import StaticURLInfo
-        from repoze.bfg.interfaces import IView
-        from repoze.bfg.interfaces import IViewClassifier
-        from repoze.bfg.interfaces import IRouteRequest
-        from repoze.bfg.interfaces import IRoutesMapper
+        from pyramid.static import StaticURLInfo
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IRoutesMapper
         context = DummyContext()
         self._callFUT(context, 'name', 'fixtures/static')
         actions = context.actions
@@ -762,11 +762,11 @@ class TestResourceDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import resource
+        from pyramid.zcml import resource
         return resource(*arg, **kw)
 
     def test_it(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         context = DummyContext()
         self._callFUT(context, 'a', 'b')
         actions = context.actions
@@ -786,12 +786,12 @@ class TestRendererDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import renderer
+        from pyramid.zcml import renderer
         return renderer(*arg, **kw)
 
     def test_it(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IRendererFactory
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IRendererFactory
         context = DummyContext()
         renderer = lambda *arg, **kw: None
         self._callFUT(context, renderer, 'r')
@@ -805,7 +805,7 @@ class TestRendererDirective(unittest.TestCase):
 class TestZCMLConfigure(unittest.TestCase):
     i = 0
     def _callFUT(self, path, package):
-        from repoze.bfg.zcml import zcml_configure
+        from pyramid.zcml import zcml_configure
         return zcml_configure(path, package)
     
     def setUp(self):
@@ -814,8 +814,8 @@ class TestZCMLConfigure(unittest.TestCase):
         import sys
         import os
         import tempfile
-        from repoze.bfg.path import package_path
-        from repoze.bfg.tests import fixtureapp as package
+        from pyramid.path import package_path
+        from pyramid.tests import fixtureapp as package
         import shutil
         tempdir = tempfile.mkdtemp()
         modname = 'myfixture%s' % self.i
@@ -856,11 +856,11 @@ class TestZCMLScanDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, context, package):
-        from repoze.bfg.zcml import scan
+        from pyramid.zcml import scan
         return scan(context, package)
 
     def test_it(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         dummy_module = DummyModule()
         context = DummyContext()
         self._callFUT(context, dummy_module)
@@ -879,7 +879,7 @@ class TestAdapterDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import adapter
+        from pyramid.zcml import adapter
         return adapter(*arg, **kw)
 
     def test_for_is_None_no_adaptedBy(self):
@@ -896,7 +896,7 @@ class TestAdapterDirective(unittest.TestCase):
                       provides=None, for_=None)
 
     def test_for_is_None_adaptedBy_set(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         context = DummyContext()
         factory = DummyFactory()
         factory.__component_adapts__ = (IDummy,)
@@ -917,7 +917,7 @@ class TestAdapterDirective(unittest.TestCase):
                           provides=None, for_=(IDummy,))
 
     def test_provides_obtained_via_implementedBy(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         context = DummyContext()
         self._callFUT(context, [DummyFactory], for_=(IDummy,))
         regadapt = context.actions[0]
@@ -944,7 +944,7 @@ class TestAdapterDirective(unittest.TestCase):
                           for_=(IDummy, IDummy))
         
     def test_rolled_up_factories(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         context = DummyContext()
         factory = DummyFactory()
         self._callFUT(context,
@@ -956,7 +956,7 @@ class TestAdapterDirective(unittest.TestCase):
                          ('adapter', (IDummy,), IFactory, ''))
         self.assertEqual(regadapt['callable'].im_func,
                          Registry.registerAdapter.im_func)
-        self.assertEqual(regadapt['args'][0].__module__, 'repoze.bfg.zcml')
+        self.assertEqual(regadapt['args'][0].__module__, 'pyramid.zcml')
 
 class TestSubscriberDirective(unittest.TestCase):
     def setUp(self):
@@ -966,7 +966,7 @@ class TestSubscriberDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import subscriber
+        from pyramid.zcml import subscriber
         return subscriber(*arg, **kw)
 
     def test_no_factory_no_handler(self):
@@ -1002,7 +1002,7 @@ class TestSubscriberDirective(unittest.TestCase):
                           factory=factory, handler=None, provides=IFactory)
         
     def test_register_with_factory(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         context = DummyContext()
         factory = DummyFactory()
         self._callFUT(context, for_=(IDummy,),
@@ -1016,7 +1016,7 @@ class TestSubscriberDirective(unittest.TestCase):
                          (factory, (IDummy,), IFactory, None, None) )
 
     def test_register_with_handler(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         context = DummyContext()
         factory = DummyFactory()
         self._callFUT(context, for_=(IDummy,),
@@ -1036,7 +1036,7 @@ class TestUtilityDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import utility
+        from pyramid.zcml import utility
         return utility(*arg, **kw)
 
     def test_factory_and_component(self):
@@ -1049,7 +1049,7 @@ class TestUtilityDirective(unittest.TestCase):
         self.assertRaises(TypeError, self._callFUT, context, provides=None)
         
     def test_provides_from_factory_implements(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         context = DummyContext()
         self._callFUT(context, factory=DummyFactory)
         self.assertEqual(len(context.actions), 1)
@@ -1061,7 +1061,7 @@ class TestUtilityDirective(unittest.TestCase):
         self.assertEqual(utility['kw'], {'factory':DummyFactory})
 
     def test_provides_from_component_provides(self):
-        from repoze.bfg.registry import Registry
+        from pyramid.registry import Registry
         context = DummyContext()
         component = DummyFactory()
         self._callFUT(context, component=component)
@@ -1081,13 +1081,13 @@ class TestTranslationDirDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import translationdir
+        from pyramid.zcml import translationdir
         return translationdir(*arg, **kw)
 
     def test_it(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         context = DummyContext()
-        tdir = 'repoze.bfg.tests.localeapp:locale'
+        tdir = 'pyramid.tests.localeapp:locale'
         self._callFUT(context, tdir)
         actions = context.actions
         self.assertEqual(len(actions), 1)
@@ -1106,11 +1106,11 @@ class TestLocaleNegotiatorDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, *arg, **kw):
-        from repoze.bfg.zcml import localenegotiator
+        from pyramid.zcml import localenegotiator
         return localenegotiator(*arg, **kw)
 
     def test_it(self):
-        from repoze.bfg.configuration import Configurator
+        from pyramid.configuration import Configurator
         context = DummyContext()
         dummy_negotiator = object()
         self._callFUT(context, dummy_negotiator)
@@ -1131,12 +1131,12 @@ class TestDefaultPermissionDirective(unittest.TestCase):
         testing.tearDown()
 
     def _callFUT(self, context, name):
-        from repoze.bfg.zcml import default_permission
+        from pyramid.zcml import default_permission
         return default_permission(context, name)
     
     def test_it(self):
-        from repoze.bfg.threadlocal import get_current_registry
-        from repoze.bfg.interfaces import IDefaultPermission
+        from pyramid.threadlocal import get_current_registry
+        from pyramid.interfaces import IDefaultPermission
         reg = get_current_registry()
         context = DummyContext()
         self._callFUT(context, 'view')
@@ -1156,12 +1156,12 @@ class TestLoadZCML(unittest.TestCase):
 
     def test_it(self):
         from zope.configuration import xmlconfig
-        import repoze.bfg.includes
-        xmlconfig.file('configure.zcml', package=repoze.bfg.includes)
+        import pyramid.includes
+        xmlconfig.file('configure.zcml', package=pyramid.includes)
 
 class TestRolledUpFactory(unittest.TestCase):
     def _callFUT(self, *factories):
-        from repoze.bfg.zcml import _rolledUpFactory
+        from pyramid.zcml import _rolledUpFactory
         return _rolledUpFactory(factories)
 
     def test_it(self):
@@ -1173,7 +1173,7 @@ class TestRolledUpFactory(unittest.TestCase):
 
 class Test_path_spec(unittest.TestCase):
     def _callFUT(self, context, path):
-        from repoze.bfg.zcml import path_spec
+        from pyramid.zcml import path_spec
         return path_spec(context, path)
 
     def test_no_package_attr(self):
@@ -1191,7 +1191,7 @@ class Test_path_spec(unittest.TestCase):
 
     def test_package_path_doesnt_start_with_abspath(self):
         context = DummyContext()
-        context.package = DummyPackage('repoze.bfg.tests')
+        context.package = DummyPackage('pyramid.tests')
         path = '/thepath'
         result = self._callFUT(context, path)
         self.assertEqual(result, path)
@@ -1200,12 +1200,12 @@ class Test_path_spec(unittest.TestCase):
         import pkg_resources
         import os
         context = DummyContext()
-        package = DummyPackage('repoze.bfg.tests')
-        package_path = pkg_resources.resource_filename('repoze.bfg.tests', '')
+        package = DummyPackage('pyramid.tests')
+        package_path = pkg_resources.resource_filename('pyramid.tests', '')
         template_path = os.path.join(package_path, 'templates/foo.pt')
         context.package = package
         result = self._callFUT(context, template_path)
-        self.assertEqual(result, 'repoze.bfg.tests:templates/foo.pt')
+        self.assertEqual(result, 'pyramid.tests:templates/foo.pt')
 
     def test_package_name_is___main__(self):
         context = DummyContext()
@@ -1216,8 +1216,8 @@ class Test_path_spec(unittest.TestCase):
 
     def test_path_is_already_resource_spec(self):
         context = DummyContext()
-        result = self._callFUT(context, 'repoze.bfg.tests:foo.pt')
-        self.assertEqual(result, 'repoze.bfg.tests:foo.pt')
+        result = self._callFUT(context, 'pyramid.tests:foo.pt')
+        self.assertEqual(result, 'pyramid.tests:foo.pt')
 
 class IDummy(Interface):
     pass

@@ -1,8 +1,8 @@
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
 
-from repoze.bfg.security import Allow
-from repoze.bfg.security import Everyone
+from pyramid.security import Allow
+from pyramid.security import Everyone
 
 class Wiki(PersistentMapping):
     __name__ = None

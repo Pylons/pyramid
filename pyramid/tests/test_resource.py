@@ -1,5 +1,5 @@
 import unittest
-from repoze.bfg.testing import cleanUp
+from pyramid.testing import cleanUp
 
 class TestOverrideProvider(unittest.TestCase):
     def setUp(self):
@@ -9,24 +9,24 @@ class TestOverrideProvider(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from repoze.bfg.resource import OverrideProvider
+        from pyramid.resource import OverrideProvider
         return OverrideProvider
 
     def _makeOne(self, module):
         klass = self._getTargetClass()
         return klass(module)
 
-    def _registerOverrides(self, overrides, name='repoze.bfg.tests'):
-        from repoze.bfg.interfaces import IPackageOverrides
-        from repoze.bfg.threadlocal import get_current_registry
+    def _registerOverrides(self, overrides, name='pyramid.tests'):
+        from pyramid.interfaces import IPackageOverrides
+        from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
         reg.registerUtility(overrides, IPackageOverrides, name=name)
 
     def test_get_resource_filename_no_overrides(self):
         import os
         resource_name = 'test_resource.py'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
         expected = os.path.join(here, resource_name)
         result = provider.get_resource_filename(None, resource_name)
@@ -35,8 +35,8 @@ class TestOverrideProvider(unittest.TestCase):
     def test_get_resource_stream_no_overrides(self):
         import os
         resource_name = 'test_resource.py'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, resource_name)).read()
         result = provider.get_resource_stream(None, resource_name)
@@ -45,8 +45,8 @@ class TestOverrideProvider(unittest.TestCase):
     def test_get_resource_string_no_overrides(self):
         import os
         resource_name = 'test_resource.py'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
         expected = open(os.path.join(here, resource_name)).read()
         result = provider.get_resource_string(None, resource_name)
@@ -54,16 +54,16 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_has_resource_no_overrides(self):
         resource_name = 'test_resource.py'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         result = provider.has_resource(resource_name)
         self.assertEqual(result, True)
 
     def test_resource_isdir_no_overrides(self):
         file_resource_name = 'test_resource.py'
         directory_resource_name = 'fixtures'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         result = provider.resource_isdir(file_resource_name)
         self.assertEqual(result, False)
         result = provider.resource_isdir(directory_resource_name)
@@ -71,8 +71,8 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_resource_listdir_no_overrides(self):
         resource_name = 'fixtures'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         result = provider.resource_isdir(resource_name)
         self.failUnless(result)
 
@@ -81,8 +81,8 @@ class TestOverrideProvider(unittest.TestCase):
         self._registerOverrides(overrides)
         import os
         resource_name = 'test_resource.py'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
         expected = os.path.join(here, resource_name)
         result = provider.get_resource_filename(None, resource_name)
@@ -93,8 +93,8 @@ class TestOverrideProvider(unittest.TestCase):
         self._registerOverrides(overrides)
         import os
         resource_name = 'test_resource.py'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
         expected = os.path.join(here, resource_name)
         result = provider.get_resource_filename(None, resource_name)
@@ -105,8 +105,8 @@ class TestOverrideProvider(unittest.TestCase):
         self._registerOverrides(overrides)
         import os
         resource_name = 'test_resource.py'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         here = os.path.dirname(os.path.abspath(__file__))
         expected = os.path.join(here, resource_name)
         result = provider.get_resource_filename(None, resource_name)
@@ -116,8 +116,8 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'test_resource.py'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         result = provider.has_resource(resource_name)
         self.assertEqual(result, True)
 
@@ -125,8 +125,8 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'fixtures'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         result = provider.resource_isdir(resource_name)
         self.assertEqual(result, True)
 
@@ -134,62 +134,62 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'fixtures'
-        import repoze.bfg.tests
-        provider = self._makeOne(repoze.bfg.tests)
+        import pyramid.tests
+        provider = self._makeOne(pyramid.tests)
         result = provider.resource_listdir(resource_name)
         self.failUnless(result)
 
     def test_get_resource_filename_override_returns_value(self):
         overrides = DummyOverrides('value')
-        import repoze.bfg.tests
+        import pyramid.tests
         self._registerOverrides(overrides)
-        provider = self._makeOne(repoze.bfg.tests)
+        provider = self._makeOne(pyramid.tests)
         result = provider.get_resource_filename(None, 'test_resource.py')
         self.assertEqual(result, 'value')
 
     def test_get_resource_stream_override_returns_value(self):
         overrides = DummyOverrides('value')
-        import repoze.bfg.tests
+        import pyramid.tests
         self._registerOverrides(overrides)
-        provider = self._makeOne(repoze.bfg.tests)
+        provider = self._makeOne(pyramid.tests)
         result = provider.get_resource_stream(None, 'test_resource.py')
         self.assertEqual(result, 'value')
 
     def test_get_resource_string_override_returns_value(self):
         overrides = DummyOverrides('value')
-        import repoze.bfg.tests
+        import pyramid.tests
         self._registerOverrides(overrides)
-        provider = self._makeOne(repoze.bfg.tests)
+        provider = self._makeOne(pyramid.tests)
         result = provider.get_resource_string(None, 'test_resource.py')
         self.assertEqual(result, 'value')
 
     def test_has_resource_override_returns_True(self):
         overrides = DummyOverrides(True)
-        import repoze.bfg.tests
+        import pyramid.tests
         self._registerOverrides(overrides)
-        provider = self._makeOne(repoze.bfg.tests)
+        provider = self._makeOne(pyramid.tests)
         result = provider.has_resource('test_resource.py')
         self.assertEqual(result, True)
 
     def test_resource_isdir_override_returns_False(self):
         overrides = DummyOverrides(False)
-        import repoze.bfg.tests
+        import pyramid.tests
         self._registerOverrides(overrides)
-        provider = self._makeOne(repoze.bfg.tests)
+        provider = self._makeOne(pyramid.tests)
         result = provider.resource_isdir('fixtures')
         self.assertEqual(result, False)
 
     def test_resource_listdir_override_returns_values(self):
         overrides = DummyOverrides(['a'])
-        import repoze.bfg.tests
+        import pyramid.tests
         self._registerOverrides(overrides)
-        provider = self._makeOne(repoze.bfg.tests)
+        provider = self._makeOne(pyramid.tests)
         result = provider.resource_listdir('fixtures')
         self.assertEqual(result, ['a'])
 
 class TestPackageOverrides(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.resource import PackageOverrides
+        from pyramid.resource import PackageOverrides
         return PackageOverrides
 
     def _makeOne(self, package, pkg_resources=None):
@@ -215,7 +215,7 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertEqual(package.__loader__, po)
 
     def test_ctor_registers_loader_type(self):
-        from repoze.bfg.resource import OverrideProvider
+        from pyramid.resource import OverrideProvider
         dummy_pkg_resources = DummyPkgResources()
         package = DummyPackage('package')
         po = self._makeOne(package, dummy_pkg_resources)
@@ -229,7 +229,7 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertEqual(po.overridden_package_name, 'package')
 
     def test_insert_directory(self):
-        from repoze.bfg.resource import DirectoryOverride
+        from pyramid.resource import DirectoryOverride
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= [None]
@@ -239,7 +239,7 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertEqual(override.__class__, DirectoryOverride)
 
     def test_insert_file(self):
-        from repoze.bfg.resource import FileOverride
+        from pyramid.resource import FileOverride
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= [None]
@@ -259,7 +259,7 @@ class TestPackageOverrides(unittest.TestCase):
     def test_get_filename(self):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
-            ('repoze.bfg.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_resource.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -270,7 +270,7 @@ class TestPackageOverrides(unittest.TestCase):
     def test_get_stream(self):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
-            ('repoze.bfg.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_resource.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -281,7 +281,7 @@ class TestPackageOverrides(unittest.TestCase):
     def test_get_string(self):
         import os
         overrides = [ DummyOverride(None), DummyOverride(
-            ('repoze.bfg.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_resource.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -291,7 +291,7 @@ class TestPackageOverrides(unittest.TestCase):
         
     def test_has_resource(self):
         overrides = [ DummyOverride(None), DummyOverride(
-            ('repoze.bfg.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_resource.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -299,7 +299,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_isdir_false(self):
         overrides = [ DummyOverride(
-            ('repoze.bfg.tests', 'test_resource.py'))]
+            ('pyramid.tests', 'test_resource.py'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -307,7 +307,7 @@ class TestPackageOverrides(unittest.TestCase):
         
     def test_isdir_true(self):
         overrides = [ DummyOverride(
-            ('repoze.bfg.tests', 'fixtures'))]
+            ('pyramid.tests', 'fixtures'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -315,7 +315,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_listdir(self):
         overrides = [ DummyOverride(
-            ('repoze.bfg.tests', 'fixtures'))]
+            ('pyramid.tests', 'fixtures'))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides= overrides
@@ -323,7 +323,7 @@ class TestPackageOverrides(unittest.TestCase):
 
 class TestDirectoryOverride(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.resource import DirectoryOverride
+        from pyramid.resource import DirectoryOverride
         return DirectoryOverride
 
     def _makeOne(self, path, package, prefix):
@@ -342,7 +342,7 @@ class TestDirectoryOverride(unittest.TestCase):
 
 class Test_resolve_resource_spec(unittest.TestCase):
     def _callFUT(self, spec, package_name='__main__'):
-        from repoze.bfg.resource import resolve_resource_spec
+        from pyramid.resource import resolve_resource_spec
         return resolve_resource_spec(spec, package_name)
 
     def test_abspath(self):
@@ -354,17 +354,17 @@ class Test_resolve_resource_spec(unittest.TestCase):
         self.assertEqual(package_name, None)
 
     def test_rel_spec(self):
-        pkg = 'repoze.bfg.tests'
+        pkg = 'pyramid.tests'
         path = 'test_resource.py'
         package_name, filename = self._callFUT(path, pkg)
-        self.assertEqual(package_name, 'repoze.bfg.tests')
+        self.assertEqual(package_name, 'pyramid.tests')
         self.assertEqual(filename, 'test_resource.py')
         
     def test_abs_spec(self):
-        pkg = 'repoze.bfg.tests'
-        path = 'repoze.bfg.nottests:test_resource.py'
+        pkg = 'pyramid.tests'
+        path = 'pyramid.nottests:test_resource.py'
         package_name, filename = self._callFUT(path, pkg)
-        self.assertEqual(package_name, 'repoze.bfg.nottests')
+        self.assertEqual(package_name, 'pyramid.nottests')
         self.assertEqual(filename, 'test_resource.py')
 
     def test_package_name_is_None(self):
@@ -375,17 +375,17 @@ class Test_resolve_resource_spec(unittest.TestCase):
         self.assertEqual(filename, 'test_resource.py')
 
     def test_package_name_is_package_object(self):
-        import repoze.bfg.tests
-        pkg = repoze.bfg.tests
+        import pyramid.tests
+        pkg = pyramid.tests
         path = 'test_resource.py'
         package_name, filename = self._callFUT(path, pkg)
-        self.assertEqual(package_name, 'repoze.bfg.tests')
+        self.assertEqual(package_name, 'pyramid.tests')
         self.assertEqual(filename, 'test_resource.py')
 
 
 class TestFileOverride(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.resource import FileOverride
+        from pyramid.resource import FileOverride
         return FileOverride
 
     def _makeOne(self, path, package, prefix):

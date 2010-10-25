@@ -1,4 +1,4 @@
-from repoze.bfg.configuration import Configurator
+from pyramid.configuration import Configurator
 from myproject.models import get_root
 
 def app(global_config, **settings):

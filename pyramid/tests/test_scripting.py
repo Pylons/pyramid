@@ -2,7 +2,7 @@ import unittest
 
 class TestGetRoot(unittest.TestCase):
     def _callFUT(self, app, request=None):
-        from repoze.bfg.paster import get_root
+        from pyramid.paster import get_root
         return get_root(app, request)
 
     def test_it_norequest(self):

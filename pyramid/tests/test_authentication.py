@@ -2,7 +2,7 @@ import unittest
 
 class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.authentication import RepozeWho1AuthenticationPolicy
+        from pyramid.authentication import RepozeWho1AuthenticationPolicy
         return RepozeWho1AuthenticationPolicy
 
     def _makeOne(self, identifier_name='auth_tkt', callback=None):
@@ -10,12 +10,12 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         verifyClass(IAuthenticationPolicy, self._getTargetClass())
 
     def test_instance_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         verifyObject(IAuthenticationPolicy, self._makeOne())
 
     def test_authenticated_userid_None(self):
@@ -46,14 +46,14 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_None(self):
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Everyone
         request = DummyRequest({})
         policy = self._makeOne()
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_userid_only(self):
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
+        from pyramid.security import Everyone
+        from pyramid.security import Authenticated
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred'}})
         policy = self._makeOne()
@@ -61,8 +61,8 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
                          [Everyone, Authenticated, 'fred'])
 
     def test_effective_principals_userid_and_groups(self):
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
+        from pyramid.security import Everyone
+        from pyramid.security import Authenticated
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred',
                                     'groups':['quux', 'biz']}})
@@ -73,7 +73,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
                          [Everyone, Authenticated, 'fred', 'quux', 'biz'])
 
     def test_effective_principals_userid_callback_returns_None(self):
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Everyone
         request = DummyRequest(
             {'repoze.who.identity':{'repoze.who.userid':'fred',
                                     'groups':['quux', 'biz']}})
@@ -116,7 +116,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
 
 class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.authentication import RemoteUserAuthenticationPolicy
+        from pyramid.authentication import RemoteUserAuthenticationPolicy
         return RemoteUserAuthenticationPolicy
 
     def _makeOne(self, environ_key='REMOTE_USER', callback=None):
@@ -124,12 +124,12 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
     
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         verifyClass(IAuthenticationPolicy, self._getTargetClass())
 
     def test_instance_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         verifyObject(IAuthenticationPolicy, self._makeOne())
 
     def test_authenticated_userid_None(self):
@@ -143,14 +143,14 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_None(self):
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Everyone
         request = DummyRequest({})
         policy = self._makeOne()
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
+        from pyramid.security import Everyone
+        from pyramid.security import Authenticated
         request = DummyRequest({'REMOTE_USER':'fred'})
         policy = self._makeOne()
         self.assertEqual(policy.effective_principals(request),
@@ -170,7 +170,7 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
 
 class TestAutkTktAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.authentication import AuthTktAuthenticationPolicy
+        from pyramid.authentication import AuthTktAuthenticationPolicy
         return AuthTktAuthenticationPolicy
 
     def _makeOne(self, callback, cookieidentity, **kw):
@@ -188,12 +188,12 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
 
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         verifyClass(IAuthenticationPolicy, self._getTargetClass())
 
     def test_instance_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyObject
-        from repoze.bfg.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy
         verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
 
     def test_authenticated_userid_no_cookie_identity(self):
@@ -216,13 +216,13 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_no_cookie_identity(self):
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Everyone
         request = DummyRequest({})
         policy = self._makeOne(None, None)
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_callback_returns_None(self):
-        from repoze.bfg.security import Everyone
+        from pyramid.security import Everyone
         request = DummyRequest({})
         def callback(userid, request):
             return None
@@ -230,8 +230,8 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
-        from repoze.bfg.security import Everyone
-        from repoze.bfg.security import Authenticated
+        from pyramid.security import Everyone
+        from pyramid.security import Authenticated
         request = DummyRequest({})
         def callback(userid, request):
             return ['group.foo']
@@ -260,7 +260,7 @@ class TestAutkTktAuthenticationPolicy(unittest.TestCase):
 
 class TestAuthTktCookieHelper(unittest.TestCase):
     def _getTargetClass(self):
-        from repoze.bfg.authentication import AuthTktCookieHelper
+        from pyramid.authentication import AuthTktCookieHelper
         return AuthTktCookieHelper
 
     def _makeOne(self, *arg, **kw):

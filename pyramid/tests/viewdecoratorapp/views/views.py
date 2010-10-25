@@ -1,11 +1,11 @@
 import os
-from repoze.bfg.view import bfg_view
+from pyramid.view import bfg_view
 
 @bfg_view(renderer='templates/foo.pt', name='first')
 def first(request):
     return {'result':'OK1'}
 
-@bfg_view(renderer='repoze.bfg.tests.viewdecoratorapp.views:templates/foo.pt',
+@bfg_view(renderer='pyramid.tests.viewdecoratorapp.views:templates/foo.pt',
           name='second')
 def second(request):
     return {'result':'OK2'}

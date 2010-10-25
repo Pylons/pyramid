@@ -1,5 +1,5 @@
-from repoze.bfg.compat import wraps
-from repoze.bfg.traversal import quote_path_segment
+from pyramid.compat import wraps
+from pyramid.traversal import quote_path_segment
 
 def wsgiapp(wrapped):
     """ Decorator to turn a WSGI application into a :mod:`repoze.bfg`

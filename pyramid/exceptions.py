@@ -1,8 +1,8 @@
 from zope.configuration.exceptions import ConfigurationError as ZCE
 from zope.interface import implements
 
-from repoze.bfg.decorator import reify
-from repoze.bfg.interfaces import IExceptionResponse
+from pyramid.decorator import reify
+from pyramid.interfaces import IExceptionResponse
 import cgi
 
 class ExceptionResponse(Exception):
