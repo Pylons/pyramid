@@ -5,13 +5,13 @@
 
 .. warning::
 
-   The ``notfound`` ZCML directive is deprecated in :mod:`repoze.bfg`
+   The ``notfound`` ZCML directive is deprecated in :mod:`pyramid`
    version 1.3.  Instead, you should use the :ref:`view_directive`
    directive with a ``context`` that names the
-   :exc:`repoze.bfg.exceptions.NotFound` class.  See
+   :exc:`pyramid.exceptions.NotFound` class.  See
    :ref:`changing_the_notfound_view` form more information.
 
-When :mod:`repoze.bfg` can't map a URL to view code, it invokes a
+When :mod:`pyramid` can't map a URL to view code, it invokes a
 :term:`not found view`.  The default not found view is very plain, but
 the view callable used can be configured via the ``notfound`` ZCML
 tag.
@@ -32,8 +32,6 @@ Attributes
   :ref:`view_directive`; see the description of ``attr``
   there).
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``renderer``
   This is either a single string term (e.g. ``json``) or a string
   implying a path or :term:`resource specification`
@@ -41,8 +39,6 @@ Attributes
   non-:term:`response` object.  This attribute has the same meaning as
   it would in the context of :ref:`view_directive`; see the
   description of ``renderer`` there).
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``wrapper``
   The :term:`view name` (*not* an object dotted name) of another view
@@ -55,8 +51,6 @@ Attributes
   the description of ``wrapper`` there).  Note that the wrapper view
   *should not* be protected by any permission; behavior is undefined
   if it does.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 Example
 ~~~~~~~
@@ -71,11 +65,11 @@ Alternatives
 ~~~~~~~~~~~~
 
 Use the :ref:`view_directive` directive with a ``context`` that names
-the :exc:`repoze.bfg.exceptions.NotFound` class.
+the :exc:`pyramid.exceptions.NotFound` class.
 
-Use the :meth:`repoze.bfg.configuration.Configurator.add_view` method,
+Use the :meth:`pyramid.configuration.Configurator.add_view` method,
 passing it a ``context`` which is the
-:exc:`repoze.bfg.exceptions.NotFound` class.
+:exc:`pyramid.exceptions.NotFound` class.
 
 See Also
 ~~~~~~~~

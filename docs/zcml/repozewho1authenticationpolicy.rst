@@ -41,8 +41,8 @@ Alternatives
 ~~~~~~~~~~~~
 
 You may create an instance of the
-:class:`repoze.bfg.authentication.RepozeWho1AuthenticationPolicy` and
-pass it to the :class:`repoze.bfg.configuration.Configurator`
+:class:`pyramid.authentication.RepozeWho1AuthenticationPolicy` and
+pass it to the :class:`pyramid.configuration.Configurator`
 constructor as the ``authentication_policy`` argument during initial
 application configuration.
 
@@ -50,4 +50,4 @@ See Also
 ~~~~~~~~
 
 See also :ref:`authentication_policies_directives_section` and
-:class:`repoze.bfg.authentication.RepozeWho1AuthenticationPolicy`.
+:class:`pyramid.authentication.RepozeWho1AuthenticationPolicy`.

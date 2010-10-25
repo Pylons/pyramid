@@ -4,7 +4,7 @@
 --------------
 
 The ``subscriber`` ZCML directive configures an :term:`subscriber`
-callable to listen for events broadcast by the :mod:`repoze.bfg` web
+callable to listen for events broadcast by the :mod:`pyramid` web
 framework.
 
 Attributes
@@ -12,7 +12,7 @@ Attributes
 
 ``for``
    The class or :term:`interface` that you are subscribing the
-   listener for, e.g. :class:`repoze.bfg.interfaces.INewRequest`.
+   listener for, e.g. :class:`pyramid.interfaces.INewRequest`.
    Registering a subscriber for a specific class or interface limits
    the event types that the subscriber will receive to those specified
    by the interface or class.  Default: ``zope.interface.Interface``
@@ -30,7 +30,7 @@ Examples
    :linenos:
 
    <subscriber
-      for="repoze.bfg.interfaces.INewRequest"
+      for="pyramid.interfaces.INewRequest"
       handler=".subscribers.handle_new_request"
     />
 
@@ -38,7 +38,7 @@ Alternatives
 ~~~~~~~~~~~~
 
 You can also register an event listener by using the
-:meth:`repoze.bfg.configuration.Configurator.add_subscriber` method.
+:meth:`pyramid.configuration.Configurator.add_subscriber` method.
 
 See Also
 ~~~~~~~~

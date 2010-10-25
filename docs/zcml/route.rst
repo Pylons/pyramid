@@ -15,8 +15,7 @@ Attributes
   about the syntax of route patterns.
 
   .. note:: For backwards compatibility purposes, the ``path``
-     attribute can also be used instead of ``pattern``.  ``pattern``
-     is the preferred spelling as of :mod:`repoze.bfg` 1.3.
+     attribute can also be used instead of ``pattern``.
 
 ``name``
   The name of the route, e.g. ``myroute``.  This attribute is
@@ -25,7 +24,7 @@ Attributes
 
 ``factory``
   The :term:`dotted Python name` to a function that will generate a
-  :mod:`repoze.bfg` context object when this route matches.
+  :mod:`pyramid` context object when this route matches.
   e.g. ``mypackage.models.MyFactoryClass``.  If this argument is not
   specified, a default root factory will be used.
 
@@ -41,8 +40,6 @@ Attributes
   route to match.  This is useful for detecting AJAX requests issued
   from jQuery, Prototype and other Javascript libraries.  If this
   predicate returns false, route matching continues.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``traverse``
   If you would like to cause the :term:`context` to be something other
@@ -82,23 +79,17 @@ Attributes
   ignored when attached to a route that has a ``*traverse`` remainder
   marker in its pattern.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
-
 ``request_method``
   A string representing an HTTP method name, e.g. ``GET``, ``POST``,
   ``HEAD``, ``DELETE``, ``PUT``.  If this argument is not specified,
   this route will match if the request has *any* request method.  If
   this predicate returns false, route matching continues.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``path_info``
   The value of this attribute represents a regular expression pattern
   that will be tested against the ``PATH_INFO`` WSGI environment
   variable.  If the regex matches, this predicate will be true.  If
   this predicate returns false, route matching continues.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``request_param``
   This value can be any string.  A view declaration with this
@@ -111,8 +102,6 @@ Attributes
   the value must match the right hand side of the expression (``123``)
   for the route to "match" the current request.  If this predicate
   returns false, route matching continues.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``header``
   The value of this attribute represents an HTTP header name or a
@@ -132,8 +121,6 @@ Attributes
   significant.  If this predicate returns false, route matching
   continues.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``accept``
   The value of this attribute represents a match query for one or more
   mimetypes in the ``Accept`` HTTP request header.  If this value is
@@ -143,8 +130,6 @@ Attributes
   token in the form ``*/*``.  If any of the forms matches the
   ``Accept`` header of the request, this predicate will be true.  If
   this predicate returns false, route matching continues.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``custom_predicates``
 
@@ -161,13 +146,6 @@ Attributes
   value ``info`` passed to a custom route predicate is a dictionary
   containing matching information; see :ref:`custom_route_predicates`
   for more information about ``info``.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
-
-  .. note:: The ``info`` argument passed to a custom predicate in
-            versions prior to :mod:`repoze.bfg` 1.3 was always
-            ``None``.
-
 
 ``view_context``
   The :term:`dotted Python name` to a class or an interface that the
@@ -212,8 +190,6 @@ Attributes
 
   This attribute can also be spelled as ``renderer``.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``view_attr``
   The view machinery defaults to using the ``__call__`` method of the
   view callable (or the function itself, if the view callable is a
@@ -228,22 +204,18 @@ Attributes
   If the ``view`` attribute is not provided, this attribute has no
   effect.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``use_global_views``
   When a request matches this route, and view lookup cannot find a view
   which has a 'route_name' predicate argument that matches the route,
   try to fall back to using a view that otherwise matches the context,
   request, and view name (but does not match the route name predicate).
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
-
 Alternatives
 ~~~~~~~~~~~~
 
 You can also add a :term:`route configuration` via:
 
-- Using the :meth:`repoze.bfg.configuration.Configurator.add_route` method.
+- Using the :meth:`pyramid.configuration.Configurator.add_route` method.
 
 See Also
 ~~~~~~~~

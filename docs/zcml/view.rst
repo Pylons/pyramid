@@ -3,7 +3,7 @@
 ``view``
 --------
 
-A ``view`` declaration directs :mod:`repoze.bfg` to create a single
+A ``view`` declaration directs :mod:`pyramid` to create a single
 :term:`view configuration` registration in the current
 :term:`application registry`.
 
@@ -49,8 +49,6 @@ Non-Predicate Attributes
   ``attr="index"`` in the view configuration for the view.  This is
   most useful when the view definition is a class.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``renderer``
   This is either a single string term (e.g. ``json``) or a string
   implying a path or :term:`resource specification`
@@ -83,8 +81,6 @@ Non-Predicate Attributes
   "null" renderer is assumed (no rendering is performed and the value
   is passed back to the upstream BFG machinery unmolested).
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``wrapper``
   The :term:`view name` (*not* an object dotted name) of another view
   declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
@@ -97,12 +93,10 @@ Non-Predicate Attributes
   wrapper view will be found as any view is found: see
   :ref:`view_lookup`.  The "best" wrapper view will be found based on
   the lookup ordering: "under the hood" this wrapper view is looked up
-  via ``repoze.bfg.view.render_view_to_response(context, request,
+  via ``pyramid.view.render_view_to_response(context, request,
   'wrapper_viewname')``. The context and request of a wrapper view is
   the same context and request of the inner view.  If this attribute
   is unspecified, no view wrapping is done.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 Predicate Attributes
 ####################
@@ -138,7 +132,7 @@ Predicate Attributes
   representing the :term:`interface` that the :term:`request` must
   have in order for this view to be found and called.  The presence of
   this attribute is largely for backwards compatibility with
-  applications written for :mod:`repoze.bfg` version 1.0.  This value
+  older iterations of this framework.  This value
   may be an HTTP ``REQUEST_METHOD`` string, e.g.  ('GET', 'HEAD',
   'PUT', 'POST', or 'DELETE').  Passing request method strings as a
   ``request_type`` is deprecated.  Use the ``request_method``
@@ -151,8 +145,6 @@ Predicate Attributes
   called when the request's ``method`` (aka ``REQUEST_METHOD``) string
   matches the supplied value.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``request_param``
   This value can be any string.  A view declaration with this
   attribute ensures that the view will only be called when the request
@@ -164,8 +156,6 @@ Predicate Attributes
   the right hand side of the expression (``123``) for the view to
   "match" the current request.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``containment``
   This value should be a :term:`dotted Python name` string
   representing the class that a graph traversal parent object of the
@@ -175,8 +165,6 @@ Predicate Attributes
   See :ref:`location_aware` for more information about
   location-awareness.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``xhr``
   This value should be either ``True`` or ``False``.  If this value is
   specified and is ``True``, the :term:`request` must possess an
@@ -184,8 +172,6 @@ Predicate Attributes
   the value ``XMLHttpRequest`` for this view to be found and called.
   This is useful for detecting AJAX requests issued from jQuery,
   Prototype and other Javascript libraries.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``accept``
   The value of this attribute represents a match query for one or more
@@ -195,8 +181,6 @@ Predicate Attributes
   token in the form ``text/*`` or a match-all wildcard mimetype match
   token in the form ``*/*``.  If any of the forms matches the
   ``Accept`` header of the request, this predicate will be true.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``header``
   The value of this attribute represents an HTTP header name or a
@@ -215,14 +199,10 @@ Predicate Attributes
   header name/value pair, the case of the header name is not
   significant.
 
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
-
 ``path_info``
   The value of this attribute represents a regular expression pattern
   that will be tested against the ``PATH_INFO`` WSGI environment
   variable.  If the regex matches, this predicate will be true.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
 
 ``custom_predicates``
   This value should be a sequence of references to custom predicate
@@ -236,8 +216,6 @@ Predicate Attributes
   context and/or the request.  If all callables return ``True``, the
   associated view callable will be considered viable for a given
   request.
-
-  .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
 
 Examples
 ~~~~~~~~
@@ -268,9 +246,9 @@ Alternatives
 
 You can also add a :term:`view configuration` via:
 
-- Using the :class:`repoze.bfg.view.bfg_view` class as a decorator.
+- Using the :class:`pyramid.view.bfg_view` class as a decorator.
 
-- Using the :meth:`repoze.bfg.configuration.Configurator.add_view` method.
+- Using the :meth:`pyramid.configuration.Configurator.add_view` method.
 
 See Also
 ~~~~~~~~

@@ -4,8 +4,8 @@ ZCML Directives
 ===============
 
 Comprehensive reference material for every ZCML directive provided by
-:mod:`repoze.bfg` is available within this chapter.  The ZCML
-directive documentation is organized alphabetically by directive name.
+:mod:`pyramid` is available within this chapter.  The ZCML directive
+documentation is organized alphabetically by directive name.
 
 .. toctree::
    :maxdepth: 1

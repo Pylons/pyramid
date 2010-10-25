@@ -6,8 +6,6 @@
 Add a :term:`gettext` :term:`translation directory` to the current
 configuration for use in localization of text.
 
-.. note:  This ZCML directive is new as of :mod:`repoze.bfg` version 1.3.
-
 Attributes
 ~~~~~~~~~~
 
@@ -57,7 +55,7 @@ Example 3
 Alternatives
 ~~~~~~~~~~~~
 
-Use :meth:`repoze.bfg.configuration.Configurator.add_translation_dirs`
+Use :meth:`pyramid.configuration.Configurator.add_translation_dirs`
 method instance during initial application setup.
 
 See Also

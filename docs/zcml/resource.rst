@@ -53,7 +53,7 @@ Examples
 Alternatives
 ~~~~~~~~~~~~
 
-The :meth:`repoze.bfg.configuration.Configurator.override_resource`
+The :meth:`pyramid.configuration.Configurator.override_resource`
 method can be used instead of the ``resource`` ZCML directive.
 
 See Also

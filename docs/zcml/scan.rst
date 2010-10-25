@@ -5,7 +5,7 @@
 
 To make use of :term:`configuration decoration` decorators, you must
 perform a :term:`scan`.  A scan finds these decorators in code.  The
-``scan`` ZCML directive tells :mod:`repoze.bfg` to begin such a scan.
+``scan`` ZCML directive tells :mod:`pyramid` to begin such a scan.
 
 Attributes
 ~~~~~~~~~~
@@ -25,7 +25,7 @@ Example
 Alternatives
 ~~~~~~~~~~~~
 
-The :meth:`repoze.bfg.configuration.Configurator.scan` method performs
+The :meth:`pyramid.configuration.Configurator.scan` method performs
 the same job as the ``scan`` ZCML directive.
 
 See Also

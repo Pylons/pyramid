@@ -4,7 +4,7 @@
 -------------
 
 Because :term:`ZCML` is XML, and because XML requires a single root
-tag for each document, every ZCML file used by :mod:`repoze.bfg` must
+tag for each document, every ZCML file used by :mod:`pyramid` must
 contain a ``configure`` container directive, which acts as the root
 XML tag.  It is a "container" directive because its only job is to
 contain other directives.
@@ -21,7 +21,7 @@ Example
 .. code-block:: xml
    :linenos:
 
-   <configure xmlns="http://namespaces.repoze.org/bfg">
+   <configure xmlns="http://pylonshq.com/pyramid">
 
       <!-- other directives -->
 
@@ -34,17 +34,17 @@ A Word On XML Namespaces
 
 Usually, the start tag of the ``<configure>`` container tag has a
 default *XML namespace* associated with it. This is usually
-``http://namespaces.repoze.org/bfg``, named by the ``xmlns`` attribute
-of the ``configure`` start tag.
+``http://pylonshq.com/pyramid``, named by the ``xmlns`` attribute of
+the ``configure`` start tag.
 
-Using the ``http://namespaces.repoze.org/bfg`` namespace as the
-default XML namespace isn't strictly necessary; you can use a
-different default namespace as the default.  However, if you do, the
-declaration tags which are defined by :mod:`repoze.bfg` such as the
-``view`` declaration tag will need to be defined in such a way that
-the XML parser that :mod:`repoze.bfg` uses knows which namespace the
-:mod:`repoze.bfg` tags are associated with.  For example, the
-following files are all completely equivalent:
+Using the ``http://pylonshq.com/pyramid`` namespace as the default XML
+namespace isn't strictly necessary; you can use a different default
+namespace as the default.  However, if you do, the declaration tags
+which are defined by :mod:`pyramid` such as the ``view`` declaration
+tag will need to be defined in such a way that the XML parser that
+:mod:`pyramid` uses knows which namespace the :mod:`pyramid` tags are
+associated with.  For example, the following files are all completely
+equivalent:
 
 .. topic:: Use of A Non-Default XML Namespace
 
@@ -52,11 +52,11 @@ following files are all completely equivalent:
      :linenos:
 
       <configure xmlns="http://namespaces.zope.org/zope"
-                 xmlns:bfg="http://namespaces.repoze.org/bfg">
+                 xmlns:pyramid="http://pylonshq.com/pyramid">
 
-        <include package="repoze.bfg.includes" />
+        <include package="pyramid.includes" />
 
-        <bfg:view
+        <pyramid:view
            view="helloworld.hello_world"
            />
 
@@ -69,9 +69,9 @@ following files are all completely equivalent:
 
       <configure>
 
-        <include package="repoze.bfg.includes" />
+        <include package="pyramid.includes" />
 
-        <view xmlns="http://namespaces.repoze.org/bfg"
+        <view xmlns="http://pylonshq.com/pyramid"
            view="helloworld.hello_world"
            />
 
@@ -81,7 +81,7 @@ For more information about XML namespaces, see `this older, but simple
 XML.com article <http://www.xml.com/pub/a/1999/01/namespaces.html>`_.
 
 The conventions in this document assume that the default XML namespace
-is ``http://namespaces.repoze.org/bfg``.
+is ``http://pylonshq.com/pyramid``.
 
 Alternatives
 ~~~~~~~~~~~~

@@ -23,8 +23,8 @@ Alternatives
 ~~~~~~~~~~~~
 
 You may create an instance of the
-:class:`repoze.bfg.authorization.ACLAuthorizationPolicy` and pass it
-to the :class:`repoze.bfg.configuration.Configurator` constructor as
+:class:`pyramid.authorization.ACLAuthorizationPolicy` and pass it
+to the :class:`pyramid.configuration.Configurator` constructor as
 the ``authorization_policy`` argument during initial application
 configuration.
 

@@ -6,8 +6,6 @@
 Set the :term:`locale negotiator` for the current configurator to
 support localization of text.
 
-.. note:  This ZCML directive is new as of :mod:`repoze.bfg` version 1.3.
-
 Attributes
 ~~~~~~~~~~
 
@@ -31,7 +29,7 @@ Example
 Alternatives
 ~~~~~~~~~~~~
 
-Use :meth:`repoze.bfg.configuration.Configurator.set_locale_negotiator`
+Use :meth:`pyramid.configuration.Configurator.set_locale_negotiator`
 method instance during initial application setup.
 
 See Also

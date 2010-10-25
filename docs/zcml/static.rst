@@ -5,7 +5,7 @@
 
 Use of the ``static`` ZCML directive or allows you to serve static
 resources (such as JavaScript and CSS files) within a
-:mod:`repoze.bfg` application. This mechanism makes static files
+:mod:`pyramid` application. This mechanism makes static files
 available at a name relative to the application root URL.
 
 Attributes
@@ -65,7 +65,7 @@ Examples
 Alternatives
 ~~~~~~~~~~~~
 
-:meth:`repoze.bfg.configuration.configurator.add_static_view` can also
+:meth:`pyramid.configuration.configurator.add_static_view` can also
 be used to add a static view.
 
 See Also

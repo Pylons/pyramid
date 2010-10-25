@@ -42,7 +42,7 @@ Examples
 Alternatives
 ~~~~~~~~~~~~
 
-The :meth:`repoze.bfg.configuration.Configurator.add_renderer` method
+The :meth:`pyramid.configuration.Configurator.add_renderer` method
 is equivalent to the ``renderer`` ZCML directive.
 
 See Also

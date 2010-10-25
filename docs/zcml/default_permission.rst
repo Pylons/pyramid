@@ -21,8 +21,6 @@ There can be only one default permission active at a time within an
 application, thus the ``default_permission`` directive can only be
 used once in any particular set of ZCML.
 
-.. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
-
 Attributes
 ~~~~~~~~~~
 
@@ -45,11 +43,11 @@ Alternatives
 ~~~~~~~~~~~~
 
 Using the ``default_permission`` argument to the
-:class:`repoze.bfg.configuration.Configurator` constructor can be used
+:class:`pyramid.configuration.Configurator` constructor can be used
 to achieve the same purpose.
 
 Using the 
-:meth:`repoze.bfg.configuration.Configurator.set_default_permission`
+:meth:`pyramid.configuration.Configurator.set_default_permission`
 method can be used to achieve the same purpose when using imperative
 configuration.
 
