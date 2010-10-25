@@ -167,13 +167,17 @@ class FixBfgImports(fixer_base.BaseFix):
             if new_name:
                 node.replace(Name(new_name, prefix=bare_name.prefix))
 
-BFG_INCLUDES_RE = (
-    r'include\s+?package\s*?=\s*?[\'\"]repoze\.bfg\.includes[\'\"]')
 BFG_NS_RE = (
     r'xmlns\s*?=\s*?[\'\"]http://namespaces\.repoze\.org/bfg[\'\"]')
+BFG_IN_ATTR = (
+    r'[\'\"]\s*?(repoze\.bfg)(.*?)[\'\"]')
 
-INCLUDES = re.compile(BFG_INCLUDES_RE, re.MULTILINE)
+
+ATTR = re.compile(BFG_IN_ATTR, re.MULTILINE)
 NS = re.compile(BFG_NS_RE, re.MULTILINE)
+
+def replace(match):
+    return '"pyramid%s"' % match.group(2)
 
 def fix_zcml(path):
     for root, dirs, files in os.walk(path):
@@ -181,8 +185,8 @@ def fix_zcml(path):
             if file.endswith('.zcml'):
                 absfile = os.path.join(root, file)
                 text = open(absfile, 'rb').read()
-                newt =INCLUDES.sub('include package="pyramid.includes"', text)
-                newt = NS.sub('xmlns="http://pylonshq.com/pyramid"', newt)
+                newt = NS.sub('xmlns="http://pylonshq.com/pyramid"', text)
+                newt = ATTR.sub(replace, newt)
                 if text != newt:
                     newf = open(absfile, 'wb')
                     newf.write(newt)
