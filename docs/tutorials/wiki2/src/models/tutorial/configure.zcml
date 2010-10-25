@@ -1,0 +1,18 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <!-- this must be included for the view declarations to work -->
+  <include package="pyramid.includes" />
+
+  <route 
+    pattern=""
+    name="home"
+    view=".views.my_view"
+    view_renderer="templates/mytemplate.pt"
+    />
+
+  <static
+    name="static"
+    path="templates/static"
+    />
+
+</configure>

@@ -1,0 +1,24 @@
+import unittest
+from pyramid.configuration import Configurator
+from pyramid import testing
+
+def _initTestingDB():
+    from tutorial.models import initialize_sql
+    session = initialize_sql('sqlite://')
+    return session
+
+class TestMyView(unittest.TestCase):
+    def setUp(self):
+        self.config = Configurator()
+        self.config.begin()
+        _initTestingDB()
+
+    def tearDown(self):
+        self.config.end()
+
+    def test_it(self):
+        from tutorial.views import my_view
+        request = testing.DummyRequest()
+        info = my_view(request)
+        self.assertEqual(info['root'].name, 'root')
+        self.assertEqual(info['project'], 'tutorial')
