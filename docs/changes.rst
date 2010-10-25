@@ -1,4 +1,4 @@
-:mod:`repoze.bfg` Change History
+:mod:`pyramid` Change History
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. include:: ../CHANGES.txt

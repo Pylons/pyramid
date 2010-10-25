@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# repoze.bfg documentation build configuration file, created by
+# pyramid documentation build configuration file, created by
 # sphinx-quickstart on Wed Jul 16 13:18:14 2008.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -54,14 +54,14 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'The repoze.bfg Web Application Framework'
+project = 'The Pyramid Web Application Development Framework'
 copyright = '2008-2010, Agendaless Consulting'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.3a15'
+version = '1.0a1'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -105,7 +105,7 @@ html_style = 'repoze.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = 'The repoze.bfg Web Application Framework v%release%'
+#html_title = 'The Pyramid Web Application Development Framework v%release%'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -174,7 +174,8 @@ latex_font_size = '10pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('latexindex', 'repozebfg.tex', 'The repoze.bfg Web Application Framework',
+  ('latexindex', 'repozebfg.tex',
+   'The Pyramid Web Application Development Framework',
    'Chris McDonough', 'manual'),
     ]
 
@@ -309,7 +310,7 @@ latex_elements = {
     'wrapperclass':'book',
     'date':'',
     'releasename':'Version',
-    'title':r'The repoze.bfg Web Application \newline Framework',
+    'title':r'The Pyramid Web Application \newline Development Framework',
 #    'pointsize':'12pt', # uncomment for 12pt version
 }
 
@@ -373,28 +374,6 @@ def setup(app):
     app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
     app.add_directive('backmatter', backmatter, 1, (0, 0, 0))
 
-# strip "repoze.bfg." from all inline literals
-
-from sphinx.writers.latex import LaTeXTranslator
-
-def visit_literal(self, node):
-        self.no_contractions += 1
-        content = self.encode(node.astext().strip())
-        self.no_contractions -= 1
-        if self.in_title:
-            self.body.append(r'\texttt{%s}' % content)
-        elif node.has_key('role') and node['role'] == 'samp':
-            self.body.append(r'\samp{%s}' % content)
-        else:
-            # XXX special treatment of overlong ``repoze.bfg.foo``
-            # literals.
-            if 'repoze.bfg.' in content:
-                content = content.replace('repoze.bfg.', '')
-            self.body.append(r'\code{%s}' % content)
-        raise nodes.SkipNode
-    
-LaTeXTranslator.visit_literal = visit_literal
-
 # turn off all line numbers in latex formatting
 
 ## from pygments.formatters import LatexFormatter
@@ -410,7 +389,7 @@ LaTeXTranslator.visit_literal = visit_literal
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'The repoze.bfg Web Application Framework, Version 1.3'
+epub_title = 'The Pyramid Web Application Development Framework, Version 1.0'
 epub_author = 'Chris McDonough'
 epub_publisher = 'Agendaless Consulting'
 epub_copyright = '2008-2010'
@@ -427,7 +406,7 @@ epub_scheme = 'ISBN'
 epub_identifier = '0615345379'
 
 # A unique identification for the text.
-epub_uid = 'The repoze.bfg Web Application Framework, Version 1.3-v0'
+epub_uid = 'The Pyramid Web Application Development Framework, Version 1.0'
 
 # HTML files that should be inserted before the pages created by sphinx.
 # The format is a list of tuples containing the path and title.

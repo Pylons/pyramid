@@ -1,34 +1,26 @@
 import copy
-import types
 
 from webob import Response
 
 from zope.configuration.xmlconfig import _clearContext
-
-from zope.deprecation import deprecated
 
 from zope.interface import implements
 from zope.interface import Interface
 from zope.interface import alsoProvides
 
 from pyramid.interfaces import IRequest
-from pyramid.interfaces import IRoutesMapper
 from pyramid.interfaces import ISecuredView
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
-from pyramid.interfaces import IViewPermission
 
 from pyramid.configuration import Configurator
 from pyramid.exceptions import Forbidden
 from pyramid.registry import Registry
-from pyramid.security import Allowed
 from pyramid.security import Authenticated
-from pyramid.security import Denied
 from pyramid.security import Everyone
 from pyramid.security import has_permission
 from pyramid.threadlocal import get_current_registry
 from pyramid.threadlocal import manager
-from pyramid.urldispatch import RoutesMapper
 from pyramid.zcml import zcml_configure # API
 
 zcml_configure # prevent pyflakes from complaining
@@ -183,34 +175,6 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
         _secure.__permitted__ = permitted
         return registerAdapter(_secure, for_, ISecuredView, name)
 
-def registerViewPermission(name, result=True, viewpermission=None,
-                           for_=(Interface, Interface)):
-    """ Registers a :mod:`repoze.bfg` 'view permission' object under a
-    name implied by the ``name`` argument.
-
-    .. warning:: This function was deprecated in repoze.bfg 1.1; it
-                 has no real effect in 1.2+.
-    """
-    if result is True:
-        result = Allowed('message')
-    else:
-        result = Denied('message')
-    if viewpermission is None:
-        def viewpermission(context, request):
-            return result
-    return registerAdapter(viewpermission, for_, IViewPermission, name)
-
-deprecated('registerViewPermission',
-           'registerViewPermission has been deprecated.  As of repoze.bfg '
-           'version 1.1, view functions are now responsible for protecting '
-           'their own execution.  A call to this function won\'t prevent a '
-           'view from being executed by the repoze.bfg router, nor '
-           'will the ``repoze.bfg.security.view_execution_permitted`` function '
-           'use the permission registered with this function.  Instead,'
-           'to register a view permission during testing, use the '
-           '``repoze.bfg.testing.registerView`` directive with a '
-           '``permission`` argument.')
-
 def registerUtility(impl, iface=Interface, name=''):
     """ Register a ZCA utility component.
 
@@ -312,28 +276,6 @@ def registerRoute(pattern, name, factory=None):
     reg = get_current_registry()
     config = Configurator(registry=reg)
     return config.add_route(name, pattern, factory=factory)
-
-def registerRoutesMapper(root_factory=None):
-    """ Register a routes 'mapper' object.
-
-    .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
-
-    .. warning:: This API is deprecated in :mod:`repoze.bfg` 1.2:
-                 a route mapper is no longer required to be present for
-                 successful system operation.
-    """
-    mapper = RoutesMapper()
-    reg = get_current_registry()
-    reg.registerUtility(mapper, IRoutesMapper)
-    return mapper
-
-deprecated('registerRoutesMapper',
-           'registerRoutesMapper has been deprecated.  As of repoze.bfg '
-           'version 1.2, a route mapper is not required to be registered '
-           'for normal system operation; if you actually do want a route to '
-           'be registered, use the '
-           '``repoze.bfg.configuration.Configurator.add_route`` '
-           'method; this will cause a route mapper to be registered also.')
 
 def registerSettings(dictarg=None, **kw):
     """Register one or more 'setting' key/value pairs.  A setting is

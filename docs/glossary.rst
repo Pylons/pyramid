@@ -400,7 +400,7 @@ Glossary
      A list of element "left over" after the :term:`router` has
      performed a successful traversal to a view.  The subpath is a
      sequence of strings, e.g. ``['left', 'over', 'names']``.  Within
-     BFG applications that use URL dispatch rather than traversal, you
+     Pyramid applications that use URL dispatch rather than traversal, you
      can use ``*subpath`` in the route pattern to influence the
      subpath.  See :ref:`star_subpath` for more information.
 

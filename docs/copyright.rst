@@ -1,7 +1,7 @@
 Copyright, Trademarks, and Attributions
 =======================================
 
-*The repoze.bfg Web Application Framework, Version 1.2*
+*The Pyramid Web Application Development Framework, Version 1.0*
 
 by Chris McDonough
 
@@ -26,9 +26,9 @@ similar license to this one.
 
 .. note::
 
-   While the :mod:`repoze.bfg` documentation is offered under the
+   While the :mod:`pyramid` documentation is offered under the
    Creative Commons Attribution-Nonconmmercial-Share Alike 3.0 United
-   States License, the :mod:`repoze.bfg` *software* is offered under a
+   States License, the :mod:`pyramid` *software* is offered under a
    `less restrictive (BSD-like) license
    <http://repoze.org/license.html>`_ .
 
@@ -74,21 +74,16 @@ Contacting The Publisher
 Please send documentation licensing inquiries, translation inquiries,
 and other business communications to `Agendaless Consulting
 <mailto:webmaster@agendaless.com>`_.  Please send software and other
-technical queries to the `repoze-dev maillist
-<http://lists.repoze.org/listinfo/repoze-dev>`_.
+technical queries to the `Pylons-discuss maillist
+<http://groups.google.com/group/pylons-discuss>`_.
 
 HTML Version and Source Code
 ----------------------------
 
 An HTML version of this book is freely available via
-http://bfg.repoze.org.
+http://pylonshq.com/pyramid.
 
 The source code for the examples used in this book are available
-within the :mod:`repoze.bfg` software distribution, always available
-via http://bfg.repoze.org.
-
-Errata
-------
-
-Errata for this book will be placed at `http://bfg.repoze.org/book_errata`.
+within the :mod:`pyramid` software distribution, always available
+via http://pylonshq.com/pyramid.
 

@@ -190,34 +190,6 @@ class Test_registerView(TestBase):
         result = render_view_to_response(None, request, 'moo.html')
         self.assertEqual(result.app_iter, ['123'])
 
-    def test_registerViewPermission_defaults(self):
-        from zope.interface import Interface
-        from pyramid.interfaces import IViewPermission
-        from pyramid import testing
-        testing.registerViewPermission('moo.html')
-        result = self.registry.getMultiAdapter(
-            (Interface, Interface), IViewPermission, 'moo.html')
-        self.assertEqual(result, True)
-        
-    def test_registerViewPermission_denying(self):
-        from zope.interface import Interface
-        from pyramid.interfaces import IViewPermission
-        from pyramid import testing
-        testing.registerViewPermission('moo.html', result=False)
-        result = self.registry.getMultiAdapter(
-            (Interface, Interface), IViewPermission, 'moo.html')
-        self.assertEqual(result, False)
-
-    def test_registerViewPermission_custom(self):
-        from zope.interface import Interface
-        from pyramid.interfaces import IViewPermission
-        def viewperm(context, request):
-            return True
-        from pyramid import testing
-        testing.registerViewPermission('moo.html', viewpermission=viewperm)
-        result = self.registry.getMultiAdapter(
-            (Interface, Interface), IViewPermission, 'moo.html')
-        self.assertEqual(result, True)
 
 class Test_registerAdapter(TestBase):
     def test_registerAdapter(self):
@@ -288,14 +260,6 @@ class Test_registerRoute(TestBase):
         request = DummyRequest()
         self.assertEqual(route_url('home', request, pagename='abc'),
                          'http://example.com/abc')
-
-class Test_registerRoutesMapper(TestBase):
-    def test_registerRoutesMapper(self):
-        from pyramid.interfaces import IRoutesMapper
-        from pyramid.testing import registerRoutesMapper
-        result = registerRoutesMapper()
-        mapper = self.registry.getUtility(IRoutesMapper)
-        self.assertEqual(result, mapper)
 
 class Test_registerSettings(TestBase):
     def test_registerSettings(self):

@@ -1,9 +1,9 @@
 .. _design_defense:
 
-Defending BFG's Design
-======================
+Defending Pyramid's Design
+==========================
 
-From time to time, challenges to various aspects of :mod:`repoze.bfg`
+From time to time, challenges to various aspects of :mod:`pyramid`
 design are lodged.  To give context to discussions that follow, we
 detail some of the design decisions and trade-offs here.  In some
 cases, we acknowledge that the framework can be made better and we
@@ -11,17 +11,17 @@ describe future steps which will be taken to improve it; in some cases
 we just file the challenge as "noted", as obviously you can't please
 everyone all of the time.
 
-BFG Uses A Zope Component Architecture ("ZCA") Registry
--------------------------------------------------------
+Pyramid Uses A Zope Component Architecture ("ZCA") Registry
+-----------------------------------------------------------
 
-:mod:`repoze.bfg` uses a :term:`Zope Component Architecture` (ZCA)
+:mod:`pyramid` uses a :term:`Zope Component Architecture` (ZCA)
 "component registry" as its :term:`application registry` under the
-hood.  This is a point of some contention.  :mod:`repoze.bfg` is of a
+hood.  This is a point of some contention.  :mod:`pyramid` is of a
 :term:`Zope` pedigree, so it was natural for its developers to use a
 ZCA registry at its inception.  However, we understand that using a
 ZCA registry has issues and consequences, which we've attempted to
 address as best we can.  Here's an introspection about
-:mod:`repoze.bfg` use of a ZCA registry, and the trade-offs its usage
+:mod:`pyramid` use of a ZCA registry, and the trade-offs its usage
 involves.
 
 Problems
@@ -39,7 +39,7 @@ global API:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.interfaces import ISettings
+   from pyramid.interfaces import ISettings
    from zope.component import getUtility
    settings = getUtility(ISettings)
 
@@ -78,7 +78,7 @@ That's sort of the best answer in this context (a more specific answer
 would require knowledge of internals).  Can there be more than one
 registry?  Yes.  So *which* registry does it find the registration in?
 Well, the "current" registry of course.  In terms of
-:mod:`repoze.bfg`, the current registry is a thread local variable.
+:mod:`pyramid`, the current registry is a thread local variable.
 Using an API that consults a thread local makes understanding how it
 works non-local.
 
@@ -91,7 +91,7 @@ nor was it performed imperatively.  This is extremely hard to
 comprehend.  Problem number six.
 
 Clearly there's some amount of cognitive load here that needs to be
-borne by a reader of code that extends the :mod:`repoze.bfg` framework
+borne by a reader of code that extends the :mod:`pyramid` framework
 due to its use of the ZCA, even if he or she is already an expert
 Python programmer and whom is an expert in the domain of web
 applications.  This is suboptimal.
@@ -99,15 +99,15 @@ applications.  This is suboptimal.
 Ameliorations
 +++++++++++++
 
-First, the primary amelioration: :mod:`repoze.bfg` *does not expect
+First, the primary amelioration: :mod:`pyramid` *does not expect
 application developers to understand ZCA concepts or any of its APIs*.
 If an *application* developer needs to understand a ZCA concept or API
-during the creation of a :mod:`repoze.bfg` application, we've failed
+during the creation of a :mod:`pyramid` application, we've failed
 on some axis.
 
 Instead, the framework hides the presence of the ZCA registry behind
 special-purpose API functions that *do* use ZCA APIs.  Take for
-example the ``repoze.bfg.security.authenticated_userid`` function,
+example the ``pyramid.security.authenticated_userid`` function,
 which returns the userid present in the current request or ``None`` if
 no userid is present in the current request.  The application
 developer calls it like so:
@@ -116,7 +116,7 @@ developer calls it like so:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import authenticated_userid
+   from pyramid.security import authenticated_userid
    userid = authenticated_userid(request)
 
 He now has the current user id.
@@ -143,7 +143,7 @@ application developers.  Application developers should just never know
 about the ZCA API: they should call a Python function with some object
 germane to the domain as an argument, and it should returns a result.
 A corollary that follows is that any reader of an application that has
-been written using :mod:`repoze.bfg` needn't understand the ZCA API
+been written using :mod:`pyramid` needn't understand the ZCA API
 either.
 
 Hiding the ZCA API from application developers and code readers is a
@@ -151,24 +151,24 @@ form of enhancing "domain specificity".  No application developer
 wants to need to understand the minutiae of the mechanics of how a web
 framework does its thing.  People want to deal in concepts that are
 closer to the domain they're working in: for example, web developers
-want to know about *users*, not *utilities*.  :mod:`repoze.bfg` uses
+want to know about *users*, not *utilities*.  :mod:`pyramid` uses
 the ZCA as an implementation detail, not as a feature which is exposed
 to end users.
 
 However, unlike application developers, *framework developers*,
-including people who want to override :mod:`repoze.bfg` functionality
+including people who want to override :mod:`pyramid` functionality
 via preordained framework plugpoints like traversal or view lookup
 *must* understand the ZCA registry API.
 
-:mod:`repoze.bfg` framework developers were so concerned about
+:mod:`pyramid` framework developers were so concerned about
 conceptual load issues of the ZCA registry API for framework
 developers that a `replacement registry implementation
 <http://svn.repoze.org/repoze.component/trunk>`_ named
 :mod:`repoze.component` was actually developed.  Though this package
 has a registry implementation which is fully functional and
 well-tested, and its API is much nicer than the ZCA registry API, work
-on it was largely abandoned and it is not used in :mod:`repoze.bfg`.
-We continued to use a ZCA registry within :mod:`repoze.bfg` because it
+on it was largely abandoned and it is not used in :mod:`pyramid`.
+We continued to use a ZCA registry within :mod:`pyramid` because it
 ultimately proved a better fit.
 
 .. note:: We continued using ZCA registry rather than disusing it in
@@ -181,16 +181,16 @@ ultimately proved a better fit.
    reinventing the wheel.
 
 Making framework developers and extenders understand the ZCA registry
-API is a trade-off.  We (the :mod:`repoze.bfg` developers) like the
+API is a trade-off.  We (the :mod:`pyramid` developers) like the
 features that the ZCA registry gives us, and we have long-ago borne
 the weight of understanding what it does and how it works.  The
-authors of :mod:`repoze.bfg` understand the ZCA deeply and can read
+authors of :mod:`pyramid` understand the ZCA deeply and can read
 code that uses it as easily as any other code.
 
 But we recognize that developers who my want to extend the framework
 are not as comfortable with the ZCA registry API as the original
 developers are with it.  So, for the purposes of being kind to
-third-party :mod:`repoze.bfg` framework developers in, we've drawn
+third-party :mod:`pyramid` framework developers in, we've drawn
 some lines in the sand.
 
 #) In all "core" code, We've made use of ZCA global API functions such
@@ -200,25 +200,25 @@ some lines in the sand.
    .. code-block:: python
       :linenos:
 
-      from repoze.bfg.interfaces import IAuthenticationPolicy
+      from pyramid.interfaces import IAuthenticationPolicy
       from zope.component import getUtility
       policy = getUtility(IAuthenticationPolicy)
 
-   :mod:`repoze.bfg` code will usually do:
+   :mod:`pyramid` code will usually do:
 
    .. code-block:: python
       :linenos:
 
-      from repoze.bfg.interfaces import IAuthenticationPolicy
-      from repoze.bfg.threadlocal import get_current_registry
+      from pyramid.interfaces import IAuthenticationPolicy
+      from pyramid.threadlocal import get_current_registry
       registry = get_current_registry()
       policy = registry.getUtility(IAuthenticationPolicy)
 
    While the latter is more verbose, it also arguably makes it more
-   obvious what's going on.  All of the :mod:`repoze.bfg` core code uses
+   obvious what's going on.  All of the :mod:`pyramid` core code uses
    this pattern rather than the ZCA global API.
 
-#) We've turned the component registry used by :mod:`repoze.bfg` into
+#) We've turned the component registry used by :mod:`pyramid` into
    something that is accessible using the plain old dictionary API
    (like the :mod:`repoze.component` API).  For example, the snippet
    of code in the problem section above was:
@@ -226,7 +226,7 @@ some lines in the sand.
    .. code-block:: python
       :linenos:
 
-      from repoze.bfg.interfaces import ISettings
+      from pyramid.interfaces import ISettings
       from zope.component import getUtility
       settings = getUtility(ISettings)
 
@@ -235,7 +235,7 @@ some lines in the sand.
    .. code-block:: python
       :linenos:
 
-      from repoze.bfg.threadlocal import get_current_registry
+      from pyramid.threadlocal import get_current_registry
 
       registry = get_current_registry()
       settings = registry['settings']
@@ -258,7 +258,7 @@ some lines in the sand.
    attributes and the dictionary API.  Every Python programmer knows
    these things, even framework programmers.
 
-While :mod:`repoze.bfg` still uses some suboptimal unnamed utility
+While :mod:`pyramid` still uses some suboptimal unnamed utility
 registrations, future versions of it will where possible disuse these
 things in favor of straight dictionary assignments and lookups, as
 demonstrated above, to be kinder to new framework developers.  We'll
@@ -267,16 +267,16 @@ continue to seek ways to reduce framework developer cognitive load.
 Rationale
 +++++++++
 
-Here are the main rationales involved in the :mod:`repoze.bfg`
+Here are the main rationales involved in the :mod:`pyramid`
 decision to use the ZCA registry:
 
 - Pedigree.  A nontrivial part of the answer to this question is
-  "pedigree".  Much of the design of :mod:`repoze.bfg` is stolen
+  "pedigree".  Much of the design of :mod:`pyramid` is stolen
   directly from :term:`Zope`.  Zope uses the ZCA registry to do a
-  number of tricks.  :mod:`repoze.bfg` mimics these tricks, and,
+  number of tricks.  :mod:`pyramid` mimics these tricks, and,
   because the ZCA registry works well for that set of tricks,
-  :mod:`repoze.bfg` uses it for the same purposes.  For example, the
-  way that :mod:`repoze.bfg` maps a :term:`request` to a :term:`view
+  :mod:`pyramid` uses it for the same purposes.  For example, the
+  way that :mod:`pyramid` maps a :term:`request` to a :term:`view
   callable` is lifted almost entirely from Zope.  The ZCA registry
   plays an important role in the particulars of how this request to
   view mapping is done.
@@ -290,12 +290,12 @@ decision to use the ZCA registry:
   :term:`interface`.
 
 - Singularity.  There's only one "place" where "application
-  configuration" lives in a :mod:`repoze.bfg` application: in a
+  configuration" lives in a :mod:`pyramid` application: in a
   component registry.  The component registry answers questions made
   to it by the framework at runtime based on the configuration of *an
   application*.  Note: "an application" is not the same as "a
   process", multiple independently configured copies of the same
-  :mod:`repoze.bfg` application are capable of running in the same
+  :mod:`pyramid` application are capable of running in the same
   process space.
 
 - Composability.  A ZCA component registry can be populated
@@ -308,7 +308,7 @@ decision to use the ZCA registry:
   extensibility via a well-defined and widely understood plugin
   architecture.  As long as framework developers and extenders
   understand the ZCA registry, it's possible to extend
-  :mod:`repoze.bfg` almost arbitrarily.  For example, it's relatively
+  :mod:`pyramid` almost arbitrarily.  For example, it's relatively
   easy to build a ZCML directive that registers several views "all at
   once", allowing app developers to use that ZCML directive as a
   "macro" in code that they write.  This is somewhat of a
@@ -321,26 +321,26 @@ decision to use the ZCA registry:
   lookups in the code find our mock objects.
 
 - Speed.  The ZCA registry is very fast for a specific set of complex
-  lookup scenarios that :mod:`repoze.bfg` uses, having been optimized
+  lookup scenarios that :mod:`pyramid` uses, having been optimized
   through the years for just these purposes.  The ZCA registry
   contains optional C code for this purpose which demonstrably has no
   (or very few) bugs.
 
 - Ecosystem.  Many existing Zope packages can be used in
-  :mod:`repoze.bfg` with few (or no) changes due to our use of the ZCA
+  :mod:`pyramid` with few (or no) changes due to our use of the ZCA
   registry and :term:`ZCML`.
 
 Conclusion
 ++++++++++
 
-If you only *develop applications* using :mod:`repoze.bfg`, there's
+If you only *develop applications* using :mod:`pyramid`, there's
 not much to complain about here.  You just should never need to
 understand the ZCA registry or even know about its presence: use
-documented :mod:`repoze.bfg` APIs instead.  However, you may be an
+documented :mod:`pyramid` APIs instead.  However, you may be an
 application developer who doesn't read API documentation because it's
 unmanly. Instead you read the raw source code, and because you haven't
 read the documentation, you don't know what functions, classes, and
-methods even *form* the :mod:`repoze.bfg` API.  As a result, you've
+methods even *form* the :mod:`pyramid` API.  As a result, you've
 now written code that uses internals and you've pained yourself into a
 conceptual corner as a result of needing to wrestle with some
 ZCA-using implementation detail.  If this is you, it's extremely hard
@@ -348,9 +348,9 @@ to have a lot of sympathy for you.  You'll either need to get familiar
 with how we're using the ZCA registry or you'll need to use only the
 documented APIs; that's why we document them as APIs.
 
-If you *extend* or *develop* :mod:`repoze.bfg` (create new ZCML
+If you *extend* or *develop* :mod:`pyramid` (create new ZCML
 directives, use some of the more obscure "ZCML hooks" as described in
-:ref:`hooks_chapter`, or work on the :mod:`repoze.bfg` core code), you
+:ref:`hooks_chapter`, or work on the :mod:`pyramid` core code), you
 will be faced with needing to understand at least some ZCA concepts.
 The ZCA registry API is quirky: we've tried to make it at least
 slightly nicer by disusing it for common registrations and lookups
@@ -359,15 +359,15 @@ will be forever.  We know it's quirky, but it's also useful and
 fundamentally understandable if you take the time to do some reading
 about it.
 
-BFG Uses Interfaces Too Liberally
----------------------------------
+Pyramid Uses Interfaces Too Liberally
+-------------------------------------
 
 In this `TOPP Engineering blog entry
 <http://www.coactivate.org/projects/topp-engineering/blog/2008/10/20/what-bothers-me-about-the-component-architecture/>`_,
-Ian Bicking asserts that the way :mod:`repoze.bfg` uses a Zope
+Ian Bicking asserts that the way :mod:`pyramid` uses a Zope
 interface to represent an HTTP request method adds too much
 indirection for not enough gain.  We agreed in general, and for this
-reason, :mod:`repoze.bfg` version 1.1 added :term:`view predicate` and
+reason, :mod:`pyramid` version 1.1 added :term:`view predicate` and
 :term:`route predicate` modifiers to view configuration.  Predicates
 are request-specific (or :term:`context` -specific) matching narrowers
 which don't use interfaces.  Instead, each predicate uses a
@@ -380,7 +380,7 @@ decorator which mentioned the ``request_method`` predicate:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
    @bfg_view(name='post_view', request_method='POST', renderer='json')
    def post_view(request):
        return 'POSTed'
@@ -392,7 +392,7 @@ response:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
    @bfg_view(name='post_view', request_method='POST', accept='application/json',
              renderer='json')
    def post_view(request):
@@ -417,7 +417,7 @@ acommodate this by allowing people to define "custom" view predicates:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.view import bfg_view
+   from pyramid.view import bfg_view
    from webob import Response
 
    def subpath(context, request):
@@ -432,27 +432,27 @@ The above view will only match when the first element of the request's
 
 .. _zcml_encouragement:
 
-BFG "Encourages Use of ZCML"
-----------------------------
+Pyramid "Encourages Use of ZCML"
+--------------------------------
 
 :term:`ZCML` is a configuration language that can be used to configure
 the :term:`Zope Component Architecture` registry that
-:mod:`repoze.bfg` uses as its application configuration.
+:mod:`pyramid` uses as its application configuration.
 
 Quick answer: well, it doesn't *really* encourage the use of ZCML.  In
-:mod:`repoze.bfg` 1.0 and 1.1, application developers could use
+:mod:`pyramid` 1.0 and 1.1, application developers could use
 decorators for the most common form of configuration.  But, yes, a
-:mod:`repoze.bfg` 1.0/1.1 application needed to possess a ZCML file
+:mod:`pyramid` 1.0/1.1 application needed to possess a ZCML file
 for it to begin executing successfully even if its only contents were
 a ``<scan>`` directive that kicked off a scan to find decorated view
 callables.
 
 In the interest of completeness and in the spirit of providing a
-lowest common denominator, :mod:`repoze.bfg` 1.2 includes a completely
+lowest common denominator, :mod:`pyramid` 1.2 includes a completely
 imperative mode for all configuration.  You will be able to make
 "single file" apps in this mode, which should help people who need to
 see everything done completely imperatively.  For example, the very
-most basic :mod:`repoze.bfg` "helloworld" program has become
+most basic :mod:`pyramid` "helloworld" program has become
 something like:
 
 .. code-block:: python
@@ -460,7 +460,7 @@ something like:
 
    from webob import Response
    from paste.httpserver import serve
-   from repoze.bfg.configuration import Configurator
+   from pyramid.configuration import Configurator
 
    def hello_world(request):
        return Response('Hello world!')
@@ -477,11 +477,11 @@ In this mode, no ZCML is required for end users.  Hopefully this mode
 will allow people who are used to doing everything imperatively feel
 more comfortable.
 
-BFG Uses ZCML; ZCML is XML and I Don't Like XML
------------------------------------------------
+Pyramid Uses ZCML; ZCML is XML and I Don't Like XML
+---------------------------------------------------
 
 :term:`ZCML` is a configuration language in the XML syntax.  Due to
-the "imperative configuration" feature (new in :mod:`repoze.bfg` 1.2),
+the "imperative configuration" feature (new in :mod:`pyramid` 1.2),
 you don't need to use ZCML at all if you start a project from scratch.
 But if you really do want to perform declarative configuration,
 perhaps because you want to build an extensible application, you will
@@ -501,20 +501,20 @@ called *declarations*.  For an example:
 
 This declaration associates a :term:`view` with a route pattern. 
 
-All :mod:`repoze.bfg` declarations are singleton tags, unlike many
+All :mod:`pyramid` declarations are singleton tags, unlike many
 other XML configuration systems.  No XML *values* in ZCML are
 meaningful; it's always just XML tags and attributes.  So in the very
 common case it's not really very much different than an otherwise
 "flat" configuration format like ``.ini``, except a developer can
 *create* a directive that requires nesting (none of these exist in
-:mod:`repoze.bfg` itself), and multiple "sections" can exist with the
+:mod:`pyramid` itself), and multiple "sections" can exist with the
 same "name" (e.g. two ``<route>`` declarations) must be able to exist
 simultaneously.
 
 You might think some other configuration file format would be better.
 But all configuration formats suck in one way or another.  I
 personally don't think any of our lives would be markedly better if
-the declarative configuration format used by :mod:`repoze.bfg` were
+the declarative configuration format used by :mod:`pyramid` were
 YAML, JSON, or INI.  It's all just plumbing that you mostly cut and
 paste once you've progressed 30 minutes into your first project.
 Folks who tend to agitate for another configuration file format are
@@ -522,13 +522,13 @@ folks that haven't yet spent that 30 minutes.
 
 .. _model_traversal_confusion:
 
-BFG Uses "Model" To Represent A Node In The Graph of Objects Traversed
-----------------------------------------------------------------------
+Pyramid Uses "Model" To Represent A Node In The Graph of Objects Traversed
+--------------------------------------------------------------------------
 
-The :mod:`repoze.bfg` documentation refers to the graph being
+The :mod:`pyramid` documentation refers to the graph being
 traversed when :term:`traversal` is used as a "model graph".  Some of
-the :mod:`repoze.bfg` APIs also use the word "model" in them when
-referring to a node in this graph (e.g. ``repoze.bfg.url.model_url``).
+the :mod:`pyramid` APIs also use the word "model" in them when
+referring to a node in this graph (e.g. ``pyramid.url.model_url``).
 
 A terminology overlap confuses people who write applications that
 always use ORM packages such as SQLAlchemy, which has a different
@@ -539,62 +539,30 @@ Often model objects must be explicitly manufactured by an ORM as a
 result of some query performed by a :term:`view`.  As a result, it can
 be unnatural to think of the nodes traversed as "model" objects if you
 develop your application using traversal and a relational database.
-When you develop such applications, the things that :mod:`repoze.bfg`
+When you develop such applications, the things that :mod:`pyramid`
 refers to as "models" in such an application may just be stand-ins
 that perform a query and generate some wrapper *for* an ORM "model"
 (or set of ORM models).  The graph *might* be composed completely of
 "model" objects (as defined by the ORM) but it also might not be.
 
 The naming impedance mismatch between the way the term "model" is used
-to refer to a node in a graph in :mod:`repoze.bfg` and the way the
+to refer to a node in a graph in :mod:`pyramid` and the way the
 term "model" is used by packages like SQLAlchemy is unfortunate.  For
 the purpose of avoiding confusion, if we had it to do all over again,
-we might refer to the graph that :mod:`repoze.bfg` traverses a "node
+we might refer to the graph that :mod:`pyramid` traverses a "node
 graph" or "object graph" rather than a "model graph", but since we've
 baked the name into the API, it's a little late.  Sorry.
 
-In our defense, many :mod:`repoze.bfg` applications (especially ones
+In our defense, many :mod:`pyramid` applications (especially ones
 which use :term:`ZODB`) do indeed traverse a graph full of model
 nodes.  Each node in the graph is a separate persistent object that is
 stored within a database.  This was the use case considered when
 coming up with the "model" terminology.
 
-I Can't Figure Out How "BFG" Is Related to "Repoze"
----------------------------------------------------
+Pyramid Does Traversal, And I Don't Like Traversal
+--------------------------------------------------
 
-When the `Repoze project <http://repoze.org>`_ was first started,
-:mod:`repoze.bfg` did not exist.  The `website <http://repoze.org>`_
-for the project had (and still has, of this writing) a tag line of
-"Plumbing Zope into the WSGI Pipeline", and contained descriptions of
-:term:`WSGI` middleware that were inspired by Zope features, and
-applications that help :term:`Zope` to run within a WSGI environment.
-The original intent was to create a "namespace" of packages
-("repoze.*") that contained software that formed a decomposition of
-Zope features into more WSGI-friendly components.  It was never the
-intention of the Repoze project to actually create another web
-framework.
-
-However, as time progressed, the folks who ran the Repoze project
-decided to create :mod:`repoze.bfg`, which *is* a web framework.  Due
-to an early naming mistake, the software composing the framework was
-named :mod:`repoze.bfg`.  This mistake was not corrected before the
-software garnered a significant user base, and in the interest of
-backwards compatibility, most likely never will be.  While
-:mod:`repoze.bfg` uses Zope technology, it is otherwise unrelated to
-the original goals of "Repoze" as stated on the repoze.org website.
-If we had it to do all over again, the :mod:`repoze.bfg` package would
-be named simply :mod:`bfg`.  But we don't have it to do all over
-again.
-
-At this point, therefore, the name "Repoze" should be considered
-basically just a "brand".  Its presence in the name of a package means
-nothing except that it has an origin as a piece of software developed
-by a member of the Repoze community.
-
-BFG Does Traversal, And I Don't Like Traversal
-----------------------------------------------
-
-In :mod:`repoze.bfg`, :term:`traversal` is the act of resolving a URL
+In :mod:`pyramid`, :term:`traversal` is the act of resolving a URL
 path to a :term:`model` object in an object graph.  Some people are
 uncomfortable with this notion, and believe it is wrong.
 
@@ -624,15 +592,15 @@ excellent way to model this, even if the backend is a relational
 database.  In this situation, the graph being traversed is actually
 less a "model graph" than a site structure.
 
-But the point is ultimately moot.  If you use :mod:`repoze.bfg`, and
+But the point is ultimately moot.  If you use :mod:`pyramid`, and
 you don't want to model your application in terms of traversal, you
 needn't use it at all.  Instead, use :term:`URL dispatch` to map URL
 paths to views.
 
-BFG Does URL Dispatch, And I Don't Like URL Dispatch
-----------------------------------------------------
+Pyramid Does URL Dispatch, And I Don't Like URL Dispatch
+--------------------------------------------------------
 
-In :mod:`repoze.bfg`, :term:`url dispatch` is the act of resolving a
+In :mod:`pyramid`, :term:`url dispatch` is the act of resolving a
 URL path to a :term:`view` callable by performing pattern matching
 against some set of ordered route definitions.  The route definitions
 are examined in order: the first pattern which matches is used to
@@ -650,7 +618,7 @@ object graph), and traversal is required to reach this code.
 
 I'll argue that URL dispatch is ultimately useful, even if you want to
 use traversal as well.  You can actually *combine* URL dispatch and
-traversal in :mod:`repoze.bfg` (see :ref:`hybrid_chapter`).  One
+traversal in :mod:`pyramid` (see :ref:`hybrid_chapter`).  One
 example of such a usage: if you want to emulate something like Zope
 2's "Zope Management Interface" UI on top of your object graph (or any
 administrative interface), you can register a route like ``<route
@@ -671,16 +639,16 @@ one-off associations between views and URL paths.  Sometimes it's just
 pointless to add a node to the object graph that effectively
 represents the entry point for some bit of code.  You can just use a
 route and be done with it.  If a route matches, a view associated with
-the route will be called; if no route matches, :mod:`repoze.bfg` falls
+the route will be called; if no route matches, :mod:`pyramid` falls
 back to using traversal.
 
-But the point is ultimately moot.  If you use :mod:`repoze.bfg`, and
+But the point is ultimately moot.  If you use :mod:`pyramid`, and
 you really don't want to use URL dispatch, you needn't use it at all.
 Instead, use :term:`traversal` exclusively to map URL paths to views,
 just like you do in :term:`Zope`.
 
-BFG Views Do Not Accept Arbitrary Keyword Arguments
----------------------------------------------------
+Pyramid Views Do Not Accept Arbitrary Keyword Arguments
+-------------------------------------------------------
 
 Many web frameworks (Zope, TurboGears, Pylons, Django) allow for their
 variant of a :term:`view callable` to accept arbitrary keyword or
@@ -716,11 +684,11 @@ arguments in the request, and the method is called (if possible) with
 its argument list filled with values mentioned therein.  TurboGears
 and Pylons operate similarly.
 
-:mod:`repoze.bfg` has neither of these features.  :mod:`repoze.bfg`
+:mod:`pyramid` has neither of these features.  :mod:`pyramid`
 view callables always accept only ``context`` and ``request`` (or just
 ``request``), and no other arguments.  The rationale: this argument
 specification matching done aggressively can be costly, and
-:mod:`repoze.bfg` has performance as one of its main goals, so we've
+:mod:`pyramid` has performance as one of its main goals, so we've
 decided to make people obtain information by interrogating the request
 object for it in the view body instead of providing magic to do
 unpacking into the view argument list.  The feature itself also just
@@ -739,15 +707,15 @@ A similar feature could be implemented to provide the Django-like
 behavior as a decorator by wrapping the view with a decorator that
 looks in ``request.matchdict``.
 
-It's possible at some point that :mod:`repoze.bfg` will grow some form
+It's possible at some point that :mod:`pyramid` will grow some form
 of argument matching feature (it would be simple to make it an
 always-on optional feature that has no cost unless you actually use
 it) for, but currently it has none.
 
-BFG Provides Too Few "Rails"
-----------------------------
+Pyramid Provides Too Few "Rails"
+--------------------------------
 
-By design, :mod:`repoze.bfg` is not a particularly "opinionated" web
+By design, :mod:`pyramid` is not a particularly "opinionated" web
 framework.  It has a relatively parsimonious feature set.  It contains
 no built in ORM nor any particular database bindings.  It contains no
 form generation framework.  It does not contain a sessioning library.
@@ -755,14 +723,14 @@ It has no administrative web user interface.  It has no built in text
 indexing.  It does not dictate how you arrange your code.
 
 Such opinionated functionality exists in applications and frameworks
-built *on top* of :mod:`repoze.bfg`.  It's intended that higher-level
-systems emerge built using :mod:`repoze.bfg` as a base.  See also
+built *on top* of :mod:`pyramid`.  It's intended that higher-level
+systems emerge built using :mod:`pyramid` as a base.  See also
 :ref:`apps_are_extensible`.
 
-BFG Provides Too Many "Rails"
------------------------------
+Pyramid Provides Too Many "Rails"
+---------------------------------
 
-:mod:`repoze.bfg` provides some features that other web frameworks do
+:mod:`pyramid` provides some features that other web frameworks do
 not.  Most notably it has machinery which resolves a URL first to a
 :term:`context` before calling a view (which has the capability to
 accept the context in its argument list), and a declarative
@@ -779,20 +747,20 @@ declarations as :term:`ACL` objects.
 Having context-sensitive declarative security for individual objects
 in the object graph is simply required for this class of application.
 Other frameworks save for Zope just do not have this feature.  This is
-one of the primary reasons that :mod:`repoze.bfg` was actually
+one of the primary reasons that :mod:`pyramid` was actually
 written.
 
 If you don't like this, it doesn't mean you can't use
-:mod:`repoze.bfg`.  Just ignore this feature and avoid configuring an
+:mod:`pyramid`.  Just ignore this feature and avoid configuring an
 authorization or authentication policy and using ACLs.  You can build
-"Pylons-style" applications using :mod:`repoze.bfg` that use their own
+"Pylons-style" applications using :mod:`pyramid` that use their own
 security model via decorators or plain-old-imperative logic in view
 code.
 
-BFG Is Too Big
---------------
+Pyramid Is Too Big
+------------------
 
-"The :mod:`repoze.bfg` compressed tarball is 1MB.  It must be
+"The :mod:`pyramid` compressed tarball is 1MB.  It must be
 enormous!"
 
 No.  We just ship it with test code and helper templates.  Here's a
@@ -814,7 +782,7 @@ repoze/bfg (except for ``repoze/bfg/tests and repoze/bfg/paster_templates``)
 
   316K
 
-The actual :mod:`repoze.bfg` runtime code is about 10% of the total
+The actual :mod:`pyramid` runtime code is about 10% of the total
 size of the tarball omitting docs, helper templates used for package
 generation, and test code.  Of the approximately 13K lines of Python
 code in the package, the code that actually has a chance of executing
@@ -823,17 +791,17 @@ files, accounts for approximately 3K lines of Python code.  This is
 comparable to Pylons, which ships with a little over 2K lines of
 Python code, excluding tests.
 
-BFG Has Too Many Dependencies
------------------------------
+Pyramid Has Too Many Dependencies
+---------------------------------
 
 This is true.  At the time of this writing, the total number of Python
-package distributions that :mod:`repoze.bfg` depends upon transitively
+package distributions that :mod:`pyramid` depends upon transitively
 is 14 if you use Python 2.6 or 2.7, or 16 if you use Python 2.4 or
 2.5.  This is a lot more than zero package distribution dependencies:
 a metric which various Python microframeworks and Django boast.
 
 The :mod:`zope.component` and :mod:`zope.configuration` packages on
-which :mod:`repoze.bfg` depends have transitive dependencies on
+which :mod:`pyramid` depends have transitive dependencies on
 several other packages (:mod:`zope.schema`, :mod:`zope.i18n`,
 :mod:`zope.event`, :mod:`zope.interface`, :mod:`zope.deprecation`,
 :mod:`zope.i18nmessageid`).  We've been working with the Zope
@@ -842,16 +810,16 @@ We'd prefer that these packages have fewer packages as transitive
 dependencies, and that much of the functionality of these packages was
 moved into a smaller *number* of packages.
 
-:mod:`repoze.bfg` also has its own direct dependencies, such as
+:mod:`pyramid` also has its own direct dependencies, such as
 :term:`Paste`, :term:`Chameleon`, and :term:`WebOb`, and some of these
 in turn have their own transitive dependencies.
 
-It should be noted that :mod:`repoze.bfg` is positively lithe compared
+It should be noted that :mod:`pyramid` is positively lithe compared
 to :term:`Grok`, a different Zope-based framework.  As of this
 writing, in its default configuration, Grok has 126 package
 distribution dependencies. The number of dependencies required by
-:mod:`repoze.bfg` is many times fewer than Grok (or Zope itself, upon
-which Grok is based).  :mod:`repoze.bfg` has a number of package
+:mod:`pyramid` is many times fewer than Grok (or Zope itself, upon
+which Grok is based).  :mod:`pyramid` has a number of package
 distribution dependencies comparable to similarly-targeted frameworks
 such as Pylons.
 
@@ -859,31 +827,31 @@ We try not to reinvent too many wheels (at least the ones that don't
 need reinventing), and this comes at the cost of some number of
 dependencies.  However, "number of package distributions" is just not
 a terribly great metric to measure complexity.  For example, the
-:mod:`zope.event` distribution on which :mod:`repoze.bfg` depends has
+:mod:`zope.event` distribution on which :mod:`pyramid` depends has
 a grand total of four lines of runtime code.  As noted above, we're
 continually trying to agitate for a collapsing of these sorts of
 packages into fewer distribution files.
 
-BFG "Cheats" To Obtain Speed
-----------------------------
+Pyramid "Cheats" To Obtain Speed
+--------------------------------
 
 Complaints have been lodged by other web framework authors at various
-times that :mod:`repoze.bfg` "cheats" to gain performance.  One
+times that :mod:`pyramid` "cheats" to gain performance.  One
 claimed cheating mechanism is our use (transitively) of the C
 extensions provided by :mod:`zope.interface` to do fast lookups.
 Another claimed cheating mechanism is the religious avoidance of
 extraneous function calls.
 
 If there's such a thing as cheating to get better performance, we want
-to cheat as much as possible.  We optimize :mod:`repoze.bfg`
+to cheat as much as possible.  We optimize :mod:`pyramid`
 aggressively.  This comes at a cost: the core code has sections that
 could be expressed more readably.  As an amelioration, we've commented
 these sections liberally.
 
-BFG Gets Its Terminology Wrong ("MVC")
---------------------------------------
+Pyramid Gets Its Terminology Wrong ("MVC")
+------------------------------------------
 
-"I'm a MVC web framework user, and I'm confused.  :mod:`repoze.bfg`
+"I'm a MVC web framework user, and I'm confused.  :mod:`pyramid`
 calls the controller a view!  And it doesn't have any controllers."
 
 People very much want to give web applications the same properties as
@@ -949,14 +917,14 @@ reasonable model, given the current constraints of the web.
 
 .. _apps_are_extensible:
 
-BFG Applications are Extensible; I Don't Believe In Application Extensibility
------------------------------------------------------------------------------
+Pyramid Applications are Extensible; I Don't Believe In Application Extensibility
+---------------------------------------------------------------------------------
 
-Any :mod:`repoze.bfg` application written obeying certain constraints
-is *extensible*. This feature is discussed in the :mod:`repoze.bfg`
+Any :mod:`pyramid` application written obeying certain constraints
+is *extensible*. This feature is discussed in the :mod:`pyramid`
 documentation chapter named :ref:`extending_chapter`.  It is made
 possible by the use of the :term:`Zope Component Architecture` and
-:term:`ZCML` within :mod:`repoze.bfg`.
+:term:`ZCML` within :mod:`pyramid`.
 
 "Extensible", in this context, means:
 
@@ -998,7 +966,7 @@ lifetime of a deployment can be difficult and time consuming, and it's
 often useful to be able to modify an application for a particular
 deployment in a less invasive way.
 
-If you don't want to think about :mod:`repoze.bfg` application
+If you don't want to think about :mod:`pyramid` application
 extensibility at all, you needn't.  You can ignore extensibility
 entirely.  However, if you follow the set of rules defined in
 :ref:`extending_chapter`, you don't need to *make* your application
@@ -1043,23 +1011,23 @@ worth, be contained in one, canonical, well-defined place.
 
 Branching an application and continually merging in order to get new
 features and bugfixes is clearly useful.  You can do that with a
-:mod:`repoze.bfg` application just as usefully as you can do it with
+:mod:`pyramid` application just as usefully as you can do it with
 any application.  But deployment of an application written in
-:mod:`repoze.bfg` makes it possible to avoid the need for this even if
+:mod:`pyramid` makes it possible to avoid the need for this even if
 the application doesn't define any plugpoints ahead of time.  It's
 possible that promoters of competing web frameworks dismiss this
 feature in favor of branching and merging because applications written
 in their framework of choice aren't extensible out of the box in a
 comparably fundamental way.
 
-While :mod:`repoze.bfg` application are fundamentally extensible even
+While :mod:`pyramid` application are fundamentally extensible even
 if you don't write them with specific extensibility in mind, if you're
 moderately adventurous, you can also take it a step further.  If you
 learn more about the :term:`Zope Component Architecture`, you can
 optionally use it to expose other more domain-specific configuration
 plugpoints while developing an application.  The plugpoints you expose
 needn't be as coarse as the ones provided automatically by
-:mod:`repoze.bfg` itself.  For example, you might compose your own
+:mod:`pyramid` itself.  For example, you might compose your own
 :term:`ZCML` directive that configures a set of views for a prebaked
 purpose (e.g. ``restview`` or somesuch) , allowing other people to
 refer to that directive when they make declarations in the
@@ -1069,85 +1037,22 @@ plugpoints for its deployers will need to understand the ZCA or he
 will need to develop his own similar extensibility system.
 
 Ultimately, any argument about whether the extensibility features lent
-to applications by :mod:`repoze.bfg` are "good" or "bad" is somewhat
+to applications by :mod:`pyramid` are "good" or "bad" is somewhat
 pointless. You needn't take advantage of the extensibility features
-provided by a particular :mod:`repoze.bfg` application in order to
+provided by a particular :mod:`pyramid` application in order to
 affect a modification for a particular set of its deployments.  You
 can ignore the application's extensibility plugpoints entirely, and
 instead use version control branching and merging to manage
 application deployment modifications instead, as if you were deploying
 an application written using any other web framework.
 
-The Name BFG Is Not Safe For Work
----------------------------------
-
-"Big Friendly Giant" is not safe for your work?  Where do you work? ;-)
-
-The BFG API Isn't "Flat"
-------------------------
-
-The :mod:`repoze.bfg` API is organized in such a way that API imports
-must come from submodules of the ``repoze.bfg`` namespace.  For
-instance:
-
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg.settings import get_settings
-   from repoze.bfg.url import model_url
-
-Some folks understandably don't want to think about the submodule
-organization, and would rather be able to do:
-
-.. ignore-next-block
-.. code-block:: python
-   :linenos:
-
-   from repoze.bfg import get_settings
-   from repoze.bfg import model_url
-
-This would indeed be nice.  However, the ``repoze.bfg`` Python package
-is a `namespace package <http://www.python.org/dev/peps/pep-0382/>`_.
-The ``__init__.py`` of a namespace package cannot contain any
-meaningful code such as imports from submodules which would let us
-form a flatter API.  Sorry.
-
-Though it makes the API slightly "thinkier", making the ``repoze.bfg``
-package into a namespace package was an early design decision, which
-we believe has paid off.  The primary goal is to make it possible to
-move features *out* of the core ``repoze.bfg`` distribution and into
-add-on distributions without breaking existing imports.  The
-``repoze.bfg.lxml`` distribution is an example of such a package: this
-functionality used to live in the core distribution, but we later
-decided that a core dependency on ``lxml`` was unacceptable.  Because
-``repoze.bfg`` is a namespace package, we were able to remove the
-``repoze.bfg.lxml`` module from the core and create a distribution
-named ``repoze.bfg.lxml`` which contains an eponymous package.  We
-were then able, via our changelog, to inform people that might have
-been depending on the feature that although it no longer shipped in
-the core distribution, they could get it back *without changing any
-code* by adding an ``install_requires`` line to their application
-package's ``setup.py``.
-
-Often new :mod:`repoze.bfg` features are released as add-on packages
-in the ``repoze.bfg`` namespace.  Because ``repoze.bfg`` is a
-namespace package, if we want to move one of these features *in* to
-the core distribition at some point, we can do so without breaking
-code which imports from the older package namespace.  This is
-currently less useful than the ability to move features *out* of the
-core distribution, as :mod:`setuptools` does not yet have any concept
-of "obsoletes" metadata which we could add to the core distribution.
-This means it's not yet possible to declaratively deprecate the older
-non-core package in the eyes of tools like ``easy_install``, ``pip``
-and ``buildout``.
-
-Zope 3 Enforces "TTW" Authorization Checks By Default; BFG Does Not
--------------------------------------------------------------------
+Zope 3 Enforces "TTW" Authorization Checks By Default; Pyramid Does Not
+-----------------------------------------------------------------------
 
 Challenge
 +++++++++
 
-:mod:`repoze.bfg` performs automatic authorization checks only at
+:mod:`pyramid` performs automatic authorization checks only at
 :term:`view` execution time.  Zope 3 wraps context objects with a
 `security proxy <http://wiki.zope.org/zope3/WhatAreSecurityProxies>`,
 which causes Zope 3 to do also security checks during attribute
@@ -1160,17 +1065,17 @@ access.  I like this, because it means:
    respect to a context object.
 
 #) I want to also expose my model via a REST API using Twisted Web. If
-   If BFG perform authorization based on attribute access via Zope3's
+   If Pyramid performed authorization based on attribute access via Zope3's
    security proies, I could enforce my authorization policy in both
-   :mod:`repoze.bfg` and in the Twisted-based system the same way.
+   :mod:`pyramid` and in the Twisted-based system the same way.
 
 Defense
 +++++++
 
-:mod:`repoze.bfg` was developed by folks familiar with Zope 2, which
+:mod:`pyramid` was developed by folks familiar with Zope 2, which
 has a "through the web" security model.  This "TTW" security model was
 the precursor to Zope 3's security proxies.  Over time, as the
-:mod:`repoze.bfg` developers (working in Zope 2) created such sites,
+:mod:`pyramid` developers (working in Zope 2) created such sites,
 we found authorization checks during code interpretation extremely
 useful in a minority of projects.  But much of the time, TTW
 authorization checks usually slowed down the development velocity of
@@ -1191,7 +1096,7 @@ notwithstanding, given that Zope 3 security proxies are "viral" by
 nature, the only requirement to use one is to make sure you wrap a
 single object in a security proxy and make sure to access that object
 normally when you want proxy security checks to happen.  It is
-possible to override the :mod:`repoze.bfg` "traverser" for a given
+possible to override the :mod:`pyramid` "traverser" for a given
 application (see :ref:`changing_the_traverser`).  To get Zope3-like
 behavior, it is possible to plug in a different traverser which
 returns Zope3-security-proxy-wrapped objects for each traversed object
@@ -1210,24 +1115,24 @@ two that are becoming popular.  `Bobo <http://bobo.digicool.com/>`_
 doesn't describe itself as a microframework, but its intended userbase
 is much the same.  Many others exist.  We've actually even (only as a
 teaching tool, not as any sort of official project) `created one using
-BFG <http://bfg.repoze.org/videos#groundhog1>`_. Microframeworks are
-small frameworks with one common feature: each allows its users to
-create a fully functional application that lives in a single Python
-file.
+BFG <http://bfg.repoze.org/videos#groundhog1>`_ (the precursor to
+Pyramid). Microframeworks are small frameworks with one common
+feature: each allows its users to create a fully functional
+application that lives in a single Python file.
 
-Some developers and microframework authors point out that BFG's "hello
-world" single-file program is longer (by about five lines) than the
-equivalent program in their favorite microframework.  Guilty as
-charged; in a contest of "whose is shortest", BFG indeed loses.
+Some developers and microframework authors point out that Pyramid's
+"hello world" single-file program is longer (by about five lines) than
+the equivalent program in their favorite microframework.  Guilty as
+charged; in a contest of "whose is shortest", Pyramid indeed loses.
 
-This loss isn't for lack of trying. BFG aims to be useful in the same
-circumstance in which microframeworks claim dominance: single-file
-applications.  But BFG doesn't sacrifice its ability to credibly
-support larger applications in order to achieve hello-world LoC parity
-with the current crop of microframeworks.  BFG's design instead tries
-to avoid some common pitfalls associated with naive declarative
-configuration schemes.  The subsections which follow explain the
-rationale.
+This loss isn't for lack of trying. Pyramid aims to be useful in the
+same circumstance in which microframeworks claim dominance:
+single-file applications.  But Pyramid doesn't sacrifice its ability
+to credibly support larger applications in order to achieve
+hello-world LoC parity with the current crop of microframeworks.
+Pyramid's design instead tries to avoid some common pitfalls
+associated with naive declarative configuration schemes.  The
+subsections which follow explain the rationale.
 
 .. _you_dont_own_modulescope:
 
@@ -1459,29 +1364,29 @@ almost-all-imperative:
         gh.add_route(foo, '/foo/')
         gh.run()
 
-This is a generic mode of operation that is encouraged in the BFG
+This is a generic mode of operation that is encouraged in the Pyramid
 documentation. Some existing microframeworks (Flask, in particular)
-allow for it as well.  None (other than BFG) *encourage* it.  If you
-never expect your application to grow beyond two or three or four or
-ten modules, it probably doesn't matter very much which mode you use.
-If your application grows large, however, imperative configuration can
-provide better predictability.
+allow for it as well.  None (other than Pyramid) *encourage* it.  If
+you never expect your application to grow beyond two or three or four
+or ten modules, it probably doesn't matter very much which mode you
+use.  If your application grows large, however, imperative
+configuration can provide better predictability.
 
 .. note::
 
-  Astute readers may notice that BFG has configuration decorators too.
-  Aha!  Don't these decorators have the same problems?  No.  These
-  decorators do not populate an external Python module when they are
-  executed.  They only mutate the functions (and classes and methods)
-  they're attached to.  These mutations must later be found during a
-  "scan" process that has a predictable and structured import phase.
-  Module-localized mutation is actually the best-case circumstance for
-  double-imports; if a module only mutates itself and its contents at
-  import time, if it is imported twice, that's OK, because each
-  decorator invocation will always be mutating an independent copy of
-  the object its attached to, not a shared resource like a registry in
-  another module.  This has the effect that double-registrations will
-  never be performed.
+  Astute readers may notice that Pyramid has configuration decorators
+  too.  Aha!  Don't these decorators have the same problems?  No.
+  These decorators do not populate an external Python module when they
+  are executed.  They only mutate the functions (and classes and
+  methods) they're attached to.  These mutations must later be found
+  during a "scan" process that has a predictable and structured import
+  phase.  Module-localized mutation is actually the best-case
+  circumstance for double-imports; if a module only mutates itself and
+  its contents at import time, if it is imported twice, that's OK,
+  because each decorator invocation will always be mutating an
+  independent copy of the object its attached to, not a shared
+  resource like a registry in another module.  This has the effect
+  that double-registrations will never be performed.
 
 Routes (Usually) Need Relative Ordering
 +++++++++++++++++++++++++++++++++++++++
@@ -1637,15 +1542,16 @@ myframework.threadlocals import get_request; request = get_request()``
 even though the latter is more explicit.
 
 It would be *most* explicit if the microframeworks did not use thread
-local variables at all.  BFG view functions are passed a request
-object; many of BFG's APIs require that an explicit request object be
-passed to them.  It is *possible* to retrieve the current BFG request
-as a threadlocal variable but it is a "in case of emergency, break
-glass" type of activity.  This explicitness makes BFG view functions
-more easily unit testable, as you don't need to rely on the framework
-to manufacture suitable "dummy" request (and other similarly-scoped)
-objects during test setup.  It also makes them more likely to work on
-arbitrary systems, such as async servers that do no monkeypatching.
+local variables at all.  Pyramid view functions are passed a request
+object; many of Pyramid's APIs require that an explicit request object
+be passed to them.  It is *possible* to retrieve the current Pyramid
+request as a threadlocal variable but it is a "in case of emergency,
+break glass" type of activity.  This explicitness makes Pyramid view
+functions more easily unit testable, as you don't need to rely on the
+framework to manufacture suitable "dummy" request (and other
+similarly-scoped) objects during test setup.  It also makes them more
+likely to work on arbitrary systems, such as async servers that do no
+monkeypatching.
 
 Explicitly WSGI
 +++++++++++++++
@@ -1653,10 +1559,10 @@ Explicitly WSGI
 Some microframeworks offer a ``run()`` method of an application object
 that executes a default server configuration for easy execution.
 
-BFG doesn't currently try to hide the fact that its router is a WSGI
-application behind a convenience ``run()`` API.  It just tells people
-to import a WSGI server and use it to serve up their BFG application
-as per the documentation of that WSGI server.
+Pyramid doesn't currently try to hide the fact that its router is a
+WSGI application behind a convenience ``run()`` API.  It just tells
+people to import a WSGI server and use it to serve up their Pyramid
+application as per the documentation of that WSGI server.
 
 The extra lines saved by abstracting away the serving step behind
 ``run()`` seem to have driven dubious second-order decisions related
@@ -1686,20 +1592,12 @@ can interface with a WSGI application is placed on the server
 developer, not the web framework developer, making it more likely to
 be timely and correct.
 
-All of the above said, BFG version 1.3 may offer a ``run()`` - like
-shortcut serving API which executes a WSGI server.  But I might also
-chicken out and not add it: I'd rather not deal with needing to supply
-support answers like `this one
-<http://twitter.com/bottlepy/status/20451760706>`_.  If I add such a
-method, it will likely be named less attractively to indicate it is
-only a shortcut.
-
-:meth:`repoze.bfg.configuration.Configurator.begin` and :meth:`repoze.bfg.configuration.Configurator.end` methods
+:meth:`pyramid.configuration.Configurator.begin` and :meth:`pyramid.configuration.Configurator.end` methods
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-The methods :meth:`repoze.bfg.configuration.Configurator.begin` and
-:meth:`repoze.bfg.configuration.Configurator.end` are used to bracket
-the configuration phase of a :mod:`repoze.bfg` application.
+The methods :meth:`pyramid.configuration.Configurator.begin` and
+:meth:`pyramid.configuration.Configurator.end` are used to bracket
+the configuration phase of a :mod:`pyramid` application.
 
 These exist because existing legacy third party *configuration* (not
 runtime) code relies on a threadlocal stack being populated. The
@@ -1707,13 +1605,13 @@ runtime) code relies on a threadlocal stack being populated. The
 method pops it back off.
 
 For the simplest applications, these lines are actually not required.
-I *could* omit them from every BFG hello world app without ill effect.
-However, when users use certain configuration methods (ones not
-represented in the hello world app), calling code will begin to fail
-when it is not bracketed between a ``begin()`` and an ``end()``.  It
-is just easier to tell users that this bracketing is required than to
-try to explain to them which circumstances it is actually required and
-which it is not, because the explanation is often torturous.
+I *could* omit them from every Pyramid hello world app without ill
+effect.  However, when users use certain configuration methods (ones
+not represented in the hello world app), calling code will begin to
+fail when it is not bracketed between a ``begin()`` and an ``end()``.
+It is just easier to tell users that this bracketing is required than
+to try to explain to them which circumstances it is actually required
+and which it is not, because the explanation is often torturous.
 
 The effectively-required execution of these two methods is a wholly
 bogus artifact of an early bad design decision which encouraged
@@ -1728,7 +1626,7 @@ removed from the documenation.
 Wrapping Up
 +++++++++++
 
-Here's a diagrammed version of the simplest repoze.bfg application,
+Here's a diagrammed version of the simplest pyramid application,
 where comments take into account what we've discussed in the
 :ref:`microframeworks_smaller_hello_world` section.
 
@@ -1742,7 +1640,7 @@ where comments take into account what we've discussed in the
        return Response('Hello world!') 
 
    if __name__ == '__main__':
-       from repoze.bfg.configuration import Configurator
+       from pyramid.configuration import Configurator
        config = Configurator()       # no global application object.
        config.begin()                # bogus, but required.
        config.add_view(hello_world)  # explicit non-decorator registration

@@ -1,7 +1,7 @@
 .. _latexindex:
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-The :mod:`repoze.bfg` Web Application Framework
+The :mod:`pyramid` Web Application Framework
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 .. frontmatter::
@@ -63,8 +63,8 @@ Tutorials
 .. toctree::
    :maxdepth: 1
 
-   tutorials/bfgwiki/index.rst
-   tutorials/bfgwiki2/index.rst
+   tutorials/wiki/index.rst
+   tutorials/wiki2/index.rst
    tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
    tutorials/zeo/index.rst

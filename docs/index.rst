@@ -1,14 +1,13 @@
 .. _index:
 
-========================================
-The repoze.bfg Web Application Framework
-========================================
+=================================================
+The pyramid Web Application Development Framework
+=================================================
 
-:mod:`repoze.bfg` is a small, fast, down-to-earth Python web
-application framework.  It is developed as part of the `Repoze
-<http://repoze.org>`_ project by `Agendaless Consulting
-<http://agendaless.com>`_ and other contributors.  It is licensed
-under a `BSD-like license <http://repoze.org/license.html>`_.
+:mod:`pyramid` is a small, fast, down-to-earth Python web application
+development framework.  It is developed as part of the `Pylons
+<http://pylonshq.com>`_ project.  It is licensed under a `BSD-like
+license <http://repoze.org/license.html>`_.
 
 Front Matter
 ============
@@ -19,21 +18,11 @@ Front Matter
    copyright.rst
    conventions.rst
 
-"What's New" Documents
-======================
-
-.. toctree::
-   :maxdepth: 2
-
-   whatsnew-1.3
-   whatsnew-1.2
-   whatsnew-1.1
-
 Narrative documentation
 =======================
 
 Narrative documentation in chapter form explaining how to use
-:mod:`repoze.bfg`.
+:mod:`pyramid`.
 
 .. toctree::
    :maxdepth: 2
@@ -69,15 +58,15 @@ Narrative documentation in chapter form explaining how to use
 Tutorials
 =========
 
-Detailed tutorials explaining how to use :mod:`repoze.bfg` to build
-various types of applications and how to deploy :mod:`repoze.bfg`
+Detailed tutorials explaining how to use :mod:`pyramid` to build
+various types of applications and how to deploy :mod:`pyramid`
 applications to various platforms.
 
 .. toctree::
    :maxdepth: 2
 
-   tutorials/bfgwiki/index.rst
-   tutorials/bfgwiki2/index.rst
+   tutorials/wiki/index.rst
+   tutorials/wiki2/index.rst
    tutorials/cmf/index.rst
    tutorials/gae/index.rst
    tutorials/modwsgi/index.rst
@@ -89,7 +78,7 @@ Reference Material
 ==================
 
 Reference material includes API documentation and documentation of
-every :mod:`repoze.bfg` :term:`ZCML directive`.
+every :mod:`pyramid` :term:`ZCML directive`.
 
 .. toctree::
    :maxdepth: 2
@@ -115,6 +104,12 @@ Design Documentation
 
 Sample Applications
 ===================
+
+.. warning::
+
+   These applications are for an older version of :mod:`pyramid`,
+   which was named :mod:`repoze.bfg`.  We'll be updating them soon to
+   use :mod:`pyramid`.
 
 `repoze.cluegun <http://svn.repoze.org/repoze.cluegun/trunk/>`_ is a
 simple pastebin application based on Rocky Burt's `ClueBin
@@ -162,25 +157,25 @@ commenting, and file uploads.  See the `KARL site
 Support and Development
 =======================
 
-The `BFG web site <http://bfg.repoze.org>`_ is the main online source
-of :mod:`repoze.bfg` support and development information.
+The `Pyramid web site <http://pylonshq.com/pyramid>`_ is the main
+online source of :mod:`pyramid` support and development information.
 
-To report bugs, use the `bug tracker <http://bfg.repoze.org/trac>`_.
+To report bugs, use the `issue tracker
+<http://github.com/Pylons/pyramid/issues>`_.
 
 If you've got questions that aren't answered by this documentation,
-contact the `Repoze-dev maillist
-<http://lists.repoze.org/listinfo/repoze-dev>`_ or join the `#repoze
-IRC channel <irc://irc.freenode.net/#repoze>`_.
+contact the `Pylons-discuss maillist
+<http://groups.google.com/group/pylons-discuss>`_ or join the `#pylons
+IRC channel <irc://irc.freenode.net/#pylons>`_.
 
-Browse and check out tagged and trunk versions of :mod:`repoze.bfg`
-via the `Repoze Subversion repository
-<http://svn.repoze.org/repoze.bfg/>`_.  To check out the trunk
-via Subversion, use this command::
+Browse and check out tagged and trunk versions of :mod:`pyramid` via
+the `Pyramid GitHub repository <http://github.com/Pylons/pyramid/>`_.
+To check out the trunk via ``git``, use this command::
 
-  svn co http://svn.repoze.org/repoze.bfg/trunk repoze.bfg
+  git clone git@github.com:Pylons/pyramid.git
 
-To find out how to become a contributor to :mod:`repoze.bfg`, please
-see the `contributor's page <http://repoze.org/contributing.html>`_.
+To find out how to become a contributor to :mod:`pyramid`, please see
+the `contributor's page <http://repoze.org/contributing.html>`_.
 
 Index and Glossary
 ==================

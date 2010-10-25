@@ -2,10 +2,10 @@
  Author Introduction
 =====================
 
-Welcome to "The :mod:`repoze.bfg` Web Application Framework".  In this
+Welcome to "The :mod:`pyramid` Web Application Framework".  In this
 introduction, I'll describe the audience for this book, I'll describe
 the book content, I'll provide some context regarding the genesis of
-:mod:`repoze.bfg`, and I'll thank some important people.
+:mod:`pyramid`, and I'll thank some important people.
 
 I hope you enjoy both this book and the software it documents.  I've
 had a blast writing both.
@@ -42,7 +42,7 @@ book.  For example, the book doesn't try to define common web-related
 concepts like "URL" or "query string."  Likewise, the book describes
 various interactions in terms of the HTTP protocol, but it does not
 describe how the HTTP protocol works in detail.  Like any good web
-framework, though, :mod:`repoze.bfg` shields you from needing to know
+framework, though, :mod:`pyramid` shields you from needing to know
 most of the gory details of web protocols and low-level data
 structures. As a result, you can usually avoid becoming "blocked"
 while you read this book even if you don't yet deeply understand web
@@ -58,10 +58,10 @@ This book is divided into four major parts:
 
 :ref:`narrative_documentation`
 
-  This is documentation which describes :mod:`repoze.bfg` concepts in
+  This is documentation which describes :mod:`pyramid` concepts in
   narrative form, written in a largely conversational tone.  Each
   narrative documentation chapter describes an isolated
-  :mod:`repoze.bfg` concept.  You should be able to get useful
+  :mod:`pyramid` concept.  You should be able to get useful
   information out of the narrative chapters if you read them
   out-of-order, or when you need only a reminder about a particular
   topic while you're developing an application.
@@ -71,18 +71,18 @@ This book is divided into four major parts:
   Each tutorial builds a sample application or implements a set of
   concepts with a sample; it then describes the application or
   concepts in terms of the sample.  You should read the tutorials if
-  you want a guided tour of :mod:`repoze.bfg`.
+  you want a guided tour of :mod:`pyramid`.
 
 :ref:`api_reference`
 
   Comprehensive reference material for every public API exposed by
-  :mod:`repoze.bfg`.  The API documentation is organized
+  :mod:`pyramid`.  The API documentation is organized
   alphabetically by module name.
 
 :ref:`zcml_reference`
 
   Comprehensive reference material for every :term:`ZCML directive`
-  provided by :mod:`repoze.bfg`.  The ZCML directive documentation is
+  provided by :mod:`pyramid`.  The ZCML directive documentation is
   organized alphabetically by directive name.
 
 .. index::
@@ -90,9 +90,12 @@ This book is divided into four major parts:
    single: Zope 3
    single: Zope 2
    single: repoze.bfg genesis
+   single: pyramid genesis
 
 The Genesis of :mod:`repoze.bfg`
 ================================
+
+Before the end of 2010, :mod:`pyramid` was known as :mod:`repoze.bfg`.
 
 I wrote :mod:`repoze.bfg` after many years of writing applications
 using :term:`Zope`.  Zope provided me with a lot of mileage: it wasn't
@@ -130,13 +133,16 @@ I decided that in the long term, creating a simpler framework that
 retained features I had become accustomed to when developing Zope
 applications was a more reasonable idea than continuing to use any
 Zope publisher or living with the limitations and unfamiliarities of a
-different framework.  The result is what is now :mod:`repoze.bfg`.
+different framework.  The result is what is now :mod:`pyramid`.
 
-It is immodest to say so, but I believe :mod:`repoze.bfg` has turned
-out to be the very best Python web framework available today, bar
-none.  It combines all the "good parts" from other web frameworks into
-a cohesive whole that is reliable, down-to-earth, flexible, speedy,
-and well-documented.
+The Genesis of :mod:`pyramid`
+=============================
+
+What was :mod:`repoze.bfg` has become :mod:`pyramid` as the result of
+a coalition built between the :term:`Repoze` and :term:`Pylons`
+community throughout the year 2010.  By merging technology, we're able
+to reduce duplication of effort, and take advantage of more of each
+others' technology.
 
 .. index::
    single: Bicking, Ian

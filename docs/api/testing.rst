@@ -15,8 +15,6 @@
 
   .. autofunction:: registerView
 
-  .. autofunction:: registerViewPermission
-
   .. autofunction:: registerUtility
 
   .. autofunction:: registerAdapter
@@ -24,8 +22,6 @@
   .. autofunction:: registerSubscriber
 
   .. autofunction:: registerRoute
-
-  .. autofunction:: registerRoutesMapper
 
   .. autofunction:: registerSettings
 
