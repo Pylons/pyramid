@@ -1,4 +1,4 @@
-<configure xmlns="http://namespaces.repoze.org/bfg">
+<configure xmlns="http://pylonshq.com/pyramid">
 
   <include package="pyramid.includes"/>
  

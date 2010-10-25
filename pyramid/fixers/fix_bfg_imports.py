@@ -182,7 +182,7 @@ def fix_zcml(path):
                 absfile = os.path.join(root, file)
                 text = open(absfile, 'rb').read()
                 newt =INCLUDES.sub('include package="pyramid.includes"', text)
-                newt = NS.sub('xmlns="http://pyramid.pylonshq.com"', newt)
+                newt = NS.sub('xmlns="http://pylonshq.com/pyramid"', newt)
                 if text != newt:
                     newf = open(absfile, 'wb')
                     newf.write(newt)

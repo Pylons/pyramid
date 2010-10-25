@@ -2,7 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:meta="http://namespaces.zope.org/meta">
 
-  <meta:directives namespace="http://namespaces.repoze.org/bfg">
+  <meta:directives namespace="http://pylonshq.com/pyramid">
 
     <meta:directive
         name="view"
