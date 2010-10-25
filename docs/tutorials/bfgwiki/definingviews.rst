@@ -2,16 +2,16 @@
 Defining Views
 ==============
 
-A :term:`view callable` in a traversal-based :mod:`repoze.bfg`
-applications is typically a simple Python function that accepts two
+A :term:`view callable` in a traversal-based :mod:`pyramid`
+application is typically a simple Python function that accepts two
 parameters: :term:`context`, and :term:`request`.  A view callable is
 assumed to return a :term:`response` object.
 
-.. note:: A :mod:`repoze.bfg` view can also be defined as callable
+.. note:: A :mod:`pyramid` view can also be defined as callable
    which accepts *one* arguments: a :term:`request`.  You'll see this
-   one-argument pattern used in other :mod:`repoze.bfg` tutorials and
+   one-argument pattern used in other :mod:`pyramid` tutorials and
    applications.  Either calling convention will work in any
-   :mod:`repoze.bfg` application; the calling conventions can be used
+   :mod:`pyramid` application; the calling conventions can be used
    interchangeably as necessary.  In :term:`traversal` based
    applications, such as this tutorial, the context is used frequently
    within the body of a view method, so it makes sense to use the
@@ -22,11 +22,12 @@ assumed to return a :term:`response` object.
    to avoid the visual "noise".
 
 We're going to define several :term:`view callable` functions then
-wire them into :mod:`repoze.bfg` using some :term:`view
+wire them into :mod:`pyramid` using some :term:`view
 configuration` via :term:`ZCML`.
 
-The source code for this tutorial stage can be browsed at
-`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.3/views>`_.
+The source code for this tutorial stage can be browsed via
+`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/views/
+<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/views/>`_.
 
 Adding View Functions
 =====================
@@ -55,8 +56,8 @@ default view of a ``Wiki`` model object.  It always redirects to the
 ``Page`` object named "FrontPage".  It returns an instance of the
 :class:`webob.exc.HTTPFound` class (instances of which implement the
 WebOb :term:`response` interface), and the
-:func:`repoze.bfg.url.model_url` API.
-:func:`repoze.bfg.url.model_url` constructs a URL to the ``FrontPage``
+:func:`pyramid.url.model_url` API.
+:func:`pyramid.url.model_url` constructs a URL to the ``FrontPage``
 page (e.g. ``http://localhost:6543/FrontPage``), and uses it as the
 "location" of the HTTPFound response, forming an HTTP redirect.
 
@@ -101,7 +102,7 @@ Note the contrast between this view callable and the ``view_wiki``
 view callable.  In the ``view_wiki`` view callable, we return a
 :term:`response` object.  In the ``view_page`` view callable, we
 return a *dictionary*.  It is *always* fine to return a
-:term:`response` object from a :mod:`repoze.bfg` view.  Returning a
+:term:`response` object from a :mod:`pyramid` view.  Returning a
 dictionary is allowed only when there is a :term:`renderer` associated
 with the view callable in the view configuration.
 
@@ -115,7 +116,7 @@ this view.  It also acts as a handler for the form that is generated
 when we want to add a page object.  The ``context`` of the
 ``add_page`` view is always a Wiki object (*not* a Page object).
 
-The request :term:`subpath` in :mod:`repoze.bfg` is the sequence of
+The request :term:`subpath` in :mod:`pyramid` is the sequence of
 names that are found *after* the view name in the URL segments given
 in the ``PATH_INFO`` of the WSGI request as the result of
 :term:`traversal`.  If our add view is invoked via,
@@ -181,7 +182,7 @@ Adding Templates
 
 Most view callables we've added expected to be rendered via a
 :term:`template`.  Each template is a :term:`Chameleon` template.  The
-default templating system in :mod:`repoze.bfg` is a variant of
+default templating system in :mod:`pyramid` is a variant of
 :term:`ZPT` provided by Chameleon.  These templates will live in the
 ``templates`` directory of our tutorial package.
 
@@ -238,7 +239,7 @@ need to create this and place it in a file named ``style.css`` within
 our package's ``templates/static`` directory.  This file is a little
 too long to replicate within the body of this guide, however it is
 available `online
-<http://docs.repoze.org/bfgwiki-1.2/views/tutorial/templates/static/style.css>`_.
+<http://github.com/Pylons/pyramid/blob/master/docs/tutorials/wiki/src/views/tutorial/templates/static/default.css>`_.
 
 This CSS file will be accessed via
 e.g. ``http://localhost:6543/static/style.css`` by virtue of the

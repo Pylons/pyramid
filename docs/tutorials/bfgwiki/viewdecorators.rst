@@ -16,12 +16,12 @@ to using view decorators.
 Adding View Decorators
 ======================
 
-We're going to import the :class:`repoze.bfg.view.bfg_view` callable.
+We're going to import the :class:`pyramid.view.bfg_view` callable.
 This callable can be used as a function, class, or method decorator.
 We'll use it to decorate our ``view_wiki``, ``view_page``,
 ``add_page`` and ``edit_page`` view functions.
 
-The :class:`repoze.bfg.view.bfg_view` callable accepts a number of
+The :class:`pyramid.view.bfg_view` callable accepts a number of
 arguments:
 
 ``context``
@@ -153,9 +153,9 @@ Adding a Scan Directive
 
 In order for our decorators to be recognized, we must add a bit of
 boilerplate to our ``configure.zcml`` file which tells
-:mod:`repoze.bfg` to kick off a :term:`scan` at startup time.  Add the
+:mod:`pyramid` to kick off a :term:`scan` at startup time.  Add the
 following tag anywhere beneath the ``<include
-package="repoze.bfg.includes">`` tag but before the ending
+package="pyramid.includes">`` tag but before the ending
 ``</configure>`` tag within ``configure.zcml``:
 
 .. code-block:: xml

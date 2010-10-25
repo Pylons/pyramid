@@ -7,17 +7,22 @@ view, edit, and add pages to our wiki.  For purposes of demonstration
 we'll change our application to allow people whom are members of a
 *group* named ``group:editors`` to add and edit wiki pages but we'll
 continue allowing anyone with access to the server to view pages.
-:mod:`repoze.bfg` provides facilities for *authorization* and
+:mod:`pyramid` provides facilities for *authorization* and
 *authentication*.  We'll make use of both features to provide security
 to our application.
+
+The source code for this tutorial stage can be browsed via
+`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/
+<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/>`_.
+
 
 The source code for this tutorial stage can be browsed at
 `docs.repoze.org <http://docs.repoze.org/bfgwiki-1.3/authorization>`_.
 
-Configuring a ``repoze.bfg`` Authentication Policy
+Configuring a ``pyramid`` Authentication Policy
 --------------------------------------------------
 
-For any :mod:`repoze.bfg` application to perform authorization, we
+For any :mod:`pyramid` application to perform authorization, we
 need to add a ``security.py`` module and we'll need to change our
 :term:`application registry` to add an :term:`authentication policy`
 and a :term:`authorization policy`.
@@ -29,7 +34,7 @@ We'll change our ``configure.zcml`` file to enable an
 ``AuthTktAuthenticationPolicy`` and an ``ACLAuthorizationPolicy`` to
 enable declarative security checking.  We'll also add a new view
 stanza, which specifies a :term:`forbidden view`.  This configures our
-login view to show up when :mod:`repoze.bfg` detects that a view
+login view to show up when :mod:`pyramid` detects that a view
 invocation can not be authorized.  When you're done, your
 ``configure.zcml`` will look like so:
 
@@ -97,7 +102,7 @@ into its template.  We'll add something like this to each view body:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import authenticated_userid
+   from pyramid.security import authenticated_userid
    logged_in = authenticated_userid(request)
 
 We'll then change the return value of each view that has an associated
@@ -144,7 +149,7 @@ Giving Our Root Model Object an ACL
 -----------------------------------
 
 We need to give our root model object an :term:`ACL`.  This ACL will
-be sufficient to provide enough information to the :mod:`repoze.bfg`
+be sufficient to provide enough information to the :mod:`pyramid`
 security machinery to challenge a user who doesn't have appropriate
 credentials when he attempts to invoke the ``add_page`` or
 ``edit_page`` views.
@@ -155,8 +160,8 @@ file:
 .. code-block:: python
    :linenos:
 
-   from repoze.bfg.security import Allow
-   from repoze.bfg.security import Everyone
+   from pyramid.security import Allow
+   from pyramid.security import Everyone
 
 Our root model is a ``Wiki`` object.  We'll add the following line at
 class scope to our ``Wiki`` class:
@@ -169,7 +174,7 @@ class scope to our ``Wiki`` class:
 
 It's only happenstance that we're assigning this ACL at class scope.
 An ACL can be attached to an object *instance* too; this is how "row
-level security" can be achieved in :mod:`repoze.bfg` applications.  We
+level security" can be achieved in :mod:`pyramid` applications.  We
 actually only need *one* ACL for the entire system, however, because
 our security requirements are simple, so this feature is not
 demonstrated.
@@ -185,14 +190,14 @@ Adding ``permission`` Declarations to our ``bfg_view`` Decorators
 
 To protect each of our views with a particular permission, we need to
 pass a ``permission`` argument to each of our
-:class:`repoze.bfg.view.bfg_view` decorators.  To do so, within
+:class:`pyramid.view.bfg_view` decorators.  To do so, within
 ``views.py``:
 
 - We add ``permission='view'`` to the decorator attached to the
   ``view_wiki`` view function. This makes the assertion that only
   users who possess the effective ``view`` permission at the time of
   the request may invoke this view.  We've granted
-  :data:`repoze.bfg.security.Everyone` the view permission at the root
+  :data:`pyramid.security.Everyone` the view permission at the root
   model via its ACL, so everyone will be able to invoke the
   ``view_wiki`` view.
 
@@ -200,7 +205,7 @@ pass a ``permission`` argument to each of our
   ``view_page`` view function.  This makes the assertion that only
   users who possess the effective ``view`` permission at the time of
   the request may invoke this view.  We've granted
-  :data:`repoze.bfg.security.Everyone` the view permission at the root
+  :data:`pyramid.security.Everyone` the view permission at the root
   model via its ACL, so everyone will be able to invoke the
   ``view_page`` view.
 

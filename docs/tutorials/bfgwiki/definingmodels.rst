@@ -11,8 +11,9 @@ objects.  A single instance of the "Wiki" class will serve as a
 container for "Page" objects, which will be instances of the "Page"
 class.
 
-The source code for this tutorial stage can be browsed at
-`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.3/models>`_.
+The source code for this tutorial stage can be browsed via
+`http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/models/
+<http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/models/>`_.
 
 Deleting the Database
 ---------------------
@@ -56,7 +57,7 @@ Our ``Wiki`` class should also have a ``__name__`` attribute set to
 ``None`` at class scope, and should have a ``__parent__`` attribute
 set to ``None`` at class scope as well.  If a model has a
 ``__parent__`` attribute of ``None`` in a traversal-based
-:mod:`repoze.bfg` application, it means that it's the :term:`root`
+:mod:`pyramid` application, it means that it's the :term:`root`
 model.  The ``__name__`` of the root model is also always ``None``.
 
 Then we'll add a ``Page`` class.  This class should inherit from the
@@ -102,10 +103,10 @@ separate test class for each model class, and we'll write a test class
 for the ``appmaker``.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class provided
-as a result of the ``bfg_zodb`` project generator.  We'll add three
-test classes: one for the ``Page`` model named ``PageModelTests``, one
-for the ``Wiki`` model named ``WikiModelTests``, and one for the
-appmaker named ``AppmakerTests``.
+as a result of the ``pyramid_zodb`` project generator.  We'll add
+three test classes: one for the ``Page`` model named
+``PageModelTests``, one for the ``Wiki`` model named
+``WikiModelTests``, and one for the appmaker named ``AppmakerTests``.
 
 When we're done changing ``tests.py``, it will look something like so:
 

@@ -7,7 +7,7 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'repoze.bfg',
+    'pyramid',
     'docutils',
     'ZODB3',
     'repoze.zodbconn',
@@ -20,7 +20,7 @@ setup(name='tutorial',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Intended Audience :: Developers",
-        "Framework :: BFG",
+        "Framework :: Pylons",
         "Programming Language :: Python",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
@@ -28,7 +28,7 @@ setup(name='tutorial',
       author='',
       author_email='',
       url='',
-      keywords='web wsgi bfg',
+      keywords='web wsgi bfg pylons pyramid',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,

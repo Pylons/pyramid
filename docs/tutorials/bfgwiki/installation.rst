@@ -52,16 +52,15 @@ Preparation, UNIX
 #. (Optional) Consider using ``source bin/activate`` to make your
    shell environment wired to use the virtualenv.
 
-#. Use ``easy_install`` to get :mod:`repoze.bfg` and its direct
+#. Use ``easy_install`` to get :mod:`pyramid` and its direct
    dependencies installed:
 
    .. code-block:: bash
 
-     $ bin/easy_install repoze.bfg
+     $ bin/easy_install pyramid
 
 #. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
-   ``repoze.zodbconn``, ``nose`` and ``coverage`` from
-   a different custom index (the "bfgsite" index).
+   ``repoze.zodbconn``, ``nose`` and ``coverage``:
 
    .. code-block:: bash
 
@@ -105,16 +104,15 @@ Preparation, Windows
 #. (Optional) Consider using ``bin\activate.bat`` to make your shell
    environment wired to use the virtualenv.
 
-#. Use ``easy_install`` to get :mod:`repoze.bfg` and its direct
+#. Use ``easy_install`` to get :mod:`pyramid` and its direct
    dependencies installed:
 
    .. code-block:: bat
 
-     c:\bigfntut> Scripts\easy_install repoze.bfg
+     c:\bigfntut> Scripts\easy_install pyramid
 
 #. Use ``easy_install`` to install ``docutils``, ``repoze.tm``,
-   ``repoze.zodbconn``, ``nose`` and ``coverage`` from a *different*
-   index (the "bfgsite" index).
+   ``repoze.zodbconn``, ``nose`` and ``coverage``:
 
    .. code-block:: bat
 
@@ -126,9 +124,9 @@ Preparation, Windows
 Making a Project
 ================
 
-Your next step is to create a project.  :mod:`repoze.bfg` supplies a
+Your next step is to create a project.  :mod:`pyramid` supplies a
 variety of templates to generate sample projects.  For this tutorial,
-we will use the :term:`ZODB` -oriented template named ``bfg_zodb``.
+we will use the :term:`ZODB` -oriented template named ``pyramid_zodb``.
 
 The below instructions assume your current working directory is the
 "virtualenv" named "bigfntut".
@@ -137,15 +135,15 @@ On UNIX:
 
 .. code-block:: bash
 
-  $ bin/paster create -t bfg_zodb tutorial
+  $ bin/paster create -t pyramid_zodb tutorial
 
 On Windows:
 
 .. code-block:: bat
 
-   c:\bigfntut> Scripts\paster create -t bfg_zodb tutorial
+   c:\bigfntut> Scripts\paster create -t pyramid_zodb tutorial
 
-.. note:: If you are using Windows, the ``bfg_zodb`` Paster template
+.. note:: If you are using Windows, the ``pyramid_zodb`` Paster template
    doesn't currently deal gracefully with installation into a location
    that contains spaces in the path.  If you experience startup
    problems, try putting both the virtualenv and the project into
@@ -233,7 +231,7 @@ On Windows:
   c:\bigfntut\tutorial> ..\Scripts\nosetests --cover-package=tutorial \
        --cover-erase --with-coverage
 
-Looks like the code in the ``bfg_zodb`` template for ZODB projects is
+Looks like the code in the ``pyramid_zodb`` template for ZODB projects is
 missing some test coverage, particularly in the file named
 ``models.py``.
 
@@ -243,12 +241,12 @@ Visit the Application in a Browser
 In a browser, visit `http://localhost:6543/ <http://localhost:6543>`_.
 You will see the generated application's default page.
 
-Decisions the ``bfg_zodb`` Template Has Made For You
-=====================================================
+Decisions the ``pyramid_zodb`` Template Has Made For You
+========================================================
 
-Creating a project using the ``bfg_zodb`` template makes the
+Creating a project using the ``pyramid_zodb`` template makes the
 assumption that you are willing to use :term:`ZODB` as persistent
-storage and :term:`traversal` to map URLs to code.  :mod:`repoze.bfg`
+storage and :term:`traversal` to map URLs to code.  :mod:`pyramid`
 supports any persistent storage mechanism (e.g. a SQL database or
 filesystem files, etc).  It also supports an additional mechanism to
 map URLs to code (:term:`URL dispatch`).  However, for the purposes of
