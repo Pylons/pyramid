@@ -83,6 +83,8 @@ setup(name='pyramid',
         pyramid_alchemy=pyramid.paster:AlchemyProjectTemplate
         [paste.paster_command]
         pyramid_shell=pyramid.paster:BFGShellCommand
+        [console_scripts]
+        bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
       """
       )
 
