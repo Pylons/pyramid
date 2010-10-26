@@ -3,4 +3,5 @@
 *.pyc
 *.pt.py
 *.txt.py
+.coverage
 env26

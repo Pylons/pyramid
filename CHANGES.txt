@@ -17,7 +17,7 @@ Backwards Incompatibilities (with BFG 1.3.X)
   has the name ``pyramid.debug``.
 
 - The deprecated API named ``pyramid.router.make_app`` (aka
-  ``pyramid.configuration.make_app) was removed.
+  ``pyramid.configuration.make_app``) was removed.
 
 - The deprecated API named ``pyramid.request.get_request`` was removed.
 
