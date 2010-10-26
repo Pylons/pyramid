@@ -1,0 +1,25 @@
+In order to add a feature to this package:
+
+- The feature must be documented in both the API and narrative
+  documentation (in docs/).
+
+- The feature must work fully on the following CPython versions: 2.4,
+  2.5, 2.6, and 2.7 on both UNIX and Windows.
+
+- The feature must not cause installation or runtime failure on Jython
+  or App Engine.  If it doesn't cause installation or runtime failure,
+  but doesn't actually *work* on these platforms, that caveat should be
+  spelled out in the documentation.
+
+- The feature must not depend on any particular persistence layer
+  (filesystem, SQL, etc).
+
+- The feature must not add unnecessary dependencies (where
+  "unnecessary" is of course subjective, but new dependencies should
+  be discussed).
+
+The above requirements are relaxed for paster template dependencies.
+If a paster template has a dependency on something that doesn't work
+on a particular platform, that caveat should be spelled out clearly in
+*its* documentation (within docs/).
+
