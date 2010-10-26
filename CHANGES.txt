@@ -28,17 +28,17 @@ Documentation (delta from BFG 1.3)
 Backwards Incompatibilities (with BFG 1.3.X)
 --------------------------------------------
 
-- The ``pyramid.testing.registerRoutesMapper`` API (deprecated in BFG
-  1.2) has been removed.
-
-- The ``pyramid.testing.registerViewPermission`` API (deprecated in
-  BFG 1.1) has been removed.
-
 - There is no longer an ``IDebugLogger`` registered as a named utility
   with the name ``repoze.bfg.debug``.
 
 - The logger which used to have the name of ``repoze.bfg.debug`` now
   has the name ``pyramid.debug``.
+
+- The deprecated API ``pyramid.testing.registerViewPermission``
+  has been removed.
+
+- The deprecated API named ``pyramid.testing.registerRoutesMapper`` 
+  has been removed.
 
 - The deprecated API named ``pyramid.request.get_request`` was removed.
 
