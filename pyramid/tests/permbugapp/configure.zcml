@@ -1,0 +1,21 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <include package="pyramid.includes" />
+
+  <view
+      view=".test"
+      name="test"
+      />
+
+  <view
+      view=".x_view"
+      name="x"
+      permission="private"
+      />
+
+  <authtktauthenticationpolicy
+     secret="seekt1t"/>
+
+  <aclauthorizationpolicy/>
+
+</configure>

@@ -1099,7 +1099,7 @@ class Configurator(object):
         isexc = isexception(context)
 
         def regclosure():
-            if hasattr(view, '__call_permissive__'):
+            if hasattr(derived_view, '__call_permissive__'):
                 view_iface = ISecuredView
             else:
                 view_iface = IView

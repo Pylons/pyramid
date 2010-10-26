@@ -186,6 +186,18 @@ class TestViewDecoratorApp(TwillBase):
         self.assertEqual(browser.get_code(), 200)
         self.failUnless('OK3' in browser.get_html())
 
+class TestViewPermissionBug(TwillBase):
+    # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
+    config = 'pyramid.tests.permbugapp:configure.zcml'
+    def test_it(self):
+        import twill.commands
+        browser = twill.commands.get_browser()
+        browser.go('http://localhost:6543/test')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('ACLDenied' in browser.get_html())
+        browser.go('http://localhost:6543/x')
+        self.assertEqual(browser.get_code(), 401)
+
 from pyramid.tests.exceptionviewapp.models import AnException, NotAnException
 excroot = {'anexception':AnException(),
            'notanexception':NotAnException()}
