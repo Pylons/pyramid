@@ -96,10 +96,14 @@ Here's how to convert a :mod:`repoze.bfg` application to a
      converted recursively, except Python files which live in
      directories which start with a ``.`` (dot).
 
-   - ZCML attributes which name ``repoze.bfg``
+   - ZCML files which contain directives that have attributes which
+     name ``repoze.bfg``
      (e.g. ``context="repoze.bfg.exceptions.NotFound"``) will be
      converted to :mod:`pyramid` compatible ZCML attributes
-     (e.g. ``context="pyramid.exceptions.NotFound``).
+     (e.g. ``context="pyramid.exceptions.NotFound``).  Every ZCML file
+     beneath the top-level path (files ending with ``.zcml``) will be
+     visited and converted recursively, except ZCML files which live
+     in directories which start with a ``.`` (dot).
 
 #. Edit the ``setup.py`` file of the application you've just converted
    (if you've been using the example paths, this will be
@@ -142,6 +146,6 @@ Here's how to convert a :mod:`repoze.bfg` application to a
 
 #. Fix any test failures.
 
-#. Celebrate.
+#. Start using the converted version of your application.  Celebrate.
 
 
