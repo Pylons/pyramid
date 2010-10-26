@@ -198,6 +198,22 @@ class TestViewPermissionBug(TwillBase):
         browser.go('http://localhost:6543/x')
         self.assertEqual(browser.get_code(), 401)
 
+class TestDefaultViewPermissionBug(TwillBase):
+    # default_view_permission bug as reported by Wiggy at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
+    config = 'pyramid.tests.defpermbugapp:configure.zcml'
+    def test_it(self):
+        import twill.commands
+        browser = twill.commands.get_browser()
+        browser.go('http://localhost:6543/x')
+        self.assertEqual(browser.get_code(), 401)
+        self.failUnless('failed permission check' in browser.get_html())
+        browser.go('http://localhost:6543/y')
+        self.assertEqual(browser.get_code(), 401)
+        self.failUnless('failed permission check' in browser.get_html())
+        browser.go('http://localhost:6543/z')
+        self.assertEqual(browser.get_code(), 200)
+        self.failUnless('public' in browser.get_html())
+
 from pyramid.tests.exceptionviewapp.models import AnException, NotAnException
 excroot = {'anexception':AnException(),
            'notanexception':NotAnException()}

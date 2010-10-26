@@ -1,0 +1,14 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <include package="pyramid.includes" />
+
+  <scan package="pyramid.tests.defpermbugapp"/>
+
+  <authtktauthenticationpolicy
+     secret="seekt1t"/>
+
+  <aclauthorizationpolicy/>
+
+  <default_permission name="private" />
+
+</configure>

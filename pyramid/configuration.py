@@ -89,8 +89,6 @@ DEFAULT_RENDERERS = (
     ('string', renderers.string_renderer_factory),
     )
 
-_marker = object()
-
 class Configurator(object):
     """
     A Configurator is used to configure a :mod:`pyramid`
@@ -746,7 +744,7 @@ class Configurator(object):
         return route
 
 
-    def add_view(self, view=None, name="", for_=None, permission=_marker, 
+    def add_view(self, view=None, name="", for_=None, permission=None, 
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
@@ -783,11 +781,12 @@ class Configurator(object):
           :class:`pyramid.configuration.Configurator` constructor's
           ``default_permission`` argument, or if
           :meth:`pyramid.configuration.Configurator.set_default_permission`
-          was used prior to this view registration.  Pass ``None`` as
-          the permission to explicitly indicate that the view should
-          always be executable by entirely anonymous users, regardless
-          of the default permission, bypassing any
-          :term:`authorization policy` that may be in effect.
+          was used prior to this view registration.  Pass the string
+          ``__no_permission_required__`` as the permission argument to
+          explicitly indicate that the view should always be
+          executable by entirely anonymous users, regardless of the
+          default permission, bypassing any :term:`authorization
+          policy` that may be in effect.
 
         attr
 
@@ -1051,10 +1050,11 @@ class Configurator(object):
             containment=containment, request_type=request_type,
             custom=custom_predicates)
 
-        if permission is _marker:
+        if permission is None:
             # intent: will be None if no default permission is registered
             permission = self.registry.queryUtility(IDefaultPermission)
 
+        # NO_PERMISSION_REQUIRED handled by _secure_view
         derived_view = self._derive_view(view, permission, predicates, attr,
                                          renderer, wrapper, name, accept, order,
                                          phash)
@@ -2514,6 +2514,12 @@ def _predicate_wrap(view, predicates):
     return predicate_wrapper
 
 def _secure_view(view, permission, authn_policy, authz_policy):
+    if permission == '__no_permission_required__':
+        # allow views registered within configurations that have a
+        # default permission to explicitly override the default
+        # permission, replacing it with no permission at all
+        permission = None
+
     wrapped_view = view
     if authn_policy and authz_policy and (permission is not None):
         def _secured_view(context, request):

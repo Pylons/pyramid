@@ -376,3 +376,4 @@ class IDefaultPermission(Interface):
     for all view configurations which do not explicitly declare their
     own."""
     
+NO_PERMISSION_REQUIRED = '__no_permission_required__'
