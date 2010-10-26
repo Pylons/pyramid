@@ -10,8 +10,8 @@ Converting a :mod:`repoze.bfg` Application to :mod:`pyramid`
 Prior iterations of :mod:`pyramid` were released as a package named
 :mod:`repoze.bfg`.  :mod:`repoze.bfg` users are encouraged to upgrade
 their deployments to :mod:`pyramid`, as, after the first final release
-of :mod:`pyramid`, further development on :mod:`repoze.bfg` will
-cease.
+of :mod:`pyramid`, further feature development on :mod:`repoze.bfg`
+will cease.
 
 Most existing :mod:`repoze.bfg` applications can be converted to a
 :mod:`pyramid` application in a completely automated fashion.
