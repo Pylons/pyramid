@@ -29,6 +29,7 @@ except IOError:
 
 install_requires=[
     'Chameleon >= 1.2.3',
+    'Mako',
     'Paste > 1.7', # temp version pin to prevent PyPi install failure :-(
     'PasteDeploy',
     'PasteScript',

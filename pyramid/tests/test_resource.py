@@ -401,7 +401,27 @@ class TestFileOverride(unittest.TestCase):
         o = self._makeOne('foo.pt', 'package', 'bar.pt')
         result = o('notfound.pt')
         self.assertEqual(result, None)
-        
+
+class Test_abspath_from_resource_spec(unittest.TestCase):
+    def _callFUT(self, spec, pname='__main__'):
+        from pyramid.resource import abspath_from_resource_spec
+        return abspath_from_resource_spec(spec, pname)
+
+    def test_pname_is_None_before_resolve_resource_spec(self):
+        result = self._callFUT('abc', None)
+        self.assertEqual(result, 'abc')
+
+    def test_pname_is_None_after_resolve_resource_spec(self):
+        result = self._callFUT('/abc', '__main__')
+        self.assertEqual(result, '/abc')
+
+    def test_pkgrelative(self):
+        import os
+        here = os.path.dirname(__file__)
+        path = os.path.abspath(here)
+        result = self._callFUT('abc', 'pyramid.tests')
+        self.assertEqual(result, os.path.join(path, 'abc'))
+
 class DummyOverride:
     def __init__(self, result):
         self.result = result

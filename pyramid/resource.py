@@ -198,4 +198,10 @@ def resource_spec_from_abspath(abspath, package):
                           relpath.replace(os.path.sep, '/'))
     return abspath
             
-    
+def abspath_from_resource_spec(spec, pname='__main__'):
+    if pname is None:
+        return spec
+    pname, filename = resolve_resource_spec(spec, pname)
+    if pname is None:
+        return filename
+    return pkg_resources.resource_filename(pname, filename)
