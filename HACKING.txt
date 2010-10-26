@@ -22,4 +22,3 @@ The above requirements are relaxed for paster template dependencies.
 If a paster template has a dependency on something that doesn't work
 on a particular platform, that caveat should be spelled out clearly in
 *its* documentation (within docs/).
-

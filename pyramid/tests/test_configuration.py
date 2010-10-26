@@ -93,6 +93,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.failUnless(config.registry.getUtility(IRendererFactory, 'string'))
         self.failUnless(config.registry.getUtility(IRendererFactory, '.pt'))
         self.failUnless(config.registry.getUtility(IRendererFactory, '.txt'))
+        self.failUnless(config.registry.getUtility(IRendererFactory, '.mak'))
+        self.failUnless(config.registry.getUtility(IRendererFactory, '.mako'))
 
     def test_begin(self):
         from pyramid.configuration import Configurator
