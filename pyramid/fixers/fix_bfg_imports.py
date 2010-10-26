@@ -176,12 +176,12 @@ for name in MODULE_NAMES:
 MODULE_ALTERNATIVES = '|'.join(MODULE_ALTERNATIVES)
 
 BFG_NS_RE = r'xmlns\s*?=\s*?[\'\"]http://namespaces\.repoze\.org/bfg[\'\"]'
-BFG_IN_ATTR = r'[\'\"]\s*?(repoze\.bfg)(%s)\s*?[\'\"]' % MODULE_ALTERNATIVES
+BFG_IN_ATTR = r'(repoze\.bfg)(%s)' % MODULE_ALTERNATIVES
 ATTR = re.compile(BFG_IN_ATTR, re.MULTILINE)
 NS = re.compile(BFG_NS_RE, re.MULTILINE)
 
 def replace(match):
-    return '"pyramid%s"' % match.group(2)
+    return 'pyramid%s' % match.group(2)
 
 def fix_zcml(path):
     for root, dirs, files in os.walk(path):
