@@ -1,8 +1,6 @@
 from zope.interface import implements
 from zope.interface import Interface
 
-from mako.lookup import TemplateLookup
-
 from pyramid.interfaces import ITemplateRenderer
 from pyramid.exceptions import ConfigurationError
 from pyramid.threadlocal import get_current_registry
@@ -14,6 +12,7 @@ class IMakoLookup(Interface):
     pass
 
 def renderer_factory(path):
+    from mako.lookup import TemplateLookup
     registry = get_current_registry()
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
