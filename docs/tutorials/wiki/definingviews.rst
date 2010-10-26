@@ -54,11 +54,11 @@ The ``view_wiki`` view function
 The ``view_wiki`` function will be configured to respond as the
 default view of a ``Wiki`` model object.  It always redirects to the
 ``Page`` object named "FrontPage".  It returns an instance of the
-:class:`webob.exc.HTTPFound` class (instances of which implement the
-WebOb :term:`response` interface), and the
-:func:`pyramid.url.model_url` API.
-:func:`pyramid.url.model_url` constructs a URL to the ``FrontPage``
-page (e.g. ``http://localhost:6543/FrontPage``), and uses it as the
+:class:`pyramid.httpexceptions.HTTPFound` class (instances of which
+implement the WebOb :term:`response` interface), and the
+:func:`pyramid.url.model_url` API.  :func:`pyramid.url.model_url`
+constructs a URL to the ``FrontPage`` page
+(e.g. ``http://localhost:6543/FrontPage``), and uses it as the
 "location" of the HTTPFound response, forming an HTTP redirect.
 
 The ``view_page`` view function

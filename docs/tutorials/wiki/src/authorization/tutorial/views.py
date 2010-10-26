@@ -1,7 +1,7 @@
 from docutils.core import publish_parts
 import re
 
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from pyramid.url import model_url
 
 from pyramid.security import authenticated_userid

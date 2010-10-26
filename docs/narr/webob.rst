@@ -309,20 +309,23 @@ default to anything, though if you subclass ``Response`` and set
 Exceptions
 ++++++++++
 
-To facilitate error responses like 404 Not Found, the module
-``webob.exc`` contains classes for each kind of error response.  These
-include boring but appropriate error bodies.
+To facilitate error responses like ``404 Not Found``, the module
+:mod:`webob.exc` contains classes for each kind of error response.
+These include boring but appropriate error bodies.  The exceptions
+exposed by this module, when used under :mod:`pyramid`, should be
+imported from the :mod:`pyramid.httpexceptions` "facade" module.
 
-Each class is named ``webob.exc.HTTP*``, where ``*`` is the reason for
-the error.  For instance, ``webob.exc.HTTPNotFound``.  It subclasses
-``Response``, so you can manipulate the instances in the same way.  A
-typical example is:
+Each class is named ``pyramid.httpexceptions.HTTP*``, where ``*`` is
+the reason for the error.  For instance,
+``pyramid.httpexceptions.HTTPNotFound``.  It subclasses ``Response``,
+so you can manipulate the instances in the same way.  A typical
+example is:
 
 .. ignore-next-block
 .. code-block:: python
 
-    from webob.exc import HTTPNotFound
-    from webob.exc import HTTPMovedPermanently
+    from pyramid.httpexceptions import HTTPNotFound
+    from pyramid.httpexceptions import HTTPMovedPermanently
 
     response = HTTPNotFound('There is no such resource')
     # or:
@@ -336,8 +339,8 @@ You can use this like:
 .. code-block:: python
    :linenos:
 
-   from webob.exc import HTTPException
-   from webob.exc import HTTPNotFound
+   from pyramid.httpexceptions import HTTPException
+   from pyramid.httpexceptions import HTTPNotFound
 
    def aview(request):
        try:

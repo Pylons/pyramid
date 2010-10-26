@@ -2,8 +2,7 @@ import re
 
 from docutils.core import publish_parts
 
-from webob.exc import HTTPFound
-
+from pyramid.httpexceptions import HTTPFound
 from pyramid.url import route_url
 
 from tutorial.models import DBSession

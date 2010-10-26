@@ -1,4 +1,4 @@
-from webob.exc import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 
 from pyramid.view import bfg_view
 from pyramid.url import model_url

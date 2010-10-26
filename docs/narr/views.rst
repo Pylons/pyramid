@@ -298,16 +298,17 @@ particular kind of response.
 .. code-block:: python
    :linenos:
 
-   from webob.exc import HTTPFound
+   from pyramid.httpexceptions import HTTPFound
 
    def myview(request):
        return HTTPFound(location='http://example.com')
 
 All exception types from the :mod:`webob.exc` module implement the
-Webob :term:`Response` interface; any can be returned as the response
-from a view.  See :term:`WebOb` for the documentation for this module;
-it includes other response types that imply other HTTP response codes,
-such as ``401 Unauthorized``.
+WebOb :term:`Response` interface; any can be returned as the response
+from a view.  See :mod:`pyramid.httpexceptions` for the documentation
+for the ``HTTPFound`` exception; it also includes other response types
+that imply other HTTP response codes, such as ``HTTPUnauthorized`` for
+``401 Unauthorized``.
 
 .. index::
    single: renderer
