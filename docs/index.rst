@@ -65,6 +65,7 @@ applications to various platforms.
 .. toctree::
    :maxdepth: 2
 
+   tutorials/bfg/index.rst
    tutorials/wiki/index.rst
    tutorials/wiki2/index.rst
    tutorials/cmf/index.rst
