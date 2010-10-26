@@ -10,7 +10,7 @@ from lib2to3 import fixer_base
 
 MAPPING = {'repoze.bfg':'pyramid'}
 
-for name in (
+MODULE_NAMES = (
     'compat',
     'configuration',
     'authentication',
@@ -42,7 +42,7 @@ for name in (
     'tests.test_configuration',
     'tests.ccbugapp',
     'tests.exceptionviewapp',
-    'repoze.bfg.tests.exceptionviewapp.models',
+    'tests.exceptionviewapp.models',
     'tests.fixtureapp',
     'tests.fixtureapp.models',
     'tests.grokkedapp',
@@ -57,7 +57,9 @@ for name in (
     'view',
     'wsgi',
     'zcml',
-    ):
+    )
+
+for name in MODULE_NAMES:
     frm = 'repoze.bfg.' + name
     to =  'pyramid.' + name
     MAPPING[frm] = to
@@ -167,8 +169,14 @@ class FixBfgImports(fixer_base.BaseFix):
             if new_name:
                 node.replace(Name(new_name, prefix=bare_name.prefix))
 
+MODULE_ALTERNATIVES = []
+for name in MODULE_NAMES:
+    MODULE_ALTERNATIVES.append(r'\.' + re.escape(name)+r'[\w\.]*?')
+
+MODULE_ALTERNATIVES = '|'.join(MODULE_ALTERNATIVES)
+
 BFG_NS_RE = r'xmlns\s*?=\s*?[\'\"]http://namespaces\.repoze\.org/bfg[\'\"]'
-BFG_IN_ATTR = r'[\'\"]\s*?(repoze\.bfg)(.*?)[\'\"]'
+BFG_IN_ATTR = r'[\'\"]\s*?(repoze\.bfg)(%s)\s*?[\'\"]' % MODULE_ALTERNATIVES
 ATTR = re.compile(BFG_IN_ATTR, re.MULTILINE)
 NS = re.compile(BFG_NS_RE, re.MULTILINE)
 
