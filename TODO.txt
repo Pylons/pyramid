@@ -86,4 +86,9 @@
 
 - Figure out what to do about "add_helper" and "add_rest_handler".
 
+- ``bfg_view`` alias.
+
+- ``repoze.bfg.message`` alias.
+
+- Try to get rid of Mako Beaker dependency.
 
