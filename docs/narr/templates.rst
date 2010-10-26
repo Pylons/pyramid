@@ -51,16 +51,14 @@ within the body of a view callable like so:
 .. warning:: Earlier iterations of this documentation
    (pre-version-1.3) encouraged the application developer to use
    ZPT-specific APIs such as
-   :func:`pyramid.chameleon_zpt.render_template_to_response`,
-   :func:`pyramid.chameleon_zpt.render_template_to_iterable`, and
-   :func:`pyramid.chameleon_zpt.render_template` to render
-   templates directly.  This style of rendering still works, but at
-   least for purposes of this documentation, those functions are
-   deprecated.  Application developers are encouraged instead to use
-   the functions available in the :mod:`pyramid.renderers` module
-   to perform rendering tasks.  This set of functions works to render
-   templates for all renderer extensions registered with
-   :mod:`pyramid`.
+   :func:`pyramid.chameleon_zpt.render_template_to_response` and
+   :func:`pyramid.chameleon_zpt.render_template` to render templates
+   directly.  This style of rendering still works, but at least for
+   purposes of this documentation, those functions are deprecated.
+   Application developers are encouraged instead to use the functions
+   available in the :mod:`pyramid.renderers` module to perform
+   rendering tasks.  This set of functions works to render templates
+   for all renderer extensions registered with :mod:`pyramid`.
 
 The ``sample_view`` :term:`view callable` above returns a
 :term:`response` object which contains the body of the
@@ -116,7 +114,7 @@ function.
 
 Every view must return a :term:`response` object (except for views
 which use a :term:`renderer` named via view configuration, which we'll
-see shortly).  The :func:`pyramid.renders.render_to_response`
+see shortly).  The :func:`pyramid.renderers.render_to_response`
 function is a shortcut function that actually returns a response
 object.
 

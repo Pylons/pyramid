@@ -16,9 +16,6 @@ The source code for this tutorial stage can be browsed via
 <http://github.com/Pylons/pyramid/tree/master/docs/tutorials/wiki/src/authorization/>`_.
 
 
-The source code for this tutorial stage can be browsed at
-`docs.repoze.org <http://docs.repoze.org/bfgwiki-1.3/authorization>`_.
-
 Configuring a ``pyramid`` Authentication Policy
 --------------------------------------------------
 

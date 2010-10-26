@@ -10,7 +10,7 @@ code which generates an instance of that content.  It is possible to
 construct and enumerate content types using APIs defined on the types
 tool.
 
-:mod:`repoze.bfg` itself has no such concept, but an addon package named
+:mod:`pyramid` itself has no such concept, but an addon package named
 :term:`repoze.lemonade` has a barebones replacement.
 
 Factory Type Information
@@ -22,7 +22,7 @@ initial view name, a factory, and a number of security settings with a
 type name.  Each type information object knows how to manufacture
 content objects that match its type.
 
-:mod:`repoze.bfg` certainly enforces none of these concepts in any
+:mod:`pyramid` certainly enforces none of these concepts in any
 particular way, but :term:`repoze.lemonade` does.
 
 ``repoze.lemonade`` Content
@@ -51,7 +51,7 @@ of helper functions which allow you to:
           content-agnostic unit tests or if you need to get an
           enumerated subset of content type information to aid in UI
           generation.  That said, this *is* a tutorial about how to
-          get CMF-like features in :mod:`repoze.bfg`, so we'll assume
+          get CMF-like features in :mod:`pyramid`, so we'll assume
           the pattern is useful to readers.
 
 See the `repoze.lemonade package

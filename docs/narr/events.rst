@@ -33,7 +33,7 @@ when it's called.
 The mere existence of a subscriber function, however, is not
 sufficient to arrange for it to be called.  To arrange for the
 subscriber to be called, you'll need to use the
-:meth:`pyramid.configurator.Configurator.add_subscriber` method to
+:meth:`pyramid.configuration.Configurator.add_subscriber` method to
 register the subscriber imperatively, or via a decorator, or you'll
 need to use ZCML for the same purpose:
 

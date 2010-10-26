@@ -8,7 +8,7 @@ The main feature of the CMF catalog is that it filters search results
 from the Zope 2 "catalog" based on the requesting user's ability to
 view a particular cataloged object.
 
-:mod:`repoze.bfg` itself has no cataloging facility, but an addon
+:mod:`pyramid` itself has no cataloging facility, but an addon
 package named :term:`repoze.catalog` offers similar functionality.
 
 Creating an Allowed Index
@@ -24,7 +24,7 @@ Creating The ``allowed`` Index
 Here's some code which creates an ``allowed`` index for use in a
 ``repoze.catalog`` catalog::
 
-    from repoze.bfg.security import principals_allowed_by_permission
+    from pyramid.security import principals_allowed_by_permission
     from repoze.catalog.indexes.keyword import CatalogKeywordIndex
     from repoze.catalog.catalog import Catalog
 
@@ -53,7 +53,7 @@ Using the ``allowed`` Index
 
 Here's how you might use the ``allowed`` index within a query::
 
-  from repoze.bfg.security import effective_principals
+  from pyramid.security import effective_principals
   principals = effective_principals(request)
   catalog.searchResults(allowed={'operator':'or', 'query':principals})
 

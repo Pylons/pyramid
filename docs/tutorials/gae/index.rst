@@ -1,14 +1,14 @@
 .. _appengine_tutorial:
 
-Running :mod:`repoze.bfg` on Google's App Engine
+Running :mod:`pyramid` on Google's App Engine
 ================================================
 
-As of :mod:`repoze.bfg` version 0.8, it is possible to run a
-:mod:`repoze.bfg` application on Google's `App Engine
-<http://code.google.com/appengine/>`_.  Content from this tutorial was
-contributed by YoungKing, based on the `"appengine-monkey" tutorial
-for Pylons <http://code.google.com/p/appengine-monkey/wiki/Pylons>`_.
-This tutorial is written in terms of using the command line on a UNIX
+It is possible to run a :mod:`pyramid` application on Google's `App
+Engine <http://code.google.com/appengine/>`_.  Content from this
+tutorial was contributed by YoungKing, based on the
+`"appengine-monkey" tutorial for Pylons
+<http://code.google.com/p/appengine-monkey/wiki/Pylons>`_.  This
+tutorial is written in terms of using the command line on a UNIX
 system; it should be possible to perform similar actions on a Windows
 system.
 
@@ -43,19 +43,18 @@ system.
    ``bfgapp/app/`` which is the directory you will upload to
    appengine.
 
-#. Install :mod:`repoze.bfg` into the virtualenv
+#. Install :mod:`pyramid` into the virtualenv
 
    .. code-block:: text
 
       $ cd bfgapp/
-      $ bin/easy_install -i http://dist.repoze.org/bfg/current/simple/ \
-             repoze.bfg
+      $ bin/easy_install pyramid
 
-   This will install :mod:`repoze.bfg` in the environment.
+   This will install :mod:`pyramid` in the environment.
 
 #. Create your application
 
-   We'll use the standard way to create a :mod:`repoze.bfg`
+   We'll use the standard way to create a :mod:`pyramid`
    application, but we'll have to move some files around when we are
    done.  The below commands assume your current working directory is
    the ``bfgapp`` virtualenv directory you created in the third step

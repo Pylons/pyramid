@@ -21,13 +21,13 @@ sessioning to your application.
    usage documentation <http://docs.repoze.org/session/usage.html>`_.
    If you don't want to use ZODB to do sessioning, you might choose to
    use a relational/filestorage sessioning system such as `Beaker
-   <http://pypi.python.org/pypi/Beaker>`_.  :mod:`repoze.bfg` is fully
+   <http://pypi.python.org/pypi/Beaker>`_.  :mod:`pyramid` is fully
    compatible with this system too.
 
 Installing Dependencies
 -----------------------
 
-#. Edit your :mod:`repoze.bfg` application's ``setup.py`` file, adding
+#. Edit your :mod:`pyramid` application's ``setup.py`` file, adding
    the following packages to the ``install_requires`` of the
    application:
 
@@ -45,7 +45,7 @@ Installing Dependencies
       setup(
           # ... other elements left out for brevity
           install_requires=[
-                'repoze.bfg',
+                'pyramid',
                 'repoze.folder',
                 'repoze.retry',
                 'repoze.tm2',
@@ -147,7 +147,7 @@ Configuration
        :linenos:
 
        from repoze.session.manager import SessionDataManager
-       from repoze.bfg.traversal import find_root
+       from pyramid.traversal import find_root
 
        def get_session(context, request):
            root = find_root(context)
@@ -167,8 +167,8 @@ Configuration
        :linenos:
 
        from repoze.session.manager import SessionDataManager
-       from repoze.bfg.traversal import find_root
-       from repoze.bfg.chameleon_zpt import render_template_to_response
+       from pyramid.traversal import find_root
+       from pyramid.chameleon_zpt import render_template_to_response
 
        def my_view(context, request):
            session = get_session(context, request)

@@ -1,8 +1,8 @@
 Missing Comparisons
 ===================
 
-We currently don't have any comparative BFG-vs-CMF information about
-the following concepts within this tutorial:
+We currently don't have any comparative Pyramid-vs-CMF information
+about the following concepts within this tutorial:
 
 - Templates
 
@@ -16,7 +16,7 @@ the following concepts within this tutorial:
 
 - Dublincore
 
-Please ask on the `repoze-dev maillist
-<http://lists.repoze.org/listinfo/repoze-dev>`_ or on the `#repoze IRC
-channel <http://irc.freenode.net#repoze>`_ about these topics.
+Please ask on the `Pylons-discuss maillist
+<http://groups.google.com/group/pylons-discuss>`_ or on the `#pylons IRC
+channel <http://irc.freenode.net#pylons>`_ about these topics.
 

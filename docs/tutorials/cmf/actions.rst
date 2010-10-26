@@ -8,7 +8,7 @@ In CMF, the "actions tool" along with "action providers" create an
 extensible mechanism to show links in the CMF management UI that
 invoke a particular behavior or which show a particular template.
 
-:mod:`repoze.bfg` itself has no such concept, and no package provides
+:mod:`pyramid` itself has no such concept, and no package provides
 a direct replacement.  Actions are such a generic concept that it's
 simple to reimplement action-like navigation in a different way within
 any given application.  For example, a module-scope global dictionary

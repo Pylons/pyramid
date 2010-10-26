@@ -4,18 +4,18 @@ Using ZODB with ZEO
 ===================
 
 :term:`ZODB` is a Python object persistence mechanism.  :term:`ZODB`
-works well as a storage mechanism for :mod:`repoze.bfg` applications,
+works well as a storage mechanism for :mod:`pyramid` applications,
 especially in applications that use :term:`traversal`.
 
 :term:`ZEO` is an extension to ZODB which allows more than one process
 to simultaneously communicate with a ZODB storage.  Making a ZODB
 database accessible to more than one process means that you can debug
-your application objects at the same time that a :mod:`repoze.bfg`
+your application objects at the same time that a :mod:`pyramid`
 server that accesses the database is running, and will also allow your
 application to run under multiprocess configurations, such as those
 exposed by :term:`mod_wsgi`.
 
-The easiest way to get started with ZODB in a :mod:`repoze.bfg`
+The easiest way to get started with ZODB in a :mod:`pyramid`
 application is to use the ZODB ``bfg_zodb`` paster template.  See
 :ref:`additional_paster_templates` for more information about using
 this template.  However, the Paster template does not set up a
@@ -25,7 +25,7 @@ scratch".
 Installing Dependencies
 -----------------------
 
-#. Edit your :mod:`repoze.bfg` application's ``setup.py`` file, adding
+#. Edit your :mod:`pyramid` application's ``setup.py`` file, adding
    the following packages to the ``install_requires`` of the
    application:
 
@@ -47,7 +47,7 @@ Installing Dependencies
       setup(
           # ... other elements left out for brevity
           install_requires=[
-                'repoze.bfg',
+                'pyramid',
                 'repoze.folder',
                 'repoze.retry',
                 'repoze.tm2',
@@ -143,7 +143,7 @@ Configuration
       </blobstorage>
 
 #.  For the purposes of this tutorial we'll assume that you want your
-    :mod:`repoze.bfg` application's :term:`root` object to be a
+    :mod:`pyramid` application's :term:`root` object to be a
     "folderish" object.  To achieve this, change your application's
     ``models.py`` file to look like the below:
 
@@ -165,13 +165,13 @@ Configuration
 
     .. code-block:: python
 
-       from repoze.bfg.configuration import Configurator
+       from pyramid.configuration import Configurator
        from repoze.zodbconn.finder import PersistentApplicationFinder
        from myapp.models import appmaker
        import transaction
 
        def app(global_config, **settings):
-           """ This function returns a ``repoze.bfg`` WSGI 
+           """ This function returns a ``pyramid`` WSGI 
            application.
 
            It is usually called by the PasteDeploy framework during
@@ -224,7 +224,7 @@ Running
     .. code-block:: text
        :linenos:
 
-       [chrism@snowpro sess]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+       [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid bfgshell \
               myapp.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin

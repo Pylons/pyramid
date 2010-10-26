@@ -226,14 +226,14 @@ used the testing API.
        
        def test_view_fn_not_submitted(self):
            from my.package import view_fn
-           renderer = self.config.testing_add_template('templates/show.pt')
+           renderer = self.config.testing_add_renderer('templates/show.pt')
            request = testing.DummyRequest()
            response = view_fn(request)
            renderer.assert_(say='Hello')
 
        def test_view_fn_submitted(self):
            from my.package import view_fn
-           renderer = self.config.testing_add_template(
+           renderer = self.config.testing_add_renderer(
                                           'templates/submitted.pt')
            request = testing.DummyRequest()
            request.params['say'] = 'Yo'
@@ -249,7 +249,7 @@ The first test method, ``test_view_fn_not_submitted`` tests the
 ``view_fn`` function in the case that no "form" values (represented by
 request.params) have been submitted.  Its first line registers a
 "dummy template renderer" named ``templates/show.pt`` via the
-:meth:`pyramid.configuration.Configurator.testing_add_template`
+:meth:`pyramid.configuration.Configurator.testing_add_renderer`
 method; this method returns a
 :class:`pyramid.testing.DummyTemplateRenderer` instance which we
 hang on to for later.
@@ -367,7 +367,7 @@ environment.
                                                    str(len(body))))
 
 Unless you cannot avoid it, you should prefer writing unit tests that
-use the :class:`pyramid.configuration,Configurator` API to set up
+use the :class:`pyramid.configuration.Configurator` API to set up
 the right "mock" registrations rather than creating an integration
 test.  Unit tests will run faster (because they do less for each test)
 and the result of a unit test is usually easier to make assertions
