@@ -70,18 +70,20 @@
 
 - Browser id
 
-- Handler stuff from Pylons2
-
 - Signed_signature method of the request and response from pylons2.
 
 - Provide a webob.Response class facade for forward compat.
 
 - CRSF token machinery
 
-- Mako docs (in templating).
+- Mako docs (in templating chapter).
 
 - Paster template that has Mako.
 
 - ``add_handler`` documentation.
 
 - ``handler`` ZCML directive.
+
+- Figure out what to do about "add_helper" and "add_rest_handler".
+
+
