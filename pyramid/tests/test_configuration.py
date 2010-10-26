@@ -1770,6 +1770,253 @@ class ConfiguratorTests(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertEqual(view(None, request), 'OK')
 
+    def test_add_handler_action_in_route_pattern(self):
+        config = self._makeOne()
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        config.add_handler('name', '/{action}', DummyHandler)
+        self._assertRoute(config, 'name', '/:action', 0)
+        self.assertEqual(len(views), 2)
+
+        view = views[0]
+        preds = view['custom_predicates']
+        self.assertEqual(len(preds), 1)
+        pred = preds[0]
+        request = DummyRequest()
+        self.assertEqual(pred(None, request), False)
+        request.matchdict = {'action':'action1'}
+        self.assertEqual(pred(None, request), True)
+        self.assertEqual(view['route_name'], 'name')
+        self.assertEqual(view['attr'], 'action1')
+        self.assertEqual(view['view'], DummyHandler)
+
+        view = views[1]
+        preds = view['custom_predicates']
+        self.assertEqual(len(preds), 1)
+        pred = preds[0]
+        request = DummyRequest()
+        self.assertEqual(pred(None, request), False)
+        request.matchdict = {'action':'action2'}
+        self.assertEqual(pred(None, request), True)
+        self.assertEqual(view['route_name'], 'name')
+        self.assertEqual(view['attr'], 'action2')
+        self.assertEqual(view['view'], DummyHandler)
+
+    def test_add_handler_with_view_overridden_autoexpose_None(self):
+        config = self._makeOne()
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        class MyView(DummyHandler):
+            __autoexpose__ = None
+        config.add_handler('name', '/{action}', MyView)
+        self._assertRoute(config, 'name', '/:action', 0)
+        self.assertEqual(len(views), 0)
+
+    def test_add_handler_with_view_overridden_autoexpose_broken_regex1(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        class MyView(DummyHandler):
+            __autoexpose__ = 1
+        self.assertRaises(ConfigurationError, config.add_handler,
+                          'name', '/{action}', MyView)
+
+    def test_add_handler_with_view_overridden_autoexpose_broken_regex2(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        class MyView(DummyHandler):
+            __autoexpose__ = 'a\\'
+        self.assertRaises(ConfigurationError, config.add_handler,
+                          'name', '/{action}', MyView)
+
+    def test_add_handler_with_view_method_has_expose_config(self):
+        config = self._makeOne()
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        class MyView(object):
+            def action(self):
+                return 'response'
+            action.__exposed__ = [{'custom_predicates':(1,)}]
+        config.add_handler('name', '/{action}', MyView)
+        self._assertRoute(config, 'name', '/:action', 0)
+        self.assertEqual(len(views), 1)
+        view = views[0]
+        preds = view['custom_predicates']
+        self.assertEqual(len(preds), 2)
+        self.assertEqual(view['route_name'], 'name')
+        self.assertEqual(view['attr'], 'action')
+        self.assertEqual(view['view'], MyView)
+
+    def test_add_handler_with_view_method_has_expose_config_with_action(self):
+        config = self._makeOne()
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        class MyView(object):
+            def action(self):
+                return 'response'
+            action.__exposed__ = [{'name':'action3000'}]
+        config.add_handler('name', '/{action}', MyView)
+        self._assertRoute(config, 'name', '/:action', 0)
+        self.assertEqual(len(views), 1)
+        view = views[0]
+        preds = view['custom_predicates']
+        self.assertEqual(len(preds), 1)
+        pred = preds[0]
+        request = DummyRequest()
+        self.assertEqual(pred(None, request), False)
+        request.matchdict = {'action':'action3000'}
+        self.assertEqual(pred(None, request), True)
+        self.assertEqual(view['route_name'], 'name')
+        self.assertEqual(view['attr'], 'action')
+        self.assertEqual(view['view'], MyView)
+
+    def test_add_handler_with_view_method_has_expose_config_with_action_regex(
+        self):
+        config = self._makeOne()
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        class MyView(object):
+            def action(self):
+                return 'response'
+            action.__exposed__ = [{'name':'^action3000$'}]
+        config.add_handler('name', '/{action}', MyView)
+        self._assertRoute(config, 'name', '/:action', 0)
+        self.assertEqual(len(views), 1)
+        view = views[0]
+        preds = view['custom_predicates']
+        self.assertEqual(len(preds), 1)
+        pred = preds[0]
+        request = DummyRequest()
+        self.assertEqual(pred(None, request), False)
+        request.matchdict = {'action':'action3000'}
+        self.assertEqual(pred(None, request), True)
+        self.assertEqual(view['route_name'], 'name')
+        self.assertEqual(view['attr'], 'action')
+        self.assertEqual(view['view'], MyView)
+
+    def test_add_handler_doesnt_mutate_expose_dict(self):
+        config = self._makeOne()
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        exposed = [{'name':'^action3000$'}]
+        class MyView(object):
+            def action(self):
+                return 'response'
+            action.__exposed__ = exposed
+        config.add_handler('name', '/{action}', MyView)
+        self.assertEqual(exposed[0], {'name':'^action3000$'}) # not mutated
+
+    def test_add_handler_with_action_and_action_in_path(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_handler, 
+                          'name', '/{action}', DummyHandler, action='abc')
+
+    def test_add_handler_with_explicit_action(self):
+        config = self._makeOne()
+        class DummyHandler(object):
+            def index(self): pass
+            index.__exposed__ = [{'a':'1'}]
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        config.add_handler('name', '/abc', DummyHandler, action='index')
+        self.assertEqual(len(views), 1)
+        view = views[0]
+        self.assertEqual(view['a'], '1')
+        self.assertEqual(view['attr'], 'index')
+        self.assertEqual(view['route_name'], 'name')
+        self.assertEqual(view['view'], DummyHandler)
+
+    def test_add_handler_with_implicit_action(self):
+        config = self._makeOne()
+        class DummyHandler(object):
+            def __call__(self): pass
+            __call__.__exposed__ = [{'a':'1'}]
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        config.add_handler('name', '/abc', DummyHandler)
+        self.assertEqual(len(views), 1)
+        view = views[0]
+        self.assertEqual(view['a'], '1')
+        self.assertEqual(view['attr'], None)
+        self.assertEqual(view['route_name'], 'name')
+        self.assertEqual(view['view'], DummyHandler)
+    
+    def test_add_handler_with_multiple_action(self):
+        config = self._makeOne()
+        class DummyHandler(object):
+            def index(self): pass
+            def create(self): pass
+            create.__exposed__ = [{'name': 'index'}]
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        config.add_handler('name', '/abc', DummyHandler, action='index')
+        self.assertEqual(len(views), 2)
+        view = views[0]
+        self.assertEqual(view['attr'], 'create')
+        self.assertEqual(view['route_name'], 'name')
+        self.assertEqual(view['view'], DummyHandler)
+        view = views[1]
+        self.assertEqual(view['attr'], 'index')
+
+    def test_add_handler_string(self):
+        import pyramid
+        views = []
+        config = self._makeOne()
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        config.add_handler('name', '/abc', 'pyramid')
+        self.assertEqual(len(views), 1)
+        view = views[0]
+        self.assertEqual(view['view'], pyramid)
+
+    def test_add_handler_pattern_None_no_previous_route(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne()
+        self.assertRaises(ConfigurationError, config.add_handler,
+                          'name', None, 'pylons')
+
+    def test_add_handler_pattern_None_with_previous_route(self):
+        import pyramid
+        config = self._makeOne()
+        config.add_route('name', ':def')
+        views = []
+        def dummy_add_view(**kw):
+            views.append(kw)
+        config.add_view = dummy_add_view
+        config.add_route = None # shouldn't be called
+        config.add_handler('name', None, 'pyramid')
+        self.assertEqual(len(views), 1)
+        view = views[0]
+        self.assertEqual(view['view'], pyramid)
+
+
     def _assertRoute(self, config, name, path, num_predicates=0):
         from pyramid.interfaces import IRoutesMapper
         mapper = config.registry.getUtility(IRoutesMapper)
@@ -2030,6 +2277,11 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         route = config.add_route('name', 'pattern', pregenerator='123')
         self.assertEqual(route.pregenerator, '123')
+
+    def test_add_route_squiggly_syntax(self):
+        config = self._makeOne()
+        config.add_route('name', '/abc/{def}/:ghi/jkl/{mno}{/:p')
+        self._assertRoute(config, 'name', '/abc/:def/:ghi/jkl/:mno{/:p', 0)
 
     def test__override_not_yet_registered(self):
         from pyramid.interfaces import IPackageOverrides
@@ -4336,3 +4588,14 @@ def dummy_view(request):
 
 def dummyfactory(request):
     """ """
+
+class DummyHandler(object):
+    def __init__(self, request):
+        self.request = request
+
+    def action1(self):
+        return 'response 1'
+
+    def action2(self):
+        return 'response 2'
+

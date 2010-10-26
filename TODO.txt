@@ -62,8 +62,6 @@
 
 - Update App engine chapter.
 
-- P2
-
 - Add SessionFactory interface
 
 - Create session interface (flash() is part of it, figure out granularity)
@@ -74,17 +72,16 @@
 
 - Handler stuff from Pylons2
 
-- HTTPExceptions facade
-
 - Signed_signature method of the request and response from pylons2.
 
 - Provide a webob.Response class facade for forward compat.
 
 - CRSF token machinery
 
-- Converter: <configure xmlns="http://namespaces.repoze.org/bfg"> -> 
-             <configure xmlns="http://pyramid.pylonshq.com/">
+- Mako docs (in templating).
 
-- Converter:   <include package="repoze.bfg.includes" /> ->
-               <include package="pyramid.includes" />
+- Paster template that has Mako.
 
+- ``add_handler`` documentation.
+
+- ``handler`` ZCML directive.
