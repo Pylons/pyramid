@@ -28,7 +28,7 @@ zcml_configure # prevent pyflakes from complaining
 _marker = object()
 
 def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
-    """ Registers a pair of faux :mod:`repoze.bfg` security policies:
+    """ Registers a pair of faux :mod:`pyramid` security policies:
     a :term:`authentication policy` and a :term:`authorization
     policy`.
 
@@ -44,16 +44,16 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
     argument.  The authentication policy will return the userid
     identifier implied by the ``userid`` argument and the group ids
     implied by the ``groupids`` argument when the
-    :func:`repoze.bfg.security.authenticated_userid` or 
-    :func:`repoze.bfg.security.effective_principals` APIs are used.
+    :func:`pyramid.security.authenticated_userid` or 
+    :func:`pyramid.security.effective_principals` APIs are used.
 
     This function is most useful when testing code that uses the APIs
-    named :func:`repoze.bfg.security.has_permission`,
-    :func:`repoze.bfg.security.authenticated_userid`,
-    :func:`repoze.bfg.security.effective_principals`, and
-    :func:`repoze.bfg.security.principals_allowed_by_permission`.
+    named :func:`pyramid.security.has_permission`,
+    :func:`pyramid.security.authenticated_userid`,
+    :func:`pyramid.security.effective_principals`, and
+    :func:`pyramid.security.principals_allowed_by_permission`.
 
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
        :meth:`repoze.bfg.configuration.Configurator.testing_securitypolicy`
        method in your unit and integration tests.
@@ -65,19 +65,19 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
 
 def registerModels(models):
     """ Registers a dictionary of :term:`model` objects that can be
-    resolved via the :func:`repoze.bfg.traversal.find_model` API.
+    resolved via the :func:`pyramid.traversal.find_model` API.
 
-    The :func:`repoze.bfg.traversal.find_model` API is called with a
+    The :func:`pyramid.traversal.find_model` API is called with a
     path as one of its arguments.  If the dictionary you register when
     calling this method contains that path as a string key
     (e.g. ``/foo/bar`` or ``foo/bar``), the corresponding value will
     be returned to ``find_model`` (and thus to your code) when
-    :func:`repoze.bfg.traversal.find_model` is called with an
+    :func:`pyramid.traversal.find_model` is called with an
     equivalent path string or tuple.
 
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
-       :meth:`repoze.bfg.configuration.Configurator.testing_models`
+       :meth:`pyramid.configuration.Configurator.testing_models`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
@@ -94,16 +94,16 @@ def registerEventListener(event_iface=None):
     event will be appended to the list.  You can then compare the
     values in the list to expected event notifications.  This method
     is useful when testing code that wants to call
-    :meth:`repoze.bfg.registry.Registry.notify`,
+    :meth:`pyramid.registry.Registry.notify`,
     :func:`zope.component.event.dispatch` or
     :func:`zope.component.event.objectEventNotify`.
 
     The default value of ``event_iface`` (``None``) implies a
     subscriber registered for *any* kind of event.
 
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
-       :meth:`repoze.bfg.configuration.Configurator.testing_add_subscriber`
+       :meth:`pyramid.configuration.Configurator.testing_add_subscriber`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
@@ -115,14 +115,14 @@ def registerTemplateRenderer(path, renderer=None):
     filename ala ``templates/foo.pt``) and return the renderer object.
     If the ``renderer`` argument is None, a 'dummy' renderer will be
     used.  This function is useful when testing code that calls the
-    :func:`repoze.bfg.renderers.render` function or
-    :func:`repoze.bfg.renderers.render_to_response` function or any
+    :func:`pyramid.renderers.render` function or
+    :func:`pyramid.renderers.render_to_response` function or any
     other ``render_*`` or ``get_*`` API of the
-    :mod:`repoze.bfg.renderers` module.
+    :mod:`pyramid.renderers` module.
 
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
-       :meth:`repoze.bfg.configuration.Configurator.testing_add_template``
+       :meth:`pyramid.configuration.Configurator.testing_add_template``
        method in your unit and integration tests.
 
     """
@@ -136,7 +136,7 @@ registerDummyRenderer = registerTemplateRenderer
 
 def registerView(name, result='', view=None, for_=(Interface, Interface),
                  permission=None):
-    """ Registers a :mod:`repoze.bfg` :term:`view callable` under the
+    """ Registers a :mod:`pyramid` :term:`view callable` under the
     name implied by the ``name`` argument.  The view will return a
     :term:`WebOb` :term:`Response` object with the value implied by
     the ``result`` argument as its ``body`` attribute.  To gain more
@@ -150,11 +150,11 @@ def registerView(name, result='', view=None, for_=(Interface, Interface),
     execution is attempted.
 
     This function is useful when testing code which calls
-    :func:`repoze.bfg.view.render_view_to_response`.
+    :func:`pyramid.view.render_view_to_response`.
 
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
-       :meth:`repoze.bfg.configuration.Configurator.add_view``
+       :meth:`pyramid.configuration.Configurator.add_view``
        method in your unit and integration tests.
     """
     for_ = (IViewClassifier, ) + for_
@@ -188,11 +188,11 @@ def registerUtility(impl, iface=Interface, name=''):
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
     more information about ZCA utilities.
 
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
-       Instead use the :meth:`repoze.bfg.Registry.registerUtility`
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+       Instead use the :meth:`pyramid.Registry.registerUtility`
        method.  The ``registry`` attribute of a :term:`Configurator`
        in your unit and integration tests is an instance of the
-       :class:`repoze.bfg.Registry` class.
+       :class:`pyramid.Registry` class.
     """
     reg = get_current_registry()
     reg.registerUtility(impl, iface, name=name)
@@ -206,7 +206,7 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     ``for`` interface type used for this registration; it is
     :class:`zope.interface.Interface` by default.  If ``for`` is not a
     tuple or list, it will be converted to a one-tuple before being
-    passed to underlying :meth:`repoze.bfg.registry.registerAdapter`
+    passed to underlying :meth:`pyramid.registry.registerAdapter`
     API.
 
     The ``provides`` argument specifies the ZCA 'provides' interface,
@@ -218,11 +218,11 @@ def registerAdapter(impl, for_=Interface, provides=Interface, name=''):
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
     more information about ZCA adapters.
 
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
-       Instead use the :meth:`repoze.bfg.Registry.registerAdapter`
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
+       Instead use the :meth:`pyramid.Registry.registerAdapter`
        method.  The ``registry`` attribute of a :term:`Configurator`
        in your unit and integration tests is an instance of the
-       :class:`repoze.bfg.Registry` class.
+       :class:`pyramid.Registry` class.
     """
     reg = get_current_registry()
     if not isinstance(for_, (tuple, list)):
@@ -240,14 +240,14 @@ def registerSubscriber(subscriber, iface=Interface):
     subscriber will be registered (:class:`zope.interface.Interface`
     by default). If ``iface`` is not a tuple or list, it will be
     converted to a one-tuple before being passed to the underlying ZCA
-    :meth:`repoze.bfg.registry.registerHandler` method.
+    :meth:`pyramid.registry.registerHandler` method.
 
     See `The ZCA book <http://www.muthukadan.net/docs/zca.html>`_ for
     more information about ZCA subscribers.
 
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
-       :meth:`repoze.bfg.configuration.Configurator.add_subscriber`
+       :meth:`pyramid.configuration.Configurator.add_subscriber`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
@@ -264,13 +264,11 @@ def registerRoute(pattern, name, factory=None):
     a :term:`root factory` associated with the route.
 
     This API is useful for testing code that calls
-    e.g. :func:`repoze.bfg.url.route_url`.
+    e.g. :func:`pyramid.url.route_url`.
 
-    .. note:: This API was added in :mod:`repoze.bfg` version 1.1.
-
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
-       :meth:`repoze.bfg.configuration.Configurator.add_route`
+       :meth:`pyramid.configuration.Configurator.add_route`
        method in your unit and integration tests.
     """
     reg = get_current_registry()
@@ -280,7 +278,7 @@ def registerRoute(pattern, name, factory=None):
 def registerSettings(dictarg=None, **kw):
     """Register one or more 'setting' key/value pairs.  A setting is
     a single key/value pair in the dictionary-ish object returned from
-    the API :func:`repoze.bfg.settings.get_settings`.
+    the API :func:`pyramid.settings.get_settings`.
 
     You may pass a dictionary::
 
@@ -291,14 +289,12 @@ def registerSettings(dictarg=None, **kw):
        registerSettings(external_uri='http://example.com')
 
     Use of this function is required when you need to test code that
-    calls the :func:`repoze.bfg.settings.get_settings` API and which
+    calls the :func:`pyramid.settings.get_settings` API and which
     uses return values from that API.
 
-    .. note:: This API is new as of :mod:`repoze.bfg` 1.1.
-
-    .. warning:: This API is deprecated as of :mod:`repoze.bfg` 1.2.
+    .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
-       :meth:`repoze.bfg.configuration.Configurator.add_settings`
+       :meth:`pyramid.configuration.Configurator.add_settings`
        method in your unit and integration tests.
     """
     registry = get_current_registry()
@@ -345,7 +341,7 @@ class DummySecurityPolicy(object):
 class DummyTemplateRenderer(object):
     """
     An instance of this class is returned from
-    :func:`repoze.bfg.testing.registerTemplateRenderer`.  It has a
+    :func:`pyramid.testing.registerTemplateRenderer`.  It has a
     helper function (``assert_``) that makes it possible to make an
     assertion which compares data passed to the renderer by the view
     function against expected key/value pairs.
@@ -387,7 +383,7 @@ class DummyTemplateRenderer(object):
     def assert_(self, **kw):
         """ Accept an arbitrary set of assertion key/value pairs.  For
         each assertion key/value pair assert that the renderer
-        (eg. :func:`repoze.bfg.renderer.render_to_response`)
+        (eg. :func:`pyramid.renderer.render_to_response`)
         received the key with a value that equals the asserted
         value. If the renderer did not receive the key at all, or the
         value received by the renderer doesn't match the assertion
@@ -408,7 +404,7 @@ class DummyTemplateRenderer(object):
         return True
 
 class DummyModel:
-    """ A dummy :mod:`repoze.bfg` :term:`model` object."""
+    """ A dummy :mod:`pyramid` :term:`model` object."""
     def __init__(self, __name__=None, __parent__=None, __provides__=None,
                  **kw):
         """ The model's ``__name__`` attribute will be set to the
@@ -558,50 +554,44 @@ class DummyRequest(object):
 
 def setUp(registry=None, request=None, hook_zca=True):
     """
-    Set :mod:`repoze.bfg` registry and request thread locals for the
+    Set :mod:`pyramid` registry and request thread locals for the
     duration of a single unit test.
-
-    .. note:: The ``setUp`` function is new as of :mod:`repoze.bfg`
-       1.1.
 
     Use this function in the ``setUp`` method of a unittest test case
     which directly or indirectly uses:
 
-    - any of the ``register*`` functions in :mod:`repoze.bfg.testing`
-      (such as :func:`repoze.bfg.testing.registerModels`)
+    - any of the ``register*`` functions in :mod:`pyramid.testing`
+      (such as :func:`pyramid.testing.registerModels`)
 
-    - any method of the :class:`repoze.bfg.configuration.Configurator`
+    - any method of the :class:`pyramid.configuration.Configurator`
       object returned by this function.
 
-    - the :func:`repoze.bfg.threadlocal.get_current_registry` or
-      :func:`repoze.bfg.threadlocal.get_current_request` functions.
+    - the :func:`pyramid.threadlocal.get_current_registry` or
+      :func:`pyramid.threadlocal.get_current_request` functions.
 
     If you use the ``testing.register*`` APIs, or the
-    ``get_current_*`` functions (or call :mod:`repoze.bfg` code that
+    ``get_current_*`` functions (or call :mod:`pyramid` code that
     uses these functions) without calling ``setUp``,
-    :func:`repoze.bfg.threadlocal.get_current_registry` will return a
+    :func:`pyramid.threadlocal.get_current_registry` will return a
     *global* :term:`application registry`, which may cause unit tests
     to not be isolated with respect to registrations they perform.
 
     If the ``registry`` argument is ``None``, a new empty
     :term:`application registry` will be created (an instance of the
-    :class:`repoze.bfg.registry.Registry` class).  If the ``registry``
+    :class:`pyramid.registry.Registry` class).  If the ``registry``
     argument is not ``None``, the value passed in should be an
-    instance of the :class:`repoze.bfg.registry.Registry` class or a
+    instance of the :class:`pyramid.registry.Registry` class or a
     suitable testing analogue.
 
     After ``setUp`` is finished, the registry returned by the
-    :func:`repoze.bfg.threadlocal.get_current_request` function will
+    :func:`pyramid.threadlocal.get_current_request` function will
     be the passed (or constructed) registry until
-    :func:`repoze.bfg.testing.tearDown` is called (or
-    :func:`repoze.bfg.testing.setUp` is called again) .
-
-    .. note:: The ``registry`` argument is new as of :mod:`repoze.bfg`
-       1.2.
+    :func:`pyramid.testing.tearDown` is called (or
+    :func:`pyramid.testing.setUp` is called again) .
 
     If the ``hook_zca`` argument is ``True``, ``setUp`` will attempt
     to perform the operation ``zope.component.getSiteManager.sethook(
-    repoze.bfg.threadlocal.get_current_registry)``, which will cause
+    pyramid.threadlocal.get_current_registry)``, which will cause
     the :term:`Zope Component Architecture` global API
     (e.g. :func:`zope.component.getSiteManager`,
     :func:`zope.component.getAdapter`, and so on) to use the registry
@@ -611,27 +601,20 @@ def setUp(registry=None, request=None, hook_zca=True):
     ``hook_zca`` is ``False``, the hook will not be set.
 
     This function returns an instance of the
-    :class:`repoze.bfg.configuration.Configurator` class, which can be
+    :class:`pyramid.configuration.Configurator` class, which can be
     used for further configuration to set up an environment suitable
     for a unit or integration test.  The ``registry`` attribute
     attached to the Configurator instance represents the 'current'
     :term:`application registry`; the same registry will be returned
-    by :func:`repoze.bfg.threadlocal.get_current_registry` during the
+    by :func:`pyramid.threadlocal.get_current_registry` during the
     execution of the test.
 
-    .. note:: The ``hook_zca`` argument is new as of :mod:`repoze.bfg`
-       1.2.
-
-    .. note:: The return value (a ``Configurator`` instance) is new as
-       of :mod:`repoze.bfg` 1.2 (previous versions used to return
-       ``None``)
-
     .. warning:: Although this method of setting up a test registry
-                 will never disappear, after :mod:`repoze.bfg` 1.2a6,
+                 will never disappear, after :mod:`pyramid` 1.0,
                  using the ``begin`` and ``end`` methods of a
                  ``Configurator`` are preferred to using
-                 ``repoze.bfg.testing.setUp`` and
-                 ``repoze.bfg.testing.tearDown``.  See
+                 ``pyramid.testing.setUp`` and
+                 ``pyramid.testing.tearDown``.  See
                  :ref:`unittesting_chapter` for more information.
     """
     manager.clear()
@@ -648,11 +631,11 @@ def setUp(registry=None, request=None, hook_zca=True):
         for name, renderer in DEFAULT_RENDERERS:
             # Cause the default renderers to be registered because
             # in-the-wild test code relies on being able to call
-            # e.g. ``repoze.bfg.chameleon_zpt.render_template``
+            # e.g. ``pyramid.chameleon_zpt.render_template``
             # without registering a .pt renderer, expecting the "real"
             # template to be rendered.  This is a holdover from when
             # individual template system renderers weren't indirected
-            # by the ``repoze.bfg.renderers`` machinery, and
+            # by the ``pyramid.renderers`` machinery, and
             # ``render_template`` and friends went behind the back of
             # any existing renderer factory lookup system.
             config.add_renderer(name, renderer)
@@ -661,27 +644,22 @@ def setUp(registry=None, request=None, hook_zca=True):
     return config
 
 def tearDown(unhook_zca=True):
-    """Undo the effects :func:`repoze.bfg.testing.setUp`.  Use this
+    """Undo the effects :func:`pyramid.testing.setUp`.  Use this
     function in the ``tearDown`` method of a unit test that uses
-    :func:`repoze.bfg.testing.setUp` in its ``setUp`` method.
-
-    .. note:: This function is new as of :mod:`repoze.bfg` 1.1.
+    :func:`pyramid.testing.setUp` in its ``setUp`` method.
 
     If the ``unhook_zca`` argument is ``True`` (the default), call
     :func:`zope.component.getSiteManager.reset`.  This undoes the
-    action of :func:`repoze.bfg.testing.setUp` called with the
+    action of :func:`pyramid.testing.setUp` called with the
     argument ``hook_zca=True``.  If :mod:`zope.component` cannot be
     imported, ignore the argument.
 
-    .. note:: The ``unhook_zca`` argument is new as of
-       :mod:`repoze.bfg` 1.2.
-
     .. warning:: Although this method of tearing a test setup down
-                 will never disappear, after :mod:`repoze.bfg` 1.2a6,
+                 will never disappear, after :mod:`pyramid` 1.0,
                  using the ``begin`` and ``end`` methods of a
                  ``Configurator`` are preferred to using
-                 ``repoze.bfg.testing.setUp`` and
-                 ``repoze.bfg.testing.tearDown``.  See
+                 ``pyramid.testing.setUp`` and
+                 ``pyramid.testing.tearDown``.  See
                  :ref:`unittesting_chapter` for more information.
 
     """
@@ -707,15 +685,15 @@ def tearDown(unhook_zca=True):
     _clearContext() # XXX why?
 
 def cleanUp(*arg, **kw):
-    """ :func:`repoze.bfg.testing.cleanUp` is an alias for
-    :func:`repoze.bfg.testing.setUp`.  Although this function is
-    effectively deprecated as of :mod:`repoze.bfg` 1.1, due to its
+    """ :func:`pyramid.testing.cleanUp` is an alias for
+    :func:`pyramid.testing.setUp`.  Although this function is
+    effectively deprecated as of :mod:`pyramid` 1.0, due to its
     extensive production usage, it will never be removed."""
     return setUp(*arg, **kw)
 
 class DummyRendererFactory(object):
     """ Registered by
-    ``repoze.bfg.configuration.Configurator.testing_add_renderer`` as
+    ``pyramid.configuration.Configurator.testing_add_renderer`` as
     a dummy renderer factory.  The indecision about what to use as a
     key (a spec vs. a relative name) is caused by test suites in the
     wild believing they can register either.  The ``factory`` argument

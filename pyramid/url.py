@@ -1,4 +1,4 @@
-""" Utility functions for dealing with URLs in repoze.bfg """
+""" Utility functions for dealing with URLs in pyramid """
 
 import os
 
@@ -15,7 +15,7 @@ from pyramid.traversal import TraversalContextURL
 from pyramid.traversal import quote_path_segment
 
 def route_url(route_name, request, *elements, **kw):
-    """Generates a fully qualified URL for a named :mod:`repoze.bfg`
+    """Generates a fully qualified URL for a named :mod:`pyramid`
     :term:`route configuration`.
     
     Use the route's ``name`` as the first positional argument.  Use a
@@ -56,7 +56,7 @@ def route_url(route_name, request, *elements, **kw):
     *or* a data structure with an ``.items()`` method that returns a
     sequence of two-tuples (presumably a dictionary).  This data
     structure will be turned into a query string per the documentation
-    of :func:`repoze.bfg.encode.urlencode` function.  After the query
+    of :func:`pyramid.encode.urlencode` function.  After the query
     data is turned into a query string, a leading ``?`` is prepended,
     and the resulting string is appended to the generated URL.
 
@@ -94,9 +94,6 @@ def route_url(route_name, request, *elements, **kw):
     ``_app_url`` is not specified, the result of
     ``request.application_url`` will be used as the prefix (the
     default).
-
-    .. note:: Special treatment of ``_app_url`` was added in
-              :mod:`repoze.bfg` 1.3.
 
     This function raises a :exc:`KeyError` if the URL cannot be
     generated due to missing replacement names.  Extra replacement
@@ -269,7 +266,7 @@ def static_url(path, request, **kw):
     """
     Generates a fully qualified URL for a static :term:`resource`.
     The resource must live within a location defined via the
-    :meth:`repoze.bfg.configuration.Configurator.add_static_view`
+    :meth:`pyramid.configuration.Configurator.add_static_view`
     :term:`configuration declaration` or the ``<static>`` ZCML
     directive (see :ref:`static_resources_section`).
 
@@ -290,7 +287,7 @@ def static_url(path, request, **kw):
     The ``request`` argument should be a :term:`request` object.
 
     The purpose of the ``**kw`` argument is the same as the purpose of
-    the :func:`repoze.bfg.url.route_url` ``**kw`` argument.  See the
+    the :func:`pyramid.url.route_url` ``**kw`` argument.  See the
     documentation for that function to understand the arguments which
     you can provide to it.  However, typically, you don't need to pass
     anything as ``*kw`` when generating a static resource URL.
@@ -298,7 +295,6 @@ def static_url(path, request, **kw):
     This function raises a :exc:`ValueError` if a static view
     definition cannot be found which matches the path specification.
 
-    .. note:: This feature is new in :mod:`repoze.bfg` 1.1.
     """
     if os.path.isabs(path):
         raise ValueError('Absolute paths cannot be used to generate static '

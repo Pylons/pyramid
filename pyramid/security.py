@@ -1,22 +1,11 @@
 from zope.interface import providedBy
 
-from zope.deprecation import deprecated
-
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import ISecuredView
 from pyramid.interfaces import IViewClassifier
 
-from pyramid.exceptions import Forbidden as Unauthorized # b/c import
 from pyramid.threadlocal import get_current_registry
-
-Unauthorized # prevent PyFlakes from complaining
-
-deprecated('Unauthorized',
-    "('from repoze.bfg.security import Unauthorized' was  "
-    "deprecated as of repoze.bfg 1.1; instead use 'from "
-    "repoze.bfg.exceptions import Forbidden')",
-    )
 
 Everyone = 'system.Everyone'
 Authenticated = 'system.Authenticated'
@@ -38,13 +27,13 @@ DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
 def has_permission(permission, context, request):
     """ Provided a permission (a string or unicode object), a context
     (a :term:`model` instance) and a request object, return an
-    instance of :data:`repoze.bfg.security.Allowed` if the permission
+    instance of :data:`pyramid.security.Allowed` if the permission
     is granted in this context to the user implied by the
-    request. Return an instance of :mod:`repoze.bfg.security.Denied`
+    request. Return an instance of :mod:`pyramid.security.Denied`
     if this permission is not granted in this context to this user.
     This function delegates to the current authentication and
     authorization policies.  Return
-    :data:`repoze.bfg.security.Allowed` unconditionally if no
+    :data:`pyramid.security.Allowed` unconditionally if no
     authentication policy has been configured in this application."""
     try:
         reg = request.registry
@@ -97,7 +86,7 @@ def principals_allowed_by_permission(context, permission):
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
     in effect, this will return a sequence with the single value
-    :mod:`repoze.bfg.security.Everyone` (the special principal
+    :mod:`pyramid.security.Everyone` (the special principal
     identifier representing all principals).
 
     .. note:: even if an :term:`authorization policy` is in effect,
@@ -140,7 +129,7 @@ def remember(request, principal, **kw):
     assumed to be an :term:`WebOb` -style :term:`response` object
     computed previously by the view code)::
 
-      from repoze.bfg.security import remember
+      from pyramid.security import remember
       headers = remember(request, 'chrism', password='123', max_age='86400')
       response.headerlist.extend(headers)
       return response
@@ -167,7 +156,7 @@ def forget(request):
     (``response`` is assumed to be an :term:`WebOb` -style
     :term:`response` object computed previously by the view code)::
 
-      from repoze.bfg.security import forget
+      from pyramid.security import forget
       headers = forget(request)
       response.headerlist.extend(headers)
       return response
@@ -205,7 +194,7 @@ class PermitsResult(int):
 
 class Denied(PermitsResult):
     """ An instance of ``Denied`` is returned when a security-related
-    API or other :mod:`repoze.bfg` code denies an action unrelated to
+    API or other :mod:`pyramid` code denies an action unrelated to
     an ACL check.  It evaluates equal to all boolean false types.  It
     has an attribute named ``msg`` describing the circumstances for
     the deny."""
@@ -213,7 +202,7 @@ class Denied(PermitsResult):
 
 class Allowed(PermitsResult):
     """ An instance of ``Allowed`` is returned when a security-related
-    API or other :mod:`repoze.bfg` code allows an action unrelated to
+    API or other :mod:`pyramid` code allows an action unrelated to
     an ACL check.  It evaluates equal to all boolean true types.  It
     has an attribute named ``msg`` describing the circumstances for
     the allow."""

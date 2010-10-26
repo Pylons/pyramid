@@ -77,7 +77,7 @@ class PredicateMismatch(NotFound):
 
 class URLDecodeError(UnicodeDecodeError):
     """
-    This exception is raised when :mod:`repoze.bfg` cannot
+    This exception is raised when :mod:`pyramid` cannot
     successfully decode a URL or a URL path segment.  This exception
     it behaves just like the Python builtin
     :exc:`UnicodeDecodeError`. It is a subclass of the builtin

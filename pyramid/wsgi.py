@@ -2,9 +2,9 @@ from pyramid.compat import wraps
 from pyramid.traversal import quote_path_segment
 
 def wsgiapp(wrapped):
-    """ Decorator to turn a WSGI application into a :mod:`repoze.bfg`
+    """ Decorator to turn a WSGI application into a :mod:`pyramid`
     :term:`view callable`.  This decorator differs from the
-    :func:`repoze.bfg.wsgi.wsgiapp2` decorator inasmuch as fixups of
+    :func:`pyramid.wsgi.wsgiapp2` decorator inasmuch as fixups of
     ``PATH_INFO`` and ``SCRIPT_NAME`` within the WSGI environment *are
     not* performed before the application is invoked.
 
@@ -25,14 +25,14 @@ def wsgiapp(wrapped):
         />
 
     Or the following call to
-    :meth:`repoze.bfg.configuration.Configurator.add_view`::
+    :meth:`pyramid.configuration.Configurator.add_view`::
 
         from views import hello_world
         config.add_view(hello_world, name='hello_world.txt')
 
     The ``wsgiapp`` decorator will convert the result of the WSGI
     application to a :term:`Response` and return it to
-    :mod:`repoze.bfg` as if the WSGI app were a :mod:`repoze.bfg`
+    :mod:`pyramid` as if the WSGI app were a :mod:`pyramid`
     view.
     
     """
@@ -41,9 +41,9 @@ def wsgiapp(wrapped):
     return wraps(wrapped)(decorator) # grokkability
 
 def wsgiapp2(wrapped):
-    """ Decorator to turn a WSGI application into a :mod:`repoze.bfg`
+    """ Decorator to turn a WSGI application into a :mod:`pyramid`
     view callable.  This decorator differs from the
-    :func:`repoze.bfg.wsgi.wsgiapp` decorator inasmuch as fixups of
+    :func:`pyramid.wsgi.wsgiapp` decorator inasmuch as fixups of
     ``PATH_INFO`` and ``SCRIPT_NAME`` within the WSGI environment
     *are* performed before the application is invoked.
 
@@ -64,14 +64,14 @@ def wsgiapp2(wrapped):
         />
 
     Or the following call to
-    :meth:`repoze.bfg.configuration.Configurator.add_view`::
+    :meth:`pyramid.configuration.Configurator.add_view`::
 
         from views import hello_world
         config.add_view(hello_world, name='hello_world.txt')
 
     The ``wsgiapp2`` decorator will convert the result of the WSGI
-    application to a Response and return it to :mod:`repoze.bfg` as if
-    the WSGI app were a :mod:`repoze.bfg` view.  The ``SCRIPT_NAME``
+    application to a Response and return it to :mod:`pyramid` as if
+    the WSGI app were a :mod:`pyramid` view.  The ``SCRIPT_NAME``
     and ``PATH_INFO`` values present in the WSGI environment are fixed
     up before the application is invoked.  """
     

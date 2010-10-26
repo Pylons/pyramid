@@ -90,7 +90,7 @@ _marker = object()
 
 class Configurator(object):
     """
-    A Configurator is used to configure a :mod:`repoze.bfg`
+    A Configurator is used to configure a :mod:`pyramid`
     :term:`application registry`.
 
     The Configurator accepts a number of arguments: ``registry``,
@@ -100,10 +100,10 @@ class Configurator(object):
     ``renderer_globals_factory``.
 
     If the ``registry`` argument is passed as a non-``None`` value, it
-    must be an instance of the :class:`repoze.bfg.registry.Registry`
+    must be an instance of the :class:`pyramid.registry.Registry`
     class representing the registry to configure.  If ``registry`` is
     ``None``, the configurator will create a
-    :class:`repoze.bfg.registry.Registry` instance itself; it will
+    :class:`pyramid.registry.Registry` instance itself; it will
     also perform some default configuration that would not otherwise
     be done.  After construction, the configurator may be used to add
     configuration to the registry.  The overall state of a registry is
@@ -125,8 +125,8 @@ class Configurator(object):
     If the ``settings`` argument is passed, it should be a Python
     dictionary representing the deployment settings for this
     application.  These are later retrievable using the
-    :meth:`repoze.bfg.configuration.Configurator.get_settings` and
-    :func:`repoze.bfg.settings.get_settings` APIs.
+    :meth:`pyramid.configuration.Configurator.get_settings` and
+    :func:`pyramid.settings.get_settings` APIs.
 
     If the ``root_factory`` argument is passed, it should be an object
     representing the default :term:`root factory` for your application
@@ -149,14 +149,14 @@ class Configurator(object):
     representing a set of :term:`renderer` factories which should be
     configured into this application (each tuple representing a set of
     positional values that should be passed to
-    :meth:`repoze.bfg.configuration.Configurator.add_renderer`).  If
+    :meth:`pyramid.configuration.Configurator.add_renderer`).  If
     it is not passed, a default set of renderer factories is used.
 
     If ``debug_logger`` is not passed, a default debug logger that
     logs to stderr will be used.  If it is passed, it should be an
     instance of the :class:`logging.Logger` (PEP 282) standard library
     class or a :term:`dotted Python name` to same.  The debug logger
-    is used by :mod:`repoze.bfg` itself to log warnings and
+    is used by :mod:`pyramid` itself to log warnings and
     authorization debugging information.
 
     If ``locale_negotiator`` is passed, it should be a :term:`locale
@@ -242,13 +242,13 @@ class Configurator(object):
         self.registry.registerUtility(factory, IDefaultRootFactory) # b/c
 
     def _set_authentication_policy(self, policy, _info=u''):
-        """ Add a :mod:`repoze.bfg` :term:`authentication policy` to
+        """ Add a :mod:`pyramid` :term:`authentication policy` to
         the current configuration."""
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthenticationPolicy, info=_info)
         
     def _set_authorization_policy(self, policy, _info=u''):
-        """ Add a :mod:`repoze.bfg` :term:`authorization policy` to
+        """ Add a :mod:`pyramid` :term:`authorization policy` to
         the current configuration state (also accepts a :term:`dotted
         Python name`."""
         policy = self.maybe_dotted(policy)
@@ -310,7 +310,7 @@ class Configurator(object):
 
     def _fix_registry(self):
         """ Fix up a ZCA component registry that is not a
-        repoze.bfg.registry.Registry by adding analogues of
+        pyramid.registry.Registry by adding analogues of
         ``has_listeners`` and ``notify`` through monkey-patching."""
 
         if not hasattr(self.registry, 'notify'):
@@ -363,13 +363,13 @@ class Configurator(object):
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
         you pass in may have already been initialized for use under
-        :mod:`repoze.bfg` via a different configurator.  However, in
+        :mod:`pyramid` via a different configurator.  However, in
         some circumstances, such as when you want to use the Zope
         'global` registry instead of a registry created as a result of
         the Configurator constructor, or when you want to reset the
         initial setup of a registry, you *do* want to explicitly
         initialize the registry associated with a Configurator for use
-        under :mod:`repoze.bfg`.  Use ``setup_registry`` to do this
+        under :mod:`pyramid`.  Use ``setup_registry`` to do this
         initialization.
 
         ``setup_registry`` configures settings, a root factory,
@@ -382,11 +382,9 @@ class Configurator(object):
         self._set_root_factory(root_factory)
         debug_logger = self.maybe_dotted(debug_logger)
         if debug_logger is None:
-            debug_logger = make_stream_logger('repoze.bfg.debug', sys.stderr)
+            debug_logger = make_stream_logger('pyramid.debug', sys.stderr)
         registry = self.registry
         registry.registerUtility(debug_logger, IDebugLogger)
-        registry.registerUtility(debug_logger, IDebugLogger,
-                                 'repoze.bfg.debug') # b /c
         if authentication_policy or authorization_policy:
             self._set_security_policies(authentication_policy,
                                         authorization_policy)
@@ -410,11 +408,11 @@ class Configurator(object):
     def hook_zca(self, getSiteManager=None):
         """ Call :func:`zope.component.getSiteManager.sethook` with
         the argument
-        :data:`repoze.bfg.threadlocal.get_current_registry`, causing
+        :data:`pyramid.threadlocal.get_current_registry`, causing
         the :term:`Zope Component Architecture` 'global' APIs such as
         :func:`zope.component.getSiteManager`,
         :func:`zope.component.getAdapter` and others to use the
-        :mod:`repoze.bfg` :term:`application registry` rather than the
+        :mod:`pyramid` :term:`application registry` rather than the
         Zope 'global' registry.  If :mod:`zope.component` cannot be
         imported, this method will raise an :exc:`ImportError`."""
         if getSiteManager is None:
@@ -425,7 +423,7 @@ class Configurator(object):
     def unhook_zca(self, getSiteManager=None):
         """ Call :func:`zope.component.getSiteManager.reset` to undo
         the action of
-        :meth:`repoze.bfg.configuration.Configurator.hook_zca`.  If
+        :meth:`pyramid.configuration.Configurator.hook_zca`.  If
         :mod:`zope.component` cannot be imported, this method will
         raise an :exc:`ImportError`."""
         if getSiteManager is None: # pragma: no cover
@@ -438,7 +436,7 @@ class Configurator(object):
         registry` implied by ``registry`` attribute of this
         configurator and the :term:`request` implied by the
         ``request`` argument on to the :term:`thread local` stack
-        consulted by various :mod:`repoze.bfg.threadlocal` API
+        consulted by various :mod:`pyramid.threadlocal` API
         functions."""
         self.manager.push({'registry':self.registry, 'request':request})
 
@@ -460,12 +458,12 @@ class Configurator(object):
         This is API is useful to framework extenders who create
         pluggable systems which need to register 'proxy' view
         callables for functions, instances, or classes which meet the
-        requirements of being a :mod:`repoze.bfg` view callable.  For
+        requirements of being a :mod:`pyramid` view callable.  For
         example, a ``some_other_framework`` function in another
         framework may want to allow a user to supply a view callable,
         but he may want to wrap the view callable in his own before
-        registering the wrapper as a :mod:`repoze.bfg` view callable.
-        Because a :mod:`repoze.bfg` view callable can be any of a
+        registering the wrapper as a :mod:`pyramid` view callable.
+        Because a :mod:`pyramid` view callable can be any of a
         number of valid objects, the framework extender will not know
         how to call the user-supplied object.  Running it through
         ``derive_view`` normalizes it to a callable which accepts two
@@ -531,7 +529,7 @@ class Configurator(object):
         ``subscriber`` argument represents a callable object (or a
         :term:`dotted Python name` which identifies a callable); it
         will be called with a single object ``event`` whenever
-        :mod:`repoze.bfg` emits an :term:`event` associated with the
+        :mod:`pyramid` emits an :term:`event` associated with the
         ``iface``, which may be an :term:`interface` or a class or a
         :term:`dotted Python name` to a global object representing an
         interface or a class.  Using the default ``iface`` value,
@@ -552,8 +550,8 @@ class Configurator(object):
         Configurator constructor with one or more 'setting' key/value
         pairs.  A setting is a single key/value pair in the
         dictionary-ish object returned from the API
-        :func:`repoze.bfg.settings.get_settings` and
-        :meth:`repoze.bfg.configuration.Configurator.get_settings`.
+        :func:`pyramid.settings.get_settings` and
+        :meth:`pyramid.configuration.Configurator.get_settings`.
 
         You may pass a dictionary::
 
@@ -564,11 +562,10 @@ class Configurator(object):
            config.add_settings(external_uri='http://example.com')
 
         This function is useful when you need to test code that calls
-        the :func:`repoze.bfg.settings.get_settings` API (or the
-        :meth:`repoze.bfg.configuration.Configurator.get_settings`
+        the :func:`pyramid.settings.get_settings` API (or the
+        :meth:`pyramid.configuration.Configurator.get_settings`
         API) and which uses return values from that API.
 
-        .. note:: This method is new as of :mod:`repoze.bfg` 1.2.
         """
         if settings is None:
             settings = {}
@@ -583,20 +580,20 @@ class Configurator(object):
         Return a 'settings' object for the current application.  A
         'settings' object is a dictionary-like object that contains
         key/value pairs based on the dictionary passed as the ``settings``
-        argument to the :class:`repoze.bfg.configuration.Configurator`
-        constructor or the :func:`repoze.bfg.router.make_app` API.
+        argument to the :class:`pyramid.configuration.Configurator`
+        constructor or the :func:`pyramid.router.make_app` API.
 
         .. note:: For backwards compatibility, dictionary keys can also be
            looked up as attributes of the settings object.
 
-        .. note:: the :class:`repoze.bfg.settings.get_settings` function
+        .. note:: the :class:`pyramid.settings.get_settings` function
            performs the same duty."""
         return self.registry.queryUtility(ISettings)
 
     def make_wsgi_app(self):
-        """ Returns a :mod:`repoze.bfg` WSGI application representing
+        """ Returns a :mod:`pyramid` WSGI application representing
         the current configuration state and sends a
-        :class:`repoze.bfg.interfaces.IApplicationCreated`
+        :class:`pyramid.interfaces.IApplicationCreated`
         event to all listeners."""
         from pyramid.router import Router # avoid circdep
         app = Router(self.registry)
@@ -643,7 +640,7 @@ class Configurator(object):
         down below into *predicate* arguments and *non-predicate*
         arguments.  Predicate arguments narrow the circumstances in
         which the view callable will be invoked when a request is
-        presented to :mod:`repoze.bfg`; non-predicate arguments are
+        presented to :mod:`pyramid`; non-predicate arguments are
         informational.
 
         Non-Predicate Arguments
@@ -666,9 +663,9 @@ class Configurator(object):
           security and permissions.  If ``permission`` is omitted, a
           *default* permission may be used for this view registration
           if one was named as the
-          :class:`repoze.bfg.configuration.Configurator` constructor's
+          :class:`pyramid.configuration.Configurator` constructor's
           ``default_permission`` argument, or if
-          :meth:`repoze.bfg.configuration.Configurator.set_default_permission`
+          :meth:`pyramid.configuration.Configurator.set_default_permission`
           was used prior to this view registration.  Pass ``None`` as
           the permission to explicitly indicate that the view should
           always be executable by entirely anonymous users, regardless
@@ -724,7 +721,7 @@ class Configurator(object):
           The ``renderer`` attribute is optional.  If it is not
           defined, the "null" renderer is assumed (no rendering is
           performed and the value is passed back to the upstream
-          :mod:`repoze.bfg` machinery unmolested).
+          :mod:`pyramid` machinery unmolested).
 
         wrapper
 
@@ -740,7 +737,7 @@ class Configurator(object):
           :ref:`view_lookup`.  The "best" wrapper view will be found
           based on the lookup ordering: "under the hood" this wrapper
           view is looked up via
-          ``repoze.bfg.view.render_view_to_response(context, request,
+          ``pyramid.view.render_view_to_response(context, request,
           'wrapper_viewname')``. The context and request of a wrapper
           view is the same context and request of the inner view.  If
           this attribute is unspecified, no view wrapping is done.
@@ -882,7 +879,6 @@ class Configurator(object):
           ``True``, the associated view callable will be considered
           viable for a given request.
 
-          .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
           """
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
@@ -1097,7 +1093,7 @@ class Configurator(object):
 
           A Python object (often a function or a class) or a
           :term:`dotted Python name` which refers to the same object
-          that will generate a :mod:`repoze.bfg` :term:`context`
+          that will generate a :mod:`pyramid` :term:`context`
           object when this route matches. For example,
           ``mypackage.models.MyFactoryClass``.  If this argument is
           not specified, a default root factory will be used.
@@ -1146,20 +1142,16 @@ class Configurator(object):
           ignored when attached to a route that has a ``*traverse``
           remainder marker in its pattern.
 
-          .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
-
         pregenerator
 
            This option should be a callable object that implements the
-           :class:`repoze.bfg.interfaces.IRoutePregenerator`
+           :class:`pyramid.interfaces.IRoutePregenerator`
            interface.  A :term:`pregenerator` is a callable called by
-           the :mod:`repoze.bfg.url.route_url` function to augment or
+           the :mod:`pyramid.url.route_url` function to augment or
            replace the arguments it is passed when generating a URL
            for the route.  This is a feature not often used directly
            by applications, it is meant to be hooked by frameworks
-           that use :mod:`repoze.bfg` as a base.
-
-          .. note:: This feature is new as of :mod:`repoze.bfg` 1.3.
+           that use :mod:`pyramid` as a base.
 
         Predicate Arguments
 
@@ -1172,11 +1164,10 @@ class Configurator(object):
           continues.
 
           .. note:: For backwards compatibility purposes (as of
-             :mod:`repoze.bfg` 1.3), a ``path`` keyword argument
-             passed to this function will be used to represent the
-             pattern value if the ``pattern`` argument is ``None``.
-             If both ``path`` and ``pattern`` are passed, ``pattern``
-             wins.
+             :mod:`pyramid` 1.0), a ``path`` keyword argument passed
+             to this function will be used to represent the pattern
+             value if the ``pattern`` argument is ``None``.  If both
+             ``path`` and ``pattern`` are passed, ``pattern`` wins.
 
         xhr
 
@@ -1268,12 +1259,6 @@ class Configurator(object):
           :ref:`custom_route_predicates` for more information about
           ``info``.
 
-          .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
-
-          .. note:: The ``info`` argument passed to a custom predicate
-                    in versions prior to :mod:`repoze.bfg` 1.3 was
-                    always ``None``.
-
         View-Related Arguments
 
         view
@@ -1354,8 +1339,6 @@ class Configurator(object):
           that otherwise matches the context, request, and view name
           (but which does not match the route_name predicate).
 
-          .. note:: This feature is new as of :mod:`repoze.bfg` 1.2.
-
         """
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
@@ -1422,7 +1405,7 @@ class Configurator(object):
     def scan(self, package=None, categories=None, _info=u''):
         """ Scan a Python package and any of its subpackages for
         objects marked with :term:`configuration decoration` such as
-        :class:`repoze.bfg.view.bfg_view`.  Any decorated object found
+        :class:`pyramid.view.bfg_view`.  Any decorated object found
         will influence the current configuration state.
 
         The ``package`` argument should be a Python :term:`package` or
@@ -1437,12 +1420,12 @@ class Configurator(object):
 
         By default, ``categories`` is ``None`` which will execute
         *all* Venusian decorator callbacks including
-        :mod:`repoze.bfg`-related decorators such as ``bfg_view``.  If
+        :mod:`pyramid`-related decorators such as ``bfg_view``.  If
         this is not desirable because the codebase has other
         Venusian-using decorators that aren't meant to be invoked
         during a particular scan, use ``('bfg',)`` as a ``categories``
         value to limit the execution of decorator callbacks to only
-        those registered by :mod:`repoze.bfg` itself.  Or pass a
+        those registered by :mod:`pyramid` itself.  Or pass a
         sequence of Venusian scan categories as necessary
         (e.g. ``('bfg', 'myframework')``) to limit the decorators
         called to the set of categories required.
@@ -1456,7 +1439,7 @@ class Configurator(object):
 
     def add_renderer(self, name, factory, _info=u''):
         """
-        Add a :mod:`repoze.bfg` :term:`renderer` factory to the
+        Add a :mod:`pyramid` :term:`renderer` factory to the
         current configuration state.
 
         The ``name`` argument is the renderer name.
@@ -1478,7 +1461,7 @@ class Configurator(object):
 
     def override_resource(self, to_override, override_with,
                           _info=u'', _override=None,):
-        """ Add a :mod:`repoze.bfg` resource override to the current
+        """ Add a :mod:`pyramid` resource override to the current
         configuration state.
 
         ``to_override`` is a :term:`resource specification` to the
@@ -1529,22 +1512,11 @@ class Configurator(object):
         """ Add a default forbidden view to the current configuration
         state.
 
-        .. warning:: This method has been deprecated in
-           :mod:`repoze.bfg` 1.3.  *Do not use it for new development;
-           it should only be used to support older code bases which
-           depend upon it.* See :ref:`changing_the_forbidden_view` to
-           see how a forbidden view should be registered in new
-           projects.
-
-        .. note:: For backwards compatibility with :mod:`repoze.bfg`
-           1.2, unlike an 'exception view' as described in
-           :ref:`exception_views`, a ``context, request`` view
-           callable registered using this API should not expect to
-           receive the exception as its first (``context``) argument.
-           Instead it should expect to receive the 'real' context as
-           found via context-finding or ``None`` if no context could
-           be found.  The exception causing the registered view to be
-           called is however still available as ``request.exception``.
+        .. warning:: This method has been deprecated in :mod:`pyramid`
+           1.0.  *Do not use it for new development; it should only be
+           used to support older code bases which depend upon it.* See
+           :ref:`changing_the_forbidden_view` to see how a forbidden
+           view should be registered in new projects.
 
         The ``view`` argument should be a :term:`view callable` or a
         :term:`dotted Python name` which refers to a view callable.
@@ -1556,7 +1528,7 @@ class Configurator(object):
         The ``renderer`` argument should be the name of (or path to) a
         :term:`renderer` used to generate a response for this view
         (see the
-        :meth:`repoze.bfg.configuration.Configurator.add_view`
+        :meth:`pyramid.configuration.Configurator.add_view`
         method's ``renderer`` argument for information about how a
         configurator relates to a renderer).
 
@@ -1576,21 +1548,11 @@ class Configurator(object):
         state.
 
         .. warning:: This method has been deprecated in
-           :mod:`repoze.bfg` 1.3.  *Do not use it for new development;
+           :mod:`pyramid` 1.0.  *Do not use it for new development;
            it should only be used to support older code bases which
            depend upon it.* See :ref:`changing_the_notfound_view` to
            see how a not found view should be registered in new
            projects.
-
-        ..note:: For backwards compatibility with :mod:`repoze.bfg`
-           1.2, unlike an 'exception view' as described in
-           :ref:`exception_views`, a ``context, request`` view
-           callable registered using this API should not expect to
-           receive the exception as its first (``context``) argument.
-           Instead it should expect to receive the 'real' context as
-           found via context-finding or ``None`` if no context could
-           be found.  The exception causing the registered view to be
-           called is however still available as ``request.exception``.
 
         The ``view`` argument should be a :term:`view callable` or a
         :term:`dotted Python name` which refers to a view callable.
@@ -1602,7 +1564,7 @@ class Configurator(object):
         The ``renderer`` argument should be the name of (or path to) a
         :term:`renderer` used to generate a response for this view
         (see the
-        :meth:`repoze.bfg.configuration.Configurator.add_view`
+        :meth:`pyramid.configuration.Configurator.add_view`
         method's ``renderer`` argument for information about how a
         configurator relates to a renderer).
 
@@ -1620,14 +1582,14 @@ class Configurator(object):
     def set_request_factory(self, factory):
         """ The object passed as ``factory`` should be an object (or a
         :term:`dotted Python name` which refers to an object) which
-        will be used by the :mod:`repoze.bfg` router to create all
+        will be used by the :mod:`pyramid` router to create all
         request objects.  This factory object must have the same
         methods and attributes as the
-        :class:`repoze.bfg.request.Request` class (particularly
+        :class:`pyramid.request.Request` class (particularly
         ``__call__``, and ``blank``).
 
         .. note:: Using the :meth:``request_factory`` argument to the
-           :class:`repoze.bfg.configuration.Configurator` constructor
+           :class:`pyramid.configuration.Configurator` constructor
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
@@ -1636,7 +1598,7 @@ class Configurator(object):
     def set_renderer_globals_factory(self, factory):
         """ The object passed as ``factory`` should be an callable (or
         a :term:`dotted Python name` which refers to an callable) that
-        will be used by the :mod:`repoze.bfg` rendering machinery as a
+        will be used by the :mod:`pyramid` rendering machinery as a
         renderers global factory (see :ref:`adding_renderer_globals`).
 
         The ``factory`` callable must accept a single argument named
@@ -1648,7 +1610,7 @@ class Configurator(object):
 
         .. note:: Using the :meth:`renderer_globals_factory`
            argument to the
-           :class:`repoze.bfg.configuration.Configurator` constructor
+           :class:`pyramid.configuration.Configurator` constructor
            can be used to achieve the same purpose.
         """
         factory = self.maybe_dotted(factory)
@@ -1668,10 +1630,8 @@ class Configurator(object):
         application.  See :ref:`activating_translation` for more
         information.
 
-        .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
-
         .. note:: Using the ``locale_negotiator`` argument to the
-           :class:`repoze.bfg.configuration.Configurator` constructor
+           :class:`pyramid.configuration.Configurator` constructor
            can be used to achieve the same purpose.
         """
         negotiator = self.maybe_dotted(negotiator)
@@ -1699,10 +1659,8 @@ class Configurator(object):
 
         See also :ref:`setting_a_default_permission`.
 
-        .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
-
         .. note:: Using the ``default_permission`` argument to the
-           :class:`repoze.bfg.configuration.Configurator` constructor
+           :class:`pyramid.configuration.Configurator` constructor
            can be used to achieve the same purpose.
         """
         self.registry.registerUtility(permission, IDefaultPermission)
@@ -1721,7 +1679,6 @@ class Configurator(object):
 
            add_translations_dirs('/usr/share/locale', 'some.package:locale')
 
-        .. note:  This API is new as of :mod:`repoze.bfg` version 1.3.
         """
         for spec in specs:
 
@@ -1778,15 +1735,15 @@ class Configurator(object):
         *Usage*
 
         The ``add_static_view`` function is typically used in
-        conjunction with the :func:`repoze.bfg.url.static_url`
+        conjunction with the :func:`pyramid.url.static_url`
         function.  ``add_static_view`` adds a view which renders a
         static resource when some URL is visited;
-        :func:`repoze.bfg.url.static_url` generates a URL to that
+        :func:`pyramid.url.static_url` generates a URL to that
         resource.
 
         The ``name`` argument to ``add_static_view`` is usually a
         :term:`view name`.  When this is the case, the
-        :func:`repoze.bfg.url.static_url` API will generate a URL
+        :func:`pyramid.url.static_url` API will generate a URL
         which points to a BFG view, which will serve up a set of
         resources that live in the package itself. For example:
 
@@ -1795,7 +1752,7 @@ class Configurator(object):
            add_static_view('images', 'mypackage:images/')
 
         Code that registers such a view can generate URLs to the view
-        via :func:`repoze.bfg.url.static_url`:
+        via :func:`pyramid.url.static_url`:
 
         .. code-block:: python
 
@@ -1803,7 +1760,7 @@ class Configurator(object):
 
         When ``add_static_view`` is called with a ``name`` argument
         that represents a simple view name, as it is above, subsequent
-        calls to :func:`repoze.bfg.url.static_url` with paths that
+        calls to :func:`pyramid.url.static_url` with paths that
         start with the ``path`` argument passed to ``add_static_view``
         will generate a URL something like ``http://<BFG app
         URL>/images/logo.png``, which will cause the ``logo.png`` file
@@ -1816,7 +1773,7 @@ class Configurator(object):
         ``name`` argument is a URL (detected as any string with a
         slash in it).  In this mode, the ``name`` is used as the URL
         prefix when generating a URL using
-        :func:`repoze.bfg.url.static_url`.  For example, if
+        :func:`pyramid.url.static_url`.  For example, if
         ``add_static_view`` is called like so:
 
         .. code-block:: python
@@ -1824,7 +1781,7 @@ class Configurator(object):
            add_static_view('http://example.com/images', 'mypackage:images/')
 
         Subsequently, the URLs generated by
-        :func:`repoze.bfg.url.static_url` for that static view will be
+        :func:`pyramid.url.static_url` for that static view will be
         prefixed with ``http://example.com/images``:
 
         .. code-block:: python
@@ -1833,7 +1790,7 @@ class Configurator(object):
 
         When ``add_static_view`` is called with a ``name`` argument
         that is the URL prefix ``http://example.com/images``,
-        subsequent calls to :func:`repoze.bfg.url.static_url` with
+        subsequent calls to :func:`pyramid.url.static_url` with
         paths that start with the ``path`` argument passed to
         ``add_static_view`` will generate a URL something like
         ``http://example.com/logo.png``.  The external webserver
@@ -1854,7 +1811,7 @@ class Configurator(object):
     def testing_securitypolicy(self, userid=None, groupids=(),
                                permissive=True):
         """Unit/integration testing helper: Registers a pair of faux
-        :mod:`repoze.bfg` security policies: a :term:`authentication
+        :mod:`pyramid` security policies: a :term:`authentication
         policy` and a :term:`authorization policy`.
 
         The behavior of the registered :term:`authorization policy`
@@ -1869,15 +1826,15 @@ class Configurator(object):
         ``groupids`` argument.  The authentication policy will return
         the userid identifier implied by the ``userid`` argument and
         the group ids implied by the ``groupids`` argument when the
-        :func:`repoze.bfg.security.authenticated_userid` or
-        :func:`repoze.bfg.security.effective_principals` APIs are
+        :func:`pyramid.security.authenticated_userid` or
+        :func:`pyramid.security.effective_principals` APIs are
         used.
 
         This function is most useful when testing code that uses
-        the APIs named :func:`repoze.bfg.security.has_permission`,
-        :func:`repoze.bfg.security.authenticated_userid`,
-        :func:`repoze.bfg.security.effective_principals`, and
-        :func:`repoze.bfg.security.principals_allowed_by_permission`.
+        the APIs named :func:`pyramid.security.has_permission`,
+        :func:`pyramid.security.authenticated_userid`,
+        :func:`pyramid.security.effective_principals`, and
+        :func:`pyramid.security.principals_allowed_by_permission`.
         """
         from pyramid.testing import DummySecurityPolicy
         policy = DummySecurityPolicy(userid, groupids, permissive)
@@ -1887,15 +1844,15 @@ class Configurator(object):
     def testing_models(self, models):
         """Unit/integration testing helper: registers a dictionary of
         :term:`model` objects that can be resolved via the
-        :func:`repoze.bfg.traversal.find_model` API.
+        :func:`pyramid.traversal.find_model` API.
 
-        The :func:`repoze.bfg.traversal.find_model` API is called with
+        The :func:`pyramid.traversal.find_model` API is called with
         a path as one of its arguments.  If the dictionary you
         register when calling this method contains that path as a
         string key (e.g. ``/foo/bar`` or ``foo/bar``), the
         corresponding value will be returned to ``find_model`` (and
         thus to your code) when
-        :func:`repoze.bfg.traversal.find_model` is called with an
+        :func:`pyramid.traversal.find_model` is called with an
         equivalent path string or tuple.
         """
         class DummyTraverserFactory:
@@ -1924,7 +1881,7 @@ class Configurator(object):
         the list.  You can then compare the values in the list to
         expected event notifications.  This method is useful when
         testing code that wants to call
-        :meth:`repoze.bfg.registry.Registry.notify`,
+        :meth:`pyramid.registry.Registry.notify`,
         :func:`zope.component.event.dispatch` or
         :func:`zope.component.event.objectEventNotify`.
 
@@ -1944,10 +1901,10 @@ class Configurator(object):
         or a resource specification) and return the renderer object.
         If the ``renderer`` argument is None, a 'dummy' renderer will
         be used.  This function is useful when testing code that calls
-        the :func:`repoze.bfg.renderers.render` function or
-        :func:`repoze.bfg.renderers.render_to_response` function or
+        the :func:`pyramid.renderers.render` function or
+        :func:`pyramid.renderers.render_to_response` function or
         any other ``render_*`` or ``get_*`` API of the
-        :mod:`repoze.bfg.renderers` module.
+        :mod:`pyramid.renderers` module.
 
         Note that calling this method for with a ``path`` argument
         representing a renderer factory type (e.g. for ``foo.pt``
@@ -1958,9 +1915,6 @@ class Configurator(object):
         .. note:: This method is also available under the alias
            ``testing_add_template`` (an older name for it).
 
-        .. note:: This method is new in :mod:`repoze.bfg` 1.3 (the
-           method named ``testing_add_template`` had the same signature
-           and purpose in previous releases)..
         """
         from pyramid.testing import DummyRendererFactory
         helper = RendererHelper(path, registry=self.registry)
@@ -2498,63 +2452,6 @@ def isexception(o):
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
-# note that ``options`` is a b/w compat alias for ``settings`` and
-# ``Configurator`` is a testing dep inj
-def make_app(root_factory, package=None, filename='configure.zcml',
-             settings=None, options=None, Configurator=Configurator):
-    """ Return a Router object, representing a fully configured
-    :mod:`repoze.bfg` WSGI application.
-
-    .. warning:: Use of this function is deprecated as of
-       :mod:`repoze.bfg` 1.2.  You should instead use a
-       :class:`repoze.bfg.configuration.Configurator` instance to
-       perform startup configuration as shown in
-       :ref:`configuration_narr`.
-
-    ``root_factory`` must be a callable that accepts a :term:`request`
-    object and which returns a traversal root object.  The traversal
-    root returned by the root factory is the *default* traversal root;
-    it can be overridden on a per-view basis.  ``root_factory`` may be
-    ``None``, in which case a 'default default' traversal root is
-    used.
-
-    ``package`` is a Python :term:`package` or module representing the
-    application's package.  It is optional, defaulting to ``None``.
-    ``package`` may be ``None``.  If ``package`` is ``None``, the
-    ``filename`` passed or the value in the ``options`` dictionary
-    named ``configure_zcml`` must be a) absolute pathname to a
-    :term:`ZCML` file that represents the application's configuration
-    *or* b) a :term:`resource specification` to a :term:`ZCML` file in
-    the form ``dotted.package.name:relative/file/path.zcml``.
-
-    ``filename`` is the filesystem path to a ZCML file (optionally
-    relative to the package path) that should be parsed to create the
-    application registry.  It defaults to ``configure.zcml``.  It can
-    also be a ;term:`resource specification` in the form
-    ``dotted_package_name:relative/file/path.zcml``. Note that if any
-    value for ``configure_zcml`` is passed within the ``settings``
-    dictionary, the value passed as ``filename`` will be ignored,
-    replaced with the ``configure_zcml`` value.
-
-    ``settings``, if used, should be a dictionary containing runtime
-    settings (e.g. the key/value pairs in an app section of a
-    PasteDeploy file), with each key representing the option and the
-    key's value representing the specific option value,
-    e.g. ``{'reload_templates':True}``.  Note that the keyword
-    parameter ``options`` is a backwards compatibility alias for the
-    ``settings`` keyword parameter.
-    """
-    settings = settings or options or {}
-    zcml_file = settings.get('configure_zcml', filename)
-    config = Configurator(package=package, settings=settings,
-                          root_factory=root_factory)
-    config.hook_zca()
-    config.begin()
-    config.load_zcml(zcml_file)
-    config.end()
-    return config.make_wsgi_app()
-
-
 class DottedNameResolver(object):
     """ This class resolves dotted name references to 'global' Python
     objects (objects which can be imported) to those objects.
@@ -2592,7 +2489,7 @@ class DottedNameResolver(object):
     resolver will only be able to resolve fully qualified (not
     relative) names.  Any attempt to resolve a relative name when the
     ``package`` is ``None`` will result in an
-    :exc:`repoze.bfg.configuration.ConfigurationError` exception.
+    :exc:`pyramid.configuration.ConfigurationError` exception.
 
     If a *module* or *module name* (as opposed to a package or package
     name) is supplied as ``package``, its containing package is
@@ -2612,7 +2509,7 @@ class DottedNameResolver(object):
     import would be for ``xml.minidom``.
 
     When a dotted name cannot be resolved, a
-    :class:`repoze.bfg.exceptions.ConfigurationError` error is raised.
+    :class:`pyramid.exceptions.ConfigurationError` error is raised.
     """
     def __init__(self, package):
         if package is None:

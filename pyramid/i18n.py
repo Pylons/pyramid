@@ -20,8 +20,8 @@ class Localizer(object):
     """
     An object providing translation and pluralizations related to
      the current request's locale name.  A
-     :class:`repoze.bfg.i18n.Localizer` object is created using the
-     :func:`repoze.bfg.i18n.get_localizer` function.
+     :class:`pyramid.i18n.Localizer` object is created using the
+     :func:`pyramid.i18n.get_localizer` function.
      """
     def __init__(self, locale_name, translations):
         self.locale_name = locale_name
@@ -48,7 +48,7 @@ class Localizer(object):
 
         Example::
 
-           from repoze.bfg.18n import TranslationString
+           from pyramid.18n import TranslationString
            ts = TranslationString('Add ${item}', domain='mypackage',
                                   mapping={'item':'Item'})
            translated = localizer.translate(ts)
@@ -147,7 +147,7 @@ def get_locale_name(request):
     return locale_name
 
 def get_localizer(request):
-    """ Retrieve a :class:`repoze.bfg.i18n.Localizer` object
+    """ Retrieve a :class:`pyramid.i18n.Localizer` object
     corresponding to the current request's locale name. """
     localizer =  getattr(request, 'bfg_localizer', None)
 

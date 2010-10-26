@@ -15,7 +15,6 @@ from webob.exc import HTTPFound
 
 import venusian
 
-from zope.deprecation import deprecated
 from zope.interface import providedBy
 
 from pyramid.interfaces import IRoutesMapper
@@ -26,23 +25,6 @@ from pyramid.path import package_path
 from pyramid.resource import resource_spec_from_abspath
 from pyramid.static import static_view as static # B/C
 from pyramid.threadlocal import get_current_registry
-
-# b/c imports
-from pyramid.security import view_execution_permitted
-
-view_execution_permitted # prevent PyFlakes from complaining
-
-deprecated('view_execution_permitted',
-    "('from repoze.bfg.view import view_execution_permitted' was  "
-    "deprecated as of repoze.bfg 1.0; instead use 'from "
-    "repoze.bfg.security import view_execution_permitted')",
-    )
-
-deprecated('NotFound',
-    "('from repoze.bfg.view import NotFound' was  "
-    "deprecated as of repoze.bfg 1.1; instead use 'from "
-    "repoze.bfg.exceptions import NotFound')",
-    )
 
 static = static # dont yet deprecate this (ever?)
 
@@ -61,7 +43,7 @@ def render_view_to_response(context, request, name='', secure=True):
     protected by a permission, the permission will be checked before
     calling the view function.  If the permission check disallows view
     execution (based on the current :term:`authorization policy`), a
-    :exc:`repoze.bfg.exceptions.Forbidden` exception will be raised.
+    :exc:`pyramid.exceptions.Forbidden` exception will be raised.
     The exception's ``args`` attribute explains why the view access
     was disallowed.
 
@@ -99,13 +81,13 @@ def render_view_to_iterable(context, request, name='', secure=True):
 
     You can usually get the string representation of the return value
     of this function by calling ``''.join(iterable)``, or just use
-    :func:`repoze.bfg.view.render_view` instead.
+    :func:`pyramid.view.render_view` instead.
 
     If ``secure`` is ``True``, and the view is protected by a
     permission, the permission will be checked before the view
     function is invoked.  If the permission check disallows view
     execution (based on the current :term:`authentication policy`), a
-    :exc:`repoze.bfg.exceptions.Forbidden` exception will be raised;
+    :exc:`pyramid.exceptions.Forbidden` exception will be raised;
     its ``args`` attribute explains why the view access was
     disallowed.
 
@@ -134,7 +116,7 @@ def render_view(context, request, name='', secure=True):
     permission, the permission will be checked before the view is
     invoked.  If the permission check disallows view execution (based
     on the current :term:`authorization policy`), a
-    :exc:`repoze.bfg.exceptions.Forbidden` exception will be raised;
+    :exc:`pyramid.exceptions.Forbidden` exception will be raised;
     its ``args`` attribute explains why the view access was
     disallowed.
 
@@ -177,7 +159,7 @@ class bfg_view(object):
           return 'OK'
 
     Might replace the following call to the
-    :meth:`repoze.bfg.configuration.Configurator.add_view` method::
+    :meth:`pyramid.configuration.Configurator.add_view` method::
 
        import views
        import models
@@ -223,7 +205,7 @@ class bfg_view(object):
     view wrapper is associated with this view).
 
     If ``request_type`` is not supplied, the interface
-    :class:`repoze.bfg.interfaces.IRequest` is used, implying the
+    :class:`pyramid.interfaces.IRequest` is used, implying the
     standard request interface type.
 
     If ``route_name`` is not supplied, the view configuration is
@@ -309,7 +291,7 @@ class bfg_view(object):
     class decorators)::
 
         from webob import Response
-        from repoze.bfg.view import bfg_view
+        from pyramid.view import bfg_view
 
         @bfg_view()
         class MyView(object):
@@ -323,7 +305,7 @@ class bfg_view(object):
     used against a class, although not in decorator form::
 
         from webob import Response
-        from repoze.bfg.view import bfg_view
+        from pyramid.view import bfg_view
 
         class MyView(object):
             def __init__(self, context, request):
@@ -344,7 +326,7 @@ class bfg_view(object):
     The bfg_view decorator can also be used against a class method::
 
         from webob import Response
-        from repoze.bfg.view import bfg_view
+        from pyramid.view import bfg_view
 
         class MyView(object):
             def __init__(self, context, request):
@@ -367,7 +349,7 @@ class bfg_view(object):
     spelled equivalently as::
 
         from webob import Response
-        from repoze.bfg.view import bfg_view
+        from pyramid.view import bfg_view
 
         @bfg_view(attr='amethod', name='hello')
         class MyView(object):
@@ -379,7 +361,7 @@ class bfg_view(object):
                 return Response('hello from %s!' % self.context)
 
     .. warning:: The ability to use the ``bfg_view`` decorator as a
-                 method decorator is new in :mod:`repoze.bfg` version
+                 method decorator is new in :mod:`pyramid` version
                  1.1.
 
     To make use of any ``bfg_view`` declaration, you must perform a
@@ -392,7 +374,7 @@ class bfg_view(object):
     ``scan`` directive.
 
     Or, if you don't use ZCML, use the
-    :meth:`repoze.bfg.configuration.Configurator.scan` method::
+    :meth:`pyramid.configuration.Configurator.scan` method::
 
       config.scan()
     """
@@ -459,15 +441,15 @@ def default_exceptionresponse_view(context, request):
 
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any
-    :mod:`repoze.bfg` application.  Even if you use
-    :func:`repoze.bfg.view.append_slash_notfound_view` as the Not
-    Found view, :mod:`repoze.bfg` still must generate a ``404 Not
+    :mod:`pyramid` application.  Even if you use
+    :func:`pyramid.view.append_slash_notfound_view` as the Not
+    Found view, :mod:`pyramid` still must generate a ``404 Not
     Found`` response when it cannot redirect to a slash-appended URL;
     this not found response will be visible to site users.
 
     If you don't care what this 404 response looks like, and you only
     need redirections to slash-appended route URLs, you may use the
-    :func:`repoze.bfg.view.append_slash_notfound_view` object as the
+    :func:`pyramid.view.append_slash_notfound_view` object as the
     Not Found view.  However, if you wish to use a *custom* notfound
     view callable when a URL cannot be redirected to a slash-appended
     URL, you may wish to use an instance of this class as the Not
@@ -477,8 +459,8 @@ class AppendSlashNotFoundViewFactory(object):
 
     .. code-block:: python
 
-       from repoze.bfg.exceptions import NotFound
-       from repoze.bfg.view import AppendSlashNotFoundViewFactory
+       from pyramid.exceptions import NotFound
+       from pyramid.view import AppendSlashNotFoundViewFactory
 
        def notfound_view(context, request):
            return HTTPNotFound('It aint there, stop trying!')
@@ -489,8 +471,6 @@ class AppendSlashNotFoundViewFactory(object):
     The ``notfound_view`` supplied must adhere to the two-argument
     view callable calling convention of ``(context, request)``
     (``context`` will be the exception object).
-
-    .. note:: This class is new as of :mod:`repoze.bfg` version 1.3.
 
     """
     def __init__(self, notfound_view=None):
@@ -531,20 +511,19 @@ If you use :term:`ZCML`, add the following to your application's
 ``configure.zcml`` to use this view as the Not Found view::
 
       <view
-         context="repoze.bfg.exceptions.NotFound"
-         view="repoze.bfg.view.append_slash_notfound_view"/>
+         context="pyramid.exceptions.NotFound"
+         view="pyramid.view.append_slash_notfound_view"/>
 
 Or use the
-:meth:`repoze.bfg.configuration.Configurator.add_view`
+:meth:`pyramid.configuration.Configurator.add_view`
 method if you don't use ZCML::
 
-  from repoze.bfg.exceptions import NotFound
-  from repoze.bfg.view import append_slash_notfound_view
+  from pyramid.exceptions import NotFound
+  from pyramid.view import append_slash_notfound_view
   config.add_view(append_slash_notfound_view, context=NotFound)
 
 See also :ref:`changing_the_notfound_view`.
 
-.. note:: This function is new as of :mod:`repoze.bfg` version 1.1.
 """
 
 

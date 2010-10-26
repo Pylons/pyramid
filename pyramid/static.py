@@ -152,7 +152,7 @@ class StaticURLInfo(object):
 
 class static_view(object):
     """ An instance of this class is a callable which can act as a
-    :mod:`repoze.bfg` :term:`view callable`; this view will serve
+    :mod:`pyramid` :term:`view callable`; this view will serve
     static files from a directory on disk based on the ``root_dir``
     you provide to its constructor.
 
@@ -179,9 +179,9 @@ class static_view(object):
     five minutes).
 
     .. note:: If the ``root_dir`` is relative to a :term:`package`, or
-         is a :term:`resource specification` the :mod:`repoze.bfg`
+         is a :term:`resource specification` the :mod:`pyramid`
          ``resource`` ZCML directive or
-         :class:`repoze.bfg.configuration.Configurator` method can be
+         :class:`pyramid.configuration.Configurator` method can be
          used to override resources within the named ``root_dir``
          package-relative directory.  However, if the ``root_dir`` is
          absolute, the ``resource`` directive will not be able to

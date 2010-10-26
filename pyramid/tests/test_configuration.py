@@ -145,7 +145,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IDebugLogger
         config = self._makeOne()
         logger = config.registry.getUtility(IDebugLogger)
-        self.assertEqual(logger.name, 'repoze.bfg.debug')
+        self.assertEqual(logger.name, 'pyramid.debug')
 
     def test_ctor_noreg_debug_logger_non_None(self):
         from pyramid.interfaces import IDebugLogger
@@ -299,7 +299,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         config.setup_registry()
         logger = reg.getUtility(IDebugLogger)
-        self.assertEqual(logger.name, 'repoze.bfg.debug')
+        self.assertEqual(logger.name, 'pyramid.debug')
 
     def test_setup_registry_debug_logger_non_None(self):
         from pyramid.registry import Registry
@@ -3927,50 +3927,6 @@ class TestRequestOnly(unittest.TestCase):
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
 
-class TestMakeApp(unittest.TestCase):
-    def setUp(self):
-        testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def _callFUT(self, *arg, **kw):
-        from pyramid.configuration import make_app
-        return make_app(*arg, **kw)
-
-    def test_it(self):
-        settings = {'a':1}
-        rootfactory = object()
-        app = self._callFUT(rootfactory, settings=settings,
-                            Configurator=DummyConfigurator)
-        self.assertEqual(app.root_factory, rootfactory)
-        self.assertEqual(app.settings, settings)
-        self.assertEqual(app.zcml_file, 'configure.zcml')
-        self.assertEqual(app.zca_hooked, True)
-
-    def test_it_options_means_settings(self):
-        settings = {'a':1}
-        rootfactory = object()
-        app = self._callFUT(rootfactory, options=settings,
-                            Configurator=DummyConfigurator)
-        self.assertEqual(app.root_factory, rootfactory)
-        self.assertEqual(app.settings, settings)
-        self.assertEqual(app.zcml_file, 'configure.zcml')
-
-    def test_it_with_package(self):
-        package = object()
-        rootfactory = object()
-        app = self._callFUT(rootfactory, package=package,
-                            Configurator=DummyConfigurator)
-        self.assertEqual(app.package, package)
-
-    def test_it_with_custom_configure_zcml(self):
-        rootfactory = object()
-        settings = {'configure_zcml':'2.zcml'}
-        app = self._callFUT(rootfactory, filename='1.zcml', settings=settings,
-                            Configurator=DummyConfigurator)
-        self.assertEqual(app.zcml_file, '2.zcml')
-
 class TestDottedNameResolver(unittest.TestCase):
     def _makeOne(self, package=None):
         from pyramid.configuration import DottedNameResolver
@@ -4246,29 +4202,6 @@ class DummySecurityPolicy:
     def permits(self, context, principals, permission):
         return self.permitted
 
-class DummyConfigurator(object):
-    def __init__(self, registry=None, package=None, root_factory=None,
-                 settings=None):
-        self.root_factory = root_factory
-        self.package = package
-        self.settings = settings
-
-    def begin(self, request=None):
-        self.begun = True
-        self.request = request
-
-    def end(self):
-        self.ended = True
-
-    def load_zcml(self, filename):
-        self.zcml_file = filename
-    
-    def make_wsgi_app(self):
-        return self
-
-    def hook_zca(self):
-        self.zca_hooked = True
-    
 class DummyAccept(object):
     def __init__(self, *matches):
         self.matches = list(matches)

@@ -4,43 +4,43 @@ from zope.interface import Interface
 # public API interfaces
 
 class IContextFound(Interface):
-    """ An event type that is emitted after :mod:`repoze.bfg` finds a
+    """ An event type that is emitted after :mod:`pyramid` finds a
     :term:`context` object but before it calls any view code.  See the
-    documentation attached to :class:`repoze.bfg.events.ContextFound`
+    documentation attached to :class:`pyramid.events.ContextFound`
     for more information.
 
     .. note:: For backwards compatibility with versions of
-       :mod:`repoze.bfg` before 1.3, this event interface can also be
-       imported as :class:`repoze.bfg.interfaces.IAfterTraversal`.
+       :mod:`pyramid` before 1.0, this event interface can also be
+       imported as :class:`pyramid.interfaces.IAfterTraversal`.
     """
     request = Attribute('The request object')
 
 IAfterTraversal = IContextFound
 
 class INewRequest(Interface):
-    """ An event type that is emitted whenever :mod:`repoze.bfg`
+    """ An event type that is emitted whenever :mod:`pyramid`
     begins to process a new request.  See the documentation attached
-    to :class:`repoze.bfg.events.NewRequest` for more information."""
+    to :class:`pyramid.events.NewRequest` for more information."""
     request = Attribute('The request object')
     
 class INewResponse(Interface):
-    """ An event type that is emitted whenever any :mod:`repoze.bfg`
+    """ An event type that is emitted whenever any :mod:`pyramid`
     view returns a response. See the
-    documentation attached to :class:`repoze.bfg.events.NewResponse`
+    documentation attached to :class:`pyramid.events.NewResponse`
     for more information."""
     request = Attribute('The request object')
     response = Attribute('The response object')
 
 class IApplicationCreated(Interface):
     """ Event issued when the
-    :meth:`repoze.bfg.configuration.Configurator.make_wsgi_app` method
+    :meth:`pyramid.configuration.Configurator.make_wsgi_app` method
     is called.  See the documentation attached to
-    :class:`repoze.bfg.events.ApplicationCreated` for more
+    :class:`pyramid.events.ApplicationCreated` for more
     information.
 
-    .. note:: For backwards compatibility with :mod:`repoze.bfg`
-       versions before 1.3, this interface can also be imported as
-       :class:`repoze.bfg.interfaces.IWSGIApplicationCreatedEvent`.
+    .. note:: For backwards compatibility with :mod:`pyramid`
+       versions before 1.0, this interface can also be imported as
+       :class:`pyramid.interfaces.IWSGIApplicationCreatedEvent`.
     """
     app = Attribute(u"Created application")
 
@@ -58,9 +58,9 @@ class IExceptionResponse(IException, IResponse):
     """ An interface representing a WSGI response which is also an
     exception object.  Register an exception view using this interface
     as a ``context`` to apply the registered view for all exception
-    types raised by :mod:`repoze.bfg` internally
-    (:class:`repoze.bfg.exceptions.NotFound` and
-    :class:`repoze.bfg.exceptions.Forbidden`)."""
+    types raised by :mod:`pyramid` internally
+    (:class:`pyramid.exceptions.NotFound` and
+    :class:`pyramid.exceptions.Forbidden`)."""
 
 # internal interfaces
 
@@ -74,7 +74,7 @@ class IRouteRequest(Interface):
     route-specific interfaces.  Not an API."""
 
 class IAuthenticationPolicy(Interface):
-    """ An object representing a BFG authentication policy. """
+    """ An object representing a Pyramid authentication policy. """
     def authenticated_userid(request):
         """ Return the authenticated userid or ``None`` if no
         authenticated userid can be found. """
@@ -96,7 +96,7 @@ class IAuthenticationPolicy(Interface):
         current user on subsequent requests. """
 
 class IAuthorizationPolicy(Interface):
-    """ An object representing a BFG authorization policy. """
+    """ An object representing a Pyramid authorization policy. """
     def permits(context, principals, permission):
         """ Return True if any of the principals is allowed the
         permission in the current context, else return False """
@@ -124,7 +124,7 @@ class IRequestFactory(Interface):
     """ A utility which generates a request """
     def __call__(environ):
         """ Return an object implementing IRequest, e.g. an instance
-        of ``repoze.bfg.request.Request``"""
+        of ``pyramid.request.Request``"""
 
     def blank(path):
         """ Return an empty request object (see
@@ -139,9 +139,9 @@ class IExceptionViewClassifier(Interface):
 class IView(Interface):
     def __call__(context, request):
         """ Must return an object that implements IResponse.  May
-        optionally raise ``repoze.bfg.exceptions.Forbidden`` if an
+        optionally raise ``pyramid.exceptions.Forbidden`` if an
         authorization failure is detected during view execution or
-        ``repoze.bfg.exceptions.NotFound`` if the not found page is
+        ``pyramid.exceptions.NotFound`` if the not found page is
         meant to be returned."""
 
 class ISecuredView(IView):
@@ -239,12 +239,12 @@ class IRouter(Interface):
         """Component architecture registry local to this application.""")
     
 class ISettings(Interface):
-    """ Runtime settings utility for repoze.bfg; represents the
+    """ Runtime settings utility for pyramid; represents the
     deployment settings for the application.  Implements a mapping
     interface."""
     
-# this interface, even if it becomes unused within BFG, is imported by
-# other packages (such as repoze.bfg.traversalwrapper)
+# this interface, even if it becomes unused within Pyramid, is
+# imported by other packages (such as repoze.bfg.traversalwrapper)
 class ILocation(Interface):
     """Objects that have a structural location"""
     __parent__ = Attribute("The parent in the location hierarchy")
@@ -259,7 +259,7 @@ class IRoutePregenerator(Interface):
     def __call__(request, elements, kw):
         """ A pregenerator is a function associated by a developer
         with a :term:`route`. The pregenerator for a route is called
-        by :func:`repoze.bfg.url.route_url` in order to adjust the set
+        by :func:`pyramid.url.route_url` in order to adjust the set
         of arguments passed to it by the user for special purposes,
         such as Pylons 'subdomain' support.  It will influence the URL
         returned by ``route_url``.
@@ -274,10 +274,9 @@ class IRoutePregenerator(Interface):
 
         You can employ a pregenerator by passing a ``pregenerator``
         argument to the
-        :meth:`repoze.bfg.configuration.Configurator.add_route`
+        :meth:`pyramid.configuration.Configurator.add_route`
         function.
 
-        .. note:: This interface is new as of :mod:`repoze.bfg` 1.3.
         """
 
 class IRoute(Interface):
@@ -286,7 +285,7 @@ class IRoute(Interface):
     name = Attribute('The route name')
     pattern = Attribute('The route pattern')
     factory = Attribute(
-        'The :term:`root factory` used by the :mod:`repoze.bfg` router '
+        'The :term:`root factory` used by the :mod:`pyramid` router '
         'when this route matches (or ``None``)')
     predicates = Attribute(
         'A sequence of :term:`route predicate` objects used to '

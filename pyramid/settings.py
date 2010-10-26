@@ -66,14 +66,14 @@ def get_settings():
     Return a 'settings' object for the current application.  A
     'settings' object is a dictionary-like object that contains
     key/value pairs based on the dictionary passed as the ``settings``
-    argument to the :class:`repoze.bfg.configuration.Configurator`
-    constructor or the :func:`repoze.bfg.router.make_app` API.
+    argument to the :class:`pyramid.configuration.Configurator`
+    constructor or the :func:`pyramid.router.make_app` API.
 
     .. note:: For backwards compatibility, dictionary keys can also be
        looked up as attributes of the settings object.
 
     .. note:: the
-       :class:`repoze.bfg.configuration.Configurator.get_settings` method
+       :class:`pyramid.configuration.Configurator.get_settings` method
        performs the same duty.
     """
     reg = get_current_registry()

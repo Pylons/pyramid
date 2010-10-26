@@ -14,7 +14,6 @@ from pyramid.interfaces import ITraverser
 from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 
-from pyramid.configuration import make_app # b/c import
 from pyramid.events import ContextFound
 from pyramid.events import NewRequest
 from pyramid.events import NewResponse
@@ -23,8 +22,6 @@ from pyramid.request import Request
 from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import ModelGraphTraverser
-
-make_app # prevent pyflakes from complaining
 
 class Router(object):
     implements(IRouter)
@@ -47,7 +44,7 @@ class Router(object):
     def __call__(self, environ, start_response):
         """
         Accept ``environ`` and ``start_response``; create a
-        :term:`request` and route the request to a :mod:`repoze.bfg`
+        :term:`request` and route the request to a :mod:`pyramid`
         view based on introspection of :term:`view configuration`
         within the application registry; call ``start_response`` and
         return an iterable.

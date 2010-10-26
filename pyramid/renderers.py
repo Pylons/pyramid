@@ -53,8 +53,6 @@ def render(renderer_name, value, request=None, package=None):
     with the most correct 'system' values (``request`` and ``context``
     in particular).
 
-    .. note:: This API is new in :mod:`repoze.bfg` 1.3.
-
     """
     try:
         registry = request.registry
@@ -96,8 +94,6 @@ def render_to_response(renderer_name, value, request=None, package=None):
     Supply a ``request`` parameter in order to provide the renderer
     with the most correct 'system' values (``request`` and ``context``
     in particular).
-
-    .. note:: This API is new in :mod:`repoze.bfg` 1.3.
 
     """
     try:
@@ -219,9 +215,9 @@ def rendered_response(renderer, result, view, context, request, renderer_name):
     return helper.render_to_response(result, system, request=request)
 
 deprecated('rendered_response',
-    "('repoze.bfg.renderers.rendered_response' is not a public API; it is  "
-    "officially deprecated as of repoze.bfg 1.3; "
-    "use repoze.bfg.renderers.render_to_response instead')",
+    "('pyramid.renderers.rendered_response' is not a public API; it is  "
+    "officially deprecated as of pyramid 1.0; "
+    "use pyramid.renderers.render_to_response instead')",
     )
 
 class RendererHelper(object):

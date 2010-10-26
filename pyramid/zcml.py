@@ -88,7 +88,7 @@ class IViewDirective(Interface):
         title=u"The request type string or dotted name interface for the view",
         description=(u"The view will be called if the interface represented by "
                      u"'request_type' is implemented by the request.  The "
-                     u"default request type is repoze.bfg.interfaces.IRequest"),
+                     u"default request type is pyramid.interfaces.IRequest"),
         required=False
         )
 
@@ -881,7 +881,6 @@ def zcml_configure(name, package):
     ``package`` which the filename should be relative to, load the
     ZCML into the current ZCML registry.
 
-    .. note:: This feature is new as of :mod:`repoze.bfg` 1.1.
     """
     context = ConfigurationMachine()
     xmlconfig.registerCommonDirectives(context)

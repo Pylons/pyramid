@@ -12,22 +12,22 @@ from pyramid.scripting import get_root
 
 class StarterProjectTemplate(Template):
     _template_dir = 'paster_templates/starter'
-    summary = 'repoze.bfg starter project'
+    summary = 'pyramid starter project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class ZODBProjectTemplate(Template):
     _template_dir = 'paster_templates/zodb'
-    summary = 'repoze.bfg ZODB starter project'
+    summary = 'pyramid ZODB starter project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class RoutesAlchemyProjectTemplate(Template):
     _template_dir = 'paster_templates/routesalchemy'
-    summary = 'repoze.bfg SQLAlchemy project using Routes (no traversal)'
+    summary = 'pyramid SQLAlchemy project using Routes (no traversal)'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 class AlchemyProjectTemplate(Template):
     _template_dir = 'paster_templates/alchemy'
-    summary = 'repoze.bfg SQLAlchemy project using traversal'
+    summary = 'pyramid SQLAlchemy project using traversal'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 def get_app(config_file, name, loadapp=loadapp):
@@ -40,7 +40,7 @@ def get_app(config_file, name, loadapp=loadapp):
 
 _marker = object()
 class BFGShellCommand(Command):
-    """Open an interactive shell with a :mod:`repoze.bfg` app loaded.
+    """Open an interactive shell with a :mod:`pyramid` app loaded.
 
     This command accepts two positional arguments:
 
@@ -60,7 +60,7 @@ class BFGShellCommand(Command):
               command will almost certainly fail.
 
     """
-    summary = "Open an interactive shell with a repoze.bfg app loaded"
+    summary = "Open an interactive shell with a pyramid app loaded"
 
     min_args = 2
     max_args = 2
