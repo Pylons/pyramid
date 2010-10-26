@@ -1,1 +1,1 @@
-.. include:: ../README.txt
+.. include:: README.txt
