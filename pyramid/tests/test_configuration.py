@@ -1808,7 +1808,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne()
         views = []
         def dummy_add_view(**kw):
-            views.append(kw)
+            views.append(kw) # pragma: no cover
         config.add_view = dummy_add_view
         class MyView(DummyHandler):
             __autoexpose__ = None
@@ -1819,9 +1819,8 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_handler_with_view_overridden_autoexpose_broken_regex1(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
-        views = []
         def dummy_add_view(**kw):
-            views.append(kw)
+            """ """
         config.add_view = dummy_add_view
         class MyView(DummyHandler):
             __autoexpose__ = 1
@@ -1831,9 +1830,8 @@ class ConfiguratorTests(unittest.TestCase):
     def test_add_handler_with_view_overridden_autoexpose_broken_regex2(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
-        views = []
         def dummy_add_view(**kw):
-            views.append(kw)
+            """ """
         config.add_view = dummy_add_view
         class MyView(DummyHandler):
             __autoexpose__ = 'a\\'
@@ -1847,7 +1845,7 @@ class ConfiguratorTests(unittest.TestCase):
             views.append(kw)
         config.add_view = dummy_add_view
         class MyView(object):
-            def action(self):
+            def action(self): # pragma: no cover
                 return 'response'
             action.__exposed__ = [{'custom_predicates':(1,)}]
         config.add_handler('name', '/{action}', MyView)
@@ -1867,7 +1865,7 @@ class ConfiguratorTests(unittest.TestCase):
             views.append(kw)
         config.add_view = dummy_add_view
         class MyView(object):
-            def action(self):
+            def action(self): # pragma: no cover
                 return 'response'
             action.__exposed__ = [{'name':'action3000'}]
         config.add_handler('name', '/{action}', MyView)
@@ -1893,7 +1891,7 @@ class ConfiguratorTests(unittest.TestCase):
             views.append(kw)
         config.add_view = dummy_add_view
         class MyView(object):
-            def action(self):
+            def action(self): # pragma: no cover
                 return 'response'
             action.__exposed__ = [{'name':'^action3000$'}]
         config.add_handler('name', '/{action}', MyView)
@@ -1919,7 +1917,7 @@ class ConfiguratorTests(unittest.TestCase):
         config.add_view = dummy_add_view
         exposed = [{'name':'^action3000$'}]
         class MyView(object):
-            def action(self):
+            def action(self): # pragma: no cover
                 return 'response'
             action.__exposed__ = exposed
         config.add_handler('name', '/{action}', MyView)
@@ -2000,7 +1998,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.add_handler,
-                          'name', None, 'pylons')
+                          'name', None, 'pyramid')
 
     def test_add_handler_pattern_None_with_previous_route(self):
         import pyramid
@@ -4428,6 +4426,57 @@ class Test_isexception(unittest.TestCase):
             pass
         self.assertEqual(self._callFUT(ISubException), True)
 
+class TestActionPredicate(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.configuration import ActionPredicate
+        return ActionPredicate
+    
+    def _makeOne(self, action='myaction'):
+        return self._getTargetClass()(action)
+
+    def test_bad_action_regex_string(self):
+        from pyramid.exceptions import ConfigurationError
+        cls = self._getTargetClass()
+        self.assertRaises(ConfigurationError, cls, '[a-z')
+
+    def test_bad_action_regex_None(self):
+        from pyramid.exceptions import ConfigurationError
+        cls = self._getTargetClass()
+        self.assertRaises(ConfigurationError, cls, None)
+
+    def test___call__no_matchdict(self):
+        pred = self._makeOne()
+        request = DummyRequest()
+        self.assertEqual(pred(None, request), False)
+
+    def test___call__no_action_in_matchdict(self):
+        pred = self._makeOne()
+        request = DummyRequest()
+        request.matchdict = {}
+        self.assertEqual(pred(None, request), False)
+
+    def test___call__action_does_not_match(self):
+        pred = self._makeOne()
+        request = DummyRequest()
+        request.matchdict = {'action':'notmyaction'}
+        self.assertEqual(pred(None, request), False)
+
+    def test___call__action_matches(self):
+        pred = self._makeOne()
+        request = DummyRequest()
+        request.matchdict = {'action':'myaction'}
+        self.assertEqual(pred(None, request), True)
+
+    def test___hash__(self):
+        pred1 = self._makeOne()
+        pred2 = self._makeOne()
+        pred3 = self._makeOne(action='notthesame')
+        self.assertEqual(hash(pred1), hash(pred2))
+        self.assertNotEqual(hash(pred1), hash(pred3))
+        self.assertNotEqual(hash(pred2), hash(pred3))
+        
+        
+
 class DummyRequest:
     subpath = ()
     def __init__(self):
@@ -4589,7 +4638,7 @@ def dummy_view(request):
 def dummyfactory(request):
     """ """
 
-class DummyHandler(object):
+class DummyHandler(object): # pragma: no cover
     def __init__(self, request):
         self.request = request
 
