@@ -93,6 +93,7 @@ API Reference
    api/paster
    api/renderers
    api/request
+   api/router
    api/scripting
    api/security
    api/settings

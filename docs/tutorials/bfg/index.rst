@@ -96,8 +96,16 @@ Here's how to convert a :mod:`repoze.bfg` application to a
      converted recursively, except Python files which live in
      directories which start with a ``.`` (dot).
 
+   - Each ZCML file found (recursively) within the path will have the
+     default ``xmlns`` attribute attached to the ``configure`` tag
+     changed from ``http://namespaces.repoze.org/bfg`` to
+     ``http://pylonshq.com/pyramid``.  Every ZCML file beneath the
+     top-level path (files ending with ``.zcml``) will be visited and
+     converted recursively, except ZCML files which live in
+     directories which start with a ``.`` (dot).
+
    - ZCML files which contain directives that have attributes which
-     name ``repoze.bfg``
+     name a ``repoze.bfg`` API module or attribute of an API module
      (e.g. ``context="repoze.bfg.exceptions.NotFound"``) will be
      converted to :mod:`pyramid` compatible ZCML attributes
      (e.g. ``context="pyramid.exceptions.NotFound``).  Every ZCML file
@@ -135,6 +143,38 @@ Here's how to convert a :mod:`repoze.bfg` application to a
    :mod:`repoze.bfg` application after replacing these add-ons.  Read
    the documentation of the :mod:`pyramid` add-on package for
    information.
+
+#. *Only if you use ZCML and add-ons which use ZCML*: The default
+   ``xmlns`` of the ``configure`` tag in ZCML has changed.  The
+   ``bfg2pyramid`` script effects the default namespace change (it
+   changes the ``configure`` tag default ``xmlns`` from
+   ``http://namespaces.repoze.org/bfg`` to
+   ``http://pylonshq.com/pyramid``).
+
+   This means that uses of add-ons which define ZCML directives in the
+   ``http://namespaces.repoze.org/bfg`` namespace will begin to "fail"
+   (they're actually not really failing, but your ZCML assumes that
+   they will always be used within a ``configure`` tag which names the
+   ``http://namespaces.repoze.org/bfg`` namespace as its default
+   ``xmlns``). Symptom: when you attempt to start the application, an
+   error such as ``ConfigurationError: ('Unknown directive',
+   u'http://namespaces.repoze.org/bfg', u'workflow')`` is printed to
+   the console and the application fails to start.  In such a case,
+   either add an ``xmlns="http://namespaces.repoze.org/bfg"``
+   attribute to each tag which causes a failure, or define a namespace
+   alias in the configure tag and prefix each failing tag.  For
+   example, change this "failing" tag instance::
+
+     <configure xmlns="http://pylonshq.com/pyramid">
+         <failingtag attr="foo"/>
+     </configure>
+ 
+   To this, which will begin to succeed::
+
+     <configure xmlns="http://pylonshq.com/pyramid"
+                xmlns:bfg="http://namespaces.repoze.org/bfg">
+         <bfg:failingtag attr="foo"/>
+     </configure>
 
 #. Retest your application using :mod:`pyramid`.  This might be as
    easy as:

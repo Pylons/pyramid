@@ -2452,6 +2452,62 @@ def isexception(o):
         (inspect.isclass(o) and (issubclass(o, Exception)))
         )
 
+# note that ``options`` is a b/w compat alias for ``settings`` and
+# ``Configurator`` is a testing dep inj
+def make_app(root_factory, package=None, filename='configure.zcml',
+             settings=None, options=None, Configurator=Configurator):
+    """ Return a Router object, representing a fully configured
+    :mod:`pyramid` WSGI application.
+
+    .. warning:: Use of this function is deprecated as of
+       :mod:`pyramid` 1.0.  You should instead use a
+       :class:`pyramid.configuration.Configurator` instance to
+       perform startup configuration as shown in
+       :ref:`configuration_narr`.
+
+    ``root_factory`` must be a callable that accepts a :term:`request`
+    object and which returns a traversal root object.  The traversal
+    root returned by the root factory is the *default* traversal root;
+    it can be overridden on a per-view basis.  ``root_factory`` may be
+    ``None``, in which case a 'default default' traversal root is
+    used.
+
+    ``package`` is a Python :term:`package` or module representing the
+    application's package.  It is optional, defaulting to ``None``.
+    ``package`` may be ``None``.  If ``package`` is ``None``, the
+    ``filename`` passed or the value in the ``options`` dictionary
+    named ``configure_zcml`` must be a) absolute pathname to a
+    :term:`ZCML` file that represents the application's configuration
+    *or* b) a :term:`resource specification` to a :term:`ZCML` file in
+    the form ``dotted.package.name:relative/file/path.zcml``.
+
+    ``filename`` is the filesystem path to a ZCML file (optionally
+    relative to the package path) that should be parsed to create the
+    application registry.  It defaults to ``configure.zcml``.  It can
+    also be a ;term:`resource specification` in the form
+    ``dotted_package_name:relative/file/path.zcml``. Note that if any
+    value for ``configure_zcml`` is passed within the ``settings``
+    dictionary, the value passed as ``filename`` will be ignored,
+    replaced with the ``configure_zcml`` value.
+
+    ``settings``, if used, should be a dictionary containing runtime
+    settings (e.g. the key/value pairs in an app section of a
+    PasteDeploy file), with each key representing the option and the
+    key's value representing the specific option value,
+    e.g. ``{'reload_templates':True}``.  Note that the keyword
+    parameter ``options`` is a backwards compatibility alias for the
+    ``settings`` keyword parameter.
+    """
+    settings = settings or options or {}
+    zcml_file = settings.get('configure_zcml', filename)
+    config = Configurator(package=package, settings=settings,
+                          root_factory=root_factory)
+    config.hook_zca()
+    config.begin()
+    config.load_zcml(zcml_file)
+    config.end()
+    return config.make_wsgi_app()
+
 class DottedNameResolver(object):
     """ This class resolves dotted name references to 'global' Python
     objects (objects which can be imported) to those objects.

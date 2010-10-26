@@ -23,6 +23,11 @@ from pyramid.threadlocal import manager
 from pyramid.traversal import DefaultRootFactory
 from pyramid.traversal import ModelGraphTraverser
 
+from pyramid.configuration import make_app # b/c
+
+make_app # prevent PyFlakes from complaining
+
+
 class Router(object):
     implements(IRouter)
 

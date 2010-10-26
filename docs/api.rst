@@ -22,6 +22,7 @@ documentation is organized alphabetically by module name.
    api/paster
    api/renderers
    api/request
+   api/router
    api/scripting
    api/security
    api/settings
