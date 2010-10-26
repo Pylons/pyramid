@@ -44,9 +44,9 @@ be used in a wide variety of circumstances.
    own via a set of libraries if the framework provides a set of
    facilities that fits your application requirements.
 
-The first release of :mod:`pyramid` was made in July of 2008.
-Since its first release, we've tried to ensure that it maintains the
-following attributes:
+The first release of the predecessor to :mod:`pyramid` (named
+:mod:`repoze.bfg`) was made in July of 2008.  Since its first release,
+we've tried to ensure that it maintains the following attributes:
 
 Simplicity
   :mod:`pyramid` attempts to be a *"pay only for what you eat"*
@@ -99,22 +99,13 @@ Openness
    single: Agendaless Consulting
    single: repoze namespace package
 
-What Is Repoze?
+What Is Pylons?
 ---------------
 
 :mod:`pyramid` is a member of the collection of software published
-under the :term:`Repoze` "brand".  :term:`Repoze` software is written
-by :term:`Agendaless Consulting` and a community of contributors.  The
-`Repoze website <http://repoze.org>`_ describes the Repoze brand in
-more detail.  Software authored that uses this brand is usually placed
-into a ``repoze`` namespace package.  This namespace consists of a
-number of packages.  Each package is useful in isolation.  The
-``repoze`` namespace package represents that the software is written
-by a notional community rather than representing a collection of
-software that is meant to be used as a unit.  For example, even though
-``pyramid`` shares the same namespace as another popular Repoze
-package, ``repoze.who``, these two packages are otherwise unrelated
-and can be used separately.
+under the :term:`Pylons` "brand".  :term:`Pylons` software is written
+by a loose-knit community of contributors.  The `Pylons website
+<http://pylonshq.com>`_ describes the Pylons brand in more detail.
 
 .. index::
    single: pyramid and other frameworks
@@ -129,8 +120,8 @@ and can be used separately.
 Until the end of 2010, :mod:`pyramid` was known as :mod:`repoze.bfg`;
 it was merged into the Pylons project at the end of 2010.
 
-:mod:`pyramid` was inspired by :term:`Zope`, :term:`Pylons` and
-:term:`Django`.  As a result, :mod:`pyramid` borrows several
+:mod:`pyramid` was inspired by :term:`Zope`, :term:`Pylons` (version
+1.0) and :term:`Django`.  As a result, :mod:`pyramid` borrows several
 concepts and features from each, combining them into a unique web
 framework.
 
@@ -144,28 +135,28 @@ developers without forking the original application.  The concepts of
 :term:`traversal` and declarative security in :mod:`pyramid` were
 pioneered first in Zope.
 
-The :mod:`pyramid` concept of :term:`URL dispatch` is inspired by
-the :term:`Routes` system used by :term:`Pylons`.  Like Pylons,
-:mod:`pyramid` is mostly policy-free.  It makes no assertions about
-which database you should use, and its built-in templating facilities
-are included only for convenience.  In essence, it only supplies a
-mechanism to map URLs to :term:`view` code, along with a set of
-conventions for calling those views.  You are free to use third-party
-components that fit your needs in your applications.
+The :mod:`pyramid` concept of :term:`URL dispatch` is inspired by the
+:term:`Routes` system used by :term:`Pylons` version 1.0.  Like Pylons
+version 1.0, :mod:`pyramid` is mostly policy-free.  It makes no
+assertions about which database you should use, and its built-in
+templating facilities are included only for convenience.  In essence,
+it only supplies a mechanism to map URLs to :term:`view` code, along
+with a set of conventions for calling those views.  You are free to
+use third-party components that fit your needs in your applications.
 
 The concepts of :term:`view` and :term:`model` are used by
 :mod:`pyramid` mostly as they would be by Django.
 :mod:`pyramid` has a documentation culture more like Django's than
 like Zope's.
 
-Like :term:`Pylons`, but unlike :term:`Zope`, a :mod:`pyramid`
-application developer may use completely imperative code to perform
-common framework configuration tasks such as adding a view or a route.
-In Zope, :term:`ZCML` is typically required for similar purposes.  In
-:term:`Grok`, a Zope-based web framework, :term:`decorator` objects
-and class-level declarations are used for this purpose.
-:mod:`pyramid` supports :term:`ZCML` and decorator-based
-configuration, but does not require either. See
+Like :term:`Pylons` version 1.0, but unlike :term:`Zope`, a
+:mod:`pyramid` application developer may use completely imperative
+code to perform common framework configuration tasks such as adding a
+view or a route.  In Zope, :term:`ZCML` is typically required for
+similar purposes.  In :term:`Grok`, a Zope-based web framework,
+:term:`decorator` objects and class-level declarations are used for
+this purpose.  :mod:`pyramid` supports :term:`ZCML` and
+decorator-based configuration, but does not require either. See
 :ref:`configuration_narr` for more information.
 
 Also unlike :term:`Zope` and unlike other "full-stack" frameworks such
