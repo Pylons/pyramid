@@ -21,7 +21,7 @@ in their names (e.g. ``repoze.bfg.skins``,
 ``repoze.bfg.traversalwrapper``, ``repoze.bfg.jinja2``), you will need
 to find an analogue for each.  For example, by the time you read this,
 there will be a ``pyramid_jinja2`` package, which can be used instead
-of ``repoze.bfg.jinja2``.  If an anlogue does not seem to exist for a
+of ``repoze.bfg.jinja2``.  If an analogue does not seem to exist for a
 ``repoze.bfg`` add-on package that your application uses, please email
 the `Pylons-discuss <http://groups.google.com/group/pylons-discuss>`_
 maillist; we'll convert the package to a :mod:`pyramid` analogue for
