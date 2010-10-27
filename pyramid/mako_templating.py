@@ -17,7 +17,7 @@ class IMakoLookup(Interface):
 
 def renderer_factory(path):
     from mako.lookup import TemplateLookup
-    from mako import exceptions, util
+    from mako import exceptions
     class PkgResourceTemplateLookup(TemplateLookup):
         def adjust_uri(self, uri, relativeto):
             # Don't adjust pkg resource spec names

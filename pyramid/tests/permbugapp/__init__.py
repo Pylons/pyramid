@@ -2,7 +2,7 @@ from cgi import escape
 from pyramid.security import view_execution_permitted
 from webob import Response
 
-def x_view(request):
+def x_view(request): # pragma: no cover
      return Response('this is private!')
 
 def test(context, request):
