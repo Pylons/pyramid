@@ -1,3 +1,7 @@
+import os
+import posixpath
+import re
+
 from zope.interface import implements
 from zope.interface import Interface
 
@@ -13,6 +17,37 @@ class IMakoLookup(Interface):
 
 def renderer_factory(path):
     from mako.lookup import TemplateLookup
+    from mako import exceptions, util
+    class PkgResourceTemplateLookup(TemplateLookup):
+        def adjust_uri(self, uri, relativeto):
+            # Don't adjust pkg resource spec names
+            if ':' in uri:
+                return uri
+            return TemplateLookup.adjust_uri(self, uri, relativeto)
+        
+        def get_template(self, uri):
+            if ':' not in uri:
+                return TemplateLookup.get_template(self, uri)
+            try:
+                if self.filesystem_checks:
+                    return self._check(uri, self._collection[uri])
+                else:
+                    return self._collection[uri]
+            except KeyError:
+                pname, path = resolve_resource_spec(uri)
+                srcfile = abspath_from_resource_spec(path, pname)
+                if os.path.isfile(srcfile):
+                    return self._load(srcfile, uri)
+                
+                u = re.sub(r'^\/+', '', path)
+                for dir in self.directories:
+                    srcfile = posixpath.normpath(posixpath.join(dir, u))
+                    if os.path.isfile(srcfile):
+                        return self._load(srcfile, uri)
+                else:
+                    raise exceptions.TopLevelLookupException(
+                                        "Cant locate template for uri %r" % uri)
+    
     registry = get_current_registry()
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
@@ -26,12 +61,11 @@ def renderer_factory(path):
                 'Mako template used without a lookup path')
         directories = directories.splitlines()
         directories = [ abspath_from_resource_spec(d) for d in directories ]
-        lookup = TemplateLookup(directories=directories,
-                                module_directory=module_directory,
-                                input_encoding=input_encoding,
-                                filesystem_checks=reload_templates)
+        lookup = PkgResourceTemplateLookup(directories=directories,
+                                           module_directory=module_directory,
+                                           input_encoding=input_encoding,
+                                           filesystem_checks=reload_templates)
         registry.registerUtility(lookup, IMakoLookup)
-    _, path = resolve_resource_spec(path)
     return MakoLookupTemplateRenderer(path, lookup)
 
 class MakoLookupTemplateRenderer(object):
