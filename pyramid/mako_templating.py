@@ -12,42 +12,45 @@ from pyramid.settings import get_settings
 from pyramid.resource import resolve_resource_spec
 from pyramid.resource import abspath_from_resource_spec
 
+from mako.lookup import TemplateLookup
+from mako import exceptions, util
+
 class IMakoLookup(Interface):
     pass
 
-def renderer_factory(path):
-    from mako.lookup import TemplateLookup
-    from mako import exceptions
-    class PkgResourceTemplateLookup(TemplateLookup):
-        def adjust_uri(self, uri, relativeto):
-            # Don't adjust pkg resource spec names
-            if ':' in uri:
-                return uri
-            return TemplateLookup.adjust_uri(self, uri, relativeto)
-        
-        def get_template(self, uri):
-            if ':' not in uri:
-                return TemplateLookup.get_template(self, uri)
-            try:
-                if self.filesystem_checks:
-                    return self._check(uri, self._collection[uri])
-                else:
-                    return self._collection[uri]
-            except KeyError:
-                pname, path = resolve_resource_spec(uri)
-                srcfile = abspath_from_resource_spec(path, pname)
+
+class PkgResourceTemplateLookup(TemplateLookup):
+    def adjust_uri(self, uri, relativeto):
+        # Don't adjust pkg resource spec names
+        if ':' in uri:
+            return uri
+        return TemplateLookup.adjust_uri(self, uri, relativeto)
+
+    def get_template(self, uri):
+        if ':' not in uri:
+            return TemplateLookup.get_template(self, uri)
+        try:
+            if self.filesystem_checks:
+                return self._check(uri, self._collection[uri])
+            else:
+                return self._collection[uri]
+        except KeyError:
+            pname, path = resolve_resource_spec(uri)
+            srcfile = abspath_from_resource_spec(path, pname)
+            if os.path.isfile(srcfile):
+                return self._load(srcfile, uri)
+
+            u = re.sub(r'^\/+', '', path)
+            for dir in self.directories:
+                srcfile = posixpath.normpath(posixpath.join(dir, u))
                 if os.path.isfile(srcfile):
                     return self._load(srcfile, uri)
-                
-                u = re.sub(r'^\/+', '', path)
-                for dir in self.directories:
-                    srcfile = posixpath.normpath(posixpath.join(dir, u))
-                    if os.path.isfile(srcfile):
-                        return self._load(srcfile, uri)
-                else:
-                    raise exceptions.TopLevelLookupException(
-                                        "Cant locate template for uri %r" % uri)
-    
+            else:
+                raise exceptions.TopLevelLookupException(
+                                    "Cant locate template for uri %r" % uri)
+
+
+def renderer_factory(path):
     registry = get_current_registry()
     lookup = registry.queryUtility(IMakoLookup)
     if lookup is None:
@@ -60,13 +63,14 @@ def renderer_factory(path):
             raise ConfigurationError(
                 'Mako template used without a lookup path')
         directories = directories.splitlines()
-        directories = [ abspath_from_resource_spec(d) for d in directories ]
+        directories = [ abspath_from_resource_spec(d) for d in directories ]        
         lookup = PkgResourceTemplateLookup(directories=directories,
                                            module_directory=module_directory,
                                            input_encoding=input_encoding,
                                            filesystem_checks=reload_templates)
         registry.registerUtility(lookup, IMakoLookup)
     return MakoLookupTemplateRenderer(path, lookup)
+
 
 class MakoLookupTemplateRenderer(object):
     implements(ITemplateRenderer)
@@ -97,4 +101,3 @@ class MakoLookupTemplateRenderer(object):
             template = template.get_def(def_name)
         result = template.render_unicode(**system)
         return result
-
