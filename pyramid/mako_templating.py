@@ -13,7 +13,7 @@ from pyramid.resource import resolve_resource_spec
 from pyramid.resource import abspath_from_resource_spec
 
 from mako.lookup import TemplateLookup
-from mako import exceptions, util
+from mako import exceptions
 
 class IMakoLookup(Interface):
     pass
