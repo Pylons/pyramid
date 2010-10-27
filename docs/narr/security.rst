@@ -239,13 +239,16 @@ application:
 
 - The :ref:`default_permission_directive` ZCML directive.
 
-When a default permission is registered, if a view configuration
-*does* name its own permission, the default permission is ignored for
-that view registration, and the view-configuration-named permission is
-used.
+When a default permission is registered:
 
-.. note:: All APIs and ZCML directives related to default permissions
-   are new in :mod:`pyramid` 1.3.
+- if a view configuration names an explicit ``permission`, the default
+  permission is ignored for that view registration, and the
+  view-configuration-named permission is used.
+
+- if a view configuration names an explicit permission as the string
+  ``__no_permission_required__``, the default permission is ignored,
+  and the view is registered *without* a permission (making it
+  available to all callers regardless of their credentials).
 
 .. index::
    single: ACL

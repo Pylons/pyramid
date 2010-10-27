@@ -2775,6 +2775,28 @@ class ConfiguratorTests(unittest.TestCase):
         permitted = result.__permitted__(None, None)
         self.assertEqual(permitted, False)
 
+    def test__derive_view_debug_auth_permission_authpol_overridden(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne()
+        self._registerSettings(config,
+                               debug_authorization=True, reload_templates=True)
+        logger = self._registerLogger(config)
+        self._registerSecurityPolicy(config, False)
+        result = config._derive_view(view,
+                                     permission='__no_permission_required__')
+        self.assertEqual(view.__module__, result.__module__)
+        self.assertEqual(view.__doc__, result.__doc__)
+        self.assertEqual(view.__name__, result.__name__)
+        self.failIf(hasattr(result, '__call_permissive__'))
+        request = self._makeRequest(config)
+        request.view_name = 'view_name'
+        request.url = 'url'
+        self.assertEqual(result(None, request), 'OK')
+        self.assertEqual(len(logger.messages), 1)
+        self.assertEqual(logger.messages[0],
+                         "debug_authorization of url url (view name "
+                         "'view_name' against context None): False")
+
     def test__derive_view_with_predicates_all(self):
         view = lambda *arg: 'OK'
         predicates = []
