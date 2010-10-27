@@ -165,7 +165,7 @@ class Request(WebobRequest):
         return self.environ.get(k, default)
 
     def has_key(self, k):
-        return self.environ.has_key(k)
+        return k in self.environ
 
     def items(self):
         return self.environ.items()

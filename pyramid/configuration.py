@@ -248,7 +248,8 @@ class Configurator(object):
         """ Add a :mod:`pyramid` :term:`authentication policy` to
         the current configuration."""
         policy = self.maybe_dotted(policy)
-        self.registry.registerUtility(policy, IAuthenticationPolicy, info=_info)
+        self.registry.registerUtility(policy, IAuthenticationPolicy,
+                                      info=_info)
         
     def _set_authorization_policy(self, policy, _info=u''):
         """ Add a :mod:`pyramid` :term:`authorization policy` to
@@ -281,7 +282,7 @@ class Configurator(object):
         owrapped_view = _owrap_view(mapped_view, viewname, wrapper_viewname)
         secured_view = _secure_view(owrapped_view, permission,
                                     authn_policy, authz_policy)
-        debug_view = _authdebug_view(secured_view, permission, 
+        debug_view = _authdebug_view(secured_view, permission,
                                      authn_policy, authz_policy, settings,
                                      logger)
         predicated_view = _predicate_wrap(debug_view, predicates)
@@ -402,7 +403,8 @@ class Configurator(object):
             request_factory = self.maybe_dotted(request_factory)
             self.set_request_factory(request_factory)
         if renderer_globals_factory:
-            renderer_globals_factory=self.maybe_dotted(renderer_globals_factory)
+            renderer_globals_factory = self.maybe_dotted(
+                renderer_globals_factory)
             self.set_renderer_globals_factory(renderer_globals_factory)
         if default_permission:
             self.set_default_permission(default_permission)
@@ -743,8 +745,7 @@ class Configurator(object):
 
         return route
 
-
-    def add_view(self, view=None, name="", for_=None, permission=None, 
+    def add_view(self, view=None, name="", for_=None, permission=None,
                  request_type=None, route_name=None, request_method=None,
                  request_param=None, containment=None, attr=None,
                  renderer=None, wrapper=None, xhr=False, accept=None,
@@ -1031,7 +1032,7 @@ class Configurator(object):
                 if deferred_views is None:
                     deferred_views = self.registry.deferred_route_views = {}
                 info = dict(
-                    view=view, name=name, for_=for_, permission=permission, 
+                    view=view, name=name, for_=for_, permission=permission,
                     request_type=request_type, route_name=route_name,
                     request_method=request_method, request_param=request_param,
                     containment=containment, attr=attr,
@@ -1056,8 +1057,8 @@ class Configurator(object):
 
         # NO_PERMISSION_REQUIRED handled by _secure_view
         derived_view = self._derive_view(view, permission, predicates, attr,
-                                         renderer, wrapper, name, accept, order,
-                                         phash)
+                                         renderer, wrapper, name, accept,
+                                         order, phash)
 
         if context is None:
             context = for_
@@ -1470,7 +1471,6 @@ class Configurator(object):
             custom=custom_predicates
             )
         
-
         request_iface = self.registry.queryUtility(IRouteRequest, name=name)
         if request_iface is None:
             bases = use_global_views and (IRequest,) or ()
@@ -1494,7 +1494,7 @@ class Configurator(object):
                 context=view_context,
                 view=view,
                 name='',
-                route_name=name, 
+                route_name=name,
                 renderer=view_renderer,
                 attr=view_attr,
                 _info=_info,
@@ -1624,14 +1624,14 @@ class Configurator(object):
         if path and path.endswith('/'):
             if override_prefix and (not override_prefix.endswith('/')):
                 raise ConfigurationError(
-                    'A directory cannot be overridden with a file (put a slash '
-                    'at the end of override_with if necessary)')
+                    'A directory cannot be overridden with a file (put a '
+                    'slash at the end of override_with if necessary)')
 
         if override_prefix and override_prefix.endswith('/'):
             if path and (not path.endswith('/')):
                 raise ConfigurationError(
-                    'A file cannot be overridden with a directory (put a slash '
-                    'at the end of to_override if necessary)')
+                    'A file cannot be overridden with a directory (put a '
+                    'slash at the end of to_override if necessary)')
 
         __import__(package)
         __import__(override_package)
@@ -2055,7 +2055,8 @@ class Configurator(object):
         helper = RendererHelper(path, registry=self.registry)
         factory = helper.factory
         if not isinstance(factory, DummyRendererFactory):
-            factory = DummyRendererFactory(helper.renderer_type, helper.factory)
+            factory = DummyRendererFactory(helper.renderer_type,
+                                           helper.factory)
             self.registry.registerUtility(factory, IRendererFactory,
                                           name=helper.renderer_type)
 
@@ -2387,7 +2388,8 @@ def is_response(ob):
         return True
     return False
 
-def _map_view(view, attr=None, renderer_name=None, registry=None, package=None):
+def _map_view(view, attr=None, renderer_name=None, registry=None,
+              package=None):
     wrapped_view = view
 
     helper = None
@@ -2743,7 +2745,8 @@ class DottedNameResolver(object):
         if value == '.':
             if self.package_name is None:
                 raise ConfigurationError(
-                    'relative name %r irresolveable without package' % (value,))
+                    'relative name %r irresolveable without package' % (value,)
+                )
             name = module.split('.')
         else:
             name = value.split('.')
