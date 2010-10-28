@@ -561,7 +561,7 @@ class IStaticDirective(Interface):
     path = TextLine(
         title=u'Path to the directory which contains resources',
         description=u'May be package-relative by using a colon to '
-        'seperate package name and path relative to the package directory.',
+        'separate package name and path relative to the package directory.',
         required=True)
 
     cache_max_age = Int(
@@ -569,7 +569,13 @@ class IStaticDirective(Interface):
         required=False,
         default=None)
 
-def static(_context, name, path, cache_max_age=3600):
+    permission = TextLine(
+        title=u'Permission string',
+        description = u'The permission string',
+        required = False)
+
+def static(_context, name, path, cache_max_age=3600,
+           permission='__no_permission_required__'):
     """ Handle ``static`` ZCML directives
     """
     path = path_spec(_context, path)
@@ -580,7 +586,9 @@ def static(_context, name, path, cache_max_age=3600):
         discriminator=('static', name),
         callable=config.add_static_view,
         args = (name, path),
-        kw = {'cache_max_age':cache_max_age, '_info':_context.info},
+        kw = {'cache_max_age':cache_max_age,
+              'permission':permission,
+              '_info':_context.info},
         )
 
     if not '/' in name:

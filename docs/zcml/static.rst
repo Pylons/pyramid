@@ -29,6 +29,20 @@ Attributes
   ``Cache-Control`` headers, when any static file is served from this
   directive.  This defaults to 3600 (5 minutes).  Optional.
 
+``permission``
+  Used to specify the :term:`permission` required by a user to execute
+  this static view.  This value defaults to the string
+  ``__no_permission_required__``.  The ``__no_permission_required__``
+  string is a special sentinel which indicates that, even if a
+  :term:`default permission` exists for the current application, the
+  static view should be renderered to completely anonymous users.
+  This default value is permissive because, in most web apps, static
+  resources seldom need protection from viewing.  You should use this
+  option only if you register a static view which points at a
+  directory that contains resources which should be shown only if the
+  calling user has (according to the :term:`authorization policy`) a
+  particular permission.
+
 Examples
 ~~~~~~~~
 

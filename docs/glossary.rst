@@ -204,6 +204,15 @@ Glossary
      to do this".  Examples of permissions: ``read``, or
      ``view_blog_entries``.
 
+   default permission
+     A :term:`permission` which is registered as the default for an
+     entire application.  When a default permission is in effect,
+     every :term:`view configuration` registered with the system will
+     be effectively amended with a ``permission`` argument that will
+     require that the executing user possess the default permission in
+     order to successfully execute the associated :term:`view
+     callable` See also :ref:`setting_a_default_permission`.
+
    ACE
      An *access control entry*.  An access control entry is one element
      in an :term:`ACL`.  An access control entry is a three-tuple that

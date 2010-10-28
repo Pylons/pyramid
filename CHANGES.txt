@@ -6,7 +6,7 @@ Features (delta from BFG 1.3.X)
 
 - Mako templating renderer supports resource specification format for
   template lookups and within Mako templates. Absolute filenames must
-  be used in Pyramid to avoid this lookup process..
+  be used in Pyramid to avoid this lookup process.
 
 - Add ``pyramid.httpexceptions`` module, which is a facade for the
   ``webob.exc`` module.

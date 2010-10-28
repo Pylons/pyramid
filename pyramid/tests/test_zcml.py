@@ -718,6 +718,8 @@ class TestStaticDirective(unittest.TestCase):
         return static(*arg, **kw)
 
     def test_it_with_slash(self):
+        from pyramid import testing
+        testing.registerDummySecurityPolicy(permissive=False)
         from pyramid.static import PackageURLParser
         from pyramid.threadlocal import get_current_registry
         from zope.interface import implementedBy
@@ -753,6 +755,45 @@ class TestStaticDirective(unittest.TestCase):
             (IViewClassifier, request_type, iface), IView, name='')
         request = DummyRequest()
         self.assertEqual(view(None, request).__class__, PackageURLParser)
+
+    def test_it_with_nondefault_permission(self):
+        from pyramid import testing
+        from pyramid.exceptions import Forbidden
+        testing.registerDummySecurityPolicy(permissive=False)
+        from pyramid.threadlocal import get_current_registry
+        from zope.interface import implementedBy
+        from pyramid.static import StaticURLInfo
+        from pyramid.interfaces import IView
+        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRouteRequest
+        from pyramid.interfaces import IRoutesMapper
+        context = DummyContext()
+        self._callFUT(context, 'name', 'fixtures/static', permission='aperm')
+        actions = context.actions
+        self.assertEqual(len(actions), 2)
+
+        reg = get_current_registry()
+
+        route_action = actions[0]
+        discriminator = route_action['discriminator']
+        self.assertEqual(discriminator, ('static', 'name'))
+        route_action['callable'](*route_action['args'], **route_action['kw'])
+        mapper = reg.getUtility(IRoutesMapper)
+        routes = mapper.get_routes()
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0].pattern, 'name/*subpath')
+        self.assertEqual(routes[0].name, 'name/')
+
+        view_action = actions[1]
+        discriminator = view_action['discriminator']
+        self.assertEqual(discriminator[:3], ('view', StaticURLInfo, ''))
+        self.assertEqual(discriminator[4], IView)
+        iface = implementedBy(StaticURLInfo)
+        request_type = reg.getUtility(IRouteRequest, 'name/')
+        view = reg.adapters.lookup(
+            (IViewClassifier, request_type, iface), IView, name='')
+        request = DummyRequest()
+        self.assertRaises(Forbidden, view, None, request)
 
 class TestResourceDirective(unittest.TestCase):
     def setUp(self):
