@@ -182,12 +182,12 @@ Our resulting ``models.py`` file will now look like so:
    :linenos:
    :language: python
 
-Adding ``permission`` Declarations to our ``bfg_view`` Decorators
------------------------------------------------------------------
+Adding ``permission`` Declarations to our ``view_config`` Decorators
+--------------------------------------------------------------------
 
 To protect each of our views with a particular permission, we need to
 pass a ``permission`` argument to each of our
-:class:`pyramid.view.bfg_view` decorators.  To do so, within
+:class:`pyramid.view.view_config` decorators.  To do so, within
 ``views.py``:
 
 - We add ``permission='view'`` to the decorator attached to the
@@ -220,10 +220,10 @@ pass a ``permission`` argument to each of our
   consults the ``GROUPS`` data structure.  This means that the
   ``editor`` user can add pages.
 
-- We add ``permission='edit'`` to the ``bfg_view`` decorator attached
-  to the ``edit_page`` view function.  This makes the assertion that
-  only users who possess the effective ``edit`` permission at the time
-  of the request may invoke this view.  We've granted the
+- We add ``permission='edit'`` to the decorator attached to the
+  ``edit_page`` view function.  This makes the assertion that only
+  users who possess the effective ``edit`` permission at the time of
+  the request may invoke this view.  We've granted the
   ``group:editors`` principal the ``edit`` permission at the root
   model via its ACL, so only the a user whom is a member of the group
   named ``group:editors`` will able to invoke the ``edit_page`` view.

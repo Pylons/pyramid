@@ -1,5 +1,5 @@
-from pyramid.view import bfg_view
+from pyramid.view import view_config
 
-@bfg_view(name='subsubpackage_init')
+@view_config(name='subsubpackage_init')
 def subpackage_init(context, request):
     return 'subsubpackage_init'

@@ -255,9 +255,9 @@ Response interface, :mod:`pyramid` will attempt to use a
    :linenos:
 
    from webob import Response
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='json')
+   @view_config(renderer='json')
    def hello_world(request):
        return {'content':'Hello!'}
 
@@ -266,7 +266,7 @@ dictionary does not implement the :term:`WebOb` response interface, so
 you might believe that this example would fail.  However, since a
 ``renderer`` is associated with the view callable through its
 :term:`view configuration` (in this case, using a ``renderer``
-argument passed to :func:`pyramid.view.bfg_view`), if the view does
+argument passed to :func:`pyramid.view.view_config`), if the view does
 *not* return a Response object, the renderer will attempt to convert
 the result of the view to a response on the developer's behalf.  Of
 course, if no renderer is associated with a view's configuration,
@@ -411,9 +411,9 @@ representation of the dictionary:
    :linenos:
 
    from webob import Response
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='string')
+   @view_config(renderer='string')
    def hello_world(request):
        return {'content':'Hello!'}
 
@@ -450,9 +450,9 @@ view will render the returned dictionary to a JSON serialization:
    :linenos:
 
    from webob import Response
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='json')
+   @view_config(renderer='json')
    def hello_world(request):
        return {'content':'Hello!'}
 
@@ -610,9 +610,9 @@ attribute to the request before returning a result:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(name='gone', renderer='templates/gone.pt')
+   @view_config(name='gone', renderer='templates/gone.pt')
    def myview(request):
        request.response_status = '404 Not Found'
        return {'URL':request.URL}
@@ -737,9 +737,9 @@ attribute of a :term:`view configuration`:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='amf')
+   @view_config(renderer='amf')
    def myview(request):
        return {'Hello':'world'}
 
@@ -771,9 +771,9 @@ configuration`:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='templates/mytemplate.jinja2')
+   @view_config(renderer='templates/mytemplate.jinja2')
    def myview(request):
        return {'Hello':'world'}
 
@@ -928,7 +928,7 @@ code raises a ``hellworld.exceptions.ValidationFailure`` exception:
 
    from helloworld.exceptions import ValidationFailure
 
-   @bfg_view(context=ValidationFailure)
+   @view_config(context=ValidationFailure)
    def failed_validation(exc, request):
        response =  Response('Failed validation: %s' % exc.msg)
        response.status_int = 500
@@ -946,11 +946,11 @@ exception view registration:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
    from pyramid.exceptions import NotFound
    from webob.exc import HTTPNotFound
 
-   @bfg_view(context=NotFound, route_name='home')
+   @view_config(context=NotFound, route_name='home')
    def notfound_view(request):
        return HTTPNotFound()
 
@@ -976,7 +976,7 @@ registered as exception views which have a name will be ignored.
   normal view.
 
 The feature can be used with any view registration mechanism
-(``@bfg_view`` decorator, ZCML, or imperative ``add_view`` styles).
+(``@view_config`` decorator, ZCML, or imperative ``add_view`` styles).
 
 .. index::
    single: unicode, views, and forms
@@ -1120,8 +1120,8 @@ View configuration is performed in one of three ways:
   :ref:`view_directive`.
 
 - by running a :term:`scan` against application source code which has
-  a :class:`pyramid.view.bfg_view` decorator attached to a Python
-  object as per :class:`pyramid.view.bfg_view` and
+  a :class:`pyramid.view.view_config` decorator attached to a Python
+  object as per :class:`pyramid.view.view_config` and
   :ref:`mapping_views_using_a_decorator_section`.
 
 - by using the :meth:`pyramid.configuration.Configurator.add_view`
@@ -1497,15 +1497,15 @@ apply for the class which is named.
 See :ref:`view_directive` for complete ZCML directive documentation.
 
 .. index::
-   single: bfg_view decorator
+   single: view_config decorator
 
 .. _mapping_views_using_a_decorator_section:
 
-View Configuration Using the ``@bfg_view`` Decorator
+View Configuration Using the ``@view_config`` Decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For better locality of reference, you may use the
-:class:`pyramid.view.bfg_view` decorator to associate your view
+:class:`pyramid.view.view_config` decorator to associate your view
 functions with URLs instead of using :term:`ZCML` or imperative
 configuration for the same purpose.
 
@@ -1520,15 +1520,15 @@ configuration for the same purpose.
    See :ref:`extending_chapter` for more information about building
    extensible applications.
 
-Usage of the ``bfg_view`` decorator is a form of :term:`declarative
+Usage of the ``view_config`` decorator is a form of :term:`declarative
 configuration`, like ZCML, but in decorator form.
-:class:`pyramid.view.bfg_view` can be used to associate :term:`view
+:class:`pyramid.view.view_config` can be used to associate :term:`view
 configuration` information -- as done via the equivalent ZCML -- with
 a function that acts as a :mod:`pyramid` view callable.  All ZCML
 :ref:`view_directive` attributes (save for the ``view`` attribute) are
 available in decorator form and mean precisely the same thing.
 
-An example of the :class:`pyramid.view.bfg_view` decorator might
+An example of the :class:`pyramid.view.view_config` decorator might
 reside in a :mod:`pyramid` application module ``views.py``:
 
 .. ignore-next-block
@@ -1536,10 +1536,10 @@ reside in a :mod:`pyramid` application module ``views.py``:
    :linenos:
 
    from models import MyModel
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
    from pyramid.chameleon_zpt import render_template_to_response
 
-   @bfg_view(name='my_view', request_method='POST', context=MyModel,
+   @view_config(name='my_view', request_method='POST', context=MyModel,
              permission='read', renderer='templates/my.pt')
    def my_view(request):
        return {'a':1}
@@ -1567,15 +1567,15 @@ Or replaces the need to add this imperative configuration stanza:
    config.add_view('.views.my_view', name='my_view', request_method='POST', 
                    context=MyModel, permission='read')
 
-All arguments to ``bfg_view`` may be omitted.  For example:
+All arguments to ``view_config`` may be omitted.  For example:
 
 .. code-block:: python
    :linenos:
 
    from webob import Response
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view()
+   @view_config()
    def my_view(request):
        """ My view """
        return Response()
@@ -1586,9 +1586,9 @@ matches any model type, using no permission, registered against
 requests with any request method / request type / request param /
 route name / containment.
 
-The mere existence of a ``@bfg_view`` decorator doesn't suffice to
+The mere existence of a ``@view_config`` decorator doesn't suffice to
 perform view configuration.  To make :mod:`pyramid` process your
-:class:`pyramid.view.bfg_view` declarations, you *must* do one of
+:class:`pyramid.view.view_config` declarations, you *must* do one of
 the following:
 
 - If you are using :term:`ZCML`, insert the following boilerplate into
@@ -1610,7 +1610,7 @@ the following:
 Please see :ref:`decorations_and_code_scanning` for detailed
 information about what happens when code is scanned for configuration
 declarations resulting from use of decorators like
-:class:`pyramid.view.bfg_view`.
+:class:`pyramid.view.view_config`.
 
 See :ref:`configuration_module` for additional API arguments to the
 :meth:`pyramid.configuration.Configurator.scan` method.  For
@@ -1619,10 +1619,10 @@ better control exactly *which* code will be scanned.  This is the same
 value implied by the ``package`` attribute of the ZCML ``<scan>``
 directive (see :ref:`scan_directive`).
 
-``@bfg_view`` Placement
-+++++++++++++++++++++++
+``@view_config`` Placement
+++++++++++++++++++++++++++
 
-A :class:`pyramid.view.bfg_view` decorator can be placed in various
+A :class:`pyramid.view.view_config` decorator can be placed in various
 points in your application.
 
 If your view callable is a function, it may be used as a function
@@ -1631,10 +1631,10 @@ decorator:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
    from webob import Response
 
-   @bfg_view(name='edit')
+   @view_config(name='edit')
    def edit(request):
        return Response('edited!')
 
@@ -1648,9 +1648,9 @@ function.  For example:
    :linenos:
 
    from webob import Response
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view()
+   @view_config()
    class MyView(object):
        def __init__(self, request):
            self.request = request
@@ -1658,7 +1658,7 @@ function.  For example:
        def __call__(self):
            return Response('hello')
 
-You can use the :class:`pyramid.view.bfg_view` decorator as a
+You can use the :class:`pyramid.view.view_config` decorator as a
 simple callable to manually decorate classes in Python 2.5 and below
 without the decorator syntactic sugar, if you wish:
 
@@ -1666,7 +1666,7 @@ without the decorator syntactic sugar, if you wish:
    :linenos:
 
    from webob import Response
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
    class MyView(object):
        def __init__(self, request):
@@ -1675,20 +1675,20 @@ without the decorator syntactic sugar, if you wish:
        def __call__(self):
            return Response('hello')
 
-   my_view = bfg_view()(MyView)
+   my_view = view_config()(MyView)
 
-More than one :class:`pyramid.view.bfg_view` decorator can be
+More than one :class:`pyramid.view.view_config` decorator can be
 stacked on top of any number of others.  Each decorator creates a
 separate view registration.  For example:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
    from webob import Response
 
-   @bfg_view(name='edit')
-   @bfg_view(name='change')
+   @view_config(name='edit')
+   @view_config(name='change')
    def edit(request):
        return Response('edited!')
 
@@ -1700,13 +1700,13 @@ The decorator can also be used against class methods:
    :linenos:
 
    from webob import Response
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
    class MyView(object):
        def __init__(self, request):
            self.request = request
 
-       @bfg_view(name='hello')
+       @view_config(name='hello')
        def amethod(self):
            return Response('hello')
 
@@ -1729,9 +1729,9 @@ equivalently as the below:
    :linenos:
 
    from webob import Response
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(attr='amethod', name='hello')
+   @view_config(attr='amethod', name='hello')
    class MyView(object):
        def __init__(self, request):
            self.request = request
@@ -1750,7 +1750,7 @@ View Configuration Using the ``add_view`` Method of a Configurator
 The :meth:`pyramid.configuration.Configurator.add_view` method
 within :ref:`configuration_module` is used to configure a view
 imperatively.  The arguments to this method are very similar to the
-arguments that you provide to the ``@bfg_view`` decorator.  For
+arguments that you provide to the ``@view_config`` decorator.  For
 example:
 
 .. code-block:: python

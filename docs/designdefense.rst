@@ -374,14 +374,14 @@ which don't use interfaces.  Instead, each predicate uses a
 domain-specific string as a match value.
 
 For example, to write a view configuration which matches only requests
-with the ``POST`` HTTP request method, you might write a ``@bfg_view``
+with the ``POST`` HTTP request method, you might write a ``@view_config``
 decorator which mentioned the ``request_method`` predicate:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
-   @bfg_view(name='post_view', request_method='POST', renderer='json')
+   from pyramid.view import view_config
+   @view_config(name='post_view', request_method='POST', renderer='json')
    def post_view(request):
        return 'POSTed'
 
@@ -392,8 +392,8 @@ response:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
-   @bfg_view(name='post_view', request_method='POST', accept='application/json',
+   from pyramid.view import view_config
+   @view_config(name='post_view', request_method='POST', accept='application/json',
              renderer='json')
    def post_view(request):
        return 'POSTed'
@@ -417,13 +417,13 @@ acommodate this by allowing people to define "custom" view predicates:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
    from webob import Response
 
    def subpath(context, request):
        return request.subpath and request.subpath[0] == 'abc'
 
-   @bfg_view(custom_predicates=(subpath,))
+   @view_config(custom_predicates=(subpath,))
    def aview(request):
        return Response('OK')
 

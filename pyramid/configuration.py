@@ -1557,7 +1557,7 @@ class Configurator(object):
     def scan(self, package=None, categories=None, _info=u''):
         """ Scan a Python package and any of its subpackages for
         objects marked with :term:`configuration decoration` such as
-        :class:`pyramid.view.bfg_view`.  Any decorated object found
+        :class:`pyramid.view.view_config`.  Any decorated object found
         will influence the current configuration state.
 
         The ``package`` argument should be a Python :term:`package` or
@@ -1572,15 +1572,15 @@ class Configurator(object):
 
         By default, ``categories`` is ``None`` which will execute
         *all* Venusian decorator callbacks including
-        :mod:`pyramid`-related decorators such as ``bfg_view``.  If
-        this is not desirable because the codebase has other
-        Venusian-using decorators that aren't meant to be invoked
-        during a particular scan, use ``('bfg',)`` as a ``categories``
-        value to limit the execution of decorator callbacks to only
-        those registered by :mod:`pyramid` itself.  Or pass a
-        sequence of Venusian scan categories as necessary
-        (e.g. ``('bfg', 'myframework')``) to limit the decorators
-        called to the set of categories required.
+        :mod:`pyramid`-related decorators such as
+        :class:`pyramid.view.view_config``.  If this is not desirable
+        because the codebase has other Venusian-using decorators that
+        aren't meant to be invoked during a particular scan, use
+        ``('bfg',)`` as a ``categories`` value to limit the execution
+        of decorator callbacks to only those registered by
+        :mod:`pyramid` itself.  Or pass a sequence of Venusian scan
+        categories as necessary (e.g. ``('bfg', 'myframework')``) to
+        limit the decorators called to the set of categories required.
         """
         package = self.maybe_dotted(package)
         if package is None: # pragma: no cover

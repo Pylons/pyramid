@@ -1,17 +1,17 @@
 import os
-from pyramid.view import bfg_view
+from pyramid.view import view_config
 
-@bfg_view(renderer='templates/foo.pt', name='first')
+@view_config(renderer='templates/foo.pt', name='first')
 def first(request):
     return {'result':'OK1'}
 
-@bfg_view(renderer='pyramid.tests.viewdecoratorapp.views:templates/foo.pt',
-          name='second')
+@view_config(renderer='pyramid.tests.viewdecoratorapp.views:templates/foo.pt',
+             name='second')
 def second(request):
     return {'result':'OK2'}
 
 here = os.path.normpath(os.path.dirname(os.path.abspath(__file__)))
 foo = os.path.join(here, 'templates', 'foo.pt')
-@bfg_view(renderer=foo, name='third')
+@view_config(renderer=foo, name='third')
 def third(request):
     return {'result':'OK3'}

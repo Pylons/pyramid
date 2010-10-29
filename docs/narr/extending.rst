@@ -39,7 +39,7 @@ The fundamental "plug points" of an application developed using
 :mod:`pyramid` are *routes*, *views*, and *resources*.  Routes are
 declarations made using the ZCML ``<route>`` directive.  Views are
 declarations made using the ZCML ``<view>`` directive (or the
-``@bfg_view`` decorator).  Resources are files that are accessed by
+``@view_config`` decorator).  Resources are files that are accessed by
 :mod:`pyramid` using the :term:`pkg_resources` API such as static
 files and templates.
 
@@ -89,7 +89,7 @@ Extending an Application Which Possesses Configuration Decorators Or Which Does 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you've inherited a :mod:`pyramid` application which uses
-:class:`pyramid.view.bfg_view` decorators or which performs
+:class:`pyramid.view.view_config` decorators or which performs
 configuration imperatively, one of two things may be true:
 
 - If you just want to *extend* the application, you can write
@@ -101,7 +101,7 @@ configuration imperatively, one of two things may be true:
   *may* need to change the source code of the original application.
 
   If the only source of trouble is the existence of
-  :class:`pyramid.view.bfg_view` decorators, you can just prevent a
+  :class:`pyramid.view.view_config` decorators, you can just prevent a
   :term:`scan` from happening (by omitting the ``<scan>`` declaration
   from ZCML or omitting any call to the
   :meth:`pyramid.configuration.Configurator.scan` method).  This

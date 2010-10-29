@@ -37,6 +37,11 @@ Features (delta from BFG 1.3.X)
 - The request now has a new attribute: ``tmpl_context`` for benefit of
   Pylons users.
 
+- The decorator previously known as ``pyramid.view.bfg_view`` is now
+  known most formally as ``pyramid.view.view_config`` in docs and
+  paster templates.  An import of ``pyramid.view.bfg_view``, however,
+  will continue to work "forever".
+
 Documentation (delta from BFG 1.3)
 -----------------------------------
 

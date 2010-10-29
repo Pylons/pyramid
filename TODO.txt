@@ -80,8 +80,6 @@
 
 - ``handler`` ZCML directive.
 
-- ``bfg_view`` alias.
-
 - ``repoze.bfg.message`` alias.
 
 - Try to get rid of Mako Beaker dependency.
