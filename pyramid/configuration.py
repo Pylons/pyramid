@@ -42,6 +42,7 @@ from pyramid.interfaces import IView
 from pyramid.interfaces import IViewClassifier
 from pyramid.interfaces import IExceptionResponse
 from pyramid.interfaces import IException
+from pyramid.interfaces import ISessionFactory
 
 from pyramid import chameleon_text
 from pyramid import chameleon_zpt
@@ -187,7 +188,17 @@ class Configurator(object):
     always be executable by entirely anonymous users (any
     authorization policy in effect is ignored).  See also
     :ref:`setting_a_default_permission`.
-    """
+
+    If ``session_factory`` is passed, it should be an object which
+    implements the :term:`session factory` interface.  If a nondefault
+    value is passed, the ``session_factory`` will be used to create a
+    session object when ``request.session`` is accessed.  Note that
+    the same outcome can be achieved by calling
+    :ref:`pyramid.configration.Configurator.set_session_factory`.  By
+    default, this argument is ``None``, indicating that no session
+    factory will be configured (and thus accessing ``request.session``
+    will throw an error) unless ``set_session_factory`` is called later
+    during configuration.  """
 
     manager = manager # for testing injection
     venusian = venusian # for testing injection
@@ -205,7 +216,9 @@ class Configurator(object):
                  locale_negotiator=None,
                  request_factory=None,
                  renderer_globals_factory=None,
-                 default_permission=None):
+                 default_permission=None,
+                 session_factory=None,
+                 ):
         if package is None:
             package = caller_package()
         name_resolver = DottedNameResolver(package)
@@ -227,6 +240,7 @@ class Configurator(object):
                 request_factory=request_factory,
                 renderer_globals_factory=renderer_globals_factory,
                 default_permission=default_permission,
+                session_factory=session_factory,
                 )
 
     def _set_settings(self, mapping):
@@ -362,7 +376,8 @@ class Configurator(object):
                        renderers=DEFAULT_RENDERERS, debug_logger=None,
                        locale_negotiator=None, request_factory=None,
                        renderer_globals_factory=None,
-                       default_permission=None):
+                       default_permission=None,
+                       session_factory=None):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial 'setup' is
         performed against the registry.  This is because the registry
@@ -408,6 +423,8 @@ class Configurator(object):
             self.set_renderer_globals_factory(renderer_globals_factory)
         if default_permission:
             self.set_default_permission(default_permission)
+        if session_factory is not None:
+            self.set_session_factory(session_factory)
 
     # getSiteManager is a unit testing dep injection
     def hook_zca(self, getSiteManager=None):
@@ -1799,6 +1816,14 @@ class Configurator(object):
            can be used to achieve the same purpose.
         """
         self.registry.registerUtility(permission, IDefaultPermission)
+
+    def set_session_factory(self, session_factory):
+        """
+        Configure the application with a :term:`session factory`.  If
+        this method is called, the ``session_factory`` argument must
+        be a session factory callable.
+        """
+        self.registry.registerUtility(session_factory, ISessionFactory)
 
     def add_translation_dirs(self, *specs):
         """ Add one or more :term:`translation directory` paths to the

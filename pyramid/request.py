@@ -4,6 +4,10 @@ from zope.interface.interface import InterfaceClass
 from webob import Request as WebobRequest
 
 from pyramid.interfaces import IRequest
+from pyramid.interfaces import ISessionFactory
+
+from pyramid.exceptions import ConfigurationError
+from pyramid.decorator import reify
 
 class Request(WebobRequest):
     """
@@ -136,6 +140,19 @@ class Request(WebobRequest):
         while callbacks:
             callback = callbacks.pop(0)
             callback(self)
+
+    @reify
+    def session(self):
+        """ Obtain the :term:`session` object associated with this
+        request.  If a :term:`session factory` has not been registered
+        during application configuration, a
+        :class:`pyramid.exceptions.ConfigurationError` will be raised"""
+        factory = self.registry.queryUtility(ISessionFactory)
+        if factory is None:
+            raise ConfigurationError(
+                'No session factory registered '
+                '(see the Session Objects chapter of the documentation)')
+        return factory(self)
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior
     __getattr__ = object.__getattribute__

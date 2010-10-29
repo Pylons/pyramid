@@ -25,3 +25,7 @@ Other Interfaces
 
   .. autointerface:: IRoutePregenerator
 
+  .. autointerface:: ISession
+
+  .. autointerface:: ISessionFactory
+

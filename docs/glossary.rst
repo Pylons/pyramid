@@ -803,3 +803,14 @@ Glossary
       ``route_url``.  See
       :class:`repoze.bfg.interfaces.IRoutePregenerator` for more
       information.
+
+   session
+      A namespace that is valid for some period of continual activity
+      that can be used to represent a user's interaction with a web
+      application.
+
+   session factory
+      A callable, which, when called with a single argument named
+      ``request`` (a :term:`request` object), returns a
+      :term:`session` object.
+

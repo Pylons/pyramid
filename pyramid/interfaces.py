@@ -375,5 +375,122 @@ class IDefaultPermission(Interface):
     """ A string object representing the default permission to be used
     for all view configurations which do not explicitly declare their
     own."""
+
+class ISessionFactory(Interface):
+    """ An interface representing a factory which accepts a request object and
+    returns an ISession object """
+    def __call__(request):
+        """ Return an ISession object """
+
+class ISession(Interface):
+    """ An interface representing a session (a web session object,
+    usually accessed via ``request.session``.
+
+    Keys and values of a session must be pickleable.
+    """
+
+    # attributes
+
+    created = Attribute('Integer representing Epoch time when created.')
+    modified = Attribute(
+        'Integer representing Epoch time of last modification.  If the '
+        'session has not yet been modified (it is new), this time will '
+        'be the created time.')
+    new = Attribute('Boolean attribute.  If ``True``, the session is new.')
+
+    # special methods
+
+    def invalidate():
+        """ Invalidate the session.  The action caused by
+        ``invalidate`` is implementation-dependent, but it should have
+        the effect of completely dissociating any data stored in the
+        session with the current request.  It might set response
+        values (such as one which clears a cookie), or it might not."""
+
+    def changed():
+        """ Mark the session as changed. A user of a session should
+        call this method after he or she mutates a mutable object that
+        is *a value of the session* (it should not be required after
+        mutating the session itself).  For example, if the user has
+        stored a dictionary in the session under the key ``foo``, and
+        he or she does ``session['foo'] = {}``, ``changed()`` needn't
+        be called.  However, if subsequently he or she does
+        ``session['foo']['a'] = 1``, ``changed()`` must be called for
+        the sessioning machinery to notice the mutation of the
+        internal dictionary."""
+
+    # mapping methods
     
+    def __getitem__(key):
+        """Get a value for a key
+
+        A ``KeyError`` is raised if there is no value for the key.
+        """
+
+    def get(key, default=None):
+        """Get a value for a key
+
+        The default is returned if there is no value for the key.
+        """
+
+    def __delitem__(key):
+        """Delete a value from the mapping using the key.
+
+        A ``KeyError`` is raised if there is no value for the key.
+        """
+
+    def __setitem__(key, value):
+        """Set a new item in the mapping."""
+
+    def keys():
+        """Return the keys of the mapping object.
+        """
+
+    def values():
+        """Return the values of the mapping object.
+        """
+
+    def items():
+        """Return the items of the mapping object.
+        """
+
+    def iterkeys():
+        "iterate over keys; equivalent to __iter__"
+
+    def itervalues():
+        "iterate over values"
+
+    def iteritems():
+        "iterate over items"
+
+    def clear():
+        "delete all items"
+    
+    def update(d):
+        " Update D from E: for k in E.keys(): D[k] = E[k]"
+    
+    def setdefault(key, default=None):
+        " D.setdefault(k[,d]) -> D.get(k,d), also set D[k]=d if k not in D "
+    
+    def pop(k, *args):
+        """remove specified key and return the corresponding value
+        ``*args`` may contain a single default value, or may not be supplied.
+        If key is not found, default is returned if given, otherwise 
+        ``KeyError`` is raised"""
+    
+    def popitem():
+        """remove and return some (key, value) pair as a
+        2-tuple; but raise ``KeyError`` if mapping is empty"""
+
+    def __len__():
+        """Return the number of items in the session.
+        """
+
+    def __iter__():
+        """Return an iterator for the keys of the mapping object.
+        """
+
+    def __contains__(key):
+        """Return true if a key exists in the mapping."""
+
 NO_PERMISSION_REQUIRED = '__no_permission_required__'

@@ -40,6 +40,7 @@ Narrative documentation in chapter form explaining how to use
    narr/views
    narr/static
    narr/webob
+   narr/sessions
    narr/templates
    narr/models
    narr/security

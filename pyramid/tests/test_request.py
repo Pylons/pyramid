@@ -1,6 +1,14 @@
 import unittest
 
 class TestRequest(unittest.TestCase):
+    def setUp(self):
+        from pyramid.configuration import Configurator
+        self.config = Configurator()
+        self.config.begin()
+
+    def tearDown(self):
+        self.config.end()
+        
     def _makeOne(self, environ):
         return self._getTargetClass()(environ)
 
@@ -34,6 +42,22 @@ class TestRequest(unittest.TestCase):
         from pyramid.interfaces import IRequest
         inst = self._makeOne({})
         self.assertTrue(IRequest.providedBy(inst))
+
+    def test_session_configured(self):
+        from pyramid.interfaces import ISessionFactory
+        inst = self._makeOne({})
+        def factory(request):
+            return 'orangejuice'
+        self.config.registry.registerUtility(factory, ISessionFactory)
+        inst.registry = self.config.registry
+        self.assertEqual(inst.session, 'orangejuice')
+        self.assertEqual(inst.__dict__['session'], 'orangejuice')
+
+    def test_session_not_configured(self):
+        from pyramid.exceptions import ConfigurationError
+        inst = self._makeOne({})
+        inst.registry = self.config.registry
+        self.assertRaises(ConfigurationError, inst.__getattr__, 'session')
 
     def test_setattr_and_getattr_dotnotation(self):
         inst = self._makeOne({})
