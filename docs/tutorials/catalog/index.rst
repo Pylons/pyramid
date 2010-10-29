@@ -78,12 +78,12 @@ want the application to be based on :term:`traversal`.
            return root['site']
 
 #.  We'll demonstrate how you might interact with a catalog from code
-    by manipulating the database directly using the ``bfgshell``
+    by manipulating the database directly using the ``pshell``
     command in a terminal window:
 
     .. code-block:: text
 
-       [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid bfgshell \
+       [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid pshell \
               myapp.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin
@@ -103,7 +103,7 @@ As you need them, add other indexes required by your application to
 the catalog by modifying the ``update_indexes`` method of the ``Site``
 object.  Whenever an index is added or removed, invoke the
 ``update_indexes`` method of the site (the root object) from a script
-or from within a ``bfgshell`` session to update the set of indexes
+or from within a ``pshell`` session to update the set of indexes
 used by your application.
 
 In :term:`view` code, you should be able to get a hold of the root

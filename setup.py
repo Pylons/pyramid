@@ -86,7 +86,7 @@ setup(name='pyramid',
         pylons_minimal=pyramid.paster:PylonsMinimalProjectTemplate
         pylons_sqla=pyramid.paster:PylonsSQLAlchemyProjectTemplate
         [paste.paster_command]
-        pyramid_shell=pyramid.paster:BFGShellCommand
+        pshell=pyramid.paster:PShellCommand
         [console_scripts]
         bfg2pyramid = pyramid.fixers.fix_bfg_imports:main
       """

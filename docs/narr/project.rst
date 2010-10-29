@@ -117,7 +117,7 @@ project we name ``MyProject``:
 
    $ bin/paster create -t pyramid_starter
    Selected and implied templates:
-     pyramid#bfg  pyramid starter project
+     pyramid#pyramid_starter  pyramid starter project
 
    Enter project name: MyProject
    Variables:
@@ -223,18 +223,18 @@ the ``pyramid_starter`` template, a single sample test exists.
 .. index::
    single: interactive shell
    single: IPython
-   single: paster bfgshell
+   single: paster pshell
 
 The Interactive Shell
 ---------------------
 
 Once you've installed your program for development using ``setup.py
 develop``, you can use an interactive Python shell to examine your
-:mod:`pyramid` application :term:`model` and :term:`view` objects
-from a Python prompt.  To do so, use the ``paster`` shell command with
-the ``bfgshell`` argument:
+:mod:`pyramid` application :term:`model` and :term:`view` objects from
+a Python prompt.  To do so, use the ``paster`` shell command with the
+``pshell`` argument:
 
-The first argument to ``bfgshell`` is the path to your application's
+The first argument to ``pshell`` is the path to your application's
 ``.ini`` file.  The second is the section name inside the ``.ini``
 file which points to your *application* as opposed to any other
 section within the ``.ini`` file.  For example, if your application
@@ -256,37 +256,37 @@ the name ``main`` as a section name:
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=pyramid bfgshell \
-         MyProject.ini main
+   [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid \
+                               pshell MyProject.ini main
    Python 2.4.5 (#1, Aug 29 2008, 12:27:37) 
    [GCC 4.0.1 (Apple Inc. build 5465)] on darwin
-   Type "help" for more information. "root" is the BFG app root object.
+   Type "help" for more information. "root" is the Pyramid app root object.
    >>> root
    <foo.models.MyModel object at 0x445270>
 
 .. note:: You *might* get away without passing
-          ``--plugin=pyramid`` to the bfgshell command.
+          ``--plugin=pyramid`` to the ``pshell`` command.
 
 If you have `IPython <http://en.wikipedia.org/wiki/IPython>`_
 installed in the interpreter you use to invoke the ``paster`` command,
-the ``bfgshell`` command will use an IPython interactive shell instead
+the ``pshell`` command will use an IPython interactive shell instead
 of a standard Python interpreter shell.  If you don't want this to
 happen, even if you have IPython installed, you can pass the
-``--disable-ipython`` flag to the ``bfgshell`` command to use a
-standard Python interpreter shell unconditionally.
+``--disable-ipython`` flag to the ``pshell`` command to use a standard
+Python interpreter shell unconditionally.
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=pyramid bfgshell \
+   [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid pshell \
          --disable-ipython MyProject.ini main
 
 You should always use a section name argument that refers to the
 actual ``app`` section within the Paste configuration file that points
-at your :mod:`pyramid` application *without any middleware
-wrapping*.  In particular, a section name is inappropriate as the
-second argument to "bfgshell" if the configuration section it names is
-a ``pipeline`` rather than an ``app``.  For example, if you have the
-following ``.ini`` file content:
+at your :mod:`pyramid` application *without any middleware wrapping*.
+In particular, a section name is inappropriate as the second argument
+to ``pshell`` if the configuration section it names is a ``pipeline``
+rather than an ``app``.  For example, if you have the following
+``.ini`` file content:
 
 .. code-block:: ini
    :linenos:
@@ -307,7 +307,7 @@ The command you use to invoke the interactive shell should be:
 
 .. code-block::  text
 
-   [chrism@vitaminf bfgshellenv]$ ../bin/paster --plugin=pyramid bfgshell \
+   [chrism@vitaminf shellenv]$ ../bin/paster --plugin=pyramid pshell \
          MyProject.ini myapp
 
 If you use ``main`` as the section name argument instead of ``myapp``

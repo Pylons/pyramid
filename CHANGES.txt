@@ -42,6 +42,9 @@ Features (delta from BFG 1.3.X)
   paster templates.  An import of ``pyramid.view.bfg_view``, however,
   will continue to work "forever".
 
+- New API methods in ``pyramid.session``: ``signed_serialize`` and
+  ``signed_deserialize``.
+
 Documentation (delta from BFG 1.3)
 -----------------------------------
 
@@ -81,3 +84,6 @@ Backwards Incompatibilities (with BFG 1.3.X)
 - The literal pattern ``{<anything>}`` is no longer permitted in route
   patterns (due to the addition of squiggly route pattern syntax
   support).
+
+- The ``bfgshell`` paster command is now named ``pshell``.
+

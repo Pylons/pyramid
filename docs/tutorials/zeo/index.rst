@@ -218,13 +218,13 @@ Running
     about the application has changed.  
 
 #.  You can manipulate the database directly (even when the
-    application's HTTP server is running) by using the ``bfgshell``
+    application's HTTP server is running) by using the ``pshell``
     command in a third terminal window:
 
     .. code-block:: text
        :linenos:
 
-       [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid bfgshell \
+       [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid pshell \
               myapp.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin

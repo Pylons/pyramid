@@ -53,7 +53,7 @@ def get_app(config_file, name, loadapp=loadapp):
     return app
 
 _marker = object()
-class BFGShellCommand(Command):
+class PShellCommand(Command):
     """Open an interactive shell with a :mod:`pyramid` app loaded.
 
     This command accepts two positional arguments:
@@ -66,11 +66,11 @@ class BFGShellCommand(Command):
 
     Example::
 
-        $ paster bfgshell myapp.ini main
+        $ paster pshell myapp.ini main
 
     .. note:: You should use a ``section_name`` that refers to the
               actual ``app`` section in the config file that points at
-              your BFG app without any middleware wrapping, or this
+              your Pyramid app without any middleware wrapping, or this
               command will almost certainly fail.
 
     """
@@ -78,7 +78,7 @@ class BFGShellCommand(Command):
 
     min_args = 2
     max_args = 2
-    group_name = 'bfg'
+    group_name = 'pyramid'
 
     parser = Command.standard_parser(simulate=True)
     parser.add_option('-d', '--disable-ipython',
@@ -104,7 +104,7 @@ class BFGShellCommand(Command):
                 from IPython.Shell import IPShell
             except ImportError: #pragma no cover
                 IPShell = None
-        cprt =('Type "help" for more information. "root" is the BFG app '
+        cprt =('Type "help" for more information. "root" is the Pyramid app '
                'root object.')
         banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
         config_file, section_name = self.args
@@ -123,3 +123,5 @@ class BFGShellCommand(Command):
                 self.interact[0](banner, local={'root':root})
             finally:
                 closer()
+
+BFGShellCommand = PShellCommand # b/w compat forever
