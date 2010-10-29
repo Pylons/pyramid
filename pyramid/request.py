@@ -9,6 +9,9 @@ from pyramid.interfaces import ISessionFactory
 from pyramid.exceptions import ConfigurationError
 from pyramid.decorator import reify
 
+class TemplateContext(object):
+    pass
+
 class Request(WebobRequest):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
@@ -35,6 +38,11 @@ class Request(WebobRequest):
     response_callbacks = ()
     finished_callbacks = ()
     exception = None
+
+    @reify
+    def tmpl_context(self):
+        """ Template context (for Pylons apps) """
+        return TemplateContext()
 
     def add_response_callback(self, callback):
         """
