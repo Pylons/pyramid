@@ -1502,7 +1502,7 @@ See :ref:`view_directive` for complete ZCML directive documentation.
 .. _mapping_views_using_a_decorator_section:
 
 View Configuration Using the ``@view_config`` Decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For better locality of reference, you may use the
 :class:`pyramid.view.view_config` decorator to associate your view
