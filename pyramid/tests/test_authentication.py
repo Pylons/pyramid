@@ -460,23 +460,23 @@ class TestAuthTktCookieHelper(unittest.TestCase):
 
     def test_remember_path(self):
         plugin = self._makeOne('secret', include_ip=True,
-                               path="/cgi-bin/bfg.cgi/")
+                               path="/cgi-bin/app.cgi/")
         request = self._makeRequest()
         result = plugin.remember(request, 'other')
         self.assertEqual(len(result), 3)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
-        self.failUnless(result[0][1].endswith('; Path=/cgi-bin/bfg.cgi/'))
+        self.failUnless(result[0][1].endswith('; Path=/cgi-bin/app.cgi/'))
         self.failUnless(result[0][1].startswith('auth_tkt='))
 
         self.assertEqual(result[1][0], 'Set-Cookie')
         self.failUnless(result[1][1].endswith(
-            '; Path=/cgi-bin/bfg.cgi/; Domain=localhost'))
+            '; Path=/cgi-bin/app.cgi/; Domain=localhost'))
         self.failUnless(result[1][1].startswith('auth_tkt='))
 
         self.assertEqual(result[2][0], 'Set-Cookie')
         self.failUnless(result[2][1].endswith(
-            '; Path=/cgi-bin/bfg.cgi/; Domain=.localhost'))
+            '; Path=/cgi-bin/app.cgi/; Domain=.localhost'))
         self.failUnless(result[2][1].startswith('auth_tkt='))
 
     def test_remember_http_only(self):

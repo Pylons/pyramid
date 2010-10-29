@@ -66,7 +66,7 @@ class subscriber(object):
         config.add_subscriber(wrapped, self.ifaces)
 
     def __call__(self, wrapped):
-        self.venusian.attach(wrapped, self.register, category='bfg')
+        self.venusian.attach(wrapped, self.register, category='pyramid')
         return wrapped
 
 class NewRequest(object):

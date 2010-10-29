@@ -129,9 +129,9 @@ class ConfiguratorTests(unittest.TestCase):
     def test_ctor_with_package_registry(self):
         import sys
         from pyramid.configuration import Configurator
-        bfg_pkg = sys.modules['pyramid']
-        config = Configurator(package=bfg_pkg)
-        self.assertEqual(config.package, bfg_pkg)
+        pkg = sys.modules['pyramid']
+        config = Configurator(package=pkg)
+        self.assertEqual(config.package, pkg)
 
     def test_ctor_noreg_custom_settings(self):
         from pyramid.interfaces import ISettings

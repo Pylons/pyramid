@@ -244,7 +244,7 @@ class ISettings(Interface):
     interface."""
     
 # this interface, even if it becomes unused within Pyramid, is
-# imported by other packages (such as repoze.bfg.traversalwrapper)
+# imported by other packages (such as traversalwrapper)
 class ILocation(Interface):
     """Objects that have a structural location"""
     __parent__ = Attribute("The parent in the location hierarchy")

@@ -87,3 +87,6 @@ Backwards Incompatibilities (with BFG 1.3.X)
 
 - The ``bfgshell`` paster command is now named ``pshell``.
 
+- The Venusian "category" for all built-in Venusian decorators
+  (e.g. ``subscriber`` and ``view_config``/``bfg_view``) is now
+  ``pyramid`` instead of ``bfg``.

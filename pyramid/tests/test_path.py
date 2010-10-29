@@ -3,8 +3,8 @@ import unittest
 class TestCallerPath(unittest.TestCase):
     def tearDown(self):
         from pyramid.tests import test_path
-        if hasattr(test_path, '__bfg_abspath__'):
-            del test_path.__bfg_abspath__
+        if hasattr(test_path, '__abspath__'):
+            del test_path.__abspath__
 
     def _callFUT(self, path, level=2):
         from pyramid.path import caller_path
@@ -20,10 +20,10 @@ class TestCallerPath(unittest.TestCase):
         result = self._callFUT('a/b/c')
         self.assertEqual(result, os.path.join(here, 'a/b/c'))
 
-    def test_memoization_has_bfg_abspath(self):
+    def test_memoization_has_abspath(self):
         import os
         from pyramid.tests import test_path
-        test_path.__bfg_abspath__ = '/foo/bar'
+        test_path.__abspath__ = '/foo/bar'
         result = self._callFUT('a/b/c')
         self.assertEqual(result, os.path.join('/foo/bar', 'a/b/c'))
 
@@ -33,7 +33,7 @@ class TestCallerPath(unittest.TestCase):
         from pyramid.tests import test_path
         result = self._callFUT('a/b/c')
         self.assertEqual(result, os.path.join(here, 'a/b/c'))
-        self.assertEqual(test_path.__bfg_abspath__, here)
+        self.assertEqual(test_path.__abspath__, here)
 
 class TestCallerModule(unittest.TestCase):
     def _callFUT(self, level=2):
@@ -103,13 +103,13 @@ class TestPackagePath(unittest.TestCase):
         from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path)
         self._callFUT(module)
-        self.assertEqual(module.__bfg_abspath__, module.package_path)
+        self.assertEqual(module.__abspath__, module.package_path)
         
     def test_memoization_fail(self):
         from pyramid.tests import test_path
         module = DummyPackageOrModule(test_path, raise_exc=TypeError)
         result = self._callFUT(module)
-        self.failIf(hasattr(module, '__bfg_abspath__'))
+        self.failIf(hasattr(module, '__abspath__'))
         self.assertEqual(result, module.package_path)
 
 class TestPackageOf(unittest.TestCase):

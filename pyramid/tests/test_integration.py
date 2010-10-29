@@ -18,7 +18,7 @@ def wsgiapptest(environ, start_response):
     """ """
     return '123'
 
-class WGSIAppPlusBFGViewTests(unittest.TestCase):
+class WGSIAppPlusViewConfigTests(unittest.TestCase):
     def test_it(self):
         from venusian import ATTACH_ATTR
         import types
