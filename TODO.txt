@@ -74,8 +74,6 @@
 
 - Mako docs (in templating chapter).
 
-- Paster template that has Mako.
-
 - ``add_handler`` documentation.
 
 - ``handler`` ZCML directive.
