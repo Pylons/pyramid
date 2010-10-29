@@ -54,7 +54,7 @@ commands and files.
     .. code-block:: text
 
        $ cd ~/modwsgi/env
-       $ bin/easy_install repoze.bfg
+       $ bin/easy_install pyramid
     
 #.  Create and install your :mod:`pyramid` application.  For the
     purposes of this tutorial, we'll just be using the ``bfg_starter``

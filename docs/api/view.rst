@@ -13,7 +13,7 @@
 
   .. autofunction:: is_response
 
-  .. autoclass:: bfg_view
+  .. autoclass:: view_config
      :members:
 
   .. autoclass:: static

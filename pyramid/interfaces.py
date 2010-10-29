@@ -392,10 +392,6 @@ class ISession(Interface):
     # attributes
 
     created = Attribute('Integer representing Epoch time when created.')
-    modified = Attribute(
-        'Integer representing Epoch time of last modification.  If the '
-        'session has not yet been modified (it is new), this time will '
-        'be the created time.')
     new = Attribute('Boolean attribute.  If ``True``, the session is new.')
 
     # special methods

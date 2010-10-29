@@ -206,7 +206,7 @@ class TestIsResponse(unittest.TestCase):
         response.status = None
         self.assertEqual(self._callFUT(response), False)
 
-class TestBFGViewDecorator(unittest.TestCase):
+class TestViewConfigDecorator(unittest.TestCase):
     def setUp(self):
         cleanUp()
 
@@ -214,8 +214,8 @@ class TestBFGViewDecorator(unittest.TestCase):
         cleanUp()
 
     def _getTargetClass(self):
-        from pyramid.view import bfg_view
-        return bfg_view
+        from pyramid.view import view_config
+        return view_config
 
     def _makeOne(self, *arg, **kw):
         return self._getTargetClass()(*arg, **kw)

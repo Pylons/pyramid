@@ -285,16 +285,16 @@ The association of a template as a renderer for a :term:`view
 configuration` makes it possible to replace code within a :term:`view
 callable` that handles the rendering of a template.
 
-Here's an example of using a :class:`pyramid.view.bfg_view`
+Here's an example of using a :class:`pyramid.view.view_config`
 decorator to specify a :term:`view configuration` that names a
 template renderer:
 
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='templates/foo.pt')
+   @view_config(renderer='templates/foo.pt')
    def my_view(request):
        return {'foo':1, 'bar':2}
 
@@ -310,7 +310,7 @@ Similar renderer configuration can be done imperatively and via
 :term:`ZCML`.  See :ref:`views_which_use_a_renderer`.  See also
 :ref:`built_in_renderers`.
 
-The ``renderer`` argument to the ``@bfg_view`` configuration decorator
+The ``renderer`` argument to the ``@view_config`` configuration decorator
 shown above is the template *path*.  In the example above, the path
 ``templates/foo.pt`` is *relative*.  Relative to what, you ask?
 Relative to the directory in which the file which defines the view
@@ -347,7 +347,7 @@ of :term:`Jinja2` templates as renderers.  See
    configuration typically return a dictionary, and making assertions
    about the information is almost always more direct than needing to
    parse HTML.  Specifying a renderer from within :term:`ZCML` (as
-   opposed to imperatively or via a ``bfg_view`` decorator, or using a
+   opposed to imperatively or via a ``view_config`` decorator, or using a
    template directly from within a view callable) also makes it
    possible for someone to modify the template used to render a view
    without needing to fork your code to do so.  See
@@ -401,9 +401,9 @@ the template as a :term:`renderer` like so:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='templates/foo.pt')
+   @view_config(renderer='templates/foo.pt')
    def my_view(request):
        return {'foo':1, 'bar':2}
 
@@ -467,16 +467,16 @@ the macro itself) *into* the rendered template.  To make a macro
 available to the rendered template, you can retrieve a different
 template using the :func:`pyramid.renderers.get_renderer` API,
 and pass it in to the template being rendered.  For example, using a
-:term:`view configuration` via a :class:`pyramid.view.bfg_view`
+:term:`view configuration` via a :class:`pyramid.view.view_config`
 decorator that uses a :term:`renderer`:
 
 .. code-block:: python
    :linenos:
 
    from pyramid.renderers import get_renderer
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='templates/mytemplate.pt')
+   @view_config(renderer='templates/mytemplate.pt')
    def my_view(request):
        main = get_renderer('templates/master.pt').implementation()
        return {'main':main}
@@ -534,9 +534,9 @@ which renders this template:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
 
-   @bfg_view(renderer='templates/mytemplate.txt')
+   @view_config(renderer='templates/mytemplate.txt')
    def my_view(request):
        return {'name':'world'}
 

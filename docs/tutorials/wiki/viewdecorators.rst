@@ -3,25 +3,26 @@ Using View Decorators Rather than ZCML ``view`` directives
 ==========================================================
 
 So far we've been using :term:`ZCML` to map model types to views.
-It's often easier to use the ``bfg_view`` view decorator to do this
-mapping.  Using view decorators provides better locality of reference
-for the mapping, because you can see which model types and view names
-the view will serve right next to the view function itself.  In this
-mode, however, you lose the ability for some views to be overridden
-"from the outside" (by someone using your application as a framework,
-as explained in the :ref:`extending_chapter`).  Since this application
-is not meant to be a framework, it makes sense for us to switch over
-to using view decorators.
+It's often easier to use the :class:`pyramid.view.view_config` view
+decorator to do this mapping.  Using view decorators provides better
+locality of reference for the mapping, because you can see which model
+types and view names the view will serve right next to the view
+function itself.  In this mode, however, you lose the ability for some
+views to be overridden "from the outside" (by someone using your
+application as a framework, as explained in the
+:ref:`extending_chapter`).  Since this application is not meant to be
+a framework, it makes sense for us to switch over to using view
+decorators.
 
 Adding View Decorators
 ======================
 
-We're going to import the :class:`pyramid.view.bfg_view` callable.
+We're going to import the :class:`pyramid.view.view_config` callable.
 This callable can be used as a function, class, or method decorator.
 We'll use it to decorate our ``view_wiki``, ``view_page``,
 ``add_page`` and ``edit_page`` view functions.
 
-The :class:`pyramid.view.bfg_view` callable accepts a number of
+The :class:`pyramid.view.view_config` callable accepts a number of
 arguments:
 
 ``context``
@@ -50,7 +51,7 @@ The decorator above the ``view_wiki`` function will be:
 .. code-block:: python
    :linenos:
 
-   @bfg_view(context=Wiki)
+   @view_config(context=Wiki)
 
 This indicates that the view is for the Wiki class and has the *empty*
 view_name (indicating the :term:`default view` for the Wiki class).
@@ -76,7 +77,7 @@ The decorator above the ``view_page`` function will be:
 .. code-block:: python
    :linenos:
 
-   @bfg_view(context=Page, renderer='templates/view.pt')
+   @view_config(context=Page, renderer='templates/view.pt')
 
 This indicates that the view is for the Page class and has the *empty*
 view_name (indicating the :term:`default view` for the Page class).
@@ -103,7 +104,7 @@ The decorator above the ``add_page`` function will be:
 .. code-block:: python
    :linenos:
 
-   @bfg_view(context=Wiki, name='add_page', renderer='templates/edit.pt')
+   @view_config(context=Wiki, name='add_page', renderer='templates/edit.pt')
 
 This indicates that the view is for the Wiki class and has the
 ``add_page`` view_name.  After injecting this decorator, we can now
@@ -130,7 +131,7 @@ The decorator above the ``edit_page`` function will be:
 .. code-block:: python
    :linenos:
 
-   @bfg_view(context=Page, name='edit_page', renderer='templates/edit.pt')
+   @view_config(context=Page, name='edit_page', renderer='templates/edit.pt')
 
 This indicates that the view is for the Page class and has the
 ``edit_page`` view_name.  After injecting this decorator, we can now

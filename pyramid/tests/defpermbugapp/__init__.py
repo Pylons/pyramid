@@ -1,14 +1,14 @@
 from webob import Response
-from pyramid.view import bfg_view
+from pyramid.view import view_config
 
-@bfg_view(name='x')
+@view_config(name='x')
 def x_view(request): # pragma: no cover
      return Response('this is private!')
 
-@bfg_view(name='y', permission='private2')
+@view_config(name='y', permission='private2')
 def y_view(request): # pragma: no cover
      return Response('this is private too!')
      
-@bfg_view(name='z', permission='__no_permission_required__')
+@view_config(name='z', permission='__no_permission_required__')
 def z_view(request):
      return Response('this is public')

@@ -181,16 +181,16 @@ For example, the following declaration protects the view named
        />
 
 The equivalent view registration including the ``add`` permission name
-may be performed via the ``@bfg_view`` decorator:
+may be performed via the ``@view_config`` decorator:
 
 .. ignore-next-block
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
    from models import Blog
 
-   @bfg_view(context=Blog, name='add_entry.html', permission='add')
+   @view_config(context=Blog, name='add_entry.html', permission='add')
    def blog_entry_add_view(request):
        """ Add blog entry code goes here """
        pass

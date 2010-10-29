@@ -2,7 +2,7 @@ import os
 import unittest
 
 from pyramid.wsgi import wsgiapp
-from pyramid.view import bfg_view
+from pyramid.view import view_config
 from pyramid.view import static
 
 from zope.interface import Interface
@@ -12,7 +12,7 @@ from pyramid import testing
 class INothing(Interface):
     pass
 
-@bfg_view(for_=INothing)
+@view_config(for_=INothing)
 @wsgiapp
 def wsgiapptest(environ, start_response):
     """ """

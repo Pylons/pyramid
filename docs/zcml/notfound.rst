@@ -6,7 +6,7 @@
 .. warning::
 
    The ``notfound`` ZCML directive is deprecated in :mod:`pyramid`
-   version 1.3.  Instead, you should use the :ref:`view_directive`
+   version 1.0.  Instead, you should use the :ref:`view_directive`
    directive with a ``context`` that names the
    :exc:`pyramid.exceptions.NotFound` class.  See
    :ref:`changing_the_notfound_view` form more information.
@@ -42,7 +42,7 @@ Attributes
 
 ``wrapper``
   The :term:`view name` (*not* an object dotted name) of another view
-  declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
+  declared elsewhere in ZCML (or via the ``@view_config`` decorator)
   which will receive the response body of this view as the
   ``request.wrapped_body`` attribute of its own request, and the
   response returned by this view as the ``request.wrapped_response``

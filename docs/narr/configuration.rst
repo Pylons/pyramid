@@ -254,7 +254,7 @@ application.  This error will contain information about which tags
 might have conflicted.
 
 .. index::
-   single: bfg_view
+   single: view_config
    single: ZCML view directive
    single: configuration decoration
    single: code scanning
@@ -277,10 +277,10 @@ referred to by the declaration itself.  For example:
 .. code-block:: python
    :linenos:
 
-   from pyramid.view import bfg_view
+   from pyramid.view import view_config
    from webob import Response
 
-   @bfg_view(name='hello', request_method='GET')
+   @view_config(name='hello', request_method='GET')
    def hello(request):
        return Response('Hello')
 
@@ -290,7 +290,7 @@ the configuration of a :mod:`pyramid` application, a configuration
 decoration within application code must be found through a process
 known as a :term:`scan`.
 
-The :class:`pyramid.view.bfg_view` decorator above adds an
+The :class:`pyramid.view.view_config` decorator above adds an
 attribute to the ``hello`` function, making it available for a
 :term:`scan` to find it later.
 
@@ -306,10 +306,10 @@ and its subpackages.  For example:
       :linenos:
 
       from paste.httpserver import serve
-      from pyramid.view import bfg_view
+      from pyramid.view import view_config
       from webob import Response
      
-      @bfg_view()
+      @view_config()
       def hello(request):
           return Response('Hello')
 
@@ -334,10 +334,10 @@ directive, the package the ZCML file points to is scanned.
       # helloworld.py
 
       from paste.httpserver import serve
-      from pyramid.view import bfg_view
+      from pyramid.view import view_config
       from webob import Response
      
-      @bfg_view()
+      @view_config()
       def hello(request):
           return Response('Hello')
 
@@ -366,7 +366,7 @@ The scanning machinery imports each module and subpackage in a package
 or module recursively, looking for special attributes attached to
 objects defined within a module.  These special attributes are
 typically attached to code via the use of a :term:`decorator`.  For
-example, the :class:`pyramid.view.bfg_view` decorator can be
+example, the :class:`pyramid.view.view_config` decorator can be
 attached to a function or instance method.
 
 Once scanning is invoked, and :term:`configuration decoration` is
@@ -375,7 +375,7 @@ found by the scanner, a set of calls are made to a
 the intent of the configuration decoration.
 
 In the example above, this is best represented as the scanner
-translating the arguments to :class:`pyramid.view.bfg_view` into a
+translating the arguments to :class:`pyramid.view.view_config` into a
 call to the :meth:`pyramid.configuration.Configurator.add_view`
 method, effectively:
 

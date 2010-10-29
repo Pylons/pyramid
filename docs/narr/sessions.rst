@@ -88,9 +88,6 @@ two extra methods.
 
 Extra attributes:
 
-``modified``
-  An integer timestamp indicating the last time the session was modified.
-
 ``created``
   An integer timestamp indicating the time that this session was created.
 
@@ -130,13 +127,24 @@ Some gotchas:
   When in doubt, call ``changed()`` after you've changed sessioning
   data.
 
+.. index::
+   single: pyramid_beaker
+   single: Beaker
+
 Using Alternate Session Factories
 ---------------------------------
 
-At the time of this writing, alternate session factories don't yet
-exist.  It is our intent that we will soon provide at least one other
-session factory which will be easily installable: one that uses the
-`Beaker <http://beaker.groovie.org/>`_ library as a backend.
+At the time of this writing, exactly one alternate session factory
+implementation exists, named ``pyramid_beaker``. This is a session
+factory that uses the `Beaker <http://beaker.groovie.org/>`_ library
+as a backend.  Beaker has support for file-based sessions, database
+based sessions, and encrypted cookie-based sessions.  See
+`http://github.com/Pylons/pyramid_beaker
+<http://github.com/Pylons/pyramid_beaker>`_ for more information about
+``pyramid_beaker``.
+
+.. index::
+   single: session factory
 
 Creating Your Own Session Factory
 ---------------------------------

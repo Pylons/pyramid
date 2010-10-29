@@ -83,7 +83,7 @@ Non-Predicate Attributes
 
 ``wrapper``
   The :term:`view name` (*not* an object dotted name) of another view
-  declared elsewhere in ZCML (or via the ``@bfg_view`` decorator)
+  declared elsewhere in ZCML (or via the ``@view_config`` decorator)
   which will receive the response body of this view as the
   ``request.wrapped_body`` attribute of its own request, and the
   response returned by this view as the ``request.wrapped_response``
@@ -246,7 +246,7 @@ Alternatives
 
 You can also add a :term:`view configuration` via:
 
-- Using the :class:`pyramid.view.bfg_view` class as a decorator.
+- Using the :class:`pyramid.view.view_config` class as a decorator.
 
 - Using the :meth:`pyramid.configuration.Configurator.add_view` method.
 

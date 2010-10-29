@@ -62,13 +62,9 @@
 
 - Update App engine chapter.
 
-- Add SessionFactory interface
+- Browser id?
 
-- Create session interface (flash() is part of it, figure out granularity)
-
-- Add CacheFactory interface
-
-- Browser id
+- .flash API on session.
 
 - Signed_signature method of the request and response from pylons2.
 
@@ -84,10 +80,12 @@
 
 - ``handler`` ZCML directive.
 
-- ``bfg_view`` alias.
-
 - ``repoze.bfg.message`` alias.
 
 - Try to get rid of Mako Beaker dependency.
 
 - Maybe make renderer globals lookup send an event?
+
+- bfgshell
+
+- ``docs`` directory for each paster template.

@@ -1,5 +1,5 @@
-from pyramid.view import bfg_view
+from pyramid.view import view_config
 
-@bfg_view(name='subpackage_notinit')
+@view_config(name='subpackage_notinit')
 def subpackage_notinit(context, request):
     return 'subpackage_notinit'

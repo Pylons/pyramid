@@ -43,6 +43,12 @@ class TestRequest(unittest.TestCase):
         inst = self._makeOne({})
         self.assertTrue(IRequest.providedBy(inst))
 
+    def test_tmpl_context(self):
+        from pyramid.request import TemplateContext
+        inst = self._makeOne({})
+        result = inst.tmpl_context
+        self.assertEqual(result.__class__, TemplateContext)
+        
     def test_session_configured(self):
         from pyramid.interfaces import ISessionFactory
         inst = self._makeOne({})

@@ -1,7 +1,7 @@
 .. _catalog_tutorial:
 
-Using :mod:`repoze.catalog` Within :mod:`repoze.bfg`
-====================================================
+Using :mod:`repoze.catalog` Within :mod:`pyramid`
+=================================================
 
 :mod:`repoze.catalog` is a ZODB-based system that can be used to index
 Python objects.  It also offers a query interface for retrieving
@@ -83,12 +83,12 @@ want the application to be based on :term:`traversal`.
 
     .. code-block:: text
 
-       [chrism@snowpro sess]$ ../bin/paster --plugin=repoze.bfg bfgshell \
+       [chrism@snowpro sess]$ ../bin/paster --plugin=pyramid bfgshell \
               myapp.ini myapp
        Python 2.5.4 (r254:67916, Sep  4 2009, 02:12:16) 
        [GCC 4.2.1 (Apple Inc. build 5646)] on darwin
        Type "help" for more information. "root" is the BFG app root object.
-       >>> from repoze.bfg.traversal import model_path
+       >>> from pyramid.traversal import model_path
        >>> from myapp.models import Document
        >>> root['name'] = Document('title')
        >>> doc = root['name']
@@ -107,7 +107,7 @@ or from within a ``bfgshell`` session to update the set of indexes
 used by your application.
 
 In :term:`view` code, you should be able to get a hold of the root
-object via the :func:`repoze.bfg.traversal.find_root` API.  The
+object via the :func:`pyramid.traversal.find_root` API.  The
 ``catalog`` attribute of that root object will represent the catalog
 previously added.
 

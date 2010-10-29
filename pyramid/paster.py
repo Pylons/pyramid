@@ -9,7 +9,6 @@ from paste.util.template import paste_script_template_renderer
 
 from pyramid.scripting import get_root
 
-
 class StarterProjectTemplate(Template):
     _template_dir = 'paster_templates/starter'
     summary = 'pyramid starter project'
@@ -28,6 +27,21 @@ class RoutesAlchemyProjectTemplate(Template):
 class AlchemyProjectTemplate(Template):
     _template_dir = 'paster_templates/alchemy'
     summary = 'pyramid SQLAlchemy project using traversal'
+    template_renderer = staticmethod(paste_script_template_renderer)
+
+class PylonsBasicProjectTemplate(Template):
+    _template_dir = 'paster_templates/pylons_basic'
+    summary = 'Pylons basic project'
+    template_renderer = staticmethod(paste_script_template_renderer)
+
+class PylonsMinimalProjectTemplate(Template):
+    _template_dir = 'paster_templates/pylons_minimal'
+    summary = 'Pylons minimal project'
+    template_renderer = staticmethod(paste_script_template_renderer)
+
+class PylonsSQLAlchemyProjectTemplate(Template):
+    _template_dir = 'paster_templates/pylons_sqla'
+    summary = 'Pylons SQLAlchemy project'
     template_renderer = staticmethod(paste_script_template_renderer)
 
 def get_app(config_file, name, loadapp=loadapp):

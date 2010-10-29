@@ -143,7 +143,7 @@ def is_response(ob):
             return True
     return False
 
-class bfg_view(object):
+class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
     callable` definition than use of :term:`ZCML` or :term:`imperative
@@ -153,8 +153,8 @@ class bfg_view(object):
 
       from models import MyModel
 
-      @bfg_view(name='my_view', context=MyModel, permission='read',
-                route_name='site1')
+      @view_config(name='my_view', context=MyModel, permission='read',
+                   route_name='site1')
       def my_view(context, request):
           return 'OK'
 
@@ -176,9 +176,13 @@ class bfg_view(object):
        route_name='site1'
        />
 
+    .. note: :class:`pyramid.view.view_config` is also importable, for
+             backwards compatibility purposes, as the name
+             :class:`pyramid.view.bfg_view`.
+
     The following arguments are supported as arguments to
-    ``bfg_view``: ``context``, ``permission``, ``name``,
-    ``request_type``, ``route_name``, ``request_method``,
+    :class:`pyramid.view.view_config``: ``context``, ``permission``,
+    ``name``, ``request_type``, ``route_name``, ``request_method``,
     ``request_param``, ``containment``, ``xhr``, ``accept``,
     ``header`` and ``path_info``.
 
@@ -274,9 +278,9 @@ class bfg_view(object):
     predicates return ``True``.
 
     Any individual or all parameters can be omitted.  The simplest
-    ``bfg_view`` declaration is::
+    :class:`pyramid.view.view_config` declaration is::
 
-        @bfg_view()
+        @view_config()
         def my_view(...):
             ...
 
@@ -286,14 +290,14 @@ class bfg_view(object):
     requests, with any ``REQUEST_METHOD``, any set of request.params
     values, without respect to any object in the :term:`lineage`.
 
-    The ``bfg_view`` decorator can also be used as a class decorator
+    The ``view_config`` decorator can also be used as a class decorator
     in Python 2.6 and better (Python 2.5 and below do not support
     class decorators)::
 
         from webob import Response
-        from pyramid.view import bfg_view
+        from pyramid.view import view_config
 
-        @bfg_view()
+        @view_config()
         class MyView(object):
             def __init__(self, context, request):
                 self.context = context
@@ -301,11 +305,11 @@ class bfg_view(object):
             def __call__(self):
                 return Response('hello from %s!' % self.context)
 
-    In Python 2.5 and below, the ``bfg_view`` decorator can still be
+    In Python 2.5 and below, the ``view_config`` decorator can still be
     used against a class, although not in decorator form::
 
         from webob import Response
-        from pyramid.view import bfg_view
+        from pyramid.view import view_config
 
         class MyView(object):
             def __init__(self, context, request):
@@ -314,7 +318,7 @@ class bfg_view(object):
             def __call__(self):
                 return Response('hello from %s!' % self.context)
 
-        MyView = bfg_view()(MyView)
+        MyView = view_config()(MyView)
 
     .. note:: When a view is a class, the calling semantics are
               different than when it is a function or another
@@ -323,22 +327,23 @@ class bfg_view(object):
 
     .. warning:: Using a class as a view is a new feature in 0.8.1+.
 
-    The bfg_view decorator can also be used against a class method::
+    The ``view_config`` decorator can also be used against a class
+    method::
 
         from webob import Response
-        from pyramid.view import bfg_view
+        from pyramid.view import view_config
 
         class MyView(object):
             def __init__(self, context, request):
                 self.context = context
                 self.request = request
 
-            @bfg_view(name='hello')
+            @view_config(name='hello')
             def amethod(self):
                 return Response('hello from %s!' % self.context)
 
-    When the ``bfg_view`` decorator is used against a class method, a
-    view is registered for the *class* (as described above), so the
+    When the ``view_config`` decorator is used against a class method,
+    a view is registered for the *class* (as described above), so the
     class constructor must accept either ``request`` or ``context,
     request``.  The method which is decorated must return a response
     (or rely on a :term:`renderer` to generate one). Using the
@@ -349,9 +354,9 @@ class bfg_view(object):
     spelled equivalently as::
 
         from webob import Response
-        from pyramid.view import bfg_view
+        from pyramid.view import view_config
 
-        @bfg_view(attr='amethod', name='hello')
+        @view_config(attr='amethod', name='hello')
         class MyView(object):
             def __init__(self, context, request):
                 self.context = context
@@ -360,11 +365,7 @@ class bfg_view(object):
             def amethod(self):
                 return Response('hello from %s!' % self.context)
 
-    .. warning:: The ability to use the ``bfg_view`` decorator as a
-                 method decorator is new in :mod:`pyramid` version
-                 1.1.
-
-    To make use of any ``bfg_view`` declaration, you must perform a
+    To make use of any ``view_config`` declaration, you must perform a
     :term:`scan`.  To do so, either insert the following boilerplate
     into your application registry's ZCML::
     
@@ -430,6 +431,8 @@ class bfg_view(object):
                 settings['renderer'] = resource
 
         return wrapped
+
+bfg_view = view_config # permanent b/c
 
 def default_exceptionresponse_view(context, request):
     if not isinstance(context, Exception):

@@ -31,10 +31,27 @@ Features (delta from BFG 1.3.X)
 - Using ``request.session`` now returns a (dictionary-like) session
   object if a session factory has been configured.
 
+- New module: ``pyramid.personality.pylons``: contains Pylons-specific
+  features.
+
+- The request now has a new attribute: ``tmpl_context`` for benefit of
+  Pylons users.
+
+- The decorator previously known as ``pyramid.view.bfg_view`` is now
+  known most formally as ``pyramid.view.view_config`` in docs and
+  paster templates.  An import of ``pyramid.view.bfg_view``, however,
+  will continue to work "forever".
+
 Documentation (delta from BFG 1.3)
 -----------------------------------
 
 - Added a ``pyramid.httpexceptions`` API documentation chapter.
+
+- Added a ``pyramid.session`` API documentation chapter.
+
+- Added a ``Session Objects`` narrative documentation chapter.
+
+- Added an API chapter for the ``pyramid.personality`` module.
 
 Backwards Incompatibilities (with BFG 1.3.X)
 --------------------------------------------

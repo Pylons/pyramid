@@ -556,7 +556,7 @@ subscriber of a :class:`pyramid.interfaces.INewRequest` event).
 Registering Configuration Decorators
 ------------------------------------
 
-Decorators such as :class:`pyramid.view.bfg_view` don't change the
+Decorators such as :class:`pyramid.view.view_config` don't change the
 behavior of the functions or classes they're decorating.  Instead,
 when a :term:`scan` is performed, a modified version of the function
 or class is registered with :mod:`pyramid`.

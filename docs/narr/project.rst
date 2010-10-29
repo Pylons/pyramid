@@ -21,6 +21,9 @@ templates".
    single: pyramid_zodb paster template
    single: pyramid_alchemy paster template
    single: pyramid_routesalchemy paster template
+   single: pylons_minimal paster template
+   single: pylons_basic paster template
+   single: pylons_sqla paster template
 
 .. _additional_paster_templates:
 
@@ -51,6 +54,18 @@ The included templates are these:
 ``pyramid_alchemy``
   URL mapping via :term:`traversal` and persistence via
   :term:`SQLAlchemy`
+
+``pylons_minimal``
+  URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
+  minimal setup.
+
+``pylons_basic``
+  URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
+  and some extra functionality.
+
+``pylons_sqla``
+  URL mapping via :term:`URL dispatch` and Pylons-style view handlers,
+  some extra functionality, and SQLAlchemy set up.
 
 Each of these project templates uses :term:`ZCML` instead of
 :term:`imperative configuration`.  Each also makes the assumption that

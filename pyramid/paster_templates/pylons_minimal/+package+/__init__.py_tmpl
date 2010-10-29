@@ -1,0 +1,21 @@
+from pyramid_beaker import session_factory_from_settings
+from pyramid.personality.pylons import renderer_globals_factory_config
+
+def main(global_config, **settings):
+    """ This function returns a Pyramid WSGI application.
+    """
+    from pyramid.configuration import Configurator
+    config = Configurator(settings=settings)
+    config.begin()
+    session_factory = session_factory_from_settings(settings)
+    config.set_session_factory(session_factory)
+    # XXX add caching setup
+    globals_factory = renderer_globals_factory_config(None)
+    config.set_renderer_globals_factory(globals_factory)
+    config.add_static_view('static', '{{package}}:static/')
+    config.add_handler('action', '/{action}', '{{package}}.handlers:MyHandler')
+    config.add_handler('home', '/', '{{package}}.handlers:MyHandler',
+                       action='index')
+    config.end()
+    return config.make_wsgi_app()
+
