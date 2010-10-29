@@ -127,6 +127,9 @@ Some gotchas:
   When in doubt, call ``changed()`` after you've changed sessioning
   data.
 
+.. index::
+   single: pyramid_beaker
+
 Using Alternate Session Factories
 ---------------------------------
 
@@ -138,6 +141,9 @@ based sessions, and encrypted cookie-based sessions.  See
 `http://github.com/Pylons/pyramid_beaker
 <http://github.com/Pylons/pyramid_beaker>`_ for more information about
 ``pyramid_beaker``.
+
+.. index::
+   single: session factory
 
 Creating Your Own Session Factory
 ---------------------------------
