@@ -151,7 +151,7 @@ class Request(WebobRequest):
         if factory is None:
             raise ConfigurationError(
                 'No session factory registered '
-                '(use ``config.add_session_factory``)')
+                '(see the Session Objects chapter of the documentation)')
         return factory(self)
 
     # override default WebOb "environ['adhoc_attr']" mutation behavior

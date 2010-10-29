@@ -25,6 +25,7 @@ documentation is organized alphabetically by module name.
    api/router
    api/scripting
    api/security
+   api/session
    api/settings
    api/testing
    api/threadlocal

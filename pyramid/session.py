@@ -49,6 +49,52 @@ def InsecureCookieSessionFactoryConfig(
     cookie_httponly=False,
     cookie_on_exception=False,
     ):
+    """
+    Configure a :term:`session factory` which will provide insecure
+    (but signed) cookie-based sessions.  The return value of this
+    function is a :term:`session factory`, which may be provided as
+    the ``session_factory`` argument of a
+    :class:`pyramid.configuration.Configurator` constructor, or used
+    as the ``session_factory`` argument of the
+    :meth:`pyramid.configuration.Configurator.set_session_factory`
+    method.
+
+    The session factory returned by this function will create sessions
+    which are limited to storing fewer than 4000 bytes of data (as the
+    payload must fit into a single cookie).
+
+    Parameters:
+
+    ``secret``
+      A string which is used to sign the cookie.
+
+    ``timeout``
+      A number of seconds of inactivity before a session times out.
+
+    ``cookie_name``
+      The name of the cookie used for sessioning.  Default: ``session``.
+
+    ``cookie_max_age``
+      The maximum age of the cookie used for sessioning (in seconds).
+      Default: ``None`` (browser scope).
+
+    ``cookie_path``
+      The path used for the session cookie.  Default: ``/``.
+
+    ``cookie_domain``
+      The domain used for the session cookie.  Default: ``None`` (no domain).
+
+    ``cookie_secure``
+      The 'secure' flag of the session cookie.  Default: ``False``.
+
+    ``cookie_httponly``
+      The 'httpOnly' flag of the session cookie.  Default: ``False``.
+
+    ``cookie_on_exception``
+      If ``True``, set a session cookie even if an exception occurs
+      while rendering a view.  Default: ``False``.
+
+    """
 
     class InsecureCookieSessionFactory(dict):
         """ Dictionary-like session object """

@@ -241,7 +241,7 @@ application:
 
 When a default permission is registered:
 
-- if a view configuration names an explicit ``permission`, the default
+- if a view configuration names an explicit ``permission``, the default
   permission is ignored for that view registration, and the
   view-configuration-named permission is used.
 

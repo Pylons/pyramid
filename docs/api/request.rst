@@ -85,3 +85,11 @@
      of ``request.exception`` will be ``None`` within response and
      finished callbacks.
 
+   .. attribute:: session
+
+     If a :term:`session factory` has been configured, this attribute
+     will represent the current user's :term:`session` object.  If a
+     session factory *has not* been configured, requesting the
+     ``request.session`` attribute will cause a
+     :class:`pyramid.exceptions.ConfigurationError` to be raised.
+
