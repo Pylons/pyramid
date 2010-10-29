@@ -30,6 +30,13 @@ class TestInsecureCookieSession(unittest.TestCase):
         session = self._makeOne(request)
         self.assertEqual(dict(session), {})
 
+    def test_ctor_with_bad_cookie(self):
+        request = testing.DummyRequest()
+        cookieval = 'abc'
+        request.cookies['session'] = cookieval
+        session = self._makeOne(request)
+        self.assertEqual(dict(session), {})
+
     def test_changed(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
