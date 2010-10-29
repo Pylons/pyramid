@@ -87,3 +87,5 @@
 - Maybe make renderer globals lookup send an event?
 
 - bfgshell
+
+- ``docs`` directory for each paster template.

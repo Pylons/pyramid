@@ -1,7 +1,15 @@
-In order to add a feature to this package:
+Hacking on Pyramid
+==================
+
+Here are some guidelines about hacking on Pyramid.
+
+Adding Features
+---------------
+
+In order to add a feature to Pyramid:
 
 - The feature must be documented in both the API and narrative
-  documentation (in docs/).
+  documentation (in ``docs/``).
 
 - The feature must work fully on the following CPython versions: 2.4,
   2.5, 2.6, and 2.7 on both UNIX and Windows.
@@ -19,6 +27,38 @@ In order to add a feature to this package:
   be discussed).
 
 The above requirements are relaxed for paster template dependencies.
-If a paster template has a dependency on something that doesn't work
-on a particular platform, that caveat should be spelled out clearly in
-*its* documentation (within docs/).
+If a paster template has an install-time dependency on something that
+doesn't work on a particular platform, that caveat should be spelled
+out clearly in *its* documentation (within its ``docs/`` directory).
+
+Coding Style
+------------
+
+- PEP8 compliance.  Whitespace rules are relaxed: not necessary to put
+  2 newlines between classes.  But 80-column lines, in particular, are
+  mandatory.
+
+Test Coverage
+-------------
+
+- The codebase *must* have 100% test statement coverage after each
+  commit.  You can test coverage via ``python setup.py nosetests
+  --with-coverage`` (requires the ``nose`` and ``coverage`` packages).
+
+Documentation Coverage
+----------------------
+
+- If you fix a bug, and the bug requires an API or behavior
+  modification, all documentation in this package which references
+  that API or behavior must change to reflect the bug fix, ideally in
+  the same commit that fixes the bug or adds the feature.
+
+Change Log
+----------
+
+- Feature additions and bugfixes must be added to the ``CHANGES.txt``
+  file in the prevailing style.  Changelog entries should be long and
+  descriptive, not cryptic.  Other developers should be able to know
+  what your changelog entry means.
+
+
