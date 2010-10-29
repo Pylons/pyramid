@@ -186,6 +186,11 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(default_permission='view')
         self.assertEqual(config.registry.getUtility(IDefaultPermission), 'view')
 
+    def test_ctor_session_factory(self):
+        from pyramid.interfaces import ISessionFactory
+        config = self._makeOne(session_factory='factory')
+        self.assertEqual(config.registry.getUtility(ISessionFactory), 'factory')
+
     def test_with_package_module(self):
         from pyramid.tests import test_configuration
         import pyramid.tests
@@ -2476,6 +2481,13 @@ class ConfiguratorTests(unittest.TestCase):
         config.set_default_permission('view')
         self.assertEqual(config.registry.getUtility(IDefaultPermission),
                          'view')
+
+    def test_set_session_factory(self):
+        from pyramid.interfaces import ISessionFactory
+        config = self._makeOne()
+        config.set_session_factory('factory')
+        self.assertEqual(config.registry.getUtility(ISessionFactory),
+                         'factory')
 
     def test_add_translation_dirs_missing_dir(self):
         from pyramid.exceptions import ConfigurationError
