@@ -1576,10 +1576,10 @@ class Configurator(object):
         :class:`pyramid.view.view_config``.  If this is not desirable
         because the codebase has other Venusian-using decorators that
         aren't meant to be invoked during a particular scan, use
-        ``('bfg',)`` as a ``categories`` value to limit the execution
+        ``('pyramid',)`` as a ``categories`` value to limit the execution
         of decorator callbacks to only those registered by
         :mod:`pyramid` itself.  Or pass a sequence of Venusian scan
-        categories as necessary (e.g. ``('bfg', 'myframework')``) to
+        categories as necessary (e.g. ``('pyramid', 'myframework')``) to
         limit the decorators called to the set of categories required.
         """
         package = self.maybe_dotted(package)
@@ -1917,7 +1917,7 @@ class Configurator(object):
         The ``name`` argument to ``add_static_view`` is usually a
         :term:`view name`.  When this is the case, the
         :func:`pyramid.url.static_url` API will generate a URL
-        which points to a BFG view, which will serve up a set of
+        which points to a Pyramid view, which will serve up a set of
         resources that live in the package itself. For example:
 
         .. code-block:: python
@@ -1935,7 +1935,7 @@ class Configurator(object):
         that represents a simple view name, as it is above, subsequent
         calls to :func:`pyramid.url.static_url` with paths that
         start with the ``path`` argument passed to ``add_static_view``
-        will generate a URL something like ``http://<BFG app
+        will generate a URL something like ``http://<Pyramid app
         URL>/images/logo.png``, which will cause the ``logo.png`` file
         in the ``images`` subdirectory of the ``mypackage`` package to
         be served.
@@ -2446,7 +2446,7 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
         if requestonly(view, attr):
             # its __init__ accepts only a single request argument,
             # instead of both context and request
-            def _bfg_class_requestonly_view(context, request):
+            def _class_requestonly_view(context, request):
                 inst = view(request)
                 if attr is None:
                     response = inst()
@@ -2459,10 +2459,10 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
                         response = helper.render_to_response(response, system,
                                                              request=request)
                 return response
-            wrapped_view = _bfg_class_requestonly_view
+            wrapped_view = _class_requestonly_view
         else:
             # its __init__ accepts both context and request
-            def _bfg_class_view(context, request):
+            def _class_view(context, request):
                 inst = view(context, request)
                 if attr is None:
                     response = inst()
@@ -2475,12 +2475,12 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
                         response = helper.render_to_response(response, system,
                                                              request=request)
                 return response
-            wrapped_view = _bfg_class_view
+            wrapped_view = _class_view
 
     elif requestonly(view, attr):
         # its __call__ accepts only a single request argument,
         # instead of both context and request
-        def _bfg_requestonly_view(context, request):
+        def _requestonly_view(context, request):
             if attr is None:
                 response = view(request)
             else:
@@ -2493,10 +2493,10 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
                     response = helper.render_to_response(response, system,
                                                          request=request)
             return response
-        wrapped_view = _bfg_requestonly_view
+        wrapped_view = _requestonly_view
 
     elif attr:
-        def _bfg_attr_view(context, request):
+        def _attr_view(context, request):
             response = getattr(view, attr)(context, request)
             if helper is not None:
                 if not is_response(response):
@@ -2505,7 +2505,7 @@ def _map_view(view, attr=None, renderer_name=None, registry=None,
                     response = helper.render_to_response(response, system,
                                                          request=request)
             return response
-        wrapped_view = _bfg_attr_view
+        wrapped_view = _attr_view
 
     elif helper is not None:
         def _rendered_view(context, request):

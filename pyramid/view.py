@@ -408,7 +408,7 @@ class view_config(object):
         def callback(context, name, ob):
             context.config.add_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category='bfg')
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or

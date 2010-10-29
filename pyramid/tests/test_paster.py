@@ -1,12 +1,12 @@
 import unittest
 
-class TestBFGShellCommand(unittest.TestCase):
+class TestPShellCommand(unittest.TestCase):
     def _getTargetClass(self):
-        from pyramid.paster import BFGShellCommand
-        return BFGShellCommand
+        from pyramid.paster import PShellCommand
+        return PShellCommand
 
     def _makeOne(self):
-        return self._getTargetClass()('bfgshell')
+        return self._getTargetClass()('pshell')
 
     def test_command_ipython_disabled(self):
         command = self._makeOne()

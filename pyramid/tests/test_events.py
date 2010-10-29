@@ -151,7 +151,8 @@ class TestSubscriber(unittest.TestCase):
         dec.venusian = dummy_venusian
         def foo(): pass
         dec(foo)
-        self.assertEqual(dummy_venusian.attached, [(foo, dec.register, 'bfg')])
+        self.assertEqual(dummy_venusian.attached,
+                         [(foo, dec.register, 'pyramid')])
 
 class DummyConfigurator(object):
     def __init__(self):

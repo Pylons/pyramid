@@ -472,7 +472,7 @@ class TestAuthTktAuthenticationPolicyDirective(unittest.TestCase):
                           cookie_name='repoze.bfg.auth_tkt',
                           secure=True, include_ip=True, timeout=100,
                           reissue_time=500, http_only=True,
-                          path="/cgi-bin/bfg.cgi/")
+                          path="/cgi-bin/app.cgi/")
 
 class TestACLAuthorizationPolicyDirective(unittest.TestCase):
     def setUp(self):

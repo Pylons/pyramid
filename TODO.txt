@@ -66,15 +66,11 @@
 
 - .flash API on session.
 
-- Signed_signature method of the request and response from pylons2.
-
 - Provide a webob.Response class facade for forward compat.
 
 - CRSF token machinery
 
 - Mako docs (in templating chapter).
-
-- Paster template that has Mako.
 
 - ``add_handler`` documentation.
 
@@ -86,6 +82,16 @@
 
 - Maybe make renderer globals lookup send an event?
 
-- bfgshell
-
 - ``docs`` directory for each paster template.
+
+- bfg.routes.matchdict and bfg.routes.route
+
+- repoze.bfg.auth_tkt
+
+- bfg_locale_name
+
+- bfg_localizer
+
+- __bfg_abspath__
+
+- "BFG" in environ variables.

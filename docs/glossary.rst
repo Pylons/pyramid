@@ -572,7 +572,6 @@ Glossary
      of code in a package.
 
    configuration decoration
-
      Metadata implying one or more :term:`configuration declaration`
      invocations.  Often set by configuration Python :term:`decorator`
      attributes, such as :class:`pyramid.view.view_config`, aka
