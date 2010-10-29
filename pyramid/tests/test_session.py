@@ -12,8 +12,8 @@ class TestInsecureCookieSession(unittest.TestCase):
         self.assertEqual(dict(session), {})
 
     def _serialize(self, accessed, state, secret='secret'):
-        from pyramid.session import serialize
-        return serialize((accessed, accessed, state), secret)
+        from pyramid.session import signed_serialize
+        return signed_serialize((accessed, accessed, state), secret)
         
     def test_ctor_with_cookie_still_valid(self):
         import time
@@ -172,22 +172,22 @@ def serialize(data, secret):
     sig = hmac.new(secret, pickled, sha1).hexdigest()
     return sig + base64.standard_b64encode(pickled)
 
-class Test_serialize(unittest.TestCase):
+class Test_signed_serialize(unittest.TestCase):
     def _callFUT(self, data, secret):
-        from pyramid.session import serialize
-        return serialize(data, secret)
+        from pyramid.session import signed_serialize
+        return signed_serialize(data, secret)
 
     def test_it(self):
         expected = serialize('123', 'secret')
         result = self._callFUT('123', 'secret')
         self.assertEqual(result, expected)
         
-class Test_deserialize(unittest.TestCase):
+class Test_signed_deserialize(unittest.TestCase):
     def _callFUT(self, serialized, secret, hmac=None):
         if hmac is None:
             import hmac
-        from pyramid.session import deserialize
-        return deserialize(serialized, secret, hmac=hmac)
+        from pyramid.session import signed_deserialize
+        return signed_deserialize(serialized, secret, hmac=hmac)
 
     def test_it(self):
         serialized = serialize('123', 'secret')
@@ -196,8 +196,7 @@ class Test_deserialize(unittest.TestCase):
 
     def test_invalid_bits(self):
         serialized = serialize('123', 'secret')
-        result = self._callFUT(serialized, 'seekrit')
-        self.assertEqual(result, None)
+        self.assertRaises(ValueError, self._callFUT, serialized, 'seekrit')
 
     def test_invalid_len(self):
         class hmac(object):
@@ -206,13 +205,12 @@ class Test_deserialize(unittest.TestCase):
             def hexdigest(self):
                 return '1234'
         serialized = serialize('123', 'secret123')
-        result = self._callFUT(serialized, 'secret', hmac=hmac())
-        self.assertEqual(result, None)
+        self.assertRaises(ValueError, self._callFUT, serialized, 'secret',
+                          hmac=hmac())
         
     def test_it_bad_encoding(self):
         serialized = 'bad' + serialize('123', 'secret')
-        result = self._callFUT(serialized, 'secret')
-        self.assertEqual(result, None)
+        self.assertRaises(ValueError, self._callFUT, serialized, 'secret')
         
 
 class DummySessionFactory(dict):

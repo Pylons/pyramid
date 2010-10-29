@@ -110,9 +110,15 @@ def InsecureCookieSessionFactoryConfig(
             now = time.time()
             created = accessed = now
             new = True
-            cookieval = request.cookies.get(self._cookie_name)
-            value = deserialize(cookieval, self._secret)
+            value = None
             state = {}
+            cookieval = request.cookies.get(self._cookie_name)
+            if cookieval is not None:
+                try:
+                    value = signed_deserialize(cookieval, self._secret)
+                except ValueError:
+                    value = None
+
             if value is not None:
                 accessed, created, state = value
                 new = False
@@ -162,7 +168,7 @@ def InsecureCookieSessionFactoryConfig(
                 exception = getattr(self.request, 'exception', None)
                 if exception is not None: # dont set a cookie during exceptions
                     return False
-            cookieval = serialize(
+            cookieval = signed_serialize(
                 (self.accessed, self.created, dict(self)), self._secret
                 )
             if len(cookieval) > 4064:
@@ -193,22 +199,43 @@ def InsecureCookieSessionFactoryConfig(
 
     return InsecureCookieSessionFactory
 
-def serialize(data, secret):
+def signed_serialize(data, secret):
+    """ Serialize any pickleable structure (``data``) and sign it
+    using the ``secret`` (must be a string).  Return the
+    serialization, which includes the signature as its first 40 bytes.
+    The ``signed_deserialize`` method will deserialize such a value.
+
+    This function is useful for creating signed cookies.  For example:
+
+    .. code-block:: python
+
+       cookieval = signed_serialize({'a':1}, 'secret')
+       response.set_cookie('signed_cookie', cookieval)
+    """
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
     sig = hmac.new(secret, pickled, sha1).hexdigest()
     return sig + base64.standard_b64encode(pickled)
 
-def deserialize(serialized, secret, hmac=hmac):
-    # hmac parameterized only for unit tests
-    if serialized is None:
-        return None
+def signed_deserialize(serialized, secret, hmac=hmac):
+    """ Deserialize the value returned from ``signed_serialize``.  If
+    the value cannot be deserialized for any reason, a
+    :exc:`ValueError` exception will be raised.
 
+    This function is useful for deserializing a signed cookie value
+    created by ``signed_serialize``.  For example:
+
+    .. code-block:: python
+
+       cookieval = request.cookies['signed_cookie']
+       data = signed_deserialize(cookieval, 'secret')
+    """
+    # hmac parameterized only for unit tests
     try:
         input_sig, pickled = (serialized[:40],
                               base64.standard_b64decode(serialized[40:]))
-    except (binascii.Error, TypeError):
+    except (binascii.Error, TypeError), e:
         # Badly formed data can make base64 die
-        return None
+        raise ValueError('Badly formed base64 data: %s' % e)
 
     sig = hmac.new(secret, pickled, sha1).hexdigest()
 
@@ -216,7 +243,7 @@ def deserialize(serialized, secret, hmac=hmac):
     # have no idea what it means)
 
     if len(sig) != len(input_sig):
-        return None
+        raise ValueError('Wrong signature length')
 
     invalid_bits = 0
 
@@ -224,7 +251,7 @@ def deserialize(serialized, secret, hmac=hmac):
         invalid_bits += a != b
 
     if invalid_bits:
-        return None
+        raise ValueError('Invalid bits in signature')
 
     return pickle.loads(pickled)
 

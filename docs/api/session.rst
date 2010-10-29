@@ -7,3 +7,8 @@
 
   .. autofunction:: InsecureCookieSessionFactoryConfig
 
+  .. autofunction:: signed_serialize
+
+  .. autofunction:: signed_deserialize
+
+
