@@ -160,7 +160,7 @@ html_last_updated_fmt = '%b %d, %Y'
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'repozebfg'
+htmlhelp_basename = 'pyramid'
 
 # Options for LaTeX output
 # ------------------------
@@ -174,7 +174,7 @@ latex_font_size = '10pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('latexindex', 'repozebfg.tex',
+  ('latexindex', 'pyramid.tex',
    'The Pyramid Web Application Development Framework',
    'Chris McDonough', 'manual'),
     ]
