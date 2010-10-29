@@ -13,7 +13,7 @@ class TestInsecureCookieSession(unittest.TestCase):
 
     def _serialize(self, accessed, state, secret='secret'):
         from pyramid.session import serialize
-        return serialize((accessed, accessed, accessed, state), secret)
+        return serialize((accessed, accessed, state), secret)
         
     def test_ctor_with_cookie_still_valid(self):
         import time
@@ -154,21 +154,6 @@ class Test_manage_accessed(unittest.TestCase):
         result = callbacks[0](request, response)
         self.assertEqual(result, None)
         self.assertEqual(session.response, response)
-
-class Test_manage_modified(Test_manage_accessed):
-    def _makeOne(self, wrapped):
-        from pyramid.session import manage_modified
-        return manage_modified(wrapped)
-
-    def test_modified_set(self):
-        request = testing.DummyRequest()
-        session = DummySessionFactory(request)
-        session.modified = None
-        session.accessed = None
-        wrapper = self._makeOne(session.__class__.__setitem__)
-        wrapper(session, 'a', 1)
-        self.assertNotEqual(session.accessed, None)
-        self.assertNotEqual(session.modified, None)
 
 def serialize(data, secret):
     try:

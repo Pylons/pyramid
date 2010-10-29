@@ -88,9 +88,6 @@ two extra methods.
 
 Extra attributes:
 
-``modified``
-  An integer timestamp indicating the last time the session was modified.
-
 ``created``
   An integer timestamp indicating the time that this session was created.
 

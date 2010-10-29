@@ -30,14 +30,6 @@ def manage_accessed(wrapped):
     accessed.__doc__ = wrapped.__doc__
     return accessed
 
-def manage_modified(wrapped):
-    accessed = manage_accessed(wrapped)
-    def modified(session, *arg, **kw):
-        session.modified = int(time.time())
-        return accessed(session, *arg, **kw)
-    modified.__doc__ = accessed.__doc__
-    return modified
-
 def InsecureCookieSessionFactoryConfig(
     secret,
     timeout=1200,
@@ -116,20 +108,19 @@ def InsecureCookieSessionFactoryConfig(
         def __init__(self, request):
             self.request = request
             now = time.time()
-            created = accessed = modified = now
+            created = accessed = now
             new = True
             cookieval = request.cookies.get(self._cookie_name)
             value = deserialize(cookieval, self._secret)
             state = {}
             if value is not None:
-                accessed, created, modified, state = value
+                accessed, created, state = value
                 new = False
                 if now - accessed > self._timeout:
                     state = {}
 
             self.created = created
             self.accessed = accessed
-            self.modified = modified
             self.new = new
             dict.__init__(self, state)
 
@@ -157,13 +148,13 @@ def InsecureCookieSessionFactoryConfig(
         __iter__ = manage_accessed(dict.__iter__)
 
         # modifying dictionary methods
-        clear = manage_modified(dict.clear)
-        update = manage_modified(dict.update)
-        setdefault = manage_modified(dict.setdefault)
-        pop = manage_modified(dict.pop)
-        popitem = manage_modified(dict.popitem)
-        __setitem__ = manage_modified(dict.__setitem__)
-        __delitem__ = manage_modified(dict.__delitem__)
+        clear = manage_accessed(dict.clear)
+        update = manage_accessed(dict.update)
+        setdefault = manage_accessed(dict.setdefault)
+        pop = manage_accessed(dict.pop)
+        popitem = manage_accessed(dict.popitem)
+        __setitem__ = manage_accessed(dict.__setitem__)
+        __delitem__ = manage_accessed(dict.__delitem__)
 
         # non-API methods
         def _set_cookie(self, response):
@@ -172,8 +163,7 @@ def InsecureCookieSessionFactoryConfig(
                 if exception is not None: # dont set a cookie during exceptions
                     return False
             cookieval = serialize(
-                (self.accessed, self.created, self.modified, dict(self)),
-                self._secret
+                (self.accessed, self.created, dict(self)), self._secret
                 )
             if len(cookieval) > 4064:
                 raise ValueError(
