@@ -760,7 +760,7 @@ code.
 Pyramid Is Too Big
 ------------------
 
-"The :mod:`pyramid` compressed tarball is 1MB.  It must be
+"The :mod:`pyramid` compressed tarball is almost 2MB.  It must be
 enormous!"
 
 No.  We just ship it with test code and helper templates.  Here's a
@@ -768,26 +768,26 @@ breakdown of what's included in subdirectories of the package tree:
 
 docs/
 
-  2.2MB
+  3.0MB
 
-repoze/bfg/tests
+pyramid/tests/
 
-  580KB
+  1.1MB
 
-repoze/bfg/paster_templates
+pyramid/paster_templates/
 
-  372KB
+  804KB
 
-repoze/bfg (except for ``repoze/bfg/tests and repoze/bfg/paster_templates``)
+pyramid/ (except for ``pyramd/tests and pyramid/paster_templates``)
 
-  316K
+  539K
 
-The actual :mod:`pyramid` runtime code is about 10% of the total
-size of the tarball omitting docs, helper templates used for package
+The actual :mod:`pyramid` runtime code is about 10% of the total size
+of the tarball omitting docs, helper templates used for package
 generation, and test code.  Of the approximately 13K lines of Python
 code in the package, the code that actually has a chance of executing
 during normal operation, excluding tests and paster template Python
-files, accounts for approximately 3K lines of Python code.  This is
+files, accounts for approximately 5K lines of Python code.  This is
 comparable to Pylons, which ships with a little over 2K lines of
 Python code, excluding tests.
 

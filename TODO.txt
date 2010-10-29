@@ -85,3 +85,5 @@
 - Try to get rid of Mako Beaker dependency.
 
 - Maybe make renderer globals lookup send an event?
+
+- bfgshell

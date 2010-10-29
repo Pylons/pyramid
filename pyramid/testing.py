@@ -55,7 +55,7 @@ def registerDummySecurityPolicy(userid=None, groupids=(), permissive=True):
 
     .. warning:: This API is deprecated as of :mod:`pyramid` 1.0.
        Instead use the
-       :meth:`repoze.bfg.configuration.Configurator.testing_securitypolicy`
+       :meth:`pyramid.configuration.Configurator.testing_securitypolicy`
        method in your unit and integration tests.
     """
     registry = get_current_registry()

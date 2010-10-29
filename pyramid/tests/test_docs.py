@@ -20,7 +20,7 @@ if 0:
             m += manuel.capture.Manuel()
             docs = []
 
-            egg_path = pkg_resources.get_distribution('repoze.bfg').location
+            egg_path = pkg_resources.get_distribution('pyramid').location
             path = os.path.join(egg_path, 'docs')
             for root, dirs, files in os.walk(path):
                 for ignore in ('.svn', '.build', '.hg', '.git', 'CVS'):
