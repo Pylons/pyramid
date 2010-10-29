@@ -129,6 +129,7 @@ Some gotchas:
 
 .. index::
    single: pyramid_beaker
+   single: Beaker
 
 Using Alternate Session Factories
 ---------------------------------
