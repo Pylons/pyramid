@@ -95,3 +95,5 @@
 - __bfg_abspath__
 
 - "BFG" in environ variables.
+
+- request.link (route_url)
