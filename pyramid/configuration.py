@@ -1865,7 +1865,20 @@ class Configurator(object):
         The ``cache_max_age`` keyword argument is input to set the
         ``Expires`` and ``Cache-Control`` headers for static resources
         served.  Note that this argument has no effect when the
-        ``name`` is a *url prefix*.
+        ``name`` is a *url prefix*.  By default, this argument is
+        ``None``, meaning that no particular Expires or Cache-Control
+        headers are set in the response.
+
+        The ``permission`` keyword argument is used to specify the
+        :term:`permission` required by a user to execute the static
+        view.  By default, it is the string
+        ``__no_permission_required__``.  The
+        ``__no_permission_required__`` string is a special sentinel
+        which indicates that, even if a :term:`default permission`
+        exists for the current application, the static view should be
+        renderered to completely anonymous users.  This default value
+        is permissive because, in most web apps, static resources
+        seldom need protection from viewing.
 
         *Usage*
 

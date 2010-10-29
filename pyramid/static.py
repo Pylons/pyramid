@@ -140,11 +140,13 @@ class StaticURLInfo(object):
             cache_max_age = extra.pop('cache_max_age', None)
             view = static_view(spec, cache_max_age=cache_max_age)
             # register a route using this view
+            permission = extra.pop('permission', '__no_permission_required__')
             self.config.add_route(
                 name,
                 "%s*subpath" % name, # name already ends with slash
                 view=view,
                 view_for=self.__class__,
+                view_permission=permission,
                 factory=lambda *x: self,
                 _info=_info
                 )

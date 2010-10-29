@@ -315,9 +315,22 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(config.kw['_info'], None)
         self.assertEqual(config.kw['view_for'], self._getTargetClass())
         self.assertEqual(config.kw['factory'](), inst)
+        self.assertEqual(config.kw['view_permission'],
+                         '__no_permission_required__')
         self.assertEqual(config.kw['view'].__class__, static_view)
         self.assertEqual(config.kw['view'].app.cache_max_age, 1)
         self.assertEqual(inst.registrations, expected)
+
+    def test_add_viewname_with_permission(self):
+        class Config:
+            def add_route(self, *arg, **kw):
+                self.arg = arg
+                self.kw = kw
+        config = Config()
+        inst = self._makeOne(config)
+        inst.add('view', 'anotherpackage:path', cache_max_age=1,
+                 permission='abc')
+        self.assertEqual(config.kw['view_permission'], 'abc')
 
 class DummyStartResponse:
     def __call__(self, status, headerlist, exc_info=None):
