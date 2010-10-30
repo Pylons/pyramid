@@ -27,8 +27,6 @@ try:
 except IOError:
     README = CHANGES = ''
 
-setup_requires = ['setuptools-git']
-
 install_requires=[
     'Chameleon >= 1.2.3',
     'Mako',
@@ -76,7 +74,6 @@ setup(name='pyramid',
       include_package_data=True,
       zip_safe=False,
       install_requires = install_requires,
-      setup_requires = setup_requires,
       tests_require = tests_require,
       test_suite="pyramid.tests",
       entry_points = """\

@@ -3,6 +3,51 @@ Hacking on Pyramid
 
 Here are some guidelines about hacking on Pyramid.
 
+Using a Development Checkout
+----------------------------
+
+Below is a quick start on creating a development environment using a Pyramid
+checkout.
+
+- Create a new directory somewhere and ``cd`` to it::
+
+  $ mkdir ~/hack-on-pyramid
+  $ cd ~/hack-on-pyramid
+
+- Check out a read-only copy of the Pyramid source::
+
+  $ git clone git://github.com/Pylons/pyramid.git
+
+  (alternately, create a writeable fork on GitHub and check that out).
+
+- Create a virtualenv in which to install Pyramid::
+
+  $ virtualenv2.6 --no-site-packages env
+
+- Install ``setuptools-git`` into the virtualenv (for good measure, as we're
+  using git to do version control)::
+
+  $ env/bin/easy_install setuptools-git
+
+- Install Pyramid from the checkout into the virtualenv using ``setup.py
+  develop`` (running ``setup.py develop`` *must* be done while the current
+  working directory is the ``pyramid`` checkout directory)::
+
+  $ cd pyramid
+  $ ../env/bin/python setup.py develop
+
+- At that point, you should be able to create new Pyramid projects by using
+  ``paster create``::
+
+  $ cd ../env
+  $ bin/paster create -t pyramid_starter starter
+
+- And install those projects (also using ``setup.py develop``) into the
+  virtualenv::
+
+  $ cd starter
+  $ ../bin/python setup.py develop
+
 Adding Features
 ---------------
 
