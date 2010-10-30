@@ -8,10 +8,9 @@ dynamic data provided by a :term:`view`.  :mod:`pyramid` offers a
 number of ways to perform templating tasks out of the box, and
 provides add-on templating support through a set of bindings packages.
 
-Out of the box, :mod:`pyramid` provides templating via the
-:term:`Chameleon` templating library.  :term:`Chameleon` provides
-support for two different types of templates: :term:`ZPT` templates
-and text templates.
+Out of the box, :mod:`pyramid` provides templating via the :term:`Chameleon`
+and :term:`Mako` templating libraries. :term:`Chameleon` provides support for
+two different types of templates: :term:`ZPT` templates and text templates.
 
 Before discussing how built-in templates are used in
 detail, we'll discuss two ways to render templates within
@@ -166,13 +165,11 @@ For example, here's an example of using raw `Mako
        response = Response(result)
        return response
 
-You probably wouldn't use this particular snippet in a project,
-because it's easier to use the Mako renderer bindings which already
-exist for :mod:`pyramid` named ``repoze.bfg.mako`` (available from
-`PyPI <http://pypi.python.org/pypi/repoze.bfg.mako>`_).  But if your
-favorite templating system is not supported as a renderer extension
-for :mod:`pyramid`, you can create your own simple combination as
-shown above.
+You probably wouldn't use this particular snippet in a project, because it's
+easier to use the Mako renderer bindings which already exist in
+:mod:`pyramid`. But if your favorite templating system is not supported as a
+renderer extension for :mod:`pyramid`, you can create your own simple
+combination as shown above.
 
 .. note::
 

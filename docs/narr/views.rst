@@ -564,6 +564,57 @@ attaching properties to the request.  See
 :ref:`response_request_attrs`.
 
 .. index::
+   pair: renderer; mako
+
+.. _mako_template_renderers:
+
+``*.mak`` or ``*.mako``: Mako Template Renderer
++++++++++++++++++++++++++++++++++++++++++++++++
+
+The ``Mako`` template renderer is a renderer which renders a Mako template.
+When used, the view must return a Response object or a Python *dictionary*.
+The dictionary items will then be used in the global template space. If the
+view callable returns anything but a Response object or a dictionary, an error
+will be raised.
+
+When using the ``renderer`` attribute to specify a Mako template, the template
+can be specified in two ways. First, a relative path can be used to name a
+Mako template relative to the configured Mako template directories. Second, a
+:term:`resource specification` can be used to locate a template to render.
+These two styles of naming a template to render also carry through to Mako
+templates, so that Mako template's can inherit using a :term:`resource
+specification` if desired.
+
+Here's an example view configuration which uses a relative path:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       name="hello"
+       renderer="foo.mak"
+       />
+
+It's important to note that in Mako's case, the 'relative' path name is not
+relative to the package, but is relative the the directory configured for
+Mako.
+
+Here's an example view configuration which uses a :term:`resource
+specification`:
+
+.. code-block:: xml
+   :linenos:
+
+   <view
+       context=".models.Hello"
+       view=".views.hello_world"
+       name="hello"
+       renderer="some.package:templates/foo.mak"
+       />
+
+.. index::
    single: response headers (from a renderer)
    single: renderer response headers
 

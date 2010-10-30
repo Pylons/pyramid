@@ -815,3 +815,7 @@ Glossary
       ``request`` (a :term:`request` object), returns a
       :term:`session` object.
 
+   Mako
+     `Mako <http://www.makotemplates.org/>`_ is a template language language
+     which refines the familiar ideas of componentized layout and inheritance
+     using Python with Python scoping and calling semantics.
