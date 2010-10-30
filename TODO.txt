@@ -102,3 +102,5 @@
 - Remove references to 'WebOb' Response and just call it 'Response', and note
   that it is imported from pyramid. API docs can mention its inheritance from
   webob.
+
+- Add docs for httpexceptions.
