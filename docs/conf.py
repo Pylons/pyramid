@@ -45,7 +45,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
               'repoze.sphinx.autointerface']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['.templates']
+templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -93,26 +93,28 @@ add_module_names = False
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = book and 'bw' or 'sphinx'
+pygments_style = book and 'bw' or 'tango'
 
 # Options for HTML output
 # -----------------------
 
+html_theme = "nature"
+
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
-html_style = 'repoze.css'
+html_style = 'pyramid.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = 'The Pyramid Web Application Development Framework v%release%'
+html_title = 'The Pyramid Web Application Development Framework v%s' % release
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.
-html_logo = '.static/logo_hi.png'
+html_logo = '_static/pyramid.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -122,7 +124,7 @@ html_logo = '.static/logo_hi.png'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['.static']
+html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -181,7 +183,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = '.static/logo_hi.png'
+latex_logo = '_static/pyramid.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
