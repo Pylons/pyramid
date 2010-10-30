@@ -11,6 +11,13 @@ class TestInsecureCookieSession(unittest.TestCase):
         session = self._makeOne(request)
         self.assertEqual(dict(session), {})
 
+    def test_instance_conforms(self):
+        from zope.interface.verify import verifyObject
+        from pyramid.interfaces import ISession
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        verifyObject(ISession, session)
+
     def _serialize(self, accessed, state, secret='secret'):
         from pyramid.session import signed_serialize
         return signed_serialize((accessed, accessed, state), secret)

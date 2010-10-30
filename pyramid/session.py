@@ -15,6 +15,10 @@ import binascii
 import time
 import base64
 
+from zope.interface import implements
+
+from pyramid.interfaces import ISession
+
 def manage_accessed(wrapped):
     """ Decorator which causes a cookie to be set when a wrapped
     method is called"""
@@ -90,6 +94,7 @@ def InsecureCookieSessionFactoryConfig(
 
     class InsecureCookieSessionFactory(dict):
         """ Dictionary-like session object """
+        implements(ISession)
 
         # configuration parameters
         _cookie_name = cookie_name
