@@ -70,8 +70,6 @@
 
 - CRSF token machinery
 
-- Mako docs (in templating chapter).
-
 - ``add_handler`` documentation.
 
 - ``handler`` ZCML directive.
@@ -100,3 +98,9 @@
   ``renderer``; pass a dictionary to each renderer instead of a string.
 
 - Test on GAE, Jython, PyPy, IronPython.
+
+- Remove references to 'WebOb' Response and just call it 'Response', and note
+  that it is imported from pyramid. API docs can mention its inheritance from
+  webob.
+
+- Add docs for httpexceptions.
