@@ -2,7 +2,7 @@
  * nature.css_t
  * ~~~~~~~~~~~~
  *
- * Sphinx stylesheet -- nature theme.
+ * Sphinx stylesheet -- pylons theme.
  *
  * :copyright: Copyright 2007-2010 by the Sphinx team, see AUTHORS.
  * :license: BSD, see LICENSE for details.
@@ -10,11 +10,12 @@
  */
  
 @import url("basic.css");
+@import url("nobile.css");
  
 /* -- page layout ----------------------------------------------------------- */
  
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Nobile", sans-serif;
     font-size: 100%;
     background-color: #111;
     color: #ffffff;
@@ -43,7 +44,7 @@ div.body {
     background-color: #ffffff;
     color: #3E4349;
     padding: 0 30px 30px 30px;
-    font-size: 0.9em;
+    font-size: 1em;
 }
  
 div.footer {
@@ -87,7 +88,7 @@ div.sphinxsidebarwrapper{
  
 div.sphinxsidebar h3,
 div.sphinxsidebar h4 {
-    font-family: Arial, sans-serif;
+    font-family: "Nobile", sans-serif;
     color: #000000;
     font-size: 1.2em;
     font-weight: normal;
@@ -167,7 +168,7 @@ div.body h3,
 div.body h4,
 div.body h5,
 div.body h6 {
-    font-family: Arial, sans-serif;
+    font-family: "Nobile", sans-serif;
     background-color: #ffffff;
     font-weight: normal;
     color: #144fb2;
@@ -255,7 +256,7 @@ tt {
 }
 
 .viewcode-back {
-    font-family: Arial, sans-serif;
+    font-family: "Nobile", sans-serif;
 }
 
 div.viewcode-block:target {
