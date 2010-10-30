@@ -614,6 +614,10 @@ specification`:
        renderer="some.package:templates/foo.mak"
        />
 
+The ``Mako`` template renderer can take additional arguments beyond the
+standard ``reload_templates`` setting, see the :ref:`environment_chapter` for
+additional :ref:`mako_template_renderer_settings`.
+
 .. index::
    single: response headers (from a renderer)
    single: renderer response headers
