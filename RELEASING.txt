@@ -1,0 +1,47 @@
+Releasing Pyramid
+=================
+
+- Make sure all unit tests pass and statement coverage is at 100%::
+
+  $ python setup.py nosetests --with-coverage
+
+- Ensure all features of the release are documented (audit CHANGES.txt or
+  communicate with contributors).
+
+- Copy relevant changes (delta bug fixes) from CHANGES.txt to
+  docs/whatsnew-X.X.
+
+- Make sure docs render OK::
+
+  $ cd docs
+  $ make clean html
+
+  There should be no meaningful errors or warnings.
+
+- Change setup.py __version__ to the new version number.
+
+- Change docs/conf.py version to the new version number.
+
+- Change CHANGES.txt heading to reflect the new version number.
+
+- Make sure PyPI long description renders (requires ``collective.dist``
+  installed into your Python)::
+
+  $ python setup.py check --restructuredtext
+
+- Create a release tag.
+
+- Release to PyPI::
+
+  $ python setup.py sdist register upload
+
+- Edit `http://wiki.python.org/moin/WebFrameworks
+  <http://wiki.python.org/moin/WebFrameworks>`_.
+
+- Publish new version of docs.
+
+- Announce to maillist.
+
+- Announce to Twitter.
+
+
