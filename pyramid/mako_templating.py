@@ -20,13 +20,25 @@ class IMakoLookup(Interface):
 
 
 class PkgResourceTemplateLookup(TemplateLookup):
+    """TemplateLookup subclass that handles resource specification
+    uri's"""
     def adjust_uri(self, uri, relativeto):
+        """Called from within a Mako template, avoids adjusting the
+        uri if it looks like a resource specification"""
         # Don't adjust pkg resource spec names
         if ':' in uri:
             return uri
         return TemplateLookup.adjust_uri(self, uri, relativeto)
 
     def get_template(self, uri):
+        """Fetch a template from the cache, or check the filesystem
+        for it
+        
+        In addition to the basic filesystem lookup, this subclass will
+        use pkg_resource to load a file using the resource
+        specification syntax.
+        
+        """
         if ':' not in uri:
             return TemplateLookup.get_template(self, uri)
         try:
