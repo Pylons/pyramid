@@ -151,12 +151,12 @@ p.sidebar-title {
 
 /* -- body styles ----------------------------------------------------------- */
  
-a {
+a, a .pre {
     color: #1b61d6;
     text-decoration: none;
 }
  
-a:hover {
+a:hover, a:hover .pre {
     color: #e88f00;
     text-decoration: underline;
 }
@@ -247,7 +247,7 @@ pre {
 }
  
 tt {
-    background-color: #ecf0f3;
+    background-color: transparent;
     color: #222;
     /* padding: 1px 2px; */
     font-size: 1.1em;
