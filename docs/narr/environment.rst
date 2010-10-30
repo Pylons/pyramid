@@ -140,6 +140,67 @@ The value supplied here is used as the default locale name when a
 |                                 |                             |
 +---------------------------------+-----------------------------+
 
+.. _mako_template_renderer_settings:
+
+Mako Template Render Settings
+-----------------------------
+
+Mako derives additional settings to configure its template renderer that
+should be set when using it. Many of these settings are optional and only need
+to be set if they should be different from the default. The Mako Template
+Renderer uses a subclass of Mako's `template lookup
+<http://www.makotemplates.org/docs/usage.html#usage_lookup>`_ and accepts
+several arguments to configure it.
+
+Mako Directories
+++++++++++++++++
+
+The value(s) supplied here are passed in as the template directories. They
+should be in :term:`resource specification` format, for example:
+``my.package:templates``.
+
++-----------------------------+
+| Config File Setting Name    |
++=============================+
+|  ``mako.directories``       |
+|                             |
+|                             |
+|                             |
++-----------------------------+
+
+Mako Module Directory
++++++++++++++++++++++
+
+The value supplied here tells Mako where to store compiled Mako templates. If
+omitted, compiled templates will be stored in memory. This value should be an
+absolute path, for example: ``%(here)s/data/templates`` would use a directory
+called ``data/templates`` in the same parent directory as the INI file.
+
++-----------------------------+
+| Config File Setting Name    |
++=============================+
+|  ``mako.module_directory``  |
+|                             |
+|                             |
+|                             |
++-----------------------------+
+
+Mako Input Encoding
++++++++++++++++++++
+
+The encoding that Mako templates are assumed to have. By default this is set
+to ``utf-8``. If you wish to use a different template encoding, this value
+should be changed accordingly.
+
++-----------------------------+
+| Config File Setting Name    |
++=============================+
+|  ``mako.input_encoding``__  |
+|                             |
+|                             |
+|                             |
++-----------------------------+
+
 Examples
 --------
 
