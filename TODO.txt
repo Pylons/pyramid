@@ -94,9 +94,6 @@
 
 - request.link (route_url)
 
-- renderer: make bfg_view and zcml view directive pass a dictionary as
-  ``renderer``; pass a dictionary to each renderer instead of a string.
-
 - Test on GAE, Jython, PyPy, IronPython.
 
 - Remove references to 'WebOb' Response and just call it 'Response', and note
